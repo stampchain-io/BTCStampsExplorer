@@ -3,31 +3,31 @@ name: Import Pattern Validation
 # Trigger on pull requests and pushes to main branch
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, dev]
     paths:
-      - '**/*.ts'
-      - '**/*.tsx'
-      - 'deno.json'
-      - '.github/workflows/validate-imports.yml'
-      - 'scripts/validate-import-patterns.ts'
+      - "**/*.ts"
+      - "**/*.tsx"
+      - "deno.json"
+      - ".github/workflows/validate-imports.yml"
+      - "scripts/validate-import-patterns.ts"
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, dev]
     paths:
-      - '**/*.ts'
-      - '**/*.tsx'
-      - 'deno.json'
-      - '.github/workflows/validate-imports.yml'
-      - 'scripts/validate-import-patterns.ts'
+      - "**/*.ts"
+      - "**/*.tsx"
+      - "deno.json"
+      - ".github/workflows/validate-imports.yml"
+      - "scripts/validate-import-patterns.ts"
 
-# Allow manual triggering
+  # Allow manual triggering
   workflow_dispatch:
     inputs:
       strict_mode:
-        description: 'Run in strict mode (fail on warnings)'
+        description: "Run in strict mode (fail on warnings)"
         required: false
-        default: 'false'
+        default: "false"
         type: choice
-        options: ['true', 'false']
+        options: ["true", "false"]
 
 # Set permissions for GitHub token
 permissions:
@@ -82,7 +82,7 @@ jobs:
             STRICT_FLAG="--strict"
             echo "Running in strict mode (warnings will fail the build)"
           fi
-          
+
           # Run validation with JSON output for processing
           echo "🔍 Running import pattern validation..."
           if deno run --allow-read --allow-write --allow-run scripts/validate-import-patterns.ts --ci $STRICT_FLAG --json > validation-results.json; then
@@ -92,19 +92,19 @@ jobs:
             echo "validation_passed=false" >> $GITHUB_OUTPUT
             echo "❌ Import pattern validation failed"
           fi
-          
+
           # Extract key metrics for summary
           if [ -f validation-results.json ]; then
             TOTAL_FILES=$(jq -r '.stats.totalFiles' validation-results.json)
             VIOLATION_COUNT=$(jq -r '.stats.violationCount' validation-results.json)
             COMPLIANCE_RATE=$(jq -r '.stats.complianceRate' validation-results.json)
             CRITICAL_COUNT=$(jq -r '.stats.violationsByCategory.critical | length' validation-results.json)
-            
+
             echo "total_files=$TOTAL_FILES" >> $GITHUB_OUTPUT
             echo "violation_count=$VIOLATION_COUNT" >> $GITHUB_OUTPUT
             echo "compliance_rate=$COMPLIANCE_RATE" >> $GITHUB_OUTPUT
             echo "critical_count=$CRITICAL_COUNT" >> $GITHUB_OUTPUT
-            
+
             echo "📊 Summary: $TOTAL_FILES files, $VIOLATION_COUNT violations, ${COMPLIANCE_RATE}% compliance"
           fi
         continue-on-error: false
@@ -124,19 +124,19 @@ jobs:
         run: |
           if [ -f validation-results.json ]; then
             echo "📝 Generating GitHub annotations for violations..."
-            
+
             # Extract critical violations and create annotations
-            jq -r '.violations[] | select(.violationType == "globals_import") | 
+            jq -r '.violations[] | select(.violationType == "globals_import") |
               "::error file=\(.file),line=\(.line)::Critical import violation: \(.pattern). \(.recommendation)"' \
               validation-results.json || true
-            
-            # Extract warning violations  
-            jq -r '.violations[] | select(.violationType == "relative_import") | 
+
+            # Extract warning violations
+            jq -r '.violations[] | select(.violationType == "relative_import") |
               "::warning file=\(.file),line=\(.line)::Import pattern warning: \(.pattern). \(.recommendation)"' \
               validation-results.json || true
-            
+
             # Extract info violations
-            jq -r '.violations[] | select(.violationType == "deprecated_pattern") | 
+            jq -r '.violations[] | select(.violationType == "deprecated_pattern") |
               "::notice file=\(.file),line=\(.line)::Import pattern suggestion: \(.pattern). \(.recommendation)"' \
               validation-results.json || true
           fi
@@ -147,22 +147,22 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            
+
             if (!fs.existsSync('validation-results.json')) {
               console.log('No validation results found');
               return;
             }
-            
+
             const results = JSON.parse(fs.readFileSync('validation-results.json', 'utf8'));
             const { stats, performanceMetrics, recommendations } = results;
-            
+
             // Create status emoji
             const statusEmoji = results.success ? '✅' : '❌';
             const complianceEmoji = stats.complianceRate >= 95 ? '🏆' : stats.complianceRate >= 90 ? '🎯' : '⚠️';
-            
+
             // Build comment body
             let commentBody = `## ${statusEmoji} Import Pattern Validation Report\n\n`;
-            
+
             // Summary table
             commentBody += `### 📊 Summary\n\n`;
             commentBody += `| Metric | Value |\n`;
@@ -171,7 +171,7 @@ jobs:
             commentBody += `| Total Violations | ${stats.violationCount} |\n`;
             commentBody += `| Compliance Rate | ${complianceEmoji} ${stats.complianceRate.toFixed(1)}% |\n`;
             commentBody += `| Scan Time | ${performanceMetrics.scanTimeMs}ms |\n\n`;
-            
+
             // Violations breakdown
             if (Object.keys(stats.violationsByType).length > 0) {
               commentBody += `### 📋 Violations by Type\n\n`;
@@ -181,7 +181,7 @@ jobs:
               }
               commentBody += `\n`;
             }
-            
+
             // Critical violations (if any)
             if (stats.violationsByCategory.critical.length > 0) {
               commentBody += `### 🚨 Critical Violations (Must Fix)\n\n`;
@@ -194,7 +194,7 @@ jobs:
               }
               commentBody += `\n`;
             }
-            
+
             // Recommendations
             if (recommendations.length > 0) {
               commentBody += `### 💡 Recommendations\n\n`;
@@ -203,27 +203,27 @@ jobs:
               }
               commentBody += `\n`;
             }
-            
+
             // Performance note
             commentBody += `### ⚡ Performance\n\n`;
             commentBody += `Analyzed ${stats.scannedFiles} files in ${performanceMetrics.scanTimeMs}ms `;
             commentBody += `(${performanceMetrics.filesPerSecond} files/sec)\n\n`;
-            
+
             // Footer
             commentBody += `---\n`;
             commentBody += `*This report was generated by the Import Pattern Validation workflow*\n`;
-            
+
             // Find existing comment to update or create new one
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
             });
-            
-            const existingComment = comments.find(comment => 
+
+            const existingComment = comments.find(comment =>
               comment.body.includes('Import Pattern Validation Report')
             );
-            
+
             if (existingComment) {
               await github.rest.issues.updateComment({
                 owner: context.repo.owner,
@@ -246,28 +246,28 @@ jobs:
           if [ -f validation-results.json ]; then
             echo "## 🔍 Import Pattern Validation Summary" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            
+
             # Extract summary data
             TOTAL_FILES=$(jq -r '.stats.totalFiles' validation-results.json)
             VIOLATION_COUNT=$(jq -r '.stats.violationCount' validation-results.json)
             COMPLIANCE_RATE=$(jq -r '.stats.complianceRate' validation-results.json)
             CRITICAL_COUNT=$(jq -r '.stats.violationsByCategory.critical | length' validation-results.json)
             SCAN_TIME=$(jq -r '.performanceMetrics.scanTimeMs' validation-results.json)
-            
+
             # Status badge
             if [ "$CRITICAL_COUNT" -eq 0 ]; then
               echo "### ✅ Validation Passed" >> $GITHUB_STEP_SUMMARY
             else
               echo "### ❌ Validation Failed" >> $GITHUB_STEP_SUMMARY
             fi
-            
+
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "- **Files Scanned:** $TOTAL_FILES" >> $GITHUB_STEP_SUMMARY
             echo "- **Total Violations:** $VIOLATION_COUNT" >> $GITHUB_STEP_SUMMARY
             echo "- **Critical Violations:** $CRITICAL_COUNT" >> $GITHUB_STEP_SUMMARY
             echo "- **Compliance Rate:** ${COMPLIANCE_RATE}%" >> $GITHUB_STEP_SUMMARY
             echo "- **Scan Time:** ${SCAN_TIME}ms" >> $GITHUB_STEP_SUMMARY
-            
+
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "📄 **Detailed results available in [validation artifacts](../../actions/runs/${{ github.run_id }})**" >> $GITHUB_STEP_SUMMARY
           else
@@ -306,14 +306,14 @@ jobs:
         run: |
           echo "🔍 Running weekly compliance monitoring..."
           deno run --allow-read --allow-write --allow-run scripts/validate-import-patterns.ts --json > compliance-report.json
-          
+
           # Extract compliance metrics
           COMPLIANCE_RATE=$(jq -r '.stats.complianceRate' compliance-report.json)
           TOTAL_VIOLATIONS=$(jq -r '.stats.violationCount' compliance-report.json)
-          
+
           echo "Current compliance rate: ${COMPLIANCE_RATE}%"
           echo "Total violations: $TOTAL_VIOLATIONS"
-          
+
           # Alert if compliance drops below threshold
           if (( $(echo "$COMPLIANCE_RATE < 90" | bc -l) )); then
             echo "⚠️ Compliance rate below 90% threshold!"
