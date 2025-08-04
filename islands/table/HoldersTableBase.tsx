@@ -4,7 +4,7 @@ import { rowTable, ScrollContainer } from "$layout";
 import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { labelXs, loaderText, textSm, textSmLink } from "$text";
 import type { HoldersTableProps } from "$types/ui.d.ts";
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useMemo, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
 // Import HolderRow from wallet types
@@ -24,12 +24,16 @@ const PAGE_SIZE = 20;
 const HoldersTableBase = (
   { holders }: HoldersTableProps,
 ) => {
-  // Transform HolderRow[] to Holder[]
-  const safeHolders: Holder[] = (holders ?? []).map((h: HolderRow) => ({
-    address: h.address,
-    amt: h.amt ?? h.quantity ?? 0,
-    percentage: h.percentage ?? 0,
-  }));
+  // Transform HolderRow[] to Holder[] - memoized to prevent recreation on every render
+  const safeHolders: Holder[] = useMemo(
+    () =>
+      (holders ?? []).map((h: HolderRow) => ({
+        address: h.address,
+        amt: h.amt ?? h.quantity ?? 0,
+        percentage: h.percentage ?? 0,
+      })),
+    [holders],
+  );
 
   /* ===== STATE ===== */
   const [data, setData] = useState<Holder[]>(safeHolders.slice(0, PAGE_SIZE));
