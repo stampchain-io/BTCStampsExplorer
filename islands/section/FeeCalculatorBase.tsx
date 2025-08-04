@@ -779,7 +779,7 @@ export function FeeCalculatorBase({
                   : (
                     <>
                       <span class="font-bold">
-                        {BTCPrice !== undefined && BTCPrice > 0
+                        {BTCPrice !== undefined
                           ? (totalWithMaraFee / 1e8 * BTCPrice).toFixed(2)
                           : "N/A"}
                       </span>{" "}

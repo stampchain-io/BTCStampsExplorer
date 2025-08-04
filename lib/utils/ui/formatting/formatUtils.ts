@@ -59,7 +59,7 @@ export function formatSatoshisToUSD(
   const { decimals = 2, includeSymbol = false } = options;
 
   // Handle cases where BTC price is not available
-  if (btcPrice === undefined || btcPrice === null || btcPrice <= 0) {
+  if (btcPrice === undefined || btcPrice === null) {
     return "N/A";
   }
 

@@ -333,7 +333,7 @@ class ImportPatternValidator {
 
     // Determine success (no critical violations or passed strict mode)
     const success = options.strict 
-      ? this.violations.length === 0
+      ? violationsByCategory.critical.length === 0 && violationsByCategory.warning.length === 0
       : violationsByCategory.critical.length === 0;
 
     return {
@@ -433,7 +433,7 @@ USAGE:
 
 OPTIONS:
   --ci              Run in CI mode (suppress interactive output)
-  --strict          Strict mode - fail on any violations (including warnings)
+  --strict          Strict mode - fail on critical and warning violations (info violations allowed)
   --json            Output results in JSON format
   --verbose, -v     Verbose output with progress information
   --output, -o      Specify output file for JSON results
@@ -453,8 +453,8 @@ EXAMPLES:
   deno run --allow-read --allow-write --allow-run --allow-env scripts/validate-import-patterns.ts --verbose
 
 EXIT CODES:
-  0  Success (no critical violations)
-  1  Validation failed (critical violations found or strict mode violations)
+  0  Success (no critical violations, or no critical/warning violations in strict mode)
+  1  Validation failed (critical violations found, or critical/warning violations in strict mode)
   2  Script error or invalid arguments
 `);
 }

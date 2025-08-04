@@ -89,7 +89,7 @@ class DependencyGraphAnalyzer {
 
   async analyzeDependencies(): Promise<DependencyGraph> {
     console.log("🔍 Starting Dependency Graph Analysis");
-    console.log("=" * 50);
+    console.log("=".repeat(50));
 
     // Discover all TypeScript files
     await this.discoverTypeModules();
@@ -198,7 +198,7 @@ class DependencyGraphAnalyzer {
 
       try {
         const content = await Deno.readTextFile(fullPath);
-        const node = await this.parseModule(modulePath, content);
+        const node = this.parseModule(modulePath, content);
         this.graph.nodes.set(modulePath, node);
 
         processedCount++;
@@ -207,7 +207,9 @@ class DependencyGraphAnalyzer {
         }
       } catch (error) {
         console.warn(
-          `   Warning: Failed to parse ${modulePath}: ${error.message}`,
+          `   Warning: Failed to parse ${modulePath}: ${
+            error instanceof Error ? error.message : String(error)
+          }`,
         );
       }
     }
@@ -223,7 +225,7 @@ class DependencyGraphAnalyzer {
     const exports: string[] = [];
 
     // Extract all imports
-    for (const [pattern, regex] of Object.entries(this.importPatterns)) {
+    for (const [_pattern, regex] of Object.entries(this.importPatterns)) {
       let match;
       while ((match = regex.exec(content)) !== null) {
         const importPath = match[1];
@@ -270,7 +272,7 @@ class DependencyGraphAnalyzer {
     // Handle relative imports
     if (importPath.startsWith("./") || importPath.startsWith("../")) {
       const fromDir = dirname(fromModule);
-      let resolvedPath = join(fromDir, importPath);
+      const resolvedPath = join(fromDir, importPath);
 
       // Add .ts extension if missing
       if (
@@ -743,9 +745,9 @@ class DependencyGraphAnalyzer {
   }
 
   printReport(): void {
-    console.log("\n" + "=" * 60);
+    console.log("\n" + "=".repeat(60));
     console.log("📊 DEPENDENCY GRAPH ANALYSIS REPORT");
-    console.log("=" * 60);
+    console.log("=".repeat(60));
 
     const report = this.graph.healthReport;
 
@@ -806,7 +808,7 @@ if (import.meta.main) {
   const format = args.find((arg) =>
     arg.startsWith("--format=")
   )?.split("=")[1] as "mermaid" | "dot" | "json" || "mermaid";
-  const _checkClientServer = args.includes("--check-client-server");
+  // const checkClientServer = args.includes("--check-client-server");
 
   const analyzer = new DependencyGraphAnalyzer(projectRoot);
 
@@ -816,7 +818,7 @@ if (import.meta.main) {
     analyzer.printReport();
 
     // Generate visualization
-    const visualization = await analyzer.generateVisualization(format);
+    const visualization = analyzer.generateVisualization(format);
 
     // Save reports
     const reportsDir = join(projectRoot, "reports");
@@ -833,7 +835,7 @@ if (import.meta.main) {
     console.log(`\n📄 Visualization saved: ${visualizationPath}`);
 
     // Save detailed JSON report
-    const jsonReport = await analyzer.generateVisualization("json");
+    const jsonReport = analyzer.generateVisualization("json");
     const reportPath = join(reportsDir, "dependency-analysis.json");
     await Deno.writeTextFile(reportPath, jsonReport);
     console.log(`📄 Detailed report saved: ${reportPath}`);
@@ -842,7 +844,10 @@ if (import.meta.main) {
     const hasIssues = graph.healthReport.criticalIssues.length > 0;
     Deno.exit(hasIssues ? 1 : 0);
   } catch (error) {
-    console.error("💥 Dependency analysis failed:", error.message);
+    console.error(
+      "💥 Dependency analysis failed:",
+      error instanceof Error ? error.message : String(error),
+    );
     Deno.exit(1);
   }
 }
