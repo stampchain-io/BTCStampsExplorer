@@ -57,7 +57,7 @@ export class BaseError extends Error {
   }
 
   private generateCorrelationId(): string {
-    return `err-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    return `err-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
   }
 
   toJSON() {
@@ -867,7 +867,7 @@ export function createApiErrorResponse(
     details,
     timestamp: Date.now(),
     correlationId: correlationId ||
-      `api-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      `api-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
     path,
     method,
   };
@@ -887,7 +887,7 @@ export function createApiSuccessResponse<T>(
     message,
     timestamp: Date.now(),
     correlationId: correlationId ||
-      `api-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      `api-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
   };
 }
 
@@ -897,7 +897,7 @@ export function createApiSuccessResponse<T>(
  * Generate unique error ID for error boundary tracking
  */
 export function generateErrorId(): string {
-  return `err-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  return `err-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
 }
 
 /**

@@ -56,7 +56,13 @@ export interface StandardFeeResponse {
 /**
  * Tool type enumeration
  */
-export type ToolType = "stamp" | "src20" | "src101";
+export type ToolType =
+  | "stamp"
+  | "src20"
+  | "src20-mint"
+  | "src20-deploy"
+  | "src20-transfer"
+  | "src101";
 
 // ToolProtocolComplianceLevel is now imported from $constants
 export { ToolProtocolComplianceLevel as ProtocolComplianceLevel } from "$constants";
