@@ -66,35 +66,35 @@ export class BTCPriceService {
     try {
       console.log(`[BTCPriceService] Starting BTC price fetch with Redis caching, preferredSource: ${preferredSource}`);
 
-      const cachedData = await this.db.handleCache<BTCPriceData | null>(this.CACHE_KEY, () => Promise.resolve(null), this.CACHE_CONFIG.duration);
+      const cachedData = await BTCPriceService.db.handleCache<BTCPriceData | null>(this.CACHE_KEY, () => Promise.resolve(null), this.CACHE_CONFIG.duration);
 
-      if (cachedData && this.isCacheValid(cachedData)) {
+      if (cachedData && BTCPriceService.isCacheValid(cachedData)) {
         return {
           ...cachedData,
           source: "cached",
-          circuitBreakerMetrics: this.getCircuitBreakerMetrics(),
+          circuitBreakerMetrics: BTCPriceService.getCircuitBreakerMetrics(),
         };
       }
 
       // Fetch fresh data
       console.log(`[BTCPriceService] Cache miss or stale data, fetching fresh price...`);
-      const freshData = await this.fetchFreshPriceData(preferredSource);
+      const freshData = await BTCPriceService.fetchFreshPriceData(preferredSource);
 
       // Cache the result
       if (freshData.source !== "default") {
-        await this.db.handleCache(this.CACHE_KEY, () => Promise.resolve(freshData), this.CACHE_CONFIG.duration);
+        await BTCPriceService.db.handleCache(BTCPriceService.CACHE_KEY, () => Promise.resolve(freshData), BTCPriceService.CACHE_CONFIG.duration);
       }
 
       return {
         ...freshData,
-        circuitBreakerMetrics: this.getCircuitBreakerMetrics(),
+        circuitBreakerMetrics: BTCPriceService.getCircuitBreakerMetrics(),
       };
     } catch (error) {
       console.error("[BTCPriceService] Failed to get BTC price:", error);
       return {
-        ...this.getStaticFallbackPrice(),
+        ...BTCPriceService.getStaticFallbackPrice(),
         errors: [error instanceof Error ? error.message : String(error)],
-        circuitBreakerMetrics: this.getCircuitBreakerMetrics(),
+        circuitBreakerMetrics: BTCPriceService.getCircuitBreakerMetrics(),
       };
     } finally {
       console.log(`[BTCPriceService] Request completed in ${Date.now() - startTime}ms`);
@@ -103,7 +103,7 @@ export class BTCPriceService {
 
   private static isCacheValid(data: BTCPriceData): boolean {
     const age = Date.now() - data.timestamp;
-    return age < this.CACHE_CONFIG.duration * 1000;
+    return age < BTCPriceService.CACHE_CONFIG.duration * 1000;
   }
 
   /**
@@ -115,10 +115,10 @@ export class BTCPriceService {
     console.log(`[BTCPriceService] Fetching fresh BTC price from external sources, preferredSource: ${preferredSource}`);
 
     // Determine source order, filtering out permanently disabled sources
-    const availableSources = this.getAvailableSources();
+    const availableSources = BTCPriceService.getAvailableSources();
     const sources = preferredSource && availableSources.includes(preferredSource)
       ? [preferredSource, ...availableSources.filter(s => s !== preferredSource)]
-      : this.getNextSourceOrder();
+      : BTCPriceService.getNextSourceOrder();
 
     console.log(`[BTCPriceService] Source order: ${sources.join(' → ')}`);
 
@@ -126,7 +126,7 @@ export class BTCPriceService {
     for (const source of sources) {
       try {
         console.log(`[BTCPriceService] Attempting to fetch from ${source}...`);
-        const result = await this.fetchFromSource(source);
+        const result = await BTCPriceService.fetchFromSource(source);
         if (result) {
           console.log(`[BTCPriceService] BTC price source (${source}) successful: $${result.price}`);
 
@@ -155,7 +155,7 @@ export class BTCPriceService {
     console.warn(`[BTCPriceService] All BTC price sources failed, using static fallback. Errors:`, errors);
 
     return {
-      ...this.getStaticFallbackPrice(),
+      ...BTCPriceService.getStaticFallbackPrice(),
       errors,
     };
   }
@@ -165,15 +165,15 @@ export class BTCPriceService {
    */
   private static getNextSourceOrder(): string[] {
     // Filter out permanently disabled sources
-    const availableSources = this.getAvailableSources();
+    const availableSources = BTCPriceService.getAvailableSources();
 
     if (availableSources.length === 0) {
       console.warn("[BTCPriceService] No available price sources - all are permanently disabled");
       return [];
     }
 
-    const primaryIndex = this.sourceCounter % availableSources.length;
-    this.sourceCounter = (this.sourceCounter + 1) % Number.MAX_SAFE_INTEGER;
+    const primaryIndex = BTCPriceService.sourceCounter % availableSources.length;
+    BTCPriceService.sourceCounter = (BTCPriceService.sourceCounter + 1) % Number.MAX_SAFE_INTEGER;
 
     const primary = availableSources[primaryIndex];
     const remaining = availableSources.filter(s => s !== primary);
@@ -185,8 +185,8 @@ export class BTCPriceService {
    * Get list of available (non-permanently disabled) sources
    */
   private static getAvailableSources(): string[] {
-    return this.SOURCES.filter(source => {
-      const breaker = this.circuitBreakers[source as keyof typeof this.circuitBreakers];
+    return BTCPriceService.SOURCES.filter(source => {
+      const breaker = BTCPriceService.circuitBreakers[source as keyof typeof BTCPriceService.circuitBreakers];
       return breaker && !breaker.isPermanentlyDisabled();
     });
   }
@@ -200,17 +200,17 @@ export class BTCPriceService {
       // case "quicknode":
       //   return await this.fetchFromQuickNode();
       case "coingecko":
-        return await this.fetchFromCoinGecko();
+        return await BTCPriceService.fetchFromCoinGecko();
       case "binance":
-        return await this.fetchFromBinance();
+        return await BTCPriceService.fetchFromBinance();
       case "kraken":
-        return await this.fetchFromKraken();
+        return await BTCPriceService.fetchFromKraken();
       case "coinbase":
-        return await this.fetchFromCoinbase();
+        return await BTCPriceService.fetchFromCoinbase();
       case "blockchain":
-        return await this.fetchFromBlockchain();
+        return await BTCPriceService.fetchFromBlockchain();
       case "bitstamp":
-        return await this.fetchFromBitstamp();
+        return await BTCPriceService.fetchFromBitstamp();
       default:
         throw new Error(`Unknown price source: ${source}`);
     }
@@ -262,7 +262,7 @@ export class BTCPriceService {
    * Fetch from CoinGecko with circuit breaker protection
    */
   private static async fetchFromCoinGecko(): Promise<Omit<BTCPriceData, 'timestamp' | 'fallbackUsed' | 'errors'> | null> {
-    return await this.circuitBreakers.coingecko.execute(async () => {
+    return await BTCPriceService.circuitBreakers.coingecko.execute(async () => {
       const response = await httpClient.get(`${COINGECKO_API_BASE_URL}/simple/price?ids=bitcoin&vs_currencies=usd`);
 
       if (response.status !== 200) {
@@ -307,7 +307,7 @@ export class BTCPriceService {
    * Fetch from Binance with circuit breaker protection (Free API - no authentication required)
    */
   private static async fetchFromBinance(): Promise<Omit<BTCPriceData, 'timestamp' | 'fallbackUsed' | 'errors'> | null> {
-    return await this.circuitBreakers.binance.execute(async () => {
+    return await BTCPriceService.circuitBreakers.binance.execute(async () => {
       const response = await httpClient.get(`${BINANCE_API_BASE_URL}/ticker/price?symbol=BTCUSDT`);
 
       if (response.status !== 200) {
@@ -352,7 +352,7 @@ export class BTCPriceService {
    * Fetch from Kraken with circuit breaker protection (Free API)
    */
   private static async fetchFromKraken(): Promise<Omit<BTCPriceData, 'timestamp' | 'fallbackUsed' | 'errors'> | null> {
-    return await this.circuitBreakers.kraken.execute(async () => {
+    return await BTCPriceService.circuitBreakers.kraken.execute(async () => {
       const response = await httpClient.get(`${KRAKEN_API_BASE_URL}/Ticker?pair=XBTUSD`);
 
       if (response.status !== 200) {
@@ -399,7 +399,7 @@ export class BTCPriceService {
    * Fetch from Coinbase with circuit breaker protection (Free API)
    */
   private static async fetchFromCoinbase(): Promise<Omit<BTCPriceData, 'timestamp' | 'fallbackUsed' | 'errors'> | null> {
-    return await this.circuitBreakers.coinbase.execute(async () => {
+    return await BTCPriceService.circuitBreakers.coinbase.execute(async () => {
       const response = await httpClient.get(`${COINBASE_API_BASE_URL}/exchange-rates?currency=BTC`);
 
       if (response.status !== 200) {
@@ -443,7 +443,7 @@ export class BTCPriceService {
    * Fetch from Blockchain.info with circuit breaker protection (Free API)
    */
   private static async fetchFromBlockchain(): Promise<Omit<BTCPriceData, 'timestamp' | 'fallbackUsed' | 'errors'> | null> {
-    return await this.circuitBreakers.blockchain.execute(async () => {
+    return await BTCPriceService.circuitBreakers.blockchain.execute(async () => {
       const response = await httpClient.get(`${BLOCKCHAIN_API_BASE_URL}/ticker`);
 
       if (response.status !== 200) {
@@ -624,11 +624,11 @@ export class BTCPriceService {
     }
 
     return {
-      circuitBreakers: this.getCircuitBreakerMetrics(),
-      healthStatus: this.getHealthStatus(),
+      circuitBreakers: BTCPriceService.getCircuitBreakerMetrics(),
+      healthStatus: BTCPriceService.getHealthStatus(),
       permanentlyDisabled,
-      sources: [...this.SOURCES],
-      availableSources: this.getAvailableSources(),
+      sources: [...BTCPriceService.SOURCES],
+      availableSources: BTCPriceService.getAvailableSources(),
     };
   }
 

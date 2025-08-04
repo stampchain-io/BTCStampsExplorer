@@ -1,5 +1,5 @@
 import { assert, assertEquals } from "@std/assert";
-import type { PROTOCOL_IDENTIFIERS } from "$lib/utils/data/protocols/protocol.ts";
+import { PROTOCOL_IDENTIFIERS } from "$lib/utils/data/protocols/protocol.ts";
 
 Deno.test("protocol - PROTOCOL_IDENTIFIERS contains expected values", () => {
   assertEquals(

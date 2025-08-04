@@ -6,9 +6,9 @@
 import { assertEquals } from "@std/assert";
 import { afterEach, beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
 import { restore, stub } from "@std/testing@1.0.14/mock";
-import type { SRC20OperationService } from "$server/services/src20/operations/src20Operations.ts";
-import type { SRC20UtilityService } from "$server/services/src20/utilityService.ts";
-import type { SRC20MultisigPSBTService } from "$server/services/src20/psbt/src20MultisigPSBTService.ts";
+import { SRC20OperationService } from "$server/services/src20/operations/src20Operations.ts";
+import { SRC20UtilityService } from "$server/services/src20/utilityService.ts";
+import { SRC20MultisigPSBTService } from "$server/services/src20/psbt/src20MultisigPSBTService.ts";
 import { logger } from "$lib/utils/logger.ts";
 import type {
   IDeploySRC20,
@@ -72,32 +72,27 @@ const validTransferParams: ITransferSRC20 = {
 };
 
 describe("SRC20OperationService - Comprehensive Tests", () => {
-  let loggerErrorStub: any;
-  let preparePSBTStub: any;
-
-  beforeEach(() => {
-    // Stub logger to avoid console output
-    loggerErrorStub = stub(logger, "error", () => {});
-
-    // Default stub for preparePSBT
-    preparePSBTStub = stub(
-      SRC20MultisigPSBTService,
-      "preparePSBT",
-      () => Promise.resolve(mockPSBTResult),
-    );
-  });
-
   afterEach(() => {
     restore();
   });
 
   describe("mintSRC20", () => {
     it("should successfully mint SRC20 tokens", async () => {
+      // Stub logger to avoid console output
+      stub(logger, "error", () => {});
+
       // Stub checkMintedOut to return not minted out
       const checkMintedOutStub = stub(
         SRC20UtilityService,
         "checkMintedOut",
         () => Promise.resolve({ minted_out: false, progress: 50 }),
+      );
+
+      // Stub preparePSBT
+      const preparePSBTStub = stub(
+        SRC20MultisigPSBTService,
+        "preparePSBT",
+        () => Promise.resolve(mockPSBTResult),
       );
 
       const result = await SRC20OperationService.mintSRC20(validMintParams);
@@ -134,6 +129,16 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
     });
 
     it("should handle token already minted out error", async () => {
+      // Stub logger to avoid console output
+      stub(logger, "error", () => {});
+
+      // Stub preparePSBT
+      const preparePSBTStub = stub(
+        SRC20MultisigPSBTService,
+        "preparePSBT",
+        () => Promise.resolve(mockPSBTResult),
+      );
+
       stub(
         SRC20UtilityService,
         "checkMintedOut",
@@ -151,14 +156,16 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
     });
 
     it("should handle prepare PSBT error", async () => {
+      // Stub logger to verify error logging
+      const loggerErrorStub = stub(logger, "error", () => {});
+
       stub(
         SRC20UtilityService,
         "checkMintedOut",
         () => Promise.resolve({ minted_out: false, progress: 50 }),
       );
 
-      preparePSBTStub.restore();
-      preparePSBTStub = stub(
+      stub(
         SRC20MultisigPSBTService,
         "preparePSBT",
         () => Promise.reject(new Error("PSBT preparation failed")),
@@ -180,14 +187,16 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
     });
 
     it("should handle estimatedTxSize being undefined", async () => {
+      // Stub logger to avoid console output
+      stub(logger, "error", () => {});
+
       stub(
         SRC20UtilityService,
         "checkMintedOut",
         () => Promise.resolve({ minted_out: false, progress: 50 }),
       );
 
-      preparePSBTStub.restore();
-      preparePSBTStub = stub(
+      stub(
         SRC20MultisigPSBTService,
         "preparePSBT",
         () =>
@@ -205,6 +214,16 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
 
   describe("deploySRC20", () => {
     it("should successfully deploy SRC20 token with all fields", async () => {
+      // Stub logger to avoid console output
+      stub(logger, "error", () => {});
+
+      // Stub preparePSBT
+      const preparePSBTStub = stub(
+        SRC20MultisigPSBTService,
+        "preparePSBT",
+        () => Promise.resolve(mockPSBTResult),
+      );
+
       const checkDeployedTickStub = stub(
         SRC20UtilityService,
         "checkDeployedTick",
@@ -248,6 +267,16 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
     });
 
     it("should deploy with minimal parameters", async () => {
+      // Stub logger to avoid console output
+      stub(logger, "error", () => {});
+
+      // Stub preparePSBT
+      const preparePSBTStub = stub(
+        SRC20MultisigPSBTService,
+        "preparePSBT",
+        () => Promise.resolve(mockPSBTResult),
+      );
+
       stub(
         SRC20UtilityService,
         "checkDeployedTick",
@@ -284,6 +313,16 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
     });
 
     it("should include dec when it is 0", async () => {
+      // Stub logger to avoid console output
+      stub(logger, "error", () => {});
+
+      // Stub preparePSBT
+      const preparePSBTStub = stub(
+        SRC20MultisigPSBTService,
+        "preparePSBT",
+        () => Promise.resolve(mockPSBTResult),
+      );
+
       stub(
         SRC20UtilityService,
         "checkDeployedTick",
@@ -299,6 +338,16 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
     });
 
     it("should not include dec when it is 18 or higher", async () => {
+      // Stub logger to avoid console output
+      stub(logger, "error", () => {});
+
+      // Stub preparePSBT
+      const preparePSBTStub = stub(
+        SRC20MultisigPSBTService,
+        "preparePSBT",
+        () => Promise.resolve(mockPSBTResult),
+      );
+
       stub(
         SRC20UtilityService,
         "checkDeployedTick",
@@ -314,6 +363,16 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
     });
 
     it("should not include dec when it is negative", async () => {
+      // Stub logger to avoid console output
+      stub(logger, "error", () => {});
+
+      // Stub preparePSBT
+      const preparePSBTStub = stub(
+        SRC20MultisigPSBTService,
+        "preparePSBT",
+        () => Promise.resolve(mockPSBTResult),
+      );
+
       stub(
         SRC20UtilityService,
         "checkDeployedTick",
@@ -329,6 +388,16 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
     });
 
     it("should use desc when description is not provided", async () => {
+      // Stub logger to avoid console output
+      stub(logger, "error", () => {});
+
+      // Stub preparePSBT
+      const preparePSBTStub = stub(
+        SRC20MultisigPSBTService,
+        "preparePSBT",
+        () => Promise.resolve(mockPSBTResult),
+      );
+
       stub(
         SRC20UtilityService,
         "checkDeployedTick",
@@ -348,6 +417,16 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
     });
 
     it("should prefer description over desc when both provided", async () => {
+      // Stub logger to avoid console output
+      stub(logger, "error", () => {});
+
+      // Stub preparePSBT
+      const preparePSBTStub = stub(
+        SRC20MultisigPSBTService,
+        "preparePSBT",
+        () => Promise.resolve(mockPSBTResult),
+      );
+
       stub(
         SRC20UtilityService,
         "checkDeployedTick",
@@ -366,6 +445,9 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
     });
 
     it("should handle token already deployed error", async () => {
+      // Stub logger to avoid console output
+      stub(logger, "error", () => {});
+
       stub(
         SRC20UtilityService,
         "checkDeployedTick",
@@ -380,6 +462,16 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
     });
 
     it("should only include optional fields when they have values", async () => {
+      // Stub logger to avoid console output
+      stub(logger, "error", () => {});
+
+      // Stub preparePSBT
+      const preparePSBTStub = stub(
+        SRC20MultisigPSBTService,
+        "preparePSBT",
+        () => Promise.resolve(mockPSBTResult),
+      );
+
       stub(
         SRC20UtilityService,
         "checkDeployedTick",
@@ -411,6 +503,16 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
 
   describe("transferSRC20", () => {
     it("should successfully transfer SRC20 tokens", async () => {
+      // Stub logger to avoid console output
+      stub(logger, "error", () => {});
+
+      // Stub preparePSBT
+      const preparePSBTStub = stub(
+        SRC20MultisigPSBTService,
+        "preparePSBT",
+        () => Promise.resolve(mockPSBTResult),
+      );
+
       const checkEnoughBalanceStub = stub(
         SRC20UtilityService,
         "checkEnoughBalance",
@@ -456,6 +558,9 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
     });
 
     it("should handle insufficient balance error", async () => {
+      // Stub logger to avoid console output
+      stub(logger, "error", () => {});
+
       stub(
         SRC20UtilityService,
         "checkEnoughBalance",
@@ -472,6 +577,9 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
     });
 
     it("should handle checkEnoughBalance throwing error", async () => {
+      // Stub logger to avoid console output
+      stub(logger, "error", () => {});
+
       stub(
         SRC20UtilityService,
         "checkEnoughBalance",
@@ -490,6 +598,9 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
 
   describe("Error Handling", () => {
     it("should handle non-Error exceptions", async () => {
+      // Stub logger to verify error logging
+      const loggerErrorStub = stub(logger, "error", () => {});
+
       stub(
         SRC20UtilityService,
         "checkMintedOut",
@@ -508,6 +619,9 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
     });
 
     it("should handle undefined errors", async () => {
+      // Stub logger to avoid console output
+      stub(logger, "error", () => {});
+
       stub(
         SRC20UtilityService,
         "checkMintedOut",
@@ -522,6 +636,9 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
     });
 
     it("should handle null errors", async () => {
+      // Stub logger to avoid console output
+      stub(logger, "error", () => {});
+
       stub(
         SRC20UtilityService,
         "checkMintedOut",
@@ -536,6 +653,9 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
     });
 
     it("should handle object errors", async () => {
+      // Stub logger to avoid console output
+      stub(logger, "error", () => {});
+
       stub(
         SRC20UtilityService,
         "checkMintedOut",
@@ -552,6 +672,9 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
 
   describe("Edge Cases", () => {
     it("should handle all operations returning consistent structure", async () => {
+      // Stub logger to avoid console output
+      stub(logger, "error", () => {});
+
       // Setup stubs
       stub(
         SRC20UtilityService,
@@ -567,6 +690,11 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
         SRC20UtilityService,
         "checkEnoughBalance",
         () => Promise.resolve(true),
+      );
+      stub(
+        SRC20MultisigPSBTService,
+        "preparePSBT",
+        () => Promise.resolve(mockPSBTResult),
       );
 
       const [mintResult, deployResult, transferResult] = await Promise.all([
@@ -591,6 +719,16 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
     });
 
     it("should pass through all params to preparePSBT", async () => {
+      // Stub logger to avoid console output
+      stub(logger, "error", () => {});
+
+      // Stub preparePSBT
+      const preparePSBTStub = stub(
+        SRC20MultisigPSBTService,
+        "preparePSBT",
+        () => Promise.resolve(mockPSBTResult),
+      );
+
       stub(
         SRC20UtilityService,
         "checkMintedOut",

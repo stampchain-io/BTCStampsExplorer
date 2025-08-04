@@ -5,7 +5,7 @@
  */
 
 import { assertEquals, assertExists, assertRejects } from "@std/assert";
-import type {
+import {
   createMockStampMarketData,
   createMockStampRow,
 } from "./utils/testFactories.ts";

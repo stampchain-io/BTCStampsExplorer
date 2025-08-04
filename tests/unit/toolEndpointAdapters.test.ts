@@ -9,6 +9,8 @@ import type {
   SRC101TransactionOptions,
   SRC20TransactionOptions,
   StampTransactionOptions,
+} from "$lib/types/toolEndpointAdapter.ts";
+import {
   ToolResponseError,
   ToolValidationError,
 } from "$lib/types/toolEndpointAdapter.ts";

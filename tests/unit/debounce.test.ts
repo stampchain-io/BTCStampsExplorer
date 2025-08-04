@@ -34,9 +34,9 @@ Deno.test("debounce - resets timer on subsequent calls", async () => {
   const debouncedFn = debounce(testFn, 50);
 
   debouncedFn();
-  await delay(30); // Wait less than debounce time
+  await delay(25); // Wait less than debounce time
   debouncedFn(); // This should reset the timer
-  await delay(30); // Total 60ms, but timer was reset
+  await delay(25); // Total 50ms, but timer was reset at 25ms
 
   // Should not have been called yet
   assertEquals(
@@ -45,7 +45,7 @@ Deno.test("debounce - resets timer on subsequent calls", async () => {
     "Function should not be called when timer is reset",
   );
 
-  await delay(30); // Now total 90ms, 60ms since last call
+  await delay(35); // Now total 85ms, 60ms since last call
 
   // Should have been called once
   assertEquals(callCount, 1, "Function should be called once after full delay");
