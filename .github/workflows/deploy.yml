@@ -141,7 +141,7 @@ jobs:
 
       # Create a summary comment for PR
       - name: Create PR Comment with Issues
-        if: github.event_name == 'pull_request' && (steps.fmtcheck.outcome == 'failure' || steps.lintcheck.outcome == 'failure')
+        if: github.event_name == 'pull_request' && (steps.fmtcheck.outcome == 'failure' || steps.lintcheck.outcome == 'failure' || steps.ssrcheck.outcome == 'failure' || steps.responsecheck.outcome == 'failure')
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -222,6 +222,24 @@ jobs:
               comment += '### ✅ Lint Check Passed\n\n';
             }
 
+            // Check SSR safety issues
+            if ('${{ steps.ssrcheck.outcome }}' === 'failure') {
+              comment += '### ❌ SSR Safety Issues Found\n\n';
+              comment += 'Found client-side only code that may cause SSR errors.\n\n';
+              comment += 'Please review the output and ensure all browser APIs are properly guarded.\n\n';
+            } else {
+              comment += '### ✅ SSR Safety Check Passed\n\n';
+            }
+
+            // Check response pattern issues
+            if ('${{ steps.responsecheck.outcome }}' === 'failure') {
+              comment += '### ❌ Response Pattern Issues Found\n\n';
+              comment += 'Found manual Response objects that should use utility functions.\n\n';
+              comment += 'Please use the response utilities from `lib/utils/api/responses/` instead.\n\n';
+            } else {
+              comment += '### ✅ Response Pattern Check Passed\n\n';
+            }
+
             // Find existing comment
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
@@ -261,9 +279,21 @@ jobs:
           actionlint_flags: '-ignore "shellcheck reported issue.*SC2086.*" -ignore "shellcheck reported issue.*SC2129.*" -ignore "shellcheck reported issue.*SC2034.*" -ignore "shellcheck reported issue.*SC2144.*" -ignore "shellcheck reported issue.*SC2012.*"'
         continue-on-error: true
 
+      # SSR Safety Check
+      - name: Check SSR Safety
+        id: ssrcheck
+        run: deno task check:ssr
+        continue-on-error: true
+
+      # Response Pattern Check
+      - name: Check Response Patterns
+        id: responsecheck
+        run: deno task check:responses
+        continue-on-error: true
+
       # Fail the workflow if any checks failed
       - name: Check for failures
-        if: steps.fmtcheck.outcome == 'failure' || steps.lintcheck.outcome == 'failure' || steps.actionlint.outcome == 'failure'
+        if: steps.fmtcheck.outcome == 'failure' || steps.lintcheck.outcome == 'failure' || steps.actionlint.outcome == 'failure' || steps.ssrcheck.outcome == 'failure' || steps.responsecheck.outcome == 'failure'
         run: exit 1
 
       # Build check
