@@ -1,10 +1,22 @@
 import { normalizeHeaders } from "$lib/utils/api/headers/headerUtils.ts";
 
+// Cache for security headers to improve performance
+const securityHeaderCache = new Map<string, Record<string, string>>();
+
 export const getSecurityHeaders = (
   options: { forceNoCache?: boolean; context?: "api" | "web" | "recursive" } =
     {},
 ) => {
   const { forceNoCache, context = "web" } = options;
+
+  // Create cache key from options
+  const cacheKey = `${context}-${forceNoCache ? "no-cache" : "cache"}`;
+
+  // Return cached headers if available
+  const cached = securityHeaderCache.get(cacheKey);
+  if (cached) {
+    return { ...cached }; // Return a copy to prevent mutation
+  }
   const cacheControl = forceNoCache
     ? "no-store, must-revalidate"
     : "public, max-age=31536000, immutable";
@@ -94,7 +106,7 @@ export const getSecurityHeaders = (
     })
     .join("; ");
 
-  return {
+  const headers = {
     "Content-Security-Policy": cspHeader,
     "Cache-Control": cacheControl,
     "CDN-Cache-Control": cacheControl,
@@ -109,6 +121,11 @@ export const getSecurityHeaders = (
     }),
     "Vary": "Accept-Encoding, Accept, Origin",
   };
+  
+  // Cache the headers for future use
+  securityHeaderCache.set(cacheKey, headers);
+  
+  return headers;
 };
 
 export const getHtmlHeaders = (options?: { forceNoCache?: boolean }) =>
