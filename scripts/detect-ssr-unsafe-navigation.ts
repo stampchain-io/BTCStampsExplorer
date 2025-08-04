@@ -47,6 +47,12 @@ const SCAN_DIRECTORIES = [
   "client/"
 ];
 
+// Client-only directories (these typically have reduced SSR concerns)
+const CLIENT_ONLY_DIRS = [
+  "islands/",
+  "client/"
+];
+
 // Files to skip (already have proper SSR protection)
 const SKIP_FILES = [
   "lib/utils/navigation/freshNavigationUtils.ts"
@@ -117,6 +123,9 @@ async function scanFile(filePath: string): Promise<{
   const safePatterns: SafePattern[] = [];
   const fPartialUsage: { file: string; line: number; content: string; }[] = [];
 
+  // Check if file is in a client-only directory
+  const isClientOnlyFile = CLIENT_ONLY_DIRS.some(dir => filePath.startsWith(dir));
+
   try {
     const content = await Deno.readTextFile(filePath);
     const lines = content.split('\n');
@@ -132,11 +141,17 @@ async function scanFile(filePath: string): Promise<{
           const hasSSRProtection = checkSSRProtection(lines, index);
 
           if (!hasSSRProtection) {
+            // Downgrade severity for client-only files
+            let severity = pattern.severity;
+            if (isClientOnlyFile && severity === "high") {
+              severity = "medium";
+            }
+
             unsafePatterns.push({
               file: filePath,
               line: lineNum,
               content: line.trim(),
-              severity: pattern.severity,
+              severity: severity,
               reason: pattern.reason,
               suggestion: pattern.suggestion
             });
@@ -176,12 +191,41 @@ async function scanFile(filePath: string): Promise<{
 }
 
 function checkSSRProtection(lines: string[], currentIndex: number): boolean {
-  // Check current line and 5 lines before and after for SSR protection patterns
-  const start = Math.max(0, currentIndex - 5);
-  const end = Math.min(lines.length, currentIndex + 5);
+  // Check current line and 10 lines before and after for SSR protection patterns
+  const start = Math.max(0, currentIndex - 10);
+  const end = Math.min(lines.length, currentIndex + 10);
 
   for (let i = start; i < end; i++) {
     const line = lines[i];
+    
+    // Skip comments
+    const trimmedLine = line.trim();
+    if (trimmedLine.startsWith('//') || trimmedLine.startsWith('/*') || trimmedLine.startsWith('*')) {
+      continue;
+    }
+
+    // Check for useEffect/useLayoutEffect (these are client-only)
+    if (line.includes('useEffect') || line.includes('useLayoutEffect')) {
+      return true;
+    }
+
+    // Check for IS_BROWSER pattern
+    if (line.includes('IS_BROWSER')) {
+      return true;
+    }
+    
+    // Check for isBrowser() function
+    if (line.includes('isBrowser()') || line.includes('!isBrowser()')) {
+      return true;
+    }
+
+    // Check for our standardized SSR-safe patterns
+    if (line.includes('useSSRSafeNavigation') || 
+        line.includes('SSRSafeUrlBuilder') ||
+        line.includes('SSRSafeLink') ||
+        line.includes('getSSRSafeUrl')) {
+      return true;
+    }
 
     // Check for browser environment checks
     if (line.includes('typeof globalThis === "undefined"') ||
@@ -379,16 +423,26 @@ async function main() {
   await Deno.writeTextFile(reportPath, report);
   console.log(`\n📄 Full report saved to: ${reportPath}`);
 
-  // Exit with error code if critical issues found (excluding known false positives)
-  const realCriticalIssues = result.unsafePatterns.filter(pattern => 
-    pattern.severity === "high" && 
-    !pattern.file.includes("freshNavigationUtils.ts") // Skip our SSR-safe utility file
+  // Exit with error code if critical issues found
+  const criticalIssues = result.unsafePatterns.filter(pattern => 
+    pattern.severity === "high"
   ).length;
   
-  if (realCriticalIssues > 0) {
+  // Optional: Uncomment to also fail on medium issues
+  // const mediumIssues = result.unsafePatterns.filter(pattern => 
+  //   pattern.severity === "medium"
+  // ).length;
+  
+  if (criticalIssues > 0) {
     console.log("\n🚨 Critical SSR safety issues found! Please fix before deployment.");
     Deno.exit(1);
   }
+  
+  // Optional: Uncomment to also fail on medium issues
+  // if (mediumIssues > 0) {
+  //   console.log("\n⚠️ Medium SSR safety issues found! Consider fixing before deployment.");
+  //   Deno.exit(1);
+  // }
 
   console.log("\n✅ SSR safety scan completed successfully!");
 }

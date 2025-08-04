@@ -368,7 +368,7 @@ export function StampOverviewPage(props: StampPageProps) {
           totalPages,
           onPageChange: (newPage: number) => {
             if (!IS_BROWSER || !globalThis.location) return;
-            
+
             const url = SSRSafeUrlBuilder.fromCurrent()
               .setParam("page", newPage.toString())
               .toString();

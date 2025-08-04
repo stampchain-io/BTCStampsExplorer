@@ -4,6 +4,8 @@ import type { SRC20OverviewContentProps } from "$types/ui.d.ts";
 // import type { SRC20Row } from "$types/src20.d.ts"; // Removed unused import
 import { SRC20OverviewHeader } from "$header";
 import { SRC20Gallery } from "$section";
+import { useSSRSafeNavigation } from "$lib/hooks/useSSRSafeNavigation.ts";
+import { SSRSafeUrlBuilder } from "$components/navigation/SSRSafeUrlBuilder.tsx";
 
 /* ===== TYPES ===== */
 type SortOption =
@@ -29,6 +31,10 @@ export function SRC20OverviewContent({
   console.log(
     `[SRC20OverviewContent] BTC price context available: $${btcPrice} from ${btcPriceSource}`,
   );
+
+  // ✅ SSR-SAFE: Use SSR-safe navigation hook
+  const { isClient } = useSSRSafeNavigation();
+
   // 🤘 PUNK ROCK SIMPLIFICATION: Remove complexity, just use the data directly
   const [_currentTimeframe, setCurrentTimeframe] = useState<
     "24H" | "7D" | "30D"
@@ -55,16 +61,17 @@ export function SRC20OverviewContent({
     setCurrentSort({ filter, direction });
     setIsNavigating(true); // ✅ FRESH.JS: Set loading state
 
-    // ✅ FRESH.JS: Use proper Fresh.js anchor link navigation pattern
-    if (typeof globalThis !== "undefined" && globalThis?.location) {
-      const url = new URL(globalThis.location.href);
-      url.searchParams.set("sortBy", filter || "TRENDING");
-      url.searchParams.set("sortDirection", direction);
-      url.searchParams.set("page", "1"); // Reset to page 1 when sorting changes
+    // ✅ SSR-SAFE: Use SSR-safe URL builder for navigation
+    if (isClient) {
+      const url = SSRSafeUrlBuilder.fromCurrent()
+        .setParam("sortBy", filter || "TRENDING")
+        .setParam("sortDirection", direction)
+        .setParam("page", "1") // Reset to page 1 when sorting changes
+        .toString();
 
       // Create anchor element with f-partial attribute for Fresh.js navigation
       const link = document.createElement("a");
-      link.href = url.toString();
+      link.href = url;
       link.setAttribute("f-partial", "");
       link.style.display = "none";
       document.body.appendChild(link as Node);
@@ -81,14 +88,16 @@ export function SRC20OverviewContent({
     // 🎸 MINTING BUTTON: Use the provided view type instead of toggling
     setIsNavigating(true);
 
-    if (typeof globalThis !== "undefined" && globalThis?.location) {
-      const url = new URL(globalThis.location.href);
-      url.searchParams.set("viewType", viewType);
-      url.searchParams.set("page", "1"); // Reset to page 1 when view changes
+    // ✅ SSR-SAFE: Use SSR-safe URL builder for navigation
+    if (isClient) {
+      const url = SSRSafeUrlBuilder.fromCurrent()
+        .setParam("viewType", viewType)
+        .setParam("page", "1") // Reset to page 1 when view changes
+        .toString();
 
       // Create anchor element with f-partial attribute for Fresh.js navigation
       const link = document.createElement("a");
-      link.href = url.toString();
+      link.href = url;
       link.setAttribute("f-partial", "");
       link.style.display = "none";
       document.body.appendChild(link as Node);
@@ -135,14 +144,15 @@ export function SRC20OverviewContent({
           page: currentPage,
           totalPages: totalPages,
           onPageChange: (newPage: number) => {
-            // ✅ FRESH.JS: Use proper Fresh.js anchor link navigation for pagination
-            if (typeof globalThis !== "undefined" && globalThis?.location) {
-              const url = new URL(globalThis.location.href);
-              url.searchParams.set("page", newPage.toString());
+            // ✅ SSR-SAFE: Use SSR-safe URL builder for pagination navigation
+            if (isClient) {
+              const url = SSRSafeUrlBuilder.fromCurrent()
+                .setParam("page", newPage.toString())
+                .toString();
 
               // Create anchor element with f-partial attribute for Fresh.js navigation
               const link = document.createElement("a");
-              link.href = url.toString();
+              link.href = url;
               link.setAttribute("f-partial", "");
               link.style.display = "none";
               document.body.appendChild(link as Node);
