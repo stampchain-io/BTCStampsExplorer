@@ -20,6 +20,10 @@ describe("CloudWatch Monitoring Service", () => {
       return id;
     } as any;
 
+    // Mock Deno.addSignalListener to prevent leaks
+    const originalAddSignalListener = Deno.addSignalListener;
+    Deno.addSignalListener = () => {};
+
     // Initialize the service for testing
     try {
       await cloudWatchMonitoring.initialize();
@@ -29,6 +33,9 @@ describe("CloudWatch Monitoring Service", () => {
         error,
       );
     }
+    
+    // Restore signal listener after initialization
+    Deno.addSignalListener = originalAddSignalListener;
   });
 
   afterAll(() => {

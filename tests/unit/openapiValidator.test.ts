@@ -1,14 +1,13 @@
-import { assertEquals, assertExists } from "$std/assert/mod.ts";
-import { describe, it } from "$std/testing/bdd.ts";
-import { validateAgainstSchema, getValidator } from "$server/middleware/openapiValidator.ts";
+import { assertEquals, assertExists } from "@std/assert";
+import { validateAgainstSchema, getValidator } from "../../server/middleware/openapiValidator.ts";
 
-describe("OpenAPI Validator", () => {
-  it("should load OpenAPI spec successfully", async () => {
+Deno.test("OpenAPI Validator", async (t) => {
+  await t.step("should load OpenAPI spec successfully", async () => {
     const validator = await getValidator();
     assertExists(validator);
   });
 
-  it("should validate successful stamp response", async () => {
+  await t.step("should validate successful stamp response", async () => {
     const mockResponse = {
       data: {
         stamp_id: 123,
@@ -21,7 +20,7 @@ describe("OpenAPI Validator", () => {
 
     const result = await validateAgainstSchema(
       "GET",
-      "/api/v2/stamp/123",
+      "/api/v2/stamps/123",
       200,
       mockResponse
     );
@@ -29,7 +28,7 @@ describe("OpenAPI Validator", () => {
     assertEquals(result.valid, true);
   });
 
-  it("should validate SRC-20 response with v2.3 nested structure", async () => {
+  await t.step("should validate SRC-20 response with v2.3 nested structure", async () => {
     const mockResponse = {
       data: {
         tick: "STAMP",
@@ -61,7 +60,7 @@ describe("OpenAPI Validator", () => {
     assertEquals(result.valid, true);
   });
 
-  it("should validate error response structure", async () => {
+  await t.step("should validate error response structure", async () => {
     const mockErrorResponse = {
       error: "Not found",
       details: {
@@ -72,7 +71,7 @@ describe("OpenAPI Validator", () => {
 
     const result = await validateAgainstSchema(
       "GET",
-      "/api/v2/stamp/999999",
+      "/api/v2/stamp/999999", 
       404,
       mockErrorResponse
     );
@@ -80,7 +79,7 @@ describe("OpenAPI Validator", () => {
     assertEquals(result.valid, true);
   });
 
-  it("should detect invalid response structure", async () => {
+  await t.step("should detect invalid response structure", async () => {
     const invalidResponse = {
       // Missing required 'data' field for successful response
       stamp_id: 123,
@@ -89,7 +88,7 @@ describe("OpenAPI Validator", () => {
 
     const result = await validateAgainstSchema(
       "GET",
-      "/api/v2/stamp/123",
+      "/api/v2/stamps/123",
       200,
       invalidResponse
     );

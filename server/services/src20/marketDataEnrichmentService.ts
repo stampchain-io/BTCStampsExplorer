@@ -66,7 +66,6 @@ export interface MarketDataFields {
   volume_7d_btc?: number;
   volume_30d_btc?: number;
   price_change_7d_percent?: number;
-  change_7d?: number;
   price_change_30d_percent?: number;
 
   /** Market data source information */
@@ -355,7 +354,8 @@ export class MarketDataEnrichmentService {
     if (includeExtendedFields) {
       standardized.volume_7d_btc = data.volume7dBTC;
       standardized.volume_30d_btc = data.volume30dBTC;
-      standardized.change_7d = data.priceChange7dPercent;
+      standardized.price_change_7d_percent = data.priceChange7dPercent;
+      standardized.price_change_30d_percent = data.priceChange30dPercent;
     }
 
     return standardized;
