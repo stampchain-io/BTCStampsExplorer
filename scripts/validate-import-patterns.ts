@@ -128,13 +128,33 @@ class ImportPatternValidator {
       name: 'Missing Type-Only Import',
       description: 'Type imports should use "import type" syntax',
       category: 'info',
-      pattern: /import\s+{[^}]*[A-Z][a-zA-Z]*[^}]*}\s+from/,
+      pattern: /import\s+{[^}]*}\s+from/,
       test: (stmt) => {
-        // Check if importing types without "import type"
-        return /import\s+{[^}]*[A-Z][a-zA-Z0-9]*[^}]*}\s+from/.test(stmt) && 
-               !stmt.includes('import type') &&
-               !stmt.includes('React') && // Allow React imports
-               !stmt.includes('Component'); // Allow component imports
+        // Only flag imports that are very likely to be type-only
+        // This is more conservative to avoid false positives
+        if (stmt.includes('import type')) return false;
+        
+        // Extract import names
+        const match = stmt.match(/import\s+{([^}]+)}\s+from/);
+        if (!match) return false;
+        
+        const imports = match[1].split(',').map(s => s.trim().replace(/\s+as\s+.*/, ''));
+        
+        // Only flag if ALL imports look like types (very conservative)
+        return imports.length > 0 && imports.every(imp => {
+          // Must start with capital letter
+          if (!/^[A-Z]/.test(imp)) return false;
+          
+          // Common type patterns that should use 'import type'
+          return (
+            // Interface/Type names (usually PascalCase with Type/Interface suffix)
+            /^[A-Z][a-zA-Z]*(?:Type|Interface|Config|Options|Props|State)$/.test(imp) ||
+            // Generic type names (single capital letter or short)  
+            /^[A-Z]$/.test(imp) ||
+            // Error/Exception types
+            /^[A-Z][a-zA-Z]*(?:Error|Exception)$/.test(imp)
+          );
+        });
       },
       recommendation: 'Use "import type" for type-only imports to improve tree-shaking'
     },
