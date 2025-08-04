@@ -8,9 +8,12 @@ import { assertEquals, assertExists } from "@std/assert";
 import { afterAll, beforeAll, describe, it } from "jsr:@std/testing@1.0.14/bdd";
 
 describe("CloudWatch Monitoring Service", () => {
-  // Store original interval functions to restore later
+  // Store original functions to restore later
   const originalSetInterval = globalThis.setInterval;
+  const originalAddSignalListener = Deno.addSignalListener;
+  const originalRemoveSignalListener = Deno.removeSignalListener;
   const intervals: number[] = [];
+  const signalListeners: Array<{ signal: Deno.Signal; handler: () => void }> = [];
 
   beforeAll(async () => {
     // Mock setInterval to track intervals for cleanup
@@ -20,9 +23,20 @@ describe("CloudWatch Monitoring Service", () => {
       return id;
     } as any;
 
-    // Mock Deno.addSignalListener to prevent leaks
-    const originalAddSignalListener = Deno.addSignalListener;
-    Deno.addSignalListener = () => {};
+    // Mock Deno.addSignalListener to track signal listeners
+    Deno.addSignalListener = (signal: Deno.Signal, handler: () => void) => {
+      signalListeners.push({ signal, handler });
+    };
+
+    // Mock Deno.removeSignalListener for completeness
+    Deno.removeSignalListener = (signal: Deno.Signal, handler: () => void) => {
+      const index = signalListeners.findIndex(
+        (item) => item.signal === signal && item.handler === handler
+      );
+      if (index !== -1) {
+        signalListeners.splice(index, 1);
+      }
+    };
 
     // Initialize the service for testing
     try {
@@ -33,9 +47,6 @@ describe("CloudWatch Monitoring Service", () => {
         error,
       );
     }
-    
-    // Restore signal listener after initialization
-    Deno.addSignalListener = originalAddSignalListener;
   });
 
   afterAll(() => {
@@ -43,8 +54,13 @@ describe("CloudWatch Monitoring Service", () => {
     intervals.forEach((id) => clearInterval(id));
     intervals.length = 0;
 
-    // Restore original setInterval
+    // Clear all tracked signal listeners
+    signalListeners.length = 0;
+
+    // Restore original functions
     globalThis.setInterval = originalSetInterval;
+    Deno.addSignalListener = originalAddSignalListener;
+    Deno.removeSignalListener = originalRemoveSignalListener;
   });
 
   describe("Initialization", () => {
