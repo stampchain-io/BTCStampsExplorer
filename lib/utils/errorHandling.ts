@@ -559,10 +559,14 @@ export class ErrorHandlingUtils {
 
       message = errorObj.message as string || message;
       try {
-        details = JSON.stringify(errorObj);
-      } catch (unknownJsonError) {
-        // Handle circular references or other JSON.stringify errors
-        handleUnknownError(unknownJsonError, "JSON stringify failed");
+        // Optimize JSON.stringify by limiting depth and skipping functions
+        details = JSON.stringify(errorObj, (_key, value) => {
+          if (typeof value === "function") return "[Function]";
+          if (typeof value === "symbol") return "[Symbol]";
+          return value;
+        });
+      } catch {
+        // Handle circular references or other JSON.stringify errors without recursion
         details = "[Circular reference or non-serializable object]";
       }
     }
