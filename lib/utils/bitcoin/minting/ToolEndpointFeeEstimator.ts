@@ -6,12 +6,12 @@
  * tool endpoints with dryRun=true for Phase 2 estimation.
  */
 
-import {
+import type {
   AnyTransactionOptions,
   StandardFeeResponse,
-  ToolEndpointError,
   ToolType,
 } from "$lib/types/toolEndpointAdapter.ts";
+import { ToolEndpointError } from "$lib/types/toolEndpointAdapter.ts";
 import { logger } from "$lib/utils/logger.ts";
 import {
   getToolAdapter,
