@@ -36,6 +36,8 @@ function restoreConsole() {
 function setup() {
   consoleOutput = [];
   mockConsole();
+  // Disable file logging for basic tests to avoid resource leaks
+  logger.setConfig({ enableFileLogging: false });
 }
 
 function teardown() {
@@ -44,6 +46,8 @@ function teardown() {
   if (!globalThis.Deno && originalDeno) {
     globalThis.Deno = originalDeno;
   }
+  // Ensure file logging is disabled
+  logger.setConfig({ enableFileLogging: false });
 }
 
 // Create an isolated test wrapper that preserves environment
@@ -64,18 +68,20 @@ function isolatedTest(
       // Run the test
       await fn();
     } finally {
-      // Always restore environment
-      if (originalDebug !== undefined) {
-        Deno.env.set("DEBUG", originalDebug);
-      } else {
-        try {
-          Deno.env.delete("DEBUG");
-        } catch {
-          // Ignore errors deleting non-existent vars
+      // Always restore environment (but only if Deno is available)
+      if (globalThis.Deno) {
+        if (originalDebug !== undefined) {
+          Deno.env.set("DEBUG", originalDebug);
+        } else {
+          try {
+            Deno.env.delete("DEBUG");
+          } catch {
+            // Ignore errors deleting non-existent vars
+          }
         }
-      }
-      if (originalDenoEnv !== undefined) {
-        Deno.env.set("DENO_ENV", originalDenoEnv);
+        if (originalDenoEnv !== undefined) {
+          Deno.env.set("DENO_ENV", originalDenoEnv);
+        }
       }
     }
   });

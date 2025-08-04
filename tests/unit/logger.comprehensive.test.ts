@@ -112,6 +112,8 @@ function setup() {
 function teardown() {
   restoreConsole();
   restoreEnvironment();
+  // Reset logger configuration to defaults
+  logger.setConfig({ enableFileLogging: false });
 }
 
 // Create an isolated test wrapper that preserves environment
@@ -157,6 +159,9 @@ isolatedTest("logger - file writing in development mode", async () => {
   // Set development environment
   Deno.env.set("DENO_ENV", "development");
   Deno.env.set("DEBUG", "stamps");
+  
+  // Explicitly enable file logging for this test
+  logger.setConfig({ enableFileLogging: true });
 
   logger.debug("stamps", { message: "Test file writing", data: "test" });
 
@@ -218,6 +223,9 @@ isolatedTest("logger - file writing with directory already exists", async () => 
   // Set to development mode to trigger file writing
   Deno.env.set("DENO_ENV", "development");
   Deno.env.set("DEBUG", "stamps");
+  
+  // Explicitly enable file logging for this test
+  logger.setConfig({ enableFileLogging: true });
 
   logger.debug("stamps", { message: "Test existing directory" });
   await new Promise((resolve) => setTimeout(resolve, 10));
@@ -238,6 +246,9 @@ isolatedTest("logger - file writing with mkdir error", async () => {
 
   Deno.env.set("DENO_ENV", "development");
   Deno.env.set("DEBUG", "stamps");
+  
+  // Explicitly enable file logging for this test
+  logger.setConfig({ enableFileLogging: true });
 
   logger.debug("stamps", { message: "Test mkdir error" });
   await new Promise((resolve) => setTimeout(resolve, 10));
@@ -260,6 +271,9 @@ isolatedTest("logger - file writing with writeTextFile error", async () => {
 
   Deno.env.set("DENO_ENV", "development");
   Deno.env.set("DEBUG", "stamps");
+  
+  // Explicitly enable file logging for this test
+  logger.setConfig({ enableFileLogging: true });
 
   logger.debug("stamps", { message: "Test write error" });
   await new Promise((resolve) => setTimeout(resolve, 10));

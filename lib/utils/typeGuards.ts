@@ -596,20 +596,32 @@ export function isValidStampNumber(num: unknown): num is number | null {
 
 /**
  * Enhanced stamp number validation (includes negative for cursed stamps)
+ * Accepts both numbers and string representations of numbers
  * @param value - Value to validate
  * @returns Type predicate for stamp number
  */
 export function isStampNumber(value: unknown): boolean {
-  return typeof value === "number" && Number.isInteger(value) && value !== 0;
+  if (typeof value === "number") {
+    return Number.isInteger(value) && value !== 0;
+  }
+  if (typeof value === "string") {
+    const num = Number(value);
+    return !isNaN(num) && Number.isInteger(num) && num !== 0;
+  }
+  return false;
 }
 
 /**
  * Validates stamp hash format
+ * Must be 12-20 characters, alphanumeric, with both uppercase and lowercase
  * @param value - Value to validate
  * @returns Type predicate for stamp hash
  */
 export function isStampHash(value: unknown): boolean {
-  return typeof value === "string" && STAMP_HASH_PATTERN.test(value);
+  return typeof value === "string" &&
+    STAMP_HASH_PATTERN.test(value) &&
+    /[a-z]/.test(value) &&
+    /[A-Z]/.test(value);
 }
 
 /**
@@ -632,23 +644,31 @@ export function isValidCPID(cpid: string): boolean {
 }
 
 /**
- * Alternative CPID validation
+ * Enhanced CPID validation supporting both numeric and alphabetic formats
  * @param value - Value to validate
  * @returns Type predicate for CPID
  */
 export function isCpid(value: unknown): boolean {
   if (typeof value !== "string") return false;
 
-  // Must be numeric
-  if (!/^\d+$/.test(value)) return false;
-
-  // Check range using BigInt for precision
-  try {
-    const cpidBigInt = BigInt(value);
-    return cpidBigInt >= CPID_MIN && cpidBigInt <= CPID_MAX;
-  } catch {
-    return false;
+  // Handle A-prefixed numeric CPIDs
+  if (value.startsWith("A")) {
+    try {
+      const numericPart = BigInt(value.slice(1));
+      const min = BigInt(26n ** 12n + 1n);
+      const max = BigInt(2n ** 64n - 1n);
+      return numericPart >= min && numericPart <= max;
+    } catch {
+      return false;
+    }
   }
+
+  // Handle alphabetic CPIDs (B-Z followed by up to 12 more letters)
+  if (/^[B-Z][A-Z]{0,12}$/.test(value)) {
+    return true;
+  }
+
+  return false;
 }
 
 /**
