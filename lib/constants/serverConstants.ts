@@ -21,13 +21,22 @@ export interface VersionConfig {
   versionEndOfLife: Record<string, string>; // version -> EOL date
 }
 
+// API Version constants for type safety
+export const API_VERSIONS = {
+  V2_1: "2.1",
+  V2_2: "2.2",
+  V2_3: "2.3",
+} as const;
+
+export type ApiVersion = typeof API_VERSIONS[keyof typeof API_VERSIONS];
+
 export const VERSION_CONFIG: VersionConfig = {
-  supportedVersions: ["2.2", "2.3"],
-  defaultVersion: "2.3", // Latest version by default
-  deprecatedVersions: ["2.1"],
+  supportedVersions: [API_VERSIONS.V2_2, API_VERSIONS.V2_3],
+  defaultVersion: API_VERSIONS.V2_3, // Latest version by default
+  deprecatedVersions: [API_VERSIONS.V2_1],
   versionEndOfLife: {
-    "2.1": "2025-06-01",
-    "2.2": "2025-12-01",
+    [API_VERSIONS.V2_1]: "2025-06-01",
+    [API_VERSIONS.V2_2]: "2025-12-01",
   },
 };
 
@@ -36,20 +45,20 @@ export const VERSION_CONFIG: VersionConfig = {
  * Endpoints that are deprecated in specific versions
  */
 export const DEPRECATED_ENDPOINTS: Record<string, {
-  deprecatedInVersion: string;
+  deprecatedInVersion: ApiVersion;
   reason: string;
   alternative: string;
   endOfLife: string;
 }> = {
   "/api/v2/cursed": {
-    deprecatedInVersion: "2.3",
+    deprecatedInVersion: API_VERSIONS.V2_3,
     reason:
       "Redundant endpoint - use /api/v2/stamps with type=cursed filter instead",
     alternative: "/api/v2/stamps?type=cursed",
     endOfLife: "2025-12-01",
   },
   "/api/v2/cursed/": {
-    deprecatedInVersion: "2.3",
+    deprecatedInVersion: API_VERSIONS.V2_3,
     reason:
       "Redundant endpoint - use /api/v2/stamps with type=cursed filter instead",
     alternative: "/api/v2/stamps?type=cursed",
