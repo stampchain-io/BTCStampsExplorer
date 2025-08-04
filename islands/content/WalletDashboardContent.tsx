@@ -18,7 +18,7 @@ import {
   navigateWithFresh,
 } from "$lib/utils/navigation/freshNavigationUtils.ts";
 import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
-import { WalletContentProps } from "$types/wallet.d.ts";
+import type { WalletContentProps } from "$types/wallet.d.ts";
 import { useEffect, useState } from "preact/hooks";
 
 /* ===== ITEM HEADER SUBCOMPONENT ===== */

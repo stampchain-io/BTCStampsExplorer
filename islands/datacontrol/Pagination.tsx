@@ -1,6 +1,6 @@
 import { Icon } from "$icon";
 import { getWindowWidth } from "$lib/utils/navigation/freshNavigationUtils.ts";
-import { PaginationProps } from "$types/pagination.d.ts";
+import type { PaginationProps } from "$types/pagination.d.ts";
 import { useEffect, useState } from "preact/hooks";
 
 // Update pagination range constants

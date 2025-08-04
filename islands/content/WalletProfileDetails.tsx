@@ -3,7 +3,7 @@ import { StatItem, StatTitle } from "$components/section/WalletComponents.tsx";
 import type { WalletProfileDetailsProps } from "$types/ui.d.ts";
 import { Icon } from "$icon";
 import { containerBackground } from "$layout";
-import { WalletOverviewInfo } from "$lib/types/wallet.d.ts";
+import type { WalletOverviewInfo } from "$lib/types/wallet.d.ts";
 import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { tooltipIcon } from "$notification";
 import { labelSm, subtitleGrey, titleGreyLD } from "$text";

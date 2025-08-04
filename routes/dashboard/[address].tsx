@@ -6,7 +6,7 @@ import { Handlers } from "$fresh/server.ts";
 
 import { WalletDashboardHeader } from "$header";
 import WalletDashboardDetails from "$islands/content/WalletDashboardDetails.tsx";
-import { PaginatedResponse } from "$lib/types/pagination.d.ts";
+import type { PaginatedResponse } from "$lib/types/pagination.d.ts";
 import { getBTCBalanceInfo } from "$lib/utils/data/processing/balanceUtils.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { StampController } from "$server/controller/stampController.ts";
@@ -14,7 +14,7 @@ import type { SRC20Row } from "$types/src20.d.ts";
 import type { StampRow } from "$types/stamp.d.ts";
 
 import type { WalletPageProps } from "$types/ui.d.ts";
-import { WalletOverviewInfo } from "$types/wallet.d.ts";
+import type { WalletOverviewInfo } from "$types/wallet.d.ts";
 
 /* ===== HELPERS ===== */
 /**

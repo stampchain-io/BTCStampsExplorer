@@ -14,9 +14,9 @@ import { getBTCBalanceInfo } from "$lib/utils/data/processing/balanceUtils.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { CreatorService } from "$server/services/creator/creatorService.ts";
-import { PaginatedResponse } from "$types/pagination.d.ts";
+import type { PaginatedResponse } from "$types/pagination.d.ts";
 import type { WalletPageProps } from "$types/ui.d.ts";
-import { WalletOverviewInfo } from "$types/wallet.d.ts";
+import type { WalletOverviewInfo } from "$types/wallet.d.ts";
 
 /* ===== SERVER HANDLER ===== */
 /**
