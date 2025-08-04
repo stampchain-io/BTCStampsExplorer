@@ -558,15 +558,18 @@ export function createFieldValidationError(
   rule?: string,
   params?: Record<string, unknown>,
 ): FieldValidationError {
-  return {
+  const error: FieldValidationError = {
     field,
     code,
     message,
-    value,
-    path,
-    rule,
-    params,
   };
+  
+  if (value !== undefined) error.value = value;
+  if (path !== undefined) error.path = path;
+  if (rule !== undefined) error.rule = rule;
+  if (params !== undefined) error.params = params;
+  
+  return error;
 }
 
 /**
