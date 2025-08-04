@@ -3749,7 +3749,7 @@ export interface FairmintToolProps extends BaseComponentProps {
  */
 export interface MintProgressProps extends BaseComponentProps {
   progress?: number;
-  progressWidth?: number;
+  progressWidth?: string;
   maxSupply?: number;
   limit?: number;
   current: number;
