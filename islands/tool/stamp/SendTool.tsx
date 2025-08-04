@@ -503,7 +503,7 @@ export function StampSendTool() {
 
           <div class={containerColForm}>
             <SelectField
-              options={stamps.data.map((stamp) => ({
+              options={(stamps.data ?? []).map((stamp) => ({
                 value: stamp.stamp?.toString() ?? "",
                 label: `Stamp ${stamp.stamp}${
                   stamp.ident ? ` - ${stamp.ident}` : ""

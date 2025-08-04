@@ -93,6 +93,7 @@ export interface ProgressiveFeeEstimationResult extends FeeDetails {
  * Tool-specific parameters for fee estimation
  */
 // Removed duplicate ToolEstimationParams definition
+// The correct definition is now in lib/types/transaction.d.ts
 
 /**
  * Progressive fee estimation options and configuration
