@@ -5,7 +5,7 @@
  * response parsing, and error handling.
  */
 
-import {
+import type {
   SRC101TransactionOptions,
   SRC20TransactionOptions,
   StampTransactionOptions,

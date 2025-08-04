@@ -6,14 +6,14 @@
 
 import type { SRC20Row } from "$types/src20.d.ts";
 import type { SRC20MarketData } from "$lib/types/marketData.d.ts";
-import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
-import {
+import type { MarketDataRepository } from "$server/database/marketDataRepository.ts";
+import type {
   hasMarketData,
   MarketDataEnrichmentService,
 } from "$server/services/src20/marketDataEnrichmentService.ts";
 import { assert, assertEquals, assertExists } from "@std/assert";
 import { afterAll, beforeAll, describe, it } from "jsr:@std/testing@1.0.14/bdd";
-import { MockDatabaseManager } from "../mocks/mockDatabaseManager.ts";
+import type { MockDatabaseManager } from "../mocks/mockDatabaseManager.ts";
 
 // Test fixtures
 const mockSRC20Token: SRC20Row = {

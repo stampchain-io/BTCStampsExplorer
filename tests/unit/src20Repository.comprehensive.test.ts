@@ -7,7 +7,7 @@
 
 import { assertEquals, assertExists, assertRejects } from "@std/assert";
 import { stub, restore } from "@std/testing/mock";
-import { SRC20Repository } from "../../server/database/src20Repository.ts";
+import type { SRC20Repository } from "../../server/database/src20Repository.ts";
 import { emojiToUnicodeEscape, unicodeEscapeToEmoji } from "../../lib/utils/ui/formatting/emojiUtils.ts";
 import { BigFloat } from "bigfloat/mod.ts";
 

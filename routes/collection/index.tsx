@@ -17,7 +17,7 @@ import {
 } from "$section";
 import { CollectionController } from "$server/controller/collectionController.ts";
 import { StampController } from "$server/controller/stampController.ts";
-import {
+import type {
   CollectionWithOptionalMarketData,
 } from "$server/types/collection.d.ts";
 

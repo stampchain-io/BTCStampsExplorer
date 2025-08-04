@@ -1,6 +1,6 @@
 import { StampFilterType } from "$constants";
-import { SRC20_FILTER_TYPES } from "$types/src20.d.ts";
-import {
+import type { SRC20_FILTER_TYPES } from "$types/src20.d.ts";
+import type {
   COLLECTION_FILTER_TYPES,
   LISTING_FILTER_TYPES,
   WALLET_FILTER_TYPES,
