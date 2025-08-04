@@ -1,6 +1,6 @@
 #!/bin/bash
 # deploy-local-changes.sh - Deploy uncommitted local changes to AWS
-# Usage: ./scripts/deploy-local-changes.sh [--skip-build] [--skip-validation] [--api-version-validation]
+# Usage: ./scripts/deploy-local-changes.sh [--skip-build] [--skip-validation] [--api-version-validation] [--force]
 
 # Attempt to load .env file if it exists and export its variables
 if [ -f .env ]; then
@@ -33,6 +33,7 @@ CODE_BUILD_PROJECT=${CODE_BUILD_PROJECT:-"stamps-app-build"}
 SKIP_BUILD=false
 SKIP_VALIDATION=false
 API_VERSION_VALIDATION=true
+FORCE_MODE=false
 for arg in "$@"; do
   case $arg in
     --skip-build)
@@ -45,6 +46,11 @@ for arg in "$@"; do
       ;;
     --no-api-validation)
       API_VERSION_VALIDATION=false
+      shift
+      ;;
+    --force)
+      FORCE_MODE=true
+      SKIP_VALIDATION=true
       shift
       ;;
   esac
@@ -213,7 +219,11 @@ post_deployment_validation() {
 
 echo -e "${BLUE}======================================================${NC}"
 echo -e "${BLUE}     Deploying Local Changes to AWS Environment      ${NC}"
-echo -e "${BLUE}     Enhanced with v2.3 API Safety Validation       ${NC}"
+if [ "$FORCE_MODE" = true ]; then
+  echo -e "${YELLOW}     ⚠️  FORCE MODE: Skipping validation checks ⚠️    ${NC}"
+else
+  echo -e "${BLUE}     Enhanced with v2.3 API Safety Validation       ${NC}"
+fi
 echo -e "${BLUE}======================================================${NC}"
 
 # Get AWS account ID
