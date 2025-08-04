@@ -1329,3 +1329,24 @@ export type {
   WalletConnectionResult,
   WalletProviderKey,
 };
+
+// Re-export constant type guards from types directory
+export {
+  getStampTypeDisplay,
+  getStampTypeOptions,
+  isValidAPIErrorCode,
+  isValidBitcoinErrorCode,
+  isValidErrorCode,
+  isValidSRC20ErrorCode,
+  isValidStampEdition,
+  isValidStampErrorCode,
+  isValidStampFiletype,
+  isValidStampFilterType,
+  isValidStampMarketplace,
+  isValidStampType,
+  isValidValidationErrorCode,
+  parseStampType,
+  validateConstants,
+  validateStampFilterType,
+  validateStampType,
+} from "$types/constants.ts";

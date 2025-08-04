@@ -6,6 +6,19 @@
 /**
  * Stamp type constants - aligned with actual application usage
  * These represent the different categories/types of stamps used throughout the application
+ *
+ * @example
+ * ```typescript
+ * import { STAMP_TYPES } from "$constants/stampConstants";
+ *
+ * // Use in API routes
+ * const filterType = params.type || STAMP_TYPES.ALL;
+ *
+ * // Use in type checking
+ * if (stampType === STAMP_TYPES.CURSED) {
+ *   return getCursedStamps();
+ * }
+ * ```
  */
 export const STAMP_TYPES = {
   /** All stamp types - no filtering */
