@@ -34,6 +34,17 @@ export type {
 } from "$constants";
 
 // ============================================================================
+// PERFORMANCE OPTIMIZATIONS
+// ============================================================================
+
+// Create Sets for O(1) lookup performance
+const STAMP_TYPE_SET = new Set(Object.values(STAMP_TYPES));
+const STAMP_FILTER_TYPE_SET = new Set(Object.values(STAMP_FILTER_TYPES));
+const STAMP_MARKETPLACE_SET = new Set(Object.values(STAMP_MARKETPLACE));
+const STAMP_EDITION_SET = new Set(Object.values(STAMP_EDITIONS));
+const STAMP_FILETYPE_SET = new Set(Object.values(STAMP_FILETYPES));
+
+// ============================================================================
 // STAMP CONSTANT TYPE GUARDS
 // ============================================================================
 
@@ -49,7 +60,7 @@ export type {
  */
 export function isValidStampType(value: unknown): value is StampType {
   return typeof value === "string" &&
-    Object.values(STAMP_TYPES).includes(value as StampType);
+    STAMP_TYPE_SET.has(value as StampType);
 }
 
 /**
@@ -59,7 +70,7 @@ export function isValidStampFilterType(
   value: unknown,
 ): value is StampFilterType {
   return typeof value === "string" &&
-    Object.values(STAMP_FILTER_TYPES).includes(value as StampFilterType);
+    STAMP_FILTER_TYPE_SET.has(value as StampFilterType);
 }
 
 /**
@@ -69,7 +80,7 @@ export function isValidStampMarketplace(
   value: unknown,
 ): value is StampMarketplace {
   return typeof value === "string" &&
-    Object.values(STAMP_MARKETPLACE).includes(value as StampMarketplace);
+    STAMP_MARKETPLACE_SET.has(value as StampMarketplace);
 }
 
 /**
@@ -77,7 +88,7 @@ export function isValidStampMarketplace(
  */
 export function isValidStampFiletype(value: unknown): value is StampFiletype {
   return typeof value === "string" &&
-    Object.values(STAMP_FILETYPES).includes(value as StampFiletype);
+    STAMP_FILETYPE_SET.has(value as StampFiletype);
 }
 
 /**
@@ -85,7 +96,7 @@ export function isValidStampFiletype(value: unknown): value is StampFiletype {
  */
 export function isValidStampEdition(value: unknown): value is StampEdition {
   return typeof value === "string" &&
-    Object.values(STAMP_EDITIONS).includes(value as StampEdition);
+    STAMP_EDITION_SET.has(value as StampEdition);
 }
 
 // ============================================================================
