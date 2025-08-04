@@ -118,7 +118,9 @@ export function isValidStampErrorCode(value: unknown): value is StampErrorCode {
 export function isValidValidationErrorCode(
   value: unknown,
 ): value is ValidationErrorCode {
-  return Object.values(ValidationErrorCode).includes(value as ValidationErrorCode);
+  return Object.values(ValidationErrorCode).includes(
+    value as ValidationErrorCode,
+  );
 }
 
 /**
