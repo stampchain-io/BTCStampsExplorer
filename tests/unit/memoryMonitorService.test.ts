@@ -118,15 +118,19 @@ describe("MemoryMonitorService", () => {
       const usagePercent = (stats.usage.current.rss / stats.limits.heapLimit) *
         100;
 
-      if (usagePercent >= 85) {
-        assertEquals(health.metrics.memoryPressure, "critical");
-      } else if (usagePercent >= 70) {
-        assertEquals(health.metrics.memoryPressure, "high");
-      } else if (usagePercent >= 50) {
-        assertEquals(health.metrics.memoryPressure, "medium");
-      } else {
-        assertEquals(health.metrics.memoryPressure, "low");
-      }
+      // Test that the memory pressure matches the expected thresholds
+      // We can't predict exact memory usage in tests, so verify the logic
+      const expectedPressure = usagePercent >= 85 ? "critical" :
+                              usagePercent >= 70 ? "high" :
+                              usagePercent >= 50 ? "medium" : "low";
+
+      assertEquals(health.metrics.memoryPressure, expectedPressure);
+      
+      // Also verify that the pressure is one of the valid values
+      assert(
+        ["low", "medium", "high", "critical"].includes(health.metrics.memoryPressure),
+        `Invalid memory pressure value: ${health.metrics.memoryPressure}`
+      );
     });
   });
 
