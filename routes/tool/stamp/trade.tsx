@@ -1,5 +1,5 @@
 /* ===== TRADE PAGE ===== */
-import { PageProps } from "$fresh/server.ts";
+import type { PageProps } from "$fresh/server.ts";
 import { StampTradeTool } from "$tool";
 
 /* ===== PAGE COMPONENT ===== */
