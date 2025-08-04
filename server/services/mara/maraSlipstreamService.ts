@@ -15,6 +15,15 @@ import type {
   MaraErrorResponse
 } from "./types.ts";
 
+// Types for dependency injection
+interface MaraConfigProvider {
+  getMaraConfig(): ReturnType<typeof getMaraConfig>;
+}
+
+interface MaraConfigValidator {
+  assertValidMaraConfig(): ReturnType<typeof assertValidMaraConfig>;
+}
+
 // Configuration constants
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000; // 1 second
@@ -31,13 +40,39 @@ export class MaraSlipstreamService {
   // Circuit breaker to handle API failures gracefully
   private static circuitBreaker = createPriceServiceCircuitBreaker("MaraSlipstream");
 
+  // Dependency injection for configuration functions (for testing)
+  private static _configProvider: MaraConfigProvider = {
+    getMaraConfig
+  };
+  private static _configValidator: MaraConfigValidator = {
+    assertValidMaraConfig
+  };
+
+  /**
+   * Set the configuration provider (for testing)
+   */
+  static setConfigProvider(provider: MaraConfigProvider): void {
+    this._configProvider = provider;
+    // Reset cached config when provider changes
+    this._config = null;
+  }
+
+  /**
+   * Set the configuration validator (for testing)
+   */
+  static setConfigValidator(validator: MaraConfigValidator): void {
+    this._configValidator = validator;
+    // Reset cached config when validator changes
+    this._config = null;
+  }
+
   /**
    * Get MARA configuration, initializing if needed
    * @throws Error if MARA is not properly configured
    */
   private static get config() {
     if (!this._config) {
-      this._config = assertValidMaraConfig();
+      this._config = this._configValidator.assertValidMaraConfig();
     }
     return this._config;
   }
@@ -388,7 +423,7 @@ export class MaraSlipstreamService {
    */
   static isConfigured(): boolean {
     try {
-      const config = getMaraConfig();
+      const config = this._configProvider.getMaraConfig();
       return config !== null && config.enabled;
     } catch {
       return false;
