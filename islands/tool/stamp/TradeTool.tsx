@@ -590,7 +590,7 @@ export function StampTradeTool() {
       // Filter UTXOs >= 546 sats and sort them
       const filteredAndSortedUtxos = [...data.utxos]
         .filter((utxo: UTXO) =>
-          utxo.value != null && utxo.value >= MIN_UTXO_VALUE
+          utxo.value !== undefined && utxo.value >= MIN_UTXO_VALUE
         )
         .sort((a: UTXO, b: UTXO) => a.value - b.value);
 
