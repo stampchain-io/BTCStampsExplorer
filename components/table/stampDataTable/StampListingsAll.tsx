@@ -8,7 +8,7 @@ import {
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { labelXs, valueDark, valueSm, valueSmLink } from "$text";
 
-export function StampListingsAllTable({ dispensers }: StampListingsAllProps) {
+export function StampListingsAllTable({ listings }: StampListingsAllProps) {
   const headers = [
     "PRICE",
     "ESCROW",
@@ -33,7 +33,7 @@ export function StampListingsAllTable({ dispensers }: StampListingsAllProps) {
             { width: "w-[14%]" },
           ]).map((col: any) => <col key={col.key} class={col.className} />)}
         </colgroup>
-        {(dispensers?.length ?? 0) > 0 && (
+        {(listings?.length ?? 0) > 0 && (
           <thead>
             <tr>
               {headers.map((header: string, i: number) => (
@@ -49,8 +49,8 @@ export function StampListingsAllTable({ dispensers }: StampListingsAllProps) {
           </thead>
         )}
         <tbody>
-          {(dispensers?.length ?? 0) > 0
-            ? dispensers?.map((dispenser: Dispenser, index: number) => {
+          {(listings?.length ?? 0) > 0
+            ? listings?.map((dispenser: Dispenser, index: number) => {
               const isEmpty = dispenser.give_remaining === 0;
               const rowDispensersRemain = `${
                 isEmpty ? "text-stamp-grey-darker" : ""

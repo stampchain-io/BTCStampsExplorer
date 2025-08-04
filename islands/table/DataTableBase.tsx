@@ -138,7 +138,6 @@ export default function DataTableBase({
           return (
             <StampListingsAllTable
               listings={tabData.dispensers || []}
-              dispensers={tabData.dispensers || []}
             />
           );
         case "sales": {
