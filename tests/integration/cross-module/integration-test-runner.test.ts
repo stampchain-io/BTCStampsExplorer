@@ -171,7 +171,7 @@ class CrossModuleIntegrationRunner {
 
   async runAllTests(): Promise<IntegrationReport> {
     console.log("🚀 Starting Cross-Module Integration Testing");
-    console.log("=" * 60);
+    console.log("=".repeat(60));
 
     const startTime = Date.now();
     this.testResults = [];
@@ -507,9 +507,9 @@ class CrossModuleIntegrationRunner {
   }
 
   private printReport(report: IntegrationReport): void {
-    console.log("\n" + "=" * 60);
+    console.log("\n" + "=".repeat(60));
     console.log("📊 CROSS-MODULE INTEGRATION TEST REPORT");
-    console.log("=" * 60);
+    console.log("=".repeat(60));
 
     console.log(`\n📈 Summary:`);
     console.log(`   Total Tests: ${report.totalTests}`);
