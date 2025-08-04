@@ -15,7 +15,7 @@
     "preview": "deno run -A main.ts",
     "check": "deno task check:fmt && deno task check:lint && deno task check:types",
     "check:debug": "deno task check:fmt:debug && deno task check:lint:debug && deno task check:types:debug",
-    "validate": "deno fmt && deno check . && deno task test:unit",
+    "validate": "deno fmt && deno check . && deno task build && deno task test:unit",
     "validate:quick": "deno fmt --check . && deno check . && deno task test:unit",
     "validate:all": "deno fmt; deno check .; deno task test:unit",
     "validate:ci": "deno fmt --check . && deno lint --quiet && deno check . && deno task check:imports:ci && deno task test:unit",
