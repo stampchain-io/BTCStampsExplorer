@@ -2,7 +2,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Deno Fresh: Standard Dev",
+      "name": "Dev Server",
       "type": "node",
       "request": "launch",
       "cwd": "${workspaceFolder}",
@@ -20,7 +20,7 @@
       }
     },
     {
-      "name": "Deno Fresh: Frontend (Fast)",
+      "name": "Frontend Dev",
       "type": "node",
       "request": "launch",
       "cwd": "${workspaceFolder}",
@@ -29,7 +29,7 @@
         "task",
         "dev:frontend"
       ],
-      "attachSimplePort": 9230,
+      "attachSimplePort": 9229,
       "console": "integratedTerminal",
       "env": {
         "DENO_ENV": "development",
@@ -38,50 +38,14 @@
       }
     },
     {
-      "name": "Deno Fresh: Full-Stack (Debounced)",
-      "type": "node",
-      "request": "launch",
-      "cwd": "${workspaceFolder}",
-      "runtimeExecutable": "deno",
-      "runtimeArgs": [
-        "task",
-        "dev:debounced"
-      ],
-      "attachSimplePort": 9231,
-      "console": "integratedTerminal",
-      "env": {
-        "DENO_ENV": "development",
-        "DEV_BASE_URL": "http://localhost:8000",
-        "SKIP_REDIS_CONNECTION": "true"
-      }
-    },
-    {
-      "name": "Deno Fresh: Clean Start",
-      "type": "node",
-      "request": "launch",
-      "cwd": "${workspaceFolder}",
-      "runtimeExecutable": "deno",
-      "runtimeArgs": [
-        "task",
-        "dev:clean"
-      ],
-      "attachSimplePort": 9232,
-      "console": "integratedTerminal",
-      "env": {
-        "DENO_ENV": "development",
-        "DEV_BASE_URL": "http://localhost:8000",
-        "SKIP_REDIS_CONNECTION": "true"
-      }
-    },
-    {
-      "name": "Deno Fresh: Debug Mode",
+      "name": "Debug (Breakpoints)",
       "type": "node",
       "request": "launch",
       "cwd": "${workspaceFolder}",
       "runtimeExecutable": "deno",
       "runtimeArgs": [
         "run",
-        "--inspect-brk=127.0.0.1:9229",
+        "--inspect-brk",
         "--allow-all",
         "--watch=routes/,islands/,components/,lib/,server/",
         "--watch-exclude=_fresh/,node_modules/,coverage/,tmp/,dist/",
@@ -89,8 +53,8 @@
         "dev.ts",
         "--host"
       ],
-      "port": 9229,
-      "console": "integratedTerminal",
+      "attachSimplePort": 9229,
+      "console": "internalConsole",
       "env": {
         "DENO_ENV": "development",
         "DEV_BASE_URL": "http://localhost:8000",
@@ -98,13 +62,13 @@
       }
     },
     {
-      "name": "Deno Fresh: Attach to Running",
+      "name": "Attach to Process",
       "type": "node",
       "request": "attach",
       "port": 9229
     },
     {
-      "name": "Deno Fresh: Production Preview",
+      "name": "Production Preview",
       "type": "node",
       "request": "launch",
       "cwd": "${workspaceFolder}",
@@ -117,24 +81,6 @@
       "console": "integratedTerminal",
       "env": {
         "DENO_ENV": "production"
-      }
-    },
-    {
-      "name": "Deno Fresh: Build & Run",
-      "type": "node",
-      "request": "launch",
-      "cwd": "${workspaceFolder}",
-      "runtimeExecutable": "deno",
-      "runtimeArgs": [
-        "task",
-        "dev:build"
-      ],
-      "attachSimplePort": 9229,
-      "console": "integratedTerminal",
-      "env": {
-        "DENO_ENV": "development",
-        "DEV_BASE_URL": "http://localhost:8000",
-        "SKIP_REDIS_CONNECTION": "true"
       }
     }
   ]

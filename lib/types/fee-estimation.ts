@@ -24,7 +24,7 @@ export interface DetailedUTXO extends BasicUTXO {
   /** Block height when this UTXO was created */
   blockHeight: number;
   /** Script type (P2WPKH, P2SH, P2PKH, etc.) */
-  scriptType?: ScriptType;
+  scriptType: ScriptType;
   /** Raw script public key */
   scriptPubKey: string;
   /** Witness data if applicable */

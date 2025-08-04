@@ -48,7 +48,10 @@ export default function FreshSRC20Gallery({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentSort, setCurrentSort] = useState<"ASC" | "DESC">(
-    typeof initialSort === "string" ? initialSort : "ASC",
+    typeof initialSort === "string" &&
+      (initialSort === "ASC" || initialSort === "DESC")
+      ? initialSort
+      : "ASC",
   );
 
   // ===== FRESH PERFORMANCE OPTIMIZATION =====
