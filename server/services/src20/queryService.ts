@@ -8,7 +8,7 @@ import type {
   SRC20TrxRequestParams
 
 } from "$types/src20.d.ts";
-import { SRC20BalanceRequestParams } from "$lib/types/src20.d.ts";
+import type {SRC20BalanceRequestParams} from "$lib/types/src20.d.ts";
 import { stripTrailingZeros } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { paginate } from "$lib/utils/data/pagination/paginationUtils.ts";
 import { MarketDataRepository } from "$server/database/marketDataRepository.ts";

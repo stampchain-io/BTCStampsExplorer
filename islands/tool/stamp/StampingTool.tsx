@@ -1938,7 +1938,7 @@ function StampingToolMain({ config }: { config: Config }) {
         <MaraModeIndicator
           isActive
           outputValue={outputValue}
-          {...(maraFeeRate !== null && { feeRate: maraFeeRate })}
+          feeRate={maraFeeRate ?? undefined}
           class="mb-4"
         />
       )}

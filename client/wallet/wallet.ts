@@ -4,7 +4,7 @@ import { openModal } from "$islands/modal/states.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { signal } from "@preact/signals";
 
-import { Wallet } from "$types/index.d.ts";
+import type { Wallet } from "$types/index.d.ts";
 import {
   broadcastPSBT,
   broadcastRawTX,

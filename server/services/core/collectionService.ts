@@ -1,6 +1,6 @@
 import { CollectionRepository } from "$server/database/collectionRepository.ts";
 import { BlockController } from "$server/controller/blockController.ts";
-import { CollectionQueryParams, PaginatedCollectionResponseBody } from "$server/types/collection.d.ts";
+import type {CollectionQueryParams, PaginatedCollectionResponseBody} from "$server/types/collection.d.ts";
 import { paginate } from "$lib/utils/data/pagination/paginationUtils.ts";
 import type { CollectionRow } from "$server/types/collection.d.ts";
 

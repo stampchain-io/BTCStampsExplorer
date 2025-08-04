@@ -557,7 +557,7 @@ export function createFieldValidationError(
   path?: string[],
   rule?: string,
   params?: Record<string, unknown>,
-): any {
+): FieldValidationError {
   return {
     field,
     code,
@@ -576,7 +576,7 @@ export function validateRequired(
   field: string,
   value: unknown,
   path?: string[],
-): any | null {
+): FieldValidationError | null {
   if (value === undefined || value === null || value === "") {
     return createFieldValidationError(
       field,
@@ -599,7 +599,7 @@ export function validateLength(
   min?: number,
   max?: number,
   path?: string[],
-): any | null {
+): FieldValidationError | null {
   if (typeof value !== "string") {
     return createFieldValidationError(
       field,
@@ -715,7 +715,7 @@ export function validateRange(
   min?: number,
   max?: number,
   path?: string[],
-): any | null {
+): FieldValidationError | null {
   if (typeof value !== "number" || isNaN(value)) {
     return createFieldValidationError(
       field,

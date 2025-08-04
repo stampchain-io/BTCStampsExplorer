@@ -1,4 +1,4 @@
-import { MarketListingAggregated, OpenStampMarketData, StampScanMarketData } from "$lib/types/marketData.d.ts";
+import type {MarketListingAggregated, OpenStampMarketData, StampScanMarketData} from "$lib/types/marketData.d.ts";
 import { serverConfig } from "$server/config/config.ts";
 import { FetchHttpClient } from "$server/interfaces/httpClient.ts";
 

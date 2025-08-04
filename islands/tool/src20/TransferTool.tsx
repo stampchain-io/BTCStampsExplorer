@@ -230,17 +230,11 @@ export function SRC20TransferTool(
     const maxAmount = Number(formState.maxAmount);
 
     if (!isNaN(inputAmount) && !isNaN(maxAmount) && inputAmount > maxAmount) {
-      handleInputChange({
-        target: { value: maxAmount.toString() },
-      } as any as Event, "amt");
+      handleInputChange(maxAmount.toString(), "amt");
       return;
     }
 
-    const syntheticEvent = {
-      target: { value },
-      type: "change",
-    } as unknown as Event;
-    handleInputChange(syntheticEvent, "amt");
+    handleInputChange(value, "amt");
   };
 
   /* ===== TOKEN CHANGE HANDLER ===== */
@@ -251,12 +245,7 @@ export function SRC20TransferTool(
     });
     const newValue = value.toUpperCase();
     if (newValue !== formState.token && !isSelecting) {
-      // Create a synthetic event for handleInputChange
-      const syntheticEvent = {
-        target: { value: newValue },
-        type: "change",
-      } as unknown as Event;
-      handleInputChange(syntheticEvent, "token");
+      handleInputChange(newValue, "token");
       setOpenDrop(true);
     }
   };

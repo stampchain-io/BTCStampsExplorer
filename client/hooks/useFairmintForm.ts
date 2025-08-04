@@ -4,7 +4,7 @@ import {
   walletContext,
 } from "$client/wallet/wallet.ts";
 import { useFees } from "$fees";
-import { Config } from "$types/base.d.ts";
+import type { Config } from "$types/base.d.ts";
 import { debounce } from "$lib/utils/performance/debounce.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { estimateFee } from "$lib/utils/minting/feeCalculations.ts";

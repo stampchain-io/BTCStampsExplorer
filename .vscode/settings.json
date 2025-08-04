@@ -54,7 +54,8 @@
   "editor.defaultFormatter": "denoland.vscode-deno",
   "editor.codeActionsOnSave": {
     "source.fixAll": "explicit",
-    "source.organizeImports": "explicit"
+    "source.organizeImports": "explicit",
+    "source.fixAll.ts": "explicit"
   },
   "[typescript]": {
     "editor.defaultFormatter": "denoland.vscode-deno"
@@ -145,6 +146,10 @@
   "editor.quickSuggestions": {
     "strings": true
   },
+  
+  // TypeScript import preferences
+  "typescript.preferences.preferTypeOnlyAutoImports": true,
+  "typescript.preferences.includePackageJsonAutoImports": "off",
 
   // GitLens configuration to prevent terminal issues
   "gitlens.advanced.fileHistoryFollowsRenames": false,

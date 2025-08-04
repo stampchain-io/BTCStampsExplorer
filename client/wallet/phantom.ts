@@ -1,6 +1,6 @@
 import { signal } from "@preact/signals";
 import { walletContext } from "$client/wallet/wallet.ts";
-import { SignPSBTResult, Wallet } from "$types/index.d.ts";
+import type { SignPSBTResult, Wallet } from "$types/index.d.ts";
 import {
   checkWalletAvailability,
   getGlobalWallets,

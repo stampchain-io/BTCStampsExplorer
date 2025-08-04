@@ -1,6 +1,6 @@
 
 import type { SRC20MarketData } from "$lib/types/marketData.d.ts";
-import { SRC20BalanceRequestParams, SRC20TickPageData } from "$lib/types/src20.d.ts";
+import type {SRC20BalanceRequestParams, SRC20TickPageData} from "$lib/types/src20.d.ts";
 import { formatAmount } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { SRC20Repository } from "$server/database/src20Repository.ts";
 import { BlockService } from "$server/services/core/blockService.ts";
