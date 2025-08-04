@@ -37,7 +37,7 @@ export const handler: Handlers = {
       ...(op && { op }),
       ...(tick && { tick }),
       ...(block_index && { block_index: Number(block_index) }),
-      ...(singleResult === "true" && { singleResult: true }),
+      singleResult: true, // Always return single result for transaction endpoint
       ...(sortValidation.data && { sortBy: sortValidation.data }),
       page: page || DEFAULT_PAGINATION.page,
       limit: limit || DEFAULT_PAGINATION.limit,
