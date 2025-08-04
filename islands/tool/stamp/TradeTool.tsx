@@ -592,7 +592,7 @@ export function StampTradeTool() {
         .filter((utxo: UTXO) =>
           utxo.value != null && utxo.value >= MIN_UTXO_VALUE
         )
-        .sort((a: UTXO, b: UTXO) => (a.value ?? 0) - (b.value ?? 0));
+        .sort((a: UTXO, b: UTXO) => a.value - b.value);
 
       console.log(`Received ${data.utxos.length} total UTXOs`);
       console.log(

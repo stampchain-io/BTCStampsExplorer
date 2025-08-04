@@ -481,7 +481,9 @@ export function getUserFriendlyMessage(
 /**
  * Determine if error should be reported to monitoring
  */
-export function shouldReportError(error: any): boolean {
+export function shouldReportError(
+  error: Error | ApplicationError | unknown,
+): boolean {
   // Don't report validation errors
   if (error instanceof ValidationError) return false;
 
@@ -648,7 +650,7 @@ export function validateEmail(
   field: string,
   value: string,
   path?: string[],
-): any | null {
+): FieldValidationError | null {
   if (typeof value !== "string") {
     return createFieldValidationError(
       field,
@@ -682,7 +684,7 @@ export function validateUrl(
   field: string,
   value: string,
   path?: string[],
-): any | null {
+): FieldValidationError | null {
   if (typeof value !== "string") {
     return createFieldValidationError(
       field,
@@ -765,7 +767,7 @@ export function validatePattern(
   value: string,
   pattern: RegExp,
   path?: string[],
-): any | null {
+): FieldValidationError | null {
   if (typeof value !== "string") {
     return createFieldValidationError(
       field,
@@ -799,7 +801,7 @@ export function validateBitcoinAddress(
   field: string,
   value: string,
   path?: string[],
-): any | null {
+): FieldValidationError | null {
   if (typeof value !== "string") {
     return createFieldValidationError(
       field,
@@ -836,7 +838,7 @@ export function validateSRC20Ticker(
   field: string,
   value: string,
   path?: string[],
-): any | null {
+): FieldValidationError | null {
   if (typeof value !== "string") {
     return createFieldValidationError(
       field,
