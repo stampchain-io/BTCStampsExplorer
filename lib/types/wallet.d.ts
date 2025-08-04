@@ -3,8 +3,8 @@ import type {
   SignatureType,
   WalletProviderKey,
 } from "$constants";
-import { PaginationQueryParams } from "$types/pagination.d.ts";
-import { WalletSortKey } from "$types/sorting.d.ts";
+import type { PaginationQueryParams } from "$types/pagination.d.ts";
+import type { WalletSortKey } from "$types/sorting.d.ts";
 import type { WalletConnectionState } from "$types/ui.d.ts";
 import type { ProgressiveFeeEstimationResult } from "$types/utils.d.ts";
 

@@ -60,7 +60,7 @@ import type { BufferLike } from "$lib/types/utils.d.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
 import { OptimalUTXOSelection } from "$server/services/utxo/optimalUtxoSelection.ts";
 import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
-import { IPrepareSRC101TX } from "$server/types/services/src101.d.ts";
+import type {IPrepareSRC101TX} from "$server/types/services/src101.d.ts";
 import type { UTXO } from "$types/base.d.ts";
 import { convertUTXOsToBasic } from "$lib/utils/bitcoin/utxo/utxoTypeUtils.ts";
 import type { PSBTInput, VOUT } from "$types/src20.d.ts";

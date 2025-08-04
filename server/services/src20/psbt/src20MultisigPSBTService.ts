@@ -60,7 +60,7 @@ import { SRC20CompressionService } from "$server/services/src20/compression/comp
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
 import { OptimalUTXOSelection } from "$server/services/utxo/optimalUtxoSelection.ts";
 import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
-import { IPrepareSRC20TX } from "$server/types/services/src20.d.ts";
+import type {IPrepareSRC20TX} from "$server/types/services/src20.d.ts";
 import type { UTXO } from "$types/base.d.ts";
 import { convertUTXOsToBasic } from "$lib/utils/bitcoin/utxo/utxoTypeUtils.ts";
 import type { PSBTInput, VOUT } from "$types/src20.d.ts";

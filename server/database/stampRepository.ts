@@ -19,7 +19,7 @@ import { logger, LogNamespace } from "$lib/utils/logger.ts";
 import { isCpid, isStampHash, isStampNumber, isTxHash } from "$lib/utils/typeGuards.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
 import { summarize_issuances } from "$server/database/index.ts";
-import { SUBPROTOCOLS } from "$types/base.d.ts";
+import type {SUBPROTOCOLS} from "$types/base.d.ts";
 import type { XcpBalance } from "$types/services.d.ts";
 import type { StampBalance, StampFilters } from "$types/stamp.d.ts";
 

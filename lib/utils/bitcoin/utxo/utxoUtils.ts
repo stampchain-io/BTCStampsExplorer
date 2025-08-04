@@ -1,4 +1,4 @@
-import { UTXO } from "$types/index.d.ts";
+import type { UTXO } from "$types/index.d.ts";
 import { decodeBase58 } from "@std/encoding/base58";
 import {
   detectScriptType,

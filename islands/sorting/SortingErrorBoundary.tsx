@@ -185,31 +185,9 @@ function SortingErrorFallback({
   maxRetries,
 }: SortingErrorFallbackProps) {
   if (!error) {
-    return (
-      <div className="sorting-error-fallback p-4">
-        <ErrorDisplay
-          error={{
-            name: "UnknownError",
-            message: "No error information available.",
-          }}
-          showDetails
-          compact={false}
-          className="mb-4"
-        />
-        <div className="text-sm text-gray-600 mb-2">
-          An unexpected error occurred, but no details are available. Please try
-          refreshing the page or contact support if the issue persists.
-        </div>
-        {onReset && (
-          <button
-            className="btn btn-secondary"
-            onClick={onReset}
-            type="button"
-          >
-            Dismiss
-          </button>
-        )}
-      </div>
+    // This should never happen: error boundary fallback must only be rendered with a real error.
+    throw new Error(
+      "SortingErrorFallback called without an error object. This indicates a logic error in the error boundary implementation.",
     );
   }
 

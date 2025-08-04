@@ -7,7 +7,7 @@ import { CollectionService } from "$server/services/core/collectionService.ts";
 import { BTCPriceService } from "$server/services/price/btcPriceService.ts";
 import { StampService } from "$server/services/stampService.ts";
 import type { CollectionRow } from "$server/types/collection.d.ts";
-import { SUBPROTOCOLS } from "$types/base.d.ts";
+import type {SUBPROTOCOLS} from "$types/base.d.ts";
 // import { formatSatoshisToBTC } from "$lib/utils/ui/formatting/formatUtils.ts"; // Fixed: Removed unused import
 import { normalizeHeaders } from "$lib/utils/api/headers/headerUtils.ts";
 import { API_RESPONSE_VERSION, ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";

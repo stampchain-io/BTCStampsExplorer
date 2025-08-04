@@ -6,7 +6,7 @@ import { estimateFee } from "$lib/utils/minting/feeCalculations.ts";
 import { showSuccess } from "$lib/utils/monitoring/notifications/notificationUtils.ts";
 import { debounce } from "$lib/utils/performance/debounce.ts";
 import { handleUnknownError } from "$lib/utils/errorHandling.ts";
-import { Config } from "$types/base.d.ts";
+import type { Config } from "$types/base.d.ts";
 import type { SRC20FormState } from "$types/ui.d.ts";
 import axiod from "axiod";
 import { useCallback, useEffect, useMemo, useState } from "preact/hooks";

@@ -3,7 +3,7 @@
  * Uses real API response fixtures instead of making external calls
  */
 
-import { UTXO } from "$types/index.d.ts";
+import type {UTXO} from "$types/index.d.ts";
 import { getMempoolTransaction } from "../fixtures/api-responses/mempool-api-fixtures.ts";
 import { getScriptTypeInfo } from "$lib/utils/bitcoin/scripts/scriptTypeUtils.ts";
 

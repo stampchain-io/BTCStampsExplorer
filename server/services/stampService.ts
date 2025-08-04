@@ -11,7 +11,7 @@ import { type StampType } from "$constants";
 import { StampRepository } from "$server/database/index.ts";
 import { BlockService } from "$server/services/core/blockService.ts";
 import { CounterpartyApiManager, CounterpartyDispenserService } from "$server/services/counterpartyApiService.ts";
-import { SUBPROTOCOLS } from "$types/base.d.ts";
+import type {SUBPROTOCOLS} from "$types/base.d.ts";
 
 import { logger, LogNamespace } from "$lib/utils/logger.ts";
 import { MarketDataRepository } from "$server/database/marketDataRepository.ts";

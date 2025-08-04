@@ -1,5 +1,5 @@
 import { TX_CONSTANTS } from "$constants";
-import { ScriptType, ScriptTypeInfo } from "$types/transaction.d.ts";
+import type { ScriptType, ScriptTypeInfo } from "$types/transaction.d.ts";
 
 // Helper function to convert Uint8Array to hex string
 function toHexString(bytes: Uint8Array): string {

@@ -1,5 +1,5 @@
 import type { CommonUTXOFetchOptions } from "$types/base.d.ts";
-import { UTXO } from "$lib/types/base.d.ts";
+import type {UTXO} from "$lib/types/base.d.ts";
 import { BLOCKSTREAM_API_BASE_URL, MEMPOOL_API_BASE_URL } from "$constants";
 import { logger } from "$lib/utils/logger.ts";
 import { detectScriptType } from "$lib/utils/bitcoin/scripts/scriptTypeUtils.ts";
@@ -9,7 +9,7 @@ import {
 import { serverConfig } from "$server/config/config.ts";
 import { FetchHttpClient } from "$server/interfaces/httpClient.ts";
 import { UTXOOptions as QuicknodeInternalUTXOOptions, QuicknodeUTXOService } from "$server/services/quicknode/quicknodeUTXOService.ts";
-import { ICommonUTXOService, UTXOFetchOptions } from "$server/services/utxo/utxoServiceInterface.d.ts";
+import type {ICommonUTXOService, UTXOFetchOptions} from "$server/services/utxo/utxoServiceInterface.d.ts";
 
 const httpClient = new FetchHttpClient();
 

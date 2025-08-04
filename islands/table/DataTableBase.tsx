@@ -314,7 +314,7 @@ export default function DataTableBase({
     <div class={containerBackground}>
       {/* ===== TABS SECTION ===== */}
       <div class="flex justify-between items-start w-full mb-6">
-        {configs.map(({ id }: TabData) => {
+        {configs.map(({ id }) => {
           const count = totalCounts[id as keyof typeof totalCounts];
           const alignment = getTabAlignment(id, configs.length);
 

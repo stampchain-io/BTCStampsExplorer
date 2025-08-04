@@ -1,5 +1,5 @@
 import { logger } from "$lib/utils/logger.ts";
-import { SignPSBTResult, Wallet } from "$types/index.d.ts";
+import type { SignPSBTResult, Wallet } from "$types/index.d.ts";
 import type { PSBTInputToSign } from "$types/wallet.d.ts";
 import { horizonProvider } from "$client/wallet/horizon.ts";
 import { leatherProvider } from "$client/wallet/leather.ts";
