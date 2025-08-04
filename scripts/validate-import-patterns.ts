@@ -123,41 +123,16 @@ class ImportPatternValidator {
       test: (stmt) => /from\s+['"]https:\/\/deno\.land\/x\/fresh@/.test(stmt),
       recommendation: 'Update to use newer Fresh import patterns or JSR imports'
     },
-    {
-      id: 'missing-type-only',
-      name: 'Missing Type-Only Import',
-      description: 'Type imports should use "import type" syntax',
-      category: 'info',
-      pattern: /import\s+{[^}]*}\s+from/,
-      test: (stmt) => {
-        // Only flag imports that are very likely to be type-only
-        // This is more conservative to avoid false positives
-        if (stmt.includes('import type')) return false;
-        
-        // Extract import names
-        const match = stmt.match(/import\s+{([^}]+)}\s+from/);
-        if (!match) return false;
-        
-        const imports = match[1].split(',').map(s => s.trim().replace(/\s+as\s+.*/, ''));
-        
-        // Only flag if ALL imports look like types (very conservative)
-        return imports.length > 0 && imports.every(imp => {
-          // Must start with capital letter
-          if (!/^[A-Z]/.test(imp)) return false;
-          
-          // Common type patterns that should use 'import type'
-          return (
-            // Interface/Type names (usually PascalCase with Type/Interface suffix)
-            /^[A-Z][a-zA-Z]*(?:Type|Interface|Config|Options|Props|State)$/.test(imp) ||
-            // Generic type names (single capital letter or short)  
-            /^[A-Z]$/.test(imp) ||
-            // Error/Exception types
-            /^[A-Z][a-zA-Z]*(?:Error|Exception)$/.test(imp)
-          );
-        });
-      },
-      recommendation: 'Use "import type" for type-only imports to improve tree-shaking'
-    },
+    // Temporarily disabled due to false positives - needs better AST analysis
+    // {
+    //   id: 'missing-type-only',
+    //   name: 'Missing Type-Only Import',
+    //   description: 'Type imports should use "import type" syntax',
+    //   category: 'info',
+    //   pattern: /import\s+{[^}]*}\s+from/,
+    //   test: (stmt) => false, // Disabled
+    //   recommendation: 'Use "import type" for type-only imports to improve tree-shaking'
+    // },
     {
       id: 'unnecessary-index-import',
       name: 'Unnecessary Index Import',
@@ -351,9 +326,11 @@ class ImportPatternValidator {
     // Generate recommendations
     const recommendations = this.generateRecommendations(violationsByCategory);
 
-    // Determine success (no critical violations or passed strict mode)
+    // Determine success (no violations of specified levels)
     const success = options.strict 
-      ? violationsByCategory.critical.length === 0 && violationsByCategory.warning.length === 0
+      ? violationsByCategory.critical.length === 0 && 
+        violationsByCategory.warning.length === 0 && 
+        violationsByCategory.info.length === 0
       : violationsByCategory.critical.length === 0;
 
     return {

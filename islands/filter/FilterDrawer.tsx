@@ -16,7 +16,7 @@ import {
 // Import SRC20 filter content
 import { Button } from "$button";
 import { CloseIcon, Icon } from "$icon";
-import { FilterType } from "$islands/button/FilterButton.tsx";
+import type { FilterType } from "$islands/button/FilterButton.tsx";
 import { FilterContentSRC20 } from "$islands/filter/FilterContentSRC20.tsx";
 import {
   getSearchParams,

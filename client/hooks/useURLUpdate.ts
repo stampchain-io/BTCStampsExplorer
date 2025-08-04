@@ -1,4 +1,4 @@
-import { StampFilterType } from "$constants";
+import type { StampFilterType } from "$constants";
 import type { SRC20_FILTER_TYPES } from "$types/src20.d.ts";
 import type {
   COLLECTION_FILTER_TYPES,
