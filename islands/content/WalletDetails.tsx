@@ -2,8 +2,8 @@
 import type { StatItemProps } from "$types/ui.d.ts";
 import type { StatTitleProps } from "$types/ui.d.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
-import { WalletData } from "$lib/types/index.d.ts";
-import { WalletOverviewInfo } from "$lib/types/wallet.d.ts";
+import type { WalletData } from "$lib/types/index.d.ts";
+import type { WalletOverviewInfo } from "$lib/types/wallet.d.ts";
 import {
   abbreviateAddress,
   formatBTCAmount,

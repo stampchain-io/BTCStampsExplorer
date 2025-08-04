@@ -8,7 +8,7 @@ import {
   StampTransfersTable,
 } from "$table";
 import { labelSm, loaderText, value3xlTransparent } from "$text";
-import { TabData, TableProps, TableType } from "$types/ui.d.ts";
+import type { TabData, TableProps, TableType } from "$types/ui.d.ts";
 import { useEffect, useState } from "preact/hooks";
 
 /* ===== CONSTANTS ===== */
