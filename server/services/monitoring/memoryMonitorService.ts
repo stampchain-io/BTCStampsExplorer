@@ -485,7 +485,7 @@ export class MemoryMonitorService {
   stopMonitoring(): void {
     if (this.monitoringInterval) {
       clearInterval(this.monitoringInterval);
-      this.monitoringInterval = undefined;
+      delete this.monitoringInterval;
       console.log("[MemoryMonitor] Monitoring stopped and resources cleaned up");
     }
   }
