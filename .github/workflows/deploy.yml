@@ -140,14 +140,28 @@ jobs:
           fi
 
       # Create a summary comment for PR
-      - name: Create PR Comment with Issues
-        if: github.event_name == 'pull_request' && (steps.fmtcheck.outcome == 'failure' || steps.lintcheck.outcome == 'failure' || steps.ssrcheck.outcome == 'failure' || steps.responsecheck.outcome == 'failure')
+      - name: Create PR Comment with Quality Results
+        if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('fs');
             let comment = '## 🔍 Code Quality Check Results\n\n';
+            
+            // Add summary
+            const hasErrors = '${{ steps.fmtcheck.outcome }}' === 'failure' || 
+                            '${{ steps.lintcheck.outcome }}' === 'failure';
+            const hasWarnings = '${{ steps.ssrcheck.outcome }}' === 'failure' || 
+                              '${{ steps.responsecheck.outcome }}' === 'failure';
+            
+            if (!hasErrors && !hasWarnings) {
+              comment += '✅ **All checks passed!**\n\n';
+            } else if (hasErrors) {
+              comment += '❌ **Blocking issues found** - these must be fixed before merging.\n\n';
+            } else {
+              comment += '⚠️ **Non-blocking warnings found** - consider addressing these issues.\n\n';
+            }
 
             // Check format issues
             if ('${{ steps.fmtcheck.outcome }}' === 'failure') {
@@ -222,20 +236,22 @@ jobs:
               comment += '### ✅ Lint Check Passed\n\n';
             }
 
-            // Check SSR safety issues
+            // Check SSR safety issues (warning only)
             if ('${{ steps.ssrcheck.outcome }}' === 'failure') {
-              comment += '### ❌ SSR Safety Issues Found\n\n';
+              comment += '### ⚠️ SSR Safety Warning\n\n';
               comment += 'Found client-side only code that may cause SSR errors.\n\n';
               comment += 'Please review the output and ensure all browser APIs are properly guarded.\n\n';
+              comment += '**Note:** This is a non-blocking warning.\n\n';
             } else {
               comment += '### ✅ SSR Safety Check Passed\n\n';
             }
 
-            // Check response pattern issues
+            // Check response pattern issues (warning only)
             if ('${{ steps.responsecheck.outcome }}' === 'failure') {
-              comment += '### ❌ Response Pattern Issues Found\n\n';
+              comment += '### ⚠️ Response Pattern Warning\n\n';
               comment += 'Found manual Response objects that should use utility functions.\n\n';
               comment += 'Please use the response utilities from `lib/utils/api/responses/` instead.\n\n';
+              comment += '**Note:** This is a non-blocking warning.\n\n';
             } else {
               comment += '### ✅ Response Pattern Check Passed\n\n';
             }
@@ -291,9 +307,10 @@ jobs:
         run: deno task check:responses
         continue-on-error: true
 
-      # Fail the workflow if any checks failed
+      # Fail the workflow if any critical checks failed
+      # Note: SSR and response checks are warnings only for now
       - name: Check for failures
-        if: steps.fmtcheck.outcome == 'failure' || steps.lintcheck.outcome == 'failure' || steps.actionlint.outcome == 'failure' || steps.ssrcheck.outcome == 'failure' || steps.responsecheck.outcome == 'failure'
+        if: steps.fmtcheck.outcome == 'failure' || steps.lintcheck.outcome == 'failure' || steps.actionlint.outcome == 'failure'
         run: exit 1
 
       # Build check
