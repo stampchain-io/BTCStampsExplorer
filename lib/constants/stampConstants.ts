@@ -240,8 +240,9 @@ export type StampFilesize =
   typeof STAMP_FILESIZES[keyof typeof STAMP_FILESIZES];
 
 /**
- * Legacy stamp classification enum (deprecated - use STAMP_TYPES instead)
- * @deprecated Use STAMP_TYPES constants instead
+ * Stamp classification enum for type validation and domain logic
+ * Contains only the core classification values (no meta-types)
+ * For filtering/routing use STAMP_TYPES constants instead
  */
 export enum StampClassification {
   /** Cursed stamps - violate protocol rules but are still have stamp: prefix */

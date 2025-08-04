@@ -293,10 +293,10 @@ Deno.test("Stamp Protocol Type Guards", async (t) => {
   });
 
   await t.step("isValidStampClassification", () => {
-    assertEquals(isValidStampClassification("blessed"), true);
     assertEquals(isValidStampClassification("cursed"), true);
     assertEquals(isValidStampClassification("classic"), true);
     assertEquals(isValidStampClassification("posh"), true);
+    assertEquals(isValidStampClassification("blessed"), false);
     assertEquals(isValidStampClassification("invalid"), false);
   });
 

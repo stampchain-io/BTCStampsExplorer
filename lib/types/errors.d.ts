@@ -8,6 +8,27 @@
  * @version 1.0.0
  */
 
+// Import error codes from constants to follow single-source-of-truth pattern
+import {
+  APIErrorCode,
+  BitcoinErrorCode,
+  ErrorSeverity,
+  ErrorType,
+  SRC20ErrorCode,
+  StampErrorCode,
+  ValidationErrorCode,
+} from "$constants";
+
+export {
+  APIErrorCode,
+  BitcoinErrorCode,
+  ErrorSeverity,
+  ErrorType,
+  SRC20ErrorCode,
+  StampErrorCode,
+  ValidationErrorCode,
+};
+
 // ===== BASE ERROR TYPES =====
 
 /**
@@ -250,99 +271,31 @@ export declare class ConfigurationError extends BaseError {
 /**
  * Validation error codes
  */
-export enum ValidationErrorCode {
-  REQUIRED_FIELD = "VALIDATION_REQUIRED_FIELD",
-  INVALID_FORMAT = "VALIDATION_INVALID_FORMAT",
-  INVALID_TYPE = "VALIDATION_INVALID_TYPE",
-  INVALID_LENGTH = "VALIDATION_INVALID_LENGTH",
-  INVALID_RANGE = "VALIDATION_INVALID_RANGE",
-  INVALID_PATTERN = "VALIDATION_INVALID_PATTERN",
-  INVALID_EMAIL = "VALIDATION_INVALID_EMAIL",
-  INVALID_URL = "VALIDATION_INVALID_URL",
-  INVALID_DATE = "VALIDATION_INVALID_DATE",
-  DUPLICATE_VALUE = "VALIDATION_DUPLICATE_VALUE",
-  REFERENCE_NOT_FOUND = "VALIDATION_REFERENCE_NOT_FOUND",
-}
+// ValidationErrorCode enum moved to constants/errorConstants.ts
 
 /**
  * API error codes
  */
-export enum APIErrorCode {
-  BAD_REQUEST = "API_BAD_REQUEST",
-  UNAUTHORIZED = "API_UNAUTHORIZED",
-  FORBIDDEN = "API_FORBIDDEN",
-  NOT_FOUND = "API_NOT_FOUND",
-  METHOD_NOT_ALLOWED = "API_METHOD_NOT_ALLOWED",
-  CONFLICT = "API_CONFLICT",
-  GONE = "API_GONE",
-  UNPROCESSABLE_ENTITY = "API_UNPROCESSABLE_ENTITY",
-  TOO_MANY_REQUESTS = "API_TOO_MANY_REQUESTS",
-  INTERNAL_ERROR = "API_INTERNAL_ERROR",
-  BAD_GATEWAY = "API_BAD_GATEWAY",
-  SERVICE_UNAVAILABLE = "API_SERVICE_UNAVAILABLE",
-  GATEWAY_TIMEOUT = "API_GATEWAY_TIMEOUT",
-}
+// APIErrorCode enum moved to constants/errorConstants.ts
 
 /**
  * Bitcoin error codes
  */
-export enum BitcoinErrorCode {
-  INVALID_ADDRESS = "BITCOIN_INVALID_ADDRESS",
-  INVALID_TRANSACTION = "BITCOIN_INVALID_TRANSACTION",
-  INSUFFICIENT_FUNDS = "BITCOIN_INSUFFICIENT_FUNDS",
-  TRANSACTION_TOO_LARGE = "BITCOIN_TRANSACTION_TOO_LARGE",
-  FEE_TOO_LOW = "BITCOIN_FEE_TOO_LOW",
-  FEE_TOO_HIGH = "BITCOIN_FEE_TOO_HIGH",
-  UTXO_NOT_FOUND = "BITCOIN_UTXO_NOT_FOUND",
-  SCRIPT_VALIDATION_ERROR = "BITCOIN_SCRIPT_VALIDATION_ERROR",
-  NETWORK_ERROR = "BITCOIN_NETWORK_ERROR",
-  NODE_UNAVAILABLE = "BITCOIN_NODE_UNAVAILABLE",
-  MEMPOOL_FULL = "BITCOIN_MEMPOOL_FULL",
-  DOUBLE_SPEND = "BITCOIN_DOUBLE_SPEND",
-}
+// BitcoinErrorCode enum moved to constants/errorConstants.ts
 
 /**
  * SRC-20 error codes
  */
-export enum SRC20ErrorCode {
-  INVALID_TICKER = "SRC20_INVALID_TICKER",
-  TOKEN_NOT_FOUND = "SRC20_TOKEN_NOT_FOUND",
-  TOKEN_ALREADY_EXISTS = "SRC20_TOKEN_ALREADY_EXISTS",
-  INSUFFICIENT_BALANCE = "SRC20_INSUFFICIENT_BALANCE",
-  INVALID_AMOUNT = "SRC20_INVALID_AMOUNT",
-  MINT_LIMIT_EXCEEDED = "SRC20_MINT_LIMIT_EXCEEDED",
-  TOKEN_FULLY_MINTED = "SRC20_TOKEN_FULLY_MINTED",
-  INVALID_DECIMALS = "SRC20_INVALID_DECIMALS",
-  DEPLOYMENT_FAILED = "SRC20_DEPLOYMENT_FAILED",
-  TRANSFER_FAILED = "SRC20_TRANSFER_FAILED",
-  MINT_FAILED = "SRC20_MINT_FAILED",
-}
+// SRC20ErrorCode enum moved to constants/errorConstants.ts
 
 /**
  * Stamp error codes
  */
-export enum StampErrorCode {
-  STAMP_NOT_FOUND = "STAMP_NOT_FOUND",
-  INVALID_STAMP_DATA = "STAMP_INVALID_STAMP_DATA",
-  INVALID_CPID = "STAMP_INVALID_CPID",
-  STAMP_ALREADY_EXISTS = "STAMP_ALREADY_EXISTS",
-  INVALID_CREATOR = "STAMP_INVALID_CREATOR",
-  INVALID_SUPPLY = "STAMP_INVALID_SUPPLY",
-  INVALID_DIVISIBILITY = "STAMP_INVALID_DIVISIBILITY",
-  INVALID_LOCK_STATUS = "STAMP_INVALID_LOCK_STATUS",
-  INVALID_MEDIA_TYPE = "STAMP_INVALID_MEDIA_TYPE",
-  MEDIA_TOO_LARGE = "STAMP_MEDIA_TOO_LARGE",
-  INVALID_BASE64 = "STAMP_INVALID_BASE64",
-}
+// StampErrorCode enum moved to constants/stampConstants.ts
 
 // ===== ERROR SEVERITY LEVELS =====
 
-export enum ErrorSeverity {
-  LOW = "low",
-  MEDIUM = "medium",
-  HIGH = "high",
-  CRITICAL = "critical",
-}
+// ErrorSeverity enum moved to constants/errorConstants.ts
 
 // ===== VALIDATION ERROR STRUCTURES =====
 
@@ -663,26 +616,8 @@ export type ErrorTransformer<
 
 // ===== LEGACY ERROR COMPATIBILITY =====
 
-/**
- * Legacy error type mappings for backward compatibility
- * @deprecated Use new error classes instead
- */
-export enum ErrorType {
-  /** @deprecated Use NetworkError */
-  NETWORK_ERROR = "network",
-  /** @deprecated Use APIError */
-  API_ERROR = "api",
-  /** @deprecated Use ValidationError */
-  DATA_ERROR = "data",
-  /** @deprecated Use ValidationError */
-  VALIDATION_ERROR = "validation",
-  /** @deprecated Use NetworkError */
-  TIMEOUT_ERROR = "timeout",
-  /** @deprecated Use AuthenticationError */
-  AUTH_ERROR = "auth",
-  /** @deprecated Use BaseError */
-  UNKNOWN_ERROR = "unknown",
-}
+// ErrorType enum moved to constants/errorConstants.ts
+// Import from there if needed
 
 /**
  * Legacy error info interface

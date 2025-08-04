@@ -277,14 +277,12 @@ Deno.test("Stamp Types - Core StampRow Structure", () => {
 Deno.test("Stamp Types - Classification and Validation", () => {
   // Test StampClassification enum
   const classifications: StampClassification[] = [
-    StampClassification.BLESSED,
     StampClassification.CURSED,
     StampClassification.CLASSIC,
     StampClassification.POSH,
   ];
 
-  assertEquals(classifications.length, 4);
-  assertEquals(StampClassification.BLESSED, "blessed");
+  assertEquals(classifications.length, 3);
   assertEquals(StampClassification.CURSED, "cursed");
 
   // Test StampValidationStatus enum
@@ -300,7 +298,7 @@ Deno.test("Stamp Types - Classification and Validation", () => {
 
   // Test StampMetadata structure
   const testMetadata: StampMetadata = {
-    classification: StampClassification.BLESSED,
+    classification: StampClassification.CURSED,
     rarity: StampRarity.COMMON,
     status: StampStatus.CONFIRMED,
     validationStatus: StampValidationStatus.VALID,
@@ -315,7 +313,7 @@ Deno.test("Stamp Types - Classification and Validation", () => {
     lastUpdated: new Date(),
   };
 
-  assertEquals(testMetadata.classification, StampClassification.BLESSED);
+  assertEquals(testMetadata.classification, StampClassification.CURSED);
   assertEquals(testMetadata.status, StampStatus.CONFIRMED);
   assertEquals(Array.isArray(testMetadata.tags), true);
 });
