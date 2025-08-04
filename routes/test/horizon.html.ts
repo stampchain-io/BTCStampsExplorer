@@ -1,5 +1,6 @@
 // 🚧 TEMPORARY TEST HANDLER - Remove after Horizon Wallet API discovery is complete
 import { Handlers } from "$fresh/server.ts";
+import { WebResponseUtil } from "$utils/api/responses/webResponseUtil.ts";
 
 export const handler: Handlers = {
   async GET(_req, _ctx) {
@@ -8,10 +9,9 @@ export const handler: Handlers = {
         "./client/test/horizon-wallet-discovery.html",
       );
 
-      return new Response(htmlContent, {
+      return WebResponseUtil.htmlResponse(htmlContent, {
+        forceNoCache: true,
         headers: {
-          "content-type": "text/html; charset=utf-8",
-          "cache-control": "no-cache, no-store, must-revalidate",
           "pragma": "no-cache",
           "expires": "0",
         },
@@ -19,7 +19,7 @@ export const handler: Handlers = {
     } catch (error: unknown) {
       console.error("Error serving horizon discovery HTML:", error);
 
-      return new Response(
+      return WebResponseUtil.htmlResponse(
         `
         <html>
           <body style="font-family: monospace; padding: 20px; background: #1a1a1a; color: #ff4444;">
@@ -32,10 +32,7 @@ export const handler: Handlers = {
           </body>
         </html>
       `,
-        {
-          status: 404,
-          headers: { "content-type": "text/html; charset=utf-8" },
-        },
+        { status: 404 },
       );
     }
   },

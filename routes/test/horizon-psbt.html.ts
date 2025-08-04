@@ -1,4 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
+import { WebResponseUtil } from "$utils/api/responses/webResponseUtil.ts";
 
 export const handler: Handlers = {
   GET(_req, _ctx) {
@@ -545,8 +546,6 @@ export const handler: Handlers = {
 </body>
 </html>`;
 
-    return new Response(htmlContent, {
-      headers: { "content-type": "text/html" },
-    });
+    return WebResponseUtil.htmlResponse(htmlContent);
   },
 };
