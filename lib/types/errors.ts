@@ -22,7 +22,12 @@ export {
 } from "$constants";
 
 // Import types for local use
-import type { ApplicationError } from "$types/errors.d.ts";
+import type {
+  ApplicationError,
+  FieldValidationError,
+  LegacyErrorInfo,
+  ValidationErrorCollection,
+} from "$types/errors.d.ts";
 
 // ===== ERROR CLASS IMPLEMENTATIONS =====
 
@@ -368,7 +373,9 @@ export function isAuthorizationError(
 /**
  * Create a validation error collection utility
  */
-export function createValidationErrorCollection(errors: any[] = []): any {
+export function createValidationErrorCollection(
+  errors: FieldValidationError[] = [],
+): ValidationErrorCollection {
   return {
     errors,
     hasErrors: errors.length > 0,
@@ -387,7 +394,9 @@ export function createValidationErrorCollection(errors: any[] = []): any {
 /**
  * Convert legacy error info to ApplicationError
  */
-export function fromLegacyErrorInfo(legacyError: any): any {
+export function fromLegacyErrorInfo(
+  legacyError: LegacyErrorInfo,
+): BaseError {
   const { type, message, details } = legacyError;
 
   switch (type) {
@@ -416,7 +425,9 @@ export function fromLegacyErrorInfo(legacyError: any): any {
 /**
  * Extract error message for user display
  */
-export function getUserFriendlyMessage(error: any): string {
+export function getUserFriendlyMessage(
+  error: Error | ApplicationError | unknown,
+): string {
   if (error instanceof ValidationError) {
     return error.field
       ? `Invalid ${error.field}: ${error.message}`
@@ -454,7 +465,17 @@ export function getUserFriendlyMessage(error: any): string {
     return `Stamp error: ${error.message}`;
   }
 
-  return error.message || "An unexpected error occurred.";
+  // Handle Error objects and unknown types
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  // Handle unknown error types
+  if (error && typeof error === "object" && "message" in error) {
+    return String(error.message);
+  }
+
+  return "An unexpected error occurred.";
 }
 
 /**

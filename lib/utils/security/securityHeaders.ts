@@ -121,10 +121,10 @@ export const getSecurityHeaders = (
     }),
     "Vary": "Accept-Encoding, Accept, Origin",
   };
-  
+
   // Cache the headers for future use
   securityHeaderCache.set(cacheKey, headers);
-  
+
   return headers;
 };
 

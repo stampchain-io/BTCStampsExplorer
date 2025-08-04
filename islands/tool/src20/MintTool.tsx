@@ -271,7 +271,7 @@ export function SRC20MintTool({
 
   /* ===== MINT PROGRESS CALCULATIONS ===== */
   const progress = mintStatus ? mintStatus.progress : "0";
-  const progressWidth = Number(progress);
+  const progressWidth = `${Number(progress)}%`;
   const maxSupply = mintStatus ? Number(mintStatus.max_supply) : 0;
   const limit = mintStatus ? Number(mintStatus.limit) : 0;
   const minters = holders ? holders.toString() : "0";
@@ -498,7 +498,7 @@ export function SRC20MintTool({
           maxSupply={maxSupply}
           limit={limit}
           minters={minters}
-          current={Math.floor((progressWidth * maxSupply) / 100)}
+          current={Math.floor((Number(progress) * maxSupply) / 100)}
           total={maxSupply}
         />
       </form>
