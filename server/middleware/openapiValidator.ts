@@ -18,7 +18,7 @@ type Next = () => Promise<void> | void;
  */
 
 interface SchemaValidator {
-  validate(data: any): boolean;
+  (data: any): boolean;
   errors?: any[];
 }
 
@@ -260,7 +260,7 @@ class OpenAPIValidator {
     valid: boolean;
     errors?: any[];
   } {
-    const valid = validator.validate(data);
+    const valid = validator(data);
     
     if (!valid && validator.errors) {
       return {
