@@ -23,7 +23,7 @@ import { useEffect, useRef, useState } from "preact/hooks";
 export function FeeCalculatorBase({
   fee,
   handleChangeFee,
-  BTCPrice = 0, // Default to 0 if not provided
+  BTCPrice, // Don't provide default value
   isSubmitting,
   onSubmit,
   onCancel,
@@ -419,8 +419,7 @@ export function FeeCalculatorBase({
                     ? formatSatoshisToBTC(feeDetails.minerFee, {
                       includeSymbol: false,
                     })
-                    : formatSatoshisToUSD(feeDetails.minerFee, BTCPrice ?? 0)}
-                  {" "}
+                    : formatSatoshisToUSD(feeDetails.minerFee, BTCPrice)}{" "}
                   <span class="font-light">{coinType}</span>
                   {!feeDetails?.hasExactFees && (
                     <span class="text-stamp-grey-light text-xs ml-1 opacity-70">
@@ -447,8 +446,7 @@ export function FeeCalculatorBase({
                 ? formatSatoshisToBTC(feeDetails.serviceFee, {
                   includeSymbol: false,
                 })
-                : formatSatoshisToUSD(feeDetails.serviceFee, BTCPrice ?? 0)}
-              {" "}
+                : formatSatoshisToUSD(feeDetails.serviceFee, BTCPrice)}{" "}
               <span class="font-light">{coinType}</span>
             </h6>
           )}
@@ -468,7 +466,7 @@ export function FeeCalculatorBase({
                       })
                       : formatSatoshisToUSD(
                         feeDetails.dustValue,
-                        BTCPrice ?? 0,
+                        BTCPrice,
                       )} <span class="font-light">{coinType}</span>
                   </>
                 )
@@ -511,7 +509,7 @@ export function FeeCalculatorBase({
                       })
                       : formatSatoshisToUSD(
                         feeDetails.itemPrice ?? 0,
-                        BTCPrice ?? 0,
+                        BTCPrice,
                       )} <span class="font-light">{coinType}</span>
                   </>
                 )
@@ -551,7 +549,7 @@ export function FeeCalculatorBase({
                       })
                       : formatSatoshisToUSD(
                         feeDetails.itemPrice ?? 0,
-                        BTCPrice ?? 0,
+                        BTCPrice,
                       )} <span class="font-light">{coinType}</span>
                   </>
                 )
@@ -691,7 +689,7 @@ export function FeeCalculatorBase({
                     ? formatSatoshisToBTC(feeDetails.totalValue, {
                       includeSymbol: false,
                     })
-                    : formatSatoshisToUSD(feeDetails.totalValue, BTCPrice ?? 0)}
+                    : formatSatoshisToUSD(feeDetails.totalValue, BTCPrice)}
                 </>
               )
               : <span class="animate-pulse">0.00000000</span>}{" "}
@@ -781,7 +779,9 @@ export function FeeCalculatorBase({
                   : (
                     <>
                       <span class="font-bold">
-                        {(totalWithMaraFee / 1e8 * BTCPrice).toFixed(2)}
+                        {BTCPrice
+                          ? (totalWithMaraFee / 1e8 * BTCPrice).toFixed(2)
+                          : "N/A"}
                       </span>{" "}
                       <span class="font-light">{coinType}</span>
                     </>
