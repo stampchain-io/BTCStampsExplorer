@@ -18,7 +18,7 @@ import { useTransactionConstructionService } from "$lib/hooks/useTransactionCons
 import { FeeCalculatorBase } from "$section";
 import { titlePurpleLD } from "$text";
 import { JSX } from "preact";
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useMemo, useState } from "preact/hooks";
 
 /* ===== COMPONENT ===== */
 export function StampSendTool() {
@@ -407,6 +407,15 @@ export function StampSendTool() {
     }
   };
 
+  /* ===== MEMOIZED VALUES ===== */
+  const stampOptions = useMemo(() => {
+    return (stamps.data ?? []).map((stamp) => ({
+      value: stamp.stamp?.toString() ?? "",
+      label: `Stamp ${stamp.stamp}${stamp.ident ? ` - ${stamp.ident}` : ""}`,
+      disabled: false,
+    }));
+  }, [stamps.data]);
+
   /* ===== RENDER HELPERS ===== */
   const renderStampContent = () => {
     if (!selectedStamp) {
@@ -503,13 +512,7 @@ export function StampSendTool() {
 
           <div class={containerColForm}>
             <SelectField
-              options={(stamps.data ?? []).map((stamp) => ({
-                value: stamp.stamp?.toString() ?? "",
-                label: `Stamp ${stamp.stamp}${
-                  stamp.ident ? ` - ${stamp.ident}` : ""
-                }`,
-                disabled: false,
-              }))}
+              options={stampOptions}
               onChange={handleStampSelect}
               value={selectedStamp?.stamp?.toString() ?? ""}
             />
