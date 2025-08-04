@@ -956,8 +956,12 @@ describe("DatabaseManager - Enhanced Comprehensive Tests", () => {
     it("should handle TCP connectivity failure", async () => {
       const configWithTcpFail = { ...testConfig, ELASTICACHE_ENDPOINT: "fail-tcp" };
       const manager = new EnhancedTestDatabaseManager(configWithTcpFail, mockClient, mockRedisClient);
-      await manager.initialize();
-      // Should handle gracefully
+      try {
+        await manager.initialize();
+        // Should handle gracefully
+      } finally {
+        await manager.closeAllClients();
+      }
     });
 
     it("should handle Redis test verification failure", async () => {
@@ -1232,19 +1236,27 @@ describe("DatabaseManager - Enhanced Comprehensive Tests", () => {
     it("should bypass cache in development environment", async () => {
       const devConfig = { ...testConfig, DENO_ENV: "development" };
       const devManager = new EnhancedTestDatabaseManager(devConfig, mockClient, mockRedisClient);
-      await devManager.initialize();
-      
-      const result = await devManager.executeQueryWithCache("SELECT 1", [], 60);
-      assertExists(result);
+      try {
+        await devManager.initialize();
+        
+        const result = await devManager.executeQueryWithCache("SELECT 1", [], 60);
+        assertExists(result);
+      } finally {
+        await devManager.closeAllClients();
+      }
     });
 
     it("should bypass cache when CACHE is false", async () => {
       const noCacheConfig = { ...testConfig, CACHE: "false" };
       const noCacheManager = new EnhancedTestDatabaseManager(noCacheConfig, mockClient, mockRedisClient);
-      await noCacheManager.initialize();
-      
-      const result = await noCacheManager.executeQueryWithCache("SELECT 1", [], 60);
-      assertExists(result);
+      try {
+        await noCacheManager.initialize();
+        
+        const result = await noCacheManager.executeQueryWithCache("SELECT 1", [], 60);
+        assertExists(result);
+      } finally {
+        await noCacheManager.closeAllClients();
+      }
     });
 
     it("should handle cache with Redis available", async () => {
