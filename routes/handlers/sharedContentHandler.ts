@@ -1,5 +1,4 @@
 import { FreshContext } from "$fresh/server.ts";
-import { normalizeHeaders } from "$lib/utils/api/headers/headerUtils.ts";
 import { getIdentifierType } from "$lib/utils/data/identifiers/identifierUtils.ts";
 import { isCpid, isTxHash } from "$lib/utils/typeGuards.ts";
 import { logger } from "$lib/utils/logger.ts";
@@ -133,7 +132,7 @@ export async function handleContentRequest(
       // Use the recursive headers which include appropriate CSP and cache settings
       const headers = {
         ...Object.fromEntries(response.headers),
-        ...getRecursiveHeaders(),
+        ...Object.fromEntries(getRecursiveHeaders()),
         "Content-Type": "text/html; charset=utf-8",
       };
 
