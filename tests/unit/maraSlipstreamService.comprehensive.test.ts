@@ -6,12 +6,11 @@
  */
 
 import { logger } from "$lib/utils/logger.ts";
-import * as configModule from "$server/config/config.ts";
-import * as validatorModule from "$server/config/maraConfigValidator.ts";
 import { FetchHttpClient } from "$server/interfaces/httpClient.ts";
 import { MaraSlipstreamService } from "$server/services/mara/maraSlipstreamService.ts";
 import { assertEquals, assertExists, assertRejects } from "@std/assert";
 import { FakeTime } from "@std/testing/time";
+import { afterEach, beforeEach } from "jsr:@std/testing@1.0.14/bdd";
 import { restore, stub } from "@std/testing@1.0.14/mock";
 
 // Mock configuration for testing
@@ -35,74 +34,114 @@ const validSubmissionResponse = {
   status: "success"
 };
 
+// Mock providers for dependency injection
+let mockConfigProvider: any;
+let mockConfigValidator: any;
+
+// Helper functions for test setup
+function setupMockProviders() {
+  mockConfigProvider = {
+    getMaraConfig: () => mockMaraConfig
+  };
+  
+  mockConfigValidator = {
+    assertValidMaraConfig: () => mockMaraConfig
+  };
+
+  MaraSlipstreamService.setConfigProvider(mockConfigProvider);
+  MaraSlipstreamService.setConfigValidator(mockConfigValidator);
+}
+
+async function teardownMockProviders() {
+  // Reset to defaults by creating new providers with original functions
+  const { getMaraConfig } = await import("$server/config/config.ts");
+  const { assertValidMaraConfig } = await import("$server/config/maraConfigValidator.ts");
+  
+  MaraSlipstreamService.setConfigProvider({ getMaraConfig });
+  MaraSlipstreamService.setConfigValidator({ assertValidMaraConfig });
+}
+
 Deno.test("MaraSlipstreamService - Configuration", async (t) => {
-  await t.step("should get configuration successfully", () => {
-    const getMaraConfigStub = stub(configModule, "getMaraConfig", () => mockMaraConfig);
-    const assertValidMaraConfigStub = stub(validatorModule, "assertValidMaraConfig", () => mockMaraConfig);
+  await t.step("should get configuration successfully", async () => {
+    setupMockProviders();
 
     try {
       const config = MaraSlipstreamService.getConfiguration();
       assertEquals(config, mockMaraConfig);
     } finally {
-      restore();
+      await teardownMockProviders();
     }
   });
 
-  await t.step("should return null when configuration fails", () => {
-    const getMaraConfigStub = stub(configModule, "getMaraConfig", () => {
-      throw new Error("Configuration error");
-    });
+  await t.step("should return null when configuration fails", async () => {
+    // Mock validator that throws error
+    const errorValidator = {
+      assertValidMaraConfig: () => {
+        throw new Error("Configuration error");
+      }
+    };
+    
+    MaraSlipstreamService.setConfigValidator(errorValidator);
 
     try {
       const config = MaraSlipstreamService.getConfiguration();
       assertEquals(config, null);
     } finally {
-      restore();
+      await teardownMockProviders();
     }
   });
 
-  await t.step("should check if service is configured", () => {
-    const getMaraConfigStub = stub(configModule, "getMaraConfig", () => mockMaraConfig);
+  await t.step("should check if service is configured", async () => {
+    setupMockProviders();
 
     try {
       const isConfigured = MaraSlipstreamService.isConfigured();
       assertEquals(isConfigured, true);
     } finally {
-      restore();
+      await teardownMockProviders();
     }
   });
 
-  await t.step("should return false when MARA is disabled", () => {
-    const getMaraConfigStub = stub(configModule, "getMaraConfig", () => ({
-      ...mockMaraConfig,
-      enabled: false
-    }));
+  await t.step("should return false when MARA is disabled", async () => {
+    const disabledProvider = {
+      getMaraConfig: () => ({
+        ...mockMaraConfig,
+        enabled: false
+      })
+    };
+    
+    MaraSlipstreamService.setConfigProvider(disabledProvider);
 
     try {
       const isConfigured = MaraSlipstreamService.isConfigured();
       assertEquals(isConfigured, false);
     } finally {
-      restore();
+      await teardownMockProviders();
     }
   });
 
-  await t.step("should return false when configuration throws", () => {
-    const getMaraConfigStub = stub(configModule, "getMaraConfig", () => {
-      throw new Error("Config error");
-    });
+  await t.step("should return false when configuration throws", async () => {
+    const errorProvider = {
+      getMaraConfig: () => {
+        throw new Error("Config error");
+      }
+    };
+    
+    MaraSlipstreamService.setConfigProvider(errorProvider);
 
     try {
       const isConfigured = MaraSlipstreamService.isConfigured();
       assertEquals(isConfigured, false);
     } finally {
-      restore();
+      await teardownMockProviders();
     }
   });
 });
 
 Deno.test("MaraSlipstreamService - Fee Rate Fetching", async (t) => {
   await t.step("should fetch fee rate successfully", async () => {
-    const assertValidMaraConfigStub = stub(validatorModule, "assertValidMaraConfig", () => mockMaraConfig);
+    setupMockProviders();
+    
     const mockHttpClient = {
       get: stub().resolves({
         ok: true,
@@ -111,7 +150,6 @@ Deno.test("MaraSlipstreamService - Fee Rate Fetching", async (t) => {
         data: validFeeRateResponse
       })
     };
-    const httpClientStub = stub(FetchHttpClient.prototype, "constructor" as any, () => {});
     const getStub = stub(FetchHttpClient.prototype, "get", mockHttpClient.get);
 
     try {
@@ -125,11 +163,13 @@ Deno.test("MaraSlipstreamService - Fee Rate Fetching", async (t) => {
       assertExists(response.timestamp);
     } finally {
       restore();
+      await teardownMockProviders();
     }
   });
 
   await t.step("should handle API error responses", async () => {
-    const assertValidMaraConfigStub = stub(validatorModule, "assertValidMaraConfig", () => mockMaraConfig);
+    setupMockProviders();
+    
     const mockHttpClient = {
       get: stub().resolves({
         ok: false,
@@ -148,11 +188,12 @@ Deno.test("MaraSlipstreamService - Fee Rate Fetching", async (t) => {
       );
     } finally {
       restore();
+      await teardownMockProviders();
     }
   });
 
   await t.step("should handle invalid response structure", async () => {
-    const assertValidMaraConfigStub = stub(validatorModule, "assertValidMaraConfig", () => mockMaraConfig);
+    setupMockProviders();
     const mockHttpClient = {
       get: stub().resolves({
         ok: true,
@@ -170,12 +211,16 @@ Deno.test("MaraSlipstreamService - Fee Rate Fetching", async (t) => {
         "Invalid response structure from MARA getinfo endpoint"
       );
     } finally {
+
       restore();
+
+      await teardownMockProviders();
+
     }
   });
 
   await t.step("should handle network timeout", async () => {
-    const assertValidMaraConfigStub = stub(validatorModule, "assertValidMaraConfig", () => mockMaraConfig);
+    setupMockProviders();
     const mockHttpClient = {
       get: stub().rejects(new Error("Network timeout"))
     };
@@ -188,12 +233,16 @@ Deno.test("MaraSlipstreamService - Fee Rate Fetching", async (t) => {
         "Network timeout"
       );
     } finally {
+
       restore();
+
+      await teardownMockProviders();
+
     }
   });
 
   await t.step("should enforce minimum fee rate correctly", async () => {
-    const assertValidMaraConfigStub = stub(validatorModule, "assertValidMaraConfig", () => mockMaraConfig);
+    setupMockProviders();
     const mockHttpClient = {
       get: stub().resolves({
         ok: true,
@@ -214,7 +263,11 @@ Deno.test("MaraSlipstreamService - Fee Rate Fetching", async (t) => {
       assertEquals(response.fee_rate, 0.5);
       assertEquals(response.min_fee_rate, 1.0); // Should be enforced minimum
     } finally {
+
       restore();
+
+      await teardownMockProviders();
+
     }
   });
 });
@@ -223,7 +276,7 @@ Deno.test("MaraSlipstreamService - Transaction Submission", async (t) => {
   const validTxHex = "0200000001abc123def456789012345678901234567890123456789012345678901234567890000000006b483045022100abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789001234567890abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789ffffffff0280969800000000001976a914abcdef0123456789abcdef0123456789abcdef012388ac80969800000000001976a914fedcba9876543210fedcba9876543210fedcba9888ac00000000";
 
   await t.step("should submit transaction successfully", async () => {
-    const assertValidMaraConfigStub = stub(validatorModule, "assertValidMaraConfig", () => mockMaraConfig);
+    setupMockProviders();
     const mockHttpClient = {
       post: stub().resolves({
         ok: true,
@@ -243,12 +296,16 @@ Deno.test("MaraSlipstreamService - Transaction Submission", async (t) => {
       assertEquals(response.message, "Transaction accepted by MARA pool");
       assertExists(response.submission_time);
     } finally {
+
       restore();
+
+      await teardownMockProviders();
+
     }
   });
 
   await t.step("should validate transaction hex input", async () => {
-    const assertValidMaraConfigStub = stub(validatorModule, "assertValidMaraConfig", () => mockMaraConfig);
+    setupMockProviders();
 
     try {
       await assertRejects(
@@ -263,12 +320,16 @@ Deno.test("MaraSlipstreamService - Transaction Submission", async (t) => {
         "Invalid transaction hex provided"
       );
     } finally {
+
       restore();
+
+      await teardownMockProviders();
+
     }
   });
 
   await t.step("should handle API submission errors", async () => {
-    const assertValidMaraConfigStub = stub(validatorModule, "assertValidMaraConfig", () => mockMaraConfig);
+    setupMockProviders();
     const mockHttpClient = {
       post: stub().resolves({
         ok: false,
@@ -286,12 +347,16 @@ Deno.test("MaraSlipstreamService - Transaction Submission", async (t) => {
         "MARA submission error: 400 - Invalid transaction format"
       );
     } finally {
+
       restore();
+
+      await teardownMockProviders();
+
     }
   });
 
   await t.step("should handle MARA error responses", async () => {
-    const assertValidMaraConfigStub = stub(validatorModule, "assertValidMaraConfig", () => mockMaraConfig);
+    setupMockProviders();
     const mockHttpClient = {
       post: stub().resolves({
         ok: true,
@@ -312,12 +377,16 @@ Deno.test("MaraSlipstreamService - Transaction Submission", async (t) => {
         "MARA submission failed: Fee rate too low"
       );
     } finally {
+
       restore();
+
+      await teardownMockProviders();
+
     }
   });
 
   await t.step("should handle invalid response structure", async () => {
-    const assertValidMaraConfigStub = stub(validatorModule, "assertValidMaraConfig", () => mockMaraConfig);
+    setupMockProviders();
     const mockHttpClient = {
       post: stub().resolves({
         ok: true,
@@ -335,12 +404,16 @@ Deno.test("MaraSlipstreamService - Transaction Submission", async (t) => {
         "Invalid MARA response: missing required fields"
       );
     } finally {
+
       restore();
+
+      await teardownMockProviders();
+
     }
   });
 
   await t.step("should validate txid format", async () => {
-    const assertValidMaraConfigStub = stub(validatorModule, "assertValidMaraConfig", () => mockMaraConfig);
+    setupMockProviders();
     const mockHttpClient = {
       post: stub().resolves({
         ok: true,
@@ -361,12 +434,16 @@ Deno.test("MaraSlipstreamService - Transaction Submission", async (t) => {
         "Invalid txid format from MARA: invalid-txid"
       );
     } finally {
+
       restore();
+
+      await teardownMockProviders();
+
     }
   });
 
   await t.step("should handle gateway errors specially", async () => {
-    const assertValidMaraConfigStub = stub(validatorModule, "assertValidMaraConfig", () => mockMaraConfig);
+    setupMockProviders();
     const mockHttpClient = {
       post: stub().resolves({
         ok: false,
@@ -384,12 +461,16 @@ Deno.test("MaraSlipstreamService - Transaction Submission", async (t) => {
         "MARA service temporarily unavailable (502)"
       );
     } finally {
+
       restore();
+
+      await teardownMockProviders();
+
     }
   });
 
   await t.step("should handle different priority levels", async () => {
-    const assertValidMaraConfigStub = stub(validatorModule, "assertValidMaraConfig", () => mockMaraConfig);
+    setupMockProviders();
     const mockHttpClient = {
       post: stub().resolves({
         ok: true,
@@ -409,30 +490,34 @@ Deno.test("MaraSlipstreamService - Transaction Submission", async (t) => {
       // Verify all calls were made
       assertEquals(mockHttpClient.post.calls.length, 3);
     } finally {
+
       restore();
+
+      await teardownMockProviders();
+
     }
   });
 });
 
 Deno.test("MaraSlipstreamService - Circuit Breaker", async (t) => {
-  await t.step("should check service availability", () => {
+  await t.step("should check service availability", async () => {
     const isAvailable = MaraSlipstreamService.isAvailable();
     assertEquals(typeof isAvailable, "boolean");
   });
 
-  await t.step("should get circuit breaker metrics", () => {
+  await t.step("should get circuit breaker metrics", async () => {
     const metrics = MaraSlipstreamService.getCircuitBreakerMetrics();
     assertExists(metrics);
     assertEquals(typeof metrics, "object");
   });
 
-  await t.step("should reset circuit breaker", () => {
+  await t.step("should reset circuit breaker", async () => {
     // Should not throw
     MaraSlipstreamService.resetCircuitBreaker();
   });
 
   await t.step("should handle circuit breaker failures during fee rate fetch", async () => {
-    const assertValidMaraConfigStub = stub(validatorModule, "assertValidMaraConfig", () => mockMaraConfig);
+    setupMockProviders();
 
     // Mock circuit breaker to throw
     const circuitBreakerStub = stub(MaraSlipstreamService as any, "circuitBreaker", {
@@ -446,12 +531,16 @@ Deno.test("MaraSlipstreamService - Circuit Breaker", async (t) => {
         "Circuit breaker is open"
       );
     } finally {
+
       restore();
+
+      await teardownMockProviders();
+
     }
   });
 
   await t.step("should handle circuit breaker failures during transaction submission", async () => {
-    const assertValidMaraConfigStub = stub(validatorModule, "assertValidMaraConfig", () => mockMaraConfig);
+    setupMockProviders();
     const validTxHex = "0200000001abc123def456789012345678901234567890123456789012345678901234567890000000006b48304502210088888888888888888888888888888888888888888888888888888888888888880123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789ffffffff0280969800000000001976a914abcdef0123456789abcdef0123456789abcdef012388ac80969800000000001976a914fedcba9876543210fedcba9876543210fedcba9888ac00000000";
 
     // Mock circuit breaker to throw
@@ -466,14 +555,18 @@ Deno.test("MaraSlipstreamService - Circuit Breaker", async (t) => {
         "Circuit breaker is open"
       );
     } finally {
+
       restore();
+
+      await teardownMockProviders();
+
     }
   });
 });
 
 Deno.test("MaraSlipstreamService - Error Handling and Edge Cases", async (t) => {
   await t.step("should handle HTML error responses", async () => {
-    const assertValidMaraConfigStub = stub(validatorModule, "assertValidMaraConfig", () => mockMaraConfig);
+    setupMockProviders();
     const mockHttpClient = {
       post: stub().resolves({
         ok: false,
@@ -492,12 +585,16 @@ Deno.test("MaraSlipstreamService - Error Handling and Edge Cases", async (t) => 
         Error
       );
     } finally {
+
       restore();
+
+      await teardownMockProviders();
+
     }
   });
 
   await t.step("should handle different error response formats", async () => {
-    const assertValidMaraConfigStub = stub(validatorModule, "assertValidMaraConfig", () => mockMaraConfig);
+    setupMockProviders();
     const testCases = [
       { data: "String error message", expected: "String error message" },
       { data: { message: "Object with message" }, expected: "Object with message" },
@@ -524,13 +621,17 @@ Deno.test("MaraSlipstreamService - Error Handling and Edge Cases", async (t) => 
           Error
         );
       } finally {
+
         restore();
+
+        await teardownMockProviders();
+
       }
     }
   });
 
   await t.step("should handle non-object response data", async () => {
-    const assertValidMaraConfigStub = stub(validatorModule, "assertValidMaraConfig", () => mockMaraConfig);
+    setupMockProviders();
     const mockHttpClient = {
       post: stub().resolves({
         ok: true,
@@ -550,12 +651,16 @@ Deno.test("MaraSlipstreamService - Error Handling and Edge Cases", async (t) => 
         "Invalid submission response format from MARA API: expected object, got string"
       );
     } finally {
+
       restore();
+
+      await teardownMockProviders();
+
     }
   });
 
   await t.step("should handle null/undefined data responses", async () => {
-    const assertValidMaraConfigStub = stub(validatorModule, "assertValidMaraConfig", () => mockMaraConfig);
+    setupMockProviders();
     const mockHttpClient = {
       post: stub().resolves({
         ok: true,
@@ -575,14 +680,18 @@ Deno.test("MaraSlipstreamService - Error Handling and Edge Cases", async (t) => 
         "Invalid submission response format from MARA API: expected object, got object"
       );
     } finally {
+
       restore();
+
+      await teardownMockProviders();
+
     }
   });
 });
 
 Deno.test("MaraSlipstreamService - Logging and Monitoring", async (t) => {
   await t.step("should log fee rate requests", async () => {
-    const assertValidMaraConfigStub = stub(validatorModule, "assertValidMaraConfig", () => mockMaraConfig);
+    setupMockProviders();
     const loggerStub = stub(logger, "info");
     const mockHttpClient = {
       get: stub().resolves({
@@ -600,12 +709,16 @@ Deno.test("MaraSlipstreamService - Logging and Monitoring", async (t) => {
       // Verify logging calls were made
       assertEquals(loggerStub.calls.length >= 2, true);
     } finally {
+
       restore();
+
+      await teardownMockProviders();
+
     }
   });
 
   await t.step("should log transaction submission requests", async () => {
-    const assertValidMaraConfigStub = stub(validatorModule, "assertValidMaraConfig", () => mockMaraConfig);
+    setupMockProviders();
     const loggerStub = stub(logger, "info");
     const mockHttpClient = {
       post: stub().resolves({
@@ -625,12 +738,16 @@ Deno.test("MaraSlipstreamService - Logging and Monitoring", async (t) => {
       // Verify logging calls were made
       assertEquals(loggerStub.calls.length >= 2, true);
     } finally {
+
       restore();
+
+      await teardownMockProviders();
+
     }
   });
 
   await t.step("should log errors appropriately", async () => {
-    const assertValidMaraConfigStub = stub(validatorModule, "assertValidMaraConfig", () => mockMaraConfig);
+    setupMockProviders();
     const loggerErrorStub = stub(logger, "error");
     const mockHttpClient = {
       get: stub().rejects(new Error("Network error"))
@@ -643,14 +760,18 @@ Deno.test("MaraSlipstreamService - Logging and Monitoring", async (t) => {
       // Verify error logging was called
       assertEquals(loggerErrorStub.calls.length >= 1, true);
     } finally {
+
       restore();
+
+      await teardownMockProviders();
+
     }
   });
 });
 
 Deno.test("MaraSlipstreamService - Integration Edge Cases", async (t) => {
   await t.step("should handle timing and performance monitoring", async () => {
-    const assertValidMaraConfigStub = stub(validatorModule, "assertValidMaraConfig", () => mockMaraConfig);
+    setupMockProviders();
     const fakeTime = new FakeTime();
 
     const mockHttpClient = {
@@ -673,11 +794,12 @@ Deno.test("MaraSlipstreamService - Integration Edge Cases", async (t) => {
     } finally {
       fakeTime.restore();
       restore();
+      await teardownMockProviders();
     }
   });
 
   await t.step("should handle concurrent requests", async () => {
-    const assertValidMaraConfigStub = stub(validatorModule, "assertValidMaraConfig", () => mockMaraConfig);
+    setupMockProviders();
     const mockHttpClient = {
       get: stub().resolves({
         ok: true,
@@ -699,7 +821,11 @@ Deno.test("MaraSlipstreamService - Integration Edge Cases", async (t) => {
         assertEquals(response.fee_rate, 3.0);
       });
     } finally {
+
       restore();
+
+      await teardownMockProviders();
+
     }
   });
 });
