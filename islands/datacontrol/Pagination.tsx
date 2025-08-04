@@ -1,11 +1,9 @@
 import { Icon } from "$icon";
-import {
-  getWindowWidth,
-  isBrowser,
-  safeNavigate,
-} from "$utils/navigation/freshNavigationUtils.ts";
+import { getWindowWidth } from "$utils/navigation/freshNavigationUtils.ts";
 import type { PaginationProps } from "$types/pagination.d.ts";
 import { useEffect, useState } from "preact/hooks";
+import { useSSRSafeNavigation } from "$lib/hooks/useSSRSafeNavigation.ts";
+import { IS_BROWSER } from "$fresh/runtime.ts";
 
 // Update pagination range constants
 const MOBILESM_MAX_PAGE_RANGE = 0;
@@ -21,11 +19,15 @@ const navContent = `
   h-9 desktop:pt-0.5 px-[14px] rounded-md hover:bg-stamp-purple-bright
   font-medium text-black text-sm leading-[16.5px]`;
 
-// Update useIsMobile to handle multiple breakpoints
+// SSR-safe screen size hook
 const useScreenSize = () => {
   const [screenSize, setScreenSize] = useState("mobileSm");
 
   useEffect(() => {
+    if (!IS_BROWSER) {
+      return;
+    }
+
     const handleResize = () => {
       const width = getWindowWidth();
       if (width < 568) {
@@ -54,6 +56,7 @@ export function Pagination({
   onPageChange,
 }: PaginationProps) {
   const screenSize = useScreenSize();
+  const { setSearchParam } = useSSRSafeNavigation();
 
   // Update maxPageRange logic based on screen size
   const getMaxPageRange = (size: string) => {
@@ -79,18 +82,9 @@ export function Pagination({
       return;
     }
 
-    // Legacy URL-based navigation if no onPageChange provided
-    // SSR-safe browser environment check
-    if (!isBrowser()) {
-      return; // Cannot navigate during SSR
-    }
-
-    const url = new URL(globalThis.location.href);
-    url.searchParams.set(
-      prefix ? `${prefix}_page` : "page",
-      newPage.toString(),
-    );
-    safeNavigate(url.toString());
+    // SSR-safe URL parameter update using the navigation hook
+    const paramName = prefix ? `${prefix}_page` : "page";
+    setSearchParam(paramName, newPage.toString());
   };
 
   const renderPageButton = (pageNum: number, iconName?: string) => {
