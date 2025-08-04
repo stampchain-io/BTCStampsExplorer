@@ -14,7 +14,7 @@ import type {
   SUBPROTOCOLS,
   WalletDataTypes,
   XCPParams,
-} from "../../../lib/types/base.d.ts";
+} from "$types/base.d.ts";
 
 Deno.test("Base types - Type compilation", async () => {
   await validateTypeCompilation("lib/types/base.d.ts");

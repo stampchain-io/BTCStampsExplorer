@@ -392,6 +392,8 @@ paths:
                         format: uri
                       currentVersion:
                         type: string
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "500":
           $ref: "#/components/responses/InternalServerError"
 
@@ -4149,9 +4151,9 @@ components:
       description: Enhanced market data for SRC-20 tokens in v2.3 API responses with consistent snake_case naming
       required:
         - tick
-        - floor_unit_price
-        - mcap
-        - volume24
+        - floor_price_btc
+        - market_cap_btc
+        - volume_24h_btc
         - holder_count
       properties:
         tick:

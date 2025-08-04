@@ -8,7 +8,7 @@
 
 import { assertEquals, assertExists } from "@std/assert";
 import { join } from "@std/path";
-import { DependencyGraphAnalyzer } from "../../../scripts/validation/dependency-graph-analyzer.ts";
+import { DependencyGraphAnalyzer } from "$lib/utils/validation/DependencyGraphAnalyzer.ts";
 
 interface IntegrationTestSuite {
   name: string;

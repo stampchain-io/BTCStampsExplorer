@@ -64,7 +64,7 @@ import type {
   TransactionRepository,
   StampStatistics,
   SRC20TokenStats
-} from "../../../server/types/database.d.ts";
+} from "$server/types/database.d.ts";
 
 import type { StampRow } from "$types/stamp.d.ts";
 import type { SRC20Row, SRC20Balance } from "$types/src20.d.ts";
