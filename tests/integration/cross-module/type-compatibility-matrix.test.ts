@@ -9,29 +9,29 @@
 import { assertEquals, assertExists, assertThrows } from "@std/assert";
 
 // Import all type modules for compatibility testing
-import type * as ApiTypes from "../../../lib/types/api.d.ts";
-import type * as BaseTypes from "../../../lib/types/base.d.ts";
-import type * as StampTypes from "../../../lib/types/stamp.d.ts";
-import type * as SRC20Types from "../../../lib/types/src20.d.ts";
-import type * as SRC101Types from "../../../lib/types/src101.d.ts";
-import type * as TransactionTypes from "../../../lib/types/transaction.d.ts";
-import type * as WalletTypes from "../../../lib/types/wallet.d.ts";
-import type * as UITypes from "../../../lib/types/ui.d.ts";
-import type * as ErrorTypes from "../../../lib/types/errors.d.ts";
-import type * as PaginationTypes from "../../../lib/types/pagination.d.ts";
-import type * as MarketDataTypes from "../../../lib/types/marketData.d.ts";
-import type * as ServicesTypes from "../../../lib/types/services.d.ts";
-import type * as UtilsTypes from "../../../lib/types/utils.d.ts";
-import type * as SortingTypes from "../../../lib/types/sorting.d.ts";
-import type * as FeeTypes from "../../../lib/types/fee.d.ts";
-import type * as QuicknodeTypes from "../../../lib/types/quicknode.d.ts";
+import type * as ApiTypes from "$types/api.d.ts";
+import type * as BaseTypes from "$types/base.d.ts";
+import type * as StampTypes from "$types/stamp.d.ts";
+import type * as SRC20Types from "$types/src20.d.ts";
+import type * as SRC101Types from "$types/src101.d.ts";
+import type * as TransactionTypes from "$types/transaction.d.ts";
+import type * as WalletTypes from "$types/wallet.d.ts";
+import type * as UITypes from "$types/ui.d.ts";
+import type * as ErrorTypes from "$types/errors.d.ts";
+import type * as PaginationTypes from "$types/pagination.d.ts";
+import type * as MarketDataTypes from "$types/marketData.d.ts";
+import type * as ServicesTypes from "$types/services.d.ts";
+import type * as UtilsTypes from "$types/utils.d.ts";
+import type * as SortingTypes from "$types/sorting.d.ts";
+import type * as FeeTypes from "$types/fee.d.ts";
+import type * as QuicknodeTypes from "$types/quicknode.d.ts";
 
 // Server types
-import type * as ServerCollectionTypes from "../../../server/types/collection.d.ts";
-import type * as ServerDatabaseTypes from "../../../server/types/database.d.ts";
-import type * as ServerIndexTypes from "../../../server/types/index.d.ts";
-import type * as ServerSRC20Types from "../../../server/types/services/src20.d.ts";
-import type * as ServerSRC101Types from "../../../server/types/services/src101.d.ts";
+import type * as ServerCollectionTypes from "$server/types/collection.d.ts";
+import type * as ServerDatabaseTypes from "$server/types/database.d.ts";
+import type * as ServerIndexTypes from "$server/types/index.d.ts";
+import type * as ServerSRC20Types from "$server/types/services/src20.d.ts";
+import type * as ServerSRC101Types from "$server/types/services/src101.d.ts";
 
 // Type compatibility test utilities
 type ExpectType<T> = T;

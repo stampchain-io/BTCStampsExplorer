@@ -14,6 +14,10 @@ apis:
       no-empty-servers: warn
       operation-operationId-unique: warn
       no-invalid-media-type-examples: warn
+      no-required-schema-properties-undefined:
+        severity: off
+        # Disabled because we use valid oneOf patterns for conditional requirements
+        # e.g., requiring either feeRate OR satsPerVB in SRC20 operations
     theme:
       openapi:
         hideLogo: true 
