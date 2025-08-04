@@ -43,7 +43,6 @@ import type {
   CollectionWithOptionalMarketData,
   Deployment,
   FeeData,
-  FeeEstimationResult as ServicesFeeEstimationResult,
   PSBTFees,
   SRC20MintStatus,
 } from "$types/services.d.ts";
