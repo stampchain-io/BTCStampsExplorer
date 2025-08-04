@@ -10,6 +10,10 @@ import {
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
 import { labelXs, textSm, valueDarkSm } from "$text";
+import {
+  isBrowser,
+  safeNavigate,
+} from "$utils/navigation/freshNavigationUtils.ts";
 
 export function SRC20CardSm({
   data,
@@ -178,10 +182,7 @@ export function SRC20CardSm({
                     ) {
                       e.preventDefault();
                       // SSR-safe browser environment check
-                      if (
-                        typeof globalThis === "undefined" ||
-                        !globalThis?.location
-                      ) {
+                      if (!isBrowser()) {
                         return; // Cannot navigate during SSR
                       }
                       const href = `/src20/${
@@ -189,7 +190,7 @@ export function SRC20CardSm({
                           unicodeEscapeToEmoji(src20.tick ?? ""),
                         )
                       }`;
-                      globalThis.location.href = href;
+                      safeNavigate(href);
                     }
                   }}
                 >

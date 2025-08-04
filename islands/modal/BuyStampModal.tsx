@@ -205,9 +205,11 @@ const BuyStampModal = ({
           });
         }
       } catch (unknownError) {
-        const originalMessage = unknownError && typeof unknownError === "object" && "message" in unknownError
-          ? (unknownError as Error).message
-          : String(unknownError);
+        const originalMessage =
+          unknownError && typeof unknownError === "object" &&
+            "message" in unknownError
+            ? (unknownError as Error).message
+            : String(unknownError);
         const error = handleUnknownError(
           unknownError,
           `BuyStamp exact fee estimation failed: ${originalMessage}`,

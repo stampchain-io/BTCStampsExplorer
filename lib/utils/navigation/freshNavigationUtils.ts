@@ -3,6 +3,13 @@
  *
  * SSR-safe navigation helpers for Fresh.js partial navigation.
  * Provides browser environment checks to prevent SSR errors.
+ *
+ * Key Functions:
+ * - safeNavigate(): SSR-safe URL navigation with fallback
+ * - getSearchParams(): SSR-safe URLSearchParams access
+ * - navigateWithFresh(): Fresh.js partial navigation with parameters
+ * - getUrlParam(): SSR-safe URL parameter reading
+ * - isBrowser(): Environment detection for SSR safety
  */
 
 /* ===== SSR-SAFE ENVIRONMENT HELPERS ===== */
@@ -50,6 +57,39 @@ export const isBrowser = (): boolean => {
     globalThis?.location !== undefined;
 };
 
+/**
+ * SSR-safe navigation helper - replaces direct globalThis.location.href assignments
+ * @param url - URL to navigate to
+ * @param options - Navigation options (optional)
+ */
+export const safeNavigate = (
+  url: string,
+  options?: { replace?: boolean },
+): void => {
+  if (!isBrowser()) {
+    return; // Safe no-op during SSR
+  }
+
+  if (options?.replace) {
+    globalThis.location.replace(url);
+  } else {
+    globalThis.location.href = url;
+  }
+};
+
+/**
+ * SSR-safe URLSearchParams getter
+ * @param fallbackSearch - Fallback search string for SSR (optional)
+ * @returns URLSearchParams object or empty params for SSR
+ */
+export const getSearchParams = (fallbackSearch?: string): URLSearchParams => {
+  if (!isBrowser()) {
+    return new URLSearchParams(fallbackSearch || ""); // Safe fallback during SSR
+  }
+
+  return new URLSearchParams(globalThis.location.search);
+};
+
 /* ===== FRESH.JS NAVIGATION HELPERS ===== */
 
 /**
@@ -67,7 +107,7 @@ export const navigateWithFresh = (
     return; // Safe no-op during SSR
   }
 
-  const currentUrl = baseUrl || globalThis.location.href;
+  const currentUrl = baseUrl || getCurrentUrl();
   const url = new URL(currentUrl);
 
   // Set parameters
@@ -81,7 +121,7 @@ export const navigateWithFresh = (
   }
 
   // Use Fresh.js partial navigation
-  globalThis.location.href = url.toString();
+  safeNavigate(url.toString());
 };
 
 /**
@@ -99,12 +139,12 @@ export const navigateToPage = (
     return; // Safe no-op during SSR
   }
 
-  const currentUrl = baseUrl || globalThis.location.href;
+  const currentUrl = baseUrl || getCurrentUrl();
   const url = new URL(currentUrl);
   url.searchParams.set(pageParam, pageValue);
 
   // Use Fresh.js partial navigation
-  globalThis.location.href = url.toString();
+  safeNavigate(url.toString());
 };
 
 /**
@@ -202,7 +242,7 @@ export const getUrlParam = (
     return fallback; // Safe fallback during SSR
   }
 
-  const url = new URL(globalThis.location.href);
+  const url = new URL(getCurrentUrl());
   return url.searchParams.get(paramName) || fallback;
 };
 
@@ -222,7 +262,7 @@ export const setUrlParam = (
     return baseUrl || "/"; // Safe fallback during SSR
   }
 
-  const currentUrl = baseUrl || globalThis.location.href;
+  const currentUrl = baseUrl || getCurrentUrl();
   const url = new URL(currentUrl);
   url.searchParams.set(paramName, value);
 

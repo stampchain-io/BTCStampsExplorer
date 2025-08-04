@@ -42,6 +42,10 @@ import { FeeCalculatorBase } from "$section";
 import { titlePurpleLD } from "$text";
 import axiod from "axiod";
 import { useEffect, useRef, useState } from "preact/hooks";
+import {
+  getSearchParams,
+  isBrowser,
+} from "$utils/navigation/freshNavigationUtils.ts";
 
 /* ===== TYPES ===== */
 
@@ -726,7 +730,9 @@ function StampingToolMain({ config }: { config: Config }) {
   /* ===== URL PARAMETER PARSING ===== */
   useEffect(() => {
     // Parse URL parameters on component mount
-    const params = new URLSearchParams(globalThis.location.search);
+    if (!isBrowser()) return;
+
+    const params = getSearchParams();
     const outputValueParam = params.get("outputValue");
 
     // Check for circuit breaker reset flag

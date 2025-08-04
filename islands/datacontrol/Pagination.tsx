@@ -1,5 +1,9 @@
 import { Icon } from "$icon";
-import { getWindowWidth } from "$lib/utils/navigation/freshNavigationUtils.ts";
+import {
+  getWindowWidth,
+  isBrowser,
+  safeNavigate,
+} from "$utils/navigation/freshNavigationUtils.ts";
 import type { PaginationProps } from "$types/pagination.d.ts";
 import { useEffect, useState } from "preact/hooks";
 
@@ -77,7 +81,7 @@ export function Pagination({
 
     // Legacy URL-based navigation if no onPageChange provided
     // SSR-safe browser environment check
-    if (typeof globalThis === "undefined" || !globalThis?.location) {
+    if (!isBrowser()) {
       return; // Cannot navigate during SSR
     }
 
@@ -86,7 +90,7 @@ export function Pagination({
       prefix ? `${prefix}_page` : "page",
       newPage.toString(),
     );
-    globalThis.location.href = url.toString();
+    safeNavigate(url.toString());
   };
 
   const renderPageButton = (pageNum: number, iconName?: string) => {
