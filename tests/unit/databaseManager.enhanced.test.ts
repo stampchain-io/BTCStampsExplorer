@@ -35,6 +35,7 @@ class EnhancedMockClient {
   private _shouldTimeout = false;
   private _queryCount = 0;
   private _connectionAttempts = 0;
+  private _permanentFailure = false;
 
   constructor(options: { 
     shouldThrow?: boolean; 
@@ -46,6 +47,7 @@ class EnhancedMockClient {
     this._connectionLost = options.connectionLost || false;
     this._shouldFailValidation = options.shouldFailValidation || false;
     this._shouldTimeout = options.shouldTimeout || false;
+    this._permanentFailure = false;
   }
 
   async connect(_config: any) {
@@ -56,11 +58,17 @@ class EnhancedMockClient {
     }
     
     if (this._shouldThrow) {
-      if (this._connectionAttempts <= 2) {
+      if (this._permanentFailure) {
+        // Always fail if permanent failure is set
         throw new Error("Connection failed");
+      } else {
+        // Original behavior - fail first 2 attempts, then succeed
+        if (this._connectionAttempts <= 2) {
+          throw new Error("Connection failed");
+        }
+        // Succeed after retries
+        this._shouldThrow = false;
       }
-      // Succeed after retries
-      this._shouldThrow = false;
     }
     
     this._connected = true;
@@ -131,13 +139,27 @@ class EnhancedMockClient {
   }
 
   // Test control methods
-  setFailure(type: string, value: boolean) {
+  setFailure(type: string, value: boolean, permanent = false) {
     switch (type) {
-      case 'connection': this._shouldThrow = value; break;
+      case 'connection': 
+        this._shouldThrow = value; 
+        this._permanentFailure = permanent;
+        break;
       case 'query': this._shouldThrow = value; break;
       case 'validation': this._shouldFailValidation = value; break;
       case 'timeout': this._shouldTimeout = value; break;
       case 'connectionLost': this._connectionLost = value; break;
+    }
+  }
+
+  isFailureSet(type: string): boolean {
+    switch (type) {
+      case 'connection': return this._shouldThrow;
+      case 'query': return this._shouldThrow;
+      case 'validation': return this._shouldFailValidation;
+      case 'timeout': return this._shouldTimeout;
+      case 'connectionLost': return this._connectionLost;
+      default: return false;
     }
   }
 
@@ -157,6 +179,7 @@ class EnhancedMockClient {
     this._shouldTimeout = false;
     this._queryCount = 0;
     this._connectionAttempts = 0;
+    this._permanentFailure = false;
   }
 }
 
@@ -410,8 +433,13 @@ class EnhancedTestDatabaseManager {
         this.activeConnections++;
         return client;
       } catch (error) {
-        // Connection invalid, close it and try again
-        await this.closeClient(client);
+        // Connection invalid, close it directly (don't use closeClient as it assumes activeConnection tracking)
+        await client.close();
+        // If validation is failing, this could cause infinite recursion
+        // so throw the validation error if it's explicitly set to fail
+        if (this.mockClient.isFailureSet('validation')) {
+          throw error;
+        }
         return this.getClient();
       }
     }
@@ -438,7 +466,13 @@ class EnhancedTestDatabaseManager {
           // Timezone setting is optional
         }
         
-        return this.mockClient;
+        // Return a wrapper that delegates to mockClient but has unique identity
+        return {
+          _clientId: Math.random(),
+          execute: (...args: any[]) => this.mockClient.execute(...args),
+          query: (...args: any[]) => this.mockClient.query(...args),
+          close: (...args: any[]) => this.mockClient.close(...args),
+        };
       } catch (error) {
         if (attempt < this.MAX_RETRIES - 1) {
           await new Promise(resolve => setTimeout(resolve, this.RETRY_INTERVAL));
@@ -966,13 +1000,22 @@ describe("DatabaseManager - Enhanced Comprehensive Tests", () => {
     });
 
     it("should handle connection timeout during creation", async () => {
+      // Set timeout failure first
       mockClient.setFailure('timeout', true);
       
+      // Reset the pool to force new connections
+      await dbManager.resetConnectionPool();
+      
+      // Now try to get a client - should fail with timeout
       await assertRejects(
         () => dbManager.getClient(),
         Error,
         "timeout"
       );
+      
+      // Clean up
+      mockClient.setFailure('timeout', false);
+      await dbManager.resetConnectionPool();
     });
 
     it("should retry connection creation with proper backoff", async () => {
@@ -1386,13 +1429,21 @@ describe("DatabaseManager - Enhanced Comprehensive Tests", () => {
     });
 
     it("should handle connection creation failures", async () => {
-      mockClient.setFailure('connection', true);
+      // Set permanent connection failure first
+      mockClient.setFailure('connection', true, true); // permanent failure
+      
+      // Reset the pool to ensure we'll create new connections
+      await dbManager.resetConnectionPool();
       
       await assertRejects(
         () => dbManager.getClient(),
         Error,
         "Connection failed"
       );
+      
+      // Clean up
+      mockClient.setFailure('connection', false);
+      await dbManager.resetConnectionPool();
     });
 
     it("should handle Redis connection errors gracefully", async () => {

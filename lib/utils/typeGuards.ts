@@ -44,7 +44,7 @@ import type { PaginatedResponse } from "../types/pagination.d.ts";
 const BITCOIN_ADDRESS_PATTERNS = {
   P2PKH: /^1[a-km-zA-HJ-NP-Z1-9]{25,33}$/,
   P2SH: /^3[a-km-zA-HJ-NP-Z1-9]{25,33}$/,
-  P2WPKH: /^bc1[a-z0-9]{39,59}$/,
+  P2WPKH: /^bc1q[a-z0-9]{38,58}$/,
   P2TR: /^bc1p[a-z0-9]{58}$/,
 } as const;
 

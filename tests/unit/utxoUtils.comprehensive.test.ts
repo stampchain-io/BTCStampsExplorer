@@ -125,7 +125,7 @@ describe("utxoUtils", () => {
           "bc1qw508d6qejxtdg4y5r3zarv", // Too short
           "bc1", // Too short
           "bc2qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4", // bc2 instead of bc1
-          "bc1rw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4", // bc1r invalid
+          "bc1rw508d6qejxtdg4y5r3zarvarywhatever", // bc1r invalid witness version
           "bc1qw508D6QEJXTDG4Y5R3ZARVARY0C5XW7KV8F3T4", // Upper case
           "bc1q" + "1".repeat(60), // Too long for P2WPKH (max 63 chars total: bc1q + 59)
           "bc1q" + "1".repeat(36), // Too short for P2WPKH (min 38 after bc1q)
@@ -160,10 +160,10 @@ describe("utxoUtils", () => {
 
       it("should reject invalid Taproot addresses", () => {
         const invalidAddresses = [
-          "bc1p5cyxnuxmeuwuvkwfem96lqzszd02n6xdcjrs20cac6yqjjwudpxqkedrc", // Too short
-          "bc1p5cyxnuxmeuwuvkwfem96lqzszd02n6xdcjrs20cac6yqjjwudpxqkedrcrr", // Too long
+          "bc1p" + "1".repeat(57), // Too short (61 chars, need 62)
+          "bc1p" + "1".repeat(59), // Too long (63 chars, need 62)
           "bc1p", // Too short
-          "bc1s5cyxnuxmeuwuvkwfem96lqzszd02n6xdcjrs20cac6yqjjwudpxqkedrcr", // bc1s invalid
+          "bc1s5cyxnuxmeuwuvkwfem96lqzszd02n6xdcjrs20cac6yqjjwudpxqkedrcr", // bc1s invalid witness version
         ];
 
         invalidAddresses.forEach((addr) => {

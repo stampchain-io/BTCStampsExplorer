@@ -1,19 +1,31 @@
 import { MemoryMonitorService } from "$/server/services/monitoring/memoryMonitorService.ts";
 import { assert, assertEquals, assertExists } from "@std/assert";
-import { afterEach, beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
+import { afterAll, afterEach, beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
 
 describe("MemoryMonitorService", () => {
   let memoryMonitor: MemoryMonitorService;
 
   beforeEach(() => {
+    // Mock Deno.addSignalListener to prevent leaks
+    const originalAddSignalListener = Deno.addSignalListener;
+    Deno.addSignalListener = () => {};
+    
     // Get the singleton instance
     memoryMonitor = MemoryMonitorService.getInstance();
+    
+    // Restore after initialization
+    Deno.addSignalListener = originalAddSignalListener;
   });
 
   afterEach(() => {
     // Reset peak memory and clear history for clean tests
     memoryMonitor.resetPeakMemory();
     memoryMonitor.clearHistory();
+  });
+  
+  afterAll(() => {
+    // Stop monitoring to clean up intervals and listeners
+    memoryMonitor.stopMonitoring();
   });
 
   describe("Singleton Pattern", () => {

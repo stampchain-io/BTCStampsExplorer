@@ -50,7 +50,11 @@ class OpenAPIValidator {
   /**
    * Load OpenAPI specification from YAML file
    */
-  async loadSpec(specPath: string = "./static/swagger/openapi.yml") {
+  async loadSpec(specPath: string = "./schema.yml") {
+    // When running from tests directory, adjust the path
+    if (Deno.cwd().endsWith("/tests")) {
+      specPath = "../schema.yml";
+    }
     try {
       const yamlContent = await Deno.readTextFile(specPath);
       this.openapiSpec = parseYaml(yamlContent) as any;

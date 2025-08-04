@@ -445,7 +445,7 @@ Deno.test("Transaction Size Estimator - Error Handling and Edge Cases", async (t
 
     try {
       const options: TransactionSizeOptions = {
-        inputs: [{ type: "UNKNOWN" as any, isWitness: false }],
+        inputs: [{ type: "UNKNOWN" as any, isWitness: true }],
         outputs: [{ type: "P2WPKH" }],
         includeChangeOutput: false
       };

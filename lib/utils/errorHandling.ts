@@ -767,7 +767,7 @@ export class ErrorHandlingUtils {
       const data = await operation();
       return { success: true, data };
     } catch (unknownError) {
-      const error = handleUnknownError(unknownError, "Safe operation failed");
+      const error = handleUnknownError(unknownError);
       const errorInfo = this.createErrorInfo(error, context);
       return {
         success: false,

@@ -251,7 +251,7 @@ export class SRC20QueryService {
         amt: params.amt || 0,
         ...(params.limit !== undefined && { limit: params.limit }),
         ...(params.page !== undefined && { page: params.page }),
-        sortBy: params.sortBy || { field: "amt", direction: "desc" },
+        sortBy: params.sortBy || "DESC",
       };
 
       const balanceResponse = await this.fetchSrc20Balance(balanceParams);
