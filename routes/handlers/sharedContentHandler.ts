@@ -137,14 +137,16 @@ export async function handleContentRequest(
         "Content-Type": "text/html; charset=utf-8",
       };
 
-      return new Response(htmlContent, {
-        headers: normalizeHeaders(headers),
+      return WebResponseUtil.custom(htmlContent, 200, {
+        headers,
+        raw: true,
       });
     }
 
     // For non-HTML, preserve response but ensure version headers
-    return new Response(response.body, {
-      headers: normalizeHeaders(response.headers),
+    return WebResponseUtil.custom(response.body, response.status, {
+      headers: Object.fromEntries(response.headers),
+      raw: true,
     });
   } catch (error) {
     logger.error("content", {
