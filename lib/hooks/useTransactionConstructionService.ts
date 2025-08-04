@@ -24,7 +24,7 @@ import { debounce } from "$lib/utils/performance/debounce.ts";
 import { logger } from "$lib/utils/logger.ts";
 import {
   type EstimationOptions,
-  type FeeEstimationResult,
+  type FeeEstimationResult as TransactionFeeEstimationResult,
   transactionConstructionService,
 } from "$lib/utils/minting/TransactionConstructionService.ts";
 import { useCallback, useEffect, useMemo, useReducer } from "preact/hooks";
@@ -38,7 +38,7 @@ type FeeEstimatorAction =
   | {
     type: "ESTIMATION_SUCCESS";
     phase: "instant" | "smart" | "exact"; // Updated: "cached" -> "smart"
-    result: FeeEstimationResult;
+    result: TransactionFeeEstimationResult;
   }
   | { type: "ESTIMATION_ERROR"; error: string }
   | { type: "START_PREFETCH" }
@@ -317,24 +317,27 @@ export function useTransactionConstructionService(options: EstimationOptions) {
   ]);
 
   // Phase 3: Exact estimation (manual trigger only)
-  const estimateExact = useCallback(async (): Promise<FeeEstimationResult> => {
-    try {
-      dispatch({ type: "START_ESTIMATION", phase: "exact" });
+  const estimateExact = useCallback(
+    async (): Promise<TransactionFeeEstimationResult> => {
+      try {
+        dispatch({ type: "START_ESTIMATION", phase: "exact" });
 
-      const result = await transactionConstructionService.estimateExact(
-        memoizedOptions,
-      );
+        const result = await transactionConstructionService.estimateExact(
+          memoizedOptions,
+        );
 
-      dispatch({ type: "ESTIMATION_SUCCESS", phase: "exact", result });
-      return result;
-    } catch (error) {
-      const errorMessage = error instanceof Error
-        ? error.message
-        : String(error);
-      dispatch({ type: "ESTIMATION_ERROR", error: errorMessage });
-      throw error;
-    }
-  }, [memoizedOptions]);
+        dispatch({ type: "ESTIMATION_SUCCESS", phase: "exact", result });
+        return result;
+      } catch (error) {
+        const errorMessage = error instanceof Error
+          ? error.message
+          : String(error);
+        dispatch({ type: "ESTIMATION_ERROR", error: errorMessage });
+        throw error;
+      }
+    },
+    [memoizedOptions],
+  );
 
   // Background pre-fetching for Phase 3 (optional optimization)
   const startPreFetch = useCallback(() => {
@@ -374,11 +377,14 @@ export function useTransactionConstructionService(options: EstimationOptions) {
   }, []);
 
   // Get the best available estimate
-  const getBestEstimate = useCallback((): FeeEstimationResult | null => {
-    // Prefer Phase 2 (smart) over Phase 1 (instant) over Phase 3 (exact)
-    // Phase 3 is only used when explicitly requested
-    return (state.phase2 || state.phase1 || null) as FeeEstimationResult | null;
-  }, [state.phase1, state.phase2]);
+  const getBestEstimate = useCallback(
+    (): TransactionFeeEstimationResult | null => {
+      // Prefer Phase 2 (smart) over Phase 1 (instant) over Phase 3 (exact)
+      // Phase 3 is only used when explicitly requested
+      return state.phase2 || state.phase1 || null;
+    },
+    [state.phase1, state.phase2],
+  );
 
   // Get cache statistics
   const getCacheStats = useCallback(() => {

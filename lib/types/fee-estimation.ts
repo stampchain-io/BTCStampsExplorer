@@ -196,7 +196,13 @@ export interface FeeEstimationError extends Error {
 /**
  * Tool type union for type safety
  */
-export type ToolType = "stamp" | "src20" | "src101";
+export type ToolType =
+  | "stamp"
+  | "src20"
+  | "src20-mint"
+  | "src20-deploy"
+  | "src20-transfer"
+  | "src101";
 
 /**
  * Estimation phase union for type safety

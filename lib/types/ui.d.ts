@@ -43,11 +43,12 @@ import type {
   CollectionWithOptionalMarketData,
   Deployment,
   FeeData,
-  FeeEstimationResult,
+  FeeEstimationResult as ServicesFeeEstimationResult,
   PSBTFees,
   SRC20MintStatus,
 } from "$types/services.d.ts";
 import type { SortDirection, SortKey, SortMetrics } from "$types/sorting.d.ts";
+import type { FeeEstimationResult as TransactionFeeEstimationResult } from "$lib/utils/bitcoin/minting/TransactionConstructionService.ts";
 import type { ScriptType, SRC20_TYPES, SRC20Row } from "$types/src20.d.ts";
 import type { StampRow } from "$types/stamp.d.ts";
 import type {
@@ -3244,9 +3245,9 @@ export interface AnimationState {
  * FeeEstimatorState - Migrated from useTransactionConstructionService.ts
  */
 export interface FeeEstimatorState {
-  phase1: FeeEstimationResult | null;
-  phase2: FeeEstimationResult | null;
-  phase3: FeeEstimationResult | null;
+  phase1: TransactionFeeEstimationResult | null;
+  phase2: TransactionFeeEstimationResult | null;
+  phase3: TransactionFeeEstimationResult | null;
   currentPhase: "instant" | "smart" | "exact"; // Updated: "cached" -> "smart"
   isEstimating: boolean;
   isPreFetching: boolean;

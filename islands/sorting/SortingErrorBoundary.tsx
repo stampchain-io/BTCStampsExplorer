@@ -185,7 +185,32 @@ function SortingErrorFallback({
   maxRetries,
 }: SortingErrorFallbackProps) {
   if (!error) {
-    return <div>No error information available.</div>;
+    return (
+      <div className="sorting-error-fallback p-4">
+        <ErrorDisplay
+          error={{
+            name: "UnknownError",
+            message: "No error information available.",
+          }}
+          showDetails
+          compact={false}
+          className="mb-4"
+        />
+        <div className="text-sm text-gray-600 mb-2">
+          An unexpected error occurred, but no details are available. Please try
+          refreshing the page or contact support if the issue persists.
+        </div>
+        {onReset && (
+          <button
+            className="btn btn-secondary"
+            onClick={onReset}
+            type="button"
+          >
+            Dismiss
+          </button>
+        )}
+      </div>
+    );
   }
 
   const canRetry = (retryCount ?? 0) < (maxRetries ?? 3) &&

@@ -847,7 +847,13 @@ export interface SRC20TransactionOptions extends TransactionOptions {
 /**
  * ToolType - Migrated from toolEndpointAdapter.ts
  */
-export type ToolType = "stamp" | "src20" | "src101";
+export type ToolType =
+  | "stamp"
+  | "src20"
+  | "src20-mint"
+  | "src20-deploy"
+  | "src20-transfer"
+  | "src101";
 
 /**
  * PropTypes - Migrated from index.tsx
