@@ -269,6 +269,52 @@ export class WebResponseUtil {
     });
   }
 
+  static htmlResponse(
+    htmlContent: string,
+    options: WebResponseOptions = {},
+  ): Response {
+    return new Response(htmlContent, {
+      status: options.status || 200,
+      headers: normalizeHeaders({
+        ...getHtmlHeaders({ forceNoCache: options.forceNoCache ?? false }),
+        "Content-Type": "text/html; charset=utf-8",
+        "X-API-Version": API_RESPONSE_VERSION,
+        ...(options.headers || {}),
+      }),
+    });
+  }
+
+  static modifiedResponse(
+    content: string,
+    originalResponse: Response,
+    options: WebResponseOptions = {},
+  ): Response {
+    return new Response(content, {
+      status: originalResponse.status,
+      statusText: originalResponse.statusText,
+      headers: normalizeHeaders({
+        ...Object.fromEntries(originalResponse.headers.entries()),
+        ...(options.headers || {}),
+      }),
+    });
+  }
+
+  static binaryResponse(
+    data: Uint8Array | ArrayBuffer,
+    mimeType: string,
+    options: WebResponseOptions = {},
+  ): Response {
+    return new Response(data, {
+      status: options.status || 200,
+      headers: normalizeHeaders({
+        ...getBinaryContentHeaders(mimeType, options),
+        "Content-Type": mimeType,
+        "X-API-Version": API_RESPONSE_VERSION,
+        ...(options.headers || {}),
+      }),
+    });
+  }
+
   private static getContentTypeHeaders(
     mimeType: string,
     options: StampResponseOptions,

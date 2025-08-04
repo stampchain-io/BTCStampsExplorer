@@ -13,6 +13,7 @@
  */
 import { Handlers } from "$fresh/server.ts";
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
+import { WebResponseUtil } from "$lib/utils/api/responses/webResponseUtil.ts";
 import {
   getOptimalLocalOptions,
   isLocalRenderingAvailable,
@@ -133,10 +134,8 @@ export const handler: Handlers = {
             // Encode as PNG with maximum compression (level 9)
             const pngBuffer = await outputImage.encode(9);
 
-            return new Response(pngBuffer, {
-              status: 200,
+            return WebResponseUtil.binaryResponse(pngBuffer, "image/png", {
               headers: {
-                "Content-Type": "image/png",
                 "X-Stamp-Number": stampNumber?.toString() || "unknown",
                 "X-Original-Type": stamp_mimetype,
                 "X-Conversion-Method": "imagescript-upscale",
@@ -164,10 +163,8 @@ export const handler: Handlers = {
             }
 
             // Fallback to redirect for unsupported formats
-            return new Response(null, {
-              status: 302,
+            return WebResponseUtil.redirect(stamp_url, 302, {
               headers: {
-                Location: stamp_url,
                 ...CACHE_HEADERS.redirect,
                 "X-Error": `upscale-failed: ${errorMessage}`,
                 "X-Unsupported-Format": isUnsupportedFormat
@@ -181,16 +178,17 @@ export const handler: Handlers = {
           const errorMessage = error instanceof Error
             ? error.message
             : String(error);
-          return new Response(null, {
-            status: 302,
-            headers: {
-              Location:
-                "https://stampchain.io/img/logo/stampchain-logo-opengraph.jpg",
-              "X-Error": `image-fetch-failed: ${errorMessage}`,
-              "X-Fallback": "default-logo",
-              ...CACHE_HEADERS.error,
+          return WebResponseUtil.redirect(
+            "https://stampchain.io/img/logo/stampchain-logo-opengraph.jpg",
+            302,
+            {
+              headers: {
+                "X-Error": `image-fetch-failed: ${errorMessage}`,
+                "X-Fallback": "default-logo",
+                ...CACHE_HEADERS.error,
+              },
             },
-          });
+          );
         }
       }
 
@@ -302,10 +300,8 @@ export const handler: Handlers = {
           const pngBuffer = pngData.asPng();
 
           // Return the PNG directly with proper caching headers
-          return new Response(pngBuffer, {
-            status: 200,
+          return WebResponseUtil.binaryResponse(pngBuffer, "image/png", {
             headers: {
-              "Content-Type": "image/png",
               "X-Stamp-Number": stampNumber?.toString() || "unknown",
               "X-Original-Type": stamp_mimetype,
               "X-Conversion-Method": "resvg-wasm",
@@ -327,17 +323,18 @@ export const handler: Handlers = {
 
           // For SVG conversion errors, only fallback to placeholder
           // Don't attempt HTML rendering as that requires Chrome and is unreliable for SVGs
-          return new Response(null, {
-            status: 302,
-            headers: {
-              Location:
-                "https://stampchain.io/img/logo/stampchain-logo-opengraph.jpg",
-              "X-Conversion-Method": "svg-conversion-failed",
-              "X-Error": `resvg-wasm-failed: ${errorMessage}`,
-              "X-Fallback": "default-logo",
-              ...CACHE_HEADERS.error,
+          return WebResponseUtil.redirect(
+            "https://stampchain.io/img/logo/stampchain-logo-opengraph.jpg",
+            302,
+            {
+              headers: {
+                "X-Conversion-Method": "svg-conversion-failed",
+                "X-Error": `resvg-wasm-failed: ${errorMessage}`,
+                "X-Fallback": "default-logo",
+                ...CACHE_HEADERS.error,
+              },
             },
-          });
+          );
         }
       }
 
@@ -354,16 +351,17 @@ export const handler: Handlers = {
                 "/usr/bin/chromium-browser",
             },
           );
-          return new Response(null, {
-            status: 302,
-            headers: {
-              Location:
-                "https://stampchain.io/img/logo/stampchain-logo-opengraph.jpg",
-              "X-Error": "no-local-rendering",
-              "X-Fallback": "default-logo",
-              ...CACHE_HEADERS.error,
+          return WebResponseUtil.redirect(
+            "https://stampchain.io/img/logo/stampchain-logo-opengraph.jpg",
+            302,
+            {
+              headers: {
+                "X-Error": "no-local-rendering",
+                "X-Fallback": "default-logo",
+                ...CACHE_HEADERS.error,
+              },
             },
-          });
+          );
         }
 
         try {
@@ -409,10 +407,8 @@ export const handler: Handlers = {
             },
           );
 
-          return new Response(pngBuffer, {
-            status: 200,
+          return WebResponseUtil.binaryResponse(pngBuffer, "image/png", {
             headers: {
-              "Content-Type": "image/png",
               "X-Stamp-Number": stampNumber?.toString() || "unknown",
               "X-Original-Type": stamp_mimetype,
               "X-Conversion-Method": method,
@@ -442,41 +438,44 @@ export const handler: Handlers = {
               fallbackUsed: "default-logo",
             },
           );
-          return new Response(null, {
-            status: 302,
-            headers: {
-              Location:
-                "https://stampchain.io/img/logo/stampchain-logo-opengraph.jpg",
-              "X-Error": "html-render-failed",
-              "X-Rendering-Engine": "local-chrome",
-              "X-Fallback": "default-logo",
-              ...CACHE_HEADERS.error,
+          return WebResponseUtil.redirect(
+            "https://stampchain.io/img/logo/stampchain-logo-opengraph.jpg",
+            302,
+            {
+              headers: {
+                "X-Error": "html-render-failed",
+                "X-Rendering-Engine": "local-chrome",
+                "X-Fallback": "default-logo",
+                ...CACHE_HEADERS.error,
+              },
             },
-          });
+          );
         }
       }
 
       // For other content types, fallback to default logo
-      return new Response(null, {
-        status: 302,
-        headers: {
-          Location:
-            "https://stampchain.io/img/logo/stampchain-logo-opengraph.jpg",
-          "X-Fallback": "unsupported-content-type",
-          ...CACHE_HEADERS.error,
+      return WebResponseUtil.redirect(
+        "https://stampchain.io/img/logo/stampchain-logo-opengraph.jpg",
+        302,
+        {
+          headers: {
+            "X-Fallback": "unsupported-content-type",
+            ...CACHE_HEADERS.error,
+          },
         },
-      });
+      );
     } catch (error) {
       console.error("Preview generation error:", error);
-      return new Response(null, {
-        status: 302,
-        headers: {
-          Location:
-            "https://stampchain.io/img/logo/stampchain-logo-opengraph.jpg",
-          "X-Fallback": "general-error",
-          ...CACHE_HEADERS.error,
+      return WebResponseUtil.redirect(
+        "https://stampchain.io/img/logo/stampchain-logo-opengraph.jpg",
+        302,
+        {
+          headers: {
+            "X-Fallback": "general-error",
+            ...CACHE_HEADERS.error,
+          },
         },
-      });
+      );
     }
   },
 };

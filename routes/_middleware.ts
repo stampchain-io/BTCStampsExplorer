@@ -1,5 +1,5 @@
 import { FreshContext } from "$fresh/server.ts";
-import { WebResponseUtil } from "$lib/utils/api/responses/webResponseUtil.ts";
+import { WebResponseUtil } from "$utils/api/responses/webResponseUtil.ts";
 
 // Route configuration constants
 const ROUTE_CONFIG = {
@@ -175,11 +175,7 @@ export async function handler(
         }
 
         // Return modified response
-        return new Response(modifiedHtml, {
-          status: response.status,
-          statusText: response.statusText,
-          headers: response.headers,
-        });
+        return WebResponseUtil.modifiedResponse(modifiedHtml, response);
       }
     } catch (error) {
       console.error("Error reordering meta tags:", error);

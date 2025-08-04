@@ -2,6 +2,7 @@
 import { Handlers } from "$fresh/server.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { serverConfig } from "$server/config/config.ts";
+import { WebResponseUtil } from "$utils/api/responses/webResponseUtil.ts";
 
 interface TestResult {
   txHash: string;
@@ -491,8 +492,6 @@ export const handler: Handlers = {
       </html>
     `;
 
-    return new Response(htmlResponse, {
-      headers: { "Content-Type": "text/html" },
-    });
+    return WebResponseUtil.htmlResponse(htmlResponse);
   },
 };

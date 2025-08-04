@@ -172,12 +172,16 @@ export const handler: Handlers = {
           },
         });
       } else {
-        return ApiResponseUtil.serviceUnavailable("Service health degraded", response, {
-          headers: {
-            "Cache-Control": "private, max-age=5",
-            "Retry-After": "60", // Suggest retry after 60 seconds
+        return ApiResponseUtil.serviceUnavailable(
+          "Service health degraded",
+          response,
+          {
+            headers: {
+              "Cache-Control": "private, max-age=5",
+              "Retry-After": "60", // Suggest retry after 60 seconds
+            },
           },
-        });
+        );
       }
     } catch (error) {
       const errorMessage = error instanceof Error
@@ -202,11 +206,15 @@ export const handler: Handlers = {
         details: [`Health check error: ${errorMessage}`],
       };
 
-      return ApiResponseUtil.serviceUnavailable("Health check failed", errorResponse, {
-        headers: {
-          "Cache-Control": "private, max-age=5",
+      return ApiResponseUtil.serviceUnavailable(
+        "Health check failed",
+        errorResponse,
+        {
+          headers: {
+            "Cache-Control": "private, max-age=5",
+          },
         },
-      });
+      );
     }
   },
 };
