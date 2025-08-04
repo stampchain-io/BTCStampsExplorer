@@ -2,22 +2,25 @@ import { Icon } from "$components/icon/IconBase.tsx";
 import type { SortProps } from "$types/ui.d.ts";
 import { tooltipIcon } from "$notification";
 import { useEffect, useRef, useState } from "preact/hooks";
+import { useSSRSafeNavigation } from "$lib/hooks/useSSRSafeNavigation.ts";
 
 export function SortButton(
   { searchParams, initSort, sortParam = "sortBy" }: SortProps,
 ) {
+  const { getSearchParam, isClient, getUrl } = useSSRSafeNavigation();
+
   // Initialize sort based on URL parameter or initSort prop
   const sort = (() => {
     // Use initSort prop if provided
     if (initSort) {
       return initSort;
     }
-    // Otherwise use the current URL if available, or fallback to searchParams
-    if (typeof globalThis !== "undefined" && globalThis?.location) {
-      const currentSort = new URL(globalThis.location.href)
-        .searchParams.get(sortParam);
+    // Use SSR-safe navigation for client-side URL parameters
+    if (isClient) {
+      const currentSort = getSearchParam(sortParam);
       return currentSort === "ASC" ? "ASC" : "DESC";
     }
+    // Fallback to server-side searchParams during SSR
     return searchParams?.get(sortParam) === "ASC" ? "ASC" : "DESC";
   })();
 
@@ -42,13 +45,9 @@ export function SortButton(
 
   // Generate the sort URL for Fresh.js partial navigation
   const getSortUrl = (): string => {
-    // Check if we're in a browser environment
-    if (typeof globalThis === "undefined" || !globalThis?.location) {
-      return "/"; // Fallback URL during SSR
-    }
-
-    const url = new URL(globalThis.location.href);
-    const currentSort = url.searchParams.get(sortParam) || "DESC";
+    // Get current URL in an SSR-safe way
+    const url = new URL(getUrl());
+    const currentSort = isClient ? getSearchParam(sortParam) || "DESC" : "DESC";
     const newSort = currentSort === "ASC" ? "DESC" : "ASC";
 
     url.searchParams.set(sortParam, newSort);

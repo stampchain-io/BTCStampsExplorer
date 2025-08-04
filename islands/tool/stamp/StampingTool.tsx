@@ -42,6 +42,7 @@ import { FeeCalculatorBase } from "$section";
 import { titlePurpleLD } from "$text";
 import axiod from "axiod";
 import { useEffect, useRef, useState } from "preact/hooks";
+import { useSSRSafeNavigation } from "$lib/hooks/useSSRSafeNavigation.ts";
 import {
   getSearchParams,
   isBrowser,
@@ -240,6 +241,7 @@ export function StampingTool() {
 /* ===== MAIN COMPONENT IMPLEMENTATION ===== */
 // This component contains all hooks and is only rendered when config is available
 function StampingToolMain({ config }: { config: Config }) {
+  const { deleteSearchParam, isClient } = useSSRSafeNavigation();
   const { wallet, isConnected } = walletContext;
   const address = isConnected ? wallet.address : undefined;
   const { fees, loading, feeSource } = useFees();
@@ -447,10 +449,10 @@ function StampingToolMain({ config }: { config: Config }) {
     setDebugTransactionHex("");
     setDebugTxid("");
 
-    // Remove URL parameter
-    const url = new URL(globalThis.location.href);
-    url.searchParams.delete("outputValue");
-    globalThis.history.replaceState({}, "", url);
+    // Remove URL parameter using SSR-safe navigation
+    if (isClient) {
+      deleteSearchParam("outputValue");
+    }
 
     logger.info("stamps", {
       message: "Switched from MARA mode to standard stamping",
