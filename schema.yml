@@ -3398,12 +3398,11 @@ components:
                     $ref: "#/components/schemas/SRC20Balance"
     StampResponseBody:
       type: object
+      required:
+        - data
       properties:
         data:
-          type: object
-          properties:
-            stamp:
-              $ref: "#/components/schemas/StampRow"
+          $ref: "#/components/schemas/StampRow"
         last_block:
           type: number
     PaginatedIdResponseBody:

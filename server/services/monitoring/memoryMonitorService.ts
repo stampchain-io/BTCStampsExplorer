@@ -478,6 +478,17 @@ export class MemoryMonitorService {
       criticalThreshold: this.formatBytes(this.memoryLimits.criticalThreshold)
     });
   }
+
+  /**
+   * Stop memory monitoring and clean up resources
+   */
+  stopMonitoring(): void {
+    if (this.monitoringInterval) {
+      clearInterval(this.monitoringInterval);
+      this.monitoringInterval = undefined;
+      console.log("[MemoryMonitor] Monitoring stopped and resources cleaned up");
+    }
+  }
 }
 
 // Export singleton instance lazily to prevent instantiation during imports in development
