@@ -3,7 +3,7 @@
  * Target: Improve from 3.1% to >80% branch coverage
  */
 
-import { SRC20MarketService } from "$server/services/src20/marketService.ts";
+import type { SRC20MarketService } from "$server/services/src20/marketService.ts";
 import { assertEquals } from "@std/assert";
 import { FetchHttpClient } from "$server/interfaces/httpClient.ts";
 

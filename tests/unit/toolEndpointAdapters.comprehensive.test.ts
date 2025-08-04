@@ -32,7 +32,7 @@ import type {
   StampTransactionOptions,
 } from "$lib/types/toolEndpointAdapter.ts";
 
-import {
+import type {
   ToolResponseError,
   ToolValidationError,
 } from "$lib/types/toolEndpointAdapter.ts";

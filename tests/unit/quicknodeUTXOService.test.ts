@@ -1,7 +1,7 @@
 import { bytesToHex } from "$lib/utils/data/binary/baseUtils.ts";
 import { assertEquals, assertExists } from "@std/assert";
 import { beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
-import { Buffer } from "node:buffer";
+import type { Buffer } from "node:buffer";
 
 // Define types needed for the test
 interface UTXO {

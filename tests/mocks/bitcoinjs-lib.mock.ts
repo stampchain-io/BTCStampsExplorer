@@ -3,7 +3,7 @@
  * This allows testing BitcoinTransactionBuilder without depending on the actual Bitcoin library
  */
 
-import { Buffer } from "node:buffer";
+import type { Buffer } from "node:buffer";
 
 // Add bech32 encode function based on sipa/bech32 reference
 function bech32Encode(prefix: string, words: number[]): string {

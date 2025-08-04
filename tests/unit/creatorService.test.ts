@@ -1,5 +1,5 @@
-import { CreatorService } from "$server/services/creator/creatorService.ts";
-import { StampService } from "$server/services/stampService.ts";
+import type { CreatorService } from "$server/services/creator/creatorService.ts";
+import type { StampService } from "$server/services/stampService.ts";
 import { assertEquals } from "@std/assert";
 import { afterEach, beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
 import { restore, stub } from "@std/testing@1.0.14/mock";

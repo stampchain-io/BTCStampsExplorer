@@ -7,7 +7,7 @@
 
 import { assertEquals, assertExists, assertThrows } from "@std/assert";
 import { stub, restore } from "@std/testing@1.0.14/mock";
-import { serverConfig, getMaraConfig, getClientConfig } from "../../server/config/config.ts";
+import type { serverConfig, getMaraConfig, getClientConfig } from "../../server/config/config.ts";
 import * as maraConfigModule from "../../server/config/maraConfig.ts";
 
 // Mock environment for testing

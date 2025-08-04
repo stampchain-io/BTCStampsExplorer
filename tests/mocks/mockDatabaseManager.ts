@@ -1,4 +1,4 @@
-import { MAX_PAGINATION_LIMIT } from "$constants";
+import type { MAX_PAGINATION_LIMIT } from "$constants";
 import blockFixturesData from "../fixtures/blockData.json" with {
   type: "json",
 };
