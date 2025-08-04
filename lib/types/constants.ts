@@ -59,8 +59,7 @@ const STAMP_FILETYPE_SET = new Set(Object.values(STAMP_FILETYPES));
  * ```
  */
 export function isValidStampType(value: unknown): value is StampType {
-  return typeof value === "string" &&
-    STAMP_TYPE_SET.has(value as StampType);
+  return STAMP_TYPE_SET.has(value as StampType);
 }
 
 /**
@@ -69,8 +68,7 @@ export function isValidStampType(value: unknown): value is StampType {
 export function isValidStampFilterType(
   value: unknown,
 ): value is StampFilterType {
-  return typeof value === "string" &&
-    STAMP_FILTER_TYPE_SET.has(value as StampFilterType);
+  return STAMP_FILTER_TYPE_SET.has(value as StampFilterType);
 }
 
 /**
@@ -79,24 +77,21 @@ export function isValidStampFilterType(
 export function isValidStampMarketplace(
   value: unknown,
 ): value is StampMarketplace {
-  return typeof value === "string" &&
-    STAMP_MARKETPLACE_SET.has(value as StampMarketplace);
+  return STAMP_MARKETPLACE_SET.has(value as StampMarketplace);
 }
 
 /**
  * Type guard for StampFiletype constants
  */
 export function isValidStampFiletype(value: unknown): value is StampFiletype {
-  return typeof value === "string" &&
-    STAMP_FILETYPE_SET.has(value as StampFiletype);
+  return STAMP_FILETYPE_SET.has(value as StampFiletype);
 }
 
 /**
  * Type guard for StampEdition constants
  */
 export function isValidStampEdition(value: unknown): value is StampEdition {
-  return typeof value === "string" &&
-    STAMP_EDITION_SET.has(value as StampEdition);
+  return STAMP_EDITION_SET.has(value as StampEdition);
 }
 
 // ============================================================================
@@ -107,16 +102,14 @@ export function isValidStampEdition(value: unknown): value is StampEdition {
  * Type guard for SRC20ErrorCode
  */
 export function isValidSRC20ErrorCode(value: unknown): value is SRC20ErrorCode {
-  return typeof value === "string" &&
-    Object.values(SRC20ErrorCode).includes(value as SRC20ErrorCode);
+  return Object.values(SRC20ErrorCode).includes(value as SRC20ErrorCode);
 }
 
 /**
  * Type guard for StampErrorCode
  */
 export function isValidStampErrorCode(value: unknown): value is StampErrorCode {
-  return typeof value === "string" &&
-    Object.values(StampErrorCode).includes(value as StampErrorCode);
+  return Object.values(StampErrorCode).includes(value as StampErrorCode);
 }
 
 /**
@@ -125,8 +118,7 @@ export function isValidStampErrorCode(value: unknown): value is StampErrorCode {
 export function isValidValidationErrorCode(
   value: unknown,
 ): value is ValidationErrorCode {
-  return typeof value === "string" &&
-    Object.values(ValidationErrorCode).includes(value as ValidationErrorCode);
+  return Object.values(ValidationErrorCode).includes(value as ValidationErrorCode);
 }
 
 /**
