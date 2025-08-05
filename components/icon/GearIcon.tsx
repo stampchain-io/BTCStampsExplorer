@@ -1,16 +1,23 @@
 /* ===== GEAR ICON COMPONENT ===== */
 import { Icon } from "$icon";
-import type { GearIconProps } from "$types/ui.d.ts";
 import type { IconVariants } from "$icon";
 
 /* ===== TYPES ===== */
+interface GearIconProps {
+  isOpen: boolean;
+  onToggle: () => void;
+  size: IconVariants["size"];
+  weight: IconVariants["weight"];
+  color: "greyLogicDL" | "greyLogicLD";
+  className?: string;
+}
 
 /* ===== COMPONENT ===== */
 export function GearIcon({
   isOpen,
   onToggle,
-  weight = "normal",
-  size = "md",
+  weight,
+  size,
   color,
   className = "",
 }: GearIconProps) {
@@ -19,7 +26,7 @@ export function GearIcon({
     const target = e.currentTarget;
     target.style.transition = "all 750ms ease-in-out"; // Gear icon timing - must match the timing of the collapsible section in Header.tsx (delay + duration)
     target.style.transform = isOpen ? "rotate(0deg)" : "rotate(180deg)"; // Gear icon rotation
-    onToggle?.();
+    onToggle();
   };
 
   /* ===== STYLES ===== */
@@ -43,7 +50,7 @@ export function GearIcon({
       type="iconButton"
       name="tools"
       weight={weight}
-      size={typeof size === "number" ? "custom" : size}
+      size={size}
       color="custom"
       className={`fill-none ${colorClasses} ${className}`
         .trim()}
