@@ -154,10 +154,50 @@ export const tagline =
 export const copyright = `font-normal text-xs ${cursor}`; // transparent text - combined with the overlayPurple class - used in footer
 export const loaderText =
   `font-medium text-sm text-stamp-grey uppercase text-center py-3 animated-text-loader ${cursor}`; // table more rows loader
+export const toggleSymbol =
+  `font-bold text-[10px] text-black select-none whitespace-nowrap`; // used in ToggleSwitchButton.tsx
 
 // Captions - used for stamp/token cards
 // Errors - used for error messages - to be defined in /notifications/styles.ts
 // Success - used for success messages - to be defined in /notifications/styles.ts
+
+/* ===== CARD TEXT STYLES ===== */
+// Standard card styles
+export const cardHashSymbol =
+  `font-light text-stamp-purple-bright text-lg mobileLg:text-xl ${cursor}`;
+export const cardStampNumber =
+  `font-extrabold text-stamp-purple-bright truncate max-w-full text-lg mobileLg:text-xl ${cursor}`;
+export const cardCreator =
+  `font-semibold text-stamp-grey-light break-words text-center pt-1 text-xs mobileMd:text-sm ${cursor}`;
+export const cardPrice =
+  `font-normal text-stamp-grey-light text-nowrap text-xs mobileLg:text-sm ${cursor}`;
+export const cardMimeType =
+  `font-normal text-stamp-grey text-nowrap text-xs mobileLg:text-sm ${cursor}`;
+export const cardSupply =
+  `font-medium text-stamp-grey text-right text-xs mobileLg:text-base ${cursor}`;
+
+// Minimal card variant styles
+export const cardHashSymbolMinimal =
+  `font-light text-stamp-grey-light group-hover:text-stamp-purple-bright text-xs mobileSm:text-base mobileLg:text-xl tablet:text-xl desktop:text-xl ${transition} ${cursor}`;
+export const cardStampNumberMinimal =
+  `font-black gray-gradient1 group-hover:[-webkit-text-fill-color:#AA00FF] truncate text-sm mobileSm:text-base mobileLg:text-xl tablet:text-xl desktop:text-xl ${transition} ${cursor}`;
+export const cardPriceMinimal =
+  `font-normal text-stamp-grey truncate text-nowrap text-[10px] mobileMd:text-xs mobileLg:text-sm ${cursor}`;
+
+// Grey gradient card variant styles
+export const cardHashSymbolGrey =
+  `font-light text-stamp-grey group-hover:text-stamp-purple-bright text-lg min-[420px]:text-xl ${transition} ${cursor}`;
+export const cardStampNumberGrey =
+  `font-black gray-gradient1 group-hover:[-webkit-text-fill-color:#AA00FF] truncate max-w-full text-lg min-[420px]:text-xl ${transition} ${cursor}`;
+
+/* ===== CARD CONFIGURATION - check if used ===== */
+export const ABBREVIATION_LENGTHS = {
+  desktop: 5,
+  tablet: 5,
+  mobileLg: 4,
+  mobileMd: 5,
+  mobileSm: 5,
+} as const;
 
 /* ===== UNCATEGORIZED STYLES ===== */
 // Add any new styles you cannot categorize here

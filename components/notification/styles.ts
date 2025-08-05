@@ -4,7 +4,7 @@
 const tooltipText =
   "font-normal text-[10px] text-stamp-grey-light whitespace-nowrap";
 const tooltipBackground =
-  "bg-[#000000BF] px-2 py-1 rounded-sm transition-opacity duration-300 pointer-events-none";
+  "bg-[#000000BF] px-2 py-1 rounded-sm transition-opacity duration-200 pointer-events-none";
 
 /* ===== TOOLTIP STYLES ===== */
 export const tooltipButton = `
