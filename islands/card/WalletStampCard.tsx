@@ -7,18 +7,28 @@ import { VNode } from "preact";
 import { memo } from "preact/compat";
 import { useEffect, useRef, useState } from "preact/hooks";
 
-import { TEXT_STYLES } from "$card";
 import { WalletStampValue } from "$components/display/BTCValueDisplay.tsx";
 import {
   AUDIO_FILE_IMAGE,
   LIBRARY_FILE_IMAGE,
   NOT_AVAILABLE_IMAGE,
 } from "$constants";
+import type { WalletStampWithValue } from "$types/wallet.d.ts";
+import { isAtomicIconVisible } from "$lib/utils/bitcoin/stamps/stampUtils.ts";
 import {
   abbreviateAddress,
   formatBalanceDisplay,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
-import { isAtomicIconVisible } from "$lib/utils/bitcoin/stamps/stampUtils.ts";
+import {
+  cardCreator,
+  cardHashSymbol,
+  cardHashSymbolGrey,
+  cardMimeType,
+  cardPrice,
+  cardStampNumber,
+  cardStampNumberGrey,
+  cardSupply,
+} from "$text";
 
 /* ===== TYPES ===== */
 
@@ -359,15 +369,9 @@ const WalletStampCardComponent = (
   /* ===== STYLE HELPERS ===== */
   const getTextStyles = (type: "hashSymbol" | "stampNumber") => {
     if (variant === "grey") {
-      return {
-        base: TEXT_STYLES.greyGradient[type].base,
-        sizes: TEXT_STYLES.greyGradient[type].sizes,
-      };
+      return type === "hashSymbol" ? cardHashSymbolGrey : cardStampNumberGrey;
     }
-    return {
-      base: TEXT_STYLES[type].base,
-      sizes: TEXT_STYLES[type].sizes,
-    };
+    return type === "hashSymbol" ? cardHashSymbol : cardStampNumber;
   };
 
   const isLongNumber = (value: string | number) => {
@@ -387,7 +391,7 @@ const WalletStampCardComponent = (
   // Determine fallback display
   const fallbackDisplay = {
     text: stamp.stamp_mimetype?.split("/")[1]?.toUpperCase() || "UNKNOWN",
-    style: TEXT_STYLES.mimeType,
+    style: cardMimeType,
     title: `File Type: ${stamp.stamp_mimetype || "Unknown"}`,
   };
 
@@ -434,17 +438,13 @@ const WalletStampCardComponent = (
           <div class="flex items-center justify-center max-w-[90%]">
             {shouldDisplayHash && (
               <span
-                class={`${getTextStyles("hashSymbol").base} ${
-                  getTextStyles("hashSymbol").sizes
-                }`}
+                class={getTextStyles("hashSymbol")}
               >
                 #
               </span>
             )}
             <span
-              class={`${getTextStyles("stampNumber").base} ${
-                getTextStyles("stampNumber").sizes
-              }`}
+              class={getTextStyles("stampNumber")}
             >
               {stampValue}
             </span>
@@ -452,7 +452,7 @@ const WalletStampCardComponent = (
 
           {/* Creator Name or Abbreviated Address */}
           <div
-            class={`${TEXT_STYLES.creator.base} ${TEXT_STYLES.creator.sizes} mt-[3px]`}
+            class={`${cardCreator} mt-[3px]`}
           >
             {creatorDisplay}
           </div>
@@ -466,7 +466,7 @@ const WalletStampCardComponent = (
                   <WalletStampValue
                     stamp={stamp}
                     size="sm"
-                    className={`${TEXT_STYLES.price.base} ${TEXT_STYLES.price.sizes}`}
+                    className={cardPrice}
                     stampId={stamp.stamp || 0}
                     walletAddress=""
                   />
@@ -483,7 +483,7 @@ const WalletStampCardComponent = (
 
             {/* Quantity Display on the Right */}
             <div
-              class={`${TEXT_STYLES.supply.base} ${TEXT_STYLES.supply.sizes} flex-1 text-right truncate min-w-0`}
+              class={`${cardSupply} flex-1 text-right truncate min-w-0`}
               title={`You own ${stamp.balance} out of ${stamp.supply} total supply`}
             >
               {formatQuantityDisplay(
