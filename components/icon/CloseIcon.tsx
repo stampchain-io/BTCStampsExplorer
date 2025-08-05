@@ -1,6 +1,6 @@
 /* ===== CLOSE ICON COMPONENT ===== */
+import type { IconVariants } from "$icon";
 import { Icon } from "$icon";
-// Removed unused MouseEventHandler import
 import type { CloseIconProps } from "$types/ui.d.ts";
 /* ===== TYPES ===== */
 
@@ -16,24 +16,16 @@ export function CloseIcon({
   "aria-label": ariaLabel,
 }: CloseIconProps) {
   /* ===== EVENT HANDLERS ===== */
-  const handleClick = (
-    e: MouseEvent & {
-      currentTarget:
-        | HTMLButtonElement
-        | HTMLAnchorElement
-        | HTMLImageElement
-        | SVGElement;
-    },
-  ) => {
+  const handleClick = (e: MouseEvent) => {
     e.stopPropagation();
-    onClick?.();
+    onClick(e);
   };
 
   /* ===== STYLES ===== */
-  const colorClasses = color === "greyGradient"
-    ? `stroke-[url(#greyGradient)] hover:stroke-stamp-grey-light transform transition-colors duration-300`
-    : color === "purpleGradient"
-    ? `stroke-[url(#purpleGradient)] hover:stroke-stamp-purple-bright transform transition-colors duration-300`
+  const colorClasses = color === "grey"
+    ? `stroke-[url(#grey)] hover:stroke-stamp-grey-light transform transition-colors duration-300`
+    : color === "purple"
+    ? `stroke-[url(#purple)] hover:stroke-stamp-purple-bright transform transition-colors duration-300`
     : "";
 
   /* ===== RENDER ICON ===== */
@@ -41,9 +33,9 @@ export function CloseIcon({
     <>
       <svg width="0" height="0">
         <defs>
-          {color === "greyGradient" && (
+          {color === "grey" && (
             <linearGradient
-              id="greyGradient"
+              id="grey"
               gradientTransform="rotate(45)"
             >
               <stop offset="0%" stop-color="#666666" />
@@ -52,9 +44,9 @@ export function CloseIcon({
               <stop offset="100%" stop-color="#CCCCCC" />
             </linearGradient>
           )}
-          {color === "purpleGradient" && (
+          {color === "purple" && (
             <linearGradient
-              id="purpleGradient"
+              id="purple"
               gradientTransform="rotate(130)"
             >
               <stop offset="0%" stop-color="#AA00FF" />
@@ -69,32 +61,12 @@ export function CloseIcon({
         type="iconButton"
         name="close"
         weight={weight}
-        size={typeof size === "number" ? "custom" : size}
+        size={size}
         color="custom"
         className={`${colorClasses} ${className}`.trim()}
         onClick={handleClick}
-        onMouseEnter={onMouseEnter
-          ? (
-            e: MouseEvent & {
-              currentTarget:
-                | HTMLButtonElement
-                | HTMLAnchorElement
-                | HTMLImageElement
-                | SVGElement;
-            },
-          ) => onMouseEnter(e)
-          : undefined}
-        onMouseLeave={onMouseLeave
-          ? (
-            e: MouseEvent & {
-              currentTarget:
-                | HTMLButtonElement
-                | HTMLAnchorElement
-                | HTMLImageElement
-                | SVGElement;
-            },
-          ) => onMouseLeave(e)
-          : undefined}
+        {...(onMouseEnter && { onMouseEnter })}
+        {...(onMouseLeave && { onMouseLeave })}
         ariaLabel={ariaLabel || "Close"}
       />
     </>
@@ -111,7 +83,7 @@ export function CloseIcon({
  * <CloseIcon
  *   size="lg"
  *   weight="light"
- *   color="greyGradient"
+ *   color="grey"
  *   onClick={() => handleClose()}
  * />
  *
@@ -119,7 +91,7 @@ export function CloseIcon({
  * <CloseIcon
  *   size="md"
  *   weight="bold"
- *   color="purpleGradient"
+ *   color="purple"
  *   onClick={() => {
  *     if (open) {
  *       closeMenu();
@@ -131,7 +103,7 @@ export function CloseIcon({
  * <CloseIcon
  *   size="lg"
  *   weight="normal"
- *   color="greyGradient"
+ *   color="grey"
  *   onClick={handleClose}
  *   className="ml-2"
  * />

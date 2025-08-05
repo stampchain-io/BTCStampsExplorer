@@ -1,16 +1,17 @@
 /* ===== FORM STYLES MODULE ===== */
+import { glassmorphismLayer2, transition } from "$layout";
 
 /* ===== BASE STYLES ===== */
 // Global sizes
 const inputFieldHeight = "h-10";
 const inputFieldWidth = "!w-10";
-const inputFieldHeightLarge = "h-11";
 
 // Input field styles
 const inputFieldStyle = `p-3 w-full
-  rounded-md bg-stamp-grey focus:bg-stamp-grey-light outline-none focus:outline-none
-  font-medium text-sm text-stamp-grey-darkest
-  placeholder:font-light placeholder:text-stamp-grey-darkest placeholder:uppercase`;
+  ${glassmorphismLayer2}
+  focus:bg-stamp-grey-darkest/30 focus:border-stamp-grey-darker/20 focus:outline-none focus-visible:outline-none no-outline
+  font-medium text-sm text-stamp-grey-light
+  placeholder:font-light placeholder:text-stamp-grey placeholder:uppercase`;
 
 /* ===== INPUT STYLES ===== */
 // Base input
@@ -30,6 +31,20 @@ export const inputTextarea = `
   ${inputFieldStyle}
 `;
 
+// Input field dropdown - define height in the component
+export const inputFieldDropdown = `
+absolute top-[100%] left-0 w-full z-[11]
+bg-[#252026]/90 backdrop-blur-xl
+border border-t-0 border-stamp-grey-darker/20 rounded-b-lg
+text-stamp-grey-light text-sm font-medium uppercase leading-none
+overflow-y-auto scrollbar-glassmorphism shadow-lg`;
+
+export const inputFieldDropdownHover = `
+flex justify-between py-2.5 px-3
+border-b-[1px] border-stamp-grey-darker/20 last:border-b-0
+hover:bg-stamp-grey-darker/10 uppercase
+${transition} cursor-pointer`;
+
 // Checkbox - used for both checkboxes and radiobuttons
 export const inputCheckbox = (
   checked: boolean,
@@ -39,9 +54,9 @@ export const inputCheckbox = (
   relative
   size-4 tablet:size-3
   rounded-full
-  border-2
+  border-[1px]
   cursor-pointer
-  transition-colors duration-300
+  transition-colors duration-200
   ${
   checked
     ? canHoverSelected
@@ -88,37 +103,33 @@ export const inputSelect = `
 /* ===== ===== ===== */
 
 /* ===== GRADIENT STYLES ===== */
-export const purpleGradient = `
-  [--color-3:#660099]
-  [--color-2:#8800CC]
-  [--color-1:#AA00FF]
-  [--default-color:var(--color-2)]
-  [--hover-color:var(--color-1)]
+export const purple = `
+  [--color-dark:#66009980]
+  [--color-medium:#8800CC4D]
+  [--color-light:#AA00FF1A]
 `;
 
-export const greyGradient = `
-  [--color-3:#666666]
-  [--color-2:#999999]
-  [--color-1:#CCCCCC]
-  [--default-color:var(--color-2)]
-  [--hover-color:var(--color-1)]
+export const grey = `
+  [--color-dark:#66666680]
+  [--color-medium:#6666664D]
+  [--color-light:#6666661A]
 `;
 
 /* ===== GRADIENT INPUT STYLES ===== */
 export const outlineGradient = `
-  relative !bg-[#100318] !p-[2px] rounded-md !border-0
-  before:absolute before:inset-0 before:rounded-md before:z-[1]
-  before:bg-[conic-gradient(from_var(--angle),var(--color-3),var(--color-2),var(--color-1),var(--color-2),var(--color-3))]
+  relative !bg-gradient-to-r !from-[#221b22] !to-[#252129] !p-[1px] rounded-lg !border-0
+  before:absolute before:inset-0 before:rounded-lg before:z-[1]
+  before:bg-[conic-gradient(from_var(--angle),var(--color-dark),var(--color-medium),var(--color-light),var(--color-medium),var(--color-dark))]
   before:[--angle:0deg] before:animate-rotate
-  hover:before:bg-[conic-gradient(from_var(--angle),var(--color-1),var(--color-1),var(--color-1),var(--color-1),var(--color-1))]
-  focus-within:before:bg-[conic-gradient(from_var(--angle),var(--color-1),var(--color-1),var(--color-1),var(--color-1),var(--color-1))]
+  hover:before:bg-[conic-gradient(from_var(--angle),var(--color-light),var(--color-light),var(--color-light),var(--color-light),var(--color-light))]
+  focus-within:before:bg-[conic-gradient(from_var(--angle),var(--color-light),var(--color-light),var(--color-light),var(--color-light),var(--color-light))]
   before:transition-colors before:duration-300
-  [&>*]:relative [&>*]:z-[2] [&>*]:rounded-md [&>*]:bg-[#100318]
-  [&>div]:flex [&>div]:justify-between [&>div]:relative [&>div]:z-[2] [&>div]:!bg-[#100318] [&>div]:placeholder:!bg-[#100318] [&>div]:rounded-md
-  [&>div>input]:${inputFieldHeightLarge} [&>div>input]:w-full [&>div>input]:bg-transparent [&>div>input]:rounded-md [&>div>input]:pl-5 
-  [&>div>input]:font-normal [&>div>input]:text-base [&>div>input]:text-stamp-grey-light 
-  [&>div>input]:placeholder:font-light [&>div>input]:placeholder:!text-stamp-grey 
-  [&>div>input]:!outline-none [&>div>input]:focus-visible:!outline-none [&>div>input]:focus:!bg-[#100318]
+  [&>*]:relative [&>*]:z-[2] [&>*]:rounded-lg [&>*]:bg-gradient-to-r [&>*]:from-[#221b22] [&>*]:to-[#252129]
+  [&>div]:flex [&>div]:justify-between [&>div]:relative [&>div]:z-[2] [&>div]:!bg-gradient-to-r [&>div]:!from-[#221b22] [&>div]:!to-[#252129] [&>div]:placeholder:!bg-gradient-to-r [&>div]:rounded-lg
+  [&>div>input]:${inputFieldHeight} [&>div>input]:w-full [&>div>input]:bg-transparent [&>div>input]:rounded-lg [&>div>input]:pl-5
+  [&>div>input]:font-normal [&>div>input]:text-base [&>div>input]:text-stamp-grey-light
+  [&>div>input]:placeholder:font-light [&>div>input]:placeholder:!text-stamp-grey
+  [&>div>input]:!outline-none [&>div>input]:focus-visible:!outline-none [&>div>input]:focus:!bg-gradient-to-r [&>div>input]:focus:!from-[#221b22] [&>div>input]:focus:!to-[#252129]
 `;
 
 /* ===== NOT IN USE NOR UPDATED ===== */

@@ -1,6 +1,10 @@
 import { button } from "$button";
 import { useState } from "preact/hooks";
 
+// Glassmorphism color effect styling - must be identical to the glassmorphismColor variant in the button/styles.ts file
+const glassmorphismColor =
+  "[&:hover]:!bg-stamp-grey-darkest/10 [&:hover]:!border-[var(--color-border-hover)] [&:hover]:!text-[#1e1723] [&:hover::before]:!scale-100 [&:hover::before]:!blur-[5px] [&:hover::before]:!bg-[linear-gradient(to_bottom_right,var(--color-dark)_0%,var(--color-dark)_20%,var(--color-medium)_20%,var(--color-medium)_45%,var(--color-light)_45%,var(--color-light)_52%,var(--color-medium)_52%,var(--color-medium)_70%,var(--color-dark)_70%,var(--color-dark)_100%)]";
+
 export const ToggleButton = ({
   options,
   selected,
@@ -9,22 +13,50 @@ export const ToggleButton = ({
   size = "smR",
   spacing = "normal",
   disabledOptions = [],
+  color = "purple",
+  className = "",
 }: {
   options: string[];
   selected: string | string[];
   onChange: (value: string | string[]) => void;
   mode?: "single" | "multi";
-  size?: "xs" | "sm" | "md" | "lg" | "xl" | "xsR" | "smR" | "mdR" | "lgR";
+  size:
+    | "xxs"
+    | "xs"
+    | "sm"
+    | "md"
+    | "lg"
+    | "xl"
+    | "xxsR"
+    | "xsR"
+    | "smR"
+    | "mdR"
+    | "lgR";
   spacing?: "normal" | "tight" | "even" | "evenFullwidth";
   disabledOptions?: string[];
+  color?:
+    | "grey"
+    | "greyDark"
+    | "purple"
+    | "purpleDark"
+    | "test"
+    | "custom";
+  className?: string;
 }) => {
-  const [canHoverSelected, setCanHoverSelected] = useState(true);
+  const [selectState, setselectState] = useState<
+    {
+      option: string;
+      action: "select" | "deselect";
+    } | null
+  >(null);
 
   const handleClick = (option: string) => {
     // Don't handle clicks on disabled options
     if (disabledOptions.includes(option)) {
       return;
     }
+
+    const wasSelected = isOptionSelected(option);
 
     if (mode === "single") {
       onChange(option);
@@ -40,13 +72,18 @@ export const ToggleButton = ({
       }
     }
 
-    // Disable hover effects after click
-    setCanHoverSelected(false);
+    // Track the button and whether it was being selected or deselected
+    setselectState({
+      option,
+      action: wasSelected ? "deselect" : "select",
+    });
   };
 
   const handleMouseLeave = () => {
-    // Re-enable hover effects when mouse leaves
-    setCanHoverSelected(true);
+    // Don't clear selectState for TRENDING to keep visual effect visible
+    if (selectState?.option !== "TRENDING") {
+      setselectState(null);
+    }
   };
 
   const isOptionSelected = (option: string): boolean => {
@@ -56,40 +93,65 @@ export const ToggleButton = ({
     return Array.isArray(selected) && selected.includes(option);
   };
 
+  // Helper function to get select state styling for clicked buttons - overrukles hover states
+  const getSelectState = (option: string): string => {
+    if (selectState?.option !== option) return "";
+
+    return selectState.action === "select"
+      ? glassmorphismColor
+      : `!bg-stamp-grey-darkest/15 !border-stamp-grey-darkest/20 !text-[var(--color-dark)] [&:hover::before]:!bg-none`;
+  };
+
   // Custom button class function
   const getButtonClass = (option: string) => {
     const isSelected = isOptionSelected(option);
     const isDisabled = disabledOptions.includes(option);
 
     if (isDisabled) {
-      const color = mode === "single" ? "grey" : "greyDark";
       return `${
-        button("outlineFlat", color, size)
-      } opacity-30 cursor-not-allowed`;
+        button("glassmorphismDeselected", "grey", size)
+      } opacity-50 cursor-not-allowed`;
     }
 
     // Choose variant and color based on selection state and mode
     if (isSelected) {
       if (mode === "single") {
-        // Single select: use flatOutline for selected state (grey) with default cursor (can't be deselected)
-        return `${button("flatOutline", "grey", size)} cursor-default ${
-          !canHoverSelected ? "pointer-events-none" : ""
-        }`;
+        // Single select: use glassmorphismSelected for selected state
+        // Special case for timeframe buttons - show default state since they can't be deselected
+        // Interactive buttons like marketplace and trending get special select state behavior
+        const isTimeframe = ["24h", "7d", "30d"].includes(option);
+
+        // Special handling for TRENDING button
+        const isTrending = option === "TRENDING";
+
+        if (isTimeframe) {
+          return `${
+            button("glassmorphismSelected", "grey", size)
+          } cursor-default ${glassmorphismColor}`;
+        } else if (isTrending) {
+          // Force TRENDING to always show special effect with persistent animation
+          const trendingClickState = selectState?.option === "TRENDING"
+            ? glassmorphismColor
+            : `hover:bg-stamp-grey-darkest/15 hover:border-stamp-grey-darkest/20 hover:text-[var(--color-dark)] hover:before:bg-none `;
+          return `${
+            button("glassmorphismSelected", color, size)
+          } cursor-pointer ${trendingClickState} ${getSelectState(option)}`;
+        } else {
+          return `${
+            button("glassmorphismSelected", "grey", size)
+          } cursor-pointer ${getSelectState(option)}`;
+        }
       } else {
-        // Multi select: use flatOutline for selected state
-        // Special case for "dispensers" - show default cursor since it can't be deselected
-        const cursorClass = option === "dispensers"
-          ? "cursor-default [&:hover]:!bg-gradient-to-br [&:hover]:!from-[var(--color-light)] [&:hover]:!to-[var(--color-dark)] [&:hover]:!text-black"
-          : "";
-        return `${button("flatOutline", "greyDark", size)} ${cursorClass}`;
+        // Multi select: use glassmorphismSelected for selected state
+        // Special case for "dispensers" - show default state since it can't be deselected
+        return `${button("glassmorphismSelected", color, size)} ${
+          option === "dispensers" ? `cursor-default ${glassmorphismColor}` : ""
+        }`;
       }
     } else {
-      // Unselected state: use outlineFlat
-      const color = mode === "single" ? "grey" : "greyDark";
-      return `${button("outlineFlat", color, size)} ${
-        !canHoverSelected
-          ? "hover:bg-gradient-to-br hover:from-transparent hover:to-transparent hover:border-[var(--color-dark)] hover:text-[var(--color-dark)]"
-          : ""
+      // Unselected state: use glassmorphismDeselected
+      return `${button("glassmorphismDeselected", "grey", size)} ${
+        getSelectState(option)
       }`;
     }
   };
@@ -98,19 +160,19 @@ export const ToggleButton = ({
   const getContainerClass = () => {
     switch (spacing) {
       case "normal":
-        return "flex gap-6";
+        return "flex gap-5";
       case "tight":
-        return "flex gap-3";
+        return "flex gap-2.5";
       case "even":
         return "flex justify-between";
       case "evenFullwidth":
-        return "flex gap-6 w-full";
+        return "flex gap-5 w-full";
     }
   };
 
   return (
     <div class={getContainerClass()}>
-      {options.map((option: string) => {
+      {options.map((option) => {
         const isDisabled = disabledOptions.includes(option);
 
         return (
@@ -124,8 +186,12 @@ export const ToggleButton = ({
               type="button"
               class={`${getButtonClass(option)} ${
                 spacing === "evenFullwidth" ? "w-full" : ""
-              }`}
-              onClick={() => handleClick(option)}
+              } ${className}`}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleClick(option);
+              }}
               onMouseLeave={handleMouseLeave}
             >
               {option.toUpperCase()}

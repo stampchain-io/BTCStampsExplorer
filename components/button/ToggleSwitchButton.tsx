@@ -1,9 +1,9 @@
 /* ===== TOGGLE SWITCH BUTTON COMPONENT ===== */
+import { toggleButton, toggleKnob, toggleKnobBackground } from "$button";
+import { toggleSymbol } from "$text";
 import { JSX } from "preact";
-
 import type { ToggleSwitchButtonProps } from "$types/ui.d.ts";
 import { useEffect, useRef } from "preact/hooks";
-import { toggleButton, toggleKnob, toggleKnobBackground } from "$button";
 
 /* ===== TYPES ===== */
 
@@ -13,6 +13,8 @@ export function ToggleSwitchButton({
   onToggle,
   toggleButtonId,
   className = "",
+  activeSymbol,
+  inactiveSymbol,
   onMouseEnter,
   onMouseLeave,
   onClick,
@@ -24,7 +26,7 @@ export function ToggleSwitchButton({
   const actualRef = buttonRef || internalRef;
 
   /* ===== EVENT HANDLERS ===== */
-  const handleClick: JSX.MouseEventHandler<HTMLButtonElement> = (e) => {
+  const handleClick = (e: MouseEvent) => {
     if (onClick) {
       onClick(e);
     }
@@ -38,8 +40,17 @@ export function ToggleSwitchButton({
       // Create inner content
       const innerDiv = document.createElement("div");
       innerDiv.className = `${toggleKnob} ${
-        isActive ? "bg-stamp-purple-dark" : "bg-stamp-purple-darker"
+        isActive ? "bg-stamp-grey-light/70" : "bg-stamp-grey/70"
+      } flex items-center justify-center ${toggleSymbol} ${
+        isActive ? "mr-1" : ""
       }`;
+
+      // Add symbol if provided
+      if (isActive && activeSymbol) {
+        innerDiv.textContent = activeSymbol;
+      } else if (!isActive && inactiveSymbol) {
+        innerDiv.textContent = inactiveSymbol;
+      }
 
       // Clear and append
       handleElement.innerHTML = "";
@@ -64,7 +75,12 @@ export function ToggleSwitchButton({
         setTimeout(() => {
           // Update inner content with active color
           const innerDiv = document.createElement("div");
-          innerDiv.className = `${toggleKnob} bg-stamp-purple-dark`;
+          innerDiv.className =
+            `${toggleKnob} bg-stamp-grey-light/70 flex items-center justify-center ${toggleSymbol} mr-1`;
+
+          if (activeSymbol) {
+            innerDiv.textContent = activeSymbol;
+          }
 
           // Clear and append
           handleElement.innerHTML = "";
@@ -76,7 +92,12 @@ export function ToggleSwitchButton({
         setTimeout(() => {
           // Update inner content with inactive color
           const innerDiv = document.createElement("div");
-          innerDiv.className = `${toggleKnob} bg-stamp-purple-darker`;
+          innerDiv.className =
+            `${toggleKnob} bg-stamp-grey/70 flex items-center justify-center ${toggleSymbol}`;
+
+          if (inactiveSymbol) {
+            innerDiv.textContent = inactiveSymbol;
+          }
 
           // Clear and append
           handleElement.innerHTML = "";
@@ -84,7 +105,7 @@ export function ToggleSwitchButton({
         }, 150);
       }
     }
-  }, [isActive]);
+  }, [isActive, activeSymbol, inactiveSymbol]);
 
   /* ===== COMPONENT RENDER ===== */
   return (

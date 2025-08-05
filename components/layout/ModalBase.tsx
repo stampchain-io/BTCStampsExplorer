@@ -1,11 +1,11 @@
 /*@baba-rename to ModalBase */
-import { useEffect, useRef, useState } from "preact/hooks";
+import { CloseIcon } from "$icon";
+import { closeModal } from "$islands/modal/states.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { tooltipIcon } from "$notification";
-import type { ModalBaseProps } from "$types/ui.d.ts";
-import { closeModal } from "$islands/modal/states.ts";
 import { titlePurpleLD } from "$text";
-import { CloseIcon } from "$icon";
+import type { ModalBaseProps } from "$types/ui.d.ts";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 export function ModalBase({
   onClose,
@@ -14,12 +14,6 @@ export function ModalBase({
   className = "",
   contentClassName = "",
   hideHeader = false,
-  isOpen: _isOpen = true,
-  size: _size = "md",
-  closeOnOverlayClick: _closeOnOverlayClick = true,
-  closeOnEscape: _closeOnEscape = true,
-  showCloseButton: _showCloseButton = true,
-  preventScroll: _preventScroll = true,
 }: ModalBaseProps) {
   const [isCloseTooltipVisible, setIsCloseTooltipVisible] = useState(false);
   const [allowCloseTooltip, setAllowCloseTooltip] = useState(true);
@@ -107,7 +101,7 @@ export function ModalBase({
               <CloseIcon
                 size="sm"
                 weight="bold"
-                color="purpleGradient"
+                color="purple"
                 onClick={() => handleClose()}
               />
               <div

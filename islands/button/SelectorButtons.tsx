@@ -1,4 +1,4 @@
-import { color, padding, pillSize, state } from "$button";
+import { buttonStyles, color, size as buttonSize, state, padding } from "$button";
 import type { SelectorButtonsProps } from "$types/ui.d.ts";
 import { glassmorphism } from "$layout";
 import { useCallback, useEffect, useRef, useState } from "preact/hooks";
@@ -115,7 +115,7 @@ export const SelectorButtons = ({
         class={`absolute top-0.5 bottom-0.5 z-10
           rounded-lg shadow-lg
           transition-transform duration-200 ease-in-out
-          ${padding[size]}
+          ${buttonStyles.padding[size]}
         `}
         style={{
           transform: selectionTransform,
@@ -135,7 +135,13 @@ export const SelectorButtons = ({
             ref={(el) => (optionRefs.current[index] = el)}
             class={`
               relative min-w-0
-              ${optionDisabled ? state.disabled : "cursor-pointer"}
+              ${
+              optionDisabled
+                ? state.disabled
+                : selectedValue === option.value
+                ? "cursor-default"
+                : "cursor-pointer"
+            }
             `}
           >
             <input
@@ -151,10 +157,10 @@ export const SelectorButtons = ({
             <label
               for={`selector-${option.value}`}
               class={`
-                relative block z-20
+                relative flex items-center justify-center z-20
                 font-semibold text-center
-                transition-all duration-200 ease-in-out
-                ${pillSize[size as keyof typeof pillSize]}
+                transition-all duration-50
+                ${buttonSize[size]}
                 ${
                 selectedValue === option.value
                   ? "text-black"

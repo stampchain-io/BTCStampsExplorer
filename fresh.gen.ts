@@ -157,6 +157,8 @@ import * as $badge_index from "./islands/badge/index.ts";
 import * as $button_ConnectButton from "./islands/button/ConnectButton.tsx";
 import * as $button_FilterButton from "./islands/button/FilterButton.tsx";
 import * as $button_PaginationButtons from "./islands/button/PaginationButtons.tsx";
+import * as $button_RangeSlider from "./islands/button/RangeSlider.tsx";
+import * as $button_RangeSliderDual from "./islands/button/RangeSliderDual.tsx";
 import * as $button_SelectorButtons from "./islands/button/SelectorButtons.tsx";
 import * as $button_SortButton from "./islands/button/SortButton.tsx";
 import * as $button_ToggleButton from "./islands/button/ToggleButton.tsx";
@@ -490,6 +492,8 @@ const manifest = {
     "./islands/button/ConnectButton.tsx": $button_ConnectButton,
     "./islands/button/FilterButton.tsx": $button_FilterButton,
     "./islands/button/PaginationButtons.tsx": $button_PaginationButtons,
+    "./islands/button/RangeSlider.tsx": $button_RangeSlider,
+    "./islands/button/RangeSliderDual.tsx": $button_RangeSliderDual,
     "./islands/button/SelectorButtons.tsx": $button_SelectorButtons,
     "./islands/button/SortButton.tsx": $button_SortButton,
     "./islands/button/ToggleButton.tsx": $button_ToggleButton,

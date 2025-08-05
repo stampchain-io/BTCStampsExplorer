@@ -750,23 +750,12 @@ export interface SelectFieldProps extends FormControlProps {
  * Base modal component props
  */
 export interface ModalBaseProps extends BaseComponentProps {
-  _isOpen?: boolean;
-  isOpen?: boolean; // Add non-underscore variant
   onClose?: () => void;
-  title?: string;
-  size?: "sm" | "md" | "lg" | "xl" | "full";
-  _closeOnOverlayClick?: boolean;
-  closeOnOverlayClick?: boolean; // Add non-underscore variant
-  _closeOnEscape?: boolean;
-  closeOnEscape?: boolean; // Add non-underscore variant
-  _showCloseButton?: boolean;
-  showCloseButton?: boolean; // Add non-underscore variant
-  _preventScroll?: boolean;
-  preventScroll?: boolean; // Add non-underscore variant
-  hideHeader?: boolean;
-  contentClassName?: string;
+  title: string;
+  children: ComponentChildren;
   className?: string;
-  children?: ComponentChildren;
+  contentClassName?: string;
+  hideHeader?: boolean;
 }
 
 /**
@@ -1556,13 +1545,13 @@ export interface TransactionHexDisplayProps {
  * Icon component props
  */
 export interface CloseIconProps {
+  onClick: (e?: MouseEvent) => void;
+  size: IconVariants["size"];
+  weight: IconVariants["weight"];
+  color: "grey" | "purple";
   className?: string;
-  onClick?: () => void;
-  size?: IconSize | number;
-  weight?: IconWeight;
-  color?: string;
-  onMouseEnter?: (event: MouseEvent) => void;
-  onMouseLeave?: (event: MouseEvent) => void;
+  onMouseEnter?: (() => void) | undefined;
+  onMouseLeave?: (() => void) | undefined;
   "aria-label"?: string;
 }
 
@@ -2616,9 +2605,19 @@ export interface ToggleSwitchButtonProps {
   onToggle: () => void;
   toggleButtonId?: string;
   className?: string;
+  
+  // Custom symbols for the toggle states
+  activeSymbol?: string;
+  inactiveSymbol?: string;
+  
+  // Event handlers for external tooltip control
   onMouseEnter?: (e: MouseEvent) => void;
   onMouseLeave?: (e: MouseEvent) => void;
+  
+  // Optional click handler
   onClick?: (e: MouseEvent) => void;
+  
+  // Optional ref forwarding
   buttonRef?: preact.RefObject<HTMLButtonElement>;
 }
 
