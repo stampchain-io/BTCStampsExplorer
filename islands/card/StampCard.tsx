@@ -7,7 +7,6 @@ import StampTextContent from "$islands/content/stampDetailContent/StampTextConte
 import { VNode } from "preact";
 import { useEffect, useRef, useState } from "preact/hooks";
 
-import { TEXT_STYLES } from "$card";
 import {
   AUDIO_FILE_IMAGE,
   LIBRARY_FILE_IMAGE,
@@ -20,6 +19,19 @@ import {
   stripTrailingZeros,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
+import {
+  cardCreator,
+  cardHashSymbol,
+  cardHashSymbolGrey,
+  cardHashSymbolMinimal,
+  cardMimeType,
+  cardPrice,
+  cardPriceMinimal,
+  cardStampNumber,
+  cardStampNumberGrey,
+  cardStampNumberMinimal,
+  cardSupply,
+} from "$text";
 
 /* ===== TYPES ===== */
 interface StampWithSaleData extends Omit<StampRow, "stamp_base64"> {
@@ -468,17 +480,13 @@ export function StampCard({
             <div class="flex items-center justify-center max-w-[90%]">
               {shouldDisplayHash && (
                 <span
-                  class={`${getTextStyles("hashSymbol").base} ${
-                    getTextStyles("hashSymbol").sizes
-                  }`}
+                  class={getTextStyles("hashSymbol")}
                 >
                   #
                 </span>
               )}
               <span
-                class={`${getTextStyles("stampNumber").base} ${
-                  getTextStyles("stampNumber").sizes
-                }`}
+                class={getTextStyles("stampNumber")}
               >
                 {stampValue}
               </span>
@@ -496,7 +504,7 @@ export function StampCard({
               {/* Price on the Left */}
               <div class="text-left bg-stamp-grey-light/5 rounded-lg px-3 py-1">
                 <span
-                  class={`${renderPrice().style.base} ${renderPrice().style.sizes}`}
+                  class={renderPrice().style}
                 >
                   {renderPrice().text}
                 </span>

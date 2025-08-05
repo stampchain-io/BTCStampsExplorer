@@ -4,8 +4,12 @@
 export const glassmorphism =
   `border-[1px] border-stamp-grey-darkest/20 rounded-xl
   bg-gradient-to-br from-stamp-grey-darkest/15 to-stamp-grey-darkest/30
-  backdrop-blur-md overflow-hidden
-  shadow-[0_8px_32px_rgba(22,22,22,0.1),inset_0_1px_0_rgba(22,22,22,0.3),inset_0_-1px_0_rgba(22,22,22,0.1),inset_0_0_8px_4px_rgba(22,22,22,0.2)]`;
+  backdrop-blur overflow-hidden
+  shadow-[0_8px_16px_rgba(22,22,22,0.1),inset_0_1px_0_rgba(22,22,22,0.3),inset_0_-1px_0_rgba(22,22,22,0.1),inset_0_0_4px_4px_rgba(22,22,22,0.2)]`;
+export const glassmorphismLayer2 =
+  `border-[1px] border-stamp-grey-darkest/20 rounded-lg
+  bg-stamp-grey-darkest/15 backdrop-blur-sm overflow-hidden
+  shadow-[0_4px_8px_rgba(22,22,22,0.1),inset_0_1px_0_rgba(22,22,22,0.3),inset_0_-1px_0_rgba(22,22,22,0.1),inset_0_0_2px_2px_rgba(22,22,22,0.2)]`;
 export const transition = "transition-colors duration-200";
 
 /* ===== BODY STYLES ===== */
@@ -24,8 +28,7 @@ export const gapSectionSlim = "gap-6 mobileLg:gap-9"; // Media index page
 export const gapGrid = "gap-6 mobileLg:gap-9 tablet:gap-12"; // - ToS index page
 
 /* ===== CONTAINER STYLES ===== */
-export const containerBackground =
-  `flex flex-col w-full px-6 py-5 ${glassmorphism}`;
+export const containerBackground = `flex flex-col w-full p-5 ${glassmorphism}`;
 
 export const containerDetailImage = `relative p-5 ${glassmorphism}`;
 
@@ -41,7 +44,8 @@ export const containerRowForm = "flex w-full gap-5"; // Form input fields specif
 
 /* ===== ROW STYLES ===== */
 export const rowForm = "flex w-full";
-export const rowResponsiveForm = "flex flex-col mobileMd:flex-row w-full gap-5";
+export const rowResponsiveForm =
+  "flex flex-col min-[420px]:flex-row w-full gap-5 min-[420px]:[&>*]:flex-1";
 export const rowTable = `h-7 hover:bg-stamp-purple-bright/15 ${transition}`;
 export const rowCardBorderLeft =
   `p-3 pl-4 rounded-l-xl border-y-[1px] border-l-[1px] border-r-0 border-stamp-grey-darkest/20 group-hover:border-stamp-purple-bright ${transition}`;
@@ -54,9 +58,9 @@ export const rowCardBorderCenter =
 
 /* ===== IMAGE STYLES ===== */
 export const imagePreviewTool =
-  "flex items-center justify-center rounded min-w-[100px] h-[100px] bg-stamp-purple-darker overflow-hidden";
+  `flex items-center justify-center min-w-[100px] h-[100px] ${glassmorphismLayer2} overflow-hidden`;
 export const imageUploadTool =
-  "flex items-center justify-center rounded min-w-[100px] h-[100px] bg-stamp-purple-bright overflow-hidden";
+  `flex items-center justify-center min-w-[100px] h-[100px] ${glassmorphismLayer2} hover:bg-stamp-grey-darkest/30 ${transition} cursor-pointer overflow-hidden`;
 
 /* ===== MODAL STYLES ===== */
 export const modalBgCenter =
@@ -64,23 +68,27 @@ export const modalBgCenter =
 
 /* ===== LOADER STYLES ===== */
 // Text loader styles are defined in /text/styles.ts
-// Internal loader style
-const loaderSpin = "animate-spin rounded-full border-b-[3px]";
-// Loader styles
-export const loaderSpinXsGrey =
-  `animate-spin rounded-full border-b-[2px] w-3 h-3 border-stamp-grey`;
-export const loaderSpinSmGrey =
-  `animate-spin rounded-full border-b-[2px] w-5 h-5 border-stamp-grey`;
+// Base loader style
+const loaderSpin = "animate-spin rounded-full border-b-[2px]";
+const loaderSkeleton =
+  `bg-stamp-grey-darkest/30 border border-stamp-grey-darkest/15 animate-pulse`;
+// Spinning loader styles
+export const loaderSpinXsGrey = `${loaderSpin} w-3 h-3 border-stamp-grey`;
+export const loaderSpinSmGrey = `${loaderSpin} w-5 h-5 border-stamp-grey`;
 export const loaderSpinGrey = `${loaderSpin} w-7 h-7 border-stamp-grey`;
 export const loaderSpinLgGrey = `${loaderSpin} w-9 h-9 border-stamp-grey`;
-export const loaderSpinXsPurple =
-  `animate-spin rounded-full border-b-[2px] w-3 h-3 border-stamp-purple`;
-export const loaderSpinSmPurple =
-  `animate-spin rounded-full border-b-[2px] w-5 h-5 border-stamp-purple`;
+export const loaderSpinXsPurple = `${loaderSpin} w-3 h-3 border-stamp-purple`;
+export const loaderSpinSmPurple = `${loaderSpin} w-5 h-5 border-stamp-purple`;
 export const loaderSpinPurple = `${loaderSpin} w-7 h-7 border-stamp-purple`;
 export const loaderSpinLgPurple = `${loaderSpin} w-9 h-9 border-stamp-purple`;
+// Skeleton loader styles - rename to: md=text - lg=form -full=rounded
+export const loaderSkeletonImage =
+  `flex items-center justify-center min-w-[100px] h-[100px] ${loaderSkeleton} rounded-lg`;
+export const loaderSkeletonMd = `${loaderSkeleton} rounded`;
+export const loaderSkeletonLg = `${loaderSkeleton} rounded-lg`;
+export const loaderSkeletonFull = `${loaderSkeleton} rounded-full`;
 
-/* ===== LEGACY STYLES - not checked yet ===== */
+/* ===== LEGACY STYLES - not checked yet-@baba ===== */
 export const modalBgTop =
   "fixed inset-0 z-50 flex items-start justify-center bg-black bg-opacity-70 backdrop-filter backdrop-blur-md";
 export const modalSearch = "w-[90%] max-w-[600px] mt-[72px] tablet:mt-24";
@@ -89,6 +97,7 @@ export const modalSearch = "w-[90%] max-w-[600px] mt-[72px] tablet:mt-24";
 export type LayoutStyles = {
   // Base styles
   glassmorphism: string;
+  glassmorphismLayer2: string;
   transition: string;
 
   // Body styles
@@ -117,8 +126,18 @@ export type LayoutStyles = {
   rowCardBorderCenter: string;
 
   // Loader styles
+  loaderSpinXsGrey: string;
+  loaderSpinSmGrey: string;
   loaderSpinGrey: string;
+  loaderSpinLgGrey: string;
+  loaderSpinXsPurple: string;
+  loaderSpinSmPurple: string;
   loaderSpinPurple: string;
+  loaderSpinLgPurple: string;
+  loaderSkeletonImage: string;
+  loaderSkeletonMd: string;
+  loaderSkeletonLg: string;
+  loaderSkeletonFull: string;
 
   // Modal styles
   modalBgCenter: string;

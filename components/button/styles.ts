@@ -1,5 +1,7 @@
 /* ===== BUTTON STYLES MODULE ===== */
+import { glassmorphismLayer2 } from "$layout";
 import { JSX } from "preact";
+
 /* ===== TYPE DEFINITIONS ===== */
 
 // Basic button props interface - exclude conflicting HTML attributes
@@ -21,6 +23,10 @@ export interface ButtonVariants {
   base: string;
   variant: Record<
     | "text"
+    | "glassmorphism"
+    | "glassmorphismColor"
+    | "glassmorphismSelected"
+    | "glassmorphismDeselected"
     | "flat"
     | "outline"
     | "flatOutline"
@@ -37,14 +43,8 @@ export interface ButtonVariants {
   color: Record<
     | "grey"
     | "greyDark"
-    | "greyGradient"
     | "purple"
     | "purpleDark"
-    | "purpleGradient"
-    | "blue"
-    | "green"
-    | "red"
-    | "gray"
     | "test"
     | "custom",
     string
@@ -70,26 +70,6 @@ export interface ButtonVariants {
     "xs" | "sm" | "md" | "lg" | "xl",
     string
   >;
-  padding: Record<
-    | "xxs"
-    | "xs"
-    | "sm"
-    | "md"
-    | "lg"
-    | "xl"
-    | "xxl"
-    | "xxsR"
-    | "xsR"
-    | "smR"
-    | "mdR"
-    | "lgR"
-    | "custom",
-    string
-  >;
-  pillSize: Record<
-    "xs" | "sm" | "md" | "lg" | "xl",
-    string
-  >;
   state: {
     disabled: string;
     loading: string;
@@ -101,6 +81,15 @@ export interface ButtonVariants {
 /* ===== BUTTON PROPS INTERFACES ===== */
 
 /* ===== BUTTON STYLE DEFINITIONS ===== */
+const baseBefore =
+  "before:absolute before:inset-0 before:rounded-lg before:z-[-1] before:transition-transform before:duration-50 before:origin-center";
+const baseGlassmorphism =
+  "border-[1px] rounded-lg backdrop-blur-sm overflow-hidden";
+const baseGlassmorphismColor =
+  "relative text-[#1e1723] before:blur-[5px] hover:border-[var(--color-border-hover)] hover:before:scale-110 hover:before:blur-sm";
+const shadow =
+  "shadow-[0_2px_4px_rgba(22,22,22,0.1),inset_0_1px_0_rgba(22,22,22,0.3),inset_0_-1px_0_rgba(22,22,22,0.1),inset_0_0_2px_2px_rgba(22,22,22,0.2)]";
+
 export const buttonStyles: ButtonVariants = {
   /* ===== BASE STYLES ===== */
   base: `
@@ -117,6 +106,32 @@ export const buttonStyles: ButtonVariants = {
       !p-0 bg-transparent !border-0
       font-semibold tracking-wide
       text-[var(--default-color)] hover:text-[var(--hover-color)]
+    `,
+    glassmorphism: `
+      ${baseGlassmorphism} bg-stamp-grey-darkest/15 border-stamp-grey-darkest/20
+      hover:bg-stamp-grey-darkest/30 hover:border-stamp-grey-darkest/40
+      text-[var(--color-dark)] hover:text-[var(--color-medium)]
+      ${shadow}
+    `,
+    glassmorphismColor: `
+      ${baseGlassmorphism} ${baseGlassmorphismColor}
+      bg-stamp-grey-darkest/10 border-[var(--color-border)]
+      ${baseBefore} ${shadow}
+      before:bg-[linear-gradient(to_bottom_right,var(--color-dark)_0%,var(--color-dark)_20%,var(--color-medium)_20%,var(--color-medium)_45%,var(--color-light)_45%,var(--color-light)_52%,var(--color-medium)_52%,var(--color-medium)_70%,var(--color-dark)_70%,var(--color-dark)_100%)]
+    `,
+    glassmorphismSelected: `
+      ${baseGlassmorphism} ${baseGlassmorphismColor}
+      bg-stamp-grey-darkest/10 border-[var(--color-border)]
+      ${baseBefore} ${shadow}
+      before:bg-[linear-gradient(to_bottom_right,var(--color-dark)_0%,var(--color-dark)_20%,var(--color-medium)_20%,var(--color-medium)_45%,var(--color-light)_45%,var(--color-light)_52%,var(--color-medium)_52%,var(--color-medium)_70%,var(--color-dark)_70%,var(--color-dark)_100%)]
+      hover:bg-stamp-grey-darkest/15 hover:border-stamp-grey-darkest/20 hover:before:bg-none hover:text-[var(--color-dark)] hover:before:blur-0
+    `,
+    glassmorphismDeselected: `
+      ${baseGlassmorphism} ${baseGlassmorphismColor}
+      bg-stamp-grey-darkest/10 border-stamp-grey-darkest/20
+      ${baseBefore} hover:${shadow}
+      before:bg-none hover:before:bg-[linear-gradient(to_bottom_right,var(--color-dark)_0%,var(--color-dark)_20%,var(--color-medium)_20%,var(--color-medium)_45%,var(--color-light)_45%,var(--color-light)_52%,var(--color-medium)_52%,var(--color-medium)_70%,var(--color-dark)_70%,var(--color-dark)_100%)]
+      text-stamp-grey-darkest hover:border-[var(--color-border)]
     `,
     flat: `
       bg-gradient-to-br from-[var(--color-light)] to-[var(--color-dark)]
@@ -182,54 +197,44 @@ export const buttonStyles: ButtonVariants = {
   /* ===== COLOR STYLES ===== */
   color: {
     grey: `
-      [--color-dark:#999999]
-      [--color-light:#CCCCCC]
-    `,
-    greyDark: `
-      [--color-dark:#666666]
-      [--color-light:#999999]
-    `,
-    greyGradient: `
       [--color-dark:#666666]
       [--color-medium:#999999]
       [--color-light:#CCCCCC]
       [--default-color:var(--color-medium)]
       [--hover-color:var(--color-light)]
+      [--color-border:#66666680]
+      [--color-border-hover:#66666699]
+    `,
+    greyDark: `
+      [--color-dark:#555555]
+      [--color-medium:#888888]
+      [--color-light:#BBBBBB]
+      [--default-color:var(--color-medium)]
+      [--hover-color:var(--color-light)]
+      [--color-border:#55555580]
+      [--color-border-hover:#55555599]
     `,
     purple: `
-      [--color-dark:#8800CC]
-      [--color-light:#AA00FF]
-    `,
-    purpleDark: `
-      [--color-dark:#660099]
-      [--color-light:#8800CC]
-    `,
-    purpleGradient: `
       [--color-dark:#660099]
       [--color-medium:#8800CC]
       [--color-light:#AA00FF]
       [--default-color:var(--color-medium)]
       [--hover-color:var(--color-light)]
+      [--color-border:#66009980]
+      [--color-border-hover:#66009999]
+    `,
+    purpleDark: `
+      [--color-dark:#550080]
+      [--color-medium:#7700b3]
+      [--color-light:#9900E6]
+      [--default-color:var(--color-medium)]
+      [--hover-color:var(--color-light)]
+      [--color-border:#55008080]
+      [--color-border-hover:#55008099]
     `,
     test: `
       [--color-dark:#00CC00]
       [--color-light:#CC0000]
-    `,
-    blue: `
-      [--color-dark:#0066CC]
-      [--color-light:#0099FF]
-    `,
-    green: `
-      [--color-dark:#00AA00]
-      [--color-light:#00CC00]
-    `,
-    red: `
-      [--color-dark:#CC0000]
-      [--color-light:#FF0000]
-    `,
-    gray: `
-      [--color-dark:#666666]
-      [--color-light:#999999]
     `,
     custom: "",
   },
@@ -258,32 +263,6 @@ export const buttonStyles: ButtonVariants = {
     md: "text-base",
     lg: "text-lg",
     xl: "text-xl",
-  },
-
-  /* ===== PADDING STYLES ===== */
-  padding: {
-    xxs: "py-[3px] px-[14px]",
-    xs: "py-[5px] px-[14px]",
-    sm: "py-[7px] px-4",
-    md: "py-[9px] px-4",
-    lg: "py-[11px] px-4",
-    xl: "py-[13px] px-5",
-    xxl: "py-[15px] px-6",
-    xxsR: "py-[3px] tablet:py-[1px] px-[14px]",
-    xsR: "py-[5px] tablet:py-[3px] px-[14px]",
-    smR: "py-[7px] tablet:py-[5px] px-4",
-    mdR: "py-[9px] tablet:py-[7px] px-4",
-    lgR: "py-[11px] tablet:py-[9px] px-4",
-    custom: "/* Custom padding - allows external styling via className */",
-  },
-
-  /* ===== PILL SIZE STYLES ===== */
-  pillSize: {
-    xs: "text-xs py-[5px] px-[14px]",
-    sm: "text-xs py-[7px] px-4",
-    md: "text-sm py-[9px] px-4",
-    lg: "text-sm py-[11px] px-4",
-    xl: "text-base py-[13px] px-5",
   },
 
   /* ===== STATE STYLES ===== */
@@ -327,13 +306,24 @@ export const toggleButton =
 export const toggleKnobBackground =
   "flex justify-center items-center relative w-5 h-5 bg-stamp-grey rounded-full transition ease-in-out transform duration-400 ";
 export const toggleKnob = "w-[18px] h-[18px] rounded-full";
-export const sliderKnob =
-  `[&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:tablet:w-4 [&::-webkit-slider-thumb]:tablet:h-4 [&::-webkit-slider-thumb]:appearance-none
-   [&::-webkit-slider-thumb]:bg-stamp-purple-dark [&::-webkit-slider-thumb]:hover:bg-stamp-purple [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
-   [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:tablet:w-4 [&::-moz-range-thumb]:tablet:h-4 [&::-moz-range-thumb]:appearance-none
-   [&::-moz-range-thumb]:bg-stamp-purple-dark [&::-moz-range-thumb]:hover:bg-stamp-purple-dark [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer`;
+export const sliderKnob = `
+  absolute top-0.5 bottom-0.5 w-full h-[14px] tablet:h-[10px] rounded-full appearance-none bg-transparent pointer-events-none
+  [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:pointer-events-auto
+  [&::-webkit-slider-thumb]:size-[14px] [&::-webkit-slider-thumb]:tablet:size-[10px]
+  [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-stamp-grey
+  [&::-webkit-slider-thumb]:hover:bg-stamp-grey-light [&::-webkit-slider-thumb]:cursor-grab
+  [&::-webkit-slider-thumb]:active:cursor-grabbing
+  [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:pointer-events-auto
+  [&::-moz-range-thumb]:size-[14px][&::-moz-range-thumb]:tablet:size-[10px]
+  [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-stamp-grey
+  [&::-moz-range-thumb]:hover:bg-stamp-grey-light [&::-moz-range-thumb]:cursor-grab
+  [&::-moz-range-thumb]:active:cursor-grabbing [&::-moz-range-thumb]:border-0
+  `;
+export const trackFill = `
+  absolute top-0.5 bottom-0.5 h-[14px] tablet:h-[10px] rounded-full transition-colors duration-200 pointer-events-none
+  `;
 export const sliderBar =
-  `w-full h-1.5 tablet:h-1 rounded-lg bg-stamp-grey appearance-none cursor-pointer`;
+  `w-full h-5 tablet:h-4 !rounded-full ${glassmorphismLayer2} cursor-pointer`;
 
 /* ===== STYLE COMPOSITION FUNCTION ===== */
 export const button = (
