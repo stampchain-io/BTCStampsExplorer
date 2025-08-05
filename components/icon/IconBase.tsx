@@ -102,6 +102,7 @@ export function Icon(props: IconVariants) {
       donate: "coinsHand",
       stamp: "stamp",
       uploadImage: "image",
+      previewImageCornersOut: "cornersOut",
 
       // Error Display Icons (fallback to existing icons)
       "info": "magnifingGlass", // Using magnifying glass as placeholder for info

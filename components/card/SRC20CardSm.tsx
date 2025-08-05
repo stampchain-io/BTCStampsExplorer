@@ -1,6 +1,6 @@
-import type { SRC20Row } from "$types/src20.d.ts";
+// import { SRC20Row } from "$globals";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
-import type { SRC20CardSmProps } from "$types/ui.d.ts";
+import type { EnrichedSRC20Row } from "$globals";
 import {
   containerCardTable,
   rowCardBorderCenter,
@@ -10,10 +10,12 @@ import {
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
 import { labelXs, textSm, valueDarkSm } from "$text";
-import {
-  isBrowser,
-  safeNavigate,
-} from "$utils/navigation/freshNavigationUtils.ts";
+
+interface SRC20CardSmProps {
+  data: EnrichedSRC20Row[];
+  fromPage: "src20" | "wallet" | "stamping/src20" | "home";
+  onImageClick: (imgSrc: string) => void;
+}
 
 export function SRC20CardSm({
   data,
@@ -42,7 +44,6 @@ export function SRC20CardSm({
       /[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F000}-\u{1F02F}\u{1F0A0}-\u{1F0FF}\u{1F100}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{1F900}-\u{1F9FF}]/gu;
     const match = text.match(emojiRegex);
     if (!match) return { text, emoji: "" };
-    if (!match || !match[0]) return { text, emoji: "" };
     const emojiIndex = text.indexOf(match[0]);
     return {
       text: text.slice(0, emojiIndex),
@@ -126,7 +127,7 @@ export function SRC20CardSm({
       <tbody>
         {data?.length
           ? (
-            data.map((src20: SRC20Row, index: number) => {
+            data.map((src20: EnrichedSRC20Row, index: number) => {
               // SRC-20 Image URL Logic:
               // 1. Use deploy_img if provided (for deploy operations: https://stampchain.io/stamps/{deploy_tx}.svg)
               // 2. Use stamp_url if provided (for transaction stamps: https://stampchain.io/stamps/{tx_hash}.svg)
@@ -181,16 +182,17 @@ export function SRC20CardSm({
                       e.button !== 1
                     ) {
                       e.preventDefault();
-                      // SSR-safe browser environment check
-                      if (!isBrowser()) {
-                        return; // Cannot navigate during SSR
+                      if (
+                        typeof globalThis !== "undefined" &&
+                        globalThis?.location
+                      ) {
+                        const href = `/src20/${
+                          encodeURIComponent(
+                            unicodeEscapeToEmoji(src20.tick ?? ""),
+                          )
+                        }`;
+                        globalThis.location.href = href;
                       }
-                      const href = `/src20/${
-                        encodeURIComponent(
-                          unicodeEscapeToEmoji(src20.tick ?? ""),
-                        )
-                      }`;
-                      safeNavigate(href);
                     }
                   }}
                 >
