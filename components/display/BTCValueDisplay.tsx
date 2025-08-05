@@ -5,13 +5,6 @@
  * error handling, and proper formatting.
  */
 
-import type {
-  BTCValueDisplayProps,
-  BTCValueSummaryProps,
-  StampBTCValueProps,
-  TotalBTCValueProps,
-  WalletStampValueProps,
-} from "$types/ui.d.ts";
 import {
   useBTCValue,
   useStampValue,
@@ -20,6 +13,16 @@ import {
 } from "$lib/hooks/useBTCValue.ts";
 import type { WalletStampWithValue } from "$lib/types/wallet.d.ts";
 import { memo } from "preact/compat";
+
+interface BTCValueDisplayProps {
+  value: number | null;
+  loading?: boolean;
+  error?: string;
+  className?: string;
+  size?: "sm" | "md" | "lg";
+  showSymbol?: boolean;
+  fallback?: string;
+}
 
 /**
  * Generic BTC value display component
@@ -42,7 +45,7 @@ export const BTCValueDisplay = memo(function BTCValueDisplay({
   if (loading) {
     return (
       <div
-        class={`${sizeClasses[size as keyof typeof sizeClasses]} ${className}`}
+        class={`${sizeClasses[size]} ${className}`}
       >
         <span class="animate-pulse text-gray-500">Loading...</span>
       </div>
@@ -52,7 +55,7 @@ export const BTCValueDisplay = memo(function BTCValueDisplay({
   if (error) {
     return (
       <div
-        class={`${sizeClasses[size as keyof typeof sizeClasses]} ${className}`}
+        class={`${sizeClasses[size]} ${className}`}
       >
         <span class="text-red-500" title={error}>Error</span>
       </div>
@@ -65,7 +68,7 @@ export const BTCValueDisplay = memo(function BTCValueDisplay({
 
   return (
     <div
-      class={`${sizeClasses[size as keyof typeof sizeClasses]} ${className}`}
+      class={`${sizeClasses[size]} ${className}`}
     >
       <span class={value && value > 0 ? "text-green-600" : "text-gray-500"}>
         {displayValue}
@@ -73,6 +76,14 @@ export const BTCValueDisplay = memo(function BTCValueDisplay({
     </div>
   );
 });
+
+interface StampBTCValueProps {
+  quantity?: number;
+  unitPrice?: number;
+  className?: string;
+  size?: "sm" | "md" | "lg";
+  showBreakdown?: boolean;
+}
 
 /**
  * Component for displaying individual stamp BTC value
@@ -84,16 +95,14 @@ export const StampBTCValue = memo(function StampBTCValue({
   size = "md",
   showBreakdown = false,
 }: StampBTCValueProps) {
-  const { value, formatted, hasValue } = useBTCValue(quantity ?? 0, unitPrice);
+  const { value, formatted, hasValue } = useBTCValue(quantity, unitPrice);
 
   if (showBreakdown && hasValue) {
     return (
       <div class={`${className}`}>
         <BTCValueDisplay value={value} size={size} />
         <div class="text-xs text-gray-500 mt-1">
-          {quantity ?? 0} × {(unitPrice ?? 0).toFixed(8).replace(/\.?0+$/, "")}
-          {" "}
-          BTC
+          {quantity} × {unitPrice?.toFixed(8).replace(/\.?0+$/, "")} BTC
         </div>
       </div>
     );
@@ -108,6 +117,14 @@ export const StampBTCValue = memo(function StampBTCValue({
     />
   );
 });
+
+interface WalletStampValueProps {
+  stamp: WalletStampWithValue;
+  className?: string;
+  size?: "sm" | "md" | "lg";
+  showBreakdown?: boolean;
+  showSource?: boolean;
+}
 
 /**
  * Component for displaying wallet stamp value with price source
@@ -163,6 +180,13 @@ export const WalletStampValue = memo(function WalletStampValue({
   );
 });
 
+interface TotalBTCValueProps {
+  stamps?: WalletStampWithValue[];
+  className?: string;
+  size?: "sm" | "md" | "lg";
+  showStats?: boolean;
+}
+
 /**
  * Component for displaying total portfolio BTC value
  */
@@ -193,6 +217,12 @@ export const TotalBTCValue = memo(function TotalBTCValue({
     </div>
   );
 });
+
+interface BTCValueSummaryProps {
+  stamps?: WalletStampWithValue[];
+  className?: string;
+  includeBreakdown?: boolean;
+}
 
 /**
  * Component for displaying comprehensive BTC value summary
