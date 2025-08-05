@@ -3,13 +3,17 @@ import { Button } from "$button";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
 import type { SRC20Row } from "$types/src20.d.ts";
 import type { SRC20CardMintingProps } from "$types/ui.d.ts";
+import type { TargetedEvent } from "preact/compat";
 import { Icon } from "$icon";
+import {
+  isBrowser,
+  safeNavigate,
+} from "$lib/utils/navigation/freshNavigationUtils.ts";
 import {
   containerCardTable,
   rowCardBorderCenter,
   rowCardBorderLeft,
   rowCardBorderRight,
-  Timeframe,
 } from "$layout";
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { formatDate } from "$lib/utils/ui/formatting/formatUtils.ts";

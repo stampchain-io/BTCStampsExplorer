@@ -202,6 +202,7 @@ export function SearchStampModal({
     searchState.value = { term: "", error: "" }; // Reset state
     const modalContent = (
       <ModalSearchBase
+        title="Search Stamps"
         onClose={() => {
           console.log("Modal closing, resetting state");
           searchState.value = { term: "", error: "" };

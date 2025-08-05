@@ -5,7 +5,6 @@ import { InputField } from "$form";
 import { gapGrid, rowForm, rowResponsiveForm } from "$layout";
 import { subtitleGrey, text, titleGreyLD } from "$text";
 import type { FormEventHandler } from "$types/ui.d.ts";
-
 import { useState } from "preact/hooks";
 
 /* ===== STATE ===== */
@@ -79,13 +78,13 @@ const ContactCta = () => {
                 <InputField
                   type="text"
                   value={name}
-                  onChange={(e) => setName(e.currentTarget?.value ?? "")}
+                  onChange={(e) => setName(e.currentTarget.value)}
                   placeholder="Name"
                 />
                 <InputField
                   type="text"
                   value={email}
-                  onChange={(e) => setEmail(e.currentTarget?.value ?? "")}
+                  onChange={(e) => setEmail(e.currentTarget.value)}
                   placeholder="Email"
                 />
               </div>
@@ -95,7 +94,7 @@ const ContactCta = () => {
                 <InputField
                   type="text"
                   value={subject}
-                  onChange={(e) => setSubject(e.currentTarget?.value ?? "")}
+                  onChange={(e) => setSubject(e.currentTarget.value)}
                   placeholder="Subject"
                 />
               </div>
@@ -114,9 +113,9 @@ const ContactCta = () => {
               <div class="w-full flex justify-end">
                 <ButtonProcessing
                   type="submit"
-                  variant="outline"
+                  variant="glassmorphismColor"
                   color="grey"
-                  size="md"
+                  size="mdR"
                   isSubmitting={isSubmitting}
                 >
                   SEND

@@ -1,4 +1,4 @@
-import { buttonStyles, color, size as buttonSize, state, padding } from "$button";
+import { buttonStyles, color, state } from "$button";
 import type { SelectorButtonsProps } from "$types/ui.d.ts";
 import { glassmorphism } from "$layout";
 import { useCallback, useEffect, useRef, useState } from "preact/hooks";
@@ -115,7 +115,6 @@ export const SelectorButtons = ({
         class={`absolute top-0.5 bottom-0.5 z-10
           rounded-lg shadow-lg
           transition-transform duration-200 ease-in-out
-          ${buttonStyles.padding[size]}
         `}
         style={{
           transform: selectionTransform,
@@ -160,7 +159,7 @@ export const SelectorButtons = ({
                 relative flex items-center justify-center z-20
                 font-semibold text-center
                 transition-all duration-50
-                ${buttonSize[size]}
+                ${buttonStyles.size[size]}
                 ${
                 selectedValue === option.value
                   ? "text-black"

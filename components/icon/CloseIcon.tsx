@@ -1,8 +1,6 @@
 /* ===== CLOSE ICON COMPONENT ===== */
-import type { IconVariants } from "$icon";
 import { Icon } from "$icon";
 import type { CloseIconProps } from "$types/ui.d.ts";
-/* ===== TYPES ===== */
 
 /* ===== COMPONENT ===== */
 export function CloseIcon({

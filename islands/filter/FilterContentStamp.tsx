@@ -7,7 +7,8 @@ import type {
   StampRange,
 } from "$constants";
 import { inputCheckbox } from "$form";
-import { Checkbox, RangeSlider } from "$islands/filter/FilterComponents.tsx";
+import { Checkbox } from "$islands/filter/FilterComponents.tsx";
+import { RangeSliderDual as RangeSlider } from "$islands/button/RangeSliderDual.tsx";
 import { StampFilters } from "$islands/filter/FilterOptionsStamp.tsx";
 import { CollapsibleSection } from "$islands/layout/CollapsibleSection.tsx";
 import { labelLogicResponsive, labelXsPosition, labelXsR } from "$text";
@@ -1143,6 +1144,7 @@ export const FilterContentStamp = ({
             {filters.sales === "volume" && (
               <div class="mt-3 pl-0.5">
                 <ToggleButton
+                  size="md"
                   options={["24h", "7d", "30d"]}
                   selected={filters.volume}
                   onChange={(value) => handleVolumeChange(value as string)}

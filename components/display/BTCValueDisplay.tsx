@@ -95,7 +95,7 @@ export const StampBTCValue = memo(function StampBTCValue({
   size = "md",
   showBreakdown = false,
 }: StampBTCValueProps) {
-  const { value, formatted, hasValue } = useBTCValue(quantity, unitPrice);
+  const { value, formatted, hasValue } = useBTCValue(quantity || 0, unitPrice);
 
   if (showBreakdown && hasValue) {
     return (

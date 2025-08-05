@@ -19,19 +19,7 @@ import {
   stripTrailingZeros,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
-import {
-  cardCreator,
-  cardHashSymbol,
-  cardHashSymbolGrey,
-  cardHashSymbolMinimal,
-  cardMimeType,
-  cardPrice,
-  cardPriceMinimal,
-  cardStampNumber,
-  cardStampNumberGrey,
-  cardStampNumberMinimal,
-  cardSupply,
-} from "$text";
+import { TEXT_STYLES } from "./styles.ts";
 
 /* ===== TYPES ===== */
 interface StampWithSaleData extends Omit<StampRow, "stamp_base64"> {
@@ -359,7 +347,7 @@ export function StampCard({
         text: `${
           stripTrailingZeros(stamp.sale_data.btc_amount.toFixed(8))
         } BTC`,
-        style: TEXT_STYLES.price,
+        style: `${TEXT_STYLES.price.base} ${TEXT_STYLES.price.sizes}`,
       };
     }
 
@@ -375,7 +363,7 @@ export function StampCard({
       if (marketPrice !== null && marketPrice > 0) {
         return {
           text: `${stripTrailingZeros(Number(marketPrice).toFixed(8))} BTC`,
-          style: TEXT_STYLES.price,
+          style: `${TEXT_STYLES.price.base} ${TEXT_STYLES.price.sizes}`,
         };
       }
     }
@@ -388,14 +376,14 @@ export function StampCard({
     if (legacyPrice !== "priceless" && !isNaN(Number(legacyPrice))) {
       return {
         text: `${stripTrailingZeros(Number(legacyPrice).toFixed(8))} BTC`,
-        style: TEXT_STYLES.price,
+        style: `${TEXT_STYLES.price.base} ${TEXT_STYLES.price.sizes}`,
       };
     }
 
     // Default to mime type if no valid price
     return {
       text: stamp.stamp_mimetype?.split("/")[1]?.toUpperCase() || "UNKNOWN",
-      style: TEXT_STYLES.mimeType,
+      style: `${TEXT_STYLES.mimeType.base} ${TEXT_STYLES.mimeType.sizes}`,
     };
   };
 
@@ -430,15 +418,11 @@ export function StampCard({
   /* ===== STYLE HELPERS ===== */
   const getTextStyles = (type: "hashSymbol" | "stampNumber") => {
     if (variant === "grey") {
-      return {
-        base: TEXT_STYLES.greyGradient[type].base,
-        sizes: TEXT_STYLES.greyGradient[type].sizes,
-      };
+      return `${TEXT_STYLES.greyGradient[type].base} ${
+        TEXT_STYLES.greyGradient[type].sizes
+      }`;
     }
-    return {
-      base: TEXT_STYLES[type].base,
-      sizes: TEXT_STYLES[type].sizes,
-    };
+    return `${TEXT_STYLES[type].base} ${TEXT_STYLES[type].sizes}`;
   };
 
   const isLongNumber = (value: string | number) => {

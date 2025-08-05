@@ -1,14 +1,19 @@
 import { cellAlign, colGroup } from "$components/layout/types.ts";
 import type { SRC20Row } from "$types/src20.d.ts";
+import type { HighchartsData } from "$types/ui.d.ts";
 import { Icon } from "$icon";
 import ChartWidget from "$islands/layout/ChartWidget.tsx";
+import {
+  isBrowser,
+  safeNavigate,
+} from "$lib/utils/navigation/freshNavigationUtils.ts";
+import { SSRSafeUrlBuilder } from "$components/navigation/SSRSafeUrlBuilder.tsx";
 import {
   containerCardTable,
   glassmorphism,
   rowCardBorderCenter,
   rowCardBorderLeft,
   rowCardBorderRight,
-  Timeframe,
 } from "$layout";
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { formatDate } from "$lib/utils/ui/formatting/formatUtils.ts";
@@ -53,6 +58,17 @@ function getVolume24h(src20: any): number {
   // Parse as float to handle string values from API
   const parsed = parseFloat(volume.toString());
   return isNaN(parsed) ? 0 : parsed;
+}
+
+interface SRC20CardProps {
+  data: any;
+  fromPage?: string;
+  timeframe?: string;
+  onImageClick?: (ticker: string) => void;
+  currentSort?: {
+    filter: string;
+    direction: "asc" | "desc";
+  } | null;
 }
 
 export function SRC20Card({

@@ -1,6 +1,6 @@
 // import { SRC20Row } from "$globals";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
-import type { EnrichedSRC20Row } from "$globals";
+import type { EnrichedSRC20Row } from "$types/src20.d.ts";
 import {
   containerCardTable,
   rowCardBorderCenter,
@@ -9,6 +9,7 @@ import {
 } from "$layout";
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
+import { safeNavigate } from "$lib/utils/navigation/freshNavigationUtils.ts";
 import { labelXs, textSm, valueDarkSm } from "$text";
 
 interface SRC20CardSmProps {
@@ -182,17 +183,12 @@ export function SRC20CardSm({
                       e.button !== 1
                     ) {
                       e.preventDefault();
-                      if (
-                        typeof globalThis !== "undefined" &&
-                        globalThis?.location
-                      ) {
-                        const href = `/src20/${
-                          encodeURIComponent(
-                            unicodeEscapeToEmoji(src20.tick ?? ""),
-                          )
-                        }`;
-                        globalThis.location.href = href;
-                      }
+                      const href = `/src20/${
+                        encodeURIComponent(
+                          unicodeEscapeToEmoji(src20.tick ?? ""),
+                        )
+                      }`;
+                      safeNavigate(href);
                     }
                   }}
                 >

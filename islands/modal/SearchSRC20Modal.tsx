@@ -71,6 +71,7 @@ export function SearchSRC20Modal({
     searchState.value = { term: "", error: "", results: [] };
     const modalContent = (
       <ModalSearchBase
+        title="Search SRC-20 Tokens"
         onClose={() => {
           console.log("Modal closing, resetting state");
           searchState.value = { term: "", error: "", results: [] };

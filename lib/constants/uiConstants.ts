@@ -7,18 +7,22 @@
  * Button variant types - standardized across the application
  */
 export type ButtonVariant =
+  | "text"
+  | "glassmorphism"
+  | "glassmorphismColor"
+  | "glassmorphismSelected"
+  | "glassmorphismDeselected"
+  | "flat"
   | "outline"
+  | "flatOutline"
+  | "outlineFlat"
+  | "outlineGradient"
+  | "custom"
   | "fill"
   | "light"
   | "thin"
   | "regular"
-  | "bold"
-  | "outlineGradient"
-  | "text"
-  | "flat"
-  | "flatOutline"
-  | "outlineFlat"
-  | "custom";
+  | "bold";
 
 /**
  * Button color types - standardized theme colors
@@ -26,14 +30,8 @@ export type ButtonVariant =
 export type ButtonColor =
   | "purple"
   | "purpleDark"
-  | "purpleGradient"
-  | "blue"
-  | "green"
-  | "red"
-  | "gray"
   | "grey"
   | "greyDark"
-  | "greyGradient"
   | "test"
   | "custom";
 

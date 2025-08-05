@@ -11,7 +11,7 @@ import { useEffect, useRef, useState } from "preact/hooks";
  * Offers options to switch to standard mode or retry
  */
 export function MaraServiceUnavailableModal({
-  isOpen,
+  isOpen: _isOpen,
   onSwitchToStandard,
   onRetry,
   onClose,
@@ -51,7 +51,6 @@ export function MaraServiceUnavailableModal({
 
   return (
     <ModalBase
-      isOpen={isOpen}
       title="MARA Service Unavailable"
       onClose={onClose}
       className={`!w-[400px] mobileLg:!w-[450px] ${glassmorphism} !bg-gradient-to-br !from-stamp-grey-darkest/70 !to-stamp-grey-darkest/80`}
@@ -68,7 +67,7 @@ export function MaraServiceUnavailableModal({
           <CloseIcon
             size="sm"
             weight="bold"
-            color="purpleGradient"
+            color="purple"
             onClick={onClose}
           />
           <div

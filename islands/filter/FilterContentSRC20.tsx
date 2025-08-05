@@ -1,7 +1,8 @@
 import { useEffect, useState } from "preact/hooks";
 import { SRC20Filters } from "$islands/filter/FilterOptionsSRC20.tsx";
 import { CollapsibleSection } from "$islands/layout/CollapsibleSection.tsx";
-import { Radiobutton, RangeSlider } from "$islands/filter/FilterComponents.tsx";
+import { Radiobutton } from "$islands/filter/FilterComponents.tsx";
+import { RangeSliderDual as RangeSlider } from "$islands/button/RangeSliderDual.tsx";
 import { ToggleButton } from "$button";
 
 // Helper function to check if a section has active filters
@@ -302,6 +303,7 @@ export const FilterContentSRC20 = ({
             variant="collapsibleLabel"
           >
             <ToggleButton
+              size="md"
               options={["24h", "3d", "7d"]}
               selected={volumePeriod}
               onChange={(newPeriod: string | string[]) => {
@@ -337,6 +339,7 @@ export const FilterContentSRC20 = ({
             variant="collapsibleLabel"
           >
             <ToggleButton
+              size="md"
               options={["24h", "3d", "7d"]}
               selected={priceChangePeriod}
               onChange={(newPeriod: string | string[]) => {

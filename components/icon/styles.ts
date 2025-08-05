@@ -104,14 +104,14 @@ export const iconStyles = {
       "stroke-stamp-grey hover:stroke-stamp-grey-light group-hover:stroke-stamp-grey-light fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-stamp-grey [&:hover_path[class*='fill-stroke']]:fill-stamp-grey-light [&:group-hover_path[class*='fill-stroke']]:fill-stamp-grey-light",
     purple:
       "stroke-stamp-purple hover:stroke-stamp-purple-bright group-hover:stroke-stamp-purple-bright fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-stamp-purple [&:hover_path[class*='fill-stroke']]:fill-stamp-purple-bright [&:group-hover_path[class*='fill-stroke']]:fill-stamp-purple-bright",
-    custom: "fill-none",
+    custom: "fill-none cursor-pointer",
   },
 
   /* ===== WEIGHT VARIANTS ===== */
   weight: {
-    extraLight: "[stroke-width:1]", // used for loading icon
+    extraLight: "[stroke-width:1.5]", // used for loading icon and tool image icons
     light: "[stroke-width:1.75]",
-    normal: "[stroke-width:2.25] tablet:[stroke-width:2",
+    normal: "[stroke-width:2.25] tablet:[stroke-width:2]",
     bold: "[stroke-width:3] tablet:[stroke-width:2.5]",
     custom: "",
   },
