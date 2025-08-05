@@ -1,4 +1,5 @@
 import { cellAlign, colGroup } from "$components/layout/types.ts";
+import type { SRC20Row } from "$types/src20.d.ts";
 import { Icon } from "$icon";
 import ChartWidget from "$islands/layout/ChartWidget.tsx";
 import {
@@ -7,25 +8,18 @@ import {
   rowCardBorderCenter,
   rowCardBorderLeft,
   rowCardBorderRight,
+  Timeframe,
 } from "$layout";
-// Removed safeMarketDataAccess import - using direct safe access instead
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { formatDate } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
 import { labelXs, textSm, valueDarkSm } from "$text";
-import type { SRC20Row } from "$types/src20.d.ts";
-import type { HighchartsData, SRC20CardProps } from "$types/ui.d.ts";
-import {
-  isBrowser,
-  safeNavigate,
-} from "$utils/navigation/freshNavigationUtils.ts";
-import { SSRSafeUrlBuilder } from "$components/navigation/SSRSafeUrlBuilder.tsx";
 
-function getMarketCap(src20: SRC20Row): number {
-  const marketCap = src20.market_data?.market_cap_btc ?? src20.market_cap_btc;
+function getMarketCap(src20: any): number {
+  const marketCap = src20?.market_data?.market_cap_btc;
   if (!marketCap) return 0;
   // Parse as float to handle string values from API
-  const parsed = parseFloat(marketCap.toString());
+  const parsed = parseFloat(marketCap);
   return isNaN(parsed) ? 0 : parsed;
 }
 
@@ -45,15 +39,15 @@ function getPriceSourceLabel(sourceType?: string): string {
 }
 
 // ✅ FIXED: Use price_btc for fungible SRC-20 tokens (not floor_price_btc)
-function getPrice(src20: SRC20Row): number {
-  const price = src20.market_data?.price_btc ?? src20.floor_price_btc;
+function getPrice(src20: any): number {
+  const price = src20?.market_data?.price_btc;
   if (!price) return 0;
   // Parse as float to handle string values from API
   const parsed = parseFloat(price.toString());
   return isNaN(parsed) ? 0 : parsed;
 }
 
-function getVolume24h(src20: SRC20Row): number {
+function getVolume24h(src20: any): number {
   const volume = src20.market_data?.volume_24h_btc ?? src20.volume_7d_btc;
   if (!volume) return 0;
   // Parse as float to handle string values from API
