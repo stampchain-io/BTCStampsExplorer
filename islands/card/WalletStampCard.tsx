@@ -13,7 +13,6 @@ import {
   LIBRARY_FILE_IMAGE,
   NOT_AVAILABLE_IMAGE,
 } from "$constants";
-import type { WalletStampWithValue } from "$types/wallet.d.ts";
 import { isAtomicIconVisible } from "$lib/utils/bitcoin/stamps/stampUtils.ts";
 import {
   abbreviateAddress,
@@ -467,13 +466,11 @@ const WalletStampCardComponent = (
                     stamp={stamp}
                     size="sm"
                     className={cardPrice}
-                    stampId={stamp.stamp || 0}
-                    walletAddress=""
                   />
                 )
                 : (
                   <span
-                    class={`${fallbackDisplay.style.base} ${fallbackDisplay.style.sizes}`}
+                    class={fallbackDisplay.style}
                     title={fallbackDisplay.title}
                   >
                     {fallbackDisplay.text}

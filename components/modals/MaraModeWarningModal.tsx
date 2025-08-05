@@ -55,7 +55,6 @@ export function MaraModeWarningModal({
 
   return (
     <ModalBase
-      isOpen
       title="MARA Mode Transaction Warning"
       onClose={onCancel || (() => {})}
       className={`!w-[400px] mobileLg:!w-[450px] ${glassmorphism} !bg-gradient-to-br !from-stamp-grey-darkest/70 !to-stamp-grey-darkest/80`}
@@ -72,7 +71,7 @@ export function MaraModeWarningModal({
           <CloseIcon
             size="sm"
             weight="bold"
-            color="purpleGradient"
+            color="purple"
             onClick={onCancel || (() => {})}
           />
           <div

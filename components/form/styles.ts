@@ -115,6 +115,9 @@ export const grey = `
   [--color-light:#6666661A]
 `;
 
+// Export aliases for backward compatibility
+export const purpleGradient = purple;
+
 /* ===== GRADIENT INPUT STYLES ===== */
 export const outlineGradient = `
   relative !bg-gradient-to-r !from-[#221b22] !to-[#252129] !p-[1px] rounded-lg !border-0

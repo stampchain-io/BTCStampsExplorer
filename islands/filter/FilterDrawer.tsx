@@ -353,7 +353,7 @@ const FilterDrawer = (
                 <CloseIcon
                   size="sm"
                   weight="bold"
-                  color="greyGradient"
+                  color="grey"
                   onClick={handleCloseDrawer}
                   onMouseEnter={handleCloseMouseEnter}
                   onMouseLeave={handleCloseMouseLeave}

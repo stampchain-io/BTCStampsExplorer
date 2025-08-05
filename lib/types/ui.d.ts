@@ -16,6 +16,7 @@ import type {
   ButtonVariant,
   CircuitState,
 } from "$constants";
+import type { IconVariants } from "$components/icon/styles.ts";
 import type { Signal } from "@preact/signals";
 import type { ComponentChildren, ComponentProps, JSX, Ref } from "preact";
 
@@ -773,7 +774,7 @@ export interface ModalSearchBaseProps extends ModalBaseProps {
 /**
  * Connect wallet modal props
  */
-export interface ConnectWalletModalProps extends ModalBaseProps {
+export interface ConnectWalletModalProps {
   walletProviders?: Array<{
     id: string;
     name: string;
@@ -785,6 +786,7 @@ export interface ConnectWalletModalProps extends ModalBaseProps {
   preferredWallet?: string;
   connectors: JSX.Element[]; // Preact VNodes for component connectors
   handleClose?: () => void; // Optional alias for onClose
+  onClose?: () => void;
 }
 
 /**
@@ -1391,13 +1393,16 @@ export interface SettingProps {
   onFilterClick?: (filter: string) => void;
 }
 
-export interface SendBTCModalProps extends ModalBaseProps {
+export interface SendBTCModalProps {
   fee: number;
   balance: number | null;
   handleChangeFee: (newFee: number) => void;
   onSend?: (to: string, amount: number) => void;
   address?: string;
   amount?: number;
+  title?: string;
+  children?: ComponentChildren;
+  onClose?: () => void;
 }
 
 export interface ReceiveAddyModalProps {
@@ -2399,7 +2404,7 @@ export interface FaqAccordionProps extends BaseComponentProps {
 /**
  * Buy Stamp Modal component props
  */
-export interface BuyStampModalProps extends ModalBaseProps {
+export interface BuyStampModalProps {
   stamp?: StampRow | undefined;
   onBuy?: (stampId: number) => void;
   disabled?: boolean;
@@ -2412,7 +2417,7 @@ export interface BuyStampModalProps extends ModalBaseProps {
 /**
  * Donate Stamp Modal component props
  */
-export interface DonateStampModalProps extends ModalBaseProps {
+export interface DonateStampModalProps {
   stamp?: StampRow | undefined;
   onDonate?: (stampId: number, amount: number) => void;
   disabled?: boolean;
@@ -2446,7 +2451,7 @@ export interface FilterSRC20ModalProps extends ModalBaseProps {
 /**
  * Detail SRC-101 Modal component props
  */
-export interface DetailSRC101ModalProps extends ModalBaseProps {
+export interface DetailSRC101ModalProps {
   detail?: any; // TODO(#type-migration): Replace with concrete SRC-101 detail type
   onAction?: (actionType: string) => void;
   loading?: boolean;
@@ -2462,18 +2467,17 @@ export interface DetailSRC101ModalProps extends ModalBaseProps {
 /**
  * Preview Code Modal component props
  */
-export interface PreviewCodeModalProps extends ModalBaseProps {
+export interface PreviewCodeModalProps {
   code?: string;
   src?: string;
   language?: string;
-  title?: string;
   onCopy?: () => void;
 }
 
 /**
  * Preview Image Modal component props
  */
-export interface PreviewImageModalProps extends ModalBaseProps {
+export interface PreviewImageModalProps {
   src: string | File;
   contentType?: "image" | "html" | "text" | "audio";
 }
@@ -2605,18 +2609,18 @@ export interface ToggleSwitchButtonProps {
   onToggle: () => void;
   toggleButtonId?: string;
   className?: string;
-  
+
   // Custom symbols for the toggle states
   activeSymbol?: string;
   inactiveSymbol?: string;
-  
+
   // Event handlers for external tooltip control
   onMouseEnter?: (e: MouseEvent) => void;
   onMouseLeave?: (e: MouseEvent) => void;
-  
+
   // Optional click handler
   onClick?: (e: MouseEvent) => void;
-  
+
   // Optional ref forwarding
   buttonRef?: preact.RefObject<HTMLButtonElement>;
 }
@@ -3723,11 +3727,12 @@ export interface PieChartProps extends BaseComponentProps {
 /**
  * ImageModalProps - Image Modal component props
  */
-export interface ImageModalProps extends ModalBaseProps {
+export interface ImageModalProps {
   imgSrc?: string;
   src?: string;
   alt?: string;
   caption?: string;
+  isOpen?: boolean;
   onClose?: () => void;
 }
 

@@ -413,8 +413,8 @@ function SendBTCModal({
   return (
     <ModalBase
       onClose={handleCloseModal}
-      title="SEND"
       {...baseProps}
+      title={baseProps.title || "SEND"}
     >
       {/* ===== AMOUNT INPUT SECTION ===== */}
       <div class="flex flex-col gap-6 -mt-3">

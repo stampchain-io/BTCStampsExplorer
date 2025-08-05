@@ -1,7 +1,6 @@
 /* ===== BUTTON COMPONENT ===== */
 import { IS_BROWSER } from "$fresh/runtime.ts";
-import { JSX } from "preact";
-import { button, ButtonProps, buttonStyles } from "$button";
+import { button, buttonStyles } from "$button";
 import type {
   ExtendedButtonProps,
   ExtendedIconButtonProps,
