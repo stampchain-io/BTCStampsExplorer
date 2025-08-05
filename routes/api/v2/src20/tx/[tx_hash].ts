@@ -27,7 +27,6 @@ export const handler: Handlers = {
       return sortValidation.error!;
     }
 
-    const singleResult = url.searchParams.get("singleResult");
     const tick = url.searchParams.get("tick");
     const op = url.searchParams.get("op");
     const block_index = url.searchParams.get("block_index");
