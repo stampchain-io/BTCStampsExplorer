@@ -846,9 +846,9 @@ export class StampController {
     const [, extension] = identifier.split(".");
     const contentType = getMimeType(extension);
 
-    // For HTML and SVG files, check if we have base64 data to process server-side
+    // For HTML files, check if we have base64 data to process server-side
     // This prevents Cloudflare Rocket Loader transformations
-    if (extension === 'html' || extension === 'svg') {
+    if (extension === 'html') {
       try {
         // Extract the base identifier without extension
         const [baseId] = identifier.split(".");
@@ -856,7 +856,6 @@ export class StampController {
         
         if (result && result.stamp_base64 && 
             (result.stamp_mimetype?.includes('html') || 
-             result.stamp_mimetype?.includes('svg') ||
              result.stamp_mimetype?.includes('text/plain'))) {
           // Process content server-side to remove Cloudflare Rocket Loader
           return await this.handleTextContent(
@@ -867,7 +866,35 @@ export class StampController {
         }
       } catch (error) {
         logger.debug("stamps", {
-          message: "Failed to get stamp data for server-side processing, falling back to proxy",
+          message: "Failed to get stamp data for HTML server-side processing, falling back to proxy",
+          identifier,
+          error: error instanceof Error ? error.message : String(error)
+        });
+      }
+    }
+
+    // For SVG files, serve directly from base64 if available (no HTML processing needed)
+    if (extension === 'svg') {
+      try {
+        // Extract the base identifier without extension
+        const [baseId] = identifier.split(".");
+        const result = await StampRepository.getStampFileWithContent(baseId);
+        
+        if (result && result.stamp_base64 && result.stamp_mimetype?.includes('svg')) {
+          // Decode base64 and serve directly as SVG (no HTML processing)
+          const svgContent = atob(result.stamp_base64);
+          return new Response(svgContent, {
+            status: 200,
+            headers: {
+              "Content-Type": result.stamp_mimetype,
+              "Cache-Control": "public, max-age=31536000",
+              "X-Served-From": "database-base64"
+            }
+          });
+        }
+      } catch (error) {
+        logger.debug("stamps", {
+          message: "Failed to get stamp data for SVG server-side processing, falling back to proxy",
           identifier,
           error: error instanceof Error ? error.message : String(error)
         });
@@ -884,21 +911,34 @@ export class StampController {
   }
 
   private static async handleStampContent(result: any, identifier: string) {
-    // Process HTML and SVG content server-side when base64 data is available
+    // Process HTML content server-side when base64 data is available
     // This ensures Cloudflare Rocket Loader transformations are removed
-    const needsProcessing = result.stamp_base64 && (
-      result.stamp_mimetype?.includes('html') || 
-      result.stamp_mimetype?.includes('svg') ||
-      result.stamp_mimetype?.includes('text/plain') // Some HTML/SVG might be stored as text/plain
+    const needsHtmlProcessing = result.stamp_base64 && (
+      result.stamp_mimetype?.includes('html') ||
+      (result.stamp_mimetype?.includes('text/plain') && identifier.endsWith('.html'))
     );
 
-    if (needsProcessing) {
-      // Process content server-side to remove Cloudflare Rocket Loader
+    if (needsHtmlProcessing) {
+      // Process HTML content server-side to remove Cloudflare Rocket Loader
       return await this.handleTextContent(
         { body: result.stamp_base64 },
         { mimeType: result.stamp_mimetype },
         identifier
       );
+    }
+
+    // For SVG content, serve directly without HTML processing
+    const needsSvgProcessing = result.stamp_base64 && result.stamp_mimetype?.includes('svg');
+    if (needsSvgProcessing) {
+      const svgContent = atob(result.stamp_base64);
+      return new Response(svgContent, {
+        status: 200,
+        headers: {
+          "Content-Type": result.stamp_mimetype,
+          "Cache-Control": "public, max-age=31536000",
+          "X-Served-From": "database-base64"
+        }
+      });
     }
     
     // For other content types or when base64 not available, redirect to CDN
