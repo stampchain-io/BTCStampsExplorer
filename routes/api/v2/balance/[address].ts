@@ -8,7 +8,6 @@ import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { RouteType } from "$server/services/infrastructure/cacheService.ts";
 import {
-  checkEmptyResult,
   DEFAULT_PAGINATION,
   validateRequiredParams,
 } from "$server/services/validation/routeValidationService.ts";
