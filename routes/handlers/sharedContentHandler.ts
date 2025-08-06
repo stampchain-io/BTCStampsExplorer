@@ -59,13 +59,15 @@ export async function handleContentRequest(
       isFullPath,
     );
 
-    // Check if this is a redirect response
+    // Check if this is a redirect response  
     if (response.status === 302 || response.status === 301) {
       const location = response.headers.get("location");
-      
-      // If the identifier has .html extension, fetch the content and process it
+
+      // For HTML files, we need to fetch and process the content
+      // to avoid Cloudflare's CDN-level Rocket Loader transformation
       if (location && identifier.toLowerCase().endsWith(".html")) {
         try {
+          // Fetch the content from the CDN location
           const contentResponse = await fetch(location);
           if (contentResponse.ok) {
             let htmlContent = await contentResponse.text();
@@ -80,12 +82,13 @@ export async function handleContentRequest(
               const dudkoArrayDefinition = dudkoMatch[2]; // Capture dudko array string
               const maxWidthValue = dudkoMatch[4];
               const maxHeightValue = dudkoMatch[6];
-                    const backgroundColorValue = dudkoMatch[8];
+              const backgroundColorValue = dudkoMatch[8];
 
               // Construct the new script content for the head
               const newHeadScriptContent =
                 `window.maxWidth=${maxWidthValue}; window.maxHeight=${maxHeightValue}; window.backgroundColor='${backgroundColorValue}'; let dudko=${dudkoArrayDefinition};`;
-              const newHeadScriptTag = `<script>${newHeadScriptContent}</script>`;
+              const newHeadScriptTag =
+                `<script>${newHeadScriptContent}</script>`;
 
               // Remove the original script tag from its place
               htmlContent = htmlContent.replace(originalFullScriptTag, "");
@@ -95,14 +98,18 @@ export async function handleContentRequest(
                 /(<head[^>]*>)/i,
                 `$1${newHeadScriptTag}`,
               );
-                  } else {
+            } else {
               // Fallback or logging if the specific dudko script isn't found, try previous broader injection
               const inlineScriptRegex =
                 /<script[^>]*>\s*let\s+dudko\s*=\s*.*?,\s*maxWidth\s*=\s*(\d+),\s*maxHeight\s*=\s*(\d+),\s*backgroundColor\s*=\s*'([0-9a-fA-F]{3,8})';?\s*<\/script>/is;
               const matchResult = htmlContent.match(inlineScriptRegex);
               if (matchResult && matchResult.length === 4) {
-                const [, extractedMaxWidth, extractedMaxHeight, extractedBgColor] =
-                  matchResult;
+                const [
+                  ,
+                  extractedMaxWidth,
+                  extractedMaxHeight,
+                  extractedBgColor,
+                ] = matchResult;
                 const injectionScript =
                   `<script>window.maxWidth=${extractedMaxWidth}; window.maxHeight=${extractedMaxHeight}; window.backgroundColor='${extractedBgColor}';</script>`;
                 htmlContent = htmlContent.replace(
@@ -110,30 +117,53 @@ export async function handleContentRequest(
                   `$1${injectionScript}`,
                 );
               }
-                  }
+            }
 
-            // Apply Cloudflare Rocket Loader fixes to HTML content
-            // Step 1: Ensure scripts have correct type and data-cfasync="false"
-                  htmlContent = htmlContent.replace(
+            // Apply comprehensive Cloudflare Rocket Loader fixes to HTML content
+            // Step 1: Fix ALL script tags - remove any Cloudflare mangling
+            htmlContent = htmlContent.replace(
               /(<script[^>]*?)>/g,
               (_match, openingTagInnerContentAndAttributes) => {
                 let tag = openingTagInnerContentAndAttributes;
-                // Correct type if it's mangled by Cloudflare Rocket Loader
+
+                // Remove ALL Cloudflare type manglings - any hex prefix before -text/javascript
                 tag = tag.replace(
-                  /type\s*=\s*"[a-f0-9]{24}-text\/javascript"/i,
+                  /type\s*=\s*"[a-f0-9]+-text\/javascript"/gi,
                   'type="text/javascript"',
                 );
-                // Add data-cfasync="false" if not already present
-                if (!tag.includes('data-cfasync="false"')) {
+
+                // Remove data-cf-settings attributes that Cloudflare adds
+                tag = tag.replace(
+                  /data-cf-settings\s*=\s*"[^"]*"/gi,
+                  '',
+                );
+
+                // Remove defer attributes from rocket-loader scripts
+                tag = tag.replace(
+                  /\s+defer(?:\s*=\s*["']?defer["']?)?/gi,
+                  '',
+                );
+
+                // Add data-cfasync="false" to prevent any Rocket Loader processing
+                // but not for cdn-cgi scripts which we'll remove entirely
+                if (!tag.includes("data-cfasync") && !tag.includes("/cdn-cgi/")) {
                   tag += ' data-cfasync="false"';
                 }
+
                 return tag + ">";
               },
             );
 
-            // Step 2: Remove Cloudflare Rocket Loader injected script tags
+            // Step 2: Remove ALL Cloudflare Rocket Loader injected script tags
+            // This includes the rocket-loader script itself which may have mangled attributes
             htmlContent = htmlContent.replace(
-              /<script[^>]*src=["'][^"']*\/cdn-cgi\/scripts\/[^"']*rocket-loader[^"']*["'][^>]*><\/script>/gi,
+              /<script[^>]*\/cdn-cgi\/scripts\/[^>]*rocket-loader[^>]*>[^<]*<\/script>/gi,
+              "",
+            );
+            
+            // Also remove any script with mangled type that loads rocket-loader
+            htmlContent = htmlContent.replace(
+              /<script[^>]*type="[a-f0-9]{8,}-text\/javascript"[^>]*src="[^"]*rocket-loader[^"]*"[^>]*><\/script>/gi,
               "",
             );
 
@@ -153,9 +183,18 @@ export async function handleContentRequest(
               },
             );
 
-            // Use the standardized HTML response method
+            // Use the standardized HTML response method with headers to prevent CDN modifications
+            const recursiveHeaders = getRecursiveHeaders();
             return WebResponseUtil.htmlResponse(htmlContent, {
-              headers: Object.fromEntries(getRecursiveHeaders()),
+              headers: {
+                ...Object.fromEntries(recursiveHeaders),
+                // Add headers to prevent Cloudflare from modifying the response
+                "CF-Cache-Level": "bypass",
+                "Cache-Control": "no-transform",
+                "X-Frame-Options": "SAMEORIGIN",
+                "X-Content-Type-Options": "nosniff",
+                "X-Content-Transformed": "true",
+              },
             });
           }
         } catch (error) {

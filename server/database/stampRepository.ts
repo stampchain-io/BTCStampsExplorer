@@ -1165,7 +1165,7 @@ export class StampRepository {
     }
 
     const query = `
-      SELECT stamp, stamp_url, stamp_mimetype
+      SELECT stamp, stamp_url, stamp_mimetype, stamp_base64, cpid, tx_hash
       FROM ${STAMP_TABLE}
       WHERE ${whereClause}
       LIMIT 1

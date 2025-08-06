@@ -300,7 +300,7 @@ export default function DonateCta() {
         />
       </div>
       <Button
-        variant="outline"
+        variant="glassmorphismColor"
         color="purple"
         size="md"
         onClick={onClick}
