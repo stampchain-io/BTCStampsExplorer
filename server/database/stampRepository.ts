@@ -1195,7 +1195,14 @@ export class StampRepository {
     };
   }
 
-  static async getSpecificStamp(identifier: string): Promise<{ stamp: number | undefined, stamp_url: string, stamp_mimetype: string }>{
+  static async getSpecificStamp(identifier: string): Promise<{ 
+    stamp: number | undefined, 
+    stamp_url: string, 
+    stamp_mimetype: string,
+    stamp_base64: string | null,
+    cpid: string,
+    tx_hash: string
+  }>{
     // Determine the type of identifier
     const idType = getIdentifierType(identifier);
 
@@ -1224,7 +1231,10 @@ export class StampRepository {
         return {
           stamp: undefined,
           stamp_url: '',
-          stamp_mimetype: ''
+          stamp_mimetype: '',
+          stamp_base64: null,
+          cpid: '',
+          tx_hash: ''
         };
     }
 
