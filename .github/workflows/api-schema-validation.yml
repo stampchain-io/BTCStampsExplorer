@@ -34,7 +34,7 @@ jobs:
       - name: Validate OpenAPI Schema
         run: |
           echo "🔍 Validating OpenAPI specification..."
-          npx @redocly/cli@latest lint ./static/swagger/openapi.yml --config .redocly.yaml --format stylish
+          npx @redocly/cli@latest lint ./schema.yml --config .redocly.yaml --format stylish
           
       - name: Check for breaking changes
         if: github.event_name == 'pull_request'
@@ -46,6 +46,6 @@ jobs:
           
           # Use oasdiff to check for breaking changes
           npx oasdiff@latest breaking \
-            --base origin/${{ github.base_ref }}:static/swagger/openapi.yml \
-            --revision HEAD:static/swagger/openapi.yml \
+            --base origin/${{ github.base_ref }}:schema.yml \
+            --revision HEAD:schema.yml \
             --format text || true
