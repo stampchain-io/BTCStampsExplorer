@@ -841,10 +841,39 @@ export class StampController {
     }
   }
 
-  private static handleFullPathStamp(identifier: string, baseUrl?: string) {
+  private static async handleFullPathStamp(identifier: string, baseUrl?: string) {
     const [, extension] = identifier.split(".");
     const contentType = getMimeType(extension);
 
+    // For HTML and SVG files, check if we have base64 data to process server-side
+    // This prevents Cloudflare Rocket Loader transformations
+    if (extension === 'html' || extension === 'svg') {
+      try {
+        // Extract the base identifier without extension
+        const [baseId] = identifier.split(".");
+        const result = await StampService.getStampFile(baseId);
+        
+        if (result && result.stamp_base64 && 
+            (result.stamp_mimetype?.includes('html') || 
+             result.stamp_mimetype?.includes('svg') ||
+             result.stamp_mimetype?.includes('text/plain'))) {
+          // Process content server-side to remove Cloudflare Rocket Loader
+          return await this.handleTextContent(
+            { body: result.stamp_base64 },
+            { mimeType: result.stamp_mimetype },
+            identifier
+          );
+        }
+      } catch (error) {
+        logger.debug("stamps", {
+          message: "Failed to get stamp data for server-side processing, falling back to proxy",
+          identifier,
+          error: error instanceof Error ? error.message : String(error)
+        });
+      }
+    }
+
+    // Fallback to CDN proxy for non-HTML/SVG or when base64 data not available
     return this.proxyContentRouteToStampsRoute(
       identifier,
       `${baseUrl}/stamps/${identifier}`,
@@ -854,9 +883,16 @@ export class StampController {
   }
 
   private static async handleStampContent(result: any, identifier: string) {
-    // If it's HTML content and we have base64 data, process it server-side
-    if (result.stamp_mimetype?.includes('html') && result.stamp_base64) {
-      // Process HTML content server-side to remove Cloudflare Rocket Loader
+    // Process HTML and SVG content server-side when base64 data is available
+    // This ensures Cloudflare Rocket Loader transformations are removed
+    const needsProcessing = result.stamp_base64 && (
+      result.stamp_mimetype?.includes('html') || 
+      result.stamp_mimetype?.includes('svg') ||
+      result.stamp_mimetype?.includes('text/plain') // Some HTML/SVG might be stored as text/plain
+    );
+
+    if (needsProcessing) {
+      // Process content server-side to remove Cloudflare Rocket Loader
       return await this.handleTextContent(
         { body: result.stamp_base64 },
         { mimeType: result.stamp_mimetype },
@@ -864,7 +900,7 @@ export class StampController {
       );
     }
     
-    // For non-HTML or when base64 not available, redirect to CDN
+    // For other content types or when base64 not available, redirect to CDN
     if (result.stamp_url) {
       return new Response(null, {
         status: 302,
