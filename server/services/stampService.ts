@@ -314,7 +314,7 @@ export class StampService {
 
     return {
       status: 200,
-      body: result.stamp_base64,
+      body: result.stamp_base64 || "",
       stamp_url: result.stamp_url,
       tx_hash: result.tx_hash,
       headers: {

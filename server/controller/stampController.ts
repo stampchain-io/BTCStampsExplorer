@@ -6,6 +6,7 @@ import { BlockService } from "$server/services/core/blockService.ts";
 import { CollectionService } from "$server/services/core/collectionService.ts";
 import { BTCPriceService } from "$server/services/price/btcPriceService.ts";
 import { StampService } from "$server/services/stampService.ts";
+import { StampRepository } from "$server/database/stampRepository.ts";
 import type { CollectionRow } from "$server/types/collection.d.ts";
 import type {SUBPROTOCOLS} from "$types/base.d.ts";
 // import { formatSatoshisToBTC } from "$lib/utils/ui/formatting/formatUtils.ts"; // Fixed: Removed unused import
@@ -851,7 +852,7 @@ export class StampController {
       try {
         // Extract the base identifier without extension
         const [baseId] = identifier.split(".");
-        const result = await StampService.getStampFile(baseId);
+        const result = await StampRepository.getStampFileWithContent(baseId);
         
         if (result && result.stamp_base64 && 
             (result.stamp_mimetype?.includes('html') || 
