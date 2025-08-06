@@ -1,6 +1,6 @@
 /* ===== BUTTON COMPONENT ===== */
-import { IS_BROWSER } from "$fresh/runtime.ts";
 import { button, buttonStyles } from "$button";
+import { IS_BROWSER } from "$fresh/runtime.ts";
 import type {
   ExtendedButtonProps,
   ExtendedIconButtonProps,

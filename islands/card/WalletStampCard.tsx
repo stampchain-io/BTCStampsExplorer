@@ -1,13 +1,23 @@
 /* ===== WALLET STAMP CARD COMPONENT ===== */
 /* Specialized version of StampCard for wallet pages showing user-specific details */
 import { Icon, LoadingIcon } from "$icon";
-import type { WalletStampCardProps } from "$types/ui.d.ts";
 import StampTextContent from "$islands/content/stampDetailContent/StampTextContent.tsx";
+import type { WalletStampCardProps } from "$types/ui.d.ts";
 import { VNode } from "preact";
 import { memo } from "preact/compat";
 import { useEffect, useRef, useState } from "preact/hooks";
 
 import { WalletStampValue } from "$components/display/BTCValueDisplay.tsx";
+import {
+  cardCreator,
+  cardHashSymbol,
+  cardHashSymbolGrey,
+  cardMimeType,
+  cardPrice,
+  cardStampNumber,
+  cardStampNumberGrey,
+  cardSupply,
+} from "$components/text/styles.ts";
 import {
   AUDIO_FILE_IMAGE,
   LIBRARY_FILE_IMAGE,
@@ -19,16 +29,6 @@ import {
   formatBalanceDisplay,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
-import {
-  cardCreator,
-  cardHashSymbol,
-  cardHashSymbolGrey,
-  cardMimeType,
-  cardPrice,
-  cardStampNumber,
-  cardStampNumberGrey,
-  cardSupply,
-} from "$text";
 
 /* ===== TYPES ===== */
 
