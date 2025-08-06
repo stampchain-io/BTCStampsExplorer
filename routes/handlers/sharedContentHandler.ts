@@ -59,108 +59,119 @@ export async function handleContentRequest(
       isFullPath,
     );
 
-    if (
-      response.headers.get("content-type")?.toLowerCase().includes("html")
-    ) {
-      let htmlContent = await response.text();
+    // Check if this is a redirect response
+    if (response.status === 302 || response.status === 301) {
+      const location = response.headers.get("location");
+      
+      // If the identifier has .html extension, fetch the content and process it
+      if (location && identifier.toLowerCase().endsWith(".html")) {
+        try {
+          const contentResponse = await fetch(location);
+          if (contentResponse.ok) {
+            let htmlContent = await contentResponse.text();
 
-      // Regex to find the specific inline script and capture its parts
-      const dudkoScriptRegex =
-        /(\s*<script[^>]*>\s*let\s+dudko\s*=\s*)(\[.*\])(\s*,\s*maxWidth\s*=\s*)(\d+)(\s*,\s*maxHeight\s*=\s*)(\d+)(\s*,\s*backgroundColor\s*=\s*['"])([0-9a-fA-F]{3,8})(['"]\s*;?\s*<\/script>)/is;
-      const dudkoMatch = htmlContent.match(dudkoScriptRegex);
+            // Regex to find the specific inline script and capture its parts
+            const dudkoScriptRegex =
+              /(\s*<script[^>]*>\s*let\s+dudko\s*=\s*)(\[.*\])(\s*,\s*maxWidth\s*=\s*)(\d+)(\s*,\s*maxHeight\s*=\s*)(\d+)(\s*,\s*backgroundColor\s*=\s*['"])([0-9a-fA-F]{3,8})(['"]\s*;?\s*<\/script>)/is;
+            const dudkoMatch = htmlContent.match(dudkoScriptRegex);
 
-      if (dudkoMatch) {
-        const originalFullScriptTag = dudkoMatch[0];
-        const dudkoArrayDefinition = dudkoMatch[2]; // Capture dudko array string
-        const maxWidthValue = dudkoMatch[4];
-        const maxHeightValue = dudkoMatch[6];
-        const backgroundColorValue = dudkoMatch[8];
+            if (dudkoMatch) {
+              const originalFullScriptTag = dudkoMatch[0];
+              const dudkoArrayDefinition = dudkoMatch[2]; // Capture dudko array string
+              const maxWidthValue = dudkoMatch[4];
+              const maxHeightValue = dudkoMatch[6];
+                    const backgroundColorValue = dudkoMatch[8];
 
-        // Construct the new script content for the head
-        const newHeadScriptContent =
-          `window.maxWidth=${maxWidthValue}; window.maxHeight=${maxHeightValue}; window.backgroundColor='${backgroundColorValue}'; let dudko=${dudkoArrayDefinition};`;
-        const newHeadScriptTag = `<script>${newHeadScriptContent}</script>`;
+              // Construct the new script content for the head
+              const newHeadScriptContent =
+                `window.maxWidth=${maxWidthValue}; window.maxHeight=${maxHeightValue}; window.backgroundColor='${backgroundColorValue}'; let dudko=${dudkoArrayDefinition};`;
+              const newHeadScriptTag = `<script>${newHeadScriptContent}</script>`;
 
-        // Remove the original script tag from its place
-        htmlContent = htmlContent.replace(originalFullScriptTag, "");
+              // Remove the original script tag from its place
+              htmlContent = htmlContent.replace(originalFullScriptTag, "");
 
-        // Prepend the new script to the head
-        htmlContent = htmlContent.replace(
-          /(<head[^>]*>)/i,
-          `$1${newHeadScriptTag}`,
-        );
-      } else {
-        // Fallback or logging if the specific dudko script isn't found, try previous broader injection
-        const inlineScriptRegex =
-          /<script[^>]*>\s*let\s+dudko\s*=\s*.*?,\s*maxWidth\s*=\s*(\d+),\s*maxHeight\s*=\s*(\d+),\s*backgroundColor\s*=\s*'([0-9a-fA-F]{3,8})';?\s*<\/script>/is;
-        const matchResult = htmlContent.match(inlineScriptRegex);
-        if (matchResult && matchResult.length === 4) {
-          const [, extractedMaxWidth, extractedMaxHeight, extractedBgColor] =
-            matchResult;
-          const injectionScript =
-            `<script>window.maxWidth=${extractedMaxWidth}; window.maxHeight=${extractedMaxHeight}; window.backgroundColor='${extractedBgColor}';</script>`;
-          htmlContent = htmlContent.replace(
-            /(<head[^>]*>)/i,
-            `$1${injectionScript}`,
-          );
+              // Prepend the new script to the head
+              htmlContent = htmlContent.replace(
+                /(<head[^>]*>)/i,
+                `$1${newHeadScriptTag}`,
+              );
+                  } else {
+              // Fallback or logging if the specific dudko script isn't found, try previous broader injection
+              const inlineScriptRegex =
+                /<script[^>]*>\s*let\s+dudko\s*=\s*.*?,\s*maxWidth\s*=\s*(\d+),\s*maxHeight\s*=\s*(\d+),\s*backgroundColor\s*=\s*'([0-9a-fA-F]{3,8})';?\s*<\/script>/is;
+              const matchResult = htmlContent.match(inlineScriptRegex);
+              if (matchResult && matchResult.length === 4) {
+                const [, extractedMaxWidth, extractedMaxHeight, extractedBgColor] =
+                  matchResult;
+                const injectionScript =
+                  `<script>window.maxWidth=${extractedMaxWidth}; window.maxHeight=${extractedMaxHeight}; window.backgroundColor='${extractedBgColor}';</script>`;
+                htmlContent = htmlContent.replace(
+                  /(<head[^>]*>)/i,
+                  `$1${injectionScript}`,
+                );
+              }
+                  }
+
+            // Apply Cloudflare Rocket Loader fixes to HTML content
+            // Step 1: Ensure scripts have correct type and data-cfasync="false"
+                  htmlContent = htmlContent.replace(
+              /(<script[^>]*?)>/g,
+              (_match, openingTagInnerContentAndAttributes) => {
+                let tag = openingTagInnerContentAndAttributes;
+                // Correct type if it's mangled by Cloudflare Rocket Loader
+                tag = tag.replace(
+                  /type\s*=\s*"[a-f0-9]{24}-text\/javascript"/i,
+                  'type="text/javascript"',
+                );
+                // Add data-cfasync="false" if not already present
+                if (!tag.includes('data-cfasync="false"')) {
+                  tag += ' data-cfasync="false"';
+                }
+                return tag + ">";
+              },
+            );
+
+            // Step 2: Remove Cloudflare Rocket Loader injected script tags
+            htmlContent = htmlContent.replace(
+              /<script[^>]*src=["'][^"']*\/cdn-cgi\/scripts\/[^"']*rocket-loader[^"']*["'][^>]*><\/script>/gi,
+              "",
+            );
+
+            // Step 3: Remove any remaining Cloudflare Rocket Loader references
+            htmlContent = htmlContent.replace(
+              /data-cf-beacon=["'][^"']*["']/gi,
+              "",
+            );
+
+            // Step 4: Clean up any malformed script src attributes with encoded quotes
+            htmlContent = htmlContent.replace(
+              /src=["']([^"']*%22[^"']*)["']/gi,
+              (_match, srcValue) => {
+                // Decode any URL-encoded quotes and fix malformed paths
+                const cleanSrc = srcValue.replace(/%22/g, "");
+                return `src="${cleanSrc}"`;
+              },
+            );
+
+            // Use the standardized HTML response method
+            return WebResponseUtil.htmlResponse(htmlContent, {
+              headers: Object.fromEntries(getRecursiveHeaders()),
+            });
+          }
+        } catch (error) {
+          logger.error("content", {
+            message: "Error fetching HTML content from redirect",
+            identifier,
+            location,
+            error: error instanceof Error ? error.message : String(error),
+          });
         }
       }
-
-      // Apply Cloudflare Rocket Loader fixes to HTML content
-      // Step 1: Ensure scripts have correct type and data-cfasync="false"
-      htmlContent = htmlContent.replace(
-        /(<script[^>]*?)>/g,
-        (_match, openingTagInnerContentAndAttributes) => {
-          let tag = openingTagInnerContentAndAttributes;
-          // Correct type if it's mangled by Cloudflare Rocket Loader
-          tag = tag.replace(
-            /type\s*=\s*"[a-f0-9]{24}-text\/javascript"/i,
-            'type="text/javascript"',
-          );
-          // Add data-cfasync="false" if not already present
-          if (!tag.includes('data-cfasync="false"')) {
-            tag += ' data-cfasync="false"';
-          }
-          return tag + ">";
-        },
-      );
-
-      // Step 2: Remove Cloudflare Rocket Loader injected script tags
-      htmlContent = htmlContent.replace(
-        /<script[^>]*src=["'][^"']*\/cdn-cgi\/scripts\/[^"']*rocket-loader[^"']*["'][^>]*><\/script>/gi,
-        "",
-      );
-
-      // Step 3: Remove any remaining Cloudflare Rocket Loader references
-      htmlContent = htmlContent.replace(
-        /data-cf-beacon=["'][^"']*["']/gi,
-        "",
-      );
-
-      // Step 4: Clean up any malformed script src attributes with encoded quotes
-      htmlContent = htmlContent.replace(
-        /src=["']([^"']*%22[^"']*)["']/gi,
-        (_match, srcValue) => {
-          // Decode any URL-encoded quotes and fix malformed paths
-          const cleanSrc = srcValue.replace(/%22/g, "");
-          return `src="${cleanSrc}"`;
-        },
-      );
-
-      // Use the recursive headers which include appropriate CSP and cache settings
-      const headers = {
-        ...Object.fromEntries(response.headers),
-        ...Object.fromEntries(getRecursiveHeaders()),
-        "Content-Type": "text/html; charset=utf-8",
-      };
-
-      return new Response(htmlContent, {
-        status: 200,
-        headers,
-      });
+      // Return the redirect response for non-HTML files
+      return response;
     }
 
-    // For non-HTML, preserve response as-is
+    // For non-HTML or non-redirect responses, preserve as-is
     return response;
   } catch (error) {
     logger.error("content", {
