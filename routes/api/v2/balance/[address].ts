@@ -65,10 +65,11 @@ export const handler: Handlers<AddressHandlerContext> = {
         getBTCBalanceInfo(address),
       ]);
 
-      // Check for empty results
+      // Check for empty results - return 404 for valid Bitcoin addresses with no stamps/tokens
       if (!stamps.data?.length && !src20.data?.length) {
-        return checkEmptyResult(null, "balance data") ??
-          ApiResponseUtil.notFound("No balance data found for this address");
+        return ApiResponseUtil.notFound(
+          `No stamps or SRC-20 tokens found for address: ${address}`,
+        );
       }
 
       // Calculate combined totals

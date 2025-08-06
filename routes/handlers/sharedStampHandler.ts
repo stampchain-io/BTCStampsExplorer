@@ -397,7 +397,22 @@ export const createStampHandler = (
           requestQuery ? requestQuery.includes("search") : false,
         );
 
+        // Check for empty stamp data - handle both array and object cases
         if (!stampData) {
+          return ApiResponseUtil.notFound("Stamp not found");
+        }
+        
+        // When getStampDetailsById returns empty, it might have:
+        // 1. data as empty array: []
+        // 2. data as empty object: {}
+        // 3. data with stamp: undefined (this is what actually happens for invalid IDs)
+        const hasNoData = !stampData.data ||
+          (Array.isArray(stampData.data) && stampData.data.length === 0) ||
+          (typeof stampData.data === "object" && 
+           !Array.isArray(stampData.data) && 
+           (Object.keys(stampData.data).length === 0 || stampData.data.stamp === undefined));
+           
+        if (hasNoData) {
           return ApiResponseUtil.notFound("Stamp not found");
         }
 
