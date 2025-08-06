@@ -2,16 +2,33 @@ import type { BlockHandlerContext } from "$types/base.d.ts";
 // Unused imports removed: IdentHandlerContext, TickHandlerContext, PaginatedTickResponseBody, SRC20TrxRequestParams
 import { Handlers } from "$fresh/server.ts";
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
+import { getPaginationParams } from "$lib/utils/data/pagination/paginationUtils.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
 
 export const handler: Handlers<BlockHandlerContext> = {
-  async GET(_req, ctx) {
+  async GET(req, ctx) {
     const { block_index, tick } = ctx.params;
+    const url = new URL(req.url);
+
+    // Extract pagination parameters
+    const pagination = getPaginationParams(url);
+    if (pagination instanceof Response) {
+      return pagination;
+    }
+    const { limit, page } = pagination;
+
+    // Extract other query parameters
+    const sort = url.searchParams.get("sort");
+    const op = url.searchParams.get("op");
 
     try {
       const result = await SRC20Service.QueryService.fetchAndFormatSrc20Data({
         block_index: Number(block_index),
         tick,
+        ...(limit && { limit }),
+        ...(page && { page }),
+        ...(sort && { sort }),
+        ...(op && { op }),
       });
       return ApiResponseUtil.success(result);
     } catch (error) {
