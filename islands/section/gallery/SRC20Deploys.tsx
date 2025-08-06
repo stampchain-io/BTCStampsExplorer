@@ -2,6 +2,7 @@
 import { StampCard } from "$card";
 import type { StampTransaction } from "$lib/types/stamping.ts";
 import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
+import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
 import type { JSX } from "preact";
 import { useEffect, useState } from "preact/hooks";
 
@@ -77,8 +78,7 @@ export default function SRC20DeploysGallery(): JSX.Element {
                 key={index}
                 stamp={stamp.stamp_url ? stamp : {
                   ...stamp,
-                  stamp_url:
-                    `https://stampchain.io/stamps/${stamp.tx_hash}.svg`,
+                  stamp_url: constructStampUrl(stamp.tx_hash, "svg"),
                 }}
                 isRecentSale={false}
                 showDetails={false}

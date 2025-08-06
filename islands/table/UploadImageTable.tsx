@@ -7,6 +7,7 @@ import {
   abbreviateAddress,
   formatDate,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
+import { getSRC20ImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
 import { textLg } from "$text";
 import { walletSignal } from "$client/wallet/wallet.ts";
 
@@ -83,11 +84,17 @@ export const UploadImageTable = (props: SRC20BalanceTableProps) => {
                         </td>
                         <td class="px-6 py-4 uppercase">
                           <img
-                            src={`/content/${src20.tx_hash}.svg`}
+                            src={getSRC20ImageSrc({
+                              ...src20,
+                              deploy_tx: src20.tx_hash,
+                            } as any)}
                             class="w-10 h-10"
                             onClick={() =>
                               handleImageInteraction(
-                                `/content/${src20.tx_hash}.svg`,
+                                getSRC20ImageSrc({
+                                  ...src20,
+                                  deploy_tx: src20.tx_hash,
+                                } as any),
                               )}
                           />
                         </td>
