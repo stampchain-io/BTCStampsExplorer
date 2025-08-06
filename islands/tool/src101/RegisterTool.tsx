@@ -3,12 +3,13 @@ import { Button } from "$button";
 import type { SRC101RegisterToolProps } from "$types/ui.d.ts";
 import { useSRC101Form } from "$client/hooks/userSRC101Form.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
+import { RegisterToolSkeleton } from "$indicators";
 import { inputFieldOutline, outlineGradient, purpleGradient } from "$form";
 import type { ROOT_DOMAIN_TYPES } from "$types/base.d.ts";
 import type { SRC101Balance } from "$types/src101.d.ts";
 import DetailSRC101Modal from "$islands/modal/DetailSRC101Modal.tsx";
 import { openModal } from "$islands/modal/states.ts";
-import { bodyTool, containerBackground, loaderSpinGrey } from "$layout";
+import { bodyTool, containerBackground } from "$layout";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
 import { ROOT_DOMAINS } from "$constants";
 import { mapProgressiveFeeDetails } from "$lib/utils/performance/fees/fee-estimation-utils.ts";
@@ -168,14 +169,7 @@ export function SRC101RegisterTool({
     return (
       <div class={bodyTool}>
         <h1 class={`${titlePurpleLD} mobileMd:mx-auto mb-1`}>REGISTER</h1>
-        <div class={`${containerBackground} mb-6`}>
-          <div class="flex items-center justify-center p-8">
-            <div class={loaderSpinGrey}></div>
-            <span class="ml-3 text-stamp-grey-light">
-              Loading configuration...
-            </span>
-          </div>
-        </div>
+        <RegisterToolSkeleton />
       </div>
     );
   }

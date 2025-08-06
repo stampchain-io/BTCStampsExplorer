@@ -413,7 +413,7 @@ const FilterDrawer = (
        bg-gradient-to-b from-[#000000]/80 to-[#000000]/100
         shadow-[0_-12px_12px_-6px_rgba(0,0,0,1)]">
         <Button
-          variant="outline"
+          variant="glassmorphismDeselected"
           color="grey"
           size="mdR"
           onClick={() => {
@@ -428,7 +428,7 @@ const FilterDrawer = (
           CLEAR
         </Button>
         <Button
-          variant="flat"
+          variant="glassmorphismColor"
           color="grey"
           size="mdR"
           onClick={handleApplyFilters}

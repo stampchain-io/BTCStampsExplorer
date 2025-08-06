@@ -2,6 +2,7 @@
 import { ToggleSwitchButton } from "$button";
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
+import { DeployToolSkeleton } from "$indicators";
 import { inputTextarea, SRC20InputField } from "$form";
 import { Icon } from "$icon";
 import {
@@ -9,7 +10,6 @@ import {
   containerBackground,
   containerColForm,
   containerRowForm,
-  loaderSpinGrey,
 } from "$layout";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
 import { APIResponse } from "$lib/utils/api/responses/apiResponseUtil.ts";
@@ -308,14 +308,7 @@ export function SRC20DeployTool(
     return (
       <div class={bodyTool}>
         <h1 class={`${titlePurpleLD} mobileMd:mx-auto mb-1`}>DEPLOY</h1>
-        <div class={`${containerBackground} mb-6`}>
-          <div class="flex items-center justify-center p-8">
-            <div class={loaderSpinGrey}></div>
-            <span class="ml-3 text-stamp-grey-light">
-              Loading configuration...
-            </span>
-          </div>
-        </div>
+        <DeployToolSkeleton />
       </div>
     );
   }
