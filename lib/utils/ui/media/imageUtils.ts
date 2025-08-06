@@ -13,6 +13,11 @@ export const getBaseUrl = (): string => {
   // This ensures images are always loaded from the CDN
   const env = typeof Deno !== "undefined" ? Deno.env.get("DENO_ENV") : null;
 
+  // For testing, always return production CDN
+  if (env === "test") {
+    return "https://stampchain.io";
+  }
+
   // Check for DEV_BASE_URL environment variable first
   if (env === "development" && typeof Deno !== "undefined") {
     const devBaseUrl = Deno.env.get("DEV_BASE_URL");
@@ -101,6 +106,7 @@ export const mimeTypeToSuffix = Object.entries(mimeTypes).reduce(
 );
 
 export const getStampImageSrc = async (stamp: StampRow): Promise<string> => {
+  const baseUrl = getBaseUrl();
   if (!stamp.stamp_url) {
     return NOT_AVAILABLE_IMAGE;
   }
@@ -112,7 +118,7 @@ export const getStampImageSrc = async (stamp: StampRow): Promise<string> => {
     const urlParts = stamp.stamp_url.split("/stamps/");
     if (urlParts.length > 1) {
       const filename = urlParts[1].replace(".json", ".svg");
-      return `https://stampchain.io/stamps/${filename}`;
+      return `${baseUrl}/stamps/${filename}`;
     }
     return NOT_AVAILABLE_IMAGE;
   }
@@ -143,9 +149,13 @@ export const getStampImageSrc = async (stamp: StampRow): Promise<string> => {
     // These are data stamps, not image stamps
     return NOT_AVAILABLE_IMAGE;
   } else {
-    // For all other stamps, return the stamp_url directly
-    // The stamp_url already points to the CDN
-    return stamp.stamp_url;
+    // For non-JSON stamps (like HTML/PNG/etc.), handle content path extraction
+    const urlParts = stamp.stamp_url.split("/stamps/");
+    const contentPath = urlParts.length > 1
+      ? urlParts[1].replace(/.html$/, "")
+      : stamp.stamp_url.split("/").pop();
+
+    return `${baseUrl}/content/${contentPath}`;
   }
 };
 

@@ -26,7 +26,7 @@ TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 # Install dependencies if not already installed (for Docker)
 if ! command -v newman &> /dev/null; then
     echo "Installing Newman..."
-    npm install -g newman newman-reporter-html newman-reporter-json
+    npm install -g newman newman-reporter-html newman-reporter-json --no-fund
 fi
 
 # Install jq and bc if not available (for Alpine Linux in Docker)

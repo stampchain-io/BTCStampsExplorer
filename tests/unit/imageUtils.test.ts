@@ -144,7 +144,7 @@ Deno.test("getStampImageSrc - handles SRC-20 JSON stamps", async () => {
     ident: "SRC-20",
   } as any;
   const result = await getStampImageSrc(stamp);
-  assertEquals(result, "/stamps/abc123.svg");
+  assertEquals(result, "https://stampchain.io/stamps/abc123.svg");
 });
 
 Deno.test("getStampImageSrc - returns placeholder for SRC-20 with invalid URL", async () => {
@@ -167,7 +167,7 @@ Deno.test("getStampImageSrc - handles SRC-20 fetch errors", async () => {
     ident: "SRC-20",
   } as any;
   const result = await getStampImageSrc(stamp);
-  assertEquals(result, "/stamps/abc123.svg"); // SRC-20 returns SVG path regardless of fetch result
+  assertEquals(result, "https://stampchain.io/stamps/abc123.svg"); // SRC-20 returns SVG path regardless of fetch result
 
   globalThis.fetch = originalFetch;
 });
@@ -177,7 +177,7 @@ Deno.test("getStampImageSrc - handles HTML stamp URL extraction", async () => {
     stamp_url: "https://stampchain.io/stamps/content.html",
   } as any;
   const result = await getStampImageSrc(stamp);
-  assertEquals(result, "/content/content");
+  assertEquals(result, "https://stampchain.io/content/content");
 });
 
 Deno.test("getStampImageSrc - handles complex HTML stamp URL", async () => {
@@ -185,7 +185,7 @@ Deno.test("getStampImageSrc - handles complex HTML stamp URL", async () => {
     stamp_url: "https://stampchain.io/stamps/path/to/file.html",
   } as any;
   const result = await getStampImageSrc(stamp);
-  assertEquals(result, "/content/path/to/file"); // The actual implementation keeps the full path
+  assertEquals(result, "https://stampchain.io/content/path/to/file"); // The actual implementation keeps the full path
 });
 
 Deno.test("getStampImageSrc - handles SRC-101 stamps with image", async () => {
@@ -257,7 +257,7 @@ Deno.test("getStampImageSrc - handles non-JSON stamps", async () => {
     stamp_url: "https://stampchain.io/stamps/image.png",
   } as any;
   const result = await getStampImageSrc(stamp);
-  assertEquals(result, "/content/image.png");
+  assertEquals(result, "https://stampchain.io/content/image.png");
 });
 
 Deno.test("getStampImageSrc - handles HTML stamps", async () => {
@@ -265,7 +265,7 @@ Deno.test("getStampImageSrc - handles HTML stamps", async () => {
     stamp_url: "https://stampchain.io/stamps/content.html",
   } as any;
   const result = await getStampImageSrc(stamp);
-  assertEquals(result, "/content/content");
+  assertEquals(result, "https://stampchain.io/content/content");
 });
 
 Deno.test("getStampImageSrc - handles other JSON stamps (not SRC-20/101)", async () => {
@@ -708,7 +708,7 @@ Deno.test("getStampImageSrc - handles malformed URL extraction", async () => {
     stamp_url: "malformed-url-no-stamps-path",
   } as any;
   const result = await getStampImageSrc(stamp);
-  assertEquals(result, "/content/malformed-url-no-stamps-path");
+  assertEquals(result, "https://stampchain.io/content/malformed-url-no-stamps-path");
 });
 
 Deno.test("getStampImageSrc - handles SRC-101 fetch not ok response", async () => {

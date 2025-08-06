@@ -10,7 +10,7 @@ echo "Node version: $(node --version)"
 echo "NPM version: $(npm --version)"
 
 echo "=== Installing Newman ==="
-npm install -g newman newman-reporter-html
+npm install -g newman newman-reporter-html --no-fund
 echo "Newman version: $(newman --version)"
 
 # Test connectivity

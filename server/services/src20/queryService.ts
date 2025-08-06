@@ -137,6 +137,8 @@ export class SRC20QueryService {
 
       // Only map and format if we have data
       if (!(data as any).rows || (data as any).rows.length === 0) {
+        // Always return paginated response for empty data
+        // The route handler will check if it's a single result request and return 404
         return {
           data: [],
           page,
