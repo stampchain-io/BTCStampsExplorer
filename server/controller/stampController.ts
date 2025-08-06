@@ -853,8 +853,18 @@ export class StampController {
     );
   }
 
-  private static handleStampContent(result: any, _identifier: string) {
-    // If stamp_url exists, redirect to CDN
+  private static async handleStampContent(result: any, identifier: string) {
+    // If it's HTML content and we have base64 data, process it server-side
+    if (result.stamp_mimetype?.includes('html') && result.stamp_base64) {
+      // Process HTML content server-side to remove Cloudflare Rocket Loader
+      return await this.handleTextContent(
+        { body: result.stamp_base64 },
+        { mimeType: result.stamp_mimetype },
+        identifier
+      );
+    }
+    
+    // For non-HTML or when base64 not available, redirect to CDN
     if (result.stamp_url) {
       return new Response(null, {
         status: 302,
@@ -869,7 +879,6 @@ export class StampController {
     return WebResponseUtil.stampNotFound();
   }
 
-  // @ts-ignore - Unused method kept for future reference
   private static async handleTextContent(result: any, contentInfo: any, identifier: string) {
     try {
       let decodedContent = await decodeBase64(result.body);
@@ -889,32 +898,68 @@ export class StampController {
         );
       }
 
-      // Apply Cloudflare Rocket Loader fixes to HTML content (including SVG with HTML structure)
+      // Apply comprehensive Cloudflare Rocket Loader fixes to HTML content
       if (contentInfo.mimeType.includes('html') || decodedContent.includes('<html') || decodedContent.includes('<script')) {
-        // Step 1: Ensure scripts have correct type and data-cfasync="false"
+        // Step 1: Fix ALL script tags - remove any Cloudflare mangling
         decodedContent = decodedContent.replace(
           /(<script[^>]*?)>/g,
           (_match, openingTagInnerContentAndAttributes) => {
             let tag = openingTagInnerContentAndAttributes;
-            // Correct type if it's mangled by Cloudflare Rocket Loader
+
+            // Remove ALL Cloudflare type manglings - any hex prefix before -text/javascript
             tag = tag.replace(
-              /type\s*=\s*"[a-f0-9]{24}-text\/javascript"/i,
+              /type\s*=\s*"[a-f0-9]+-text\/javascript"/gi,
               'type="text/javascript"',
             );
-            // Add data-cfasync="false" if not already present
-            if (!tag.includes('data-cfasync="false"')) {
+
+            // Remove data-cf-settings attributes that Cloudflare adds
+            tag = tag.replace(
+              /data-cf-settings\s*=\s*"[^"]*"/gi,
+              '',
+            );
+
+            // Remove defer attributes from rocket-loader scripts
+            tag = tag.replace(
+              /\s+defer(?:\s*=\s*["']?defer["']?)?/gi,
+              '',
+            );
+
+            // Add data-cfasync="false" to prevent any Rocket Loader processing
+            // but not for cdn-cgi scripts which we'll remove entirely
+            if (!tag.includes("data-cfasync") && !tag.includes("/cdn-cgi/")) {
               tag += ' data-cfasync="false"';
             }
+
             return tag + ">";
           },
         );
 
-        // Step 2: Globally correct any remaining mangled script types
-        // Cloudflare's Rocket Loader might change type="text/javascript"
-        // to type="<hex_value>-text/javascript". This reverts that change.
+        // Step 2: Remove ALL Cloudflare Rocket Loader injected script tags
         decodedContent = decodedContent.replace(
-          /type\s*=\s*"[a-f0-9]{24}-text\/javascript"/gi,
-          'type="text/javascript"',
+          /<script[^>]*\/cdn-cgi\/scripts\/[^>]*rocket-loader[^>]*>[^<]*<\/script>/gi,
+          "",
+        );
+        
+        // Also remove any script with mangled type that loads rocket-loader
+        decodedContent = decodedContent.replace(
+          /<script[^>]*type="[a-f0-9]{8,}-text\/javascript"[^>]*src="[^"]*rocket-loader[^"]*"[^>]*><\/script>/gi,
+          "",
+        );
+
+        // Step 3: Remove any remaining Cloudflare Rocket Loader references
+        decodedContent = decodedContent.replace(
+          /data-cf-beacon=["'][^"']*["']/gi,
+          "",
+        );
+
+        // Step 4: Clean up any malformed script src attributes with encoded quotes
+        decodedContent = decodedContent.replace(
+          /src=["']([^"']*%22[^"']*)["']/gi,
+          (_match, srcValue) => {
+            // Decode any URL-encoded quotes and fix malformed paths
+            const cleanSrc = srcValue.replace(/%22/g, "");
+            return `src="${cleanSrc}"`;
+          },
         );
       }
 

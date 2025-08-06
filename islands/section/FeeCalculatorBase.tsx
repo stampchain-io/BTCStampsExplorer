@@ -1,9 +1,4 @@
-import {
-  buttonPurpleFlat,
-  buttonPurpleOutline,
-  sliderBar,
-  sliderKnob,
-} from "$button";
+import { Button, sliderBar, sliderKnob } from "$button";
 import { MaraModeBadge } from "$components/indicators/MaraModeIndicator.tsx";
 import { FeeSkeletonLoader } from "$components/indicators/ProgressIndicator.tsx";
 import { handleModalClose } from "$components/layout/ModalBase.tsx";
@@ -933,11 +928,10 @@ export function FeeCalculatorBase({
           {/* Buttons on the right */}
           <div class="flex justify-end gap-6">
             {onCancel && (
-              <button
-                type="button"
-                className={`${buttonPurpleOutline} ${
-                  isSubmitting ? "opacity-50 cursor-not-allowed" : ""
-                }`}
+              <Button
+                variant="glassmorphismDeselected"
+                color="purple"
+                size="md"
                 onClick={() => {
                   logger.debug("ui", {
                     message: "Cancel clicked",
@@ -946,18 +940,15 @@ export function FeeCalculatorBase({
                   handleModalClose();
                   onCancel();
                 }}
-                disabled={isSubmitting}
+                disabled={!!isSubmitting}
               >
                 {cancelText}
-              </button>
+              </Button>
             )}
-            <button
-              type="button"
-              className={`${buttonPurpleFlat} ${
-                (disabled || isSubmitting || !tosAgreed)
-                  ? "opacity-50 cursor-not-allowed"
-                  : ""
-              }`}
+            <Button
+              variant="glassmorphismColor"
+              color="purple"
+              size="md"
               onClick={() => {
                 console.log(
                   "FEE_CALCULATOR_BASE: Internal button onClick fired! About to call props.onSubmit.",
@@ -966,10 +957,10 @@ export function FeeCalculatorBase({
                   onSubmit();
                 }
               }}
-              disabled={disabled || isSubmitting || !tosAgreed}
+              disabled={!!(disabled || isSubmitting || !tosAgreed)}
             >
               {isSubmitting ? "PROCESSING" : confirmText || buttonName}
-            </button>
+            </Button>
           </div>
         </div>
       </div>
