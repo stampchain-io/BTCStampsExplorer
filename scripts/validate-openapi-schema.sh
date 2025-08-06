@@ -11,7 +11,7 @@ echo "============================"
 echo ""
 
 # Check if OpenAPI file exists
-OPENAPI_FILE="./static/swagger/openapi.yml"
+OPENAPI_FILE="./schema.yml"
 if [ ! -f "$OPENAPI_FILE" ]; then
     echo "❌ Error: OpenAPI file not found at $OPENAPI_FILE"
     exit 1
