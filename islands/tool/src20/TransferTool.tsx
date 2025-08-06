@@ -1,12 +1,12 @@
 /* ===== TRANSFER CONTENT COMPONENT ===== */
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
+import { TransferToolSkeleton } from "$indicators";
 import { SRC20InputField } from "$form";
 import {
   bodyTool,
   containerBackground,
   containerColForm,
-  loaderSpinGrey,
   rowResponsiveForm,
 } from "$layout";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
@@ -260,14 +260,7 @@ export function SRC20TransferTool(
     return (
       <div class={bodyTool}>
         <h1 class={`${titlePurpleLD} mobileMd:mx-auto mb-1`}>TRANSFER</h1>
-        <div class={`${containerBackground} mb-6`}>
-          <div class="flex items-center justify-center p-8">
-            <div class={loaderSpinGrey}></div>
-            <span class="ml-3 text-stamp-grey-light">
-              Loading configuration...
-            </span>
-          </div>
-        </div>
+        <TransferToolSkeleton />
       </div>
     );
   }

@@ -59,7 +59,7 @@ export async function handleContentRequest(
       isFullPath,
     );
 
-    // Check if this is a redirect response  
+    // Check if this is a redirect response
     if (response.status === 302 || response.status === 301) {
       const location = response.headers.get("location");
 
@@ -135,18 +135,20 @@ export async function handleContentRequest(
                 // Remove data-cf-settings attributes that Cloudflare adds
                 tag = tag.replace(
                   /data-cf-settings\s*=\s*"[^"]*"/gi,
-                  '',
+                  "",
                 );
 
                 // Remove defer attributes from rocket-loader scripts
                 tag = tag.replace(
                   /\s+defer(?:\s*=\s*["']?defer["']?)?/gi,
-                  '',
+                  "",
                 );
 
                 // Add data-cfasync="false" to prevent any Rocket Loader processing
                 // but not for cdn-cgi scripts which we'll remove entirely
-                if (!tag.includes("data-cfasync") && !tag.includes("/cdn-cgi/")) {
+                if (
+                  !tag.includes("data-cfasync") && !tag.includes("/cdn-cgi/")
+                ) {
                   tag += ' data-cfasync="false"';
                 }
 
@@ -160,7 +162,7 @@ export async function handleContentRequest(
               /<script[^>]*\/cdn-cgi\/scripts\/[^>]*rocket-loader[^>]*>[^<]*<\/script>/gi,
               "",
             );
-            
+
             // Also remove any script with mangled type that loads rocket-loader
             htmlContent = htmlContent.replace(
               /<script[^>]*type="[a-f0-9]{8,}-text\/javascript"[^>]*src="[^"]*rocket-loader[^"]*"[^>]*><\/script>/gi,
