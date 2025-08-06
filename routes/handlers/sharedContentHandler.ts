@@ -106,12 +106,13 @@ export async function handleContentRequest(
         }
       }
 
-      // Step 1: Ensure scripts from /s/ have correct type and data-cfasync="false"
+      // Apply Cloudflare Rocket Loader fixes to HTML content
+      // Step 1: Ensure scripts have correct type and data-cfasync="false"
       htmlContent = htmlContent.replace(
-        /(<script[^>]*?src="\/s\/[A-Z0-9]+"[^>]*?)>/g, // Matches <script ... src="/s/..." ...>
+        /(<script[^>]*?)>/g,
         (_match, openingTagInnerContentAndAttributes) => {
           let tag = openingTagInnerContentAndAttributes;
-          // Correct type if it's mangled
+          // Correct type if it's mangled by Cloudflare Rocket Loader
           tag = tag.replace(
             /type\s*=\s*"[a-f0-9]{24}-text\/javascript"/i,
             'type="text/javascript"',
@@ -124,13 +125,26 @@ export async function handleContentRequest(
         },
       );
 
-      // Step 2: Globally correct any remaining mangled script types (e.g., for inline scripts).
-      // Cloudflare's Rocket Loader might change type="text/javascript"
-      // to type="<hex_value>-text/javascript". This reverts that change.
-      // Assumes the hex string is 24 characters long.
+      // Step 2: Remove Cloudflare Rocket Loader injected script tags
       htmlContent = htmlContent.replace(
-        /type\s*=\s*"[a-f0-9]{24}-text\/javascript"/gi,
-        'type="text/javascript"',
+        /<script[^>]*src=["'][^"']*\/cdn-cgi\/scripts\/[^"']*rocket-loader[^"']*["'][^>]*><\/script>/gi,
+        "",
+      );
+
+      // Step 3: Remove any remaining Cloudflare Rocket Loader references
+      htmlContent = htmlContent.replace(
+        /data-cf-beacon=["'][^"']*["']/gi,
+        "",
+      );
+
+      // Step 4: Clean up any malformed script src attributes with encoded quotes
+      htmlContent = htmlContent.replace(
+        /src=["']([^"']*%22[^"']*)["']/gi,
+        (_match, srcValue) => {
+          // Decode any URL-encoded quotes and fix malformed paths
+          const cleanSrc = srcValue.replace(/%22/g, "");
+          return `src="${cleanSrc}"`;
+        },
       );
 
       // Use the recursive headers which include appropriate CSP and cache settings
