@@ -1,0 +1,51 @@
+name: API Schema Validation
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'routes/api/**'
+      - 'server/services/**'
+      - 'static/swagger/**'
+      - '.redocly.yaml'
+  push:
+    branches:
+      - main
+      - dev
+    paths:
+      - 'routes/api/**'
+      - 'server/services/**'
+      - 'static/swagger/**'
+      - '.redocly.yaml'
+
+jobs:
+  validate-schema:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: Validate OpenAPI Schema
+        run: |
+          echo "🔍 Validating OpenAPI specification..."
+          npx @redocly/cli@latest lint ./static/swagger/openapi.yml --config .redocly.yaml --format stylish
+          
+      - name: Check for breaking changes
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        run: |
+          echo "📊 Checking for breaking changes..."
+          # Fetch the base branch to compare against
+          git fetch origin ${{ github.base_ref }}
+          
+          # Use oasdiff to check for breaking changes
+          npx oasdiff@latest breaking \
+            --base origin/${{ github.base_ref }}:static/swagger/openapi.yml \
+            --revision HEAD:static/swagger/openapi.yml \
+            --format text || true

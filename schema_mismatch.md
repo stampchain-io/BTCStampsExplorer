@@ -14,3 +14,9 @@ schema mismatch description
   - Add explicit schema validation tests in the Postman collection
   - Use a tool like openapi-validator-middleware in the API itself
   - Add specific test assertions for each endpoint's expected response structure
+
+
+  Recommendations for Future:
+  1. Integrate newman-openapi-validator.js into CI pipeline
+  2. Add schema validation to Newman test assertions
+  3. Consider adding runtime OpenAPI validation middleware

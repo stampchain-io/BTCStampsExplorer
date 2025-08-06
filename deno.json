@@ -33,6 +33,7 @@
     "test:api": "docker-compose -f docker-compose.test.yml run --rm newman",
     "test:api:performance": "docker-compose -f docker-compose.test.yml run --rm newman-performance",
     "test:api:all": "deno task test:api && deno task test:api:performance",
+    "test:api:schema": "./scripts/validate-openapi-schema.sh",
     "smoke:test": "BASE_URL=${BASE_URL:-https://stampchain.io} newman run tests/postman/collections/smoke-tests.json --environment-var baseUrl=$BASE_URL --reporters html,json --reporter-html-export ./reports/smoke-test-$(date +%Y%m%d_%H%M%S).html --reporter-json-export ./reports/smoke-test-$(date +%Y%m%d_%H%M%S).json --bail",
     "load:test": "./scripts/load-testing/run-load-tests.sh ${LOAD_TEST_TYPE:-smoke}",
     "monitor:memory": "deno run --allow-net --allow-env scripts/monitorMemory.ts --url=${MONITOR_URL:-http://localhost:8000}",
