@@ -4,7 +4,7 @@ echo "=== Newman Pagination Validation Testing ==="
 
 # Install Newman
 echo "Installing Newman..."
-npm install -g newman newman-reporter-html newman-reporter-json
+npm install -g newman newman-reporter-html newman-reporter-json --no-fund
 
 # Create reports directory
 mkdir -p reports/newman-pagination-validation

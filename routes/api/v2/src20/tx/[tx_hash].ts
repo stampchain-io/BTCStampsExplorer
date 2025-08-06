@@ -46,6 +46,19 @@ export const handler: Handlers = {
       const result = await SRC20Service.QueryService.fetchAndFormatSrc20Data(
         params,
       );
+
+      // Check if result is empty (no transaction found)
+      // For single transactions, we expect data to be an object, not an array or null
+      if (
+        !result.data ||
+        result.data === null ||
+        (Array.isArray(result.data) && result.data.length === 0)
+      ) {
+        return ApiResponseUtil.notFound(
+          `Transaction not found: ${tx_hash}`,
+        );
+      }
+
       return ApiResponseUtil.success(result);
     } catch (error) {
       return ApiResponseUtil.internalError(error, "Error processing request");

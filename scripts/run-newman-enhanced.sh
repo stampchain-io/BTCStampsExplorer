@@ -5,8 +5,8 @@ echo "Node version:" && node --version
 echo "NPM version:" && npm --version
 
 echo "=== Installing Newman and Dependencies ==="
-npm install -g newman
-npm install -g newman-reporter-html
+npm install -g newman --no-fund
+npm install -g newman-reporter-html --no-fund
 echo "Newman version:" && newman --version
 
 echo "=== Installing OpenAPI Schema Validator Dependencies ==="

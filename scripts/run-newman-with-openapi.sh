@@ -5,9 +5,9 @@ echo "Node version:" && node --version
 echo "NPM version:" && npm --version
 
 echo "=== Installing Newman and Dependencies ==="
-npm install -g newman
-npm install -g newman-reporter-html
-npm install -g js-yaml ajv ajv-formats
+npm install -g newman --no-fund
+npm install -g newman-reporter-html --no-fund
+npm install -g js-yaml ajv ajv-formats --no-fund
 echo "Newman version:" && newman --version
 
 echo "=== Checking OpenAPI Validator ==="
@@ -45,33 +45,33 @@ if [ "$USE_OPENAPI_VALIDATOR" = "true" ] && [ -f "./static/swagger/openapi.yml" 
   NEWMAN_EXIT_CODE=$?
   
   # Also generate standard Newman reports
-  newman run "${NEWMAN_COLLECTION:-tests/postman/collections/comprehensive.json}" \
-    --environment "${NEWMAN_ENVIRONMENT:-postman-environment.json}" \
-    --reporters cli,html,json \
-    --reporter-html-export reports/newman/$TIMESTAMP-report.html \
-    --reporter-json-export reports/newman/$TIMESTAMP-results.json \
-    ${NEWMAN_FOLDER:+--folder "$NEWMAN_FOLDER"} \
-    ${NEWMAN_ITERATIONS:+--iteration-count "$NEWMAN_ITERATIONS"} \
-    ${NEWMAN_DELAY_REQUEST:+--delay-request "$NEWMAN_DELAY_REQUEST"} \
-    ${NEWMAN_TIMEOUT:+--timeout "$NEWMAN_TIMEOUT"} \
-    ${NEWMAN_BAIL:+--bail "$NEWMAN_BAIL"} \
-    ${NEWMAN_VERBOSE:+--verbose}
+  # Build Newman command with proper parameter handling
+  NEWMAN_CMD="newman run '${NEWMAN_COLLECTION:-tests/postman/collections/comprehensive.json}' --environment '${NEWMAN_ENVIRONMENT:-postman-environment.json}' --reporters cli,html,json --reporter-html-export reports/newman/$TIMESTAMP-report.html --reporter-json-export reports/newman/$TIMESTAMP-results.json"
+  
+  [ -n "$NEWMAN_FOLDER" ] && NEWMAN_CMD="$NEWMAN_CMD --folder '$NEWMAN_FOLDER'"
+  [ -n "$NEWMAN_ITERATIONS" ] && [ "$NEWMAN_ITERATIONS" -gt 0 ] && NEWMAN_CMD="$NEWMAN_CMD --iteration-count $NEWMAN_ITERATIONS"
+  [ -n "$NEWMAN_DELAY_REQUEST" ] && [ "$NEWMAN_DELAY_REQUEST" -gt 0 ] && NEWMAN_CMD="$NEWMAN_CMD --delay-request $NEWMAN_DELAY_REQUEST"
+  [ -n "$NEWMAN_TIMEOUT" ] && [ "$NEWMAN_TIMEOUT" -gt 0 ] && NEWMAN_CMD="$NEWMAN_CMD --timeout $NEWMAN_TIMEOUT"
+  [ "$NEWMAN_BAIL" = "true" ] && NEWMAN_CMD="$NEWMAN_CMD --bail"
+  [ "$NEWMAN_VERBOSE" = "true" ] && NEWMAN_CMD="$NEWMAN_CMD --verbose"
+  
+  eval $NEWMAN_CMD
 
 else
   echo "=== Running Standard Newman Tests ==="
   echo "⚠️  OpenAPI validation will depend on server-side headers only"
   
-  newman run "${NEWMAN_COLLECTION:-tests/postman/collections/comprehensive.json}" \
-    --environment "${NEWMAN_ENVIRONMENT:-postman-environment.json}" \
-    --reporters cli,html,json \
-    --reporter-html-export reports/newman/$TIMESTAMP-report.html \
-    --reporter-json-export reports/newman/$TIMESTAMP-results.json \
-    ${NEWMAN_FOLDER:+--folder "$NEWMAN_FOLDER"} \
-    ${NEWMAN_ITERATIONS:+--iteration-count "$NEWMAN_ITERATIONS"} \
-    ${NEWMAN_DELAY_REQUEST:+--delay-request "$NEWMAN_DELAY_REQUEST"} \
-    ${NEWMAN_TIMEOUT:+--timeout "$NEWMAN_TIMEOUT"} \
-    ${NEWMAN_BAIL:+--bail "$NEWMAN_BAIL"} \
-    ${NEWMAN_VERBOSE:+--verbose}
+  # Build Newman command with proper parameter handling
+  NEWMAN_CMD="newman run '${NEWMAN_COLLECTION:-tests/postman/collections/comprehensive.json}' --environment '${NEWMAN_ENVIRONMENT:-postman-environment.json}' --reporters cli,html,json --reporter-html-export reports/newman/$TIMESTAMP-report.html --reporter-json-export reports/newman/$TIMESTAMP-results.json"
+  
+  [ -n "$NEWMAN_FOLDER" ] && NEWMAN_CMD="$NEWMAN_CMD --folder '$NEWMAN_FOLDER'"
+  [ -n "$NEWMAN_ITERATIONS" ] && [ "$NEWMAN_ITERATIONS" -gt 0 ] && NEWMAN_CMD="$NEWMAN_CMD --iteration-count $NEWMAN_ITERATIONS"
+  [ -n "$NEWMAN_DELAY_REQUEST" ] && [ "$NEWMAN_DELAY_REQUEST" -gt 0 ] && NEWMAN_CMD="$NEWMAN_CMD --delay-request $NEWMAN_DELAY_REQUEST"
+  [ -n "$NEWMAN_TIMEOUT" ] && [ "$NEWMAN_TIMEOUT" -gt 0 ] && NEWMAN_CMD="$NEWMAN_CMD --timeout $NEWMAN_TIMEOUT"
+  [ "$NEWMAN_BAIL" = "true" ] && NEWMAN_CMD="$NEWMAN_CMD --bail"
+  [ "$NEWMAN_VERBOSE" = "true" ] && NEWMAN_CMD="$NEWMAN_CMD --verbose"
+  
+  eval $NEWMAN_CMD
   
   NEWMAN_EXIT_CODE=$?
 fi
