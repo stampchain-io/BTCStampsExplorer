@@ -33,9 +33,14 @@ const colors = {
 function findLatestReport(reportDir) {
   const files = fs.readdirSync(reportDir)
     .filter((f) => f.endsWith("-results.json"))
-    .sort((a, b) => b.localeCompare(a)); // Sort by timestamp descending
+    .map(f => ({
+      name: f,
+      path: path.join(reportDir, f),
+      time: fs.statSync(path.join(reportDir, f)).mtime.getTime()
+    }))
+    .sort((a, b) => b.time - a.time); // Sort by modification time descending
 
-  return files.length > 0 ? path.join(reportDir, files[0]) : null;
+  return files.length > 0 ? files[0].path : null;
 }
 
 function analyzeRegression(results) {
@@ -301,20 +306,34 @@ function generateReport(regressions) {
 
 // Main execution
 function main() {
-  const reportDir = path.join(
+  // Check both possible locations for Newman reports
+  const comprehensiveDir = path.join(
     __dirname,
     "..",
     "reports",
     "newman-comprehensive",
   );
+  const regularDir = path.join(
+    __dirname,
+    "..",
+    "reports",
+    "newman",
+  );
+
+  // Prefer regular newman directory if it exists and has recent results
+  let reportDir = regularDir;
+  if (!fs.existsSync(regularDir) || fs.readdirSync(regularDir).filter(f => f.endsWith('-results.json')).length === 0) {
+    // Fall back to comprehensive directory
+    reportDir = comprehensiveDir;
+  }
 
   if (!fs.existsSync(reportDir)) {
     console.error(
       colors.red +
-        "Error: No Newman comprehensive reports found. Run tests first." +
+        "Error: No Newman reports found. Run tests first." +
         colors.reset,
     );
-    console.log("Run: npm run test:api:comprehensive");
+    console.log("Run: npm run test:api:comprehensive or npm run test:api:regression");
     process.exit(1);
   }
 
@@ -327,7 +346,12 @@ function main() {
     process.exit(1);
   }
 
-  console.log(`Analyzing: ${path.basename(latestReport)}`);
+  const fileStats = fs.statSync(latestReport);
+  const fileDate = fileStats.mtime.toISOString();
+  console.log(`Analyzing: ${path.relative(process.cwd(), latestReport)}`);
+  console.log(`File Date: ${fileDate}`);
+  console.log(`Directory: ${reportDir}`);
+  console.log("");
 
   try {
     const resultsData = fs.readFileSync(latestReport, "utf8");
