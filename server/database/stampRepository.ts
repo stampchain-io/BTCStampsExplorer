@@ -427,6 +427,70 @@ export class StampRepository {
     }
   }
 
+  /**
+   * Get stamp file with content for server-side processing
+   */
+  static async getStampFileWithContent(identifier: string): Promise<{
+    stamp_base64: string | null;
+    stamp_url: string;
+    tx_hash: string;
+    stamp_mimetype: string;
+    cpid: string;
+  } | null> {
+    const sanitizedIdentifier = this.sanitize(identifier);
+    const idType = getIdentifierType(sanitizedIdentifier);
+
+    let whereClause: string;
+    let params: string[];
+
+    switch (idType) {
+      case "stamp_number":
+        whereClause = "stamp = ?";
+        params = [sanitizedIdentifier];
+        break;
+      case "tx_hash":
+        whereClause = "tx_hash = ?";
+        params = [sanitizedIdentifier];
+        break;
+      case "stamp_hash":
+        whereClause = "stamp_hash = ?";
+        params = [sanitizedIdentifier];
+        break;
+      case "cpid":
+        whereClause = "cpid = ?";
+        params = [sanitizedIdentifier];
+        break;
+      default:
+        return null;
+    }
+
+    const query = `
+      SELECT stamp_url, stamp_mimetype, stamp_base64, cpid, tx_hash
+      FROM ${STAMP_TABLE}
+      WHERE ${whereClause}
+      LIMIT 1
+    `;
+
+    const result = await this.db.executeQueryWithCache(
+      query,
+      params,
+      DEFAULT_CACHE_DURATION
+    );
+
+    if (!(result as any)?.rows?.length) {
+      return null;
+    }
+
+    const row = (result as any).rows[0];
+    return {
+      stamp_base64: row.stamp_base64 || null,
+      stamp_url: row.stamp_url || '',
+      stamp_mimetype: row.stamp_mimetype || '',
+      cpid: row.cpid || '',
+      tx_hash: row.tx_hash || ''
+    };
+  }
+
   static async getStampFile(identifier: string) {
     const sanitizedIdentifier = this.sanitize(identifier);
     const idType = getIdentifierType(sanitizedIdentifier);
@@ -1180,7 +1244,10 @@ export class StampRepository {
     return {
       stamp: (result as any).rows[0]?.stamp,
       stamp_url: (result as any).rows[0]?.stamp_url || '',
-      stamp_mimetype: (result as any).rows[0]?.stamp_mimetype || ''
+      stamp_mimetype: (result as any).rows[0]?.stamp_mimetype || '',
+      stamp_base64: (result as any).rows[0]?.stamp_base64 || null,
+      cpid: (result as any).rows[0]?.cpid || '',
+      tx_hash: (result as any).rows[0]?.tx_hash || ''
     };
   }
 
