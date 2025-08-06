@@ -12,7 +12,7 @@ export const getBaseUrl = (): string => {
   // regardless of the current environment
   // This ensures images are always loaded from the CDN
   const env = typeof Deno !== "undefined" ? Deno.env.get("DENO_ENV") : null;
-  
+
   // Check for DEV_BASE_URL environment variable first
   if (env === "development" && typeof Deno !== "undefined") {
     const devBaseUrl = Deno.env.get("DEV_BASE_URL");
@@ -20,7 +20,7 @@ export const getBaseUrl = (): string => {
       return devBaseUrl;
     }
   }
-  
+
   // Default to production CDN
   return "https://stampchain.io";
 };
@@ -159,19 +159,19 @@ export const getSRC20ImageSrc = (src20: SRC20Row): string => {
   // 2. Use stamp_url if provided (for transaction stamps)
   // 3. Fallback to constructing URL from deploy_tx if available
   // 4. Final fallback to placeholder image
-  
+
   if (src20.deploy_img) {
     return src20.deploy_img;
   }
-  
+
   if (src20.stamp_url) {
     return src20.stamp_url;
   }
-  
+
   if (src20.deploy_tx) {
     return constructStampUrl(src20.deploy_tx, "svg");
   }
-  
+
   return "/img/placeholder/stamp-no-image.svg";
 };
 

@@ -24,7 +24,8 @@ const DONATE_ADDRESS = "bc1qe5sz3mt4a3e57n8e39pprval4qe0xdrkzew203";
 const DONATE_STAMP: DonateStampData = {
   stamp: "-398",
   stamp_mimetype: "png",
-  stamp_url: "https://stampchain.io/stamps/6df1763d2df70b21f5fb52c9a47347c7466dfdf8a87d1430f640d363f0efa37a.png",
+  stamp_url:
+    "https://stampchain.io/stamps/6df1763d2df70b21f5fb52c9a47347c7466dfdf8a87d1430f640d363f0efa37a.png",
   tx_hash: "6df1763d2df70b21f5fb52c9a47347c7466dfdf8a87d1430f640d363f0efa37a",
 };
 
