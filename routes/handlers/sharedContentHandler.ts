@@ -7,6 +7,8 @@ import { WebResponseUtil } from "$lib/utils/api/responses/webResponseUtil.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { RouteType } from "$server/services/infrastructure/cacheService.ts";
 import type { State } from "$types/ui.d.ts";
+// import { getBaseUrl } from "$lib/utils/ui/media/imageUtils.ts";
+// import { getMimeType } from "$lib/utils/ui/media/imageUtils.ts";
 
 // Define the state type
 
@@ -48,6 +50,8 @@ export async function handleContentRequest(
       }
     }
 
+    // For /content/ routes, we need to determine the proper file extension
+    // First, try to get stamp info to determine the correct URL
     const response = await StampController.getStampFile(
       identifier,
       RouteType.STAMP_DETAIL,

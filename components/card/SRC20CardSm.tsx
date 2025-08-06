@@ -8,7 +8,7 @@ import {
   rowCardBorderRight,
 } from "$layout";
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
-import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
+import { getSRC20ImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
 import { safeNavigate } from "$lib/utils/navigation/freshNavigationUtils.ts";
 import { labelXs, textSm, valueDarkSm } from "$text";
 
@@ -129,15 +129,8 @@ export function SRC20CardSm({
         {data?.length
           ? (
             data.map((src20: EnrichedSRC20Row, index: number) => {
-              // SRC-20 Image URL Logic:
-              // 1. Use deploy_img if provided (for deploy operations: https://stampchain.io/stamps/{deploy_tx}.svg)
-              // 2. Use stamp_url if provided (for transaction stamps: https://stampchain.io/stamps/{tx_hash}.svg)
-              // 3. Fallback to constructing URL from deploy_tx if available
-              // 4. Final fallback to placeholder image
-              const imageUrl = src20.deploy_img ||
-                src20.stamp_url ||
-                (src20.deploy_tx ? constructStampUrl(src20.deploy_tx) : null) ||
-                "/img/placeholder/stamp-no-image.svg";
+              // Use centralized image URL logic
+              const imageUrl = getSRC20ImageSrc(src20);
 
               // --- BEGIN DEBUG LOGS ---
               if (index < 3) { // Log only for the first 3 items to avoid spam
