@@ -154,17 +154,14 @@ export async function handleContentRequest(
         "Content-Type": "text/html; charset=utf-8",
       };
 
-      return WebResponseUtil.custom(htmlContent, 200, {
+      return new Response(htmlContent, {
+        status: 200,
         headers,
-        raw: true,
       });
     }
 
-    // For non-HTML, preserve response but ensure version headers
-    return WebResponseUtil.custom(response.body, response.status, {
-      headers: Object.fromEntries(response.headers),
-      raw: true,
-    });
+    // For non-HTML, preserve response as-is
+    return response;
   } catch (error) {
     logger.error("content", {
       message: "Content handler error",
