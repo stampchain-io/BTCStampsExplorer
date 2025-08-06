@@ -15,7 +15,7 @@ import { WebResponseUtil } from "$lib/utils/api/responses/webResponseUtil.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { isCpid } from "$lib/utils/typeGuards.ts";
 import { decodeBase64 } from "$lib/utils/ui/formatting/formatUtils.ts";
-import { detectContentType, getMimeType } from "$lib/utils/ui/media/imageUtils.ts";
+import { getBaseUrl, getMimeType } from "$lib/utils/ui/media/imageUtils.ts";
 import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
 import { RouteType } from "$server/services/infrastructure/cacheService.ts";
 import type { PaginatedStampBalanceResponseBody } from "$types/api.d.ts";
@@ -755,16 +755,12 @@ export class StampController {
   private static async proxyContentRouteToStampsRoute(
     identifier: string,
     _stamp_url: string,
-    baseUrl?: string,
+    _baseUrl?: string,
     contentType: string = 'application/octet-stream'
   ) {
-    // Use IMAGES_SRC_PATH for CDN requests if available, otherwise fall back to baseUrl
-    const imagesSrcPath = Deno.env.get("IMAGES_SRC_PATH");
-
-    // Construct the full proxy path
-    const proxyPath = imagesSrcPath
-      ? `${imagesSrcPath}/${identifier}`
-      : `${baseUrl}/stamps/${identifier}`;
+    // Use centralized getBaseUrl function for consistency
+    const cdnBaseUrl = getBaseUrl();
+    const proxyPath = `${cdnBaseUrl}/stamps/${identifier}`;
 
     try {
       // Use raw fetch for binary content to avoid consuming the response body
@@ -797,17 +793,14 @@ export class StampController {
           }
         });
       } else {
-        // For binary content, convert to base64 string as expected by WebResponseUtil
-        const arrayBuffer = await response.arrayBuffer();
-        const uint8Array = new Uint8Array(arrayBuffer);
-        const base64String = btoa(String.fromCharCode(...uint8Array));
-
-        return WebResponseUtil.stampResponse(base64String, contentType, {
-          binary: true,
-          headers: {
+        // For binary content, just proxy the response directly
+        return new Response(response.body, {
+          headers: normalizeHeaders({
             ...Object.fromEntries(response.headers),
+            "Content-Type": contentType,
+            "X-API-Version": API_RESPONSE_VERSION,
             "Vary": "Accept-Encoding, X-API-Version, Origin",
-          }
+          }),
         });
       }
     } catch (error) {
@@ -860,26 +853,23 @@ export class StampController {
     );
   }
 
-  private static handleStampContent(result: any, identifier: string) {
-    const contentInfo = detectContentType(
-      result.body,
-      undefined,
-      result.headers["Content-Type"] as string | undefined
-    );
-
-    const needsDecoding =
-      contentInfo.mimeType.includes('javascript') ||
-      contentInfo.mimeType.includes('text/') ||
-      contentInfo.mimeType.includes('application/json') ||
-      contentInfo.mimeType.includes('xml');
-
-    if (needsDecoding) {
-      return this.handleTextContent(result, contentInfo, identifier);
+  private static handleStampContent(result: any, _identifier: string) {
+    // If stamp_url exists, redirect to CDN
+    if (result.stamp_url) {
+      return new Response(null, {
+        status: 302,
+        headers: {
+          "Location": result.stamp_url,
+          "Cache-Control": "public, max-age=31536000, immutable"
+        }
+      });
     }
-
-    return this.handleBinaryContent(result, contentInfo);
+    
+    // Fallback if no stamp_url
+    return WebResponseUtil.stampNotFound();
   }
 
+  // @ts-ignore - Unused method kept for future reference
   private static async handleTextContent(result: any, contentInfo: any, identifier: string) {
     try {
       let decodedContent = await decodeBase64(result.body);
@@ -951,6 +941,7 @@ export class StampController {
     }
   }
 
+  // @ts-ignore - Unused method kept for future reference
   private static handleBinaryContent(result: any, contentInfo: any) {
     return WebResponseUtil.stampResponse(result.body, contentInfo.mimeType, {
       binary: true,

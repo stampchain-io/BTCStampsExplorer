@@ -18,6 +18,7 @@ import {
   abbreviateAddress,
   formatBalanceDisplay,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
+import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
 import {
   cardCreator,
   cardHashSymbol,
@@ -84,16 +85,11 @@ const WalletStampCardComponent = (
     return 6;
   };
 
-  const fetchStampImage = () => {
+  const fetchStampImage = async () => {
     setLoading(true);
-    // Use stamp_url if available, otherwise construct image source
-    if (stamp.stamp_url) {
-      setSrc(stamp.stamp_url);
-    } else {
-      // Fallback to constructing URL from tx_hash
-      const fallbackSrc = `/content/${stamp.tx_hash}.svg`;
-      setSrc(fallbackSrc);
-    }
+    // Use centralized image URL logic
+    const imageSrc = await getStampImageSrc(stamp);
+    setSrc(imageSrc);
     setLoading(false);
   };
 

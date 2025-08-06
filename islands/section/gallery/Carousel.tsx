@@ -57,6 +57,7 @@ export default function CarouselGallery(props: CarouselHomeProps) {
   const [validatedContent, setValidatedContent] = useState<
     Record<string, ComponentChildren>
   >({});
+  const [stampSources, setStampSources] = useState<Record<string, string>>({});
 
   /* ===== EVENT HANDLERS ===== */
   const handleLoad = () => {
@@ -67,6 +68,7 @@ export default function CarouselGallery(props: CarouselHomeProps) {
   useEffect(() => {
     const validateStamps = async () => {
       const validated: Record<string, ComponentChildren> = {};
+      const sources: Record<string, string> = {};
 
       // Process stamps in batches to avoid overwhelming the browser
       const batchSize = 5;
@@ -81,6 +83,7 @@ export default function CarouselGallery(props: CarouselHomeProps) {
 
           // Get proper stamp URL using getStampImageSrc
           const src = await getStampImageSrc(stamp);
+          sources[stamp.tx_hash] = src;
 
           // Handle HTML content
           if (stamp.stamp_mimetype === "text/html") {
@@ -103,16 +106,14 @@ export default function CarouselGallery(props: CarouselHomeProps) {
 
           // Handle SVG content with caching
           if (stamp.stamp_mimetype === "image/svg+xml") {
-            const svgSrc = `/content/${stamp.tx_hash}.svg`;
-
             // Check cache first
-            let isValid = validationCache.get(svgSrc);
+            let isValid = validationCache.get(src);
 
             if (isValid === undefined) {
               // Only validate if not in cache
-              const validationResult = await validateStampContent(svgSrc);
+              const validationResult = await validateStampContent(src);
               isValid = validationResult.isValid;
-              validationCache.set(svgSrc, isValid);
+              validationCache.set(src, isValid);
             }
 
             if (!isValid) {
@@ -133,6 +134,9 @@ export default function CarouselGallery(props: CarouselHomeProps) {
         // Update state after each batch
         if (Object.keys(validated).length > 0) {
           setValidatedContent((prev) => ({ ...prev, ...validated }));
+        }
+        if (Object.keys(sources).length > 0) {
+          setStampSources((prev) => ({ ...prev, ...sources }));
         }
       }
     };
@@ -184,7 +188,7 @@ export default function CarouselGallery(props: CarouselHomeProps) {
         <div class="swiper h-full">
           <div class="swiper-wrapper">
             {duplicatedStamps.map((stamp, index) => {
-              const extension = stamp.stamp_url?.split(".")?.pop() || "";
+              // const extension = stamp.stamp_url?.split(".")?.pop() || "";
               return (
                 <div
                   class="swiper-slide group h-full"
@@ -196,7 +200,7 @@ export default function CarouselGallery(props: CarouselHomeProps) {
                       <div class="relative min-h-[150px] mobileMd:min-h-[242px] mobileLg:min-h-[200px] tablet:min-h-[269px] desktop:min-h-[408px] p-[6px] mobileMd:p-[12px] desktop:p-[18px] rounded-md bg-stamp-card-bg hover:bg-black">
                         {validatedContent[stamp.tx_hash] || (
                           <img
-                            src={`/content/${stamp.tx_hash}.${extension}`}
+                            src={stampSources[stamp.tx_hash] || stamp.stamp_url}
                             alt={`Stamp #${stamp.stamp}`}
                             loading="lazy"
                             class="object-contain cursor-pointer desktop:min-w-[408px] tablet:min-w-[269px] mobileLg:min-w-[200px] mobileMd:min-w-[242px] min-w-[150px] rounded pixelart stamp-image"

@@ -1,22 +1,28 @@
 /// <reference lib="dom" />
 import { NOT_AVAILABLE_IMAGE } from "$constants";
 import type { StampRow } from "$types/stamp.d.ts";
+import type { SRC20Row } from "$types/src20.d.ts";
 
 /**
  * Get the base URL for the current environment
  * Used for constructing fully qualified URLs
  */
 export const getBaseUrl = (): string => {
-  // Client-side: use current window location
-  if (typeof globalThis.window !== "undefined") {
-    return globalThis.window.location.origin;
+  // For stamp images, always use the production CDN URL
+  // regardless of the current environment
+  // This ensures images are always loaded from the CDN
+  const env = typeof Deno !== "undefined" ? Deno.env.get("DENO_ENV") : null;
+  
+  // Check for DEV_BASE_URL environment variable first
+  if (env === "development" && typeof Deno !== "undefined") {
+    const devBaseUrl = Deno.env.get("DEV_BASE_URL");
+    if (devBaseUrl) {
+      return devBaseUrl;
+    }
   }
-
-  // Server-side: use environment-based logic
-  const env = Deno.env.get("DENO_ENV");
-  return env === "development"
-    ? (Deno.env.get("DEV_BASE_URL") || "https://stampchain.io")
-    : "https://stampchain.io";
+  
+  // Default to production CDN
+  return "https://stampchain.io";
 };
 
 /**
@@ -106,7 +112,7 @@ export const getStampImageSrc = async (stamp: StampRow): Promise<string> => {
     const urlParts = stamp.stamp_url.split("/stamps/");
     if (urlParts.length > 1) {
       const filename = urlParts[1].replace(".json", ".svg");
-      return `/stamps/${filename}`;
+      return `https://stampchain.io/stamps/${filename}`;
     }
     return NOT_AVAILABLE_IMAGE;
   }
@@ -137,15 +143,36 @@ export const getStampImageSrc = async (stamp: StampRow): Promise<string> => {
     // These are data stamps, not image stamps
     return NOT_AVAILABLE_IMAGE;
   } else {
-    // Extract filename from full URL if present
-    const urlParts = stamp.stamp_url.split("/stamps/");
-    const filename = urlParts.length > 1
-      ? urlParts[1].replace(".html", "")
-      : stamp.stamp_url;
-
-    // Use relative path
-    return `/content/${filename}`;
+    // For all other stamps, return the stamp_url directly
+    // The stamp_url already points to the CDN
+    return stamp.stamp_url;
   }
+};
+
+/**
+ * Get the image source URL for an SRC-20 token
+ * Handles deploy_img, stamp_url, and constructs from deploy_tx
+ */
+export const getSRC20ImageSrc = (src20: SRC20Row): string => {
+  // Priority order for SRC-20 images:
+  // 1. Use deploy_img if provided (for deploy operations)
+  // 2. Use stamp_url if provided (for transaction stamps)
+  // 3. Fallback to constructing URL from deploy_tx if available
+  // 4. Final fallback to placeholder image
+  
+  if (src20.deploy_img) {
+    return src20.deploy_img;
+  }
+  
+  if (src20.stamp_url) {
+    return src20.stamp_url;
+  }
+  
+  if (src20.deploy_tx) {
+    return constructStampUrl(src20.deploy_tx, "svg");
+  }
+  
+  return "/img/placeholder/stamp-no-image.svg";
 };
 
 export const getSRC101Data = async (stamp: StampRow) => {
@@ -348,7 +375,34 @@ export function detectContentType(
     }
 
     // Decode base64 for content inspection
-    const decoded = atob(content);
+    let decoded: string;
+    try {
+      decoded = atob(content);
+    } catch (_e) {
+      // If base64 decoding fails, trust the provided mime type
+      if (providedMimeType) {
+        return {
+          mimeType: providedMimeType,
+          isGzipped: false,
+          isJavaScript: providedMimeType.includes("javascript"),
+        };
+      }
+      // Otherwise, try to detect from filename
+      if (fileName) {
+        const extension = fileName.split(".").pop()?.toLowerCase() || "";
+        return {
+          mimeType: getMimeType(extension),
+          isGzipped: false,
+          isJavaScript: extension === "js",
+        };
+      }
+      // Default fallback
+      return {
+        mimeType: "application/octet-stream",
+        isGzipped: false,
+        isJavaScript: false,
+      };
+    }
 
     // Special case: If database says text/html but content is clearly JavaScript
     if (providedMimeType === "text/html") {
