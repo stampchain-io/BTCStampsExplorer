@@ -19,6 +19,7 @@ import { extractSRC20ErrorMessage } from "$lib/utils/bitcoin/src20/errorHandling
 import { StatusMessages } from "$notification";
 import { FeeCalculatorBase } from "$section";
 import { labelSm, labelXl, titlePurpleLD, valueSm, valueXl } from "$text";
+import { getSRC20ImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
 import axiod from "axiod";
 import { useEffect, useRef, useState } from "preact/hooks";
 
@@ -239,7 +240,12 @@ export function SRC20MintTool({
       } else {
         setMintStatus(data.mintStatus);
         setHolders(data.holders || 0);
-        setSelectedTokenImage(`/content/${data.mintStatus.tx_hash}.svg`);
+        // Use centralized image URL logic
+        const imageUrl = getSRC20ImageSrc({
+          ...data.mintStatus,
+          deploy_tx: data.mintStatus.tx_hash,
+        } as any);
+        setSelectedTokenImage(imageUrl);
 
         setFormState((prevState) => ({
           ...prevState,
