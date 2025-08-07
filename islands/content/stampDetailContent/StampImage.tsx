@@ -473,10 +473,10 @@ export function StampImage(
     );
   };
 
-  const fetchStampImage = async () => {
+  const fetchStampImage = () => {
     if (!stamp) return;
     setLoading(true);
-    const res = await getStampImageSrc(stamp);
+    const res = getStampImageSrc(stamp);
     if (res) {
       setSrc(res);
     } else setSrc(NOT_AVAILABLE_IMAGE);
@@ -643,10 +643,7 @@ export function StampImage(
   }, []);
 
   useEffect(() => {
-    fetchStampImage().catch((error) => {
-      console.error("Error fetching stamp image:", error);
-      setLoading(false); // Ensure loading is set to false even on error
-    });
+    fetchStampImage();
   }, []);
 
   useEffect(() => {

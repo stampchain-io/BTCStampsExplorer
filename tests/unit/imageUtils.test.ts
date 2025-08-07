@@ -132,160 +132,123 @@ Deno.test("detectContentType - handles filename extension extraction", () => {
 });
 
 // Tests for getStampImageSrc
-Deno.test("getStampImageSrc - returns placeholder when no stamp_url", async () => {
+Deno.test("getStampImageSrc - returns placeholder when no stamp_url", () => {
   const stamp = { stamp_url: null } as any;
-  const result = await getStampImageSrc(stamp);
+  const result = getStampImageSrc(stamp);
   assertEquals(result, NOT_AVAILABLE_IMAGE);
 });
 
-Deno.test("getStampImageSrc - handles SRC-20 JSON stamps", async () => {
+Deno.test("getStampImageSrc - handles SRC-20 JSON stamps", () => {
   const stamp = {
     stamp_url: "https://stampchain.io/stamps/abc123.json",
     ident: "SRC-20",
   } as any;
-  const result = await getStampImageSrc(stamp);
+  const result = getStampImageSrc(stamp);
   assertEquals(result, "https://stampchain.io/stamps/abc123.svg");
 });
 
-Deno.test("getStampImageSrc - returns placeholder for SRC-20 with invalid URL", async () => {
+Deno.test("getStampImageSrc - returns placeholder for SRC-20 with invalid URL", () => {
   const stamp = {
     stamp_url: "https://example.com/invalid.json",
     ident: "SRC-20",
   } as any;
-  const result = await getStampImageSrc(stamp);
+  const result = getStampImageSrc(stamp);
   assertEquals(result, NOT_AVAILABLE_IMAGE);
 });
 
-Deno.test("getStampImageSrc - handles SRC-20 fetch errors", async () => {
+Deno.test("getStampImageSrc - handles SRC-20 fetch errors", () => {
+  // Ensure test environment
+  const originalEnv = Deno.env.get("DENO_ENV");
+  Deno.env.set("DENO_ENV", "test");
+  
   const originalFetch = globalThis.fetch;
   globalThis.fetch = () => {
     return Promise.resolve(new Response("", { status: 404 }));
   };
 
-  const stamp = {
-    stamp_url: "https://stampchain.io/stamps/abc123.json",
-    ident: "SRC-20",
-  } as any;
-  const result = await getStampImageSrc(stamp);
-  assertEquals(result, "https://stampchain.io/stamps/abc123.svg"); // SRC-20 returns SVG path regardless of fetch result
-
-  globalThis.fetch = originalFetch;
+  try {
+    const stamp = {
+      stamp_url: "https://stampchain.io/stamps/abc123.json",
+      ident: "SRC-20",
+    } as any;
+    const result = getStampImageSrc(stamp);
+    assertEquals(result, "https://stampchain.io/stamps/abc123.svg"); // SRC-20 returns SVG path regardless of fetch result
+  } finally {
+    globalThis.fetch = originalFetch;
+    if (originalEnv) {
+      Deno.env.set("DENO_ENV", originalEnv);
+    }
+  }
 });
 
-Deno.test("getStampImageSrc - handles HTML stamp URL extraction", async () => {
-  const stamp = {
-    stamp_url: "https://stampchain.io/stamps/content.html",
-  } as any;
-  const result = await getStampImageSrc(stamp);
-  assertEquals(result, "https://stampchain.io/content/content");
+Deno.test("getStampImageSrc - handles HTML stamp URL extraction", () => {
+  // Ensure test environment
+  const originalEnv = Deno.env.get("DENO_ENV");
+  Deno.env.set("DENO_ENV", "test");
+  
+  try {
+    const stamp = {
+      stamp_url: "https://stampchain.io/stamps/content.html",
+      stamp_mimetype: "text/html",
+      tx_hash: "abc123"
+    } as any;
+    const result = getStampImageSrc(stamp);
+    // Now using /content/ path like main branch
+    assertEquals(result, "https://stampchain.io/content/content");
+  } finally {
+    if (originalEnv) {
+      Deno.env.set("DENO_ENV", originalEnv);
+    }
+  }
 });
 
-Deno.test("getStampImageSrc - handles complex HTML stamp URL", async () => {
+Deno.test("getStampImageSrc - handles complex HTML stamp URL", () => {
   const stamp = {
     stamp_url: "https://stampchain.io/stamps/path/to/file.html",
   } as any;
-  const result = await getStampImageSrc(stamp);
-  assertEquals(result, "https://stampchain.io/content/path/to/file"); // The actual implementation keeps the full path
+  const result = getStampImageSrc(stamp);
+  assertEquals(result, "https://stampchain.io/content/path/to/file");
 });
 
-Deno.test("getStampImageSrc - handles SRC-101 stamps with image", async () => {
-  // Mock fetch for SRC-101 JSON
-  const originalFetch = globalThis.fetch;
-  globalThis.fetch = (url: string | URL | Request) => {
-    if (typeof url === "string" && url.includes("src101")) {
-      return Promise.resolve(
-        new Response(
-          JSON.stringify({
-            img: ["https://example.com/image.png"],
-          }),
-          { status: 200 },
-        ),
-      );
-    }
-    return originalFetch(url);
-  };
-
+Deno.test("getStampImageSrc - handles SRC-101 stamps", () => {
   const stamp = {
     stamp_url: "https://stampchain.io/stamps/src101.json",
     ident: "SRC-101",
   } as any;
-  const result = await getStampImageSrc(stamp);
-  assertEquals(result, "https://example.com/image.png");
-
-  globalThis.fetch = originalFetch;
-});
-
-Deno.test("getStampImageSrc - handles SRC-101 stamps without image", async () => {
-  // Mock fetch for SRC-101 JSON without image
-  const originalFetch = globalThis.fetch;
-  globalThis.fetch = (url: string | URL | Request) => {
-    if (typeof url === "string" && url.includes("src101")) {
-      return Promise.resolve(new Response(JSON.stringify({}), { status: 200 }));
-    }
-    return originalFetch(url);
-  };
-
-  const stamp = {
-    stamp_url: "https://stampchain.io/stamps/src101.json",
-    ident: "SRC-101",
-  } as any;
-  const result = await getStampImageSrc(stamp);
+  const result = getStampImageSrc(stamp);
+  // SRC-101 JSON stamps now return placeholder (can't fetch synchronously)
   assertEquals(result, NOT_AVAILABLE_IMAGE);
-
-  globalThis.fetch = originalFetch;
 });
 
-Deno.test("getStampImageSrc - handles SRC-101 fetch errors", async () => {
-  // Mock fetch to throw error
-  const originalFetch = globalThis.fetch;
-  globalThis.fetch = () => {
-    throw new Error("Network error");
-  };
+// SRC-101 tests removed since getStampImageSrc is now synchronous
+// and doesn't fetch JSON data anymore
 
-  const stamp = {
-    stamp_url: "https://stampchain.io/stamps/src101.json",
-    ident: "SRC-101",
-  } as any;
-  const result = await getStampImageSrc(stamp);
-  assertEquals(result, NOT_AVAILABLE_IMAGE);
-
-  globalThis.fetch = originalFetch;
-});
-
-Deno.test("getStampImageSrc - handles non-JSON stamps", async () => {
+Deno.test("getStampImageSrc - handles non-JSON stamps", () => {
   const stamp = {
     stamp_url: "https://stampchain.io/stamps/image.png",
   } as any;
-  const result = await getStampImageSrc(stamp);
+  const result = getStampImageSrc(stamp);
   assertEquals(result, "https://stampchain.io/content/image.png");
 });
 
-Deno.test("getStampImageSrc - handles HTML stamps", async () => {
-  const stamp = {
-    stamp_url: "https://stampchain.io/stamps/content.html",
-  } as any;
-  const result = await getStampImageSrc(stamp);
-  assertEquals(result, "https://stampchain.io/content/content");
-});
-
-Deno.test("getStampImageSrc - handles other JSON stamps (not SRC-20/101)", async () => {
+Deno.test("getStampImageSrc - handles other JSON stamps (not SRC-20/101)", () => {
   const stamp = {
     stamp_url: "https://stampchain.io/stamps/data.json",
     ident: "OTHER",
   } as any;
-  const result = await getStampImageSrc(stamp);
+  const result = getStampImageSrc(stamp);
   assertEquals(result, NOT_AVAILABLE_IMAGE);
 });
 
-Deno.test("getStampImageSrc - handles empty stamp_url string", async () => {
+Deno.test("getStampImageSrc - handles empty stamp_url string", () => {
   const stamp = { stamp_url: "" } as any;
-  const result = await getStampImageSrc(stamp);
+  const result = getStampImageSrc(stamp);
   assertEquals(result, NOT_AVAILABLE_IMAGE);
 });
 
-Deno.test("getStampImageSrc - handles undefined stamp_url", async () => {
+Deno.test("getStampImageSrc - handles undefined stamp_url", () => {
   const stamp = { stamp_url: undefined } as any;
-  const result = await getStampImageSrc(stamp);
+  const result = getStampImageSrc(stamp);
   assertEquals(result, NOT_AVAILABLE_IMAGE);
 });
 
@@ -703,29 +666,25 @@ Deno.test("detectContentType - handles filename without extension", () => {
   assertEquals(result.isJavaScript, false);
 });
 
-Deno.test("getStampImageSrc - handles malformed URL extraction", async () => {
-  const stamp = {
-    stamp_url: "malformed-url-no-stamps-path",
-  } as any;
-  const result = await getStampImageSrc(stamp);
-  assertEquals(result, "https://stampchain.io/content/malformed-url-no-stamps-path");
+Deno.test("getStampImageSrc - handles malformed URL extraction", () => {
+  // Ensure test environment
+  const originalEnv = Deno.env.get("DENO_ENV");
+  Deno.env.set("DENO_ENV", "test");
+  
+  try {
+    const stamp = {
+      stamp_url: "malformed-url-no-stamps-path",
+    } as any;
+    const result = getStampImageSrc(stamp);
+    assertEquals(result, "https://stampchain.io/content/malformed-url-no-stamps-path");
+  } finally {
+    if (originalEnv) {
+      Deno.env.set("DENO_ENV", originalEnv);
+    }
+  }
 });
 
-Deno.test("getStampImageSrc - handles SRC-101 fetch not ok response", async () => {
-  const originalFetch = globalThis.fetch;
-  globalThis.fetch = () => {
-    return Promise.resolve(new Response("", { status: 404 }));
-  };
-
-  const stamp = {
-    stamp_url: "https://stampchain.io/stamps/src101.json",
-    ident: "SRC-101",
-  } as any;
-  const result = await getStampImageSrc(stamp);
-  assertEquals(result, NOT_AVAILABLE_IMAGE);
-
-  globalThis.fetch = originalFetch;
-});
+// Removed SRC-101 fetch test - getStampImageSrc is now synchronous
 
 Deno.test("isValidSVG - handles parser error", () => {
   const originalDOMParser = globalThis.DOMParser;

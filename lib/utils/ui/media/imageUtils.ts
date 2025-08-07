@@ -105,7 +105,7 @@ export const mimeTypeToSuffix = Object.entries(mimeTypes).reduce(
   {} as { [key: string]: string },
 );
 
-export const getStampImageSrc = async (stamp: StampRow): Promise<string> => {
+export const getStampImageSrc = (stamp: StampRow): string => {
   const baseUrl = getBaseUrl();
   if (!stamp.stamp_url) {
     return NOT_AVAILABLE_IMAGE;
@@ -123,40 +123,20 @@ export const getStampImageSrc = async (stamp: StampRow): Promise<string> => {
     return NOT_AVAILABLE_IMAGE;
   }
 
-  // SRC-101 stamps may contain image URLs in their JSON metadata
-  if (stamp.stamp_url.includes("json") && stamp.ident === "SRC-101") {
-    try {
-      const res = await fetch(stamp.stamp_url);
-      if (!res.ok) {
-        return NOT_AVAILABLE_IMAGE;
-      }
-
-      const jsonData = await res.json();
-      if (
-        jsonData && jsonData.img && Array.isArray(jsonData.img) &&
-        jsonData.img.length > 0
-      ) {
-        return jsonData.img[0];
-      }
-      return NOT_AVAILABLE_IMAGE;
-    } catch (_e) {
-      // Silently handle JSON parsing errors - just return placeholder
-      // This prevents console spam for malformed JSON
-      return NOT_AVAILABLE_IMAGE;
-    }
-  } else if (stamp.stamp_url.includes("json")) {
-    // For other JSON stamps (pure data, etc.), just show placeholder
-    // These are data stamps, not image stamps
+  // For JSON stamps (including SRC-101), just show placeholder
+  // We can't fetch JSON synchronously, and these are data stamps anyway
+  if (stamp.stamp_url.includes("json")) {
     return NOT_AVAILABLE_IMAGE;
-  } else {
-    // For non-JSON stamps (like HTML/PNG/etc.), handle content path extraction
-    const urlParts = stamp.stamp_url.split("/stamps/");
-    const contentPath = urlParts.length > 1
-      ? urlParts[1].replace(/.html$/, "")
-      : stamp.stamp_url.split("/").pop();
-
-    return `${baseUrl}/content/${contentPath}`;
   }
+
+  // Extract filename from full URL if present (same as main branch)
+  const urlParts = stamp.stamp_url.split("/stamps/");
+  const filename = urlParts.length > 1
+    ? urlParts[1].replace(".html", "")
+    : stamp.stamp_url;
+
+  // Use /content/ path which has server-side HTML cleaning (same as main branch)
+  return `${baseUrl}/content/${filename}`;
 };
 
 /**

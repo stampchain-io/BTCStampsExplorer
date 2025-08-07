@@ -234,7 +234,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
       setFileSize(res);
     } else if (stamp.stamp_mimetype?.startsWith("image/")) {
       // Handle images
-      const src = await getStampImageSrc(stamp);
+      const src = getStampImageSrc(stamp);
       const img = new Image();
       img.onload = () => {
         setImageDimensions({

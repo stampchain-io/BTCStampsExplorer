@@ -78,9 +78,9 @@ export function StampCard({
     return 6;
   };
 
-  const fetchStampImage = async () => {
+  const fetchStampImage = () => {
     setLoading(true);
-    const res = await getStampImageSrc(stamp as StampRow);
+    const res = getStampImageSrc(stamp as StampRow);
     if (res) {
       setSrc(res);
     } else setSrc(NOT_AVAILABLE_IMAGE);

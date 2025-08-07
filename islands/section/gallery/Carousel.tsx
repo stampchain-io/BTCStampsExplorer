@@ -82,7 +82,7 @@ export default function CarouselGallery(props: CarouselHomeProps) {
           }
 
           // Get proper stamp URL using getStampImageSrc
-          const src = await getStampImageSrc(stamp);
+          const src = getStampImageSrc(stamp);
           sources[stamp.tx_hash] = src;
 
           // Handle HTML content

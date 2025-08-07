@@ -336,9 +336,9 @@ function DispenserRow(
   const [src, setSrc] = useState("");
 
   /* ===== IMAGE FETCHING ===== */
-  const fetchStampImage = async () => {
+  const fetchStampImage = () => {
     setLoading(true);
-    const res = await getStampImageSrc(dispenser.stamp as StampRow);
+    const res = getStampImageSrc(dispenser.stamp as StampRow);
     if (res) {
       setSrc(res);
     } else setSrc(NOT_AVAILABLE_IMAGE);
