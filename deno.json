@@ -186,6 +186,7 @@
     "$icon": "./components/icon/index.ts",
     "$form": "./components/form/index.ts",
     "$notification": "./components/notification/index.ts",
+    "$indicators": "./components/indicators/index.ts",
     "$table": "./islands/table/index.ts",
     "$fee": "./components/fee/index.ts",
     "$fees": "./lib/hooks/useFees.ts",

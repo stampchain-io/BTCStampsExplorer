@@ -85,10 +85,10 @@ const WalletStampCardComponent = (
     return 6;
   };
 
-  const fetchStampImage = async () => {
+  const fetchStampImage = () => {
     setLoading(true);
     // Use centralized image URL logic
-    const imageSrc = await getStampImageSrc(stamp);
+    const imageSrc = getStampImageSrc(stamp);
     setSrc(imageSrc);
     setLoading(false);
   };
