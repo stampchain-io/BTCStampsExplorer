@@ -6,18 +6,16 @@ import { BlockService } from "$server/services/core/blockService.ts";
 import { CollectionService } from "$server/services/core/collectionService.ts";
 import { BTCPriceService } from "$server/services/price/btcPriceService.ts";
 import { StampService } from "$server/services/stampService.ts";
-import { StampRepository } from "$server/database/stampRepository.ts";
 import type { CollectionRow } from "$server/types/collection.d.ts";
 import type {SUBPROTOCOLS} from "$types/base.d.ts";
 // import { formatSatoshisToBTC } from "$lib/utils/ui/formatting/formatUtils.ts"; // Fixed: Removed unused import
 import { normalizeHeaders } from "$lib/utils/api/headers/headerUtils.ts";
 import { API_RESPONSE_VERSION, ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { WebResponseUtil } from "$lib/utils/api/responses/webResponseUtil.ts";
-import { getRecursiveHeaders } from "$lib/utils/security/securityHeaders.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { isCpid } from "$lib/utils/typeGuards.ts";
 import { decodeBase64 } from "$lib/utils/ui/formatting/formatUtils.ts";
-import { getBaseUrl, getMimeType } from "$lib/utils/ui/media/imageUtils.ts";
+import { detectContentType, getMimeType } from "$lib/utils/ui/media/imageUtils.ts";
 import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
 import { RouteType } from "$server/services/infrastructure/cacheService.ts";
 import type { PaginatedStampBalanceResponseBody } from "$types/api.d.ts";
@@ -760,8 +758,9 @@ export class StampController {
     _baseUrl?: string,
     contentType: string = 'application/octet-stream'
   ) {
-    // Use centralized getBaseUrl function for consistency
-    const cdnBaseUrl = getBaseUrl();
+    // ALWAYS use production CDN for /stamps/ content
+    // These files don't exist locally
+    const cdnBaseUrl = "https://stampchain.io";
     const proxyPath = `${cdnBaseUrl}/stamps/${identifier}`;
 
     try {
@@ -843,97 +842,10 @@ export class StampController {
     }
   }
 
-  private static async handleFullPathStamp(identifier: string, baseUrl?: string) {
+  private static handleFullPathStamp(identifier: string, baseUrl?: string) {
     const [, extension] = identifier.split(".");
     const contentType = getMimeType(extension);
 
-    // For HTML files, check if we have base64 data to process server-side
-    // This prevents Cloudflare Rocket Loader transformations
-    if (extension === 'html') {
-      try {
-        // Extract the base identifier without extension
-        const [baseId] = identifier.split(".");
-        const result = await StampRepository.getStampFileWithContent(baseId);
-        
-        if (result && result.stamp_base64 && 
-            (result.stamp_mimetype?.includes('html') || 
-             result.stamp_mimetype?.includes('text/plain'))) {
-          // Process content server-side to remove Cloudflare Rocket Loader
-          return await this.handleTextContent(
-            { body: result.stamp_base64 },
-            { mimeType: result.stamp_mimetype },
-            identifier
-          );
-        }
-      } catch (error) {
-        logger.debug("stamps", {
-          message: "Failed to get stamp data for HTML server-side processing, falling back to proxy",
-          identifier,
-          error: error instanceof Error ? error.message : String(error)
-        });
-      }
-    }
-
-    // For SVG files, serve directly from base64 if available (no HTML processing needed)
-    if (extension === 'svg') {
-      try {
-        // Extract the base identifier without extension
-        const [baseId] = identifier.split(".");
-        const result = await StampRepository.getStampFileWithContent(baseId);
-        
-        if (result && result.stamp_base64 && result.stamp_mimetype?.includes('svg')) {
-          // Decode base64 and serve directly as SVG (no HTML processing)
-          let svgContent = atob(result.stamp_base64);
-          
-          // Check if SVG has external references and rewrite them to use our proxy
-          const hasExternalRefs = svgContent.includes("ordinals.com/content/") || 
-                                  svgContent.includes("arweave.net/");
-          
-          if (hasExternalRefs) {
-            // Rewrite external references to use our proxy
-            svgContent = svgContent.replace(
-              /https:\/\/ordinals\.com\/content\/([^"'\s>]+)/g,
-              "/api/proxy/ordinals/$1"
-            );
-            svgContent = svgContent.replace(
-              /https:\/\/arweave\.net\/([^"'\s>]+)/g,
-              "/api/proxy/arweave/$1"
-            );
-          }
-          
-          // Use WebResponseUtil.stampResponse with recursive headers for SVGs with external refs
-          // This ensures proper CSP headers are applied
-          if (hasExternalRefs) {
-            return WebResponseUtil.stampResponse(svgContent, result.stamp_mimetype, {
-              binary: false,
-              headers: {
-                ...getRecursiveHeaders({ forceNoCache: false }), // Permissive CSP for external refs
-                "Cache-Control": "public, max-age=31536000",
-                "X-Served-From": "database-base64-with-proxy"
-              }
-            });
-          } else {
-            // Regular SVG without external refs can use standard headers
-            return new Response(svgContent, {
-              status: 200,
-              headers: {
-                "Content-Type": result.stamp_mimetype,
-                "Cache-Control": "public, max-age=31536000",
-                "X-Served-From": "database-base64"
-              }
-            });
-          }
-        }
-      } catch (error) {
-        logger.debug("stamps", {
-          message: "Failed to get stamp data for SVG server-side processing, falling back to proxy",
-          identifier,
-          error: error instanceof Error ? error.message : String(error)
-        });
-      }
-    }
-
-    // Fallback to CDN proxy for non-HTML/SVG or when base64 data not available
     return this.proxyContentRouteToStampsRoute(
       identifier,
       `${baseUrl}/stamps/${identifier}`,
@@ -942,78 +854,24 @@ export class StampController {
     );
   }
 
-  private static async handleStampContent(result: any, identifier: string) {
-    // Process HTML content server-side when base64 data is available
-    // This ensures Cloudflare Rocket Loader transformations are removed
-    const needsHtmlProcessing = result.stamp_base64 && (
-      result.stamp_mimetype?.includes('html') ||
-      (result.stamp_mimetype?.includes('text/plain') && identifier.endsWith('.html'))
+  private static handleStampContent(result: any, identifier: string) {
+    const contentInfo = detectContentType(
+      result.body,
+      undefined,
+      result.headers["Content-Type"] as string | undefined
     );
 
-    if (needsHtmlProcessing) {
-      // Process HTML content server-side to remove Cloudflare Rocket Loader
-      return await this.handleTextContent(
-        { body: result.stamp_base64 },
-        { mimeType: result.stamp_mimetype },
-        identifier
-      );
+    const needsDecoding =
+      contentInfo.mimeType.includes('javascript') ||
+      contentInfo.mimeType.includes('text/') ||
+      contentInfo.mimeType.includes('application/json') ||
+      contentInfo.mimeType.includes('xml');
+
+    if (needsDecoding) {
+      return this.handleTextContent(result, contentInfo, identifier);
     }
 
-    // For SVG content, serve directly without HTML processing
-    const needsSvgProcessing = result.stamp_base64 && result.stamp_mimetype?.includes('svg');
-    if (needsSvgProcessing) {
-      let svgContent = atob(result.stamp_base64);
-      
-      // Check if SVG has external references and rewrite them to use our proxy
-      const hasExternalRefs = svgContent.includes("ordinals.com/content/") || 
-                              svgContent.includes("arweave.net/");
-      
-      if (hasExternalRefs) {
-        // Rewrite external references to use our proxy
-        svgContent = svgContent.replace(
-          /https:\/\/ordinals\.com\/content\/([^"'\s>]+)/g,
-          "/api/proxy/ordinals/$1"
-        );
-        svgContent = svgContent.replace(
-          /https:\/\/arweave\.net\/([^"'\s>]+)/g,
-          "/api/proxy/arweave/$1"
-        );
-        
-        // Use WebResponseUtil.stampResponse with recursive headers for external refs
-        return WebResponseUtil.stampResponse(svgContent, result.stamp_mimetype, {
-          binary: false,
-          headers: {
-            ...getRecursiveHeaders({ forceNoCache: false }), // Permissive CSP for external refs
-            "Cache-Control": "public, max-age=31536000",
-            "X-Served-From": "database-base64-with-proxy"
-          }
-        });
-      } else {
-        // Regular SVG without external refs can use standard headers
-        return new Response(svgContent, {
-          status: 200,
-          headers: {
-            "Content-Type": result.stamp_mimetype,
-            "Cache-Control": "public, max-age=31536000",
-            "X-Served-From": "database-base64"
-          }
-        });
-      }
-    }
-    
-    // For other content types or when base64 not available, redirect to CDN
-    if (result.stamp_url) {
-      return new Response(null, {
-        status: 302,
-        headers: {
-          "Location": result.stamp_url,
-          "Cache-Control": "public, max-age=31536000, immutable"
-        }
-      });
-    }
-    
-    // Fallback if no stamp_url
-    return WebResponseUtil.stampNotFound();
+    return this.handleBinaryContent(result, contentInfo);
   }
 
   private static async handleTextContent(result: any, contentInfo: any, identifier: string) {
@@ -1035,68 +893,32 @@ export class StampController {
         );
       }
 
-      // Apply comprehensive Cloudflare Rocket Loader fixes to HTML content
+      // Apply Cloudflare Rocket Loader fixes to HTML content (including SVG with HTML structure)
       if (contentInfo.mimeType.includes('html') || decodedContent.includes('<html') || decodedContent.includes('<script')) {
-        // Step 1: Fix ALL script tags - remove any Cloudflare mangling
+        // Step 1: Ensure scripts have correct type and data-cfasync="false"
         decodedContent = decodedContent.replace(
           /(<script[^>]*?)>/g,
           (_match, openingTagInnerContentAndAttributes) => {
             let tag = openingTagInnerContentAndAttributes;
-
-            // Remove ALL Cloudflare type manglings - any hex prefix before -text/javascript
+            // Correct type if it's mangled by Cloudflare Rocket Loader
             tag = tag.replace(
-              /type\s*=\s*"[a-f0-9]+-text\/javascript"/gi,
+              /type\s*=\s*"[a-f0-9]{24}-text\/javascript"/i,
               'type="text/javascript"',
             );
-
-            // Remove data-cf-settings attributes that Cloudflare adds
-            tag = tag.replace(
-              /data-cf-settings\s*=\s*"[^"]*"/gi,
-              '',
-            );
-
-            // Remove defer attributes from rocket-loader scripts
-            tag = tag.replace(
-              /\s+defer(?:\s*=\s*["']?defer["']?)?/gi,
-              '',
-            );
-
-            // Add data-cfasync="false" to prevent any Rocket Loader processing
-            // but not for cdn-cgi scripts which we'll remove entirely
-            if (!tag.includes("data-cfasync") && !tag.includes("/cdn-cgi/")) {
+            // Add data-cfasync="false" if not already present
+            if (!tag.includes('data-cfasync="false"')) {
               tag += ' data-cfasync="false"';
             }
-
             return tag + ">";
           },
         );
 
-        // Step 2: Remove ALL Cloudflare Rocket Loader injected script tags
+        // Step 2: Globally correct any remaining mangled script types
+        // Cloudflare's Rocket Loader might change type="text/javascript"
+        // to type="<hex_value>-text/javascript". This reverts that change.
         decodedContent = decodedContent.replace(
-          /<script[^>]*\/cdn-cgi\/scripts\/[^>]*rocket-loader[^>]*>[^<]*<\/script>/gi,
-          "",
-        );
-        
-        // Also remove any script with mangled type that loads rocket-loader
-        decodedContent = decodedContent.replace(
-          /<script[^>]*type="[a-f0-9]{8,}-text\/javascript"[^>]*src="[^"]*rocket-loader[^"]*"[^>]*><\/script>/gi,
-          "",
-        );
-
-        // Step 3: Remove any remaining Cloudflare Rocket Loader references
-        decodedContent = decodedContent.replace(
-          /data-cf-beacon=["'][^"']*["']/gi,
-          "",
-        );
-
-        // Step 4: Clean up any malformed script src attributes with encoded quotes
-        decodedContent = decodedContent.replace(
-          /src=["']([^"']*%22[^"']*)["']/gi,
-          (_match, srcValue) => {
-            // Decode any URL-encoded quotes and fix malformed paths
-            const cleanSrc = srcValue.replace(/%22/g, "");
-            return `src="${cleanSrc}"`;
-          },
+          /type\s*=\s*"[a-f0-9]{24}-text\/javascript"/gi,
+          'type="text/javascript"',
         );
       }
 

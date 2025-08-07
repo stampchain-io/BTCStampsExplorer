@@ -8,25 +8,17 @@ import type { SRC20Row } from "$types/src20.d.ts";
  * Used for constructing fully qualified URLs
  */
 export const getBaseUrl = (): string => {
-  // For stamp images, always use the production CDN URL
-  // regardless of the current environment
-  // This ensures images are always loaded from the CDN
-  const env = typeof Deno !== "undefined" ? Deno.env.get("DENO_ENV") : null;
+  // Always use relative URLs for /content/ and /s/ endpoints
+  // This ensures images work the same way regardless of environment
+  // The route handlers will proxy to production CDN when needed
+  return "";
+};
 
-  // For testing, always return production CDN
-  if (env === "test") {
-    return "https://stampchain.io";
-  }
-
-  // Check for DEV_BASE_URL environment variable first
-  if (env === "development" && typeof Deno !== "undefined") {
-    const devBaseUrl = Deno.env.get("DEV_BASE_URL");
-    if (devBaseUrl) {
-      return devBaseUrl;
-    }
-  }
-
-  // Default to production CDN
+/**
+ * Get the CDN URL - always returns production CDN
+ * Used for assets that only exist on the CDN
+ */
+export const getCdnUrl = (): string => {
   return "https://stampchain.io";
 };
 
@@ -38,8 +30,9 @@ export const constructStampUrl = (
   txHash: string,
   extension = "svg",
 ): string => {
-  const baseUrl = getBaseUrl();
-  return `${baseUrl}/stamps/${txHash}.${extension}`;
+  // Always use CDN for /stamps/ assets
+  const cdnUrl = getCdnUrl();
+  return `${cdnUrl}/stamps/${txHash}.${extension}`;
 };
 
 // Extended MIME types including all supported formats for stamps and web assets
@@ -118,7 +111,9 @@ export const getStampImageSrc = (stamp: StampRow): string => {
     const urlParts = stamp.stamp_url.split("/stamps/");
     if (urlParts.length > 1) {
       const filename = urlParts[1].replace(".json", ".svg");
-      return `${baseUrl}/stamps/${filename}`;
+      // Always use CDN for /stamps/ assets
+      const cdnUrl = getCdnUrl();
+      return `${cdnUrl}/stamps/${filename}`;
     }
     return NOT_AVAILABLE_IMAGE;
   }
@@ -136,8 +131,9 @@ export const getStampImageSrc = (stamp: StampRow): string => {
   // For HTML stamps, use the /content/ endpoint which processes recursive content
   // The /content/ endpoint will handle HTML cleaning and recursive image loading
   if (stamp.stamp_mimetype === "text/html" || filename.endsWith(".html")) {
-    // Important: Include the full filename with extension for HTML
-    return `${baseUrl}/content/${filename}`;
+    // Strip the .html extension for the /content/ endpoint
+    const htmlFilename = filename.replace(/\.html?$/i, "");
+    return `${baseUrl}/content/${htmlFilename}`;
   }
 
   // For SVG stamps, also use /content/ to handle external references
@@ -145,10 +141,8 @@ export const getStampImageSrc = (stamp: StampRow): string => {
     return `${baseUrl}/content/${filename}`;
   }
 
-  // For other stamps (images, etc.), use the direct CDN URL
-  return stamp.stamp_url.startsWith("http") 
-    ? stamp.stamp_url 
-    : `${baseUrl}/stamps/${filename}`;
+  // For other stamps (images, etc.), use the /content/ endpoint
+  return `${baseUrl}/content/${filename}`;
 };
 
 /**
