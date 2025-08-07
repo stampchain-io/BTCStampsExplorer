@@ -13,6 +13,7 @@ import type {SUBPROTOCOLS} from "$types/base.d.ts";
 import { normalizeHeaders } from "$lib/utils/api/headers/headerUtils.ts";
 import { API_RESPONSE_VERSION, ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { WebResponseUtil } from "$lib/utils/api/responses/webResponseUtil.ts";
+import { getRecursiveHeaders } from "$lib/utils/security/securityHeaders.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { isCpid } from "$lib/utils/typeGuards.ts";
 import { decodeBase64 } from "$lib/utils/ui/formatting/formatUtils.ts";
@@ -882,15 +883,46 @@ export class StampController {
         
         if (result && result.stamp_base64 && result.stamp_mimetype?.includes('svg')) {
           // Decode base64 and serve directly as SVG (no HTML processing)
-          const svgContent = atob(result.stamp_base64);
-          return new Response(svgContent, {
-            status: 200,
-            headers: {
-              "Content-Type": result.stamp_mimetype,
-              "Cache-Control": "public, max-age=31536000",
-              "X-Served-From": "database-base64"
-            }
-          });
+          let svgContent = atob(result.stamp_base64);
+          
+          // Check if SVG has external references and rewrite them to use our proxy
+          const hasExternalRefs = svgContent.includes("ordinals.com/content/") || 
+                                  svgContent.includes("arweave.net/");
+          
+          if (hasExternalRefs) {
+            // Rewrite external references to use our proxy
+            svgContent = svgContent.replace(
+              /https:\/\/ordinals\.com\/content\/([^"'\s>]+)/g,
+              "/api/proxy/ordinals/$1"
+            );
+            svgContent = svgContent.replace(
+              /https:\/\/arweave\.net\/([^"'\s>]+)/g,
+              "/api/proxy/arweave/$1"
+            );
+          }
+          
+          // Use WebResponseUtil.stampResponse with recursive headers for SVGs with external refs
+          // This ensures proper CSP headers are applied
+          if (hasExternalRefs) {
+            return WebResponseUtil.stampResponse(svgContent, result.stamp_mimetype, {
+              binary: false,
+              headers: {
+                ...getRecursiveHeaders({ forceNoCache: false }), // Permissive CSP for external refs
+                "Cache-Control": "public, max-age=31536000",
+                "X-Served-From": "database-base64-with-proxy"
+              }
+            });
+          } else {
+            // Regular SVG without external refs can use standard headers
+            return new Response(svgContent, {
+              status: 200,
+              headers: {
+                "Content-Type": result.stamp_mimetype,
+                "Cache-Control": "public, max-age=31536000",
+                "X-Served-From": "database-base64"
+              }
+            });
+          }
         }
       } catch (error) {
         logger.debug("stamps", {
@@ -930,15 +962,43 @@ export class StampController {
     // For SVG content, serve directly without HTML processing
     const needsSvgProcessing = result.stamp_base64 && result.stamp_mimetype?.includes('svg');
     if (needsSvgProcessing) {
-      const svgContent = atob(result.stamp_base64);
-      return new Response(svgContent, {
-        status: 200,
-        headers: {
-          "Content-Type": result.stamp_mimetype,
-          "Cache-Control": "public, max-age=31536000",
-          "X-Served-From": "database-base64"
-        }
-      });
+      let svgContent = atob(result.stamp_base64);
+      
+      // Check if SVG has external references and rewrite them to use our proxy
+      const hasExternalRefs = svgContent.includes("ordinals.com/content/") || 
+                              svgContent.includes("arweave.net/");
+      
+      if (hasExternalRefs) {
+        // Rewrite external references to use our proxy
+        svgContent = svgContent.replace(
+          /https:\/\/ordinals\.com\/content\/([^"'\s>]+)/g,
+          "/api/proxy/ordinals/$1"
+        );
+        svgContent = svgContent.replace(
+          /https:\/\/arweave\.net\/([^"'\s>]+)/g,
+          "/api/proxy/arweave/$1"
+        );
+        
+        // Use WebResponseUtil.stampResponse with recursive headers for external refs
+        return WebResponseUtil.stampResponse(svgContent, result.stamp_mimetype, {
+          binary: false,
+          headers: {
+            ...getRecursiveHeaders({ forceNoCache: false }), // Permissive CSP for external refs
+            "Cache-Control": "public, max-age=31536000",
+            "X-Served-From": "database-base64-with-proxy"
+          }
+        });
+      } else {
+        // Regular SVG without external refs can use standard headers
+        return new Response(svgContent, {
+          status: 200,
+          headers: {
+            "Content-Type": result.stamp_mimetype,
+            "Cache-Control": "public, max-age=31536000",
+            "X-Served-From": "database-base64"
+          }
+        });
+      }
     }
     
     // For other content types or when base64 not available, redirect to CDN
