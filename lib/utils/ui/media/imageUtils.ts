@@ -129,14 +129,26 @@ export const getStampImageSrc = (stamp: StampRow): string => {
     return NOT_AVAILABLE_IMAGE;
   }
 
-  // Extract filename from full URL if present (same as main branch)
+  // Extract filename from full URL if present
   const urlParts = stamp.stamp_url.split("/stamps/");
-  const filename = urlParts.length > 1
-    ? urlParts[1].replace(".html", "")
-    : stamp.stamp_url;
+  const filename = urlParts.length > 1 ? urlParts[1] : stamp.stamp_url;
 
-  // Use /content/ path which has server-side HTML cleaning (same as main branch)
-  return `${baseUrl}/content/${filename}`;
+  // For HTML stamps, use the /content/ endpoint which processes recursive content
+  // The /content/ endpoint will handle HTML cleaning and recursive image loading
+  if (stamp.stamp_mimetype === "text/html" || filename.endsWith(".html")) {
+    // Important: Include the full filename with extension for HTML
+    return `${baseUrl}/content/${filename}`;
+  }
+
+  // For SVG stamps, also use /content/ to handle external references
+  if (stamp.stamp_mimetype === "image/svg+xml" || filename.endsWith(".svg")) {
+    return `${baseUrl}/content/${filename}`;
+  }
+
+  // For other stamps (images, etc.), use the direct CDN URL
+  return stamp.stamp_url.startsWith("http") 
+    ? stamp.stamp_url 
+    : `${baseUrl}/stamps/${filename}`;
 };
 
 /**
