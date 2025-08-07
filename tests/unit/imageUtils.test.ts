@@ -182,23 +182,43 @@ Deno.test("getStampImageSrc - handles SRC-20 fetch errors", () => {
 });
 
 Deno.test("getStampImageSrc - handles HTML stamp URL extraction", () => {
-  const stamp = {
-    stamp_url: "https://stampchain.io/stamps/content.html",
-    stamp_mimetype: "text/html",
-    tx_hash: "abc123"
-  } as any;
-  const result = getStampImageSrc(stamp);
-  // Now using relative URLs - /content/ path without .html extension
-  assertEquals(result, "/content/content");
+  // Ensure test environment
+  const originalEnv = Deno.env.get("DENO_ENV");
+  Deno.env.set("DENO_ENV", "test");
+  
+  try {
+    const stamp = {
+      stamp_url: "https://stampchain.io/stamps/content.html",
+      stamp_mimetype: "text/html",
+      tx_hash: "abc123"
+    } as any;
+    const result = getStampImageSrc(stamp);
+    // In test environment, uses full URLs - /content/ path without .html extension
+    assertEquals(result, "https://stampchain.io/content/content");
+  } finally {
+    if (originalEnv) {
+      Deno.env.set("DENO_ENV", originalEnv);
+    }
+  }
 });
 
 Deno.test("getStampImageSrc - handles complex HTML stamp URL", () => {
-  const stamp = {
-    stamp_url: "https://stampchain.io/stamps/path/to/file.html",
-  } as any;
-  const result = getStampImageSrc(stamp);
-  // Now using relative URLs
-  assertEquals(result, "/content/path/to/file");
+  // Ensure test environment
+  const originalEnv = Deno.env.get("DENO_ENV");
+  Deno.env.set("DENO_ENV", "test");
+  
+  try {
+    const stamp = {
+      stamp_url: "https://stampchain.io/stamps/path/to/file.html",
+    } as any;
+    const result = getStampImageSrc(stamp);
+    // In test environment, uses full URLs
+    assertEquals(result, "https://stampchain.io/content/path/to/file");
+  } finally {
+    if (originalEnv) {
+      Deno.env.set("DENO_ENV", originalEnv);
+    }
+  }
 });
 
 Deno.test("getStampImageSrc - handles SRC-101 stamps", () => {
@@ -215,12 +235,22 @@ Deno.test("getStampImageSrc - handles SRC-101 stamps", () => {
 // and doesn't fetch JSON data anymore
 
 Deno.test("getStampImageSrc - handles non-JSON stamps", () => {
-  const stamp = {
-    stamp_url: "https://stampchain.io/stamps/image.png",
-  } as any;
-  const result = getStampImageSrc(stamp);
-  // Now using relative URLs
-  assertEquals(result, "/content/image.png");
+  // Ensure test environment
+  const originalEnv = Deno.env.get("DENO_ENV");
+  Deno.env.set("DENO_ENV", "test");
+  
+  try {
+    const stamp = {
+      stamp_url: "https://stampchain.io/stamps/image.png",
+    } as any;
+    const result = getStampImageSrc(stamp);
+    // In test environment, uses full URLs
+    assertEquals(result, "https://stampchain.io/content/image.png");
+  } finally {
+    if (originalEnv) {
+      Deno.env.set("DENO_ENV", originalEnv);
+    }
+  }
 });
 
 Deno.test("getStampImageSrc - handles other JSON stamps (not SRC-20/101)", () => {
@@ -659,12 +689,22 @@ Deno.test("detectContentType - handles filename without extension", () => {
 });
 
 Deno.test("getStampImageSrc - handles malformed URL extraction", () => {
-  const stamp = {
-    stamp_url: "malformed-url-no-stamps-path",
-  } as any;
-  const result = getStampImageSrc(stamp);
-  // Now using relative URLs
-  assertEquals(result, "/content/malformed-url-no-stamps-path");
+  // Ensure test environment
+  const originalEnv = Deno.env.get("DENO_ENV");
+  Deno.env.set("DENO_ENV", "test");
+  
+  try {
+    const stamp = {
+      stamp_url: "malformed-url-no-stamps-path",
+    } as any;
+    const result = getStampImageSrc(stamp);
+    // In test environment, uses full URLs
+    assertEquals(result, "https://stampchain.io/content/malformed-url-no-stamps-path");
+  } finally {
+    if (originalEnv) {
+      Deno.env.set("DENO_ENV", originalEnv);
+    }
+  }
 });
 
 // Removed SRC-101 fetch test - getStampImageSrc is now synchronous
