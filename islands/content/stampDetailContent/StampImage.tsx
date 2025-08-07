@@ -1,23 +1,23 @@
 /* ===== STAMP IMAGE COMPONENT ===== */
 /* @baba-update audio icon size (custom) - 780*/
 
+import {
+  AUDIO_FILE_IMAGE,
+  LIBRARY_FILE_IMAGE,
+  NOT_AVAILABLE_IMAGE,
+} from "$constants";
 import { Icon, LoadingIcon } from "$icon";
-import type { StampRow } from "$types/stamp.d.ts";
 import TextContentIsland from "$islands/content/stampDetailContent/StampTextContent.tsx";
 import PreviewCodeModal from "$islands/modal/PreviewCodeModal.tsx";
 import PreviewImageModal from "$islands/modal/PreviewImageModal.tsx";
 import { openModal } from "$islands/modal/states.ts";
 import { body, containerDetailImage, gapSectionSlim } from "$layout";
 import {
-  AUDIO_FILE_IMAGE,
-  LIBRARY_FILE_IMAGE,
-  NOT_AVAILABLE_IMAGE,
-} from "$constants";
-import {
   getStampImageSrc,
   handleImageError,
 } from "$lib/utils/ui/media/imageUtils.ts";
 import { tooltipIcon } from "$notification";
+import type { StampRow } from "$types/stamp.d.ts";
 import { VNode } from "preact";
 import { useEffect, useRef, useState } from "preact/hooks";
 
@@ -477,6 +477,7 @@ export function StampImage(
     if (!stamp) return;
     setLoading(true);
     const res = getStampImageSrc(stamp);
+
     if (res) {
       setSrc(res);
     } else setSrc(NOT_AVAILABLE_IMAGE);
@@ -753,22 +754,48 @@ export function StampImage(
         <div className={`${className} ${body} ${gapSectionSlim}`}>
           <div className={`relative ${flag ? containerDetailImage : ""}`}>
             <div className="stamp-container">
-              <div className="relative pt-[100%]">
+              <div className="relative pt-[100%] rounded overflow-hidden">
+                {/* Show placeholder image as background while loading */}
+                <img
+                  src={NOT_AVAILABLE_IMAGE}
+                  alt="Loading..."
+                  className="absolute top-0 left-0 w-full h-full object-contain rounded pixelart"
+                  style={{ zIndex: 0 }}
+                />
+                {console.log("Rendering iframe with src:", src)}
                 <iframe
                   width="100%"
                   height="100%"
                   scrolling="no"
                   className={`${
                     className || ""
-                  } rounded absolute top-0 left-0 pointer-events-none`}
+                  } rounded absolute top-0 left-0 w-full h-full bg-transparent`}
                   sandbox="allow-scripts allow-same-origin"
                   src={src || ""}
                   loading="lazy"
-                  style={{ transform: transform || "none" }}
-                  onError={handleImageError}
+                  style={{
+                    transform: transform || "none",
+                    border: "none",
+                    display: "block",
+                    backgroundColor: "transparent",
+                    zIndex: 1,
+                  }}
+                  onLoad={(e) => {
+                    console.log("Iframe loaded successfully:", src);
+                    // Hide the placeholder once iframe loads
+                    const iframe = e.currentTarget as HTMLIFrameElement;
+                    const placeholder = iframe
+                      .previousElementSibling as HTMLElement;
+                    if (placeholder) {
+                      placeholder.style.display = "none";
+                    }
+                  }}
+                  onError={(e) => {
+                    console.error("Iframe load error:", e, src);
+                    handleImageError(e);
+                  }}
                   title="Stamp"
                 />
-                <div className="absolute inset-0 cursor-pointer" />
               </div>
             </div>
           </div>
