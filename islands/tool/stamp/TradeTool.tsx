@@ -25,10 +25,8 @@ import { InputField } from "$form";
 import { bodyTool, containerBackground } from "$layout";
 import type { UTXO, XcpBalance } from "$lib/types/index.d.ts";
 import { StatusMessages } from "$notification";
-import {
-  ComposeAttachOptions,
-  normalizeFeeRate,
-} from "$server/services/counterpartyApiService.ts";
+import type { ComposeAttachOptions } from "$types/services.d.ts";
+import { normalizeFeeRate } from "$lib/utils/fees.ts";
 import { subtitlePurple, titlePurpleLD } from "$text";
 
 /* ===== CONSTANTS ===== */

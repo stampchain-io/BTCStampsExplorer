@@ -5,10 +5,27 @@ import { CollectionCard } from "$card";
 import { BREAKPOINTS } from "$constants";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
-import type {
-  Collection,
-  CollectionGalleryProps,
-} from "$server/types/collection.d.ts";
+import type { Collection } from "$types/stamp.d.ts";
+// Local copy of props to avoid importing server-only types
+export interface CollectionGalleryProps {
+  title?: string;
+  subTitle?: string;
+  collections: Collection[];
+  gridClass: string;
+  displayCounts?: {
+    desktop?: number;
+    tablet?: number;
+    mobileLg?: number;
+    mobileMd?: number;
+    mobileSm?: number;
+  };
+  pagination?: {
+    page: number;
+    totalPages: number;
+    prefix?: string;
+    onPageChange?: (page: number) => void;
+  };
+}
 import { subtitlePurple, titlePurpleLD } from "$text";
 import { useEffect, useState } from "preact/hooks";
 

@@ -1,8 +1,6 @@
 /* ===== COLLECTION DETAILS HEADER COMPONENT ===== */
-import type {
-  CollectionWithOptionalMarketData,
-  StampRow,
-} from "$server/types/collection.d.ts";
+import type { CollectionWithOptionalMarketData } from "$types/services.d.ts";
+import type { StampRow } from "$types/stamp.d.ts";
 import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
 import { containerBackground, containerColData } from "$layout";
 import {

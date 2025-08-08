@@ -2,10 +2,21 @@
 import { BREAKPOINTS } from "$constants";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
 import { CollectionsBanner } from "$section";
-import type {
-  Collection,
-  CollectionGalleryProps,
-} from "$server/types/collection.d.ts";
+import type { Collection } from "$types/stamp.d.ts";
+// Local copy of props to avoid importing server-only types
+export interface CollectionGalleryProps {
+  title?: string;
+  subTitle?: string;
+  collections: Collection[];
+  gridClass: string;
+  displayCounts?: {
+    desktop?: number;
+    tablet?: number;
+    mobileLg?: number;
+    mobileMd?: number;
+    mobileSm?: number;
+  };
+}
 import { subtitleGrey, titleGreyLD } from "$text";
 import { useEffect, useState } from "preact/hooks";
 
