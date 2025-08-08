@@ -227,8 +227,16 @@ export const buttonStyles: ButtonVariants = {
   /* ===== STATE STYLES ===== */
   state: {
     disabled: `
-      opacity-70
+      opacity-50
       cursor-not-allowed
+      relative
+      [&:after]:content-['SOON™']
+      [&:after]:absolute [&:after]:inset-0
+      [&:after]:flex [&:after]:items-center [&:after]:justify-center
+      [&:after]:opacity-0 [&:after]:group-hover:opacity-100
+      [&:after]:transition-opacity [&:after]:ease-in-out [&:after]:duration-200
+      [&:after]:pointer-events-none [&:after]:z-10
+      [&:after]:text-white [&:after]:text-xs [&:after]:font-bold
     `,
     loading: `
       opacity-70

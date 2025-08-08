@@ -108,9 +108,9 @@ export const ToggleButton = ({
     const isDisabled = disabledOptions.includes(option);
 
     if (isDisabled) {
-      return `${
-        button("glassmorphismDeselected", "grey", size)
-      } opacity-50 cursor-not-allowed`;
+      return button("glassmorphismDeselected", "grey", size, {
+        disabled: true,
+      });
     }
 
     // Choose variant and color based on selection state and mode
@@ -173,8 +173,6 @@ export const ToggleButton = ({
   return (
     <div class={getContainerClass()}>
       {options.map((option) => {
-        const isDisabled = disabledOptions.includes(option);
-
         return (
           <div
             key={option}
@@ -196,15 +194,6 @@ export const ToggleButton = ({
             >
               {option.toUpperCase()}
             </button>
-
-            {/* Coming Soon overlay text for disabled buttons */}
-            {isDisabled && (
-              <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity ease-in-out duration-200 pointer-events-none z-10">
-                <div class="text-stamp-grey-light text-xs font-bold">
-                  SOON™
-                </div>
-              </div>
-            )}
           </div>
         );
       })}
