@@ -63,9 +63,9 @@ const getCommonButtonProps = ({
 
 /* ===== COMPONENT ===== */
 export function Button({
-  variant = "outline",
-  color = "purple",
-  size = "md",
+  variant = "glassmorphism",
+  color = "grey",
+  size = "mdR",
   disabled,
   isActive,
   href,
@@ -224,9 +224,9 @@ export function ButtonIcon({
 
 /* ===== PROCESSING BUTTON COMPONENT ===== */
 export function ButtonProcessing({
-  variant = "outline",
-  color = "purple",
-  size = "md",
+  variant = "glassmorphism",
+  color = "grey",
+  size = "mdR",
   disabled,
   isSubmitting,
   isActive,
