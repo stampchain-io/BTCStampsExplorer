@@ -1,6 +1,6 @@
 import { buttonStyles, color, state } from "$button";
-import type { SelectorButtonsProps } from "$types/ui.d.ts";
 import { glassmorphism } from "$layout";
+import type { SelectorButtonsProps } from "$types/ui.d.ts";
 import { useCallback, useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
@@ -16,7 +16,7 @@ export const SelectorButtons = ({
   value,
   defaultValue,
   onChange,
-  size = "md",
+  size,
   color: colorProp,
   className = "",
   disabled: disabledProp = false,
@@ -112,15 +112,12 @@ export const SelectorButtons = ({
     >
       {/* Selection button */}
       <div
-        class={`absolute top-0.5 bottom-0.5 z-10
-          rounded-lg shadow-lg
-          transition-transform duration-200 ease-in-out
+        class={`!absolute top-0.5 bottom-0.5 z-10
+          ${buttonStyles.variant.glassmorphismColor}
         `}
         style={{
           transform: selectionTransform,
-          width: `calc((100% - ${options.length * 2}px) / ${options.length})`,
-          background:
-            `linear-gradient(135deg, var(--color-light), var(--color-dark))`,
+          width: `calc((100% - ${options.length * 4}px) / ${options.length})`,
         }}
       />
 
@@ -163,7 +160,7 @@ export const SelectorButtons = ({
                 ${
                 selectedValue === option.value
                   ? "text-black"
-                  : "text-[var(--color-dark)] hover:text-[var(--color-light)]"
+                  : "mx-[1px] !rounded-lg bg-transparent text-[var(--color-dark)] hover:text-[var(--color-medium)] hover:bg-stamp-grey-darkest/30"
               }
                 ${optionDisabled ? state.disabled : "cursor-pointer"}
               `}

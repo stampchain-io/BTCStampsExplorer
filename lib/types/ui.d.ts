@@ -1511,7 +1511,7 @@ export interface SelectorButtonsProps {
   className?: string;
   value?: string | undefined;
   defaultValue?: string;
-  size?: ButtonSize;
+  size: ButtonSize;
   color?: string;
   disabled?: boolean;
 }
