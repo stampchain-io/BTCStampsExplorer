@@ -24,10 +24,9 @@ export function normalizeFeeRate(params: {
   if (params.satsPerVB !== undefined) {
     normalizedSatsPerVB = params.satsPerVB;
   } else if (params.satsPerKB !== undefined) {
-    normalizedSatsPerVB =
-      params.satsPerKB < SATS_PER_KB_MULTIPLIER
-        ? params.satsPerKB
-        : params.satsPerKB / SATS_PER_KB_MULTIPLIER;
+    normalizedSatsPerVB = params.satsPerKB < SATS_PER_KB_MULTIPLIER
+      ? params.satsPerKB
+      : params.satsPerKB / SATS_PER_KB_MULTIPLIER;
   } else {
     throw new Error("Either satsPerKB or satsPerVB must be provided");
   }
@@ -41,5 +40,3 @@ export function normalizeFeeRate(params: {
     normalizedSatsPerKB: normalizedSatsPerVB * SATS_PER_KB_MULTIPLIER,
   };
 }
-
-

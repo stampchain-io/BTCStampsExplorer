@@ -63,13 +63,19 @@ import build from "$fresh/dev.ts";
 import { start } from "$fresh/server.ts";
 const DENO_ROLE = Deno.env.get("DENO_ROLE");
 // Lazy import DB and background services only when not running in pure web mode
-let dbManager: typeof import("$server/database/databaseManager.ts").dbManager | undefined;
-let BackgroundFeeService: typeof import("$server/services/fee/backgroundFeeService.ts").BackgroundFeeService | undefined;
+let dbManager:
+  | typeof import("$server/database/databaseManager.ts").dbManager
+  | undefined;
+let BackgroundFeeService:
+  | typeof import("$server/services/fee/backgroundFeeService.ts").BackgroundFeeService
+  | undefined;
 if (DENO_ROLE !== "web") {
   const dbModule = await import("$server/database/databaseManager.ts");
   dbManager = dbModule.dbManager;
   await import("$server/database/index.ts");
-  const feeModule = await import("$server/services/fee/backgroundFeeService.ts");
+  const feeModule = await import(
+    "$server/services/fee/backgroundFeeService.ts"
+  );
   BackgroundFeeService = feeModule.BackgroundFeeService;
 }
 

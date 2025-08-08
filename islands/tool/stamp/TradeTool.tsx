@@ -24,10 +24,10 @@ import { Button } from "$button";
 import { InputField } from "$form";
 import { bodyTool, containerBackground } from "$layout";
 import type { UTXO, XcpBalance } from "$lib/types/index.d.ts";
-import { StatusMessages } from "$notification";
-import type { ComposeAttachOptions } from "$types/services.d.ts";
 import { normalizeFeeRate } from "$lib/utils/fees.ts";
+import { StatusMessages } from "$notification";
 import { subtitlePurple, titlePurpleLD } from "$text";
+import type { ComposeAttachOptions } from "$types/services.d.ts";
 
 /* ===== CONSTANTS ===== */
 const SIGHASH_SINGLE = 0x03;

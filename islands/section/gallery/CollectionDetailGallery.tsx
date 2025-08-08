@@ -5,7 +5,9 @@ import { CollectionCard } from "$card";
 import { BREAKPOINTS } from "$constants";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
+import { subtitlePurple, titlePurpleLD } from "$text";
 import type { Collection } from "$types/stamp.d.ts";
+import { useEffect, useState } from "preact/hooks";
 // Local copy of props to avoid importing server-only types
 export interface CollectionGalleryProps {
   title?: string;
@@ -26,8 +28,6 @@ export interface CollectionGalleryProps {
     onPageChange?: (page: number) => void;
   };
 }
-import { subtitlePurple, titlePurpleLD } from "$text";
-import { useEffect, useState } from "preact/hooks";
 
 /* ===== STATE ===== */
 export default function CollectionDetailGallery({
