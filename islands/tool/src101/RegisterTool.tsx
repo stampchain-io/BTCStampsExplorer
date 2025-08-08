@@ -1,22 +1,22 @@
 /* ===== SRC101 BITNAME REGISTRATION COMPONENT ===== */
 import { Button } from "$button";
-import type { SRC101RegisterToolProps } from "$types/ui.d.ts";
 import { useSRC101Form } from "$client/hooks/userSRC101Form.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
+import { ROOT_DOMAINS } from "$constants";
+import { inputFieldOutline, outlineGradient, purple } from "$form";
 import { RegisterToolSkeleton } from "$indicators";
-import { inputFieldOutline, outlineGradient, purpleGradient } from "$form";
-import type { ROOT_DOMAIN_TYPES } from "$types/base.d.ts";
-import type { SRC101Balance } from "$types/src101.d.ts";
 import DetailSRC101Modal from "$islands/modal/DetailSRC101Modal.tsx";
 import { openModal } from "$islands/modal/states.ts";
 import { bodyTool, containerBackground } from "$layout";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
-import { ROOT_DOMAINS } from "$constants";
-import { mapProgressiveFeeDetails } from "$lib/utils/performance/fees/fee-estimation-utils.ts";
 import { logger } from "$lib/utils/logger.ts";
+import { mapProgressiveFeeDetails } from "$lib/utils/performance/fees/fee-estimation-utils.ts";
 import { StatusMessages, tooltipButton } from "$notification";
 import { FeeCalculatorBase } from "$section";
 import { titlePurpleLD } from "$text";
+import type { ROOT_DOMAIN_TYPES } from "$types/base.d.ts";
+import type { SRC101Balance } from "$types/src101.d.ts";
+import type { SRC101RegisterToolProps } from "$types/ui.d.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== COMPONENT INTERFACE ===== */
@@ -243,7 +243,7 @@ export function SRC101RegisterTool({
       >
         {/* Animated Input Container */}
         <div
-          class={`${outlineGradient} ${purpleGradient} ${
+          class={`${outlineGradient} ${purple} ${
             openTldDropdown && !isSelectingTld ? "input-open-right" : ""
           }`}
         >
