@@ -13,7 +13,7 @@ export interface CollectionGalleryProps {
   title?: string;
   subTitle?: string;
   collections: Collection[];
-  gridClass: string;
+  gridClass?: string;
   displayCounts?: {
     desktop?: number;
     tablet?: number;
@@ -90,6 +90,7 @@ export default function CollectionDetailGallery({
   }, [width, displayCounts, collectionArray.length]);
 
   /* ===== RENDER ===== */
+  const grid = gridClass ?? "grid grid-cols-1 gap-4";
   return (
     <div>
       {title && <h3 class={titlePurpleLD}>{title}</h3>}
@@ -101,7 +102,7 @@ export default function CollectionDetailGallery({
           {subTitle}
         </h4>
       )}
-      <div class={gridClass}>
+      <div class={grid}>
         {collectionArray.slice(0, displayCount).map((
           collection: Collection,
         ) => (
