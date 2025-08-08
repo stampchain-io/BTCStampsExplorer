@@ -1,4 +1,4 @@
-import { ToggleButton } from "$button";
+import { RangeSliderDual, SelectorButtons, ToggleButton } from "$button";
 import type {
   FrontendStampType,
   StampEdition,
@@ -8,7 +8,6 @@ import type {
 } from "$constants";
 import { inputCheckbox } from "$form";
 import { Checkbox } from "$islands/filter/FilterComponents.tsx";
-import { RangeSliderDual as RangeSlider } from "$islands/button/RangeSliderDual.tsx";
 import { StampFilters } from "$islands/filter/FilterOptionsStamp.tsx";
 import { CollapsibleSection } from "$islands/layout/CollapsibleSection.tsx";
 import { labelLogicResponsive, labelXsPosition, labelXsR } from "$text";
@@ -923,36 +922,22 @@ export const FilterContentStamp = ({
 
   return (
     <div ref={drawerRef}>
-      {/* 🎯 STAMP TYPE FILTER - BEAUTIFUL RADIO DESIGN! */}
-      <CollapsibleSection
-        title="STAMP TYPE"
-        section="stampType"
-        expanded={expandedSections.stampType}
-        toggle={() => toggleSection("stampType")}
-        variant="collapsibleTitle"
-      >
-        <Radio
-          label="CLASSIC"
-          value="classic"
-          checked={filters.stampType === "classic"}
-          onChange={() => handleStampTypeChange("classic")}
-          name="stampType"
-        />
-        <Radio
-          label="CURSED"
-          value="cursed"
-          checked={filters.stampType === "cursed"}
-          onChange={() => handleStampTypeChange("cursed")}
-          name="stampType"
-        />
-        <Radio
-          label="POSH COLLECTION"
-          value="posh"
-          checked={filters.stampType === "posh"}
-          onChange={() => handleStampTypeChange("posh")}
-          name="stampType"
-        />
-      </CollapsibleSection>
+      {/* 🎯 STAMP TYPE FILTER - SELECTOR BUTTONS */}
+      <SelectorButtons
+        options={[
+          { value: "classic", label: "CLASSIC" },
+
+          { value: "posh", label: "POSH" },
+
+          { value: "cursed", label: "CURSED" },
+        ]}
+        value={filters.stampType}
+        onChange={(value) =>
+          handleStampTypeChange(value as "cursed" | "classic" | "posh")}
+        size="smR"
+        color="grey"
+        className="mt-2 mb-5 -mx-0.5"
+      />
 
       <CollapsibleSection
         title="MARKET PLACE"
@@ -969,7 +954,7 @@ export const FilterContentStamp = ({
             onChange={(value) =>
               toggleMarketType(value as "listings" | "sales")}
             mode="single"
-            size="mdR"
+            size="smR"
             spacing="evenFullwidth"
           />
         </div>
@@ -1005,6 +990,7 @@ export const FilterContentStamp = ({
                 size="smR"
                 spacing="evenFullwidth"
                 disabledOptions={["atomics"]}
+                color="greyDark"
               />
             </div>
 
@@ -1053,7 +1039,7 @@ export const FilterContentStamp = ({
                 {/* Custom price range slider */}
                 {filters.listings === "custom" && (
                   <div class="mt-3 pl-0.5">
-                    <RangeSlider
+                    <RangeSliderDual
                       variant="price"
                       onChange={handlePriceRangeChange}
                     />
@@ -1095,6 +1081,7 @@ export const FilterContentStamp = ({
                 size="smR"
                 spacing="evenFullwidth"
                 disabledOptions={["atomics"]}
+                color="greyDark"
               />
             </div>
 
@@ -1133,7 +1120,7 @@ export const FilterContentStamp = ({
             {/* Custom price range slider for sales */}
             {filters.sales === "custom" && (
               <div class="mt-3 pl-0.5">
-                <RangeSlider
+                <RangeSliderDual
                   variant="price"
                   onChange={handlePriceRangeChange}
                 />
@@ -1144,12 +1131,12 @@ export const FilterContentStamp = ({
             {filters.sales === "volume" && (
               <div class="mt-3 pl-0.5">
                 <ToggleButton
-                  size="md"
                   options={["24h", "7d", "30d"]}
                   selected={filters.volume}
                   onChange={(value) => handleVolumeChange(value as string)}
                   mode="single"
                   spacing="evenFullwidth"
+                  size="smR"
                 />
               </div>
             )}
@@ -1307,7 +1294,7 @@ export const FilterContentStamp = ({
 
         {filters.fileSize === "custom" && (
           <div class="mt-2">
-            <RangeSlider
+            <RangeSliderDual
               variant="fileSize"
               onChange={handleFileSizeRangeChange}
               initialMin={filters.fileSizeMin
@@ -1392,7 +1379,7 @@ export const FilterContentStamp = ({
           toggle={() => {}}
           variant="collapsibleLabel"
         >
-          <RangeSlider
+          <RangeSliderDual
             variant="range"
             onChange={handleRangeSliderChange}
           />
