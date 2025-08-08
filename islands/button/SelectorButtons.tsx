@@ -130,7 +130,7 @@ export const SelectorButtons = ({
             key={option.value}
             ref={(el) => (optionRefs.current[index] = el)}
             class={`
-              relative min-w-0
+              relative min-w-0 group
               ${
               optionDisabled
                 ? state.disabled
@@ -153,7 +153,7 @@ export const SelectorButtons = ({
             <label
               for={`selector-${option.value}`}
               class={`
-                relative flex items-center justify-center z-20
+                relative flex items-center justify-center z-20 group
                 font-semibold text-center
                 transition-all duration-50
                 ${buttonStyles.size[size]}
