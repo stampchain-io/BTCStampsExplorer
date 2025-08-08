@@ -81,7 +81,7 @@ export const SRC20OverviewHeader = (
             ]}
             value={viewType}
             onChange={handleViewTypeClick}
-            _size="sm"
+            size="mdR"
             color="purple"
             className="w-full mobileMd:w-auto"
           />
@@ -93,7 +93,7 @@ export const SRC20OverviewHeader = (
           <Button
             variant={getTrendingVariant()}
             color="grey"
-            size="xs"
+            size="mdR"
             onClick={handleTrendingClick}
             class={`
               ${
@@ -116,7 +116,7 @@ export const SRC20OverviewHeader = (
             ]}
             value={selectedTimeframe}
             onChange={handleTimeframeClick}
-            _size="sm"
+            size="mdR"
             color="grey"
           />
         </div>
