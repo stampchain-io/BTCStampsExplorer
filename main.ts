@@ -61,9 +61,17 @@ import manifest from "$/fresh.gen.ts";
 import "$/globals.d.ts";
 import build from "$fresh/dev.ts";
 import { start } from "$fresh/server.ts";
-import { dbManager } from "$server/database/databaseManager.ts"; // Explicit import for direct use
-import "$server/database/index.ts"; // Ensures dbManager instance is created via its module execution
-import { BackgroundFeeService } from "$server/services/fee/backgroundFeeService.ts";
+const DENO_ROLE = Deno.env.get("DENO_ROLE");
+// Lazy import DB and background services only when not running in pure web mode
+let dbManager: typeof import("$server/database/databaseManager.ts").dbManager | undefined;
+let BackgroundFeeService: typeof import("$server/services/fee/backgroundFeeService.ts").BackgroundFeeService | undefined;
+if (DENO_ROLE !== "web") {
+  const dbModule = await import("$server/database/databaseManager.ts");
+  dbManager = dbModule.dbManager;
+  await import("$server/database/index.ts");
+  const feeModule = await import("$server/services/fee/backgroundFeeService.ts");
+  BackgroundFeeService = feeModule.BackgroundFeeService;
+}
 
 // Set DENO_BUILD_MODE globally, to be accessible within the resolver
 (globalThis as any).DENO_BUILD_MODE = Deno.args.includes("build");
@@ -125,14 +133,14 @@ import.meta.resolve = function (specifier: string): string {
 };
 
 if (import.meta.main) {
-  if (!Deno.args.includes("build")) {
+  if (!Deno.args.includes("build") && DENO_ROLE !== "web") {
     try {
       console.log(`[MAIN] Attempting dbManager.initialize() at ${Date.now()}`);
-      await dbManager.initialize();
+      await dbManager!.initialize();
       console.log(`[MAIN] dbManager.initialize() completed at ${Date.now()}`);
 
       // Start background fee cache warming service
-      BackgroundFeeService.start();
+      BackgroundFeeService!.start();
       console.log(
         `[MAIN] Background fee service started`,
       );
