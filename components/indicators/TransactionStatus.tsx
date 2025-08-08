@@ -1,8 +1,10 @@
+import { Button } from "$button";
 import { Icon } from "$icon";
-import type { MaraSuccessMessageProps } from "$types/ui.d.ts";
-import type { TransactionBadgeProps } from "$types/ui.d.ts";
-import type { TransactionStatusProps } from "$types/ui.d.ts";
-import { buttonPurpleFlat } from "$button";
+import type {
+  MaraSuccessMessageProps,
+  TransactionBadgeProps,
+  TransactionStatusProps,
+} from "$types/ui.d.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
 
 export function TransactionStatus({
@@ -173,24 +175,26 @@ export function TransactionStatus({
             </div>
           )}
 
-          <div class="flex gap-2">
+          <div class="flex gap-3">
             {txid && onViewTransaction && (
-              <button
-                type="button"
+              <Button
+                variant="glassmorphism"
+                color="grey"
+                size="mdR"
                 onClick={onViewTransaction}
-                class={`${buttonPurpleFlat} text-xs px-3 py-1.5`}
               >
-                View Transaction
-              </button>
+                VIEW TRANSACTION
+              </Button>
             )}
             {state === "failed" && onRetry && (
-              <button
-                type="button"
+              <Button
+                variant="glassmorphismColor"
+                color="grey"
+                size="mdR"
                 onClick={onRetry}
-                class="inline-flex items-center justify-center bg-stamp-grey border-2 border-stamp-grey rounded-md text-xs font-bold tracking-wider text-white h-[30px] px-3 hover:bg-stamp-grey-light transition-colors duration-300"
               >
-                Retry
-              </button>
+                RETRY
+              </Button>
             )}
           </div>
         </div>
