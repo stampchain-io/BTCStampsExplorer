@@ -14,15 +14,15 @@ import { NOT_AVAILABLE_IMAGE } from "$constants";
 import FreshSRC20Gallery from "$islands/section/gallery/FreshSRC20Gallery.tsx";
 import { FreshStampGallery } from "$islands/section/gallery/FreshStampGallery.tsx";
 import {
-  createPaginationHandler,
-  isBrowser,
-  safeNavigate,
-} from "$utils/navigation/freshNavigationUtils.ts";
-import {
   abbreviateAddress,
   formatBTCAmount,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
+import {
+  createPaginationHandler,
+  isBrowser,
+  safeNavigate,
+} from "$utils/navigation/freshNavigationUtils.ts";
 import { useEffect, useState } from "preact/hooks";
 
 // ===== ADVANCED SORTING IMPORTS =====
@@ -166,7 +166,7 @@ function SectionHeader({
                   onSortChange?.(sortValue);
                 }}
                 variant="buttons"
-                _size="sm"
+                size="sm"
                 showLabel={false}
               />
             </SortingErrorBoundary>

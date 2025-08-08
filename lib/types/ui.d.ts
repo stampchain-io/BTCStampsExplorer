@@ -9,6 +9,7 @@
  * Usage: Import UI component types and interfaces
  */
 
+import type { IconVariants } from "$components/icon/styles.ts";
 import type { Timeframe } from "$components/layout/types.ts";
 import type {
   ButtonColor,
@@ -16,7 +17,6 @@ import type {
   ButtonVariant,
   CircuitState,
 } from "$constants";
-import type { IconVariants } from "$components/icon/styles.ts";
 import type { Signal } from "@preact/signals";
 import type { ComponentChildren, ComponentProps, JSX, Ref } from "preact";
 
@@ -25,6 +25,7 @@ export type { ButtonColor, ButtonSize, ButtonVariant };
 
 import type { StampFilterType, StampType } from "$constants";
 import type { StampFilters } from "$islands/filter/FilterOptionsStamp.tsx";
+import type { FeeEstimationResult as TransactionFeeEstimationResult } from "$lib/utils/bitcoin/minting/TransactionConstructionService.ts";
 import type {
   AlignmentType,
   AncestorInfo,
@@ -48,7 +49,6 @@ import type {
   SRC20MintStatus,
 } from "$types/services.d.ts";
 import type { SortDirection, SortKey, SortMetrics } from "$types/sorting.d.ts";
-import type { FeeEstimationResult as TransactionFeeEstimationResult } from "$lib/utils/bitcoin/minting/TransactionConstructionService.ts";
 import type { ScriptType, SRC20_TYPES, SRC20Row } from "$types/src20.d.ts";
 import type { StampRow } from "$types/stamp.d.ts";
 import type {
@@ -456,7 +456,7 @@ export interface ChartWidgetProps extends BaseComponentProps {
  * Loading icon component props
  */
 export interface LoadingIconProps extends BaseComponentProps {
-  _size?: "sm" | "md" | "lg" | "xl";
+  size?: "sm" | "md" | "lg" | "xl";
   color?: string;
   speed?: "slow" | "normal" | "fast";
   label?: string;
@@ -474,7 +474,7 @@ export interface ProgressIndicatorProps extends BaseComponentProps {
   showPercentage?: boolean;
   variant?: "linear" | "circular";
   color?: string;
-  _size?: ButtonSize;
+  size?: ButtonSize;
   indeterminate?: boolean;
   state?: ProgressState;
   message?: string;
@@ -492,7 +492,7 @@ export interface ProgressIndicatorProps extends BaseComponentProps {
  */
 export interface IconProps extends BaseComponentProps {
   name?: string;
-  _size?: number | string;
+  size?: number | string;
   color?: string;
   variant?: "solid" | "outline" | "ghost";
   weight?: "light" | "regular" | "bold" | undefined;
@@ -507,7 +507,7 @@ export interface IconProps extends BaseComponentProps {
 export interface IconButtonProps extends BaseComponentProps {
   isLoading?: boolean;
   icon: string;
-  _size?: ButtonSize;
+  size?: ButtonSize;
   variant?: ButtonVariant;
   color?: ButtonColor;
   disabled?: boolean;
@@ -722,7 +722,7 @@ export interface InputFieldProps extends InputProps {
   iconPosition?: "left" | "right";
   clearable?: boolean;
   onClear?: () => void;
-  _size?: ButtonSize;
+  size?: ButtonSize;
 }
 
 /**
@@ -739,7 +739,7 @@ export interface SelectFieldProps extends FormControlProps {
   placeholder?: string;
   onChange?: (value: string) => void;
   multiple?: boolean;
-  _size?: ButtonSize;
+  size?: ButtonSize;
   onClick?: (event: JSX.TargetedEvent<HTMLSelectElement, Event>) => void;
 }
 
@@ -835,7 +835,7 @@ export interface MaraModeIndicatorProps extends BaseComponentProps {
   isActive: boolean;
   mode?: "standard" | "turbo" | "eco";
   showLabel?: boolean;
-  _size?: ButtonSize;
+  size?: ButtonSize;
   animate?: boolean;
   outputValue?: number;
   feeRate?: number;
@@ -884,7 +884,7 @@ export interface TransactionBadgeProps extends BaseComponentProps {
   status?: "pending" | "confirmed" | "failed" | "processing";
   confirmations?: number;
   showIcon?: boolean;
-  _size?: ButtonSize;
+  size?: ButtonSize;
   animated?: boolean;
   class?: string;
 }
@@ -1108,7 +1108,6 @@ export interface TransactionProgressProps {
 }
 
 export interface SpinnerProps {
-  _size?: ButtonSize;
   size?: "sm" | "md" | "lg";
   color?: string;
   class?: string;
@@ -1262,7 +1261,6 @@ export interface StyledSortingDropdownProps {
     option: { value: string; label: string; icon?: string },
   ) => string;
   size?: "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "custom";
-  _size?: "sm" | "md" | "lg";
 }
 
 export interface StyledSortingErrorProps {
@@ -1276,7 +1274,6 @@ export interface StyledSortingButtonsProps {
   testId?: string;
   variant?: "primary" | "secondary" | "ghost";
   size?: "sm" | "md" | "lg";
-  _size?: "sm" | "md" | "lg";
   showIcons?: boolean;
   showLoading?: boolean;
   renderButton?: (
@@ -1295,7 +1292,6 @@ export interface StyledSortingLabelProps {
   onClick?: () => void;
   active?: boolean;
   variant?: "default" | "compact" | "inline";
-  _size?: ButtonSize;
   testId?: string;
 }
 
@@ -1515,7 +1511,6 @@ export interface SelectorButtonsProps {
   className?: string;
   value?: string | undefined;
   defaultValue?: string;
-  _size?: ButtonSize;
   size?: ButtonSize;
   color?: string;
   disabled?: boolean;
@@ -3701,7 +3696,6 @@ export interface CompleteSortingInterfaceProps extends BaseComponentProps {
   onSortChange: (sortBy: string, sortOrder: "asc" | "desc") => void;
   options: Array<{ key: string; label: string }>;
   variant?: "default" | "compact" | "inline" | "dropdown" | "buttons";
-  _size?: ButtonSize;
   size?: ButtonSize;
   showLoading?: boolean;
 }
@@ -4097,7 +4091,7 @@ export interface MockResponse<T> {
  */
 export interface ColorSwatchProps extends BaseComponentProps {
   color: string;
-  _size?: ButtonSize;
+  size?: ButtonSize;
   variant?: "solid" | "outline";
   onClick?: () => void;
   selected?: boolean;
