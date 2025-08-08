@@ -2,8 +2,6 @@
 import { Button } from "$button";
 import type { ViewAllButtonProps } from "$types/ui.d.ts";
 
-/* ===== TYPES ===== */
-
 /* ===== COMPONENT ===== */
 export function ViewAllButton({ href }: ViewAllButtonProps) {
   return (

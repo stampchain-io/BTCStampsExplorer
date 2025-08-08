@@ -1,11 +1,9 @@
 /* ===== TOGGLE SWITCH BUTTON COMPONENT ===== */
 import { toggleButton, toggleKnob, toggleKnobBackground } from "$button";
 import { toggleSymbol } from "$text";
-import { JSX } from "preact";
 import type { ToggleSwitchButtonProps } from "$types/ui.d.ts";
+import { JSX } from "preact";
 import { useEffect, useRef } from "preact/hooks";
-
-/* ===== TYPES ===== */
 
 /* ===== COMPONENT ===== */
 export function ToggleSwitchButton({
@@ -90,7 +88,7 @@ export function ToggleSwitchButton({
         // Move handle to inactive position
         handleElement.classList.remove("translate-x-full");
         setTimeout(() => {
-          // Update inner content with inactive color
+          // Update inner content with inactive color and symbol
           const innerDiv = document.createElement("div");
           innerDiv.className =
             `${toggleKnob} bg-stamp-grey/70 flex items-center justify-center ${toggleSymbol}`;

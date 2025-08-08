@@ -16,13 +16,7 @@ export type ButtonVariant =
   | "outline"
   | "flatOutline"
   | "outlineFlat"
-  | "outlineGradient"
-  | "custom"
-  | "fill"
-  | "light"
-  | "thin"
-  | "regular"
-  | "bold";
+  | "outlineGradient";
 
 /**
  * Button color types - standardized theme colors
