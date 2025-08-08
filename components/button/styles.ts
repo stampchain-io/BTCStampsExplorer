@@ -31,13 +31,7 @@ export interface ButtonVariants {
     | "outline"
     | "flatOutline"
     | "outlineFlat"
-    | "outlineGradient"
-    | "custom"
-    | "fill"
-    | "light"
-    | "thin"
-    | "regular"
-    | "bold",
+    | "outlineGradient",
     string
   >;
   color: Record<
@@ -78,8 +72,6 @@ export interface ButtonVariants {
   spinner: string;
 }
 
-/* ===== BUTTON PROPS INTERFACES ===== */
-
 /* ===== BUTTON STYLE DEFINITIONS ===== */
 const baseBefore =
   "before:absolute before:inset-0 before:rounded-lg before:z-[-1] before:transition-transform before:duration-50 before:origin-center";
@@ -95,17 +87,17 @@ export const buttonStyles: ButtonVariants = {
   base: `
     inline-flex items-center justify-center
     rounded-lg border-[1px]
-    font-bold tracking-wide
-    transition-colors ease-in-out duration-200
+    font-semibold tracking-wide
+    transition-colors duration-50
   `,
 
   /* ===== VARIANT STYLES ===== */
+  /* If the glassmorphismColor variant "before:"" background gradient is changed then the ToggleButton.tsx file must be update too */
   variant: {
     text: `
       !items-start !justify-start !h-auto
       !p-0 bg-transparent !border-0
-      font-semibold tracking-wide
-      text-[var(--default-color)] hover:text-[var(--hover-color)]
+      text-[var(--color-medium)] hover:text-[var(--color-light)]
     `,
     glassmorphism: `
       ${baseGlassmorphism} bg-stamp-grey-darkest/15 border-stamp-grey-darkest/20
@@ -128,10 +120,11 @@ export const buttonStyles: ButtonVariants = {
     `,
     glassmorphismDeselected: `
       ${baseGlassmorphism} ${baseGlassmorphismColor}
-      bg-stamp-grey-darkest/10 border-stamp-grey-darkest/20
-      ${baseBefore} hover:${shadow}
-      before:bg-none hover:before:bg-[linear-gradient(to_bottom_right,var(--color-dark)_0%,var(--color-dark)_20%,var(--color-medium)_20%,var(--color-medium)_45%,var(--color-light)_45%,var(--color-light)_52%,var(--color-medium)_52%,var(--color-medium)_70%,var(--color-dark)_70%,var(--color-dark)_100%)]
-      text-stamp-grey-darkest hover:border-[var(--color-border)]
+      bg-stamp-grey-darkest/15 border-stamp-grey-darkest/20
+      text-[var(--color-dark)] before:bg-none
+      hover:bg-stamp-grey-darkest/10 hover:text-[#1e1723] hover:before:!scale-100 hover:before:!blur-[5px]
+      ${baseBefore} ${shadow}
+      hover:before:bg-[linear-gradient(to_bottom_right,var(--color-dark)_0%,var(--color-dark)_20%,var(--color-medium)_20%,var(--color-medium)_45%,var(--color-light)_45%,var(--color-light)_52%,var(--color-medium)_52%,var(--color-medium)_70%,var(--color-dark)_70%,var(--color-dark)_100%)]
     `,
     flat: `
       bg-gradient-to-br from-[var(--color-light)] to-[var(--color-dark)]
@@ -159,38 +152,12 @@ export const buttonStyles: ButtonVariants = {
       before:bg-[conic-gradient(from_var(--angle),var(--color-dark),var(--color-medium),var(--color-light),var(--color-medium),var(--color-dark))]
       before:[--angle:0deg] before:animate-rotate
       hover:before:bg-[conic-gradient(from_var(--angle),var(--color-light),var(--color-light),var(--color-light),var(--color-light),var(--color-light))]
-      before:transition-colors before:ease-in-out before:duration-200
+      before:transition-colors before:duration-50
       [&>*]:relative [&>*]:z-[2] [&>*]:rounded-lg [&>*]:bg-[linear-gradient(to_right,#1a0824,#210925)] [&>*]:!border-0
       [&>*]:inline-flex [&>*]:items-center [&>*]:justify-center [&>*]:w-full [&>*]:h-full [&>*]:px-5
       [&>*]:font-bold [&>*]:tracking-wider
-      [&>*]:text-[var(--default-color)] hover:[&>*]:text-[var(--hover-color)]
-      [&>*]:transition-colors [&>*]:ease-in-out [&>*]:duration-200
-    `,
-    custom: `
-      /* Custom variant - allows external styling via className */
-    `,
-    fill: `
-      bg-[var(--color-dark)] border-[var(--color-dark)] text-white
-      hover:bg-[var(--color-light)] hover:border-[var(--color-light)]
-    `,
-    light: `
-      bg-[var(--color-light)] border-[var(--color-light)] text-black
-      hover:bg-[var(--color-dark)] hover:border-[var(--color-dark)] hover:text-white
-    `,
-    thin: `
-      bg-transparent border-[var(--color-dark)] text-[var(--color-dark)]
-      border-opacity-50 font-normal
-      hover:border-opacity-100 hover:bg-[var(--color-dark)] hover:bg-opacity-10
-    `,
-    regular: `
-      bg-[var(--color-dark)] border-[var(--color-dark)] text-white
-      font-medium
-      hover:bg-[var(--color-light)] hover:border-[var(--color-light)]
-    `,
-    bold: `
-      bg-[var(--color-dark)] border-[var(--color-dark)] text-white
-      font-bold border-2
-      hover:bg-[var(--color-light)] hover:border-[var(--color-light)]
+      [&>*]:text-[var(--color-medium)] hover:[&>*]:text-[var(--color-light)]
+      [&>*]:transition-colors [&>*]:duration-50
     `,
   },
 
@@ -200,36 +167,28 @@ export const buttonStyles: ButtonVariants = {
       [--color-dark:#666666]
       [--color-medium:#999999]
       [--color-light:#CCCCCC]
-      [--default-color:var(--color-medium)]
-      [--hover-color:var(--color-light)]
-      [--color-border:#66666680]
+      [--color-border:#66666666]
       [--color-border-hover:#66666699]
     `,
     greyDark: `
       [--color-dark:#555555]
       [--color-medium:#888888]
       [--color-light:#BBBBBB]
-      [--default-color:var(--color-medium)]
-      [--hover-color:var(--color-light)]
-      [--color-border:#55555580]
+      [--color-border:#55555566]
       [--color-border-hover:#55555599]
     `,
     purple: `
       [--color-dark:#660099]
       [--color-medium:#8800CC]
       [--color-light:#AA00FF]
-      [--default-color:var(--color-medium)]
-      [--hover-color:var(--color-light)]
-      [--color-border:#66009980]
+      [--color-border:#66009966]
       [--color-border-hover:#66009999]
     `,
     purpleDark: `
       [--color-dark:#550080]
       [--color-medium:#7700b3]
       [--color-light:#9900E6]
-      [--default-color:var(--color-medium)]
-      [--hover-color:var(--color-light)]
-      [--color-border:#55008080]
+      [--color-border:#55008066]
       [--color-border-hover:#55008099]
     `,
     test: `
@@ -249,7 +208,7 @@ export const buttonStyles: ButtonVariants = {
     xl: "h-[46px] px-5 text-base",
     xxl: "h-[50px] px-6 text-lg",
     xxsR: "h-[26px] tablet:h-[22px] px-[14px] text-[10px]",
-    xsR: "h-[30px] tablet:h-[26px] px-[14px] text-xs",
+    xsR: "h-[30px] tablet:h-[26px] px-[14px] text-xs tablet:text-[10px]",
     smR: "h-[34px] tablet:h-[30px] px-4 text-xs",
     mdR: "h-[38px] tablet:h-[34px] px-4 text-sm tablet:text-xs",
     lgR: "h-[42px] tablet:h-[38px] px-4 text-sm",
@@ -272,8 +231,8 @@ export const buttonStyles: ButtonVariants = {
       cursor-not-allowed
     `,
     loading: `
+      opacity-70
       cursor-wait
-      opacity-75
     `,
     active: `
       scale-95
@@ -288,24 +247,17 @@ export const buttonStyles: ButtonVariants = {
     rounded-full
     h-5 w-5
     border-b-[3px]
-    border-[var(--hover-color)]
+    border-[var(--color-light)]
   `,
 };
 
 /* ===== ADDITIONAL STYLES ===== */
-/* ===== TEMPORARY STYLES ===== */
-/* @baba - update feeCalculatorBase buttons + toggle switch */
-export const buttonPurpleOutline =
-  "inline-flex items-center justify-center border-[1px] border-stamp-purple rounded-lg text-sm font-bold tracking-wider text-stamp-purple h-[38px] px-4 hover:border-stamp-purple-highlight hover:text-stamp-purple-highlight transition-colors ease-in-out duration-200";
-export const buttonPurpleFlat =
-  "inline-flex items-center justify-center bg-stamp-purple border-[1px] border-stamp-purple rounded-lg text-sm font-bold tracking-wider text-black h-[38px] px-4 hover:border-stamp-purple-highlight hover:bg-stamp-purple-highlight transition-colors ease-in-out duration-200";
-
 /* ===== TOGGLE SWITCH BUTTON STYLES ===== */
 export const toggleButton =
-  "flex items-center relative w-10 h-5 rounded-full bg-stamp-grey focus:outline-none transition ease-in-out duration-200";
+  `flex items-center relative w-10 h-5 !rounded-full ${glassmorphismLayer2} focus:outline-none transition duration-50`;
 export const toggleKnobBackground =
-  "flex justify-center items-center relative w-5 h-5 bg-stamp-grey rounded-full transition ease-in-out transform duration-400 ";
-export const toggleKnob = "w-[18px] h-[18px] rounded-full";
+  "flex justify-center items-center relative w-5 h-5 bg-transparent rounded-full transition ease-in-out transform duration-400";
+export const toggleKnob = "w-[14px] h-[14px] rounded-full";
 export const sliderKnob = `
   absolute top-0.5 bottom-0.5 w-full h-[14px] tablet:h-[10px] rounded-full appearance-none bg-transparent pointer-events-none
   [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:pointer-events-auto
