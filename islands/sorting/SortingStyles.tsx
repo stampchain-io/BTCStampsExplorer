@@ -298,7 +298,7 @@ function CompleteSortingInterface({
             {variant === "dropdown" && (
               <StyledSortingDropdown
                 options={transformedOptions}
-                _size={mapButtonSizeToSortingSize(size)}
+                size={mapButtonSizeToSortingSize(size)}
               />
             )}
             {variant === "buttons" && (
