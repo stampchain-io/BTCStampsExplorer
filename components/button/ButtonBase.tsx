@@ -59,8 +59,6 @@ const getCommonButtonProps = ({
   ...props,
 });
 
-/* ===== TYPES ===== */
-
 /* ===== COMPONENT ===== */
 export function Button({
   variant = "glassmorphism",
@@ -159,8 +157,6 @@ export function Button({
     );
 }
 
-/* ===== TYPES ===== */
-
 /* ===== ICON BUTTON COMPONENT ===== */
 export function ButtonIcon({
   variant = "outline",
@@ -219,8 +215,6 @@ export function ButtonIcon({
       </button>
     );
 }
-
-/* ===== TYPES ===== */
 
 /* ===== PROCESSING BUTTON COMPONENT ===== */
 export function ButtonProcessing({
