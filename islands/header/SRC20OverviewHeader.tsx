@@ -1,6 +1,6 @@
 /* ===== SRC20 HEADER COMPONENT ===== */
 /* @baba - update search button styling */
-import { Button, SelectorButtons } from "$button";
+import { SelectorButtons, ToggleButton } from "$button";
 import { SearchSRC20Modal } from "$islands/modal/SearchSRC20Modal.tsx";
 import { titlePurpleLD } from "$text";
 import type { SRC20OverviewHeaderProps } from "$types/ui.d.ts";
@@ -81,7 +81,7 @@ export const SRC20OverviewHeader = (
             ]}
             value={viewType}
             onChange={handleViewTypeClick}
-            size="mdR"
+            size="smR"
             color="purple"
             className="w-full mobileMd:w-auto"
           />
@@ -89,23 +89,17 @@ export const SRC20OverviewHeader = (
 
         {/* Trending and Timeframes - Right */}
         <div class="flex justify-between pt-3 mobileLg:pt-0 gap-3">
-          {/* Trending Button */}
-          <Button
-            variant={getTrendingVariant()}
-            color="grey"
-            size="mdR"
-            onClick={handleTrendingClick}
-            class={`
-              ${
-              currentSort?.filter === "TRENDING"
-                ? "cursor-default"
-                : "cursor-pointer"
-            }
-              mt-[3px]
-            `}
-          >
-            TRENDING
-          </Button>
+          {/* Trending Toggle */}
+          <div class="mt-[3px]">
+            <ToggleButton
+              options={["TRENDING"]}
+              selected={currentSort?.filter === "TRENDING" ? "TRENDING" : ""}
+              onChange={handleTrendingClick}
+              mode="single"
+              size="smR"
+              color="grey"
+            />
+          </div>
 
           {/* Timeframe Buttons */}
           <SelectorButtons
@@ -116,7 +110,7 @@ export const SRC20OverviewHeader = (
             ]}
             value={selectedTimeframe}
             onChange={handleTimeframeClick}
-            size="mdR"
+            size="smR"
             color="grey"
           />
         </div>
