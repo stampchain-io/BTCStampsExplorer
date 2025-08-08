@@ -11,12 +11,12 @@ export const getBaseUrl = (): string => {
   // Server-side environment check
   if (typeof Deno !== "undefined") {
     const env = Deno.env.get("DENO_ENV");
-    
+
     // In development mode, use relative URLs so they work with localhost dev server
     if (env === "development") {
-      return "";  // Empty string = relative URLs
+      return ""; // Empty string = relative URLs
     }
-    
+
     // For test environment, always return production CDN
     if (env === "test") {
       return "https://stampchain.io";
@@ -26,7 +26,7 @@ export const getBaseUrl = (): string => {
     try {
       // @ts-ignore - globalThis.location exists in browser
       if (globalThis.location && globalThis.location.hostname === "localhost") {
-        return "";  // Use relative URLs on localhost
+        return ""; // Use relative URLs on localhost
       }
     } catch {
       // Ignore errors if location is not available
