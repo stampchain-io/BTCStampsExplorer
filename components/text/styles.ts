@@ -204,6 +204,8 @@ export const ABBREVIATION_LENGTHS = {
 
 /* ===== TYPE DEFINITIONS ===== */
 export type TextStyles = {
+  // Overlay styles
+  overlayPurple: string;
   // Logo styles
   logoPurpleDL: string;
   logoPurpleDLLink: string;
@@ -238,6 +240,7 @@ export type TextStyles = {
   text: string;
   textLg: string;
   textXl: string;
+  text2xl: string;
   textLinkUnderline: string;
   // Label styles
   labelXs: string;
@@ -248,7 +251,10 @@ export type TextStyles = {
   labelXsR: string;
   labelXsPosition: string;
   labelSmPurple: string;
-  labelLogicResponsive: string;
+  labelLogicResponsive: (
+    checked: boolean,
+    canHoverSelected: boolean,
+  ) => string;
   // Value styles
   valueXs: string;
   valueSm: string;
@@ -271,4 +277,17 @@ export type TextStyles = {
   tagline: string;
   copyright: string;
   loaderText: string;
+  toggleSymbol: string;
+  // Card text styles
+  cardHashSymbol: string;
+  cardStampNumber: string;
+  cardCreator: string;
+  cardPrice: string;
+  cardMimeType: string;
+  cardSupply: string;
+  cardHashSymbolMinimal: string;
+  cardStampNumberMinimal: string;
+  cardPriceMinimal: string;
+  cardHashSymbolGrey: string;
+  cardStampNumberGrey: string;
 };
