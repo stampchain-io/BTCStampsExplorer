@@ -68,7 +68,7 @@ export const inputCheckbox = (
 }
     after:content-['']
     after:block
-    after:size-2 tablet:after:size-1
+    after:size-[12px] tablet:after:size-[8px]
     after:rounded-full
     after:absolute
     after:top-1/2 after:left-1/2
@@ -76,7 +76,7 @@ export const inputCheckbox = (
     after:scale-0
     checked:after:scale-100
     after:transition-all
-    after:duration-100
+    after:duration-200
   `;
 
 /* ===== NOT IN USE NOR UPDATED ===== */
@@ -114,9 +114,6 @@ export const grey = `
   [--color-medium:#6666664D]
   [--color-light:#6666661A]
 `;
-
-// Export aliases for backward compatibility
-export const purpleGradient = purple;
 
 /* ===== GRADIENT INPUT STYLES ===== */
 export const outlineGradient = `
@@ -165,10 +162,12 @@ export type FormStyles = {
   inputSelect: string;
   inputCheckbox: string;
   inputRadio: string;
+  inputFieldDropdown: string;
+  inputFieldDropdownHover: string;
 
   // Gradients
-  purpleGradient: string;
-  greyGradient: string;
+  purple: string;
+  grey: string;
   outlineGradient: string;
 
   // Labels - not used
