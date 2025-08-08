@@ -25,6 +25,7 @@
     "check:imports:report": "deno run --allow-read --allow-write --allow-run --allow-env scripts/validate-import-patterns.ts || true",
     "check:ssr": "deno run --allow-read --allow-write scripts/detect-ssr-unsafe-navigation.ts",
     "check:responses": "deno run --allow-read scripts/check-manual-responses.ts",
+    "check:boundary": "bash ./scripts/check-boundary.sh",
     "test:unit": "cd tests && DENO_ENV=test SKIP_REDIS_CONNECTION=true deno test --allow-all unit/ --no-check --parallel",
     "test:unit:coverage": "cd tests && DENO_ENV=test SKIP_REDIS_CONNECTION=true deno test --allow-all unit/ --coverage=../coverage/ --no-check && cd .. && deno coverage coverage/ --exclude='tests/' --exclude='node_modules/' --exclude='_fresh/'",
     "test:integration": "cd tests && DENO_ENV=test SKIP_REDIS_CONNECTION=true deno test --allow-all integration/ --no-check",
