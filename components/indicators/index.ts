@@ -15,7 +15,7 @@ export {
   RegisterToolSkeleton,
   SendToolSkeleton,
   SkeletonButton,
-  SkeletonElement,
+  SkeletonContainer,
   SkeletonImage,
   SkeletonInput,
   SkeletonText,
