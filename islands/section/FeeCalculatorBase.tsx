@@ -1,9 +1,11 @@
-import { Button, sliderBar, sliderKnob } from "$button";
+import { Button } from "$button";
+import { ToggleSwitchButton } from "$components/button/ToggleSwitchButton.tsx";
 import { MaraModeBadge } from "$components/indicators/MaraModeIndicator.tsx";
 import { FeeSkeletonLoader } from "$components/indicators/ProgressIndicator.tsx";
 import { handleModalClose } from "$components/layout/ModalBase.tsx";
 import { useFees } from "$fees";
 import { Icon } from "$icon";
+import { RangeSlider } from "$islands/button/RangeSlider.tsx";
 import type { ExtendedBaseFeeCalculatorProps } from "$lib/types/base.d.ts";
 import { estimateTransactionSizeForType } from "$lib/utils/bitcoin/transactions/transactionSizeEstimator.ts";
 import { logger } from "$lib/utils/logger.ts";
@@ -230,26 +232,26 @@ export function FeeCalculatorBase({
     }
   };
 
+  // Ensure a stable handler function for the slider to satisfy exactOptionalPropertyTypes
+  const onSliderChange = (value: number) => {
+    if (handleChangeFee) {
+      handleChangeFee(value);
+    }
+  };
+
   // Fee selector component
   const renderFeeSelector = () => {
     if (isLoadingMaraFee) {
       return (
-        <div class={`flex flex-col ${isModal ? "w-2/3" : "w-1/2"}`}>
+        <div class={`flex flex-col ${isModal ? "w-2/3" : "w-[65%]"}`}>
           <FeeSkeletonLoader />
         </div>
       );
     }
 
     return (
-      <div class={`flex flex-col ${isModal ? "w-2/3" : "w-1/2"}`}>
+      <div class={`flex flex-col ${isModal ? "w-2/3" : "w-[65%]"}`}>
         <div class="flex items-center gap-2">
-          <h6 class="font-light text-base text-stamp-grey-light">
-            <span class="text-stamp-grey-darker pr-2">FEE</span>
-            <span class={`font-bold ${maraMode ? "text-purple-400" : ""}`}>
-              {fee === 0 ? <span class="animate-pulse">XX</span> : fee}
-            </span>{" "}
-            SAT/vB
-          </h6>
           {maraMode && (
             <div
               className="relative cursor-help"
@@ -259,11 +261,13 @@ export function FeeCalculatorBase({
             </div>
           )}
         </div>
-        <h6 class="font-light text-sm text-stamp-grey-light mb-3 text-nowrap">
+        <h6 class="font-light text-xs text-stamp-grey text-nowrap">
           <span class="text-stamp-grey-darker pr-2">
             {maraMode ? "MARA REQUIRED" : "RECOMMENDED"}
           </span>
-          <span class={`font-medium ${maraMode ? "text-purple-400" : ""}`}>
+          <span
+            class={`font-medium ${maraMode ? "text-stamp-grey-light" : ""}`}
+          >
             {maraMode && maraFeeRate !== null
               ? maraFeeRate
               : fees?.recommendedFee
@@ -272,43 +276,30 @@ export function FeeCalculatorBase({
           </span>{" "}
           SAT/vB
         </h6>
-        <div
-          className="relative w-full group"
-          onMouseMove={handleMouseMove}
-          onMouseEnter={handleFeeMouseEnter}
-          onMouseLeave={handleFeeMouseLeave}
-          onMouseDown={handleMouseDown}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <input
-            type="range"
-            value={feeToSliderPos(fee ?? 1)}
-            min="0"
-            max="100"
-            step="0.25"
-            onChange={(e) => {
-              if (!maraMode && handleChangeFee) {
-                handleChangeFee(
-                  sliderPosToFee(
-                    parseFloat((e.target as HTMLInputElement).value),
-                  ),
-                );
-              }
-            }}
-            onInput={(e) => {
-              if (!maraMode && handleChangeFee) {
-                handleChangeFee(
-                  sliderPosToFee(
-                    parseFloat((e.target as HTMLInputElement).value),
-                  ),
-                );
-              }
-            }}
-            className={`${sliderBar} ${sliderKnob} ${
-              maraMode ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-            disabled={maraMode}
-          />
+        <h6 class="font-light text-base text-stamp-grey-light mb-3">
+          <span class="text-stamp-grey-darker pr-2">FEE</span>
+          <span
+            class={`font-bold ${maraMode ? "text-stamp-grey-light" : ""}`}
+          >
+            {fee === 0 ? <span class="animate-pulse">XX</span> : fee}
+          </span>{" "}
+          SAT/vB
+        </h6>
+        <div class="relative">
+          <div className={`${maraMode ? "opacity-50 cursor-not-allowed" : ""}`}>
+            <RangeSlider
+              value={fee ?? 0}
+              onChange={onSliderChange}
+              valueToPosition={feeToSliderPos}
+              positionToValue={sliderPosToFee}
+              onMouseEnter={handleFeeMouseEnter}
+              onMouseLeave={handleFeeMouseLeave}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              disabled={maraMode}
+            />
+          </div>
+
           <div
             className={`${tooltipImage} ${
               isFeeTooltipVisible ? "opacity-100" : "opacity-0"
@@ -330,7 +321,7 @@ export function FeeCalculatorBase({
   const renderDetails = () => {
     return (
       <div
-        className={`transition-all duration-300 ease-in-out overflow-hidden ${
+        className={`transition-all duration-400 ease-in-out overflow-hidden ${
           visible ? "max-h-[220px] opacity-100" : "max-h-0 opacity-0"
         }`}
       >
@@ -718,23 +709,19 @@ export function FeeCalculatorBase({
         {showCoinToggle && (
           <div
             className={`flex gap-1 items-start justify-end ${
-              isModal ? "w-1/3" : "w-1/2"
+              isModal ? "w-1/3" : "w-[35%]"
             }`}
           >
-            <button
-              type="button"
-              className="min-w-10 h-5 rounded-full bg-stamp-grey flex items-center transition duration-300 focus:outline-none shadow relative"
-              onClick={handleCoinToggle}
-              onMouseEnter={handleCurrencyMouseEnter}
-              onMouseLeave={handleCurrencyMouseLeave}
-            >
-              <div
-                className={`w-5 h-5 relative rounded-full transition duration-500 transform flex justify-center items-center bg-stamp-grey ${
-                  coinType === "BTC" ? "translate-x-full" : ""
-                }`}
-              >
-                {coinType === "BTC" ? btcIcon : usdIcon}
-              </div>
+            <div className="relative">
+              <ToggleSwitchButton
+                isActive={coinType === "USDT"}
+                onToggle={handleCoinToggle}
+                toggleButtonId="currency-toggle"
+                activeSymbol="$"
+                inactiveSymbol="₿"
+                onMouseEnter={handleCurrencyMouseEnter}
+                onMouseLeave={handleCurrencyMouseLeave}
+              />
               <div
                 className={`${tooltipButton} ${
                   isCurrencyTooltipVisible ? "opacity-100" : "opacity-0"
@@ -742,60 +729,68 @@ export function FeeCalculatorBase({
               >
                 {currencyTooltipText}
               </div>
-            </button>
+            </div>
           </div>
         )}
       </div>
 
-      <h6 class="mt-4 text-xl text-stamp-grey-light font-light">
-        <span class="text-stamp-grey-darker pr-2">ESTIMATE</span>
-        {feeDetails?.totalValue !== undefined
-          ? (
-            <>
-              {!feeDetails.hasExactFees && (
-                <span class="text-stamp-grey-light">~</span>
-              )}
-              {(() => {
-                // Add MARA service fee if in MARA mode
-                const maraServiceFee = maraMode ? 42000 : 0;
-                const totalWithMaraFee = feeDetails.totalValue + maraServiceFee;
+      <div class="mt-5 flex flex-col-reverse justify-start min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between">
+        <h6 class="text-lg text-stamp-grey-light font-light">
+          <span class="text-stamp-grey-darker">ESTIMATE</span>
+          {feeDetails?.totalValue !== undefined
+            ? (
+              <>
+                {!feeDetails.hasExactFees && (
+                  <span class="text-stamp-grey-light pl-2 pr-1">~</span>
+                )}
+                {(() => {
+                  // Add MARA service fee if in MARA mode
+                  const maraServiceFee = maraMode ? 42000 : 0;
+                  const totalWithMaraFee = feeDetails.totalValue +
+                    maraServiceFee;
 
-                return coinType === "BTC"
-                  ? (
-                    <>
-                      <span class="font-bold">
-                        {formatSatoshisToBTC(totalWithMaraFee, {
-                          includeSymbol: false,
-                        })}
-                      </span>{" "}
-                      <span class="font-light">BTC</span>
-                    </>
-                  )
-                  : (
-                    <>
-                      <span class="font-bold">
-                        {BTCPrice !== undefined
-                          ? (totalWithMaraFee / 1e8 * BTCPrice).toFixed(2)
-                          : "N/A"}
-                      </span>{" "}
-                      <span class="font-light">{coinType}</span>
-                    </>
-                  );
-              })()}
-              {/* Removed (est) from main ESTIMATE line as requested */}
-            </>
-          )
-          : (
-            <>
-              <span class="font-bold animate-pulse">0.00000000</span>{" "}
-              <span class="font-light">{coinType}</span>
-            </>
-          )}
-      </h6>
+                  return coinType === "BTC"
+                    ? (
+                      <>
+                        <span class="font-bold">
+                          {formatSatoshisToBTC(totalWithMaraFee, {
+                            includeSymbol: false,
+                          })}
+                        </span>{" "}
+                        <span class="font-light">BTC</span>
+                      </>
+                    )
+                    : (
+                      <>
+                        <span class="font-bold">
+                          {BTCPrice !== undefined
+                            ? (totalWithMaraFee / 1e8 * BTCPrice).toFixed(2)
+                            : "N/A"}
+                        </span>{" "}
+                        <span class="font-light">{coinType}</span>
+                      </>
+                    );
+                })()}
+              </>
+            )
+            : (
+              <>
+                <span class="font-bold animate-pulse">0.00000000</span>{" "}
+                <span class="font-light">{coinType}</span>
+              </>
+            )}
+        </h6>
+
+        {progressIndicator && (
+          <div className="flex items-center justify-start mb-0.5 min-[420px]:justify-end min-[420px]:mb-0 w-auto">
+            {progressIndicator}
+          </div>
+        )}
+      </div>
 
       <div
         onClick={() => setVisible(!visible)}
-        className="flex items-center mt-2 font-normal text-xs text-stamp-grey-darker hover:text-stamp-grey-light uppercase transition-colors duration-300 gap-2 cursor-pointer group"
+        className="flex items-center font-normal text-xs text-stamp-grey-darker hover:text-stamp-grey-light uppercase transition-colors duration-200 gap-2 cursor-pointer group"
       >
         DETAILS
         <Icon
@@ -804,7 +799,7 @@ export function FeeCalculatorBase({
           weight="bold"
           size="xxxs"
           color="custom"
-          className={` stroke-stamp-grey-darker group-hover:stroke-stamp-grey-light transition-all duration-300 transform ${
+          className={` stroke-stamp-grey-darker group-hover:stroke-stamp-grey-light transition-all duration-200 transform ${
             visible ? "scale-y-[-1]" : ""
           }`}
         />
@@ -837,31 +832,30 @@ export function FeeCalculatorBase({
                 w-4 h-4 tablet:w-3 tablet:h-3 mr-3 tablet:mr-2
                 flex items-center justify-center
                 rounded-sm
-                transition-all duration-300 ease-in-out
+                transition-all duration-200 ease-in-out
                 border
                 relative
                 overflow-hidden
                 ${
                 tosAgreed
                   ? canHoverSelected
-                    ? "bg-stamp-grey-darker border-stamp-grey-darker group-hover:bg-stamp-grey-light group-hover:border-stamp-grey-light"
-                    : "bg-stamp-grey-darker border-stamp-grey-darker"
+                    ? "bg-stamp-grey-darkest/15 border-stamp-grey-darkest/20  group-hover:border-stamp-grey-darkest/40"
+                    : "bg-stamp-grey-darkest/15 border-stamp-grey-darkest/20"
                   : canHoverSelected
-                  ? "bg-stamp-grey-light border-stamp-grey-light group-hover:bg-stamp-grey-darker group-hover:border-stamp-grey-darker"
-                  : "bg-stamp-grey-light border-stamp-grey-light"
+                  ? "bg-stamp-grey-darkest/15 border-stamp-grey-darkest/20 group-hover:border-stamp-grey-darkest/40"
+                  : "bg-stamp-grey-darkest/15 border-stamp-grey-darkest/20"
               }
               `}
             >
               <div
                 className={`
-                  absolute
-                  inset-0.5
-                  transform transition-all duration-300 ease-in-out
+                  absolute inset-[1px] rounded-sm
+                  transform transition-all duration-200 ease-in-out
                   ${tosAgreed ? "scale-100" : "scale-0"}
                   ${
                   canHoverSelected
-                    ? "bg-stamp-grey-darkest group-hover:bg-stamp-grey-darkest/50"
-                    : "bg-stamp-grey-darkest"
+                    ? "bg-stamp-grey-darker group-hover:bg-stamp-grey-light"
+                    : "bg-stamp-grey-darker"
                 }
                 `}
               />
@@ -869,7 +863,7 @@ export function FeeCalculatorBase({
             <span
               className={`
                 text-xs font-medium select-none
-                transition-colors duration-300
+                transition-colors duration-200
                 ${
                 tosAgreed ? "text-stamp-grey-darker" : "text-stamp-grey-light"
               }
@@ -883,16 +877,18 @@ export function FeeCalculatorBase({
               `}
             >
               AGREE TO THE{" "}
-              <span class="text-stamp-purple">
+              <span class="text-stamp-grey-darker">
                 <span class="tablet:hidden">
                   <a
                     href="/termsofservice"
                     className={`
-                      transition-colors duration-300
+                      transition-colors duration-200
                       ${
-                      tosAgreed ? "text-stamp-purple-dark" : "text-stamp-purple"
+                      tosAgreed
+                        ? "text-stamp-grey-darker"
+                        : "text-stamp-grey-darker"
                     }
-                      hover:text-stamp-purple-bright
+                      hover:text-stamp-grey-light
                     `}
                   >
                     TERMS
@@ -902,11 +898,13 @@ export function FeeCalculatorBase({
                   <a
                     href="/termsofservice"
                     className={`
-                      transition-colors duration-300
+                      transition-colors duration-200
                       ${
-                      tosAgreed ? "text-stamp-purple-dark" : "text-stamp-purple"
+                      tosAgreed
+                        ? "text-stamp-grey-darker"
+                        : "text-stamp-grey-darker"
                     }
-                      hover:text-stamp-purple-bright
+                      hover:text-stamp-grey-light
                     `}
                   >
                     TERMS OF SERVICE
@@ -917,14 +915,7 @@ export function FeeCalculatorBase({
           </label>
         </div>
 
-        <div class="flex items-center justify-between gap-4">
-          {/* Progress indicator on the left */}
-          {progressIndicator && (
-            <div class="flex-1">
-              {progressIndicator}
-            </div>
-          )}
-
+        <div class="flex items-center justify-end gap-5">
           {/* Buttons on the right */}
           <div class="flex justify-end gap-6">
             {onCancel && (
@@ -947,8 +938,8 @@ export function FeeCalculatorBase({
             )}
             <Button
               variant="glassmorphismColor"
-              color="purple"
-              size="md"
+              color="grey"
+              size="mdR"
               onClick={() => {
                 console.log(
                   "FEE_CALCULATOR_BASE: Internal button onClick fired! About to call props.onSubmit.",
@@ -990,32 +981,3 @@ export function FeeCalculatorBase({
     </div>
   );
 }
-
-// BTC and USD icons
-const btcIcon = (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className="w-5 h-5"
-    viewBox="0 0 24 24"
-  >
-    <path
-      fill="#996600"
-      d="M14.24 10.56c-.31 1.24-2.24.61-2.84.44l.55-2.18c.62.18 2.61.44 2.29 1.74m-3.11 1.56l-.6 2.41c.74.19 3.03.92 3.37-.44c.36-1.42-2.03-1.79-2.77-1.97m10.57 2.3c-1.34 5.36-6.76 8.62-12.12 7.28S.963 14.94 2.3 9.58A9.996 9.996 0 0 1 14.42 2.3c5.35 1.34 8.61 6.76 7.28 12.12m-7.49-6.37l.45-1.8l-1.1-.25l-.44 1.73c-.29-.07-.58-.14-.88-.2l.44-1.77l-1.09-.26l-.45 1.79c-.24-.06-.48-.11-.7-.17l-1.51-.38l-.3 1.17s.82.19.8.2c.45.11.53.39.51.64l-1.23 4.93c-.05.14-.21.32-.5.27c.01.01-.8-.2-.8-.2L6.87 15l1.42.36c.27.07.53.14.79.2l-.46 1.82l1.1.28l.45-1.81c.3.08.59.15.87.23l-.45 1.79l1.1.28l.46-1.82c1.85.35 3.27.21 3.85-1.48c.5-1.35 0-2.15-1-2.66c.72-.19 1.26-.64 1.41-1.62c.2-1.33-.82-2.04-2.2-2.52"
-    />
-  </svg>
-);
-
-const usdIcon = (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className="w-5 h-5"
-    style={{ padding: "1px" }}
-    viewBox="0 0 32 32"
-  >
-    <path
-      fill="#006600"
-      fillRule="evenodd"
-      d="M16 32C7.163 32 0 24.837 0 16S7.163 0 16 0s16 7.163 16 16s-7.163 16-16 16m6.5-12.846c0-2.523-1.576-3.948-5.263-4.836v-4.44c1.14.234 2.231.725 3.298 1.496l1.359-2.196a9.49 9.49 0 0 0-4.56-1.776V6h-2.11v1.355c-3.032.234-5.093 1.963-5.093 4.486c0 2.64 1.649 3.925 5.19 4.813v4.58c-1.577-.234-2.886-.935-4.269-2.01L9.5 21.35a11.495 11.495 0 0 0 5.724 2.314V26h2.11v-2.313c3.08-.257 5.166-1.963 5.166-4.533m-7.18-5.327c-1.867-.537-2.327-1.168-2.327-2.15c0-1.027.8-1.845 2.328-1.962zm4.318 5.49c0 1.122-.873 1.893-2.401 2.01v-4.229c1.892.538 2.401 1.168 2.401 2.22z"
-    />
-  </svg>
-);
