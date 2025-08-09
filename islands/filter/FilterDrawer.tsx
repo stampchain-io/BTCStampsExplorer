@@ -18,13 +18,13 @@ import { Button } from "$button";
 import { CloseIcon, Icon } from "$icon";
 import type { FilterType } from "$islands/button/FilterButton.tsx";
 import { FilterContentSRC20 } from "$islands/filter/FilterContentSRC20.tsx";
+import { useBreakpoints } from "$lib/hooks/useBreakpoints.ts";
+import { tooltipIcon } from "$notification";
 import {
   getSearchParams,
   isBrowser,
   safeNavigate,
 } from "$utils/navigation/freshNavigationUtils.ts";
-import { useBreakpoints } from "$lib/hooks/useBreakpoints.ts";
-import { tooltipIcon } from "$notification";
 
 // Tooltip component
 const Tooltip = ({ visible, text }: { visible: boolean; text: string }) => (
@@ -325,11 +325,12 @@ const FilterDrawer = (
       id={drawerId}
       ref={drawerRef}
       class={`fixed top-0 z-40 h-[100dvh]
-        bg-gradient-to-b from-[#0e0014]/60 via-[#000000]/80 to-[#000000]/100 backdrop-blur-md
+        bg-gradient-to-b from-black/90 via-black/50 to-black/100 backdrop-blur-md
         transition-transform duration-500 will-change-transform
-        overflow-y-auto overflow-x-hidden scrollbar-black
-        left-0 right-auto w-full min-[420px]:w-[340px] shadow-[12px_0_12px_-6px_rgba(0,0,0,0.5)]
-        tablet:right-0 tablet:left-auto tablet:w-[300px] tablet:shadow-[-12px_0_12px_-6px_rgba(0,0,0,0.5)]
+        left-0 right-auto w-full
+        min-[420px]:w-[340px] min-[420px]:rounded-r-xl min-[420px]:border-l-0  min-[420px]:border-r-[1px] min-[420px]:border-r-black
+        min-[420px]:shadow-[12px_0_12px_-6px_rgba(0,0,0,0.5)]
+        tablet:right-0 tablet:left-auto tablet:w-[300px] tablet:rounded-l-xl tablet:border-l-[1px] tablet:border-r-0 tablet:border-l-black tablet:shadow-[-12px_0_12px_-6px_rgba(0,0,0,0.5)]
         ${
         open ? "translate-x-0" : "-translate-x-full tablet:translate-x-full"
       }`}
@@ -337,8 +338,8 @@ const FilterDrawer = (
       aria-labelledby="drawer-form-label"
     >
       {/* Scrollable content area */}
-      <div class="h-[calc(100dvh-110px)] tablet:h-[calc(100dvh-82px)] overflow-y-auto scrollbar-black">
-        <div class="w-full pt-[25px] mobileLg:pt-[37px] tablet:pt-[38px] px-9 tablet:px-6">
+      <div class="h-full overflow-y-auto scrollbar-black pt-[25px] mobileLg:pt-[37px] tablet:pt-[38px]">
+        <div class="px-9 tablet:px-6">
           <div class="relative w-full">
             {/* Mobile CloseIcon - shows by default, hidden on tablet+ */}
             <div class="flex flex-row tablet:hidden justify-between items-center w-full">
@@ -388,7 +389,7 @@ const FilterDrawer = (
         </div>
 
         {/* Filter content based on type */}
-        <div class="flex flex-col pt-6 pb-9 px-9 tablet:pt-5 tablet:pb-6 tablet:px-6">
+        <div class="flex flex-col pt-6 pb-[120px] px-9 tablet:pt-5 tablet:pb-[100px] tablet:px-6">
           {type === "stamp" && (
             <FilterContentStamp
               initialFilters={currentFilters as StampFilters}
@@ -409,11 +410,9 @@ const FilterDrawer = (
         </div>
       </div>
       {/* Sticky buttons */}
-      <div class="flex justify-between w-full sticky bottom-0 py-9 tablet:py-6 px-9 tablet:px-6 gap-6
-       bg-gradient-to-b from-[#000000]/80 to-[#000000]/100
-        shadow-[0_-12px_12px_-6px_rgba(0,0,0,1)]">
+      <div class="flex justify-between w-full sticky bottom-0 pb-9 tablet:pb-6 px-9 tablet:px-6 gap-6 bg-black/80 shadow-[0_-36px_36px_-6px_rgba(0,0,0,1)]">
         <Button
-          variant="glassmorphismDeselected"
+          variant="glassmorphism"
           color="grey"
           size="mdR"
           onClick={() => {
