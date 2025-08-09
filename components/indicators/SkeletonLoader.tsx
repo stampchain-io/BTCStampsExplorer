@@ -220,30 +220,57 @@ export function MintToolSkeleton({ className = "" }: SkeletonLoaderProps) {
   return (
     <div class={`space-y-6 ${className}`}>
       <SkeletonContainer>
-        {/* Left Column Skeleton - Image upload and decimals */}
-        <div class={`${containerColForm} !w-[100px]`}>
-          {/* Image upload skeleton */}
-          <SkeletonImage />
-
-          {/* Decimals input skeleton */}
-          <SkeletonInput />
-        </div>
-
-        {/* Right Column Skeleton - Token details */}
         <div class={`${containerColForm}`}>
           <div class={`${containerRowForm}`}>
-            {/* Ticker name input skeleton */}
-            <SkeletonInput width="w-full flex-1" />
+            {/* Left Column Skeleton - Image preview */}
+            <div class={`${containerColForm} !w-[100px]`}>
+              {/* Image upload skeleton */}
+              <SkeletonImage />
+            </div>
 
-            {/* Toggle switch skeleton */}
-            <SkeletonToggle />
+            {/* Right Column Skeleton - Token details */}
+            <div class={`${containerColForm}`}>
+              {/* Ticker name input skeleton */}
+              <SkeletonInput />
+
+              {/* Amount input skeleton */}
+              <SkeletonInput />
+            </div>
           </div>
+          {/* Mint progress skeleton */}
+          <div
+            class={`flex flex-col
+          min-[480px]:flex-row min-[480px]:justify-between min-[480px]:items-end
+          gap-4 min-[480px]:gap-0 mt-2 min-[480px]:mt-0`}
+          >
+            <div class={`flex flex-col w-full min-[480px]:w-[55%] gap-2.5`}>
+              {/* Progress indicator skeleton */}
+              <SkeletonText
+                lines={1}
+                widths={["w-[150px]"]}
+                className="my-0"
+              />
 
-          {/* Supply input skeleton */}
-          <SkeletonInput />
-
-          {/* Limit per mint input skeleton */}
-          <SkeletonInput />
+              {/* Progress bar skeleton */}
+              <SkeletonInput
+                width="w-full max-w-[420px]"
+                height="h-3"
+                rounded="rounded-full"
+              />
+            </div>
+            {/* Supply, limit and minters information skeleton */}
+            <div
+              class={`flex flex-col w-full items-start mt-2
+            min-[480px]:w-[45%] min-[480px]:!items-end min-[480px]:mt-1`}
+            >
+              <SkeletonText
+                lines={3}
+                height="h-3"
+                widths={["w-[80px]", "w-[70px]", "w-[90px]"]}
+                className="min-[480px]:flex min-[480px]:flex-col min-[480px]:items-end"
+              />
+            </div>
+          </div>
         </div>
       </SkeletonContainer>
     </div>

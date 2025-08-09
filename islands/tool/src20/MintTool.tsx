@@ -1,7 +1,11 @@
 /* ===== SRC20 TOKEN MINTING COMPONENT ===== */
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
-import { SRC20InputField } from "$form";
+import {
+  inputFieldDropdown,
+  inputFieldDropdownHover,
+  SRC20InputField,
+} from "$form";
 import { Icon } from "$icon";
 import { MintToolSkeleton } from "$indicators";
 import {
@@ -9,6 +13,7 @@ import {
   containerBackground,
   containerColForm,
   containerRowForm,
+  glassmorphismLayer2,
   imagePreviewTool,
   loaderSpinGrey,
 } from "$layout";
@@ -19,7 +24,7 @@ import { mapProgressiveFeeDetails } from "$lib/utils/performance/fees/fee-estima
 import { getSRC20ImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
 import { StatusMessages } from "$notification";
 import { FeeCalculatorBase } from "$section";
-import { labelSm, labelXl, titleGreyLD, valueSm, valueXl } from "$text";
+import { labelLg, labelSm, titleGreyLD, valueLg, valueSm } from "$text";
 import type { MintProgressProps } from "$types/ui.d.ts";
 import axiod from "axiod";
 import { useEffect, useRef, useState } from "preact/hooks";
@@ -32,12 +37,14 @@ const MintProgress = (
   { progress, progressWidth, maxSupply, limit, minters }: MintProgressProps,
 ) => {
   return (
-    <div class="flex justify-between items-end">
+    <div class="flex flex-col min-[480px]:flex-row
+    min-[480px]:justify-between min-[480px]:items-end
+    gap-3 min-[480px]:gap-0 mt-2 min-[480px]:mt-0">
       {/* Progress indicator */}
-      <div class=" flex flex-col w-1/2 gap-1.5">
-        <h5 class={labelXl}>
+      <div class="flex flex-col w-full min-[480px]:w-[55%] gap-1.5">
+        <h5 class={labelLg}>
           PROGRESS
-          <span class={`${valueXl} pl-3`}>
+          <span class={`${valueLg} pl-3`}>
             {progress?.toString().match(/^-?\d+(?:\.\d{0,2})?/)?.[0] ?? "0"}
             <span class="font-light">
               %
@@ -45,16 +52,21 @@ const MintProgress = (
           </span>
         </h5>
         {/* Progress bar */}
-        <div class="relative w-full max-w-[420px] h-1.5 bg-stamp-grey rounded-full">
+        <div
+          class={`relative w-full max-w-[420px] h-3 ${glassmorphismLayer2} rounded-full`}
+        >
           <div
-            class="absolute left-0 top-0 h-1.5 bg-stamp-purple-dark rounded-full"
+            class="absolute top-[1px] left-[1px] right-[1px] h-2 bg-stamp-grey rounded-full"
             style={{ width: progressWidth }}
           />
         </div>
       </div>
 
       {/* Supply and limit information */}
-      <div class="flex flex-col w-1/2 justify-end items-end -mb-1">
+      <div
+        class={`flex flex-col w-full items-start mt-2 -mb-1
+        min-[480px]:w-[45%] min-[480px]:justify-end min-[480px]:items-end`}
+      >
         <h5 class={labelSm}>
           SUPPLY <span class={`${valueSm} pl-1.5`}>{maxSupply}</span>
         </h5>
@@ -391,7 +403,7 @@ export function SRC20MintTool({
         novalidate
       >
         {/* ===== TOKEN SEARCH AND AMOUNT INPUT ===== */}
-        <div class={`${containerRowForm} mb-5`}>
+        <div class={`${containerRowForm} mb-3`}>
           {/* Token image preview */}
           <div
             id="image-preview"
@@ -413,7 +425,7 @@ export function SRC20MintTool({
               : (
                 <Icon
                   type="icon"
-                  name="uploadImage"
+                  name="previewImage"
                   weight="extraLight"
                   size="xxl"
                   color="grey"
@@ -475,7 +487,7 @@ export function SRC20MintTool({
                   !isSelecting;
                 return shouldShow;
               })() && (
-                <ul class="absolute top-[100%] left-0 max-h-[168px] w-full bg-stamp-grey-light border border-stamp-grey rounded-b-md text-stamp-grey-darkest text-sm leading-none font-bold z-[11] overflow-y-auto scrollbar-grey shadow-lg">
+                <ul class={`${inputFieldDropdown} max-h-[148px]`}>
                   {searchResults.map((result: SearchResult) => (
                     <li
                       key={result.tick}
@@ -483,11 +495,13 @@ export function SRC20MintTool({
                         e.preventDefault(); // Prevent input blur
                         handleResultClick(result.tick);
                       }}
-                      class="p-3 pl-4 hover:bg-stamp-grey-darker hover:text-stamp-grey-light uppercase cursor-pointer border-b border-stamp-grey last:border-b-0 transition-colors duration-150"
+                      class={`${inputFieldDropdownHover}`}
                     >
-                      <div class="font-bold text-base">{result.tick}</div>
-                      <div class="font-medium text-xs text-stamp-grey-darker opacity-75 mt-1">
-                        {(result.progress || 0).toFixed(1)}% minted
+                      <div class="pt-[1px]">
+                        {result.tick}
+                      </div>
+                      <div class="text-xs text-stamp-grey">
+                        {(result.progress || 0).toFixed(1)}%
                       </div>
                     </li>
                   ))}
