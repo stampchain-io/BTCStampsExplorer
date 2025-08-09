@@ -1,6 +1,7 @@
 /* ===== SRC20 TOKEN MINTING COMPONENT ===== */
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
+import { ProgressiveEstimationIndicator } from "$components/indicators/ProgressiveEstimationIndicator.tsx";
 import {
   inputFieldDropdown,
   inputFieldDropdownHover,
@@ -300,7 +301,12 @@ export function SRC20MintTool({
   const {
     getBestEstimate,
     isEstimating,
+    isPreFetching,
     estimateExact,
+    // Phase-specific results for UI indicators
+    phase1,
+    phase2,
+    phase3,
     currentPhase,
     error: feeEstimationError,
     clearError,
@@ -555,6 +561,19 @@ export function SRC20MintTool({
           buttonName={isConnected ? "MINT" : "CONNECT WALLET"}
           tosAgreed={tosAgreed}
           onTosChange={setTosAgreed}
+          progressIndicator={
+            <ProgressiveEstimationIndicator
+              isConnected={!!wallet && !isSubmitting}
+              isSubmitting={isSubmitting}
+              isPreFetching={isPreFetching}
+              currentPhase={currentPhase}
+              phase1={!!phase1}
+              phase2={!!phase2}
+              phase3={!!phase3}
+              feeEstimationError={feeEstimationError}
+              clearError={clearError}
+            />
+          }
         />
 
         {/* Error Display */}

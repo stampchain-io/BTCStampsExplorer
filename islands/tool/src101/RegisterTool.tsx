@@ -2,6 +2,7 @@
 import { Button } from "$button";
 import { useSRC101Form } from "$client/hooks/userSRC101Form.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
+import { ProgressiveEstimationIndicator } from "$components/indicators/ProgressiveEstimationIndicator.tsx";
 import { ROOT_DOMAINS } from "$constants";
 import { inputFieldOutline, outlineGradient, purple } from "$form";
 import { RegisterToolSkeleton } from "$indicators";
@@ -53,7 +54,13 @@ export function SRC101RegisterTool({
   /* ===== PROGRESSIVE FEE ESTIMATION ===== */
   const {
     getBestEstimate,
+    isPreFetching,
     estimateExact, // Phase 3: Exact estimation before registering
+    // Phase-specific results for UI indicators
+    phase1,
+    phase2,
+    phase3,
+    currentPhase,
     error: feeEstimationError,
     clearError,
   } = useTransactionConstructionService({
@@ -356,7 +363,19 @@ export function SRC101RegisterTool({
           feeDetails={mapProgressiveFeeDetails(
             exactFeeDetails || progressiveFeeDetails,
           )}
-          // Progressive fee estimation props removed - not supported by FeeCalculatorBase
+          progressIndicator={
+            <ProgressiveEstimationIndicator
+              isConnected={!!wallet && !isSubmitting}
+              isSubmitting={isSubmitting}
+              isPreFetching={isPreFetching}
+              currentPhase={currentPhase}
+              phase1={!!phase1}
+              phase2={!!phase2}
+              phase3={!!phase3}
+              feeEstimationError={feeEstimationError}
+              clearError={clearError}
+            />
+          }
         />
 
         {/* ===== 🚨 FEE ESTIMATION ERROR HANDLING ===== */}
