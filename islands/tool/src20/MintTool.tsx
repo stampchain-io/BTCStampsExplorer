@@ -1,10 +1,9 @@
 /* ===== SRC20 TOKEN MINTING COMPONENT ===== */
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
-import type { MintProgressProps } from "$types/ui.d.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
-import { MintToolSkeleton } from "$indicators";
 import { SRC20InputField } from "$form";
 import { Icon } from "$icon";
+import { MintToolSkeleton } from "$indicators";
 import {
   bodyTool,
   containerBackground,
@@ -14,13 +13,14 @@ import {
   loaderSpinGrey,
 } from "$layout";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
-import { mapProgressiveFeeDetails } from "$lib/utils/performance/fees/fee-estimation-utils.ts";
-import { logger } from "$lib/utils/logger.ts";
 import { extractSRC20ErrorMessage } from "$lib/utils/bitcoin/src20/errorHandling.tsx";
+import { logger } from "$lib/utils/logger.ts";
+import { mapProgressiveFeeDetails } from "$lib/utils/performance/fees/fee-estimation-utils.ts";
+import { getSRC20ImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
 import { StatusMessages } from "$notification";
 import { FeeCalculatorBase } from "$section";
-import { labelSm, labelXl, titlePurpleLD, valueSm, valueXl } from "$text";
-import { getSRC20ImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
+import { labelSm, labelXl, titleGreyLD, valueSm, valueXl } from "$text";
+import type { MintProgressProps } from "$types/ui.d.ts";
 import axiod from "axiod";
 import { useEffect, useRef, useState } from "preact/hooks";
 
@@ -97,6 +97,7 @@ export function SRC20MintTool({
     handleChangeFee,
     handleInputChange,
     handleSubmit,
+    config,
     isSubmitting,
     submissionMessage,
     apiError,
@@ -358,10 +359,20 @@ export function SRC20MintTool({
     }
   }, [progressiveFeeDetails, isEstimating, currentPhase]);
 
+  /* ===== CONFIG CHECK ===== */
+  if (!config) {
+    return (
+      <div class={bodyTool}>
+        <h1 class={`${titleGreyLD} mx-auto mb-4`}>MINT</h1>
+        <MintToolSkeleton />
+      </div>
+    );
+  }
+
   /* ===== COMPONENT RENDER ===== */
   return (
     <div class={bodyTool}>
-      <h1 class={`${titlePurpleLD} mobileMd:mx-auto mb-1`}>MINT</h1>
+      <h1 class={`${titleGreyLD} mx-auto mb-4`}>MINT</h1>
 
       {/* ===== ERROR MESSAGE DISPLAY ===== */}
       {error && (
@@ -379,139 +390,135 @@ export function SRC20MintTool({
         aria-label="Mint SRC20 tokens"
         novalidate
       >
-        {!searchTerm && !mintStatus ? <MintToolSkeleton /> : (
-          <>
-            {/* ===== TOKEN SEARCH AND AMOUNT INPUT ===== */}
-            <div class={`${containerRowForm} mb-5`}>
-              {/* Token image preview */}
-              <div
-                id="image-preview"
-                class={imagePreviewTool}
-              >
-                {isImageLoading
-                  ? <div class={loaderSpinGrey} />
-                  : selectedTokenImage
-                  ? (
-                    <img
-                      src={selectedTokenImage}
-                      class="w-full h-full"
-                      alt=""
-                      loading="lazy"
-                      onLoad={() => setIsImageLoading(false)}
-                      onError={() => setIsImageLoading(false)}
-                    />
-                  )
-                  : (
-                    <Icon
-                      type="icon"
-                      name="uploadImage"
-                      weight="normal"
-                      size="xxl"
-                      color="grey"
-                    />
-                  )}
-              </div>
-
-              {/* Token inputs */}
-              <div class={containerColForm}>
-                {/* Token search field with dropdown */}
-                <div
-                  class={`relative ${
-                    openDrop && searchResults.length > 0 && !isSelecting
-                      ? "input-open"
-                      : ""
-                  }`}
-                  ref={dropdownRef}
-                >
-                  <SRC20InputField
-                    type="text"
-                    placeholder="Token"
-                    value={searchTerm}
-                    onChange={(e) => {
-                      const newValue = (e.target as HTMLInputElement).value
-                        .toUpperCase();
-                      if (newValue !== searchTerm) {
-                        if (!isSelecting && !isSwitchingFields) {
-                          setOpenDrop(true);
-                        }
-                        setIsSelecting(false);
-                        setSearchTerm(newValue);
-                      }
-                    }}
-                    onFocus={() => {
-                      if (
-                        !searchTerm.trim() && !isSwitchingFields && !isSelecting
-                      ) {
-                        setOpenDrop(true);
-                      }
-                      setIsSelecting(false);
-                    }}
-                    onBlur={() => {
-                      setIsSwitchingFields(true);
-                      setTimeout(() => {
-                        setOpenDrop(false);
-                        setIsSwitchingFields(false);
-                        if (!searchTerm.trim()) {
-                          setIsSelecting(false);
-                        }
-                      }, 150);
-                    }}
-                    error={formState.tokenError}
-                    isUppercase
-                  />
-
-                  {/* Search results dropdown */}
-                  {(() => {
-                    const shouldShow = openDrop && searchResults.length > 0 &&
-                      !isSelecting;
-                    return shouldShow;
-                  })() && (
-                    <ul class="absolute top-[100%] left-0 max-h-[168px] w-full bg-stamp-grey-light border border-stamp-grey rounded-b-md text-stamp-grey-darkest text-sm leading-none font-bold z-[11] overflow-y-auto scrollbar-grey shadow-lg">
-                      {searchResults.map((result: SearchResult) => (
-                        <li
-                          key={result.tick}
-                          onMouseDown={(e) => {
-                            e.preventDefault(); // Prevent input blur
-                            handleResultClick(result.tick);
-                          }}
-                          class="p-3 pl-4 hover:bg-stamp-grey-darker hover:text-stamp-grey-light uppercase cursor-pointer border-b border-stamp-grey last:border-b-0 transition-colors duration-150"
-                        >
-                          <div class="font-bold text-base">{result.tick}</div>
-                          <div class="font-medium text-xs text-stamp-grey-darker opacity-75 mt-1">
-                            {(result.progress || 0).toFixed(1)}% minted
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-
-                {/* Amount input field */}
-                <SRC20InputField
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  placeholder="Amount"
-                  value={formState.amt}
-                  onChange={(e) => handleInputChange(e, "amt")}
-                  onBlur={() => handleInputBlur("amt")}
-                  error={formState.amtError}
+        {/* ===== TOKEN SEARCH AND AMOUNT INPUT ===== */}
+        <div class={`${containerRowForm} mb-5`}>
+          {/* Token image preview */}
+          <div
+            id="image-preview"
+            class={imagePreviewTool}
+          >
+            {isImageLoading
+              ? <div class={loaderSpinGrey} />
+              : selectedTokenImage
+              ? (
+                <img
+                  src={selectedTokenImage}
+                  class="w-full h-full"
+                  alt=""
+                  loading="lazy"
+                  onLoad={() => setIsImageLoading(false)}
+                  onError={() => setIsImageLoading(false)}
                 />
-              </div>
+              )
+              : (
+                <Icon
+                  type="icon"
+                  name="uploadImage"
+                  weight="extraLight"
+                  size="xxl"
+                  color="grey"
+                />
+              )}
+          </div>
+
+          {/* Token inputs */}
+          <div class={containerColForm}>
+            {/* Token search field with dropdown */}
+            <div
+              class={`relative ${
+                openDrop && searchResults.length > 0 && !isSelecting
+                  ? "input-open"
+                  : ""
+              }`}
+              ref={dropdownRef}
+            >
+              <SRC20InputField
+                type="text"
+                placeholder="Token"
+                value={searchTerm}
+                onChange={(e) => {
+                  const newValue = (e.target as HTMLInputElement).value
+                    .toUpperCase();
+                  if (newValue !== searchTerm) {
+                    if (!isSelecting && !isSwitchingFields) {
+                      setOpenDrop(true);
+                    }
+                    setIsSelecting(false);
+                    setSearchTerm(newValue);
+                  }
+                }}
+                onFocus={() => {
+                  if (
+                    !searchTerm.trim() && !isSwitchingFields && !isSelecting
+                  ) {
+                    setOpenDrop(true);
+                  }
+                  setIsSelecting(false);
+                }}
+                onBlur={() => {
+                  setIsSwitchingFields(true);
+                  setTimeout(() => {
+                    setOpenDrop(false);
+                    setIsSwitchingFields(false);
+                    if (!searchTerm.trim()) {
+                      setIsSelecting(false);
+                    }
+                  }, 150);
+                }}
+                error={formState.tokenError}
+                isUppercase
+              />
+
+              {/* Search results dropdown */}
+              {(() => {
+                const shouldShow = openDrop && searchResults.length > 0 &&
+                  !isSelecting;
+                return shouldShow;
+              })() && (
+                <ul class="absolute top-[100%] left-0 max-h-[168px] w-full bg-stamp-grey-light border border-stamp-grey rounded-b-md text-stamp-grey-darkest text-sm leading-none font-bold z-[11] overflow-y-auto scrollbar-grey shadow-lg">
+                  {searchResults.map((result: SearchResult) => (
+                    <li
+                      key={result.tick}
+                      onMouseDown={(e) => {
+                        e.preventDefault(); // Prevent input blur
+                        handleResultClick(result.tick);
+                      }}
+                      class="p-3 pl-4 hover:bg-stamp-grey-darker hover:text-stamp-grey-light uppercase cursor-pointer border-b border-stamp-grey last:border-b-0 transition-colors duration-150"
+                    >
+                      <div class="font-bold text-base">{result.tick}</div>
+                      <div class="font-medium text-xs text-stamp-grey-darker opacity-75 mt-1">
+                        {(result.progress || 0).toFixed(1)}% minted
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
 
-            {/* ===== MINT PROGRESS DISPLAY ===== */}
-            <MintProgress
-              progress={progress}
-              progressWidth={progressWidth}
-              maxSupply={maxSupply}
-              limit={limit}
-              minters={minters}
-              current={Math.floor((Number(progress) * maxSupply) / 100)}
-              total={maxSupply}
+            {/* Amount input field */}
+            <SRC20InputField
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              placeholder="Amount"
+              value={formState.amt}
+              onChange={(e) => handleInputChange(e, "amt")}
+              onBlur={() => handleInputBlur("amt")}
+              error={formState.amtError}
             />
-          </>
-        )}
+          </div>
+        </div>
+
+        {/* ===== MINT PROGRESS DISPLAY ===== */}
+        <MintProgress
+          progress={progress}
+          progressWidth={progressWidth}
+          maxSupply={maxSupply}
+          limit={limit}
+          minters={minters}
+          current={Math.floor((Number(progress) * maxSupply) / 100)}
+          total={maxSupply}
+        />
       </form>
 
       {/* ===== FEE CALCULATOR ===== */}
