@@ -155,45 +155,27 @@ export function SkeletonImage({
 export function StampingToolSkeleton({ className = "" }: SkeletonLoaderProps) {
   return (
     <div class={`space-y-6 ${className}`}>
-      {/* File upload section */}
-      <div class="space-y-3">
-        <SkeletonText lines={1} widths={["w-24"]} />
-        <div class="flex gap-4">
-          <SkeletonImage size="w-32 h-32" />
-          <div class="flex-1 space-y-3">
-            <SkeletonButton width="w-40" />
-            <SkeletonText lines={2} widths={["w-full", "w-3/4"]} />
+      <SkeletonContainer>
+        {/* Left Column Skeleton - Image upload and decimals */}
+        <div class={`${containerColForm} !w-[100px]`}>
+          {/* Image upload skeleton */}
+          <SkeletonImage />
+
+          {/* Decimals input skeleton */}
+          <SkeletonInput />
+        </div>
+
+        {/* Right Column Skeleton - Token details */}
+        <div class={`${containerColForm}`}>
+          <div class={`${containerRowForm}`}>
+            {/* Ticker name input skeleton */}
+            <SkeletonInput width="w-full flex-1" />
+
+            {/* Toggle switch skeleton */}
+            <SkeletonToggle />
           </div>
         </div>
-      </div>
-
-      {/* Form inputs */}
-      <div class="space-y-4">
-        <SkeletonInput />
-        <SkeletonInput />
-        <div class="grid grid-cols-2 gap-4">
-          <SkeletonInput />
-          <SkeletonInput />
-        </div>
-      </div>
-
-      {/* Toggle switches */}
-      <div class="space-y-3">
-        <div class="flex items-center justify-between">
-          <SkeletonText lines={1} widths={["w-32"]} />
-          <SkeletonToggle />
-        </div>
-        <div class="flex items-center justify-between">
-          <SkeletonText lines={1} widths={["w-28"]} />
-          <SkeletonToggle />
-        </div>
-      </div>
-
-      {/* Action buttons */}
-      <div class="flex gap-3">
-        <SkeletonButton width="flex-1" />
-        <SkeletonButton width="w-32" />
-      </div>
+      </SkeletonContainer>
     </div>
   );
 }
@@ -237,40 +219,33 @@ export function DeployToolSkeleton({ className = "" }: SkeletonLoaderProps) {
 export function MintToolSkeleton({ className = "" }: SkeletonLoaderProps) {
   return (
     <div class={`space-y-6 ${className}`}>
-      {/* Token info display */}
-      <div class="space-y-3">
-        <div class="flex items-center gap-4">
-          <SkeletonImage size="w-16 h-16" />
-          <div class="flex-1">
-            <SkeletonText lines={2} widths={["w-32", "w-48"]} />
-          </div>
+      <SkeletonContainer>
+        {/* Left Column Skeleton - Image upload and decimals */}
+        <div class={`${containerColForm} !w-[100px]`}>
+          {/* Image upload skeleton */}
+          <SkeletonImage />
+
+          {/* Decimals input skeleton */}
+          <SkeletonInput />
         </div>
 
-        {/* Progress bar */}
-        <div class="space-y-2">
-          <div class="flex justify-between">
-            <SkeletonText lines={1} widths={["w-20"]} />
-            <SkeletonText lines={1} widths={["w-16"]} />
+        {/* Right Column Skeleton - Token details */}
+        <div class={`${containerColForm}`}>
+          <div class={`${containerRowForm}`}>
+            {/* Ticker name input skeleton */}
+            <SkeletonInput width="w-full flex-1" />
+
+            {/* Toggle switch skeleton */}
+            <SkeletonToggle />
           </div>
-          <SkeletonContainer
-            height="h-1.5"
-            width="w-full"
-            rounded="rounded-full"
-          />
+
+          {/* Supply input skeleton */}
+          <SkeletonInput />
+
+          {/* Limit per mint input skeleton */}
+          <SkeletonInput />
         </div>
-      </div>
-
-      {/* Form inputs */}
-      <div class="space-y-4">
-        <SkeletonInput />
-        <SkeletonInput />
-      </div>
-
-      {/* Fee section */}
-      <SkeletonContainer height="h-12" width="w-full" rounded="rounded-lg" />
-
-      {/* Action button */}
-      <SkeletonButton size="mdR" width="w-full" />
+      </SkeletonContainer>
     </div>
   );
 }
@@ -279,33 +254,20 @@ export function MintToolSkeleton({ className = "" }: SkeletonLoaderProps) {
 export function TransferToolSkeleton({ className = "" }: SkeletonLoaderProps) {
   return (
     <div class={`space-y-6 ${className}`}>
-      {/* Token selector */}
-      <div class="space-y-3">
-        <SkeletonText lines={1} widths={["w-32"]} />
-        <SkeletonContainer
-          height="h-[42px]"
-          width="w-full"
-          rounded="rounded-lg"
-        />
-      </div>
+      <SkeletonContainer>
+        <div class={`${containerColForm}`}>
+          <div class={`${containerRowForm}`}>
+            {/* Ticker name input skeleton */}
+            <SkeletonInput width="w-full flex-1" />
 
-      {/* Form inputs */}
-      <div class="space-y-4">
-        <SkeletonInput />
-        <SkeletonInput />
-      </div>
+            {/* Amount input skeleton */}
+            <SkeletonInput width="w-full flex-1" />
+          </div>
 
-      {/* Balance display */}
-      <div class="space-y-2">
-        <SkeletonText lines={1} widths={["w-20"]} />
-        <SkeletonText lines={1} widths={["w-32"]} />
-      </div>
-
-      {/* Fee section */}
-      <SkeletonContainer height="h-12" width="w-full" rounded="rounded-lg" />
-
-      {/* Action button */}
-      <SkeletonButton size="mdR" width="w-full" />
+          {/* Address input skeleton */}
+          <SkeletonInput />
+        </div>
+      </SkeletonContainer>
     </div>
   );
 }
