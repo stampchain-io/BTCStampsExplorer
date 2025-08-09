@@ -1,4 +1,7 @@
+import { glassmorphismLayer2 } from "$layout";
+import { tooltipButton } from "$notification";
 import type { ProgressiveEstimationIndicatorProps } from "$types/ui.d.ts";
+import { useRef, useState } from "preact/hooks";
 /**
  * Progressive Fee Estimation Indicator Component
  *
@@ -23,64 +26,98 @@ export function ProgressiveEstimationIndicator({
   feeEstimationError,
   clearError,
 }: ProgressiveEstimationIndicatorProps): VNode<any> | null {
+  const [isTooltipVisible, setIsTooltipVisible] = useState(false);
+  const tooltipTimeoutRef = useRef<number | null>(null);
+
   // Only show when connected
   if (!isConnected) {
     return null;
   }
 
+  const handleMouseEnter = () => {
+    if (tooltipTimeoutRef.current) {
+      globalThis.clearTimeout(tooltipTimeoutRef.current);
+    }
+
+    tooltipTimeoutRef.current = globalThis.setTimeout(() => {
+      setIsTooltipVisible(true);
+    }, 500);
+  };
+
+  const handleMouseLeave = () => {
+    if (tooltipTimeoutRef.current) {
+      globalThis.clearTimeout(tooltipTimeoutRef.current);
+    }
+    setIsTooltipVisible(false);
+  };
+
   return (
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-2 relative">
       {/* Phase Status Summary */}
       {!isSubmitting && !feeEstimationError && (
-        <div className="flex items-center gap-2 bg-stamp-grey-darker/95 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-sm border border-stamp-grey-light/10">
-          {/* Phase indicators */}
-          <div className="flex items-center gap-1">
-            {/* Phase 1: Instant */}
-            <div
-              className={`w-1.5 h-1.5 rounded-full ${
-                phase1 ? "bg-green-400" : "bg-stamp-grey-light/30"
-              }`}
-              title="Phase 1: Instant estimate"
-            />
-            {/* Phase 2: Smart */}
-            <div
-              className={`w-1.5 h-1.5 rounded-full ${
-                phase2
-                  ? "bg-blue-400"
-                  : currentPhase === "smart" || isPreFetching
-                  ? "bg-blue-400 animate-pulse"
-                  : "bg-stamp-grey-light/30"
-              }`}
-              title="Phase 2: Smart UTXO estimate"
-            />
-            {/* Phase 3: Exact */}
-            <div
-              className={`w-1.5 h-1.5 rounded-full ${
-                phase3 ? "bg-green-500" : "bg-stamp-grey-light/30"
-              }`}
-              title="Phase 3: Exact calculation"
-            />
+        <div className="relative">
+          <div
+            className={`flex items-center py-0.5 min-[420px]:py-1.5 min-[460px]:py-0.5 px-2 ${glassmorphismLayer2} !rounded-full cursor-default select-none`}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+          >
+            {/* Phase indicators */}
+            <div className="flex items-center gap-1">
+              {/* Phase 1: Instant */}
+              <div
+                className={`size-1.5 rounded-full tracking-wide ${
+                  phase1 ? "bg-stamp-grey-light" : "bg-stamp-grey/40"
+                }`}
+              />
+              {/* Phase 2: Smart */}
+              <div
+                className={`size-1.5 rounded-full tracking-wide ${
+                  phase2
+                    ? "bg-stamp-grey-light"
+                    : currentPhase === "smart" || isPreFetching
+                    ? "bg-stamp-grey-light animate-pulse"
+                    : "bg-stamp-grey/40"
+                }`}
+              />
+              {/* Phase 3: Exact */}
+              <div
+                className={`size-1.5 rounded-full tracking-wide ${
+                  phase3 ? "bg-stamp-grey-light" : "bg-stamp-grey/40"
+                }`}
+              />
+            </div>
+
+            {/* Current phase text */}
+            <span className="inline min-[420px]:hidden min-[460px]:inline ml-1.5 text-[10px] text-stamp-grey font-normal">
+              {currentPhase === "instant" && "ROUGH"}
+              {currentPhase === "smart" && "SMART"}
+              {currentPhase === "exact" && "EXACT"}
+            </span>
+
+            {/* Mobile-only emoji */}
+            <span className="hidden min-[420px]:inline min-[460px]:hidden">
+              {currentPhase === "instant" && ""}
+              {currentPhase === "smart" && ""}
+              {currentPhase === "exact" && ""}
+            </span>
           </div>
-
-          {/* Current phase text */}
-          <span className="hidden sm:inline text-xs text-stamp-grey-light font-normal opacity-80">
-            {currentPhase === "instant" && "⚡ Instant"}
-            {currentPhase === "smart" && "💡 Smart"}
-            {currentPhase === "exact" && "🎯 Exact"}
-          </span>
-
-          {/* Mobile-only emoji */}
-          <span className="inline sm:hidden text-stamp-grey-light text-xs opacity-80">
-            {currentPhase === "instant" && "⚡"}
-            {currentPhase === "smart" && "💡"}
-            {currentPhase === "exact" && "🎯"}
-          </span>
+          <div
+            className={`${tooltipButton} ${
+              isTooltipVisible ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            {currentPhase === "instant" && "ROUGH ESTIMATE"}
+            {currentPhase === "smart" && "SMART UTXO ESTIMATE"}
+            {currentPhase === "exact" && "EXACT CALCULATION"}
+          </div>
         </div>
       )}
 
       {/* Phase 2: Smart UTXO-based estimation (background pre-fetching) */}
       {isPreFetching && !isSubmitting && (
-        <div className="flex items-center gap-2 bg-stamp-grey-darker/95 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-sm border border-stamp-grey-light/10">
+        <div
+          className={`flex items-center px-3 py-1.5 ${glassmorphismLayer2}`}
+        >
           <div className="relative">
             <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse" />
             <div className="absolute inset-0 w-1.5 h-1.5 bg-blue-400 rounded-full animate-ping opacity-20" />
