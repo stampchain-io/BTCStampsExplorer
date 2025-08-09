@@ -1,14 +1,15 @@
 /* ===== FAIRMINT CONTENT COMPONENT ===== */
 import { useFairmintForm } from "$client/hooks/useFairmintForm.ts";
-import type { FairmintToolProps } from "$types/ui.d.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
+import { ProgressiveEstimationIndicator } from "$components/indicators/ProgressiveEstimationIndicator.tsx";
 import { bodyTool, containerBackground, containerColForm } from "$layout";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
-import { mapProgressiveFeeDetails } from "$lib/utils/performance/fees/fee-estimation-utils.ts";
 import { logger } from "$lib/utils/logger.ts";
+import { mapProgressiveFeeDetails } from "$lib/utils/performance/fees/fee-estimation-utils.ts";
 import { StatusMessages } from "$notification";
 import { FeeCalculatorBase } from "$section";
 import { titlePurpleLD } from "$text";
+import type { FairmintToolProps } from "$types/ui.d.ts";
 import { useEffect, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
@@ -234,7 +235,19 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
             exactFeeDetails || progressiveFeeDetails,
           )}
           bitname=""
-          // Progressive fee estimation props removed - not supported by FeeCalculatorBase
+          progressIndicator={
+            <ProgressiveEstimationIndicator
+              isConnected={!!wallet && !isSubmitting}
+              isSubmitting={isSubmitting}
+              isPreFetching={isPreFetching}
+              currentPhase={currentPhase}
+              phase1={!!phase1}
+              phase2={!!phase2}
+              phase3={!!phase3}
+              feeEstimationError={feeEstimationError}
+              clearError={clearError}
+            />
+          }
         />
 
         {/* ===== 🚨 FEE ESTIMATION ERROR HANDLING ===== */}

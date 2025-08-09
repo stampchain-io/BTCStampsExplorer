@@ -1,6 +1,7 @@
 /* ===== TRANSFER CONTENT COMPONENT ===== */
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
+import { ProgressiveEstimationIndicator } from "$components/indicators/ProgressiveEstimationIndicator.tsx";
 import {
   inputFieldDropdown,
   inputFieldDropdownHover,
@@ -63,7 +64,13 @@ export function SRC20TransferTool(
   /* ===== PROGRESSIVE FEE ESTIMATION INTEGRATION ===== */
   const {
     getBestEstimate,
+    isPreFetching,
     estimateExact, // Phase 3: Exact estimation before transferring
+    // Phase-specific results for UI indicators
+    phase1,
+    phase2,
+    phase3,
+    currentPhase,
     error: feeEstimationError,
     clearError,
   } = useTransactionConstructionService({
@@ -380,7 +387,19 @@ export function SRC20TransferTool(
           feeDetails={mapProgressiveFeeDetails(
             exactFeeDetails || progressiveFeeDetails,
           )}
-          // Progressive fee estimation props removed - not supported by FeeCalculatorBase
+          progressIndicator={
+            <ProgressiveEstimationIndicator
+              isConnected={!!wallet && !isSubmitting}
+              isSubmitting={isSubmitting}
+              isPreFetching={isPreFetching}
+              currentPhase={currentPhase}
+              phase1={!!phase1}
+              phase2={!!phase2}
+              phase3={!!phase3}
+              feeEstimationError={feeEstimationError}
+              clearError={clearError}
+            />
+          }
         />
 
         {/* Error Display */}

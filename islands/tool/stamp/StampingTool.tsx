@@ -28,6 +28,7 @@ import {
 import type { Config } from "$types/base.d.ts";
 
 import { NOT_AVAILABLE_IMAGE } from "$constants";
+import { useSSRSafeNavigation } from "$lib/hooks/useSSRSafeNavigation.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { validateWalletAddressForMinting } from "$lib/utils/scriptTypeUtils.ts";
 import { handleImageError } from "$lib/utils/ui/media/imageUtils.ts";
@@ -39,14 +40,13 @@ import {
   tooltipImage,
 } from "$notification";
 import { FeeCalculatorBase } from "$section";
-import { titlePurpleLD } from "$text";
-import axiod from "axiod";
-import { useEffect, useRef, useState } from "preact/hooks";
-import { useSSRSafeNavigation } from "$lib/hooks/useSSRSafeNavigation.ts";
+import { titleGreyLD } from "$text";
 import {
   getSearchParams,
   isBrowser,
 } from "$utils/navigation/freshNavigationUtils.ts";
+import axiod from "axiod";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
 
@@ -1939,7 +1939,7 @@ function StampingToolMain({ config }: { config: Config }) {
   /* ===== COMPONENT RENDER ===== */
   return (
     <div class={bodyTool}>
-      <h1 class={`${titlePurpleLD} mobileMd:mx-auto mb-1`}>STAMP</h1>
+      <h1 class={`${titleGreyLD} mx-auto mb-4`}>STAMP</h1>
 
       {/* MARA Mode Indicator */}
       {maraMode && outputValue !== null && (
@@ -2177,7 +2177,7 @@ function StampingToolMain({ config }: { config: Config }) {
           bitname=""
           progressIndicator={
             <ProgressiveEstimationIndicator
-              isConnected={isConnected}
+              isConnected={!!wallet && !isSubmitting}
               isSubmitting={isSubmitting}
               isPreFetching={isPreFetching}
               currentPhase={currentPhase}
