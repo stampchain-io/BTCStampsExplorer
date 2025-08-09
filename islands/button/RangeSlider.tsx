@@ -15,6 +15,8 @@ export const RangeSlider = ({
   onMouseLeave,
   onMouseDown,
   onMouseMove,
+  className,
+  disabled,
 }: {
   value: number;
   onChange?: (value: number) => void;
@@ -27,6 +29,8 @@ export const RangeSlider = ({
   onMouseLeave?: () => void;
   onMouseDown?: () => void;
   onMouseMove?: (e: MouseEvent) => void;
+  className?: string;
+  disabled?: boolean;
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [hovered, setHovered] = useState(false);
@@ -129,7 +133,7 @@ export const RangeSlider = ({
     : defaultFormatValue(value);
 
   return (
-    <div class="w-full">
+    <div class={`w-full ${className ?? ""}`}>
       {formatValue && (
         <div class="flex w-full justify-center pb-1.5 tablet:pb-1">
           <div class="flex items-center text-sm tablet:text-xs font-regular">
@@ -168,6 +172,7 @@ export const RangeSlider = ({
           onMouseEnter={() => setHovered(true)}
           onMouseLeave={() => setHovered(false)}
           class={`${sliderKnob} z-10 px-0.5`}
+          disabled={disabled}
         />
       </div>
     </div>
