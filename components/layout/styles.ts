@@ -68,10 +68,11 @@ export const modalBgCenter =
 
 /* ===== LOADER STYLES ===== */
 // Text loader styles are defined in /text/styles.ts
+// Skeleton loader styles are defined in /layout/SkeletonLoader.tsx
 // Base loader style
 const loaderSpin = "animate-spin rounded-full border-b-[2px]";
-const loaderSkeleton =
-  `bg-stamp-grey-darkest/30 border border-stamp-grey-darkest/15 animate-pulse`;
+export const loaderSkeleton =
+  `bg-stamp-grey-darkest/30 border-[1px] border-stamp-grey-darkest/15 animate-pulse`;
 // Spinning loader styles
 export const loaderSpinXsGrey = `${loaderSpin} w-3 h-3 border-stamp-grey`;
 export const loaderSpinSmGrey = `${loaderSpin} w-5 h-5 border-stamp-grey`;
@@ -81,14 +82,8 @@ export const loaderSpinXsPurple = `${loaderSpin} w-3 h-3 border-stamp-purple`;
 export const loaderSpinSmPurple = `${loaderSpin} w-5 h-5 border-stamp-purple`;
 export const loaderSpinPurple = `${loaderSpin} w-7 h-7 border-stamp-purple`;
 export const loaderSpinLgPurple = `${loaderSpin} w-9 h-9 border-stamp-purple`;
-// Skeleton loader styles - rename to: md=text - lg=form -full=rounded
-export const loaderSkeletonImage =
-  `flex items-center justify-center min-w-[100px] h-[100px] ${loaderSkeleton} rounded-lg`;
-export const loaderSkeletonMd = `${loaderSkeleton} rounded`;
-export const loaderSkeletonLg = `${loaderSkeleton} rounded-lg`;
-export const loaderSkeletonFull = `${loaderSkeleton} rounded-full`;
 
-/* ===== LEGACY STYLES - not checked yet-@baba ===== */
+/* ===== LEGACY STYLES - @baba-check and remove ===== */
 export const modalBgTop =
   "fixed inset-0 z-50 flex items-start justify-center bg-black bg-opacity-70 backdrop-filter backdrop-blur-md";
 export const modalSearch = "w-[90%] max-w-[600px] mt-[72px] tablet:mt-24";
@@ -134,6 +129,7 @@ export type LayoutStyles = {
   loaderSpinSmPurple: string;
   loaderSpinPurple: string;
   loaderSpinLgPurple: string;
+  loaderSkeleton: string;
   loaderSkeletonImage: string;
   loaderSkeletonMd: string;
   loaderSkeletonLg: string;

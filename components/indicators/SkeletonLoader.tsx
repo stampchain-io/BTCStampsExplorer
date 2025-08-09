@@ -1,87 +1,110 @@
 /* ===== SKELETON LOADER COMPONENTS ===== */
+import { Icon } from "$icon";
+import { containerColForm, containerRowForm, loaderSkeleton } from "$layout";
 import type { SkeletonLoaderProps } from "$types/ui.d.ts";
 
 /* ===== BASIC SKELETON COMPONENTS ===== */
-
-/**
- * Basic skeleton element with customizable dimensions
- */
-export function SkeletonElement({
-  height = "h-4",
+/* Skeleton container */
+export function SkeletonContainer({
+  height = "h-full",
   width = "w-full",
-  rounded = "rounded",
-  className = "",
+  rounded = "rounded-2xl",
+  className = "flex p-5 gap-5",
+  children,
 }: {
   height?: string;
   width?: string;
   rounded?: string;
   className?: string;
+  children?: any;
 }) {
   return (
     <div
-      class={`animate-pulse bg-stamp-grey-darker ${height} ${width} ${rounded} ${className}`}
-    />
-  );
-}
-
-/**
- * Skeleton for form inputs
- */
-export function SkeletonInput({
-  label = true,
-  width = "w-full",
-  className = "",
-}: {
-  label?: boolean;
-  width?: string;
-  className?: string;
-}) {
-  return (
-    <div class={`space-y-1.5 ${className}`}>
-      {label && <SkeletonElement height="h-4" width="w-20" />}
-      <SkeletonElement height="h-[38px]" width={width} rounded="rounded-lg" />
+      class={`${loaderSkeleton} ${height} ${width} ${rounded} ${className}`}
+    >
+      {children}
     </div>
   );
 }
 
-/**
- * Skeleton for buttons
- */
-export function SkeletonButton({
-  size = "md",
-  width = "w-32",
+/* Skeleton for form inputs */
+export function SkeletonInput({
+  height = "h-10",
+  width = "w-full",
+  rounded = "rounded-lg",
   className = "",
 }: {
-  size?: "sm" | "md" | "lg";
   width?: string;
+  height?: string;
+  rounded?: string;
   className?: string;
 }) {
-  const heights = {
-    sm: "h-[34px]",
-    md: "h-[38px]",
-    lg: "h-[42px]",
-  };
-
   return (
-    <SkeletonElement
-      height={heights[size]}
-      width={width}
-      rounded="rounded-lg"
-      className={className}
+    <div
+      class={`${loaderSkeleton} ${height} ${width} ${rounded} ${className}`}
     />
   );
 }
 
-/**
- * Skeleton for text lines
- */
+/* Skeleton for buttons */
+export function SkeletonButton({
+  width = "w-32",
+  rounded = "rounded-lg",
+  size = "mdR",
+  className = "",
+}: {
+  height?: string;
+  width?: string;
+  rounded?: string;
+  size?: "smR" | "mdR" | "lgR";
+  className?: string;
+}) {
+  const sizes = {
+    smR: "h-9 tablet:h-8",
+    mdR: "h-10 tablet:h-9",
+    lgR: "h-11 tablet:h-10",
+  };
+
+  return (
+    <div
+      class={`${loaderSkeleton} ${width} ${rounded} ${
+        sizes[size]
+      } ${className}`}
+    />
+  );
+}
+
+/* Skeleton for toggle switches */
+export function SkeletonToggle({
+  height = "h-5",
+  width = "w-10",
+  rounded = "rounded-full",
+  className = "",
+}: {
+  width?: string;
+  height?: string;
+  rounded?: string;
+  className?: string;
+}) {
+  return (
+    <div
+      class={`${loaderSkeleton} ${height} ${width} ${rounded} ${className}`}
+    />
+  );
+}
+
+/* Skeleton for text lines */
 export function SkeletonText({
   lines = 1,
+  height = "h-4",
   widths = ["w-full"],
+  rounded = "rounded",
   className = "",
 }: {
   lines?: number;
+  height?: string;
   widths?: string[];
+  rounded?: string;
   className?: string;
 }) {
   const lineWidths = Array.from(
@@ -92,42 +115,43 @@ export function SkeletonText({
   return (
     <div class={`space-y-2 ${className}`}>
       {lineWidths.map((width, index) => (
-        <SkeletonElement key={index} height="h-4" width={width} />
+        <div
+          class={`${loaderSkeleton} ${index} ${height} ${width} ${rounded}`}
+        />
       ))}
     </div>
   );
 }
 
-/**
- * Skeleton for image previews
- */
+/* Skeleton for image previews */
 export function SkeletonImage({
-  size = "w-32 h-32",
+  size = "w-[100px] h-[100px]",
+  rounded = "rounded-lg",
   className = "",
 }: {
   size?: string;
+  rounded?: string;
   className?: string;
 }) {
   return (
     <div
-      class={`animate-pulse bg-stamp-grey-darker ${size} rounded-lg flex items-center justify-center ${className}`}
+      class={`flex items-center justify-center ${loaderSkeleton} ${size} ${rounded} ${className}`}
     >
-      <svg
-        class="w-8 h-8 text-stamp-grey"
-        fill="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM19 19H5V5H19V19ZM13.96 12.29L11.21 15.83L9.25 13.47L6.5 17H17.5L13.96 12.29Z" />
-      </svg>
+      <Icon
+        type="icon"
+        name="uploadImage"
+        weight="extraLight"
+        size="xxl"
+        color="grey"
+        className="opacity-20"
+      />
     </div>
   );
 }
 
 /* ===== TOOL-SPECIFIC SKELETON LOADERS ===== */
 
-/**
- * Skeleton loader for stamping tool form
- */
+/* Skeleton loader for stamping tool form */
 export function StampingToolSkeleton({ className = "" }: SkeletonLoaderProps) {
   return (
     <div class={`space-y-6 ${className}`}>
@@ -157,62 +181,59 @@ export function StampingToolSkeleton({ className = "" }: SkeletonLoaderProps) {
       <div class="space-y-3">
         <div class="flex items-center justify-between">
           <SkeletonText lines={1} widths={["w-32"]} />
-          <SkeletonElement height="h-5" width="w-10" rounded="rounded-full" />
+          <SkeletonToggle />
         </div>
         <div class="flex items-center justify-between">
           <SkeletonText lines={1} widths={["w-28"]} />
-          <SkeletonElement height="h-5" width="w-10" rounded="rounded-full" />
+          <SkeletonToggle />
         </div>
       </div>
 
       {/* Action buttons */}
       <div class="flex gap-3">
-        <SkeletonButton size="lg" width="flex-1" />
-        <SkeletonButton size="lg" width="w-32" />
+        <SkeletonButton width="flex-1" />
+        <SkeletonButton width="w-32" />
       </div>
     </div>
   );
 }
 
-/**
- * Skeleton loader for SRC20 deploy tool
- */
+/* Skeleton loader for SRC20 deploy tool */
 export function DeployToolSkeleton({ className = "" }: SkeletonLoaderProps) {
   return (
     <div class={`space-y-6 ${className}`}>
-      {/* Token info inputs */}
-      <div class="space-y-4">
-        <SkeletonInput />
-        <SkeletonInput />
-        <div class="grid grid-cols-2 gap-4">
-          <SkeletonInput />
+      <SkeletonContainer>
+        {/* Left Column Skeleton - Image upload and decimals */}
+        <div class={`${containerColForm} !w-[100px]`}>
+          {/* Image upload skeleton */}
+          <SkeletonImage />
+
+          {/* Decimals input skeleton */}
           <SkeletonInput />
         </div>
-      </div>
 
-      {/* Settings toggles */}
-      <div class="space-y-3">
-        <div class="flex items-center justify-between">
-          <SkeletonText lines={1} widths={["w-24"]} />
-          <SkeletonElement height="h-5" width="w-10" rounded="rounded-full" />
+        {/* Right Column Skeleton - Token details */}
+        <div class={`${containerColForm}`}>
+          <div class={`${containerRowForm}`}>
+            {/* Ticker name input skeleton */}
+            <SkeletonInput width="w-full flex-1" />
+
+            {/* Toggle switch skeleton */}
+            <SkeletonToggle />
+          </div>
+
+          {/* Supply input skeleton */}
+          <SkeletonInput />
+
+          {/* Limit per mint input skeleton */}
+          <SkeletonInput />
         </div>
-      </div>
-
-      {/* Fee section placeholder */}
-      <div class="space-y-2">
-        <SkeletonText lines={1} widths={["w-16"]} />
-        <SkeletonElement height="h-12" width="w-full" rounded="rounded-lg" />
-      </div>
-
-      {/* Action button */}
-      <SkeletonButton size="lg" width="w-full" />
+      </SkeletonContainer>
     </div>
   );
 }
 
-/**
- * Skeleton loader for SRC20 mint tool
- */
+/* Skeleton loader for SRC20 mint tool */
 export function MintToolSkeleton({ className = "" }: SkeletonLoaderProps) {
   return (
     <div class={`space-y-6 ${className}`}>
@@ -231,7 +252,7 @@ export function MintToolSkeleton({ className = "" }: SkeletonLoaderProps) {
             <SkeletonText lines={1} widths={["w-20"]} />
             <SkeletonText lines={1} widths={["w-16"]} />
           </div>
-          <SkeletonElement
+          <SkeletonContainer
             height="h-1.5"
             width="w-full"
             rounded="rounded-full"
@@ -246,24 +267,22 @@ export function MintToolSkeleton({ className = "" }: SkeletonLoaderProps) {
       </div>
 
       {/* Fee section */}
-      <SkeletonElement height="h-12" width="w-full" rounded="rounded-lg" />
+      <SkeletonContainer height="h-12" width="w-full" rounded="rounded-lg" />
 
       {/* Action button */}
-      <SkeletonButton size="lg" width="w-full" />
+      <SkeletonButton size="mdR" width="w-full" />
     </div>
   );
 }
 
-/**
- * Skeleton loader for SRC20 transfer tool
- */
+/* Skeleton loader for SRC20 transfer tool */
 export function TransferToolSkeleton({ className = "" }: SkeletonLoaderProps) {
   return (
     <div class={`space-y-6 ${className}`}>
       {/* Token selector */}
       <div class="space-y-3">
         <SkeletonText lines={1} widths={["w-32"]} />
-        <SkeletonElement
+        <SkeletonContainer
           height="h-[42px]"
           width="w-full"
           rounded="rounded-lg"
@@ -283,17 +302,15 @@ export function TransferToolSkeleton({ className = "" }: SkeletonLoaderProps) {
       </div>
 
       {/* Fee section */}
-      <SkeletonElement height="h-12" width="w-full" rounded="rounded-lg" />
+      <SkeletonContainer height="h-12" width="w-full" rounded="rounded-lg" />
 
       {/* Action button */}
-      <SkeletonButton size="lg" width="w-full" />
+      <SkeletonButton size="mdR" width="w-full" />
     </div>
   );
 }
 
-/**
- * Skeleton loader for send tool
- */
+/* Skeleton loader for send tool */
 export function SendToolSkeleton({ className = "" }: SkeletonLoaderProps) {
   return (
     <div class={`space-y-6 ${className}`}>
@@ -315,17 +332,15 @@ export function SendToolSkeleton({ className = "" }: SkeletonLoaderProps) {
       </div>
 
       {/* Fee section */}
-      <SkeletonElement height="h-12" width="w-full" rounded="rounded-lg" />
+      <SkeletonContainer height="h-12" width="w-full" rounded="rounded-lg" />
 
       {/* Action button */}
-      <SkeletonButton size="lg" width="w-full" />
+      <SkeletonButton size="mdR" width="w-full" />
     </div>
   );
 }
 
-/**
- * Skeleton loader for register tool (SRC101)
- */
+/* Skeleton loader for register tool (SRC101) */
 export function RegisterToolSkeleton({ className = "" }: SkeletonLoaderProps) {
   return (
     <div class={`space-y-6 ${className}`}>
@@ -348,10 +363,10 @@ export function RegisterToolSkeleton({ className = "" }: SkeletonLoaderProps) {
       </div>
 
       {/* Fee section */}
-      <SkeletonElement height="h-12" width="w-full" rounded="rounded-lg" />
+      <SkeletonContainer height="h-12" width="w-full" rounded="rounded-lg" />
 
       {/* Action button */}
-      <SkeletonButton size="lg" width="w-full" />
+      <SkeletonButton size="mdR" width="w-full" />
     </div>
   );
 }
