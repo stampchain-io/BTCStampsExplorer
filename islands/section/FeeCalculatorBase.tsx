@@ -243,14 +243,14 @@ export function FeeCalculatorBase({
   const renderFeeSelector = () => {
     if (isLoadingMaraFee) {
       return (
-        <div class={`flex flex-col ${isModal ? "w-2/3" : "w-[65%]"}`}>
+        <div class={`flex flex-col ${isModal ? "w-2/3" : "w-[85%]"}`}>
           <FeeSkeletonLoader />
         </div>
       );
     }
 
     return (
-      <div class={`flex flex-col ${isModal ? "w-2/3" : "w-[65%]"}`}>
+      <div class={`flex flex-col ${isModal ? "w-2/3" : "w-[85%]"}`}>
         <div class="flex items-center gap-2">
           {maraMode && (
             <div
@@ -261,7 +261,7 @@ export function FeeCalculatorBase({
             </div>
           )}
         </div>
-        <h6 class="font-light text-xs text-stamp-grey text-nowrap">
+        <h6 class="font-light text-xs text-stamp-grey cursor-default select-none text-nowrap">
           <span class="text-stamp-grey-darker pr-2">
             {maraMode ? "MARA REQUIRED" : "RECOMMENDED"}
           </span>
@@ -276,8 +276,8 @@ export function FeeCalculatorBase({
           </span>{" "}
           SAT/vB
         </h6>
-        <h6 class="font-light text-base text-stamp-grey-light mb-3">
-          <span class="text-stamp-grey-darker pr-2">FEE</span>
+        <h6 class="font-light text-base text-stamp-grey-light mb-1.5 cursor-default select-none">
+          <span class="text-stamp-grey-darker pr-2.5">FEE</span>
           <span
             class={`font-bold ${maraMode ? "text-stamp-grey-light" : ""}`}
           >
@@ -367,7 +367,7 @@ export function FeeCalculatorBase({
               onMouseMove={handleMouseMove}
             >
               <span class={labelXs}>TX SIZE</span>&nbsp;&nbsp;
-              <span class="text-stamp-grey-light">~</span>
+              <span class="text-stamp-grey-light pr-1">~</span>
               {(() => {
                 const transactionType = type === "send"
                   ? "send"
@@ -399,7 +399,7 @@ export function FeeCalculatorBase({
               ? (
                 <>
                   {!feeDetails.hasExactFees && (
-                    <span class="text-stamp-grey-light">~</span>
+                    <span class="text-stamp-grey-light pr-1">~</span>
                   )}
                   {coinType === "BTC"
                     ? formatSatoshisToBTC(feeDetails.minerFee, {
@@ -407,11 +407,6 @@ export function FeeCalculatorBase({
                     })
                     : formatSatoshisToUSD(feeDetails.minerFee, BTCPrice)}{" "}
                   <span class="font-light">{coinType}</span>
-                  {!feeDetails?.hasExactFees && (
-                    <span class="text-stamp-grey-light text-xs ml-1 opacity-70">
-                      (est)
-                    </span>
-                  )}
                 </>
               )
               : (
@@ -671,6 +666,9 @@ export function FeeCalculatorBase({
             {feeDetails?.totalValue
               ? (
                 <>
+                  {!feeDetails.hasExactFees && (
+                    <span class="text-stamp-grey-light pr-1">~</span>
+                  )}
                   {coinType === "BTC"
                     ? formatSatoshisToBTC(feeDetails.totalValue, {
                       includeSymbol: false,
@@ -680,11 +678,6 @@ export function FeeCalculatorBase({
               )
               : <span class="animate-pulse">0.00000000</span>}{" "}
             <span class="font-light">{coinType}</span>
-            {feeDetails && !feeDetails.hasExactFees && (
-              <span class="text-stamp-grey-light text-xs ml-1 opacity-70">
-                (est)
-              </span>
-            )}
           </h6>
         </div>
       </div>
@@ -703,13 +696,13 @@ export function FeeCalculatorBase({
   };
 
   return (
-    <div class={`text-[#999999] ${className}`}>
+    <div class={`text-[#00ff00] ${className}`}>
       <div class="flex">
         {renderFeeSelector()}
         {showCoinToggle && (
           <div
             className={`flex gap-1 items-start justify-end ${
-              isModal ? "w-1/3" : "w-[35%]"
+              isModal ? "w-1/3" : "w-[15%]"
             }`}
           >
             <div className="relative">
@@ -734,14 +727,14 @@ export function FeeCalculatorBase({
         )}
       </div>
 
-      <div class="mt-5 flex flex-col-reverse justify-start min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between">
-        <h6 class="text-lg text-stamp-grey-light font-light">
+      <div class="mt-6 flex flex-col-reverse justify-start min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between">
+        <h6 class="text-lg text-stamp-grey-light font-light cursor-default select-none">
           <span class="text-stamp-grey-darker">ESTIMATE</span>
           {feeDetails?.totalValue !== undefined
             ? (
               <>
                 {!feeDetails.hasExactFees && (
-                  <span class="text-stamp-grey-light pl-2 pr-1">~</span>
+                  <span class="text-stamp-grey-light pl-2.5 pr-1.5">~</span>
                 )}
                 {(() => {
                   // Add MARA service fee if in MARA mode
@@ -790,7 +783,7 @@ export function FeeCalculatorBase({
 
       <div
         onClick={() => setVisible(!visible)}
-        className="flex items-center font-normal text-xs text-stamp-grey-darker hover:text-stamp-grey-light uppercase transition-colors duration-200 gap-2 cursor-pointer group"
+        className="flex items-center font-normal text-xs text-stamp-grey-darker hover:text-stamp-grey-light uppercase transition-colors duration-200 gap-1.5 cursor-pointer group"
       >
         DETAILS
         <Icon
@@ -839,11 +832,11 @@ export function FeeCalculatorBase({
                 ${
                 tosAgreed
                   ? canHoverSelected
-                    ? "bg-stamp-grey-darkest/15 border-stamp-grey-darkest/20  group-hover:border-stamp-grey-darkest/40"
+                    ? "bg-stamp-grey-darkest/15 border-stamp-grey-darkest/20  group-hover:border-stamp-grey-light/20"
                     : "bg-stamp-grey-darkest/15 border-stamp-grey-darkest/20"
                   : canHoverSelected
-                  ? "bg-stamp-grey-darkest/15 border-stamp-grey-darkest/20 group-hover:border-stamp-grey-darkest/40"
-                  : "bg-stamp-grey-darkest/15 border-stamp-grey-darkest/20"
+                  ? "bg-stamp-grey-darkest/15 border-stamp-grey-light/20 group-hover:border-stamp-grey-darkest/40"
+                  : "bg-stamp-grey-darkest/15 border-stamp-grey-light/20"
               }
               `}
             >
@@ -917,12 +910,12 @@ export function FeeCalculatorBase({
 
         <div class="flex items-center justify-end gap-5">
           {/* Buttons on the right */}
-          <div class="flex justify-end gap-6">
+          <div class="flex justify-end gap-5">
             {onCancel && (
               <Button
                 variant="glassmorphismDeselected"
-                color="purple"
-                size="md"
+                color="grey"
+                size="mdR"
                 onClick={() => {
                   logger.debug("ui", {
                     message: "Cancel clicked",

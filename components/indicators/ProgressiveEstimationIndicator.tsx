@@ -57,7 +57,7 @@ export function ProgressiveEstimationIndicator({
       {!isSubmitting && !feeEstimationError && (
         <div className="relative">
           <div
-            className={`flex items-center py-0.5 min-[420px]:py-1.5 min-[460px]:py-0.5 px-2 ${glassmorphismLayer2} !rounded-full cursor-default select-none`}
+            className={`flex items-center py-0.5 min-[420px]:py-2 min-[460px]:py-0.5 px-2 ${glassmorphismLayer2} !rounded-full cursor-default select-none`}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
           >

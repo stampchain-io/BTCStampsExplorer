@@ -11,6 +11,7 @@ export {
 // Skeleton loader components
 export {
   DeployToolSkeleton,
+  FeeCalculatorSkeleton,
   MintToolSkeleton,
   RegisterToolSkeleton,
   SendToolSkeleton,
