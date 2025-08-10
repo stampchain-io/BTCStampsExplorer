@@ -18,6 +18,8 @@ import {
   containerBackground,
   containerRowForm,
   glassmorphism,
+  glassmorphismLayer2,
+  transition,
 } from "$layout";
 import { useFees } from "$lib/hooks/useFees.ts";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
@@ -40,7 +42,7 @@ import {
   tooltipImage,
 } from "$notification";
 import { FeeCalculatorBase } from "$section";
-import { titleGreyLD } from "$text";
+import { labelLg, titleGreyLD } from "$text";
 import {
   getSearchParams,
   isBrowser,
@@ -1632,7 +1634,7 @@ function StampingToolMain({ config }: { config: Config }) {
   const imagePreviewDiv = (
     <div
       id="image-preview"
-      class={`relative items-center content-center mx-auto rounded ${PREVIEW_SIZE_CLASSES} text-center group transition duration-300 cursor-pointer `}
+      class={`relative items-center content-center mx-auto ${PREVIEW_SIZE_CLASSES} text-center group ${glassmorphismLayer2} hover:bg-stamp-grey-darkest/30 ${transition} cursor-pointer `}
       onMouseMove={handleMouseMove}
       onMouseEnter={handleUploadMouseEnter}
       onMouseLeave={handleUploadMouseLeave}
@@ -1654,7 +1656,7 @@ function StampingToolMain({ config }: { config: Config }) {
             {file.name.match(/\.(jpg|jpeg|png|gif|webp|svg|avif)$/i)
               ? (
                 <img
-                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded bg-conic-pattern bg-[length:4px_4px] bg-stamp-grey [image-rendering:pixelated]`}
+                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded bg-conic-pattern bg-[length:4px_4px] bg-stamp-grey/50 [image-rendering:pixelated]`}
                   src={URL.createObjectURL(file)}
                   alt="Preview"
                   onError={(e) => {
@@ -1701,9 +1703,10 @@ function StampingToolMain({ config }: { config: Config }) {
               <Icon
                 type="icon"
                 name="uploadImage"
-                weight="normal"
+                weight="extraLight"
                 size="xxl"
-                color="grey"
+                color="custom"
+                className="stroke-stamp-grey"
               />
             </div>
           </label>
@@ -1711,12 +1714,12 @@ function StampingToolMain({ config }: { config: Config }) {
         : (
           <label
             for="upload"
-            class="flex flex-col items-center justify-center h-full rounded bg-stamp-purple-dark hover:bg-stamp-purple cursor-pointer"
+            class={`flex flex-col items-center justify-center h-full cursor-pointer`}
           >
             <Icon
               type="icon"
               name="uploadImage"
-              weight="normal"
+              weight="extraLight"
               size="xxl"
               color="grey"
             />
@@ -2029,8 +2032,8 @@ function StampingToolMain({ config }: { config: Config }) {
                 {tooltipText}
               </div>
             </div>
-            <div className="flex items-center gap-3 min-[420px]:gap-5">
-              <h5 className="font-semibold text-lg min-[420px]:text-xl text-stamp-grey">
+            <div className="flex items-center gap-5">
+              <h5 className={`${labelLg} !text-stamp-grey`}>
                 EDITIONS
               </h5>
 
@@ -2057,7 +2060,7 @@ function StampingToolMain({ config }: { config: Config }) {
             {poshToggleButton}
             <div
               ref={lockButtonRef}
-              className="flex items-center justify-center !w-10 !h-10 rounded-md bg-stamp-grey cursor-pointer group"
+              className={`flex items-center justify-center !w-10 !h-10 ${glassmorphismLayer2} group`}
               onClick={() => {
                 setIsLocked(!isLocked);
                 setIsLockTooltipVisible(false);
@@ -2073,8 +2076,7 @@ function StampingToolMain({ config }: { config: Config }) {
                     name="locked"
                     weight="bold"
                     size="xs"
-                    color="custom"
-                    className="stroke-stamp-purple-dark group-hover:stroke-stamp-purple cursor-pointer"
+                    color="grey"
                   />
                 )
                 : (
@@ -2084,7 +2086,7 @@ function StampingToolMain({ config }: { config: Config }) {
                     weight="bold"
                     size="xs"
                     color="custom"
-                    className="stroke-stamp-purple-bright group-hover:stroke-stamp-purple-dark cursor-pointer"
+                    className="stroke-stamp-grey-light group-hover:stroke-stamp-grey"
                   />
                 )}
             </div>
@@ -2104,7 +2106,7 @@ function StampingToolMain({ config }: { config: Config }) {
 
             <div
               ref={previewButtonRef}
-              className="flex items-center justify-center !w-[46px] !h-10 rounded-md bg-stamp-grey cursor-pointer group" // dunno why but the width has to be +6px ?!?!
+              className={`flex items-center justify-center !w-[46px] !h-10 ${glassmorphismLayer2} group`} // dunno why, but the width has to be +6px ?!?!
               onClick={() => {
                 toggleFullScreenModal();
                 setIsPreviewTooltipVisible(false);
@@ -2115,11 +2117,10 @@ function StampingToolMain({ config }: { config: Config }) {
             >
               <Icon
                 type="iconButton"
-                name="previewImage"
+                name="previewImageCornersOut"
                 weight="bold"
                 size="xs"
-                color="custom"
-                className="stroke-stamp-purple-dark group-hover:stroke-stamp-purple cursor-pointer"
+                color="grey"
               />
               <div
                 class={`${tooltipButton} ${
