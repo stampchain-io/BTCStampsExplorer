@@ -88,8 +88,14 @@ export function SkeletonToggle({
 }) {
   return (
     <div
-      class={`${loaderSkeleton} ${height} ${width} ${rounded} ${className}`}
-    />
+      class={`${loaderSkeleton} ${height} ${width} ${rounded} ${className} flex items-center relative`}
+    >
+      <div
+        class={`flex justify-center items-center relative w-5 bg-transparent ${height} ${rounded}`}
+      >
+        <div class={`w-[14px] h-[14px] bg-stamp-grey opacity-30 ${rounded}`} />
+      </div>
+    </div>
   );
 }
 
@@ -116,7 +122,7 @@ export function SkeletonText({
     <div class={`space-y-2 ${className}`}>
       {lineWidths.map((width, index) => (
         <div
-          class={`${loaderSkeleton} ${index} ${height} ${width} ${rounded}`}
+          class={`${loaderSkeleton} ${index} ${height} ${width} ${rounded} !border-transparent`}
         />
       ))}
     </div>
@@ -143,7 +149,7 @@ export function SkeletonImage({
         weight="extraLight"
         size="xxl"
         color="grey"
-        className="opacity-20"
+        className="opacity-30"
       />
     </div>
   );
