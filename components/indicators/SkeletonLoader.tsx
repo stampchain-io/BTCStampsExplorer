@@ -1,12 +1,17 @@
 /* ===== SKELETON LOADER COMPONENTS ===== */
 import { Icon } from "$icon";
-import { containerColForm, containerRowForm, loaderSkeleton } from "$layout";
+import {
+  containerColForm,
+  containerRowForm,
+  loaderSkeleton,
+  rowResponsiveForm,
+} from "$layout";
 import type { SkeletonLoaderProps } from "$types/ui.d.ts";
 
 /* ===== BASIC SKELETON COMPONENTS ===== */
 /* Skeleton container */
 export function SkeletonContainer({
-  height = "h-full",
+  height = "h-auto",
   width = "w-full",
   rounded = "rounded-xl",
   className = "flex p-5 gap-5",
@@ -165,6 +170,70 @@ export function SkeletonImage({
   );
 }
 
+/* ===== BASE SKELETON COMPONENTS ===== */
+/* FEE CALCULATOR SKELETON */
+export function FeeCalculatorSkeleton() {
+  return (
+    <SkeletonContainer>
+      <div class={`${containerColForm}`}>
+        <div class={`${containerRowForm} justify-between`}>
+          {/* Left side - Text lines */}
+          <SkeletonText
+            lines={2}
+            heights={["h-3", "h-[14px]"]}
+            widths={["w-[164px]", "w-[112px]"]}
+            className="mt-0.5"
+          />
+
+          {/* Right side - Toggle switch */}
+          <SkeletonToggle />
+        </div>
+
+        {/* Fee slider skeleton */}
+        <SkeletonInput
+          width="w-[85%]"
+          height="h-5 tablet:h-4"
+          rounded="rounded-full"
+          className="-mt-2.5"
+        />
+
+        <div class="mt-2 mb-6 flex flex-col-reverse justify-start min-[420px]:flex-row min-[420px]:justify-between">
+          {/* Estimate and details text lines */}
+          <SkeletonText
+            lines={2}
+            widths={["w-[254px]", "w-[70px]"]}
+            heights={["h-4", "h-3"]}
+            className="mt-0.5"
+          />
+
+          {/* Fee estimation pill */}
+          <div
+            className={`flex justify-start -mt-0.5 mb-2 w-auto
+              min-[420px]:justify-end min-[420px]:mt-0 min-[420px]:mb-0 `}
+          >
+            <SkeletonInput
+              width="w-[84px] min-[420px]:w-[44px] min-[460px]:w-[84px]"
+              height="h-5"
+              rounded="rounded-full"
+            />
+          </div>
+        </div>
+
+        {/* Bottom Section - TOS + Buttons */}
+        <div class={`${containerColForm} items-end`}>
+          <SkeletonText
+            lines={1}
+            heights={["h-3"]}
+            widths={["w-[160px] tablet:w-[226px]"]}
+            className="-mb-1 tablet:-mb-0.5"
+          />
+          <SkeletonButton size="mdR" width="w-[168px] tablet:w-[150px]" />
+        </div>
+      </div>
+    </SkeletonContainer>
+  );
+}
+
 /* ===== TOOL-SPECIFIC SKELETON LOADERS ===== */
 /* ===== STAMP TOOLS ===== */
 /* CREATE STAMP TOOL */
@@ -192,6 +261,9 @@ export function StampingToolSkeleton({ className = "" }: SkeletonLoaderProps) {
           </div>
         </div>
       </SkeletonContainer>
+
+      {/* Fee calculator skeleton */}
+      <FeeCalculatorSkeleton />
     </div>
   );
 }
@@ -232,6 +304,9 @@ export function SendToolSkeleton({ className = "" }: SkeletonLoaderProps) {
           <SkeletonInput />
         </div>
       </SkeletonContainer>
+
+      {/* Fee calculator skeleton */}
+      <FeeCalculatorSkeleton />
     </div>
   );
 }
@@ -268,6 +343,9 @@ export function DeployToolSkeleton({ className = "" }: SkeletonLoaderProps) {
           <SkeletonInput />
         </div>
       </SkeletonContainer>
+
+      {/* Fee calculator skeleton */}
+      <FeeCalculatorSkeleton />
     </div>
   );
 }
@@ -330,6 +408,9 @@ export function MintToolSkeleton({ className = "" }: SkeletonLoaderProps) {
           </div>
         </div>
       </SkeletonContainer>
+
+      {/* Fee calculator skeleton */}
+      <FeeCalculatorSkeleton />
     </div>
   );
 }
@@ -340,18 +421,23 @@ export function TransferToolSkeleton({ className = "" }: SkeletonLoaderProps) {
     <div class={`space-y-6 ${className}`}>
       <SkeletonContainer>
         <div class={`${containerColForm}`}>
-          <div class={`${containerRowForm}`}>
+          <div
+            class={`${rowResponsiveForm}`}
+          >
             {/* Ticker name input skeleton */}
-            <SkeletonInput width="w-full flex-1" />
+            <SkeletonInput width="w-full min-[420px]:flex-1" />
 
             {/* Amount input skeleton */}
-            <SkeletonInput width="w-full flex-1" />
+            <SkeletonInput width="w-full min-[420px]:flex-1" />
           </div>
 
           {/* Address input skeleton */}
           <SkeletonInput />
         </div>
       </SkeletonContainer>
+
+      {/* Fee calculator skeleton */}
+      <FeeCalculatorSkeleton />
     </div>
   );
 }
@@ -364,12 +450,15 @@ export function RegisterToolSkeleton({ className = "" }: SkeletonLoaderProps) {
       <SkeletonContainer>
         <div class={`${containerColForm} items-end`}>
           {/* Domain input skeleton */}
-          <SkeletonInput height="h-11" />
+          <SkeletonInput height="h-[44px]" className="-mb-[1px]" />
 
           {/* Available button skeleton */}
           <SkeletonButton size="mdR" width="w-[116px]" />
         </div>
       </SkeletonContainer>
+
+      {/* Fee calculator skeleton */}
+      <FeeCalculatorSkeleton />
     </div>
   );
 }
