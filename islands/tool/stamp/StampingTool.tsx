@@ -11,6 +11,7 @@ import { MaraModeWarningModal } from "$components/modals/MaraModeWarningModal.ts
 import { MaraServiceUnavailableModal } from "$components/modals/MaraServiceUnavailableModal.tsx";
 import { InputField } from "$form";
 import { Icon } from "$icon";
+import { StampingToolSkeleton } from "$indicators";
 import PreviewImageModal from "$islands/modal/PreviewImageModal.tsx";
 import { closeModal, openModal } from "$islands/modal/states.ts";
 import {
@@ -42,7 +43,7 @@ import {
   tooltipImage,
 } from "$notification";
 import { FeeCalculatorBase } from "$section";
-import { labelLg, titleGreyLD } from "$text";
+import { labelLg, subtitleGrey, titleGreyLD } from "$text";
 import {
   getSearchParams,
   isBrowser,
@@ -229,11 +230,21 @@ export function StampingTool() {
 
   /* ===== EARLY RETURN CONDITIONS ===== */
   if (isLoading) {
-    return <div>Loading configuration...</div>;
+    return (
+      <div class={bodyTool}>
+        <h1 class={`${titleGreyLD} mx-auto mb-4`}>STAMP</h1>
+        <StampingToolSkeleton />
+      </div>
+    );
   }
 
   if (!config) {
-    return <div>Error: Configuration not loaded</div>;
+    return (
+      <div class={bodyTool}>
+        <h5 class={`${titleGreyLD} mx-auto mb-2`}>ERROR</h5>
+        <h6 class={`${subtitleGrey} mx-auto`}>CONFIGURATION NOT LOADED</h6>
+      </div>
+    );
   }
 
   // Once we have the config, render the main component
