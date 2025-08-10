@@ -102,29 +102,39 @@ export function SkeletonToggle({
 /* Skeleton for text lines */
 export function SkeletonText({
   lines = 1,
-  height = "h-4",
+  heights = ["h-4"],
   widths = ["w-full"],
   rounded = "rounded",
   className = "",
 }: {
   lines?: number;
-  height?: string;
+  heights?: string[];
   widths?: string[];
   rounded?: string;
   className?: string;
 }) {
   const lineWidths = Array.from(
     { length: lines },
-    (_, i) => widths[i] || widths[widths.length - 1] || "w-full",
+    (_, i) => widths[i] || widths[widths.length - 1],
+  );
+
+  const lineHeights = Array.from(
+    { length: lines },
+    (_, i) => heights[i] || heights[heights.length - 1],
   );
 
   return (
     <div class={`space-y-2 ${className}`}>
-      {lineWidths.map((width, index) => (
-        <div
-          class={`${loaderSkeleton} ${index} ${height} ${width} ${rounded} !border-transparent`}
-        />
-      ))}
+      {lineWidths.map((_, index) => {
+        const width = lineWidths[index];
+        const height = lineHeights[index];
+        return (
+          <div
+            key={index}
+            class={`${loaderSkeleton} ${height} ${width} ${rounded} !border-transparent`}
+          />
+        );
+      })}
     </div>
   );
 }
@@ -156,7 +166,7 @@ export function SkeletonImage({
 }
 
 /* ===== TOOL-SPECIFIC SKELETON LOADERS ===== */
-
+/* ===== STAMP TOOLS ===== */
 /* Skeleton loader for stamping tool form */
 export function StampingToolSkeleton({ className = "" }: SkeletonLoaderProps) {
   return (
@@ -186,6 +196,45 @@ export function StampingToolSkeleton({ className = "" }: SkeletonLoaderProps) {
   );
 }
 
+/* Skeleton loader for send tool */
+export function SendToolSkeleton({ className = "" }: SkeletonLoaderProps) {
+  return (
+    <div class={`space-y-6 ${className}`}>
+      <SkeletonContainer>
+        <div class={`${containerColForm}`}>
+          <div class={`${containerRowForm}`}>
+            {/* Left Column Skeleton - Image upload */}
+            <div class={`${containerColForm} !w-[100px]`}>
+              <SkeletonImage />
+            </div>
+
+            {/* Right Column Skeleton - Token details */}
+            <div class={`${containerColForm} justify-between items-end`}>
+              <div class={`${containerRowForm} `}>
+                {/* Stamp selector skeleton */}
+                <SkeletonInput />
+              </div>
+              <div class={`${containerRowForm} justify-end items-center gap-5`}>
+                {/* Editions text skeleton */}
+                <SkeletonText
+                  lines={2}
+                  widths={["w-[88px]", "w-[48px]"]}
+                  heights={["h-4", "h-3"]}
+                />
+
+                {/* Editions input skeleton */}
+                <SkeletonInput width="w-10" />
+              </div>
+            </div>
+          </div>
+          <SkeletonInput />
+        </div>
+      </SkeletonContainer>
+    </div>
+  );
+}
+
+/* ===== SRC20 TOOLS ===== */
 /* Skeleton loader for SRC20 deploy tool */
 export function DeployToolSkeleton({ className = "" }: SkeletonLoaderProps) {
   return (
@@ -271,7 +320,7 @@ export function MintToolSkeleton({ className = "" }: SkeletonLoaderProps) {
             >
               <SkeletonText
                 lines={3}
-                height="h-3"
+                heights={["h-3"]}
                 widths={["w-[80px]", "w-[70px]", "w-[90px]"]}
                 className="min-[480px]:flex min-[480px]:flex-col min-[480px]:items-end"
               />
@@ -305,36 +354,7 @@ export function TransferToolSkeleton({ className = "" }: SkeletonLoaderProps) {
   );
 }
 
-/* Skeleton loader for send tool */
-export function SendToolSkeleton({ className = "" }: SkeletonLoaderProps) {
-  return (
-    <div class={`space-y-6 ${className}`}>
-      {/* Stamp selector/info */}
-      <div class="space-y-3">
-        <SkeletonText lines={1} widths={["w-28"]} />
-        <div class="flex gap-4">
-          <SkeletonImage size="w-20 h-20" />
-          <div class="flex-1">
-            <SkeletonText lines={3} widths={["w-full", "w-3/4", "w-1/2"]} />
-          </div>
-        </div>
-      </div>
-
-      {/* Form inputs */}
-      <div class="space-y-4">
-        <SkeletonInput />
-        <SkeletonInput />
-      </div>
-
-      {/* Fee section */}
-      <SkeletonContainer height="h-12" width="w-full" rounded="rounded-lg" />
-
-      {/* Action button */}
-      <SkeletonButton size="mdR" width="w-full" />
-    </div>
-  );
-}
-
+/* ===== SRC101 TOOLS ===== */
 /* Skeleton loader for register tool (SRC101) */
 export function RegisterToolSkeleton({ className = "" }: SkeletonLoaderProps) {
   return (

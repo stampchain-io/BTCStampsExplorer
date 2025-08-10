@@ -4,6 +4,7 @@ import { walletContext } from "$client/wallet/wallet.ts";
 import { ProgressiveEstimationIndicator } from "$components/indicators/ProgressiveEstimationIndicator.tsx";
 import { inputField, inputFieldSquare } from "$form";
 import { Icon } from "$icon";
+import { SendToolSkeleton } from "$indicators";
 import { SelectField } from "$islands/form/SelectField.tsx";
 import {
   bodyTool,
@@ -52,6 +53,7 @@ export function StampSendTool() {
   const [tosAgreed, setTosAgreed] = useState<boolean>(false);
   const [isImageLoading, setIsImageLoading] = useState(true);
   const [showFallbackIcon, setShowFallbackIcon] = useState(false);
+  const [isLoadingStamps, setIsLoadingStamps] = useState(true); // Add loading state
 
   /* ===== FORM HANDLING ===== */
   const {
@@ -135,8 +137,12 @@ export function StampSendTool() {
   useEffect(() => {
     const fetchStamps = async () => {
       try {
-        if (!wallet?.address) return;
+        if (!wallet?.address) {
+          setIsLoadingStamps(false);
+          return;
+        }
 
+        setIsLoadingStamps(true); // Set loading when starting fetch
         const endpoint = `/api/v2/stamps/balance/${wallet.address}`;
         const response = await fetch(endpoint);
 
@@ -161,12 +167,12 @@ export function StampSendTool() {
         } else {
           setError(String(error));
         }
+      } finally {
+        setIsLoadingStamps(false); // Clear loading when done
       }
     };
 
-    if (wallet?.address) {
-      fetchStamps();
-    }
+    fetchStamps();
   }, [wallet?.address]);
 
   // Set initial stamp effect
@@ -487,6 +493,16 @@ export function StampSendTool() {
       </div>
     );
   };
+
+  /* ===== EARLY RETURN FOR LOADING STATE ===== */
+  if (isLoadingStamps) {
+    return (
+      <div class={bodyTool}>
+        <h1 class={`${titleGreyLD} mx-auto mb-4`}>SEND</h1>
+        <SendToolSkeleton />
+      </div>
+    );
+  }
 
   /* ===== RENDER ===== */
   return (
