@@ -60,9 +60,9 @@ export function SkeletonButton({
   className?: string;
 }) {
   const sizes = {
-    smR: "h-9 tablet:h-8",
-    mdR: "h-10 tablet:h-9",
-    lgR: "h-11 tablet:h-10",
+    smR: "h-[34px] tablet:h-[30px]",
+    mdR: "h-[38px] tablet:h-[34px]",
+    lgR: "h-[42px] tablet:h-[38px]",
   };
 
   return (
@@ -167,7 +167,7 @@ export function SkeletonImage({
 
 /* ===== TOOL-SPECIFIC SKELETON LOADERS ===== */
 /* ===== STAMP TOOLS ===== */
-/* Skeleton loader for stamping tool form */
+/* CREATE STAMP TOOL */
 export function StampingToolSkeleton({ className = "" }: SkeletonLoaderProps) {
   return (
     <div class={`space-y-6 ${className}`}>
@@ -196,7 +196,7 @@ export function StampingToolSkeleton({ className = "" }: SkeletonLoaderProps) {
   );
 }
 
-/* Skeleton loader for send tool */
+/* SEND STAMP TOOL */
 export function SendToolSkeleton({ className = "" }: SkeletonLoaderProps) {
   return (
     <div class={`space-y-6 ${className}`}>
@@ -237,7 +237,7 @@ export function SendToolSkeleton({ className = "" }: SkeletonLoaderProps) {
 }
 
 /* ===== SRC20 TOOLS ===== */
-/* Skeleton loader for SRC20 deploy tool */
+/* DEPLOY SRC20 TOOL */
 export function DeployToolSkeleton({ className = "" }: SkeletonLoaderProps) {
   return (
     <div class={`space-y-6 ${className}`}>
@@ -272,7 +272,7 @@ export function DeployToolSkeleton({ className = "" }: SkeletonLoaderProps) {
   );
 }
 
-/* Skeleton loader for SRC20 mint tool */
+/* MINT SRC20 TOOL */
 export function MintToolSkeleton({ className = "" }: SkeletonLoaderProps) {
   return (
     <div class={`space-y-6 ${className}`}>
@@ -334,7 +334,7 @@ export function MintToolSkeleton({ className = "" }: SkeletonLoaderProps) {
   );
 }
 
-/* Skeleton loader for SRC20 transfer tool */
+/* TRANSFER SRC20 TOOL */
 export function TransferToolSkeleton({ className = "" }: SkeletonLoaderProps) {
   return (
     <div class={`space-y-6 ${className}`}>
@@ -357,33 +357,19 @@ export function TransferToolSkeleton({ className = "" }: SkeletonLoaderProps) {
 }
 
 /* ===== SRC101 TOOLS ===== */
-/* Skeleton loader for register tool (SRC101) */
+/* REGISTER SRC101 TOOL */
 export function RegisterToolSkeleton({ className = "" }: SkeletonLoaderProps) {
   return (
     <div class={`space-y-6 ${className}`}>
-      {/* Domain input */}
-      <SkeletonInput />
+      <SkeletonContainer>
+        <div class={`${containerColForm} items-end`}>
+          {/* Domain input skeleton */}
+          <SkeletonInput height="h-11" />
 
-      {/* Registration info */}
-      <div class="space-y-3">
-        <SkeletonText lines={2} widths={["w-full", "w-2/3"]} />
-        <div class="grid grid-cols-2 gap-4">
-          <div class="space-y-1">
-            <SkeletonText lines={1} widths={["w-16"]} />
-            <SkeletonText lines={1} widths={["w-24"]} />
-          </div>
-          <div class="space-y-1">
-            <SkeletonText lines={1} widths={["w-20"]} />
-            <SkeletonText lines={1} widths={["w-32"]} />
-          </div>
+          {/* Available button skeleton */}
+          <SkeletonButton size="mdR" width="w-[116px]" />
         </div>
-      </div>
-
-      {/* Fee section */}
-      <SkeletonContainer height="h-12" width="w-full" rounded="rounded-lg" />
-
-      {/* Action button */}
-      <SkeletonButton size="mdR" width="w-full" />
+      </SkeletonContainer>
     </div>
   );
 }

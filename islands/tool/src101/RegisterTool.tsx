@@ -4,7 +4,13 @@ import { useSRC101Form } from "$client/hooks/userSRC101Form.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { ProgressiveEstimationIndicator } from "$components/indicators/ProgressiveEstimationIndicator.tsx";
 import { ROOT_DOMAINS } from "$constants";
-import { inputFieldOutline, outlineGradient, purple } from "$form";
+import {
+  grey,
+  inputFieldDropdown,
+  inputFieldDropdownHover,
+  inputFieldOutline,
+  outlineGradient,
+} from "$form";
 import { RegisterToolSkeleton } from "$indicators";
 import DetailSRC101Modal from "$islands/modal/DetailSRC101Modal.tsx";
 import { openModal } from "$islands/modal/states.ts";
@@ -14,7 +20,7 @@ import { logger } from "$lib/utils/logger.ts";
 import { mapProgressiveFeeDetails } from "$lib/utils/performance/fees/fee-estimation-utils.ts";
 import { StatusMessages, tooltipButton } from "$notification";
 import { FeeCalculatorBase } from "$section";
-import { titlePurpleLD } from "$text";
+import { titleGreyLD } from "$text";
 import type { ROOT_DOMAIN_TYPES } from "$types/base.d.ts";
 import type { SRC101Balance } from "$types/src101.d.ts";
 import type { SRC101RegisterToolProps } from "$types/ui.d.ts";
@@ -175,7 +181,7 @@ export function SRC101RegisterTool({
   if (!config) {
     return (
       <div class={bodyTool}>
-        <h1 class={`${titlePurpleLD} mobileMd:mx-auto mb-1`}>REGISTER</h1>
+        <h1 class={`${titleGreyLD} mx-auto mb-4`}>REGISTER</h1>
         <RegisterToolSkeleton />
       </div>
     );
@@ -237,10 +243,10 @@ export function SRC101RegisterTool({
   /* ===== COMPONENT RENDER ===== */
   return (
     <div class={bodyTool}>
-      <h1 class={`${titlePurpleLD} mobileMd:mx-auto mb-1`}>REGISTER</h1>
+      <h1 class={`${titleGreyLD} mx-auto mb-4`}>REGISTER</h1>
 
       <form
-        class={`${containerBackground} gap-5`}
+        class={`${containerBackground} gap-5 mb-6`}
         onSubmit={(e) => {
           e.preventDefault();
           handleTransferSubmit();
@@ -250,7 +256,7 @@ export function SRC101RegisterTool({
       >
         {/* Animated Input Container */}
         <div
-          class={`${outlineGradient} ${purple} ${
+          class={`${outlineGradient} ${grey} ${
             openTldDropdown && !isSelectingTld ? "input-open-right" : ""
           }`}
         >
@@ -259,7 +265,7 @@ export function SRC101RegisterTool({
               type="text"
               placeholder="bitname"
               id="search-dropdown"
-              class={`${inputFieldOutline} pt-1`}
+              class={inputFieldOutline}
               required
               value={formState.toAddress || ""}
               onChange={(e) => handleInputChange(e, "toAddress")}
@@ -279,7 +285,7 @@ export function SRC101RegisterTool({
                   setAllowTldTooltip(false);
                   setIsTldTooltipVisible(false);
                 }}
-                class="h-11 min-w-20 mt-[1px] px-5 rounded-md bg-transparent font-bold text-base text-stamp-grey text-right hover:text-stamp-grey-light tracking-wider transition-colors duration-300 focus-visible:!outline-none"
+                class="h-10 min-w-16 mt-[1px] px-4 rounded-lg bg-transparent font-semibold text-sm text-stamp-grey text-right hover:text-stamp-grey-light tracking-wider transition-all duration-50 focus-visible:!outline-none"
                 onMouseEnter={handleTldMouseEnter}
                 onMouseLeave={handleTldMouseLeave}
                 aria-label="Select top level domain"
@@ -294,11 +300,14 @@ export function SRC101RegisterTool({
                 {formState.root}
               </button>
               {openTldDropdown && (
-                <ul class="absolute top-[100%] right-[-2px] max-h-[160px] w-[80px] bg-[#100318] bg-opacity-70 backdrop-filter backdrop-blur-md border-2 border-t-0 border-stamp-purple-bright rounded-b-md z-[11] overflow-y-auto">
+                <ul
+                  class={`${inputFieldDropdown} !left-[1px] max-h-[73px] !w-[64px] !bg-gradient-to-b !from-[#252129] !to-[#252129]/50
+                  `}
+                >
                   {ROOT_DOMAINS.map((tld) => (
                     <li
                       key={tld}
-                      class="py-2 last:pb-4 tablet:py-1.5 tablet:last:pb-3 pr-5 font-bold text-sm text-stamp-grey text-right tracking-wide leading-none hover:bg-stamp-purple-bright/15 hover:text-stamp-grey-light transition-colors duration-300 cursor-pointer"
+                      class={`${inputFieldDropdownHover} !px-[14px] !text-xs !lowercase !justify-end`}
                       onClick={() => handleTldSelect(tld)}
                       onMouseDown={(e) => e.preventDefault()}
                       role="option"
@@ -332,9 +341,9 @@ export function SRC101RegisterTool({
           <div class="flex flex-col items-end">
             <Button
               type="button"
-              variant="outline"
-              color="purple"
-              size="md"
+              variant="glassmorphism"
+              color="grey"
+              size="mdR"
               onClick={checkAvailability}
               aria-label="Check bitname availability"
             >
@@ -403,34 +412,4 @@ export function SRC101RegisterTool({
       </div>
     </div>
   );
-}
-
-{
-  /* <div class={animatedInputContainer}>
-  <InputField
-    type="text"
-    placeholder="Please input your bitname"
-    value={formState.toAddress?.replace(".btc", "") || ""}
-    onChange={(e) => {
-      const value = (e.target as HTMLInputElement).value.toLowerCase()
-        .replace(
-          ".btc",
-          "",
-        );
-      handleInputChange(
-        {
-          target: {
-            value: value ? `${value}.btc` : "",
-          },
-        },
-        "toAddress",
-      );
-    }}
-    error={formState.toAddressError}
-    class="relative z-[2] h-[54px] mobileLg:h-[60px] w-full !bg-[#100318] rounded-md pl-6 text-base mobileLg:text-lg font-bold text-stamp-grey-light placeholder:!bg-[#100318] placeholder:!text-stamp-grey placeholder:lowercase outline-none focus:!bg-[#100318]"
-  />
-</div>
-<span class="absolute z-[3] right-6 top-1/2 -translate-y-1/2 text-base mobileLg:text-lg font-black text-stamp-purple pointer-events-none">
-  .btc
-</span> */
 }
