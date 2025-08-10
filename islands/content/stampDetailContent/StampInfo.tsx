@@ -1,6 +1,7 @@
 /* ===== STAMP INFO COMPONENT ===== */
 /*@baba-750+764+815+icons - refactor to StatItems */
 import { Button } from "$button";
+import { Src101Detail, StampRow } from "$globals";
 import { Icon } from "$icon";
 import BuyStampModal from "$islands/modal/BuyStampModal.tsx";
 import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
@@ -22,22 +23,23 @@ import {
   getStampImageSrc,
 } from "$lib/utils/ui/media/imageUtils.ts";
 import { tooltipIcon } from "$notification";
-import { /* Dispenser, */ StampListingsOpenTable } from "$table";
+import { Dispenser, StampListingsOpenTable } from "$table";
 import {
   headingGreyDLLink,
   labelSm,
   titleGreyLD,
+  value2xl,
   value3xl,
   valueDark,
   valueSm,
 } from "$text";
-import type { Src101Detail } from "$types/src101.d.ts";
-import type { DispenserRow as Dispenser, StampRow } from "$types/stamp.d.ts";
-
-import type { StampInfoProps } from "$types/ui.d.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
+interface StampInfoProps {
+  stamp: StampRow;
+  lowestPriceDispenser: any;
+}
 
 interface DimensionsType {
   width: number | string;
@@ -234,7 +236,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
       setFileSize(res);
     } else if (stamp.stamp_mimetype?.startsWith("image/")) {
       // Handle images
-      const src = getStampImageSrc(stamp);
+      const src = await getStampImageSrc(stamp);
       const img = new Image();
       img.onload = () => {
         setImageDimensions({
@@ -792,7 +794,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
             ? (
               <div className="flex flex-col w-full pt-6 mobileLg:pt-12">
                 <div
-                  className={`flex w-full gap-6 mb-3 items-end ${
+                  className={`flex w-full gap-6 mb-2 items-end ${
                     dispensers?.length >= 2 ? "justify-between" : "justify-end"
                   }`}
                 >
@@ -817,7 +819,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                         })} <span className="font-light">USD</span>
                       </h6>
                     )}
-                    <h6 className={value3xl}>
+                    <h6 className={value2xl}>
                       {formatBTCAmount(
                         typeof displayPrice === "number" ? displayPrice : 0,
                         { excludeSuffix: true },
@@ -836,7 +838,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                           : "max-h-0 opacity-0"
                       }`}
                     >
-                      <div className="w-full mb-6">
+                      <div className="w-full mb-4">
                         {isLoadingDispensers
                           ? <h6>LOADING</h6>
                           : (
@@ -854,9 +856,9 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
 
                 <div className="flex justify-end">
                   <Button
-                    variant="outline"
-                    color="purple"
-                    size="md"
+                    variant="glassmorphismColor"
+                    color="grey"
+                    size="mdR"
                     onClick={() =>
                       toggleModal(selectedDispenser || lowestPriceDispenser)}
                   >
