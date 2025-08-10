@@ -21,9 +21,9 @@ export function CloseIcon({
 
   /* ===== STYLES ===== */
   const colorClasses = color === "grey"
-    ? `stroke-[url(#grey)] hover:stroke-stamp-grey-light transform transition-colors duration-300`
+    ? `stroke-[url(#grey)] hover:stroke-stamp-grey-light transform transition-colors duration-200`
     : color === "purple"
-    ? `stroke-[url(#purple)] hover:stroke-stamp-purple-bright transform transition-colors duration-300`
+    ? `stroke-[url(#purple)] hover:stroke-stamp-purple-bright transform transition-colors duration-200`
     : "";
 
   /* ===== RENDER ICON ===== */

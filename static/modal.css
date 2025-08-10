@@ -6,7 +6,7 @@
 defined individually
   */
   --animation-timing: cubic-bezier(0.46,0.03,0.52,0.96);
-  --animation-bg: rgba(66, 66, 66, .3);
+  --animation-bg: rgba(18, 15, 19, 0.9);
   --animation-duration-background: .5s;
   --animation-cleanup-delay: .5s;
 
@@ -187,7 +187,7 @@ defined individually
 
 @keyframes fadeModalIn {
   0% {
-    background: rgba(66, 66, 66, 0);
+    background: rgba(18, 15, 19, 0);
   }
 
   100% {
@@ -201,7 +201,7 @@ defined individually
   }
 
   100% {
-    background: rgba(66, 66, 66, 0);
+    background: rgba(18, 15, 19, 0);
   }
 }
 
