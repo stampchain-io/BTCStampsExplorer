@@ -162,23 +162,23 @@ export function StampingToolSkeleton({ className = "" }: SkeletonLoaderProps) {
   return (
     <div class={`space-y-6 ${className}`}>
       <SkeletonContainer>
-        {/* Left Column Skeleton - Image upload and decimals */}
+        {/* Left Column Skeleton - Image upload */}
         <div class={`${containerColForm} !w-[100px]`}>
-          {/* Image upload skeleton */}
           <SkeletonImage />
-
-          {/* Decimals input skeleton */}
-          <SkeletonInput />
         </div>
 
         {/* Right Column Skeleton - Token details */}
-        <div class={`${containerColForm}`}>
-          <div class={`${containerRowForm}`}>
-            {/* Ticker name input skeleton */}
-            <SkeletonInput width="w-full flex-1" />
-
+        <div class={`${containerColForm} justify-between items-end`}>
+          <div class={`${containerRowForm} justify-end`}>
             {/* Toggle switch skeleton */}
             <SkeletonToggle />
+          </div>
+          <div class={`${containerRowForm} justify-end items-center gap-5`}>
+            {/* Editions text skeleton */}
+            <SkeletonText lines={1} widths={["w-[88px]"]} />
+
+            {/* Editions input skeleton */}
+            <SkeletonInput width="w-10" />
           </div>
         </div>
       </SkeletonContainer>
