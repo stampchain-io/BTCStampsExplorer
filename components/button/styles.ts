@@ -147,13 +147,13 @@ export const buttonStyles: ButtonVariants = {
       hover:bg-gradient-to-br hover:from-[var(--color-light)] hover:to-[var(--color-dark)] hover:border-[var(--color-dark)] hover:text-black
     `,
     outlineGradient: `
-      relative !bg-[linear-gradient(to_right,#1a0824,#210925)] !p-[1px] rounded-lg !border-0
+      relative !bg-[#000000] !p-[1px] rounded-lg !border-0
       before:absolute before:inset-0 before:rounded-lg before:z-[1]
       before:bg-[conic-gradient(from_var(--angle),var(--color-dark),var(--color-medium),var(--color-light),var(--color-medium),var(--color-dark))]
       before:[--angle:0deg] before:animate-rotate
       hover:before:bg-[conic-gradient(from_var(--angle),var(--color-light),var(--color-light),var(--color-light),var(--color-light),var(--color-light))]
       before:transition-colors before:duration-50
-      [&>*]:relative [&>*]:z-[2] [&>*]:rounded-lg [&>*]:bg-[linear-gradient(to_right,#1a0824,#210925)] [&>*]:!border-0
+      [&>*]:relative [&>*]:z-[2] [&>*]:rounded-lg [&>*]:bg-[#000000] [&>*]:!border-0
       [&>*]:inline-flex [&>*]:items-center [&>*]:justify-center [&>*]:w-full [&>*]:h-full [&>*]:px-5
       [&>*]:font-bold [&>*]:tracking-wider
       [&>*]:text-[var(--color-medium)] hover:[&>*]:text-[var(--color-light)]

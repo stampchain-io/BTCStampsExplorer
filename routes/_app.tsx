@@ -1,15 +1,15 @@
 /* ===== ROOT APP LAYOUT ROUTE ===== */
-import { type PageProps } from "$fresh/server.ts";
-import { Partial } from "$fresh/runtime.ts";
-import { Head } from "$fresh/runtime.ts";
-import { ToastProvider } from "$islands/Toast/ToastProvider.tsx";
 import { MetaTags } from "$components/layout/MetaTags.tsx";
-import { Footer, NavigatorProvider } from "$layout";
+import { Head, Partial } from "$fresh/runtime.ts";
+import { type PageProps } from "$fresh/server.ts";
 import { Header } from "$header";
+import AnimationControlsManager from "$islands/layout/AnimationControlsManager.tsx";
+import BackgroundTopology from "$islands/layout/BackgroundTopology.tsx";
 import FontLoader from "$islands/layout/FontLoader.tsx";
 import ModalProvider from "$islands/layout/ModalProvider.tsx";
 import PageVisibilityManager from "$islands/layout/PageVisibilityManager.tsx";
-import AnimationControlsManager from "$islands/layout/AnimationControlsManager.tsx";
+import { ToastProvider } from "$islands/Toast/ToastProvider.tsx";
+import { Footer, NavigatorProvider } from "$layout";
 
 /* ===== ROOT COMPONENT ===== */
 export default function App({ Component, state, url }: PageProps<unknown>) {
@@ -46,6 +46,17 @@ export default function App({ Component, state, url }: PageProps<unknown>) {
           as="script"
         />
 
+        {/* ===== VANTA.JS DEPENDENCIES ===== */}
+        <link
+          rel="preconnect"
+          href="https://cdn.jsdelivr.net"
+          crossOrigin="anonymous"
+        />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js">
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.topology.min.js">
+        </script>
+
         {/* ===== CRITICAL CSS ===== */}
         <link rel="preload" href="/styles.css" as="style" />
         <link rel="stylesheet" href="/styles.css" />
@@ -65,14 +76,14 @@ export default function App({ Component, state, url }: PageProps<unknown>) {
             .text-fill-transparent {
               -webkit-text-fill-color: transparent;
             }
-            
+
             /* Critical text styles */
             .home-header-text {
               text-rendering: optimizeLegibility;
               -webkit-font-smoothing: antialiased;
               -moz-osx-font-smoothing: grayscale;
             }
-            
+
             /* Mobile menu is handled with CSS classes in the component */
           `}
         </style>
@@ -105,14 +116,14 @@ export default function App({ Component, state, url }: PageProps<unknown>) {
                 #1b0029 40%,
                 #220033 50%,
                 #1b0029 60%,
-                #14001f 70%                
+                #14001f 70%
               );
               background-size: 200% 100%;
               animation: shimmer 1.5s infinite linear;
             }
 
             /* ===== COMPREHENSIVE ANIMATION PERFORMANCE CONTROLS ===== */
-            
+
             /* Loading skeleton controls */
             .loading-skeleton.paused {
               animation-play-state: paused;
@@ -132,19 +143,19 @@ export default function App({ Component, state, url }: PageProps<unknown>) {
               animation: none;
               background: #14001f; /* Static background color */
             }
-            
+
             /* Global animation controls based on page visibility */
             .page-hidden * {
               animation-play-state: paused !important;
             }
-            
+
             .page-hidden .animate-pulse,
             .page-hidden .animate-spin,
             .page-hidden .animate-bounce,
             .page-hidden .animate-ping {
               animation-play-state: paused !important;
             }
-            
+
             /* Reduced motion support (accessibility) */
             .reduced-motion *,
             .reduced-motion *::before,
@@ -154,47 +165,47 @@ export default function App({ Component, state, url }: PageProps<unknown>) {
               transition-duration: 0.01ms !important;
               scroll-behavior: auto !important;
             }
-            
+
             /* Performance-based animation controls */
             .performance-low * {
               animation-duration: 0.1s !important;
               transition-duration: 0.1s !important;
             }
-            
+
             .performance-low .animate-pulse,
             .performance-low .animate-spin {
               animation: none !important;
             }
-            
+
             .performance-medium * {
               animation-duration: 0.3s !important;
               transition-duration: 0.3s !important;
             }
-            
+
             /* Intersection observer based controls */
             .animation-paused {
               animation-play-state: paused !important;
             }
-            
+
             .animation-running {
               animation-play-state: running !important;
             }
-            
+
             /* Specific component animation controls */
             .page-hidden .swiper-slide,
             .page-hidden .carousel-slider {
               animation-play-state: paused !important;
             }
-            
+
             .page-hidden .modal-content {
               animation-play-state: paused !important;
             }
-            
+
             /* Transition optimizations for low performance */
             .performance-low .transition-all {
               transition: none !important;
             }
-            
+
             .performance-low .hover\\:scale-105:hover {
               transform: none !important;
             }
@@ -246,7 +257,22 @@ export default function App({ Component, state, url }: PageProps<unknown>) {
 
       {/* ===== BODY SECTION ===== */}
       <body class="!relative min-h-screen overflow-x-hidden overflow-hidden">
-        {/* ===== BACKGROUND LAYERS ===== */}
+        {/* ===== VANTA BACKGROUND ===== */}
+        <BackgroundTopology
+          color={0x3b0056}
+          backgroundColor={0x000000}
+          minHeight={200}
+          minWidth={200}
+          scale={1.0}
+          scaleMobile={0.8}
+          mouseControls={false}
+          touchControls={true}
+          gyroControls={false}
+        />
+
+        {/* ===== OLD BACKGROUND LAYERS - COMMENTED OUT ===== */}
+        {
+          /*
         {state?.route !== "/"
           ? <div class="bgGradientTop contain-layout" />
           : (
@@ -256,6 +282,8 @@ export default function App({ Component, state, url }: PageProps<unknown>) {
           )}
         <div class="bgGradientBottom contain-layout" />
         <div class="absolute inset-0 bg-gradient-to-b from-transparent via-stamp-dark-DEFAULT/50 to-transparent z-[1] contain-paint" />
+        */
+        }
 
         {/* ===== MAIN CONTENT WRAPPER ===== */}
         <div class="flex flex-col min-h-screen font-work-sans relative z-[2]">
