@@ -220,6 +220,7 @@ export function SendToolSkeleton({ className = "" }: SkeletonLoaderProps) {
                   lines={2}
                   widths={["w-[88px]", "w-[48px]"]}
                   heights={["h-4", "h-3"]}
+                  className="mt-0.5"
                 />
 
                 {/* Editions input skeleton */}
@@ -227,6 +228,7 @@ export function SendToolSkeleton({ className = "" }: SkeletonLoaderProps) {
               </div>
             </div>
           </div>
+          {/* Address input skeleton */}
           <SkeletonInput />
         </div>
       </SkeletonContainer>
