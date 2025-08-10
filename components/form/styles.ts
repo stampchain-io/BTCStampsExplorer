@@ -20,6 +20,13 @@ export const inputField = `
   ${inputFieldStyle}
 `;
 
+// Square input field - used for quantity input
+export const inputFieldSquare = `
+  ${inputField}
+  ${inputFieldWidth}
+  text-center
+`;
+
 // Outline input - most styling of this input field is done in the outlineGradient constant
 export const inputFieldOutline = `
   ${inputFieldHeight} w-full
@@ -81,11 +88,6 @@ export const inputCheckbox = (
 
 /* ===== NOT IN USE NOR UPDATED ===== */
 // Input styles
-export const inputFieldSquare = `
-  ${inputField}
-  ${inputFieldWidth}
-  text-center
-`;
 export const inputNumeric = `
   ${inputField}
   [appearance:textfield]
