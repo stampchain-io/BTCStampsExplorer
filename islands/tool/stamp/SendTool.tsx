@@ -17,7 +17,7 @@ import {
 } from "$layout";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
 import { FeeCalculatorBase } from "$section";
-import { titleGreyLD } from "$text";
+import { labelLg, labelSm, titleGreyLD } from "$text";
 import type { StampRow } from "$types/stamp.d.ts";
 import { JSX } from "preact";
 import { useEffect, useMemo, useState } from "preact/hooks";
@@ -534,12 +534,12 @@ export function StampSendTool() {
               value={selectedStamp?.stamp?.toString() ?? ""}
             />
 
-            <div class="flex w-full justify-end items-center gap-5">
+            <div class="flex w-full justify-end items-center -my-[3px] gap-5">
               <div class="flex flex-col justify-start -space-y-0.5">
-                <h5 class="text-xl font-bold text-stamp-grey">
+                <h5 class={`${labelLg} !text-stamp-grey`}>
                   EDITIONS
                 </h5>
-                <h6 class="text-sm font-medium text-stamp-grey-darker">
+                <h6 class={labelSm}>
                   MAX {maxQuantity}
                 </h6>
               </div>
