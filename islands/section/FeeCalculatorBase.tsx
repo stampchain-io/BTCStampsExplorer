@@ -913,7 +913,7 @@ export function FeeCalculatorBase({
           <div class="flex justify-end gap-5">
             {onCancel && (
               <Button
-                variant="glassmorphismDeselected"
+                variant="glassmorphism"
                 color="grey"
                 size="mdR"
                 onClick={() => {
