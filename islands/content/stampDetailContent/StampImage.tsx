@@ -442,10 +442,11 @@ function RightPanel(
 
 /* ===== MAIN STAMP IMAGE COMPONENT ===== */
 export function StampImage(
-  { stamp, className, flag }: {
+  { stamp, className, flag, containerClassName }: {
     stamp?: StampRow;
     className?: string;
     flag?: boolean;
+    containerClassName?: string;
   },
 ) {
   /* ===== STATE & REFS ===== */
@@ -574,7 +575,7 @@ export function StampImage(
 
         setValidatedContent(
           <div
-            className="max-w-none object-contain rounded pixelart stamp-image h-full w-full flex items-center justify-center"
+            className="max-w-none object-contain rounded-md pixelart stamp-image h-full w-full flex items-center justify-center"
             dangerouslySetInnerHTML={{ __html: rewrittenSVG }}
             style={{
               width: "100%",
@@ -591,7 +592,7 @@ export function StampImage(
           <img
             width="100%"
             loading="lazy"
-            className="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
+            className="max-w-none object-contain rounded-md pixelart stamp-image h-full w-full"
             src={src}
             onError={handleImageError}
             alt={`Stamp No. ${stamp.stamp}`}
@@ -604,7 +605,7 @@ export function StampImage(
         <img
           width="100%"
           loading="lazy"
-          className="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
+          className="max-w-none object-contain rounded-md pixelart stamp-image h-full w-full"
           src={src}
           onError={handleImageError}
           alt={`Stamp No. ${stamp.stamp}`}
@@ -682,7 +683,7 @@ export function StampImage(
   if (!stamp) {
     return (
       <div className="stamp-container bg-gray-200 rounded-lg p-4 text-center text-gray-500">
-        No stamp data available
+        NO STAMP DATA AVAILABLE
       </div>
     );
   }
@@ -727,7 +728,7 @@ export function StampImage(
   if (isLoadingOrValidating) {
     return (
       <div class={`${body} ${gapSectionSlim}`}>
-        <div className={containerDetailImage}>
+        <div className={`${containerDetailImage} ${containerClassName || ""}`}>
           <div className="stamp-container">
             <LoadingIcon containerClassName="rounded-lg" />
           </div>
@@ -743,7 +744,7 @@ export function StampImage(
           <img
             width="100%"
             loading="lazy"
-            className={`max-w-none object-contain rounded ${className} pixelart stamp-image`}
+            className={`max-w-none object-contain rounded-md ${className} pixelart stamp-image`}
             src={src}
             alt="Not Available"
           />
@@ -752,14 +753,18 @@ export function StampImage(
 
       {src !== NOT_AVAILABLE_IMAGE && isHtml && (
         <div className={`${className} ${body} ${gapSectionSlim}`}>
-          <div className={`relative ${flag ? containerDetailImage : ""}`}>
+          <div
+            className={`relative ${
+              flag ? `${containerDetailImage} ${containerClassName || ""}` : ""
+            }`}
+          >
             <div className="stamp-container">
-              <div className="relative pt-[100%] rounded overflow-hidden">
+              <div className="relative pt-[100%] rounded-md overflow-hidden">
                 {/* Show placeholder image as background while loading */}
                 <img
                   src={NOT_AVAILABLE_IMAGE}
                   alt="Loading..."
-                  className="absolute top-0 left-0 w-full h-full object-contain rounded pixelart"
+                  className="absolute top-0 left-0 w-full h-full object-contain rounded-md pixelart"
                   style={{ zIndex: 0 }}
                 />
                 {console.log("Rendering iframe with src:", src)}
@@ -769,7 +774,7 @@ export function StampImage(
                   scrolling="no"
                   className={`${
                     className || ""
-                  } rounded absolute top-0 left-0 w-full h-full bg-transparent`}
+                  } rounded-md absolute top-0 left-0 w-full h-full bg-transparent`}
                   sandbox="allow-scripts allow-same-origin"
                   src={src || ""}
                   loading="lazy"
@@ -812,7 +817,9 @@ export function StampImage(
 
       {src !== NOT_AVAILABLE_IMAGE && isPlainText && (
         <div class={`${body} ${gapSectionSlim}`}>
-          <div className={containerDetailImage}>
+          <div
+            className={`${containerDetailImage} ${containerClassName || ""}`}
+          >
             <div className="stamp-container">
               <div className="relative aspect-square">
                 <TextContentIsland src={src} />
@@ -832,12 +839,14 @@ export function StampImage(
 
       {src !== NOT_AVAILABLE_IMAGE && isAudio && (
         <div className={`${className} ${body} ${gapSectionSlim}`}>
-          <div className={containerDetailImage}>
+          <div
+            className={`${containerDetailImage} ${containerClassName || ""}`}
+          >
             <div className="stamp-container relative group">
               <img
                 src={AUDIO_FILE_IMAGE}
                 alt="Audio File"
-                className="absolute top-0 left-0 w-full h-full object-contain rounded pixelart stamp-image pointer-events-none select-none"
+                className="absolute top-0 left-0 w-full h-full object-contain rounded-md pixelart stamp-image pointer-events-none select-none"
                 draggable={false}
               />
               <div className="absolute inset-0 flex items-center justify-center">
@@ -879,12 +888,14 @@ export function StampImage(
 
       {src !== NOT_AVAILABLE_IMAGE && isLibraryFile && (
         <div className={`${className} ${body} ${gapSectionSlim}`}>
-          <div className={containerDetailImage}>
+          <div
+            className={`${containerDetailImage} ${containerClassName || ""}`}
+          >
             <div className="stamp-container relative group">
               <img
                 src={LIBRARY_FILE_IMAGE}
                 alt="Library File"
-                className="absolute top-0 left-0 w-full h-full object-contain rounded pixelart stamp-image pointer-events-none select-none"
+                className="absolute top-0 left-0 w-full h-full object-contain rounded-md pixelart stamp-image pointer-events-none select-none"
                 draggable={false}
               />
             </div>
@@ -905,14 +916,18 @@ export function StampImage(
           flag
             ? (
               <div class={`${body} ${gapSectionSlim}`}>
-                <div className={containerDetailImage}>
+                <div
+                  className={`${containerDetailImage} ${
+                    containerClassName || ""
+                  }`}
+                >
                   <div className="stamp-container">
                     <div className="relative z-10 aspect-square flex items-center justify-center">
                       {validatedContent || (
                         <img
                           width="100%"
                           loading="lazy"
-                          className="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
+                          className="max-w-none object-contain rounded-md pixelart stamp-image h-full w-full"
                           src={src}
                           onError={handleImageError}
                           alt="Stamp"
@@ -932,14 +947,18 @@ export function StampImage(
               </div>
             )
             : (
-              <div className={containerDetailImage}>
+              <div
+                className={`${containerDetailImage} ${
+                  containerClassName || ""
+                }`}
+              >
                 <div className="stamp-container">
                   <div className="relative z-10 aspect-square flex items-center justify-center">
                     {validatedContent || (
                       <img
                         width="100%"
                         loading="lazy"
-                        className="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
+                        className="max-w-none object-contain rounded-md pixelart stamp-image h-full w-full"
                         src={src}
                         onError={handleImageError}
                         alt="Stamp"
