@@ -1645,7 +1645,7 @@ function StampingToolMain({ config }: { config: Config }) {
   const imagePreviewDiv = (
     <div
       id="image-preview"
-      class={`relative items-center content-center mx-auto ${PREVIEW_SIZE_CLASSES} text-center group ${glassmorphismLayer2} hover:bg-stamp-grey-darkest/30 ${transition} cursor-pointer `}
+      class={`relative items-center content-center mx-auto ${PREVIEW_SIZE_CLASSES} text-center group ${glassmorphismLayer2} hover:bg-[#171417]/10 hover:border-[#33333380] ${transition} cursor-pointer `}
       onMouseMove={handleMouseMove}
       onMouseEnter={handleUploadMouseEnter}
       onMouseLeave={handleUploadMouseLeave}
@@ -1667,7 +1667,7 @@ function StampingToolMain({ config }: { config: Config }) {
             {file.name.match(/\.(jpg|jpeg|png|gif|webp|svg|avif)$/i)
               ? (
                 <img
-                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded bg-conic-pattern bg-[length:4px_4px] bg-stamp-grey/50 [image-rendering:pixelated]`}
+                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded bg-conic-pattern bg-[length:4px_4px] bg-stamp-grey/30 [image-rendering:pixelated]`}
                   src={URL.createObjectURL(file)}
                   alt="Preview"
                   onError={(e) => {
@@ -1688,7 +1688,7 @@ function StampingToolMain({ config }: { config: Config }) {
                   loading="lazy"
                   sandbox="allow-scripts allow-same-origin"
                   src={URL.createObjectURL(file)}
-                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded bg-stamp-grey [image-rendering:pixelated]`}
+                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded bg-stamp-grey/30 [image-rendering:pixelated]`}
                   onError={(e) => {
                     console.error("iframe error (detailed):", {
                       error: e,
@@ -1710,7 +1710,7 @@ function StampingToolMain({ config }: { config: Config }) {
                   alt={`File: ${file.name}`}
                 />
               )}
-            <div class="flex items-center justify-center absolute inset-0 rounded hover:bg-stamp-grey-darkest/80 opacity-0 hover:opacity-100 transition-opacity">
+            <div class="flex items-center justify-center absolute inset-0 rounded hover:bg-[#171417]/10 hover:border-[#33333380] opacity-0 hover:opacity-100 transition-opacity">
               <Icon
                 type="icon"
                 name="uploadImage"
@@ -2071,7 +2071,7 @@ function StampingToolMain({ config }: { config: Config }) {
             {poshToggleButton}
             <div
               ref={lockButtonRef}
-              className={`flex items-center justify-center !w-10 !h-10 ${glassmorphismLayer2} group`}
+              className={`flex items-center justify-center !w-10 !h-10 ${glassmorphismLayer2} hover:bg-[#171417]/10 hover:border-[#33333380] group`}
               onClick={() => {
                 setIsLocked(!isLocked);
                 setIsLockTooltipVisible(false);
@@ -2117,7 +2117,7 @@ function StampingToolMain({ config }: { config: Config }) {
 
             <div
               ref={previewButtonRef}
-              className={`flex items-center justify-center !w-[46px] !h-10 ${glassmorphismLayer2} group`} // dunno why, but the width has to be +6px ?!?!
+              className={`flex items-center justify-center !w-[46px] !h-10 ${glassmorphismLayer2} hover:bg-[#171417]/10 hover:border-[#33333380] group`} // dunno why, but the width has to be +6px ?!?!
               onClick={() => {
                 toggleFullScreenModal();
                 setIsPreviewTooltipVisible(false);

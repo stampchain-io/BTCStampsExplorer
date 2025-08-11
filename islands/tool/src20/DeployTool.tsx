@@ -343,7 +343,7 @@ export function SRC20DeployTool(
             {/* Image upload preview */}
             <div
               id="image-preview"
-              class={`relative flex flex-col items-center justify-center content-center mx-auto min-h-[100px] min-w-[100px] ${glassmorphismLayer2} hover:bg-stamp-grey-darkest/30 ${transition} cursor-pointer`}
+              class={`relative flex flex-col items-center justify-center content-center mx-auto min-h-[100px] min-w-[100px] ${glassmorphismLayer2} hover:bg-[#171417]/10 hover:border-[#33333380] ${transition} cursor-pointer`}
               onMouseMove={handleMouseMove}
               onMouseEnter={handleUploadMouseEnter}
               onMouseLeave={handleUploadMouseLeave}
