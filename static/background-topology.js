@@ -1,6 +1,7 @@
 /* ===== Modified version of vanta topology background animation ===== */
-/* ===== https://www.vantajs.com/?effect=topology ===== */
-/* ===== https://cdn.jsdelivr.net/npm/vanta@0.5.24/dist/vanta.topology.min.js ===== */
+/* https://www.vantajs.com/?effect=topology */
+/* https://cdn.jsdelivr.net/npm/vanta@0.5.24/dist/vanta.topology.min.js */
+
 !(function (e, t) {
     "object" == typeof exports && "object" == typeof module ? (module.exports = t()) : "function" == typeof define && define.amd ? define([], t) : "object" == typeof exports ? (exports._vantaEffect = t()) : (e._vantaEffect = t());
 })("undefined" != typeof self ? self : this, () =>
@@ -235,9 +236,9 @@
                             t.noStroke(),
                             (function () {
                                 // *** PARTICLE COUNT - LINE 290 ***
-                                // Controls the number of flowing particles in the topology
+                                // Controls the number of flowing particles in the topology - update the code below too
                                 // Default: 4500 particles
-                                for (let e = 0; e < 3000; e++) {
+                                for (let e = 0; e < 1500; e++) {
                                     let s = t.random(t.width + 200),
                                         i = t.random(t.height + 200);
                                     a.push({ prev: t.createVector(s, i), pos: t.createVector(s, i), vel: t.createVector(0, 0), acc: t.createVector(0, 0), col: t.random(255), seed: e });
@@ -255,7 +256,7 @@
                             t.translate(-100, -100),
                                 (function () {
                                     // This number should match the particle count above
-                                    for (let i = 0; i < 3000; i++) {
+                                    for (let i = 0; i < 1500; i++) {
                                         let o = a[i],
                                             n = ((e = o.pos.x), (s = o.pos.y), (e = t.constrain(e, 0, t.width + 200)), (s = t.constrain(s, 0, t.height + 200)), h[t.floor(s / 10)][t.floor(e / 10)]);
                                         (o.prev.x = o.pos.x),
@@ -288,7 +289,7 @@
                                             // *** LINE OPACITY/TRANSPARENCY - LINE 341 ***
                                             // Controls how visible/transparent the connecting lines are
                                             // Default: 0.05
-                                            })(e.options.color, 0.05)
+                                            })(e.options.color, 0.08)
                                         );
                                     for (let e = 0; e < a.length; e++) l.Vector.dist(a[e].prev, a[e].pos) < 10 && t.line(a[e].prev.x, a[e].prev.y, a[e].pos.x, a[e].pos.y);
                                 })(),
