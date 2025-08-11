@@ -7,18 +7,12 @@ interface BackgroundTopologyProps {
 }
 
 declare global {
-  interface Window {
-    VANTA?: {
-      TOPOLOGY?: (options: any) => {
-        destroy: () => void;
-      };
-      HALO?: (options: any) => {
-        destroy: () => void;
-      };
+  var VANTA: {
+    TOPOLOGY?: (options: any) => {
+      destroy: () => void;
     };
-    p5?: any;
-    THREE?: any;
-  }
+  } | undefined;
+  var p5: any;
 }
 
 export default function BackgroundTopology(
@@ -35,15 +29,15 @@ export default function BackgroundTopology(
     let timeoutId: number;
 
     const tryInitVanta = () => {
-      if (window.VANTA?.TOPOLOGY && containerRef.current) {
+      if (globalThis.VANTA?.TOPOLOGY && containerRef.current) {
         try {
           // All options are now hardcoded in the JS file
-          vantaRef.current = window.VANTA.TOPOLOGY({
+          vantaRef.current = globalThis.VANTA.TOPOLOGY({
             el: containerRef.current,
           });
           return true;
         } catch (error) {
-          console.error("BackgroundTopology: ailed to initialize:", error);
+          console.error("BackgroundTopology: Failed to initialize:", error);
           return false;
         }
       }

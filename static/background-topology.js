@@ -1,3 +1,6 @@
+/* ===== Modified version of vanta topology background animation ===== */
+/* ===== https://www.vantajs.com/?effect=topology ===== */
+/* ===== https://cdn.jsdelivr.net/npm/vanta@0.5.24/dist/vanta.topology.min.js ===== */
 !(function (e, t) {
     "object" == typeof exports && "object" == typeof module ? (module.exports = t()) : "function" == typeof define && define.amd ? define([], t) : "object" == typeof exports ? (exports._vantaEffect = t()) : (e._vantaEffect = t());
 })("undefined" != typeof self ? self : this, () =>
@@ -40,15 +43,17 @@
             constructor(e = {}) {
                 if (!o) return !1;
                 (r.current = this),
-                    (this.windowMouseMoveWrapper = this.windowMouseMoveWrapper.bind(this)),
-                    (this.windowTouchWrapper = this.windowTouchWrapper.bind(this)),
-                    (this.windowGyroWrapper = this.windowGyroWrapper.bind(this)),
                     (this.resize = this.resize.bind(this)),
                     (this.animationLoop = this.animationLoop.bind(this)),
                     (this.restart = this.restart.bind(this));
                 const t = "function" == typeof this.getDefaultOptions ? this.getDefaultOptions() : this.defaultOptions;
                 if (
-                    ((this.options = Object.assign({ mouseControls: !0, touchControls: !0, gyroControls: !1, minHeight: 200, minWidth: 200, scale: 1, scaleMobile: 1 }, t)),
+                    ((this.options = Object.assign({
+                        minHeight: 200,        // *** MINIMUM CANVAS HEIGHT (pixels) ***
+                        minWidth: 200,         // *** MINIMUM CANVAS WIDTH (pixels) ***
+                        scale: 1.00,           // *** DESKTOP SCALE FACTOR (1.0 = normal size) ***
+                        scaleMobile: 1.00      // *** MOBILE SCALE FACTOR (reduce for performance) ***
+                    }, t)),
                     (e instanceof HTMLElement || "string" == typeof e) && (e = { el: e }),
                     Object.assign(this.options, e),
                     this.options.THREE && (n = this.options.THREE),
@@ -71,16 +76,13 @@
                         void (this.options.backgroundColor && (console.log("[VANTA] Falling back to backgroundColor"), (this.el.style.background = s(this.options.backgroundColor))))
                     );
                 }
-                this.initMouse(), this.resize(), this.animationLoop();
+                this.resize(), this.animationLoop();
                 const a = window.addEventListener;
                 a("resize", this.resize),
-                    window.requestAnimationFrame(this.resize),
-                    this.options.mouseControls && (a("scroll", this.windowMouseMoveWrapper), a("mousemove", this.windowMouseMoveWrapper)),
-                    this.options.touchControls && (a("touchstart", this.windowTouchWrapper), a("touchmove", this.windowTouchWrapper)),
-                    this.options.gyroControls && a("deviceorientation", this.windowGyroWrapper);
+                    window.requestAnimationFrame(this.resize);
             }
             setOptions(e = {}) {
-                Object.assign(this.options, e), this.triggerMouseMove();
+                Object.assign(this.options, e);
             }
             prepareEl() {
                 let e, t;
@@ -114,36 +116,6 @@
                 const e = this.getCanvasElement();
                 return !!e && e.getBoundingClientRect();
             }
-            windowMouseMoveWrapper(e) {
-                const t = this.getCanvasRect();
-                if (!t) return !1;
-                const s = e.clientX - t.left,
-                    i = e.clientY - t.top;
-                s >= 0 && i >= 0 && s <= t.width && i <= t.height && ((this.mouseX = s), (this.mouseY = i), this.options.mouseEase || this.triggerMouseMove(s, i));
-            }
-            windowTouchWrapper(e) {
-                const t = this.getCanvasRect();
-                if (!t) return !1;
-                if (1 === e.touches.length) {
-                    const s = e.touches[0].clientX - t.left,
-                        i = e.touches[0].clientY - t.top;
-                    s >= 0 && i >= 0 && s <= t.width && i <= t.height && ((this.mouseX = s), (this.mouseY = i), this.options.mouseEase || this.triggerMouseMove(s, i));
-                }
-            }
-            windowGyroWrapper(e) {
-                const t = this.getCanvasRect();
-                if (!t) return !1;
-                const s = Math.round(2 * e.alpha) - t.left,
-                    i = Math.round(2 * e.beta) - t.top;
-                s >= 0 && i >= 0 && s <= t.width && i <= t.height && ((this.mouseX = s), (this.mouseY = i), this.options.mouseEase || this.triggerMouseMove(s, i));
-            }
-            triggerMouseMove(e, t) {
-                void 0 === e && void 0 === t && (this.options.mouseEase ? ((e = this.mouseEaseX), (t = this.mouseEaseY)) : ((e = this.mouseX), (t = this.mouseY))),
-                    this.uniforms && ((this.uniforms.iMouse.value.x = e / this.scale), (this.uniforms.iMouse.value.y = t / this.scale));
-                const s = e / this.width,
-                    i = t / this.height;
-                "function" == typeof this.onMouseMove && this.onMouseMove(s, i);
-            }
             setSize() {
                 this.scale || (this.scale = 1),
                     "undefined" != typeof navigator && (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 600) && this.options.scaleMobile
@@ -151,10 +123,6 @@
                         : this.options.scale && (this.scale = this.options.scale),
                     (this.width = Math.max(this.el.offsetWidth, this.options.minWidth)),
                     (this.height = Math.max(this.el.offsetHeight, this.options.minHeight));
-            }
-            initMouse() {
-                ((!this.mouseX && !this.mouseY) || (this.mouseX === this.options.minWidth / 2 && this.mouseY === this.options.minHeight / 2)) &&
-                    ((this.mouseX = this.width / 2), (this.mouseY = this.height / 2), this.triggerMouseMove(this.mouseX, this.mouseY));
             }
             resize() {
                 this.setSize(),
@@ -178,11 +146,6 @@
                 }
                 return (
                     (this.prevNow = e),
-                    this.options.mouseEase &&
-                        ((this.mouseEaseX = this.mouseEaseX || this.mouseX || 0),
-                        (this.mouseEaseY = this.mouseEaseY || this.mouseY || 0),
-                        Math.abs(this.mouseEaseX - this.mouseX) + Math.abs(this.mouseEaseY - this.mouseY) > 0.1 &&
-                            ((this.mouseEaseX += 0.05 * (this.mouseX - this.mouseEaseX)), (this.mouseEaseY += 0.05 * (this.mouseY - this.mouseEaseY)), this.triggerMouseMove(this.mouseEaseX, this.mouseEaseY))),
                     (this.isOnScreen() || this.options.forceAnimate) &&
                         ("function" == typeof this.onUpdate && this.onUpdate(),
                         this.scene && this.camera && (this.renderer.render(this.scene, this.camera), this.renderer.setClearColor(this.options.backgroundColor, this.options.backgroundAlpha)),
@@ -201,12 +164,7 @@
             destroy() {
                 "function" == typeof this.onDestroy && this.onDestroy();
                 const e = window.removeEventListener;
-                e("touchstart", this.windowTouchWrapper),
-                    e("touchmove", this.windowTouchWrapper),
-                    e("scroll", this.windowMouseMoveWrapper),
-                    e("mousemove", this.windowMouseMoveWrapper),
-                    e("deviceorientation", this.windowGyroWrapper),
-                    e("resize", this.resize),
+                e("resize", this.resize),
                     window.cancelAnimationFrame(this.req);
                 const t = this.scene;
                 t && t.children && i(t), this.renderer && (this.renderer.domElement && this.el.removeChild(this.renderer.domElement), (this.renderer = null), (this.scene = null)), r.current === this && (r.current = null);
@@ -276,7 +234,7 @@
                             t.smooth(),
                             t.noStroke(),
                             (function () {
-                                // *** PARTICLE COUNT - LINE 276 ***
+                                // *** PARTICLE COUNT - LINE 290 ***
                                 // Controls the number of flowing particles in the topology
                                 // Default: 4500 particles
                                 for (let e = 0; e < 3000; e++) {
@@ -304,12 +262,12 @@
                                             (o.prev.y = o.pos.y),
                                             (o.pos.x = d(o.pos.x + o.vel.x, t.width + 200)),
                                             (o.pos.y = d(o.pos.y + o.vel.y, t.height + 200)),
-                                            // *** PARTICLE MOVEMENT SPEED - LINE 300 ***
+                                            // *** PARTICLE MOVEMENT SPEED - LINE 318 ***
                                             // Controls how fast particles move through the topology
                                             // Default: mult(2.2)
                                             o.vel.add(o.acc).normalize().mult(4),
                                             (o.acc = t.createVector(0, 0)),
-                                            // *** FLOW FIELD RESPONSE STRENGTH - LINE 302 ***
+                                            // *** FLOW FIELD RESPONSE STRENGTH - LINE 323 ***
                                             // Controls how strongly particles respond to the flow field
                                             // Default: mult(3)
                                             o.acc.add(n).mult(11);
@@ -317,7 +275,7 @@
                                     var e, s;
                                 })(),
                                 (function () {
-                                    // *** LINE THICKNESS - LINE 307 ***
+                                    // *** LINE THICKNESS - LINE 331 ***
                                     // Controls the thickness of the connecting lines between particles
                                     // Default: strokeWeight(1)
                                     t.strokeWeight(1),
@@ -327,14 +285,14 @@
                                                     o = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(i),
                                                     n = o ? { r: parseInt(o[1], 16), g: parseInt(o[2], 16), b: parseInt(o[3], 16) } : null;
                                                 return "rgba(" + n.r + "," + n.g + "," + n.b + "," + t + ")";
-                                            // *** LINE OPACITY/TRANSPARENCY - LINE 314 ***
+                                            // *** LINE OPACITY/TRANSPARENCY - LINE 341 ***
                                             // Controls how visible/transparent the connecting lines are
                                             // Default: 0.05
                                             })(e.options.color, 0.05)
                                         );
                                     for (let e = 0; e < a.length; e++) l.Vector.dist(a[e].prev, a[e].pos) < 10 && t.line(a[e].prev.x, a[e].prev.y, a[e].pos.x, a[e].pos.y);
                                 })(),
-                                // *** FLOW FIELD EVOLUTION SPEED - LINE 318 ***
+                                // *** FLOW FIELD EVOLUTION SPEED - LINE 349 ***
                                 // Controls how fast the underlying flow field changes over time
                                 // This creates the "flowing" effect of the topology
                                 // Default: c += 0.002
@@ -350,14 +308,25 @@
 );
 
 /*
- * SUMMARY OF CUSTOMIZABLE VARIABLES:
+ * CUSTOMIZABLE VARIABLES (default values):
  *
- * Line 276: Particle count (4500) - Controls density
- * Line 293: Particle count in loop (4500) - Must match line 276
- * Line 300: Particle speed mult(2.2) - Controls movement speed
- * Line 302: Flow field strength mult(3) - Controls field influence
- * Line 307: Line thickness strokeWeight(1) - Controls line width
- * Line 314: Line opacity (0.05) - Controls line transparency
- * Line 318: Flow evolution (c += 0.002) - Controls field animation
+ * === BASIC SIZING (Line ~50) ===
+ * minHeight: 200
+ * minWidth: 200
+ * scale: 1
+ * scaleMobile: 1
  *
+ * === VISUAL COLORS (Line ~247) ===
+ * color: 3866710 (current: 3866710 = 0x3b0056 purple)
+ * backgroundColor: 0 (current: 0 = 0x000000 black)
+ *
+ * === PARTICLE SYSTEM (Lines ~290 & ~308) ===
+ * Particle count: 4500 (in both loops)
+ *
+ * === ANIMATION BEHAVIOR ===
+ * Particle speed: mult(2.2) - Line ~318
+ * Flow field strength: mult(3) - Line ~323
+ * Line thickness: strokeWeight(1) - Line ~331
+ * Line opacity: 0.05 - Line ~341
+ * Flow animation speed: c += 0.002 - Line ~349
  */
