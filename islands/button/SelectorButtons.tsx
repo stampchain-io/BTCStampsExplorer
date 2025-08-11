@@ -160,7 +160,7 @@ export const SelectorButtons = ({
                 ${
                 selectedValue === option.value
                   ? "text-black"
-                  : "mx-[1px] !rounded-lg bg-transparent text-[var(--color-dark)] hover:text-[var(--color-medium)] hover:bg-stamp-grey-darkest/30"
+                  : "mx-[1px] !rounded-lg bg-transparent text-[var(--color-text)] hover:text-[var(--color-text-hover)] hover:bg-[#1f1c1f]/50"
               }
                 ${optionDisabled ? state.disabled : "cursor-pointer"}
               `}
