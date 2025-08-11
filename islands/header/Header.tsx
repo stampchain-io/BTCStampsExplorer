@@ -483,9 +483,9 @@ export function Header() {
         ref={drawerRef}
         class={`flex tablet:hidden flex-col justify-between
            fixed top-0 right-0 left-auto w-full min-[420px]:w-[340px] h-[100dvh] z-30
-           bg-gradient-to-b from-black/90 via-black/50 to-black/100 backdrop-blur-md
-           min-[420px]:rounded-r-xl min-[420px]:border-r-[1px] min-[420px]:border-l-0 min-[420px]:border-r-black
-           min-[420px]:shadow-[12px_0_12px_-6px_rgba(0,0,0,0.5)]
+           bg-gradient-to-b from-[#111011]/90 via-[#111011]/60 to-[#111011]/100 backdrop-blur-md
+           min-[420px]:rounded-r-xl min-[420px]:border-r-[1px] min-[420px]:border-l-0 min-[420px]:border-r-[#111011]
+           min-[420px]:shadow-[12px_0_12px_-6px_rgba(17,16,17,0.5)]
            transition-transform duration-500 will-change-transform
            overflow-y-auto overflow-x-hidden scrollbar-black
            ${open ? "translate-x-0" : "translate-x-full"}`}
@@ -523,7 +523,7 @@ export function Header() {
           </div>
 
           <div class="flex flex-col w-full sticky bottom-0
-          bg-black/80 shadow-[0_-36px_36px_-6px_rgba(0,0,0,1)]">
+          bg-[#111011]/60 shadow-[0_-36px_36px_-6px_rgba(17,16,17,0.6)]">
             {/* Tools section with gear icon */}
             <div class="flex w-full justify-between pt-3 pb-8 px-9">
               <div class="flex justify-start items-end -ml-1">
