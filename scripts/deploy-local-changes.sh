@@ -36,6 +36,10 @@ ECS_SERVICE_NAME=${ECS_SERVICE_NAME:-"stamps-app-service"}
 S3_BUCKET=${S3_BUCKET}
 CODE_BUILD_PROJECT=${CODE_BUILD_PROJECT:-"stamps-app-build"}
 
+# Load Cloudflare configuration (optional - for cache purging)
+CLOUDFLARE_ZONE_ID=${CLOUDFLARE_ZONE_ID:-""}
+CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN:-""}
+
 # Parse arguments
 SKIP_BUILD=false
 SKIP_VALIDATION=false
@@ -427,6 +431,37 @@ while [ $(date +%s) -lt $CUTOFF_TIME ]; do
 
   if [ "$ROLLOUT_STATE" = "COMPLETED" ]; then
     echo -e "${GREEN}Deployment completed successfully!${NC}"
+    
+    # Clear Cloudflare cache for Fresh build artifacts
+    if [ -n "$CLOUDFLARE_ZONE_ID" ] && [ -n "$CLOUDFLARE_API_TOKEN" ]; then
+      echo -e "${YELLOW}Purging Cloudflare cache for Fresh build artifacts...${NC}"
+      
+      # Purge by prefix (most efficient for Fresh assets)
+      PURGE_RESPONSE=$(curl -s -X POST \
+        "https://api.cloudflare.com/client/v4/zones/${CLOUDFLARE_ZONE_ID}/purge_cache" \
+        -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+        -H "Content-Type: application/json" \
+        --data '{
+          "prefixes": [
+            "stampchain.io/_frsh/",
+            "stampchain.io/_fresh/"
+          ]
+        }')
+      
+      if echo "$PURGE_RESPONSE" | jq -e '.success == true' > /dev/null 2>&1; then
+        echo -e "${GREEN}✅ Cloudflare cache purged for Fresh artifacts${NC}"
+      else
+        echo -e "${YELLOW}⚠️ Cloudflare cache purge may have failed - check manually${NC}"
+        echo -e "${YELLOW}Response: $(echo $PURGE_RESPONSE | jq -r '.errors[0].message // "Unknown error"')${NC}"
+      fi
+      
+      # Wait a moment for cache to clear
+      echo -e "${YELLOW}Waiting 5 seconds for cache to propagate...${NC}"
+      sleep 5
+    else
+      echo -e "${YELLOW}⚠️ Cloudflare credentials not found - skipping cache purge${NC}"
+      echo -e "${YELLOW}   Set CLOUDFLARE_ZONE_ID and CLOUDFLARE_API_TOKEN in .env to enable${NC}"
+    fi
 
     # 🚀 RUN POST-DEPLOYMENT VALIDATION
     if post_deployment_validation; then

@@ -1220,7 +1220,6 @@ export interface WalletData {
  */
 export interface MarketListingSummary {
   tick: string;
-  // 🎸 PUNK ROCK v2.3 STANDARDIZED FIELDS 🎸
   floor_price_btc: number | null; // ✅ v2.3 standardized field
   market_cap_btc: number; // ✅ v2.3 standardized field
   volume_7d_btc: number | null; // ✅ v2.3 extended field (was sum_7d)
@@ -1252,7 +1251,6 @@ export interface OpenStampMarketData {
  */
 export interface StampScanMarketData {
   tick: string; // emoji tick
-  // 🎸 PUNK ROCK v2.3 STANDARDIZED FIELDS 🎸
   floor_price_btc: number | null; // ✅ v2.3 standardized field (was floor_unit_price)
   market_cap_btc: number; // ✅ v2.3 standardized field (was mcap)
   volume_7d_btc: number | null; // ✅ v2.3 extended field (was sum_7d)
@@ -1268,7 +1266,6 @@ export interface StampScanMarketData {
  */
 export interface MarketListingAggregated {
   tick: string;
-  // 🎸 PUNK ROCK v2.3 STANDARDIZED FIELDS 🎸
   price_btc?: number | null; // ✅ v2.3 field for fungible SRC-20 tokens
   floor_price_btc: number | null; // ✅ v2.3 standardized field (for NFTs, lower of stampscan/openstamp)
   market_cap_btc: number; // ✅ v2.3 standardized field (computed on lower price * totalSupply)

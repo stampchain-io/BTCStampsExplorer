@@ -1,11 +1,13 @@
 /* ===== SRC20 OVERVIEW CONTENT COMPONENT ===== */
-import { useState } from "preact/hooks";
 import type { SRC20OverviewContentProps } from "$types/ui.d.ts";
+import { useState } from "preact/hooks";
 // import type { SRC20Row } from "$types/src20.d.ts"; // Removed unused import
 import { SRC20OverviewHeader } from "$header";
 import { SRC20Gallery } from "$section";
-import { useSSRSafeNavigation } from "$lib/hooks/useSSRSafeNavigation.ts";
-import { SSRSafeUrlBuilder } from "$components/navigation/SSRSafeUrlBuilder.tsx";
+import {
+  createFreshPaginationHandler,
+  navigateWithFreshPartial,
+} from "$utils/navigation/freshNavigationUtils.ts";
 
 /* ===== TYPES ===== */
 type SortOption =
@@ -32,11 +34,7 @@ export function SRC20OverviewContent({
     `[SRC20OverviewContent] BTC price context available: $${btcPrice} from ${btcPriceSource}`,
   );
 
-  // ✅ SSR-SAFE: Use SSR-safe navigation hook
-  const { isClient } = useSSRSafeNavigation();
-
-  // 🤘 PUNK ROCK SIMPLIFICATION: Remove complexity, just use the data directly
-  const [_currentTimeframe, setCurrentTimeframe] = useState<
+  const [currentTimeframe, setCurrentTimeframe] = useState<
     "24H" | "7D" | "30D"
   >(timeframe as "24H" | "7D" | "30D");
   const [isNavigating, setIsNavigating] = useState(false);
@@ -61,23 +59,11 @@ export function SRC20OverviewContent({
     setCurrentSort({ filter, direction });
     setIsNavigating(true); // ✅ FRESH.JS: Set loading state
 
-    // ✅ SSR-SAFE: Use SSR-safe URL builder for navigation
-    if (isClient) {
-      const url = SSRSafeUrlBuilder.fromCurrent()
-        .setParam("sortBy", filter || "TRENDING")
-        .setParam("sortDirection", direction)
-        .setParam("page", "1") // Reset to page 1 when sorting changes
-        .toString();
-
-      // Create anchor element with f-partial attribute for Fresh.js navigation
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("f-partial", "");
-      link.style.display = "none";
-      document.body.appendChild(link as Node);
-      link.click();
-      document.body.removeChild(link as Node);
-    }
+    // Use centralized Fresh partial navigation
+    navigateWithFreshPartial("/src20", {
+      sortBy: filter || "TRENDING",
+      sortDirection: direction,
+    }, true); // Reset to page 1
 
     // Reset loading state after a short delay (Fresh.js will handle the actual navigation)
     setTimeout(() => setIsNavigating(false), 100);
@@ -88,25 +74,34 @@ export function SRC20OverviewContent({
     // 🎸 MINTING BUTTON: Use the provided view type instead of toggling
     setIsNavigating(true);
 
-    // ✅ SSR-SAFE: Use SSR-safe URL builder for navigation
-    if (isClient) {
-      const url = SSRSafeUrlBuilder.fromCurrent()
-        .setParam("viewType", viewType)
-        .setParam("page", "1") // Reset to page 1 when view changes
-        .toString();
-
-      // Create anchor element with f-partial attribute for Fresh.js navigation
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("f-partial", "");
-      link.style.display = "none";
-      document.body.appendChild(link as Node);
-      link.click();
-      document.body.removeChild(link as Node);
-    }
+    // Use centralized Fresh partial navigation
+    navigateWithFreshPartial("/src20", {
+      viewType: viewType,
+    }, true); // Reset to page 1
 
     // Reset loading state after a short delay
     setTimeout(() => setIsNavigating(false), 100);
+  };
+
+  // Handle timeframe changes
+  const handleTimeframeChange = (newTimeframe: string) => {
+    if (
+      newTimeframe === "24H" || newTimeframe === "7D" || newTimeframe === "30D"
+    ) {
+      setCurrentTimeframe(newTimeframe);
+      setIsNavigating(true);
+
+      // Navigate with the new timeframe parameter
+      navigateWithFreshPartial("/src20", {
+        timeframe: newTimeframe,
+        sortBy: currentSort.filter || "TRENDING",
+        sortDirection: currentSort.direction,
+        viewType: viewType || "minted",
+      }, false); // Don't reset page when changing timeframe
+
+      // Reset loading state after a short delay
+      setTimeout(() => setIsNavigating(false), 100);
+    }
   };
 
   return (
@@ -123,13 +118,7 @@ export function SRC20OverviewContent({
       <SRC20OverviewHeader
         onViewTypeChange={handleViewTypeChange}
         viewType={viewType || "minted"} // 🔧 Fix TS2375: Provide default when undefined
-        onTimeframeChange={(timeframe: string) => {
-          if (
-            timeframe === "24H" || timeframe === "7D" || timeframe === "30D"
-          ) {
-            setCurrentTimeframe(timeframe);
-          }
-        }}
+        onTimeframeChange={handleTimeframeChange}
         onFilterChange={(filter: string, direction?: "asc" | "desc") =>
           handleFilterChange(filter as SortOption | null, direction || "desc")}
         currentSort={currentSort}
@@ -138,28 +127,12 @@ export function SRC20OverviewContent({
         viewType={viewType || "minted"} // 🔧 Fix TS2375: Provide default when undefined
         fromPage="src20"
         initialData={currentData}
-        timeframe={_currentTimeframe}
+        timeframe={currentTimeframe}
         currentSort={currentSort} // 🎯 NEW: Pass currentSort for table header sorting
         pagination={{
           page: currentPage,
           totalPages: totalPages,
-          onPageChange: (newPage: number) => {
-            // ✅ SSR-SAFE: Use SSR-safe URL builder for pagination navigation
-            if (isClient) {
-              const url = SSRSafeUrlBuilder.fromCurrent()
-                .setParam("page", newPage.toString())
-                .toString();
-
-              // Create anchor element with f-partial attribute for Fresh.js navigation
-              const link = document.createElement("a");
-              link.href = url;
-              link.setAttribute("f-partial", "");
-              link.style.display = "none";
-              document.body.appendChild(link as Node);
-              link.click();
-              document.body.removeChild(link as Node);
-            }
-          },
+          onPageChange: createFreshPaginationHandler("/src20"),
         }}
       />
     </div>

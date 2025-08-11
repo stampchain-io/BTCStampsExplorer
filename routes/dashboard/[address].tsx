@@ -311,7 +311,7 @@ export default function DashboardPage(props: WalletPageProps) {
 
   /* ===== RENDER ===== */
   return (
-    <div class="flex flex-col gap-6" f-client-nav>
+    <div class="flex flex-col gap-6" f-client-nav data-partial="/dashboard">
       <WalletDashboardHeader />
       <WalletDashboardDetails
         walletData={walletData as WalletOverviewInfo}

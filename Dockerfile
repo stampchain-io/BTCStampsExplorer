@@ -34,10 +34,11 @@ WORKDIR /app
 # Copy files and set permissions
 COPY --chown=deno:deno . .
 
-# Clean any existing caches
+# Clean any existing caches and old build artifacts
 RUN rm -rf node_modules/.deno && \
     rm -rf .npm && \
-    rm -rf .deno
+    rm -rf .deno && \
+    rm -rf _fresh
 
 # Switch to deno user for build steps
 USER deno

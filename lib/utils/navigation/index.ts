@@ -6,3 +6,6 @@
  */
 
 export * from "./freshNavigationUtils.ts";
+
+// Explicitly export the new pagination handler for clarity
+export { createFreshPaginationHandler } from "./freshNavigationUtils.ts";

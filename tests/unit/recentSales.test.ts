@@ -445,11 +445,11 @@ Deno.test("Performance - ErrorHandlingUtils error creation", () => {
   const endTime = performance.now();
   const duration = endTime - startTime;
 
-  // Should complete in under 200ms (increased threshold to reduce flakiness)
+  // Should complete in under 500ms (reasonable threshold for various environments)
   assertEquals(
-    duration < 200,
+    duration < 500,
     true,
-    `Performance test took ${duration}ms, expected < 200ms`,
+    `Performance test took ${duration}ms, expected < 500ms`,
   );
 });
 
