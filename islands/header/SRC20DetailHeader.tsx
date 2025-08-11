@@ -44,7 +44,6 @@ export function SRC20DetailHeader({
     (deployment.tx_hash ? constructStampUrl(deployment.tx_hash) : null) ||
     "/img/placeholder/stamp-no-image.svg";
 
-  // 🎸 PUNK ROCK v2.3 MARKET DATA - PROPER STANDARDIZED FIELDS! 🎸
   const floorPriceBTC = marketInfo?.floor_price_btc ?? 0; // ✅ v2.3 standardized field
   const volume24hBTC = marketInfo?.volume_24h_btc ?? 0; // ✅ v2.3 standardized field
   const volume7dBTC = marketInfo?.volume_7d_btc ?? 0; // ✅ v2.3 extended field (no more (as any) hacks!)

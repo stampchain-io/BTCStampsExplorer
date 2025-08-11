@@ -55,7 +55,9 @@ const CLIENT_ONLY_DIRS = [
 
 // Files to skip (already have proper SSR protection)
 const SKIP_FILES = [
-  "lib/utils/navigation/freshNavigationUtils.ts"
+  "freshNavigationUtils.ts",  // Has isBrowser() checks wrapping all location access
+  "SSRSafeUrlBuilder.tsx",    // Dedicated SSR-safe utility
+  "SSRSafeLink.tsx"          // Dedicated SSR-safe component
 ];
 
 // File extensions to scan
@@ -291,15 +293,42 @@ async function scanCodebase(): Promise<ScanResult> {
   }
 
   // Filter out files that should be skipped
-  const filesToScan = allFiles.filter(file => 
-    !SKIP_FILES.some(skipFile => file.includes(skipFile))
-  );
+  const skippedFiles: string[] = [];
+  const filesToScan = allFiles.filter(file => {
+    const shouldSkip = SKIP_FILES.some(skipFile => file.includes(skipFile));
+    if (shouldSkip) {
+      skippedFiles.push(file);
+    }
+    return !shouldSkip;
+  });
+
+  if (skippedFiles.length > 0) {
+    console.log("📝 Skipping files with built-in SSR protection:");
+    skippedFiles.forEach(file => console.log(`   - ${file}`));
+    console.log("");
+  }
 
   result.summary.totalFilesScanned = filesToScan.length;
 
   // Scan each file
+  let filesProcessed = 0;
   for (const file of filesToScan) {
     const { unsafePatterns, safePatterns, fPartialUsage } = await scanFile(file);
+
+    // Show progress for large codebases
+    filesProcessed++;
+    if (filesProcessed % 50 === 0) {
+      console.log(`   Processed ${filesProcessed}/${filesToScan.length} files...`);
+    }
+
+    // Log unsafe patterns immediately for debugging
+    if (unsafePatterns.length > 0) {
+      console.log(`\n⚠️  Found issues in ${file}:`);
+      unsafePatterns.forEach(pattern => {
+        const icon = pattern.severity === "high" ? "🚨" : "⚠️";
+        console.log(`   ${icon} Line ${pattern.line}: ${pattern.reason}`);
+      });
+    }
 
     result.unsafePatterns.push(...unsafePatterns);
     result.safePatterns.push(...safePatterns);

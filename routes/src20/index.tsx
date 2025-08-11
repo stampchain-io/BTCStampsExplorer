@@ -255,7 +255,7 @@ export default function SRC20OverviewPage({ data }: any) {
   } = data;
 
   return (
-    <div f-partial="/src20">
+    <div f-client-nav data-partial="/src20">
       <SRC20OverviewContent
         mintingData={mintingData}
         timeframe={timeframe}

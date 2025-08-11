@@ -59,17 +59,37 @@ export const isBrowser = (): boolean => {
 
 /**
  * SSR-safe navigation helper - replaces direct globalThis.location.href assignments
+ * Uses Fresh partial navigation when available
  * @param url - URL to navigate to
  * @param options - Navigation options (optional)
  */
 export const safeNavigate = (
   url: string,
-  options?: { replace?: boolean },
+  options?: { replace?: boolean; partial?: string },
 ): void => {
   if (!isBrowser()) {
     return; // Safe no-op during SSR
   }
 
+  // Try to detect Fresh partial navigation context
+  // Check if we're inside a data-partial container
+  const partialContainer = document.querySelector("[data-partial]");
+  const partialPath = options?.partial ||
+    (partialContainer?.getAttribute("data-partial") as string | undefined);
+
+  // Use Fresh partial navigation if we have a partial path and not replacing
+  if (partialPath && !options?.replace) {
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("f-partial", partialPath);
+    link.style.display = "none";
+    document.body.appendChild(link as unknown as Node);
+    link.click();
+    document.body.removeChild(link as unknown as Node);
+    return;
+  }
+
+  // Fallback to standard navigation
   if (options?.replace) {
     globalThis.location.replace(url);
   } else {
@@ -163,6 +183,57 @@ export const createPaginationHandler = (
       anchorName,
     );
   };
+};
+
+/**
+ * Create a Fresh partial navigation handler for pagination
+ * This is the recommended approach for routes with Fresh partials
+ * @param partialPath - The Fresh partial path (e.g., "/stamp", "/explorer")
+ * @param pageParam - URL parameter name for page (default: "page")
+ * @returns Pagination handler that uses Fresh partials
+ */
+export const createFreshPaginationHandler = (
+  partialPath: string,
+  pageParam: string = "page",
+) => {
+  return (page: number) => {
+    if (!isBrowser()) return;
+
+    const url = new URL(globalThis.location.href);
+    url.searchParams.set(pageParam, page.toString());
+
+    // Use our enhanced safeNavigate with partial support
+    safeNavigate(url.toString(), { partial: partialPath });
+  };
+};
+
+/**
+ * Navigate with Fresh partial and custom URL parameters
+ * @param partialPath - The Fresh partial path (e.g., "/src20")
+ * @param params - URL parameters to set
+ * @param resetPage - Whether to reset page to 1 (default: true)
+ */
+export const navigateWithFreshPartial = (
+  partialPath: string,
+  params: Record<string, string>,
+  resetPage: boolean = true,
+) => {
+  if (!isBrowser()) return;
+
+  const url = new URL(globalThis.location.href);
+
+  // Set all provided parameters
+  Object.entries(params).forEach(([key, value]) => {
+    url.searchParams.set(key, value);
+  });
+
+  // Reset page if requested (common for filters/sorting)
+  if (resetPage && !params.page) {
+    url.searchParams.set("page", "1");
+  }
+
+  // Use our enhanced safeNavigate with partial support
+  safeNavigate(url.toString(), { partial: partialPath });
 };
 
 /**

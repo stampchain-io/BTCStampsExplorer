@@ -128,8 +128,6 @@ export interface SRC20Row {
   tg?: string; // Telegram handle
   x?: string; // X (Twitter) handle
   holders: number; // Number of token holders
-
-  // 🎸 PUNK ROCK v2.3 STANDARDIZED FIELDS 🎸
   floor_price_btc?: number | null; // v2.3 standardized field (was floor_unit_price)
   fee_rate_sat_vb: number | null; // Fee rate in sat/vB
   fee: number | null; // Transaction fee

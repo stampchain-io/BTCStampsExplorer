@@ -5,8 +5,7 @@ import { Handlers } from "$fresh/server.ts";
 
 import { FRONTEND_STAMP_TYPE_VALUES } from "$constants";
 import { StampOverviewHeader } from "$header";
-import { IS_BROWSER } from "$fresh/runtime.ts";
-import { SSRSafeUrlBuilder } from "$components/navigation/SSRSafeUrlBuilder.tsx";
+import { createFreshPaginationHandler } from "$utils/navigation/freshNavigationUtils.ts";
 import {
   queryParamsToFilters,
   queryParamsToServicePayload,
@@ -366,19 +365,7 @@ export function StampOverviewPage(props: StampPageProps) {
         pagination={{
           page,
           totalPages,
-          onPageChange: (newPage: number) => {
-            if (!IS_BROWSER || !globalThis.location) return;
-
-            const url = SSRSafeUrlBuilder.fromCurrent()
-              .setParam("page", newPage.toString())
-              .toString();
-
-            // Use Fresh.js partial navigation
-            const link = document.createElement("a");
-            link.href = url;
-            link.setAttribute("f-partial", "");
-            link.click();
-          },
+          onPageChange: createFreshPaginationHandler("/stamp"),
         }}
       />
     </div>

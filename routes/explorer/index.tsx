@@ -5,6 +5,7 @@ import { ExplorerContent } from "$content";
 import { Handlers } from "$fresh/server.ts";
 
 import { ExplorerHeader } from "$header";
+import { createFreshPaginationHandler } from "$utils/navigation/freshNavigationUtils.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { CollectionService } from "$server/services/core/collectionService.ts";
 import type { StampPageProps } from "$types/api.d.ts";
@@ -135,15 +136,7 @@ export function ExplorerPage(props: StampPageProps) {
         pagination={{
           page,
           totalPages,
-          onPageChange: (newPage: number) => {
-            // SSR-safe browser environment check
-            if (typeof globalThis === "undefined" || !globalThis?.location) {
-              return; // Cannot navigate during SSR
-            }
-            const url = new URL(globalThis.location.href);
-            url.searchParams.set("page", newPage.toString());
-            globalThis.location.href = url.toString();
-          },
+          onPageChange: createFreshPaginationHandler("/explorer"),
         }}
       />
     </div>
