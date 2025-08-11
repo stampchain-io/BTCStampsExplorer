@@ -1,8 +1,9 @@
+/* ===== Animated background topology ===== */
+/* References the static/background-topology.js file */
+
 import { useEffect, useRef } from "preact/hooks";
 
-// Minimal interface since we're hardcoding values in the JS file
 interface BackgroundTopologyProps {
-  /** Optional className for additional styling */
   className?: string;
 }
 
