@@ -9,7 +9,7 @@ const inputFieldWidth = "!w-10";
 // Input field styles
 const inputFieldStyle = `p-3 w-full
   ${glassmorphismLayer2}
-  focus:[#171417]/40 focus:border-[#171417] focus:outline-none focus-visible:outline-none no-outline
+  focus:[#1d191d] focus:border-[#33333380] focus:outline-none focus-visible:outline-none no-outline
   font-medium text-sm text-stamp-grey-light
   placeholder:font-light placeholder:text-stamp-grey placeholder:uppercase`;
 
