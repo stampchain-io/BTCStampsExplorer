@@ -76,11 +76,11 @@ export interface ButtonVariants {
 const baseBefore =
   "before:absolute before:inset-0 before:rounded-lg before:z-[-1] before:transition-transform before:duration-50 before:origin-center";
 const baseGlassmorphism =
-  "border-[1px] rounded-lg backdrop-blur-sm overflow-hidden";
+  "border-[1px] rounded-lg backdrop-blur-xs overflow-hidden";
 const baseGlassmorphismColor =
-  "relative text-[#1e1723] before:blur-[5px] hover:border-[var(--color-border-hover)] hover:before:scale-110 hover:before:blur-sm";
+  "relative text-[#171417] before:blur-sm hover:border-[var(--color-border-hover)] hover:before:scale-105";
 const shadow =
-  "shadow-[0_2px_4px_rgba(22,22,22,0.1),inset_0_1px_0_rgba(22,22,22,0.3),inset_0_-1px_0_rgba(22,22,22,0.1),inset_0_0_2px_2px_rgba(22,22,22,0.2)]";
+  "shadow-[0_2px_4px_rgba(11,11,11,0.1),inset_0_1px_0_rgba(11,11,11,0.1),inset_0_-1px_0_rgba(11,11,11,0.1),inset_0_0_2px_2px_rgba(11,11,11,0.1)]";
 
 export const buttonStyles: ButtonVariants = {
   /* ===== BASE STYLES ===== */
@@ -100,14 +100,14 @@ export const buttonStyles: ButtonVariants = {
       text-[var(--color-text)] hover:text-[var(--color-text-hover)]
     `,
     glassmorphism: `
-      ${baseGlassmorphism} bg-stamp-grey-darkest/15 border-stamp-grey-darker/20
-      hover:bg-stamp-grey-darkest/30 hover:border-stamp-grey-darker/40
-      text-[var(--color-text)] hover:text-[var(--color-text-hover)]
+      ${baseGlassmorphism} bg-[#211c21]/20 border-[var(--color-border)]
+      hover:[#211c21]/40 hover:border-[var(--color-border-hover)]
+      text-[var(--color-dark)] hover:text-[var(--color-medium)]
       ${shadow}
     `,
     glassmorphismColor: `
       ${baseGlassmorphism} ${baseGlassmorphismColor}
-      bg-stamp-grey-darkest/10 border-[var(--color-border)]
+      bg-[#211c21]/10 border-[var(--color-border)]
       ${baseBefore} ${shadow}
       before:bg-[linear-gradient(to_bottom_right,var(--color-dark)_0%,var(--color-dark)_20%,var(--color-medium)_20%,var(--color-medium)_45%,var(--color-light)_45%,var(--color-light)_52%,var(--color-medium)_52%,var(--color-medium)_70%,var(--color-dark)_70%,var(--color-dark)_100%)]
     `,
@@ -122,7 +122,7 @@ export const buttonStyles: ButtonVariants = {
       ${baseGlassmorphism} ${baseGlassmorphismColor}
       bg-stamp-grey-darkest/15 border-stamp-grey-darker/20
       text-[var(--color-text)] before:bg-none
-      hover:bg-stamp-grey-darkest/10 hover:text-[#1e1723] hover:before:!scale-100 hover:before:!blur-[5px]
+      hover:bg-stamp-grey-darkest/10 hover:text-[#171417] hover:before:!scale-100 hover:before:!blur-[5px]
       ${baseBefore} ${shadow}
       hover:before:bg-[linear-gradient(to_bottom_right,var(--color-dark)_0%,var(--color-dark)_20%,var(--color-medium)_20%,var(--color-medium)_45%,var(--color-light)_45%,var(--color-light)_52%,var(--color-medium)_52%,var(--color-medium)_70%,var(--color-dark)_70%,var(--color-dark)_100%)]
     `,
@@ -164,36 +164,36 @@ export const buttonStyles: ButtonVariants = {
   /* ===== COLOR STYLES ===== */
   color: {
     grey: `
-      [--color-dark:#CCCCCC33]
-      [--color-medium:#CCCCCC66]
-      [--color-light:#CCCCCC]
-      [--color-border:#66666666]
-      [--color-border-hover:#66666699]
+      [--color-dark:#CCCCCC66]
+      [--color-medium:#CCCCCC99]
+      [--color-light:#CCCCCCCC]
+      [--color-border:#33333380]
+      [--color-border-hover:#333333]
       [--color-text:#666666]
       [--color-text-hover:#999999]
     `,
     greyDark: `
-      [--color-dark:#BBBBBB33]
-      [--color-medium:#BBBBBB66]
-      [--color-light:#BBBBBB]
+      [--color-dark:#BBBBBB66]
+      [--color-medium:#BBBBBB99]
+      [--color-light:#BBBBBBCC]
       [--color-border:#55555566]
       [--color-border-hover:#55555599]
       [--color-text:#555555]
       [--color-text-hover:#888888]
     `,
     purple: `
-      [--color-dark:#AA00FF33]
-      [--color-medium:#AA00FF66]
-      [--color-light:#AA00FF]
+      [--color-dark:#AA00FF66]
+      [--color-medium:#AA00FF99]
+      [--color-light:#AA00FFcc]
       [--color-border:#66009966]
       [--color-border-hover:#66009999]
       [--color-text:#660099]
       [--color-text-hover:#8800CC]
     `,
     purpleDark: `
-      [--color-dark:#9900E633]
-      [--color-medium:#9900E666]
-      [--color-light:#9900E6]
+      [--color-dark:#9900E666]
+      [--color-medium:#9900E699]
+      [--color-light:#9900E6CC]
       [--color-border:#55008066]
       [--color-border-hover:#55008099]
       [--color-text:#550080]
