@@ -50,10 +50,10 @@
                 const t = "function" == typeof this.getDefaultOptions ? this.getDefaultOptions() : this.defaultOptions;
                 if (
                     ((this.options = Object.assign({
-                        minHeight: 200,        // *** MINIMUM CANVAS HEIGHT (pixels) ***
-                        minWidth: 200,         // *** MINIMUM CANVAS WIDTH (pixels) ***
-                        scale: 1.00,           // *** DESKTOP SCALE FACTOR (1.0 = normal size) ***
-                        scaleMobile: 1.00      // *** MOBILE SCALE FACTOR (reduce for performance) ***
+                        minHeight: 200,     // *** MINIMUM CANVAS HEIGHT (pixels) ***
+                        minWidth: 200,      // *** MINIMUM CANVAS WIDTH (pixels) ***
+                        scale: 1.00,        // *** DESKTOP SCALE FACTOR (1.0 = normal size) ***
+                        scaleMobile: 0.75   // *** MOBILE SCALE FACTOR ***
                     }, t)),
                     (e instanceof HTMLElement || "string" == typeof e) && (e = { el: e }),
                     Object.assign(this.options, e),
@@ -196,7 +196,7 @@
         class d extends p {
             static initClass() {
                 (this.prototype.p5 = !0), (this.prototype.defaultOptions = {
-                  color: 3866710,        // *** 3866710 = 0x3b0056 (purple)***
+                  color: 3670090,        // *** 3670090 = 0x38004a (dark purple) ***
                   backgroundColor: 0     // *** 0 = 0x000000 (black) ***
                 });
             }
@@ -235,10 +235,10 @@
                             t.smooth(),
                             t.noStroke(),
                             (function () {
-                                // *** PARTICLE COUNT - LINE 290 ***
+                                // *** PARTICLE COUNT ***
                                 // Controls the number of flowing particles in the topology - update the code below too
                                 // Default: 4500 particles
-                                for (let e = 0; e < 1500; e++) {
+                                for (let e = 0; e < 2500; e++) {
                                     let s = t.random(t.width + 200),
                                         i = t.random(t.height + 200);
                                     a.push({ prev: t.createVector(s, i), pos: t.createVector(s, i), vel: t.createVector(0, 0), acc: t.createVector(0, 0), col: t.random(255), seed: e });
@@ -256,19 +256,19 @@
                             t.translate(-100, -100),
                                 (function () {
                                     // This number should match the particle count above
-                                    for (let i = 0; i < 1500; i++) {
+                                    for (let i = 0; i < 2500; i++) {
                                         let o = a[i],
                                             n = ((e = o.pos.x), (s = o.pos.y), (e = t.constrain(e, 0, t.width + 200)), (s = t.constrain(s, 0, t.height + 200)), h[t.floor(s / 10)][t.floor(e / 10)]);
                                         (o.prev.x = o.pos.x),
                                             (o.prev.y = o.pos.y),
                                             (o.pos.x = d(o.pos.x + o.vel.x, t.width + 200)),
                                             (o.pos.y = d(o.pos.y + o.vel.y, t.height + 200)),
-                                            // *** PARTICLE MOVEMENT SPEED - LINE 318 ***
+                                            // *** PARTICLE MOVEMENT SPEED ***
                                             // Controls how fast particles move through the topology
                                             // Default: mult(2.2)
                                             o.vel.add(o.acc).normalize().mult(4),
                                             (o.acc = t.createVector(0, 0)),
-                                            // *** FLOW FIELD RESPONSE STRENGTH - LINE 323 ***
+                                            // *** FLOW FIELD RESPONSE STRENGTH ***
                                             // Controls how strongly particles respond to the flow field
                                             // Default: mult(3)
                                             o.acc.add(n).mult(11);
@@ -276,7 +276,7 @@
                                     var e, s;
                                 })(),
                                 (function () {
-                                    // *** LINE THICKNESS - LINE 331 ***
+                                    // *** LINE THICKNESS ***
                                     // Controls the thickness of the connecting lines between particles
                                     // Default: strokeWeight(1)
                                     t.strokeWeight(1),
@@ -286,14 +286,14 @@
                                                     o = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(i),
                                                     n = o ? { r: parseInt(o[1], 16), g: parseInt(o[2], 16), b: parseInt(o[3], 16) } : null;
                                                 return "rgba(" + n.r + "," + n.g + "," + n.b + "," + t + ")";
-                                            // *** LINE OPACITY/TRANSPARENCY - LINE 341 ***
+                                            // *** LINE OPACITY/TRANSPARENCY ***
                                             // Controls how visible/transparent the connecting lines are
                                             // Default: 0.05
-                                            })(e.options.color, 0.08)
+                                            })(e.options.color, 0.05)
                                         );
                                     for (let e = 0; e < a.length; e++) l.Vector.dist(a[e].prev, a[e].pos) < 10 && t.line(a[e].prev.x, a[e].prev.y, a[e].pos.x, a[e].pos.y);
                                 })(),
-                                // *** FLOW FIELD EVOLUTION SPEED - LINE 349 ***
+                                // *** FLOW FIELD EVOLUTION SPEED ***
                                 // Controls how fast the underlying flow field changes over time
                                 // This creates the "flowing" effect of the topology
                                 // Default: c += 0.002
@@ -318,8 +318,8 @@
  * scaleMobile: 1
  *
  * === VISUAL COLORS (Line ~247) ===
- * color: 3866710 (current: 3866710 = 0x3b0056 purple)
- * backgroundColor: 0 (current: 0 = 0x000000 black)
+ * color: 3670090 (0x38004a purple)
+ * backgroundColor: 0 (0x000000 black)
  *
  * === PARTICLE SYSTEM (Lines ~290 & ~308) ===
  * Particle count: 4500 (in both loops)

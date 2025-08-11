@@ -257,23 +257,8 @@ export default function App({ Component, state, url }: PageProps<unknown>) {
 
       {/* ===== BODY SECTION ===== */}
       <body class="!relative min-h-screen overflow-x-hidden overflow-hidden">
-        {/* ===== VANTA BACKGROUND ===== */}
+        {/* ===== BACKGROUND ANIMATION===== */}
         <BackgroundTopology />
-
-        {/* ===== OLD BACKGROUND LAYERS - @baba-remove if we keep the background topology ===== */}
-        {
-          /*
-        {state?.route !== "/"
-          ? <div class="bgGradientTop contain-layout" />
-          : (
-            <>
-              <div class="bgGradientTop contain-layout block" />
-            </>
-          )}
-        <div class="bgGradientBottom contain-layout" />
-        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-stamp-dark-DEFAULT/50 to-transparent z-[1] contain-paint" />
-        */
-        }
 
         {/* ===== MAIN CONTENT WRAPPER ===== */}
         <div class="flex flex-col min-h-screen font-work-sans relative z-[2]">
