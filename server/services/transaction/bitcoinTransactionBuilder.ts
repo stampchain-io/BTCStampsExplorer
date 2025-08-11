@@ -383,7 +383,7 @@ export class BitcoinTransactionBuilder {
         script: new Uint8Array(hex2bin(utxoDetails.script)), // Use hex2bin and be explicit with Uint8Array
         value: BigInt(inputAmount), // Use BigInt for values
       },
-      sighashType: bitcoin.Transaction.__SIGHASH_SINGLE | bitcoin.Transaction.__SIGHASH_ANYONECANPAY,
+      sighashType: bitcoin.Transaction.SIGHASH_SINGLE | bitcoin.Transaction.SIGHASH_ANYONECANPAY,
     };
 
     // Add input
@@ -718,7 +718,7 @@ export class BitcoinTransactionBuilder {
 
         totalInputValue += BigInt(utxoDetails.value ?? 0);
         const scriptTypeInfo = getScriptTypeInfo(utxoDetails.script);
-        const updateData: any = { sighashType: bitcoin.Transaction.__SIGHASH_ALL };
+        const updateData: any = { sighashType: bitcoin.Transaction.SIGHASH_ALL };
 
         if (scriptTypeInfo.isWitness || (scriptTypeInfo.type === "P2SH" && scriptTypeInfo.redeemScriptType?.isWitness)) {
           updateData.witnessUtxo = {
@@ -855,7 +855,7 @@ export class BitcoinTransactionBuilder {
       // Create inputsToSign array for return value
       const inputsToSign: { index: number; address?: string; sighashTypes?: number[] }[] = [];
       for (let i = 0; i < psbt.inputCount; i++) {
-        inputsToSign.push({ index: i, address: userAddress, sighashTypes: [bitcoin.Transaction.__SIGHASH_ALL] });
+        inputsToSign.push({ index: i, address: userAddress, sighashTypes: [bitcoin.Transaction.SIGHASH_ALL] });
         try {
           psbt.finalizeInput(i);
           console.log(`[BitcoinTransactionBuilder] Successfully finalized input #${i} on final PSBT.`);
@@ -974,7 +974,7 @@ export class BitcoinTransactionBuilder {
           },
         });
         // Assuming all inputs from cpTx are to be signed by the userAddress
-        inputsToSign.push({ index, address: userAddress, sighashTypes: [bitcoin.Transaction.__SIGHASH_ALL] });
+        inputsToSign.push({ index, address: userAddress, sighashTypes: [bitcoin.Transaction.SIGHASH_ALL] });
       }
 
       let totalValueToOthers = BigInt(0);
