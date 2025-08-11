@@ -266,12 +266,12 @@
                                             // *** PARTICLE MOVEMENT SPEED ***
                                             // Controls how fast particles move through the topology
                                             // Default: mult(2.2)
-                                            o.vel.add(o.acc).normalize().mult(2.2),
+                                            o.vel.add(o.acc).normalize().mult(3.5),
                                             (o.acc = t.createVector(0, 0)),
                                             // *** FLOW FIELD RESPONSE STRENGTH ***
                                             // Controls how strongly particles respond to the flow field
                                             // Default: mult(3)
-                                            o.acc.add(n).mult(1);
+                                            o.acc.add(n).mult(0.3);
                                     }
                                     var e, s;
                                 })(),
@@ -289,7 +289,7 @@
                                             // *** LINE OPACITY/TRANSPARENCY ***
                                             // Controls how visible/transparent the connecting lines are
                                             // Default: 0.05
-                                            })(e.options.color, 0.08)
+                                            })(e.options.color, 0.05)
                                         );
                                     for (let e = 0; e < a.length; e++) l.Vector.dist(a[e].prev, a[e].pos) < 10 && t.line(a[e].prev.x, a[e].prev.y, a[e].pos.x, a[e].pos.y);
                                 })(),
