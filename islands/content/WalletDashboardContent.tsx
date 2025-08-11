@@ -1,22 +1,22 @@
 /* ===== WALLET DASHBOARD CONTENT COMPONENT ===== */
 import type { DispenserRow as Dispenser, StampRow } from "$types/stamp.d.ts";
 
+import { NOT_AVAILABLE_IMAGE } from "$constants";
 import { Icon, LoadingIcon } from "$icon";
 import { SortButton } from "$islands/button/SortButton.tsx";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { Setting } from "$islands/datacontrol/Setting.tsx";
 import FreshSRC20Gallery from "$islands/section/gallery/FreshSRC20Gallery.tsx";
 import { FreshStampGallery } from "$islands/section/gallery/FreshStampGallery.tsx";
-import { NOT_AVAILABLE_IMAGE } from "$constants";
-import {
-  abbreviateAddress,
-  formatBTCAmount,
-} from "$lib/utils/ui/formatting/formatUtils.ts";
 import {
   createPaginationHandler,
   getCurrentUrl,
   navigateWithFresh,
 } from "$lib/utils/navigation/freshNavigationUtils.ts";
+import {
+  abbreviateAddress,
+  formatBTCAmount,
+} from "$lib/utils/ui/formatting/formatUtils.ts";
 import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
 import type { WalletContentProps } from "$types/wallet.d.ts";
 import { useEffect, useState } from "preact/hooks";

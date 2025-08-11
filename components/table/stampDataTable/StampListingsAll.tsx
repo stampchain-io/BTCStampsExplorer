@@ -1,12 +1,12 @@
 import { cellAlign, colGroup } from "$components/layout/types.ts";
-import type { StampListingsAllProps } from "$types/ui.d.ts";
-import type { Dispenser } from "$types/stamp.d.ts";
 import { rowTable } from "$layout";
 import {
   abbreviateAddress,
   formatSatoshisToBTC,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { labelXs, valueDark, valueSm, valueSmLink } from "$text";
+import type { Dispenser } from "$types/stamp.d.ts";
+import type { StampListingsAllProps } from "$types/ui.d.ts";
 
 export function StampListingsAllTable({ listings }: StampListingsAllProps) {
   const headers = [

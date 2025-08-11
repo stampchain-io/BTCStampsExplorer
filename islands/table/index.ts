@@ -13,5 +13,5 @@ export * from "$islands/table/HoldersPieChart.tsx";
 export { default as HoldersTableBase } from "$islands/table/HoldersTableBase.tsx";
 export * from "$islands/table/UploadImageTable.tsx";
 
-// Export Dispenser as requested - TEMPORARILY DISABLED (missing file)
-// export { default as Dispenser } from "$components/dispenser/Dispenser.tsx";
+// Export Dispenser type from types file
+export type { Dispenser } from "$types/stamp.d.ts";
