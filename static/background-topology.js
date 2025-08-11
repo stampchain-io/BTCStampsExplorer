@@ -196,7 +196,7 @@
         class d extends p {
             static initClass() {
                 (this.prototype.p5 = !0), (this.prototype.defaultOptions = {
-                  color: 11141375,        // *** 11141375 = #aa00ff (light purple) ***
+                  color: 8913100,        // *** 8913100 = #8800cc (light purple) ***
                   backgroundColor: 0     // *** 0 = #000000 (black) ***
                 });
             }

@@ -1,15 +1,13 @@
 /* ===== LAYOUT STYLES MODULE ===== */
 
 /* ===== BASE STYLES ===== */
-export const glassmorphism =
-  `border-[1px] border-stamp-grey-darkest/20 rounded-xl
-  bg-gradient-to-br from-stamp-grey-darkest/15 to-stamp-grey-darkest/30
+export const glassmorphism = `border-[1px] border-[#1d191d]/60 rounded-xl
+  bg-gradient-to-br from-[#171417]/40 to-[#171417]/60
   backdrop-blur overflow-hidden
-  shadow-[0_8px_16px_rgba(22,22,22,0.1),inset_0_1px_0_rgba(22,22,22,0.3),inset_0_-1px_0_rgba(22,22,22,0.1),inset_0_0_4px_4px_rgba(22,22,22,0.2)]`;
-export const glassmorphismLayer2 =
-  `border-[1px] border-stamp-grey-darkest/20 rounded-lg
-  bg-stamp-grey-darkest/15 backdrop-blur-sm overflow-hidden
-  shadow-[0_4px_8px_rgba(22,22,22,0.1),inset_0_1px_0_rgba(22,22,22,0.3),inset_0_-1px_0_rgba(22,22,22,0.1),inset_0_0_2px_2px_rgba(22,22,22,0.2)]`;
+  shadow-[0_8px_16px_rgba(13,11,13,0.2),inset_0_1px_0_rgba(13,11,13,0.1),inset_0_-1px_0_rgba(13,11,13,0.1),inset_0_0_4px_4px_rgba(13,11,13,0.1)]`;
+export const glassmorphismLayer2 = `border-[1px] border-[#1d191d]/70 rounded-lg
+  bg-[#171417]/20 backdrop-blur-sm overflow-hidden
+  shadow-[0_3px_6px_rgba(13,11,13,0.2),inset_0_1px_0_rgba(13,11,13,0.1),inset_0_-1px_0_rgba(13,11,13,0.1),inset_0_0_1px_1px_rgba(13,11,13,0.1)]`;
 export const transition = "transition-colors duration-200";
 
 /* ===== BODY STYLES ===== */
@@ -72,7 +70,7 @@ export const modalBgCenter =
 // Base loader style
 const loaderSpin = "animate-spin rounded-full border-b-[2px]";
 export const loaderSkeleton =
-  `bg-stamp-grey-darkest/30 border-[1px] border-stamp-grey-darkest/15 animate-pulse`;
+  `bg-[#171417]/50 border-[1px] border-[#1d191d]/70 animate-pulse`;
 // Spinning loader styles
 export const loaderSpinXsGrey = `${loaderSpin} w-3 h-3 border-stamp-grey`;
 export const loaderSpinSmGrey = `${loaderSpin} w-5 h-5 border-stamp-grey`;
