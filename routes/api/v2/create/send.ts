@@ -198,7 +198,7 @@ export const handler: Handlers<SendResponse | { error: string }> = {
       inputsToSign.push({
         index: 0,
         address: address,
-        sighashTypes: [Transaction.__SIGHASH_ALL],
+        sighashTypes: [Transaction.SIGHASH_ALL],
       });
 
       // Add all outputs from Counterparty's transaction

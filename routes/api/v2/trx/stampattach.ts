@@ -172,7 +172,7 @@ export const handler: Handlers = {
         inputsToSign.push({
           index: 0,
           address: address,
-          sighashTypes: [Transaction.__SIGHASH_ALL],
+          sighashTypes: [Transaction.SIGHASH_ALL],
         });
       } else { // Counterparty chose the input(s) - assume one for now from cpTx.ins[0]
         if (!cpTx.ins || cpTx.ins.length === 0) {
@@ -229,7 +229,7 @@ export const handler: Handlers = {
         inputsToSign.push({
           index: 0,
           address: address,
-          sighashTypes: [Transaction.__SIGHASH_ALL],
+          sighashTypes: [Transaction.SIGHASH_ALL],
         });
       }
 
