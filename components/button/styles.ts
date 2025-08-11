@@ -97,12 +97,12 @@ export const buttonStyles: ButtonVariants = {
     text: `
       !items-start !justify-start !h-auto
       !p-0 bg-transparent !border-0
-      text-[var(--color-medium)] hover:text-[var(--color-light)]
+      text-[var(--color-text)] hover:text-[var(--color-text-hover)]
     `,
     glassmorphism: `
-      ${baseGlassmorphism} bg-stamp-grey-darkest/15 border-stamp-grey-darkest/20
-      hover:bg-stamp-grey-darkest/30 hover:border-stamp-grey-darkest/40
-      text-[var(--color-dark)] hover:text-[var(--color-medium)]
+      ${baseGlassmorphism} bg-stamp-grey-darkest/15 border-stamp-grey-darker/20
+      hover:bg-stamp-grey-darkest/30 hover:border-stamp-grey-darker/40
+      text-[var(--color-text)] hover:text-[var(--color-text-hover)]
       ${shadow}
     `,
     glassmorphismColor: `
@@ -116,12 +116,12 @@ export const buttonStyles: ButtonVariants = {
       bg-stamp-grey-darkest/10 border-[var(--color-border)]
       ${baseBefore} ${shadow}
       before:bg-[linear-gradient(to_bottom_right,var(--color-dark)_0%,var(--color-dark)_20%,var(--color-medium)_20%,var(--color-medium)_45%,var(--color-light)_45%,var(--color-light)_52%,var(--color-medium)_52%,var(--color-medium)_70%,var(--color-dark)_70%,var(--color-dark)_100%)]
-      hover:bg-stamp-grey-darkest/15 hover:border-stamp-grey-darkest/20 hover:before:bg-none hover:text-[var(--color-dark)] hover:before:blur-0
+      hover:bg-stamp-grey-darkest/15 hover:border-stamp-grey-darker/20 hover:before:bg-none hover:text-[var(--color-text-hover)] hover:before:blur-0
     `,
     glassmorphismDeselected: `
       ${baseGlassmorphism} ${baseGlassmorphismColor}
-      bg-stamp-grey-darkest/15 border-stamp-grey-darkest/20
-      text-[var(--color-dark)] before:bg-none
+      bg-stamp-grey-darkest/15 border-stamp-grey-darker/20
+      text-[var(--color-text)] before:bg-none
       hover:bg-stamp-grey-darkest/10 hover:text-[#1e1723] hover:before:!scale-100 hover:before:!blur-[5px]
       ${baseBefore} ${shadow}
       hover:before:bg-[linear-gradient(to_bottom_right,var(--color-dark)_0%,var(--color-dark)_20%,var(--color-medium)_20%,var(--color-medium)_45%,var(--color-light)_45%,var(--color-light)_52%,var(--color-medium)_52%,var(--color-medium)_70%,var(--color-dark)_70%,var(--color-dark)_100%)]
@@ -133,17 +133,17 @@ export const buttonStyles: ButtonVariants = {
       hover:border-[var(--color-light)]
     `,
     outline: `
-      bg-transparent border-[var(--color-dark)] text-[var(--color-dark)]
-      hover:border-[var(--color-light)] hover:text-[var(--color-light)]
+      bg-transparent border-[var(--color-dark)] text-[var(--color-text)]
+      hover:border-[var(--color-light)] hover:text-[var(--color-text-hover)]
     `,
     flatOutline: `
       bg-gradient-to-br from-[var(--color-light)] to-[var(--color-dark)]
       border-[var(--color-dark)] text-black
       hover:bg-gradient-to-br hover:from-transparent hover:to-transparent
-      hover:border-[var(--color-dark)] hover:text-[var(--color-dark)]
+      hover:border-[var(--color-dark)] hover:text-[var(--color-text-hover)]
     `,
     outlineFlat: `
-      bg-transparent border-[var(--color-dark)] text-[var(--color-dark)]
+      bg-transparent border-[var(--color-dark)] text-[var(--color-text)]
       hover:bg-gradient-to-br hover:from-[var(--color-light)] hover:to-[var(--color-dark)] hover:border-[var(--color-dark)] hover:text-black
     `,
     outlineGradient: `
@@ -156,7 +156,7 @@ export const buttonStyles: ButtonVariants = {
       [&>*]:relative [&>*]:z-[2] [&>*]:rounded-lg [&>*]:bg-[#000000] [&>*]:!border-0
       [&>*]:inline-flex [&>*]:items-center [&>*]:justify-center [&>*]:w-full [&>*]:h-full [&>*]:px-5
       [&>*]:font-bold [&>*]:tracking-wider
-      [&>*]:text-[var(--color-medium)] hover:[&>*]:text-[var(--color-light)]
+      [&>*]:text-[var(--color-text)] hover:[&>*]:text-[var(--color-text-hover)]
       [&>*]:transition-colors [&>*]:duration-50
     `,
   },
@@ -164,36 +164,45 @@ export const buttonStyles: ButtonVariants = {
   /* ===== COLOR STYLES ===== */
   color: {
     grey: `
-      [--color-dark:#666666]
-      [--color-medium:#999999]
+      [--color-dark:#CCCCCC33]
+      [--color-medium:#CCCCCC66]
       [--color-light:#CCCCCC]
       [--color-border:#66666666]
       [--color-border-hover:#66666699]
+      [--color-text:#666666]
+      [--color-text-hover:#999999]
     `,
     greyDark: `
-      [--color-dark:#555555]
-      [--color-medium:#888888]
+      [--color-dark:#BBBBBB33]
+      [--color-medium:#BBBBBB66]
       [--color-light:#BBBBBB]
       [--color-border:#55555566]
       [--color-border-hover:#55555599]
+      [--color-text:#555555]
+      [--color-text-hover:#888888]
     `,
     purple: `
-      [--color-dark:#660099]
-      [--color-medium:#8800CC]
+      [--color-dark:#AA00FF33]
+      [--color-medium:#AA00FF66]
       [--color-light:#AA00FF]
       [--color-border:#66009966]
       [--color-border-hover:#66009999]
+      [--color-text:#660099]
+      [--color-text-hover:#8800CC]
     `,
     purpleDark: `
-      [--color-dark:#550080]
-      [--color-medium:#7700b3]
+      [--color-dark:#9900E633]
+      [--color-medium:#9900E666]
       [--color-light:#9900E6]
       [--color-border:#55008066]
       [--color-border-hover:#55008099]
+      [--color-text:#550080]
+      [--color-text-hover:#7700b3]
     `,
     test: `
-      [--color-dark:#00CC00]
-      [--color-light:#CC0000]
+      [--color-dark:#00CC0033]
+      [--color-medium:#00CC0066]
+      [--color-light:#CC000033]
     `,
     custom: "",
   },
