@@ -54,7 +54,7 @@ export default function App({ Component, state, url }: PageProps<unknown>) {
         />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js">
         </script>
-        <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.topology.min.js">
+        <script src="/background-topology.js">
         </script>
 
         {/* ===== CRITICAL CSS ===== */}
@@ -258,19 +258,9 @@ export default function App({ Component, state, url }: PageProps<unknown>) {
       {/* ===== BODY SECTION ===== */}
       <body class="!relative min-h-screen overflow-x-hidden overflow-hidden">
         {/* ===== VANTA BACKGROUND ===== */}
-        <BackgroundTopology
-          color={0x3b0056}
-          backgroundColor={0x000000}
-          minHeight={200}
-          minWidth={200}
-          scale={1.0}
-          scaleMobile={0.8}
-          mouseControls={false}
-          touchControls={true}
-          gyroControls={false}
-        />
+        <BackgroundTopology />
 
-        {/* ===== OLD BACKGROUND LAYERS - COMMENTED OUT ===== */}
+        {/* ===== OLD BACKGROUND LAYERS - @baba-remove if we keep the background topology ===== */}
         {
           /*
         {state?.route !== "/"

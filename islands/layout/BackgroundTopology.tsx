@@ -1,49 +1,33 @@
 import { useEffect, useRef } from "preact/hooks";
 
+// Minimal interface since we're hardcoding values in the JS file
 interface BackgroundTopologyProps {
-  /** Color in hex format (e.g., 0xcc1fde) */
-  color?: number;
-  /** Background color in hex format (e.g., 0x220022) */
-  backgroundColor?: number;
-  /** Minimum height for the effect */
-  minHeight?: number;
-  /** Minimum width for the effect */
-  minWidth?: number;
-  /** Scale factor */
-  scale?: number;
-  /** Scale factor for mobile */
-  scaleMobile?: number;
-  /** Enable mouse controls */
-  mouseControls?: boolean;
-  /** Enable touch controls */
-  touchControls?: boolean;
-  /** Enable gyro controls */
-  gyroControls?: boolean;
+  /** Optional className for additional styling */
+  className?: string;
 }
 
 declare global {
   interface Window {
-    VANTA?: any;
+    VANTA?: {
+      TOPOLOGY?: (options: any) => {
+        destroy: () => void;
+      };
+      HALO?: (options: any) => {
+        destroy: () => void;
+      };
+    };
     p5?: any;
+    THREE?: any;
   }
 }
 
-export default function BackgroundTopology({
-  color = 0x3b0056,
-  backgroundColor = 0x000000,
-  minHeight = 200.00,
-  minWidth = 200.00,
-  scale = 1.00,
-  scaleMobile = 1.00,
-  mouseControls = false,
-  touchControls = false,
-  gyroControls = false,
-}: BackgroundTopologyProps) {
+export default function BackgroundTopology(
+  { className }: BackgroundTopologyProps,
+) {
   const vantaRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Simple check if already initialized
     if (vantaRef.current) {
       return;
     }
@@ -53,43 +37,31 @@ export default function BackgroundTopology({
     const tryInitVanta = () => {
       if (window.VANTA?.TOPOLOGY && containerRef.current) {
         try {
+          // All options are now hardcoded in the JS file
           vantaRef.current = window.VANTA.TOPOLOGY({
             el: containerRef.current,
-            mouseControls,
-            touchControls,
-            gyroControls,
-            minHeight,
-            minWidth,
-            scale,
-            scaleMobile,
-            color,
-            backgroundColor,
           });
           return true;
         } catch (error) {
-          console.error("BackgroundTopology: Failed to initialize:", error);
+          console.error("BackgroundTopology: ailed to initialize:", error);
           return false;
         }
       }
       return false;
     };
 
-    // Try to initialize immediately if scripts are already loaded
     if (tryInitVanta()) {
       return;
     }
 
-    // If not available, set up polling to check periodically
     let attempts = 0;
     const maxAttempts = 50; // 5 seconds max
 
     const pollForDependencies = () => {
       attempts++;
-
       if (tryInitVanta()) {
         return;
       }
-
       if (attempts < maxAttempts) {
         timeoutId = setTimeout(pollForDependencies, 100);
       } else {
@@ -101,7 +73,6 @@ export default function BackgroundTopology({
 
     timeoutId = setTimeout(pollForDependencies, 100);
 
-    // Cleanup
     return () => {
       if (timeoutId) {
         clearTimeout(timeoutId);
@@ -117,7 +88,7 @@ export default function BackgroundTopology({
     <div
       ref={containerRef}
       id="vanta-background"
-      class="fixed inset-0 w-full h-full"
+      class={`fixed inset-0 w-full h-full ${className || ""}`}
       style={{
         zIndex: 0,
         pointerEvents: "none",
