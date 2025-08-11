@@ -1,7 +1,8 @@
 /* ===== STAMP INFO COMPONENT ===== */
 /*@baba-750+764+815+icons - refactor to StatItems */
 import { Button } from "$button";
-import { Src101Detail, StampRow } from "$globals";
+import type { StampRow } from "$lib/types/stamp.d.ts";
+import type { Src101Detail } from "$lib/types/src101.d.ts";
 import { Icon } from "$icon";
 import BuyStampModal from "$islands/modal/BuyStampModal.tsx";
 import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
