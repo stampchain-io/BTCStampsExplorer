@@ -196,7 +196,7 @@
         class d extends p {
             static initClass() {
                 (this.prototype.p5 = !0), (this.prototype.defaultOptions = {
-                  color: 4456550,        // *** 4456550 = #440066 (dark purple) ***
+                  color: 11141375,        // *** 11141375 = #aa00ff (light purple) ***
                   backgroundColor: 0     // *** 0 = #000000 (black) ***
                 });
             }
@@ -238,7 +238,7 @@
                                 // *** PARTICLE COUNT ***
                                 // Controls the number of flowing particles in the topology - update the code below too
                                 // Default: 4500 particles
-                                for (let e = 0; e < 3500; e++) {
+                                for (let e = 0; e < 500; e++) {
                                     let s = t.random(t.width + 200),
                                         i = t.random(t.height + 200);
                                     a.push({ prev: t.createVector(s, i), pos: t.createVector(s, i), vel: t.createVector(0, 0), acc: t.createVector(0, 0), col: t.random(255), seed: e });
@@ -256,7 +256,7 @@
                             t.translate(-100, -100),
                                 (function () {
                                     // This number should match the particle count above
-                                    for (let i = 0; i < 3500; i++) {
+                                    for (let i = 0; i < 500; i++) {
                                         let o = a[i],
                                             n = ((e = o.pos.x), (s = o.pos.y), (e = t.constrain(e, 0, t.width + 200)), (s = t.constrain(s, 0, t.height + 200)), h[t.floor(s / 10)][t.floor(e / 10)]);
                                         (o.prev.x = o.pos.x),
@@ -271,7 +271,7 @@
                                             // *** FLOW FIELD RESPONSE STRENGTH ***
                                             // Controls how strongly particles respond to the flow field
                                             // Default: mult(3)
-                                            o.acc.add(n).mult(0.3);
+                                            o.acc.add(n).mult(7);
                                     }
                                     var e, s;
                                 })(),
@@ -297,7 +297,7 @@
                                 // Controls how fast the underlying flow field changes over time
                                 // This creates the "flowing" effect of the topology
                                 // Default: c += 0.002
-                                (c += 0.001);
+                                (c += 0.1);
                         });
                 });
             }
