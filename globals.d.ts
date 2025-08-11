@@ -71,6 +71,8 @@ export type {
 } from "./lib/constants/stampConstants.ts";
 
 export type {
+  Dispenser,
+  DispenserRow,
   StampBalance,
   StampClassification,
   StampDetail,
@@ -99,6 +101,14 @@ export type {
   SRC20Row,
   Src20SnapShotDetail,
 } from "./lib/types/src20.d.ts";
+
+// SRC-101 Token Types
+/**
+ * @deprecated Use `import type { Src101Detail } from "./lib/types/src101.d.ts";` instead.
+ * This global re-export will be removed in v2.0.0 (Q2 2025).
+ * @since 1.4.0
+ */
+export type { Src101Detail } from "./lib/types/src101.d.ts";
 
 // Wallet and Transaction Types
 /**

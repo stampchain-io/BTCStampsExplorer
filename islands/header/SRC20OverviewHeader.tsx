@@ -44,13 +44,6 @@ export const SRC20OverviewHeader = (
     onFilterChange?.(newFilter);
   }, [onFilterChange, currentSort?.filter]);
 
-  // 🚀 PREACT OPTIMIZATION: Memoized variant getters
-  const getTrendingVariant = useCallback(() => {
-    return currentSort?.filter === "TRENDING"
-      ? "glassmorphismSelected"
-      : "glassmorphismDeselected";
-  }, [currentSort?.filter]);
-
   /* ===== RENDER ===== */
   return (
     <div class="relative flex flex-col w-full gap-1.5">
