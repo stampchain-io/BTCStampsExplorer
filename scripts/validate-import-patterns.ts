@@ -479,6 +479,28 @@ function displayResults(results: ValidationResults, options: CLIOptions): void {
     
     if (!results.success) {
       console.log(`Critical: ${stats.violationsByCategory.critical.length}, Warnings: ${stats.violationsByCategory.warning.length}`);
+      
+      // Show critical violations in CI mode for easier debugging
+      if (stats.violationsByCategory.critical.length > 0) {
+        console.log('\n🚨 CRITICAL VIOLATIONS:');
+        stats.violationsByCategory.critical.slice(0, 5).forEach(v => {
+          console.log(`  ${v.file}:${v.line} - ${v.message}`);
+        });
+        if (stats.violationsByCategory.critical.length > 5) {
+          console.log(`  ... and ${stats.violationsByCategory.critical.length - 5} more`);
+        }
+      }
+      
+      // Show warnings if in verbose mode
+      if (options.verbose && stats.violationsByCategory.warning.length > 0) {
+        console.log('\n⚠️ WARNINGS:');
+        stats.violationsByCategory.warning.slice(0, 5).forEach(v => {
+          console.log(`  ${v.file}:${v.line} - ${v.message}`);
+        });
+        if (stats.violationsByCategory.warning.length > 5) {
+          console.log(`  ... and ${stats.violationsByCategory.warning.length - 5} more`);
+        }
+      }
     }
     return;
   }
