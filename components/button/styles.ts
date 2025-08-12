@@ -94,9 +94,10 @@ export const buttonStyles: ButtonVariants = {
     rounded-lg border-[1px]
     font-semibold tracking-wide
     transition-colors duration-50
+    cursor-pointer
   `,
 
-  /* ===== VARIANT STYLES ===== */
+  /* ===== VARIANT STYLES  ===== */
   /* If the glassmorphism/Color variants are changed then the ToggleButton.tsx file must be update too */
   variant: {
     text: `
