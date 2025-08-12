@@ -430,3 +430,47 @@ strong {
 .highcharts-range-selector-buttons .highcharts-button-pressed text {
   fill: white !important;
 }
+
+/* SYSTEMIC FIX: Force cursor inheritance for glassmorphism elements */
+/* This fixes the issue where backdrop-blur and pseudo-elements override cursor styles */
+
+/* Fix for all buttons with glassmorphism */
+button,
+button *,
+button::before,
+button::after {
+  cursor: inherit !important;
+}
+
+/* Fix for glassmorphism containers that should inherit cursor */
+.backdrop-blur-sm,
+.backdrop-blur-sm *,
+.backdrop-blur-sm::before,
+.backdrop-blur-sm::after {
+  cursor: inherit !important;
+}
+
+/* Fix for overflow-hidden containers */
+.overflow-hidden,
+.overflow-hidden *,
+.overflow-hidden::before,
+.overflow-hidden::after {
+  cursor: inherit !important;
+}
+
+/* Specific fix for range sliders */
+input[type="range"],
+input[type="range"]::-webkit-slider-thumb,
+input[type="range"]::-moz-range-thumb {
+  cursor: inherit !important;
+}
+
+/* Override any text cursor defaults in interactive elements */
+button span,
+button div,
+button p,
+[role="button"] span,
+[role="button"] div,
+[role="button"] p {
+  cursor: inherit !important;
+}
