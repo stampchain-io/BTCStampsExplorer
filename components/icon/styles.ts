@@ -1,4 +1,5 @@
 /* ===== ICON STYLES MODULE ===== */
+/* @baba - check icon button hover states */
 import { JSX } from "preact";
 
 /* ===== TYPE DEFINITIONS ===== */
@@ -101,10 +102,11 @@ export const iconStyles = {
 
   iconButton: {
     grey:
-      "stroke-stamp-grey hover:stroke-stamp-grey-light group-hover:stroke-stamp-grey-light fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-stamp-grey [&:hover_path[class*='fill-stroke']]:fill-stamp-grey-light [&:group-hover_path[class*='fill-stroke']]:fill-stamp-grey-light",
+      "stroke-stamp-grey hover:stroke-stamp-grey-light group-hover:stroke-stamp-grey-light fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_*]:cursor-pointer [&_path]:cursor-pointer [&_svg]:cursor-pointer [&_path[class*='fill-stroke']]:fill-stamp-grey [&:hover_path[class*='fill-stroke']]:fill-stamp-grey-light [&:group-hover_path[class*='fill-stroke']]:fill-stamp-grey-light",
     purple:
-      "stroke-stamp-purple hover:stroke-stamp-purple-bright group-hover:stroke-stamp-purple-bright fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-stamp-purple [&:hover_path[class*='fill-stroke']]:fill-stamp-purple-bright [&:group-hover_path[class*='fill-stroke']]:fill-stamp-purple-bright",
-    custom: "fill-none cursor-pointer",
+      "stroke-stamp-purple hover:stroke-stamp-purple-bright group-hover:stroke-stamp-purple-bright fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_*]:cursor-pointer [&_path]:cursor-pointer [&_svg]:cursor-pointer [&_path[class*='fill-stroke']]:fill-stamp-purple [&:hover_path[class*='fill-stroke']]:fill-stamp-purple-bright [&:group-hover_path[class*='fill-stroke']]:fill-stamp-purple-bright",
+    custom:
+      "fill-none cursor-pointer [&_*]:cursor-pointer [&_path]:cursor-pointer [&_svg]:cursor-pointer",
   },
 
   /* ===== WEIGHT VARIANTS ===== */
