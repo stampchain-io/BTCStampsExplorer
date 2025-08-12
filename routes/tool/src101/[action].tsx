@@ -1,10 +1,10 @@
 /* ===== SRC101 TOOLS PAGE ===== */
 /*@baba-60+61+65*/
 import { Handlers, PageProps } from "$fresh/server.ts";
-import type { ToolsSrc101PageProps } from "$types/ui.d.ts";
-import { body, gapSection } from "$layout";
-import { SRC101RegisterTool } from "$tool";
+import { body, gapSectionSlim } from "$layout";
 import { SRC101RegisterHowto } from "$section";
+import { SRC101RegisterTool } from "$tool";
+import type { ToolsSrc101PageProps } from "$types/ui.d.ts";
 
 /* ===== TYPES ===== */
 
@@ -54,7 +54,7 @@ export default function ToolsSrc101Page(
 
   /* ===== RENDER ===== */
   return (
-    <div class={`${body} ${gapSection}`}>
+    <div class={`${body} ${gapSectionSlim}`}>
       <div class={`flex w-full`}>
         {renderContent()}
       </div>
