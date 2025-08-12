@@ -1,7 +1,8 @@
 /* ===== SRC20 RECENT MINTS GALLERY COMPONENT ===== */
 import { SRC20CardSmMinting } from "$card";
-import type { SRC20Row } from "$types/src20.d.ts";
+import { containerBackground } from "$layout";
 import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
+import type { SRC20Row } from "$types/src20.d.ts";
 import { useEffect, useState } from "preact/hooks";
 
 /* ===== COMPONENT ===== */
@@ -47,17 +48,19 @@ export default function SRC20MintsGallery() {
 
   /* ===== RENDER ===== */
   return (
-    <div class="flex flex-col w-full items-start tablet:items-end">
+    <div class={`${containerBackground} items-start tablet:items-end`}>
       {/* ===== TITLE SECTION ===== */}
       <div class="w-full">
         <h4 class={`${titlePurpleLD} tablet:hidden`}>
           TRENDING
         </h4>
-        <h4 class={`hidden tablet:block w-full text-right ${titlePurpleDL}`}>
+        <h4
+          class={`hidden tablet:block w-full tablet:text-right ${titlePurpleDL}`}
+        >
           TRENDING
         </h4>
       </div>
-      <h3 class={`w-full text-right ${subtitlePurple}`}>
+      <h3 class={`${subtitlePurple} w-full tablet:text-right mb-2`}>
         {isLoading ? <span class="animate-pulse">POPULAR TOKENS</span> : (
           "POPULAR TOKENS"
         )}
@@ -66,26 +69,28 @@ export default function SRC20MintsGallery() {
       {/* ===== LOADING OR CONTENT ===== */}
       {isLoading
         ? (
-          <div class="w-full flex flex-col gap-6">
-            {[...Array(5)].map((_, index) => (
+          <div class="flex flex-col w-full gap-3">
+            {[...Array(6)].map((_, index) => (
               <div
                 key={index}
-                class="loading-skeleton running w-full h-12 rounded"
+                class={`loading-skeleton running w-full rounded-lg ${
+                  index === 0 ? "h-6" : "h-[56px]"
+                }`}
               />
             ))}
           </div>
         )
         : error
         ? (
-          <div class="w-full p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-            <p class="font-bold">Error loading trending tokens:</p>
+          <div class="w-full p-5 bg-[#171417]/50 border border-red-500/40 text-red-500/70 rounded-xl">
+            <p class="font-bold">ERROR LOADING TRENDING TOKENS:</p>
             <p class="text-sm">{error}</p>
           </div>
         )
         : transactions.length === 0
         ? (
           <div class="text-stamp-grey-darkest text-sm">
-            No trending tokens found
+            NO TRENDING TOKENS FOUND
           </div>
         )
         : (

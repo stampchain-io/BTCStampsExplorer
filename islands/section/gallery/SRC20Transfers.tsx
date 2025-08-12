@@ -1,8 +1,9 @@
 /* ===== SRC20 RECENT TRANSFERS GALLERY COMPONENT ===== */
 import { StampCard } from "$card";
+import { containerBackground } from "$layout";
 import type { StampTransaction } from "$lib/types/stamping.ts";
-import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
 import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
+import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
 import type { JSX } from "preact";
 import { useEffect, useState } from "preact/hooks";
 
@@ -41,19 +42,21 @@ export default function SRC20TransfersGallery(): JSX.Element {
 
   /* ===== RENDER ===== */
   return (
-    <div class="flex flex-col w-full items-start tablet:items-end">
+    <div class={`${containerBackground} items-start tablet:items-end`}>
       {/* ===== TITLE SECTION ===== */}
       <div class="w-full">
         <h4 class={`${titlePurpleLD} tablet:hidden`}>
           RECENT TRANSFERS
         </h4>
-        <h4 class={`hidden tablet:block w-full text-right ${titlePurpleDL}`}>
+        <h4
+          class={`hidden tablet:block w-full tablet:text-right ${titlePurpleDL}`}
+        >
           RECENT TRANSFERS
         </h4>
       </div>
 
       {/* Show block title with loading state */}
-      <h3 class={`w-full text-right ${subtitlePurple}`}>
+      <h3 class={`w-full tablet:text-right ${subtitlePurple}`}>
         {isLoading ? <span class="animate-pulse">BLOCK #XXX,XXX</span> : (
           transactions.length > 0 && `BLOCK #${transactions[0].block_index}`
         )}
@@ -62,11 +65,11 @@ export default function SRC20TransfersGallery(): JSX.Element {
       {/* ===== LOADING OR CONTENT ===== */}
       {isLoading
         ? (
-          <div class="w-full grid grid-cols-4 mobileMd:grid-cols-4 mobileLg:grid-cols-6 tablet:grid-cols-4 desktop:grid-cols-4 gap-6">
+          <div class="w-full grid grid-cols-4 mobileMd:grid-cols-4 mobileLg:grid-cols-6 tablet:grid-cols-4 desktop:grid-cols-4 gap-5">
             {[...Array(5)].map((_, index) => (
               <div
                 key={index}
-                class="loading-skeleton running aspect-square rounded"
+                class="loading-skeleton running aspect-square rounded-xl"
               />
             ))}
           </div>
