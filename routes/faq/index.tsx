@@ -1,13 +1,18 @@
 /* ===== FAQ PAGE ===== */
 import { FaqAccordion } from "$content";
 import { FaqHeader } from "$header";
-import { body, FAQ_CONTENT, gapSection } from "$layout";
+import {
+  body,
+  containerBackground,
+  FAQ_CONTENT,
+  gapSectionSlim,
+} from "$layout";
 import { subtitleGrey, text, titleGreyLD } from "$text";
 
 /* ===== PAGE COMPONENT ===== */
 export default function FaqPage() {
   return (
-    <div class={`${body} ${gapSection}`}>
+    <div class={`${body} ${gapSectionSlim}`}>
       {/* ===== HEADER SECTION ===== */}
       <FaqHeader />
 
@@ -15,7 +20,7 @@ export default function FaqPage() {
       {FAQ_CONTENT.map((section) => (
         <section
           key={section.title}
-          class="flex flex-col gap-6"
+          class={`${containerBackground} space-y-7`}
         >
           {/* ===== ACCORDION HEADER SECTION ===== */}
           <div>

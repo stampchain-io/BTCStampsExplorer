@@ -3,7 +3,7 @@ import { text, textLg, titleGreyDL, titleGreyLD } from "$text";
 /* ===== COMPONENT ===== */
 export function FaqHeader() {
   return (
-    <section class="flex flex-col items-center">
+    <section class="flex flex-col items-center mb-9">
       <div class="flex flex-col items-center text-center">
         {/* ===== TITLE SECTION ===== */}
         <h1 class={titleGreyLD}>
