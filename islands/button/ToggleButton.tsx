@@ -145,14 +145,20 @@ export const ToggleButton = ({
         // Multi select: use glassmorphismSelected for selected state
         // Special case for "dispensers" - show default state since it can't be deselected
         return `${button("glassmorphismSelected", color, size)} ${
-          option === "dispensers" ? `cursor-default ${glassmorphismColor}` : ""
+          option === "dispensers"
+            ? `cursor-default ${glassmorphismColor}`
+            : "cursor-pointer"
         }`;
       }
     } else {
       // Unselected state: use glassmorphismDeselected
+      // Check if this is a timeframe button that should have pointer cursor when unselected
+      const isTimeframe = ["24h", "7d", "30d"].includes(option);
+      const cursorClass = isTimeframe ? "cursor-pointer" : "cursor-pointer";
+
       return `${button("glassmorphismDeselected", "grey", size)} ${
         getSelectState(option)
-      }`;
+      } ${cursorClass}`;
     }
   };
 
