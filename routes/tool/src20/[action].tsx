@@ -1,11 +1,7 @@
 /* ===== SRC20 TOOLS PAGE ===== */
 /*@baba-154+159*/
 import { Handlers, PageProps } from "$fresh/server.ts";
-import type { ToolSrc20PageProps } from "$types/ui.d.ts";
-import { Src20Controller } from "$server/controller/src20Controller.ts";
-import { SRC20Service } from "$server/services/src20/index.ts";
 import { body, gapSection } from "$layout";
-import { SRC20DeployTool, SRC20MintTool, SRC20TransferTool } from "$tool";
 import {
   SRC20DeployHowto,
   SRC20DeploysGallery,
@@ -14,6 +10,10 @@ import {
   SRC20TransferHowto,
   SRC20TransfersGallery,
 } from "$section";
+import { Src20Controller } from "$server/controller/src20Controller.ts";
+import { SRC20Service } from "$server/services/src20/index.ts";
+import { SRC20DeployTool, SRC20MintTool, SRC20TransferTool } from "$tool";
+import type { ToolSrc20PageProps } from "$types/ui.d.ts";
 
 /* ===== TYPES ===== */
 
@@ -147,10 +147,10 @@ export default function ToolSrc20Page(
       <div
         class={`flex flex-col tablet:flex-row justify-between ${gapSection}`}
       >
-        <div class="flex w-full tablet:w-1/2 desktop:w-1/3">
+        <div class="flex w-full tablet:w-1/2">
           {renderLeftSidebar()}
         </div>
-        <div class={`flex w-full tablet:w-1/2 desktop:w-2/3`}>
+        <div class={`flex w-full tablet:w-1/2`}>
           {renderRightSidebar()}
         </div>
       </div>
