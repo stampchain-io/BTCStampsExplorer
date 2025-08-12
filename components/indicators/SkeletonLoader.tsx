@@ -1,4 +1,7 @@
 /* ===== SKELETON LOADER COMPONENTS ===== */
+/* Simple skeleton loaders (for card and rows) are defined in _app.tsx */
+/* The styling of both files need to be in sync */
+
 import { Icon } from "$icon";
 import {
   containerColForm,

@@ -110,16 +110,9 @@ export default function App({ Component, state, url }: PageProps<unknown>) {
         <style>
           {`
             .loading-skeleton {
-              background: linear-gradient(
-                110deg,
-                #14001f 30%,
-                #1b0029 40%,
-                #220033 50%,
-                #1b0029 60%,
-                #14001f 70%
-              );
-              background-size: 200% 100%;
-              animation: shimmer 1.5s infinite linear;
+              background: rgba(23, 20, 23, 0.5);
+              border: 1px solid rgba(29, 25, 29, 0.8);
+              animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
             }
 
             /* ===== COMPREHENSIVE ANIMATION PERFORMANCE CONTROLS ===== */
@@ -141,7 +134,8 @@ export default function App({ Component, state, url }: PageProps<unknown>) {
             /* Stop animations when loading is complete */
             .loading-skeleton.completed {
               animation: none;
-              background: #14001f; /* Static background color */
+              background: rgba(23, 20, 23, 0.5);
+              border: 1px solid rgba(29, 25, 29, 0.8);
             }
 
             /* Global animation controls based on page visibility */
@@ -168,8 +162,8 @@ export default function App({ Component, state, url }: PageProps<unknown>) {
 
             /* Performance-based animation controls */
             .performance-low * {
-              animation-duration: 0.1s !important;
-              transition-duration: 0.1s !important;
+              animation-duration: 1.5s !important;
+              transition-duration: 1.5s !important;
             }
 
             .performance-low .animate-pulse,
@@ -178,8 +172,8 @@ export default function App({ Component, state, url }: PageProps<unknown>) {
             }
 
             .performance-medium * {
-              animation-duration: 0.3s !important;
-              transition-duration: 0.3s !important;
+              animation-duration: 1s !important;
+              transition-duration: 1s !important;
             }
 
             /* Intersection observer based controls */
@@ -214,24 +208,28 @@ export default function App({ Component, state, url }: PageProps<unknown>) {
             .stamp-grid-skeleton {
               display: grid;
               grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-              gap: 1.5rem;
-              padding: 1rem;
+              gap: 1.25rem;
+              padding: 1.25rem;
             }
 
             .stamp-card-skeleton {
               aspect-ratio: 1;
-              border-radius: 0.5rem;
+              border-radius: 0.5rem; /* rounded-lg */
             }
 
             /* Match SRC20Section layout */
             .src20-skeleton {
               height: 120px;
-              margin: 1rem 0;
+              margin: 1.25rem 0;
             }
 
-            @keyframes shimmer {
-              to {
-                background-position: -200% 0;
+            /* ===== KEYFRAMES ===== */
+            @keyframes pulse {
+              0%, 100% {
+                opacity: 1;
+              }
+              50% {
+                opacity: 0.5;
               }
             }
 
