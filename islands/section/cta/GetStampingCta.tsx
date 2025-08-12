@@ -96,19 +96,19 @@ export default function GetStampingCta() {
       {/* ===== BUTTONS SECTION ===== */}
       <div class="flex flex-col pt-7 gap-3">
         {/* ===== BUTTONS ===== */}
-        <div class="flex justify-end gap-6">
+        <div class="flex justify-end gap-5">
           <Button
-            variant="outline"
+            variant="glassmorphism"
             color="grey"
-            size="md"
+            size="mdR"
             href="/faq"
           >
             FAQ
           </Button>
           <Button
-            variant="flat"
+            variant="glassmorphismColor"
             color="grey"
-            size="md"
+            size="mdR"
             href="/tool/stamp/create"
           >
             STAMP
