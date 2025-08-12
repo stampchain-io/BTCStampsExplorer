@@ -131,7 +131,7 @@ body {
 }
 
 .scrollbar-glassmorphism {
-  @apply [&::-webkit-scrollbar]:w-[3px] [&::-webkit-scrollbar-track]:bg-[#252026]/90 [&::-webkit-scrollbar-thumb]:bg-[#666666]/50 [&::-webkit-scrollbar-thumb:hover]:bg-[#666666];
+  @apply [&::-webkit-scrollbar]:w-[2px] [&::-webkit-scrollbar-track]:bg-[#141015] [&::-webkit-scrollbar-thumb]:bg-[#666666]/50 [&::-webkit-scrollbar-thumb:hover]:bg-[#666666];
 }
 
 .pixelart {
@@ -226,8 +226,11 @@ body {
   border-bottom-right-radius: 0 !important;
 }
 
-.input-open-right:before,
-.input-open-right>* {
+.input-open-right {
+  @apply rounded-t-lg rounded-bl-lg rounded-br-[0px] !important;
+}
+
+.input-open-right > * {
   @apply rounded-t-lg rounded-bl-lg rounded-br-[0px] !important;
 }
 

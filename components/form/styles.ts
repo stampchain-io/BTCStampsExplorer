@@ -40,16 +40,16 @@ export const inputTextarea = `
 
 // Input field dropdown - define height in the component
 export const inputFieldDropdown = `
-absolute top-[100%] left-0 w-full z-[11]
-bg-[#252026]/90 backdrop-blur-xl
-border border-t-0 border-stamp-grey-darker/20 rounded-b-lg
+absolute top-[100%] left-0 w-full z-[60]
+bg-[#141015] backdrop-blur-xl
+border border-t-0 border-[#1d191d]/80 rounded-b-lg
 text-stamp-grey-light text-sm font-medium uppercase leading-none
-overflow-y-auto scrollbar-glassmorphism shadow-lg`;
+overflow-y-auto scrollbar-glassmorphism shadow-lg cursor-pointer`;
 
 export const inputFieldDropdownHover = `
 flex justify-between py-2.5 px-3
-border-b-[1px] border-stamp-grey-darker/20 last:border-b-0
-hover:bg-stamp-grey-darker/10 uppercase
+border-b-[1px] border-[#1d191d]/80 last:border-b-0
+hover:bg-[#171417]/80 uppercase
 ${transition} cursor-pointer`;
 
 // Checkbox - used for both checkboxes and radiobuttons
@@ -104,36 +104,44 @@ export const inputSelect = `
 `;
 /* ===== ===== ===== */
 
-/* ===== GRADIENT STYLES ===== */
+/* ===== GRADIENT STYLES - WIP @baba =====
 export const purple = `
-  [--color-dark:#66009980]
-  [--color-medium:#8800CC4D]
-  [--color-light:#AA00FF1A]
+  [--color-dark:#AA00FF66]
+  [--color-medium:#AA00FF99]
+  [--color-light:#AA00FFcc]
+  [--color-border:#66009999]
+  [--color-border-hover:#660099CC]
+  [--color-text:#660099]
+  [--color-text-hover:#8800CC]
 `;
 
 export const grey = `
-  [--color-dark:#66666680]
-  [--color-medium:#6666664D]
-  [--color-light:#6666661A]
+  [--color-dark:#1d191d66]
+  [--color-medium:#1d191d99]
+  [--color-light:#2c262c]
+  [--color-border:#66666699]
+  [--color-border-hover:#666666CC]
+  [--color-text:#666666]
+  [--color-text-hover:#999999]
 `;
-
-/* ===== GRADIENT INPUT STYLES ===== */
+*/
+/* ===== GRADIENT INPUT STYLES =====
 export const outlineGradient = `
-  relative !bg-gradient-to-r !from-[#221b22] !to-[#252129] !p-[1px] rounded-lg !border-0
+  relative !bg-[#141015] !p-[1px] rounded-lg !border-0
   before:absolute before:inset-0 before:rounded-lg before:z-[1]
   before:bg-[conic-gradient(from_var(--angle),var(--color-dark),var(--color-medium),var(--color-light),var(--color-medium),var(--color-dark))]
   before:[--angle:0deg] before:animate-rotate
   hover:before:bg-[conic-gradient(from_var(--angle),var(--color-light),var(--color-light),var(--color-light),var(--color-light),var(--color-light))]
   focus-within:before:bg-[conic-gradient(from_var(--angle),var(--color-light),var(--color-light),var(--color-light),var(--color-light),var(--color-light))]
   before:transition-colors before:duration-300
-  [&>*]:relative [&>*]:z-[2] [&>*]:rounded-lg [&>*]:bg-gradient-to-r [&>*]:from-[#221b22] [&>*]:to-[#252129]
-  [&>div]:flex [&>div]:justify-between [&>div]:relative [&>div]:z-[2] [&>div]:!bg-gradient-to-r [&>div]:!from-[#221b22] [&>div]:!to-[#252129] [&>div]:placeholder:!bg-gradient-to-r [&>div]:rounded-lg
+  [&>*]:relative [&>*]:z-[2] [&>*]:rounded-lg [&>*]:bg-[#141015]
+  [&>div]:flex [&>div]:justify-between [&>div]:relative [&>div]:z-[2] [&>div]:!bg-[#141015] [&>div]:placeholder:!bg-[#141015] [&>div]:rounded-lg
   [&>div>input]:${inputFieldHeight} [&>div>input]:w-full [&>div>input]:bg-transparent [&>div>input]:rounded-lg [&>div>input]:pl-5
   [&>div>input]:font-normal [&>div>input]:text-base [&>div>input]:text-stamp-grey-light
   [&>div>input]:placeholder:font-light [&>div>input]:placeholder:!text-stamp-grey
-  [&>div>input]:!outline-none [&>div>input]:focus-visible:!outline-none [&>div>input]:focus:!bg-gradient-to-r [&>div>input]:focus:!from-[#221b22] [&>div>input]:focus:!to-[#252129]
+  [&>div>input]:!outline-none [&>div>input]:focus-visible:!outline-none [&>div>input]:focus:!bg-[#1d191d]
 `;
-
+*/
 /* ===== NOT IN USE NOR UPDATED ===== */
 /* ===== LABEL STYLES ===== */
 export const labelBase =
@@ -168,9 +176,9 @@ export type FormStyles = {
   inputFieldDropdownHover: string;
 
   // Gradients
-  purple: string;
-  grey: string;
-  outlineGradient: string;
+  // purple: string;
+  // grey: string;
+  // outlineGradient: string;
 
   // Labels - not used
   labelBase: string;

@@ -4,17 +4,12 @@ import { useSRC101Form } from "$client/hooks/userSRC101Form.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { ProgressiveEstimationIndicator } from "$components/indicators/ProgressiveEstimationIndicator.tsx";
 import { ROOT_DOMAINS } from "$constants";
-import {
-  grey,
-  inputFieldDropdown,
-  inputFieldDropdownHover,
-  inputFieldOutline,
-  outlineGradient,
-} from "$form";
+import { inputFieldDropdown, inputFieldDropdownHover } from "$form";
 import { RegisterToolSkeleton } from "$indicators";
+import { InputField } from "$islands/form/InputField.tsx";
 import DetailSRC101Modal from "$islands/modal/DetailSRC101Modal.tsx";
 import { openModal } from "$islands/modal/states.ts";
-import { bodyTool, containerBackground } from "$layout";
+import { bodyTool, containerBackground, glassmorphismLayer2 } from "$layout";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { mapProgressiveFeeDetails } from "$lib/utils/performance/fees/fee-estimation-utils.ts";
@@ -254,28 +249,29 @@ export function SRC101RegisterTool({
         aria-label="Bitname registration form"
         novalidate
       >
-        {/* Animated Input Container */}
+        {/* Input Field with TLD Dropdown */}
         <div
-          class={`${outlineGradient} ${grey} ${
-            openTldDropdown && !isSelectingTld ? "input-open-right" : ""
+          class={`relative ${glassmorphismLayer2} ${
+            openTldDropdown && !isSelectingTld
+              ? "input-open-right overflow-visible"
+              : "overflow-hidden"
           }`}
         >
           <div class="flex justify-between relative z-[2]">
-            <input
+            <InputField
               type="text"
               placeholder="bitname"
               id="search-dropdown"
-              class={inputFieldOutline}
-              required
               value={formState.toAddress || ""}
               onChange={(e) => handleInputChange(e, "toAddress")}
-              autocomplete="off"
-              autoCorrect="off"
+              class="flex-1 !border-0 bg-transparent focus:outline-none placeholder:!lowercase"
+              required
+              autoComplete="off"
               aria-label="Bitname input"
             />
             {/* TLD Dropdown Container */}
             <div
-              class="relative"
+              class="relative z-[50]"
               ref={tldDropdownRef}
             >
               <button
@@ -301,7 +297,7 @@ export function SRC101RegisterTool({
               </button>
               {openTldDropdown && (
                 <ul
-                  class={`${inputFieldDropdown} !left-[1px] max-h-[73px] !w-[64px] !bg-gradient-to-b !from-[#252129] !to-[#252129]/50
+                  class={`${inputFieldDropdown} !left-[1px] max-h-[73px] !w-[64px]
                   `}
                 >
                   {ROOT_DOMAINS.map((tld) => (
@@ -346,6 +342,7 @@ export function SRC101RegisterTool({
               size="mdR"
               onClick={checkAvailability}
               aria-label="Check bitname availability"
+              class="z-[-1]"
             >
               AVAILABILITY
             </Button>
