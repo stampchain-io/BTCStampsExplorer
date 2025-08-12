@@ -9,7 +9,7 @@ import { RegisterToolSkeleton } from "$indicators";
 import { InputField } from "$islands/form/InputField.tsx";
 import DetailSRC101Modal from "$islands/modal/DetailSRC101Modal.tsx";
 import { openModal } from "$islands/modal/states.ts";
-import { bodyTool, containerBackground, glassmorphismLayer2 } from "$layout";
+import { bodyTool, containerBackground } from "$layout";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { mapProgressiveFeeDetails } from "$lib/utils/performance/fees/fee-estimation-utils.ts";
@@ -249,72 +249,65 @@ export function SRC101RegisterTool({
         aria-label="Bitname registration form"
         novalidate
       >
-        {/* Input Field with TLD Dropdown */}
-        <div
-          class={`relative ${glassmorphismLayer2} ${
-            openTldDropdown && !isSelectingTld
-              ? "input-open-right overflow-visible"
-              : "overflow-hidden"
-          }`}
-        >
-          <div class="flex justify-between relative z-[2]">
-            <InputField
-              type="text"
-              placeholder="bitname"
-              id="search-dropdown"
-              value={formState.toAddress || ""}
-              onChange={(e) => handleInputChange(e, "toAddress")}
-              class="flex-1 !border-0 bg-transparent focus:outline-none placeholder:!lowercase"
-              required
-              autoComplete="off"
-              aria-label="Bitname input"
-            />
-            {/* TLD Dropdown Container */}
+        <div class="flex gap-5">
+          {/* Bitname Input Field */}
+          <InputField
+            type="text"
+            placeholder="bitname"
+            id="search-dropdown"
+            value={formState.toAddress || ""}
+            onChange={(e) => handleInputChange(e, "toAddress")}
+            class="flex-1 placeholder:!lowercase"
+            required
+            autoComplete="off"
+            aria-label="Bitname input"
+          />
+
+          {/* TLD Dropdown InputField - styled like glassmorphismLayer2 */}
+          <div class="relative w-[64px]" ref={tldDropdownRef}>
             <div
-              class="relative z-[50]"
-              ref={tldDropdownRef}
+              class={`h-10 px-4 border-[1px] border-[#1d191d]/80 rounded-lg
+                !bg-[#171417]/20 hover:bg-[#1d191d] hover:border-[#33333380]
+                font-semibold text-sm text-stamp-grey text-right backdrop-blur-sm hover:text-stamp-grey-light tracking-wider transition-all duration-50 focus-visible:!outline-none cursor-pointer flex items-center justify-end ${
+                openTldDropdown && !isSelectingTld ? "input-open-bottom" : ""
+              }`}
+              onClick={() => {
+                setOpenTldDropdown(!openTldDropdown);
+                setAllowTldTooltip(false);
+                setIsTldTooltipVisible(false);
+              }}
+              onMouseEnter={handleTldMouseEnter}
+              onMouseLeave={handleTldMouseLeave}
+              aria-label="Select top level domain"
             >
-              <button
-                type="button"
-                onClick={() => {
-                  setOpenTldDropdown(!openTldDropdown);
-                  setAllowTldTooltip(false);
-                  setIsTldTooltipVisible(false);
-                }}
-                class="h-10 min-w-16 mt-[1px] px-4 rounded-lg bg-transparent font-semibold text-sm text-stamp-grey text-right hover:text-stamp-grey-light tracking-wider transition-all duration-50 focus-visible:!outline-none"
-                onMouseEnter={handleTldMouseEnter}
-                onMouseLeave={handleTldMouseLeave}
-                aria-label="Select top level domain"
+              <div
+                class={`${tooltipButton} tracking-normal ${
+                  isTldTooltipVisible ? "opacity-100" : "opacity-0"
+                }`}
               >
-                <div
-                  class={`${tooltipButton} tracking-normal ${
-                    isTldTooltipVisible ? "opacity-100" : "opacity-0"
-                  }`}
-                >
-                  SELECT TOP LEVEL DOMAIN
-                </div>
-                {formState.root}
-              </button>
-              {openTldDropdown && (
-                <ul
-                  class={`${inputFieldDropdown} !left-[1px] max-h-[73px] !w-[64px]
-                  `}
-                >
-                  {ROOT_DOMAINS.map((tld) => (
-                    <li
-                      key={tld}
-                      class={`${inputFieldDropdownHover} !px-[14px] !text-xs !lowercase !justify-end`}
-                      onClick={() => handleTldSelect(tld)}
-                      onMouseDown={(e) => e.preventDefault()}
-                      role="option"
-                      aria-selected={formState.root === tld}
-                    >
-                      {tld}
-                    </li>
-                  ))}
-                </ul>
-              )}
+                SELECT TOP LEVEL DOMAIN
+              </div>
+              {formState.root}
             </div>
+            {openTldDropdown && (
+              <ul
+                class={`${inputFieldDropdown} !left-0 max-h-[73px] !w-[64px] !z-[9999]
+              `}
+              >
+                {ROOT_DOMAINS.map((tld) => (
+                  <li
+                    key={tld}
+                    class={`${inputFieldDropdownHover} !px-[14px] !text-xs !lowercase !justify-end`}
+                    onClick={() => handleTldSelect(tld)}
+                    onMouseDown={(e) => e.preventDefault()}
+                    role="option"
+                    aria-selected={formState.root === tld}
+                  >
+                    {tld}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
 
@@ -342,7 +335,6 @@ export function SRC101RegisterTool({
               size="mdR"
               onClick={checkAvailability}
               aria-label="Check bitname availability"
-              class="z-[-1]"
             >
               AVAILABILITY
             </Button>
