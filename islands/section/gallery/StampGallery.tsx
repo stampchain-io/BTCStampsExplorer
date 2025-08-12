@@ -241,11 +241,11 @@ export default function StampGallery({
           <div class={containerClass}>
             {isLoading
               ? (
-                // Grid view loading skeleton with optimized animation control
+                // Grid view loading skeleton with optimized animation control - IS THIS WORKING @baba-check
                 [...Array(displayCount)].map((_, index) => {
                   const skeletonClasses = useLoadingSkeleton(
                     isLoading,
-                    "aspect-square rounded",
+                    "aspect-square rounded-lg",
                   );
                   return (
                     <div

@@ -204,12 +204,12 @@ export default function App({ Component, state, url }: PageProps<unknown>) {
               transform: none !important;
             }
 
-            /* Match StampCard grid layout */
+            /* Match StampCard grid layout - doesnt apply to StampCardRows */
             .stamp-grid-skeleton {
               display: grid;
               grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-              gap: 1.25rem;
-              padding: 1.25rem;
+              gap: 1.5rem;
+              padding: 1rem;
             }
 
             .stamp-card-skeleton {
@@ -220,7 +220,7 @@ export default function App({ Component, state, url }: PageProps<unknown>) {
             /* Match SRC20Section layout */
             .src20-skeleton {
               height: 120px;
-              margin: 1.25rem 0;
+              margin: 1rem 0;
             }
 
             /* ===== KEYFRAMES ===== */
