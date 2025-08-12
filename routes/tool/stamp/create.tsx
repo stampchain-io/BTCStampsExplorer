@@ -1,12 +1,12 @@
 /* ===== STAMPING TOOL PAGE ===== */
 /*@baba-71-81*/
 
-import type { StampRow } from "$types/stamp.d.ts";
 import { Handlers, PageProps } from "$fresh/server.ts";
+import { body, containerBackground, gapSectionSlim } from "$layout";
+import { StampGallery, StampingHowto } from "$section";
 import { StampController } from "$server/controller/stampController.ts";
 import { StampingTool } from "$tool";
-import { StampGallery, StampingHowto } from "$section";
-import { body, gapSection } from "$layout";
+import type { StampRow } from "$types/stamp.d.ts";
 
 /* ===== TYPES ===== */
 interface StampPageData {
@@ -49,8 +49,7 @@ export default function ToolStampingPage({ data }: PageProps<StampPageData>) {
     alignRight: true,
     gridClass: `
       grid w-full
-      gap-3
-      mobileMd:gap-6
+      gap-3 mobileMd:gap-5
       grid-cols-2
       mobileSm:grid-cols-3
       mobileLg:grid-cols-4
@@ -68,17 +67,19 @@ export default function ToolStampingPage({ data }: PageProps<StampPageData>) {
 
   /* ===== RENDER ===== */
   return (
-    <div class={`${body} ${gapSection}`}>
+    <div class={`${body} ${gapSectionSlim}`}>
       <div class={`flex w-full`}>
         <StampingTool />
       </div>
       <div
-        class={`flex flex-col tablet:flex-row justify-between ${gapSection}`}
+        class={`flex flex-col tablet:flex-row justify-between ${gapSectionSlim}`}
       >
         <div class="flex w-full tablet:w-1/2">
           <StampingHowto />
         </div>
-        <div class="flex flex-col w-full tablet:w-1/2 items-start tablet:items-end gap-6">
+        <div
+          class={`${containerBackground} h-fit tablet:w-1/2 items-start tablet:items-end`}
+        >
           <StampGallery {...latestStampsSection} />
         </div>
       </div>
