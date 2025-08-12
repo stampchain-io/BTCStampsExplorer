@@ -1,11 +1,12 @@
 /* ===== HOW TO TRANSFER TOKEN COMPONENT ===== */
 import { ReadAllButton } from "$button";
+import { containerBackground } from "$layout";
 import { subtitleGrey, text, titleGreyLD } from "$text";
 
 /* ===== COMPONENT ===== */
 export const SRC20TransferHowto = () => {
   return (
-    <div class="flex flex-col gap-3 mobileMd:gap-6">
+    <div class={`${containerBackground} gap-5`}>
       <div class="flex flex-col">
         <h3 class={titleGreyLD}>HOW-TO</h3>
         <h2 class={subtitleGrey}>TRANSFER A TOKEN</h2>
