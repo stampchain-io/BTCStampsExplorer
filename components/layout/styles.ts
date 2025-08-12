@@ -17,7 +17,7 @@ export const bodyTool = `
   ${body} mobileMd:max-w-[420px] mobileMd:mx-auto
 `;
 export const bodyArticle = `
-  ${body} tablet:max-w-[922px] tablet:mx-auto
+  ${body} tablet:max-w-[922px] tablet:mx-auto p-5 ${glassmorphism}
 `;
 // Section gaps
 export const gapSection = "gap-12 mobileLg:gap-[72px]"; // Index pages
@@ -26,7 +26,7 @@ export const gapSectionSlim = "gap-6 mobileLg:gap-9"; // Media index page
 export const gapGrid = "gap-6 mobileLg:gap-9 tablet:gap-12"; // - ToS index page
 
 /* ===== CONTAINER STYLES ===== */
-export const containerBackground = `flex flex-col w-full p-5 ${glassmorphism}`;
+export const containerBackground = `${body} p-5 ${glassmorphism}`;
 
 export const containerDetailImage = `relative p-5 ${glassmorphism}`;
 

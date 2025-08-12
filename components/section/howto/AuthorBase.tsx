@@ -1,5 +1,6 @@
 /* ===== AUTHOR COMPONENT ===== */
-import { textLg, textSm } from "$text";
+import { glassmorphismLayer2 } from "$layout";
+import { text, textSm } from "$text";
 import type { AuthorProps } from "$types/ui.d.ts";
 
 /* ===== TYPES ===== */
@@ -8,8 +9,10 @@ import type { AuthorProps } from "$types/ui.d.ts";
 export function AuthorSection({ name, twitter, website }: AuthorProps) {
   return (
     <section>
-      <div class="flex flex-col items-end -mt-4">
-        <p class={`${textLg} tablet:text-base font-bold mb-2.5 tablet:mb-2`}>
+      <div
+        class={`flex flex-col items-end -mt-4 pt-4 px-5 pb-5 w-fit ml-auto ${glassmorphismLayer2}`}
+      >
+        <p class={`${text} font-bold mb-2.5 tablet:mb-2`}>
           <span class="text-stamp-grey-darker">by&nbsp;</span>
           {name}
         </p>

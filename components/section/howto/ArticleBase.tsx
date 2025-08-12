@@ -1,8 +1,8 @@
 /* ===== ARTICLE COMPONENT ===== */
-import { body, bodyArticle, gapSection } from "$layout";
-import type { ArticleProps } from "$types/ui.d.ts";
-import { headingGrey, subtitleGrey, text, titleGreyLD } from "$text";
+import { body, bodyArticle, gapSectionSlim } from "$layout";
 import { ArticlesOverview } from "$section";
+import { headingGrey, subtitleGrey, text, titleGreyLD } from "$text";
+import type { ArticleProps } from "$types/ui.d.ts";
 
 /* ===== TYPES ===== */
 
@@ -12,7 +12,7 @@ export function Article(
 ) {
   /* ===== COMPONENT RENDER ===== */
   return (
-    <div class={`${body} ${gapSection}`}>
+    <div class={`${body} ${gapSectionSlim}`}>
       <div class={bodyArticle}>
         {/* ===== MAIN CONTENT SECTION ===== */}
         <section>
@@ -25,7 +25,7 @@ export function Article(
             src={headerImage}
             width="100%"
             alt="Screenshot"
-            class="pt-2 pb-9 mobileMd:pb-12"
+            class="pt-2 pb-9 mobileMd:pb-12 rounded-xl"
           />
 
           {/* ===== CONTENT ===== */}
