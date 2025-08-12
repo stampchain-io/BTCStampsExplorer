@@ -2,8 +2,12 @@ import { button } from "$button";
 import { useState } from "preact/hooks";
 
 // Glassmorphism color effect styling - must be identical to the glassmorphismColor variant in the button/styles.ts file
-const glassmorphismColor =
-  "[&:hover]:!bg-stamp-grey-darkest/10 [&:hover]:!border-[var(--color-border-hover)] [&:hover]:!text-[#1e1723] [&:hover::before]:!scale-100 [&:hover::before]:!blur-[5px] [&:hover::before]:!bg-[linear-gradient(to_bottom_right,var(--color-dark)_0%,var(--color-dark)_20%,var(--color-medium)_20%,var(--color-medium)_45%,var(--color-light)_45%,var(--color-light)_52%,var(--color-medium)_52%,var(--color-medium)_70%,var(--color-dark)_70%,var(--color-dark)_100%)]";
+const glassmorphismColor = `
+  [&:hover]:!bg-[#211c21]/10 [&:hover]:border-[var(--color-border)] [&:hover]:!text-[#171417]
+
+  [&:hover::before]:!scale-100 [&:hover::before]:!blur-sm
+  [&:hover::before]:!bg-[linear-gradient(to_bottom_right,var(--color-dark)_0%,var(--color-dark)_20%,var(--color-medium)_20%,var(--color-medium)_45%,var(--color-light)_45%,var(--color-light)_52%,var(--color-medium)_52%,var(--color-medium)_70%,var(--color-dark)_70%,var(--color-dark)_100%)]
+  shadow-[0_2px_4px_rgba(13,11,13,0.1),inset_0_1px_0_rgba(13,11,13,0.1),inset_0_-1px_0_rgba(13,11,13,0.1),inset_0_0_2px_2px_rgba(13,11,13,0.1)]`;
 
 export const ToggleButton = ({
   options,
@@ -99,7 +103,7 @@ export const ToggleButton = ({
 
     return selectState.action === "select"
       ? glassmorphismColor
-      : `!bg-stamp-grey-darkest/15 !border-stamp-grey-darkest/20 !text-[var(--color-dark)] [&:hover::before]:!bg-none`;
+      : `!bg-[#211c21]/20 !border-[var(--color-border)] !text-[var(--color-text)] [&:hover::before]:!bg-none`;
   };
 
   // Custom button class function
@@ -129,13 +133,9 @@ export const ToggleButton = ({
             button("glassmorphismSelected", "grey", size)
           } cursor-default ${glassmorphismColor}`;
         } else if (isTrending) {
-          // Force TRENDING to always show special effect with persistent animation
-          const trendingClickState = selectState?.option === "TRENDING"
-            ? glassmorphismColor
-            : `hover:bg-stamp-grey-darkest/15 hover:border-stamp-grey-darkest/20 hover:text-[var(--color-dark)] hover:before:bg-none `;
           return `${
             button("glassmorphismSelected", color, size)
-          } cursor-pointer ${trendingClickState} ${getSelectState(option)}`;
+          } cursor-pointer ${getSelectState(option)}`;
         } else {
           return `${
             button("glassmorphismSelected", "grey", size)
