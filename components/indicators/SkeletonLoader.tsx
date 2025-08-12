@@ -424,9 +424,7 @@ export function TransferToolSkeleton({ className = "" }: SkeletonLoaderProps) {
     <div class={`space-y-6 ${className}`}>
       <SkeletonContainer>
         <div class={`${containerColForm}`}>
-          <div
-            class={`${rowResponsiveForm}`}
-          >
+          <div class={`${rowResponsiveForm}`}>
             {/* Ticker name input skeleton */}
             <SkeletonInput width="w-full min-[420px]:flex-1" />
 
@@ -452,8 +450,13 @@ export function RegisterToolSkeleton({ className = "" }: SkeletonLoaderProps) {
     <div class={`space-y-6 ${className}`}>
       <SkeletonContainer>
         <div class={`${containerColForm} items-end`}>
-          {/* Domain input skeleton */}
-          <SkeletonInput height="h-[44px]" className="-mb-[1px]" />
+          <div class={`${rowResponsiveForm}`}>
+            {/* Domain input skeleton */}
+            <SkeletonInput width="w-full" />
+
+            {/* TLD input skeleton */}
+            <SkeletonInput width="w-[64px] !flex-none" />
+          </div>
 
           {/* Available button skeleton */}
           <SkeletonButton size="mdR" width="w-[116px]" />

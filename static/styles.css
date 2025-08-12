@@ -226,12 +226,12 @@ body {
   border-bottom-right-radius: 0 !important;
 }
 
-.input-open-right {
-  @apply rounded-t-lg rounded-bl-lg rounded-br-[0px] !important;
+.input-open-bottom {
+  @apply rounded-t-lg rounded-b-[0px] !important;
 }
 
-.input-open-right > * {
-  @apply rounded-t-lg rounded-bl-lg rounded-br-[0px] !important;
+.input-open-bottom > * {
+  @apply rounded-t-lg rounded-b-[0px] !important;
 }
 
 

@@ -41,7 +41,7 @@ export const inputTextarea = `
 // Input field dropdown - define height in the component
 export const inputFieldDropdown = `
 absolute top-[100%] left-0 w-full z-[60]
-bg-[#141015] backdrop-blur-xl
+bg-gradient-to-b from-[#171417]/20 to-[#171417] backdrop-blur-sm
 border border-t-0 border-[#1d191d]/80 rounded-b-lg
 text-stamp-grey-light text-sm font-medium uppercase leading-none
 overflow-y-auto scrollbar-glassmorphism shadow-lg cursor-pointer`;
