@@ -14,8 +14,8 @@ import {
 function IntroSection() {
   return (
     // Add class "-mb-3" only if using BulletList, otherwise omit
-    <div class="flex justify-between -mb-3">
-      <div class="w-3/4">
+    <div class="flex flex-col-reverse min-[520px]:flex-row min-[520px]:justify-between gap-5">
+      <div class="w-full min-[520px]:w-3/4">
         <p>
           <b>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
@@ -40,6 +40,7 @@ function IntroSection() {
         name="Anon"
         twitter="anon"
         website="https://anon.com"
+        class="justify-end items-end w-full min-[520px]:w-1/4"
       />
     </div>
   );

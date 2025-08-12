@@ -11,8 +11,8 @@ import {
 /* ===== INTRODUCTION COMPONENT ===== */
 function IntroSection() {
   return (
-    <div class="flex justify-between">
-      <div class="w-3/4">
+    <div class="flex flex-col-reverse min-[520px]:flex-row min-[520px]:justify-between gap-5">
+      <div class="w-full min-[520px]:w-3/4">
         <p>
           SRC-20 is a fungible token protocol that records transactions directly
           on the Bitcoin blockchain, eliminating the need for Counterparty since
@@ -34,6 +34,7 @@ function IntroSection() {
         name="TonyNL"
         twitter="tonynlbtc"
         website="https://linktr.ee/tonynl"
+        class="justify-end items-end w-full min-[520px]:w-1/4"
       />
     </div>
   );

@@ -1,14 +1,14 @@
 /* ===== ARTICLES OVERVIEW COMPONENT ===== */
-import { gapGrid } from "$layout";
-import { ARTICLE_LINKS } from "$components/section/howto/data.ts"; // needs direct import - cannot use "$howto"
 import { Button } from "$button";
+import { ARTICLE_LINKS } from "$components/section/howto/data.ts"; // needs direct import - cannot use "$howto"
+import { bodyArticle, gapGrid } from "$layout";
 import { headingGreyLDLink, subtitleGrey, text, titleGreyDL } from "$text";
 
 /* ===== COMPONENT ===== */
 export function ArticlesOverview() {
   /* ===== COMPONENT RENDER ===== */
   return (
-    <section>
+    <section class={bodyArticle}>
       {/* ===== SECTION TITLE ===== */}
       <h1 class={titleGreyDL}>
         KEEP READING
@@ -41,8 +41,8 @@ export function ArticlesOverview() {
             stuff you never thought you needed to know.
           </p>
           {/* ===== FAQ BUTTON ===== */}
-          <div class="w-full flex justify-end mt-1">
-            <Button variant="outline" color="grey" size="md" href="/faq">
+          <div class="w-full flex justify-start tablet:justify-end">
+            <Button variant="glassmorphism" color="grey" size="mdR" href="/faq">
               FAQ
             </Button>
           </div>
