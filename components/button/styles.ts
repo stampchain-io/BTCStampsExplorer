@@ -73,14 +73,19 @@ export interface ButtonVariants {
 }
 
 /* ===== BUTTON STYLE DEFINITIONS ===== */
-const baseBefore =
-  "before:absolute before:inset-0 before:rounded-lg before:z-[-1] before:transition-transform before:duration-50 before:origin-center";
+/* gradientOverlay and gradientOverlayHover must be identical */
 const baseGlassmorphism =
-  "border-[1px] rounded-lg backdrop-blur-xs overflow-hidden";
+  "border-[1px] rounded-lg backdrop-blur-sm overflow-hidden";
 const baseGlassmorphismColor =
   "relative text-[#171417] before:blur-sm hover:border-[var(--color-border-hover)] hover:before:scale-105";
+const baseBefore =
+  "before:absolute before:inset-0 before:rounded-lg before:z-[-1] before:transition-transform before:duration-50 before:origin-center";
+const gradientOverlay =
+  "before:bg-[linear-gradient(to_bottom_right,var(--color-dark)_0%,var(--color-dark)_20%,var(--color-medium)_20%,var(--color-medium)_45%,var(--color-light)_45%,var(--color-light)_52%,var(--color-medium)_52%,var(--color-medium)_70%,var(--color-dark)_70%,var(--color-dark)_100%)]";
+const gradientOverlayHover =
+  "hover:before:bg-[linear-gradient(to_bottom_right,var(--color-dark)_0%,var(--color-dark)_20%,var(--color-medium)_20%,var(--color-medium)_45%,var(--color-light)_45%,var(--color-light)_52%,var(--color-medium)_52%,var(--color-medium)_70%,var(--color-dark)_70%,var(--color-dark)_100%)]";
 const shadow =
-  "shadow-[0_2px_4px_rgba(11,11,11,0.1),inset_0_1px_0_rgba(11,11,11,0.1),inset_0_-1px_0_rgba(11,11,11,0.1),inset_0_0_2px_2px_rgba(11,11,11,0.1)]";
+  "shadow-[0_2px_4px_rgba(13,11,13,0.1),inset_0_1px_0_rgba(13,11,13,0.1),inset_0_-1px_0_rgba(13,11,13,0.1),inset_0_0_2px_2px_rgba(13,11,13,0.1)]";
 
 export const buttonStyles: ButtonVariants = {
   /* ===== BASE STYLES ===== */
@@ -92,7 +97,7 @@ export const buttonStyles: ButtonVariants = {
   `,
 
   /* ===== VARIANT STYLES ===== */
-  /* If the glassmorphismColor variant "before:"" background gradient is changed then the ToggleButton.tsx file must be update too */
+  /* If the glassmorphism/Color variants are changed then the ToggleButton.tsx file must be update too */
   variant: {
     text: `
       !items-start !justify-start !h-auto
@@ -109,23 +114,38 @@ export const buttonStyles: ButtonVariants = {
       ${baseGlassmorphism} ${baseGlassmorphismColor}
       bg-[#211c21]/10 border-[var(--color-border)]
       ${baseBefore} ${shadow}
-      before:bg-[linear-gradient(to_bottom_right,var(--color-dark)_0%,var(--color-dark)_20%,var(--color-medium)_20%,var(--color-medium)_45%,var(--color-light)_45%,var(--color-light)_52%,var(--color-medium)_52%,var(--color-medium)_70%,var(--color-dark)_70%,var(--color-dark)_100%)]
+      ${gradientOverlay}
     `,
     glassmorphismSelected: `
       ${baseGlassmorphism} ${baseGlassmorphismColor}
-      bg-stamp-grey-darkest/10 border-[var(--color-border)]
+      bg-[#211c21]/10 border-[var(--color-border)]
       ${baseBefore} ${shadow}
-      before:bg-[linear-gradient(to_bottom_right,var(--color-dark)_0%,var(--color-dark)_20%,var(--color-medium)_20%,var(--color-medium)_45%,var(--color-light)_45%,var(--color-light)_52%,var(--color-medium)_52%,var(--color-medium)_70%,var(--color-dark)_70%,var(--color-dark)_100%)]
-      hover:bg-stamp-grey-darkest/15 hover:border-stamp-grey-darker/20 hover:before:bg-none hover:text-[var(--color-text-hover)] hover:before:blur-0
+      ${gradientOverlay}
+      hover:bg-[#211c21]/20 hover:!border-[var(--color-border)] hover:before:bg-none hover:text-[var(--color-text)] hover:before:blur-0
     `,
     glassmorphismDeselected: `
       ${baseGlassmorphism} ${baseGlassmorphismColor}
-      bg-stamp-grey-darkest/15 border-stamp-grey-darker/20
+      bg-[#211c21]/20 border-[var(--color-border)]
       text-[var(--color-text)] before:bg-none
-      hover:bg-stamp-grey-darkest/10 hover:text-[#171417] hover:before:!scale-100 hover:before:!blur-[5px]
+      hover:bg-[#211c21]/10 hover:!border-[var(--color-border)]
+      hover:text-[#171417] hover:before:!scale-100 hover:before:!blur-sm
       ${baseBefore} ${shadow}
-      hover:before:bg-[linear-gradient(to_bottom_right,var(--color-dark)_0%,var(--color-dark)_20%,var(--color-medium)_20%,var(--color-medium)_45%,var(--color-light)_45%,var(--color-light)_52%,var(--color-medium)_52%,var(--color-medium)_70%,var(--color-dark)_70%,var(--color-dark)_100%)]
+      ${gradientOverlayHover}
     `,
+    outlineGradient: `
+      relative !bg-[#000000] !p-[1px] rounded-lg !border-0
+      before:absolute before:inset-0 before:rounded-lg before:z-[1]
+      before:bg-[conic-gradient(from_var(--angle),var(--color-dark),var(--color-medium),var(--color-light),var(--color-medium),var(--color-dark))]
+      before:[--angle:0deg] before:animate-rotate
+      hover:before:bg-[conic-gradient(from_var(--angle),var(--color-light),var(--color-light),var(--color-light),var(--color-light),var(--color-light))]
+      before:transition-colors before:duration-50
+      [&>*]:relative [&>*]:z-[2] [&>*]:rounded-lg [&>*]:bg-[#000000] [&>*]:!border-0
+      [&>*]:inline-flex [&>*]:items-center [&>*]:justify-center [&>*]:w-full [&>*]:h-full [&>*]:px-5
+      [&>*]:font-bold [&>*]:tracking-wider
+      [&>*]:text-[var(--color-text)] hover:[&>*]:text-[var(--color-text-hover)]
+      [&>*]:transition-colors [&>*]:duration-50
+    `,
+    /* LEGACY STYLES - @baba-should be removed */
     flat: `
       bg-gradient-to-br from-[var(--color-light)] to-[var(--color-dark)]
       border-[var(--color-dark)] text-black
@@ -146,19 +166,6 @@ export const buttonStyles: ButtonVariants = {
       bg-transparent border-[var(--color-dark)] text-[var(--color-text)]
       hover:bg-gradient-to-br hover:from-[var(--color-light)] hover:to-[var(--color-dark)] hover:border-[var(--color-dark)] hover:text-black
     `,
-    outlineGradient: `
-      relative !bg-[#000000] !p-[1px] rounded-lg !border-0
-      before:absolute before:inset-0 before:rounded-lg before:z-[1]
-      before:bg-[conic-gradient(from_var(--angle),var(--color-dark),var(--color-medium),var(--color-light),var(--color-medium),var(--color-dark))]
-      before:[--angle:0deg] before:animate-rotate
-      hover:before:bg-[conic-gradient(from_var(--angle),var(--color-light),var(--color-light),var(--color-light),var(--color-light),var(--color-light))]
-      before:transition-colors before:duration-50
-      [&>*]:relative [&>*]:z-[2] [&>*]:rounded-lg [&>*]:bg-[#000000] [&>*]:!border-0
-      [&>*]:inline-flex [&>*]:items-center [&>*]:justify-center [&>*]:w-full [&>*]:h-full [&>*]:px-5
-      [&>*]:font-bold [&>*]:tracking-wider
-      [&>*]:text-[var(--color-text)] hover:[&>*]:text-[var(--color-text-hover)]
-      [&>*]:transition-colors [&>*]:duration-50
-    `,
   },
 
   /* ===== COLOR STYLES ===== */
@@ -167,8 +174,8 @@ export const buttonStyles: ButtonVariants = {
       [--color-dark:#CCCCCC66]
       [--color-medium:#CCCCCC99]
       [--color-light:#CCCCCCCC]
-      [--color-border:#33333380]
-      [--color-border-hover:#333333]
+      [--color-border:#66666699]
+      [--color-border-hover:#666666CC]
       [--color-text:#666666]
       [--color-text-hover:#999999]
     `,
@@ -176,8 +183,8 @@ export const buttonStyles: ButtonVariants = {
       [--color-dark:#BBBBBB66]
       [--color-medium:#BBBBBB99]
       [--color-light:#BBBBBBCC]
-      [--color-border:#55555566]
-      [--color-border-hover:#55555599]
+      [--color-border:#55555599]
+      [--color-border-hover:#555555CC]
       [--color-text:#555555]
       [--color-text-hover:#888888]
     `,
@@ -185,8 +192,8 @@ export const buttonStyles: ButtonVariants = {
       [--color-dark:#AA00FF66]
       [--color-medium:#AA00FF99]
       [--color-light:#AA00FFcc]
-      [--color-border:#66009966]
-      [--color-border-hover:#66009999]
+      [--color-border:#66009999]
+      [--color-border-hover:#660099CC]
       [--color-text:#660099]
       [--color-text-hover:#8800CC]
     `,
@@ -194,8 +201,8 @@ export const buttonStyles: ButtonVariants = {
       [--color-dark:#9900E666]
       [--color-medium:#9900E699]
       [--color-light:#9900E6CC]
-      [--color-border:#55008066]
-      [--color-border-hover:#55008099]
+      [--color-border:#55008099]
+      [--color-border-hover:#550080CC]
       [--color-text:#550080]
       [--color-text-hover:#7700b3]
     `,
