@@ -1,5 +1,5 @@
 /* ===== TEAM GALLERY COMPONENT ===== */
-import { gapGrid } from "$layout";
+import { containerBackground, gapGrid } from "$layout";
 import { headingPurpleLD, subtitlePurple, valueSmPurple } from "$text";
 
 /* ===== COMPONENT ===== */
@@ -7,9 +7,9 @@ export default function TeamBanner() {
   /* ===== RENDER ===== */
   return (
     <>
-      <section>
+      <section class={containerBackground}>
         {/* ===== TEAM SECTION CONTAINER ===== */}
-        <div class="w-full flex justify-start items-start py-9">
+        <div class="w-full flex justify-start items-start">
           <div class="w-full">
             {/* ===== SECTION TITLE ===== */}
             <h2 class={subtitlePurple}>THE TEAM</h2>

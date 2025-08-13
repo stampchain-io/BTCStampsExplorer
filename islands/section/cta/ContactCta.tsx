@@ -2,8 +2,13 @@
 /* ===== CONTACT CTA COMPONENT ===== */
 import { ButtonProcessing } from "$button";
 import { InputField } from "$form";
-import { gapGrid, rowForm, rowResponsiveForm } from "$layout";
-import { subtitleGrey, text, titleGreyLD } from "$text";
+import {
+  containerBackground,
+  gapGrid,
+  rowForm,
+  rowResponsiveForm,
+} from "$layout";
+import { subtitleGrey, text, textLg, titleGreyLD } from "$text";
 import type { FormEventHandler } from "$types/ui.d.ts";
 import { useState } from "preact/hooks";
 
@@ -30,7 +35,7 @@ const ContactCta = () => {
   /* ===== COMPONENT ===== */
   return (
     <>
-      <section>
+      <section class={containerBackground}>
         {/* ===== HEADER SECTION ===== */}
         <div class="flex flex-col">
           <h4 class={titleGreyLD}>
@@ -44,7 +49,7 @@ const ContactCta = () => {
         <div class={`flex flex-col mobileLg:flex-row ${gapGrid}`}>
           {/* ===== DESCRIPTION TEXT ===== */}
           <div class="w-full mobileLg:w-full">
-            <p class={text}>
+            <p class={textLg}>
               Reach out if you have any questions about stamps, our tooling and
               services.
             </p>

@@ -264,6 +264,7 @@ import * as $section_gallery_StampGallery from "./islands/section/gallery/StampG
 import * as $section_gallery_StampOverviewGallery from "./islands/section/gallery/StampOverviewGallery.tsx";
 import * as $section_gallery_StampSales from "./islands/section/gallery/StampSales.tsx";
 import * as $section_gallery_StampSends from "./islands/section/gallery/StampSends.tsx";
+import * as $section_gallery_StatsBanner from "./islands/section/gallery/StatsBanner.tsx";
 import * as $section_gallery_SwiperStyles from "./islands/section/gallery/SwiperStyles.tsx";
 import * as $section_gallery_TeamBanner from "./islands/section/gallery/TeamBanner.tsx";
 import * as $section_howto_SRC101RegisterHowto from "./islands/section/howto/SRC101RegisterHowto.tsx";
@@ -626,6 +627,7 @@ const manifest = {
       $section_gallery_StampOverviewGallery,
     "./islands/section/gallery/StampSales.tsx": $section_gallery_StampSales,
     "./islands/section/gallery/StampSends.tsx": $section_gallery_StampSends,
+    "./islands/section/gallery/StatsBanner.tsx": $section_gallery_StatsBanner,
     "./islands/section/gallery/SwiperStyles.tsx": $section_gallery_SwiperStyles,
     "./islands/section/gallery/TeamBanner.tsx": $section_gallery_TeamBanner,
     "./islands/section/howto/SRC101RegisterHowto.tsx":
