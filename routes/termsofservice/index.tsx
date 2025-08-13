@@ -1,13 +1,13 @@
 /* ===== TERMS OF SERVICE PAGE ===== */
-import { body, CourierFontLoader, gapGrid } from "$layout";
-import { subtitleGrey, text, textSm, titleGreyLD } from "$text";
+import { containerBackground, CourierFontLoader, gapGrid } from "$layout";
+import { subtitleGrey, text, textLg, textSm, titleGreyLD } from "$text";
 
 /* ===== PAGE COMPONENT ===== */
 export default function TermsOfServicePage() {
   return (
     <>
       <CourierFontLoader />
-      <div class={`${body} ${gapGrid}`}>
+      <div class={`${containerBackground} ${gapGrid}`}>
         {/* ===== HEADER SECTION ===== */}
         <section>
           <h1 class={titleGreyLD}>TERMS OF SERVICE</h1>
@@ -25,7 +25,7 @@ export default function TermsOfServicePage() {
           <div
             class={`flex flex-col ${textSm} font-courier-prime leading-6`}
           >
-            <p>
+            <p class={text}>
               We are Stampchain ("Company," "we," "us," "our"). We operate the
               website https://stampchain.io (the "Site"), as well as any other
               related products and services that refer or link to these legal
@@ -38,12 +38,12 @@ export default function TermsOfServicePage() {
               You agree that by accessing the Services, you have read,
               understood, and agreed to be bound by all of these Legal Terms.
             </p>
-            <p class={`${text} !font-semibold`}>
+            <p class={`${textLg} !font-medium`}>
               IF YOU DO NOT AGREE WITH ALL OF THESE LEGAL TERMS, THEN YOU ARE
               EXPRESSLY PROHIBITED FROM USING THE SERVICES AND YOU MUST
               DISCONTINUE USE IMMEDIATELY.
             </p>
-            <p>
+            <p class={text}>
               Supplemental terms and conditions or documents that may be posted
               on the Services from time to time are hereby expressly
               incorporated herein by reference. We reserve the right, in our
@@ -62,7 +62,7 @@ export default function TermsOfServicePage() {
               Persons under the age of 18 are not permitted to use or register
               for the Services.
             </p>
-            <p>
+            <p class={text}>
               We recommend that you print a copy of these Legal Terms for your
               records.
             </p>
