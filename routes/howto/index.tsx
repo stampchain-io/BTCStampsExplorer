@@ -7,7 +7,7 @@ export default function HowToPage() {
   return (
     <div class={`${body} ${gapSectionSlim}`}>
       {/* ===== INTRODUCTION SECTION ===== */}
-      <section class="mb-6 tablet:mb-9">
+      <section class={containerBackground}>
         <h1 class={titleGreyLD}>HOW-TO</h1>
         <h2 class={subtitleGrey}>OUR STEP-BY-STEP GUIDES</h2>
         <p class={textLg}>
@@ -19,7 +19,7 @@ export default function HowToPage() {
           Whether you're a beginner or a pro, these guides will help you make
           the most out of every tool we offer.
         </p>
-        <p class={textLg}>
+        <p class={text}>
           Need help with something that's not covered? Let us know!
           <br />
           Reach out to us, and we'll be happy to create new how-tos based on
