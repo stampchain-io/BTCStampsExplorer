@@ -1,14 +1,16 @@
 /* ===== STAMPCHAIN CONTACT CTA COMPONENT ===== */
 import { Button } from "$button";
+import { containerBackground } from "$layout";
 import { subtitleGrey, text, textLg, titleGreyDL } from "$text";
 
 /* ===== COMPONENT ===== */
 export const StampchainContactCta = () => {
   /* ===== RENDER ===== */
   return (
-    <div class="grid grid-cols-1 desktop:grid-cols-3 gap-7 items-end
-      max-w-desktop w-full mx-auto
-    ">
+    <div
+      class={`grid grid-cols-1 desktop:grid-cols-3 gap-7 items-end
+      max-w-desktop w-full mx-auto ${containerBackground}`}
+    >
       <div class="col-span1 desktop:col-span-2">
         {/* ===== HEADER SECTION ===== */}
         <h3 class={titleGreyDL}>STAMPCHAIN</h3>
@@ -45,19 +47,19 @@ export const StampchainContactCta = () => {
       </div>
 
       {/* ===== BUTTONS SECTION ===== */}
-      <div class="flex gap-6 justify-end">
+      <div class="flex gap-5 justify-end">
         <Button
-          variant="outline"
+          variant="glassmorphism"
           color="grey"
-          size="md"
+          size="mdR"
           href="/about/#contact"
         >
           CONTACT
         </Button>
         <Button
-          variant="flat"
+          variant="glassmorphismColor"
           color="grey"
-          size="md"
+          size="mdR"
           href="/about"
         >
           ABOUT

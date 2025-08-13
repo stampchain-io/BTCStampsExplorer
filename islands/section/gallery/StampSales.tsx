@@ -1,10 +1,10 @@
 /* ===== RECENT SALES GALLERY COMPONENT ===== */
 /*@baba-153+154-move Refreshing to ViewAllButton-remove default (not used)*/
-import { loaderSpinXsPurple } from "$layout";
-import type { StampSalesProps } from "$types/ui.d.ts";
+import { containerBackground, loaderSpinXsPurple } from "$layout";
 import { StampGallery } from "$section";
 import { titlePurpleLD } from "$text";
 import type { StampWithEnhancedSaleData } from "$types/marketData.d.ts";
+import type { StampSalesProps } from "$types/ui.d.ts";
 import { useEffect, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
@@ -160,7 +160,7 @@ export function StampSalesGallery({
 
   /* ===== RENDER ===== */
   return (
-    <div>
+    <div class={containerBackground}>
       <h3
         class={variant === "home"
           ? titlePurpleLD

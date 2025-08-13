@@ -1,13 +1,11 @@
 /* ===== STAMP OVERVIEW GALLERY COMPONENT ===== */
+import { containerBackground, gapSectionSlim } from "$layout";
+import { StampGallery } from "$section";
+import { titlePurpleLD } from "$text";
 import type {
   StampGalleryProps,
   StampOverviewGalleryProps,
 } from "$types/stamp.d.ts";
-
-import { StampGallery } from "$section";
-import { titlePurpleDL } from "$text";
-
-/* ===== TYPES ===== */
 
 /* ===== COMPONENT ===== */
 export function StampOverviewGallery({
@@ -19,7 +17,7 @@ export function StampOverviewGallery({
   /* ===== SECTION CONFIGURATIONS ===== */
   const LatestArtStampsSection: StampGalleryProps[] = [
     {
-      subTitle: "ON-CHAIN MARVELS",
+      subTitle: "CLASSIC",
       type: "classic",
       stamps: stamps_art,
       fromPage: "home",
@@ -44,7 +42,6 @@ export function StampOverviewGallery({
 
   const CollectionsSection: StampGalleryProps[] = [
     {
-      title: "COLLECTIONS",
       subTitle: "FRESH POSH STAMPS",
       type: "posh",
       stamps: stamps_posh,
@@ -95,34 +92,34 @@ export function StampOverviewGallery({
         gap-12 mobileLg:gap-24 desktop:gap-36
       ">
       {/* ===== LATEST ART STAMPS SECTION ===== */}
-      <div class="flex flex-col">
-        <div class="w-full">
-          <h1 class={titlePurpleDL}>
+      <div class={`${containerBackground} ${gapSectionSlim}`}>
+        <div class="w-full -mb-6 mobileLg:-mb-9">
+          <h1 class={titlePurpleLD}>
             <span class="block mobileLg:hidden">LATEST STAMPS</span>
             <span class="hidden mobileLg:block">LATEST ART STAMPS</span>
           </h1>
         </div>
-        <div class="flex flex-col gap-3 mobileMd:gap-6">
+        <div class="flex flex-col gap-5">
           {LatestArtStampsSection.map((section, index) => (
             <StampGallery key={index} {...section} />
           ))}
         </div>
-      </div>
 
-      {
-        /* ===== FEATURED ARTISTS SECTION =====
+        {
+          /* ===== FEATURED ARTISTS SECTION =====
       <CollectionGallery {...FeaturedArtistsSection} />*/
-      }
+        }
 
-      {/* ===== COLLECTIONS SECTION ===== */}
-      {CollectionsSection.map((section, index) => (
-        <StampGallery key={index} {...section} />
-      ))}
+        {/* ===== COLLECTIONS SECTION ===== */}
+        {CollectionsSection.map((section, index) => (
+          <StampGallery key={index} {...section} />
+        ))}
 
-      {
-        /* ===== CUTTING EDGE SECTION =====
+        {
+          /* ===== CUTTING EDGE SECTION =====
       <CollectionGallery {...CuttingEdgeSection} />*/
-      }
+        }
+      </div>
     </div>
   );
 }
