@@ -327,7 +327,7 @@ export function Header() {
                     ? link.title
                     : link.title.default) === "TOOLS"
                   ? (
-                    <div class="hidden group-hover:flex absolute top-full -right-[18px] min-w-[300px] z-10 pt-1 pb-3.5 px-[18px] whitespace-nowrap backdrop-blur-md bg-gradient-to-b from-transparent to-[#000000]/30 rounded-b-lg">
+                    <div class="hidden group-hover:flex absolute top-full -right-[18px] min-w-[300px] z-10 pt-1 pb-3.5 px-[18px] whitespace-nowrap backdrop-blur-md bg-gradient-to-b from-transparent to-[#111011]/30 rounded-b-lg">
                       <div class="grid grid-cols-3 gap-4 w-full">
                         {/* Column 1: Left aligned - Stamp tools */}
                         <div class="flex flex-col space-y-1 text-left">
@@ -423,7 +423,7 @@ export function Header() {
                   )
                   : (
                     // Default single-column layout for other dropdowns
-                    <div class="hidden group-hover:flex flex-col absolute top-full left-1/2 -translate-x-1/2 min-w-[calc(100%+36px)] z-10 pt-1 pb-3.5 px-[18px] space-y-1 whitespace-nowrap backdrop-blur-md bg-gradient-to-b from-transparent to-[#000000]/30 rounded-b-lg">
+                    <div class="hidden group-hover:flex flex-col absolute top-full left-1/2 -translate-x-1/2 min-w-[calc(100%+36px)] z-10 pt-1 pb-3.5 px-[18px] space-y-1 whitespace-nowrap backdrop-blur-md bg-gradient-to-b from-transparent to-[#111011]/30 rounded-b-lg">
                       {link.subLinks?.map((subLink) => (
                         <a
                           key={subLink.href}
@@ -483,7 +483,7 @@ export function Header() {
         ref={drawerRef}
         class={`flex tablet:hidden flex-col justify-between
            fixed top-0 right-0 left-auto w-full min-[420px]:w-[340px] h-[100dvh] z-30
-           bg-gradient-to-b from-[#111011]/90 via-[#111011]/60 to-[#111011]/100 backdrop-blur-md
+           bg-gradient-to-b from-[#111011]/100 via-[#111011]/70 to-[#111011]/100 backdrop-blur-lg
            min-[420px]:rounded-r-xl min-[420px]:border-r-[1px] min-[420px]:border-l-0 min-[420px]:border-r-[#111011]
            min-[420px]:shadow-[12px_0_12px_-6px_rgba(17,16,17,0.5)]
            transition-transform duration-500 will-change-transform
@@ -518,7 +518,7 @@ export function Header() {
               />
             </div>
           </div>
-          <div class="flex flex-col flex-1 items-start pb-9 tablet:pb-6 px-9 tablet:px-6 gap-5">
+          <div class="flex flex-col flex-1 items-start py-9 tablet:py-6 px-9 tablet:px-6 gap-5">
             {renderNavLinks(true)}
           </div>
 
@@ -587,7 +587,7 @@ export function Header() {
 class={`${
   isMobile
     ? "hidden group-hover:flex flex-col z-10 w-full pt-3 gap-2 group"
-    : "hidden group-hover:flex flex-col absolute top-full left-1/2 -translate-x-1/2 min-w-[calc(100%+36px)] z-10 pt-1 pb-3.5 px-[18px] space-y-1 whitespace-nowrap backdrop-blur-md bg-gradient-to-b from-transparent to-[#000000]/30 rounded-b-lg"
+    : "hidden group-hover:flex flex-col absolute top-full left-1/2 -translate-x-1/2 min-w-[calc(100%+36px)] z-10 pt-1 pb-3.5 px-[18px] space-y-1 whitespace-nowrap backdrop-blur-lg bg-gradient-to-b from-transparent to-[#111011]/30 rounded-b-lg"
 }`}
 > */
 /*

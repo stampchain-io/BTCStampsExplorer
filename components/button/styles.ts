@@ -106,7 +106,7 @@ export const buttonStyles: ButtonVariants = {
       text-[var(--color-text)] hover:text-[var(--color-text-hover)]
     `,
     glassmorphism: `
-      ${baseGlassmorphism} bg-[#211c21]/20 border-[var(--color-border)]
+      ${baseGlassmorphism} bg-[#211c21]/10 border-[var(--color-border)]
       hover:[#211c21]/40 hover:border-[var(--color-border-hover)]
       text-[var(--color-dark)] hover:text-[var(--color-medium)]
       ${shadow}
@@ -122,11 +122,11 @@ export const buttonStyles: ButtonVariants = {
       bg-[#211c21]/10 border-[var(--color-border)]
       ${baseBefore} ${shadow}
       ${gradientOverlay}
-      hover:bg-[#211c21]/20 hover:!border-[var(--color-border)] hover:before:bg-none hover:text-[var(--color-text)] hover:before:blur-0
+      hover:bg-[#211c21]/10 hover:!border-[var(--color-border)] hover:before:bg-none hover:text-[var(--color-text)] hover:before:blur-0
     `,
     glassmorphismDeselected: `
       ${baseGlassmorphism} ${baseGlassmorphismColor}
-      bg-[#211c21]/20 border-[var(--color-border)]
+      bg-[#211c21]/10 border-[var(--color-border)]
       text-[var(--color-text)] before:bg-none
       hover:bg-[#211c21]/10 hover:!border-[var(--color-border)]
       hover:text-[#171417] hover:before:!scale-100 hover:before:!blur-sm

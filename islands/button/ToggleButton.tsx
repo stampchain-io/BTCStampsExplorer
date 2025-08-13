@@ -103,7 +103,7 @@ export const ToggleButton = ({
 
     return selectState.action === "select"
       ? glassmorphismColor
-      : `!bg-[#211c21]/20 !border-[var(--color-border)] !text-[var(--color-text)] [&:hover::before]:!bg-none`;
+      : `!bg-[#211c21]/10 !border-[var(--color-border)] !text-[var(--color-text)] [&:hover::before]:!bg-none`;
   };
 
   // Custom button class function
