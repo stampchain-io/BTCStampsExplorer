@@ -5,7 +5,7 @@ import type { SRC20Row } from "$types/src20.d.ts";
 import type { StampRow, StampSaleRow } from "$types/stamp.d.ts";
 
 import { HomeHeader } from "$header";
-import { gapSectionSlim, Micro5FontLoader } from "$layout";
+import { containerBackground, gapSectionSlim, Micro5FontLoader } from "$layout";
 import { ResponseUtil } from "$lib/utils/api/responses/responseUtil.ts";
 import {
   CarouselHome,
@@ -296,77 +296,78 @@ export default function Home({ data }: PageProps<HomePageData>) {
       {/* Load Micro5 font only when needed */}
       <Micro5FontLoader />
 
-      <div>
-        {/* ===== MAIN CONTENT ===== */}
-        <div class="layout-container flex flex-col gap-24 mobileLg:gap-36 mt-0 min-[420px]:mt-3 mobileMd:mt-6 tablet:mt-3">
-          {/* ===== CRITICAL ABOVE FOLD CONTENT ===== */}
-          <HomeHeader />
+      {/* ===== MAIN CONTENT ===== */}
+      <div
+        class={`flex flex-col mt-0 min-[420px]:mt-3 mobileMd:mt-6 tablet:mt-3 ${gapSectionSlim}`}
+      >
+        {/* ===== CRITICAL ABOVE FOLD CONTENT ===== */}
+        <HomeHeader />
 
-          {/* ===== DEFERRED IMPORTANT CONTENT ===== */}
-          <div style="content-visibility:auto; margin-top:-96px; margin-bottom:-48px;">
-            <CarouselHome carouselStamps={carouselStamps} />
-          </div>
+        {/* ===== DEFERRED IMPORTANT CONTENT ===== */}
+        <div style="content-visibility:auto;">
+          <CarouselHome carouselStamps={carouselStamps} />
+        </div>
 
-          {/* ===== NON-CRITICAL CONTENT ===== */}
-          <div style="content-visibility: auto; contain-intrinsic-size: 0 500px;">
-            <StampOverviewGallery
-              stamps_art={stamps_art}
-              stamps_posh={stamps_posh}
-              stamps_src721={stamps_src721}
-              collectionData={collectionData}
+        {/* ===== NON-CRITICAL CONTENT ===== */}
+        <div style="content-visibility: auto; contain-intrinsic-size: 0 500px;">
+          <StampOverviewGallery
+            stamps_art={stamps_art}
+            stamps_posh={stamps_posh}
+            stamps_src721={stamps_src721}
+            collectionData={collectionData}
+          />
+        </div>
+
+        {/* ===== BELOW FOLD CONTENT - LAZY LOAD ===== */}
+        <div style="content-visibility: auto; contain-intrinsic-size: 0 800px;">
+          <div class="flex flex-col">
+            <StampSalesGallery
+              title="RECENT SALES"
+              subTitle="HOT STAMPS"
+              variant="home"
+              initialData={recentSalesData?.data || []}
+              displayCounts={{
+                mobileSm: 3,
+                mobileMd: 4,
+                mobileLg: 5,
+                tablet: 6,
+                desktop: 7,
+              }}
             />
           </div>
-
-          {/* ===== BELOW FOLD CONTENT - LAZY LOAD ===== */}
-          <div style="margin-top: -48px; content-visibility: auto; contain-intrinsic-size: 0 800px;">
+          <div class="my-6 mobileLg:my-9">
             <GetStampingCta />
+          </div>
 
-            <div class="flex flex-col pt-12 mobileLg:pt-24 desktop:pt-36">
-              <StampSalesGallery
-                title="RECENT SALES"
-                subTitle="HOT STAMPS"
-                variant="home"
-                initialData={recentSalesData?.data || []}
-                displayCounts={{
-                  mobileSm: 3,
-                  mobileMd: 4,
-                  mobileLg: 5,
-                  tablet: 6,
-                  desktop: 7,
-                }}
+          <div
+            class={`flex flex-col tablet:flex-row ${containerBackground} ${gapSectionSlim}`}
+          >
+            <div class="w-full tablet:w-1/2">
+              <SRC20Gallery
+                title="SRC-20 TOKENS"
+                subTitle="TOP TICKERS"
+                viewType="minted"
+                fromPage="home"
+                {...(src20Data?.minted && { serverData: src20Data.minted })}
+                timeframe="24H"
               />
             </div>
-
-            <div
-              class={`flex flex-col tablet:flex-row pt-12 mobileLg:pt-24 desktop:pt-36 ${gapSectionSlim}`}
-            >
-              <div class="w-full tablet:w-1/2">
-                <SRC20Gallery
-                  title="SRC-20 TOKENS"
-                  subTitle="TOP TICKERS"
-                  viewType="minted"
-                  fromPage="home"
-                  {...(src20Data?.minted && { serverData: src20Data.minted })}
-                  timeframe="24H"
-                />
-              </div>
-              <div class="w-full tablet:w-1/2">
-                <SRC20Gallery
-                  title="SRC-20 TOKENS"
-                  subTitle="TRENDING MINTS"
-                  viewType="minting"
-                  fromPage="home"
-                  {...(src20Data?.minting && { serverData: src20Data.minting })}
-                  timeframe="24H"
-                />
-              </div>
+            <div class="w-full tablet:w-1/2">
+              <SRC20Gallery
+                title="SRC-20 TOKENS"
+                subTitle="TRENDING MINTS"
+                viewType="minting"
+                fromPage="home"
+                {...(src20Data?.minting && { serverData: src20Data.minting })}
+                timeframe="24H"
+              />
             </div>
           </div>
+        </div>
 
-          <div class="flex flex-col gap-6 mobileLg:gap-12">
-            <StampchainContactCta />
-            <PartnersBanner />
-          </div>
+        <div class={`flex flex-col ${gapSectionSlim}`}>
+          <StampchainContactCta />
+          <PartnersBanner />
         </div>
       </div>
     </>

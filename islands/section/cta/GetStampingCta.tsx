@@ -1,6 +1,6 @@
 /* ===== GET STAMPING CTA COMPONENT ===== */
 import { Button } from "$button";
-import { gapGrid } from "$layout";
+import { containerBackground, gapGrid } from "$layout";
 import { getCSRFToken } from "$lib/utils/security/clientSecurityUtils.ts";
 import { formatUSDValue } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { subtitleGrey, text, titleGreyDL } from "$text";
@@ -48,7 +48,7 @@ export default function GetStampingCta() {
 
   /* ===== RENDER ===== */
   return (
-    <div class="flex flex-col">
+    <div class={`${containerBackground}`}>
       {/* ===== HEADER SECTION ===== */}
       <h3 class={titleGreyDL}>GET STAMPING</h3>
       <h4 class={subtitleGrey}>IMMORTALISE YOUR ART</h4>
@@ -116,7 +116,7 @@ export default function GetStampingCta() {
         </div>
 
         {/* ===== PRICE/FEE INFO ===== */}
-        <div class="flex justify-end gap-5
+        <div class="flex justify-end -mb-6 gap-5
         font-light text-sm text-stamp-grey">
           <p>
             <span class="text-stamp-grey-darker">FEE</span>&nbsp;
