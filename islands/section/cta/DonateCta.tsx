@@ -1,12 +1,16 @@
 /* ===== DONATE CTA COMPONENT ===== */
 import { Button } from "$button";
 import { StampCard } from "$card";
-import type { StampRow } from "$types/stamp.d.ts";
 import { Icon } from "$icon";
 import DonateStampModal from "$islands/modal/DonateStampModal.tsx";
 import RecieveAddyModal from "$islands/modal/RecieveAddyModal.tsx";
 import { openModal } from "$islands/modal/states.ts";
-import { DonateStampData, Transaction, TxOutput } from "$layout";
+import {
+  containerBackground,
+  DonateStampData,
+  Transaction,
+  TxOutput,
+} from "$layout";
 import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { tooltipIcon } from "$notification";
 import {
@@ -14,8 +18,10 @@ import {
   labelSm,
   subtitlePurple,
   text,
+  textLg,
   titlePurpleLD,
 } from "$text";
+import type { StampRow } from "$types/stamp.d.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== CONSTANTS ===== */
@@ -313,21 +319,21 @@ export default function DonateCta() {
   /* ===== COMPONENT ===== */
   return (
     <>
-      <section>
+      <section class={containerBackground}>
         {/* ===== HEADER SECTION ===== */}
         <div class="w-full flex flex-col justify-center items-start">
           <h3 class={titlePurpleLD}>DONATE</h3>
           <h4 class={subtitlePurple}>TO THE DEV FUND</h4>
         </div>
         {/* ===== MAIN CONTENT SECTION ===== */}
-        <p class={`${text} tablet:hidden block mb-0`}>
+        <p class={`${textLg} tablet:hidden block mb-0`}>
           Support the ongoing development of Bitcoin Stamps and contribute to
           the monthly running costs of the backend infrastructure, to help
           ensure the stamping machine keeps running.
         </p>
         <div class="grid grid-cols-12">
           <div class="col-span-12 mobileMd:col-span-8">
-            <p class={`${text} tablet:block hidden`}>
+            <p class={`${textLg} tablet:block hidden`}>
               Support the ongoing development of Bitcoin Stamps and contribute
               to the monthly running costs of the backend infrastructure, to
               help ensure the stamping machine keeps running.

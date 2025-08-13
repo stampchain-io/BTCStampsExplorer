@@ -1,7 +1,7 @@
 /* ===== PARTNERS GALLERY COMPONENT ===== */
-import { useState } from "preact/hooks";
-import { gapGrid } from "$layout";
+import { containerBackground } from "$layout";
 import { subtitleGrey } from "$text";
+import { useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
 interface Partner {
@@ -41,7 +41,7 @@ function PartnerCard({ name, largeImage, smallImage, url }: Partner) {
   /* ===== RENDER ===== */
   const content = (
     <div
-      class={`relative w-full border-2 ${
+      class={`relative w-full border-[1px] ${
         isHovered
           ? "border-stamp-grey shadow-collection"
           : "border-stamp-grey-darker"
@@ -66,7 +66,7 @@ function PartnerCard({ name, largeImage, smallImage, url }: Partner) {
         src={largeImage}
         alt={`${name} banner`}
         loading="lazy"
-        class={`hidden mobileMd:block absolute inset-0 w-full cursor-pointer transition-all duration-150 ${
+        class={`hidden mobileMd:block absolute inset-0 w-full cursor-pointer transition-all duration-50 ${
           isHovered ? "grayscale-0" : "grayscale"
         }`}
       />
@@ -74,14 +74,14 @@ function PartnerCard({ name, largeImage, smallImage, url }: Partner) {
         src={smallImage}
         alt={`${name} banner`}
         loading="lazy"
-        class={`block mobileMd:hidden absolute inset-0 w-full cursor-pointer transition-all duration-150 ${
+        class={`block mobileMd:hidden absolute inset-0 w-full cursor-pointer transition-all duration-50 ${
           isHovered ? "grayscale-0" : "grayscale"
         }`}
       />
 
       {/* ===== GRADIENT OVERLAY ===== */}
       <div
-        class={`w-full h-full bg-gradient-to-tr from-[#666666FF] via-[#9999997F] to-[#CCCCCC00] absolute left-0 top-0 transition-opacity duration-150 ${
+        class={`w-full h-full bg-gradient-to-tr from-[#666666FF] via-[#9999997F] to-[#CCCCCC00] absolute left-0 top-0 transition-opacity duration-50 ${
           isHovered ? "!hidden" : ""
         }`}
       />
@@ -101,15 +101,17 @@ function PartnerCard({ name, largeImage, smallImage, url }: Partner) {
 export function PartnersBanner() {
   /* ===== RENDER ===== */
   return (
-    <div class="flex flex-col max-w-desktop w-full mx-auto mb-4">
-      {/* ===== TITLE SECTION ===== */}
-      <h2 class={`${subtitleGrey} !mb-2`}>PARTNERS</h2>
-      {/* ===== BANNER CARDS SECTION ===== */}
-      <div class={`grid grid-cols-3 pt-2 ${gapGrid}`}>
-        {partners.map((partner) => (
-          <PartnerCard key={partner.name} {...partner} />
-        ))}
+    <section class={containerBackground}>
+      <div class="flex flex-col max-w-desktop w-full mx-auto">
+        {/* ===== TITLE SECTION ===== */}
+        <h2 class={`${subtitleGrey} !mb-2`}>PARTNERS</h2>
+        {/* ===== BANNER CARDS SECTION ===== */}
+        <div class={`grid grid-cols-3 gap-5`}>
+          {partners.map((partner) => (
+            <PartnerCard key={partner.name} {...partner} />
+          ))}
+        </div>
       </div>
-    </div>
+    </section>
   );
 }
