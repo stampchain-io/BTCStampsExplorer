@@ -325,7 +325,7 @@ const FilterDrawer = (
       id={drawerId}
       ref={drawerRef}
       class={`fixed top-0 z-40 h-[100dvh]
-        bg-gradient-to-b from-[#111011]/90 via-[#111011]/60 to-[#111011]/100 backdrop-blur-md
+        bg-gradient-to-b from-[#111011]/100 via-[#111011]/70 to-[#111011]/100 backdrop-blur-lg
         transition-transform duration-500 will-change-transform
         left-0 right-auto w-full
         min-[420px]:w-[340px] min-[420px]:rounded-r-xl min-[420px]:border-l-0  min-[420px]:border-r-[1px] min-[420px]:border-r-[#111011]
