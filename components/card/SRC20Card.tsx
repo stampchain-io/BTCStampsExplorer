@@ -554,12 +554,7 @@ export function SRC20Card({
                         cellAlign(7, headers?.length ?? 0)
                       } ${rowCardBorderRight} !py-0`}
                     >
-                      {console.log(
-                        "Chart data for",
-                        src20.tick ?? "",
-                        src20.chart,
-                      )}
-                      {src20.chart && (
+                      {src20.chart ? (
                         <ChartWidget
                           type="line"
                           fromPage="home"
@@ -567,6 +562,10 @@ export function SRC20Card({
                           tick={src20.tick ?? ""}
                           data-chart-widget
                         />
+                      ) : (
+                        <div class="flex items-center justify-center text-xs text-stamp-grey-light opacity-60">
+                          <span>—</span>
+                        </div>
                       )}
                     </td>
                   </tr>
