@@ -280,8 +280,8 @@ jobs:
 
       - name: Check for hardcoded secrets
         run: |
-          # Check for potential secrets in code
-          if grep -r "password\|secret\|key" --include="*.ts" --include="*.tsx" --exclude-dir=node_modules --exclude-dir=_fresh . | grep -v "PASSWORD\|SECRET\|KEY" | grep -v "\.d\.ts" | grep -v test; then
+          # Check for potential hardcoded secrets (targeting actual secret patterns)
+          if grep -r -E "password\s*[=:]\s*[\"'].*[\"']|secret\s*[=:]\s*[\"'].*[\"']|api[_-]?key\s*[=:]\s*[\"'].*[\"']|private[_-]?key\s*[=:]\s*[\"'].*[\"']" --include="*.ts" --include="*.tsx" --exclude-dir=node_modules --exclude-dir=_fresh . | grep -v "\.d\.ts" | grep -v test; then
             echo "❌ Potential hardcoded secrets found"
             exit 1
           fi

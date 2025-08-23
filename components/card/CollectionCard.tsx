@@ -1,5 +1,12 @@
 /* ===== COLLECTION OVERVIEW CARD COMPONENT ===== */
-import type { CollectionWithOptionalMarketData } from "$types";
+import type { CollectionWithOptionalMarketData } from "$types/index.d.ts";
+
+// Extended type for CollectionCard with the additional fields we need
+interface CollectionCardData extends CollectionWithOptionalMarketData {
+  first_stamp_image?: string | null;
+  stamp_images?: string[] | null;
+  creator_names?: string[];
+}
 import {
   abbreviateAddress,
   formatBTC,
@@ -17,7 +24,7 @@ function abbreviateCollectionName(name: string): string {
 
 /* ===== COMPONENT ===== */
 export function CollectionCard(
-  { collection }: { collection: CollectionWithOptionalMarketData },
+  { collection }: { collection: CollectionCardData },
 ) {
   // Early return if collection is undefined
   if (!collection) {
