@@ -90,7 +90,8 @@ export class Src20Controller {
       };
 
       // Process data with mint progress if requested
-      let processedData: any = Array.isArray(rawData) && rawData.length > 1 ? [...rawData]: rawData;
+      // 🚨 CRITICAL FIX: Ensure data is always an array to prevent frontend TypeError
+      let processedData: any = Array.isArray(rawData) ? [...rawData] : (rawData ? [rawData] : []);
 
       // 🚀 CENTRALIZED MARKET DATA ENRICHMENT (v2.3 format)
       // Middleware will transform to v2.2 (remove market_data) if needed

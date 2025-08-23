@@ -52,6 +52,8 @@ export default function App({ Component, state, url }: PageProps<unknown>) {
           href="https://cdn.jsdelivr.net"
           crossOrigin="anonymous"
         />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js">
+        </script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js">
         </script>
         <script src="/background-topology.js">

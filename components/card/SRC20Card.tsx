@@ -208,6 +208,11 @@ export function SRC20Card({
   };
 
   function splitTextAndEmojis(text: string): { text: string; emoji: string } {
+    // Ensure text is actually a string
+    if (typeof text !== "string") {
+      return { text: String(text || ""), emoji: "" };
+    }
+
     const emojiRegex =
       /[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F000}-\u{1F02F}\u{1F0A0}-\u{1F0FF}\u{1F100}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{1F900}-\u{1F9FF}]/gu;
     const match = text.match(emojiRegex);
@@ -351,8 +356,12 @@ export function SRC20Card({
                         <div class="flex flex-col">
                           <div class="font-bold text-base uppercase tracking-wide">
                             {(() => {
+                              const tickValue = src20.tick ?? "";
+                              const emojiValue = unicodeEscapeToEmoji(
+                                tickValue,
+                              );
                               const { text, emoji } = splitTextAndEmojis(
-                                unicodeEscapeToEmoji(src20.tick ?? ""),
+                                emojiValue,
                               );
                               return (
                                 <>
@@ -554,19 +563,21 @@ export function SRC20Card({
                         cellAlign(7, headers?.length ?? 0)
                       } ${rowCardBorderRight} !py-0`}
                     >
-                      {src20.chart ? (
-                        <ChartWidget
-                          type="line"
-                          fromPage="home"
-                          data={src20.chart as unknown as HighchartsData}
-                          tick={src20.tick ?? ""}
-                          data-chart-widget
-                        />
-                      ) : (
-                        <div class="flex items-center justify-center text-xs text-stamp-grey-light opacity-60">
-                          <span>—</span>
-                        </div>
-                      )}
+                      {src20.chart
+                        ? (
+                          <ChartWidget
+                            type="line"
+                            fromPage="home"
+                            data={src20.chart as unknown as HighchartsData}
+                            tick={src20.tick ?? ""}
+                            data-chart-widget
+                          />
+                        )
+                        : (
+                          <div class="flex items-center justify-center text-xs text-stamp-grey-light opacity-60">
+                            <span>—</span>
+                          </div>
+                        )}
                     </td>
                   </tr>
                 );

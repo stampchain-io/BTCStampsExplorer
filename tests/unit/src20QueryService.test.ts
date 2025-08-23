@@ -1006,8 +1006,8 @@ describe(
 
         const result = await SRC20QueryService.fetchAndFormatSrc20DataV2();
 
-        // When empty, the method returns undefined for data property, not an empty array
-        assertEquals(result.data, undefined);
+        // When empty, the method returns an empty array for data property for consistency
+        assertEquals(result.data, []);
         assertEquals((result as any).totalPages, 0);
         assertExists((result as any).performance);
       });

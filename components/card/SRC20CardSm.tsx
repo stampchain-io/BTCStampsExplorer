@@ -128,39 +128,9 @@ export function SRC20CardSm({
       <tbody>
         {data?.length
           ? (
-            data.map((src20: EnrichedSRC20Row, index: number) => {
+            data.map((src20: EnrichedSRC20Row) => {
               // Use centralized image URL logic
               const imageUrl = getSRC20ImageSrc(src20);
-
-              // --- BEGIN DEBUG LOGS ---
-              if (index < 3) { // Log only for the first 3 items to avoid spam
-                console.log(
-                  `[SRC20CardSm] Debugging item ${index}, Tick: ${
-                    src20.tick ?? ""
-                  }`,
-                );
-                console.log(
-                  `  Raw src20.market_data:`,
-                  JSON.stringify(src20.market_data),
-                );
-                // ✅ FIXED: Use price_btc for fungible tokens (floor_price_btc is for NFTs)
-                const priceBTC = src20.market_data?.price_btc;
-                console.log(
-                  `  src20.market_data?.price_btc (BTC):`,
-                  priceBTC,
-                );
-                const priceSATSBeforeRound = (priceBTC ?? 0) * 1e8;
-                console.log(
-                  `  Price in SATS (before round):`,
-                  priceSATSBeforeRound,
-                );
-                const priceSATSAfterRound = Math.round(priceSATSBeforeRound);
-                console.log(
-                  `  Price in SATS (after round):`,
-                  priceSATSAfterRound,
-                );
-              }
-              // --- END DEBUG LOGS ---
 
               return (
                 <tr

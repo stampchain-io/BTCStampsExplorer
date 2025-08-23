@@ -671,6 +671,7 @@ export class SRC20QueryService {
           totalPages: 0,
           limit,
           last_block: lastBlock,
+          data: [], // 🚨 CRITICAL FIX: Always include empty data array to prevent frontend TypeError
           performance: metrics
         } as any;
       }

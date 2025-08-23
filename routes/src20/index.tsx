@@ -26,14 +26,14 @@ async function fetchFromAPI(endpoint: string, baseUrl: string): Promise<any> {
 
     if (!response.ok) {
       console.error(
-        `[SRC20 Route] API call failed: ${endpoint} - ${response.status}`,
+        `[SRC20] API call failed: ${endpoint} - ${response.status}`,
       );
       return { data: [], total: 0, page: 1, totalPages: 0 };
     }
 
     const result = await response.json();
 
-    // ✅ FIXED: Handle API response structure properly
+    // Handle API response structure properly
     if (result.data && Array.isArray(result.data)) {
       // Standard API response with pagination info
       return {
@@ -56,7 +56,10 @@ async function fetchFromAPI(endpoint: string, baseUrl: string): Promise<any> {
         { data: [], total: 0, page: 1, totalPages: 0 };
     }
   } catch (error) {
-    console.error(`[SRC20 Route] API call error: ${endpoint}`, error);
+    console.error(
+      `[SRC20] API call error: ${endpoint}`,
+      error,
+    );
     return { data: [], total: 0, page: 1, totalPages: 0 };
   }
 }
@@ -82,7 +85,7 @@ export const handler: Handlers = {
       | "asc"
       | "desc";
 
-    // 🎸 NEW: MINTING button toggle functionality
+    // MINTING button toggle functionality
     const viewType = (url.searchParams.get("viewType") || "minted") as
       | "minted"
       | "minting";
@@ -91,21 +94,18 @@ export const handler: Handlers = {
 
     try {
       /* ===== SINGLE BTC PRICE FETCH ===== */
-      // 🚀 PERFORMANCE: Use singleton BTC price service to eliminate duplicate fetches
+      // Use singleton BTC price service to eliminate duplicate fetches
       const { btcPriceSingleton } = await import(
         "$server/services/price/btcPriceSingleton.ts"
       );
       const btcPriceData = await btcPriceSingleton.getPrice();
       const btcPrice = btcPriceData.price;
-      console.log(
-        `[SRC20 Route] Singleton BTC price: $${btcPrice} from ${btcPriceData.source}`,
-      );
 
       // Store BTC price in context for components to use
       ctx.state.btcPrice = btcPrice;
       ctx.state.btcPriceSource = btcPriceData.source;
 
-      // 🎯 FIXED: Build API endpoint with v2.3 parameters for world-class design
+      // Build API endpoint with v2.3 parameters
       let apiEndpoint =
         `/api/v2/src20?op=DEPLOY&limit=${limit}&page=${page}&includeMarketData=true&includeProgress=true`;
 
@@ -192,7 +192,6 @@ export const handler: Handlers = {
       }
 
       // Fetch data from API
-      console.log("[SRC20 Route] Fetching from API:", apiEndpoint);
       const result = await fetchFromAPI(apiEndpoint, baseUrl);
 
       const mintingData = result || {
@@ -203,34 +202,30 @@ export const handler: Handlers = {
         last_block: 0,
         data: [],
       };
-
-      // 🎯 No client-side filtering needed anymore! API handles it all
-      console.log(
-        `[SRC20 Route] API returned ${
-          mintingData.data?.length || 0
-        } ${viewType} tokens`,
-      );
-
       return ctx.render({
         mintingData,
         timeframe,
         sortBy,
         sortDirection,
-        viewType, // 🎸 NEW: Pass viewType to frontend
-        // 🚀 PERFORMANCE: Pass BTC price to components to avoid redundant fetches
+        viewType, // Pass viewType to frontend
+        // Pass BTC price to components to avoid redundant fetches
         btcPrice: btcPrice,
         btcPriceSource: btcPriceData.source,
       });
     } catch (error) {
-      console.error("Error fetching SRC20 data:", error);
+      console.error(
+        `[SRC20] Error fetching SRC20 data:`,
+        error,
+      );
+
       const emptyData = { data: [], total: 0, page: 1, totalPages: 0 };
       return ctx.render({
         mintingData: emptyData,
         timeframe,
         sortBy,
         sortDirection,
-        viewType, // 🎸 NEW: Pass viewType to frontend
-        // 🚀 PERFORMANCE: Pass BTC price even in error case
+        viewType, // Pass viewType to frontend
+        // Pass BTC price even in error case
         btcPrice: undefined,
         btcPriceSource: "error",
       });
