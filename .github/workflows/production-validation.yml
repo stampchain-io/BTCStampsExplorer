@@ -45,7 +45,7 @@ jobs:
           restore-keys: deno-
 
       - name: Run TypeScript validation
-        run: deno task check:types
+        run: deno task check
 
       - name: Run test coverage validation
         run: deno task test:unit:coverage
@@ -275,7 +275,7 @@ jobs:
 
       - name: Run security checks
         run: |
-          deno task check:imports:ci
+          deno task check:imports
           deno task check:ssr
 
       - name: Check for hardcoded secrets
