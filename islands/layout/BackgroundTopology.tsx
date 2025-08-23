@@ -14,6 +14,7 @@ declare global {
     };
   } | undefined;
   var p5: any;
+  var THREE: any;
 }
 
 export default function BackgroundTopology(
@@ -30,19 +31,38 @@ export default function BackgroundTopology(
     let timeoutId: number;
 
     const tryInitVanta = () => {
-      if (globalThis.VANTA?.TOPOLOGY && containerRef.current) {
-        try {
-          // All options are now hardcoded in the JS file
-          vantaRef.current = globalThis.VANTA.TOPOLOGY({
-            el: containerRef.current,
-          });
-          return true;
-        } catch (error) {
-          console.error("BackgroundTopology: Failed to initialize:", error);
-          return false;
-        }
+      // Check for all required dependencies
+      if (!globalThis.THREE) {
+        console.warn("BackgroundTopology: THREE.js not loaded yet");
+        return false;
       }
-      return false;
+
+      if (!globalThis.p5) {
+        console.warn("BackgroundTopology: p5.js not loaded yet");
+        return false;
+      }
+
+      if (!globalThis.VANTA?.TOPOLOGY) {
+        console.warn("BackgroundTopology: VANTA.TOPOLOGY not available yet");
+        return false;
+      }
+
+      if (!containerRef.current) {
+        console.warn("BackgroundTopology: Container ref not ready");
+        return false;
+      }
+
+      try {
+        // All options are now hardcoded in the JS file
+        vantaRef.current = globalThis.VANTA.TOPOLOGY({
+          el: containerRef.current,
+        });
+        console.log("BackgroundTopology: Successfully initialized");
+        return true;
+      } catch (error) {
+        console.error("BackgroundTopology: Failed to initialize:", error);
+        return false;
+      }
     };
 
     if (tryInitVanta()) {

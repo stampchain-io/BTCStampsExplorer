@@ -25,3 +25,16 @@
     { "path": "/api/internal/carousel", "method": "GET", "file": "routes/api/internal/carousel.ts", "classification": "keep", "authRequired": [], "migrationPhase": "C", "dependencies": ["ui-only"], "contracts": ["none"] }
   ]
 }
+
+
+
+
+
+
+
+
+
+
+
+
+

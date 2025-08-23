@@ -50,19 +50,19 @@ if (isBuildMode) {
   }
 }
 
-import { bin2hex, hex2bin } from "$lib/utils/data/binary/baseUtils.ts";
-import { logger } from "$lib/utils/logger.ts";
 import { estimateMintingTransactionSize } from "$lib/utils/bitcoin/minting/transactionSizes.ts";
 import { arc4 } from "$lib/utils/bitcoin/minting/transactionUtils.ts";
+import { bin2hex, hex2bin } from "$lib/utils/data/binary/baseUtils.ts";
+import { logger } from "$lib/utils/logger.ts";
 import { serverConfig } from "$server/config/config.ts";
 import { SRC20CompressionService } from "$server/services/src20/compression/compressionService.ts";
 // Removed TransactionService import - using direct OptimalUTXOSelection instead
+import { convertUTXOsToBasic } from "$lib/utils/bitcoin/utxo/utxoTypeUtils.ts";
+import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
 import { OptimalUTXOSelection } from "$server/services/utxo/optimalUtxoSelection.ts";
-import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
-import type {IPrepareSRC20TX} from "$server/types/services/src20.d.ts";
+import type { IPrepareSRC20TX } from "$server/types/services/src20.d.ts";
 import type { UTXO } from "$types/base.d.ts";
-import { convertUTXOsToBasic } from "$lib/utils/bitcoin/utxo/utxoTypeUtils.ts";
 import type { PSBTInput, VOUT } from "$types/src20.d.ts";
 import { crypto } from "@std/crypto";
 import * as msgpack from "msgpack";

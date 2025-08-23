@@ -41,7 +41,6 @@ export const FilterContentSRC20 = ({
   initialFilters: SRC20Filters;
   onFiltersChange: (filters: SRC20Filters) => void;
 }) => {
-  console.log("FilterContentSRC20 - initialFilters:", initialFilters);
   const [filters, setFilters] = useState(initialFilters);
   const [volumePeriod, setVolumePeriod] = useState<PeriodType>(
     initialFilters.market.volumePeriod || "24h",
@@ -52,7 +51,6 @@ export const FilterContentSRC20 = ({
 
   // Add this effect to watch for changes to initialFilters
   useEffect(() => {
-    console.log("FilterContentSRC20 - initialFilters changed:", initialFilters);
     setFilters(initialFilters);
   }, [initialFilters]);
 
@@ -93,8 +91,6 @@ export const FilterContentSRC20 = ({
 
       // For max, if it's Infinity, use a reasonable default
       const maxVal = max === Infinity ? 10000 : max;
-
-      console.log(`Holders range changed: ${minVal} - ${maxVal}`); // Debug log
 
       // Update the filters state with the new values
       setFilters((prevFilters) => {

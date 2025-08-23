@@ -25,14 +25,11 @@ export function SRC20OverviewContent({
   sortBy,
   sortDirection,
   viewType, // 🎸 NEW: Accept viewType prop
-  btcPrice, // 🚀 PERFORMANCE: Accept BTC price (for future use)
-  btcPriceSource, // 🚀 PERFORMANCE: Accept BTC price source (for future use)
+  btcPrice: _btcPrice, // 🚀 PERFORMANCE: Accept BTC price (for future use)
+  btcPriceSource: _btcPriceSource, // 🚀 PERFORMANCE: Accept BTC price source (for future use)
 }: SRC20OverviewContentProps) {
   // Note: btcPrice and btcPriceSource are available for future component optimizations
   // Currently passed through context but not directly used in this component
-  console.log(
-    `[SRC20OverviewContent] BTC price context available: $${btcPrice} from ${btcPriceSource}`,
-  );
 
   const [currentTimeframe, setCurrentTimeframe] = useState<
     "24H" | "7D" | "30D"
