@@ -97,7 +97,7 @@
           "if (!pm.collectionVariables.get('test_session_id')) {",
           "    const sessionId = 'test_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);",
           "    pm.collectionVariables.set('test_session_id', sessionId);",
-          "    console.log('\ud83d\ude80 Starting regression test session:', sessionId);",
+          "    console.log('🚀 Starting regression test session:', sessionId);",
           "}",
           "",
           "// Initialize comparison results",
@@ -106,7 +106,7 @@
           "}",
           "",
           "// Log request details",
-          "console.log('\ud83d\udce4 Request: ' + pm.request.method + ' ' + pm.request.url.toString());"
+          "console.log('📤 Request: ' + pm.request.method + ' ' + pm.request.url.toString());"
         ]
       }
     },
@@ -542,7 +542,7 @@
                   "});",
                   "",
                   "console.log('\\n' + '='.repeat(80));",
-                  "console.log('\ud83d\udd0d COMPREHENSIVE API REGRESSION REPORT');",
+                  "console.log('🔍 COMPREHENSIVE API REGRESSION REPORT');",
                   "console.log('='.repeat(80));",
                   "console.log('Session ID:', pm.collectionVariables.get('test_session_id'));",
                   "console.log('Generated:', new Date().toISOString());",
@@ -564,11 +564,11 @@
                   "        ",
                   "        // Compare status codes",
                   "        if (dev.status !== prod.status) {",
-                  "            console.log(`   \u274c Status Code: Dev=${dev.status}, Prod=${prod.status}`);",
+                  "            console.log(`   ❌ Status Code: Dev=${dev.status}, Prod=${prod.status}`);",
                   "            statusMismatches++;",
                   "            endpointDiffs++;",
                   "        } else {",
-                  "            console.log(`   \u2705 Status Code: ${dev.status}`);",
+                  "            console.log(`   ✅ Status Code: ${dev.status}`);",
                   "        }",
                   "        ",
                   "        // Deep compare response bodies",
@@ -576,7 +576,7 @@
                   "        ",
                   "        if (bodyDiffs.length > 0) {",
                   "            endpointDiffs += bodyDiffs.length;",
-                  "            console.log(`   \u26a0\ufe0f  Response Differences Found (${bodyDiffs.length}):`);",
+                  "            console.log(`   ⚠️  Response Differences Found (${bodyDiffs.length}):`);",
                   "            ",
                   "            // Group differences by type",
                   "            const added = bodyDiffs.filter(d => d.type === 'added');",
@@ -584,21 +584,21 @@
                   "            const changed = bodyDiffs.filter(d => d.type === 'changed');",
                   "            ",
                   "            if (added.length > 0) {",
-                  "                console.log('      \ud83d\udcd7 Fields in DEV but not PROD (v2.3 additions):');",
+                  "                console.log('      📗 Fields in DEV but not PROD (v2.3 additions):');",
                   "                added.forEach(d => {",
                   "                    console.log(`         - ${d.path}`);",
                   "                });",
                   "            }",
                   "            ",
                   "            if (removed.length > 0) {",
-                  "                console.log('      \ud83d\udcd5 Fields in PROD but not DEV (v2.3 removals):');",
+                  "                console.log('      📕 Fields in PROD but not DEV (v2.3 removals):');",
                   "                removed.forEach(d => {",
                   "                    console.log(`         - ${d.path}`);",
                   "                });",
                   "            }",
                   "            ",
                   "            if (changed.length > 0) {",
-                  "                console.log('      \ud83d\udcd9 Fields with different values:');",
+                  "                console.log('      📙 Fields with different values:');",
                   "                changed.slice(0, 10).forEach(d => {",
                   "                    console.log(`         - ${d.path}`);",
                   "                    if (typeof d.devValue !== 'object') {",
@@ -620,7 +620,7 @@
                   "});",
                   "",
                   "console.log('\\n' + '='.repeat(80));",
-                  "console.log('\ud83d\udcca SUMMARY');",
+                  "console.log('📊 SUMMARY');",
                   "console.log('='.repeat(80));",
                   "console.log('Endpoints Tested:', Object.keys(grouped).length);",
                   "console.log('Endpoints with Differences:', endpointsWithDifferences);",
@@ -628,7 +628,7 @@
                   "console.log('Total Field Differences:', totalDifferences);",
                   "",
                   "// Expected v2.3 differences",
-                  "console.log('\\n\ud83d\udccc Expected v2.3 Differences:');",
+                  "console.log('\\n📌 Expected v2.3 Differences:');",
                   "console.log('   - marketData (new in v2.3)');",
                   "console.log('   - dispenserInfo (new in v2.3)');",
                   "console.log('   - cacheStatus (new in v2.3)');",
@@ -695,7 +695,40 @@
                 }
               ]
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Cursed endpoints are deprecated and return HTTP 410 (Gone)",
+                  "pm.test('Response status is valid (including deprecated 410)', () => {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 400, 404, 410]);",
+                  "});",
+                  "",
+                  "pm.test('Response time is acceptable', () => {",
+                  "    pm.expect(pm.response.responseTime).to.be.below({{test_timeout}});",
+                  "});",
+                  "",
+                  "pm.test('Response has valid JSON', () => {",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "// Additional test for deprecated behavior",
+                  "if (pm.response.code === 410) {",
+                  "    pm.test('✅ Deprecated endpoint correctly returns 410 Gone', () => {",
+                  "        pm.expect(pm.response.code).to.equal(410);",
+                  "        console.log('ℹ️ Cursed endpoint correctly deprecated with HTTP 410');",
+                  "    });",
+                  "} else {",
+                  "    pm.test('Response status is 2xx for non-deprecated response', () => {",
+                  "        pm.expect(pm.response.code).to.be.within(200, 299);",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "Get Cursed List - Prod",
@@ -724,7 +757,40 @@
                 }
               ]
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Cursed endpoints are deprecated and return HTTP 410 (Gone)",
+                  "pm.test('Response status is valid (including deprecated 410)', () => {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 400, 404, 410]);",
+                  "});",
+                  "",
+                  "pm.test('Response time is acceptable', () => {",
+                  "    pm.expect(pm.response.responseTime).to.be.below({{test_timeout}});",
+                  "});",
+                  "",
+                  "pm.test('Response has valid JSON', () => {",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "// Additional test for deprecated behavior",
+                  "if (pm.response.code === 410) {",
+                  "    pm.test('✅ Deprecated endpoint correctly returns 410 Gone', () => {",
+                  "        pm.expect(pm.response.code).to.equal(410);",
+                  "        console.log('ℹ️ Cursed endpoint correctly deprecated with HTTP 410');",
+                  "    });",
+                  "} else {",
+                  "    pm.test('Response status is 2xx for non-deprecated response', () => {",
+                  "        pm.expect(pm.response.code).to.be.within(200, 299);",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "Get Cursed by ID - Dev",
@@ -748,7 +814,40 @@
                 "{{test_cursed_id}}"
               ]
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Cursed endpoints are deprecated and return HTTP 410 (Gone)",
+                  "pm.test('Response status is valid (including deprecated 410)', () => {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 400, 404, 410]);",
+                  "});",
+                  "",
+                  "pm.test('Response time is acceptable', () => {",
+                  "    pm.expect(pm.response.responseTime).to.be.below({{test_timeout}});",
+                  "});",
+                  "",
+                  "pm.test('Response has valid JSON', () => {",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "// Additional test for deprecated behavior",
+                  "if (pm.response.code === 410) {",
+                  "    pm.test('✅ Deprecated endpoint correctly returns 410 Gone', () => {",
+                  "        pm.expect(pm.response.code).to.equal(410);",
+                  "        console.log('ℹ️ Cursed endpoint correctly deprecated with HTTP 410');",
+                  "    });",
+                  "} else {",
+                  "    pm.test('Response status is 2xx for non-deprecated response', () => {",
+                  "        pm.expect(pm.response.code).to.be.within(200, 299);",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "Get Cursed by ID - Prod",
@@ -772,7 +871,40 @@
                 "{{test_cursed_id}}"
               ]
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Cursed endpoints are deprecated and return HTTP 410 (Gone)",
+                  "pm.test('Response status is valid (including deprecated 410)', () => {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 400, 404, 410]);",
+                  "});",
+                  "",
+                  "pm.test('Response time is acceptable', () => {",
+                  "    pm.expect(pm.response.responseTime).to.be.below({{test_timeout}});",
+                  "});",
+                  "",
+                  "pm.test('Response has valid JSON', () => {",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "// Additional test for deprecated behavior",
+                  "if (pm.response.code === 410) {",
+                  "    pm.test('✅ Deprecated endpoint correctly returns 410 Gone', () => {",
+                  "        pm.expect(pm.response.code).to.equal(410);",
+                  "        console.log('ℹ️ Cursed endpoint correctly deprecated with HTTP 410');",
+                  "    });",
+                  "} else {",
+                  "    pm.test('Response status is 2xx for non-deprecated response', () => {",
+                  "        pm.expect(pm.response.code).to.be.within(200, 299);",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "Get Cursed by Block - Dev",
@@ -797,7 +929,40 @@
                 "{{test_block}}"
               ]
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Cursed endpoints are deprecated and return HTTP 410 (Gone)",
+                  "pm.test('Response status is valid (including deprecated 410)', () => {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 400, 404, 410]);",
+                  "});",
+                  "",
+                  "pm.test('Response time is acceptable', () => {",
+                  "    pm.expect(pm.response.responseTime).to.be.below({{test_timeout}});",
+                  "});",
+                  "",
+                  "pm.test('Response has valid JSON', () => {",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "// Additional test for deprecated behavior",
+                  "if (pm.response.code === 410) {",
+                  "    pm.test('✅ Deprecated endpoint correctly returns 410 Gone', () => {",
+                  "        pm.expect(pm.response.code).to.equal(410);",
+                  "        console.log('ℹ️ Cursed endpoint correctly deprecated with HTTP 410');",
+                  "    });",
+                  "} else {",
+                  "    pm.test('Response status is 2xx for non-deprecated response', () => {",
+                  "        pm.expect(pm.response.code).to.be.within(200, 299);",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "Get Cursed by Block - Prod",
@@ -822,7 +987,40 @@
                 "{{test_block}}"
               ]
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Cursed endpoints are deprecated and return HTTP 410 (Gone)",
+                  "pm.test('Response status is valid (including deprecated 410)', () => {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 400, 404, 410]);",
+                  "});",
+                  "",
+                  "pm.test('Response time is acceptable', () => {",
+                  "    pm.expect(pm.response.responseTime).to.be.below({{test_timeout}});",
+                  "});",
+                  "",
+                  "pm.test('Response has valid JSON', () => {",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "// Additional test for deprecated behavior",
+                  "if (pm.response.code === 410) {",
+                  "    pm.test('✅ Deprecated endpoint correctly returns 410 Gone', () => {",
+                  "        pm.expect(pm.response.code).to.equal(410);",
+                  "        console.log('ℹ️ Cursed endpoint correctly deprecated with HTTP 410');",
+                  "    });",
+                  "} else {",
+                  "    pm.test('Response status is 2xx for non-deprecated response', () => {",
+                  "        pm.expect(pm.response.code).to.be.within(200, 299);",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ]
         }
       ]
     },

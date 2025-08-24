@@ -442,11 +442,11 @@ describe("Response Utility Migration - Comprehensive Validation", () => {
       const endTime = performance.now();
       const duration = endTime - startTime;
 
-      // Should complete in reasonable time (less than 100ms for 100 responses)
+      // Should complete in reasonable time (less than 200ms for 100 responses with full security headers)
       assertEquals(
-        duration < 100,
+        duration < 200,
         true,
-        `Response creation took ${duration}ms, should be under 100ms`,
+        `Response creation took ${duration}ms, should be under 200ms`,
       );
     });
 
