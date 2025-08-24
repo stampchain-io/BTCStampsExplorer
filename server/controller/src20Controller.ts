@@ -309,25 +309,21 @@ export class Src20Controller {
             page: 1,
           }),
           SRC20Service.QueryService.fetchSrc20MintProgress(tick).catch(() => null),
-          SRC20Service.QueryService.fetchBasicSrc20Data({
-            limit: 1,
-            page: 1,
-            sortBy: "DESC",
-          }),
+          BlockService.getLastBlock(),
         ],
       );
 
       // If deploymentData is empty, it means the tick doesn't exist
       if (!deploymentData.data || !Array.isArray(deploymentData.data) || deploymentData.data.length === 0) {
         return {
-          last_block: lastBlockData.last_block,
+          last_block: lastBlockData,
           mint_status: null,
           data: null,
         };
       }
 
       return {
-        last_block: lastBlockData.last_block,
+        last_block: lastBlockData,
         mint_status: mintStatusData,
         data: (deploymentData.data as any[])[0],
       };
