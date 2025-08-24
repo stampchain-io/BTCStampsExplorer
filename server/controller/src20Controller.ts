@@ -302,14 +302,14 @@ export class Src20Controller {
     try {
       const [deploymentData, mintStatusData, lastBlockData] = await Promise.all(
         [
-          SRC20Service.QueryService.fetchAndFormatSrc20Data({
+          SRC20Service.QueryService.fetchBasicSrc20Data({
             tick: [tick],
             op: "DEPLOY",
             limit: 1,
             page: 1,
           }),
           SRC20Service.QueryService.fetchSrc20MintProgress(tick).catch(() => null),
-          SRC20Service.QueryService.fetchAndFormatSrc20Data({
+          SRC20Service.QueryService.fetchBasicSrc20Data({
             limit: 1,
             page: 1,
             sortBy: "DESC",
@@ -459,7 +459,7 @@ export class Src20Controller {
       const marketDataMap = await SRC20Service.QueryService.getBulkSRC20MarketData(ticks);
 
       // Get basic deployment data for trending tokens
-      const deploymentData = await SRC20Service.QueryService.fetchAndFormatSrc20DataV2({
+      const deploymentData = await SRC20Service.QueryService.fetchEnhancedSrc20Data({
         tick: ticks,
         op: "DEPLOY",
         limit: ticks.length,

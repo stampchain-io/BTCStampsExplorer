@@ -22,7 +22,7 @@ export const handler: Handlers<BlockHandlerContext> = {
     const op = url.searchParams.get("op");
 
     try {
-      const result = await SRC20Service.QueryService.fetchAndFormatSrc20Data({
+      const result = await SRC20Service.QueryService.fetchBasicSrc20Data({
         block_index: Number(block_index),
         ...(tick && { tick }),
         ...(limit && { limit }),

@@ -27,7 +27,7 @@ export const handler: Handlers = {
     }
 
     try {
-      const result = await SRC20Service.QueryService.fetchAndFormatSrc20Data({
+      const result = await SRC20Service.QueryService.fetchBasicSrc20Data({
         op: op.toUpperCase(),
         ...(sortValidation.data && { sortBy: sortValidation.data }),
         page: page || DEFAULT_PAGINATION.page,

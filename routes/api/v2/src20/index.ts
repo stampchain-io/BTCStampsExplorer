@@ -92,8 +92,8 @@ export const handler: Handlers = {
     };
 
     try {
-      // Use the enhanced V2 service method with world-class feature support
-      const result = await SRC20Service.QueryService.fetchAndFormatSrc20DataV2(
+      // Use the enhanced service method with world-class feature support
+      const result = await SRC20Service.QueryService.fetchEnhancedSrc20Data(
         params,
         {
           // 🎯 Smart filtering based on API parameters
