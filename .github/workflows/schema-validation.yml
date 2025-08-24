@@ -1,0 +1,172 @@
+name: API Schema Validation
+
+on:
+  push:
+    branches: [main, dev]
+    paths:
+      - 'routes/api/**'
+      - 'server/**'
+      - 'lib/types/**'
+      - 'schema.yml'
+      - 'tests/postman/collections/schema-validation.json'
+      - '.github/workflows/schema-validation.yml'
+  pull_request:
+    branches: [main, dev]
+    paths:
+      - 'routes/api/**'
+      - 'server/**'
+      - 'lib/types/**'
+      - 'schema.yml'
+      - 'tests/postman/collections/schema-validation.json'
+      - '.github/workflows/schema-validation.yml'
+  workflow_dispatch:
+
+env:
+  DENO_VERSION: "2.4.x"
+  NODE_VERSION: "18"
+
+jobs:
+  # CRITICAL: Schema validation prevents API breaking changes
+  api-schema-validation:
+    name: API Schema Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: ${{ env.DENO_VERSION }}
+
+      - name: Setup Node.js (for Newman)
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install Newman
+        run: npm install -g newman
+
+      - name: Start development server
+        run: |
+          echo "Starting dev server in background..."
+          deno task dev &
+          SERVER_PID=$!
+          echo "SERVER_PID=$SERVER_PID" >> $GITHUB_ENV
+          
+          echo "Waiting for server to start..."
+          timeout 120 bash -c 'until curl -f http://localhost:8000/api/health 2>/dev/null; do sleep 2; done'
+          echo "Development server is ready"
+
+      - name: Run Schema Validation Tests
+        run: |
+          echo "🔍 Running critical schema validation tests..."
+          newman run tests/postman/collections/schema-validation.json \
+            --environment tests/postman/environments/local.json \
+            --reporters cli,json \
+            --reporter-json-export reports/schema-validation-results.json \
+            --bail \
+            --verbose
+        env:
+          BASE_URL: http://localhost:8000
+
+      - name: Stop development server
+        if: always()
+        run: |
+          if [ -n "$SERVER_PID" ]; then
+            kill $SERVER_PID || true
+          fi
+
+      - name: Check for Schema Validation Failures
+        if: always()
+        run: |
+          if [ -f "reports/schema-validation-results.json" ]; then
+            FAILED_TESTS=$(jq '.run.failures | length' reports/schema-validation-results.json)
+            TOTAL_TESTS=$(jq '.run.stats.tests.total' reports/schema-validation-results.json)
+            
+            echo "📊 Schema Validation Results: $((TOTAL_TESTS - FAILED_TESTS))/$TOTAL_TESTS tests passed"
+            
+            if [ "$FAILED_TESTS" -gt 0 ]; then
+              echo "❌ CRITICAL: $FAILED_TESTS schema validation tests failed!"
+              echo ""
+              echo "🚨 API BREAKING CHANGES DETECTED 🚨"
+              echo "This indicates that API response structures have changed"
+              echo "in a way that violates the OpenAPI schema contract."
+              echo ""
+              echo "Common causes:"
+              echo "- Single object endpoint returning array (pagination added incorrectly)"
+              echo "- Array endpoint returning single object (pagination removed incorrectly)"
+              echo "- Missing required fields in response"
+              echo "- Incorrect data types in response"
+              echo ""
+              echo "Fix required before merging to prevent production issues."
+              exit 1
+            else
+              echo "✅ All schema validation tests passed - API contracts maintained"
+            fi
+          else
+            echo "❌ Schema validation results file not found"
+            exit 1
+          fi
+
+      - name: Upload Schema Validation Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: schema-validation-results
+          path: reports/schema-validation-results.json
+          retention-days: 30
+
+      - name: Comment PR with Schema Validation Results
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = 'reports/schema-validation-results.json';
+            
+            if (fs.existsSync(path)) {
+              const results = JSON.parse(fs.readFileSync(path, 'utf8'));
+              const failed = results.run.failures.length;
+              const total = results.run.stats.tests.total;
+              const passed = total - failed;
+              
+              let status = failed > 0 ? '❌' : '✅';
+              let title = failed > 0 ? 'SCHEMA VALIDATION FAILED' : 'Schema Validation Passed';
+              
+              const comment = `## ${status} API Schema Validation Results
+              
+              **${title}**
+              
+              - **Tests Passed**: ${passed}/${total}
+              - **Tests Failed**: ${failed}/${total}
+              
+              ${failed > 0 ? `
+              🚨 **CRITICAL API BREAKING CHANGES DETECTED** 🚨
+              
+              This PR contains changes that violate the API schema contract. This could break existing clients and must be fixed before merging.
+              
+              **Common Issues:**
+              - Single object endpoint returning array (incorrect pagination)
+              - Array endpoint returning single object (missing pagination)
+              - Missing required response fields
+              - Incorrect data types
+              
+              Please review the test failures above and ensure API responses match the OpenAPI schema.
+              ` : `
+              ✅ **All schema validation tests passed!**
+              
+              API response structures are consistent with the OpenAPI schema contract.
+              `}
+              
+              View detailed results in the [workflow artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
+              
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+            }
