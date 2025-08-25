@@ -1413,7 +1413,7 @@ export interface RecentSaleCardProps {
   onClick?: () => void;
   className?: string;
   showFullDetails?: boolean;
-  btcPriceUSD?: number;
+  btc_price_usd?: number;
 }
 
 export interface RecentSalesGalleryProps {
@@ -1436,7 +1436,7 @@ export interface RecentSalesGalleryProps {
     prefix?: string;
   };
   isLoading?: boolean;
-  btcPriceUSD?: number;
+  btc_price_usd?: number;
   autoRefresh?: boolean;
   refreshIntervalMs?: number;
   onRefresh?: () => void;

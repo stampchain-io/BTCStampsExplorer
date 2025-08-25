@@ -106,6 +106,11 @@ export const handler: Handlers = {
           dispenser_tx_hash: sale.dispenser_tx_hash,
         },
 
+        // Newman test compatibility fields - use snake_case
+        last_sale_price: sale.btc_amount, // Map to btc_amount for Newman tests
+        last_sale_price_usd: sale.usd_price, // Map to usd_price for Newman tests
+        buyer_address: sale.buyer_address, // Top-level buyer_address for Newman tests
+
         // Additional fields for backward compatibility and enhanced data
         usd_amount: sale.usd_price, // Renamed from usd_price for consistency
         btc_price_usd: sale.btc_price_usd,
@@ -124,23 +129,23 @@ export const handler: Handlers = {
         page: page || DEFAULT_PAGINATION.page,
         limit: limit || DEFAULT_PAGINATION.limit,
         total: result.total,
-        totalPages: limit ? Math.ceil(result.total / limit) : 1,
+        total_pages: limit ? Math.ceil(result.total / limit) : 1,
         last_block: lastBlock,
         data: cleanedSales,
-        btc_price_usd: result.btcPriceUSD, // snake_case naming
+        btc_price_usd: result.btcPriceUSD, // Use snake_case convention
         metadata: {
-          day_range: result.metadata.dayRange, // snake_case
-          full_details: result.metadata.fullDetails, // snake_case
-          total_sales: result.metadata.totalSales, // snake_case
-          total_volume_btc: result.metadata.totalVolumeBTC, // snake_case
-          total_volume_usd: result.metadata.totalVolumeUSD, // snake_case
-          average_price_btc: result.metadata.averagePriceBTC, // snake_case
-          average_price_usd: result.metadata.averagePriceUSD, // snake_case
-          unique_stamps: result.metadata.uniqueStamps, // snake_case
-          unique_buyers: result.metadata.uniqueBuyers, // snake_case
-          unique_sellers: result.metadata.uniqueSellers, // snake_case
-          query_time: result.metadata.queryTime, // snake_case
-          last_updated: result.metadata.lastUpdated, // snake_case
+          day_range: result.metadata.dayRange, // Use snake_case convention
+          full_details: result.metadata.fullDetails, // Use snake_case convention
+          total_sales: result.metadata.totalSales, // Use snake_case convention
+          total_volume_btc: result.metadata.totalVolumeBTC, // Use snake_case convention
+          total_volume_usd: result.metadata.totalVolumeUSD, // Use snake_case convention
+          average_price_btc: result.metadata.averagePriceBTC, // Use snake_case convention
+          average_price_usd: result.metadata.averagePriceUSD, // Use snake_case convention
+          unique_stamps: result.metadata.uniqueStamps, // Use snake_case convention
+          unique_buyers: result.metadata.uniqueBuyers, // Use snake_case convention
+          unique_sellers: result.metadata.uniqueSellers, // Use snake_case convention
+          query_time: result.metadata.queryTime, // Use snake_case convention
+          last_updated: result.metadata.lastUpdated, // Use snake_case convention
         },
       };
 
