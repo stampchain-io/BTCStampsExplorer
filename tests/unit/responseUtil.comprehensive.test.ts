@@ -443,7 +443,9 @@ Deno.test("ResponseUtil - simulate API route detection for coverage", () => {
 
 Deno.test("ApiResponseUtil - test all remaining methods for 100% coverage", async () => {
   // Import ApiResponseUtil directly since it's not exposed through ResponseUtil
-  const { ApiResponseUtil } = await import("$lib/utils/api/responses/apiResponseUtil.ts");
+  const { ApiResponseUtil } = await import(
+    "$lib/utils/api/responses/apiResponseUtil.ts"
+  );
 
   // Test created method (201)
   const createdResponse = ApiResponseUtil.created({
@@ -578,7 +580,9 @@ Deno.test("ApiResponseUtil - test all remaining methods for 100% coverage", asyn
   assertExists(customUint8Array.headers);
 
   // Test caching options with routeType
-  const { RouteType } = await import("$server/services/infrastructure/cacheService.ts");
+  const { RouteType } = await import(
+    "$server/services/infrastructure/cacheService.ts"
+  );
   const successWithCache = ApiResponseUtil.success(
     { cached: true },
     {
@@ -591,7 +595,9 @@ Deno.test("ApiResponseUtil - test all remaining methods for 100% coverage", asyn
   assertExists(successWithCache.headers);
 
   // Test cache config edge cases
-  const { RouteType: RT } = await import("$server/services/infrastructure/cacheService.ts");
+  const { RouteType: RT } = await import(
+    "$server/services/infrastructure/cacheService.ts"
+  );
 
   // Test with staleWhileRevalidate and staleIfError values
   const successWithFullCache = ApiResponseUtil.success(

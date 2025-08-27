@@ -1,7 +1,7 @@
 // tests/unit/cloudWatchMonitoring.test.ts
 import {
-    type BusinessMetrics,
-    cloudWatchMonitoring,
+  type BusinessMetrics,
+  cloudWatchMonitoring,
 } from "$server/services/aws/cloudWatchMonitoring.ts";
 import { ecsDetection } from "$server/services/aws/ecsDetection.ts";
 import { assertEquals, assertExists } from "@std/assert";
@@ -13,7 +13,8 @@ describe("CloudWatch Monitoring Service", () => {
   const originalAddSignalListener = Deno.addSignalListener;
   const originalRemoveSignalListener = Deno.removeSignalListener;
   const intervals: number[] = [];
-  const signalListeners: Array<{ signal: Deno.Signal; handler: () => void }> = [];
+  const signalListeners: Array<{ signal: Deno.Signal; handler: () => void }> =
+    [];
 
   beforeAll(async () => {
     // Mock setInterval to track intervals for cleanup
@@ -31,7 +32,7 @@ describe("CloudWatch Monitoring Service", () => {
     // Mock Deno.removeSignalListener for completeness
     Deno.removeSignalListener = (signal: Deno.Signal, handler: () => void) => {
       const index = signalListeners.findIndex(
-        (item) => item.signal === signal && item.handler === handler
+        (item) => item.signal === signal && item.handler === handler,
       );
       if (index !== -1) {
         signalListeners.splice(index, 1);

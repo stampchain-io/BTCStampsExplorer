@@ -62,7 +62,8 @@ function mockFileSystem() {
       return Promise.resolve();
     };
     // Override toString to not include "[native code]"
-    mockWriteTextFile.toString = () => "function mockWriteTextFile() { /* mocked */ }";
+    mockWriteTextFile.toString = () =>
+      "function mockWriteTextFile() { /* mocked */ }";
     globalThis.Deno.writeTextFile = mockWriteTextFile;
 
     // Mock Deno.errors
@@ -120,17 +121,17 @@ function teardown() {
 function isolatedTest(
   name: string,
   fn: () => void | Promise<void>,
-  options?: { sanitizeOps?: boolean; sanitizeResources?: boolean }
+  options?: { sanitizeOps?: boolean; sanitizeResources?: boolean },
 ) {
   Deno.test(name, options || {}, async () => {
     // Save current environment state
     const originalDebug = Deno.env.get("DEBUG");
     const originalDenoEnv = Deno.env.get("DENO_ENV");
-    
+
     try {
       // Ensure test mode is set for all tests
       Deno.env.set("DENO_ENV", "test");
-      
+
       // Run the test
       await fn();
     } finally {
@@ -159,7 +160,7 @@ isolatedTest("logger - file writing in development mode", async () => {
   // Set development environment
   Deno.env.set("DENO_ENV", "development");
   Deno.env.set("DEBUG", "stamps");
-  
+
   // Explicitly enable file logging for this test
   logger.setConfig({ enableFileLogging: true });
 
@@ -208,33 +209,36 @@ isolatedTest("logger - production vs development file writing logic", () => {
   teardown();
 });
 
-isolatedTest("logger - file writing with directory already exists", async () => {
-  setup();
+isolatedTest(
+  "logger - file writing with directory already exists",
+  async () => {
+    setup();
 
-  // Mock mkdir to throw AlreadyExists error but still track the call
-  globalThis.Deno.mkdir = (path: any, options?: any) => {
-    mockFileOperations.mkdir.push({ path, options });
-    const error = new (globalThis.Deno.errors.AlreadyExists)(
-      "Directory already exists",
-    );
-    throw error;
-  };
+    // Mock mkdir to throw AlreadyExists error but still track the call
+    globalThis.Deno.mkdir = (path: any, options?: any) => {
+      mockFileOperations.mkdir.push({ path, options });
+      const error = new (globalThis.Deno.errors.AlreadyExists)(
+        "Directory already exists",
+      );
+      throw error;
+    };
 
-  // Set to development mode to trigger file writing
-  Deno.env.set("DENO_ENV", "development");
-  Deno.env.set("DEBUG", "stamps");
-  
-  // Explicitly enable file logging for this test
-  logger.setConfig({ enableFileLogging: true });
+    // Set to development mode to trigger file writing
+    Deno.env.set("DENO_ENV", "development");
+    Deno.env.set("DEBUG", "stamps");
 
-  logger.debug("stamps", { message: "Test existing directory" });
-  await new Promise((resolve) => setTimeout(resolve, 10));
+    // Explicitly enable file logging for this test
+    logger.setConfig({ enableFileLogging: true });
 
-  // Should still write to file even if directory exists
-  assertEquals(mockFileOperations.writeTextFile.length, 1);
+    logger.debug("stamps", { message: "Test existing directory" });
+    await new Promise((resolve) => setTimeout(resolve, 10));
 
-  teardown();
-});
+    // Should still write to file even if directory exists
+    assertEquals(mockFileOperations.writeTextFile.length, 1);
+
+    teardown();
+  },
+);
 
 isolatedTest("logger - file writing with mkdir error", async () => {
   setup();
@@ -246,7 +250,7 @@ isolatedTest("logger - file writing with mkdir error", async () => {
 
   Deno.env.set("DENO_ENV", "development");
   Deno.env.set("DEBUG", "stamps");
-  
+
   // Explicitly enable file logging for this test
   logger.setConfig({ enableFileLogging: true });
 
@@ -271,7 +275,7 @@ isolatedTest("logger - file writing with writeTextFile error", async () => {
 
   Deno.env.set("DENO_ENV", "development");
   Deno.env.set("DEBUG", "stamps");
-  
+
   // Explicitly enable file logging for this test
   logger.setConfig({ enableFileLogging: true });
 
@@ -512,22 +516,25 @@ isolatedTest("logger - client-side existing namespaces preservation", () => {
   teardown();
 });
 
-isolatedTest("logger - client-side initialization with no existing config", () => {
-  setup();
+isolatedTest(
+  "logger - client-side initialization with no existing config",
+  () => {
+    setup();
 
-  // Simulate client environment with no existing __DEBUG
-  delete (globalThis as any).Deno;
-  delete (globalThis as any).__DEBUG;
+    // Simulate client environment with no existing __DEBUG
+    delete (globalThis as any).Deno;
+    delete (globalThis as any).__DEBUG;
 
-  // Mock console for client-side
-  consoleOutput = [];
-  console.debug = (data: any) => consoleOutput.push({ level: "debug", data });
+    // Mock console for client-side
+    consoleOutput = [];
+    console.debug = (data: any) => consoleOutput.push({ level: "debug", data });
 
-  logger.debug("stamps", { message: "Default config" });
+    logger.debug("stamps", { message: "Default config" });
 
-  // Should initialize with default namespaces
-  assertEquals(consoleOutput.length, 1, "Should log with default config");
-  assertEquals(consoleOutput[0].data.namespace, "stamps");
+    // Should initialize with default namespaces
+    assertEquals(consoleOutput.length, 1, "Should log with default config");
+    assertEquals(consoleOutput[0].data.namespace, "stamps");
 
-  teardown();
-});
+    teardown();
+  },
+);

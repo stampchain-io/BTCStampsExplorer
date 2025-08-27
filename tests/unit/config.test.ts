@@ -1,13 +1,18 @@
 /**
  * Tests for server/config/config.ts
- * 
+ *
  * Tests the server configuration module including environment variable handling,
  * MARA configuration, and client configuration generation.
  */
 
-import { assertEquals, assertExists, assert } from "@std/assert";
-import { beforeEach, afterEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
-import { stub, restore } from "@std/testing@1.0.14/mock";
+import { assert, assertEquals, assertExists } from "@std/assert";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  it,
+} from "jsr:@std/testing@1.0.14/bdd";
+import { restore, stub } from "@std/testing@1.0.14/mock";
 
 describe("Server Config Module", () => {
   let originalEnv: Record<string, string | undefined>;
@@ -16,14 +21,25 @@ describe("Server Config Module", () => {
     // Store original environment variables
     originalEnv = {};
     const envVars = [
-      "IMAGES_SRC_PATH", "MINTING_SERVICE_FEE", "MINTING_SERVICE_FEE_ADDRESS",
-      "CSRF_SECRET_KEY", "OPENSTAMP_API_KEY", "API_KEY", "QUICKNODE_ENDPOINT",
-      "QUICKNODE_API_KEY", "DEBUG", "APP_DOMAIN", "ALLOWED_DOMAINS",
-      "MARA_API_BASE_URL", "MARA_API_TIMEOUT", "MARA_SERVICE_FEE_SATS",
-      "MARA_SERVICE_FEE_ADDRESS", "ENABLE_MARA_INTEGRATION"
+      "IMAGES_SRC_PATH",
+      "MINTING_SERVICE_FEE",
+      "MINTING_SERVICE_FEE_ADDRESS",
+      "CSRF_SECRET_KEY",
+      "OPENSTAMP_API_KEY",
+      "API_KEY",
+      "QUICKNODE_ENDPOINT",
+      "QUICKNODE_API_KEY",
+      "DEBUG",
+      "APP_DOMAIN",
+      "ALLOWED_DOMAINS",
+      "MARA_API_BASE_URL",
+      "MARA_API_TIMEOUT",
+      "MARA_SERVICE_FEE_SATS",
+      "MARA_SERVICE_FEE_ADDRESS",
+      "ENABLE_MARA_INTEGRATION",
     ];
-    
-    envVars.forEach(key => {
+
+    envVars.forEach((key) => {
       originalEnv[key] = Deno.env.get(key);
       Deno.env.delete(key);
     });
@@ -38,7 +54,7 @@ describe("Server Config Module", () => {
         Deno.env.delete(key);
       }
     });
-    
+
     // Clear module cache to get fresh imports
     restore();
   });
@@ -197,7 +213,10 @@ describe("Server Config Module", () => {
   describe("MARA configuration getters", () => {
     it("should return default MARA_API_BASE_URL", async () => {
       const { serverConfig } = await import("../../server/config/config.ts");
-      assertEquals(serverConfig.MARA_API_BASE_URL, "https://slipstream.mara.com/rest-api");
+      assertEquals(
+        serverConfig.MARA_API_BASE_URL,
+        "https://slipstream.mara.com/rest-api",
+      );
     });
 
     it("should return env value for MARA_API_BASE_URL", async () => {
@@ -230,7 +249,10 @@ describe("Server Config Module", () => {
 
     it("should return default MARA_SERVICE_FEE_ADDRESS", async () => {
       const { serverConfig } = await import("../../server/config/config.ts");
-      assertEquals(serverConfig.MARA_SERVICE_FEE_ADDRESS, "bc1qhhv6rmxvq5mj2fc3zne2gpjqduy45urapje64m");
+      assertEquals(
+        serverConfig.MARA_SERVICE_FEE_ADDRESS,
+        "bc1qhhv6rmxvq5mj2fc3zne2gpjqduy45urapje64m",
+      );
     });
 
     it("should return env value for MARA_SERVICE_FEE_ADDRESS", async () => {
@@ -255,10 +277,10 @@ describe("Server Config Module", () => {
     it("should return config even when ENABLE_MARA_INTEGRATION is disabled (MARA is always available)", async () => {
       // MARA is always enabled in the implementation
       Deno.env.set("ENABLE_MARA_INTEGRATION", "0");
-      
+
       const { getMaraConfig } = await import("../../server/config/config.ts");
       const config = getMaraConfig();
-      
+
       assertExists(config);
       assertEquals(config!.enabled, true); // MARA is always enabled
     });
@@ -267,10 +289,10 @@ describe("Server Config Module", () => {
       // Enable MARA with minimal required config
       Deno.env.set("ENABLE_MARA_INTEGRATION", "1");
       Deno.env.set("MARA_API_BASE_URL", "https://test.mara.api");
-      
+
       const { getMaraConfig } = await import("../../server/config/config.ts");
       const config = getMaraConfig();
-      
+
       if (config) {
         assertExists(config);
         assertEquals(config.enabled, true);
@@ -282,16 +304,18 @@ describe("Server Config Module", () => {
       // Set invalid MARA configuration
       Deno.env.set("ENABLE_MARA_INTEGRATION", "1");
       Deno.env.set("MARA_API_BASE_URL", "invalid-url");
-      
+
       // Capture console.error
       const originalConsoleError = console.error;
       let errorLogged = false;
-      console.error = () => { errorLogged = true; };
-      
+      console.error = () => {
+        errorLogged = true;
+      };
+
       try {
         const { getMaraConfig } = await import("../../server/config/config.ts");
         const config = getMaraConfig();
-        
+
         assertEquals(config, null);
         assert(errorLogged, "Should have logged an error");
       } finally {
@@ -306,10 +330,10 @@ describe("Server Config Module", () => {
       Deno.env.set("MINTING_SERVICE_FEE", "1000");
       Deno.env.set("MINTING_SERVICE_FEE_ADDRESS", "bc1qtest123");
       Deno.env.set("DEBUG", "app:*");
-      
+
       const { getClientConfig } = await import("../../server/config/config.ts");
       const clientConfig = getClientConfig();
-      
+
       assertEquals(clientConfig.MINTING_SERVICE_FEE, "1000");
       assertEquals(clientConfig.MINTING_SERVICE_FEE_ADDRESS, "bc1qtest123");
       assertEquals(clientConfig.DEBUG_NAMESPACES, "app:*");
@@ -319,7 +343,7 @@ describe("Server Config Module", () => {
     it("should return default values when env vars not set", async () => {
       const { getClientConfig } = await import("../../server/config/config.ts");
       const clientConfig = getClientConfig();
-      
+
       assertEquals(clientConfig.MINTING_SERVICE_FEE, "");
       assertEquals(clientConfig.MINTING_SERVICE_FEE_ADDRESS, "");
       assertEquals(clientConfig.DEBUG_NAMESPACES, "");
@@ -329,14 +353,14 @@ describe("Server Config Module", () => {
     it("should only include safe configuration fields", async () => {
       const { getClientConfig } = await import("../../server/config/config.ts");
       const clientConfig = getClientConfig();
-      
+
       const keys = Object.keys(clientConfig);
       assertEquals(keys.length, 4);
       assert(keys.includes("MINTING_SERVICE_FEE"));
       assert(keys.includes("MINTING_SERVICE_FEE_ADDRESS"));
       assert(keys.includes("DEBUG_NAMESPACES"));
       assert(keys.includes("IS_DEBUG_ENABLED"));
-      
+
       // Should not include sensitive keys
       assert(!keys.includes("CSRF_SECRET_KEY"));
       assert(!keys.includes("API_KEY"));
@@ -348,9 +372,9 @@ describe("Server Config Module", () => {
   describe("config indexability", () => {
     it("should allow index access to config properties", async () => {
       Deno.env.set("API_KEY", "test123");
-      
+
       const { serverConfig } = await import("../../server/config/config.ts");
-      
+
       // Test index signature access
       assertEquals(serverConfig["API_KEY"], "test123");
       assertEquals(serverConfig["APP_ROOT"], Deno.cwd());
@@ -359,7 +383,7 @@ describe("Server Config Module", () => {
 
     it("should handle undefined keys gracefully", async () => {
       const { serverConfig } = await import("../../server/config/config.ts");
-      
+
       // Test accessing undefined key
       assertEquals(serverConfig["NONEXISTENT_KEY"], undefined);
     });
@@ -368,30 +392,30 @@ describe("Server Config Module", () => {
   describe("edge cases and error handling", () => {
     it("should handle falsy but defined environment variables", async () => {
       Deno.env.set("DEBUG", "");
-      
+
       const { serverConfig } = await import("../../server/config/config.ts");
-      
+
       assertEquals(serverConfig.DEBUG_NAMESPACES, "");
       assertEquals(serverConfig.IS_DEBUG_ENABLED, false);
     });
 
     it("should handle environment variables with special characters", async () => {
       Deno.env.set("MINTING_SERVICE_FEE", "1,000.50");
-      
+
       const { serverConfig } = await import("../../server/config/config.ts");
       assertEquals(serverConfig.MINTING_SERVICE_FEE, "1,000.50");
     });
 
     it("should maintain getter behavior on multiple accesses", async () => {
       Deno.env.set("API_KEY", "initial");
-      
+
       const { serverConfig } = await import("../../server/config/config.ts");
-      
+
       assertEquals(serverConfig.API_KEY, "initial");
-      
+
       // Change environment variable
       Deno.env.set("API_KEY", "changed");
-      
+
       // Getter should return new value
       assertEquals(serverConfig.API_KEY, "changed");
     });

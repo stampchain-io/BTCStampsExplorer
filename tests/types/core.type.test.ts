@@ -11,26 +11,25 @@
 
 import { assertEquals } from "@std/assert";
 import {
-    analyzeDependencies,
-    benchmarkTypeChecking,
-    validateCrossModuleCompatibility,
-    validateTypeCompilation,
-    validateTypeExports,
-    withTempTypeFile
+  analyzeDependencies,
+  benchmarkTypeChecking,
+  validateCrossModuleCompatibility,
+  validateTypeCompilation,
+  validateTypeExports,
+  withTempTypeFile,
 } from "./utils/typeValidation.ts";
-
 
 // ============================================================================
 // BASE TYPE IMPORTS AND TESTS
 // ============================================================================
 
 import type {
-    BlockRow,
-    BtcInfo,
-    ROOT_DOMAIN_TYPES,
-    SUBPROTOCOLS,
-    UTXO,
-    WalletDataTypes
+  BlockRow,
+  BtcInfo,
+  ROOT_DOMAIN_TYPES,
+  SUBPROTOCOLS,
+  UTXO,
+  WalletDataTypes,
 } from "../../lib/types/base.d.ts";
 
 // ============================================================================
@@ -38,15 +37,15 @@ import type {
 // ============================================================================
 
 import type {
-    StampBalance,
-    StampClassification,
-    StampMetadata,
-    StampRarity,
-    StampRow,
-    StampStatus,
-    StampValidationError,
-    StampValidationResult,
-    StampValidationStatus
+  StampBalance,
+  StampClassification,
+  StampMetadata,
+  StampRarity,
+  StampRow,
+  StampStatus,
+  StampValidationError,
+  StampValidationResult,
+  StampValidationStatus,
 } from "../../lib/types/stamp.d.ts";
 
 // ============================================================================
@@ -54,14 +53,14 @@ import type {
 // ============================================================================
 
 import type {
-    EnrichedSRC20Row,
-    MintStatus,
-    SRC20_OPERATIONS,
-    SRC20Balance,
-    SRC20Deploy,
-    SRC20Mint,
-    SRC20Row,
-    SRC20Transfer
+  EnrichedSRC20Row,
+  MintStatus,
+  SRC20_OPERATIONS,
+  SRC20Balance,
+  SRC20Deploy,
+  SRC20Mint,
+  SRC20Row,
+  SRC20Transfer,
 } from "../../lib/types/src20.d.ts";
 
 // ============================================================================
@@ -69,8 +68,8 @@ import type {
 // ============================================================================
 
 import type {
-    SRC101InputData,
-    SRC101Operation,
+  SRC101InputData,
+  SRC101Operation,
 } from "../../lib/types/src101.d.ts";
 
 // ============================================================================
@@ -78,9 +77,9 @@ import type {
 // ============================================================================
 
 import type {
-    DispenserRow,
-    SendRow,
-    SentGalleryProps
+  DispenserRow,
+  SendRow,
+  SentGalleryProps,
 } from "../../lib/types/transaction.d.ts";
 
 // ============================================================================
@@ -98,46 +97,82 @@ Deno.test("Core Types - Type Compilation", async () => {
 
 Deno.test("Core Types - Cross-Module Compatibility", async () => {
   // Test that types can be imported together without conflicts
-  const sharedTypes = ["SUBPROTOCOLS", "UTXO", "TransactionInput", "TransactionOutput"];
+  const sharedTypes = [
+    "SUBPROTOCOLS",
+    "UTXO",
+    "TransactionInput",
+    "TransactionOutput",
+  ];
 
   await validateCrossModuleCompatibility(
     "../../lib/types/base.d.ts",
     "../../lib/types/stamp.d.ts",
-    sharedTypes
+    sharedTypes,
   );
 
   await validateCrossModuleCompatibility(
     "../../lib/types/base.d.ts",
     "../../lib/types/src20.d.ts",
-    ["SUBPROTOCOLS"]
+    ["SUBPROTOCOLS"],
   );
 });
 
 Deno.test("Core Types - Export Validation", async () => {
   // Verify key types are properly exported
   await validateTypeExports("lib/types/base.d.ts", [
-    "BlockRow", "BtcInfo", "Config", "ROOT_DOMAIN_TYPES", "SUBPROTOCOLS",
-    "WalletDataTypes", "XCPParams", "UTXO", "TransactionInput", "TransactionOutput"
+    "BlockRow",
+    "BtcInfo",
+    "Config",
+    "ROOT_DOMAIN_TYPES",
+    "SUBPROTOCOLS",
+    "WalletDataTypes",
+    "XCPParams",
+    "UTXO",
+    "TransactionInput",
+    "TransactionOutput",
   ]);
 
   await validateTypeExports("lib/types/stamp.d.ts", [
-    "StampRow", "StampBalance", "StampFilters", "STAMP_TYPES", "StampClassification",
-    "StampValidationResult", "StampTransactionType", "StampProtocolVersion"
+    "StampRow",
+    "StampBalance",
+    "StampFilters",
+    "STAMP_TYPES",
+    "StampClassification",
+    "StampValidationResult",
+    "StampTransactionType",
+    "StampProtocolVersion",
   ]);
 
   await validateTypeExports("lib/types/src20.d.ts", [
-    "SRC20Row", "SRC20Balance", "Src20Detail", "EnrichedSRC20Row", "MintStatus",
-    "SRC20_OPERATIONS", "SRC20Deploy", "SRC20Mint", "SRC20Transfer"
+    "SRC20Row",
+    "SRC20Balance",
+    "Src20Detail",
+    "EnrichedSRC20Row",
+    "MintStatus",
+    "SRC20_OPERATIONS",
+    "SRC20Deploy",
+    "SRC20Mint",
+    "SRC20Transfer",
   ]);
 
   await validateTypeExports("lib/types/src101.d.ts", [
-    "SRC101Collection", "SRC101Token", "SRC101Transfer", "SRC101Attribute",
-    "SRC101Metadata", "SRC101Statistics", "SRC101TokenStandard"
+    "SRC101Collection",
+    "SRC101Token",
+    "SRC101Transfer",
+    "SRC101Attribute",
+    "SRC101Metadata",
+    "SRC101Statistics",
+    "SRC101TokenStandard",
   ]);
 
   await validateTypeExports("lib/types/transaction.d.ts", [
-    "SendRow", "SendBalance", "DispenserRow", "TransactionHash", "TransactionBuilder",
-    "UTXOSelectionStrategy", "FeeEstimationStrategy"
+    "SendRow",
+    "SendBalance",
+    "DispenserRow",
+    "TransactionHash",
+    "TransactionBuilder",
+    "UTXOSelectionStrategy",
+    "FeeEstimationStrategy",
   ]);
 });
 
@@ -147,19 +182,32 @@ Deno.test("Core Types - Export Validation", async () => {
 
 Deno.test("Bitcoin Base Types - Structure Validation", () => {
   // Test ROOT_DOMAIN_TYPES enum values
-  const validDomains: ROOT_DOMAIN_TYPES[] = [".btc", ".sats", ".xbt", ".x", ".pink"];
+  const validDomains: ROOT_DOMAIN_TYPES[] = [
+    ".btc",
+    ".sats",
+    ".xbt",
+    ".x",
+    ".pink",
+  ];
   assertEquals(validDomains.length, 5);
 
   // Test SUBPROTOCOLS enum values
-  const validProtocols: SUBPROTOCOLS[] = ["STAMP", "SRC-20", "SRC-721", "SRC-101"];
+  const validProtocols: SUBPROTOCOLS[] = [
+    "STAMP",
+    "SRC-20",
+    "SRC-721",
+    "SRC-101",
+  ];
   assertEquals(validProtocols.length, 4);
 
   // Test BlockRow interface structure
   const testBlock: BlockRow = {
     block_index: 810000,
-    block_hash: "00000000000000000002a7c4c1e48d76c5a37902165a270156b7a8d72728a054",
+    block_hash:
+      "00000000000000000002a7c4c1e48d76c5a37902165a270156b7a8d72728a054",
     block_time: new Date(),
-    previous_block_hash: "00000000000000000002a7c4c1e48d76c5a37902165a270156b7a8d72728a053",
+    previous_block_hash:
+      "00000000000000000002a7c4c1e48d76c5a37902165a270156b7a8d72728a053",
     difficulty: 51234338590905.38,
     ledger_hash: "test_ledger_hash",
     txlist_hash: "test_txlist_hash",
@@ -203,7 +251,8 @@ Deno.test("Bitcoin Base Types - WalletDataTypes Structure", () => {
   const testWallet: WalletDataTypes = {
     accounts: ["1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"],
     address: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
-    publicKey: "04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5f",
+    publicKey:
+      "04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5f",
     btcBalance: {
       confirmed: 5000000000,
       unconfirmed: 0,
@@ -237,7 +286,8 @@ Deno.test("Stamp Types - Core StampRow Structure", () => {
     keyburn: null,
     locked: 0,
     supply: 1,
-    stamp_base64: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==",
+    stamp_base64:
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==",
     stamp_mimetype: "image/png",
     stamp_url: "https://stamps.com/12345",
     stamp_hash: "hash123",
@@ -482,7 +532,13 @@ Deno.test("SRC-20 Types - Operations and Transactions", () => {
 
 Deno.test("SRC-101 Types - Basic Structure", () => {
   // Test SRC101Operation enum values
-  const operations: SRC101Operation[] = ["deploy", "mint", "transfer", "setrecord", "renew"];
+  const operations: SRC101Operation[] = [
+    "deploy",
+    "mint",
+    "transfer",
+    "setrecord",
+    "renew",
+  ];
   assertEquals(operations.length, 5);
 
   // Test SRC101InputData structure
@@ -598,7 +654,10 @@ Deno.test("Core Types - Dependency Analysis", async () => {
     "lib/types/transaction.d.ts",
   ];
 
-  const analysis = await analyzeDependencies(".//Documents/BTCStampsExplorer", typeFiles);
+  const analysis = await analyzeDependencies(
+    ".//Documents/BTCStampsExplorer",
+    typeFiles,
+  );
 
   // Should have no circular dependencies
   assertEquals(analysis.circularDependencies.length, 0);
@@ -606,7 +665,9 @@ Deno.test("Core Types - Dependency Analysis", async () => {
   // All files should be in dependency map
   assertEquals(analysis.dependencies.size, typeFiles.length);
 
-  console.log(`✅ Dependency analysis passed - ${analysis.dependencies.size} files analyzed`);
+  console.log(
+    `✅ Dependency analysis passed - ${analysis.dependencies.size} files analyzed`,
+  );
 });
 
 // ============================================================================
@@ -622,7 +683,7 @@ Deno.test("Core Types - Performance Benchmarks", async () => {
     "lib/types/transaction.d.ts",
   ];
 
-  const benchmarks: Array<{file: string, result: any}> = [];
+  const benchmarks: Array<{ file: string; result: any }> = [];
 
   for (const file of typeFiles) {
     const result = await benchmarkTypeChecking(file);
@@ -630,12 +691,20 @@ Deno.test("Core Types - Performance Benchmarks", async () => {
 
     // Assert reasonable performance (>100 lines per second)
     if (result.performanceScore < 100) {
-      console.warn(`⚠️ Slow type checking detected for ${file}: ${result.performanceScore} lines/sec`);
+      console.warn(
+        `⚠️ Slow type checking detected for ${file}: ${result.performanceScore} lines/sec`,
+      );
     }
   }
 
-  const avgPerformance = benchmarks.reduce((sum, b) => sum + b.result.performanceScore, 0) / benchmarks.length;
-  console.log(`📊 Average type checking performance: ${Math.round(avgPerformance)} lines/sec`);
+  const avgPerformance =
+    benchmarks.reduce((sum, b) => sum + b.result.performanceScore, 0) /
+    benchmarks.length;
+  console.log(
+    `📊 Average type checking performance: ${
+      Math.round(avgPerformance)
+    } lines/sec`,
+  );
 
   // Should have reasonable average performance
   assertEquals(avgPerformance > 50, true, "Type checking performance too slow");
@@ -647,7 +716,8 @@ Deno.test("Core Types - Performance Benchmarks", async () => {
 
 Deno.test("Core Types - Real-World Usage Examples", async () => {
   // Test stamp creation workflow
-  await withTempTypeFile(`
+  await withTempTypeFile(
+    `
     import type { StampRow, StampClassification, StampValidationResult } from "$types/stamp.d.ts";
     import type { SRC20Row, SRC20_OPERATIONS } from "$types/src20.d.ts";
     import type { TransactionBuilder, UTXOSelectionStrategy } from "$types/transaction.d.ts";
@@ -701,9 +771,11 @@ Deno.test("Core Types - Real-World Usage Examples", async () => {
     const _stamp: typeof newStamp = newStamp;
     const _token: typeof tokenDeploy = tokenDeploy;
     const _builder: typeof txBuilder = txBuilder;
-  `, async (filePath) => {
-    await validateTypeCompilation(filePath);
-  });
+  `,
+    async (filePath) => {
+      await validateTypeCompilation(filePath);
+    },
+  );
 });
 
 // ============================================================================
@@ -711,29 +783,29 @@ Deno.test("Core Types - Real-World Usage Examples", async () => {
 // ============================================================================
 
 import type {
-    ChartData,
-    ChartDataPoint,
-    ChartOptions,
-    Deployment,
-    InputData,
-    PaginatedSrc20ResponseBody,
-    SignPSBTResult,
-    SRC20_DETAILS,
-    SRC20_FILTER_TYPES,
-    SRC20_MARKET,
-    SRC20_STATUS,
-    SRC20_TYPES,
-    SRC20BalanceRequestParams,
-    SRC20Filters,
-    SRC20HolderData,
-    SRC20MarketDataQueryParams,
-    SRC20MintDataResponse,
-    SRC20MintStatus,
-    SRC20Operation,
-    SRC20OperationResult,
-    SRC20SnapshotRequestParams,
-    SRC20TrxRequestParams,
-    SRC20WithOptionalMarketData
+  ChartData,
+  ChartDataPoint,
+  ChartOptions,
+  Deployment,
+  InputData,
+  PaginatedSrc20ResponseBody,
+  SignPSBTResult,
+  SRC20_DETAILS,
+  SRC20_FILTER_TYPES,
+  SRC20_MARKET,
+  SRC20_STATUS,
+  SRC20_TYPES,
+  SRC20BalanceRequestParams,
+  SRC20Filters,
+  SRC20HolderData,
+  SRC20MarketDataQueryParams,
+  SRC20MintDataResponse,
+  SRC20MintStatus,
+  SRC20Operation,
+  SRC20OperationResult,
+  SRC20SnapshotRequestParams,
+  SRC20TrxRequestParams,
+  SRC20WithOptionalMarketData,
 } from "../../lib/types/src20.d.ts";
 
 Deno.test("SRC-20 Types - Core Type Definitions", () => {
@@ -1182,13 +1254,13 @@ Deno.test("SRC-20 Types - Compatibility Exports", () => {
 // ============================================================================
 
 import type {
-    BlockInfo,
-    InputTypeForSizeEstimation,
-    MintStampInputData,
-    Output,
-    OutputTypeForSizeEstimation,
-    ScriptType,
-    TX
+  BlockInfo,
+  InputTypeForSizeEstimation,
+  MintStampInputData,
+  Output,
+  OutputTypeForSizeEstimation,
+  ScriptType,
+  TX,
 } from "../../lib/types/transaction.d.ts";
 
 Deno.test("Transaction Types - SendRow Interface Structure", () => {
@@ -1199,7 +1271,8 @@ Deno.test("Transaction Types - SendRow Interface Structure", () => {
     tick: "TEST",
     memo: "Test send transaction",
     quantity: "1000000",
-    tx_hash: "a1b2c3d4e5f6789012345678901234567890123456789012345678901234567890",
+    tx_hash:
+      "a1b2c3d4e5f6789012345678901234567890123456789012345678901234567890",
     block_index: 850000,
     satoshirate: 50000,
     block_time: new Date("2024-01-01T00:00:00Z"),
@@ -1232,7 +1305,8 @@ Deno.test("Transaction Types - BlockInfo Interface Structure", () => {
     keyburn: null,
     locked: 0,
     supply: 1,
-    stamp_base64: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==",
+    stamp_base64:
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==",
     stamp_mimetype: "image/png",
     stamp_url: "https://example.com/stamp1.png",
     stamp_hash: "abc123",
@@ -1244,9 +1318,11 @@ Deno.test("Transaction Types - BlockInfo Interface Structure", () => {
   const blockInfo: BlockInfo = {
     block_info: {
       block_index: 850000,
-      block_hash: "0000000000000000000f1c54cb9637e4c4fcd5b1d4b1d4e4f4e8b0a9d8c7b6a5",
+      block_hash:
+        "0000000000000000000f1c54cb9637e4c4fcd5b1d4b1d4e4f4e8b0a9d8c7b6a5",
       block_time: "2024-01-01T00:00:00Z",
-      previous_block_hash: "0000000000000000000e1c54cb9637e4c4fcd5b1d4b1d4e4f4e8b0a9d8c7b6a4",
+      previous_block_hash:
+        "0000000000000000000e1c54cb9637e4c4fcd5b1d4b1d4e4f4e8b0a9d8c7b6a4",
       difficulty: 85000000000000,
       ledger_hash: "def456",
       txlist_hash: "ghi789",
@@ -1306,7 +1382,8 @@ Deno.test("Transaction Types - MintStampInputData Interface", () => {
     locked: false,
     divisible: false,
     filename: "stamp.png",
-    file: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==",
+    file:
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==",
     satsPerKB: 50000,
     service_fee: 1000,
     service_fee_address: "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",

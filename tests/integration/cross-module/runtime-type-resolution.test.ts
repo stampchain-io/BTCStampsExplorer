@@ -1,12 +1,17 @@
 /**
  * Runtime Type Resolution Testing Suite
- * 
+ *
  * Comprehensive testing of runtime type resolution, dynamic imports, type guards,
  * and runtime type validation across the domain migration. Tests type safety at
  * runtime and validates that types work correctly in actual execution contexts.
  */
 
-import { assertEquals, assertExists, assertThrows, assertTrue } from "@std/assert";
+import {
+  assertEquals,
+  assertExists,
+  assertThrows,
+  assertTrue,
+} from "@std/assert";
 import { join } from "@std/path";
 
 interface RuntimeTypeTest {
@@ -64,62 +69,62 @@ class RuntimeTypeResolutionTester {
         name: "dynamic-import-type-resolution",
         testFunction: () => this.testDynamicImportResolution(),
         critical: true,
-        timeout: 30000
+        timeout: 30000,
       },
       {
         name: "type-guard-runtime-validation",
         testFunction: () => this.testTypeGuardValidation(),
         critical: true,
-        timeout: 15000
+        timeout: 15000,
       },
       {
         name: "runtime-interface-validation",
         testFunction: () => this.testRuntimeInterfaceValidation(),
         critical: true,
-        timeout: 20000
+        timeout: 20000,
       },
       {
         name: "generic-type-resolution",
         testFunction: () => this.testGenericTypeResolution(),
         critical: false,
-        timeout: 15000
+        timeout: 15000,
       },
       {
         name: "union-type-narrowing",
         testFunction: () => this.testUnionTypeNarrowing(),
         critical: true,
-        timeout: 10000
+        timeout: 10000,
       },
       {
         name: "conditional-type-resolution",
         testFunction: () => this.testConditionalTypeResolution(),
         critical: false,
-        timeout: 15000
+        timeout: 15000,
       },
       {
         name: "mapped-type-runtime-behavior",
         testFunction: () => this.testMappedTypeRuntimeBehavior(),
         critical: false,
-        timeout: 10000
+        timeout: 10000,
       },
       {
         name: "api-response-type-validation",
         testFunction: () => this.testApiResponseTypeValidation(),
         critical: true,
-        timeout: 25000
+        timeout: 25000,
       },
       {
         name: "cross-module-type-compatibility",
         testFunction: () => this.testCrossModuleTypeCompatibility(),
         critical: true,
-        timeout: 30000
+        timeout: 30000,
       },
       {
         name: "performance-type-resolution",
         testFunction: () => this.testTypeResolutionPerformance(),
         critical: false,
-        timeout: 45000
-      }
+        timeout: 45000,
+      },
     ];
 
     for (const test of tests) {
@@ -128,7 +133,7 @@ class RuntimeTypeResolutionTester {
 
     const endTime = Date.now();
     const report = this.generateReport(endTime - startTime);
-    
+
     this.printReport(report);
     await this.saveReport(report);
 
@@ -137,7 +142,7 @@ class RuntimeTypeResolutionTester {
 
   private async runSingleTest(test: RuntimeTypeTest): Promise<void> {
     console.log(`   🧪 ${test.name}${test.critical ? " [CRITICAL]" : ""}`);
-    
+
     const startTime = Date.now();
     let passed = false;
     let error: string | undefined;
@@ -151,7 +156,6 @@ class RuntimeTypeResolutionTester {
 
       const testPromise = test.testFunction();
       passed = await Promise.race([testPromise, timeoutPromise]);
-
     } catch (err) {
       passed = false;
       error = err instanceof Error ? err.message : String(err);
@@ -165,11 +169,15 @@ class RuntimeTypeResolutionTester {
       passed,
       duration,
       error,
-      typeInfo
+      typeInfo,
     });
 
     const status = passed ? "✅" : "❌";
-    console.log(`      ${status} ${passed ? "PASSED" : "FAILED"} (${duration}ms)${error ? ` - ${error}` : ""}`);
+    console.log(
+      `      ${status} ${passed ? "PASSED" : "FAILED"} (${duration}ms)${
+        error ? ` - ${error}` : ""
+      }`,
+    );
   }
 
   private async testDynamicImportResolution(): Promise<boolean> {
@@ -177,19 +185,19 @@ class RuntimeTypeResolutionTester {
       // Test dynamic import of type modules
       const modules = [
         "lib/types/api.d.ts",
-        "lib/types/base.d.ts", 
+        "lib/types/base.d.ts",
         "lib/types/stamp.d.ts",
         "lib/types/src20.d.ts",
-        "lib/types/transaction.d.ts"
+        "lib/types/transaction.d.ts",
       ];
 
       for (const modulePath of modules) {
         const fullPath = join(this.projectRoot, modulePath);
-        
+
         try {
           // Test dynamic import resolution
           const module = await import(fullPath);
-          
+
           // Verify module loaded
           if (typeof module !== "object") {
             throw new Error(`Module ${modulePath} did not load as object`);
@@ -197,9 +205,10 @@ class RuntimeTypeResolutionTester {
 
           // Test if we can access type exports (they should be undefined at runtime)
           // This is expected behavior for type-only exports
-          
         } catch (importError) {
-          console.warn(`Dynamic import failed for ${modulePath}: ${importError.message}`);
+          console.warn(
+            `Dynamic import failed for ${modulePath}: ${importError.message}`,
+          );
           return false;
         }
       }
@@ -207,28 +216,28 @@ class RuntimeTypeResolutionTester {
       // Test dynamic import of implementation modules
       const implModules = [
         "lib/utils/ui/media/imageUtils.ts",
-        "server/services/stampService.ts"
+        "server/services/stampService.ts",
       ];
 
       for (const modulePath of implModules) {
         const fullPath = join(this.projectRoot, modulePath);
-        
+
         try {
           const module = await import(fullPath);
-          
+
           // Verify module has exports
           if (typeof module !== "object" || Object.keys(module).length === 0) {
             console.warn(`Implementation module ${modulePath} has no exports`);
           }
-          
         } catch (importError) {
-          console.warn(`Dynamic import failed for ${modulePath}: ${importError.message}`);
+          console.warn(
+            `Dynamic import failed for ${modulePath}: ${importError.message}`,
+          );
           // Don't fail the test for implementation modules that might not exist
         }
       }
 
       return true;
-
     } catch (error) {
       console.error(`Dynamic import resolution test failed: ${error.message}`);
       return false;
@@ -242,31 +251,35 @@ class RuntimeTypeResolutionTester {
         { type: "stamp", cpid: "A1234567890123456789", valid: true },
         { type: "src20", tick: "TEST", valid: true },
         { type: "invalid", data: "bad", valid: false },
-        { invalid: "object", valid: false }
+        { invalid: "object", valid: false },
       ];
 
       // Define type guards
-      const isStampLike = (obj: any): obj is { type: "stamp", cpid: string } => {
-        return typeof obj === "object" && 
-               obj !== null && 
-               obj.type === "stamp" && 
-               typeof obj.cpid === "string" &&
-               obj.cpid.length > 0;
+      const isStampLike = (
+        obj: any,
+      ): obj is { type: "stamp"; cpid: string } => {
+        return typeof obj === "object" &&
+          obj !== null &&
+          obj.type === "stamp" &&
+          typeof obj.cpid === "string" &&
+          obj.cpid.length > 0;
       };
 
-      const isSRC20Like = (obj: any): obj is { type: "src20", tick: string } => {
-        return typeof obj === "object" && 
-               obj !== null && 
-               obj.type === "src20" && 
-               typeof obj.tick === "string" &&
-               obj.tick.length > 0;
+      const isSRC20Like = (
+        obj: any,
+      ): obj is { type: "src20"; tick: string } => {
+        return typeof obj === "object" &&
+          obj !== null &&
+          obj.type === "src20" &&
+          typeof obj.tick === "string" &&
+          obj.tick.length > 0;
       };
 
       // Test type guards
       for (const testCase of testData) {
         const isStamp = isStampLike(testCase);
         const isSRC20 = isSRC20Like(testCase);
-        
+
         if (testCase.valid) {
           if (testCase.type === "stamp" && !isStamp) {
             throw new Error(`Type guard failed for valid stamp object`);
@@ -282,7 +295,10 @@ class RuntimeTypeResolutionTester {
       }
 
       // Test union type narrowing
-      type AssetType = { type: "stamp", cpid: string } | { type: "src20", tick: string };
+      type AssetType = { type: "stamp"; cpid: string } | {
+        type: "src20";
+        tick: string;
+      };
 
       const processAsset = (asset: AssetType): string => {
         if (asset.type === "stamp") {
@@ -296,7 +312,7 @@ class RuntimeTypeResolutionTester {
 
       const testAssets: AssetType[] = [
         { type: "stamp", cpid: "TEST123" },
-        { type: "src20", tick: "BTC" }
+        { type: "src20", tick: "BTC" },
       ];
 
       for (const asset of testAssets) {
@@ -307,7 +323,6 @@ class RuntimeTypeResolutionTester {
       }
 
       return true;
-
     } catch (error) {
       console.error(`Type guard validation test failed: ${error.message}`);
       return false;
@@ -326,11 +341,11 @@ class RuntimeTypeResolutionTester {
 
       const validateApiResponse = (obj: any): obj is TestApiResponse => {
         return typeof obj === "object" &&
-               obj !== null &&
-               typeof obj.success === "boolean" &&
-               typeof obj.timestamp === "number" &&
-               (obj.data === undefined || obj.data !== null) &&
-               (obj.error === undefined || typeof obj.error === "string");
+          obj !== null &&
+          typeof obj.success === "boolean" &&
+          typeof obj.timestamp === "number" &&
+          (obj.data === undefined || obj.data !== null) &&
+          (obj.error === undefined || typeof obj.error === "string");
       };
 
       const testResponses = [
@@ -344,7 +359,7 @@ class RuntimeTypeResolutionTester {
       for (let i = 0; i < testResponses.length; i++) {
         const response = testResponses[i];
         const isValid = validateApiResponse(response);
-        
+
         if (i < 3) {
           // First 3 should be valid
           if (!isValid) {
@@ -372,36 +387,36 @@ class RuntimeTypeResolutionTester {
 
       const validateNestedData = (obj: any): obj is NestedData => {
         return typeof obj === "object" &&
-               obj !== null &&
-               typeof obj.user === "object" &&
-               obj.user !== null &&
-               typeof obj.user.id === "string" &&
-               typeof obj.user.name === "string" &&
-               typeof obj.settings === "object" &&
-               obj.settings !== null &&
-               (obj.settings.theme === "light" || obj.settings.theme === "dark") &&
-               typeof obj.settings.notifications === "boolean";
+          obj !== null &&
+          typeof obj.user === "object" &&
+          obj.user !== null &&
+          typeof obj.user.id === "string" &&
+          typeof obj.user.name === "string" &&
+          typeof obj.settings === "object" &&
+          obj.settings !== null &&
+          (obj.settings.theme === "light" || obj.settings.theme === "dark") &&
+          typeof obj.settings.notifications === "boolean";
       };
 
       const nestedTestData = [
         {
           user: { id: "123", name: "Test User" },
-          settings: { theme: "dark" as const, notifications: true }
+          settings: { theme: "dark" as const, notifications: true },
         },
         {
           user: { id: "456", name: "Another User" },
-          settings: { theme: "light" as const, notifications: false }
+          settings: { theme: "light" as const, notifications: false },
         },
         {
           user: { id: "789" }, // Missing name - should fail
-          settings: { theme: "dark" as const, notifications: true }
-        }
+          settings: { theme: "dark" as const, notifications: true },
+        },
       ];
 
       for (let i = 0; i < nestedTestData.length; i++) {
         const data = nestedTestData[i];
         const isValid = validateNestedData(data);
-        
+
         if (i < 2) {
           if (!isValid) {
             throw new Error(`Valid nested data ${i} failed validation`);
@@ -414,9 +429,10 @@ class RuntimeTypeResolutionTester {
       }
 
       return true;
-
     } catch (error) {
-      console.error(`Runtime interface validation test failed: ${error.message}`);
+      console.error(
+        `Runtime interface validation test failed: ${error.message}`,
+      );
       return false;
     }
   }
@@ -444,9 +460,11 @@ class RuntimeTypeResolutionTester {
       const stringContainer = new Container<string>();
       stringContainer.add("test1");
       stringContainer.add("test2");
-      
+
       const strings = stringContainer.getAll();
-      if (strings.length !== 2 || strings[0] !== "test1" || strings[1] !== "test2") {
+      if (
+        strings.length !== 2 || strings[0] !== "test1" || strings[1] !== "test2"
+      ) {
         throw new Error("String container failed");
       }
 
@@ -454,7 +472,7 @@ class RuntimeTypeResolutionTester {
       const numberContainer = new Container<number>();
       numberContainer.add(42);
       numberContainer.add(100);
-      
+
       const numbers = numberContainer.getAll();
       if (numbers.length !== 2 || numbers[0] !== 42 || numbers[1] !== 100) {
         throw new Error("Number container failed");
@@ -469,14 +487,16 @@ class RuntimeTypeResolutionTester {
       const objectContainer = new Container<TestObject>();
       objectContainer.add({ id: "test1", value: 10 });
       objectContainer.add({ id: "test2", value: 20 });
-      
+
       const objects = objectContainer.getAll();
-      if (objects.length !== 2 || objects[0].id !== "test1" || objects[1].value !== 20) {
+      if (
+        objects.length !== 2 || objects[0].id !== "test1" ||
+        objects[1].value !== 20
+      ) {
         throw new Error("Object container failed");
       }
 
       return true;
-
     } catch (error) {
       console.error(`Generic type resolution test failed: ${error.message}`);
       return false;
@@ -487,7 +507,7 @@ class RuntimeTypeResolutionTester {
     try {
       // Test union type narrowing in various scenarios
       type Status = "loading" | "success" | "error";
-      
+
       const processStatus = (status: Status): string => {
         switch (status) {
           case "loading":
@@ -512,7 +532,7 @@ class RuntimeTypeResolutionTester {
       }
 
       // Test discriminated unions
-      type ApiResult = 
+      type ApiResult =
         | { success: true; data: any }
         | { success: false; error: string };
 
@@ -528,7 +548,7 @@ class RuntimeTypeResolutionTester {
 
       const results: ApiResult[] = [
         { success: true, data: { value: 42 } },
-        { success: false, error: "Test error" }
+        { success: false, error: "Test error" },
       ];
 
       for (const result of results) {
@@ -539,7 +559,6 @@ class RuntimeTypeResolutionTester {
       }
 
       return true;
-
     } catch (error) {
       console.error(`Union type narrowing test failed: ${error.message}`);
       return false;
@@ -566,9 +585,10 @@ class RuntimeTypeResolutionTester {
       }
 
       return true;
-
     } catch (error) {
-      console.error(`Conditional type resolution test failed: ${error.message}`);
+      console.error(
+        `Conditional type resolution test failed: ${error.message}`,
+      );
       return false;
     }
   }
@@ -600,17 +620,20 @@ class RuntimeTypeResolutionTester {
       const completeObject: PartialBase = {
         id: "test2",
         name: "Test Name",
-        active: true
+        active: true,
       };
 
-      if (completeObject.name !== "Test Name" || completeObject.active !== true) {
+      if (
+        completeObject.name !== "Test Name" || completeObject.active !== true
+      ) {
         throw new Error("Complete partial object failed");
       }
 
       return true;
-
     } catch (error) {
-      console.error(`Mapped type runtime behavior test failed: ${error.message}`);
+      console.error(
+        `Mapped type runtime behavior test failed: ${error.message}`,
+      );
       return false;
     }
   }
@@ -639,17 +662,19 @@ class RuntimeTypeResolutionTester {
       const validateStampResponse = (obj: any): obj is StampApiResponse => {
         if (typeof obj !== "object" || obj === null) return false;
         if (typeof obj.success !== "boolean") return false;
-        
+
         if (obj.success) {
           if (!obj.data || typeof obj.data !== "object") return false;
           if (!Array.isArray(obj.data.stamps)) return false;
           if (typeof obj.data.total !== "number") return false;
-          
+
           // Validate stamp objects
           for (const stamp of obj.data.stamps) {
-            if (typeof stamp.cpid !== "string" || 
-                typeof stamp.creator !== "string" || 
-                typeof stamp.supply !== "number") {
+            if (
+              typeof stamp.cpid !== "string" ||
+              typeof stamp.creator !== "string" ||
+              typeof stamp.supply !== "number"
+            ) {
               return false;
             }
           }
@@ -658,10 +683,12 @@ class RuntimeTypeResolutionTester {
         }
 
         if (obj.pagination) {
-          if (typeof obj.pagination !== "object" ||
-              typeof obj.pagination.page !== "number" ||
-              typeof obj.pagination.totalPages !== "number" ||
-              typeof obj.pagination.limit !== "number") {
+          if (
+            typeof obj.pagination !== "object" ||
+            typeof obj.pagination.page !== "number" ||
+            typeof obj.pagination.totalPages !== "number" ||
+            typeof obj.pagination.limit !== "number"
+          ) {
             return false;
           }
         }
@@ -675,25 +702,27 @@ class RuntimeTypeResolutionTester {
           data: {
             stamps: [
               { cpid: "A123", creator: "bc1test", supply: 1000 },
-              { cpid: "B456", creator: "bc1test2", supply: 500 }
+              { cpid: "B456", creator: "bc1test2", supply: 500 },
             ],
-            total: 2
+            total: 2,
           },
-          pagination: { page: 1, totalPages: 1, limit: 50 }
+          pagination: { page: 1, totalPages: 1, limit: 50 },
         },
         {
           success: false,
-          error: "Invalid request parameters"
+          error: "Invalid request parameters",
         },
         {
           success: true,
-          data: { stamps: [], total: 0 }
-        }
+          data: { stamps: [], total: 0 },
+        },
       ];
 
       for (const response of testResponses) {
         if (!validateStampResponse(response)) {
-          throw new Error(`API response validation failed for: ${JSON.stringify(response)}`);
+          throw new Error(
+            `API response validation failed for: ${JSON.stringify(response)}`,
+          );
         }
       }
 
@@ -702,19 +731,24 @@ class RuntimeTypeResolutionTester {
         { success: "invalid" }, // wrong type
         { success: true, data: { stamps: "invalid" } }, // stamps not array
         { success: true, data: { stamps: [{ invalid: "stamp" }], total: 1 } }, // invalid stamp
-        { success: false } // missing error
+        { success: false }, // missing error
       ];
 
       for (const response of invalidResponses) {
         if (validateStampResponse(response)) {
-          throw new Error(`Invalid response incorrectly passed validation: ${JSON.stringify(response)}`);
+          throw new Error(
+            `Invalid response incorrectly passed validation: ${
+              JSON.stringify(response)
+            }`,
+          );
         }
       }
 
       return true;
-
     } catch (error) {
-      console.error(`API response type validation test failed: ${error.message}`);
+      console.error(
+        `API response type validation test failed: ${error.message}`,
+      );
       return false;
     }
   }
@@ -723,7 +757,7 @@ class RuntimeTypeResolutionTester {
     try {
       // Test type compatibility across modules
       // This simulates importing types from different modules and using them together
-      
+
       // Simulate types from different modules
       interface BaseEntity {
         id: string;
@@ -744,21 +778,25 @@ class RuntimeTypeResolutionTester {
       }
 
       // Test type compatibility
-      const createStamp = (data: Omit<StampEntity, keyof BaseEntity>): StampEntity => {
+      const createStamp = (
+        data: Omit<StampEntity, keyof BaseEntity>,
+      ): StampEntity => {
         return {
           ...data,
           id: `stamp_${Date.now()}`,
           createdAt: new Date(),
-          updatedAt: new Date()
+          updatedAt: new Date(),
         };
       };
 
-      const createSRC20 = (data: Omit<SRC20Entity, keyof BaseEntity>): SRC20Entity => {
+      const createSRC20 = (
+        data: Omit<SRC20Entity, keyof BaseEntity>,
+      ): SRC20Entity => {
         return {
           ...data,
           id: `src20_${Date.now()}`,
           createdAt: new Date(),
-          updatedAt: new Date()
+          updatedAt: new Date(),
         };
       };
 
@@ -766,7 +804,7 @@ class RuntimeTypeResolutionTester {
       const stamp = createStamp({
         cpid: "A123456789",
         creator: "bc1test",
-        supply: 1000
+        supply: 1000,
       });
 
       if (!stamp.id || !stamp.cpid || !stamp.createdAt) {
@@ -777,7 +815,7 @@ class RuntimeTypeResolutionTester {
       const src20 = createSRC20({
         tick: "TEST",
         max: "21000000",
-        lim: "1000"
+        lim: "1000",
       });
 
       if (!src20.id || !src20.tick || !src20.createdAt) {
@@ -797,9 +835,10 @@ class RuntimeTypeResolutionTester {
       }
 
       return true;
-
     } catch (error) {
-      console.error(`Cross-module type compatibility test failed: ${error.message}`);
+      console.error(
+        `Cross-module type compatibility test failed: ${error.message}`,
+      );
       return false;
     }
   }
@@ -811,7 +850,7 @@ class RuntimeTypeResolutionTester {
 
       // Simulate heavy type operations
       const iterations = 10000;
-      
+
       interface TestObject {
         id: string;
         data: {
@@ -831,9 +870,9 @@ class RuntimeTypeResolutionTester {
             metadata: {
               index: i,
               timestamp: Date.now(),
-              valid: true
-            }
-          }
+              valid: true,
+            },
+          },
         };
         objects.push(obj);
       }
@@ -841,10 +880,12 @@ class RuntimeTypeResolutionTester {
       // Process objects with type narrowing
       let processedCount = 0;
       for (const obj of objects) {
-        if (typeof obj.id === "string" && 
-            obj.data && 
-            Array.isArray(obj.data.values) &&
-            obj.data.values.length > 0) {
+        if (
+          typeof obj.id === "string" &&
+          obj.data &&
+          Array.isArray(obj.data.values) &&
+          obj.data.values.length > 0
+        ) {
           processedCount++;
         }
       }
@@ -852,36 +893,55 @@ class RuntimeTypeResolutionTester {
       const endTime = performance.now();
       const duration = endTime - startTime;
 
-      console.log(`      Performance test: ${iterations} objects processed in ${duration.toFixed(1)}ms`);
+      console.log(
+        `      Performance test: ${iterations} objects processed in ${
+          duration.toFixed(1)
+        }ms`,
+      );
 
       // Performance should be reasonable (under 5 seconds for 10k objects)
       if (duration > 5000) {
-        throw new Error(`Type resolution performance too slow: ${duration}ms for ${iterations} objects`);
+        throw new Error(
+          `Type resolution performance too slow: ${duration}ms for ${iterations} objects`,
+        );
       }
 
       if (processedCount !== iterations) {
-        throw new Error(`Type checking failed: ${processedCount}/${iterations} objects processed correctly`);
+        throw new Error(
+          `Type checking failed: ${processedCount}/${iterations} objects processed correctly`,
+        );
       }
 
       return true;
-
     } catch (error) {
-      console.error(`Type resolution performance test failed: ${error.message}`);
+      console.error(
+        `Type resolution performance test failed: ${error.message}`,
+      );
       return false;
     }
   }
 
   private generateReport(totalDuration: number): RuntimeTypeReport {
     const totalTests = this.testResults.length;
-    const passedTests = this.testResults.filter(r => r.passed).length;
+    const passedTests = this.testResults.filter((r) => r.passed).length;
     const failedTests = totalTests - passedTests;
-    const criticalFailures = this.testResults.filter(r => !r.passed && r.test.includes("critical")).length;
+    const criticalFailures =
+      this.testResults.filter((r) => !r.passed && r.test.includes("critical"))
+        .length;
 
     // Calculate component-specific results
-    const dynamicImportTests = this.testResults.filter(r => r.test.includes("dynamic-import"));
-    const typeGuardTests = this.testResults.filter(r => r.test.includes("type-guard"));
-    const validationTests = this.testResults.filter(r => r.test.includes("validation"));
-    const performanceTests = this.testResults.filter(r => r.test.includes("performance"));
+    const dynamicImportTests = this.testResults.filter((r) =>
+      r.test.includes("dynamic-import")
+    );
+    const typeGuardTests = this.testResults.filter((r) =>
+      r.test.includes("type-guard")
+    );
+    const validationTests = this.testResults.filter((r) =>
+      r.test.includes("validation")
+    );
+    const performanceTests = this.testResults.filter((r) =>
+      r.test.includes("performance")
+    );
 
     return {
       timestamp: new Date().toISOString(),
@@ -892,11 +952,11 @@ class RuntimeTypeResolutionTester {
       totalDuration,
       results: this.testResults,
       summary: {
-        dynamicImports: dynamicImportTests.every(r => r.passed),
-        typeGuards: typeGuardTests.every(r => r.passed),
-        runtimeValidation: validationTests.every(r => r.passed),
-        performanceAcceptable: performanceTests.every(r => r.passed)
-      }
+        dynamicImports: dynamicImportTests.every((r) => r.passed),
+        typeGuards: typeGuardTests.every((r) => r.passed),
+        runtimeValidation: validationTests.every((r) => r.passed),
+        performanceAcceptable: performanceTests.every((r) => r.passed),
+      },
     };
   }
 
@@ -910,19 +970,35 @@ class RuntimeTypeResolutionTester {
     console.log(`   Passed: ${report.passedTests}`);
     console.log(`   Failed: ${report.failedTests}`);
     console.log(`   Critical Failures: ${report.criticalFailures}`);
-    console.log(`   Total Duration: ${(report.totalDuration / 1000).toFixed(1)}s`);
+    console.log(
+      `   Total Duration: ${(report.totalDuration / 1000).toFixed(1)}s`,
+    );
 
     console.log(`\n🔍 Component Status:`);
-    console.log(`   Dynamic Imports: ${report.summary.dynamicImports ? "✅ PASS" : "❌ FAIL"}`);
-    console.log(`   Type Guards: ${report.summary.typeGuards ? "✅ PASS" : "❌ FAIL"}`);
-    console.log(`   Runtime Validation: ${report.summary.runtimeValidation ? "✅ PASS" : "❌ FAIL"}`);
-    console.log(`   Performance: ${report.summary.performanceAcceptable ? "✅ PASS" : "❌ FAIL"}`);
+    console.log(
+      `   Dynamic Imports: ${
+        report.summary.dynamicImports ? "✅ PASS" : "❌ FAIL"
+      }`,
+    );
+    console.log(
+      `   Type Guards: ${report.summary.typeGuards ? "✅ PASS" : "❌ FAIL"}`,
+    );
+    console.log(
+      `   Runtime Validation: ${
+        report.summary.runtimeValidation ? "✅ PASS" : "❌ FAIL"
+      }`,
+    );
+    console.log(
+      `   Performance: ${
+        report.summary.performanceAcceptable ? "✅ PASS" : "❌ FAIL"
+      }`,
+    );
 
     // Show failed tests
-    const failedTests = report.results.filter(r => !r.passed);
+    const failedTests = report.results.filter((r) => !r.passed);
     if (failedTests.length > 0) {
       console.log(`\n❌ Failed Tests:`);
-      failedTests.forEach(test => {
+      failedTests.forEach((test) => {
         console.log(`   • ${test.test} (${test.duration}ms)`);
         if (test.error) {
           console.log(`     Error: ${test.error}`);
@@ -932,7 +1008,11 @@ class RuntimeTypeResolutionTester {
 
     // Overall status
     const overallPassed = report.criticalFailures === 0;
-    console.log(`\n${overallPassed ? "✅" : "❌"} Overall Status: ${overallPassed ? "PASSED" : "FAILED"}`);
+    console.log(
+      `\n${overallPassed ? "✅" : "❌"} Overall Status: ${
+        overallPassed ? "PASSED" : "FAILED"
+      }`,
+    );
 
     if (!overallPassed) {
       console.log(`\n🚫 RUNTIME TYPE RESOLUTION FAILED`);
@@ -940,7 +1020,9 @@ class RuntimeTypeResolutionTester {
       console.log(`   Runtime type safety is compromised`);
     } else {
       console.log(`\n🎉 RUNTIME TYPE RESOLUTION PASSED`);
-      console.log(`   All critical tests passed - runtime types are working correctly`);
+      console.log(
+        `   All critical tests passed - runtime types are working correctly`,
+      );
     }
   }
 
@@ -949,7 +1031,10 @@ class RuntimeTypeResolutionTester {
       const reportsDir = join(this.projectRoot, "reports");
       await Deno.mkdir(reportsDir, { recursive: true });
 
-      const reportPath = join(reportsDir, `runtime-type-resolution-${Date.now()}.json`);
+      const reportPath = join(
+        reportsDir,
+        `runtime-type-resolution-${Date.now()}.json`,
+      );
       await Deno.writeTextFile(reportPath, JSON.stringify(report, null, 2));
 
       console.log(`\n📄 Runtime type resolution report saved: ${reportPath}`);
@@ -963,15 +1048,25 @@ class RuntimeTypeResolutionTester {
 Deno.test("Runtime Type Resolution Test Suite", async () => {
   const projectRoot = Deno.cwd();
   const tester = new RuntimeTypeResolutionTester(projectRoot);
-  
+
   const report = await tester.runRuntimeTypeTests();
-  
+
   // Assert that all critical tests passed
-  assertEquals(report.criticalFailures, 0, "All critical runtime type tests must pass");
-  
+  assertEquals(
+    report.criticalFailures,
+    0,
+    "All critical runtime type tests must pass",
+  );
+
   // Assert overall runtime type health
-  const overallHealthy = Object.values(report.summary).every(status => status === true);
-  assertEquals(overallHealthy, true, "All runtime type components must be healthy");
+  const overallHealthy = Object.values(report.summary).every((status) =>
+    status === true
+  );
+  assertEquals(
+    overallHealthy,
+    true,
+    "All runtime type components must be healthy",
+  );
 });
 
-export { RuntimeTypeResolutionTester, type RuntimeTypeReport };
+export { type RuntimeTypeReport, RuntimeTypeResolutionTester };

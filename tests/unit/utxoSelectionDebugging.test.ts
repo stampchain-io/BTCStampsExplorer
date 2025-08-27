@@ -1,9 +1,6 @@
 import { OptimalUTXOSelection } from "$server/services/utxo/optimalUtxoSelection.ts";
 import type { BasicUTXO, Output } from "$types/index.d.ts";
-import {
-  assertEquals,
-  assertExists,
-} from "@std/assert";
+import { assertEquals, assertExists } from "@std/assert";
 
 /**
  * Tests for enhanced UTXO selection debugging features

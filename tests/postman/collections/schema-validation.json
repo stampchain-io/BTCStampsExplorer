@@ -149,7 +149,7 @@
                   "// CRITICAL: Must HAVE pagination fields",
                   "pm.test('CRITICAL: Response HAS pagination (paginated endpoint)', function () {",
                   "    pm.expect(jsonData).to.have.property('page');",
-                  "    pm.expect(jsonData).to.have.property('limit');", 
+                  "    pm.expect(jsonData).to.have.property('limit');",
                   "    pm.expect(jsonData).to.have.property('total');",
                   "    pm.expect(jsonData).to.have.property('totalPages');",
                   "    pm.expect(jsonData.page).to.be.a('number');",

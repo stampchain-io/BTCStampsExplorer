@@ -1,9 +1,9 @@
 /**
  * Utils Type Tests
- * 
+ *
  * Comprehensive type tests for utility types including:
  * - TypeScript utility types
- * - Bitcoin utility types  
+ * - Bitcoin utility types
  * - Data transformation types
  * - Error handling types
  * - Validation types
@@ -11,16 +11,16 @@
  */
 
 import { assertEquals } from "@std/assert";
-import { 
-  validateTypeCompilation,
-  validateTypeExports,
-  validateCrossModuleCompatibility,
-  withTempTypeFile,
-  validateTypeCompilationWithSuggestions,
+import {
   analyzeDependencies,
   benchmarkTypeChecking,
-  validateModuleResolution,
   TypeValidationError,
+  validateCrossModuleCompatibility,
+  validateModuleResolution,
+  validateTypeCompilation,
+  validateTypeCompilationWithSuggestions,
+  validateTypeExports,
+  withTempTypeFile,
 } from "./utils/typeValidation.ts";
 
 import { assertType, IsExact } from "./utils/typeAssertions.ts";
@@ -30,76 +30,66 @@ import { assertType, IsExact } from "./utils/typeAssertions.ts";
 // ============================================================================
 
 import type {
-  // Generic Utility Types
-  DeepPartial,
-  DeepRequired,
-  DeepReadonly,
-  Nullable,
-  Optional,
-  NonNullable,
-  
-  // Object Manipulation Types
-  PickByType,
-  OmitByType,
-  RenameKeys,
-  MergeTypes,
-  
   // Array and Collection Types
   ArrayElement,
-  NonEmptyArray,
-  ReadonlyArray,
-  
   // Function Types
   AsyncFunction,
-  SyncFunction,
-  ReturnTypeAsync,
-  ParametersAsync,
-  
-  // Validation Types
-  ValidationResult,
-  ValidationError,
-  ValidationRule,
-  ValidatorFunction,
-  
-  // Transform Types
-  Transformer,
-  TransformResult,
-  DataMapper,
-  
-  // Conditional Types
-  IsAny,
-  IsNever,
-  IsUnknown,
-  IsFunction,
-  IsObject,
-  IsArray,
-  
+  CamelCase,
   // String Manipulation Types
   Capitalize,
-  Uncapitalize,
-  CamelCase,
-  SnakeCase,
-  KebabCase,
-  
-  // Number and Math Types
-  PositiveNumber,
-  NegativeNumber,
-  Integer,
-  Float,
-  Range,
-  
-  // Date and Time Types
-  Timestamp,
+  DataMapper,
   DateString,
-  TimeString,
+  // Generic Utility Types
+  DeepPartial,
+  DeepReadonly,
+  DeepRequired,
   Duration,
-  
+  ErrorResult,
   // Error Types
   ErrorWithCode,
   ErrorWithMetadata,
+  Float,
+  Integer,
+  // Conditional Types
+  IsAny,
+  IsArray,
+  IsFunction,
+  IsNever,
+  IsObject,
+  IsUnknown,
+  KebabCase,
+  MergeTypes,
+  NegativeNumber,
+  NonEmptyArray,
+  NonNullable,
+  Nullable,
+  OmitByType,
+  Optional,
+  ParametersAsync,
+  // Object Manipulation Types
+  PickByType,
+  // Number and Math Types
+  PositiveNumber,
+  Range,
+  ReadonlyArray,
+  RenameKeys,
   ResultType,
+  ReturnTypeAsync,
+  SnakeCase,
   SuccessResult,
-  ErrorResult,
+  SyncFunction,
+  // Date and Time Types
+  Timestamp,
+  TimeString,
+  // Transform Types
+  Transformer,
+  TransformResult,
+  Uncapitalize,
+  ValidationError,
+  // Validation Types
+  ValidationResult,
+  ValidationRule,
+  ValidatorFunction,
 } from "../../lib/types/utils.d.ts";
 
 // ============================================================================
@@ -107,46 +97,40 @@ import type {
 // ============================================================================
 
 import type {
-  // Address Types
-  BitcoinAddress,
-  AddressValidator,
+  AddressConverter,
+  AddressFormatValidator,
   AddressType,
-  NetworkType,
-  
-  // Transaction Utility Types
-  TransactionHex,
-  TransactionId,
-  ScriptSig,
-  ScriptPubKey,
-  Satoshis,
-  
-  // Cryptographic Types
-  PrivateKey,
-  PublicKey,
-  Signature,
-  Hash256,
-  Hash160,
-  
+  AddressValidator,
   // Encoding Types
   Base58,
   Base64,
-  Hex,
-  WIF,
-  
-  // Network Utility Types
-  FeeRate,
-  BlockHeight,
-  Confirmation,
-  
+  // Address Types
+  BitcoinAddress,
   // Validation Utility Types
   BitcoinValidator,
+  BlockHeight,
+  Confirmation,
+  // Network Utility Types
+  FeeRate,
+  FormatConverter,
+  Hash160,
+  Hash256,
+  Hex,
+  NetworkType,
+  // Cryptographic Types
+  PrivateKey,
+  PublicKey,
+  Satoshis,
+  ScriptPubKey,
+  ScriptSig,
+  Signature,
+  // Transaction Utility Types
+  TransactionHex,
+  TransactionId,
   TransactionValidator,
-  AddressFormatValidator,
-  
   // Conversion Types
   UnitConverter,
-  FormatConverter,
-  AddressConverter,
+  WIF,
 } from "../../lib/types/bitcoin-utils.d.ts";
 
 // ============================================================================
@@ -160,16 +144,19 @@ Deno.test("Utils Types - Type Compilation", async () => {
   } catch (error) {
     console.log("⚠️ utils.d.ts not found - testing with temporary definitions");
   }
-  
+
   try {
     await validateTypeCompilation("lib/types/bitcoin-utils.d.ts");
   } catch (error) {
-    console.log("⚠️ bitcoin-utils.d.ts not found - testing with temporary definitions");
+    console.log(
+      "⚠️ bitcoin-utils.d.ts not found - testing with temporary definitions",
+    );
   }
 });
 
 Deno.test("Utils Types - Generic Utility Types", async () => {
-  await withTempTypeFile(`
+  await withTempTypeFile(
+    `
     // Generic utility type definitions for testing
     
     // Deep manipulation types
@@ -368,13 +355,16 @@ Deno.test("Utils Types - Generic Utility Types", async () => {
     const _positive = positiveNum;
     const _integer = integerNum;
     
-  `, async (filePath) => {
-    await validateTypeCompilation(filePath);
-  });
+  `,
+    async (filePath) => {
+      await validateTypeCompilation(filePath);
+    },
+  );
 });
 
 Deno.test("Utils Types - Bitcoin Utility Types", async () => {
-  await withTempTypeFile(`
+  await withTempTypeFile(
+    `
     // Bitcoin utility type definitions for testing
     
     // Address types
@@ -539,13 +529,16 @@ Deno.test("Utils Types - Bitcoin Utility Types", async () => {
     const _btc = btcFromSats;
     const _formatted = formattedBtc;
     
-  `, async (filePath) => {
-    await validateTypeCompilation(filePath);
-  });
+  `,
+    async (filePath) => {
+      await validateTypeCompilation(filePath);
+    },
+  );
 });
 
 Deno.test("Utils Types - Data Transformation Types", async () => {
-  await withTempTypeFile(`
+  await withTempTypeFile(
+    `
     // Data transformation utility types
     
     interface Transformer<TInput, TOutput> {
@@ -773,13 +766,16 @@ Deno.test("Utils Types - Data Transformation Types", async () => {
     const _processed = processedStamp;
     const _token = tokenInfo;
     
-  `, async (filePath) => {
-    await validateTypeCompilation(filePath);
-  });
+  `,
+    async (filePath) => {
+      await validateTypeCompilation(filePath);
+    },
+  );
 });
 
 Deno.test("Utils Types - Error Handling and Results", async () => {
-  await withTempTypeFile(`
+  await withTempTypeFile(
+    `
     // Advanced error handling types
     
     interface ErrorWithCode extends Error {
@@ -1076,9 +1072,11 @@ Deno.test("Utils Types - Error Handling and Results", async () => {
     const _processingErr = processingError;
     const _result = Result;
     
-  `, async (filePath) => {
-    await validateTypeCompilation(filePath);
-  });
+  `,
+    async (filePath) => {
+      await validateTypeCompilation(filePath);
+    },
+  );
 });
 
 // ============================================================================
@@ -1086,7 +1084,8 @@ Deno.test("Utils Types - Error Handling and Results", async () => {
 // ============================================================================
 
 Deno.test("Utils Types - Complex Type Interactions", async () => {
-  await withTempTypeFile(`
+  await withTempTypeFile(
+    `
     // Complex type scenario: Building a type-safe Bitcoin Stamps API client
     
     // Generic utility types
@@ -1326,9 +1325,11 @@ Deno.test("Utils Types - Complex Type Interactions", async () => {
     const _txHash = validTxHash;
     const _address = validAddress;
     
-  `, async (filePath) => {
-    await validateTypeCompilation(filePath);
-  });
+  `,
+    async (filePath) => {
+      await validateTypeCompilation(filePath);
+    },
+  );
 });
 
 // ============================================================================
@@ -1337,11 +1338,11 @@ Deno.test("Utils Types - Complex Type Interactions", async () => {
 
 Deno.test("Utils Types - Performance Stress Test", async () => {
   const startTime = performance.now();
-  
+
   // Create many complex type instances to test TypeScript performance
   const iterations = 200;
   const complexObjects = [];
-  
+
   for (let i = 0; i < iterations; i++) {
     // Create deeply nested object to stress-test type checking
     const complexObject = {
@@ -1381,21 +1382,27 @@ Deno.test("Utils Types - Performance Stress Test", async () => {
         mapper: <T>(arr: T[], fn: (item: T) => T) => arr.map(fn),
       },
     };
-    
+
     complexObjects.push(complexObject);
-    
+
     // Validate structure
     assertEquals(complexObject.id, i);
     assertEquals(complexObject.arrays.numbers.length, 10);
     assertEquals(typeof complexObject.functions.transformer, "function");
   }
-  
+
   const endTime = performance.now();
   const duration = endTime - startTime;
-  
-  console.log(`📊 Utils type stress test: ${iterations} complex objects created in ${duration.toFixed(2)}ms`);
-  console.log(`📊 Average time per object: ${(duration / iterations).toFixed(3)}ms`);
-  
+
+  console.log(
+    `📊 Utils type stress test: ${iterations} complex objects created in ${
+      duration.toFixed(2)
+    }ms`,
+  );
+  console.log(
+    `📊 Average time per object: ${(duration / iterations).toFixed(3)}ms`,
+  );
+
   // Should complete within reasonable time (< 100ms for 200 iterations)
   assertEquals(duration < 100, true, "Utils type operations too slow");
   assertEquals(complexObjects.length, iterations);
@@ -1404,7 +1411,7 @@ Deno.test("Utils Types - Performance Stress Test", async () => {
 Deno.test("Utils Types - Type Guard Performance", async () => {
   // Test performance of type guards and validation functions
   const startTime = performance.now();
-  
+
   const testValues = [
     "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4", // valid address
     "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa", // valid legacy address
@@ -1416,28 +1423,29 @@ Deno.test("Utils Types - Type Guard Performance", async () => {
     12345, // number
     { address: "fake" }, // object
   ];
-  
+
   // Mock type guard functions
   const isValidBitcoinAddress = (value: unknown): value is string => {
-    return typeof value === "string" && 
-           (value.startsWith("bc1") || value.startsWith("1") || value.startsWith("3")) &&
-           value.length >= 26 && value.length <= 62;
+    return typeof value === "string" &&
+      (value.startsWith("bc1") || value.startsWith("1") ||
+        value.startsWith("3")) &&
+      value.length >= 26 && value.length <= 62;
   };
-  
+
   const isValidStampId = (value: unknown): value is number => {
     return typeof value === "number" && value > 0 && Number.isInteger(value);
   };
-  
+
   const isValidTxHash = (value: unknown): value is string => {
     return typeof value === "string" && /^[0-9a-fA-F]{64}$/.test(value);
   };
-  
+
   // Run type guards many times
   const iterations = 1000;
   let validAddresses = 0;
   let validStampIds = 0;
   let validTxHashes = 0;
-  
+
   for (let i = 0; i < iterations; i++) {
     for (const value of testValues) {
       if (isValidBitcoinAddress(value)) validAddresses++;
@@ -1445,18 +1453,30 @@ Deno.test("Utils Types - Type Guard Performance", async () => {
       if (isValidTxHash(value)) validTxHashes++;
     }
   }
-  
+
   const endTime = performance.now();
   const duration = endTime - startTime;
   const totalChecks = iterations * testValues.length * 3; // 3 type guards per value
-  
-  console.log(`📊 Type guard performance: ${totalChecks} checks in ${duration.toFixed(2)}ms`);
-  console.log(`📊 Checks per second: ${Math.round(totalChecks / (duration / 1000))}`);
-  console.log(`📊 Results: ${validAddresses} addresses, ${validStampIds} stamp IDs, ${validTxHashes} tx hashes`);
-  
+
+  console.log(
+    `📊 Type guard performance: ${totalChecks} checks in ${
+      duration.toFixed(2)
+    }ms`,
+  );
+  console.log(
+    `📊 Checks per second: ${Math.round(totalChecks / (duration / 1000))}`,
+  );
+  console.log(
+    `📊 Results: ${validAddresses} addresses, ${validStampIds} stamp IDs, ${validTxHashes} tx hashes`,
+  );
+
   // Should be very fast (>10000 checks per second)
   const checksPerSecond = totalChecks / (duration / 1000);
-  assertEquals(checksPerSecond > 10000, true, "Type guard performance too slow");
+  assertEquals(
+    checksPerSecond > 10000,
+    true,
+    "Type guard performance too slow",
+  );
 });
 
 // ============================================================================
@@ -1464,7 +1484,8 @@ Deno.test("Utils Types - Type Guard Performance", async () => {
 // ============================================================================
 
 Deno.test("Utils Types - Integration with Domain Types", async () => {
-  await withTempTypeFile(`
+  await withTempTypeFile(
+    `
     // Test integration between utility types and domain types
     
     // Import types from stamp domain (simplified for testing)
@@ -1575,9 +1596,11 @@ Deno.test("Utils Types - Integration with Domain Types", async () => {
     const _valid = isValid;
     const _result = processResult;
     
-  `, async (filePath) => {
-    await validateTypeCompilation(filePath);
-  });
+  `,
+    async (filePath) => {
+      await validateTypeCompilation(filePath);
+    },
+  );
 });
 
 console.log("✅ All utils type tests completed successfully!");

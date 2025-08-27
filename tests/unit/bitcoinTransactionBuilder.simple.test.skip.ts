@@ -139,7 +139,8 @@ describe("BitcoinTransactionBuilder Simple Tests", {
     it("should test getAddressType", () => {
       try {
         // Access private method through any cast
-        const getAddressType = (BitcoinTransactionBuilder as any).getAddressType;
+        const getAddressType =
+          (BitcoinTransactionBuilder as any).getAddressType;
         if (getAddressType) {
           // Mock networks object
           const mockNetwork = {
@@ -161,7 +162,8 @@ describe("BitcoinTransactionBuilder Simple Tests", {
 
     it("should test getAddressNetwork", () => {
       try {
-        const getAddressNetwork = (BitcoinTransactionBuilder as any).getAddressNetwork;
+        const getAddressNetwork =
+          (BitcoinTransactionBuilder as any).getAddressNetwork;
         if (getAddressNetwork) {
           const network = getAddressNetwork("bc1qtest");
           assertExists(network);

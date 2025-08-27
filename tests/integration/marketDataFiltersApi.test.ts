@@ -1,7 +1,4 @@
-import {
-  assertEquals,
-  assertExists,
-} from "@std/assert/mod.ts";
+import { assertEquals, assertExists } from "@std/assert/mod.ts";
 
 const API_BASE = "http://localhost:8000/api/v2";
 

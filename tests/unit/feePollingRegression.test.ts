@@ -11,41 +11,44 @@ const originalEnv = Deno.env.get("DENO_ENV");
 const originalSkipRedis = (globalThis as any).SKIP_REDIS_CONNECTION;
 
 Deno.test("Fee Polling Regression Tests", async (t) => {
-  await t.step("Development mode should bypass Redis and use static fallback", async () => {
-    // Set development environment
-    Deno.env.set("DENO_ENV", "development");
-    (globalThis as any).SKIP_REDIS_CONNECTION = true;
+  await t.step(
+    "Development mode should bypass Redis and use static fallback",
+    async () => {
+      // Set development environment
+      Deno.env.set("DENO_ENV", "development");
+      (globalThis as any).SKIP_REDIS_CONNECTION = true;
 
-    // Mock FeeService.getFeeData to simulate our fix
-    const mockGetFeeData = async () => {
-      const isDevelopment = Deno.env.get("DENO_ENV") === "development";
+      // Mock FeeService.getFeeData to simulate our fix
+      const mockGetFeeData = async () => {
+        const isDevelopment = Deno.env.get("DENO_ENV") === "development";
 
-      if (isDevelopment) {
-        return {
-          recommendedFee: 10,
-          btcPrice: 0,
-          source: "default" as const,
-          confidence: "low" as const,
-          timestamp: Date.now(),
-          fallbackUsed: true,
-          debug_feesResponse: {
-            static_fallback: true,
-            reason: "Development mode - API timeouts prevented"
-          }
-        };
-      }
+        if (isDevelopment) {
+          return {
+            recommendedFee: 10,
+            btcPrice: 0,
+            source: "default" as const,
+            confidence: "low" as const,
+            timestamp: Date.now(),
+            fallbackUsed: true,
+            debug_feesResponse: {
+              static_fallback: true,
+              reason: "Development mode - API timeouts prevented",
+            },
+          };
+        }
 
-      // Simulate production behavior
-      throw new Error("Redis timeout simulation");
-    };
+        // Simulate production behavior
+        throw new Error("Redis timeout simulation");
+      };
 
-    const result = await mockGetFeeData();
+      const result = await mockGetFeeData();
 
-    assertEquals(result.recommendedFee, 10);
-    assertEquals(result.source, "default");
-    assertEquals(result.fallbackUsed, true);
-    assertExists(result.debug_feesResponse?.static_fallback);
-  });
+      assertEquals(result.recommendedFee, 10);
+      assertEquals(result.source, "default");
+      assertEquals(result.fallbackUsed, true);
+      assertExists(result.debug_feesResponse?.static_fallback);
+    },
+  );
 
   await t.step("Fee endpoint should not timeout in development", async () => {
     // Use FakeTime to test timeout scenarios
@@ -65,7 +68,7 @@ Deno.test("Fee Polling Regression Tests", async (t) => {
           source: "default",
           confidence: "low",
           timestamp: Date.now(),
-          fallbackUsed: true
+          fallbackUsed: true,
         });
       }, 100); // Quick response
     });
@@ -87,25 +90,36 @@ Deno.test("Fee Polling Regression Tests", async (t) => {
     assertEquals((result as any).recommendedFee, 10);
   });
 
-  await t.step("Fee initialization should never be 0 to prevent validation errors", () => {
-    // Test all the fee initialization patterns we fixed
+  await t.step(
+    "Fee initialization should never be 0 to prevent validation errors",
+    () => {
+      // Test all the fee initialization patterns we fixed
 
-    // StampingTool pattern - should initialize to safe value
-    const stampingToolFee = 10; // Our fix
-    assertEquals(stampingToolFee >= 1, true, "StampingTool fee should be >= 1 sat/vB");
+      // StampingTool pattern - should initialize to safe value
+      const stampingToolFee = 10; // Our fix
+      assertEquals(
+        stampingToolFee >= 1,
+        true,
+        "StampingTool fee should be >= 1 sat/vB",
+      );
 
-    // SRC101 pattern - should initialize to safe value
-    const src101Fee = 10; // Our fix
-    assertEquals(src101Fee >= 1, true, "SRC101 fee should be >= 1 sat/vB");
+      // SRC101 pattern - should initialize to safe value
+      const src101Fee = 10; // Our fix
+      assertEquals(src101Fee >= 1, true, "SRC101 fee should be >= 1 sat/vB");
 
-    // useSRC20Form pattern - already safe
-    const src20Fee = 1;
-    assertEquals(src20Fee >= 1, true, "SRC20 fee should be >= 1 sat/vB");
+      // useSRC20Form pattern - already safe
+      const src20Fee = 1;
+      assertEquals(src20Fee >= 1, true, "SRC20 fee should be >= 1 sat/vB");
 
-    // useTransactionForm pattern - already safe
-    const transactionFee = 1;
-    assertEquals(transactionFee >= 1, true, "Transaction fee should be >= 1 sat/vB");
-  });
+      // useTransactionForm pattern - already safe
+      const transactionFee = 1;
+      assertEquals(
+        transactionFee >= 1,
+        true,
+        "Transaction fee should be >= 1 sat/vB",
+      );
+    },
+  );
 
   await t.step("Fee validation should handle edge cases", () => {
     const validateFee = (fee: number) => {
@@ -128,71 +142,99 @@ Deno.test("Fee Polling Regression Tests", async (t) => {
       validateFee(0);
       assertEquals(false, true, "Should have thrown error for fee = 0");
     } catch (error) {
-      assertEquals(error instanceof Error, true, "Should throw Error for fee = 0");
-      assertEquals(error.message, "Invalid fee rate", "Should have correct error message");
+      assertEquals(
+        error instanceof Error,
+        true,
+        "Should throw Error for fee = 0",
+      );
+      assertEquals(
+        error.message,
+        "Invalid fee rate",
+        "Should have correct error message",
+      );
     }
 
     try {
       validateFee(-1);
       assertEquals(false, true, "Should have thrown error for fee = -1");
     } catch (error) {
-      assertEquals(error instanceof Error, true, "Should throw Error for fee = -1");
-      assertEquals(error.message, "Invalid fee rate", "Should have correct error message");
+      assertEquals(
+        error instanceof Error,
+        true,
+        "Should throw Error for fee = -1",
+      );
+      assertEquals(
+        error.message,
+        "Invalid fee rate",
+        "Should have correct error message",
+      );
     }
 
     try {
       validateFee(0.05);
       assertEquals(false, true, "Should have thrown error for fee = 0.05");
     } catch (error) {
-      assertEquals(error instanceof Error, true, "Should throw Error for fee = 0.05");
-      assertEquals(error.message, "Fee rate too low", "Should have correct error message");
+      assertEquals(
+        error instanceof Error,
+        true,
+        "Should throw Error for fee = 0.05",
+      );
+      assertEquals(
+        error.message,
+        "Fee rate too low",
+        "Should have correct error message",
+      );
     }
   });
 
-  await t.step("Fee polling should handle network failures gracefully", async () => {
-    let fallbackUsed = false;
+  await t.step(
+    "Fee polling should handle network failures gracefully",
+    async () => {
+      let fallbackUsed = false;
 
-    const mockFeePolling = async (simulateFailure: boolean) => {
-      if (simulateFailure) {
-        // Simulate network failure
-        fallbackUsed = true;
+      const mockFeePolling = async (simulateFailure: boolean) => {
+        if (simulateFailure) {
+          // Simulate network failure
+          fallbackUsed = true;
+          return {
+            recommendedFee: 10, // Conservative fallback
+            btcPrice: 0,
+            source: "default" as const,
+            confidence: "low" as const,
+            timestamp: Date.now(),
+            fallbackUsed: true,
+            errors: ["Network timeout", "API unavailable"],
+          };
+        }
+
         return {
-          recommendedFee: 10, // Conservative fallback
-          btcPrice: 0,
-          source: "default" as const,
-          confidence: "low" as const,
+          recommendedFee: 5,
+          btcPrice: 50000,
+          source: "mempool" as const,
+          confidence: "high" as const,
           timestamp: Date.now(),
-          fallbackUsed: true,
-          errors: ["Network timeout", "API unavailable"]
+          fallbackUsed: false,
         };
-      }
-
-      return {
-        recommendedFee: 5,
-        btcPrice: 50000,
-        source: "mempool" as const,
-        confidence: "high" as const,
-        timestamp: Date.now(),
-        fallbackUsed: false
       };
-    };
 
-    // Test successful case
-    const successResult = await mockFeePolling(false);
-    assertEquals(successResult.fallbackUsed, false);
-    assertEquals(successResult.source, "mempool");
+      // Test successful case
+      const successResult = await mockFeePolling(false);
+      assertEquals(successResult.fallbackUsed, false);
+      assertEquals(successResult.source, "mempool");
 
-    // Test failure case with fallback
-    const failureResult = await mockFeePolling(true);
-    assertEquals(failureResult.fallbackUsed, true);
-    assertEquals(failureResult.source, "default");
-    assertEquals(failureResult.recommendedFee, 10); // Safe fallback
-    assertEquals(fallbackUsed, true);
-  });
+      // Test failure case with fallback
+      const failureResult = await mockFeePolling(true);
+      assertEquals(failureResult.fallbackUsed, true);
+      assertEquals(failureResult.source, "default");
+      assertEquals(failureResult.recommendedFee, 10); // Safe fallback
+      assertEquals(fallbackUsed, true);
+    },
+  );
 
   await t.step("Redis caching should be bypassed in development", () => {
     const isDevelopment = Deno.env.get("DENO_ENV") === "development";
-    const skipRedis = isDevelopment || (globalThis as any).SKIP_REDIS_CONNECTION;
+    const skipRedis = isDevelopment ||
+      (globalThis as any).SKIP_REDIS_CONNECTION;
 
     assertEquals(skipRedis, true, "Redis should be skipped in development");
 
@@ -206,7 +248,11 @@ Deno.test("Fee Polling Regression Tests", async (t) => {
     const mockFeesFromSignal = null; // No fee data available
     const loading = false;
 
-    const getFinalFee = (signalFees: any, userFee: number | null, currentFee: number) => {
+    const getFinalFee = (
+      signalFees: any,
+      userFee: number | null,
+      currentFee: number,
+    ) => {
       if (signalFees && !loading) {
         const recommendedFee = Math.round(signalFees.recommendedFee);
         if (recommendedFee >= 1) {
@@ -221,10 +267,22 @@ Deno.test("Fee Polling Regression Tests", async (t) => {
     };
 
     // Test various scenarios
-    assertEquals(getFinalFee(null, null, 0), 10, "Should use 10 sat/vB when no data");
+    assertEquals(
+      getFinalFee(null, null, 0),
+      10,
+      "Should use 10 sat/vB when no data",
+    );
     assertEquals(getFinalFee(null, 15, 0), 15, "Should use user fee when set");
-    assertEquals(getFinalFee({ recommendedFee: 5 }, null, 0), 5, "Should use signal fee when valid");
-    assertEquals(getFinalFee({ recommendedFee: 0 }, null, 0), 10, "Should fallback when signal fee invalid");
+    assertEquals(
+      getFinalFee({ recommendedFee: 5 }, null, 0),
+      5,
+      "Should use signal fee when valid",
+    );
+    assertEquals(
+      getFinalFee({ recommendedFee: 0 }, null, 0),
+      10,
+      "Should fallback when signal fee invalid",
+    );
   });
 
   // Cleanup
@@ -254,7 +312,11 @@ Deno.test("Fee Component Integration Tests", async (t) => {
 
     // Test with invalid recommended fee
     currentFee = 10; // Reset
-    const invalidFees = { recommendedFee: 0, btcPrice: 50000, source: "default" };
+    const invalidFees = {
+      recommendedFee: 0,
+      btcPrice: 50000,
+      source: "default",
+    };
 
     if (invalidFees && !loading) {
       const recommendedFee = Math.round(invalidFees.recommendedFee);
@@ -264,7 +326,11 @@ Deno.test("Fee Component Integration Tests", async (t) => {
       // Fee stays at 10 because recommended fee is invalid
     }
 
-    assertEquals(currentFee, 10, "Should keep safe fee when recommended fee is invalid");
+    assertEquals(
+      currentFee,
+      10,
+      "Should keep safe fee when recommended fee is invalid",
+    );
   });
 
   await t.step("Fee calculator should show recommended fee or fallback", () => {
@@ -294,11 +360,11 @@ Deno.test("Fee Component Integration Tests", async (t) => {
         available_rates: {
           conservative: 10,
           normal: 6,
-          minimum: 1
+          minimum: 1,
         },
         selected_rate: 10,
-        reason: "Development mode - API timeouts prevented"
-      }
+        reason: "Development mode - API timeouts prevented",
+      },
     };
 
     // Validate structure

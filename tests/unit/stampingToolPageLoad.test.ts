@@ -6,8 +6,8 @@
  */
 
 import {
-    TransactionConstructionService,
-    type EstimationOptions,
+  type EstimationOptions,
+  TransactionConstructionService,
 } from "$lib/utils/bitcoin/minting/TransactionConstructionService.ts";
 import { assertEquals, assertExists } from "@std/assert";
 import { describe, it } from "jsr:@std/testing@1.0.14/bdd";
@@ -45,11 +45,15 @@ describe("StampingTool Page Load Scenario", () => {
     });
 
     // Test what buildToolTransactionOptions produces
-    const toolOptions = (estimator as any).buildToolTransactionOptions(pageLoadOptions);
+    const toolOptions = (estimator as any).buildToolTransactionOptions(
+      pageLoadOptions,
+    );
 
     console.log("🔧 BUILT TOOL OPTIONS:", {
       walletAddress: toolOptions.walletAddress,
-      file: toolOptions.file ? `${toolOptions.file.substring(0, 20)}...` : toolOptions.file,
+      file: toolOptions.file
+        ? `${toolOptions.file.substring(0, 20)}...`
+        : toolOptions.file,
       filename: toolOptions.filename,
       fileSize: toolOptions.fileSize,
       quantity: toolOptions.quantity,
@@ -60,13 +64,28 @@ describe("StampingTool Page Load Scenario", () => {
     });
 
     // Validate that all required fields are present
-    assertExists(toolOptions.walletAddress, "walletAddress should be provided (dummy)");
+    assertExists(
+      toolOptions.walletAddress,
+      "walletAddress should be provided (dummy)",
+    );
     assertExists(toolOptions.file, "file should be provided (dummy)");
     assertExists(toolOptions.filename, "filename should be provided (dummy)");
     assertExists(toolOptions.fileSize, "fileSize should be provided (dummy)");
-    assertEquals(typeof toolOptions.quantity, "number", "quantity should be a number");
-    assertEquals(typeof toolOptions.locked, "boolean", "locked should be a boolean");
-    assertEquals(typeof toolOptions.divisible, "boolean", "divisible should be a boolean");
+    assertEquals(
+      typeof toolOptions.quantity,
+      "number",
+      "quantity should be a number",
+    );
+    assertEquals(
+      typeof toolOptions.locked,
+      "boolean",
+      "locked should be a boolean",
+    );
+    assertEquals(
+      typeof toolOptions.divisible,
+      "boolean",
+      "divisible should be a boolean",
+    );
     assertEquals(toolOptions.dryRun, true, "dryRun should be true");
 
     // These should match the endpoint's required fields
@@ -90,8 +109,11 @@ describe("StampingTool Page Load Scenario", () => {
 
     // All required fields should be present
     Object.entries(requiredFields).forEach(([key, value]) => {
-      assertEquals(value !== undefined && value !== null && value !== "", true,
-        `Required field ${key} should not be empty/undefined/null, got: ${value}`);
+      assertEquals(
+        value !== undefined && value !== null && value !== "",
+        true,
+        `Required field ${key} should not be empty/undefined/null, got: ${value}`,
+      );
     });
   });
 
@@ -114,7 +136,9 @@ describe("StampingTool Page Load Scenario", () => {
     console.log("======================");
 
     console.log("\n❌ OLD BEHAVIOR (Before Fix):");
-    console.log("- Phase 2 condition: if (!walletAddress || !isConnected) return;");
+    console.log(
+      "- Phase 2 condition: if (!walletAddress || !isConnected) return;",
+    );
     console.log("- Result: Phase 2 never runs without wallet connection");
     console.log("- User sees: Only Phase 1 mathematical estimates");
     console.log("- No API calls made");
@@ -125,11 +149,17 @@ describe("StampingTool Page Load Scenario", () => {
     console.log("- User sees: Better estimates from actual endpoint");
     console.log("- API call made: /api/v2/olga/mint with dryRun=true");
 
-    const toolOptions = (estimator as any).buildToolTransactionOptions(pageLoadOptions);
+    const toolOptions = (estimator as any).buildToolTransactionOptions(
+      pageLoadOptions,
+    );
 
     console.log("\n📦 DUMMY VALUES PROVIDED:");
     console.log(`- walletAddress: ${toolOptions.walletAddress}`);
-    console.log(`- file: ${toolOptions.file.substring(0, 30)}... (${toolOptions.file.length} chars)`);
+    console.log(
+      `- file: ${
+        toolOptions.file.substring(0, 30)
+      }... (${toolOptions.file.length} chars)`,
+    );
     console.log(`- filename: ${toolOptions.filename}`);
     console.log(`- fileSize: ${toolOptions.fileSize} bytes`);
     console.log(`- quantity: ${toolOptions.quantity}`);
@@ -155,8 +185,8 @@ describe("StampingTool Page Load Scenario", () => {
 
     // Old condition (should block)
     const oldConditionBlocks = !pageLoadConditions.walletAddress ||
-                             !pageLoadConditions.isConnected ||
-                             pageLoadConditions.isSubmitting;
+      !pageLoadConditions.isConnected ||
+      pageLoadConditions.isSubmitting;
 
     // New condition (should allow)
     const newConditionBlocks = pageLoadConditions.isSubmitting;
@@ -166,13 +196,23 @@ describe("StampingTool Page Load Scenario", () => {
     console.log(`- New condition blocks Phase 2: ${newConditionBlocks}`);
 
     if (oldConditionBlocks && !newConditionBlocks) {
-      console.log("✅ SUCCESS: New condition allows Phase 2 when old condition blocked it");
+      console.log(
+        "✅ SUCCESS: New condition allows Phase 2 when old condition blocked it",
+      );
     } else {
       console.log("❌ ISSUE: Conditions don't behave as expected");
     }
 
     // Validate the fix
-    assertEquals(oldConditionBlocks, true, "Old condition should block Phase 2 on page load");
-    assertEquals(newConditionBlocks, false, "New condition should allow Phase 2 on page load");
+    assertEquals(
+      oldConditionBlocks,
+      true,
+      "Old condition should block Phase 2 on page load",
+    );
+    assertEquals(
+      newConditionBlocks,
+      false,
+      "New condition should allow Phase 2 on page load",
+    );
   });
 });

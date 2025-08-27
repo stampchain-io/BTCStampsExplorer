@@ -6,7 +6,12 @@
 import { dbManager } from "$server/database/databaseManager.ts";
 import { SRC20Repository } from "$server/database/src20Repository.ts";
 import { assertEquals, assertExists } from "@std/assert";
-import { afterEach, beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  it,
+} from "jsr:@std/testing@1.0.14/bdd";
 import { MockDatabaseManager } from "../mocks/mockDatabaseManager.ts";
 
 // Test fixtures for sorting validation

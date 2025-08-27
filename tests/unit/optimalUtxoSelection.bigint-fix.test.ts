@@ -1,10 +1,6 @@
 import { OptimalUTXOSelection } from "$server/services/utxo/optimalUtxoSelection.ts";
 import type { BasicUTXO, Output } from "$types/index.d.ts";
-import {
-  assertEquals,
-  assertExists,
-  assertThrows,
-} from "@std/assert";
+import { assertEquals, assertExists, assertThrows } from "@std/assert";
 
 Deno.test("OptimalUTXOSelection - BigInt(Infinity) fix", async (t) => {
   await t.step(
@@ -49,15 +45,24 @@ Deno.test("OptimalUTXOSelection - BigInt(Infinity) fix", async (t) => {
 
       // This should throw due to insufficient funds for fees
       try {
-        const result = OptimalUTXOSelection.selectUTXOs(utxos, outputs, feeRate);
+        const result = OptimalUTXOSelection.selectUTXOs(
+          utxos,
+          outputs,
+          feeRate,
+        );
         // If we get here without throwing, the test should fail
         // Log the result to understand what happened
         console.log("Unexpected result:", result);
-        throw new Error("Expected function to throw 'Insufficient funds' but it returned a result");
+        throw new Error(
+          "Expected function to throw 'Insufficient funds' but it returned a result",
+        );
       } catch (error) {
         // Verify it's the expected error
-        assertEquals(error.message.includes("Insufficient funds"), true, 
-          `Expected error containing 'Insufficient funds', got: ${error.message}`);
+        assertEquals(
+          error.message.includes("Insufficient funds"),
+          true,
+          `Expected error containing 'Insufficient funds', got: ${error.message}`,
+        );
       }
     },
   );
@@ -142,18 +147,22 @@ Deno.test("OptimalUTXOSelection - BigInt(Infinity) fix", async (t) => {
       assertEquals(
         typeof result.waste === "number" && isFinite(result.waste),
         true,
-        "Waste should be a finite number"
+        "Waste should be a finite number",
       );
 
       // Check all numeric properties are finite
       assertEquals(isFinite(result.fee), true, "Fee should be finite");
       assertEquals(isFinite(result.change), true, "Change should be finite");
-      
+
       // Verify algorithm was selected
       assertExists(result.algorithm, "Algorithm should be specified");
-      
+
       // Verify inputs were selected
-      assertEquals(result.inputs.length > 0, true, "Should have selected inputs");
+      assertEquals(
+        result.inputs.length > 0,
+        true,
+        "Should have selected inputs",
+      );
     },
   );
 });

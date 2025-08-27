@@ -1,6 +1,12 @@
 import { MemoryMonitorService } from "$/server/services/monitoring/memoryMonitorService.ts";
 import { assert, assertEquals, assertExists } from "@std/assert";
-import { afterAll, afterEach, beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
+import {
+  afterAll,
+  afterEach,
+  beforeEach,
+  describe,
+  it,
+} from "jsr:@std/testing@1.0.14/bdd";
 
 describe("MemoryMonitorService", () => {
   let memoryMonitor: MemoryMonitorService;
@@ -9,10 +15,10 @@ describe("MemoryMonitorService", () => {
     // Mock Deno.addSignalListener to prevent leaks
     const originalAddSignalListener = Deno.addSignalListener;
     Deno.addSignalListener = () => {};
-    
+
     // Get the singleton instance
     memoryMonitor = MemoryMonitorService.getInstance();
-    
+
     // Restore after initialization
     Deno.addSignalListener = originalAddSignalListener;
   });
@@ -22,7 +28,7 @@ describe("MemoryMonitorService", () => {
     memoryMonitor.resetPeakMemory();
     memoryMonitor.clearHistory();
   });
-  
+
   afterAll(() => {
     // Stop monitoring to clean up intervals and listeners
     memoryMonitor.stopMonitoring();
@@ -120,16 +126,22 @@ describe("MemoryMonitorService", () => {
 
       // Test that the memory pressure matches the expected thresholds
       // We can't predict exact memory usage in tests, so verify the logic
-      const expectedPressure = usagePercent >= 85 ? "critical" :
-                              usagePercent >= 70 ? "high" :
-                              usagePercent >= 50 ? "medium" : "low";
+      const expectedPressure = usagePercent >= 85
+        ? "critical"
+        : usagePercent >= 70
+        ? "high"
+        : usagePercent >= 50
+        ? "medium"
+        : "low";
 
       assertEquals(health.metrics.memoryPressure, expectedPressure);
-      
+
       // Also verify that the pressure is one of the valid values
       assert(
-        ["low", "medium", "high", "critical"].includes(health.metrics.memoryPressure),
-        `Invalid memory pressure value: ${health.metrics.memoryPressure}`
+        ["low", "medium", "high", "critical"].includes(
+          health.metrics.memoryPressure,
+        ),
+        `Invalid memory pressure value: ${health.metrics.memoryPressure}`,
       );
     });
   });

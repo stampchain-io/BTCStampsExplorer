@@ -514,7 +514,10 @@ class TestStampService {
         };
       }
 
-      const asset = await MockCounterpartyApiManager.getAssetInfo(stamp.cpid, 300);
+      const asset = await MockCounterpartyApiManager.getAssetInfo(
+        stamp.cpid,
+        300,
+      );
 
       return {
         stamp,
@@ -753,7 +756,12 @@ class TestStampService {
     limit: number,
     _options: any,
   ) {
-    return await MockCounterpartyApiManager.getAllXcpHoldersByCpid(cpid, page, limit, 300);
+    return await MockCounterpartyApiManager.getAllXcpHoldersByCpid(
+      cpid,
+      page,
+      limit,
+      300,
+    );
   }
 
   static async getStampSends(
@@ -762,7 +770,12 @@ class TestStampService {
     limit: number,
     _options: any,
   ) {
-    return await MockCounterpartyApiManager.getXcpSendsByCPID(cpid, page, limit, 300);
+    return await MockCounterpartyApiManager.getXcpSendsByCPID(
+      cpid,
+      page,
+      limit,
+      300,
+    );
   }
 
   static async getStampDispensers(
@@ -772,7 +785,11 @@ class TestStampService {
     _options?: any,
   ) {
     if (page !== undefined && limit !== undefined) {
-      return await MockCounterpartyDispenserService.getDispensersByCpid(cpid, page, limit);
+      return await MockCounterpartyDispenserService.getDispensersByCpid(
+        cpid,
+        page,
+        limit,
+      );
     }
     return await MockCounterpartyDispenserService.getDispensersByCpid(cpid);
   }

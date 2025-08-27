@@ -1,15 +1,15 @@
 import { assert, assertEquals, assertExists, assertThrows } from "@std/assert";
 import { beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
-import { stub, returnsNext, Stub } from "@std/testing@1.0.14/mock";
+import { returnsNext, Stub, stub } from "@std/testing@1.0.14/mock";
 
 import {
   calculateCIP33ChunkCount,
-  getP2WSHOutputSize,
+  calculateMinimumFunding,
   calculateTotalDustValue,
   estimateMARATransactionSize,
-  validateMARAOutputValue,
-  calculateMinimumFunding,
+  getP2WSHOutputSize,
   type MARATransactionEstimateConfig,
+  validateMARAOutputValue,
 } from "../../lib/utils/bitcoin/minting/maraTransactionSizeEstimator.ts";
 
 import type { ScriptType } from "$types/index.d.ts";
@@ -176,7 +176,7 @@ describe("MARA Transaction Size Estimator", () => {
       };
 
       const result = estimateMARATransactionSize(configWithWitness);
-      
+
       // Should include witness marker and flag
       assert(result.estimatedWeight > 0);
       assert(result.estimatedSize > 0);
@@ -192,7 +192,7 @@ describe("MARA Transaction Size Estimator", () => {
       };
 
       const result = estimateMARATransactionSize(configNonWitness);
-      
+
       // Non-witness inputs should result in larger size
       assert(result.estimatedWeight > 0);
       assert(result.estimatedSize > 0);
@@ -287,14 +287,14 @@ describe("MARA Transaction Size Estimator", () => {
 
     it("should produce breakdown with correct totals", () => {
       const result = estimateMARATransactionSize(basicConfig);
-      
-      const calculatedTotal = result.breakdown.base + 
-                            result.breakdown.inputs + 
-                            result.breakdown.opReturn + 
-                            result.breakdown.dataOutputs + 
-                            result.breakdown.serviceFee + 
-                            result.breakdown.change;
-      
+
+      const calculatedTotal = result.breakdown.base +
+        result.breakdown.inputs +
+        result.breakdown.opReturn +
+        result.breakdown.dataOutputs +
+        result.breakdown.serviceFee +
+        result.breakdown.change;
+
       assertEquals(result.breakdown.total, result.estimatedSize);
     });
 
@@ -312,7 +312,10 @@ describe("MARA Transaction Size Estimator", () => {
     it("should handle multiple inputs efficiently", () => {
       const manyInputsConfig = {
         ...basicConfig,
-        inputs: Array(10).fill({ type: "P2WPKH" as ScriptType, isWitness: true }),
+        inputs: Array(10).fill({
+          type: "P2WPKH" as ScriptType,
+          isWitness: true,
+        }),
       };
 
       const result = estimateMARATransactionSize(manyInputsConfig);
@@ -348,14 +351,16 @@ describe("MARA Transaction Size Estimator", () => {
       assertEquals(result.breakdown.serviceFee, 42000);
 
       // Verify buffer is 10% of miner fee
-      const expectedBuffer = Math.ceil(result.breakdown.estimatedMinerFee * 0.1);
+      const expectedBuffer = Math.ceil(
+        result.breakdown.estimatedMinerFee * 0.1,
+      );
       assertEquals(result.breakdown.buffer, expectedBuffer);
 
       // Verify total calculation
       const expectedTotal = result.breakdown.dustTotal +
-                          result.breakdown.serviceFee +
-                          result.breakdown.estimatedMinerFee +
-                          result.breakdown.buffer;
+        result.breakdown.serviceFee +
+        result.breakdown.estimatedMinerFee +
+        result.breakdown.buffer;
       assertEquals(result.minimumFunding, expectedTotal);
     });
 
@@ -418,7 +423,10 @@ describe("MARA Transaction Size Estimator", () => {
       };
 
       const result = calculateMinimumFunding(manyInputsConfig);
-      assert(result.breakdown.estimatedMinerFee > basicFundingConfig.estimatedInputCount);
+      assert(
+        result.breakdown.estimatedMinerFee >
+          basicFundingConfig.estimatedInputCount,
+      );
     });
 
     it("should handle MARA mode output values", () => {
@@ -443,11 +451,11 @@ describe("MARA Transaction Size Estimator", () => {
 
     it("should provide realistic funding estimates", () => {
       const result = calculateMinimumFunding(basicFundingConfig);
-      
+
       // Minimum funding should be reasonable for real use
       assert(result.minimumFunding > 40000); // Should cover service fee
       assert(result.minimumFunding < 100000); // Should not be excessive
-      
+
       // Buffer should be reasonable
       assert(result.breakdown.buffer > 0);
       assert(result.breakdown.buffer < result.breakdown.estimatedMinerFee);
@@ -458,7 +466,7 @@ describe("MARA Transaction Size Estimator", () => {
     it("should handle complete MARA transaction workflow", () => {
       const fileSize = 128;
       const outputValue = 150;
-      
+
       // Step 1: Validate output value
       const validation = validateMARAOutputValue(outputValue);
       assertEquals(validation.isValid, true);
@@ -504,7 +512,7 @@ describe("MARA Transaction Size Estimator", () => {
 
       const funding = calculateMinimumFunding(fundingConfig);
       assertEquals(funding.breakdown.dustTotal, dustValue);
-      
+
       // Verify consistency between estimates
       assert(funding.breakdown.estimatedMinerFee > 0);
       assert(funding.minimumFunding > dustValue + 42000);
@@ -533,7 +541,10 @@ describe("MARA Transaction Size Estimator", () => {
     it("should handle maximum complexity transactions", () => {
       // Large file, many inputs, high fees
       const complexConfig: MARATransactionEstimateConfig = {
-        inputs: Array(20).fill({ type: "P2WPKH" as ScriptType, isWitness: true }),
+        inputs: Array(20).fill({
+          type: "P2WPKH" as ScriptType,
+          isWitness: true,
+        }),
         fileSize: 5000,
         outputValue: 300,
         includeServiceFee: true,
@@ -567,14 +578,17 @@ describe("MARA Transaction Size Estimator", () => {
       const largeFile = 1000000; // 1MB
       const chunkCount = calculateCIP33ChunkCount(largeFile);
       assertEquals(chunkCount, Math.ceil(largeFile / 32));
-      
+
       const dustValue = calculateTotalDustValue(chunkCount, 100);
       assertEquals(dustValue, chunkCount * 100);
     });
 
     it("should maintain precision with large calculations", () => {
       const config: MARATransactionEstimateConfig = {
-        inputs: Array(50).fill({ type: "P2WPKH" as ScriptType, isWitness: true }),
+        inputs: Array(50).fill({
+          type: "P2WPKH" as ScriptType,
+          isWitness: true,
+        }),
         fileSize: 100000,
         outputValue: 333,
         includeServiceFee: true,
@@ -586,7 +600,7 @@ describe("MARA Transaction Size Estimator", () => {
       };
 
       const result = estimateMARATransactionSize(config);
-      
+
       // Verify calculations don't overflow or lose precision
       assert(result.estimatedSize > 0);
       assert(result.estimatedWeight > 0);

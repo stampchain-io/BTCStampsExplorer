@@ -3,10 +3,7 @@ import { StampValidationService } from "$server/services/stamp/stampValidationSe
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
 import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
 import * as bitcoin from "bitcoinjs-lib";
-import {
-  assertEquals,
-  assertExists,
-} from "@std/assert/mod.ts";
+import { assertEquals, assertExists } from "@std/assert/mod.ts";
 import { stub } from "@std/testing/mock.ts";
 import { mintAddressUTXOs } from "../fixtures/utxoFixtures.mint.ts";
 

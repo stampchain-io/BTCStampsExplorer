@@ -3,73 +3,70 @@
  * Verifies all type guards work correctly after consolidation
  */
 
-import { assertEquals, assertExists } from "https://deno.land/std@0.208.0/assert/mod.ts";
 import {
-  // Bitcoin Protocol Guards
-  isP2PKHAddress,
-  isP2SHAddress,
-  isP2WPKHAddress,
-  isP2TRAddress,
-  isValidBitcoinAddress,
-  isTxHash,
-  isValidUTXO,
-  isValidTransactionInput,
-  isValidTransactionOutput,
-  
-  // Bitcoin Script Guards
-  isP2PKHScript,
-  isP2SHScript,
-  isP2WPKHScript,
-  isP2WSHScript,
-  isP2TRScript,
-  
-  // SRC-20 Protocol Guards
-  isValidSRC20Ticker,
-  isValidSrc20Tick,
-  isValidSRC20Deploy,
-  isValidSRC20Mint,
-  isValidSRC20Transfer,
-  isSRC20Operation,
-  isSRC20Data,
-  validateSRC20Deployment,
-  
-  // SRC-101 Protocol Guards
-  isValidSRC101Slug,
-  isValidSRC101Deploy,
-  
-  // Stamp Protocol Guards
-  isValidStampNumber,
-  isStampNumber,
-  isStampHash,
-  isValidCPID,
-  isCpid,
-  isValidStampClassification,
-  isValidStampMimeType,
-  isValidBase64StampData,
-  isValidStampRow,
-  isStampData,
-  
+  assertEquals,
+  assertExists,
+} from "https://deno.land/std@0.208.0/assert/mod.ts";
+import {
+  filterNonNull,
+  isAPIError,
   // Error Type Guards
   isApplicationError,
-  isValidationError,
-  isAPIError,
-  isBitcoinError,
-  isSRC20Error,
-  isStampError,
-  isNetworkError,
   isAuthenticationError,
   isAuthorizationError,
-  
+  isBitcoinError,
+  isCpid,
+  isDefined,
+  isNetworkError,
+  isNonEmptyArray,
+  isNonEmptyString,
+  isNonNegativeNumber,
   // Utility Guards
   isObject,
-  isNonEmptyString,
+  // Bitcoin Protocol Guards
+  isP2PKHAddress,
+  // Bitcoin Script Guards
+  isP2PKHScript,
+  isP2SHAddress,
+  isP2SHScript,
+  isP2TRAddress,
+  isP2TRScript,
+  isP2WPKHAddress,
+  isP2WPKHScript,
+  isP2WSHScript,
   isPositiveInteger,
-  isNonNegativeNumber,
-  isNonEmptyArray,
+  isSRC20Data,
+  isSRC20Error,
+  isSRC20Operation,
+  isStampData,
+  isStampError,
+  isStampHash,
+  isStampNumber,
+  isTxHash,
+  isValidationError,
+  isValidBase64StampData,
+  isValidBitcoinAddress,
+  isValidCPID,
+  isValidSRC101Deploy,
+  // SRC-101 Protocol Guards
+  isValidSRC101Slug,
+  isValidSRC20Deploy,
+  isValidSRC20Mint,
+  isValidSrc20Tick,
+  // SRC-20 Protocol Guards
+  isValidSRC20Ticker,
+  isValidSRC20Transfer,
+  isValidStampClassification,
+  isValidStampMimeType,
+  // Stamp Protocol Guards
+  isValidStampNumber,
+  isValidStampRow,
+  isValidTransactionInput,
+  isValidTransactionOutput,
+  isValidUTXO,
   safeFirst,
   safeLast,
-  filterNonNull,
-  isDefined,
+  validateSRC20Deployment,
 } from "$lib/utils/typeGuards.ts";
 
 // ============================================================================
@@ -85,7 +82,10 @@ Deno.test("Bitcoin Address Type Guards", async (t) => {
 
   await t.step("isP2PKHAddress - invalid addresses", () => {
     assertEquals(isP2PKHAddress("3J98t1WpEZ73CNmQviecrnyiWrnqRhWNLy"), false);
-    assertEquals(isP2PKHAddress("bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq"), false);
+    assertEquals(
+      isP2PKHAddress("bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq"),
+      false,
+    );
     assertEquals(isP2PKHAddress("invalid"), false);
     assertEquals(isP2PKHAddress(""), false);
   });
@@ -96,20 +96,50 @@ Deno.test("Bitcoin Address Type Guards", async (t) => {
   });
 
   await t.step("isP2WPKHAddress - valid addresses", () => {
-    assertEquals(isP2WPKHAddress("bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq"), true);
-    assertEquals(isP2WPKHAddress("bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4"), true);
+    assertEquals(
+      isP2WPKHAddress("bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq"),
+      true,
+    );
+    assertEquals(
+      isP2WPKHAddress("bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4"),
+      true,
+    );
   });
 
   await t.step("isP2TRAddress - valid addresses", () => {
-    assertEquals(isP2TRAddress("bc1p5cyxnuxmeuwuvkwfem96lqzszd02n6xdcjrs20cac6yqjjwudpxqkedrcr"), true);
-    assertEquals(isP2TRAddress("bc1p0xlxvlhemja6c4dqv22uapctqupfhlxm9h8z3k2e72q4k9hcz7vqzk5jj0"), true);
+    assertEquals(
+      isP2TRAddress(
+        "bc1p5cyxnuxmeuwuvkwfem96lqzszd02n6xdcjrs20cac6yqjjwudpxqkedrcr",
+      ),
+      true,
+    );
+    assertEquals(
+      isP2TRAddress(
+        "bc1p0xlxvlhemja6c4dqv22uapctqupfhlxm9h8z3k2e72q4k9hcz7vqzk5jj0",
+      ),
+      true,
+    );
   });
 
   await t.step("isValidBitcoinAddress - all types", () => {
-    assertEquals(isValidBitcoinAddress("1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2"), true);
-    assertEquals(isValidBitcoinAddress("3J98t1WpEZ73CNmQviecrnyiWrnqRhWNLy"), true);
-    assertEquals(isValidBitcoinAddress("bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq"), true);
-    assertEquals(isValidBitcoinAddress("bc1p5cyxnuxmeuwuvkwfem96lqzszd02n6xdcjrs20cac6yqjjwudpxqkedrcr"), true);
+    assertEquals(
+      isValidBitcoinAddress("1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2"),
+      true,
+    );
+    assertEquals(
+      isValidBitcoinAddress("3J98t1WpEZ73CNmQviecrnyiWrnqRhWNLy"),
+      true,
+    );
+    assertEquals(
+      isValidBitcoinAddress("bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq"),
+      true,
+    );
+    assertEquals(
+      isValidBitcoinAddress(
+        "bc1p5cyxnuxmeuwuvkwfem96lqzszd02n6xdcjrs20cac6yqjjwudpxqkedrcr",
+      ),
+      true,
+    );
     assertEquals(isValidBitcoinAddress("invalid_address"), false);
   });
 });
@@ -120,14 +150,34 @@ Deno.test("Bitcoin Address Type Guards", async (t) => {
 
 Deno.test("Transaction Type Guards", async (t) => {
   await t.step("isTxHash - valid transaction hashes", () => {
-    assertEquals(isTxHash("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"), true);
-    assertEquals(isTxHash("0000000000000000000000000000000000000000000000000000000000000000"), true);
-    assertEquals(isTxHash("abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890"), true);
+    assertEquals(
+      isTxHash(
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      ),
+      true,
+    );
+    assertEquals(
+      isTxHash(
+        "0000000000000000000000000000000000000000000000000000000000000000",
+      ),
+      true,
+    );
+    assertEquals(
+      isTxHash(
+        "abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+      ),
+      true,
+    );
   });
 
   await t.step("isTxHash - invalid transaction hashes", () => {
     assertEquals(isTxHash("too_short"), false);
-    assertEquals(isTxHash("not_hex_characters_zzz0000000000000000000000000000000000000000000"), false);
+    assertEquals(
+      isTxHash(
+        "not_hex_characters_zzz0000000000000000000000000000000000000000000",
+      ),
+      false,
+    );
     assertEquals(isTxHash(""), false);
   });
 
@@ -136,31 +186,67 @@ Deno.test("Transaction Type Guards", async (t) => {
       txid: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       vout: 0,
       value: 100000,
-      script: "76a914"
+      script: "76a914",
     };
     assertEquals(isValidUTXO(validUTXO), true);
   });
 
   await t.step("isValidUTXO - invalid UTXO", () => {
-    assertEquals(isValidUTXO({ txid: "invalid", vout: 0, value: 100000, script: "76a914" }), false);
-    assertEquals(isValidUTXO({ txid: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", vout: -1, value: 100000, script: "76a914" }), false);
-    assertEquals(isValidUTXO({ txid: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", vout: 0, value: -100, script: "76a914" }), false);
+    assertEquals(
+      isValidUTXO({
+        txid: "invalid",
+        vout: 0,
+        value: 100000,
+        script: "76a914",
+      }),
+      false,
+    );
+    assertEquals(
+      isValidUTXO({
+        txid:
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        vout: -1,
+        value: 100000,
+        script: "76a914",
+      }),
+      false,
+    );
+    assertEquals(
+      isValidUTXO({
+        txid:
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        vout: 0,
+        value: -100,
+        script: "76a914",
+      }),
+      false,
+    );
     assertEquals(isValidUTXO(null), false);
   });
 
   await t.step("isValidTransactionInput", () => {
     const validInput = { type: "p2pkh", isWitness: false, size: 148 };
     assertEquals(isValidTransactionInput(validInput), true);
-    
+
     const invalidInput = { type: "", isWitness: false, size: 148 };
     assertEquals(isValidTransactionInput(invalidInput), false);
   });
 
   await t.step("isValidTransactionOutput", () => {
-    const validOutput = { type: "p2pkh", value: 100000, isWitness: false, size: 34 };
+    const validOutput = {
+      type: "p2pkh",
+      value: 100000,
+      isWitness: false,
+      size: 34,
+    };
     assertEquals(isValidTransactionOutput(validOutput), true);
-    
-    const invalidOutput = { type: "p2pkh", value: -100, isWitness: false, size: 34 };
+
+    const invalidOutput = {
+      type: "p2pkh",
+      value: -100,
+      isWitness: false,
+      size: 34,
+    };
     assertEquals(isValidTransactionOutput(invalidOutput), false);
   });
 });
@@ -193,7 +279,7 @@ Deno.test("SRC-20 Protocol Type Guards", async (t) => {
       tick: "TEST",
       max: "1000000",
       lim: "1000",
-      dec: "8"
+      dec: "8",
     };
     assertEquals(isValidSRC20Deploy(validDeploy), true);
 
@@ -201,7 +287,7 @@ Deno.test("SRC-20 Protocol Type Guards", async (t) => {
       p: "src-20",
       op: "deploy",
       tick: "TOOLONG",
-      max: "1000000"
+      max: "1000000",
     };
     assertEquals(isValidSRC20Deploy(invalidDeploy), false);
   });
@@ -211,7 +297,7 @@ Deno.test("SRC-20 Protocol Type Guards", async (t) => {
       p: "src-20",
       op: "mint",
       tick: "TEST",
-      amt: "1000"
+      amt: "1000",
     };
     assertEquals(isValidSRC20Mint(validMint), true);
 
@@ -219,7 +305,7 @@ Deno.test("SRC-20 Protocol Type Guards", async (t) => {
       p: "src-20",
       op: "mint",
       tick: "TEST",
-      amt: "0"
+      amt: "0",
     };
     assertEquals(isValidSRC20Mint(invalidMint), false);
   });
@@ -229,7 +315,7 @@ Deno.test("SRC-20 Protocol Type Guards", async (t) => {
       p: "src-20",
       op: "transfer",
       tick: "TEST",
-      amt: "500"
+      amt: "500",
     };
     assertEquals(isValidSRC20Transfer(validTransfer), true);
 
@@ -237,7 +323,7 @@ Deno.test("SRC-20 Protocol Type Guards", async (t) => {
       p: "src-20",
       op: "transfer",
       tick: "TEST",
-      amt: "-100"
+      amt: "-100",
     };
     assertEquals(isValidSRC20Transfer(invalidTransfer), false);
   });
@@ -249,7 +335,7 @@ Deno.test("SRC-20 Protocol Type Guards", async (t) => {
       tick: "BTC",
       max: "21000000000000001",
       lim: "1000",
-      dec: "8"
+      dec: "8",
     };
     const result = validateSRC20Deployment(deployment);
     assertEquals(result.valid, true);
@@ -316,7 +402,7 @@ Deno.test("Stamp Protocol Type Guards", async (t) => {
       locked: true,
       supply: 1000,
       stamp_mimetype: "image/png",
-      stamp_base64: "aGVsbG8=" // "hello" in base64
+      stamp_base64: "aGVsbG8=", // "hello" in base64
     };
     assertEquals(isValidStampRow(validRow), true);
 
@@ -326,7 +412,7 @@ Deno.test("Stamp Protocol Type Guards", async (t) => {
       creator: "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2",
       divisible: false,
       locked: true,
-      supply: 1000
+      supply: 1000,
     };
     assertEquals(isValidStampRow(invalidRow), false);
   });
@@ -343,7 +429,7 @@ Deno.test("Error Type Guards", async (t) => {
     (appError as any).timestamp = Date.now();
     (appError as any).correlationId = "12345";
     assertEquals(isApplicationError(appError), true);
-    
+
     const regularError = new Error("Regular error");
     assertEquals(isApplicationError(regularError), false);
   });
@@ -352,7 +438,7 @@ Deno.test("Error Type Guards", async (t) => {
     const validationError = new Error("Validation failed");
     (validationError as any).code = "VALIDATION_REQUIRED_FIELD";
     assertEquals(isValidationError(validationError), true);
-    
+
     const otherError = new Error("Other error");
     (otherError as any).code = "OTHER_ERROR";
     assertEquals(isValidationError(otherError), false);
@@ -518,7 +604,12 @@ Deno.test("SRC-101 Protocol Type Guards", async (t) => {
     assertEquals(isValidSRC101Slug("cool-collection-123"), true);
     assertEquals(isValidSRC101Slug("invalid_slug"), false);
     assertEquals(isValidSRC101Slug("UPPERCASE"), false);
-    assertEquals(isValidSRC101Slug("too-long-slug-that-exceeds-fifty-characters-limit-here"), false);
+    assertEquals(
+      isValidSRC101Slug(
+        "too-long-slug-that-exceeds-fifty-characters-limit-here",
+      ),
+      false,
+    );
   });
 
   await t.step("isValidSRC101Deploy", () => {
@@ -528,7 +619,7 @@ Deno.test("SRC-101 Protocol Type Guards", async (t) => {
       name: "My NFT Collection",
       slug: "my-nft",
       supply: "1000",
-      traits: { rarity: "common" }
+      traits: { rarity: "common" },
     };
     assertEquals(isValidSRC101Deploy(validDeploy), true);
 
@@ -536,7 +627,7 @@ Deno.test("SRC-101 Protocol Type Guards", async (t) => {
       p: "src-101",
       op: "deploy",
       name: "",
-      slug: "my-nft"
+      slug: "my-nft",
     };
     assertEquals(isValidSRC101Deploy(invalidDeploy), false);
   });
@@ -544,11 +635,11 @@ Deno.test("SRC-101 Protocol Type Guards", async (t) => {
 
 // Wallet State Type Guards Tests
 Deno.test("Wallet State Type Guards", async (t) => {
-  const { 
-    isValidWalletProvider, 
-    isConnectedWallet, 
+  const {
+    isValidWalletProvider,
+    isConnectedWallet,
     isWalletConnectionResult,
-    isValidWalletState 
+    isValidWalletState,
   } = await import("$lib/utils/typeGuards.ts");
 
   await t.step("isValidWalletProvider", () => {
@@ -571,17 +662,19 @@ Deno.test("Wallet State Type Guards", async (t) => {
     // Valid connected wallet
     const validWallet = {
       address: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
-      publicKey: "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+      publicKey:
+        "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
       provider: "unisat",
-      balance: 1000000
+      balance: 1000000,
     };
     assertEquals(isConnectedWallet(validWallet), true);
 
     // Valid wallet without balance
     const walletNoBalance = {
       address: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
-      publicKey: "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
-      provider: "xverse"
+      publicKey:
+        "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+      provider: "xverse",
     };
     assertEquals(isConnectedWallet(walletNoBalance), true);
 
@@ -590,11 +683,14 @@ Deno.test("Wallet State Type Guards", async (t) => {
     assertEquals(isConnectedWallet(undefined), false);
     assertEquals(isConnectedWallet({}), false);
     assertEquals(isConnectedWallet({ address: "invalid" }), false);
-    assertEquals(isConnectedWallet({ 
-      address: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
-      publicKey: "",
-      provider: "unisat"
-    }), false);
+    assertEquals(
+      isConnectedWallet({
+        address: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+        publicKey: "",
+        provider: "unisat",
+      }),
+      false,
+    );
   });
 
   await t.step("isWalletConnectionResult", () => {
@@ -602,8 +698,9 @@ Deno.test("Wallet State Type Guards", async (t) => {
     const successResult = {
       success: true,
       address: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
-      publicKey: "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
-      provider: "unisat"
+      publicKey:
+        "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+      provider: "unisat",
     };
     assertEquals(isWalletConnectionResult(successResult), true);
 
@@ -612,8 +709,8 @@ Deno.test("Wallet State Type Guards", async (t) => {
       success: false,
       error: {
         code: "USER_REJECTED",
-        message: "User rejected the connection request"
-      }
+        message: "User rejected the connection request",
+      },
     };
     assertEquals(isWalletConnectionResult(errorResult), true);
 
@@ -622,20 +719,29 @@ Deno.test("Wallet State Type Guards", async (t) => {
     assertEquals(isWalletConnectionResult(undefined), false);
     assertEquals(isWalletConnectionResult({}), false);
     assertEquals(isWalletConnectionResult({ success: "true" }), false);
-    assertEquals(isWalletConnectionResult({ 
-      success: true,
-      address: "invalid-address"
-    }), false);
+    assertEquals(
+      isWalletConnectionResult({
+        success: true,
+        address: "invalid-address",
+      }),
+      false,
+    );
   });
 
   await t.step("isValidWalletState", () => {
     // Valid states
-    assertEquals(isValidWalletState({ address: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa" }), true);
-    assertEquals(isValidWalletState({ 
-      address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
-      connected: true,
-      provider: "unisat"
-    }), true);
+    assertEquals(
+      isValidWalletState({ address: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa" }),
+      true,
+    );
+    assertEquals(
+      isValidWalletState({
+        address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
+        connected: true,
+        provider: "unisat",
+      }),
+      true,
+    );
 
     // Invalid states
     assertEquals(isValidWalletState(null), false);
@@ -648,10 +754,10 @@ Deno.test("Wallet State Type Guards", async (t) => {
 
 // Fee Calculation Type Guards Tests
 Deno.test("Fee Calculation Type Guards", async (t) => {
-  const { 
-    isValidFeeRate, 
-    isValidFeeEstimate, 
-    isFeeAlert 
+  const {
+    isValidFeeRate,
+    isValidFeeEstimate,
+    isFeeAlert,
   } = await import("$lib/utils/typeGuards.ts");
 
   await t.step("isValidFeeRate", () => {
@@ -680,13 +786,13 @@ Deno.test("Fee Calculation Type Guards", async (t) => {
       effectiveFeeRate: 45,
       feeRateSatsPerVB: 48,
       minFeeRate: 10,
-      maxFeeRate: 200
+      maxFeeRate: 200,
     };
     assertEquals(isValidFeeEstimate(validEstimate), true);
 
     // Valid minimal estimate
     const minimalEstimate = {
-      recommendedFee: 25
+      recommendedFee: 25,
     };
     assertEquals(isValidFeeEstimate(minimalEstimate), true);
 
@@ -706,7 +812,7 @@ Deno.test("Fee Calculation Type Guards", async (t) => {
       message: "Fees are higher than usual",
       currentFee: 150,
       recommendedFee: 50,
-      threshold: 100
+      threshold: 100,
     };
     assertEquals(isFeeAlert(warningAlert), true);
 
@@ -714,7 +820,7 @@ Deno.test("Fee Calculation Type Guards", async (t) => {
       type: "critical",
       message: "Extremely high fees detected",
       currentFee: 500,
-      recommendedFee: 50
+      recommendedFee: 50,
     };
     assertEquals(isFeeAlert(criticalAlert), true);
 
@@ -722,26 +828,32 @@ Deno.test("Fee Calculation Type Guards", async (t) => {
     assertEquals(isFeeAlert(null), false);
     assertEquals(isFeeAlert(undefined), false);
     assertEquals(isFeeAlert({}), false);
-    assertEquals(isFeeAlert({ 
-      type: "invalid-type",
-      message: "Test",
-      currentFee: 50,
-      recommendedFee: 25
-    }), false);
-    assertEquals(isFeeAlert({ 
-      type: "warning",
-      message: "",
-      currentFee: 50,
-      recommendedFee: 25
-    }), false);
+    assertEquals(
+      isFeeAlert({
+        type: "invalid-type",
+        message: "Test",
+        currentFee: 50,
+        recommendedFee: 25,
+      }),
+      false,
+    );
+    assertEquals(
+      isFeeAlert({
+        type: "warning",
+        message: "",
+        currentFee: 50,
+        recommendedFee: 25,
+      }),
+      false,
+    );
   });
 });
 
 // API Response Type Guards Tests
 Deno.test("API Response Type Guards", async (t) => {
-  const { 
+  const {
     isPaginatedResponse,
-    isValidApiResponse 
+    isValidApiResponse,
   } = await import("$lib/utils/typeGuards.ts");
 
   await t.step("isPaginatedResponse", () => {
@@ -753,7 +865,7 @@ Deno.test("API Response Type Guards", async (t) => {
       total: 100,
       totalPages: 10,
       hasMore: true,
-      cursor: "next-cursor"
+      cursor: "next-cursor",
     };
     assertEquals(isPaginatedResponse(validPaginated), true);
 
@@ -763,7 +875,7 @@ Deno.test("API Response Type Guards", async (t) => {
       page: 1,
       limit: 20,
       total: 0,
-      totalPages: 0
+      totalPages: 0,
     };
     assertEquals(isPaginatedResponse(minimalPaginated), true);
 
@@ -772,27 +884,30 @@ Deno.test("API Response Type Guards", async (t) => {
     assertEquals(isPaginatedResponse(undefined), false);
     assertEquals(isPaginatedResponse({}), false);
     assertEquals(isPaginatedResponse({ data: "not-array" }), false);
-    assertEquals(isPaginatedResponse({ 
-      data: [],
-      page: 0,
-      limit: 10,
-      total: 0,
-      totalPages: 0
-    }), false);
+    assertEquals(
+      isPaginatedResponse({
+        data: [],
+        page: 0,
+        limit: 10,
+        total: 0,
+        totalPages: 0,
+      }),
+      false,
+    );
   });
 
   await t.step("isValidApiResponse", () => {
     // Valid success response
     const successResponse = {
       success: true,
-      data: { id: 1, name: "Test" }
+      data: { id: 1, name: "Test" },
     };
     assertEquals(isValidApiResponse(successResponse), true);
 
     // Valid error response
     const errorResponse = {
       success: false,
-      error: { code: "NOT_FOUND", message: "Resource not found" }
+      error: { code: "NOT_FOUND", message: "Resource not found" },
     };
     assertEquals(isValidApiResponse(errorResponse), true);
 
@@ -811,7 +926,9 @@ console.log("This comprehensive test suite validates:");
 console.log("- Bitcoin address validation (P2PKH, P2SH, P2WPKH, P2TR)");
 console.log("- Transaction validation (hashes, UTXOs, inputs/outputs)");
 console.log("- SRC-20 protocol validation (deploy, mint, transfer)");
-console.log("- Stamp protocol validation (numbers, hashes, CPIDs, classifications)");
+console.log(
+  "- Stamp protocol validation (numbers, hashes, CPIDs, classifications)",
+);
 console.log("- Error type discrimination");
 console.log("- Utility functions and array safety");
 console.log("- Bitcoin script validation");

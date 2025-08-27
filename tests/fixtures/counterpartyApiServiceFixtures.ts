@@ -582,7 +582,9 @@ export const xcpTestHelpers = {
   /**
    * Generate error response
    */
-  generateErrorResponse(type: keyof typeof counterpartyApiServiceFixtures.errors) {
+  generateErrorResponse(
+    type: keyof typeof counterpartyApiServiceFixtures.errors,
+  ) {
     const errorConfig = counterpartyApiServiceFixtures.errors[type];
     if ("error" in errorConfig) {
       return {

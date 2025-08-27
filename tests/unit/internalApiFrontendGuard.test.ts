@@ -1,9 +1,11 @@
+import { assertEquals, assertExists } from "@std/assert";
 import {
-  assertEquals,
-  assertExists,
-} from "@std/assert";
-import { afterEach, beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
-import { stub, returnsNext } from "@std/testing@1.0.14/mock";
+  afterEach,
+  beforeEach,
+  describe,
+  it,
+} from "jsr:@std/testing@1.0.14/bdd";
+import { returnsNext, stub } from "@std/testing@1.0.14/mock";
 import { InternalApiFrontendGuard } from "$/server/services/security/internalApiFrontendGuard.ts";
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 
@@ -14,12 +16,12 @@ describe("InternalApiFrontendGuard", () => {
   beforeEach(() => {
     // Save original env
     originalEnv = Deno.env.get("DENO_ENV");
-    
+
     // Mock ApiResponseUtil.forbidden
     apiResponseStub = stub(
       ApiResponseUtil,
       "forbidden",
-      returnsNext([new Response("Forbidden", { status: 403 })])
+      returnsNext([new Response("Forbidden", { status: 403 })]),
     );
   });
 
@@ -30,7 +32,7 @@ describe("InternalApiFrontendGuard", () => {
     } else {
       Deno.env.delete("DENO_ENV");
     }
-    
+
     // Restore stubs
     apiResponseStub.restore();
   });
@@ -42,10 +44,10 @@ describe("InternalApiFrontendGuard", () => {
     // Issue: https://github.com/BTCStampsExplorer/issues/env-variable-timing
     it.ignore("should allow all requests in development", () => {
       Deno.env.set("DENO_ENV", "development");
-      
+
       const req = new Request("http://localhost:8000/api/internal/test");
       const result = InternalApiFrontendGuard.requireInternalAccess(req);
-      
+
       assertEquals(result, null);
     });
   });
@@ -62,7 +64,7 @@ describe("InternalApiFrontendGuard", () => {
           "X-API-Key": "test-api-key-123",
         },
       });
-      
+
       const result = InternalApiFrontendGuard.requireInternalAccess(req);
       assertEquals(result, null);
     });
@@ -73,14 +75,14 @@ describe("InternalApiFrontendGuard", () => {
           "X-API-Key": "wrong-key",
         },
       });
-      
+
       const result = InternalApiFrontendGuard.requireInternalAccess(req);
       assertExists(result);
     });
 
     it("should block requests without API key when one is expected", () => {
       const req = new Request("http://api.stampchain.io/api/internal/test");
-      
+
       const result = InternalApiFrontendGuard.requireInternalAccess(req);
       assertExists(result);
     });
@@ -97,7 +99,7 @@ describe("InternalApiFrontendGuard", () => {
           "Origin": "https://stampchain.io",
         },
       });
-      
+
       const result = InternalApiFrontendGuard.requireInternalAccess(req);
       assertEquals(result, null);
     });
@@ -108,7 +110,7 @@ describe("InternalApiFrontendGuard", () => {
           "Origin": "https://www.stampchain.io",
         },
       });
-      
+
       const result = InternalApiFrontendGuard.requireInternalAccess(req);
       assertEquals(result, null);
     });
@@ -119,7 +121,7 @@ describe("InternalApiFrontendGuard", () => {
           "Origin": "https://evil.com",
         },
       });
-      
+
       const result = InternalApiFrontendGuard.requireInternalAccess(req);
       assertExists(result);
     });
@@ -130,7 +132,7 @@ describe("InternalApiFrontendGuard", () => {
           "Origin": "https://stampchain.io.evil.com",
         },
       });
-      
+
       const result = InternalApiFrontendGuard.requireInternalAccess(req);
       assertExists(result);
     });
@@ -147,7 +149,7 @@ describe("InternalApiFrontendGuard", () => {
           "Referer": "https://stampchain.io/some/page",
         },
       });
-      
+
       const result = InternalApiFrontendGuard.requireInternalAccess(req);
       assertEquals(result, null);
     });
@@ -158,7 +160,7 @@ describe("InternalApiFrontendGuard", () => {
           "Referer": "https://malicious.site/attack",
         },
       });
-      
+
       const result = InternalApiFrontendGuard.requireInternalAccess(req);
       assertExists(result);
     });
@@ -177,7 +179,7 @@ describe("InternalApiFrontendGuard", () => {
           "Accept": "application/json",
         },
       });
-      
+
       const result = InternalApiFrontendGuard.requireInternalAccess(req);
       assertEquals(result, null);
     });
@@ -190,7 +192,7 @@ describe("InternalApiFrontendGuard", () => {
           "Accept": "*/*",
         },
       });
-      
+
       const result = InternalApiFrontendGuard.requireInternalAccess(req);
       assertExists(result);
     });
@@ -210,7 +212,7 @@ describe("InternalApiFrontendGuard", () => {
             "Accept": "text/html,application/json",
           },
         });
-        
+
         const result = InternalApiFrontendGuard.requireInternalAccess(req);
         assertEquals(result, null);
       }
@@ -230,7 +232,7 @@ describe("InternalApiFrontendGuard", () => {
           "X-Forwarded-Host": "stampchain.io",
         },
       });
-      
+
       const result = InternalApiFrontendGuard.requireInternalAccess(req);
       assertEquals(result, null);
     });
@@ -243,7 +245,7 @@ describe("InternalApiFrontendGuard", () => {
           "X-Forwarded-Host": "evil.com",
         },
       });
-      
+
       const result = InternalApiFrontendGuard.requireInternalAccess(req);
       assertExists(result);
     });
@@ -256,7 +258,7 @@ describe("InternalApiFrontendGuard", () => {
           "X-Forwarded-Host": "stampchain.io",
         },
       });
-      
+
       const result = InternalApiFrontendGuard.requireInternalAccess(req);
       assertExists(result);
     });
@@ -273,7 +275,7 @@ describe("InternalApiFrontendGuard", () => {
           "Origin": "not-a-valid-url",
         },
       });
-      
+
       const result = InternalApiFrontendGuard.requireInternalAccess(req);
       assertExists(result);
     });
@@ -282,7 +284,7 @@ describe("InternalApiFrontendGuard", () => {
       const req = new Request("http://api.stampchain.io/api/internal/test", {
         headers: {},
       });
-      
+
       const result = InternalApiFrontendGuard.requireInternalAccess(req);
       assertExists(result);
     });
@@ -293,14 +295,14 @@ describe("InternalApiFrontendGuard", () => {
           "Origin": "stampchain.io", // Without protocol
         },
       });
-      
+
       const result = InternalApiFrontendGuard.requireInternalAccess(req);
       assertEquals(result, null);
     });
 
     it("should block requests with no identifying headers", () => {
       const req = new Request("http://api.stampchain.io/api/internal/test");
-      
+
       const result = InternalApiFrontendGuard.requireInternalAccess(req);
       assertExists(result);
     });
@@ -319,7 +321,7 @@ describe("InternalApiFrontendGuard", () => {
           "Origin": "https://evil.com", // Invalid origin but valid API key
         },
       });
-      
+
       const result = InternalApiFrontendGuard.requireInternalAccess(req);
       assertEquals(result, null);
     });
@@ -331,7 +333,7 @@ describe("InternalApiFrontendGuard", () => {
           "Origin": "https://stampchain.io", // Valid origin but invalid API key
         },
       });
-      
+
       const result = InternalApiFrontendGuard.requireInternalAccess(req);
       assertEquals(result, null); // Should pass due to valid origin
     });

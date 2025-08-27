@@ -11,10 +11,10 @@ import {
 } from "@std/assert";
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import {
-  createBitcoinTransactionBuilder,
-  formatPsbtForLogging,
   BitcoinTransactionBuilder,
   BitcoinTransactionBuilderImpl,
+  createBitcoinTransactionBuilder,
+  formatPsbtForLogging,
 } from "$server/services/transaction/bitcoinTransactionBuilder.ts";
 import { type UTXOFixture, utxoFixtures } from "../fixtures/utxoFixtures.ts";
 import { realUTXOFixtures } from "../fixtures/realUTXOFixtures.ts";
@@ -540,16 +540,17 @@ describe(
         const mockTxHex =
           "020000000001010000000000000000000000000000000000000000000000000000000000000000000000000000000000";
 
-        const result = await BitcoinTransactionBuilder.buildPsbtFromUserFundedRawHex(
-          mockTxHex,
-          utxoFixtures.p2wpkh.standard.address,
-          10,
-          {
-            dispenserDestinationAddress:
-              "bc1qdispenser00000000000000000000000000000",
-            dispenserPaymentAmount: 100000,
-          },
-        );
+        const result = await BitcoinTransactionBuilder
+          .buildPsbtFromUserFundedRawHex(
+            mockTxHex,
+            utxoFixtures.p2wpkh.standard.address,
+            10,
+            {
+              dispenserDestinationAddress:
+                "bc1qdispenser00000000000000000000000000000",
+              dispenserPaymentAmount: 100000,
+            },
+          );
 
         assertExists(result.psbtHex);
         assertExists(result.inputsToSign);
@@ -564,20 +565,21 @@ describe(
         const mockTxHex =
           "020000000001010000000000000000000000000000000000000000000000000000000000000000000000000000000000";
 
-        const result = await BitcoinTransactionBuilder.buildPsbtFromUserFundedRawHex(
-          mockTxHex,
-          utxoFixtures.p2wpkh.standard.address,
-          10,
-          {
-            dispenserDestinationAddress:
-              "bc1qdispenser00000000000000000000000000000",
-            dispenserPaymentAmount: 100000,
-            serviceFeeDetails: {
-              fee: 5000,
-              address: "bc1qservicefee000000000000000000000000000",
+        const result = await BitcoinTransactionBuilder
+          .buildPsbtFromUserFundedRawHex(
+            mockTxHex,
+            utxoFixtures.p2wpkh.standard.address,
+            10,
+            {
+              dispenserDestinationAddress:
+                "bc1qdispenser00000000000000000000000000000",
+              dispenserPaymentAmount: 100000,
+              serviceFeeDetails: {
+                fee: 5000,
+                address: "bc1qservicefee000000000000000000000000000",
+              },
             },
-          },
-        );
+          );
 
         assertExists(result.psbtHex);
         assertEquals(result.estimatedFee > 0, true);
@@ -610,16 +612,17 @@ describe(
         const mockTxHex =
           "020000000001010000000000000000000000000000000000000000000000000000000000000000000000000000000001066a047465737400000000";
 
-        const result = await BitcoinTransactionBuilder.buildPsbtFromUserFundedRawHex(
-          mockTxHex,
-          utxoFixtures.p2wpkh.standard.address,
-          10,
-          {
-            dispenserDestinationAddress:
-              "bc1qdispenser00000000000000000000000000000",
-            dispenserPaymentAmount: 100000,
-          },
-        );
+        const result = await BitcoinTransactionBuilder
+          .buildPsbtFromUserFundedRawHex(
+            mockTxHex,
+            utxoFixtures.p2wpkh.standard.address,
+            10,
+            {
+              dispenserDestinationAddress:
+                "bc1qdispenser00000000000000000000000000000",
+              dispenserPaymentAmount: 100000,
+            },
+          );
 
         assertExists(result.psbtHex);
         // Verify PSBT includes OP_RETURN
@@ -695,7 +698,9 @@ describe(
       it("should throw error for invalid address", () => {
         assertThrows(
           () => {
-            (BitcoinTransactionBuilder as any).getAddressNetwork("invalid_address");
+            (BitcoinTransactionBuilder as any).getAddressNetwork(
+              "invalid_address",
+            );
           },
           Error,
           "Invalid Bitcoin address",
@@ -830,9 +835,10 @@ describe(
 
       it("should handle script type info for non-witness inputs", async () => {
         // Mock CommonUTXOService to return P2PKH script
-        (BitcoinTransactionBuilder as any).commonUtxoService.getRawTransactionHex = () => {
-          return "020000000101deadbeef00000000000000000000000000000000000000000000000000000000000000000000000000";
-        };
+        (BitcoinTransactionBuilder as any).commonUtxoService
+          .getRawTransactionHex = () => {
+            return "020000000101deadbeef00000000000000000000000000000000000000000000000000000000000000000000000000";
+          };
 
         const psbt = new Psbt({ network: networks.bitcoin });
         psbt.addInput({
@@ -878,9 +884,10 @@ describe(
 
       it("should handle all error paths in processCounterpartyPSBT", async () => {
         // Test with enrichment error
-        (BitcoinTransactionBuilder as any).commonUtxoService.getSpecificUTXO = () => {
-          throw new Error("Enrichment failed");
-        };
+        (BitcoinTransactionBuilder as any).commonUtxoService.getSpecificUTXO =
+          () => {
+            throw new Error("Enrichment failed");
+          };
 
         const psbt = new Psbt({ network: networks.bitcoin });
         psbt.addInput({
@@ -970,16 +977,17 @@ describe(
         const mockTxHex =
           "020000000002010000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000";
 
-        const result = await BitcoinTransactionBuilder.buildPsbtFromUserFundedRawHex(
-          mockTxHex,
-          utxoFixtures.p2wpkh.standard.address,
-          10,
-          {
-            dispenserDestinationAddress:
-              "bc1qdispenser00000000000000000000000000000",
-            dispenserPaymentAmount: 100000,
-          },
-        );
+        const result = await BitcoinTransactionBuilder
+          .buildPsbtFromUserFundedRawHex(
+            mockTxHex,
+            utxoFixtures.p2wpkh.standard.address,
+            10,
+            {
+              dispenserDestinationAddress:
+                "bc1qdispenser00000000000000000000000000000",
+              dispenserPaymentAmount: 100000,
+            },
+          );
 
         assertExists(result.psbtHex);
         assertEquals(result.inputsToSign.length, 2); // Two inputs to sign

@@ -1,7 +1,4 @@
-import {
-  assertEquals,
-  assertExists,
-} from "@std/assert/mod.ts";
+import { assertEquals, assertExists } from "@std/assert/mod.ts";
 import { stub } from "@std/testing/mock.ts";
 import { handler } from "$routes/api/v2/olga/mint.ts";
 import { mintAddressUTXOs } from "../fixtures/utxoFixtures.mint.ts";

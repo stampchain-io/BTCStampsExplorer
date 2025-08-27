@@ -6,8 +6,8 @@
  */
 
 import {
-    TransactionConstructionService,
-    type EstimationOptions,
+  type EstimationOptions,
+  TransactionConstructionService,
 } from "$lib/utils/bitcoin/minting/TransactionConstructionService.ts";
 import { assertEquals, assertExists } from "@std/assert";
 import { describe, it } from "jsr:@std/testing@1.0.14/bdd";
@@ -32,7 +32,10 @@ describe("TransactionConstructionService Phase 2 Dummy Address Tests", () => {
     const toolOptions = (estimator as any).buildToolTransactionOptions(options);
 
     // Should use dummy address
-    assertEquals(toolOptions.walletAddress, "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4");
+    assertEquals(
+      toolOptions.walletAddress,
+      "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+    );
     assertEquals(toolOptions.dryRun, true);
     assertEquals(toolOptions.file, "test-file-data");
     assertEquals(toolOptions.filename, "test.png");
@@ -82,7 +85,10 @@ describe("TransactionConstructionService Phase 2 Dummy Address Tests", () => {
     const toolOptions = (estimator as any).buildToolTransactionOptions(options);
 
     // Should use dummy address and default values
-    assertEquals(toolOptions.walletAddress, "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4");
+    assertEquals(
+      toolOptions.walletAddress,
+      "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+    );
     assertEquals(toolOptions.dryRun, true);
     assertExists(toolOptions.file); // Should have dummy PNG data
     assertEquals(toolOptions.filename, "dummy-stamp.png");
@@ -93,7 +99,10 @@ describe("TransactionConstructionService Phase 2 Dummy Address Tests", () => {
     assertEquals(toolOptions.feeRate, 5);
 
     // Validate dummy PNG is valid base64
-    assertEquals(toolOptions.file.startsWith("iVBORw0KGgoAAAANSUhEUgAAAAE"), true);
+    assertEquals(
+      toolOptions.file.startsWith("iVBORw0KGgoAAAANSUhEUgAAAAE"),
+      true,
+    );
   });
 
   it("should handle SRC-20 tool options with dummy address", () => {
@@ -112,7 +121,10 @@ describe("TransactionConstructionService Phase 2 Dummy Address Tests", () => {
     const toolOptions = (estimator as any).buildToolTransactionOptions(options);
 
     // Should use dummy address and provided SRC-20 values
-    assertEquals(toolOptions.walletAddress, "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4");
+    assertEquals(
+      toolOptions.walletAddress,
+      "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+    );
     assertEquals(toolOptions.dryRun, true);
     assertEquals(toolOptions.op, "DEPLOY");
     assertEquals(toolOptions.tick, "MYTOKEN");
@@ -134,7 +146,10 @@ describe("TransactionConstructionService Phase 2 Dummy Address Tests", () => {
     const toolOptions = (estimator as any).buildToolTransactionOptions(options);
 
     // Should use dummy address and default SRC-20 values
-    assertEquals(toolOptions.walletAddress, "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4");
+    assertEquals(
+      toolOptions.walletAddress,
+      "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+    );
     assertEquals(toolOptions.dryRun, true);
     assertEquals(toolOptions.op, "MINT");
     assertEquals(toolOptions.tick, "TEST");
@@ -158,21 +173,29 @@ describe("TransactionConstructionService Phase 2 Dummy Address Tests", () => {
       await estimator.estimateSmart(options);
     } catch (error) {
       // Expected to fail at API level, but should not fail due to missing wallet
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage = error instanceof Error
+        ? error.message
+        : String(error);
 
       // Should NOT contain wallet-related error messages
-      assertEquals(errorMessage.includes("wallet"), false,
-        `Error should not be wallet-related: ${errorMessage}`);
-      assertEquals(errorMessage.includes("connection"), false,
-        `Error should not be connection-related: ${errorMessage}`);
+      assertEquals(
+        errorMessage.includes("wallet"),
+        false,
+        `Error should not be wallet-related: ${errorMessage}`,
+      );
+      assertEquals(
+        errorMessage.includes("connection"),
+        false,
+        `Error should not be connection-related: ${errorMessage}`,
+      );
 
       // Should be an API/URL related error (expected in test environment)
       assertEquals(
         errorMessage.includes("Invalid URL") ||
-        errorMessage.includes("fetch") ||
-        errorMessage.includes("endpoint"),
+          errorMessage.includes("fetch") ||
+          errorMessage.includes("endpoint"),
         true,
-        `Expected API-related error, got: ${errorMessage}`
+        `Expected API-related error, got: ${errorMessage}`,
       );
     }
   });
@@ -189,13 +212,17 @@ describe("TransactionConstructionService Phase 2 Dummy Address Tests", () => {
 
     console.log("\n🚀 AFTER (New Architecture):");
     console.log("Phase 2 works without wallet connection");
-    console.log("- if (isSubmitting) fallback to Phase 1 (only during submission)");
+    console.log(
+      "- if (isSubmitting) fallback to Phase 1 (only during submission)",
+    );
     console.log("- Direct tool endpoint call with dummy address");
     console.log("- Full estimation capabilities without wallet");
 
     console.log("\n📈 BENEFITS:");
     console.log("• Better user experience - estimates available immediately");
-    console.log("• Consistent estimation logic across connected/disconnected states");
+    console.log(
+      "• Consistent estimation logic across connected/disconnected states",
+    );
     console.log("• Leverages existing endpoint dummy address patterns");
     console.log("• Maintains 33% API call reduction goal");
 

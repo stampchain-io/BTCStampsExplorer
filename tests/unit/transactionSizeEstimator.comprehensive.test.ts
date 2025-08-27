@@ -10,7 +10,7 @@ import {
   calculateTransactionFee,
   estimateTransactionSize,
   estimateTransactionSizeForType,
-  TransactionSizeOptions
+  TransactionSizeOptions,
 } from "$lib/utils/bitcoin/transactions/transactionSizeEstimator.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { assertEquals } from "@std/assert";
@@ -21,7 +21,7 @@ Deno.test("Transaction Size Estimator - Basic Size Calculation", async (t) => {
     const options: TransactionSizeOptions = {
       inputs: [{ type: "P2WPKH", isWitness: true }],
       outputs: [{ type: "P2WPKH" }, { type: "P2WPKH" }],
-      includeChangeOutput: false
+      includeChangeOutput: false,
     };
 
     const vsize = estimateTransactionSize(options);
@@ -35,7 +35,7 @@ Deno.test("Transaction Size Estimator - Basic Size Calculation", async (t) => {
     const options: TransactionSizeOptions = {
       inputs: [{ type: "P2PKH", isWitness: false }],
       outputs: [{ type: "P2PKH" }, { type: "P2PKH" }],
-      includeChangeOutput: false
+      includeChangeOutput: false,
     };
 
     const vsize = estimateTransactionSize(options);
@@ -47,7 +47,7 @@ Deno.test("Transaction Size Estimator - Basic Size Calculation", async (t) => {
     const witnessOptions: TransactionSizeOptions = {
       inputs: [{ type: "P2WPKH", isWitness: true }],
       outputs: [{ type: "P2WPKH" }, { type: "P2WPKH" }],
-      includeChangeOutput: false
+      includeChangeOutput: false,
     };
     const witnessVsize = estimateTransactionSize(witnessOptions);
     assertEquals(vsize > witnessVsize, true);
@@ -57,7 +57,7 @@ Deno.test("Transaction Size Estimator - Basic Size Calculation", async (t) => {
     const options: TransactionSizeOptions = {
       inputs: [{ type: "P2WSH", isWitness: true }],
       outputs: [{ type: "P2WSH" }],
-      includeChangeOutput: false
+      includeChangeOutput: false,
     };
 
     const vsize = estimateTransactionSize(options);
@@ -70,7 +70,7 @@ Deno.test("Transaction Size Estimator - Basic Size Calculation", async (t) => {
     const options: TransactionSizeOptions = {
       inputs: [{ type: "P2TR", isWitness: true }],
       outputs: [{ type: "P2TR" }],
-      includeChangeOutput: false
+      includeChangeOutput: false,
     };
 
     const vsize = estimateTransactionSize(options);
@@ -84,10 +84,10 @@ Deno.test("Transaction Size Estimator - Basic Size Calculation", async (t) => {
       inputs: [
         { type: "P2WPKH", isWitness: true },
         { type: "P2PKH", isWitness: false },
-        { type: "P2WSH", isWitness: true }
+        { type: "P2WSH", isWitness: true },
       ],
       outputs: [{ type: "P2WPKH" }],
-      includeChangeOutput: false
+      includeChangeOutput: false,
     };
 
     const vsize = estimateTransactionSize(options);
@@ -98,39 +98,42 @@ Deno.test("Transaction Size Estimator - Basic Size Calculation", async (t) => {
 });
 
 Deno.test("Transaction Size Estimator - Witness Data Handling", async (t) => {
-  await t.step("should include witness marker and flag for witness transactions", () => {
-    const witnessOptions: TransactionSizeOptions = {
-      inputs: [{ type: "P2WPKH", isWitness: true }],
-      outputs: [{ type: "P2WPKH" }],
-      includeChangeOutput: false
-    };
+  await t.step(
+    "should include witness marker and flag for witness transactions",
+    () => {
+      const witnessOptions: TransactionSizeOptions = {
+        inputs: [{ type: "P2WPKH", isWitness: true }],
+        outputs: [{ type: "P2WPKH" }],
+        includeChangeOutput: false,
+      };
 
-    const nonWitnessOptions: TransactionSizeOptions = {
-      inputs: [{ type: "P2PKH", isWitness: false }],
-      outputs: [{ type: "P2PKH" }],
-      includeChangeOutput: false
-    };
+      const nonWitnessOptions: TransactionSizeOptions = {
+        inputs: [{ type: "P2PKH", isWitness: false }],
+        outputs: [{ type: "P2PKH" }],
+        includeChangeOutput: false,
+      };
 
-    const witnessVsize = estimateTransactionSize(witnessOptions);
-    const nonWitnessVsize = estimateTransactionSize(nonWitnessOptions);
+      const witnessVsize = estimateTransactionSize(witnessOptions);
+      const nonWitnessVsize = estimateTransactionSize(nonWitnessOptions);
 
-    // Both should be positive but different due to witness overhead
-    assertEquals(witnessVsize > 0, true);
-    assertEquals(nonWitnessVsize > 0, true);
-    assertEquals(witnessVsize !== nonWitnessVsize, true);
-  });
+      // Both should be positive but different due to witness overhead
+      assertEquals(witnessVsize > 0, true);
+      assertEquals(nonWitnessVsize > 0, true);
+      assertEquals(witnessVsize !== nonWitnessVsize, true);
+    },
+  );
 
   await t.step("should auto-detect witness from input type", () => {
     const autoDetectOptions: TransactionSizeOptions = {
       inputs: [{ type: "P2WPKH" }], // No explicit isWitness flag
       outputs: [{ type: "P2WPKH" }],
-      includeChangeOutput: false
+      includeChangeOutput: false,
     };
 
     const explicitOptions: TransactionSizeOptions = {
       inputs: [{ type: "P2WPKH", isWitness: true }],
       outputs: [{ type: "P2WPKH" }],
-      includeChangeOutput: false
+      includeChangeOutput: false,
     };
 
     const autoVsize = estimateTransactionSize(autoDetectOptions);
@@ -144,10 +147,10 @@ Deno.test("Transaction Size Estimator - Witness Data Handling", async (t) => {
     const mixedOptions: TransactionSizeOptions = {
       inputs: [
         { type: "P2WPKH", isWitness: true },
-        { type: "P2PKH", isWitness: false }
+        { type: "P2PKH", isWitness: false },
       ],
       outputs: [{ type: "P2WPKH" }],
-      includeChangeOutput: false
+      includeChangeOutput: false,
     };
 
     const vsize = estimateTransactionSize(mixedOptions);
@@ -162,7 +165,7 @@ Deno.test("Transaction Size Estimator - Output Types", async (t) => {
     const options: TransactionSizeOptions = {
       inputs: [{ type: "P2WPKH", isWitness: true }],
       outputs: [{ type: "P2PKH" }],
-      includeChangeOutput: false
+      includeChangeOutput: false,
     };
 
     const vsize = estimateTransactionSize(options);
@@ -173,7 +176,7 @@ Deno.test("Transaction Size Estimator - Output Types", async (t) => {
     const options: TransactionSizeOptions = {
       inputs: [{ type: "P2WPKH", isWitness: true }],
       outputs: [{ type: "P2SH" }],
-      includeChangeOutput: false
+      includeChangeOutput: false,
     };
 
     const vsize = estimateTransactionSize(options);
@@ -184,7 +187,7 @@ Deno.test("Transaction Size Estimator - Output Types", async (t) => {
     const options: TransactionSizeOptions = {
       inputs: [{ type: "P2WPKH", isWitness: true }],
       outputs: [{ type: "OP_RETURN" }],
-      includeChangeOutput: false
+      includeChangeOutput: false,
     };
 
     const vsize = estimateTransactionSize(options);
@@ -198,7 +201,7 @@ Deno.test("Transaction Size Estimator - Output Types", async (t) => {
       const options: TransactionSizeOptions = {
         inputs: [{ type: "P2WPKH", isWitness: true }],
         outputs: [{ type: "UNKNOWN" as any }],
-        includeChangeOutput: false
+        includeChangeOutput: false,
       };
 
       const vsize = estimateTransactionSize(options);
@@ -210,39 +213,42 @@ Deno.test("Transaction Size Estimator - Output Types", async (t) => {
     }
   });
 
-  await t.step("should calculate different sizes for different output types", () => {
-    const p2wpkhOptions: TransactionSizeOptions = {
-      inputs: [{ type: "P2WPKH", isWitness: true }],
-      outputs: [{ type: "P2WPKH" }],
-      includeChangeOutput: false
-    };
+  await t.step(
+    "should calculate different sizes for different output types",
+    () => {
+      const p2wpkhOptions: TransactionSizeOptions = {
+        inputs: [{ type: "P2WPKH", isWitness: true }],
+        outputs: [{ type: "P2WPKH" }],
+        includeChangeOutput: false,
+      };
 
-    const p2wshOptions: TransactionSizeOptions = {
-      inputs: [{ type: "P2WPKH", isWitness: true }],
-      outputs: [{ type: "P2WSH" }],
-      includeChangeOutput: false
-    };
+      const p2wshOptions: TransactionSizeOptions = {
+        inputs: [{ type: "P2WPKH", isWitness: true }],
+        outputs: [{ type: "P2WSH" }],
+        includeChangeOutput: false,
+      };
 
-    const p2wpkhVsize = estimateTransactionSize(p2wpkhOptions);
-    const p2wshVsize = estimateTransactionSize(p2wshOptions);
+      const p2wpkhVsize = estimateTransactionSize(p2wpkhOptions);
+      const p2wshVsize = estimateTransactionSize(p2wshOptions);
 
-    // P2WSH output should be larger than P2WPKH
-    assertEquals(p2wshVsize > p2wpkhVsize, true);
-  });
+      // P2WSH output should be larger than P2WPKH
+      assertEquals(p2wshVsize > p2wpkhVsize, true);
+    },
+  );
 });
 
 Deno.test("Transaction Size Estimator - Change Output Handling", async (t) => {
   await t.step("should include change output by default", () => {
     const withChangeOptions: TransactionSizeOptions = {
       inputs: [{ type: "P2WPKH", isWitness: true }],
-      outputs: [{ type: "P2WPKH" }]
+      outputs: [{ type: "P2WPKH" }],
       // includeChangeOutput defaults to true
     };
 
     const withoutChangeOptions: TransactionSizeOptions = {
       inputs: [{ type: "P2WPKH", isWitness: true }],
       outputs: [{ type: "P2WPKH" }],
-      includeChangeOutput: false
+      includeChangeOutput: false,
     };
 
     const withChangeVsize = estimateTransactionSize(withChangeOptions);
@@ -256,14 +262,14 @@ Deno.test("Transaction Size Estimator - Change Output Handling", async (t) => {
       inputs: [{ type: "P2WPKH", isWitness: true }],
       outputs: [{ type: "P2WPKH" }],
       includeChangeOutput: true,
-      changeOutputType: "P2WPKH"
+      changeOutputType: "P2WPKH",
     };
 
     const p2wshChangeOptions: TransactionSizeOptions = {
       inputs: [{ type: "P2WPKH", isWitness: true }],
       outputs: [{ type: "P2WPKH" }],
       includeChangeOutput: true,
-      changeOutputType: "P2WSH"
+      changeOutputType: "P2WSH",
     };
 
     const p2wpkhVsize = estimateTransactionSize(p2wpkhChangeOptions);
@@ -277,7 +283,7 @@ Deno.test("Transaction Size Estimator - Change Output Handling", async (t) => {
     const defaultChangeOptions: TransactionSizeOptions = {
       inputs: [{ type: "P2WPKH", isWitness: true }],
       outputs: [{ type: "P2WPKH" }],
-      includeChangeOutput: true
+      includeChangeOutput: true,
       // changeOutputType not specified
     };
 
@@ -285,7 +291,7 @@ Deno.test("Transaction Size Estimator - Change Output Handling", async (t) => {
       inputs: [{ type: "P2WPKH", isWitness: true }],
       outputs: [{ type: "P2WPKH" }],
       includeChangeOutput: true,
-      changeOutputType: "P2WPKH"
+      changeOutputType: "P2WPKH",
     };
 
     const defaultVsize = estimateTransactionSize(defaultChangeOptions);
@@ -417,7 +423,7 @@ Deno.test("Transaction Size Estimator - Error Handling and Edge Cases", async (t
     const options: TransactionSizeOptions = {
       inputs: [],
       outputs: [{ type: "P2WPKH" }],
-      includeChangeOutput: false
+      includeChangeOutput: false,
     };
 
     const vsize = estimateTransactionSize(options);
@@ -431,7 +437,7 @@ Deno.test("Transaction Size Estimator - Error Handling and Edge Cases", async (t
     const options: TransactionSizeOptions = {
       inputs: [{ type: "P2WPKH", isWitness: true }],
       outputs: [],
-      includeChangeOutput: false
+      includeChangeOutput: false,
     };
 
     const vsize = estimateTransactionSize(options);
@@ -447,7 +453,7 @@ Deno.test("Transaction Size Estimator - Error Handling and Edge Cases", async (t
       const options: TransactionSizeOptions = {
         inputs: [{ type: "UNKNOWN" as any, isWitness: true }],
         outputs: [{ type: "P2WPKH" }],
-        includeChangeOutput: false
+        includeChangeOutput: false,
       };
 
       const vsize = estimateTransactionSize(options);
@@ -470,7 +476,7 @@ Deno.test("Transaction Size Estimator - Error Handling and Edge Cases", async (t
       const options: TransactionSizeOptions = {
         inputs: [{ type: "P2WPKH", isWitness: true }],
         outputs: [{ type: "P2WPKH" }],
-        includeChangeOutput: false
+        includeChangeOutput: false,
       };
 
       const vsize = estimateTransactionSize(options);
@@ -488,7 +494,7 @@ Deno.test("Transaction Size Estimator - Error Handling and Edge Cases", async (t
     const options: TransactionSizeOptions = {
       inputs: Array(100).fill({ type: "P2WPKH", isWitness: true }),
       outputs: Array(100).fill({ type: "P2WPKH" }),
-      includeChangeOutput: false
+      includeChangeOutput: false,
     };
 
     const vsize = estimateTransactionSize(options);
@@ -502,7 +508,7 @@ Deno.test("Transaction Size Estimator - Error Handling and Edge Cases", async (t
     const options: TransactionSizeOptions = {
       inputs: [{ type: "P2WPKH", isWitness: true }],
       outputs: [{ type: "P2WPKH" }],
-      includeChangeOutput: false
+      includeChangeOutput: false,
     };
 
     const vsize = estimateTransactionSize(options);
@@ -514,19 +520,22 @@ Deno.test("Transaction Size Estimator - Error Handling and Edge Cases", async (t
 });
 
 Deno.test("Transaction Size Estimator - Weight Calculation Accuracy", async (t) => {
-  await t.step("should calculate weight correctly for witness transactions", () => {
-    const options: TransactionSizeOptions = {
-      inputs: [{ type: "P2WPKH", isWitness: true }],
-      outputs: [{ type: "P2WPKH" }],
-      includeChangeOutput: false
-    };
+  await t.step(
+    "should calculate weight correctly for witness transactions",
+    () => {
+      const options: TransactionSizeOptions = {
+        inputs: [{ type: "P2WPKH", isWitness: true }],
+        outputs: [{ type: "P2WPKH" }],
+        includeChangeOutput: false,
+      };
 
-    const vsize = estimateTransactionSize(options);
+      const vsize = estimateTransactionSize(options);
 
-    // vsize should be weight / 4 rounded up
-    assertEquals(typeof vsize, "number");
-    assertEquals(vsize % 1, 0); // Should be integer
-  });
+      // vsize should be weight / 4 rounded up
+      assertEquals(typeof vsize, "number");
+      assertEquals(vsize % 1, 0); // Should be integer
+    },
+  );
 
   await t.step("should use weightToVsize function from TX_CONSTANTS", () => {
     // Mock the weightToVsize function to test it's being used
@@ -542,7 +551,7 @@ Deno.test("Transaction Size Estimator - Weight Calculation Accuracy", async (t) 
       const options: TransactionSizeOptions = {
         inputs: [{ type: "P2WPKH", isWitness: true }],
         outputs: [{ type: "P2WPKH" }],
-        includeChangeOutput: false
+        includeChangeOutput: false,
       };
 
       estimateTransactionSize(options);
@@ -559,9 +568,12 @@ Deno.test("Transaction Size Estimator - Weight Calculation Accuracy", async (t) 
 
     for (const scriptType of scriptTypes) {
       const options: TransactionSizeOptions = {
-        inputs: [{ type: scriptType as any, isWitness: scriptType.startsWith("P2W") || scriptType === "P2TR" }],
+        inputs: [{
+          type: scriptType as any,
+          isWitness: scriptType.startsWith("P2W") || scriptType === "P2TR",
+        }],
         outputs: [{ type: scriptType as any }],
-        includeChangeOutput: false
+        includeChangeOutput: false,
       };
 
       const vsize = estimateTransactionSize(options);

@@ -10,10 +10,10 @@
 
 import { assertEquals } from "@std/assert";
 import {
-    validateCrossModuleCompatibility,
-    validateTypeCompilation,
-    validateTypeExports,
-    withTempTypeFile
+  validateCrossModuleCompatibility,
+  validateTypeCompilation,
+  validateTypeExports,
+  withTempTypeFile,
 } from "./utils/typeValidation.ts";
 
 import { assertType } from "./utils/typeAssertions.ts";
@@ -23,18 +23,18 @@ import { assertType } from "./utils/typeAssertions.ts";
 // ============================================================================
 
 import type {
-    AddressTickHandlerContext,
-    BlockHandlerContext,
-    // Handler Context Types
-    IdentHandlerContext,
-    // Response Body Types
-    PaginatedStampResponseBody,
-    SRC20SnapshotRequestParams,
-    // Request Parameter Types
-    SRC20TrxRequestParams,
-    // Composite Types
-    StampsAndSrc20,
-    TickHandlerContext
+  AddressTickHandlerContext,
+  BlockHandlerContext,
+  // Handler Context Types
+  IdentHandlerContext,
+  // Response Body Types
+  PaginatedStampResponseBody,
+  SRC20SnapshotRequestParams,
+  // Request Parameter Types
+  SRC20TrxRequestParams,
+  // Composite Types
+  StampsAndSrc20,
+  TickHandlerContext,
 } from "../../lib/types/api.d.ts";
 
 // ============================================================================
@@ -42,19 +42,19 @@ import type {
 // ============================================================================
 
 import type {
-    ButtonVariant,
-    ColorScheme,
-    // Component Props
-    ComponentProps,
-    FormState,
-    // Layout Types
-    LayoutConfig,
-    ModalSize,
-    PaginationState,
-    ToastType,
-    Typography,
-    // State Management
-    UIState
+  ButtonVariant,
+  ColorScheme,
+  // Component Props
+  ComponentProps,
+  FormState,
+  // Layout Types
+  LayoutConfig,
+  ModalSize,
+  PaginationState,
+  ToastType,
+  Typography,
+  // State Management
+  UIState,
 } from "../../lib/types/ui.d.ts";
 
 // ============================================================================
@@ -62,13 +62,13 @@ import type {
 // ============================================================================
 
 import type {
-    // Analytics
-    MarketAnalytics,
-    // Portfolio Types
-    PortfolioData,
-    SRC20MarketData,
-    // Core Market Data
-    StampMarketData
+  // Analytics
+  MarketAnalytics,
+  // Portfolio Types
+  PortfolioData,
+  SRC20MarketData,
+  // Core Market Data
+  StampMarketData,
 } from "../../lib/types/marketData.d.ts";
 
 // ============================================================================
@@ -76,15 +76,15 @@ import type {
 // ============================================================================
 
 import type {
-    // Bitcoin Wallet Types
-    BitcoinWallet,
-    TransactionPreview,
-    // Transaction Building
-    TransactionRequest,
-    // Integration Types
-    WalletAdapter,
-    WalletBalance,
-    WalletConnection
+  // Bitcoin Wallet Types
+  BitcoinWallet,
+  TransactionPreview,
+  // Transaction Building
+  TransactionRequest,
+  // Integration Types
+  WalletAdapter,
+  WalletBalance,
+  WalletConnection,
 } from "../../lib/types/wallet.d.ts";
 
 // ============================================================================
@@ -106,30 +106,49 @@ Deno.test("Client Types - Cross-Module Compatibility", async () => {
   await validateCrossModuleCompatibility(
     "../../lib/types/api.d.ts",
     "../../lib/types/marketData.d.ts",
-    sharedTypes
+    sharedTypes,
   );
 });
 
 Deno.test("Client Types - Export Validation", async () => {
   // Verify key types are properly exported
   await validateTypeExports("lib/types/api.d.ts", [
-    "IdentHandlerContext", "SRC20TrxRequestParams", "PaginatedStampResponseBody",
-    "PaginatedSrc20ResponseBody", "StampsAndSrc20", "StampPageProps"
+    "IdentHandlerContext",
+    "SRC20TrxRequestParams",
+    "PaginatedStampResponseBody",
+    "PaginatedSrc20ResponseBody",
+    "StampsAndSrc20",
+    "StampPageProps",
   ]);
 
   await validateTypeExports("lib/types/ui.d.ts", [
-    "ComponentProps", "ButtonVariant", "LayoutConfig", "ThemeMode",
-    "UIState", "FormState", "PaginationState"
+    "ComponentProps",
+    "ButtonVariant",
+    "LayoutConfig",
+    "ThemeMode",
+    "UIState",
+    "FormState",
+    "PaginationState",
   ]);
 
   await validateTypeExports("lib/types/marketData.d.ts", [
-    "StampMarketData", "SRC20MarketData", "PriceData", "VolumeData",
-    "MarketAnalytics", "CacheStatus", "PortfolioData"
+    "StampMarketData",
+    "SRC20MarketData",
+    "PriceData",
+    "VolumeData",
+    "MarketAnalytics",
+    "CacheStatus",
+    "PortfolioData",
   ]);
 
   await validateTypeExports("lib/types/wallet.d.ts", [
-    "WalletProvider", "WalletConnection", "BitcoinWallet", "TransactionRequest",
-    "WalletAdapter", "WalletAsset", "AssetBalance"
+    "WalletProvider",
+    "WalletConnection",
+    "BitcoinWallet",
+    "TransactionRequest",
+    "WalletAdapter",
+    "WalletAsset",
+    "AssetBalance",
   ]);
 });
 
@@ -289,7 +308,14 @@ Deno.test("API Types - Response Body Types", () => {
 Deno.test("UI Types - Component Props and Variants", () => {
   // Test ButtonVariant enum
   const buttonVariants: ButtonVariant[] = [
-    "primary", "secondary", "danger", "warning", "success", "info", "ghost", "link"
+    "primary",
+    "secondary",
+    "danger",
+    "warning",
+    "success",
+    "info",
+    "ghost",
+    "link",
   ];
 
   assertEquals(buttonVariants.length, 8);
@@ -758,7 +784,8 @@ Deno.test("Wallet Types - Core Wallet Interfaces", () => {
   const walletConnection: WalletConnection = {
     provider: "unisat",
     address: "bc1q...",
-    publicKey: "04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5f",
+    publicKey:
+      "04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5f",
     network: "mainnet",
     isConnected: true,
     connectionTime: new Date(),
@@ -941,7 +968,8 @@ Deno.test("Wallet Types - Transaction Building", () => {
 // ============================================================================
 
 Deno.test("Client Types - API Integration Example", async () => {
-  await withTempTypeFile(`
+  await withTempTypeFile(
+    `
     // Example API integration with proper typing
     interface ApiClient {
       getStamps(params?: SRC20TrxRequestParams): Promise<PaginatedStampResponseBody>;
@@ -1014,13 +1042,16 @@ Deno.test("Client Types - API Integration Example", async () => {
     // This should compile without errors
     const client = new MockApiClient();
     const _client: ApiClient = client;
-  `, async (filePath) => {
-    await validateTypeCompilation(filePath);
-  });
+  `,
+    async (filePath) => {
+      await validateTypeCompilation(filePath);
+    },
+  );
 });
 
 Deno.test("Client Types - React Component Example", async () => {
-  await withTempTypeFile(`
+  await withTempTypeFile(
+    `
     // Example React component with proper typing
     interface StampCardProps extends ComponentProps {
       stamp: {
@@ -1089,9 +1120,11 @@ Deno.test("Client Types - React Component Example", async () => {
     };
 
     const _component: ReactComponent<StampCardProps> = StampCard;
-  `, async (filePath) => {
-    await validateTypeCompilation(filePath);
-  });
+  `,
+    async (filePath) => {
+      await validateTypeCompilation(filePath);
+    },
+  );
 });
 
 // ============================================================================
@@ -1113,7 +1146,11 @@ Deno.test("Client Types - Performance Benchmark", async () => {
         change24h: Math.random() * 10 - 5,
       },
       volume: {
-        volume24h: { btc: Math.random() * 5, usd: Math.random() * 225000, transactions: Math.floor(Math.random() * 100) },
+        volume24h: {
+          btc: Math.random() * 5,
+          usd: Math.random() * 225000,
+          transactions: Math.floor(Math.random() * 100),
+        },
       },
       marketCap: {
         btc: Math.random() * 100,
@@ -1149,7 +1186,11 @@ Deno.test("Client Types - Performance Benchmark", async () => {
   const endTime = performance.now();
   const duration = endTime - startTime;
 
-  console.log(`📊 Client type performance: ${iterations} market data objects created in ${duration.toFixed(2)}ms`);
+  console.log(
+    `📊 Client type performance: ${iterations} market data objects created in ${
+      duration.toFixed(2)
+    }ms`,
+  );
 
   // Should complete within reasonable time (< 50ms for 50 iterations)
   assertEquals(duration < 50, true, "Client type operations too slow");
@@ -1160,34 +1201,34 @@ Deno.test("Client Types - Performance Benchmark", async () => {
 // ============================================================================
 
 import type {
-    // Animation Types
-    AnimationProps,
-    // Accessibility Types
-    AriaAttributes,
-    ButtonColor,
-    // Button Types
-    ButtonProps,
-    ButtonSize,
-    DisplayCountBreakpoints,
-    ErrorStateProps,
-    // Layout Types
-    FlexboxProps,
-    GridProps,
-    // Icon Types
-    IconProps,
-    IconSize,
-    IconWeight,
-    InputProps,
-    // Common Pattern Types
-    LoadingStateProps,
-    // Responsive Design Types
-    ResponsiveValue,
-    ScreenReaderProps,
-    SelectProps,
-    SRC20CardProps,
-    // Bitcoin Stamps UI Types
-    StampGalleryProps,
-    ToastProps
+  // Animation Types
+  AnimationProps,
+  // Accessibility Types
+  AriaAttributes,
+  ButtonColor,
+  // Button Types
+  ButtonProps,
+  ButtonSize,
+  DisplayCountBreakpoints,
+  ErrorStateProps,
+  // Layout Types
+  FlexboxProps,
+  GridProps,
+  // Icon Types
+  IconProps,
+  IconSize,
+  IconWeight,
+  InputProps,
+  // Common Pattern Types
+  LoadingStateProps,
+  // Responsive Design Types
+  ResponsiveValue,
+  ScreenReaderProps,
+  SelectProps,
+  SRC20CardProps,
+  // Bitcoin Stamps UI Types
+  StampGalleryProps,
+  ToastProps,
 } from "../../lib/types/ui.d.ts";
 
 Deno.test("UI Component Types - Button Component Structure", () => {

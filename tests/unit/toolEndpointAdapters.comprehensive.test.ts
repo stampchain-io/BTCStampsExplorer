@@ -1,16 +1,12 @@
 /**
  * Comprehensive tests for Tool Endpoint Adapters
- * 
+ *
  * These tests supplement the existing toolEndpointAdapters.test.ts file
  * to achieve higher coverage by testing edge cases, error conditions,
  * and additional scenarios not covered in the basic tests.
  */
 
-import {
-  assertEquals,
-  assertExists,
-  assertThrows,
-} from "@std/assert";
+import { assertEquals, assertExists, assertThrows } from "@std/assert";
 import { describe, it } from "jsr:@std/testing@1.0.14/bdd";
 
 import {
@@ -81,7 +77,7 @@ describe("StampToolAdapter - Comprehensive Coverage", () => {
       assertThrows(
         () => adapter.parseResponse(null),
         ToolResponseError,
-        "Invalid response format from stamp endpoint"
+        "Invalid response format from stamp endpoint",
       );
     });
 
@@ -89,7 +85,7 @@ describe("StampToolAdapter - Comprehensive Coverage", () => {
       assertThrows(
         () => adapter.parseResponse("invalid"),
         ToolResponseError,
-        "Invalid response format from stamp endpoint"
+        "Invalid response format from stamp endpoint",
       );
     });
 
@@ -102,7 +98,7 @@ describe("StampToolAdapter - Comprehensive Coverage", () => {
       assertThrows(
         () => adapter.parseResponse(incompleteResponse),
         ToolResponseError,
-        "Missing required fields in stamp response"
+        "Missing required fields in stamp response",
       );
     });
 
@@ -136,7 +132,7 @@ describe("StampToolAdapter - Comprehensive Coverage", () => {
       assertThrows(
         () => adapter.validateOptions(invalidOptions),
         ToolValidationError,
-        "Invalid stamp transaction options"
+        "Invalid stamp transaction options",
       );
     });
 
@@ -154,7 +150,7 @@ describe("StampToolAdapter - Comprehensive Coverage", () => {
 
       assertThrows(
         () => adapter.validateOptions(options),
-        ToolValidationError
+        ToolValidationError,
       );
     });
   });
@@ -230,7 +226,7 @@ describe("SRC20ToolAdapter - Comprehensive Coverage", () => {
       assertThrows(
         () => adapter.buildRequestBody(options),
         Error,
-        "Wallet address is required for SRC20 operations"
+        "Wallet address is required for SRC20 operations",
       );
     });
 
@@ -327,7 +323,7 @@ describe("SRC20ToolAdapter - Comprehensive Coverage", () => {
 
       assertThrows(
         () => adapter.validateOptions(invalidMintOptions),
-        ToolValidationError
+        ToolValidationError,
       );
     });
 
@@ -343,7 +339,7 @@ describe("SRC20ToolAdapter - Comprehensive Coverage", () => {
 
       assertThrows(
         () => adapter.validateOptions(invalidTransferOptions),
-        ToolValidationError
+        ToolValidationError,
       );
     });
 
@@ -358,7 +354,7 @@ describe("SRC20ToolAdapter - Comprehensive Coverage", () => {
 
       assertThrows(
         () => adapter.validateOptions(invalidOpOptions),
-        ToolValidationError
+        ToolValidationError,
       );
     });
   });
@@ -491,7 +487,7 @@ describe("SRC101ToolAdapter - Comprehensive Coverage", () => {
 
       assertThrows(
         () => adapter.validateOptions(invalidMintOptions),
-        ToolValidationError
+        ToolValidationError,
       );
     });
 
@@ -506,7 +502,7 @@ describe("SRC101ToolAdapter - Comprehensive Coverage", () => {
 
       assertThrows(
         () => adapter.validateOptions(invalidTransferOptions),
-        ToolValidationError
+        ToolValidationError,
       );
     });
   });
@@ -661,7 +657,7 @@ describe("Factory and Utility Functions", () => {
       assertThrows(
         () => getToolAdapter("unsupported" as any),
         Error,
-        "No adapter available for tool type: unsupported"
+        "No adapter available for tool type: unsupported",
       );
     });
   });
@@ -674,7 +670,7 @@ describe("Factory and Utility Functions", () => {
     it("should provide same adapter instances on multiple calls", () => {
       const adapter1 = factory.createAdapter("stamp");
       const adapter2 = factory.createAdapter("stamp");
-      
+
       // Should return the same instance (from internal Map)
       assertEquals(adapter1, adapter2);
     });
@@ -685,7 +681,7 @@ describe("Error Handling and Edge Cases", () => {
   describe("ToolResponseError Integration", () => {
     it("should include proper error context in ToolResponseError", () => {
       const adapter = new StampToolAdapter();
-      
+
       try {
         adapter.parseResponse({ invalid: "response" });
       } catch (error) {

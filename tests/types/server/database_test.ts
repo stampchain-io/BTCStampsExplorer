@@ -5,157 +5,182 @@
 
 import { assertType, IsExact } from "../utils/typeAssertions.ts";
 import type {
+  BackupOperation,
+  BlockTableSchema,
+  Collection,
+  ColumnDefinition,
+  ConnectionPoolStatistics,
+  ConstraintDefinition,
+  // Multi-Database Support
+  DatabaseConnection,
+  DatabaseHealthCheck,
   // Base Database Schema Types
   DatabaseSchema,
-  TableDefinition,
-  ColumnDefinition,
-  IndexDefinition,
-  ConstraintDefinition,
-  
-  // Query Builder Types
-  QueryBuilder,
-  SelectQueryBuilder,
-  InsertQueryBuilder,
-  UpdateQueryBuilder,
   DeleteQueryBuilder,
-  QueryResult,
-  WhereCondition,
-  
-  // ORM Interface Types
-  Model,
-  ModelQueryBuilder,
-  PaginatedResult,
-  RelationDefinition,
-  
+  IndexDefinition,
+  InsertQueryBuilder,
   // Migration Types
   Migration,
   MigrationOperation,
-  SchemaBuilder,
-  TableBuilder,
   MigrationRunner,
-  
-  // Bitcoin-specific Types
-  StampTableSchema,
-  SRC20TokenTableSchema,
-  SRC20BalanceTableSchema,
-  TransactionTableSchema,
-  BlockTableSchema,
-  UTXOTableSchema,
-  
-  // Multi-Database Support
-  DatabaseConnection,
-  SQLDatabase,
+  // ORM Interface Types
+  Model,
+  ModelQueryBuilder,
   NoSQLDatabase,
-  RedisDatabase,
-  Transaction,
-  Collection,
-  
+  PaginatedResult,
+  // Query Builder Types
+  QueryBuilder,
   // Performance and Monitoring
   QueryPerformanceMetrics,
-  ConnectionPoolStatistics,
-  DatabaseHealthCheck,
-  BackupOperation,
-  RestoreOperation,
-  
+  QueryResult,
+  RedisDatabase,
+  RelationDefinition,
   // Repository Pattern
   Repository,
-  StampRepository,
+  RestoreOperation,
+  SchemaBuilder,
+  SelectQueryBuilder,
+  SQLDatabase,
+  SRC20BalanceTableSchema,
   SRC20Repository,
-  TransactionRepository,
+  SRC20TokenStats,
+  SRC20TokenTableSchema,
+  StampRepository,
   StampStatistics,
-  SRC20TokenStats
+  // Bitcoin-specific Types
+  StampTableSchema,
+  TableBuilder,
+  TableDefinition,
+  Transaction,
+  TransactionRepository,
+  TransactionTableSchema,
+  UpdateQueryBuilder,
+  UTXOTableSchema,
+  WhereCondition,
 } from "$server/types/database.d.ts";
 
 import type { StampRow } from "$types/stamp.d.ts";
-import type { SRC20Row, SRC20Balance } from "$types/src20.d.ts";
+import type { SRC20Balance, SRC20Row } from "$types/src20.d.ts";
 import type { SendRow } from "$types/transaction.d.ts";
 
 Deno.test("Database Schema Types", () => {
   // Test DatabaseSchema structure
-  assertType<IsExact<DatabaseSchema, {
-    tables: { [tableName: string]: TableDefinition };
-    indexes: { [indexName: string]: IndexDefinition };
-    constraints: { [constraintName: string]: ConstraintDefinition };
-    version: string;
-  }>>(true);
+  assertType<
+    IsExact<DatabaseSchema, {
+      tables: { [tableName: string]: TableDefinition };
+      indexes: { [indexName: string]: IndexDefinition };
+      constraints: { [constraintName: string]: ConstraintDefinition };
+      version: string;
+    }>
+  >(true);
 
   // Test TableDefinition structure
-  assertType<IsExact<TableDefinition, {
-    name: string;
-    columns: { [columnName: string]: ColumnDefinition };
-    primaryKey: string[];
-    indexes?: IndexDefinition[];
-    constraints?: ConstraintDefinition[];
-    engine?: "InnoDB" | "MyISAM" | "Memory" | "Archive";
-    charset?: string;
-    collation?: string;
-  }>>(true);
+  assertType<
+    IsExact<TableDefinition, {
+      name: string;
+      columns: { [columnName: string]: ColumnDefinition };
+      primaryKey: string[];
+      indexes?: IndexDefinition[];
+      constraints?: ConstraintDefinition[];
+      engine?: "InnoDB" | "MyISAM" | "Memory" | "Archive";
+      charset?: string;
+      collation?: string;
+    }>
+  >(true);
 
   // Test ColumnDefinition structure
-  assertType<IsExact<ColumnDefinition, {
-    type: "INT" | "BIGINT" | "TINYINT" | "SMALLINT" | "MEDIUMINT" |
-          "DECIMAL" | "NUMERIC" | "FLOAT" | "DOUBLE" |
-          "VARCHAR" | "CHAR" | "TEXT" | "MEDIUMTEXT" | "LONGTEXT" |
-          "DATE" | "TIME" | "DATETIME" | "TIMESTAMP" |
-          "BINARY" | "VARBINARY" | "BLOB" | "MEDIUMBLOB" | "LONGBLOB" |
-          "JSON" | "ENUM" | "SET" | "BOOLEAN";
-    nullable?: boolean;
-    primaryKey?: boolean;
-    unique?: boolean;
-    autoIncrement?: boolean;
-    default?: unknown;
-    length?: number;
-    precision?: number;
-    scale?: number;
-    comment?: string;
-    collation?: string;
-  }>>(true);
+  assertType<
+    IsExact<ColumnDefinition, {
+      type:
+        | "INT"
+        | "BIGINT"
+        | "TINYINT"
+        | "SMALLINT"
+        | "MEDIUMINT"
+        | "DECIMAL"
+        | "NUMERIC"
+        | "FLOAT"
+        | "DOUBLE"
+        | "VARCHAR"
+        | "CHAR"
+        | "TEXT"
+        | "MEDIUMTEXT"
+        | "LONGTEXT"
+        | "DATE"
+        | "TIME"
+        | "DATETIME"
+        | "TIMESTAMP"
+        | "BINARY"
+        | "VARBINARY"
+        | "BLOB"
+        | "MEDIUMBLOB"
+        | "LONGBLOB"
+        | "JSON"
+        | "ENUM"
+        | "SET"
+        | "BOOLEAN";
+      nullable?: boolean;
+      primaryKey?: boolean;
+      unique?: boolean;
+      autoIncrement?: boolean;
+      default?: unknown;
+      length?: number;
+      precision?: number;
+      scale?: number;
+      comment?: string;
+      collation?: string;
+    }>
+  >(true);
 });
 
 Deno.test("Query Builder Types", () => {
   // Test generic QueryBuilder interface
-  assertType<IsExact<QueryBuilder<any>, {
-    select: SelectQueryBuilder<any>;
-    insert: InsertQueryBuilder<any>;
-    update: UpdateQueryBuilder<any>;
-    delete: DeleteQueryBuilder<any>;
-  }>>(true);
+  assertType<
+    IsExact<QueryBuilder<any>, {
+      select: SelectQueryBuilder<any>;
+      insert: InsertQueryBuilder<any>;
+      update: UpdateQueryBuilder<any>;
+      delete: DeleteQueryBuilder<any>;
+    }>
+  >(true);
 
   // Test WhereCondition type with example object
   type TestModel = { id: number; name: string; active: boolean };
-  
+
   const validWhereCondition: WhereCondition<TestModel> = {
     id: { $gt: 10 },
     name: { $like: "test%" },
-    active: true
+    active: true,
   };
-  
+
   assertType<WhereCondition<TestModel>>(validWhereCondition);
 
   // Test QueryResult structure
-  assertType<IsExact<QueryResult<TestModel>, {
-    rows: TestModel[];
-    rowCount: number;
-    fields: Array<{
-      name: string;
-      type: string;
-      length: number;
-      nullable: boolean;
-      primaryKey: boolean;
-      unique: boolean;
-      autoIncrement: boolean;
-      default: any;
-    }>;
-    affectedRows?: number;
-    insertId?: number;
-    warningCount?: number;
-  }>>(true);
+  assertType<
+    IsExact<QueryResult<TestModel>, {
+      rows: TestModel[];
+      rowCount: number;
+      fields: Array<{
+        name: string;
+        type: string;
+        length: number;
+        nullable: boolean;
+        primaryKey: boolean;
+        unique: boolean;
+        autoIncrement: boolean;
+        default: any;
+      }>;
+      affectedRows?: number;
+      insertId?: number;
+      warningCount?: number;
+    }>
+  >(true);
 });
 
 Deno.test("ORM Interface Types", () => {
   // Test Model interface structure
   type TestModel = { id: number; name: string; createdAt: Date };
-  
+
   const validModel: Model<TestModel> = {
     tableName: "test_table",
     primaryKey: "id",
@@ -165,7 +190,7 @@ Deno.test("ORM Interface Types", () => {
     casts: {
       id: "integer",
       name: "string",
-      createdAt: "date"
+      createdAt: "date",
     },
     timestamps: true,
     createdAt: "createdAt",
@@ -173,47 +198,49 @@ Deno.test("ORM Interface Types", () => {
       posts: {
         type: "hasMany",
         model: "Post",
-        foreignKey: "user_id"
-      }
-    }
+        foreignKey: "user_id",
+      },
+    },
   };
-  
+
   assertType<Model<TestModel>>(validModel);
 
   // Test PaginatedResult structure
-  assertType<IsExact<PaginatedResult<TestModel>, {
-    data: TestModel[];
-    meta: {
-      current_page: number;
-      per_page: number;
-      total: number;
-      total_pages: number;
-      from: number;
-      to: number;
-    };
-    links: {
-      first: string | null;
-      last: string | null;
-      prev: string | null;
-      next: string | null;
-    };
-  }>>(true);
+  assertType<
+    IsExact<PaginatedResult<TestModel>, {
+      data: TestModel[];
+      meta: {
+        current_page: number;
+        per_page: number;
+        total: number;
+        total_pages: number;
+        from: number;
+        to: number;
+      };
+      links: {
+        first: string | null;
+        last: string | null;
+        prev: string | null;
+        next: string | null;
+      };
+    }>
+  >(true);
 
   // Test RelationDefinition types
   const hasOneRelation: RelationDefinition = {
     type: "hasOne",
     model: "Profile",
-    foreignKey: "user_id"
+    foreignKey: "user_id",
   };
-  
+
   const belongsToManyRelation: RelationDefinition = {
     type: "belongsToMany",
     model: "Role",
     pivotTable: "user_roles",
     pivotForeignKey: "user_id",
-    pivotLocalKey: "role_id"
+    pivotLocalKey: "role_id",
   };
-  
+
   assertType<RelationDefinition>(hasOneRelation);
   assertType<RelationDefinition>(belongsToManyRelation);
 });
@@ -225,29 +252,29 @@ Deno.test("Migration Types", () => {
     name: "CreateUsersTable",
     version: "1.0.0",
     description: "Create users table with basic fields",
-    up: async () => { /* migration up logic */ },
-    down: async () => { /* migration down logic */ },
+    up: async () => {/* migration up logic */},
+    down: async () => {/* migration down logic */},
     dependencies: [],
     createdAt: new Date(),
-    executedAt: new Date()
+    executedAt: new Date(),
   };
-  
+
   assertType<Migration>(validMigration);
 
   // Test MigrationOperation types
   const createTableOp: MigrationOperation = {
     type: "CREATE_TABLE",
     table: "users",
-    data: { /* table definition */ }
+    data: {/* table definition */},
   };
-  
+
   const addColumnOp: MigrationOperation = {
     type: "ADD_COLUMN",
     table: "users",
     column: "email",
-    data: { type: "VARCHAR", length: 255, nullable: false }
+    data: { type: "VARCHAR", length: 255, nullable: false },
   };
-  
+
   assertType<MigrationOperation>(createTableOp);
   assertType<MigrationOperation>(addColumnOp);
 });
@@ -275,9 +302,9 @@ Deno.test("Bitcoin-Specific Database Types", () => {
     is_cursed: false,
     is_reissuance: false,
     created_at: new Date(),
-    updated_at: new Date()
+    updated_at: new Date(),
   };
-  
+
   assertType<StampTableSchema>(validStampSchema);
 
   // Test SRC20TokenTableSchema
@@ -297,9 +324,9 @@ Deno.test("Bitcoin-Specific Database Types", () => {
     status: "active",
     creator_fee: "0.001",
     created_at: new Date(),
-    updated_at: new Date()
+    updated_at: new Date(),
   };
-  
+
   assertType<SRC20TokenTableSchema>(validSRC20Schema);
 
   // Test SRC20BalanceTableSchema
@@ -311,9 +338,9 @@ Deno.test("Bitcoin-Specific Database Types", () => {
     last_update_block: 800000,
     last_update_tx: "abcd1234",
     created_at: new Date(),
-    updated_at: new Date()
+    updated_at: new Date(),
   };
-  
+
   assertType<SRC20BalanceTableSchema>(validBalanceSchema);
 
   // Test TransactionTableSchema
@@ -332,9 +359,9 @@ Deno.test("Bitcoin-Specific Database Types", () => {
     order_index: 0,
     tx_index: 0,
     created_at: new Date(),
-    updated_at: new Date()
+    updated_at: new Date(),
   };
-  
+
   assertType<TransactionTableSchema>(validTxSchema);
 
   // Test UTXOTableSchema
@@ -351,9 +378,9 @@ Deno.test("Bitcoin-Specific Database Types", () => {
     spent_by_vin: undefined,
     block_index: 800000,
     created_at: new Date(),
-    updated_at: new Date()
+    updated_at: new Date(),
   };
-  
+
   assertType<UTXOTableSchema>(validUTXOSchema);
 });
 
@@ -366,7 +393,7 @@ Deno.test("Multi-Database Support Types", () => {
       port: 3306,
       database: "test_db",
       username: "user",
-      password: "pass"
+      password: "pass",
     },
     client: {} as any,
     isConnected: true,
@@ -374,9 +401,9 @@ Deno.test("Multi-Database Support Types", () => {
     disconnect: async () => {},
     ping: async () => true,
     execute: async () => ({ rows: [], rowCount: 0, fields: [] }),
-    transaction: async (callback) => callback({} as any)
+    transaction: async (callback) => callback({} as any),
   };
-  
+
   assertType<DatabaseConnection>(mockConnection);
 
   // Test RedisDatabase interface methods
@@ -393,12 +420,18 @@ Deno.test("Multi-Database Support Types", () => {
     hgetall: async (key: string) => ({ field1: "value1" }),
     sadd: async (key: string, member: string | string[]) => 1,
     smembers: async (key: string) => ["member1", "member2"],
-    zadd: async (key: string, score: number, member: string) => 1
+    zadd: async (key: string, score: number, member: string) => 1,
   };
-  
+
   // These should not cause type errors
-  if (mockRedis.get) assertType<(key: string) => Promise<string | null>>(mockRedis.get);
-  if (mockRedis.hgetall) assertType<(key: string) => Promise<Record<string, string>>>(mockRedis.hgetall);
+  if (mockRedis.get) {
+    assertType<(key: string) => Promise<string | null>>(mockRedis.get);
+  }
+  if (mockRedis.hgetall) {
+    assertType<(key: string) => Promise<Record<string, string>>>(
+      mockRedis.hgetall,
+    );
+  }
 });
 
 Deno.test("Performance and Monitoring Types", () => {
@@ -412,14 +445,14 @@ Deno.test("Performance and Monitoring Types", () => {
     warnings: [{
       level: "Note",
       code: 1003,
-      message: "Query executed successfully"
+      message: "Query executed successfully",
     }],
     timestamp: new Date(),
     connectionId: "conn123",
     database: "test_db",
-    user: "app_user"
+    user: "app_user",
   };
-  
+
   assertType<QueryPerformanceMetrics>(validMetrics);
 
   // Test ConnectionPoolStatistics
@@ -435,9 +468,9 @@ Deno.test("Performance and Monitoring Types", () => {
     totalAcquiredConnections: 1000,
     totalReleasedConnections: 995,
     connectionErrors: 2,
-    lastResetTime: new Date()
+    lastResetTime: new Date(),
   };
-  
+
   assertType<ConnectionPoolStatistics>(validPoolStats);
 
   // Test DatabaseHealthCheck
@@ -452,15 +485,15 @@ Deno.test("Performance and Monitoring Types", () => {
       slowQueries: 2,
       cacheHitRatio: 0.95,
       bufferPoolUsage: 0.75,
-      indexEfficiency: 0.98
+      indexEfficiency: 0.98,
     },
     storage: {
       totalSize: 1024 * 1024 * 1024, // 1GB
-      dataSize: 800 * 1024 * 1024,   // 800MB
-      indexSize: 200 * 1024 * 1024,  // 200MB
-      freeSpace: 24 * 1024 * 1024,   // 24MB
+      dataSize: 800 * 1024 * 1024, // 800MB
+      indexSize: 200 * 1024 * 1024, // 200MB
+      freeSpace: 24 * 1024 * 1024, // 24MB
       growthRate: 0.1,
-      fragmentation: 0.05
+      fragmentation: 0.05,
     },
     lastCheck: new Date(),
     checks: [{
@@ -468,10 +501,10 @@ Deno.test("Performance and Monitoring Types", () => {
       status: "healthy",
       message: "Database connection successful",
       responseTime: 10.5,
-      timestamp: new Date()
-    }]
+      timestamp: new Date(),
+    }],
   };
-  
+
   assertType<DatabaseHealthCheck>(validHealthCheck);
 
   // Test BackupOperation
@@ -487,20 +520,23 @@ Deno.test("Performance and Monitoring Types", () => {
     location: "/backups/test_db_20240101.sql.gz",
     compression: "gzip",
     encryption: true,
-    checksum: "sha256:abc123..."
+    checksum: "sha256:abc123...",
   };
-  
+
   assertType<BackupOperation>(validBackup);
 });
 
 Deno.test("Repository Pattern Types", () => {
   // Test generic Repository interface
   type TestEntity = { id: number; name: string; active: boolean };
-  
+
   const mockRepository: Repository<TestEntity> = {
     find: async (id) => ({ id: 1, name: "test", active: true }),
     findAll: async (options) => [{ id: 1, name: "test", active: true }],
-    findBy: async (criteria, options) => [{ id: 1, name: "test", active: true }],
+    findBy: async (
+      criteria,
+      options,
+    ) => [{ id: 1, name: "test", active: true }],
     findOneBy: async (criteria) => ({ id: 1, name: "test", active: true }),
     create: async (data) => ({ id: 1, name: data.name, active: data.active }),
     update: async (id, data) => ({ id: 1, name: "updated", active: true }),
@@ -515,17 +551,17 @@ Deno.test("Repository Pattern Types", () => {
         total: 100,
         total_pages: 10,
         from: 1,
-        to: 10
+        to: 10,
       },
       links: {
         first: "/api/test?page=1",
         last: "/api/test?page=10",
         prev: null,
-        next: "/api/test?page=2"
-      }
-    })
+        next: "/api/test?page=2",
+      },
+    }),
   };
-  
+
   assertType<Repository<TestEntity>>(mockRepository);
 
   // Test StampRepository specific methods
@@ -541,13 +577,15 @@ Deno.test("Repository Pattern Types", () => {
       uniqueCreators: 5000,
       totalVolume: 1000000,
       averageSize: 2048,
-      latestStamp: 50000
-    })
+      latestStamp: 50000,
+    }),
   };
-  
+
   // These should not cause type errors
   if (mockStampRepo.findByStampNumber) {
-    assertType<(stampNumber: number) => Promise<StampRow | null>>(mockStampRepo.findByStampNumber);
+    assertType<(stampNumber: number) => Promise<StampRow | null>>(
+      mockStampRepo.findByStampNumber,
+    );
   }
   if (mockStampRepo.getStampStats) {
     assertType<() => Promise<StampStatistics>>(mockStampRepo.getStampStats);
@@ -566,46 +604,50 @@ Deno.test("Repository Pattern Types", () => {
       holders: 100,
       transfers: 1000,
       mintProgress: 0.5,
-      isCompleted: false
-    })
+      isCompleted: false,
+    }),
   };
-  
+
   // These should not cause type errors
   if (mockSRC20Repo.findByTick) {
-    assertType<(tick: string) => Promise<SRC20Row | null>>(mockSRC20Repo.findByTick);
+    assertType<(tick: string) => Promise<SRC20Row | null>>(
+      mockSRC20Repo.findByTick,
+    );
   }
   if (mockSRC20Repo.getTokenStats) {
-    assertType<(tick: string) => Promise<SRC20TokenStats>>(mockSRC20Repo.getTokenStats);
+    assertType<(tick: string) => Promise<SRC20TokenStats>>(
+      mockSRC20Repo.getTokenStats,
+    );
   }
 });
 
 Deno.test("Type Compatibility with Domain Types", () => {
   // Ensure database types are compatible with domain types
-  
+
   // StampRow should be compatible with StampTableSchema (minus database-specific fields)
   const _stampData: StampRow = {} as StampRow;
   const stampSchema: StampTableSchema = {} as StampTableSchema;
-  
+
   // These assignments should be valid where applicable
   // (Note: Not all fields will match exactly due to domain vs persistence layer differences)
   assertType<number>(stampSchema.stamp_number);
   assertType<string>(stampSchema.tx_hash);
   assertType<string>(stampSchema.creator);
   assertType<boolean>(stampSchema.is_btc_stamp);
-  
+
   // SRC20 types should be compatible
   const _src20Data: SRC20Row = {} as SRC20Row;
   const src20Schema: SRC20TokenTableSchema = {} as SRC20TokenTableSchema;
-  
+
   assertType<string>(src20Schema.tick);
   assertType<string>(src20Schema.max);
   assertType<string>(src20Schema.lim);
   assertType<number>(src20Schema.dec);
-  
+
   // Balance types should be compatible
   const _balanceData: SRC20Balance = {} as SRC20Balance;
   const balanceSchema: SRC20BalanceTableSchema = {} as SRC20BalanceTableSchema;
-  
+
   assertType<string>(balanceSchema.address);
   assertType<string>(balanceSchema.tick);
   assertType<string>(balanceSchema.balance);

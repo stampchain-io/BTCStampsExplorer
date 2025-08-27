@@ -1,9 +1,9 @@
 /**
  * OpenAPI Contract Testing Script for Postman Collections
- * 
+ *
  * This script integrates with Postman tests to validate API responses
  * against OpenAPI schema definitions, supporting v2.2/v2.3 transitions
- * 
+ *
  * Task 82: Add OpenAPI Contract Testing
  */
 
@@ -202,22 +202,22 @@ if (pm.info.iteration === pm.info.iterationCount - 1) {
 
 // Export scripts for use in Postman collections
 module.exports = {
-    preRequestScript: loadOpenAPISpec,
-    testScript: validateResponseSchema,
-    collectionTestScript: summarizeValidationResults,
-    
-    // Helper to add schema validation to existing test
-    addSchemaValidation: function(existingTest) {
-        return existingTest + '\n\n' + validateResponseSchema;
-    },
-    
-    // Helper to create a schema-validated test
-    createValidatedTest: function(testName, customValidation = '') {
-        return `
+  preRequestScript: loadOpenAPISpec,
+  testScript: validateResponseSchema,
+  collectionTestScript: summarizeValidationResults,
+
+  // Helper to add schema validation to existing test
+  addSchemaValidation: function (existingTest) {
+    return existingTest + "\n\n" + validateResponseSchema;
+  },
+
+  // Helper to create a schema-validated test
+  createValidatedTest: function (testName, customValidation = "") {
+    return `
 // ${testName}
 ${validateResponseSchema}
 
 ${customValidation}
         `;
-    }
+  },
 };

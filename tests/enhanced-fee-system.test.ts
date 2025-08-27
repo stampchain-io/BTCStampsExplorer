@@ -2,12 +2,12 @@ import { dbManager } from "$server/database/databaseManager.ts";
 import { BackgroundFeeService } from "$server/services/fee/backgroundFeeService.ts";
 import { assert, assertEquals, assertExists } from "@std/assert";
 import {
-    cacheTestFixtures,
-    createWorldClassFetchMock,
-    expectedFeeDataStructure,
-    performanceFixtures,
-    testScenarios,
-    validateFeeData,
+  cacheTestFixtures,
+  createWorldClassFetchMock,
+  expectedFeeDataStructure,
+  performanceFixtures,
+  testScenarios,
+  validateFeeData,
 } from "./fixtures/feeSystemFixtures.ts";
 
 // 🚀 ENHANCED FEE SYSTEM TESTS
@@ -44,16 +44,20 @@ Deno.test("🚀 Enhanced Fee System Tests", async (t) => {
       const result = await dbManager.handleCache(
         cacheTestFixtures.testKey,
         () => Promise.resolve(cacheTestFixtures.testData),
-        cacheTestFixtures.cacheDuration
+        cacheTestFixtures.cacheDuration,
       );
 
       assertExists(result);
-      assertEquals(result.recommendedFee, cacheTestFixtures.testData.recommendedFee);
+      assertEquals(
+        result.recommendedFee,
+        cacheTestFixtures.testData.recommendedFee,
+      );
       assertEquals(result.btcPrice, cacheTestFixtures.testData.btcPrice);
       console.log("✅ Cache operation with fixture data completed");
-
     } catch (error) {
-      console.log(`⚠️  Cache operation failed (expected in test environment): ${error.message}`);
+      console.log(
+        `⚠️  Cache operation failed (expected in test environment): ${error.message}`,
+      );
       assert(true, "Cache failure is expected in test environment");
     }
   });
@@ -78,12 +82,16 @@ Deno.test("🚀 Enhanced Fee System Tests", async (t) => {
         economyFee: (config.expectedFee || 15) - 5,
         minimumFee: 1,
         fallbackUsed: config.expectedFallback || false,
-        debug_feesResponse: {}
+        debug_feesResponse: {},
       };
 
       // Validate structure using fixture helper
       const errors = validateFeeData(mockFeeData);
-      assertEquals(errors.length, 0, `Validation errors for ${scenarioName}: ${errors.join(", ")}`);
+      assertEquals(
+        errors.length,
+        0,
+        `Validation errors for ${scenarioName}: ${errors.join(", ")}`,
+      );
 
       console.log(`  ✅ ${config.name} structure validated`);
     }
@@ -104,18 +112,31 @@ Deno.test("🚀 Enhanced Fee System Tests", async (t) => {
           await fetchMock("https://mempool.space/api/v1/fees/recommended");
           assert(false, "Expected network error for failure scenario");
         } catch (error) {
-          assert(error.message.includes("Network error"), `Expected network error, got: ${error.message}`);
+          assert(
+            error.message.includes("Network error"),
+            `Expected network error, got: ${error.message}`,
+          );
           console.log(`  ✅ ${config.name} properly throws network errors`);
         }
       } else {
         // Test successful scenarios
-        const mempoolResponse = await fetchMock("https://mempool.space/api/v1/fees/recommended");
+        const mempoolResponse = await fetchMock(
+          "https://mempool.space/api/v1/fees/recommended",
+        );
         assertExists(mempoolResponse);
-        assert(mempoolResponse.ok, `Expected successful response for ${config.name}`);
+        assert(
+          mempoolResponse.ok,
+          `Expected successful response for ${config.name}`,
+        );
 
-        const coinGeckoResponse = await fetchMock("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd");
+        const coinGeckoResponse = await fetchMock(
+          "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd",
+        );
         assertExists(coinGeckoResponse);
-        assert(coinGeckoResponse.ok, `Expected successful response for ${config.name}`);
+        assert(
+          coinGeckoResponse.ok,
+          `Expected successful response for ${config.name}`,
+        );
 
         console.log(`  ✅ ${config.name} mock responses working`);
       }
@@ -129,7 +150,7 @@ Deno.test("🚀 Enhanced Fee System Tests", async (t) => {
 
     // Warmup iterations
     for (let i = 0; i < performanceFixtures.warmupIterations; i++) {
-      await new Promise(resolve => setTimeout(resolve, 1));
+      await new Promise((resolve) => setTimeout(resolve, 1));
     }
 
     // Actual performance test
@@ -153,13 +174,19 @@ Deno.test("🚀 Enhanced Fee System Tests", async (t) => {
       • Average: ${avgTime.toFixed(2)}ms
       • Max: ${maxTime}ms
       • Threshold: ${performanceFixtures.maxAcceptableTime}ms
-      • All times: ${times.join(', ')}ms`);
+      • All times: ${times.join(", ")}ms`);
 
     // Performance assertions using fixture thresholds
-    assert(avgTime < performanceFixtures.maxAcceptableTime,
-      `Average time ${avgTime}ms should be under ${performanceFixtures.maxAcceptableTime}ms`);
-    assert(maxTime < performanceFixtures.maxAcceptableTime * 2,
-      `Max time ${maxTime}ms should be under ${performanceFixtures.maxAcceptableTime * 2}ms`);
+    assert(
+      avgTime < performanceFixtures.maxAcceptableTime,
+      `Average time ${avgTime}ms should be under ${performanceFixtures.maxAcceptableTime}ms`,
+    );
+    assert(
+      maxTime < performanceFixtures.maxAcceptableTime * 2,
+      `Max time ${maxTime}ms should be under ${
+        performanceFixtures.maxAcceptableTime * 2
+      }ms`,
+    );
 
     console.log("✅ Performance benchmarks met");
   });
@@ -168,6 +195,10 @@ Deno.test("🚀 Enhanced Fee System Tests", async (t) => {
   console.log("📋 Test Summary:");
   console.log(`   • ${Object.keys(testScenarios).length} scenarios tested`);
   console.log(`   • ${performanceFixtures.iterations} performance iterations`);
-  console.log(`   • ${Object.keys(expectedFeeDataStructure).length} data structure fields validated`);
+  console.log(
+    `   • ${
+      Object.keys(expectedFeeDataStructure).length
+    } data structure fields validated`,
+  );
   console.log(`   • Comprehensive fixture data utilized ✅`);
 });

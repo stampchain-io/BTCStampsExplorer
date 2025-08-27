@@ -1,84 +1,458 @@
-# Task Master AI - Claude Code Integration Guide
+# BTCStampsExplorer - Claude Code 2025 Instructions
 
-## Essential Commands
+## Project Overview
 
-### Core Workflow Commands
+BTCStampsExplorer is the **official Bitcoin Stamps block explorer and API** powering [stampchain.io](https://stampchain.io). This is a production-grade Deno Fresh application serving the Bitcoin Stamps ecosystem with:
 
+- **Fresh Framework**: Server-side rendering + islands architecture for optimal performance
+- **API Server**: OpenAPI/Swagger documented endpoints serving Bitcoin Stamps data
+- **Database Stack**: MySQL (read-only for security) + Redis caching layer
+- **Testing Infrastructure**: Newman API tests, unit tests, integration tests
+- **AWS Deployment**: Production CI/CD pipeline with automated rollback capabilities
+
+**Critical Production Context**: This application serves live Bitcoin Stamps data and financial information. All changes must maintain data integrity and security standards.
+
+## Task Master AI Integration
+
+**Import Task Master's development workflow commands and guidelines:**
+@./.taskmaster/CLAUDE.md
+
+## Claude Code 2025 Best Practices
+
+### The "Do Not Touch" List (Critical ⚠️)
+
+**Core Infrastructure Files** (never modify without explicit user permission):
+- `deno.json` - Deno configuration with complex import maps and tasks
+- `deno.lock` - Dependency lockfile (auto-managed by Deno)
+- `main.ts` - Application entry point with critical resolver hooks
+- `dev.ts` - Development server configuration
+- `fresh.gen.ts` - Fresh framework auto-generated routes file
+- `schema.yml` - OpenAPI specification (validated in CI)
+- `docker-compose.*.yml` - Container orchestration for testing
+- `Dockerfile` - Production container configuration
+- `.github/workflows/` - Critical CI/CD pipelines
+- `.taskmaster/` - Task Master AI files and configurations
+
+**Security & Environment**:
+- `.env` files - Never commit, contain database and Redis credentials
+- `server/middleware/auth/` - Authentication middleware
+- `server/middleware/securityHeaders.ts` - Security headers configuration
+- `lib/utils/security/` - Security utility functions
+- Database connection files - Read-only access must be preserved
+
+**Fresh Framework Generated/Auto-managed**:
+- `_fresh/` directory - Fresh framework internals
+- `node_modules/` - Auto-generated (Deno uses this for npm compatibility)
+- Routes with `fresh.gen.ts` registration - Managed by Fresh build system
+
+**Production Build Artifacts**:
+- `dist/` directory - Build output
+- `coverage/` - Test coverage reports  
+- `reports/` - Newman test reports
+- `tmp/` - Temporary files
+
+### Quality Control Shortcuts
+
+Adapted for Deno Fresh development:
+
+- **QPLAN**: "Analyze deno.json tasks, existing route patterns, and database models before implementing. Check Fresh islands architecture and SSR considerations."
+- **QCODE**: "Implement with proper TypeScript types, run `deno task check`, validate OpenAPI schema, test both SSR and client-side functionality"  
+- **QCHECK**: "Perform security review focusing on data integrity, caching correctness, API response validation, and Fresh architecture patterns"
+
+### Extended Thinking Triggers
+
+For BTCStampsExplorer's complex blockchain data processing:
+
+- **"think"**: Basic reasoning for simple route or component changes
+- **"think hard"**: Deep analysis for database queries, caching strategies, or API design
+- **"think harder"**: Complex blockchain data processing, transaction validation, or performance optimization
+- **"ultrathink"**: Security-critical changes, database schema impacts, or production deployment decisions
+
+### Custom Slash Commands
+
+**BTCStampsExplorer-specific commands** (use with `/command-name`):
+
+Create `.claude/commands/btc-dev-server.md`:
+```markdown
+Start BTCStampsExplorer development server with proper setup.
+
+Steps:
+1. Check Deno version with `deno --version` (must be 2.4.2+)
+2. Validate environment with `deno task check:ports` 
+3. Start development server: `deno task dev`
+4. Verify server is running on http://localhost:8000
+5. Check for any TypeScript errors or warnings
+```
+
+Create `.claude/commands/btc-test-api.md`:
+```markdown
+Run comprehensive API tests for BTCStampsExplorer: $ARGUMENTS
+
+Steps:
+1. Validate OpenAPI schema: `deno task test:api:schema`
+2. Run smoke tests: `npm run test:api:smoke`
+3. Run comprehensive Newman tests: `npm run test:api:comprehensive`
+4. If $ARGUMENTS contains "performance": `npm run test:api:performance`
+5. Generate test report summary
+```
+
+Create `.claude/commands/btc-validate-build.md`:
+```markdown
+Validate BTCStampsExplorer build and deployment readiness.
+
+Steps:
+1. Run full quality checks: `deno task check:all`
+2. Run unit tests with coverage: `deno task test:unit:coverage`
+3. Build production: `deno task build`
+4. Run deployment validation: `deno task deploy:validate`
+5. Check for any build warnings or errors
+```
+
+Create `.claude/commands/btc-debug-database.md`:
+```markdown
+Debug database connectivity and query performance.
+
+Steps:
+1. Check database connection in server logs
+2. Review Redis cache status and hit rates
+3. Analyze slow query logs if performance issues
+4. Check read-only permissions are properly configured
+5. Validate data integrity for recent blocks
+```
+
+### Hooks Configuration
+
+Configure in `.claude/settings.json`:
+
+```json
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "command": "bash -c 'if [[ \"$CLAUDE_TOOL\" == \"Write\" && \"$CLAUDE_FILE_PATH\" =~ \\.(ts|tsx|js)$ ]]; then echo \"[DENO PRE-CHECK] Validating TypeScript syntax for $CLAUDE_FILE_PATH\"; deno check \"$CLAUDE_FILE_PATH\" 2>/dev/null || echo \"Warning: TypeScript check failed\"; fi'",
+        "description": "Pre-validate TypeScript files before writing"
+      }
+    ],
+    "PostToolUse": [
+      {
+        "command": "bash -c 'if [[ \"$CLAUDE_TOOL\" == \"Write\" && \"$CLAUDE_FILE_PATH\" =~ routes/.*\\.tsx?$ ]]; then echo \"[FRESH POST-CHECK] Route file modified: $CLAUDE_FILE_PATH\"; deno task check:ssr || echo \"Warning: SSR validation failed\"; fi'",
+        "description": "Validate Fresh routes after modification"
+      },
+      {
+        "command": "bash -c 'if [[ \"$CLAUDE_TOOL\" == \"Write\" && \"$CLAUDE_FILE_PATH\" == \"schema.yml\" ]]; then echo \"[OPENAPI POST-CHECK] Schema modified, validating...\"; npm run validate:schema || echo \"Error: OpenAPI schema validation failed\"; fi'",
+        "description": "Validate OpenAPI schema after changes"
+      }
+    ],
+    "SessionStart": [
+      {
+        "command": "echo \"🚀 BTCStampsExplorer Development Session Started\"",
+        "description": "Session startup message"
+      },
+      {
+        "command": "bash -c 'if [ -f .env ]; then echo \"✅ Environment configuration found\"; else echo \"⚠️  No .env file - copy from .env.sample if needed\"; fi'",
+        "description": "Check environment setup"
+      }
+    ]
+  }
+}
+```
+
+### Development Workflow Patterns
+
+**Daily Development Cycle**:
 ```bash
-# Project Setup
-task-master init                                    # Initialize Task Master in current project
-task-master parse-prd .taskmaster/docs/prd.txt      # Generate tasks from PRD document
-task-master models --setup                        # Configure AI models interactively
+# 1. Start session with environment check
+claude  # Hooks will validate environment
 
-# Daily Development Workflow
-task-master list                                   # Show all tasks with status
-task-master next                                   # Get next available task to work on
-task-master show <id>                             # View detailed task information (e.g., task-master show 1.2)
-task-master set-status --id=<id> --status=done    # Mark task complete
+# 2. Get next task from Task Master
+task-master next
 
-# Task Management
-task-master add-task --prompt="description" --research        # Add new task with AI assistance
-task-master expand --id=<id> --research --force              # Break task into subtasks
-task-master update-task --id=<id> --prompt="changes"         # Update specific task
-task-master update --from=<id> --prompt="changes"            # Update multiple tasks from ID onwards
-task-master update-subtask --id=<id> --prompt="notes"        # Add implementation notes to subtask
+# 3. Standard development cycle
+deno task dev                    # Start development server
+deno task check                  # Quality validation
+deno task test:unit             # Run unit tests
+npm run test:api:smoke          # API smoke tests
 
-# Analysis & Planning
-task-master analyze-complexity --research          # Analyze task complexity
-task-master complexity-report                      # View complexity analysis
-task-master expand --all --research               # Expand all eligible tasks
-
-# Dependencies & Organization
-task-master add-dependency --id=<id> --depends-on=<id>       # Add task dependency
-task-master move --from=<id> --to=<id>                       # Reorganize task hierarchy
-task-master validate-dependencies                            # Check for dependency issues
-task-master generate                                         # Update task markdown files (usually auto-called)
+# 4. Pre-commit validation
+deno task validate:quick        # Quick validation
+deno task build                 # Ensure build works
 ```
 
-## Key Files & Project Structure
+**Feature Development Pattern**:
+```bash
+# 1. Plan changes
+/btc-validate-build            # Ensure clean starting state
 
-### Core Files
+# 2. Implement with validation
+# Edit files...
+deno task check:imports        # Validate import patterns
+deno task check:ssr           # Check SSR compatibility
 
-- `.taskmaster/tasks/tasks.json` - Main task data file (auto-managed)
-- `.taskmaster/config.json` - AI model configuration (use `task-master models` to modify)
-- `.taskmaster/docs/prd.txt` - Product Requirements Document for parsing
-- `.taskmaster/tasks/*.txt` - Individual task files (auto-generated from tasks.json)
-- `.env` - API keys for CLI usage
+# 3. Test thoroughly
+npm run test:api:comprehensive # Full API test suite
+deno task test:unit:coverage  # Unit tests with coverage
 
-### Claude Code Integration Files
-
-- `CLAUDE.md` - Auto-loaded context for Claude Code (this file)
-- `.claude/settings.json` - Claude Code tool allowlist and preferences
-- `.claude/commands/` - Custom slash commands for repeated workflows
-- `.mcp.json` - MCP server configuration (project-specific)
-
-### Directory Structure
-
-```
-project/
-├── .taskmaster/
-│   ├── tasks/              # Task files directory
-│   │   ├── tasks.json      # Main task database
-│   │   ├── task-1.md      # Individual task files
-│   │   └── task-2.md
-│   ├── docs/              # Documentation directory
-│   │   ├── prd.txt        # Product requirements
-│   ├── reports/           # Analysis reports directory
-│   │   └── task-complexity-report.json
-│   ├── templates/         # Template files
-│   │   └── example_prd.txt  # Example PRD template
-│   └── config.json        # AI models & settings
-├── .claude/
-│   ├── settings.json      # Claude Code configuration
-│   └── commands/         # Custom slash commands
-├── .env                  # API keys
-├── .mcp.json            # MCP configuration
-└── CLAUDE.md            # This file - auto-loaded by Claude Code
+# 4. Deploy validation
+deno task deploy:pre-flight   # Production readiness check
 ```
 
-## MCP Integration
+### BTCStampsExplorer Specific Guidelines
 
-Task Master provides an MCP server that Claude Code can connect to. Configure in `.mcp.json`:
+#### Fresh Framework Architecture
+
+**Server-Side Rendering (SSR)**:
+- Routes in `routes/` directory auto-generate server endpoints
+- Islands in `islands/` directory provide client-side interactivity
+- Components in `components/` are server-rendered only
+- Use `$lib/utils/freshNavigationUtils.ts` for navigation helpers
+
+**Critical SSR Rules**:
+- Never use browser-only APIs in route handlers or components
+- Use `islands/` for any client-side JavaScript functionality
+- Database queries only in route handlers, never in islands
+- Validate with `deno task check:ssr` before committing
+
+#### Database and Caching Architecture
+
+**MySQL Database Access**:
+- **READ-ONLY access only** - this is critical for security
+- Connection pool managed in `server/database/`
+- All queries must be parameterized (no string concatenation)
+- Use `lib/utils/monitoring/` for query performance tracking
+
+**Redis Caching Strategy**:
+- Cache keys follow pattern: `btc:stamps:{type}:{identifier}`
+- TTL values configured per endpoint type
+- Cache invalidation handled automatically
+- Use `server/middleware/cache/` for caching logic
+
+**Performance Requirements**:
+- API responses < 500ms (cached) and < 2s (uncached)
+- Database queries optimized with proper indexing
+- Redis hit ratio > 80% for frequently accessed data
+- Monitor with `deno task monitor:memory` for memory leaks
+
+#### API Development Standards
+
+**OpenAPI/Swagger Compliance**:
+- All endpoints must be documented in `schema.yml`
+- Validate changes with `npm run validate:schema`
+- Use typed response utilities from `$lib/utils/apiResponseUtil.ts`
+- Version API responses with `$lib/utils/versionedApiResponse.ts`
+
+**Response Structure**:
+```typescript
+// All API responses should follow this pattern
+interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+  meta?: {
+    pagination?: PaginationMeta;
+    caching?: CacheMeta;
+  };
+  error?: ApiError;
+}
+```
+
+**Critical API Routes**:
+- `/api/v1/stamps/` - Core stamp data (most critical)
+- `/api/v1/src20/` - SRC-20 token endpoints
+- `/api/v1/blocks/` - Block explorer functionality
+- `/api/health` - System health monitoring
+
+#### Testing Infrastructure
+
+**Newman API Testing**:
+```bash
+# Test collections in tests/postman/collections/
+npm run test:api:smoke           # 3 endpoints, health checks
+npm run test:api:comprehensive   # 46 endpoints, full coverage
+npm run test:api:performance     # Load testing
+npm run test:api:regression      # Dev vs prod validation
+```
+
+**Unit and Integration Tests**:
+```bash
+# Deno testing framework
+deno task test:unit              # Unit tests in tests/unit/
+deno task test:unit:coverage     # With coverage reports
+deno task test:integration       # Database integration tests
+```
+
+**Test Environment Requirements**:
+- Tests run with `DENO_ENV=test` and `SKIP_REDIS_CONNECTION=true`
+- Docker Compose provides isolated Newman test environment
+- CI/CD runs full test matrix including cross-browser validation
+
+#### Security and Production Considerations
+
+**Security Headers** (configured in `server/middleware/securityHeaders.ts`):
+- Content Security Policy for XSS protection
+- HSTS for HTTPS enforcement  
+- CORS configured for API access
+- Rate limiting on API endpoints
+
+**Data Integrity**:
+- All Bitcoin data is read-only from indexer database
+- Cache invalidation ensures data freshness
+- Transaction signatures validated against Bitcoin network
+- Block height consensus verified
+
+**Production Deployment**:
+- AWS deployment with automated rollback: `deno task deploy:rollback`
+- Performance benchmarking: `deno task deploy:benchmark`
+- Regression detection: `deno task deploy:regression`
+- Load testing validation before deployment
+
+#### Common Development Patterns
+
+**Route Handler Pattern**:
+```typescript
+// routes/api/v1/stamps/[id].ts
+import { Handlers } from "$fresh/server.ts";
+import { getCachedStampData } from "$server/cache/stampCache.ts";
+
+export const handler: Handlers = {
+  async GET(req, ctx) {
+    const { id } = ctx.params;
+    const stampData = await getCachedStampData(id);
+    
+    return Response.json({
+      success: true,
+      data: stampData,
+      meta: { cached: true }
+    });
+  }
+};
+```
+
+**Island Component Pattern**:
+```typescript
+// islands/StampViewer.tsx
+import { useSignal } from "@preact/signals";
+import { StampData } from "$types/stamps.ts";
+
+export default function StampViewer({ stampId }: { stampId: string }) {
+  const loading = useSignal(false);
+  // Client-side functionality only
+  
+  return <div>...</div>;
+}
+```
+
+**Database Query Pattern**:
+```typescript
+// lib/database/stampQueries.ts
+export async function getStampById(id: string): Promise<StampData | null> {
+  const query = `
+    SELECT * FROM stamps 
+    WHERE stamp_id = ? 
+    AND block_index IS NOT NULL
+  `;
+  
+  const [rows] = await db.execute(query, [id]);
+  return rows[0] || null;
+}
+```
+
+### Performance Optimization Guidelines
+
+**Caching Strategy**:
+- Static assets cached at CDN level
+- API responses cached in Redis with appropriate TTL
+- Database query results cached to minimize DB load
+- Use `$lib/utils/debounce.ts` for user input processing
+
+**Fresh Framework Optimization**:
+- Minimize island JavaScript bundle sizes
+- Use server-side rendering for SEO-critical content
+- Implement proper hydration boundaries
+- Monitor bundle sizes with build output
+
+**Database Performance**:
+- Use EXPLAIN ANALYZE for query optimization
+- Monitor slow query log and optimize accordingly
+- Implement proper indexing for frequently accessed data
+- Use connection pooling to manage database connections
+
+### Monitoring and Alerting
+
+**System Monitoring**:
+```bash
+# Memory monitoring
+deno task monitor:memory --url=http://localhost:8000
+
+# Performance monitoring  
+deno task deploy:benchmark
+
+# Health checks
+curl http://localhost:8000/api/health
+```
+
+**Key Metrics to Monitor**:
+- API response times and error rates
+- Database query performance and connection pool usage
+- Redis cache hit ratios and memory usage
+- Memory consumption and potential leaks
+- SSL certificate expiration and security headers
+
+### Common Gotchas and Solutions
+
+**Deno-Specific Issues**:
+- Import maps in `deno.json` are complex - use existing aliases like `$lib/`, `$utils/`
+- Node modules compatibility via `node:` prefix imports
+- Permission system requires explicit `--allow-` flags
+- Use `deno task check_version` to ensure correct Deno version
+
+**Fresh Framework Issues**:
+- Islands vs components confusion - use islands for client-side functionality only
+- SSR hydration mismatches - validate with `deno task check:ssr`
+- Route parameter extraction - use `ctx.params` correctly
+- Static file serving from `static/` directory
+
+**Bitcoin Stamps Specific**:
+- Transaction validation requires proper secp256k1 handling
+- Block height consensus critical for data integrity  
+- SRC-20 token balance calculations must be precise
+- Image protocol data requires special base64 handling
+
+### Troubleshooting Commands
+
+**Development Issues**:
+```bash
+# Kill stuck servers
+deno task kill
+
+# Clean restart
+deno task dev:clean
+
+# Check port conflicts
+deno task check:ports
+
+# Validate all systems
+deno task validate:quick
+```
+
+**Production Issues**:
+```bash
+# Check deployment readiness
+deno task deploy:validate
+
+# Run regression tests
+deno task deploy:regression
+
+# Monitor system performance
+deno task monitor:memory
+
+# Rollback if needed
+deno task deploy:rollback --check
+```
+
+## Advanced Claude Code Features
+
+### MCP Integration
+
+BTCStampsExplorer can integrate with MCP servers for enhanced development workflow:
 
 ```json
 {
@@ -87,335 +461,63 @@ Task Master provides an MCP server that Claude Code can connect to. Configure in
       "command": "npx",
       "args": ["-y", "--package=task-master-ai", "task-master-ai"],
       "env": {
-        "ANTHROPIC_API_KEY": "your_key_here",
-        "PERPLEXITY_API_KEY": "your_key_here",
-        "OPENAI_API_KEY": "OPENAI_API_KEY_HERE",
-        "GOOGLE_API_KEY": "GOOGLE_API_KEY_HERE",
-        "XAI_API_KEY": "XAI_API_KEY_HERE",
-        "OPENROUTER_API_KEY": "OPENROUTER_API_KEY_HERE",
-        "MISTRAL_API_KEY": "MISTRAL_API_KEY_HERE",
-        "AZURE_OPENAI_API_KEY": "AZURE_OPENAI_API_KEY_HERE",
-        "OLLAMA_API_KEY": "OLLAMA_API_KEY_HERE"
+        "ANTHROPIC_API_KEY": "your_key_here"
       }
     }
   }
 }
 ```
 
-### Essential MCP Tools
+### Status Line Configuration
 
-```javascript
-help; // = shows available taskmaster commands
-// Project setup
-initialize_project; // = task-master init
-parse_prd; // = task-master parse-prd
+Add to `.claude/settings.json` for enhanced development experience:
 
-// Daily workflow
-get_tasks; // = task-master list
-next_task; // = task-master next
-get_task; // = task-master show <id>
-set_task_status; // = task-master set-status
-
-// Task management
-add_task; // = task-master add-task
-expand_task; // = task-master expand
-update_task; // = task-master update-task
-update_subtask; // = task-master update-subtask
-update; // = task-master update
-
-// Analysis
-analyze_project_complexity; // = task-master analyze-complexity
-complexity_report; // = task-master complexity-report
+```json
+{
+  "statusLine": {
+    "command": "bash -c 'echo \"🟢 Deno $(deno --version | head -1 | cut -d\" \" -f2) | Branch: $(git branch --show-current 2>/dev/null || echo \"none\") | Ports: $(lsof -ti:8000 >/dev/null && echo \"8000✓\" || echo \"8000✗\")\"'",
+    "refreshIntervalSeconds": 5
+  }
+}
 ```
 
-## Claude Code Workflow Integration
+### Tool Allowlist
 
-### Standard Development Workflow
-
-#### 1. Project Initialization
-
-```bash
-# Initialize Task Master
-task-master init
-
-# Create or obtain PRD, then parse it
-task-master parse-prd .taskmaster/docs/prd.txt
-
-# Analyze complexity and expand tasks
-task-master analyze-complexity --research
-task-master expand --all --research
-```
-
-If tasks already exist, another PRD can be parsed (with new information only!) using parse-prd with --append flag. This will add the generated tasks to the existing list of tasks..
-
-#### 2. Daily Development Loop
-
-```bash
-# Start each session
-task-master next                           # Find next available task
-task-master show <id>                     # Review task details
-
-# During implementation, check in code context into the tasks and subtasks
-task-master update-subtask --id=<id> --prompt="implementation notes..."
-
-# Complete tasks
-task-master set-status --id=<id> --status=done
-```
-
-#### 3. Multi-Claude Workflows
-
-For complex projects, use multiple Claude Code sessions:
-
-```bash
-# Terminal 1: Main implementation
-cd project && claude
-
-# Terminal 2: Testing and validation
-cd project-test-worktree && claude
-
-# Terminal 3: Documentation updates
-cd project-docs-worktree && claude
-```
-
-### Custom Slash Commands
-
-Create `.claude/commands/taskmaster-next.md`:
-
-```markdown
-Find the next available Task Master task and show its details.
-
-Steps:
-
-1. Run `task-master next` to get the next task
-2. If a task is available, run `task-master show <id>` for full details
-3. Provide a summary of what needs to be implemented
-4. Suggest the first implementation step
-```
-
-Create `.claude/commands/taskmaster-complete.md`:
-
-```markdown
-Complete a Task Master task: $ARGUMENTS
-
-Steps:
-
-1. Review the current task with `task-master show $ARGUMENTS`
-2. Verify all implementation is complete
-3. Run any tests related to this task
-4. Mark as complete: `task-master set-status --id=$ARGUMENTS --status=done`
-5. Show the next available task with `task-master next`
-```
-
-## Tool Allowlist Recommendations
-
-Add to `.claude/settings.json`:
+Configure safe tool usage in `.claude/settings.json`:
 
 ```json
 {
   "allowedTools": [
-    "Edit",
+    "Read",
+    "Write",
+    "Bash(deno task *)",
+    "Bash(npm run test:*)",
     "Bash(task-master *)",
-    "Bash(git commit:*)",
-    "Bash(git add:*)",
-    "Bash(npm run *)",
+    "Bash(git *)",
+    "Bash(curl -X GET *)",
     "mcp__task_master_ai__*"
+  ],
+  "deniedTools": [
+    "Bash(rm -rf *)",
+    "Bash(sudo *)",
+    "Bash(DROP *)",
+    "Bash(*--force*)"
   ]
 }
 ```
 
-## Configuration & Setup
+## Critical Production Notes
 
-### API Keys Required
+**Data Integrity**: BTCStampsExplorer serves financial data for Bitcoin Stamps ecosystem. All changes must preserve data accuracy and system security.
 
-At least **one** of these API keys must be configured:
+**High Availability**: The application serves [stampchain.io](https://stampchain.io) with uptime requirements. Test thoroughly before deployment.
 
-- `ANTHROPIC_API_KEY` (Claude models) - **Recommended**
-- `PERPLEXITY_API_KEY` (Research features) - **Highly recommended**
-- `OPENAI_API_KEY` (GPT models)
-- `GOOGLE_API_KEY` (Gemini models)
-- `MISTRAL_API_KEY` (Mistral models)
-- `OPENROUTER_API_KEY` (Multiple models)
-- `XAI_API_KEY` (Grok models)
+**Community Impact**: Changes affect Bitcoin Stamps community members and their digital assets. Maintain backward compatibility and clear communication.
 
-An API key is required for any provider used across any of the 3 roles defined in the `models` command.
-
-### Model Configuration
-
-```bash
-# Interactive setup (recommended)
-task-master models --setup
-
-# Set specific models
-task-master models --set-main claude-3-5-sonnet-20241022
-task-master models --set-research perplexity-llama-3.1-sonar-large-128k-online
-task-master models --set-fallback gpt-4o-mini
-```
-
-## Task Structure & IDs
-
-### Task ID Format
-
-- Main tasks: `1`, `2`, `3`, etc.
-- Subtasks: `1.1`, `1.2`, `2.1`, etc.
-- Sub-subtasks: `1.1.1`, `1.1.2`, etc.
-
-### Task Status Values
-
-- `pending` - Ready to work on
-- `in-progress` - Currently being worked on
-- `done` - Completed and verified
-- `deferred` - Postponed
-- `cancelled` - No longer needed
-- `blocked` - Waiting on external factors
-
-### Task Fields
-
-```json
-{
-  "id": "1.2",
-  "title": "Implement user authentication",
-  "description": "Set up JWT-based auth system",
-  "status": "pending",
-  "priority": "high",
-  "dependencies": ["1.1"],
-  "details": "Use bcrypt for hashing, JWT for tokens...",
-  "testStrategy": "Unit tests for auth functions, integration tests for login flow",
-  "subtasks": []
-}
-```
-
-## Claude Code Best Practices with Task Master
-
-### Context Management
-
-- Use `/clear` between different tasks to maintain focus
-- This CLAUDE.md file is automatically loaded for context
-- Use `task-master show <id>` to pull specific task context when needed
-
-### Iterative Implementation
-
-1. `task-master show <subtask-id>` - Understand requirements
-2. Explore codebase and plan implementation
-3. `task-master update-subtask --id=<id> --prompt="detailed plan"` - Log plan
-4. `task-master set-status --id=<id> --status=in-progress` - Start work
-5. Implement code following logged plan
-6. `task-master update-subtask --id=<id> --prompt="what worked/didn't work"` - Log progress
-7. `task-master set-status --id=<id> --status=done` - Complete task
-
-### Complex Workflows with Checklists
-
-For large migrations or multi-step processes:
-
-1. Create a markdown PRD file describing the new changes: `touch task-migration-checklist.md` (prds can be .txt or .md)
-2. Use Taskmaster to parse the new prd with `task-master parse-prd --append` (also available in MCP)
-3. Use Taskmaster to expand the newly generated tasks into subtasks. Consdier using `analyze-complexity` with the correct --to and --from IDs (the new ids) to identify the ideal subtask amounts for each task. Then expand them.
-4. Work through items systematically, checking them off as completed
-5. Use `task-master update-subtask` to log progress on each task/subtask and/or updating/researching them before/during implementation if getting stuck
-
-### Git Integration
-
-Task Master works well with `gh` CLI:
-
-```bash
-# Create PR for completed task
-gh pr create --title "Complete task 1.2: User authentication" --body "Implements JWT auth system as specified in task 1.2"
-
-# Reference task in commits
-git commit -m "feat: implement JWT auth (task 1.2)"
-```
-
-### Parallel Development with Git Worktrees
-
-```bash
-# Create worktrees for parallel task development
-git worktree add ../project-auth feature/auth-system
-git worktree add ../project-api feature/api-refactor
-
-# Run Claude Code in each worktree
-cd ../project-auth && claude    # Terminal 1: Auth work
-cd ../project-api && claude     # Terminal 2: API work
-```
-
-## Troubleshooting
-
-### AI Commands Failing
-
-```bash
-# Check API keys are configured
-cat .env                           # For CLI usage
-
-# Verify model configuration
-task-master models
-
-# Test with different model
-task-master models --set-fallback gpt-4o-mini
-```
-
-### MCP Connection Issues
-
-- Check `.mcp.json` configuration
-- Verify Node.js installation
-- Use `--mcp-debug` flag when starting Claude Code
-- Use CLI as fallback if MCP unavailable
-
-### Task File Sync Issues
-
-```bash
-# Regenerate task files from tasks.json
-task-master generate
-
-# Fix dependency issues
-task-master fix-dependencies
-```
-
-DO NOT RE-INITIALIZE. That will not do anything beyond re-adding the same Taskmaster core files.
-
-## Important Notes
-
-### AI-Powered Operations
-
-These commands make AI calls and may take up to a minute:
-
-- `parse_prd` / `task-master parse-prd`
-- `analyze_project_complexity` / `task-master analyze-complexity`
-- `expand_task` / `task-master expand`
-- `expand_all` / `task-master expand --all`
-- `add_task` / `task-master add-task`
-- `update` / `task-master update`
-- `update_task` / `task-master update-task`
-- `update_subtask` / `task-master update-subtask`
-
-### File Management
-
-- Never manually edit `tasks.json` - use commands instead
-- Never manually edit `.taskmaster/config.json` - use `task-master models`
-- Task markdown files in `tasks/` are auto-generated
-- Run `task-master generate` after manual changes to tasks.json
-
-### Claude Code Session Management
-
-- Use `/clear` frequently to maintain focused context
-- Create custom slash commands for repeated Task Master workflows
-- Configure tool allowlist to streamline permissions
-- Use headless mode for automation: `claude -p "task-master next"`
-
-### Multi-Task Updates
-
-- Use `update --from=<id>` to update multiple future tasks
-- Use `update-task --id=<id>` for single task updates
-- Use `update-subtask --id=<id>` for implementation logging
-
-### Research Mode
-
-- Add `--research` flag for research-based AI enhancement
-- Requires a research model API key like Perplexity (`PERPLEXITY_API_KEY`) in environment
-- Provides more informed task creation and updates
-- Recommended for complex technical tasks
+**Security First**: Database access is read-only by design. Never modify transaction data, only display and analyze it.
 
 ---
 
-_This guide ensures Claude Code has immediate access to Task Master's essential functionality for agentic development workflows._
+**Remember**: BTCStampsExplorer is critical infrastructure for the Bitcoin Stamps ecosystem. Every change should prioritize data integrity, security, and community needs while maintaining the high technical standards expected of financial software.
 
-## Task Master AI Instructions
-**Import Task Master's development workflow commands and guidelines, treat as if import is in the main CLAUDE.md file.**
-@./.taskmaster/CLAUDE.md
+*Building the future of Bitcoin Stamps, one commit at a time* 🧡

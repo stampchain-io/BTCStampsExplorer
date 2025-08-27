@@ -2,7 +2,7 @@ import { assert, assertEquals, assertExists } from "@std/assert";
 import { beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
 import { returnsNext, stub } from "@std/testing@1.0.14/mock";
 import btcPriceApiResponses from "../fixtures/btcPriceApiResponses.json" with {
-  type: "json"
+  type: "json",
 };
 import { btcPriceFixture } from "../fixtures/marketDataFixtures.ts";
 

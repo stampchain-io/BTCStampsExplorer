@@ -160,7 +160,7 @@ Deno.test("getStampImageSrc - handles SRC-20 fetch errors", () => {
   // Ensure test environment
   const originalEnv = Deno.env.get("DENO_ENV");
   Deno.env.set("DENO_ENV", "test");
-  
+
   const originalFetch = globalThis.fetch;
   globalThis.fetch = () => {
     return Promise.resolve(new Response("", { status: 404 }));
@@ -185,12 +185,12 @@ Deno.test("getStampImageSrc - handles HTML stamp URL extraction", () => {
   // Ensure test environment
   const originalEnv = Deno.env.get("DENO_ENV");
   Deno.env.set("DENO_ENV", "test");
-  
+
   try {
     const stamp = {
       stamp_url: "https://stampchain.io/stamps/content.html",
       stamp_mimetype: "text/html",
-      tx_hash: "abc123"
+      tx_hash: "abc123",
     } as any;
     const result = getStampImageSrc(stamp);
     // In test environment, uses full URLs - /content/ path without .html extension
@@ -206,7 +206,7 @@ Deno.test("getStampImageSrc - handles complex HTML stamp URL", () => {
   // Ensure test environment
   const originalEnv = Deno.env.get("DENO_ENV");
   Deno.env.set("DENO_ENV", "test");
-  
+
   try {
     const stamp = {
       stamp_url: "https://stampchain.io/stamps/path/to/file.html",
@@ -238,7 +238,7 @@ Deno.test("getStampImageSrc - handles non-JSON stamps", () => {
   // Ensure test environment
   const originalEnv = Deno.env.get("DENO_ENV");
   Deno.env.set("DENO_ENV", "test");
-  
+
   try {
     const stamp = {
       stamp_url: "https://stampchain.io/stamps/image.png",
@@ -692,14 +692,17 @@ Deno.test("getStampImageSrc - handles malformed URL extraction", () => {
   // Ensure test environment
   const originalEnv = Deno.env.get("DENO_ENV");
   Deno.env.set("DENO_ENV", "test");
-  
+
   try {
     const stamp = {
       stamp_url: "malformed-url-no-stamps-path",
     } as any;
     const result = getStampImageSrc(stamp);
     // In test environment, uses full URLs
-    assertEquals(result, "https://stampchain.io/content/malformed-url-no-stamps-path");
+    assertEquals(
+      result,
+      "https://stampchain.io/content/malformed-url-no-stamps-path",
+    );
   } finally {
     if (originalEnv) {
       Deno.env.set("DENO_ENV", originalEnv);

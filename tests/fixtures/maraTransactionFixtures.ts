@@ -103,25 +103,86 @@ export const fileSizeTestCases = [
 
 // Output value validation test cases
 export const outputValueTestCases = [
-  { value: -10, isValid: false, isMaraMode: false, description: "negative value" },
+  {
+    value: -10,
+    isValid: false,
+    isMaraMode: false,
+    description: "negative value",
+  },
   { value: 0, isValid: false, isMaraMode: false, description: "zero value" },
-  { value: 1, isValid: true, isMaraMode: true, description: "minimum valid value" },
+  {
+    value: 1,
+    isValid: true,
+    isMaraMode: true,
+    description: "minimum valid value",
+  },
   { value: 50, isValid: true, isMaraMode: true, description: "low MARA value" },
-  { value: 100, isValid: true, isMaraMode: true, description: "typical MARA value" },
-  { value: 329, isValid: true, isMaraMode: true, description: "borderline MARA value" },
-  { value: 330, isValid: true, isMaraMode: false, description: "non-MARA threshold" },
-  { value: 500, isValid: true, isMaraMode: false, description: "typical non-MARA value" },
-  { value: 5000, isValid: true, isMaraMode: false, description: "maximum valid value" },
-  { value: 5001, isValid: false, isMaraMode: false, description: "above maximum" },
-  { value: 10000, isValid: false, isMaraMode: false, description: "well above maximum" },
+  {
+    value: 100,
+    isValid: true,
+    isMaraMode: true,
+    description: "typical MARA value",
+  },
+  {
+    value: 329,
+    isValid: true,
+    isMaraMode: true,
+    description: "borderline MARA value",
+  },
+  {
+    value: 330,
+    isValid: true,
+    isMaraMode: false,
+    description: "non-MARA threshold",
+  },
+  {
+    value: 500,
+    isValid: true,
+    isMaraMode: false,
+    description: "typical non-MARA value",
+  },
+  {
+    value: 5000,
+    isValid: true,
+    isMaraMode: false,
+    description: "maximum valid value",
+  },
+  {
+    value: 5001,
+    isValid: false,
+    isMaraMode: false,
+    description: "above maximum",
+  },
+  {
+    value: 10000,
+    isValid: false,
+    isMaraMode: false,
+    description: "well above maximum",
+  },
 ];
 
 // Expected transaction size ranges for validation
 export const expectedSizeRanges = {
-  minimal: { minSize: 100, maxSize: 200, description: "Single input, no services" },
-  typical: { minSize: 200, maxSize: 400, description: "Two inputs with services" },
-  complex: { minSize: 300, maxSize: 600, description: "Mixed inputs, large file" },
-  largeFile: { minSize: 1000, maxSize: 5000, description: "Large file, many chunks" },
+  minimal: {
+    minSize: 100,
+    maxSize: 200,
+    description: "Single input, no services",
+  },
+  typical: {
+    minSize: 200,
+    maxSize: 400,
+    description: "Two inputs with services",
+  },
+  complex: {
+    minSize: 300,
+    maxSize: 600,
+    description: "Mixed inputs, large file",
+  },
+  largeFile: {
+    minSize: 1000,
+    maxSize: 5000,
+    description: "Large file, many chunks",
+  },
 };
 
 // Minimum funding test scenarios
@@ -139,7 +200,7 @@ export const fundingTestScenarios = [
     expectedMinimum: 42000, // At least service fee
   },
   {
-    name: "Medium File MARA", 
+    name: "Medium File MARA",
     config: {
       fileSize: 256,
       outputValue: 150,
@@ -188,7 +249,7 @@ export const createMockLogger = () => ({
 // Helper function to create test configurations with overrides
 export function createTestConfig(
   baseConfig: keyof typeof testConfigurations,
-  overrides: Partial<MARATransactionEstimateConfig> = {}
+  overrides: Partial<MARATransactionEstimateConfig> = {},
 ): MARATransactionEstimateConfig {
   return {
     ...testConfigurations[baseConfig],
@@ -199,49 +260,67 @@ export function createTestConfig(
 // Validation helper for test results
 export function validateTransactionEstimate(estimate: any) {
   const requiredFields = [
-    'estimatedSize',
-    'estimatedWeight', 
-    'chunkCount',
-    'totalDustValue',
-    'estimatedFee',
-    'breakdown'
+    "estimatedSize",
+    "estimatedWeight",
+    "chunkCount",
+    "totalDustValue",
+    "estimatedFee",
+    "breakdown",
   ];
 
-  const missingFields = requiredFields.filter(field => !(field in estimate));
+  const missingFields = requiredFields.filter((field) => !(field in estimate));
   if (missingFields.length > 0) {
-    throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
+    throw new Error(`Missing required fields: ${missingFields.join(", ")}`);
   }
 
-  const breakdownFields = ['base', 'inputs', 'opReturn', 'dataOutputs', 'serviceFee', 'change', 'total'];
-  const missingBreakdownFields = breakdownFields.filter(field => !(field in estimate.breakdown));
+  const breakdownFields = [
+    "base",
+    "inputs",
+    "opReturn",
+    "dataOutputs",
+    "serviceFee",
+    "change",
+    "total",
+  ];
+  const missingBreakdownFields = breakdownFields.filter((field) =>
+    !(field in estimate.breakdown)
+  );
   if (missingBreakdownFields.length > 0) {
-    throw new Error(`Missing breakdown fields: ${missingBreakdownFields.join(', ')}`);
+    throw new Error(
+      `Missing breakdown fields: ${missingBreakdownFields.join(", ")}`,
+    );
   }
 
   // Validate types
-  if (typeof estimate.estimatedSize !== 'number' || estimate.estimatedSize < 0) {
-    throw new Error('estimatedSize must be a non-negative number');
+  if (
+    typeof estimate.estimatedSize !== "number" || estimate.estimatedSize < 0
+  ) {
+    throw new Error("estimatedSize must be a non-negative number");
   }
 
-  if (typeof estimate.estimatedWeight !== 'number' || estimate.estimatedWeight < 0) {
-    throw new Error('estimatedWeight must be a non-negative number');
+  if (
+    typeof estimate.estimatedWeight !== "number" || estimate.estimatedWeight < 0
+  ) {
+    throw new Error("estimatedWeight must be a non-negative number");
   }
 
-  if (typeof estimate.chunkCount !== 'number' || estimate.chunkCount < 0) {
-    throw new Error('chunkCount must be a non-negative number');
+  if (typeof estimate.chunkCount !== "number" || estimate.chunkCount < 0) {
+    throw new Error("chunkCount must be a non-negative number");
   }
 
-  if (typeof estimate.totalDustValue !== 'number' || estimate.totalDustValue < 0) {
-    throw new Error('totalDustValue must be a non-negative number');
+  if (
+    typeof estimate.totalDustValue !== "number" || estimate.totalDustValue < 0
+  ) {
+    throw new Error("totalDustValue must be a non-negative number");
   }
 
-  if (typeof estimate.estimatedFee !== 'number' || estimate.estimatedFee < 0) {
-    throw new Error('estimatedFee must be a non-negative number');
+  if (typeof estimate.estimatedFee !== "number" || estimate.estimatedFee < 0) {
+    throw new Error("estimatedFee must be a non-negative number");
   }
 
   // Validate breakdown totals
   if (estimate.breakdown.total !== estimate.estimatedSize) {
-    throw new Error('breakdown.total must equal estimatedSize');
+    throw new Error("breakdown.total must equal estimatedSize");
   }
 
   return true;
@@ -249,26 +328,35 @@ export function validateTransactionEstimate(estimate: any) {
 
 // Helper to validate minimum funding result
 export function validateFundingResult(result: any) {
-  const requiredFields = ['minimumFunding', 'breakdown'];
-  const missingFields = requiredFields.filter(field => !(field in result));
+  const requiredFields = ["minimumFunding", "breakdown"];
+  const missingFields = requiredFields.filter((field) => !(field in result));
   if (missingFields.length > 0) {
-    throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
+    throw new Error(`Missing required fields: ${missingFields.join(", ")}`);
   }
 
-  const breakdownFields = ['dustTotal', 'serviceFee', 'estimatedMinerFee', 'buffer'];
-  const missingBreakdownFields = breakdownFields.filter(field => !(field in result.breakdown));
+  const breakdownFields = [
+    "dustTotal",
+    "serviceFee",
+    "estimatedMinerFee",
+    "buffer",
+  ];
+  const missingBreakdownFields = breakdownFields.filter((field) =>
+    !(field in result.breakdown)
+  );
   if (missingBreakdownFields.length > 0) {
-    throw new Error(`Missing breakdown fields: ${missingBreakdownFields.join(', ')}`);
+    throw new Error(
+      `Missing breakdown fields: ${missingBreakdownFields.join(", ")}`,
+    );
   }
 
   // Validate funding calculation
-  const expectedTotal = result.breakdown.dustTotal + 
-                       result.breakdown.serviceFee + 
-                       result.breakdown.estimatedMinerFee + 
-                       result.breakdown.buffer;
-  
+  const expectedTotal = result.breakdown.dustTotal +
+    result.breakdown.serviceFee +
+    result.breakdown.estimatedMinerFee +
+    result.breakdown.buffer;
+
   if (result.minimumFunding !== expectedTotal) {
-    throw new Error('minimumFunding must equal sum of breakdown components');
+    throw new Error("minimumFunding must equal sum of breakdown components");
   }
 
   return true;
@@ -282,13 +370,13 @@ export const performanceTestCases = [
     maxExecutionTime: 10, // ms
   },
   {
-    name: "Typical Transaction", 
+    name: "Typical Transaction",
     config: testConfigurations.typical,
     maxExecutionTime: 20, // ms
   },
   {
     name: "Complex Transaction",
-    config: testConfigurations.complex, 
+    config: testConfigurations.complex,
     maxExecutionTime: 50, // ms
   },
   {

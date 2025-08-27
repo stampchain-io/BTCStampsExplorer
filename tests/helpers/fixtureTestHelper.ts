@@ -62,7 +62,10 @@ export class FixtureTestHelper {
   /**
    * Mock a cached query with fixture data
    */
-  mockCachedQuery<T = unknown, R = unknown>(rows: T[], mapFn?: (data: T) => R): Stub {
+  mockCachedQuery<T = unknown, R = unknown>(
+    rows: T[],
+    mapFn?: (data: T) => R,
+  ): Stub {
     return this.mockDbCall({
       method: "executeQueryWithCache",
       response: { rows, rowCount: rows.length },

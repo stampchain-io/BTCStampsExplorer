@@ -5,7 +5,12 @@
 
 import { MockXcpProvider } from "$server/services/counterparty/xcpManagerDI.ts";
 import { assertEquals, assertRejects } from "@std/assert";
-import { afterEach, beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  it,
+} from "jsr:@std/testing@1.0.14/bdd";
 
 describe("CounterpartyApiManagerDI", () => {
   let mockProvider: MockXcpProvider;

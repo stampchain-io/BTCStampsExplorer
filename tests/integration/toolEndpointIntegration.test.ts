@@ -4,12 +4,12 @@
  */
 
 import type {
-    SRC101TransactionOptions,
-    SRC20TransactionOptions,
-    StampTransactionOptions,
+  SRC101TransactionOptions,
+  SRC20TransactionOptions,
+  StampTransactionOptions,
 } from "$lib/types/toolEndpointAdapter.ts";
 import {
-    toolEndpointFeeEstimator,
+  toolEndpointFeeEstimator,
 } from "$lib/utils/bitcoin/minting/ToolEndpointFeeEstimator.ts";
 import { assertEquals, assertExists } from "@std/assert";
 import { describe, it } from "@std/testing/bdd";

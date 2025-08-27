@@ -1,7 +1,12 @@
 import { assert, assertEquals, assertExists } from "@std/assert";
 import { BTCPriceService } from "$server/services/price/btcPriceService.ts";
 import { DatabaseManager } from "$server/database/databaseManager.ts";
-import { afterEach, beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  it,
+} from "jsr:@std/testing@1.0.14/bdd";
 
 // Mock database manager with cache functionality
 const mockDb = {

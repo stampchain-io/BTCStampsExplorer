@@ -5,14 +5,19 @@
 import { hex2bin } from "$lib/utils/data/binary/baseUtils.ts";
 import { DatabaseManager } from "$server/database/databaseManager.ts";
 import { assertEquals, assertExists, assertThrows } from "@std/assert";
-import { afterEach, beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
 import {
-    createUTXOFixture,
-    safeBigIntConversion,
-    type UTXOFixture,
-    utxoFixtures,
-    utxoTestScenarios,
-    validateUTXOFixture,
+  afterEach,
+  beforeEach,
+  describe,
+  it,
+} from "jsr:@std/testing@1.0.14/bdd";
+import {
+  createUTXOFixture,
+  safeBigIntConversion,
+  type UTXOFixture,
+  utxoFixtures,
+  utxoTestScenarios,
+  validateUTXOFixture,
 } from "../fixtures/utxoFixtures.ts";
 import { MockDatabaseManager } from "../mocks/mockDatabaseManager.ts";
 
