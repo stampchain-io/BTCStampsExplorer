@@ -5,7 +5,7 @@ import { Handlers } from "$fresh/server.ts";
 
 import { FRONTEND_STAMP_TYPE_VALUES } from "$constants";
 import { StampOverviewHeader } from "$header";
-import { createFreshPaginationHandler } from "$utils/navigation/freshNavigationUtils.ts";
+
 import {
   queryParamsToFilters,
   queryParamsToServicePayload,
@@ -365,7 +365,7 @@ export function StampOverviewPage(props: StampPageProps) {
         pagination={{
           page,
           totalPages,
-          onPageChange: createFreshPaginationHandler("/stamp"),
+          // Use link-based navigation for better Fresh compatibility
         }}
       />
     </div>

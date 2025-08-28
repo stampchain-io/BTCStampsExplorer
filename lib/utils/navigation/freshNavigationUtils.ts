@@ -202,7 +202,7 @@ export const createFreshPaginationHandler = (
     const url = new URL(globalThis.location.href);
     url.searchParams.set(pageParam, page.toString());
 
-    // Use our enhanced safeNavigate with partial support
+    // Use the existing safeNavigate function for proper Fresh partial navigation
     safeNavigate(url.toString(), { partial: partialPath });
   };
 };

@@ -1,4 +1,12 @@
 /* ===== COLLECTION OVERVIEW CARD COMPONENT ===== */
+import { containerBackground } from "$layout";
+import {
+  abbreviateAddress,
+  formatBTC,
+  formatMarketCap,
+  formatVolume,
+} from "$lib/utils/ui/formatting/formatUtils.ts";
+import { labelSm, valueSm } from "$text";
 import type { CollectionWithOptionalMarketData } from "$types/index.d.ts";
 
 // Extended type for CollectionCard with the additional fields we need
@@ -7,14 +15,6 @@ interface CollectionCardData extends CollectionWithOptionalMarketData {
   stamp_images?: string[] | null;
   creator_names?: string[];
 }
-import {
-  abbreviateAddress,
-  formatBTC,
-  formatMarketCap,
-  formatVolume,
-} from "$lib/utils/ui/formatting/formatUtils.ts";
-import { containerBackground } from "$layout";
-import { labelSm, valueSm } from "$text";
 
 /* ===== HELPERS ===== */
 function abbreviateCollectionName(name: string): string {
@@ -39,6 +39,7 @@ export function CollectionCard(
   return (
     <a
       href={`/collection/detail/${collectionName}`}
+      f-partial="/collection"
       className={`${containerBackground} gap-6 hover:border-stamp-purple-bright hover:shadow-stamp hover:border-solid border-2 border-transparent group`}
     >
       {/* ===== CARD HEADER ===== */}

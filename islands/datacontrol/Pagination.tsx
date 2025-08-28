@@ -1,9 +1,9 @@
-import { Icon } from "$icon";
-import { getWindowWidth } from "$utils/navigation/freshNavigationUtils.ts";
-import type { PaginationProps } from "$types/pagination.d.ts";
-import { useEffect, useState } from "preact/hooks";
-import { useSSRSafeNavigation } from "$lib/hooks/useSSRSafeNavigation.ts";
 import { IS_BROWSER } from "$fresh/runtime.ts";
+import { Icon } from "$icon";
+import { useSSRSafeNavigation } from "$lib/hooks/useSSRSafeNavigation.ts";
+import type { PaginationProps } from "$types/pagination.d.ts";
+import { getWindowWidth } from "$utils/navigation/freshNavigationUtils.ts";
+import { useEffect, useState } from "preact/hooks";
 
 // Update pagination range constants
 const MOBILESM_MAX_PAGE_RANGE = 0;
@@ -95,12 +95,14 @@ export function Pagination({
       ? `${baseClass} bg-stamp-purple`
       : `${baseClass} bg-stamp-purple-dark`;
 
+    // Always use button with click handler for consistent navigation
     return (
       <button
         type="button"
         class={buttonClass}
         onClick={() => handlePageChange(pageNum)}
         disabled={isCurrentPage}
+        {...(isCurrentPage && { "aria-current": "page" })}
       >
         {iconName
           ? (

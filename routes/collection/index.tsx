@@ -1,7 +1,7 @@
 /* ===== COLLECTION LANDING PAGE ===== */
+import type { StampFilterType } from "$constants";
 import { FreshContext, Handlers } from "$fresh/server.ts";
 import type { CollectionGalleryProps } from "$server/types/collection.d.ts";
-import type { StampFilterType } from "$constants";
 import type {
   CollectionLandingPageProps,
   StampGalleryProps,
@@ -150,7 +150,11 @@ export default function CollectionLandingPage(
 
   /* ===== COMPONENT ===== */
   return (
-    <div class={`${body} ${gapSection}`}>
+    <div
+      class={`${body} ${gapSection}`}
+      f-client-nav
+      data-partial="/collection"
+    >
       <div>
         <CollectionOverviewHeader />
         <StampGallery

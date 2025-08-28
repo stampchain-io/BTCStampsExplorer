@@ -90,7 +90,7 @@ export default function CollectionDetailPage(
 
   /* ===== COMPONENT ===== */
   return (
-    <div class="flex flex-col gap-6">
+    <div class="flex flex-col gap-6" f-client-nav data-partial="/collection">
       <CollectionDetailHeader collection={collection} stamps={stamps} />
       <CollectionDetailContent stamps={stamps} />
       <div class="mt-12 mobileLg:mt-[72px]">
