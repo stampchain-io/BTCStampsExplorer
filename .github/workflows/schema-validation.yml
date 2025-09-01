@@ -30,7 +30,7 @@ jobs:
   api-schema-validation:
     name: API Schema Validation
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
 
     steps:
       - name: Checkout code
@@ -49,15 +49,25 @@ jobs:
       - name: Install Newman
         run: npm install -g newman
 
+      - name: Cache Deno dependencies
+        run: |
+          echo "Pre-caching Deno dependencies to speed up server startup..."
+          deno cache --node-modules-dir deps.ts main.ts
+          echo "Dependencies cached successfully"
+
       - name: Start development server
+        env:
+          SKIP_REDIS_CONNECTION: "true"
+          DENO_ENV: "test"
+          CI: "true"
         run: |
           echo "Starting dev server in background..."
           deno task dev &
           SERVER_PID=$!
           echo "SERVER_PID=$SERVER_PID" >> $GITHUB_ENV
           
-          echo "Waiting for server to start..."
-          timeout 120 bash -c 'until curl -f http://localhost:8000/api/health 2>/dev/null; do sleep 2; done'
+          echo "Waiting for server to start (extended timeout for CI)..."
+          timeout 300 bash -c 'until curl -f http://localhost:8000/api/health 2>/dev/null; do echo "Still waiting for server..."; sleep 5; done'
           echo "Development server is ready"
 
       - name: Run Schema Validation Tests
