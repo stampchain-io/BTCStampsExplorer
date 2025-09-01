@@ -93,12 +93,36 @@ export class ApiResponseUtil {
     };
   }
 
+  private static serializeWithBigInt(data: unknown): string {
+    // Fast path: if no BigInts, use regular JSON.stringify
+    if (!this.hasBigInt(data)) {
+      return JSON.stringify(data);
+    }
+
+    // Only use reviver when BigInts are present
+    return JSON.stringify(data, (_key, value) => {
+      if (typeof value === "bigint") {
+        return value.toString();
+      }
+      return value;
+    });
+  }
+
+  private static hasBigInt(obj: unknown): boolean {
+    if (typeof obj === "bigint") return true;
+    if (obj === null || typeof obj !== "object") return false;
+    if (Array.isArray(obj)) {
+      return obj.some((item) => this.hasBigInt(item));
+    }
+    for (const value of Object.values(obj)) {
+      if (this.hasBigInt(value)) return true;
+    }
+    return false;
+  }
+
   static success(data: unknown, options: ApiResponseOptions = {}): Response {
     return new Response(
-      JSON.stringify(
-        data,
-        (_key, value) => typeof value === "bigint" ? value.toString() : value,
-      ),
+      this.serializeWithBigInt(data),
       {
         status: options.status || 200,
         headers: normalizeHeaders(this.createHeaders(options)),
@@ -111,7 +135,7 @@ export class ApiResponseUtil {
     options: ApiResponseOptions = {},
   ): Response {
     return new Response(
-      JSON.stringify(data),
+      this.serializeWithBigInt(data),
       {
         status: 201,
         headers: normalizeHeaders(this.createHeaders(options)),
@@ -297,10 +321,7 @@ export class ApiResponseUtil {
     return new Response(
       body instanceof ArrayBuffer || body instanceof Uint8Array
         ? body
-        : JSON.stringify(
-          body,
-          (_key, value) => typeof value === "bigint" ? value.toString() : value,
-        ),
+        : this.serializeWithBigInt(body),
       {
         status,
         headers: normalizeHeaders(this.createHeaders(options)),

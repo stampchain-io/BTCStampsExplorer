@@ -74,7 +74,7 @@ export class SRC20QueryService {
             return await SRC20Repository.getValidSrc20TxFromDb(params, excludeFullyMinted);
   }
 
-  static async fetchAndFormatSrc20Data(
+  static async fetchBasicSrc20Data(
     params: SRC20TrxRequestParams = {},
     _excludeFullyMinted: boolean = false,
     _onlyFullyMinted: boolean = false,
@@ -176,7 +176,7 @@ export class SRC20QueryService {
         data: Array.isArray(formattedData) ? formattedData : [formattedData],
       };
     } catch (error: any) {
-      console.error("Error in fetchAndFormatSrc20Data:", error);
+      console.error("Error in fetchBasicSrc20Data:", error);
       if (error.message.includes("Stamps Down")) {
         throw new Error("Stamps Down...");
       }
@@ -533,11 +533,11 @@ export class SRC20QueryService {
   }
 
   /**
-   * Enhanced version of fetchAndFormatSrc20Data with optional data enrichment
-   * and performance monitoring. This version maintains backward compatibility
-   * while adding new features.
+   * Enhanced version with optional data enrichment, market data integration,
+   * trending calculations, and performance monitoring. Use this for advanced
+   * queries that need market data, filtering, or trending analysis.
    */
-  static async fetchAndFormatSrc20DataV2(
+  static async fetchEnhancedSrc20Data(
     params: SRC20TrxRequestParams & {
       dateFrom?: string;  // ISO date string
       dateTo?: string;    // ISO date string
@@ -642,7 +642,7 @@ export class SRC20QueryService {
         // Add a custom filter condition for fully minted tokens
         if (!queryParams.tick || (Array.isArray(queryParams.tick) && queryParams.tick.length === 0)) {
           // If no specific ticks are provided, we need to modify the approach
-          console.log("[fetchAndFormatSrc20DataV2] onlyFullyMinted requires specific ticks from market data");
+          console.log("[fetchEnhancedSrc20Data] onlyFullyMinted requires specific ticks from market data");
         }
       }
 
@@ -685,7 +685,7 @@ export class SRC20QueryService {
 
       // 🚨 CRITICAL FIX: Apply onlyFullyMinted filtering after data formatting
       if (options.onlyFullyMinted && Array.isArray(formattedData)) {
-        console.log(`[fetchAndFormatSrc20DataV2] Applying onlyFullyMinted filter to ${formattedData.length} items`);
+        console.log(`[fetchEnhancedSrc20Data] Applying onlyFullyMinted filter to ${formattedData.length} items`);
 
         formattedData = formattedData.filter((item: any) => {
           // 🚀 USE ONLY src20_market_data progress_percentage AS SOURCE OF TRUTH
@@ -695,15 +695,15 @@ export class SRC20QueryService {
           const isFullyMinted = progress >= 99.9;
 
           if (isFullyMinted) {
-            console.log(`[fetchAndFormatSrc20DataV2] Including fully minted token: ${item.tick} (${progress}%)`);
+            console.log(`[fetchEnhancedSrc20Data] Including fully minted token: ${item.tick} (${progress}%)`);
           } else {
-            console.log(`[fetchAndFormatSrc20DataV2] Excluding minting token: ${item.tick} (${progress}%)`);
+            console.log(`[fetchEnhancedSrc20Data] Excluding minting token: ${item.tick} (${progress}%)`);
           }
 
           return isFullyMinted;
         });
 
-        console.log(`[fetchAndFormatSrc20DataV2] After onlyFullyMinted filter: ${formattedData.length} items`);
+        console.log(`[fetchEnhancedSrc20Data] After onlyFullyMinted filter: ${formattedData.length} items`);
       }
 
       // Apply date range filtering if specified
@@ -894,7 +894,7 @@ export class SRC20QueryService {
           const timeframe = (typeof normalizedSortBy === 'string' && normalizedSortBy.includes('24H')) ? '24h' :
                            (typeof normalizedSortBy === 'string' && normalizedSortBy.includes('7D')) ? '7d' : '30d';
 
-          console.log(`[fetchAndFormatSrc20DataV2] Analyzing ${timeframe} volume distribution for ${normalizedSortBy || 'unknown'}`);
+          console.log(`[fetchEnhancedSrc20Data] Analyzing ${timeframe} volume distribution for ${normalizedSortBy || 'unknown'}`);
           const beforeCount = filteredTokens.length;
 
                     // Count tokens with meaningful volume (> 0.01 BTC = ~$600+ at current prices)
@@ -912,9 +912,9 @@ export class SRC20QueryService {
               const volume = getVolumeFromToken(token, timeframe);
               return volume > 0;
             });
-            console.log(`[fetchAndFormatSrc20DataV2] Applied ${timeframe} volume filtering: ${beforeCount} → ${filteredTokens.length} tokens (${tokensWithVolume} had high volume)`);
+            console.log(`[fetchEnhancedSrc20Data] Applied ${timeframe} volume filtering: ${beforeCount} → ${filteredTokens.length} tokens (${tokensWithVolume} had high volume)`);
           } else {
-            console.log(`[fetchAndFormatSrc20DataV2] Skipped ${timeframe} volume filtering: only ${tokensWithVolume} tokens have high volume out of ${beforeCount} (threshold: ${Math.min(10, Math.floor(beforeCount * 0.5))})`);
+            console.log(`[fetchEnhancedSrc20Data] Skipped ${timeframe} volume filtering: only ${tokensWithVolume} tokens have high volume out of ${beforeCount} (threshold: ${Math.min(10, Math.floor(beforeCount * 0.5))})`);
           }
         }
 
@@ -950,7 +950,7 @@ export class SRC20QueryService {
       (response as any).performance = metrics;
       return response;
     } catch (error: any) {
-      console.error("Error in fetchAndFormatSrc20DataV2:", error);
+      console.error("Error in fetchEnhancedSrc20Data:", error);
       metrics.duration = performance.now() - startTime;
 
       if (error.message.includes("Stamps Down")) {

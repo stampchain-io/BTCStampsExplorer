@@ -1,45 +1,47 @@
 import { assert, assertEquals, assertExists, assertRejects } from "@std/assert";
 import { beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
-import { stub, returnsNext, Stub } from "@std/testing@1.0.14/mock";
+import { returnsNext, Stub, stub } from "@std/testing@1.0.14/mock";
 
 import { StampCreationService } from "$server/services/stamp/stampCreationService.ts";
 import {
-  mockStampParams,
-  mockWalletAddresses,
-  mockUTXOs,
+  createMockServices,
+  createRealisticStampScenario,
+  edgeCases,
+  errorScenarios,
+  mockCIP33Addresses,
   mockCounterpartyResponses,
   mockFileData,
   mockPSBTResults,
-  mockCIP33Addresses,
-  validationTestCases,
-  edgeCases,
-  createMockServices,
+  mockStampParams,
+  mockUTXOs,
+  mockWalletAddresses,
   performanceTestCases,
   validateStampResult,
-  createRealisticStampScenario,
-  errorScenarios,
+  validationTestCases,
 } from "../fixtures/stampCreationServiceFixtures.ts";
 
 describe("StampCreationService", () => {
   describe("createStampIssuance", () => {
     describe("Input validation", () => {
       for (const testCase of validationTestCases) {
-        it(`should ${testCase.shouldPass ? 'accept' : 'reject'} ${testCase.name}`, async () => {
+        it(`should ${testCase.shouldPass ? "accept" : "reject"} ${testCase.name}`, async () => {
           if (testCase.shouldPass) {
             // Mock dependencies for successful case
             const createIssuanceStub = stub(
               StampCreationService as any,
               "createIssuanceTransaction",
-              returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })])
+              returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })]),
             );
             const generatePSBTStub = stub(
               StampCreationService as any,
-              "generatePSBT", 
-              returnsNext([Promise.resolve(mockPSBTResults.successful)])
+              "generatePSBT",
+              returnsNext([Promise.resolve(mockPSBTResults.successful)]),
             );
 
             try {
-              const result = await StampCreationService.createStampIssuance(testCase.params);
+              const result = await StampCreationService.createStampIssuance(
+                testCase.params,
+              );
               assertExists(result);
               validateStampResult(result);
             } finally {
@@ -50,7 +52,7 @@ describe("StampCreationService", () => {
             await assertRejects(
               () => StampCreationService.createStampIssuance(testCase.params),
               Error,
-              testCase.expectedError
+              testCase.expectedError,
             );
           }
         });
@@ -67,12 +69,12 @@ describe("StampCreationService", () => {
         const createIssuanceStub = stub(
           StampCreationService as any,
           "createIssuanceTransaction",
-          returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })])
+          returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })]),
         );
         const generatePSBTStub = stub(
           StampCreationService as any,
           "generatePSBT",
-          returnsNext([Promise.resolve(mockPSBTResults.successful)])
+          returnsNext([Promise.resolve(mockPSBTResults.successful)]),
         );
 
         try {
@@ -93,12 +95,12 @@ describe("StampCreationService", () => {
         const createIssuanceStub = stub(
           StampCreationService as any,
           "createIssuanceTransaction",
-          returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })])
+          returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })]),
         );
         const generatePSBTStub = stub(
           StampCreationService as any,
           "generatePSBT",
-          returnsNext([Promise.resolve(mockPSBTResults.successful)])
+          returnsNext([Promise.resolve(mockPSBTResults.successful)]),
         );
 
         try {
@@ -119,7 +121,7 @@ describe("StampCreationService", () => {
         await assertRejects(
           () => StampCreationService.createStampIssuance(params),
           Error,
-          "Invalid source wallet"
+          "Invalid source wallet",
         );
       });
 
@@ -133,7 +135,7 @@ describe("StampCreationService", () => {
         await assertRejects(
           () => StampCreationService.createStampIssuance(params),
           Error,
-          "Invalid service fee address"
+          "Invalid service fee address",
         );
       });
 
@@ -147,12 +149,12 @@ describe("StampCreationService", () => {
         const createIssuanceStub = stub(
           StampCreationService as any,
           "createIssuanceTransaction",
-          returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })])
+          returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })]),
         );
         const generatePSBTStub = stub(
           StampCreationService as any,
           "generatePSBT",
-          returnsNext([Promise.resolve(mockPSBTResults.successful)])
+          returnsNext([Promise.resolve(mockPSBTResults.successful)]),
         );
 
         try {
@@ -173,16 +175,18 @@ describe("StampCreationService", () => {
           const createIssuanceStub = stub(
             StampCreationService as any,
             "createIssuanceTransaction",
-            returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })])
+            returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })]),
           );
           const generatePSBTStub = stub(
             StampCreationService as any,
             "generatePSBT",
-            returnsNext([Promise.resolve(mockPSBTResults.successful)])
+            returnsNext([Promise.resolve(mockPSBTResults.successful)]),
           );
 
           try {
-            const result = await StampCreationService.createStampIssuance(params);
+            const result = await StampCreationService.createStampIssuance(
+              params,
+            );
             assertExists(result);
           } finally {
             createIssuanceStub.restore();
@@ -197,12 +201,12 @@ describe("StampCreationService", () => {
         const createIssuanceStub = stub(
           StampCreationService as any,
           "createIssuanceTransaction",
-          returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })])
+          returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })]),
         );
         const generatePSBTStub = stub(
           StampCreationService as any,
           "generatePSBT",
-          returnsNext([Promise.resolve(mockPSBTResults.successful)])
+          returnsNext([Promise.resolve(mockPSBTResults.successful)]),
         );
 
         try {
@@ -223,7 +227,7 @@ describe("StampCreationService", () => {
           await assertRejects(
             () => StampCreationService.createStampIssuance(params),
             Error,
-            `Invalid outputValue: ${outputValue}`
+            `Invalid outputValue: ${outputValue}`,
           );
         }
       });
@@ -235,12 +239,12 @@ describe("StampCreationService", () => {
         const createIssuanceStub = stub(
           StampCreationService as any,
           "createIssuanceTransaction",
-          returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })])
+          returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })]),
         );
         const generatePSBTStub = stub(
           StampCreationService as any,
           "generatePSBT",
-          returnsNext([Promise.resolve(mockPSBTResults.successful)])
+          returnsNext([Promise.resolve(mockPSBTResults.successful)]),
         );
 
         try {
@@ -263,12 +267,12 @@ describe("StampCreationService", () => {
         const createIssuanceStub = stub(
           StampCreationService as any,
           "createIssuanceTransaction",
-          returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })])
+          returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })]),
         );
         const generatePSBTStub = stub(
           StampCreationService as any,
           "generatePSBT",
-          returnsNext([Promise.resolve(mockPSBTResults.successful)])
+          returnsNext([Promise.resolve(mockPSBTResults.successful)]),
         );
 
         try {
@@ -289,12 +293,12 @@ describe("StampCreationService", () => {
         const createIssuanceStub = stub(
           StampCreationService as any,
           "createIssuanceTransaction",
-          returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })])
+          returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })]),
         );
         const generatePSBTStub = stub(
           StampCreationService as any,
           "generatePSBT",
-          returnsNext([Promise.resolve(mockPSBTResults.successful)])
+          returnsNext([Promise.resolve(mockPSBTResults.successful)]),
         );
 
         try {
@@ -314,12 +318,12 @@ describe("StampCreationService", () => {
         const createIssuanceStub = stub(
           StampCreationService as any,
           "createIssuanceTransaction",
-          returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })])
+          returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })]),
         );
         const generatePSBTStub = stub(
           StampCreationService as any,
           "generatePSBT",
-          returnsNext([Promise.resolve(mockPSBTResults.successful)])
+          returnsNext([Promise.resolve(mockPSBTResults.successful)]),
         );
 
         try {
@@ -341,12 +345,12 @@ describe("StampCreationService", () => {
         const createIssuanceStub = stub(
           StampCreationService as any,
           "createIssuanceTransaction",
-          returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })])
+          returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })]),
         );
         const generatePSBTStub = stub(
           StampCreationService as any,
           "generatePSBT",
-          returnsNext([Promise.resolve(mockPSBTResults.successful)])
+          returnsNext([Promise.resolve(mockPSBTResults.successful)]),
         );
 
         try {
@@ -384,20 +388,20 @@ describe("StampCreationService", () => {
         const createIssuanceStub = stub(
           StampCreationService as any,
           "createIssuanceTransaction",
-          returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })])
+          returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })]),
         );
         const generatePSBTStub = stub(
           StampCreationService as any,
           "generatePSBT",
-          returnsNext([Promise.resolve(mockPSBTResults.successful)])
+          returnsNext([Promise.resolve(mockPSBTResults.successful)]),
         );
 
         try {
           const result = await StampCreationService.createStampIssuance(params);
-          
+
           // Should not include hex field in dry run
           assert(!("hex" in result));
-          
+
           // Should include estimation fields
           assertExists(result.est_tx_size);
           assertExists(result.input_value);
@@ -419,17 +423,17 @@ describe("StampCreationService", () => {
         const createIssuanceStub = stub(
           StampCreationService as any,
           "createIssuanceTransaction",
-          returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })])
+          returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })]),
         );
         const generatePSBTStub = stub(
           StampCreationService as any,
           "generatePSBT",
-          returnsNext([Promise.resolve(mockPSBTResults.successful)])
+          returnsNext([Promise.resolve(mockPSBTResults.successful)]),
         );
 
         try {
           const result = await StampCreationService.createStampIssuance(params);
-          
+
           assertExists(result.hex);
           assertEquals(typeof result.hex, "string");
           assert(result.hex.length > 0);
@@ -449,19 +453,22 @@ describe("StampCreationService", () => {
         const createIssuanceStub = stub(
           StampCreationService as any,
           "createIssuanceTransaction",
-          returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })])
+          returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })]),
         );
         const generatePSBTStub = stub(
           StampCreationService as any,
           "generatePSBT",
-          returnsNext([Promise.resolve(mockPSBTResults.successful)])
+          returnsNext([Promise.resolve(mockPSBTResults.successful)]),
         );
 
         try {
           const result = await StampCreationService.createStampIssuance(params);
           assertExists(result);
 
-          assertEquals(createIssuanceStub.calls[0].args[0].assetName, "MYASSET");
+          assertEquals(
+            createIssuanceStub.calls[0].args[0].assetName,
+            "MYASSET",
+          );
         } finally {
           createIssuanceStub.restore();
           generatePSBTStub.restore();
@@ -475,12 +482,12 @@ describe("StampCreationService", () => {
         const createIssuanceStub = stub(
           StampCreationService as any,
           "createIssuanceTransaction",
-          returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })])
+          returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })]),
         );
         const generatePSBTStub = stub(
           StampCreationService as any,
           "generatePSBT",
-          returnsNext([Promise.resolve(mockPSBTResults.successful)])
+          returnsNext([Promise.resolve(mockPSBTResults.successful)]),
         );
 
         try {
@@ -502,14 +509,14 @@ describe("StampCreationService", () => {
         const createIssuanceStub = stub(
           StampCreationService as any,
           "createIssuanceTransaction",
-          returnsNext([Promise.resolve({ tx_hex: "" })]) // Empty tx_hex
+          returnsNext([Promise.resolve({ tx_hex: "" })]), // Empty tx_hex
         );
 
         try {
           await assertRejects(
             () => StampCreationService.createStampIssuance(params),
             Error,
-            "Transaction creation failed: No transaction hex returned"
+            "Transaction creation failed: No transaction hex returned",
           );
         } finally {
           createIssuanceStub.restore();
@@ -522,14 +529,14 @@ describe("StampCreationService", () => {
         const createIssuanceStub = stub(
           StampCreationService as any,
           "createIssuanceTransaction",
-          returnsNext([Promise.resolve({})]) // No tx_hex field
+          returnsNext([Promise.resolve({})]), // No tx_hex field
         );
 
         try {
           await assertRejects(
             () => StampCreationService.createStampIssuance(params),
             Error,
-            "Transaction creation failed: No transaction hex returned"
+            "Transaction creation failed: No transaction hex returned",
           );
         } finally {
           createIssuanceStub.restore();
@@ -542,14 +549,14 @@ describe("StampCreationService", () => {
         const createIssuanceStub = stub(
           StampCreationService as any,
           "createIssuanceTransaction",
-          returnsNext([Promise.reject(new Error("invalid base58 address"))])
+          returnsNext([Promise.reject(new Error("invalid base58 address"))]),
         );
 
         try {
           await assertRejects(
             () => StampCreationService.createStampIssuance(params),
             Error,
-            "Invalid address format. Please use a supported Bitcoin address format"
+            "Invalid address format. Please use a supported Bitcoin address format",
           );
         } finally {
           createIssuanceStub.restore();
@@ -563,14 +570,14 @@ describe("StampCreationService", () => {
         const createIssuanceStub = stub(
           StampCreationService as any,
           "createIssuanceTransaction",
-          returnsNext([Promise.reject(originalError)])
+          returnsNext([Promise.reject(originalError)]),
         );
 
         try {
           await assertRejects(
             () => StampCreationService.createStampIssuance(params),
             Error,
-            "Network connection failed"
+            "Network connection failed",
           );
         } finally {
           createIssuanceStub.restore();
@@ -580,17 +587,20 @@ describe("StampCreationService", () => {
 
     describe("File processing", () => {
       it("should process small files correctly", async () => {
-        const params = { ...mockStampParams.basic, file: mockFileData.small.base64 };
+        const params = {
+          ...mockStampParams.basic,
+          file: mockFileData.small.base64,
+        };
 
         const createIssuanceStub = stub(
           StampCreationService as any,
           "createIssuanceTransaction",
-          returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })])
+          returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })]),
         );
         const generatePSBTStub = stub(
           StampCreationService as any,
           "generatePSBT",
-          returnsNext([Promise.resolve(mockPSBTResults.successful)])
+          returnsNext([Promise.resolve(mockPSBTResults.successful)]),
         );
 
         try {
@@ -603,23 +613,26 @@ describe("StampCreationService", () => {
       });
 
       it("should process large files correctly", async () => {
-        const params = { ...mockStampParams.basic, file: mockFileData.large.base64 };
+        const params = {
+          ...mockStampParams.basic,
+          file: mockFileData.large.base64,
+        };
 
         const createIssuanceStub = stub(
           StampCreationService as any,
           "createIssuanceTransaction",
-          returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })])
+          returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })]),
         );
         const generatePSBTStub = stub(
           StampCreationService as any,
           "generatePSBT",
-          returnsNext([Promise.resolve(mockPSBTResults.successful)])
+          returnsNext([Promise.resolve(mockPSBTResults.successful)]),
         );
 
         try {
           const result = await StampCreationService.createStampIssuance(params);
           assertExists(result);
-          
+
           // Large files should result in higher estimated sizes
           assert(result.est_tx_size > 200);
         } finally {
@@ -629,17 +642,20 @@ describe("StampCreationService", () => {
       });
 
       it("should calculate file sizes correctly", async () => {
-        const params = { ...mockStampParams.basic, file: mockFileData.medium.base64 };
+        const params = {
+          ...mockStampParams.basic,
+          file: mockFileData.medium.base64,
+        };
 
         const createIssuanceStub = stub(
           StampCreationService as any,
           "createIssuanceTransaction",
-          returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })])
+          returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })]),
         );
         const generatePSBTStub = stub(
           StampCreationService as any,
           "generatePSBT",
-          returnsNext([Promise.resolve(mockPSBTResults.successful)])
+          returnsNext([Promise.resolve(mockPSBTResults.successful)]),
         );
 
         try {
@@ -650,7 +666,7 @@ describe("StampCreationService", () => {
           const generatePSBTCall = generatePSBTStub.calls[0];
           const fileSize = generatePSBTCall.args[6]; // fileSize parameter
           assert(fileSize > 0);
-          assert(typeof fileSize === 'number');
+          assert(typeof fileSize === "number");
         } finally {
           createIssuanceStub.restore();
           generatePSBTStub.restore();
@@ -665,12 +681,12 @@ describe("StampCreationService", () => {
         const createIssuanceStub = stub(
           StampCreationService as any,
           "createIssuanceTransaction",
-          returnsNext([Promise.resolve({ tx_hex: "mockTxHex123" })])
+          returnsNext([Promise.resolve({ tx_hex: "mockTxHex123" })]),
         );
         const generatePSBTStub = stub(
           StampCreationService as any,
           "generatePSBT",
-          returnsNext([Promise.resolve(mockPSBTResults.successful)])
+          returnsNext([Promise.resolve(mockPSBTResults.successful)]),
         );
 
         try {
@@ -680,7 +696,7 @@ describe("StampCreationService", () => {
           // Verify createIssuanceTransaction was called with correct parameters
           assertEquals(createIssuanceStub.calls.length, 1);
           const callArgs = createIssuanceStub.calls[0].args[0];
-          
+
           assertEquals(callArgs.sourceWallet, params.sourceWallet);
           assertEquals(callArgs.qty, parseInt(params.qty));
           assertEquals(callArgs.locked, params.locked);
@@ -701,12 +717,12 @@ describe("StampCreationService", () => {
         const createIssuanceStub = stub(
           StampCreationService as any,
           "createIssuanceTransaction",
-          returnsNext([Promise.resolve({ tx_hex: "mockTxHex456" })])
+          returnsNext([Promise.resolve({ tx_hex: "mockTxHex456" })]),
         );
         const generatePSBTStub = stub(
           StampCreationService as any,
           "generatePSBT",
-          returnsNext([Promise.resolve(mockPSBTResults.successful)])
+          returnsNext([Promise.resolve(mockPSBTResults.successful)]),
         );
 
         try {
@@ -716,16 +732,16 @@ describe("StampCreationService", () => {
           // Verify generatePSBT was called with correct parameters
           assertEquals(generatePSBTStub.calls.length, 1);
           const callArgs = generatePSBTStub.calls[0].args;
-          
+
           assertEquals(callArgs[0], "mockTxHex456"); // tx hex
           assertEquals(callArgs[1], params.sourceWallet); // address
-          assert(typeof callArgs[2] === 'number'); // satsPerVB
+          assert(typeof callArgs[2] === "number"); // satsPerVB
           assertEquals(callArgs[3], params.service_fee); // service_fee
           assertEquals(callArgs[4], params.service_fee_address); // recipient_fee
           assert(Array.isArray(callArgs[5])); // cip33Addresses
-          assert(typeof callArgs[6] === 'number'); // fileSize
+          assert(typeof callArgs[6] === "number"); // fileSize
           assertEquals(callArgs[7], false); // isDryRun
-          assert(typeof callArgs[8] === 'number'); // dustValue
+          assert(typeof callArgs[8] === "number"); // dustValue
         } finally {
           createIssuanceStub.restore();
           generatePSBTStub.restore();
@@ -740,22 +756,28 @@ describe("StampCreationService", () => {
         const createIssuanceStub = stub(
           StampCreationService as any,
           "createIssuanceTransaction",
-          returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })])
+          returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })]),
         );
         const generatePSBTStub = stub(
           StampCreationService as any,
           "generatePSBT",
-          returnsNext([Promise.resolve(mockPSBTResults.successful)])
+          returnsNext([Promise.resolve(mockPSBTResults.successful)]),
         );
 
         try {
           const startTime = Date.now();
-          const result = await StampCreationService.createStampIssuance(testCase.params);
+          const result = await StampCreationService.createStampIssuance(
+            testCase.params,
+          );
           const endTime = Date.now();
-          
+
           assertExists(result);
-          assert(endTime - startTime < testCase.maxExecutionTime, 
-            `Execution took ${endTime - startTime}ms, expected < ${testCase.maxExecutionTime}ms`);
+          assert(
+            endTime - startTime < testCase.maxExecutionTime,
+            `Execution took ${
+              endTime - startTime
+            }ms, expected < ${testCase.maxExecutionTime}ms`,
+          );
         } finally {
           createIssuanceStub.restore();
           generatePSBTStub.restore();
@@ -771,12 +793,12 @@ describe("StampCreationService", () => {
       const createIssuanceStub = stub(
         StampCreationService as any,
         "createIssuanceTransaction",
-        returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })])
+        returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })]),
       );
       const generatePSBTStub = stub(
         StampCreationService as any,
         "generatePSBT",
-        returnsNext([Promise.resolve(mockPSBTResults.successful)])
+        returnsNext([Promise.resolve(mockPSBTResults.successful)]),
       );
 
       try {
@@ -794,25 +816,25 @@ describe("StampCreationService", () => {
       const createIssuanceStub = stub(
         StampCreationService as any,
         "createIssuanceTransaction",
-        returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })])
+        returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })]),
       );
-      
+
       // Create a dynamic PSBT result based on the high fee rate (1000 sats/vB)
       const highFeeResult = {
         ...mockPSBTResults.successful,
         estMinerFee: 250 * 1000, // 250 bytes * 1000 sats/vB = 250,000
       };
-      
+
       const generatePSBTStub = stub(
         StampCreationService as any,
         "generatePSBT",
-        returnsNext([Promise.resolve(highFeeResult)])
+        returnsNext([Promise.resolve(highFeeResult)]),
       );
 
       try {
         const result = await StampCreationService.createStampIssuance(params);
         assertExists(result);
-        
+
         // High fee rates should result in high estimated fees
         assert(result.est_miner_fee > 50000); // Should be substantial
       } finally {
@@ -827,25 +849,25 @@ describe("StampCreationService", () => {
       const createIssuanceStub = stub(
         StampCreationService as any,
         "createIssuanceTransaction",
-        returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })])
+        returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })]),
       );
-      
+
       // Create a dynamic PSBT result based on the low fee rate (1 sat/vB)
       const lowFeeResult = {
         ...mockPSBTResults.successful,
         estMinerFee: 250 * 1, // 250 bytes * 1 sat/vB = 250
       };
-      
+
       const generatePSBTStub = stub(
         StampCreationService as any,
         "generatePSBT",
-        returnsNext([Promise.resolve(lowFeeResult)])
+        returnsNext([Promise.resolve(lowFeeResult)]),
       );
 
       try {
         const result = await StampCreationService.createStampIssuance(params);
         assertExists(result);
-        
+
         // Low fee rates should result in low estimated fees
         assert(result.est_miner_fee < 1000);
       } finally {
@@ -860,21 +882,22 @@ describe("StampCreationService", () => {
       const createIssuanceStub = stub(
         StampCreationService as any,
         "createIssuanceTransaction",
-        returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })])
+        returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })]),
       );
       const generatePSBTStub = stub(
         StampCreationService as any,
         "generatePSBT",
         returnsNext([Promise.resolve({
           ...mockPSBTResults.successful,
-          totalOutputValue: mockPSBTResults.successful.totalOutputValue + 950000 // Add high service fee
-        })])
+          totalOutputValue: mockPSBTResults.successful.totalOutputValue +
+            950000, // Add high service fee
+        })]),
       );
 
       try {
         const result = await StampCreationService.createStampIssuance(params);
         assertExists(result);
-        
+
         // Should handle large service fees without issues
         assert(result.total_output_value > 1000000);
       } finally {
@@ -891,12 +914,12 @@ describe("StampCreationService", () => {
       const createIssuanceStub = stub(
         StampCreationService as any,
         "createIssuanceTransaction",
-        returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })])
+        returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })]),
       );
       const generatePSBTStub = stub(
         StampCreationService as any,
         "generatePSBT",
-        returnsNext([Promise.resolve(mockPSBTResults.successful)])
+        returnsNext([Promise.resolve(mockPSBTResults.successful)]),
       );
 
       try {
@@ -919,12 +942,12 @@ describe("StampCreationService", () => {
       const createIssuanceStub = stub(
         StampCreationService as any,
         "createIssuanceTransaction",
-        returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })])
+        returnsNext([Promise.resolve({ tx_hex: "mockTxHex" })]),
       );
       const generatePSBTStub = stub(
         StampCreationService as any,
         "generatePSBT",
-        returnsNext([Promise.resolve(mockPSBTResults.successful)])
+        returnsNext([Promise.resolve(mockPSBTResults.successful)]),
       );
 
       try {

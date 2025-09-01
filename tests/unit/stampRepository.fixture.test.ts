@@ -1,5 +1,10 @@
 import { assertEquals, assertExists } from "@std/assert";
-import { afterEach, beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  it,
+} from "jsr:@std/testing@1.0.14/bdd";
 import { stub } from "@std/testing@1.0.14/mock";
 import { StampRepository } from "$server/database/stampRepository.ts";
 import stampFixtures from "../fixtures/stampData.json" with { type: "json" };
@@ -10,7 +15,7 @@ import type { StampRow } from "$types/stamp.d.ts";
 class MockDatabaseManager {
   executeQueryWithCache: any;
   executeQuery: any;
-  
+
   async invalidateCacheByCategory(category: string): Promise<void> {
     // Mock implementation - just log for testing
     console.log(`[MOCK] Invalidating cache for category: ${category}`);

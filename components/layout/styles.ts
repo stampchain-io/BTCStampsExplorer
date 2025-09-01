@@ -22,6 +22,9 @@ export const bodyArticle = `
 // Section gaps
 export const gapSection = "gap-12 mobileLg:gap-[72px]"; // Index pages
 export const gapSectionSlim = "gap-6 mobileLg:gap-9"; // Media index page
+// Header spacing - for consistent spacing from global header
+export const headerMargin = "mt-0 min-[420px]:mt-3 mobileMd:mt-6 tablet:mt-3"; // Page header spacing
+export const headerSpacing = `flex flex-col ${headerMargin}`; // Complete header container
 // Grid/flex row and column gaps
 export const gapGrid = "gap-6 mobileLg:gap-9 tablet:gap-12"; // - ToS index page
 

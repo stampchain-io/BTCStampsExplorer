@@ -4,7 +4,12 @@
  */
 
 import { assertEquals } from "@std/assert";
-import { afterEach, beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  it,
+} from "jsr:@std/testing@1.0.14/bdd";
 import { restore, stub } from "@std/testing@1.0.14/mock";
 import { SRC20OperationService } from "$server/services/src20/operations/src20Operations.ts";
 import { SRC20UtilityService } from "$server/services/src20/utilityService.ts";

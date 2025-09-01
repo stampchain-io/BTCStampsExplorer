@@ -2,6 +2,7 @@
 /*@baba-367*/
 
 import { MetaTags } from "$components/layout/MetaTags.tsx";
+import { headerSpacing } from "$layout";
 import { WalletProfileContent } from "$content";
 import { Handlers } from "$fresh/server.ts";
 import type { SRC20Balance, SRC20Row } from "$types/src20.d.ts";
@@ -65,7 +66,7 @@ export const handler: Handlers = {
     // Extract pagination parameters with grid-friendly defaults
     const stampsParams = {
       page: parseInt(url.searchParams.get("stamps_page") || "1"),
-      limit: parseInt(url.searchParams.get("stamps_limit") || "36"), // Changed from 32 to 36 for even grid rows (6x6)
+      limit: parseInt(url.searchParams.get("stamps_limit") || "40"), // Changed to 40 to fill 10x4 grid completely
       sortBy: url.searchParams.get("stampsSortBy") as "ASC" | "DESC" || "DESC",
     };
 
@@ -101,7 +102,7 @@ export const handler: Handlers = {
         fetch(
           `${url.origin}/api/v2/stamps/balance/${address}?enhanced=true&page=${
             stampsParams.page || 1
-          }&limit=${stampsParams.limit || 32}&sortBy=${normalizedStampsSortBy}`,
+          }&limit=${stampsParams.limit || 40}&sortBy=${normalizedStampsSortBy}`,
           {
             headers: {
               "X-API-Version": "2.3",
@@ -117,7 +118,7 @@ export const handler: Handlers = {
             // Fallback to basic endpoint
             return StampController.getStampBalancesByAddress(
               address,
-              stampsParams.limit || 32,
+              stampsParams.limit || 40,
               stampsParams.page || 1,
               (normalizedStampsSortBy === "ASC" ||
                   normalizedStampsSortBy === "DESC")
@@ -224,7 +225,7 @@ export const handler: Handlers = {
             // Fallback to basic endpoint with high limit
             return StampController.getStampBalancesByAddress(
               address,
-              1000, // High limit to get all stamps
+              1000, // High limit to get all stamps for value calculation
               1,
               "DESC",
             );
@@ -277,11 +278,11 @@ export const handler: Handlers = {
           page: stampsResponse.value.pagination?.page ||
             stampsResponse.value.page || 1,
           limit: stampsResponse.value.pagination?.limit ||
-            stampsResponse.value.limit || 32,
+            stampsResponse.value.limit || 40,
           totalPages: stampsResponse.value.pagination?.totalPages ||
             stampsResponse.value.totalPages || 0,
         }
-        : { data: [], total: 0, page: 1, limit: 32, totalPages: 0 };
+        : { data: [], total: 0, page: 1, limit: 40, totalPages: 0 };
 
       // CRITICAL FIX: Calculate stamp values using ALL stamps, not just current page
       const stampValues = allStampsForValuesResponse.status === "fulfilled"
@@ -493,7 +494,7 @@ export const handler: Handlers = {
           data: {
             stamps: {
               data: [],
-              pagination: { page: 1, limit: 8, total: 0, totalPages: 0 },
+              pagination: { page: 1, limit: 40, total: 0, totalPages: 0 },
             },
             src20: {
               data: [],
@@ -589,7 +590,11 @@ export default function WalletPage(props: { data: WalletPageProps }) {
 
   /* ===== RENDER ===== */
   return (
-    <div>
+    <div
+      f-client-nav
+      data-partial={`/wallet/${routeData.address}`}
+      class={headerSpacing}
+    >
       <MetaTags
         title={`BTC Stamps Explorer - ${routeData.address || "Address"}`}
         description={`Explore Bitcoin stamps and SRC-20 tokens for address ${

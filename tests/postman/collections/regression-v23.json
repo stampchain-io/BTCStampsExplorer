@@ -72,7 +72,7 @@
           "if (!pm.collectionVariables.get('test_session_id')) {",
           "    const sessionId = 'test_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);",
           "    pm.collectionVariables.set('test_session_id', sessionId);",
-          "    console.log('\ud83d\ude80 Starting v2.3 regression test session:', sessionId);",
+          "    console.log('🚀 Starting v2.3 regression test session:', sessionId);",
           "}",
           "",
           "// Log each request",

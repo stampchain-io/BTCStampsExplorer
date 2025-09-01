@@ -54,17 +54,17 @@ function teardown() {
 function isolatedTest(
   name: string,
   fn: () => void | Promise<void>,
-  options?: { sanitizeOps?: boolean; sanitizeResources?: boolean }
+  options?: { sanitizeOps?: boolean; sanitizeResources?: boolean },
 ) {
   Deno.test(name, options || {}, async () => {
     // Save current environment state
     const originalDebug = Deno.env.get("DEBUG");
     const originalDenoEnv = Deno.env.get("DENO_ENV");
-    
+
     try {
       // Ensure test mode is set for all tests
       Deno.env.set("DENO_ENV", "test");
-      
+
       // Run the test
       await fn();
     } finally {
@@ -127,7 +127,7 @@ isolatedTest("logger - debug does not log when namespace is disabled", () => {
 
 isolatedTest("logger - error always logs", () => {
   setup();
-  
+
   // Ensure we're in test mode to prevent file writes
   Deno.env.set("DENO_ENV", "test");
 
@@ -164,7 +164,7 @@ isolatedTest("logger - info logs when namespace is enabled", () => {
 
 isolatedTest("logger - warn always logs", () => {
   setup();
-  
+
   // Ensure we're in test mode to prevent file writes
   Deno.env.set("DENO_ENV", "test");
 
@@ -230,7 +230,7 @@ isolatedTest(
     setup();
 
     // Wait for any pending async operations to complete before modifying Deno
-    await new Promise(resolve => setTimeout(resolve, 50));
+    await new Promise((resolve) => setTimeout(resolve, 50));
 
     // Temporarily remove Deno to simulate client environment
     // @ts-ignore - Intentionally modifying global
@@ -269,5 +269,5 @@ isolatedTest(
 
     teardown();
   },
-  { sanitizeOps: false, sanitizeResources: false }
+  { sanitizeOps: false, sanitizeResources: false },
 );

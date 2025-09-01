@@ -1,7 +1,12 @@
 import { dbManager } from "$server/database/databaseManager.ts";
 import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
 import { assertEquals, assertExists } from "@std/assert";
-import { afterEach, beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  it,
+} from "jsr:@std/testing@1.0.14/bdd";
 import { stub } from "@std/testing@1.0.14/mock";
 import { MockDatabaseManager } from "../mocks/mockDatabaseManager.ts";
 

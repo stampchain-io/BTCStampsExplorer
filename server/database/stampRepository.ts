@@ -19,7 +19,7 @@ import { logger, LogNamespace } from "$lib/utils/logger.ts";
 import { isCpid, isStampHash, isStampNumber, isTxHash } from "$lib/utils/typeGuards.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
 import { summarize_issuances } from "$server/database/index.ts";
-import type {SUBPROTOCOLS} from "$types/base.d.ts";
+import type { SUBPROTOCOLS } from "$types/base.d.ts";
 import type { XcpBalance } from "$types/services.d.ts";
 import type { StampBalance, StampFilters } from "$types/stamp.d.ts";
 
@@ -1195,9 +1195,9 @@ export class StampRepository {
     };
   }
 
-  static async getSpecificStamp(identifier: string): Promise<{ 
-    stamp: number | undefined, 
-    stamp_url: string, 
+  static async getSpecificStamp(identifier: string): Promise<{
+    stamp: number | undefined,
+    stamp_url: string,
     stamp_mimetype: string
   }>{
     // Determine the type of identifier
@@ -1384,7 +1384,8 @@ export class StampRepository {
                 holderCount: row.holder_count || 0,
                 lastPriceUpdate: row.sale_time ? new Date(row.sale_time * 1000) : null, // Convert unix timestamp
                 dataQualityScore: row.data_quality_score || 0,
-                minutesSinceSale: row.sale_time ? Math.floor((Date.now() - (row.sale_time * 1000)) / 60000) : 0
+                minutesSinceSale: row.sale_time ? Math.floor((Date.now() - (row.sale_time * 1000)) / 60000) : 0,
+                lastSaleQuantity: row.quantity ? parseInt(row.quantity) : 1 // Quantity sold in transaction
               },
               sale_data: {
                 btc_amount: row.btc_amount ? parseFloat(row.btc_amount) : 0,

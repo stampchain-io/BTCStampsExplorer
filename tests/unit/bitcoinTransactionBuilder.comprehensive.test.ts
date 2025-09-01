@@ -4,12 +4,17 @@
  */
 
 import {
-    assertEquals,
-    assertExists,
-    assertRejects,
-    assertThrows,
+  assertEquals,
+  assertExists,
+  assertRejects,
+  assertThrows,
 } from "@std/assert";
-import { afterEach, beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  it,
+} from "jsr:@std/testing@1.0.14/bdd";
 import { Buffer } from "node:buffer";
 import * as bitcoin from "../mocks/bitcoinjs-lib.mock.ts";
 import { networks, Psbt, Transaction } from "../mocks/bitcoinjs-lib.mock.ts";
@@ -22,21 +27,21 @@ Deno.env.set("SKIP_DB_CONNECTION", "true");
 Deno.env.set("DENO_ENV", "test");
 
 import {
-    BitcoinTransactionBuilder,
-    type BitcoinTransactionBuilderDependencies,
-    createBitcoinTransactionBuilder,
+  BitcoinTransactionBuilder,
+  type BitcoinTransactionBuilderDependencies,
+  createBitcoinTransactionBuilder,
 } from "$server/services/transaction/bitcoinTransactionBuilder.ts";
 import { utxoFixtures } from "../fixtures/utxoFixtures.ts";
 import {
-    clearMockResponses,
-    MockCommonUTXOService,
-    setMockUTXOResponse as setMockCommonUTXOResponse,
-    setMockTransactionHex,
+  clearMockResponses,
+  MockCommonUTXOService,
+  setMockTransactionHex,
+  setMockUTXOResponse as setMockCommonUTXOResponse,
 } from "../mocks/CommonUTXOService.mock.ts";
 import { clearMockUTXOResponses } from "../mocks/utxoUtils.mock.ts";
 import {
-    createMockAddressTestData,
-    createMockNetworks,
+  createMockAddressTestData,
+  createMockNetworks,
 } from "./utils/testFactories.ts";
 
 // Use the mock Psbt type for formatPsbtForLogging

@@ -1,0 +1,115 @@
+{
+  "info": {
+    "name": "Schema vs Production Response Audit",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "SRC20 Balance Snapshot - Schema Compliance Check",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Accept", "value": "application/json" }],
+        "url": {
+          "raw": "https://stampchain.io/api/v2/src20/balance/snapshot/STAMP?limit=1",
+          "protocol": "https",
+          "host": ["stampchain", "io"],
+          "path": ["api", "v2", "src20", "balance", "snapshot", "STAMP"],
+          "query": [{ "key": "limit", "value": "1" }]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('✅ Response successful', function () {",
+              "    pm.response.to.have.status(200);",
+              "    pm.response.to.be.json;",
+              "});",
+              "",
+              "const response = pm.response.json();",
+              "",
+              "pm.test('📋 Current Schema Compliance Audit', function () {",
+              "    console.log('=== SCHEMA vs PRODUCTION AUDIT ===');",
+              "    console.log('Current Response Structure:', Object.keys(response));",
+              "    ",
+              "    // Schema expects (according to Pagination schema):",
+              "    console.log('📋 SCHEMA EXPECTS: page, limit, totalPages, total');",
+              "    console.log('🏭 PRODUCTION HAS:', Object.keys(response).filter(k => ['page', 'limit', 'totalPages', 'total_pages', 'total'].includes(k)).join(', '));",
+              "    ",
+              "    // Check current field usage",
+              "    if (response.totalPages !== undefined) {",
+              "        console.log('✅ MATCHES SCHEMA: totalPages =', response.totalPages);",
+              "    }",
+              "    if (response.total_pages !== undefined) {",
+              "        console.log('❌ CONTRADICTS SCHEMA: total_pages =', response.total_pages, '(schema expects totalPages)');",
+              "    }",
+              "    if (response.snapshot_block !== undefined) {",
+              "        console.log('✅ SCHEMA COMPLIANT: snapshot_block =', response.snapshot_block);",
+              "    }",
+              "    ",
+              "    console.log('=== VERDICT ===');",
+              "    const isSchemaCompliant = response.totalPages !== undefined && response.total_pages === undefined;",
+              "    console.log('Schema Compliant:', isSchemaCompliant ? '✅ YES' : '❌ NO');",
+              "});",
+              "",
+              "pm.test('📊 Schema Field Analysis', function () {",
+              "    // According to schema.yml Pagination component:",
+              "    pm.expect(response).to.have.property('page');",
+              "    pm.expect(response).to.have.property('limit'); ",
+              "    pm.expect(response).to.have.property('total');",
+              "    ",
+              "    // The critical test - schema says 'totalPages' not 'total_pages'",
+              "    if (response.totalPages !== undefined) {",
+              "        pm.expect(response.totalPages).to.be.a('number');",
+              "        console.log('✅ SCHEMA MATCH: totalPages found');",
+              "    } else if (response.total_pages !== undefined) {",
+              "        console.log('❌ SCHEMA MISMATCH: Found total_pages instead of totalPages');",
+              "    }",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "SRC20 Balance Address - Schema Compliance Check",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Accept", "value": "application/json" }],
+        "url": {
+          "raw": "https://stampchain.io/api/v2/src20/balance/bc1qzxszplp8v7w0jc89dlrqyct9staqlhwxzy7lkq?limit=1",
+          "protocol": "https",
+          "host": ["stampchain", "io"],
+          "path": ["api", "v2", "src20", "balance", "bc1qzxszplp8v7w0jc89dlrqyct9staqlhwxzy7lkq"],
+          "query": [{ "key": "limit", "value": "1" }]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('✅ Response successful', function () {",
+              "    pm.response.to.have.status(200);",
+              "    pm.response.to.be.json;",
+              "});",
+              "",
+              "const balanceResponse = pm.response.json();",
+              "",
+              "pm.test('📋 SRC20 Balance Schema Compliance', function () {",
+              "    console.log('=== SRC20 BALANCE SCHEMA AUDIT ===');",
+              "    console.log('Response Structure:', Object.keys(balanceResponse));",
+              "    ",
+              "    // Check if this endpoint follows schema",
+              "    const isCompliant = balanceResponse.totalPages !== undefined && balanceResponse.total_pages === undefined;",
+              "    console.log('Schema Compliant:', isCompliant ? '✅ YES (matches schema totalPages)' : '❌ NO');",
+              "    console.log('Critical Status: This endpoint CANNOT be changed (legacy support)');",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

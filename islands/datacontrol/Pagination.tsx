@@ -1,9 +1,11 @@
-import { Icon } from "$icon";
-import { getWindowWidth } from "$utils/navigation/freshNavigationUtils.ts";
-import type { PaginationProps } from "$types/pagination.d.ts";
-import { useEffect, useState } from "preact/hooks";
-import { useSSRSafeNavigation } from "$lib/hooks/useSSRSafeNavigation.ts";
 import { IS_BROWSER } from "$fresh/runtime.ts";
+import { Icon } from "$icon";
+import type { PaginationProps } from "$types/pagination.d.ts";
+import {
+  getWindowWidth,
+  safeNavigate,
+} from "$utils/navigation/freshNavigationUtils.ts";
+import { useEffect, useState } from "preact/hooks";
 
 // Update pagination range constants
 const MOBILESM_MAX_PAGE_RANGE = 0;
@@ -56,7 +58,6 @@ export function Pagination({
   onPageChange,
 }: PaginationProps) {
   const screenSize = useScreenSize();
-  const { setSearchParam } = useSSRSafeNavigation();
 
   // Update maxPageRange logic based on screen size
   const getMaxPageRange = (size: string) => {
@@ -82,9 +83,15 @@ export function Pagination({
       return;
     }
 
-    // SSR-safe URL parameter update using the navigation hook
-    const paramName = prefix ? `${prefix}_page` : "page";
-    setSearchParam(paramName, newPage.toString());
+    // Use Fresh partial navigation if available, fallback to URL parameter update
+    if (IS_BROWSER) {
+      const url = new URL(globalThis.location.href);
+      const paramName = prefix ? `${prefix}_page` : "page";
+      url.searchParams.set(paramName, newPage.toString());
+
+      // Try Fresh partial navigation first
+      safeNavigate(url.toString());
+    }
   };
 
   const renderPageButton = (pageNum: number, iconName?: string) => {
@@ -95,12 +102,14 @@ export function Pagination({
       ? `${baseClass} bg-stamp-purple`
       : `${baseClass} bg-stamp-purple-dark`;
 
+    // Always use button with click handler for consistent navigation
     return (
       <button
         type="button"
         class={buttonClass}
         onClick={() => handlePageChange(pageNum)}
         disabled={isCurrentPage}
+        {...(isCurrentPage && { "aria-current": "page" })}
       >
         {iconName
           ? (

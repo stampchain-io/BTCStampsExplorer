@@ -81,7 +81,7 @@ export default function CollectionDetailPage(
   props: CollectionDetailsPageProps,
 ) {
   const {
-    id: _id,
+    id,
     stamps,
     page,
     pages,
@@ -90,22 +90,18 @@ export default function CollectionDetailPage(
 
   /* ===== COMPONENT ===== */
   return (
-    <div class="flex flex-col gap-6">
+    <div
+      class="flex flex-col gap-6"
+      f-client-nav
+      data-partial={`/collection/detail/${id}`}
+    >
       <CollectionDetailHeader collection={collection} stamps={stamps} />
       <CollectionDetailContent stamps={stamps} />
       <div class="mt-12 mobileLg:mt-[72px]">
         <Pagination
           page={page}
           totalPages={pages}
-          onPageChange={(newPage) => {
-            // SSR-safe browser environment check
-            if (typeof globalThis === "undefined" || !globalThis?.location) {
-              return; // Cannot navigate during SSR
-            }
-            const url = new URL(globalThis.location.href);
-            url.searchParams.set("page", newPage.toString());
-            globalThis.location.href = url.toString();
-          }}
+          // Remove onPageChange to let Pagination component use its built-in Fresh navigation
         />
       </div>
     </div>

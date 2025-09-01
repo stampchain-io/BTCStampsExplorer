@@ -4,7 +4,12 @@
  */
 
 import { assertEquals, assertExists, assertRejects } from "@std/assert";
-import { afterEach, beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  it,
+} from "jsr:@std/testing@1.0.14/bdd";
 import { Psbt } from "bitcoinjs-lib";
 import { Buffer } from "node:buffer";
 
@@ -73,11 +78,15 @@ describe("BitcoinTransactionBuilder with Fixture-Based Mocks", {
   sanitizeOps: false,
   sanitizeResources: false,
 }, () => {
-  let bitcoinTransactionBuilder: ReturnType<typeof createBitcoinTransactionBuilder>;
+  let bitcoinTransactionBuilder: ReturnType<
+    typeof createBitcoinTransactionBuilder
+  >;
 
   beforeEach(() => {
     // Create service with mocked dependencies
-    bitcoinTransactionBuilder = createBitcoinTransactionBuilder(mockDependencies);
+    bitcoinTransactionBuilder = createBitcoinTransactionBuilder(
+      mockDependencies,
+    );
   });
 
   afterEach(() => {
@@ -337,7 +346,10 @@ describe("BitcoinTransactionBuilder with Fixture-Based Mocks", {
 
       await assertRejects(
         async () => {
-          await bitcoinTransactionBuilder.validateUTXOOwnership(utxoString, address);
+          await bitcoinTransactionBuilder.validateUTXOOwnership(
+            utxoString,
+            address,
+          );
         },
         Error,
       );

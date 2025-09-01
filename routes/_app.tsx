@@ -1,5 +1,6 @@
 /* ===== ROOT APP LAYOUT ROUTE ===== */
 import { MetaTags } from "$components/layout/MetaTags.tsx";
+import { ResourceHints } from "$components/layout/PerformanceUtils.tsx";
 import { Head, Partial } from "$fresh/runtime.ts";
 import { type PageProps } from "$fresh/server.ts";
 import { Header } from "$header";
@@ -38,13 +39,8 @@ export default function App({ Component, state, url }: PageProps<unknown>) {
           skipOgMeta={isStampPage}
         />
 
-        {/* ===== RESOURCE PRELOADING ===== */}
-        <link
-          rel="preconnect"
-          href="https://esm.sh"
-          crossOrigin="anonymous"
-          as="script"
-        />
+        {/* ===== ENHANCED RESOURCE PRELOADING ===== */}
+        <ResourceHints />
 
         {/* ===== VANTA.JS DEPENDENCIES ===== */}
         <link

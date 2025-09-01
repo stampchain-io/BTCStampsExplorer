@@ -6,7 +6,9 @@ import { describe, it } from "jsr:@std/testing@1.0.14/bdd";
 describe("SRC20CompressionService", () => {
   describe("zLibCompress", () => {
     it("should compress data successfully", async () => {
-      const testData = new TextEncoder().encode("Hello, World! This is a test string that should compress well.");
+      const testData = new TextEncoder().encode(
+        "Hello, World! This is a test string that should compress well.",
+      );
       const compressed = await SRC20CompressionService.zLibCompress(testData);
 
       assertInstanceOf(compressed, Uint8Array);
@@ -48,7 +50,7 @@ describe("SRC20CompressionService", () => {
       // Test with data that might stress the compression system
       const hugeData = new Uint8Array(100000); // 100KB of data
       for (let i = 0; i < hugeData.length; i++) {
-        hugeData[i] = (i % 256);
+        hugeData[i] = i % 256;
       }
 
       const result = await SRC20CompressionService.zLibCompress(hugeData);
@@ -74,9 +76,15 @@ describe("SRC20CompressionService", () => {
 
   describe("zLibUncompress", () => {
     it("should uncompress previously compressed data", async () => {
-      const originalData = new TextEncoder().encode("Hello, World! This is a test string for compression and decompression.");
-      const compressed = await SRC20CompressionService.zLibCompress(originalData);
-      const uncompressed = await SRC20CompressionService.zLibUncompress(compressed);
+      const originalData = new TextEncoder().encode(
+        "Hello, World! This is a test string for compression and decompression.",
+      );
+      const compressed = await SRC20CompressionService.zLibCompress(
+        originalData,
+      );
+      const uncompressed = await SRC20CompressionService.zLibUncompress(
+        compressed,
+      );
 
       assertInstanceOf(uncompressed, Uint8Array);
       // If compression worked, uncompressed should match original
@@ -104,15 +112,26 @@ describe("SRC20CompressionService", () => {
     it("should handle large compressed data", async () => {
       const largeData = new Uint8Array(2000).fill(66); // 2000 'B' characters
       const compressed = await SRC20CompressionService.zLibCompress(largeData);
-      const uncompressed = await SRC20CompressionService.zLibUncompress(compressed);
+      const uncompressed = await SRC20CompressionService.zLibUncompress(
+        compressed,
+      );
 
       assertInstanceOf(uncompressed, Uint8Array);
     });
 
     it("should handle malformed zlib header", async () => {
       // Create data that looks like it might be compressed but has invalid header
-      const malformedData = new Uint8Array([0x78, 0x9C, 0xFF, 0xFF, 0xFF, 0xFF]);
-      const result = await SRC20CompressionService.zLibUncompress(malformedData);
+      const malformedData = new Uint8Array([
+        0x78,
+        0x9C,
+        0xFF,
+        0xFF,
+        0xFF,
+        0xFF,
+      ]);
+      const result = await SRC20CompressionService.zLibUncompress(
+        malformedData,
+      );
 
       assertInstanceOf(result, Uint8Array);
       // Should gracefully handle malformed data and return original
@@ -121,8 +140,12 @@ describe("SRC20CompressionService", () => {
 
     it("should handle corrupted compressed data", async () => {
       // Start with valid compressed data then corrupt it
-      const originalData = new TextEncoder().encode("This is test data for corruption testing that is long enough to compress.");
-      const compressed = await SRC20CompressionService.zLibCompress(originalData);
+      const originalData = new TextEncoder().encode(
+        "This is test data for corruption testing that is long enough to compress.",
+      );
+      const compressed = await SRC20CompressionService.zLibCompress(
+        originalData,
+      );
 
       // Corrupt the compressed data if it's actually compressed
       if (!arraysEqual(compressed, originalData) && compressed.length > 5) {
@@ -142,7 +165,9 @@ describe("SRC20CompressionService", () => {
         largeInvalidData[i] = Math.floor(Math.random() * 256);
       }
 
-      const result = await SRC20CompressionService.zLibUncompress(largeInvalidData);
+      const result = await SRC20CompressionService.zLibUncompress(
+        largeInvalidData,
+      );
       assertInstanceOf(result, Uint8Array);
       // Should handle large invalid data gracefully
     });
@@ -166,7 +191,9 @@ describe("SRC20CompressionService", () => {
     });
 
     it("should attempt compression for data longer than 32 bytes", async () => {
-      const longData = new TextEncoder().encode("This is a very long string that is definitely longer than 32 bytes and should trigger compression logic in the service.");
+      const longData = new TextEncoder().encode(
+        "This is a very long string that is definitely longer than 32 bytes and should trigger compression logic in the service.",
+      );
       const result = await SRC20CompressionService.compressWithCheck(longData);
 
       assertInstanceOf(result.compressedData, Uint8Array);
@@ -183,14 +210,19 @@ describe("SRC20CompressionService", () => {
 
     it("should handle highly compressible data", async () => {
       const repetitiveData = new Uint8Array(100).fill(65); // 100 'A' characters - highly compressible
-      const result = await SRC20CompressionService.compressWithCheck(repetitiveData);
+      const result = await SRC20CompressionService.compressWithCheck(
+        repetitiveData,
+      );
 
       assertInstanceOf(result.compressedData, Uint8Array);
       assertEquals(typeof result.compressed, "boolean");
 
       // This type of data should compress well if compression is working
       if (result.compressed) {
-        assertEquals(result.compressedData.length < repetitiveData.length, true);
+        assertEquals(
+          result.compressedData.length < repetitiveData.length,
+          true,
+        );
       }
     });
 
@@ -200,7 +232,9 @@ describe("SRC20CompressionService", () => {
         randomData[i] = Math.floor(Math.random() * 256);
       }
 
-      const result = await SRC20CompressionService.compressWithCheck(randomData);
+      const result = await SRC20CompressionService.compressWithCheck(
+        randomData,
+      );
 
       assertInstanceOf(result.compressedData, Uint8Array);
       assertEquals(typeof result.compressed, "boolean");
@@ -212,12 +246,16 @@ describe("SRC20CompressionService", () => {
     });
 
     it("should verify round-trip integrity", async () => {
-      const testData = new TextEncoder().encode("Test data for round-trip verification that is longer than 32 bytes to trigger compression logic.");
+      const testData = new TextEncoder().encode(
+        "Test data for round-trip verification that is longer than 32 bytes to trigger compression logic.",
+      );
       const result = await SRC20CompressionService.compressWithCheck(testData);
 
       if (result.compressed) {
         // If compression succeeded, verify we can decompress back to original
-        const decompressed = await SRC20CompressionService.zLibUncompress(result.compressedData);
+        const decompressed = await SRC20CompressionService.zLibUncompress(
+          result.compressedData,
+        );
         assertEquals(arraysEqual(decompressed, testData), true);
       } else {
         // If compression didn't happen, data should be unchanged
@@ -252,7 +290,9 @@ describe("SRC20CompressionService", () => {
       // Result should always be valid
       if (result.compressed) {
         // If marked as compressed, should be able to decompress to original
-        const decompressed = await SRC20CompressionService.zLibUncompress(result.compressedData);
+        const decompressed = await SRC20CompressionService.zLibUncompress(
+          result.compressedData,
+        );
         assertEquals(arraysEqual(decompressed, testData), true);
       }
     });
@@ -293,7 +333,9 @@ describe("SRC20CompressionService", () => {
 
       // If compression was marked as successful, the round-trip should work
       if (result.compressed) {
-        const decompressed = await SRC20CompressionService.zLibUncompress(result.compressedData);
+        const decompressed = await SRC20CompressionService.zLibUncompress(
+          result.compressedData,
+        );
         assertEquals(arraysEqual(decompressed, testData), true);
       } else {
         // If not compressed, should be original data
@@ -308,24 +350,34 @@ describe("SRC20CompressionService", () => {
         poorCompressionData[i] = Math.floor(Math.random() * 256);
       }
 
-      const result = await SRC20CompressionService.compressWithCheck(poorCompressionData);
+      const result = await SRC20CompressionService.compressWithCheck(
+        poorCompressionData,
+      );
 
       assertInstanceOf(result.compressedData, Uint8Array);
       assertEquals(typeof result.compressed, "boolean");
 
       // If compression doesn't save space, should return original data
       if (!result.compressed) {
-        assertEquals(arraysEqual(result.compressedData, poorCompressionData), true);
+        assertEquals(
+          arraysEqual(result.compressedData, poorCompressionData),
+          true,
+        );
       } else {
         // If marked as compressed, compressed data should be smaller
-        assertEquals(result.compressedData.length < poorCompressionData.length, true);
+        assertEquals(
+          result.compressedData.length < poorCompressionData.length,
+          true,
+        );
       }
     });
   });
 
   describe("Direct function exports", () => {
     it("should export zLibCompress function", async () => {
-      const { zLibCompress } = await import("$server/services/src20/compression/compressionService.ts");
+      const { zLibCompress } = await import(
+        "$server/services/src20/compression/compressionService.ts"
+      );
       assertEquals(typeof zLibCompress, "function");
 
       const testData = new TextEncoder().encode("Test");
@@ -334,7 +386,9 @@ describe("SRC20CompressionService", () => {
     });
 
     it("should export zLibUncompress function", async () => {
-      const { zLibUncompress } = await import("$server/services/src20/compression/compressionService.ts");
+      const { zLibUncompress } = await import(
+        "$server/services/src20/compression/compressionService.ts"
+      );
       assertEquals(typeof zLibUncompress, "function");
 
       const testData = new TextEncoder().encode("Test");
@@ -343,7 +397,9 @@ describe("SRC20CompressionService", () => {
     });
 
     it("should export compressWithCheck function", async () => {
-      const { compressWithCheck } = await import("$server/services/src20/compression/compressionService.ts");
+      const { compressWithCheck } = await import(
+        "$server/services/src20/compression/compressionService.ts"
+      );
       assertEquals(typeof compressWithCheck, "function");
 
       const testData = new TextEncoder().encode("Test");
@@ -357,13 +413,19 @@ describe("SRC20CompressionService", () => {
     it("should handle null-like data gracefully", async () => {
       const emptyArray = new Uint8Array(0);
 
-      const compressResult = await SRC20CompressionService.zLibCompress(emptyArray);
+      const compressResult = await SRC20CompressionService.zLibCompress(
+        emptyArray,
+      );
       assertInstanceOf(compressResult, Uint8Array);
 
-      const uncompressResult = await SRC20CompressionService.zLibUncompress(emptyArray);
+      const uncompressResult = await SRC20CompressionService.zLibUncompress(
+        emptyArray,
+      );
       assertInstanceOf(uncompressResult, Uint8Array);
 
-      const checkResult = await SRC20CompressionService.compressWithCheck(emptyArray);
+      const checkResult = await SRC20CompressionService.compressWithCheck(
+        emptyArray,
+      );
       assertEquals(checkResult.compressed, false);
       assertEquals(arraysEqual(checkResult.compressedData, emptyArray), true);
     });
@@ -380,13 +442,19 @@ describe("SRC20CompressionService", () => {
     });
 
     it("should maintain data integrity across multiple operations", async () => {
-      const originalData = new TextEncoder().encode("Multi-operation test data that is definitely longer than 32 bytes for comprehensive testing.");
+      const originalData = new TextEncoder().encode(
+        "Multi-operation test data that is definitely longer than 32 bytes for comprehensive testing.",
+      );
 
       // First compress with check
-      const firstResult = await SRC20CompressionService.compressWithCheck(originalData);
+      const firstResult = await SRC20CompressionService.compressWithCheck(
+        originalData,
+      );
 
       // Then compress the result again
-      const secondResult = await SRC20CompressionService.compressWithCheck(firstResult.compressedData);
+      const secondResult = await SRC20CompressionService.compressWithCheck(
+        firstResult.compressedData,
+      );
 
       assertInstanceOf(firstResult.compressedData, Uint8Array);
       assertInstanceOf(secondResult.compressedData, Uint8Array);
@@ -400,13 +468,19 @@ describe("SRC20CompressionService", () => {
         binaryData[i] = i % 10 === 0 ? 0 : (i % 256); // Include null bytes
       }
 
-      const compressResult = await SRC20CompressionService.zLibCompress(binaryData);
+      const compressResult = await SRC20CompressionService.zLibCompress(
+        binaryData,
+      );
       assertInstanceOf(compressResult, Uint8Array);
 
-      const uncompressResult = await SRC20CompressionService.zLibUncompress(compressResult);
+      const uncompressResult = await SRC20CompressionService.zLibUncompress(
+        compressResult,
+      );
       assertInstanceOf(uncompressResult, Uint8Array);
 
-      const checkResult = await SRC20CompressionService.compressWithCheck(binaryData);
+      const checkResult = await SRC20CompressionService.compressWithCheck(
+        binaryData,
+      );
       assertInstanceOf(checkResult.compressedData, Uint8Array);
       assertEquals(typeof checkResult.compressed, "boolean");
     });
@@ -426,7 +500,9 @@ describe("SRC20CompressionService", () => {
         }
       }
 
-      const result = await SRC20CompressionService.compressWithCheck(problematicData);
+      const result = await SRC20CompressionService.compressWithCheck(
+        problematicData,
+      );
       assertInstanceOf(result.compressedData, Uint8Array);
       assertEquals(typeof result.compressed, "boolean");
 
@@ -438,7 +514,9 @@ describe("SRC20CompressionService", () => {
   describe("Performance and boundary conditions", () => {
     it("should handle data at 32-byte boundary", async () => {
       const boundaryData = new Uint8Array(32).fill(65);
-      const result = await SRC20CompressionService.compressWithCheck(boundaryData);
+      const result = await SRC20CompressionService.compressWithCheck(
+        boundaryData,
+      );
 
       assertEquals(result.compressed, false);
       assertEquals(arraysEqual(result.compressedData, boundaryData), true);
@@ -446,7 +524,9 @@ describe("SRC20CompressionService", () => {
 
     it("should handle data just over 32-byte boundary", async () => {
       const overBoundaryData = new Uint8Array(33).fill(65);
-      const result = await SRC20CompressionService.compressWithCheck(overBoundaryData);
+      const result = await SRC20CompressionService.compressWithCheck(
+        overBoundaryData,
+      );
 
       assertInstanceOf(result.compressedData, Uint8Array);
       assertEquals(typeof result.compressed, "boolean");
@@ -455,10 +535,14 @@ describe("SRC20CompressionService", () => {
     it("should handle single byte data", async () => {
       const singleByte = new Uint8Array([65]);
 
-      const compressResult = await SRC20CompressionService.zLibCompress(singleByte);
+      const compressResult = await SRC20CompressionService.zLibCompress(
+        singleByte,
+      );
       assertInstanceOf(compressResult, Uint8Array);
 
-      const checkResult = await SRC20CompressionService.compressWithCheck(singleByte);
+      const checkResult = await SRC20CompressionService.compressWithCheck(
+        singleByte,
+      );
       assertEquals(checkResult.compressed, false);
       assertEquals(arraysEqual(checkResult.compressedData, singleByte), true);
     });
@@ -483,7 +567,9 @@ describe("SRC20CompressionService", () => {
 
       for (const size of sizes) {
         const testData = new Uint8Array(size).fill(65);
-        const result = await SRC20CompressionService.compressWithCheck(testData);
+        const result = await SRC20CompressionService.compressWithCheck(
+          testData,
+        );
 
         assertInstanceOf(result.compressedData, Uint8Array);
         assertEquals(typeof result.compressed, "boolean");
@@ -497,12 +583,16 @@ describe("SRC20CompressionService", () => {
     });
 
     it("should handle repeated compression attempts on same data", async () => {
-      const testData = new TextEncoder().encode("Repeated compression test data that is longer than 32 bytes to trigger compression logic multiple times.");
+      const testData = new TextEncoder().encode(
+        "Repeated compression test data that is longer than 32 bytes to trigger compression logic multiple times.",
+      );
 
       // Perform multiple compression operations on the same data
       const results = [];
       for (let i = 0; i < 5; i++) {
-        const result = await SRC20CompressionService.compressWithCheck(testData);
+        const result = await SRC20CompressionService.compressWithCheck(
+          testData,
+        );
         results.push(result);
 
         assertInstanceOf(result.compressedData, Uint8Array);
@@ -512,7 +602,10 @@ describe("SRC20CompressionService", () => {
       // All results should be consistent
       for (let i = 1; i < results.length; i++) {
         assertEquals(results[i].compressed, results[0].compressed);
-        assertEquals(arraysEqual(results[i].compressedData, results[0].compressedData), true);
+        assertEquals(
+          arraysEqual(results[i].compressedData, results[0].compressedData),
+          true,
+        );
       }
     });
   });
@@ -520,19 +613,27 @@ describe("SRC20CompressionService", () => {
   describe("Initialization and system behavior", () => {
     it("should handle initialization gracefully", async () => {
       // Test that the service works even if initialization has issues
-      const testData = new TextEncoder().encode("Test data for initialization handling");
+      const testData = new TextEncoder().encode(
+        "Test data for initialization handling",
+      );
 
-      const compressResult = await SRC20CompressionService.zLibCompress(testData);
+      const compressResult = await SRC20CompressionService.zLibCompress(
+        testData,
+      );
       assertInstanceOf(compressResult, Uint8Array);
 
-      const uncompressResult = await SRC20CompressionService.zLibUncompress(testData);
+      const uncompressResult = await SRC20CompressionService.zLibUncompress(
+        testData,
+      );
       assertInstanceOf(uncompressResult, Uint8Array);
 
       // Service should always return valid Uint8Array even if initialization fails
     });
 
     it("should handle multiple concurrent operations", async () => {
-      const testData = new TextEncoder().encode("Concurrent operation test data that is longer than 32 bytes to trigger compression.");
+      const testData = new TextEncoder().encode(
+        "Concurrent operation test data that is longer than 32 bytes to trigger compression.",
+      );
 
       // Start multiple operations concurrently
       const operations = [];
@@ -551,7 +652,10 @@ describe("SRC20CompressionService", () => {
       // All results should be identical
       for (let i = 1; i < results.length; i++) {
         assertEquals(results[i].compressed, results[0].compressed);
-        assertEquals(arraysEqual(results[i].compressedData, results[0].compressedData), true);
+        assertEquals(
+          arraysEqual(results[i].compressedData, results[0].compressedData),
+          true,
+        );
       }
     });
   });

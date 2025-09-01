@@ -13,7 +13,7 @@
   },
   "insufficientFundsTest": {
     "description": "UTXO with stamp attached but insufficient BTC to cover detach fees",
-    "cpid": "A12301588492677696204", 
+    "cpid": "A12301588492677696204",
     "utxo": "a5b51bd8e9f01ce59bfa7e4f7cbdd9b3a642a6068b21ab181cdd5a11cf0ff1dd:0",
     "destination": "bc1qzxszplp8v7w0jc89dlrqyct9staqlhwxzy7lkq",
     "mock_utxo_balance": 1191,

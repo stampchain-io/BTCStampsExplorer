@@ -9,10 +9,7 @@
  * - Accessibility utilities
  */
 
-import {
-  assertEquals,
-  assertExists,
-} from "@std/assert";
+import { assertEquals, assertExists } from "@std/assert";
 import {
   ErrorHandlingUtils,
   ErrorSeverity,

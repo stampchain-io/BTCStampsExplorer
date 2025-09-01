@@ -12,14 +12,14 @@ import type { RecentSaleCardProps } from "$types/ui.d.ts";
 export function RecentSaleCard({
   sale,
   showFullDetails = false,
-  btcPriceUSD = 0,
+  btc_price_usd = 0,
 }: RecentSaleCardProps) {
   const explorerBaseUrl = "https://mempool.space/tx/";
   const addressExplorerUrl = "https://mempool.space/address/";
 
   // Calculate USD value if BTC price is available
-  const usdValue = btcPriceUSD && sale.sale_data?.btc_amount
-    ? sale.sale_data.btc_amount * btcPriceUSD
+  const usdValue = btc_price_usd && sale.sale_data?.btc_amount
+    ? sale.sale_data.btc_amount * btc_price_usd
     : null;
 
   // Generate accessibility labels

@@ -6,6 +6,7 @@ import { Handlers } from "$fresh/server.ts";
 
 import { WalletDashboardHeader } from "$header";
 import WalletDashboardDetails from "$islands/content/WalletDashboardDetails.tsx";
+import { headerSpacing } from "$layout";
 import type { PaginatedResponse } from "$lib/types/pagination.d.ts";
 import { getBTCBalanceInfo } from "$lib/utils/data/processing/balanceUtils.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
@@ -311,7 +312,11 @@ export default function DashboardPage(props: WalletPageProps) {
 
   /* ===== RENDER ===== */
   return (
-    <div class="flex flex-col gap-6" f-client-nav data-partial="/dashboard">
+    <div
+      class={`${headerSpacing} gap-6`}
+      f-client-nav
+      data-partial="/dashboard"
+    >
       <WalletDashboardHeader />
       <WalletDashboardDetails
         walletData={walletData as WalletOverviewInfo}

@@ -5,7 +5,8 @@ import { Handlers } from "$fresh/server.ts";
 
 import { FRONTEND_STAMP_TYPE_VALUES } from "$constants";
 import { StampOverviewHeader } from "$header";
-import { createFreshPaginationHandler } from "$utils/navigation/freshNavigationUtils.ts";
+import { headerSpacing } from "$layout";
+
 import {
   queryParamsToFilters,
   queryParamsToServicePayload,
@@ -65,7 +66,7 @@ export const handler: Handlers = {
       let recentSalesData: StampSaleRow[] = [];
 
       if (recentSales) {
-        // ✅ FIX: When recentSales=true, fetch from optimized internal API endpoint
+        // ✅ FIX: Use API endpoint (proper architectural separation)
         try {
           const recentSalesParams = new URLSearchParams({
             page: page.toString(),
@@ -76,65 +77,102 @@ export const handler: Handlers = {
             type: typeFilter, // Add stamp type filtering
           });
 
-          const recentSalesResponse = await httpClient.get(
+          // Use fetch with proper headers for internal API access
+          const response = await fetch(
             `${baseUrl}/api/internal/stamp-recent-sales?${recentSalesParams}`,
             {
-              headers: {},
+              headers: {
+                "X-API-Version": "2.3",
+                "User-Agent": "Mozilla/5.0 (compatible; StampChain/2.0)",
+                "Accept": "application/json",
+                "Origin": baseUrl,
+                "Referer": `${baseUrl}/stamp`,
+                "Host": new URL(baseUrl).host,
+              },
             },
           );
 
-          if (!recentSalesResponse.ok) {
+          if (!response.ok) {
             console.error(
               "[Recent Sales API Error]",
-              recentSalesResponse.status,
+              response.status,
+              await response.text(),
             );
             throw new Error(
-              `Recent sales API failed: ${recentSalesResponse.status}`,
+              `Recent sales API failed: ${response.status}`,
             );
           }
 
           // Extract data (handle API wrapper format)
-          const salesResult = recentSalesResponse.data?.data ||
-            recentSalesResponse.data || [];
+          const result = await response.json();
+          const salesResult = result.data || [];
           recentSalesData = Array.isArray(salesResult) ? salesResult : [];
 
-          // ✅ FIX: Format as stamps data for StampOverviewContent
+          // Debug: Check received data for stamp_url issues
+          recentSalesData.forEach((sale: any, index: number) => {
+            if (!sale.stamp_url) {
+              console.warn(
+                `[Frontend] Sale ${index} missing stamp_url. Received data:`,
+                {
+                  stamp: sale.stamp,
+                  stamp_url: sale.stamp_url,
+                  stamp_mimetype: sale.stamp_mimetype,
+                  has_stamp_url: "stamp_url" in sale,
+                  stamp_url_type: typeof sale.stamp_url,
+                },
+              );
+            }
+          });
+
+          // ✅ PRACTICAL FIX: Handle potential data processing issues with fallback
           stampsData = {
-            data: recentSalesData.map((sale) => ({
-              stamp: sale.stamp_number,
-              cpid: sale.cpid,
-              tx_hash: sale.tx_hash,
-              tx_index: 0, // Default to 0, as transaction index is not available in StampSaleRow
-              block_index: sale.block_index,
-              block_time: sale.timestamp,
-              stamp_base64: "", // Default empty string for StampSaleRow
-              stamp_url: "", // Default empty string for StampSaleRow
-              stamp_mimetype: "", // Default empty string for StampSaleRow
-              stamp_hash: "", // Default empty string for StampSaleRow
-              file_hash: "", // Default empty string for StampSaleRow
-              file_size_bytes: null, // Not available in StampSaleRow
-              ident: "STAMP" as const, // Default to STAMP for sales data
-              creator: sale.seller,
-              creator_name: null, // Not available in StampSaleRow
-              divisible: false, // Assuming not divisible, as it's not in StampSaleRow
-              keyburn: null, // Not available in StampSaleRow
-              locked: 0, // Assuming not locked, as it's not in StampSaleRow
-              supply: 0, // Assuming zero supply, as it's not in StampSaleRow
-              unbound_quantity: 0, // Default to 0
-              sale_data: {
-                btc_amount: sale.price_btc,
-                block_index: sale.block_index,
+            data: recentSalesData.map((sale: any) => {
+              // Debug: Check if stamp_url is actually missing/invalid
+              if (
+                !sale.stamp_url || sale.stamp_url === "" ||
+                sale.stamp_url.includes("undefined") ||
+                sale.stamp_url.includes("null")
+              ) {
+                console.warn(
+                  `[Recent Sales] Invalid stamp_url for stamp ${sale.stamp}: "${sale.stamp_url}". Using fallback.`,
+                );
+              }
+
+              return {
+                stamp: sale.stamp,
+                cpid: sale.cpid,
                 tx_hash: sale.tx_hash,
-              },
-            })),
+                tx_index: 0,
+                block_index: sale.block_index,
+                block_time: sale.timestamp,
+                stamp_base64: "",
+                // Use stamp content route as reliable fallback for any invalid URLs
+                stamp_url: (sale.stamp_url && sale.stamp_url !== "" &&
+                    !sale.stamp_url.includes("undefined") &&
+                    !sale.stamp_url.includes("null"))
+                  ? sale.stamp_url
+                  : `/s/${sale.stamp}`,
+                stamp_mimetype: sale.stamp_mimetype || "",
+                stamp_hash: "",
+                file_hash: "",
+                file_size_bytes: null,
+                ident: "STAMP" as const,
+                creator: sale.creator || sale.source,
+                creator_name: sale.creator_name,
+                divisible: false,
+                keyburn: null,
+                locked: 0,
+                // For recent sales, show transaction quantity instead of total supply
+                supply: sale.sale_data?.dispense_quantity || 1,
+                unbound_quantity: sale.sale_data?.dispense_quantity || 1,
+                sale_data: sale.sale_data,
+              };
+            }),
             pagination: {
-              total: recentSalesResponse.data?.total || recentSalesData.length,
-              page: page,
-              totalPages: recentSalesResponse.data?.totalPages ||
-                Math.ceil(
-                  (recentSalesResponse.data?.total || recentSalesData.length) /
-                    page_size,
-                ),
+              total: result.total || 0,
+              page: result.page || page,
+              totalPages: result.total_pages ||
+                Math.ceil((result.total || 0) / page_size),
             },
           };
 
@@ -352,7 +390,11 @@ export function StampOverviewPage(props: StampPageProps) {
 
   /* ===== RENDER ===== */
   return (
-    <div class="w-full" f-client-nav data-partial="/stamp">
+    <div
+      class={`${headerSpacing} w-full`}
+      f-client-nav
+      data-partial="/stamp"
+    >
       {/* Header Component with Filter Controls */}
       <StampOverviewHeader
         currentFilters={filters as StampFilters}
@@ -365,7 +407,7 @@ export function StampOverviewPage(props: StampPageProps) {
         pagination={{
           page,
           totalPages,
-          onPageChange: createFreshPaginationHandler("/stamp"),
+          // Remove onPageChange to let Pagination component use its built-in Fresh navigation
         }}
       />
     </div>

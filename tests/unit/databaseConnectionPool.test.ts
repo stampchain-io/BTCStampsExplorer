@@ -1,8 +1,4 @@
-import {
-  assertEquals,
-  assertExists,
-  assertRejects,
-} from "@std/assert";
+import { assertEquals, assertExists, assertRejects } from "@std/assert";
 import { beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
 import { assertSpyCall, spy } from "@std/testing@1.0.14/mock";
 import { Client } from "mysql/mod.ts";
@@ -34,36 +30,36 @@ class MockDatabaseManager {
     warn: spy(),
     error: spy(),
   };
-  
+
   // Expose methods for test manipulation
   _setPool(pool: Client[]) {
     this.pool = pool;
   }
-  
+
   _getPool() {
     return this.pool;
   }
-  
+
   _setActiveConnections(count: number) {
     this.activeConnections = count;
   }
-  
+
   _getActiveConnections() {
     return this.activeConnections;
   }
-  
+
   _getLogger() {
     return this.logger;
   }
-  
+
   _setConnectionLimit(limit: number) {
     this.CONNECTION_LIMIT = limit;
   }
-  
+
   _setMinConnections(min: number) {
     this.MIN_CONNECTIONS = min;
   }
-  
+
   _setAcquireTimeout(timeout: number) {
     this.ACQUIRE_TIMEOUT = timeout;
   }
@@ -71,7 +67,7 @@ class MockDatabaseManager {
   async warmupConnectionPool(): Promise<void> {
     const connectionsToCreate = Math.min(
       this.MIN_CONNECTIONS,
-      this.CONNECTION_LIMIT
+      this.CONNECTION_LIMIT,
     );
 
     for (let i = 0; i < connectionsToCreate; i++) {
@@ -79,12 +75,14 @@ class MockDatabaseManager {
         const client = await this.createNewConnection();
         this.pool.push(client);
       } catch (error) {
-        this.logger.warn(`Failed to create warmup connection ${i + 1}: ${error}`);
+        this.logger.warn(
+          `Failed to create warmup connection ${i + 1}: ${error}`,
+        );
       }
     }
 
     this.logger.info(
-      `Connection pool warmed up with ${this.pool.length} connections`
+      `Connection pool warmed up with ${this.pool.length} connections`,
     );
   }
 
@@ -126,7 +124,7 @@ class MockDatabaseManager {
     }
 
     throw new Error(
-      `Connection pool exhausted. Active: ${this.activeConnections}/${this.CONNECTION_LIMIT}`
+      `Connection pool exhausted. Active: ${this.activeConnections}/${this.CONNECTION_LIMIT}`,
     );
   }
 
@@ -134,7 +132,7 @@ class MockDatabaseManager {
     this.activeConnections = Math.max(0, this.activeConnections - 1);
     this.pool.push(client);
     this.logger.info(
-      `Connection released. Pool size: ${this.pool.length}, Active: ${this.activeConnections}`
+      `Connection released. Pool size: ${this.pool.length}, Active: ${this.activeConnections}`,
     );
   }
 
@@ -167,11 +165,11 @@ class MockDatabaseManager {
       totalConnections: this.pool.length + this.activeConnections,
       connectionLimit: this.CONNECTION_LIMIT,
       utilizationPercent: Math.round(
-        (this.activeConnections / this.CONNECTION_LIMIT) * 100
+        (this.activeConnections / this.CONNECTION_LIMIT) * 100,
       ),
     };
   }
-  
+
   // Test helper method to simulate connection creation failures
   _setCreateNewConnectionError(error: Error | null) {
     if (error) {
@@ -198,7 +196,7 @@ describe("Database Connection Pool Management", () => {
   describe("Connection Pool Warmup", () => {
     it("should warm up pool to minimum connections", async () => {
       await dbManager.warmupConnectionPool();
-      
+
       const metrics = dbManager.getPoolMetrics();
       assertEquals(metrics.poolSize, mockConfig.minConnections);
       assertEquals(metrics.activeConnections, 0);
@@ -209,11 +207,11 @@ describe("Database Connection Pool Management", () => {
       dbManager._setCreateNewConnectionError(new Error("Connection failed"));
 
       await dbManager.warmupConnectionPool();
-      
+
       // Should log warnings but not throw
       const metrics = dbManager.getPoolMetrics();
       assertEquals(metrics.poolSize, 0);
-      
+
       // Verify logger was called
       const logger = dbManager._getLogger();
       assertEquals(logger.warn.calls.length >= 2, true);
@@ -225,7 +223,7 @@ describe("Database Connection Pool Management", () => {
       dbManager._setConnectionLimit(10);
 
       await dbManager.warmupConnectionPool();
-      
+
       const metrics = dbManager.getPoolMetrics();
       assertEquals(metrics.poolSize <= 10, true);
     });
@@ -235,10 +233,10 @@ describe("Database Connection Pool Management", () => {
     it("should get connection from pool", async () => {
       // Pre-populate pool
       await dbManager.warmupConnectionPool();
-      
+
       const client = await dbManager.getClient();
       assertExists(client);
-      
+
       const metrics = dbManager.getPoolMetrics();
       assertEquals(metrics.activeConnections, 1);
       assertEquals(metrics.poolSize, mockConfig.minConnections - 1);
@@ -248,7 +246,7 @@ describe("Database Connection Pool Management", () => {
       // Don't warm up pool
       const client = await dbManager.getClient();
       assertExists(client);
-      
+
       const metrics = dbManager.getPoolMetrics();
       assertEquals(metrics.activeConnections, 1);
       assertEquals(metrics.poolSize, 0);
@@ -256,7 +254,7 @@ describe("Database Connection Pool Management", () => {
 
     it("should validate connections before returning", async () => {
       await dbManager.warmupConnectionPool();
-      
+
       // Mark first connection as invalid
       const pool = dbManager._getPool();
       if (pool[0]) {
@@ -265,7 +263,7 @@ describe("Database Connection Pool Management", () => {
 
       const client = await dbManager.getClient();
       assertExists(client);
-      
+
       // Should have skipped invalid connection
       assertEquals((client as any).isValid !== false, true);
     });
@@ -284,7 +282,7 @@ describe("Database Connection Pool Management", () => {
       await assertRejects(
         () => dbManager.getClient(),
         Error,
-        "Connection pool exhausted"
+        "Connection pool exhausted",
       );
     });
 
@@ -310,27 +308,27 @@ describe("Database Connection Pool Management", () => {
     it("should release connection back to pool", async () => {
       const client = await dbManager.getClient();
       const metricsBeforeRelease = dbManager.getPoolMetrics();
-      
+
       dbManager.releaseClient(client);
-      
+
       const metricsAfterRelease = dbManager.getPoolMetrics();
       assertEquals(
         metricsAfterRelease.poolSize,
-        metricsBeforeRelease.poolSize + 1
+        metricsBeforeRelease.poolSize + 1,
       );
       assertEquals(
         metricsAfterRelease.activeConnections,
-        metricsBeforeRelease.activeConnections - 1
+        metricsBeforeRelease.activeConnections - 1,
       );
     });
 
     it("should handle negative active connections", () => {
       // Force negative scenario
       dbManager._setActiveConnections(0);
-      
+
       const client = new Client();
       dbManager.releaseClient(client);
-      
+
       const metrics = dbManager.getPoolMetrics();
       assertEquals(metrics.activeConnections, 0); // Should not go negative
     });
@@ -340,9 +338,9 @@ describe("Database Connection Pool Management", () => {
     it("should close connection gracefully", async () => {
       const client = new Client();
       const closeSpy = spy(client, "close");
-      
+
       await dbManager.closeClient(client);
-      
+
       assertSpyCall(closeSpy, 0);
     });
 
@@ -352,10 +350,10 @@ describe("Database Connection Pool Management", () => {
       client.close = async () => {
         throw new Error("Close failed");
       };
-      
+
       // Should not throw
       await dbManager.closeClient(client);
-      
+
       // Should log error
       const logger = dbManager._getLogger();
       assertEquals(logger.error.calls.length >= 1, true);
@@ -377,7 +375,7 @@ describe("Database Connection Pool Management", () => {
 
     it("should report accurate total connections", async () => {
       await dbManager.warmupConnectionPool();
-      
+
       // Acquire some connections
       await dbManager.getClient();
       await dbManager.getClient();
@@ -385,7 +383,7 @@ describe("Database Connection Pool Management", () => {
       const metrics = dbManager.getPoolMetrics();
       assertEquals(
         metrics.totalConnections,
-        metrics.poolSize + metrics.activeConnections
+        metrics.poolSize + metrics.activeConnections,
       );
     });
   });
@@ -393,7 +391,7 @@ describe("Database Connection Pool Management", () => {
   describe("Edge Cases", () => {
     it("should handle rapid acquire/release cycles", async () => {
       const cycles = 20;
-      
+
       for (let i = 0; i < cycles; i++) {
         const client = await dbManager.getClient();
         dbManager.releaseClient(client);
@@ -413,7 +411,7 @@ describe("Database Connection Pool Management", () => {
       }
 
       const clients = await Promise.all(promises);
-      
+
       assertEquals(clients.length, concurrentRequests);
       const metrics = dbManager.getPoolMetrics();
       assertEquals(metrics.activeConnections, concurrentRequests);
@@ -421,7 +419,7 @@ describe("Database Connection Pool Management", () => {
 
     it("should recover from validation failures", async () => {
       await dbManager.warmupConnectionPool();
-      
+
       // Mark all connections as invalid
       const pool = dbManager._getPool();
       for (const conn of pool) {

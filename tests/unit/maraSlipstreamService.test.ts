@@ -4,7 +4,12 @@ import {
   assertRejects,
   assertStringIncludes,
 } from "@std/assert";
-import { afterEach, beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  it,
+} from "jsr:@std/testing@1.0.14/bdd";
 import { assertSpyCalls, spy } from "@std/testing@1.0.14/mock";
 import { MaraSlipstreamService } from "$/server/services/mara/maraSlipstreamService.ts";
 import type {
@@ -13,7 +18,9 @@ import type {
 } from "$/server/services/mara/types.ts";
 
 // Mock fixture for API responses
-const createMockFeeRateResponse = (overrides?: Partial<MaraFeeRateResponse>): MaraFeeRateResponse => ({
+const createMockFeeRateResponse = (
+  overrides?: Partial<MaraFeeRateResponse>,
+): MaraFeeRateResponse => ({
   fee_rate: 3.0,
   block_height: 800000,
   network: "mainnet",
@@ -22,7 +29,9 @@ const createMockFeeRateResponse = (overrides?: Partial<MaraFeeRateResponse>): Ma
   ...overrides,
 });
 
-const createMockSubmissionResponse = (overrides?: Partial<MaraSubmissionResponse>): MaraSubmissionResponse => ({
+const createMockSubmissionResponse = (
+  overrides?: Partial<MaraSubmissionResponse>,
+): MaraSubmissionResponse => ({
   status: "accepted",
   txid: "a".repeat(64),
   submission_time: Date.now(),
@@ -35,7 +44,7 @@ const createMockSubmissionResponse = (overrides?: Partial<MaraSubmissionResponse
 class TestableMaraSlipstreamService extends MaraSlipstreamService {
   static _testConfig: any = undefined;
   static _testHttpClient: any = null;
-  
+
   static get config() {
     // If _testConfig is explicitly set to null, return null
     if (this._testConfig === null) {
@@ -48,11 +57,11 @@ class TestableMaraSlipstreamService extends MaraSlipstreamService {
       apiTimeout: 5000,
     };
   }
-  
+
   static get httpClient() {
     return this._testHttpClient;
   }
-  
+
   // Override isConfigured to use our test config
   static isConfigured(): boolean {
     const config = this.config;
@@ -67,7 +76,7 @@ describe("MaraSlipstreamService", () => {
   beforeEach(() => {
     // Use the testable service
     service = TestableMaraSlipstreamService;
-    
+
     // Reset static properties
     (service as any)._config = null;
     (service as any)._httpClient = null;
@@ -79,29 +88,33 @@ describe("MaraSlipstreamService", () => {
 
     // Create HTTP client mock
     httpClientStub = {
-      get: spy(() => Promise.resolve({
-        ok: true,
-        status: 200,
-        statusText: "OK",
-        data: createMockFeeRateResponse(),
-      })),
-      post: spy(() => Promise.resolve({
-        ok: true,
-        status: 200,
-        statusText: "OK",
-        data: createMockSubmissionResponse(),
-      })),
+      get: spy(() =>
+        Promise.resolve({
+          ok: true,
+          status: 200,
+          statusText: "OK",
+          data: createMockFeeRateResponse(),
+        })
+      ),
+      post: spy(() =>
+        Promise.resolve({
+          ok: true,
+          status: 200,
+          statusText: "OK",
+          data: createMockSubmissionResponse(),
+        })
+      ),
     };
 
     // Set the test HTTP client
     service._testHttpClient = httpClientStub;
   });
-  
+
   // Clean up after each test
   afterEach(() => {
     // Reset the circuit breaker between tests
     service.resetCircuitBreaker();
-    
+
     // Reset static properties
     (service as any)._config = null;
     (service as any)._httpClient = null;
@@ -113,12 +126,14 @@ describe("MaraSlipstreamService", () => {
     it("should fetch fee rate successfully", async () => {
       const mockResponse = createMockFeeRateResponse();
 
-      httpClientStub.get = spy(() => Promise.resolve({
-        ok: true,
-        status: 200,
-        statusText: "OK",
-        data: mockResponse,
-      }));
+      httpClientStub.get = spy(() =>
+        Promise.resolve({
+          ok: true,
+          status: 200,
+          statusText: "OK",
+          data: mockResponse,
+        })
+      );
 
       const result = await service.getFeeRate();
 
@@ -135,12 +150,14 @@ describe("MaraSlipstreamService", () => {
         fee_rate: 0.5, // Below minimum
       });
 
-      httpClientStub.get = spy(() => Promise.resolve({
-        ok: true,
-        status: 200,
-        statusText: "OK",
-        data: mockResponse,
-      }));
+      httpClientStub.get = spy(() =>
+        Promise.resolve({
+          ok: true,
+          status: 200,
+          statusText: "OK",
+          data: mockResponse,
+        })
+      );
 
       const result = await service.getFeeRate();
 
@@ -150,43 +167,49 @@ describe("MaraSlipstreamService", () => {
     });
 
     it("should handle API errors", async () => {
-      httpClientStub.get = spy(() => Promise.resolve({
-        ok: false,
-        status: 500,
-        statusText: "Internal Server Error",
-        data: { error: "Server error" },
-      }));
+      httpClientStub.get = spy(() =>
+        Promise.resolve({
+          ok: false,
+          status: 500,
+          statusText: "Internal Server Error",
+          data: { error: "Server error" },
+        })
+      );
 
       await assertRejects(
         () => service.getFeeRate(),
         Error,
-        "MARA API error: 500 - Server error"
+        "MARA API error: 500 - Server error",
       );
     });
 
     it("should handle invalid response structure", async () => {
-      httpClientStub.get = spy(() => Promise.resolve({
-        ok: true,
-        status: 200,
-        statusText: "OK",
-        data: { invalid: "response" },
-      }));
+      httpClientStub.get = spy(() =>
+        Promise.resolve({
+          ok: true,
+          status: 200,
+          statusText: "OK",
+          data: { invalid: "response" },
+        })
+      );
 
       await assertRejects(
         () => service.getFeeRate(),
         Error,
-        "Invalid response structure from MARA getinfo endpoint"
+        "Invalid response structure from MARA getinfo endpoint",
       );
     });
 
     it("should handle circuit breaker open state", async () => {
       // Simulate multiple failures to open circuit breaker
-      httpClientStub.get = spy(() => Promise.resolve({
-        ok: false,
-        status: 500,
-        statusText: "Error",
-        data: null,
-      }));
+      httpClientStub.get = spy(() =>
+        Promise.resolve({
+          ok: false,
+          status: 500,
+          statusText: "Error",
+          data: null,
+        })
+      );
 
       // Cause failures to open circuit breaker
       for (let i = 0; i < 3; i++) {
@@ -199,7 +222,7 @@ describe("MaraSlipstreamService", () => {
       await assertRejects(
         () => service.getFeeRate(),
         Error,
-        "Circuit breaker is OPEN"
+        "Circuit breaker is OPEN",
       );
     });
   });
@@ -213,12 +236,14 @@ describe("MaraSlipstreamService", () => {
         status: "success",
       };
 
-      httpClientStub.post = spy(() => Promise.resolve({
-        ok: true,
-        status: 200,
-        statusText: "OK",
-        data: mockResponse,
-      }));
+      httpClientStub.post = spy(() =>
+        Promise.resolve({
+          ok: true,
+          status: 200,
+          statusText: "OK",
+          data: mockResponse,
+        })
+      );
 
       const result = await service.submitTransaction(validHex);
 
@@ -233,28 +258,30 @@ describe("MaraSlipstreamService", () => {
       await assertRejects(
         () => service.submitTransaction(""),
         Error,
-        "Invalid transaction hex provided"
+        "Invalid transaction hex provided",
       );
 
       await assertRejects(
         () => service.submitTransaction(null as any),
         Error,
-        "Invalid transaction hex provided"
+        "Invalid transaction hex provided",
       );
     });
 
     it("should handle submission errors", async () => {
-      httpClientStub.post = spy(() => Promise.resolve({
-        ok: false,
-        status: 400,
-        statusText: "Bad Request",
-        data: { error: "Invalid transaction" },
-      }));
+      httpClientStub.post = spy(() =>
+        Promise.resolve({
+          ok: false,
+          status: 400,
+          statusText: "Bad Request",
+          data: { error: "Invalid transaction" },
+        })
+      );
 
       await assertRejects(
         () => service.submitTransaction(validHex),
         Error,
-        "MARA submission error: 400 - Invalid transaction"
+        "MARA submission error: 400 - Invalid transaction",
       );
     });
 
@@ -264,17 +291,19 @@ describe("MaraSlipstreamService", () => {
         status: "error",
       };
 
-      httpClientStub.post = spy(() => Promise.resolve({
-        ok: true,
-        status: 200,
-        statusText: "OK",
-        data: mockResponse,
-      }));
+      httpClientStub.post = spy(() =>
+        Promise.resolve({
+          ok: true,
+          status: 200,
+          statusText: "OK",
+          data: mockResponse,
+        })
+      );
 
       await assertRejects(
         () => service.submitTransaction(validHex),
         Error,
-        "MARA submission failed: Transaction rejected: insufficient fee"
+        "MARA submission failed: Transaction rejected: insufficient fee",
       );
     });
 
@@ -284,62 +313,70 @@ describe("MaraSlipstreamService", () => {
         status: "success",
       };
 
-      httpClientStub.post = spy(() => Promise.resolve({
-        ok: true,
-        status: 200,
-        statusText: "OK",
-        data: mockResponse,
-      }));
+      httpClientStub.post = spy(() =>
+        Promise.resolve({
+          ok: true,
+          status: 200,
+          statusText: "OK",
+          data: mockResponse,
+        })
+      );
 
       await assertRejects(
         () => service.submitTransaction(validHex),
         Error,
-        "Invalid txid format from MARA"
+        "Invalid txid format from MARA",
       );
     });
 
     it("should handle gateway errors specially", async () => {
-      httpClientStub.post = spy(() => Promise.resolve({
-        ok: false,
-        status: 502,
-        statusText: "Bad Gateway",
-        data: null,
-      }));
+      httpClientStub.post = spy(() =>
+        Promise.resolve({
+          ok: false,
+          status: 502,
+          statusText: "Bad Gateway",
+          data: null,
+        })
+      );
 
       await assertRejects(
         () => service.submitTransaction(validHex),
         Error,
-        "MARA service temporarily unavailable (502)"
+        "MARA service temporarily unavailable (502)",
       );
     });
 
     it("should handle HTML error responses", async () => {
-      httpClientStub.post = spy(() => Promise.resolve({
-        ok: false,
-        status: 500,
-        statusText: "Internal Server Error",
-        data: "<!DOCTYPE html><html><body>Error</body></html>",
-      }));
+      httpClientStub.post = spy(() =>
+        Promise.resolve({
+          ok: false,
+          status: 500,
+          statusText: "Internal Server Error",
+          data: "<!DOCTYPE html><html><body>Error</body></html>",
+        })
+      );
 
       await assertRejects(
         () => service.submitTransaction(validHex),
         Error,
-        "MARA submission error: 500"
+        "MARA submission error: 500",
       );
     });
 
     it("should handle missing response fields", async () => {
-      httpClientStub.post = spy(() => Promise.resolve({
-        ok: true,
-        status: 200,
-        statusText: "OK",
-        data: { someField: "value" }, // Missing required fields
-      }));
+      httpClientStub.post = spy(() =>
+        Promise.resolve({
+          ok: true,
+          status: 200,
+          statusText: "OK",
+          data: { someField: "value" }, // Missing required fields
+        })
+      );
 
       await assertRejects(
         () => service.submitTransaction(validHex),
         Error,
-        "Invalid MARA response: missing required fields"
+        "Invalid MARA response: missing required fields",
       );
     });
   });
@@ -347,7 +384,7 @@ describe("MaraSlipstreamService", () => {
   describe("Circuit Breaker Management", () => {
     it("should report circuit breaker metrics", () => {
       const metrics = service.getCircuitBreakerMetrics();
-      
+
       assertExists(metrics);
       assertExists(metrics.state);
       assertExists(metrics.failureCount);
@@ -358,7 +395,7 @@ describe("MaraSlipstreamService", () => {
     it("should reset circuit breaker", () => {
       // No error should be thrown
       service.resetCircuitBreaker();
-      
+
       const metrics = service.getCircuitBreakerMetrics();
       assertEquals(metrics.failureCount, 0);
     });
@@ -379,7 +416,7 @@ describe("MaraSlipstreamService", () => {
     it("should handle missing configuration", () => {
       // Override config to return null
       service._testConfig = null;
-      
+
       const isConfigured = service.isConfigured();
       assertEquals(isConfigured, false);
     });
@@ -387,7 +424,7 @@ describe("MaraSlipstreamService", () => {
     it("should handle disabled configuration", () => {
       // Override config to return disabled
       service._testConfig = { enabled: false };
-      
+
       const isConfigured = service.isConfigured();
       assertEquals(isConfigured, false);
     });
@@ -407,7 +444,7 @@ describe("MaraSlipstreamService", () => {
         },
         configurable: true,
       });
-      
+
       const config = service.getConfiguration();
       assertEquals(config, null);
     });

@@ -9,36 +9,41 @@
  * - API error response structures
  */
 
-import { assert, assertEquals, assertInstanceOf, assertStringIncludes } from "@std/assert";
 import {
-    validateCrossModuleCompatibility,
-    validateTypeCompilation
+  assert,
+  assertEquals,
+  assertInstanceOf,
+  assertStringIncludes,
+} from "@std/assert";
+import {
+  validateCrossModuleCompatibility,
+  validateTypeCompilation,
 } from "./utils/typeValidation.ts";
 
 // Import all error types from the consolidated errors module
 import {
-    APIError,
-    APIErrorCode,
-    BaseError,
-    BitcoinError,
-    BitcoinErrorCode,
-    createApiErrorResponse,
-    createApiSuccessResponse,
-    createErrorBoundaryState,
-    createFieldValidationError,
-    createValidationErrorCollection,
-    generateErrorId,
-    getUserFriendlyMessage,
-    isApplicationError,
-    isBitcoinError,
-    isValidationError,
-    resetErrorBoundaryState,
-    shouldReportError,
-    SRC20Error,
-    SRC20ErrorCode,
-    StampErrorCode,
-    ValidationError,
-    ValidationErrorCode
+  APIError,
+  APIErrorCode,
+  BaseError,
+  BitcoinError,
+  BitcoinErrorCode,
+  createApiErrorResponse,
+  createApiSuccessResponse,
+  createErrorBoundaryState,
+  createFieldValidationError,
+  createValidationErrorCollection,
+  generateErrorId,
+  getUserFriendlyMessage,
+  isApplicationError,
+  isBitcoinError,
+  isValidationError,
+  resetErrorBoundaryState,
+  shouldReportError,
+  SRC20Error,
+  SRC20ErrorCode,
+  StampErrorCode,
+  ValidationError,
+  ValidationErrorCode,
 } from "../../lib/types/errors.ts";
 
 // ============================================================================
@@ -54,7 +59,7 @@ Deno.test("Error Types - Cross Module Compatibility", async () => {
   await validateCrossModuleCompatibility([
     "lib/types/errors.d.ts",
     "lib/types/api.d.ts",
-    "lib/types/ui.d.ts"
+    "lib/types/ui.d.ts",
   ]);
 });
 
@@ -98,7 +103,7 @@ Deno.test("ValidationError - field validation details", () => {
     400,
     { field: "email", value: "invalid-email" },
     "email",
-    "email_format"
+    "email_format",
   );
 
   assertEquals(error.field, "email");
@@ -111,7 +116,14 @@ Deno.test("ValidationError - field validation details", () => {
 // ============================================================================
 
 Deno.test("APIError - HTTP status code mapping", () => {
-  const error = new APIError("Not found", "API_NOT_FOUND", 404, {}, "GET", "/api/test");
+  const error = new APIError(
+    "Not found",
+    "API_NOT_FOUND",
+    404,
+    {},
+    "GET",
+    "/api/test",
+  );
   assertEquals(error.statusCode, 404);
   assertEquals(error.method, "GET");
   assertEquals(error.url, "/api/test");
@@ -125,7 +137,7 @@ Deno.test("BitcoinError - transaction context", () => {
     {},
     "send",
     "abc123",
-    "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"
+    "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
   );
 
   assertEquals(error.operation, "send");
@@ -141,7 +153,7 @@ Deno.test("SRC20Error - token operation context", () => {
     {},
     "transfer",
     "STAMPS",
-    "100"
+    "100",
   );
 
   assertEquals(error.operation, "transfer");
@@ -191,7 +203,10 @@ Deno.test("Error correlation ID uniqueness", () => {
 });
 
 Deno.test("getUserFriendlyMessage function", () => {
-  const validationError = new ValidationError("Invalid input", "VALIDATION_REQUIRED_FIELD");
+  const validationError = new ValidationError(
+    "Invalid input",
+    "VALIDATION_REQUIRED_FIELD",
+  );
   const message = getUserFriendlyMessage(validationError);
 
   assert(typeof message === "string");
@@ -200,7 +215,10 @@ Deno.test("getUserFriendlyMessage function", () => {
 
 Deno.test("shouldReportError function", () => {
   const criticalError = new BaseError("Critical", "CRITICAL", 500);
-  const validationError = new ValidationError("Required field", "VALIDATION_REQUIRED_FIELD");
+  const validationError = new ValidationError(
+    "Required field",
+    "VALIDATION_REQUIRED_FIELD",
+  );
 
   // These functions would be implemented based on business logic
   assert(typeof shouldReportError(criticalError) === "boolean");
@@ -216,7 +234,7 @@ Deno.test("Validation utilities - createFieldValidationError", () => {
     "email",
     ValidationErrorCode.INVALID_EMAIL,
     "Invalid email format",
-    "invalid@"
+    "invalid@",
   );
 
   assertEquals(fieldError.field, "email");
@@ -227,8 +245,16 @@ Deno.test("Validation utilities - createFieldValidationError", () => {
 
 Deno.test("Validation utilities - createValidationErrorCollection", () => {
   const errors = [
-    createFieldValidationError("email", ValidationErrorCode.INVALID_EMAIL, "Invalid email"),
-    createFieldValidationError("name", ValidationErrorCode.REQUIRED_FIELD, "Name required")
+    createFieldValidationError(
+      "email",
+      ValidationErrorCode.INVALID_EMAIL,
+      "Invalid email",
+    ),
+    createFieldValidationError(
+      "name",
+      ValidationErrorCode.REQUIRED_FIELD,
+      "Name required",
+    ),
   ];
 
   const collection = createValidationErrorCollection(errors);
@@ -312,13 +338,19 @@ Deno.test("Error codes - APIErrorCode enum", () => {
 
 Deno.test("Error codes - BitcoinErrorCode enum", () => {
   assertEquals(BitcoinErrorCode.INVALID_ADDRESS, "BITCOIN_INVALID_ADDRESS");
-  assertEquals(BitcoinErrorCode.INSUFFICIENT_FUNDS, "BITCOIN_INSUFFICIENT_FUNDS");
+  assertEquals(
+    BitcoinErrorCode.INSUFFICIENT_FUNDS,
+    "BITCOIN_INSUFFICIENT_FUNDS",
+  );
   assertEquals(BitcoinErrorCode.NETWORK_ERROR, "BITCOIN_NETWORK_ERROR");
 });
 
 Deno.test("Error codes - SRC20ErrorCode enum", () => {
   assertEquals(SRC20ErrorCode.TOKEN_NOT_FOUND, "SRC20_TOKEN_NOT_FOUND");
-  assertEquals(SRC20ErrorCode.INSUFFICIENT_BALANCE, "SRC20_INSUFFICIENT_BALANCE");
+  assertEquals(
+    SRC20ErrorCode.INSUFFICIENT_BALANCE,
+    "SRC20_INSUFFICIENT_BALANCE",
+  );
   assertEquals(SRC20ErrorCode.MINT_LIMIT_EXCEEDED, "SRC20_MINT_LIMIT_EXCEEDED");
 });
 

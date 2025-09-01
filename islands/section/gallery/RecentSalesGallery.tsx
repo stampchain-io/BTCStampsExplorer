@@ -24,7 +24,7 @@ export default function RecentSalesGallery({
   },
   pagination,
   isLoading = false,
-  btcPriceUSD = 0,
+  btc_price_usd = 0,
   autoRefresh = false,
   refreshIntervalMs = 30000, // 30 seconds
   onRefresh,
@@ -210,7 +210,7 @@ export default function RecentSalesGallery({
                 <RecentSaleCard
                   sale={sale}
                   showFullDetails={showFullDetails}
-                  btcPriceUSD={btcPriceUSD}
+                  btc_price_usd={btc_price_usd}
                 />
               </div>
             ))

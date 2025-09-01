@@ -1,9 +1,9 @@
 /* ===== COLLECTION OVERVIEW PAGE ===== */
 
+import type { StampFilterType } from "$constants";
 import { StampOverviewContent } from "$content";
 import { FreshContext, Handlers, PageProps } from "$fresh/server.ts";
 import type { CollectionOverviewPageProps } from "$types/index.d.ts";
-import type { StampFilterType } from "$constants";
 
 import { CollectionOverviewHeader } from "$header";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
@@ -169,6 +169,7 @@ export default function CollectionOverviewPage(
               <Pagination
                 page={page ?? 1}
                 totalPages={pages ?? 1}
+                // Remove onPageChange to let Pagination component use its built-in Fresh navigation
                 prefix=""
               />
             </div>
@@ -178,14 +179,19 @@ export default function CollectionOverviewPage(
       case "posh":
       case "recursive":
         return (
-          <div class="w-full flex flex-col items-center" f-client-nav>
-            <div data-partial="/stamp">
+          <div
+            class="w-full flex flex-col items-center"
+            f-client-nav
+            data-partial="/collection"
+          >
+            <div>
               <StampOverviewContent
                 stamps={stamps || []}
                 isRecentSales={isRecentSales}
                 pagination={{
                   page: page ?? 1,
                   totalPages: pages ?? 1,
+                  // Remove onPageChange to let Pagination component use its built-in Fresh navigation
                   prefix: "",
                 }}
               />

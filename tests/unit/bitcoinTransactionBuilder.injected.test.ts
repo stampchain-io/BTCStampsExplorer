@@ -4,7 +4,12 @@
  */
 
 import { assertEquals, assertExists, assertRejects } from "@std/assert";
-import { afterEach, beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  it,
+} from "jsr:@std/testing@1.0.14/bdd";
 import { Buffer } from "node:buffer";
 // Import our mock instead of real bitcoinjs-lib for complete isolation
 import * as bitcoin from "../mocks/bitcoinjs-lib.mock.ts";
@@ -101,12 +106,16 @@ describe("BitcoinTransactionBuilder with Dependency Injection and Fixtures", {
   sanitizeOps: false,
   sanitizeResources: false,
 }, () => {
-  let bitcoinTransactionBuilder: ReturnType<typeof createBitcoinTransactionBuilder>;
+  let bitcoinTransactionBuilder: ReturnType<
+    typeof createBitcoinTransactionBuilder
+  >;
 
   beforeEach(() => {
     clearMockUTXOResponses();
     clearMockResponses();
-    bitcoinTransactionBuilder = createBitcoinTransactionBuilder(mockDependencies);
+    bitcoinTransactionBuilder = createBitcoinTransactionBuilder(
+      mockDependencies,
+    );
   });
 
   afterEach(() => {
@@ -472,7 +481,8 @@ describe("BitcoinTransactionBuilder with Dependency Injection and Fixtures", {
 
       setMockTransactionHex(fixture.txid, rawHex);
 
-      const result = await bitcoinTransactionBuilder.buildPsbtFromUserFundedRawHex(rawHex);
+      const result = await bitcoinTransactionBuilder
+        .buildPsbtFromUserFundedRawHex(rawHex);
 
       assertExists(result);
       assertEquals(typeof result, "string");

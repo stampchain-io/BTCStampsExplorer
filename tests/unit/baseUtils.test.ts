@@ -1,17 +1,17 @@
 import {
-    arraysEqual,
-    base64_to_hex,
-    base64ToBytes,
-    base64ToHex,
-    bin2hex,
-    bufferToHex,
-    bytesToBase64,
-    bytesToHex,
-    hex2bin,
-    hex_to_base64,
-    hexToBase64,
-    hexToBuffer,
-    hexToBytes,
+  arraysEqual,
+  base64_to_hex,
+  base64ToBytes,
+  base64ToHex,
+  bin2hex,
+  bufferToHex,
+  bytesToBase64,
+  bytesToHex,
+  hex2bin,
+  hex_to_base64,
+  hexToBase64,
+  hexToBuffer,
+  hexToBytes,
 } from "$lib/utils/data/binary/baseUtils.ts";
 import { assert, assertEquals, assertThrows } from "@std/assert";
 
@@ -97,7 +97,7 @@ Deno.test("baseUtils - hexToBase64 throws on empty string (CIP33 compatibility)"
   assertThrows(
     () => hexToBase64(""),
     TypeError,
-    "Cannot read properties of null"
+    "Cannot read properties of null",
   );
 });
 
@@ -151,7 +151,10 @@ Deno.test("baseUtils - backward compatibility aliases work", () => {
 
   // Test hex2bin alias
   const bytes3 = hex2bin(hex);
-  assert(arraysEqual(hexToBytes(hex), bytes3), "hex2bin should work like hexToBytes");
+  assert(
+    arraysEqual(hexToBytes(hex), bytes3),
+    "hex2bin should work like hexToBytes",
+  );
 
   // Test bin2hex alias
   assertEquals(

@@ -6,10 +6,10 @@
  */
 
 import type {
-    EnrichedSRC20Row,
-    SRC20MarketDataV3,
-    SRC20Token,
-    SRC20WithOptionalMarketData, // Legacy interface
+  EnrichedSRC20Row,
+  SRC20MarketDataV3,
+  SRC20Token,
+  SRC20WithOptionalMarketData, // Legacy interface
 } from "$lib/types/src20.d.ts";
 import { assert } from "@std/assert";
 
@@ -186,4 +186,4 @@ console.log("   • Enhanced type safety throughout");
 console.log("   • Improved developer experience");
 console.log("   • Enabled future extensibility");
 
-export { }; // Make this a module
+export {}; // Make this a module

@@ -4,14 +4,17 @@ echo "=== Newman with OpenAPI Contract Testing ==="
 echo "Node version:" && node --version
 echo "NPM version:" && npm --version
 
-echo "=== Installing Newman and Dependencies ==="
-npm install -g newman --no-fund
-npm install -g newman-reporter-html --no-fund
-npm install -g js-yaml ajv ajv-formats --no-fund
+echo "=== Installing Local Dependencies for OpenAPI Validation ==="
+npm install --no-fund --silent
+echo "Local dependencies installed"
+
+echo "=== Checking Pre-installed Dependencies ==="
 echo "Newman version:" && newman --version
+echo "Node.js version:" && node --version
+echo "Global modules:" && ls -la /usr/local/lib/node_modules/ | grep -E "(newman|js-yaml|ajv)" | head -3 || echo "Dependencies ready"
 
 echo "=== Checking OpenAPI Validator ==="
-if [ -f "scripts/newman-openapi-validator.js" ]; then
+if [ -f "scripts/newman-openapi-validator.mjs" ]; then
   echo "✅ OpenAPI validator script found"
   USE_OPENAPI_VALIDATOR=true
 else
@@ -36,15 +39,21 @@ echo "Using environment: ${NEWMAN_ENVIRONMENT:-postman-environment.json}"
 if [ "$USE_OPENAPI_VALIDATOR" = "true" ] && [ -f "./static/swagger/openapi.yml" ]; then
   echo "=== Running Newman with OpenAPI Contract Validation ==="
   
-  # Use our OpenAPI validator script
-  node scripts/newman-openapi-validator.js \
+  # Use our OpenAPI validator script with proper npx
+  node scripts/newman-openapi-validator.mjs \
     ./static/swagger/openapi.yml \
     "${NEWMAN_COLLECTION:-tests/postman/collections/comprehensive.json}" \
     "${NEWMAN_ENVIRONMENT:-postman-environment.json}" > reports/newman/$TIMESTAMP-openapi-validation.log 2>&1
   
-  NEWMAN_EXIT_CODE=$?
+  OPENAPI_EXIT_CODE=$?
   
-  # Also generate standard Newman reports
+  if [ $OPENAPI_EXIT_CODE -eq 0 ]; then
+    echo "✅ OpenAPI validation completed successfully"
+  else
+    echo "⚠️  OpenAPI validation encountered issues, check log"
+  fi
+  
+  # Also generate standard Newman reports using global newman
   # Build Newman command with proper parameter handling
   NEWMAN_CMD="newman run '${NEWMAN_COLLECTION:-tests/postman/collections/comprehensive.json}' --environment '${NEWMAN_ENVIRONMENT:-postman-environment.json}' --reporters cli,html,json --reporter-html-export reports/newman/$TIMESTAMP-report.html --reporter-json-export reports/newman/$TIMESTAMP-results.json"
   

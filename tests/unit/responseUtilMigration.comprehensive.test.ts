@@ -12,7 +12,12 @@
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { WebResponseUtil } from "$lib/utils/api/responses/webResponseUtil.ts";
 import { assertEquals, assertExists } from "@std/assert";
-import { afterEach, beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  it,
+} from "jsr:@std/testing@1.0.14/bdd";
 import { MockDatabaseManager } from "../mocks/mockDatabaseManager.ts";
 
 describe("Response Utility Migration - Comprehensive Validation", () => {
@@ -442,11 +447,11 @@ describe("Response Utility Migration - Comprehensive Validation", () => {
       const endTime = performance.now();
       const duration = endTime - startTime;
 
-      // Should complete in reasonable time (less than 100ms for 100 responses)
+      // Should complete in reasonable time (less than 200ms for 100 responses with full security headers)
       assertEquals(
-        duration < 100,
+        duration < 200,
         true,
-        `Response creation took ${duration}ms, should be under 100ms`,
+        `Response creation took ${duration}ms, should be under 200ms`,
       );
     });
 

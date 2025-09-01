@@ -4,7 +4,12 @@
  */
 
 import { assertEquals, assertExists, assertRejects } from "@std/assert";
-import { afterEach, beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  it,
+} from "jsr:@std/testing@1.0.14/bdd";
 
 // Set environment to skip Redis and database connections before importing
 (globalThis as any).SKIP_REDIS_CONNECTION = true;
@@ -177,7 +182,7 @@ describe(
       });
     });
 
-    describe("fetchAndFormatSrc20Data", () => {
+    describe("fetchBasicSrc20Data", () => {
       beforeEach(() => {
         // Setup common mocks
         BlockService.getLastBlock = () => Promise.resolve(830000);
@@ -193,7 +198,7 @@ describe(
         SRC20Repository.getTotalCountValidSrc20TxFromDb = () =>
           Promise.resolve({ rows: [{ total: 100 }] });
 
-        const result = await SRC20QueryService.fetchAndFormatSrc20Data();
+        const result = await SRC20QueryService.fetchBasicSrc20Data();
 
         assertEquals(result.page, 1);
         assertEquals(result.limit, 50);
@@ -212,7 +217,7 @@ describe(
         SRC20Repository.getTotalCountValidSrc20TxFromDb = () =>
           Promise.resolve({ rows: [{ total: 0 }] });
 
-        await SRC20QueryService.fetchAndFormatSrc20Data({
+        await SRC20QueryService.fetchBasicSrc20Data({
           tick: "TEST<script>",
           op: "MINT&inject",
           tx_hash: "abc123!@#",
@@ -236,7 +241,7 @@ describe(
         SRC20Repository.getTotalCountValidSrc20TxFromDb = () =>
           Promise.resolve({ rows: [{ total: 0 }] });
 
-        await SRC20QueryService.fetchAndFormatSrc20Data({
+        await SRC20QueryService.fetchBasicSrc20Data({
           tick: ["TEST1<script>", "TEST2&inject"],
           op: ["MINT", "TRANSFER"],
         });
@@ -254,7 +259,7 @@ describe(
         SRC20Repository.getTotalCountValidSrc20TxFromDb = () =>
           Promise.resolve({ rows: [{ total: 0 }] });
 
-        await SRC20QueryService.fetchAndFormatSrc20Data({
+        await SRC20QueryService.fetchBasicSrc20Data({
           limit: "invalid" as any,
           page: -5 as any,
         });
@@ -269,7 +274,7 @@ describe(
         SRC20Repository.getTotalCountValidSrc20TxFromDb = () =>
           Promise.resolve({ rows: [{ total: 0 }] });
 
-        const result = await SRC20QueryService.fetchAndFormatSrc20Data();
+        const result = await SRC20QueryService.fetchBasicSrc20Data();
 
         assertEquals(result.data, []);
         assertEquals(result.totalPages, 0);
@@ -283,7 +288,7 @@ describe(
         SRC20Repository.getTotalCountValidSrc20TxFromDb = () =>
           Promise.resolve({ rows: [{ total: 1 }] });
 
-        const result = await SRC20QueryService.fetchAndFormatSrc20Data({
+        const result = await SRC20QueryService.fetchBasicSrc20Data({
           singleResult: true,
         });
 
@@ -301,7 +306,7 @@ describe(
         SRC20Repository.getTotalCountValidSrc20TxFromDb = () =>
           Promise.resolve({ rows: [{ total: 0 }] });
 
-        await SRC20QueryService.fetchAndFormatSrc20Data({
+        await SRC20QueryService.fetchBasicSrc20Data({
           tick: "TEST",
           // op is undefined, should be removed
         });
@@ -317,7 +322,7 @@ describe(
           Promise.reject(new Error("Database error - Stamps Down"));
 
         await assertRejects(
-          () => SRC20QueryService.fetchAndFormatSrc20Data(),
+          () => SRC20QueryService.fetchBasicSrc20Data(),
           Error,
           "Stamps Down...",
         );
@@ -328,7 +333,7 @@ describe(
           Promise.reject(new Error("Database connection failed"));
 
         await assertRejects(
-          () => SRC20QueryService.fetchAndFormatSrc20Data(),
+          () => SRC20QueryService.fetchBasicSrc20Data(),
           Error,
           "Database connection failed",
         );
@@ -845,7 +850,7 @@ describe(
       });
     });
 
-    describe("fetchAndFormatSrc20DataV2", () => {
+    describe("fetchEnhancedSrc20Data", () => {
       beforeEach(() => {
         BlockService.getLastBlock = () => Promise.resolve(830000);
         SRC20UtilityService.formatSRC20Row = (row: any) => ({
@@ -864,7 +869,7 @@ describe(
         SRC20Repository.getTotalCountValidSrc20TxFromDb = () =>
           Promise.resolve({ rows: [{ total: 100 }] });
 
-        const result = await SRC20QueryService.fetchAndFormatSrc20DataV2();
+        const result = await SRC20QueryService.fetchEnhancedSrc20Data();
 
         assertEquals(result.page, 1);
         assertEquals(result.limit, 50);
@@ -890,7 +895,7 @@ describe(
         SRC20Repository.getTotalCountValidSrc20TxFromDb = () =>
           Promise.resolve({ rows: [{ total: 2 }] });
 
-        const result = await SRC20QueryService.fetchAndFormatSrc20DataV2({
+        const result = await SRC20QueryService.fetchEnhancedSrc20Data({
           dateFrom: "2024-02-09T00:00:00.000Z",
           dateTo: "2024-02-11T00:00:00.000Z",
         });
@@ -905,7 +910,7 @@ describe(
         SRC20Repository.getTotalCountValidSrc20TxFromDb = () =>
           Promise.resolve({ rows: [{ total: 0 }] });
 
-        const result = await SRC20QueryService.fetchAndFormatSrc20DataV2({
+        const result = await SRC20QueryService.fetchEnhancedSrc20Data({
           minPrice: -100, // Should be clamped to 0
           maxPrice: 500,
           minVolume: -50, // Should be clamped to 0
@@ -942,7 +947,7 @@ describe(
         SRC20MarketService.fetchMarketListingSummary = () =>
           Promise.resolve(mockMarketData as any);
 
-        const result = await SRC20QueryService.fetchAndFormatSrc20DataV2(
+        const result = await SRC20QueryService.fetchEnhancedSrc20Data(
           {},
           { includeMarketData: true },
         );
@@ -973,7 +978,7 @@ describe(
             tick: "TEST",
           });
 
-        const result = await SRC20QueryService.fetchAndFormatSrc20DataV2(
+        const result = await SRC20QueryService.fetchEnhancedSrc20Data(
           {},
           { enrichWithProgress: true },
         );
@@ -988,7 +993,7 @@ describe(
         SRC20Repository.getTotalCountValidSrc20TxFromDb = () =>
           Promise.resolve({ rows: [{ total: 1 }] });
 
-        const result = await SRC20QueryService.fetchAndFormatSrc20DataV2({
+        const result = await SRC20QueryService.fetchEnhancedSrc20Data({
           singleResult: true,
         });
 
@@ -1004,7 +1009,7 @@ describe(
         SRC20Repository.getTotalCountValidSrc20TxFromDbOptimized = () =>
           Promise.resolve({ rows: [{ total: 0 }] });
 
-        const result = await SRC20QueryService.fetchAndFormatSrc20DataV2();
+        const result = await SRC20QueryService.fetchEnhancedSrc20Data();
 
         // When empty, the method returns an empty array for data property for consistency
         assertEquals(result.data, []);
@@ -1017,7 +1022,7 @@ describe(
           Promise.reject(new Error("Database error - Stamps Down"));
 
         try {
-          await SRC20QueryService.fetchAndFormatSrc20DataV2();
+          await SRC20QueryService.fetchEnhancedSrc20Data();
         } catch (error: any) {
           assertEquals(error.message, "Stamps Down...");
           assertExists(error.performance);
@@ -1029,7 +1034,7 @@ describe(
           Promise.reject(new Error("Database connection failed"));
 
         try {
-          await SRC20QueryService.fetchAndFormatSrc20DataV2();
+          await SRC20QueryService.fetchEnhancedSrc20Data();
         } catch (error: any) {
           assertEquals(error.message, "Database connection failed");
           assertExists(error.performance);
@@ -1045,7 +1050,7 @@ describe(
         SRC20Repository.getTotalCountValidSrc20TxFromDb = () =>
           Promise.resolve({ rows: [{ total: 0 }] });
 
-        await SRC20QueryService.fetchAndFormatSrc20DataV2({
+        await SRC20QueryService.fetchEnhancedSrc20Data({
           tick: "TEST",
           // op is undefined, should be removed
         });
@@ -1061,7 +1066,7 @@ describe(
 
     describe("private method tests via public methods", () => {
       describe("mapTransactionData", () => {
-        it("should be called by fetchAndFormatSrc20Data", async () => {
+        it("should be called by fetchBasicSrc20Data", async () => {
           let formatSRC20RowCallCount = 0;
           SRC20UtilityService.formatSRC20Row = (row: any) => {
             formatSRC20RowCallCount++;
@@ -1074,7 +1079,7 @@ describe(
           SRC20Repository.getTotalCountValidSrc20TxFromDb = () =>
             Promise.resolve({ rows: [{ total: 2 }] });
 
-          await SRC20QueryService.fetchAndFormatSrc20Data();
+          await SRC20QueryService.fetchBasicSrc20Data();
 
           assertEquals(formatSRC20RowCallCount, 2);
         });
@@ -1093,7 +1098,7 @@ describe(
           SRC20Repository.getTotalCountValidSrc20TxFromDb = () =>
             Promise.resolve({ rows: [{ total: 1 }] });
 
-          const result = await SRC20QueryService.fetchAndFormatSrc20Data({
+          const result = await SRC20QueryService.fetchBasicSrc20Data({
             tx_hash: "abc123",
             block_index: null,
           });
@@ -1116,7 +1121,7 @@ describe(
           SRC20Repository.getTotalCountValidSrc20TxFromDb = () =>
             Promise.resolve({ rows: [{ total: 1 }] });
 
-          const result = await SRC20QueryService.fetchAndFormatSrc20Data({
+          const result = await SRC20QueryService.fetchBasicSrc20Data({
             tick: "TEST",
           });
 
@@ -1147,7 +1152,7 @@ describe(
             Promise.reject(new Error("Market data error"));
 
           // Should not throw error, should return original data
-          const result = await SRC20QueryService.fetchAndFormatSrc20DataV2(
+          const result = await SRC20QueryService.fetchEnhancedSrc20Data(
             {},
             { includeMarketData: true },
           );
@@ -1177,7 +1182,7 @@ describe(
             Promise.reject(new Error("Mint progress error"));
 
           // Should not throw error, should return data without mint progress
-          const result = await SRC20QueryService.fetchAndFormatSrc20DataV2(
+          const result = await SRC20QueryService.fetchEnhancedSrc20Data(
             {},
             { enrichWithProgress: true },
           );

@@ -274,9 +274,15 @@ class NewmanOpenAPIValidator {
   async runNewmanWithValidation(collectionPath, options = {}) {
     await this.loadOpenAPISpec();
     
+    // Load collection and environment files
+    const collection = JSON.parse(fs.readFileSync(path.resolve(collectionPath), 'utf8'));
+    const environment = options.environment ? 
+      JSON.parse(fs.readFileSync(path.resolve(options.environment), 'utf8')) : 
+      undefined;
+    
     const newmanOptions = {
-      collection: require(path.resolve(collectionPath)),
-      environment: options.environment ? require(path.resolve(options.environment)) : undefined,
+      collection,
+      environment,
       reporters: ['cli'],
       customReporter: this.createNewmanReporter(),
       ...options

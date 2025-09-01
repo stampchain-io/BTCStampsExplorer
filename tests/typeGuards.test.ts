@@ -3,14 +3,14 @@
  */
 
 import {
-    isDefined,
-    isNonEmptyArray,
-    isNonEmptyString,
-    isNotNull,
-    isValidNumber,
-    safeArrayAccess,
-    safeNumberConvert,
-    safeStringConvert
+  isDefined,
+  isNonEmptyArray,
+  isNonEmptyString,
+  isNotNull,
+  isValidNumber,
+  safeArrayAccess,
+  safeNumberConvert,
+  safeStringConvert,
 } from "$lib/utils/typeGuards.ts";
 import { assertEquals } from "https://deno.land/std@0.208.0/assert/mod.ts";
 

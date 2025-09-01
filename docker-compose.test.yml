@@ -1,6 +1,8 @@
 services:
   newman:
-    image: node:22-alpine
+    build:
+      context: .
+      dockerfile: Dockerfile.newman
     working_dir: /app
     extra_hosts:
       - "host.docker.internal:host-gateway"

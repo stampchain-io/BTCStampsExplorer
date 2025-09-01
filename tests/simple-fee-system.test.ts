@@ -39,15 +39,16 @@ Deno.test("🚀 Simple Fee System Tests", async (t) => {
       const result = await dbManager.handleCache(
         testKey,
         () => Promise.resolve(testData),
-        10
+        10,
       );
 
       assertExists(result);
       assertEquals(result.value, "test");
       console.log("✅ Basic cache operation completed");
-
     } catch (error) {
-      console.log(`⚠️  Cache operation failed (expected in test environment): ${error.message}`);
+      console.log(
+        `⚠️  Cache operation failed (expected in test environment): ${error.message}`,
+      );
       // This is expected in test environment without Redis
       assert(true, "Cache failure is expected in test environment");
     }
@@ -69,7 +70,7 @@ Deno.test("🚀 Simple Fee System Tests", async (t) => {
       economyFee: 5,
       minimumFee: 1,
       fallbackUsed: false,
-      debug_feesResponse: {}
+      debug_feesResponse: {},
     };
 
     // Basic structure validation
@@ -82,8 +83,10 @@ Deno.test("🚀 Simple Fee System Tests", async (t) => {
     console.log("✅ Fee data structure validation passed");
 
     // Test fee range validation
-    assert(testFeeData.recommendedFee >= 1 && testFeeData.recommendedFee <= 1000,
-      "Fee should be in reasonable range");
+    assert(
+      testFeeData.recommendedFee >= 1 && testFeeData.recommendedFee <= 1000,
+      "Fee should be in reasonable range",
+    );
 
     console.log("✅ Fee range validation passed");
   });
@@ -102,7 +105,7 @@ Deno.test("🚀 Simple Fee System Tests", async (t) => {
         const data = {
           fee: 15,
           price: 45000,
-          timestamp: Date.now()
+          timestamp: Date.now(),
         };
         return Promise.resolve(data);
       };
@@ -118,7 +121,7 @@ Deno.test("🚀 Simple Fee System Tests", async (t) => {
     console.log(`📊 Performance Results:
       • Average: ${avgTime.toFixed(2)}ms
       • Max: ${maxTime}ms
-      • All times: ${times.join(', ')}ms`);
+      • All times: ${times.join(", ")}ms`);
 
     // Basic performance assertion
     assert(avgTime < 100, `Average time ${avgTime}ms should be under 100ms`);

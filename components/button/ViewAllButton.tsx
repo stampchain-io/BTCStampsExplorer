@@ -11,6 +11,7 @@ export function ViewAllButton({ href }: ViewAllButtonProps) {
         color="purple"
         size="mdR"
         href={href}
+        f-partial="/collection"
         target="_top"
       >
         VIEW

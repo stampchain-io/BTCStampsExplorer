@@ -1,10 +1,15 @@
 import { assert, assertEquals, assertExists } from "@std/assert";
-import { afterEach, beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
-import { stub, Stub } from "@std/testing@1.0.14/mock";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  it,
+} from "jsr:@std/testing@1.0.14/bdd";
+import { Stub, stub } from "@std/testing@1.0.14/mock";
 
 import {
-  estimateTransactionSize,
   calculateTransactionFee,
+  estimateTransactionSize,
   estimateTransactionSizeForType,
   type TransactionSizeOptions,
 } from "../../lib/utils/bitcoin/transactions/transactionSizeEstimator.ts";
@@ -33,7 +38,7 @@ describe("Transaction Size Estimator", () => {
       };
 
       const result = estimateTransactionSize(options);
-      
+
       // P2WPKH tx should be around 140-170 vBytes
       assert(result > 100);
       assert(result < 200);
@@ -49,7 +54,7 @@ describe("Transaction Size Estimator", () => {
       };
 
       const result = estimateTransactionSize(options);
-      
+
       // P2PKH tx should be larger than P2WPKH due to no witness discount
       assert(result > 150);
       assert(result < 400);
@@ -97,7 +102,7 @@ describe("Transaction Size Estimator", () => {
       };
 
       const result = estimateTransactionSize(options);
-      
+
       // Should handle mixed types without errors
       assert(result > 300);
       assert(result < 600);
@@ -117,7 +122,7 @@ describe("Transaction Size Estimator", () => {
       };
 
       const result = estimateTransactionSize(options);
-      
+
       // Multiple outputs should increase size
       assert(result > 200);
       assert(result < 400);
@@ -133,7 +138,7 @@ describe("Transaction Size Estimator", () => {
       };
 
       const result = estimateTransactionSize(options);
-      
+
       // P2TR should be efficient
       assert(result > 100);
       assert(result < 200);
@@ -149,7 +154,7 @@ describe("Transaction Size Estimator", () => {
       };
 
       const result = estimateTransactionSize(options);
-      
+
       // P2SH should be larger due to complex scripts
       assert(result > 250);
       assert(result < 500);
@@ -175,7 +180,7 @@ describe("Transaction Size Estimator", () => {
 
       // With change should be larger
       assert(withChangeResult > withoutChangeResult);
-      
+
       // Difference should be approximately one P2WPKH output (31 bytes)
       const difference = withChangeResult - withoutChangeResult;
       assert(difference > 25);
@@ -190,7 +195,7 @@ describe("Transaction Size Estimator", () => {
       };
 
       const result = estimateTransactionSize(options);
-      
+
       // Should still calculate base tx + outputs
       assert(result > 25);
       assert(result < 150);
@@ -205,7 +210,7 @@ describe("Transaction Size Estimator", () => {
       };
 
       const result = estimateTransactionSize(options);
-      
+
       // Should calculate base tx + inputs only
       assert(result > 50);
       assert(result < 200);
@@ -222,7 +227,7 @@ describe("Transaction Size Estimator", () => {
       };
 
       const result = estimateTransactionSize(options);
-      
+
       // Should scale with inputs
       assert(result > 1000);
       assert(result < 3000);
@@ -238,7 +243,7 @@ describe("Transaction Size Estimator", () => {
       };
 
       const result = estimateTransactionSize(options);
-      
+
       // Should scale with outputs
       assert(result > 1500);
       assert(result < 3000);
@@ -260,7 +265,9 @@ describe("Transaction Size Estimator", () => {
         changeOutputType: "P2WPKH",
       };
 
-      const resultWithoutFlag = estimateTransactionSize(optionsWithoutWitnessFlag);
+      const resultWithoutFlag = estimateTransactionSize(
+        optionsWithoutWitnessFlag,
+      );
       const resultWithFlag = estimateTransactionSize(optionsWithWitnessFlag);
 
       // Should produce same result when witness is inferred
@@ -276,7 +283,7 @@ describe("Transaction Size Estimator", () => {
       };
 
       const result = estimateTransactionSize(options);
-      
+
       // Should use defaults and not crash
       assert(result > 100);
       assert(result < 300);
@@ -292,7 +299,7 @@ describe("Transaction Size Estimator", () => {
       };
 
       const result = estimateTransactionSize(options);
-      
+
       // Should use defaults and not crash
       assert(result > 100);
       assert(result < 200);
@@ -304,18 +311,18 @@ describe("Transaction Size Estimator", () => {
     it("should calculate fee correctly", () => {
       const vsize = 140;
       const feeRate = 10; // 10 sats/vB
-      
+
       const result = calculateTransactionFee(vsize, feeRate);
-      
+
       assertEquals(result, 1400);
     });
 
     it("should round up fractional fees", () => {
       const vsize = 141;
       const feeRate = 10.5; // Fractional fee rate
-      
+
       const result = calculateTransactionFee(vsize, feeRate);
-      
+
       // Should ceil(141 * 10.5) = ceil(1480.5) = 1481
       assertEquals(result, 1481);
     });
@@ -323,27 +330,27 @@ describe("Transaction Size Estimator", () => {
     it("should handle zero fee rate", () => {
       const vsize = 140;
       const feeRate = 0;
-      
+
       const result = calculateTransactionFee(vsize, feeRate);
-      
+
       assertEquals(result, 0);
     });
 
     it("should handle high fee rates", () => {
       const vsize = 140;
       const feeRate = 1000; // High fee rate
-      
+
       const result = calculateTransactionFee(vsize, feeRate);
-      
+
       assertEquals(result, 140000);
     });
 
     it("should handle fractional vsize", () => {
       const vsize = 140.5;
       const feeRate = 10;
-      
+
       const result = calculateTransactionFee(vsize, feeRate);
-      
+
       // Should ceil(140.5 * 10) = ceil(1405) = 1405
       assertEquals(result, 1405);
     });
@@ -352,7 +359,7 @@ describe("Transaction Size Estimator", () => {
   describe("estimateTransactionSizeForType", () => {
     it("should estimate stamp transaction size", () => {
       const result = estimateTransactionSizeForType("stamp", 100);
-      
+
       // Stamp with ~100 bytes should have OP_RETURN + data outputs
       assert(result > 200);
       assert(result < 500);
@@ -362,7 +369,7 @@ describe("Transaction Size Estimator", () => {
     it("should estimate stamp transaction with large file", () => {
       const smallFile = estimateTransactionSizeForType("stamp", 32);
       const largeFile = estimateTransactionSizeForType("stamp", 1000);
-      
+
       // Larger file should result in larger transaction
       assert(largeFile > smallFile);
       assert(largeFile > 1000);
@@ -370,7 +377,7 @@ describe("Transaction Size Estimator", () => {
 
     it("should estimate SRC20 transaction size", () => {
       const result = estimateTransactionSizeForType("src20", 100);
-      
+
       // SRC20 should have data outputs but no OP_RETURN
       assert(result > 150);
       assert(result < 400);
@@ -379,7 +386,7 @@ describe("Transaction Size Estimator", () => {
 
     it("should estimate SRC101 transaction size", () => {
       const result = estimateTransactionSizeForType("src101", 100);
-      
+
       // Should be similar to SRC20
       assert(result > 150);
       assert(result < 400);
@@ -388,7 +395,7 @@ describe("Transaction Size Estimator", () => {
 
     it("should cap data chunks for SRC20/SRC101", () => {
       const result = estimateTransactionSizeForType("src20", 10000);
-      
+
       // Should cap at 5 chunks regardless of file size
       assert(result < 1000); // Should not be enormous
       assert(Number.isInteger(result));
@@ -396,7 +403,7 @@ describe("Transaction Size Estimator", () => {
 
     it("should estimate send transaction size", () => {
       const result = estimateTransactionSizeForType("send");
-      
+
       // Simple send: input -> recipient + change
       assert(result > 100);
       assert(result < 200);
@@ -405,7 +412,7 @@ describe("Transaction Size Estimator", () => {
 
     it("should estimate dispense transaction size", () => {
       const result = estimateTransactionSizeForType("dispense");
-      
+
       // Dispense: input -> OP_RETURN + recipient + change
       assert(result > 150);
       assert(result < 250);
@@ -414,7 +421,7 @@ describe("Transaction Size Estimator", () => {
 
     it("should handle default case", () => {
       const result = estimateTransactionSizeForType("unknown" as any);
-      
+
       // Should default to simple 2-output transaction
       assert(result > 100);
       assert(result < 200);
@@ -423,7 +430,7 @@ describe("Transaction Size Estimator", () => {
 
     it("should handle undefined file size", () => {
       const result = estimateTransactionSizeForType("stamp");
-      
+
       // Should use default file size (100 bytes)
       assert(result > 200);
       assert(result < 500);
@@ -433,18 +440,24 @@ describe("Transaction Size Estimator", () => {
     it("should be consistent for same inputs", () => {
       const result1 = estimateTransactionSizeForType("stamp", 256);
       const result2 = estimateTransactionSizeForType("stamp", 256);
-      
+
       assertEquals(result1, result2);
     });
 
     it("should scale with file size for stamp transactions", () => {
       const sizes = [32, 64, 128, 256, 512];
-      const results = sizes.map(size => estimateTransactionSizeForType("stamp", size));
-      
+      const results = sizes.map((size) =>
+        estimateTransactionSizeForType("stamp", size)
+      );
+
       // Each result should be larger than the previous
       for (let i = 1; i < results.length; i++) {
-        assert(results[i] > results[i - 1], 
-          `Size ${results[i]} should be larger than ${results[i - 1]} for file size ${sizes[i]} vs ${sizes[i - 1]}`);
+        assert(
+          results[i] > results[i - 1],
+          `Size ${results[i]} should be larger than ${
+            results[i - 1]
+          } for file size ${sizes[i]} vs ${sizes[i - 1]}`,
+        );
       }
     });
   });
@@ -469,7 +482,7 @@ describe("Transaction Size Estimator", () => {
       };
 
       const result = estimateTransactionSize(options);
-      
+
       // Should handle large transactions without overflow
       assert(result > 5000);
       assert(result < 50000);
@@ -496,7 +509,7 @@ describe("Transaction Size Estimator", () => {
       };
 
       const result = estimateTransactionSize(options);
-      
+
       // Verify result is reasonable and precise
       assert(Number.isInteger(result));
       assert(result > 400);
@@ -511,7 +524,7 @@ describe("Transaction Size Estimator", () => {
       };
 
       const result = estimateTransactionSize(options);
-      
+
       // Minimum viable transaction should be around 100-120 vBytes
       assert(result >= 100);
       assert(result <= 140);

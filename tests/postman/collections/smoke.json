@@ -48,7 +48,7 @@
     {
       "name": "Version Check",
       "request": {
-        "method": "GET", 
+        "method": "GET",
         "header": [
           {
             "key": "Accept",
@@ -89,7 +89,7 @@
         "method": "GET",
         "header": [
           {
-            "key": "Accept", 
+            "key": "Accept",
             "value": "application/json"
           }
         ],
@@ -145,7 +145,7 @@
     {
       "listen": "test",
       "script": {
-        "type": "text/javascript", 
+        "type": "text/javascript",
         "exec": [
           "// Log smoke test completion",
           "console.log('✅ Smoke test completed for:', pm.info.requestName);"
@@ -153,4 +153,4 @@
       }
     }
   ]
-} 
+}

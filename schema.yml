@@ -4432,42 +4432,46 @@ components:
       type: object
       description: Metadata for recent sales query
       properties:
-        dayRange:
+        day_range:
           type: integer
           description: Number of days queried
-        fullDetails:
+        full_details:
           type: boolean
           description: Whether full details were included
-        totalSales:
+        total_sales:
           type: integer
           description: Total number of sales found
-        totalVolumeBTC:
+        total_volume_btc:
           type: number
           description: Total volume in BTC
-        totalVolumeUSD:
+        total_volume_usd:
           type: number
           nullable: true
           description: Total volume in USD
-        averagePriceBTC:
+        average_price_btc:
           type: number
           description: Average price in BTC
-        averagePriceUSD:
+        average_price_usd:
           type: number
           nullable: true
           description: Average price in USD
-        uniqueStamps:
+        unique_stamps:
           type: integer
           description: Number of unique stamps sold
-        uniqueBuyers:
+        unique_buyers:
           type: integer
           description: Number of unique buyers
-        uniqueSellers:
+        unique_sellers:
           type: integer
           description: Number of unique sellers
-        queryTime:
+        query_time:
           type: string
           format: date-time
           description: Query execution time
+        last_updated:
+          type: string
+          format: date-time
+          description: Last update time
 
   responses:
     NotFound:

@@ -1,6 +1,6 @@
 /**
  * Comprehensive Cross-Module Integration Test Runner
- * 
+ *
  * Orchestrates all cross-module integration tests including type compatibility,
  * dependency graph validation, runtime type resolution, and performance testing.
  * Provides unified reporting and CI/CD integration.
@@ -72,25 +72,26 @@ class CrossModuleIntegrationRunner {
             name: "basic-type-compatibility",
             testFunction: () => this.testBasicTypeCompatibility(),
             critical: true,
-            timeout: 30000
+            timeout: 30000,
           },
           {
             name: "complex-intersections",
             testFunction: () => this.testComplexIntersections(),
             critical: true,
-            timeout: 15000
+            timeout: 15000,
           },
           {
             name: "generic-constraints",
             testFunction: () => this.testGenericConstraints(),
             critical: false,
-            timeout: 10000
-          }
-        ]
+            timeout: 10000,
+          },
+        ],
       },
       {
         name: "dependency-graph",
-        description: "Dependency graph health and circular dependency detection",
+        description:
+          "Dependency graph health and circular dependency detection",
         enabled: true,
         timeout: 120000,
         tests: [
@@ -98,21 +99,21 @@ class CrossModuleIntegrationRunner {
             name: "circular-dependency-detection",
             testFunction: () => this.testCircularDependencies(),
             critical: true,
-            timeout: 60000
+            timeout: 60000,
           },
           {
             name: "client-server-separation",
             testFunction: () => this.testClientServerSeparation(),
             critical: true,
-            timeout: 30000
+            timeout: 30000,
           },
           {
             name: "orphaned-type-detection",
             testFunction: () => this.testOrphanedTypes(),
             critical: false,
-            timeout: 20000
-          }
-        ]
+            timeout: 20000,
+          },
+        ],
       },
       {
         name: "runtime-resolution",
@@ -124,21 +125,21 @@ class CrossModuleIntegrationRunner {
             name: "dynamic-import-resolution",
             testFunction: () => this.testDynamicImports(),
             critical: true,
-            timeout: 45000
+            timeout: 45000,
           },
           {
             name: "tree-shaking-validation",
             testFunction: () => this.testTreeShaking(),
             critical: false,
-            timeout: 60000
+            timeout: 60000,
           },
           {
             name: "type-guard-validation",
             testFunction: () => this.testTypeGuards(),
             critical: true,
-            timeout: 15000
-          }
-        ]
+            timeout: 15000,
+          },
+        ],
       },
       {
         name: "performance",
@@ -150,22 +151,22 @@ class CrossModuleIntegrationRunner {
             name: "compilation-performance",
             testFunction: () => this.testCompilationPerformance(),
             critical: false,
-            timeout: 120000
+            timeout: 120000,
           },
           {
             name: "memory-usage-validation",
             testFunction: () => this.testMemoryUsage(),
             critical: false,
-            timeout: 60000
+            timeout: 60000,
           },
           {
             name: "build-time-validation",
             testFunction: () => this.testBuildTime(),
             critical: false,
-            timeout: 180000
-          }
-        ]
-      }
+            timeout: 180000,
+          },
+        ],
+      },
     ];
   }
 
@@ -192,16 +193,19 @@ class CrossModuleIntegrationRunner {
 
     const endTime = Date.now();
     const report = this.generateReport(endTime - startTime);
-    
+
     this.printReport(report);
     await this.saveReport(report);
 
     return report;
   }
 
-  private async runSingleTest(suite: IntegrationTestSuite, test: IntegrationTest): Promise<void> {
+  private async runSingleTest(
+    suite: IntegrationTestSuite,
+    test: IntegrationTest,
+  ): Promise<void> {
     console.log(`   🔬 ${test.name}${test.critical ? " [CRITICAL]" : ""}`);
-    
+
     const startTime = Date.now();
     let passed = false;
     let error: string | undefined;
@@ -214,7 +218,6 @@ class CrossModuleIntegrationRunner {
 
       const testPromise = test.testFunction();
       passed = await Promise.race([testPromise, timeoutPromise]);
-
     } catch (err) {
       passed = false;
       error = err instanceof Error ? err.message : String(err);
@@ -229,11 +232,15 @@ class CrossModuleIntegrationRunner {
       passed,
       duration,
       error,
-      critical: test.critical
+      critical: test.critical,
     });
 
     const status = passed ? "✅" : "❌";
-    console.log(`      ${status} ${passed ? "PASSED" : "FAILED"} (${duration}ms)${error ? ` - ${error}` : ""}`);
+    console.log(
+      `      ${status} ${passed ? "PASSED" : "FAILED"} (${duration}ms)${
+        error ? ` - ${error}` : ""
+      }`,
+    );
   }
 
   private async testBasicTypeCompatibility(): Promise<boolean> {
@@ -242,7 +249,7 @@ class CrossModuleIntegrationRunner {
       const { ApiResponse } = await import("../../../lib/types/api.d.ts");
       const { BaseEntity } = await import("../../../lib/types/base.d.ts");
       const { Stamp } = await import("../../../lib/types/stamp.d.ts");
-      
+
       // This should compile without errors
       return true;
     } catch (error) {
@@ -281,12 +288,16 @@ class CrossModuleIntegrationRunner {
     try {
       const analyzer = new DependencyGraphAnalyzer(this.projectRoot);
       const graph = await analyzer.analyzeDependencies();
-      
+
       // Check for critical circular dependencies
-      const criticalCircular = graph.circularDependencies.filter(cd => cd.severity === "critical");
-      
+      const criticalCircular = graph.circularDependencies.filter((cd) =>
+        cd.severity === "critical"
+      );
+
       if (criticalCircular.length > 0) {
-        console.error(`Found ${criticalCircular.length} critical circular dependencies`);
+        console.error(
+          `Found ${criticalCircular.length} critical circular dependencies`,
+        );
         return false;
       }
 
@@ -301,10 +312,12 @@ class CrossModuleIntegrationRunner {
     try {
       const analyzer = new DependencyGraphAnalyzer(this.projectRoot);
       const graph = await analyzer.analyzeDependencies();
-      
+
       // Check for client-server leaks
       if (graph.clientServerLeaks.length > 0) {
-        console.error(`Found ${graph.clientServerLeaks.length} client-server boundary violations`);
+        console.error(
+          `Found ${graph.clientServerLeaks.length} client-server boundary violations`,
+        );
         return false;
       }
 
@@ -319,11 +332,11 @@ class CrossModuleIntegrationRunner {
     try {
       const analyzer = new DependencyGraphAnalyzer(this.projectRoot);
       const graph = await analyzer.analyzeDependencies();
-      
+
       // Orphaned types are not critical but should be minimized
       const orphanedCount = graph.orphanedTypes.length;
       console.log(`      Found ${orphanedCount} orphaned types`);
-      
+
       // Allow up to 5 orphaned types
       return orphanedCount <= 5;
     } catch (error) {
@@ -337,7 +350,7 @@ class CrossModuleIntegrationRunner {
       // Test dynamic import resolution
       const stampTypes = await import("../../../lib/types/stamp.d.ts");
       const src20Types = await import("../../../lib/types/src20.d.ts");
-      
+
       // Verify imports loaded correctly
       return stampTypes !== undefined && src20Types !== undefined;
     } catch (error) {
@@ -352,11 +365,11 @@ class CrossModuleIntegrationRunner {
       const buildCmd = new Deno.Command("deno", {
         args: ["task", "build"],
         stdout: "piped",
-        stderr: "piped"
+        stderr: "piped",
       });
 
       const result = await buildCmd.output();
-      
+
       if (result.code !== 0) {
         console.error("Build failed during tree-shaking test");
         return false;
@@ -374,9 +387,11 @@ class CrossModuleIntegrationRunner {
     try {
       // Test type guards work correctly
       const testObject = { type: "stamp", data: { cpid: "test" } };
-      
+
       // Simple type guard test
-      const isStampType = (obj: any): obj is { type: "stamp", data: { cpid: string } } => {
+      const isStampType = (
+        obj: any,
+      ): obj is { type: "stamp"; data: { cpid: string } } => {
         return obj.type === "stamp" && typeof obj.data?.cpid === "string";
       };
 
@@ -390,12 +405,12 @@ class CrossModuleIntegrationRunner {
   private async testCompilationPerformance(): Promise<boolean> {
     try {
       const startTime = performance.now();
-      
+
       // Test TypeScript compilation performance
       const checkCmd = new Deno.Command("deno", {
         args: ["check", "lib/types/", "server/types/"],
         stdout: "piped",
-        stderr: "piped"
+        stderr: "piped",
       });
 
       const result = await checkCmd.output();
@@ -421,17 +436,19 @@ class CrossModuleIntegrationRunner {
     try {
       // Test memory usage during type operations
       const initialMemory = this.getMemoryUsage();
-      
+
       // Perform memory-intensive type operations
       for (let i = 0; i < 1000; i++) {
         await import("../../../lib/types/api.d.ts");
       }
-      
+
       const finalMemory = this.getMemoryUsage();
       const memoryIncrease = finalMemory - initialMemory;
-      
-      console.log(`      Memory increase: ${(memoryIncrease / 1024 / 1024).toFixed(2)}MB`);
-      
+
+      console.log(
+        `      Memory increase: ${(memoryIncrease / 1024 / 1024).toFixed(2)}MB`,
+      );
+
       // Fail if memory increase is more than 100MB
       return memoryIncrease < 100 * 1024 * 1024;
     } catch (error) {
@@ -443,11 +460,11 @@ class CrossModuleIntegrationRunner {
   private async testBuildTime(): Promise<boolean> {
     try {
       const startTime = performance.now();
-      
+
       const buildCmd = new Deno.Command("deno", {
         args: ["task", "build"],
         stdout: "piped",
-        stderr: "piped"
+        stderr: "piped",
       });
 
       const result = await buildCmd.output();
@@ -479,15 +496,24 @@ class CrossModuleIntegrationRunner {
 
   private generateReport(totalDuration: number): IntegrationReport {
     const totalTests = this.testResults.length;
-    const passedTests = this.testResults.filter(r => r.passed).length;
+    const passedTests = this.testResults.filter((r) => r.passed).length;
     const failedTests = totalTests - passedTests;
-    const criticalFailures = this.testResults.filter(r => !r.passed && r.critical).length;
+    const criticalFailures =
+      this.testResults.filter((r) => !r.passed && r.critical).length;
 
     // Calculate suite-specific results
-    const typeCompatibilityResults = this.testResults.filter(r => r.suite === "type-compatibility");
-    const dependencyResults = this.testResults.filter(r => r.suite === "dependency-graph");
-    const runtimeResults = this.testResults.filter(r => r.suite === "runtime-resolution");
-    const performanceResults = this.testResults.filter(r => r.suite === "performance");
+    const typeCompatibilityResults = this.testResults.filter((r) =>
+      r.suite === "type-compatibility"
+    );
+    const dependencyResults = this.testResults.filter((r) =>
+      r.suite === "dependency-graph"
+    );
+    const runtimeResults = this.testResults.filter((r) =>
+      r.suite === "runtime-resolution"
+    );
+    const performanceResults = this.testResults.filter((r) =>
+      r.suite === "performance"
+    );
 
     return {
       timestamp: new Date().toISOString(),
@@ -498,11 +524,12 @@ class CrossModuleIntegrationRunner {
       totalDuration,
       results: this.testResults,
       summary: {
-        typeCompatibility: typeCompatibilityResults.every(r => r.passed),
-        dependencyHealth: dependencyResults.every(r => r.passed),
-        runtimeResolution: runtimeResults.every(r => r.passed),
-        performanceAcceptable: performanceResults.filter(r => r.critical).every(r => r.passed)
-      }
+        typeCompatibility: typeCompatibilityResults.every((r) => r.passed),
+        dependencyHealth: dependencyResults.every((r) => r.passed),
+        runtimeResolution: runtimeResults.every((r) => r.passed),
+        performanceAcceptable: performanceResults.filter((r) => r.critical)
+          .every((r) => r.passed),
+      },
     };
   }
 
@@ -516,19 +543,37 @@ class CrossModuleIntegrationRunner {
     console.log(`   Passed: ${report.passedTests}`);
     console.log(`   Failed: ${report.failedTests}`);
     console.log(`   Critical Failures: ${report.criticalFailures}`);
-    console.log(`   Total Duration: ${(report.totalDuration / 1000).toFixed(1)}s`);
+    console.log(
+      `   Total Duration: ${(report.totalDuration / 1000).toFixed(1)}s`,
+    );
 
     console.log(`\n🔍 Component Health:`);
-    console.log(`   Type Compatibility: ${report.summary.typeCompatibility ? "✅ PASS" : "❌ FAIL"}`);
-    console.log(`   Dependency Health: ${report.summary.dependencyHealth ? "✅ PASS" : "❌ FAIL"}`);
-    console.log(`   Runtime Resolution: ${report.summary.runtimeResolution ? "✅ PASS" : "❌ FAIL"}`);
-    console.log(`   Performance: ${report.summary.performanceAcceptable ? "✅ PASS" : "❌ FAIL"}`);
+    console.log(
+      `   Type Compatibility: ${
+        report.summary.typeCompatibility ? "✅ PASS" : "❌ FAIL"
+      }`,
+    );
+    console.log(
+      `   Dependency Health: ${
+        report.summary.dependencyHealth ? "✅ PASS" : "❌ FAIL"
+      }`,
+    );
+    console.log(
+      `   Runtime Resolution: ${
+        report.summary.runtimeResolution ? "✅ PASS" : "❌ FAIL"
+      }`,
+    );
+    console.log(
+      `   Performance: ${
+        report.summary.performanceAcceptable ? "✅ PASS" : "❌ FAIL"
+      }`,
+    );
 
     // Show failed tests
-    const failedTests = report.results.filter(r => !r.passed);
+    const failedTests = report.results.filter((r) => !r.passed);
     if (failedTests.length > 0) {
       console.log(`\n❌ Failed Tests:`);
-      failedTests.forEach(test => {
+      failedTests.forEach((test) => {
         const critical = test.critical ? " [CRITICAL]" : "";
         console.log(`   • ${test.suite}/${test.name}${critical}`);
         if (test.error) {
@@ -539,7 +584,11 @@ class CrossModuleIntegrationRunner {
 
     // Overall status
     const overallPassed = report.criticalFailures === 0;
-    console.log(`\n${overallPassed ? "✅" : "❌"} Overall Status: ${overallPassed ? "PASSED" : "FAILED"}`);
+    console.log(
+      `\n${overallPassed ? "✅" : "❌"} Overall Status: ${
+        overallPassed ? "PASSED" : "FAILED"
+      }`,
+    );
 
     if (!overallPassed) {
       console.log(`\n🚫 INTEGRATION TESTING FAILED`);
@@ -547,7 +596,9 @@ class CrossModuleIntegrationRunner {
       console.log(`   Cross-module integration is not ready for production`);
     } else {
       console.log(`\n🎉 INTEGRATION TESTING PASSED`);
-      console.log(`   All critical tests passed - cross-module integration is healthy`);
+      console.log(
+        `   All critical tests passed - cross-module integration is healthy`,
+      );
     }
   }
 
@@ -556,7 +607,10 @@ class CrossModuleIntegrationRunner {
       const reportsDir = join(this.projectRoot, "reports");
       await Deno.mkdir(reportsDir, { recursive: true });
 
-      const reportPath = join(reportsDir, `cross-module-integration-${Date.now()}.json`);
+      const reportPath = join(
+        reportsDir,
+        `cross-module-integration-${Date.now()}.json`,
+      );
       await Deno.writeTextFile(reportPath, JSON.stringify(report, null, 2));
 
       console.log(`\n📄 Integration test report saved: ${reportPath}`);
@@ -570,15 +624,25 @@ class CrossModuleIntegrationRunner {
 Deno.test("Cross-Module Integration Test Suite", async () => {
   const projectRoot = Deno.cwd();
   const runner = new CrossModuleIntegrationRunner(projectRoot);
-  
+
   const report = await runner.runAllTests();
-  
+
   // Assert that all critical tests passed
-  assertEquals(report.criticalFailures, 0, "All critical integration tests must pass");
-  
+  assertEquals(
+    report.criticalFailures,
+    0,
+    "All critical integration tests must pass",
+  );
+
   // Assert overall integration health
-  const overallHealthy = Object.values(report.summary).every(status => status === true);
-  assertEquals(overallHealthy, true, "All integration components must be healthy");
+  const overallHealthy = Object.values(report.summary).every((status) =>
+    status === true
+  );
+  assertEquals(
+    overallHealthy,
+    true,
+    "All integration components must be healthy",
+  );
 });
 
 export { CrossModuleIntegrationRunner, type IntegrationReport };

@@ -1,9 +1,9 @@
 /* ===== STAMP CARD COMPONENT ===== */
 /* @baba-update audio icon size (custom) - 247*/
 /*@baba-check styles+icon*/
-import type { StampRow } from "$types/stamp.d.ts";
 import { Icon, LoadingIcon } from "$icon";
 import StampTextContent from "$islands/content/stampDetailContent/StampTextContent.tsx";
+import type { StampRow } from "$types/stamp.d.ts";
 import { VNode } from "preact";
 import { useEffect, useRef, useState } from "preact/hooks";
 
@@ -391,7 +391,9 @@ export function StampCard({
   const shouldDisplayHash = Number(stamp.stamp ?? 0) >= 0 ||
     (stamp.cpid && stamp.cpid.charAt(0) === "A");
 
-  const supplyDisplay = stamp.ident !== "SRC-20" && stamp.balance
+  const supplyDisplay = isRecentSale
+    ? `Qty: ${stamp.supply || 1}` // For recent sales, show transaction quantity
+    : stamp.ident !== "SRC-20" && stamp.balance
     ? `${formatSupplyValue(Number(stamp.balance), stamp.divisible)}/${
       stamp.supply < 100000 && !stamp.divisible
         ? formatSupplyValue(stamp.supply ?? 0, stamp.divisible)

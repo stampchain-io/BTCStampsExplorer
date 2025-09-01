@@ -119,11 +119,18 @@
             "url": {
               "raw": "{{base_url}}/api/v2/src20/balance/{{test_address}}/{{test_token}}",
               "host": ["{{base_url}}"],
-              "path": ["api", "v2", "src20", "balance", "{{test_address}}", "{{test_token}}"]
+              "path": [
+                "api",
+                "v2",
+                "src20",
+                "balance",
+                "{{test_address}}",
+                "{{test_token}}"
+              ]
             }
           }
         }
       ]
     }
   ]
-} 
+}

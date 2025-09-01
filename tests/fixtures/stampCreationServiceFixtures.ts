@@ -3,7 +3,7 @@
  * Provides mock data and utilities for stamp creation testing
  */
 
-import type { UTXO, ScriptType } from "$types/index.d.ts";
+import type { ScriptType, UTXO } from "$types/index.d.ts";
 
 // Mock stamp creation parameters
 export const mockStampParams = {
@@ -14,7 +14,8 @@ export const mockStampParams = {
     locked: true,
     divisible: false,
     filename: "test.png",
-    file: "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAEElEQVQ4jWNgYGBgGAWjgAEAAJQAAf//",
+    file:
+      "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAEElEQVQ4jWNgYGBgGAWjgAEAAJQAAf//",
     satsPerVB: 25,
     service_fee: 42000,
     service_fee_address: "bc1qservicefeetest123456789abcdefghij0vlvk",
@@ -27,7 +28,8 @@ export const mockStampParams = {
     sourceWallet: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh0vlvk",
     qty: "1",
     filename: "test.png",
-    file: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChAGAWzrQTgAAAABJRU5ErkJggg==",
+    file:
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChAGAWzrQTgAAAABJRU5ErkJggg==",
   },
 
   withServiceFee: {
@@ -35,7 +37,8 @@ export const mockStampParams = {
     assetName: "STAMPWITHFEE",
     qty: "50",
     filename: "test-with-fee.png",
-    file: "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAEElEQVQ4jWNgYGBgGAWjgAEAAJQAAf//",
+    file:
+      "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAEElEQVQ4jWNgYGBgGAWjgAEAAJQAAf//",
     service_fee: 50000,
     service_fee_address: "bc1qservicefeetest123456789abcdefghij0vlvk",
     satsPerVB: 30,
@@ -46,7 +49,8 @@ export const mockStampParams = {
     assetName: "MARASTAMP",
     qty: "10",
     filename: "mara-test.png",
-    file: "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAEElEQVQ4jWNgYGBgGAWjgAEAAJQAAf//",
+    file:
+      "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAEElEQVQ4jWNgYGBgGAWjgAEAAJQAAf//",
     outputValue: 150, // MARA mode (< 330)
     satsPerVB: 40,
   },
@@ -56,7 +60,8 @@ export const mockStampParams = {
     assetName: "LARGESTAMP",
     qty: "1",
     filename: "large-image.png",
-    file: "iVBORw0KGgoAAAANSUhEUgAAAMAAAADAAMAAABlApw1AAAAB3RJTUUH1QEMFiUSN4UQhQAAAAlwSFlzAAALEgAACxIB0t1+/AAAAFVQTFRFAAAAAIDU/wAA1P8A/9QA///U1NTU/wAA1P8A/9QA///U1NTU",
+    file:
+      "iVBORw0KGgoAAAANSUhEUgAAAMAAAADAAMAAABlApw1AAAAB3RJTUUH1QEMFiUSN4UQhQAAAAlwSFlzAAALEgAACxIB0t1+/AAAAFVQTFRFAAAAAIDU/wAA1P8A/9QA///U1NTU/wAA1P8A/9QA///U1NTU",
     satsPerVB: 20,
   },
 };
@@ -111,8 +116,10 @@ export const mockUTXOs: UTXO[] = [
 // Mock counterparty API responses
 export const mockCounterpartyResponses = {
   createIssuance: {
-    tx_hex: "020000000001010000000000000000000000000000000000000000000000000000000000000000000000000000ffffffff0150c30000000000001976a914c2b7a8b8f5d6e0a1b2c3d4e5f678901234567890ac00000000",
-    tx_hash: "abc123def456789012345678901234567890123456789012345678901234567890",
+    tx_hex:
+      "020000000001010000000000000000000000000000000000000000000000000000000000000000000000000000ffffffff0150c30000000000001976a914c2b7a8b8f5d6e0a1b2c3d4e5f678901234567890ac00000000",
+    tx_hash:
+      "abc123def456789012345678901234567890123456789012345678901234567890",
     btc_in: 100000,
     btc_out: 95000,
     btc_change: 95000,
@@ -128,20 +135,26 @@ export const mockCounterpartyResponses = {
 // Mock file data
 export const mockFileData = {
   small: {
-    base64: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChAGAWzrQTgAAAABJRU5ErkJggg==",
-    hex: "89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c4890000000d4944415478da636460f800028401805b3ad04e0000000049454e44ae426082",
+    base64:
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChAGAWzrQTgAAAABJRU5ErkJggg==",
+    hex:
+      "89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c4890000000d4944415478da636460f800028401805b3ad04e0000000049454e44ae426082",
     size: 95, // bytes
     filename: "1x1.png",
   },
   medium: {
-    base64: "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAEElEQVQ4jWNgYGBgGAWjgAEAAJQAAf//", 
-    hex: "89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff61000000104944415478da636460601805a3802000900201ff",
+    base64:
+      "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAEElEQVQ4jWNgYGBgGAWjgAEAAJQAAf//",
+    hex:
+      "89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff61000000104944415478da636460601805a3802000900201ff",
     size: 70, // bytes
     filename: "16x16.png",
   },
   large: {
-    base64: "iVBORw0KGgoAAAANSUhEUgAAAMAAAADAAMAAABlApw1AAAAB3RJTUUH1QEMFiUSN4UQhQAAAAlwSFlzAAALEgAACxIB0t1+/AAAAFVQTFRFAAAAAIDU/wAA1P8A/9QA///U1NTU/wAA1P8A/9QA///U1NTU",
-    hex: "89504e470d0a1a0a0000000d49484452000000c0000000c008060000006505c935000000074944415478da636460601805a38020000900201ff0000000049454e44ae426082",
+    base64:
+      "iVBORw0KGgoAAAANSUhEUgAAAMAAAADAAMAAABlApw1AAAAB3RJTUUH1QEMFiUSN4UQhQAAAAlwSFlzAAALEgAACxIB0t1+/AAAAFVQTFRFAAAAAIDU/wAA1P8A/9QA///U1NTU/wAA1P8A/9QA///U1NTU",
+    hex:
+      "89504e470d0a1a0a0000000d49484452000000c0000000c008060000006505c935000000074944415478da636460601805a38020000900201ff0000000049454e44ae426082",
     size: 5000, // bytes (estimated for large file)
     filename: "large-192x192.png",
   },
@@ -172,9 +185,9 @@ export const mockPSBTResults = {
 
 // Mock CIP33 addresses
 export const mockCIP33Addresses = [
-  "bc1qcip33addr1", 
-  "bc1qcip33addr2", 
-  "bc1qcip33addr3"
+  "bc1qcip33addr1",
+  "bc1qcip33addr2",
+  "bc1qcip33addr3",
 ];
 
 // Validation test cases
@@ -255,7 +268,7 @@ export const createMockServices = () => ({
     createIssuance: async () => mockCounterpartyResponses.createIssuance,
   },
   commonUtxoService: {
-    getOptimalUTXOs: async () => ({ 
+    getOptimalUTXOs: async () => ({
       utxos: mockUTXOs,
       totalValue: mockUTXOs.reduce((sum, utxo) => sum + utxo.value, 0),
     }),
@@ -284,7 +297,7 @@ export const performanceTestCases = [
     maxExecutionTime: 200, // ms
   },
   {
-    name: "Large stamp creation", 
+    name: "Large stamp creation",
     params: { ...mockStampParams.basic, file: mockFileData.large.base64 },
     maxExecutionTime: 500, // ms
   },
@@ -309,7 +322,7 @@ export function createMockLogger() {
 export function validateStampResult(result: any, isDryRun: boolean = false) {
   const requiredFields = [
     "est_tx_size",
-    "input_value", 
+    "input_value",
     "total_dust_value",
     "est_miner_fee",
     "change_value",
@@ -320,22 +333,24 @@ export function validateStampResult(result: any, isDryRun: boolean = false) {
     requiredFields.push("hex");
   }
 
-  const missingFields = requiredFields.filter(field => !(field in result));
+  const missingFields = requiredFields.filter((field) => !(field in result));
   if (missingFields.length > 0) {
-    throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
+    throw new Error(`Missing required fields: ${missingFields.join(", ")}`);
   }
 
   // Validate field types
-  if (typeof result.est_tx_size !== 'number' || result.est_tx_size <= 0) {
-    throw new Error('est_tx_size must be a positive number');
+  if (typeof result.est_tx_size !== "number" || result.est_tx_size <= 0) {
+    throw new Error("est_tx_size must be a positive number");
   }
 
-  if (typeof result.input_value !== 'number' || result.input_value < 0) {
-    throw new Error('input_value must be a non-negative number');
+  if (typeof result.input_value !== "number" || result.input_value < 0) {
+    throw new Error("input_value must be a non-negative number");
   }
 
-  if (!isDryRun && (typeof result.hex !== 'string' || result.hex.length === 0)) {
-    throw new Error('hex must be a non-empty string for non-dry-run results');
+  if (
+    !isDryRun && (typeof result.hex !== "string" || result.hex.length === 0)
+  ) {
+    throw new Error("hex must be a non-empty string for non-dry-run results");
   }
 
   return true;
@@ -360,6 +375,8 @@ export const errorScenarios = {
   },
   invalidTransaction: {
     params: mockStampParams.basic,
-    mockError: new Error("Transaction creation failed: No transaction hex returned"),
+    mockError: new Error(
+      "Transaction creation failed: No transaction hex returned",
+    ),
   },
 };

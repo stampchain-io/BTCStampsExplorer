@@ -5,7 +5,12 @@ import type { SRC20Row } from "$types/src20.d.ts";
 import type { StampRow, StampSaleRow } from "$types/stamp.d.ts";
 
 import { HomeHeader } from "$header";
-import { containerBackground, gapSectionSlim, Micro5FontLoader } from "$layout";
+import {
+  containerBackground,
+  gapSectionSlim,
+  headerSpacing,
+  Micro5FontLoader,
+} from "$layout";
 import { ResponseUtil } from "$lib/utils/api/responses/responseUtil.ts";
 import {
   CarouselHome,
@@ -298,7 +303,7 @@ export default function Home({ data }: PageProps<HomePageData>) {
 
       {/* ===== MAIN CONTENT ===== */}
       <div
-        class={`flex flex-col mt-0 min-[420px]:mt-3 mobileMd:mt-6 tablet:mt-3 ${gapSectionSlim}`}
+        class={`${headerSpacing} ${gapSectionSlim}`}
       >
         {/* ===== CRITICAL ABOVE FOLD CONTENT ===== */}
         <HomeHeader />

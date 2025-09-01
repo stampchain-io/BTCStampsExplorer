@@ -4,11 +4,11 @@ import { getDatabaseConfig, logDatabaseConfig, validateDatabaseConfig, type Data
 import { bigIntReviver, bigIntSerializer } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { crypto } from "@std/crypto";
 import {
-  ConsoleHandler,
-  FileHandler,
-  getLogger,
-  LogRecord,
-  setup,
+    ConsoleHandler,
+    FileHandler,
+    getLogger,
+    LogRecord,
+    setup,
 } from "@std/log";
 import { Client } from "mysql/mod.ts";
 // Conditionally import Redis based on build mode
@@ -840,19 +840,19 @@ class DatabaseManager {
     } else if (queryUpper.includes('SRC20_TX') || queryUpper.includes('SRC_20_TX') ||
                (queryUpper.includes('SRC20') && queryUpper.includes('TRANSACTION'))) {
       category = 'src20_transaction';
-    } else if (queryUpper.includes('FROM SRC20') || 
+    } else if (queryUpper.includes('FROM SRC20') ||
                (queryUpper.includes('SRC20') && queryUpper.includes('COUNT')) ||
                (queryUpper.includes('SRC20') && queryUpper.includes('TICK'))) {
       // SRC-20 queries that should be invalidated on new blocks
       category = 'blockchain_data';
     } else if (queryUpper.includes('DISPENSER') || queryUpper.includes('dispensers')) {
       category = 'dispenser';
-    } else if ((queryUpper.includes('STAMP') || queryUpper.includes('stamps')) && 
-               queryUpper.includes('WHERE') && 
+    } else if ((queryUpper.includes('STAMP') || queryUpper.includes('stamps')) &&
+               queryUpper.includes('WHERE') &&
                (queryUpper.includes('stamp_id') || queryUpper.includes('ident') || queryUpper.includes('cpid'))) {
       // Individual stamp detail queries
       category = 'stamp_detail';
-    } else if ((queryUpper.includes('STAMP') || queryUpper.includes('stamps')) && 
+    } else if ((queryUpper.includes('STAMP') || queryUpper.includes('stamps')) &&
                (!queryUpper.includes('WHERE') || queryUpper.includes('LIMIT'))) {
       // Full stamp list queries (no WHERE or just LIMIT)
       category = 'stamp_list';
@@ -1278,7 +1278,7 @@ class DatabaseManager {
 
           // Limit items if maxItems specified (keep most recent)
           if (maxItems && finalData.length > maxItems) {
-            finalData = sortOrder === 'DESC' 
+            finalData = sortOrder === 'DESC'
               ? finalData.slice(0, maxItems)
               : finalData.slice(-maxItems);
           }

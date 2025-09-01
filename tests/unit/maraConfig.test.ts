@@ -1,14 +1,14 @@
 import { assert, assertEquals, assertExists, assertThrows } from "@std/assert";
 import { beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
-import { stub, restore } from "@std/testing@1.0.14/mock";
+import { restore, stub } from "@std/testing@1.0.14/mock";
 
 import {
-  type MaraConfig,
-  isMaraConfig,
   createMaraConfigFromEnv,
-  validateMaraConfig,
-  isValidBitcoinAddress,
   DEFAULT_MARA_CONFIG,
+  isMaraConfig,
+  isValidBitcoinAddress,
+  type MaraConfig,
+  validateMaraConfig,
 } from "../../server/config/maraConfig.ts";
 
 describe("MARA Configuration", () => {
@@ -81,7 +81,7 @@ describe("MARA Configuration", () => {
         "3J98t1WpEZ73CNmQviecrnyiWrnqRhWNLy", // P2SH
       ];
 
-      validAddresses.forEach(address => {
+      validAddresses.forEach((address) => {
         assert(isValidBitcoinAddress(address), `Should be valid: ${address}`);
       });
     });
@@ -96,8 +96,11 @@ describe("MARA Configuration", () => {
         "tb1qtestnet", // testnet address
       ];
 
-      invalidAddresses.forEach(address => {
-        assert(!isValidBitcoinAddress(address), `Should be invalid: ${address}`);
+      invalidAddresses.forEach((address) => {
+        assert(
+          !isValidBitcoinAddress(address),
+          `Should be invalid: ${address}`,
+        );
       });
     });
   });
@@ -107,12 +110,18 @@ describe("MARA Configuration", () => {
       it("should create config from environment variables", () => {
         const envStub = stub(Deno.env, "get", (key: string) => {
           switch (key) {
-            case "MARA_API_BASE_URL": return "https://api.mara.com";
-            case "MARA_API_TIMEOUT": return "25000";
-            case "MARA_SERVICE_FEE_SATS": return "42000";
-            case "MARA_SERVICE_FEE_ADDRESS": return "bc1qhhv6rmxvq5mj2fc3zne2gpjqduy45urapje64m";
-            case "MARA_ENABLED": return "true";
-            default: return undefined;
+            case "MARA_API_BASE_URL":
+              return "https://api.mara.com";
+            case "MARA_API_TIMEOUT":
+              return "25000";
+            case "MARA_SERVICE_FEE_SATS":
+              return "42000";
+            case "MARA_SERVICE_FEE_ADDRESS":
+              return "bc1qhhv6rmxvq5mj2fc3zne2gpjqduy45urapje64m";
+            case "MARA_ENABLED":
+              return "true";
+            default:
+              return undefined;
           }
         });
 
@@ -122,7 +131,10 @@ describe("MARA Configuration", () => {
         assertEquals(config!.apiBaseUrl, "https://api.mara.com");
         assertEquals(config!.apiTimeout, 25000);
         assertEquals(config!.serviceFeeAmount, 42000);
-        assertEquals(config!.serviceFeeAddress, "bc1qhhv6rmxvq5mj2fc3zne2gpjqduy45urapje64m");
+        assertEquals(
+          config!.serviceFeeAddress,
+          "bc1qhhv6rmxvq5mj2fc3zne2gpjqduy45urapje64m",
+        );
         assertEquals(config!.enabled, true);
 
         envStub.restore();
@@ -136,8 +148,14 @@ describe("MARA Configuration", () => {
         assertExists(config);
         assertEquals(config!.apiBaseUrl, DEFAULT_MARA_CONFIG.apiBaseUrl);
         assertEquals(config!.apiTimeout, DEFAULT_MARA_CONFIG.apiTimeout);
-        assertEquals(config!.serviceFeeAmount, DEFAULT_MARA_CONFIG.serviceFeeAmount);
-        assertEquals(config!.serviceFeeAddress, DEFAULT_MARA_CONFIG.serviceFeeAddress);
+        assertEquals(
+          config!.serviceFeeAmount,
+          DEFAULT_MARA_CONFIG.serviceFeeAmount,
+        );
+        assertEquals(
+          config!.serviceFeeAddress,
+          DEFAULT_MARA_CONFIG.serviceFeeAddress,
+        );
         assertEquals(config!.enabled, true); // MARA is always enabled
 
         envStub.restore();
@@ -146,9 +164,12 @@ describe("MARA Configuration", () => {
       it("should handle invalid numeric environment variables", () => {
         const envStub = stub(Deno.env, "get", (key: string) => {
           switch (key) {
-            case "MARA_API_TIMEOUT": return "invalid-number";
-            case "MARA_SERVICE_FEE_SATS": return "not-a-number";
-            default: return undefined;
+            case "MARA_API_TIMEOUT":
+              return "invalid-number";
+            case "MARA_SERVICE_FEE_SATS":
+              return "not-a-number";
+            default:
+              return undefined;
           }
         });
 
@@ -157,7 +178,10 @@ describe("MARA Configuration", () => {
         assertExists(config);
         // Should fall back to defaults for invalid numbers
         assertEquals(config!.apiTimeout, DEFAULT_MARA_CONFIG.apiTimeout);
-        assertEquals(config!.serviceFeeAmount, DEFAULT_MARA_CONFIG.serviceFeeAmount);
+        assertEquals(
+          config!.serviceFeeAmount,
+          DEFAULT_MARA_CONFIG.serviceFeeAmount,
+        );
 
         envStub.restore();
       });
@@ -165,7 +189,7 @@ describe("MARA Configuration", () => {
       it("should ignore MARA_ENABLED environment variable (always enabled)", () => {
         const testCases = [
           "true",
-          "false", 
+          "false",
           "1",
           "0",
           "yes",
@@ -182,7 +206,11 @@ describe("MARA Configuration", () => {
           const config = createMaraConfigFromEnv();
           assertExists(config);
           // MARA is always enabled in the implementation
-          assertEquals(config!.enabled, true, `MARA is always enabled regardless of env value "${value}"`);
+          assertEquals(
+            config!.enabled,
+            true,
+            `MARA is always enabled regardless of env value "${value}"`,
+          );
 
           envStub.restore();
         });
@@ -218,8 +246,14 @@ describe("MARA Configuration", () => {
       // Should fall back to defaults for empty strings
       assertEquals(config!.apiBaseUrl, DEFAULT_MARA_CONFIG.apiBaseUrl);
       assertEquals(config!.apiTimeout, DEFAULT_MARA_CONFIG.apiTimeout);
-      assertEquals(config!.serviceFeeAmount, DEFAULT_MARA_CONFIG.serviceFeeAmount);
-      assertEquals(config!.serviceFeeAddress, DEFAULT_MARA_CONFIG.serviceFeeAddress);
+      assertEquals(
+        config!.serviceFeeAmount,
+        DEFAULT_MARA_CONFIG.serviceFeeAmount,
+      );
+      assertEquals(
+        config!.serviceFeeAddress,
+        DEFAULT_MARA_CONFIG.serviceFeeAddress,
+      );
       assertEquals(config!.enabled, DEFAULT_MARA_CONFIG.enabled);
 
       envStub.restore();
@@ -228,10 +262,14 @@ describe("MARA Configuration", () => {
     it("should handle whitespace in environment variables", () => {
       const envStub = stub(Deno.env, "get", (key: string) => {
         switch (key) {
-          case "MARA_API_BASE_URL": return "  https://api.mara.com  ";
-          case "MARA_SERVICE_FEE_ADDRESS": return "  bc1qhhv6rmxvq5mj2fc3zne2gpjqduy45urapje64m  ";
-          case "MARA_ENABLED": return "  true  ";
-          default: return undefined;
+          case "MARA_API_BASE_URL":
+            return "  https://api.mara.com  ";
+          case "MARA_SERVICE_FEE_ADDRESS":
+            return "  bc1qhhv6rmxvq5mj2fc3zne2gpjqduy45urapje64m  ";
+          case "MARA_ENABLED":
+            return "  true  ";
+          default:
+            return undefined;
         }
       });
 
@@ -240,7 +278,10 @@ describe("MARA Configuration", () => {
       assertExists(config);
       // Should trim whitespace
       assertEquals(config!.apiBaseUrl, "https://api.mara.com");
-      assertEquals(config!.serviceFeeAddress, "bc1qhhv6rmxvq5mj2fc3zne2gpjqduy45urapje64m");
+      assertEquals(
+        config!.serviceFeeAddress,
+        "bc1qhhv6rmxvq5mj2fc3zne2gpjqduy45urapje64m",
+      );
       assertEquals(config!.enabled, true);
 
       envStub.restore();
@@ -257,7 +298,7 @@ describe("MARA Configuration", () => {
 
       // Test that the config passes validation
       assert(isMaraConfig(config));
-      
+
       // Test validateMaraConfig assertion
       try {
         validateMaraConfig(config);
@@ -273,12 +314,18 @@ describe("MARA Configuration", () => {
       // Step 1: Set up environment
       const envStub = stub(Deno.env, "get", (key: string) => {
         switch (key) {
-          case "MARA_API_BASE_URL": return "https://slipstream.mara.com/rest-api";
-          case "MARA_API_TIMEOUT": return "30000";
-          case "MARA_SERVICE_FEE_SATS": return "42000";
-          case "MARA_SERVICE_FEE_ADDRESS": return "bc1qhhv6rmxvq5mj2fc3zne2gpjqduy45urapje64m";
-          case "MARA_ENABLED": return "true";
-          default: return undefined;
+          case "MARA_API_BASE_URL":
+            return "https://slipstream.mara.com/rest-api";
+          case "MARA_API_TIMEOUT":
+            return "30000";
+          case "MARA_SERVICE_FEE_SATS":
+            return "42000";
+          case "MARA_SERVICE_FEE_ADDRESS":
+            return "bc1qhhv6rmxvq5mj2fc3zne2gpjqduy45urapje64m";
+          case "MARA_ENABLED":
+            return "true";
+          default:
+            return undefined;
         }
       });
 

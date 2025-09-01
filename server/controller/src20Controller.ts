@@ -89,22 +89,47 @@ export class Src20Controller {
         last_block: lastBlock,
       };
 
-      // Process data with mint progress if requested
-      // 🚨 CRITICAL FIX: Ensure data is always an array to prevent frontend TypeError
-      let processedData: any = Array.isArray(rawData) ? [...rawData] : (rawData ? [rawData] : []);
+      // Process data based on pagination requirements
+      // For paginated requests: ensure data is array for consistency
+      // For single object requests: maintain single object structure per schema
+      let processedData: any;
+      
+      if (balanceParams.includePagination) {
+        // Paginated endpoint: data must be array
+        processedData = Array.isArray(rawData) ? [...rawData] : (rawData ? [rawData] : []);
+      } else {
+        // Single object endpoint: data must be object (not array)
+        processedData = Array.isArray(rawData) ? rawData[0] || null : rawData;
+      }
 
       // 🚀 CENTRALIZED MARKET DATA ENRICHMENT (v2.3 format)
       // Middleware will transform to v2.2 (remove market_data) if needed
       if (balanceParams.includeMarketData) {
         try {
-          processedData = await MarketDataEnrichmentService.enrichWithMarketData(
-            processedData,
-            {
-              includeExtendedFields: true, // ✅ Include volume_7d_btc, volume_30d_btc for v2.3
-              bulkOptimized: true,
-              enableLogging: true // ✅ Enable logging for error tracking
+          if (balanceParams.includePagination) {
+            // For paginated endpoints: enrich array directly
+            processedData = await MarketDataEnrichmentService.enrichWithMarketData(
+              processedData,
+              {
+                includeExtendedFields: true,
+                bulkOptimized: true,
+                enableLogging: true
+              }
+            );
+          } else {
+            // For single object endpoints: wrap in array for enrichment, then unwrap
+            if (processedData) {
+              const enrichedArray = await MarketDataEnrichmentService.enrichWithMarketData(
+                [processedData],
+                {
+                  includeExtendedFields: true,
+                  bulkOptimized: true,
+                  enableLogging: true
+                }
+              );
+              processedData = enrichedArray[0] || processedData;
             }
-          );
+          }
         } catch (marketDataError) {
           // ✅ Enhanced error handling for market data enrichment failures
           console.warn("Market data enrichment failed for balance request:", {
@@ -117,30 +142,39 @@ export class Src20Controller {
           });
 
           // ✅ Graceful degradation: continue with balance data but no market enrichment
-          // The MarketDataEnrichmentService already handles this, but we log the failure
           console.info("Balance request continuing without market data enrichment");
         }
       }
 
-      if (balanceParams.includeMintData && Array.isArray(processedData)) {
-        const ticks = processedData.map((row: any) => row.tick).filter(Boolean);
-        if (ticks.length > 0) {
-          const mintProgressData = await Promise.all(
-            ticks.map((tick: string) =>
-              SRC20Service.QueryService.fetchSrc20MintProgress(tick)
-            )
-          );
+      if (balanceParams.includeMintData) {
+        if (balanceParams.includePagination && Array.isArray(processedData)) {
+          // For paginated endpoints: process array of balances
+          const ticks = processedData.map((row: any) => row.tick).filter(Boolean);
+          if (ticks.length > 0) {
+            const mintProgressData = await Promise.all(
+              ticks.map((tick: string) =>
+                SRC20Service.QueryService.fetchSrc20MintProgress(tick)
+              )
+            );
 
-          // Create a map of tick to mint progress for efficient lookup
-          const mintProgressMap = new Map(
-            mintProgressData.map((progress: any, index: number) => [ticks[index], progress])
-          );
+            // Create a map of tick to mint progress for efficient lookup
+            const mintProgressMap = new Map(
+              mintProgressData.map((progress: any, index: number) => [ticks[index], progress])
+            );
 
-          // Enrich data with mint progress
-          processedData = processedData.map((row: any) => ({
-            ...row,
-            mint_progress: mintProgressMap.get(row.tick) || null
-          }));
+            // Enrich data with mint progress
+            processedData = processedData.map((row: any) => ({
+              ...row,
+              mint_progress: mintProgressMap.get(row.tick) || null
+            }));
+          }
+        } else if (!balanceParams.includePagination && processedData && processedData.tick) {
+          // For single object endpoints: process single balance
+          const mintProgress = await SRC20Service.QueryService.fetchSrc20MintProgress(processedData.tick);
+          processedData = {
+            ...processedData,
+            mint_progress: mintProgress || null
+          };
         }
       }
 
@@ -185,11 +219,26 @@ export class Src20Controller {
       }
 
       // ✅ Return structured error response with graceful degradation
-      return {
+      let errorResponse: any = {
         last_block: lastBlock,
         data: balanceParams.address && balanceParams.tick ? {} : [],
         // Note: API middleware will add appropriate error metadata if needed
       };
+
+      // ✅ Include pagination fields if this was a paginated request
+      if (balanceParams.includePagination) {
+        const limit = balanceParams.limit || 50;
+        const page = balanceParams.page || 1;
+        errorResponse = {
+          page,
+          limit,
+          totalPages: 0, // No data available due to error
+          total: 0, // No data available due to error
+          ...errorResponse,
+        };
+      }
+
+      return errorResponse;
     }
   }
 
@@ -268,32 +317,28 @@ export class Src20Controller {
     try {
       const [deploymentData, mintStatusData, lastBlockData] = await Promise.all(
         [
-          SRC20Service.QueryService.fetchAndFormatSrc20Data({
+          SRC20Service.QueryService.fetchBasicSrc20Data({
             tick: [tick],
             op: "DEPLOY",
             limit: 1,
             page: 1,
           }),
           SRC20Service.QueryService.fetchSrc20MintProgress(tick).catch(() => null),
-          SRC20Service.QueryService.fetchAndFormatSrc20Data({
-            limit: 1,
-            page: 1,
-            sortBy: "DESC",
-          }),
+          BlockService.getLastBlock(),
         ],
       );
 
       // If deploymentData is empty, it means the tick doesn't exist
       if (!deploymentData.data || !Array.isArray(deploymentData.data) || deploymentData.data.length === 0) {
         return {
-          last_block: lastBlockData.last_block,
+          last_block: lastBlockData,
           mint_status: null,
           data: null,
         };
       }
 
       return {
-        last_block: lastBlockData.last_block,
+        last_block: lastBlockData,
         mint_status: mintStatusData,
         data: (deploymentData.data as any[])[0],
       };
@@ -425,7 +470,7 @@ export class Src20Controller {
       const marketDataMap = await SRC20Service.QueryService.getBulkSRC20MarketData(ticks);
 
       // Get basic deployment data for trending tokens
-      const deploymentData = await SRC20Service.QueryService.fetchAndFormatSrc20DataV2({
+      const deploymentData = await SRC20Service.QueryService.fetchEnhancedSrc20Data({
         tick: ticks,
         op: "DEPLOY",
         limit: ticks.length,

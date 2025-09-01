@@ -1,6 +1,6 @@
 import {
-    StampCreationService,
-    StampValidationService,
+  StampCreationService,
+  StampValidationService,
 } from "$server/services/stamp/index.ts";
 import { assertEquals, assertExists } from "@std/assert";
 import { Psbt } from "bitcoinjs-lib";

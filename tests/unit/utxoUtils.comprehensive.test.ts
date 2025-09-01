@@ -1,5 +1,10 @@
 import { assertArrayIncludes, assertEquals, assertExists } from "@std/assert";
-import { afterEach, beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  it,
+} from "jsr:@std/testing@1.0.14/bdd";
 import {
   getTxInfo,
   getUTXOForAddress,

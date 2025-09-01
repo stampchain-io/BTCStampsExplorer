@@ -36,7 +36,7 @@ export const handler: Handlers = {
     };
 
     try {
-      const result = await SRC20Service.QueryService.fetchAndFormatSrc20Data(
+      const result = await SRC20Service.QueryService.fetchBasicSrc20Data(
         params,
       );
       return ApiResponseUtil.success(result, {

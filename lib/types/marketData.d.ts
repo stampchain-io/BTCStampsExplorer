@@ -508,10 +508,10 @@ export interface RecentSaleData {
 export interface RecentSalesResponse {
   recentSales: RecentSaleData[];
   total: number;
-  btcPriceUSD: number;
+  btc_price_usd: number;
   metadata: {
-    dayRange: number;
-    lastUpdated: string;
+    day_range: number;
+    last_updated: string;
   };
 }
 

@@ -222,11 +222,12 @@ class MockUTXOService {
 
     if (options.filterStampUTXOs) {
       try {
-        const stampBalances = await mockCounterpartyApiManager.getXcpBalancesByAddress(
-          address,
-          undefined,
-          true,
-        );
+        const stampBalances = await mockCounterpartyApiManager
+          .getXcpBalancesByAddress(
+            address,
+            undefined,
+            true,
+          );
 
         const utxosToExcludeFromStamps = new Set<string>();
         for (const balance of stampBalances.balances) {

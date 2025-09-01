@@ -3,9 +3,9 @@
  * This shows how to migrate from direct globalThis.location usage
  */
 
-import type { JSX } from "preact";
 import { Icon } from "$icon";
-import { useSSRSafeNavigation } from "$lib/hooks/useSSRSafeNavigation.ts";
+import { safeNavigate } from "$utils/navigation/freshNavigationUtils.ts";
+import type { JSX } from "preact";
 
 interface PaginationProps {
   page: number;
@@ -24,9 +24,6 @@ export const PaginationSSRSafe = ({
   prefix,
   class: className = "",
 }: PaginationProps): JSX.Element | null => {
-  // Use our SSR-safe navigation hook
-  const { setSearchParam } = useSSRSafeNavigation();
-
   const navArrow =
     "rounded-none border-none h-6 w-6 hover:bg-stamp-purple-md active:bg-stamp-purple-dark transition-all flex items-center justify-center text-white";
   const navContent =
@@ -38,9 +35,13 @@ export const PaginationSSRSafe = ({
       return;
     }
 
-    // SSR-safe URL parameter update
+    // Use Fresh partial navigation if available, fallback to URL parameter update
+    const url = new URL(globalThis.location?.href || "http://localhost:8000");
     const paramName = prefix ? `${prefix}_page` : "page";
-    setSearchParam(paramName, newPage.toString());
+    url.searchParams.set(paramName, newPage.toString());
+
+    // Try Fresh partial navigation first
+    safeNavigate(url.toString());
   };
 
   const renderPageButton = (pageNum: number, iconName?: string) => {

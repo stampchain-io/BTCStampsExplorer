@@ -1,14 +1,14 @@
 /* ===== COLLECTION LANDING PAGE ===== */
+import type { StampFilterType } from "$constants";
 import { FreshContext, Handlers } from "$fresh/server.ts";
 import type { CollectionGalleryProps } from "$server/types/collection.d.ts";
-import type { StampFilterType } from "$constants";
 import type {
   CollectionLandingPageProps,
   StampGalleryProps,
 } from "$types/ui.d.ts";
 
 import { CollectionOverviewHeader } from "$header";
-import { body, gapSection } from "$layout";
+import { body, gapSection, headerSpacing } from "$layout";
 import {
   CollectionDetailGallery,
   RecursiveContactCta,
@@ -150,7 +150,11 @@ export default function CollectionLandingPage(
 
   /* ===== COMPONENT ===== */
   return (
-    <div class={`${body} ${gapSection}`}>
+    <div
+      class={`${headerSpacing} ${body} ${gapSection}`}
+      f-client-nav
+      data-partial="/collection"
+    >
       <div>
         <CollectionOverviewHeader />
         <StampGallery
