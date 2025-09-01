@@ -39,7 +39,7 @@ export function SkeletonContainer({
 export function SkeletonInput({
   height = "h-10",
   width = "w-full",
-  rounded = "rounded-lg",
+  rounded = "rounded-xl",
   className = "",
 }: {
   width?: string;
@@ -57,7 +57,7 @@ export function SkeletonInput({
 /* Skeleton for buttons */
 export function SkeletonButton({
   width = "w-32",
-  rounded = "rounded-lg",
+  rounded = "rounded-xl",
   size = "mdR",
   className = "",
 }: {
@@ -150,7 +150,7 @@ export function SkeletonText({
 /* Skeleton for image previews */
 export function SkeletonImage({
   size = "w-[100px] h-[100px]",
-  rounded = "rounded-lg",
+  rounded = "rounded-xl",
   className = "",
 }: {
   size?: string;

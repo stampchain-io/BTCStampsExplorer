@@ -1,7 +1,7 @@
 /// <reference lib="dom" />
 import { NOT_AVAILABLE_IMAGE } from "$constants";
-import type { StampRow } from "$types/stamp.d.ts";
 import type { SRC20Row } from "$types/src20.d.ts";
+import type { StampRow } from "$types/stamp.d.ts";
 
 /**
  * Get the base URL for the current environment
@@ -213,7 +213,7 @@ export function showFallback(element: HTMLElement) {
   const fallback = document.createElement("img");
   fallback.src = NOT_AVAILABLE_IMAGE;
   fallback.alt = "Content not available";
-  fallback.className = "w-full h-full object-contain rounded-lg pixelart";
+  fallback.className = "w-full h-full object-contain rounded-xl pixelart";
 
   if (element instanceof HTMLIFrameElement) {
     element.style.display = "none";

@@ -19,8 +19,10 @@ import {
   containerBackground,
   containerRowForm,
   glassmorphism,
-  glassmorphismLayer2,
-  transition,
+  glassmorphismL2,
+  glassmorphismL2Hover,
+  transitionAll,
+  transitionColors,
 } from "$layout";
 import { useFees } from "$lib/hooks/useFees.ts";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
@@ -1645,7 +1647,8 @@ function StampingToolMain({ config }: { config: Config }) {
   const imagePreviewDiv = (
     <div
       id="image-preview"
-      class={`relative items-center content-center mx-auto ${PREVIEW_SIZE_CLASSES} text-center group ${glassmorphismLayer2} hover:bg-[#171417]/10 hover:border-[#33333380] ${transition} cursor-pointer `}
+      class={`relative items-center content-center mx-auto ${PREVIEW_SIZE_CLASSES} text-center group ${glassmorphismL2}
+      ${glassmorphismL2Hover} ${transitionColors} cursor-pointer `}
       onMouseMove={handleMouseMove}
       onMouseEnter={handleUploadMouseEnter}
       onMouseLeave={handleUploadMouseLeave}
@@ -1667,7 +1670,7 @@ function StampingToolMain({ config }: { config: Config }) {
             {file.name.match(/\.(jpg|jpeg|png|gif|webp|svg|avif)$/i)
               ? (
                 <img
-                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded bg-conic-pattern bg-[length:4px_4px] bg-stamp-grey/30 [image-rendering:pixelated]`}
+                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded-lg bg-conic-pattern bg-[length:4px_4px] bg-stamp-grey/30 [image-rendering:pixelated]`}
                   src={URL.createObjectURL(file)}
                   alt="Preview"
                   onError={(e) => {
@@ -1688,7 +1691,7 @@ function StampingToolMain({ config }: { config: Config }) {
                   loading="lazy"
                   sandbox="allow-scripts allow-same-origin"
                   src={URL.createObjectURL(file)}
-                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded bg-stamp-grey/30 [image-rendering:pixelated]`}
+                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded-lg bg-stamp-grey/30 [image-rendering:pixelated]`}
                   onError={(e) => {
                     console.error("iframe error (detailed):", {
                       error: e,
@@ -1705,12 +1708,12 @@ function StampingToolMain({ config }: { config: Config }) {
               )
               : (
                 <img
-                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded bg-conic-pattern bg-[length:4px_4px] [image-rendering:pixelated]`}
+                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded-lg bg-conic-pattern bg-[length:4px_4px] [image-rendering:pixelated]`}
                   src={NOT_AVAILABLE_IMAGE}
                   alt={`File: ${file.name}`}
                 />
               )}
-            <div class="flex items-center justify-center absolute inset-0 rounded hover:bg-[#171417]/10 hover:border-[#33333380] opacity-0 hover:opacity-100 transition-opacity">
+            <div class="flex items-center justify-center absolute inset-0 rounded-lg hover:bg-[#100a10]/60 hover:border-[#242424] opacity-0 hover:opacity-100 transition-opacity">
               <Icon
                 type="icon"
                 name="uploadImage"
@@ -1987,7 +1990,7 @@ function StampingToolMain({ config }: { config: Config }) {
             <button
               type="button"
               onClick={switchToStandardMode}
-              class={`px-4 py-2 ${glassmorphism} bg-gradient-to-br from-purple-600/80 to-purple-700/80 text-white text-sm rounded-lg hover:from-purple-600 hover:to-purple-700 transition-colors font-semibold`}
+              class={`px-4 py-2 ${glassmorphism} bg-gradient-to-br from-purple-600/80 to-purple-700/80 text-white text-sm rounded-xl hover:from-purple-600 hover:to-purple-700 transition-colors font-semibold`}
             >
               Switch to Standard
             </button>
@@ -2061,7 +2064,7 @@ function StampingToolMain({ config }: { config: Config }) {
         </div>
 
         <div
-          className={`overflow-hidden transition-all duration-500 ${
+          className={`overflow-hidden ${transitionAll} ${
             showAdvancedOptions
               ? "max-h-[150px] opacity-100 mt-5"
               : "max-h-0 opacity-0 mt-0"
@@ -2071,7 +2074,7 @@ function StampingToolMain({ config }: { config: Config }) {
             {poshToggleButton}
             <div
               ref={lockButtonRef}
-              className={`flex items-center justify-center !w-10 !h-10 ${glassmorphismLayer2} hover:bg-[#171417]/10 hover:border-[#33333380] group`}
+              className={`flex items-center justify-center !w-10 !h-10 ${glassmorphismL2} ${glassmorphismL2Hover} group`}
               onClick={() => {
                 setIsLocked(!isLocked);
                 setIsLockTooltipVisible(false);
@@ -2117,7 +2120,7 @@ function StampingToolMain({ config }: { config: Config }) {
 
             <div
               ref={previewButtonRef}
-              className={`flex items-center justify-center !w-[46px] !h-10 ${glassmorphismLayer2} hover:bg-[#171417]/10 hover:border-[#33333380] group`} // dunno why, but the width has to be +6px ?!?!
+              className={`flex items-center justify-center !w-[46px] !h-10 ${glassmorphismL2} ${glassmorphismL2Hover} group`} // dunno why, but the width has to be +6px ?!?!
               onClick={() => {
                 toggleFullScreenModal();
                 setIsPreviewTooltipVisible(false);

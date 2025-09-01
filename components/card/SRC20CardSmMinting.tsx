@@ -1,16 +1,17 @@
-/* reinamora - update Trending calculations */
+/* @reinamora - update Trending calculations */
 import { Button } from "$button";
-import type { SRC20Row } from "$types/src20.d.ts";
-import type { TargetedEvent } from "preact/compat";
-import type { SRC20CardSmMintingProps } from "$types/ui.d.ts";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
+import type { SRC20Row } from "$types/src20.d.ts";
+import type { SRC20CardSmMintingProps } from "$types/ui.d.ts";
+import type { TargetedEvent } from "preact/compat";
 // SRC20 card component for minting state
 import {
-  containerCardTable,
-  rowCardBorderCenter,
-  rowCardBorderLeft,
-  rowCardBorderRight,
-  // Timeframe - removed unused import
+  cellCenterL2Card,
+  cellLeftL2Card,
+  cellRightL2Card,
+  cellStickyLeft,
+  glassmorphismL2,
+  shadowGlowPurple,
 } from "$layout";
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
@@ -30,7 +31,7 @@ export function SRC20CardSmMinting({
     "MINTS",
     "PROGRESS",
     "HOLDERS",
-    "", // MINT button
+    "MINT",
   ];
 
   function splitTextAndEmojis(text: string): { text: string; emoji: string } {
@@ -46,270 +47,285 @@ export function SRC20CardSmMinting({
   }
 
   return (
-    <table class={`w-full ${textSm} border-separate border-spacing-y-3 -mt-8`}>
-      <colgroup>
-        {colGroup([
-          {
-            width:
-              "w-[28%] min-[600px]:w-[22%] tablet:w-[35%] min-[1280px]:w-[22%]",
-          }, // TOKEN
-          {
-            width:
-              "hidden min-[600px]:w-[16%] tablet:hidden min-[1280px]:w-[12%]",
-          }, // MINTS
-          {
-            width:
-              "w-[32%] min-[600px]:w-[16%] tablet:w-[28%] min-[1280px]:w-[20%]",
-          }, // PROGRESS
-          {
-            width:
-              "w-[17%] min-[600px]:w-[16%] tablet:w-[20%] min-[1280px]:w-[18%]",
-          }, // HOLDERS
-          {
-            width:
-              "w-[23%] min-[600px]:w-[30%] tablet:w-[17%] min-[1280px]:w-[28%]",
-          }, // MINT button
-        ]).map((col) => <col key={col.key} class={col.className} />)}
-      </colgroup>
-      <thead>
-        <tr>
-          {headers.map((header, i) => (
-            <th
-              key={header}
-              class={`${labelXs} ${cellAlign(i, headers?.length ?? 0)} ${
-                i === 1
-                  ? "hidden min-[600px]:table-cell tablet:hidden min-[1280px]:table-cell"
-                  : "" // MINTS
-              }`}
-            >
-              {header}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {data?.length
-          ? (
-            data.map((src20: SRC20Row) => {
-              // SRC-20 Image URL Logic:
-              // 1. Use deploy_img if provided (for deploy operations: https://stampchain.io/stamps/{deploy_tx}.svg)
-              // 2. Use stamp_url if provided (for transaction stamps: https://stampchain.io/stamps/{tx_hash}.svg)
-              // 3. Fallback to constructing URL from deploy_tx if available
-              // 4. Final fallback to placeholder image
-              const imageUrl = src20.deploy_img ||
-                src20.stamp_url ||
-                (src20.deploy_tx ? constructStampUrl(src20.deploy_tx) : null) ||
-                "/img/placeholder/stamp-no-image.svg";
+    <div class="overflow-x-auto tablet:overflow-x-visible scrollbar-hide">
+      <table
+        class={`w-full -mt-2 border-separate border-spacing-y-3 ${textSm}`}
+      >
+        <colgroup>
+          {colGroup([
+            {
+              width:
+                "min-w-[140px] max-w-[160px] w-auto sticky left-0 mobileLg:static tablet:min-w-[130px] min-[1090px]:min-w-[140px]",
+            }, // TOKEN
+            {
+              width:
+                "min-w-[90px] w-auto tablet:hidden min-[1280px]:table-cell min-[1280px]:min-w-[80px]",
+            }, // MINTS
+            {
+              width:
+                "min-w-[120px] w-auto tablet:min-w-[110px] min-[1090px]:min-w-[120px]",
+            }, // PROGRESS
+            {
+              width:
+                "min-w-[100px] w-auto tablet:min-w-[80px] min-[1090px]:min-w-[100px]",
+            }, // HOLDERS
+            {
+              width:
+                "min-w-[80px] w-auto tablet:min-w-[70px] min-[1090px]:min-w-[80px]",
+            }, // MINT button
+          ]).map((col) => <col key={col.key} class={col.className} />)}
+        </colgroup>
+        <thead>
+          <tr class={`${glassmorphismL2}`}>
+            {headers.map((header, i) => {
+              const isFirst = i === 0;
+              const isLast = i === (headers?.length ?? 0) - 1;
 
-              const href = `/src20/${
-                encodeURIComponent(unicodeEscapeToEmoji(src20.tick ?? ""))
-              }`;
-
-              const mintHref = `/tool/src20/mint?tick=${
-                encodeURIComponent(src20.tick ?? "")
-              }&trxType=olga`;
-
-              const handleMintClick = (
-                event: TargetedEvent<HTMLButtonElement>,
-              ) => {
-                event.preventDefault();
-
-                // SSR-safe browser environment check
-                if (!isBrowser()) {
-                  return; // Cannot navigate during SSR
-                }
-
-                // Check if we're already on the mint page
-                const currentUrl = getCurrentUrl();
-                const url = new URL(currentUrl);
-                const isMintPage = url.pathname.includes("/tool/src20/mint");
-
-                if (isMintPage) {
-                  // If we're on the mint page, update URL parameters to populate form
-                  const newUrl = new URL(currentUrl);
-                  newUrl.searchParams.set("tick", src20.tick ?? "");
-                  newUrl.searchParams.set("trxType", "olga");
-                  globalThis.history.replaceState({}, "", newUrl.toString());
-
-                  // Trigger a custom event that the MintTool can listen to
-                  globalThis.dispatchEvent(
-                    new CustomEvent("mintTokenSelected", {
-                      detail: { tick: src20.tick ?? "" },
-                    }),
-                  );
-                } else {
-                  // Otherwise, navigate to mint page with parameters
-                  safeNavigate(mintHref);
-                }
-              };
+              // Row background color and rounded corners
+              const rowClass = isFirst
+                ? cellLeftL2Card
+                : isLast
+                ? cellRightL2Card
+                : cellCenterL2Card;
 
               return (
-                <tr
-                  key={src20.tx_hash}
-                  class={`${containerCardTable} cursor-pointer group`}
+                <th
+                  key={header}
+                  class={`${labelXs} ${
+                    cellAlign(i, headers?.length ?? 0)
+                  } py-2 ${rowClass} ${
+                    i === 1
+                      ? "tablet:hidden min-[1280px]:table-cell" // MINTS - show on mobile, hide on tablet, show on desktop
+                      : ""
+                  } ${isFirst ? cellStickyLeft : ""}`}
                 >
-                  {/* TOKEN */}
-                  <td
-                    class={`${
-                      cellAlign(0, headers?.length ?? 0)
-                    } ${rowCardBorderLeft}`}
+                  {header}
+                </th>
+              );
+            })}
+          </tr>
+        </thead>
+        <tbody>
+          {data?.length
+            ? (
+              data.map((src20: SRC20Row) => {
+                // SRC-20 Image URL Logic:
+                // 1. Use deploy_img if provided (for deploy operations: https://stampchain.io/stamps/{deploy_tx}.svg)
+                // 2. Use stamp_url if provided (for transaction stamps: https://stampchain.io/stamps/{tx_hash}.svg)
+                // 3. Fallback to constructing URL from deploy_tx if available
+                // 4. Final fallback to placeholder image
+                const imageUrl = src20.deploy_img ||
+                  src20.stamp_url ||
+                  (src20.deploy_tx
+                    ? constructStampUrl(src20.deploy_tx)
+                    : null) ||
+                  "/img/placeholder/stamp-no-image.svg";
+
+                const href = `/src20/${
+                  encodeURIComponent(unicodeEscapeToEmoji(src20.tick ?? ""))
+                }`;
+
+                const mintHref = `/tool/src20/mint?tick=${
+                  encodeURIComponent(src20.tick ?? "")
+                }&trxType=olga`;
+
+                const handleMintClick = (
+                  event: TargetedEvent<HTMLButtonElement>,
+                ) => {
+                  event.preventDefault();
+
+                  // SSR-safe browser environment check
+                  if (!isBrowser()) {
+                    return; // Cannot navigate during SSR
+                  }
+
+                  // Check if we're already on the mint page
+                  const currentUrl = getCurrentUrl();
+                  const url = new URL(currentUrl);
+                  const isMintPage = url.pathname.includes("/tool/src20/mint");
+
+                  if (isMintPage) {
+                    // If we're on the mint page, update URL parameters to populate form
+                    const newUrl = new URL(currentUrl);
+                    newUrl.searchParams.set("tick", src20.tick ?? "");
+                    newUrl.searchParams.set("trxType", "olga");
+                    globalThis.history.replaceState({}, "", newUrl.toString());
+
+                    // Trigger a custom event that the MintTool can listen to
+                    globalThis.dispatchEvent(
+                      new CustomEvent("mintTokenSelected", {
+                        detail: { tick: src20.tick ?? "" },
+                      }),
+                    );
+                  } else {
+                    // Otherwise, navigate to mint page with parameters
+                    safeNavigate(mintHref);
+                  }
+                };
+
+                return (
+                  <tr
+                    key={src20.tx_hash}
+                    class={`${glassmorphismL2} ${shadowGlowPurple}`}
+                    onClick={(e) => {
+                      // Only navigate if not clicking on image or button
+                      const target = e.target as HTMLElement;
+                      const isImage = target.tagName === "IMG";
+                      const isButton = target.closest("button");
+                      if (
+                        !isImage && !isButton && !e.ctrlKey && !e.metaKey &&
+                        e.button !== 1
+                      ) {
+                        e.preventDefault();
+                        if (isBrowser()) {
+                          safeNavigate(href);
+                        }
+                      }
+                    }}
                   >
-                    <div class="flex items-center gap-4">
-                      <img
-                        src={imageUrl}
-                        class="hidden min-[420px]:flex w-7 h-7 rounded-sm cursor-pointer"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          onImageClick?.(imageUrl);
-                        }}
-                        alt={unicodeEscapeToEmoji(src20.tick ?? "")}
-                      />
-                      <div class="flex flex-col">
-                        <div class="font-bold text-base uppercase tracking-wide">
-                          {(() => {
-                            const { text, emoji } = splitTextAndEmojis(
-                              unicodeEscapeToEmoji(src20.tick ?? ""),
-                            );
-                            return (
-                              <>
-                                {text && (
-                                  <a
-                                    href={href}
-                                    onClick={(e) => {
-                                      if (
-                                        !e.ctrlKey && !e.metaKey &&
-                                        e.button !== 1
-                                      ) {
-                                        e.preventDefault();
-                                        // SSR-safe browser environment check
-                                        if (
-                                          typeof globalThis === "undefined" ||
-                                          !globalThis?.location
-                                        ) {
-                                          return; // Cannot navigate during SSR
-                                        }
-                                        globalThis.location.href = href;
-                                      }
-                                    }}
-                                  >
-                                    <span class="gray-gradient1 group-hover:[-webkit-text-fill-color:#AA00FF] inline-block transition-colors duration-300">
+                    {/* TOKEN */}
+                    <td
+                      class={`${
+                        cellAlign(0, headers?.length ?? 0)
+                      } ${cellLeftL2Card} ${cellStickyLeft}`}
+                    >
+                      <div class="flex items-center gap-4">
+                        <img
+                          src={imageUrl}
+                          class="w-7 h-7 rounded cursor-pointer"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            onImageClick?.(imageUrl);
+                          }}
+                          alt={unicodeEscapeToEmoji(src20.tick ?? "")}
+                        />
+                        <div class="flex flex-col">
+                          <div class="font-bold text-base uppercase tracking-wide">
+                            {(() => {
+                              const { text, emoji } = splitTextAndEmojis(
+                                unicodeEscapeToEmoji(src20.tick ?? ""),
+                              );
+                              return (
+                                <>
+                                  {text && (
+                                    <span class="gray-gradient1 group-hover:[-webkit-text-fill-color:#AA00FF] inline-block transition-colors duration-200">
                                       {text.toUpperCase()}
                                     </span>
-                                  </a>
-                                )}
-                                {emoji && (
-                                  <span class="emoji-ticker">{emoji}</span>
-                                )}
-                              </>
-                            );
-                          })()}
+                                  )}
+                                  {emoji && (
+                                    <span class="emoji-ticker">{emoji}</span>
+                                  )}
+                                </>
+                              );
+                            })()}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </td>
-                  {/* MINTS */}
-                  <td
-                    class={`${
-                      cellAlign(1, headers?.length ?? 0)
-                    } ${rowCardBorderCenter} hidden min-[600px]:table-cell tablet:hidden min-[1280px]:table-cell`}
-                  >
-                    {src20.mint_progress?.total_mints || src20.mint_count ||
-                      "N/A"}
-                  </td>
-                  {/* PROGRESS */}
-                  <td
-                    class={`${
-                      cellAlign(2, headers?.length ?? 0)
-                    } ${rowCardBorderCenter}`}
-                  >
-                    <div class="flex items-center justify-center w-full">
-                      <div class="flex flex-col w-[100px] min-[420px]:w-[120px] mobileLg:w-[160px] tablet:w-[120px] desktop:w-[160px] gap-1">
-                        <div class="!text-xs text-center">
-                          {(() => {
-                            // ✅ FIXED: Use the same data access pattern as SRC20CardMinting
-                            const progressRaw = src20.mint_progress?.progress ??
-                              src20.progress ?? 0;
-                            const progressValue = Number(progressRaw);
-                            if (isNaN(progressValue)) {
-                              return "0";
-                            }
-                            return progressValue.toFixed(1);
-                          })()}
-                          <span class="text-stamp-grey-light">%</span>
-                        </div>
-                        <div class="relative h-1.5 bg-stamp-grey rounded-full">
-                          <div
-                            class="absolute left-0 top-0 h-1.5 bg-stamp-purple-dark rounded-full"
-                            style={{
-                              width: `${
-                                (() => {
-                                  // ✅ FIXED: Use the same data access pattern as SRC20CardMinting
-                                  const progressRaw =
-                                    src20.mint_progress?.progress ??
-                                      src20.progress ?? 0;
-                                  const progressValue = Number(progressRaw);
-                                  if (isNaN(progressValue)) {
-                                    return 0;
-                                  }
-                                  return Math.min(
-                                    100,
-                                    Math.max(0, progressValue),
-                                  );
-                                })()
-                              }%`,
-                            }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  {/* HOLDERS */}
-                  <td
-                    class={`${
-                      cellAlign(3, headers?.length ?? 0)
-                    } ${rowCardBorderCenter}`}
-                  >
-                    {(() => {
-                      // ✅ FIXED: Use the same data access pattern as SRC20CardMinting
-                      const holderCount =
-                        (src20 as any)?.market_data?.holder_count ||
-                        (src20 as any)?.holders ||
-                        0;
-                      return Number(holderCount).toLocaleString();
-                    })()}
-                  </td>
-                  {/* MINT BUTTON */}
-                  <td
-                    class={`${
-                      cellAlign(4, headers?.length ?? 0)
-                    } ${rowCardBorderRight}`}
-                  >
-                    <Button
-                      variant="outline"
-                      color="custom"
-                      size="xs"
-                      class="[--default-color:#999999] [--hover-color:#AA00FF]"
-                      href={mintHref}
-                      onClick={handleMintClick}
+                    </td>
+                    {/* MINTS */}
+                    <td
+                      class={`${
+                        cellAlign(1, headers?.length ?? 0)
+                      } ${cellCenterL2Card} tablet:hidden min-[1280px]:table-cell`}
                     >
-                      MINT
-                    </Button>
-                  </td>
-                </tr>
-              );
-            })
-          )
-          : (
-            <tr>
-              <td
-                colSpan={headers?.length ?? 0}
-                class={`${valueDarkSm} w-full`}
-              >
-                NO MINTING TOKENS
-              </td>
-            </tr>
-          )}
-      </tbody>
-    </table>
+                      {src20.mint_progress?.total_mints || src20.mint_count ||
+                        "N/A"}
+                    </td>
+                    {/* PROGRESS */}
+                    <td
+                      class={`${
+                        cellAlign(2, headers?.length ?? 0)
+                      } ${cellCenterL2Card}`}
+                    >
+                      <div class="flex items-center justify-center w-full">
+                        <div class="flex flex-col w-[65px] min-[380px]:w-[75px] min-[400px]:w-[85px] min-[420px]:w-[100px] min-[480px]:w-[125px] mobileLg:w-[160px] tablet:w-[80px] min-[1080px]:w-[90px] min-[1180px]:w-[110px] desktop:w-[160px] gap-1">
+                          <div class="!text-xs text-center">
+                            {(() => {
+                              // ✅ FIXED: Use the same data access pattern as SRC20CardMinting
+                              const progressRaw =
+                                src20.mint_progress?.progress ??
+                                  src20.progress ?? 0;
+                              const progressValue = Number(progressRaw);
+                              if (isNaN(progressValue)) {
+                                return "0";
+                              }
+                              return progressValue.toFixed(1);
+                            })()}
+                            <span class="text-stamp-grey-light">%</span>
+                          </div>
+                          <div class="relative h-1.5 bg-stamp-grey rounded-full">
+                            <div
+                              class="absolute left-0 top-0 h-1.5 bg-stamp-purple-dark rounded-full"
+                              style={{
+                                width: `${
+                                  (() => {
+                                    // ✅ FIXED: Use the same data access pattern as SRC20CardMinting
+                                    const progressRaw =
+                                      src20.mint_progress?.progress ??
+                                        src20.progress ?? 0;
+                                    const progressValue = Number(progressRaw);
+                                    if (isNaN(progressValue)) {
+                                      return 0;
+                                    }
+                                    return Math.min(
+                                      100,
+                                      Math.max(0, progressValue),
+                                    );
+                                  })()
+                                }%`,
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    {/* HOLDERS */}
+                    <td
+                      class={`${
+                        cellAlign(3, headers?.length ?? 0)
+                      } ${cellCenterL2Card}`}
+                    >
+                      {(() => {
+                        // ✅ FIXED: Use the same data access pattern as SRC20CardMinting
+                        const holderCount =
+                          (src20 as any)?.market_data?.holder_count ||
+                          (src20 as any)?.holders ||
+                          0;
+                        return Number(holderCount).toLocaleString();
+                      })()}
+                    </td>
+                    {/* MINT BUTTON */}
+                    <td
+                      class={`${
+                        cellAlign(4, headers?.length ?? 0)
+                      } ${cellRightL2Card}`}
+                    >
+                      <Button
+                        variant="glassmorphismColor"
+                        color="grey"
+                        size="xsR"
+                        href={mintHref}
+                        onClick={handleMintClick}
+                      >
+                        MINT
+                      </Button>
+                    </td>
+                  </tr>
+                );
+              })
+            )
+            : (
+              <tr>
+                <td
+                  colSpan={headers?.length ?? 0}
+                  class={`${valueDarkSm} w-full`}
+                >
+                  NO MINTING TOKENS
+                </td>
+              </tr>
+            )}
+        </tbody>
+      </table>
+    </div>
   );
 }

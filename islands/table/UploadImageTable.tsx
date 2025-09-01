@@ -1,7 +1,5 @@
-import type { SRC20Row } from "$types/src20.d.ts";
-import type { ImageModalProps, SRC20BalanceTableProps } from "$types/ui.d.ts";
-import type { WalletDataTypes } from "$types/base.d.ts";
-import { useState } from "preact/hooks";
+/* ===== UPLOAD IMAGE TABLE COMPONENT ===== */
+import { walletSignal } from "$client/wallet/wallet.ts";
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import {
   abbreviateAddress,
@@ -9,8 +7,12 @@ import {
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { getSRC20ImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
 import { textLg } from "$text";
-import { walletSignal } from "$client/wallet/wallet.ts";
+import type { WalletDataTypes } from "$types/base.d.ts";
+import type { SRC20Row } from "$types/src20.d.ts";
+import type { ImageModalProps, SRC20BalanceTableProps } from "$types/ui.d.ts";
+import { useState } from "preact/hooks";
 
+/* ===== IMAGE MODAL COMPONENT ===== */
 const ImageModal = ({ imgSrc, isOpen, onClose }: ImageModalProps) => {
   if (!isOpen) return null;
 
@@ -26,9 +28,11 @@ const ImageModal = ({ imgSrc, isOpen, onClose }: ImageModalProps) => {
   );
 };
 
+/* ===== COMPONENT ===== */
 export const UploadImageTable = (props: SRC20BalanceTableProps) => {
   const { data } = props;
 
+  /* ===== STATE ===== */
   const [modalImg, setModalImg] = useState<string>("");
   const [isModalOpen, setModalOpen] = useState(false);
 
@@ -36,6 +40,7 @@ export const UploadImageTable = (props: SRC20BalanceTableProps) => {
   // This eliminates the 1-second polling that was consuming CPU resources
   const wallet = walletSignal.value as WalletDataTypes;
 
+  /* ===== EVENT HANDLERS ===== */
   const handleCloseModal = () => {
     setModalOpen(false);
   };
@@ -45,6 +50,7 @@ export const UploadImageTable = (props: SRC20BalanceTableProps) => {
     setModalOpen(!isModalOpen);
   };
 
+  /* ===== RENDER ===== */
   return (
     <>
       <ImageModal
@@ -54,7 +60,7 @@ export const UploadImageTable = (props: SRC20BalanceTableProps) => {
       />
       {wallet
         ? (
-          <div class="relative overflow-x-auto shadow-md mobileLg:rounded-lg">
+          <div class="relative overflow-x-auto shadow-md rounded-xl">
             <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
               <caption class="p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white dark:text-white dark:bg-gray-800">
                 SRC20

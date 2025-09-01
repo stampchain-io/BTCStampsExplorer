@@ -1,9 +1,9 @@
 import { ModalBase } from "$components/layout/ModalBase.tsx";
-import type { MaraModeWarningModalProps } from "$types/ui.d.ts";
 import { CloseIcon } from "$icon";
-import { titlePurpleLD } from "$text";
-import { tooltipIcon } from "$notification";
 import { glassmorphism } from "$layout";
+import { tooltipIcon } from "$notification";
+import { titlePurpleLD } from "$text";
+import type { MaraModeWarningModalProps } from "$types/ui.d.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
 
 /**
@@ -160,14 +160,14 @@ export function MaraModeWarningModal({
         <button
           type="button"
           onClick={onCancel || (() => {})}
-          class={`flex-1 px-4 py-2 rounded-lg transition-colors ${glassmorphism} bg-gradient-to-br from-stamp-grey-darkest/20 to-stamp-grey-darkest/40 text-stamp-grey-light hover:from-stamp-grey-darkest/30 hover:to-stamp-grey-darkest/50`}
+          class={`flex-1 px-4 py-2 rounded-xl transition-colors ${glassmorphism} bg-gradient-to-br from-stamp-grey-darkest/20 to-stamp-grey-darkest/40 text-stamp-grey-light hover:from-stamp-grey-darkest/30 hover:to-stamp-grey-darkest/50`}
         >
           Cancel
         </button>
         <button
           type="button"
           onClick={handleConfirm}
-          class={`flex-1 px-4 py-2 rounded-lg transition-colors font-semibold ${glassmorphism} bg-gradient-to-br from-purple-600/80 to-purple-700/80 text-white hover:from-purple-600 hover:to-purple-700`}
+          class={`flex-1 px-4 py-2 rounded-xl transition-colors font-semibold ${glassmorphism} bg-gradient-to-br from-purple-600/80 to-purple-700/80 text-white hover:from-purple-600 hover:to-purple-700`}
         >
           I Understand, Continue
         </button>

@@ -56,7 +56,7 @@ export function StatusMessages({
               <button
                 type="button"
                 onClick={onCopyHex}
-                class="flex items-center gap-1 px-2 py-1 rounded bg-red-500/20 hover:bg-red-500/30 transition-colors group"
+                class="flex items-center gap-1 px-2 py-1 rounded-lg bg-red-500/20 hover:bg-red-500/30 transition-colors group"
                 title="Copy transaction hex"
               >
                 <svg

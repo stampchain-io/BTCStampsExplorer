@@ -2,8 +2,9 @@
 import { Handlers } from "$fresh/server.ts";
 import { SRC20DetailHeader } from "$islands/header/index.ts";
 import ChartWidget from "$islands/layout/ChartWidget.tsx";
+import { body, gapSectionSlim } from "$layout";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
-import { DataTableBase, HoldersTable } from "$table";
+import { DetailsTableBase, HoldersTable } from "$table";
 import type { ProcessedHolder } from "$types/wallet.d.ts";
 
 /* ===== SERVER HANDLER ===== */
@@ -114,7 +115,7 @@ function SRC20DetailPage(props: { data: SRC20DetailPageData }) {
 
   /* ===== RENDER ===== */
   return (
-    <div class="flex flex-col gap-6">
+    <div class={`${body} ${gapSectionSlim}`}>
       <SRC20DetailHeader
         deployment={deployment}
         _mintStatus={mint_status}
@@ -129,13 +130,15 @@ function SRC20DetailPage(props: { data: SRC20DetailPageData }) {
         tick={tick}
       />
       <HoldersTable
-        data={holders.map((h) => ({
+        holders={holders.map((h) => ({
           address: h.address,
-          balance: h.amt,
+          quantity: h.amt,
+          divisible: false, // SRC20 tokens are not divisible
+          amt: h.amt,
           percentage: h.percentage,
         }))}
       />
-      <DataTableBase
+      <DetailsTableBase
         type="src20"
         configs={tableConfigs}
         tick={tick}

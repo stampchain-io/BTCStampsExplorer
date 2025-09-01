@@ -1,18 +1,18 @@
 /* ===== WALLET PROVIDER MODAL COMPONENT ===== */
 import { horizonProvider } from "$client/wallet/horizon.ts";
-import type { WalletProviderProps } from "$types/ui.d.ts";
 import { leatherProvider } from "$client/wallet/leather.ts";
 import { okxProvider } from "$client/wallet/okx.ts";
 import { phantomProvider } from "$client/wallet/phantom.ts";
 import { tapWalletProvider } from "$client/wallet/tapwallet.ts";
 import { unisatProvider } from "$client/wallet/unisat.ts";
-import { closeForegroundModal, closeModal } from "$islands/modal/states.ts";
-import { containerCard } from "$layout";
 import { WALLET_PROVIDERS } from "$constants";
-import type { WalletProviderKey } from "$constants/walletProviders.ts";
+import { closeForegroundModal, closeModal } from "$islands/modal/states.ts";
+import { containerCardL2 } from "$layout";
+import type { WalletProviderKey } from "$lib/constants/walletProviders.ts";
+import { handleUnknownError } from "$lib/utils/errorHandling.ts";
 import type { BaseToast } from "$lib/utils/ui/notifications/toastSignal.ts";
 import { showToast } from "$lib/utils/ui/notifications/toastSignal.ts";
-import { handleUnknownError } from "$lib/utils/errorHandling.ts";
+import type { WalletProviderProps } from "$types/ui.d.ts";
 import { useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
@@ -99,7 +99,7 @@ export function WalletProvider(
       onClick={handleConnect}
       role="button"
       aria-label={`Connect to ${providerInfo.name}`}
-      class={`flex justify-between items-center p-4 ${containerCard}`}
+      class={`flex justify-between items-center p-4 ${containerCardL2} !rounded-xl`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >

@@ -1,8 +1,8 @@
 /* ===== STAMP RECENT SALES GALLERY COMPONENT ===== */
 import { StampCard } from "$card";
 import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
-import type { JSX } from "preact";
 import type { StampSendsGalleryProps } from "$types/ui.d.ts";
+import type { JSX } from "preact";
 
 /* ===== COMPONENT ===== */
 export default function StampSendsGallery({
@@ -45,7 +45,7 @@ export default function StampSendsGallery({
             [...Array(5)].map((_, index) => (
               <div
                 key={index}
-                class="aspect-square rounded bg-gray-200 animate-pulse"
+                class="aspect-square rounded-xl bg-gray-200 animate-pulse"
               />
             ))
           )}

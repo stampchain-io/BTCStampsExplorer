@@ -46,7 +46,7 @@ export function MarketDataStatus({
   return (
     <div
       class={`
-      flex items-center gap-2 px-3 py-2 rounded-lg border text-xs
+      flex items-center gap-2 px-3 py-2 rounded-xl border text-xs
       ${getStatusColor()}
       ${className}
     `}

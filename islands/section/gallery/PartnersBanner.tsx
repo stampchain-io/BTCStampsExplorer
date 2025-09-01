@@ -1,5 +1,5 @@
 /* ===== PARTNERS GALLERY COMPONENT ===== */
-import { containerBackground } from "$layout";
+import { containerBackground, shadowGlowGrey } from "$layout";
 import { subtitleGrey } from "$text";
 import { useState } from "preact/hooks";
 
@@ -43,9 +43,9 @@ function PartnerCard({ name, largeImage, smallImage, url }: Partner) {
     <div
       class={`relative w-full border-[1px] ${
         isHovered
-          ? "border-stamp-grey shadow-collection"
+          ? `border-stamp-grey ${shadowGlowGrey}`
           : "border-stamp-grey-darker"
-      } rounded-md`}
+      } rounded-xl`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -53,12 +53,12 @@ function PartnerCard({ name, largeImage, smallImage, url }: Partner) {
       <img
         src={largeImage}
         alt=""
-        class="hidden mobileMd:block w-full invisible"
+        class="hidden mobileMd:block w-full invisible rounded-xl"
       />
       <img
         src={smallImage}
         alt=""
-        class="block mobileMd:hidden w-full invisible"
+        class="block mobileMd:hidden w-full invisible rounded-xl"
       />
 
       {/* ===== DISPLAY IMAGES ===== */}
@@ -66,7 +66,7 @@ function PartnerCard({ name, largeImage, smallImage, url }: Partner) {
         src={largeImage}
         alt={`${name} banner`}
         loading="lazy"
-        class={`hidden mobileMd:block absolute inset-0 w-full cursor-pointer transition-all duration-50 ${
+        class={`hidden mobileMd:block absolute inset-0 w-full cursor-pointer transition-all duration-50 rounded-xl ${
           isHovered ? "grayscale-0" : "grayscale"
         }`}
       />
@@ -74,14 +74,14 @@ function PartnerCard({ name, largeImage, smallImage, url }: Partner) {
         src={smallImage}
         alt={`${name} banner`}
         loading="lazy"
-        class={`block mobileMd:hidden absolute inset-0 w-full cursor-pointer transition-all duration-50 ${
+        class={`block mobileMd:hidden absolute inset-0 w-full cursor-pointer transition-all duration-50 rounded-xl ${
           isHovered ? "grayscale-0" : "grayscale"
         }`}
       />
 
       {/* ===== GRADIENT OVERLAY ===== */}
       <div
-        class={`w-full h-full bg-gradient-to-tr from-[#666666FF] via-[#9999997F] to-[#CCCCCC00] absolute left-0 top-0 transition-opacity duration-50 ${
+        class={`w-full h-full bg-gradient-to-tr from-[#666666FF] via-[#9999997F] to-[#CCCCCC00] absolute left-0 top-0 transition-opacity duration-50 rounded-xl ${
           isHovered ? "!hidden" : ""
         }`}
       />

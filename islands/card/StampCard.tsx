@@ -12,7 +12,7 @@ import {
   LIBRARY_FILE_IMAGE,
   NOT_AVAILABLE_IMAGE,
 } from "$constants";
-import { glassmorphism, transition } from "$layout";
+import { glassmorphism, glassmorphismL2, transitionColors } from "$layout";
 import {
   abbreviateAddress,
   formatSupplyValue,
@@ -150,7 +150,7 @@ export function StampCard({
               <div class="stamp-container">
                 <div class="relative z-10 aspect-square flex items-center justify-center">
                   <div
-                    class="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
+                    class="max-w-none object-contain rounded-xl pixelart stamp-image h-full w-full"
                     dangerouslySetInnerHTML={{ __html: rewrittenSVG }}
                   />
                 </div>
@@ -165,7 +165,7 @@ export function StampCard({
                     src={src}
                     loading="lazy"
                     alt={`Stamp No. ${stamp.stamp}`}
-                    class="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
+                    class="max-w-none object-contain rounded-xl pixelart stamp-image h-full w-full"
                     onError={handleImageError}
                   />
                 </div>
@@ -180,7 +180,7 @@ export function StampCard({
                 <img
                   src={NOT_AVAILABLE_IMAGE}
                   alt="Invalid SVG"
-                  class="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
+                  class="max-w-none object-contain rounded-xl pixelart stamp-image h-full w-full"
                 />
               </div>
             </div>,
@@ -226,7 +226,7 @@ export function StampCard({
             <img
               src={AUDIO_FILE_IMAGE}
               alt="Audio File"
-              class="absolute top-0 left-0 w-full h-full object-contain rounded pixelart stamp-image pointer-events-none select-none"
+              class="absolute top-0 left-0 w-full h-full object-contain rounded-xl pixelart stamp-image pointer-events-none select-none"
               draggable={false}
             />
             <audio
@@ -276,7 +276,7 @@ export function StampCard({
               loading="lazy"
               sandbox="allow-scripts allow-same-origin"
               src={src}
-              class="absolute top-0 left-0 w-full h-full object-contain pointer-events-none"
+              class="absolute top-0 left-0 w-full h-full rounded-xl object-contain pointer-events-none"
               onError={(e) => {
                 console.error("iframe error (detailed):", {
                   error: e,
@@ -303,7 +303,7 @@ export function StampCard({
             <img
               src={LIBRARY_FILE_IMAGE}
               alt="Library File"
-              class="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
+              class="max-w-none object-contain rounded-xl pixelart stamp-image h-full w-full"
               loading="lazy"
             />
           </div>
@@ -318,7 +318,7 @@ export function StampCard({
             <img
               src={NOT_AVAILABLE_IMAGE}
               alt="Loading..."
-              class="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
+              class="max-w-none object-contain rounded-xl pixelart stamp-image h-full w-full"
             />
           </div>
         </div>
@@ -333,7 +333,7 @@ export function StampCard({
             src={src}
             loading="lazy"
             alt={`Stamp No. ${stamp.stamp}`}
-            class="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
+            class="max-w-none object-contain rounded-xl pixelart stamp-image h-full w-full"
             onError={handleImageError}
           />
         </div>
@@ -445,7 +445,7 @@ export function StampCard({
           p-stamp-card mobileLg:p-3
           w-full h-full
           hover:border-stamp-purple-bright hover:shadow-stamp
-          ${glassmorphism} ${transition}
+          ${glassmorphism} ${transitionColors}
         `}
       >
         {/* ===== ATOM ICON ===== */}
@@ -488,7 +488,7 @@ export function StampCard({
             {/* Price and Supply */}
             <div class="flex justify-between items-center mt-4 w-full">
               {/* Price on the Left */}
-              <div class="text-left bg-stamp-grey-light/5 rounded-lg px-3 py-1">
+              <div class={`text-left ${glassmorphismL2} px-3 py-1`}>
                 <span
                   class={renderPrice().style}
                 >
@@ -497,7 +497,7 @@ export function StampCard({
               </div>
               {/* Supply/Editions on the Right */}
               <div
-                class={`${TEXT_STYLES.supply.base} ${TEXT_STYLES.supply.sizes} text-right bg-stamp-grey-light/5 rounded-lg px-3 py-1`}
+                class={`${TEXT_STYLES.supply.base} ${TEXT_STYLES.supply.sizes} text-right ${glassmorphismL2} px-3 py-1`}
               >
                 {supplyDisplay}
               </div>

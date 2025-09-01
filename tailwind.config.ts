@@ -183,7 +183,7 @@ export default {
       },
       spacing: {
         // PAGE GUTTERS (horizontal padding from screen edges to header, footer and body)
-        "gutter-mobile": "24px", // updated breakpoint naming convention
+        "gutter-mobile": "20px", // updated breakpoint naming convention
         "gutter-tablet": "36px", // updated breakpoint naming convention
         "gutter-desktop": "48px", // updated breakpoint naming convention
 
@@ -220,7 +220,6 @@ export default {
       boxShadow: {
         "stamp": "0px 0px 18px #aa00ff",
         "stamp-hover": "0px 0px 24px #aa00ff",
-        "collection": "0px 0px 24px #FFFFFF7F",
       },
       aspectRatio: {
         "stamp": "1",
@@ -328,6 +327,15 @@ export default {
             "&:hover": {
               "background-color": "var(--stamp-scrollbar-hover)",
             },
+          },
+        },
+        ".scrollbar-hide": {
+          /* Hide scrollbar for IE, Edge and Firefox */
+          "-ms-overflow-style": "none",
+          "scrollbar-width": "none",
+          /* Hide scrollbar for Chrome, Safari and Opera */
+          "&::-webkit-scrollbar": {
+            "display": "none",
           },
         },
         ":root": {

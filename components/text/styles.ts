@@ -8,7 +8,7 @@ const textFont = "font-normal text-stamp-grey-light";
 const labelFont = "font-light text-stamp-grey-darker tracking-wide";
 const valueFont = "font-medium text-stamp-grey-light";
 const select = "select-none whitespace-nowrap";
-const transition = "transition-colors duration-200";
+const transitionColors = "transition-colors duration-200";
 
 /* ===== OVERLAY STYLES ===== */
 // Overlays - used for text overlay effects of whole divs - text must be transparent or not declared with tailwind css
@@ -18,25 +18,25 @@ export const overlayPurple =
 /* ===== LOGO STYLES ===== */
 export const logoPurpleDL = `${logoFont} purple-gradient2 ${select}`; // used in footer
 export const logoPurpleDLLink =
-  `${logoFont} purple-gradient2-hover ${transition} cursor-pointer ${select}`;
+  `${logoFont} purple-gradient2-hover ${transitionColors} cursor-pointer ${select}`;
 export const logoPurpleLD = `${logoFont} purple-gradient4 ${select}`;
 export const logoPurpleLDLink =
-  `${logoFont} purple-gradient4-hover ${transition} cursor-pointer ${select}`; // used in header
+  `${logoFont} purple-gradient4-hover ${transitionColors} cursor-pointer ${select}`; // used in header
 
 /* ===== NAVIGATION STYLES ===== */
 // Header - Desktop
 export const navLinkPurple =
-  `font-bold text-stamp-purple text-sm group-hover:text-stamp-purple-bright tracking-wide ${transition} cursor-pointer ${select}`;
+  `font-bold text-stamp-purple text-sm group-hover:text-stamp-purple-bright tracking-wide ${transitionColors} cursor-pointer ${select}`;
 export const navSublinkPurple =
-  `font-semibold text-stamp-purple text-xs hover:text-stamp-purple-bright ${transition} cursor-pointer ${select}`; // used in ConnectButton.tsx for connected sunmenu links - header uses custom styles
+  `font-semibold text-stamp-purple text-xs hover:text-stamp-purple-bright ${transitionColors} cursor-pointer ${select}`; // used in ConnectButton.tsx for connected sunmenu links - header uses custom styles
 // Header - Mobile/tablet
 export const navLinkGrey =
-  `font-bold text-lg text-stamp-grey-darker group-hover:text-stamp-grey tracking-wide ${transition} cursor-pointer ${select}`;
+  `font-bold text-lg text-stamp-grey-darker group-hover:text-stamp-grey tracking-wide ${transitionColors} cursor-pointer ${select}`;
 export const navLinkGreyLD =
-  `font-extrabold text-xl gray-gradient1-hover tracking-wide inline-block w-fit ${transition} cursor-pointer ${select}`;
+  `font-extrabold text-xl gray-gradient1-hover tracking-wide inline-block w-fit ${transitionColors} cursor-pointer ${select}`;
 // Footer - transparent text - ued with the overlayPurple class
 export const navLinkTransparentPurple =
-  `font-semibold text-xs hover:text-stamp-purple-bright ${transition} cursor-pointer ${select}`;
+  `font-semibold text-xs hover:text-stamp-purple-bright ${transitionColors} cursor-pointer ${select}`;
 
 /* ===== TITLE STYLES ===== */
 export const titleGreyLD =
@@ -60,9 +60,9 @@ export const headingGrey2 =
 export const headingGreyLD =
   `font-bold text-xl gray-gradient1 tracking-wide inline-block w-fit relative ${select}`;
 export const headingGreyLDLink =
-  `font-bold text-lg gray-gradient1-hover tracking-wide inline-block w-fit relative ${transition} cursor-pointer ${select}`; // used in media page / keep reading in howto pages / accordion titles (custom code)
+  `font-bold text-lg gray-gradient1-hover tracking-wide inline-block w-fit relative ${transitionColors} cursor-pointer ${select}`; // used in media page / keep reading in howto pages / accordion titles (custom code)
 export const headingGreyDLLink =
-  `font-bold text-lg gray-gradient3-hover tracking-wide inline-block w-fit relative -mt-1 ${transition} cursor-pointer ${select}`; // used in collection and stamp detail pages
+  `font-bold text-lg gray-gradient3-hover tracking-wide inline-block w-fit relative -mt-1 ${transitionColors} cursor-pointer ${select}`; // used in collection and stamp detail pages
 export const headingGrey =
   `font-bold text-2xl text-stamp-grey cursor-default ${select}`; // used in howto overview and detail pages / donate CTA
 export const headingPurpleLD =
@@ -73,13 +73,13 @@ export const textXxs = `${textFont} text-[10px]`;
 export const textXs = `${textFont} text-xs`;
 export const textSm = `${textFont} text-sm`;
 export const textSmLink =
-  `${textFont} text-sm hover:text-stamp-purple-bright ${transition} cursor-pointer ${select}`;
+  `${textFont} text-sm hover:text-stamp-purple-bright ${transitionColors} cursor-pointer ${select}`;
 export const text = `${textFont} text-base`;
 export const textLg = `${textFont} text-lg`;
 export const textXl = `${textFont} text-xl`;
 export const text2xl = `${textFont} text-2xl`;
 export const textLinkUnderline =
-  `font-bold text-base text-stamp-grey-light animated-underline ${transition}`;
+  `font-bold text-base text-stamp-grey-light animated-underline ${transitionColors}`;
 
 /* ===== LINK STYLES ===== */
 // Use the specific link styles created or just add "animated-underline" to the class name to apply an animated underline effect
@@ -119,7 +119,7 @@ export const labelLogicResponsive = ( // used for the filter labels
 export const valueXs = `${valueFont} text-xs ${select}`;
 export const valueSm = `${valueFont} text-sm ${select}`;
 export const valueSmLink =
-  `${valueFont} text-sm hover:text-stamp-purple-bright ${transition} cursor-pointer w-full ${select}`;
+  `${valueFont} text-sm hover:text-stamp-purple-bright ${transitionColors} cursor-pointer w-full ${select}`;
 export const value = `${valueFont} text-base ${select}`;
 export const valueLg = `${valueFont} text-lg ${select}`;
 export const valueXl =
@@ -130,7 +130,7 @@ export const value3xl =
   `font-black text-3xl text-stamp-grey-light -mt-1 ${select}`;
 // Transparent variants
 export const value2xlTransparent = `font-black text-2xl -mt-1 ${select}`;
-export const value3xlTransparent = `font-black text-3xl -mt-1 ${select}`; // used in DataTableBase.tsx
+export const value3xlTransparent = `font-black text-3xl -mt-1 ${select}`; // used in DetailsTableBase.tsx
 // Purple variants
 export const valueSmPurple =
   `font-medium text-xs text-stamp-purple text-center wcursor-default ${select}`; // used in team banner gallery
@@ -145,7 +145,12 @@ export const valueDarkXs =
   `font-medium text-xs text-stamp-grey-darker tracking-tighter ${select}`; // used for addy styling in mobile/table header
 export const valueDarkSm =
   `font-medium text-sm text-stamp-grey-darker tracking-tighter ${select}`; // used for addy styling in desktop header
-export const valueDark = `font-bold text-base text-stamp-grey-darker ${select}`; // used in tables
+export const valueDark =
+  `font-semibold text-base text-stamp-grey-darker ${select}`; // used in tables
+// Color variants
+export const valuePositive = `text-green-600`;
+export const valueNegative = `text-red-600`;
+export const valueNeutral = `text-stamp-grey-darker`;
 
 /* ===== TOOLTIP STYLES ===== */
 // One text style for tooltips - defined in /notifications/styles.ts
@@ -184,17 +189,17 @@ export const cardSupply =
 
 // Minimal card variant styles
 export const cardHashSymbolMinimal =
-  `font-light text-stamp-grey-light group-hover:text-stamp-purple-bright text-xs mobileSm:text-base mobileLg:text-xl tablet:text-xl desktop:text-xl ${transition} ${select}`;
+  `font-light text-stamp-grey-light group-hover:text-stamp-purple-bright text-xs mobileSm:text-base mobileLg:text-xl tablet:text-xl desktop:text-xl ${transitionColors} ${select}`;
 export const cardStampNumberMinimal =
-  `font-black gray-gradient1 group-hover:[-webkit-text-fill-color:#AA00FF] truncate text-sm mobileSm:text-base mobileLg:text-xl tablet:text-xl desktop:text-xl ${transition} ${select}`;
+  `font-black gray-gradient1 group-hover:[-webkit-text-fill-color:#AA00FF] truncate text-sm mobileSm:text-base mobileLg:text-xl tablet:text-xl desktop:text-xl ${transitionColors} ${select}`;
 export const cardPriceMinimal =
   `font-normal text-stamp-grey truncate text-nowrap text-[10px] mobileMd:text-xs mobileLg:text-sm ${select}`;
 
 // Grey gradient card variant styles
 export const cardHashSymbolGrey =
-  `font-light text-stamp-grey group-hover:text-stamp-purple-bright text-lg min-[420px]:text-xl ${transition} ${select}`;
+  `font-light text-stamp-grey group-hover:text-stamp-purple-bright text-lg min-[420px]:text-xl ${transitionColors} ${select}`;
 export const cardStampNumberGrey =
-  `font-black gray-gradient1 group-hover:[-webkit-text-fill-color:#AA00FF] truncate max-w-full text-lg min-[420px]:text-xl ${transition} ${select}`;
+  `font-black gray-gradient1 group-hover:[-webkit-text-fill-color:#AA00FF] truncate max-w-full text-lg min-[420px]:text-xl ${transitionColors} ${select}`;
 
 /* ===== CARD CONFIGURATION - check if used ===== */
 export const ABBREVIATION_LENGTHS = {
@@ -279,6 +284,8 @@ export type TextStyles = {
   valueDarkSm: string;
   valueDarkXs: string;
   valueDark: string;
+  valueGain: string;
+  valueLoss: string;
   // Special text styles
   tagline: string;
   copyright: string;

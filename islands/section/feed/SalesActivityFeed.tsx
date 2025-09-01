@@ -1,12 +1,12 @@
 /* ===== SALES ACTIVITY FEED COMPONENT ===== */
 import { Icon, LoadingIcon } from "$icon";
-import type { SalesActivityFeedProps } from "$types/ui.d.ts";
 import {
   abbreviateAddress,
   formatBTCAmount,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { subtitlePurple, titlePurpleDL } from "$text";
 import type { StampWithEnhancedSaleData } from "$types/marketData.d.ts";
+import type { SalesActivityFeedProps } from "$types/ui.d.ts";
 import { useEffect, useState } from "preact/hooks";
 
 export default function SalesActivityFeed({
@@ -99,7 +99,7 @@ export default function SalesActivityFeed({
           {/* Stamp Preview */}
           {showStampPreviews && (
             <div class="flex-shrink-0">
-              <div class="w-12 h-12 bg-gray-700 rounded border-2 border-gray-600 overflow-hidden">
+              <div class="w-12 h-12 bg-gray-700 rounded-lg border-2 border-gray-600 overflow-hidden">
                 <img
                   src={`/api/v2/stamps/src/${sale.tx_hash}?size=small`}
                   alt={`Stamp #${sale.stamp}`}
@@ -312,8 +312,8 @@ export default function SalesActivityFeed({
 
       {/* ===== LOADING OVERLAY FOR REFRESH ===== */}
       {refreshLoading && !isLoading && (
-        <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center rounded">
-          <div class="bg-stamp-card-bg p-4 rounded flex items-center gap-2">
+        <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center rounded-lg">
+          <div class="bg-stamp-card-bg p-4 rounded-lg flex items-center gap-2">
             <LoadingIcon />
             <span class="text-white text-sm">Refreshing...</span>
           </div>

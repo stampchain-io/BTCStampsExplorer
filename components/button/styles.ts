@@ -1,5 +1,5 @@
 /* ===== BUTTON STYLES MODULE ===== */
-import { glassmorphismLayer2 } from "$layout";
+import { glassmorphismL2, shadowL2, transitionColors } from "$layout";
 import { JSX } from "preact";
 
 /* ===== TYPE DEFINITIONS ===== */
@@ -75,25 +75,23 @@ export interface ButtonVariants {
 /* ===== BUTTON STYLE DEFINITIONS ===== */
 /* gradientOverlay and gradientOverlayHover must be identical */
 const baseGlassmorphism =
-  "border-[1px] rounded-lg backdrop-blur-sm overflow-hidden";
+  "border-[1px] rounded-xl backdrop-blur-sm overflow-hidden";
 const baseGlassmorphismColor =
-  "relative text-[#171417] before:blur-sm hover:border-[var(--color-border-hover)] hover:before:scale-105";
+  "relative text-[#100a10] before:blur-sm hover:border-[var(--color-border-hover)] hover:before:scale-105";
 const baseBefore =
-  "before:absolute before:inset-0 before:rounded-lg before:z-[-1] before:transition-transform before:duration-50 before:origin-center";
+  "before:absolute before:inset-0 before:rounded-xl before:z-[-1] before:transition-transform before:duration-50 before:origin-center";
 const gradientOverlay =
   "before:bg-[linear-gradient(to_bottom_right,var(--color-dark)_0%,var(--color-dark)_20%,var(--color-medium)_20%,var(--color-medium)_45%,var(--color-light)_45%,var(--color-light)_52%,var(--color-medium)_52%,var(--color-medium)_70%,var(--color-dark)_70%,var(--color-dark)_100%)]";
 const gradientOverlayHover =
   "hover:before:bg-[linear-gradient(to_bottom_right,var(--color-dark)_0%,var(--color-dark)_20%,var(--color-medium)_20%,var(--color-medium)_45%,var(--color-light)_45%,var(--color-light)_52%,var(--color-medium)_52%,var(--color-medium)_70%,var(--color-dark)_70%,var(--color-dark)_100%)]";
-const shadow =
-  "shadow-[0_2px_4px_rgba(13,11,13,0.1),inset_0_1px_0_rgba(13,11,13,0.1),inset_0_-1px_0_rgba(13,11,13,0.1),inset_0_0_2px_2px_rgba(13,11,13,0.1)]";
 
 export const buttonStyles: ButtonVariants = {
   /* ===== BASE STYLES ===== */
   base: `
     inline-flex items-center justify-center
-    rounded-lg border-[1px]
+    rounded-xl border-[1px]
     font-semibold tracking-wide
-    transition-colors duration-50
+    ${transitionColors}
     cursor-pointer
   `,
 
@@ -107,20 +105,20 @@ export const buttonStyles: ButtonVariants = {
     `,
     glassmorphism: `
       ${baseGlassmorphism} bg-[#211c21]/10 border-[var(--color-border)]
-      hover:[#211c21]/40 hover:border-[var(--color-border-hover)]
+      hover:bg-[#211c21]/20 hover:border-[var(--color-border-hover)]
       text-[var(--color-dark)] hover:text-[var(--color-medium)]
-      ${shadow}
+      ${shadowL2}
     `,
     glassmorphismColor: `
       ${baseGlassmorphism} ${baseGlassmorphismColor}
       bg-[#211c21]/10 border-[var(--color-border)]
-      ${baseBefore} ${shadow}
+      ${baseBefore} ${shadowL2}
       ${gradientOverlay}
     `,
     glassmorphismSelected: `
       ${baseGlassmorphism} ${baseGlassmorphismColor}
       bg-[#211c21]/10 border-[var(--color-border)]
-      ${baseBefore} ${shadow}
+      ${baseBefore} ${shadowL2}
       ${gradientOverlay}
       hover:bg-[#211c21]/10 hover:!border-[var(--color-border)] hover:before:bg-none hover:text-[var(--color-text)] hover:before:blur-0
     `,
@@ -129,18 +127,18 @@ export const buttonStyles: ButtonVariants = {
       bg-[#211c21]/10 border-[var(--color-border)]
       text-[var(--color-text)] before:bg-none
       hover:bg-[#211c21]/10 hover:!border-[var(--color-border)]
-      hover:text-[#171417] hover:before:!scale-100 hover:before:!blur-sm
-      ${baseBefore} ${shadow}
+      hover:text-[#100a10] hover:before:!scale-100 hover:before:!blur-sm
+      ${baseBefore} ${shadowL2}
       ${gradientOverlayHover}
     `,
     outlineGradient: `
-      relative !bg-[#000000] !p-[1px] rounded-lg !border-0
-      before:absolute before:inset-0 before:rounded-lg before:z-[1]
+      relative !bg-[#000000] !p-[1px] rounded-xl !border-0
+      before:absolute before:inset-0 before:rounded-xl before:z-[1]
       before:bg-[conic-gradient(from_var(--angle),var(--color-dark),var(--color-medium),var(--color-light),var(--color-medium),var(--color-dark))]
       before:[--angle:0deg] before:animate-rotate
       hover:before:bg-[conic-gradient(from_var(--angle),var(--color-light),var(--color-light),var(--color-light),var(--color-light),var(--color-light))]
       before:transition-colors before:duration-50
-      [&>*]:relative [&>*]:z-[2] [&>*]:rounded-lg [&>*]:bg-[#000000] [&>*]:!border-0
+      [&>*]:relative [&>*]:z-[2] [&>*]:rounded-xl [&>*]:bg-[#000000] [&>*]:!border-0
       [&>*]:inline-flex [&>*]:items-center [&>*]:justify-center [&>*]:w-full [&>*]:h-full [&>*]:px-5
       [&>*]:font-bold [&>*]:tracking-wider
       [&>*]:text-[var(--color-text)] hover:[&>*]:text-[var(--color-text-hover)]
@@ -279,7 +277,7 @@ export const buttonStyles: ButtonVariants = {
 /* ===== ADDITIONAL STYLES ===== */
 /* ===== TOGGLE SWITCH BUTTON STYLES ===== */
 export const toggleButton =
-  `flex items-center relative w-10 h-5 !rounded-full ${glassmorphismLayer2} focus:outline-none transition duration-50`;
+  `flex items-center relative w-10 h-5 !rounded-full ${glassmorphismL2} focus:outline-none transition duration-50`;
 export const toggleKnobBackground =
   "flex justify-center items-center relative w-5 h-5 bg-transparent rounded-full transition ease-in-out transform duration-400";
 export const toggleKnob = "w-[14px] h-[14px] rounded-full";
@@ -300,7 +298,7 @@ export const trackFill = `
   absolute top-0.5 bottom-0.5 h-[14px] tablet:h-[10px] rounded-full transition-colors duration-200 pointer-events-none
   `;
 export const sliderBar =
-  `w-full h-5 tablet:h-4 !rounded-full ${glassmorphismLayer2} cursor-pointer`;
+  `w-full h-5 tablet:h-4 !rounded-full ${glassmorphismL2} cursor-pointer`;
 
 /* ===== STYLE COMPOSITION FUNCTION ===== */
 export const button = (

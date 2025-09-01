@@ -248,7 +248,7 @@ export function FreshStampGallery({
     if (!error) return null;
 
     return (
-      <div class="bg-red-500/10 border border-red-500/20 rounded-lg p-4 mb-4">
+      <div class="bg-red-500/10 border border-red-500/20 rounded-xl p-4 mb-4">
         <div class="text-red-400 text-sm">
           Error: {error}
         </div>
@@ -270,7 +270,7 @@ export function FreshStampGallery({
     if (!loading || !showLoadingSkeleton) return null;
 
     return (
-      <div class="absolute inset-0 bg-black/50 flex items-center justify-center z-10 rounded-lg">
+      <div class="absolute inset-0 bg-black/50 flex items-center justify-center z-10 rounded-xl">
         <div class="flex flex-col items-center gap-4">
           <LoadingIcon />
           <div class="text-white text-sm">Loading stamps...</div>

@@ -1,6 +1,6 @@
 import { Icon } from "$icon";
-import type { MaraStatusLinkProps } from "$types/ui.d.ts";
 import { glassmorphism } from "$layout";
+import type { MaraStatusLinkProps } from "$types/ui.d.ts";
 
 export function MaraStatusLink(
   { txid, class: className = "" }: MaraStatusLinkProps,
@@ -35,7 +35,7 @@ export function MaraStatusLink(
           href={statusUrl}
           target="_blank"
           rel="noopener noreferrer"
-          class="px-4 py-2 bg-purple-600/80 hover:bg-purple-600 text-white text-sm rounded-lg transition-colors font-semibold flex items-center gap-2"
+          class="px-4 py-2 bg-purple-600/80 hover:bg-purple-600 text-white text-sm rounded-xl transition-colors font-semibold flex items-center gap-2"
         >
           View Status
           <Icon

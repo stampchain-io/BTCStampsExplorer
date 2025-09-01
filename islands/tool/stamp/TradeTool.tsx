@@ -707,7 +707,7 @@ export function StampTradeTool() {
 
         {/* ===== 🎯 INLINE FEE STATUS DISPLAY - CREATE PSBT ===== */}
         {createPsbtFeeDetails && (
-          <div className="mb-4 p-3 bg-stamp-grey-darker/50 rounded-lg border border-stamp-grey-light/10">
+          <div className="mb-4 p-3 bg-stamp-grey-darker/50 rounded-xl border border-stamp-grey-light/10">
             <div className="flex items-center gap-2 mb-2">
               <span className="text-sm text-stamp-grey-light">
                 Estimated Fees:
@@ -801,7 +801,7 @@ export function StampTradeTool() {
           <div class={`${containerBackground} break-words mt-6`}>
             <h2 class="text-xl font-bold mb-2">Signed PSBT (Hex):</h2>
             <textarea
-              class="w-full h-40 p-2 bg-gray-800 text-white rounded-md"
+              class="w-full h-40 p-2 bg-gray-800 text-white rounded-xl"
               readOnly
               value={tradeFormState.psbtHex}
             />
@@ -820,7 +820,7 @@ export function StampTradeTool() {
 
         {/* ===== 🎯 INLINE FEE STATUS DISPLAY - UTXO ATTACH ===== */}
         {attachFeeDetails && (
-          <div className="mb-4 p-3 bg-stamp-grey-darker/50 rounded-lg border border-stamp-grey-light/10">
+          <div className="mb-4 p-3 bg-stamp-grey-darker/50 rounded-xl border border-stamp-grey-light/10">
             <div className="flex items-center gap-2 mb-2">
               <span className="text-sm text-stamp-grey-light">
                 Estimated Fees:
@@ -899,7 +899,7 @@ export function StampTradeTool() {
 
             {/* Asset selection results */}
             {availableAssets.length > 0 && (
-              <div class="max-h-40 overflow-y-auto bg-gray-800 rounded-md p-3">
+              <div class="max-h-40 overflow-y-auto bg-gray-800 rounded-xl p-3">
                 <h4 class="text-sm font-medium mb-2">Available Assets:</h4>
                 {availableAssets.map((asset) => (
                   <div
@@ -958,7 +958,7 @@ export function StampTradeTool() {
 
             {/* UTXO selection results */}
             {availableUtxos.length > 0 && (
-              <div class="max-h-40 overflow-y-auto bg-gray-800 rounded-md p-3">
+              <div class="max-h-40 overflow-y-auto bg-gray-800 rounded-xl p-3">
                 <h4 class="text-sm font-medium mb-2">Available UTXOs:</h4>
                 {availableUtxos.map((utxo) => (
                   <div
@@ -1001,7 +1001,7 @@ export function StampTradeTool() {
           <div class={`${containerBackground} break-words mt-6`}>
             <h2 class="text-xl font-bold mb-2">Signed PSBT (Hex):</h2>
             <textarea
-              class="w-full h-40 p-2 bg-gray-800 text-white rounded-md"
+              class="w-full h-40 p-2 bg-gray-800 text-white rounded-xl"
               readOnly
               value={attachFormState.psbtHex}
             />
@@ -1019,7 +1019,7 @@ export function StampTradeTool() {
 
         {/* ===== 🎯 INLINE FEE STATUS DISPLAY - COMPLETE SWAP ===== */}
         {swapFeeDetails && (
-          <div className="mb-4 p-3 bg-stamp-grey-darker/50 rounded-lg border border-stamp-grey-light/10">
+          <div className="mb-4 p-3 bg-stamp-grey-darker/50 rounded-xl border border-stamp-grey-light/10">
             <div className="flex items-center gap-2 mb-2">
               <span className="text-sm text-stamp-grey-light">
                 Estimated Fees:

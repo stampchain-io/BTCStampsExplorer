@@ -1,6 +1,6 @@
 import { BadgeIcon, Icon } from "$components/icon/IconBase.tsx";
-import { useEffect, useRef, useState } from "preact/hooks";
 import { tooltipIcon } from "$notification";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 // Define the filter types
 export type FilterType = "stamp" | "src20" | "explorer";
@@ -59,7 +59,7 @@ export function FilterButton(
         weight="bold"
         size="smR"
         color="purple"
-        className="mt-[6px] group-hover:stroke-stamp-purple-bright transition-all duration-300"
+        className="mt-[6px] group-hover:stroke-stamp-purple-bright transition-all duration-200"
         onClick={() => {
           setOpen(!open);
           setIsTooltipVisible(false);

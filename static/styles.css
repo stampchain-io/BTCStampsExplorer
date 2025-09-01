@@ -131,6 +131,10 @@ body {
 }
 
 .scrollbar-glassmorphism {
+  @apply [&::-webkit-scrollbar-track]:bg-[#141015] [&::-webkit-scrollbar-thumb]:bg-[#666666]/50 [&::-webkit-scrollbar-thumb:hover]:bg-[#666666];
+}
+
+.scrollbar-glassmorphism-slim {
   @apply [&::-webkit-scrollbar]:w-[2px] [&::-webkit-scrollbar-track]:bg-[#141015] [&::-webkit-scrollbar-thumb]:bg-[#666666]/50 [&::-webkit-scrollbar-thumb:hover]:bg-[#666666];
 }
 
@@ -401,43 +405,70 @@ strong {
   color: #999999;
 }
 
-/* SRC20 Chart Styles */
-/* Style for all zoom buttons */
+/* ChartWidget Styles */
+/* Position range selector buttons to the left */
+.highcharts-range-selector-buttons {
+  transform: translateX(-40px); /* Move 40px to the left */
+}
+
+/* Style for all zoom buttons - @baba - check if this is needed */
+/*
 .highcharts-range-selector-buttons rect {
   fill: transparent !important;
-  /* Transparent background */
-  stroke: #8800cc !important;
-  /* Purple border */
-  stroke-width: 2px !important;
-  /* Border thickness */
-  rx: 6px;
-  /* Rounded corners */
+  /* Transparent background
+  stroke: #999999 !important;
+  /* Grey border
+  stroke-width: 1px !important;
+  /* 1px border thickness
+  rx: 8px;
+  /* Rounded corners (rounded-lg)
 }
+*/
 
 /* Style for zoom button text */
+/*
 .highcharts-range-selector-buttons text {
   cursor: pointer !important;
-  fill: #8800cc !important;
-  /* Purple text */
-  font-weight: bold;
+  fill: #999999 !important;
+  /* Grey text
+  font-weight: normal;
+  font-size: 11px;
 }
+*/
+
+/* Hover state */
+/*
+.highcharts-range-selector-buttons .highcharts-button:hover rect {
+  stroke: #CCCCCC !important;
+}
+
+.highcharts-range-selector-buttons .highcharts-button:hover text {
+  fill: #CCCCCC !important;
+}
+*/
 
 /* Active (selected) button */
+/*
 .highcharts-range-selector-buttons .highcharts-button-pressed rect {
-  fill: #8800cc !important;
-  /* Solid purple when selected */
-  stroke: #660099 !important;
+  fill: transparent !important;
+  /* Keep transparent when selected
+  stroke: #CCCCCC !important;
 }
+*/
 
 /* Active text color */
+/*
 .highcharts-range-selector-buttons .highcharts-button-pressed text {
-  fill: white !important;
+  fill: #CCCCCC !important;
+  font-weight: bold;
 }
+*/
+
 
 /* SYSTEMIC FIX: Force cursor inheritance for glassmorphism elements */
 /* This fixes the issue where backdrop-blur and pseudo-elements override cursor styles */
 
-/* Fix for all buttons with glassmorphism */
+/* Fix for all buttons with glassmorphism
 button,
 button *,
 button::before,
@@ -445,7 +476,7 @@ button::after {
   cursor: inherit !important;
 }
 
-/* Fix for glassmorphism containers that should inherit cursor */
+/* Fix for glassmorphism containers that should inherit cursor
 .backdrop-blur-sm,
 .backdrop-blur-sm *,
 .backdrop-blur-sm::before,
@@ -453,7 +484,7 @@ button::after {
   cursor: inherit !important;
 }
 
-/* Fix for overflow-hidden containers */
+/* Fix for overflow-hidden containers
 .overflow-hidden,
 .overflow-hidden *,
 .overflow-hidden::before,
@@ -461,191 +492,14 @@ button::after {
   cursor: inherit !important;
 }
 
-/* Fix for swiper container in latest stamps section - Prevent image cropping */
-.swiper-container {
-  height: auto !important;
-  min-height: 240px !important;
-  overflow: visible !important;
-  display: block !important;
-}
-
-/* Additional specificity for stamp detail page swiper */
-div.swiper-container {
-  height: auto !important;
-  min-height: 240px !important;
-  overflow: visible !important;
-}
-
-.swiper-container .swiper {
-  height: auto !important;
-  overflow: visible !important;
-}
-
-.swiper-container .swiper-wrapper {
-  height: auto !important;
-  align-items: flex-start !important;
-  display: flex !important;
-  padding-bottom: 20px; /* Extra space for proper display */
-}
-
-.swiper-container .swiper-slide {
-  height: auto !important;
-  min-height: 200px;
-  display: flex !important;
-  align-items: flex-start !important;
-  justify-content: center !important;
-  flex-shrink: 0 !important;
-  position: relative !important;
-  padding: 8px 4px;
-}
-
-/* Ensure stamp cards have proper dimensions in swiper */
-.swiper-container .swiper-slide .relative {
-  width: 100%;
-  max-width: 100%;
-  min-height: 180px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-}
-
-/* Override any swiper height constraints */
-.swiper-container .swiper-slide-active,
-.swiper-container .swiper-slide-next,
-.swiper-container .swiper-slide-prev {
-  height: auto !important;
-  min-height: 200px;
-}
-
-/* Ensure stamp image container doesn't get cropped */
-.swiper-container .swiper-slide .aspect-stamp {
-  max-height: none !important;
-  height: auto !important;
-  min-height: 140px;
-}
-
-/* Prevent overflow issues with stamp images - Match StampCard behavior */
-.swiper-container .swiper-slide .stamp-image {
-  max-height: none !important;
-  height: 100% !important;
-  width: 100% !important;
-  max-width: none !important;
-  object-fit: contain !important;
-  display: block !important;
-  /* Pixelated rendering to match StampCard */
-  -webkit-image-rendering: pixelated !important;
-  image-rendering: pixelated !important;
-  image-rendering: -moz-crisp-edges !important;
-  image-rendering: crisp-edges !important;
-  /* Hardware acceleration */
-  -webkit-transform: translateZ(0) !important;
-  transform: translateZ(0) !important;
-  /* Prevent iOS image stretching */
-  -webkit-backface-visibility: hidden !important;
-  backface-visibility: hidden !important;
-}
-
-/* Additional specificity for stamp detail page images - Match StampCard behavior */
-div.swiper-container .swiper-slide .stamp-image {
-  max-height: none !important;
-  height: 100% !important;
-  width: 100% !important;
-  max-width: none !important;
-  object-fit: contain !important;
-  display: block !important;
-  /* Pixelated rendering to match StampCard */
-  -webkit-image-rendering: pixelated !important;
-  image-rendering: pixelated !important;
-  image-rendering: -moz-crisp-edges !important;
-  image-rendering: crisp-edges !important;
-  /* Hardware acceleration */
-  -webkit-transform: translateZ(0) !important;
-  transform: translateZ(0) !important;
-  /* Prevent iOS image stretching */
-  -webkit-backface-visibility: hidden !important;
-  backface-visibility: hidden !important;
-}
-
-/* Force aspect ratio handling for stamp cards in swiper */
-.swiper-container .swiper-slide .aspect-stamp {
-  aspect-ratio: 1 !important;
-  width: 100% !important;
-  height: auto !important;
-  min-height: 140px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
-
-@media (max-width: 767px) {
-  .swiper-container {
-    min-height: 220px !important;
-  }
-  .swiper-container .swiper-slide {
-    min-height: 180px !important;
-  }
-  .swiper-container .swiper-slide .aspect-stamp {
-    min-height: 120px !important;
-    aspect-ratio: 1 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
-  .swiper-container .swiper-slide .stamp-image {
-    min-height: 120px !important;
-    max-height: none !important;
-    height: 100% !important;
-    width: 100% !important;
-    max-width: none !important;
-    object-fit: contain !important;
-    display: block !important;
-    /* Pixelated rendering to match StampCard */
-    -webkit-image-rendering: pixelated !important;
-    image-rendering: pixelated !important;
-    image-rendering: -moz-crisp-edges !important;
-    image-rendering: crisp-edges !important;
-  }
-}
-
-@media (max-width: 567px) {
-  .swiper-container {
-    min-height: 200px !important;
-  }
-  .swiper-container .swiper-slide {
-    min-height: 160px !important;
-    padding: 6px 2px !important;
-  }
-  .swiper-container .swiper-slide .aspect-stamp {
-    min-height: 100px !important;
-    aspect-ratio: 1 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
-  .swiper-container .swiper-slide .stamp-image {
-    min-height: 100px !important;
-    max-height: none !important;
-    height: 100% !important;
-    width: 100% !important;
-    max-width: none !important;
-    object-fit: contain !important;
-    display: block !important;
-    /* Pixelated rendering to match StampCard */
-    -webkit-image-rendering: pixelated !important;
-    image-rendering: pixelated !important;
-    image-rendering: -moz-crisp-edges !important;
-    image-rendering: crisp-edges !important;
-  }
-}
-
-/* Specific fix for range sliders */
+/* Specific fix for range sliders
 input[type="range"],
 input[type="range"]::-webkit-slider-thumb,
 input[type="range"]::-moz-range-thumb {
   cursor: inherit !important;
 }
 
-/* Override any text cursor defaults in interactive elements */
+/* Override any text cursor defaults in interactive elements
 button span,
 button div,
 button p,
@@ -654,3 +508,4 @@ button p,
 [role="button"] p {
   cursor: inherit !important;
 }
+ */

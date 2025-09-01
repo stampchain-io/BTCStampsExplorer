@@ -1,7 +1,7 @@
 /* ===== HOLDERS PIE CHART COMPONENT ===== */
-import { Chart } from "fresh_charts/island.tsx";
 import type { PieChartProps } from "$types/ui.d.ts";
 import type { HolderRow } from "$types/wallet.d.ts";
+import { Chart } from "fresh_charts/island.tsx";
 
 /* ===== TYPES ===== */
 interface Holder {
@@ -20,7 +20,7 @@ export const HoldersPieChart = ({ holders: rawHolders }: PieChartProps) => {
   }));
   /* ===== EMPTY STATE ===== */
   if (!holders?.length) {
-    return <div class="text-center py-4">No holder data available</div>;
+    return <div class="text-center py-4">NO HOLDER DATA AVAILABLE</div>;
   }
 
   /* ===== HELPER FUNCTIONS ===== */
@@ -104,6 +104,6 @@ export const HoldersPieChart = ({ holders: rawHolders }: PieChartProps) => {
   } catch (error) {
     /* ===== ERROR STATE ===== */
     console.error("Error rendering chart:", error);
-    return <div class="text-center py-6">Error rendering chart</div>;
+    return <div class="text-center py-6">ERROR RENDERING CHART</div>;
   }
 };

@@ -2,14 +2,18 @@
 import type { DispenserRow as Dispenser, StampRow } from "$types/stamp.d.ts";
 
 import { NOT_AVAILABLE_IMAGE } from "$constants";
-import { Icon } from "$icon";
+import { Icon, LoadingIcon } from "$icon";
 import { SortButton } from "$islands/button/SortButton.tsx";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { Setting } from "$islands/datacontrol/Setting.tsx";
 import FreshSRC20Gallery from "$islands/section/gallery/FreshSRC20Gallery.tsx";
 import { FreshStampGallery } from "$islands/section/gallery/FreshStampGallery.tsx";
-import { Skeleton } from "$ui";
-
+import { shadowGlowPurple } from "$layout";
+import {
+  createPaginationHandler,
+  getCurrentUrl,
+  navigateWithFresh,
+} from "$lib/utils/navigation/freshNavigationUtils.ts";
 import {
   abbreviateAddress,
   formatBTCAmount,
@@ -188,15 +192,10 @@ function DispenserItem({
             page={pagination.page}
             totalPages={pagination.totalPages}
             prefix="dispensers"
-            onPageChange={(newPage: number) => {
-              // SSR-safe browser environment check
-              if (typeof globalThis === "undefined" || !globalThis?.location) {
-                return; // Cannot navigate during SSR
-              }
-              const url = new URL(globalThis.location.href);
-              url.searchParams.set("dispensers_page", newPage.toString());
-              globalThis.location.href = url.toString();
-            }}
+            onPageChange={createPaginationHandler(
+              "dispensers_page",
+              "closed_listings",
+            )}
           />
         </div>
       )}
@@ -236,39 +235,30 @@ function DispenserRow(
   }
 
   return (
-    <div class="flex justify-between dark-gradient rounded-lg hover:border-stamp-primary-light hover:shadow-[0px_0px_20px_#9900EE] group border-2 border-transparent">
+    <div
+      class={`flex justify-between dark-gradient rounded-xl hover:border-stamp-primary-light ${shadowGlowPurple} border-2 border-transparent`}
+    >
       <div class="flex p-3 mobileLg:p-6 gap-6 uppercase w-full">
         <a
           href={`/stamp/${dispenser.stamp.stamp}`}
           class={`${imageSize} relative flex-shrink-0`}
         >
-          <div class="relative p-[6px] mobileMd:p-3 bg-[#1F002E] rounded-lg aspect-square">
+          <div class="relative p-[6px] mobileMd:p-3 bg-[#1F002E] rounded-xl aspect-square">
             <div class="stamp-container absolute inset-0 flex items-center justify-center">
               <div class="relative z-10 w-full h-full">
-                {loading && !src
-                  ? (
-                    <div class="w-full h-full bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
-                      <Skeleton
-                        width="60%"
-                        height="60%"
-                        borderRadius="0.25rem"
-                      />
-                    </div>
-                  )
-                  : (
-                    <img
-                      width="100%"
-                      height="100%"
-                      loading="lazy"
-                      class="max-w-none w-full h-full object-contain rounded pixelart stamp-image"
-                      src={src}
-                      alt={`Stamp ${dispenser.stamp.stamp}`}
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src =
-                          NOT_AVAILABLE_IMAGE;
-                      }}
-                    />
-                  )}
+                {loading && !src ? <LoadingIcon /> : (
+                  <img
+                    width="100%"
+                    height="100%"
+                    loading="lazy"
+                    class="max-w-none w-full h-full object-contain rounded pixelart stamp-image"
+                    src={src}
+                    alt={`Stamp ${dispenser.stamp.stamp}`}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = NOT_AVAILABLE_IMAGE;
+                    }}
+                  />
+                )}
               </div>
             </div>
           </div>
@@ -398,6 +388,8 @@ const WalletDashboardContent = ({
   const [openSetting, setOpenSetting] = useState<boolean>(false);
 
   /* ===== COMPUTED VALUES ===== */
+  const openDispensersCount =
+    dispensers.data?.filter((d: any) => d.give_remaining > 0)?.length ?? 0;
 
   /* ===== EFFECTS ===== */
   useEffect(() => {
@@ -419,11 +411,8 @@ const WalletDashboardContent = ({
   }, [anchor, stamps, src20, dispensers]);
 
   useEffect(() => {
-    // SSR-safe URL access
-    if (typeof globalThis === "undefined" || !globalThis?.location) {
-      return; // Cannot access URL during SSR
-    }
-    const url = new URL(globalThis.location.href);
+    const currentUrl = getCurrentUrl();
+    const url = new URL(currentUrl);
     const filterByValue = url.searchParams.get("filterBy") || "";
     if (filterByValue === "Transfer") {
       setOpenSetting(true);
@@ -438,38 +427,35 @@ const WalletDashboardContent = ({
   /* ===== SORT HANDLERS ===== */
   const handleChangeSort = (newSort: "ASC" | "DESC") => {
     setSortStamps(newSort);
-    // SSR-safe navigation
-    if (typeof globalThis === "undefined" || !globalThis?.location) {
-      return; // Cannot navigate during SSR
-    }
-    const url = new URL(globalThis.location.href);
-    url.searchParams.set("stampsSortBy", newSort);
-    url.searchParams.set("stamps_page", "1"); // Reset to page 1 when sorting
-    globalThis.location.href = url.toString();
+    navigateWithFresh(
+      {
+        "stampsSortBy": newSort,
+        "stamps_page": "1", // Reset to page 1 when sorting
+      },
+      "stamps",
+    );
   };
 
   const handleTokenSort = (newSort: "ASC" | "DESC") => {
     setSortTokens(newSort);
-    // SSR-safe navigation
-    if (typeof globalThis === "undefined" || !globalThis?.location) {
-      return; // Cannot navigate during SSR
-    }
-    const url = new URL(globalThis.location.href);
-    url.searchParams.set("src20SortBy", newSort);
-    url.searchParams.set("src20_page", "1"); // Reset to page 1 when sorting
-    globalThis.location.href = url.toString();
+    navigateWithFresh(
+      {
+        "src20SortBy": newSort,
+        "src20_page": "1", // Reset to page 1 when sorting
+      },
+      "src20",
+    );
   };
 
   const handleDispenserSort = (newSort: "ASC" | "DESC") => {
     setSortDispensers(newSort);
-    // SSR-safe navigation
-    if (typeof globalThis === "undefined" || !globalThis?.location) {
-      return; // Cannot navigate during SSR
-    }
-    const url = new URL(globalThis.location.href);
-    url.searchParams.set("dispensersSortBy", newSort);
-    url.searchParams.set("dispensers_page", "1"); // Reset to page 1 when sorting
-    globalThis.location.href = url.toString();
+    navigateWithFresh(
+      {
+        "dispensersSortBy": newSort,
+        "dispensers_page": "1", // Reset to page 1 when sorting
+      },
+      openDispensersCount > 0 ? "open_listings" : "closed_listings",
+    );
   };
 
   /* ===== RENDER ===== */
@@ -594,17 +580,10 @@ const WalletDashboardContent = ({
                 page: dispensers.pagination.page,
                 totalPages: dispensers.pagination.totalPages,
                 prefix: "dispensers",
-                onPageChange: (newPage: number) => {
-                  // SSR-safe browser environment check
-                  if (
-                    typeof globalThis === "undefined" || !globalThis?.location
-                  ) {
-                    return; // Cannot navigate during SSR
-                  }
-                  const url = new URL(globalThis.location.href);
-                  url.searchParams.set("dispensers_page", newPage.toString());
-                  globalThis.location.href = url.toString();
-                },
+                onPageChange: createPaginationHandler(
+                  "dispensers_page",
+                  "closed_listings",
+                ),
               }}
             />
           </div>

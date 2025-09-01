@@ -1,6 +1,5 @@
 /* ===== SRC20 RECENT MINTS GALLERY COMPONENT ===== */
 import { SRC20CardSmMinting } from "$card";
-import { containerBackground } from "$layout";
 import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
 import type { SRC20Row } from "$types/src20.d.ts";
 import { useEffect, useState } from "preact/hooks";
@@ -48,7 +47,7 @@ export default function SRC20MintsGallery() {
 
   /* ===== RENDER ===== */
   return (
-    <div class={`${containerBackground} items-start tablet:items-end`}>
+    <div class="w-full items-start tablet:items-end">
       {/* ===== TITLE SECTION ===== */}
       <div class="w-full">
         <h4 class={`${titlePurpleLD} tablet:hidden`}>
@@ -69,12 +68,12 @@ export default function SRC20MintsGallery() {
       {/* ===== LOADING OR CONTENT ===== */}
       {isLoading
         ? (
-          <div class="flex flex-col w-full gap-3">
+          <div class="flex flex-col w-full gap-3 mt-3">
             {[...Array(6)].map((_, index) => (
               <div
                 key={index}
-                class={`loading-skeleton running w-full rounded-lg ${
-                  index === 0 ? "h-6" : "h-[56px]"
+                class={`loading-skeleton running w-full rounded-xl ${
+                  index === 0 ? "h-[34px]" : "h-[56px]"
                 }`}
               />
             ))}
@@ -82,7 +81,7 @@ export default function SRC20MintsGallery() {
         )
         : error
         ? (
-          <div class="w-full p-5 bg-[#171417]/50 border border-red-500/40 text-red-500/70 rounded-xl">
+          <div class="w-full p-5 bg-[#100a10]/50 border border-red-500/40 text-red-500/70 rounded-xl">
             <p class="font-bold">ERROR LOADING TRENDING TOKENS:</p>
             <p class="text-sm">{error}</p>
           </div>

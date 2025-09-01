@@ -11,8 +11,10 @@ import {
   containerBackground,
   containerColForm,
   containerRowForm,
-  glassmorphismLayer2,
-  transition,
+  glassmorphismL2,
+  glassmorphismL2Hover,
+  transitionAll,
+  transitionColors,
 } from "$layout";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
 import { APIResponse } from "$lib/utils/api/responses/apiResponseUtil.ts";
@@ -343,7 +345,9 @@ export function SRC20DeployTool(
             {/* Image upload preview */}
             <div
               id="image-preview"
-              class={`relative flex flex-col items-center justify-center content-center mx-auto min-h-[100px] min-w-[100px] ${glassmorphismLayer2} hover:bg-[#171417]/10 hover:border-[#33333380] ${transition} cursor-pointer`}
+              class={`relative flex flex-col items-center justify-center content-center mx-auto min-h-[100px] min-w-[100px]
+              ${glassmorphismL2} ${glassmorphismL2Hover}
+              ${transitionColors} cursor-pointer`}
               onMouseMove={handleMouseMove}
               onMouseEnter={handleUploadMouseEnter}
               onMouseLeave={handleUploadMouseLeave}
@@ -367,7 +371,7 @@ export function SRC20DeployTool(
                     objectFit: "contain",
                     imageRendering: "pixelated",
                     backgroundColor: "rgb(0,0,0)",
-                    borderRadius: "6px",
+                    borderRadius: "12px",
                   }}
                   src={URL.createObjectURL(formState.file)}
                 />
@@ -485,9 +489,9 @@ export function SRC20DeployTool(
 
         {/* ===== ADVANCED OPTIONS SECTION ===== */}
         <div
-          class={`overflow-hidden transition-all duration-400 ${
+          class={`overflow-hidden ${transitionAll} ${
             showAdvancedOptions
-              ? "max-h-[-320px] opacity-100 mt-5"
+              ? "max-h-[320px] opacity-100 mt-5"
               : "max-h-0 opacity-0 mt-0"
           }`}
         >

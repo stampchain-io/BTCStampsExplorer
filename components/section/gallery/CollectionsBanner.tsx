@@ -1,10 +1,11 @@
 /* ===== COLLECTION LIST CARD COMPONENT ===== */
+import { shadowGlowGrey } from "$layout";
 import type { CollectionsBannerProps } from "$types/ui.d.ts";
 import { useState } from "preact/hooks";
 
 /* ===== STYLES ===== */
 const containerClassName =
-  `border-2 border-stamp-grey-darker rounded-md relative overflow-hidden
+  `border-2 border-stamp-grey-darker rounded-lg relative overflow-hidden
   w-full h-[92px] mobileMd:h-[116px] mobileLg:h-[130px] tablet:h-[148px] desktop:h-[160px]`;
 const imageContentClassName =
   "bg-center bg-no-repeat bg-[length:100%] w-full h-full grayscale transition-all duration-300";
@@ -31,7 +32,7 @@ export function CollectionsBanner(
   return (
     <a
       href={`/collection/detail/${collection.collection_name ?? ""}`}
-      class={`${containerClassName} ${isHovered ? "shadow-collection" : ""}`}
+      class={`${containerClassName} ${isHovered ? shadowGlowGrey : ""}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >

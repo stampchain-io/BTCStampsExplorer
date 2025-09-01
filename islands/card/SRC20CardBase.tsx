@@ -1,6 +1,7 @@
 /* ===== SRC20 CARD BASE COMPONENT ===== */
 /*@baba-check styles*/
 import { cellAlign } from "$components/layout/types.ts";
+import { shadowGlowPurple } from "$layout";
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { getSRC20ImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
 import type { SRC20CardBaseProps } from "$types/ui.d.ts";
@@ -44,7 +45,7 @@ export function SRC20CardBase({
 
   return (
     <tr
-      class="dark-gradient !rounded-xl border-2 border-transparent hover:border-stamp-primary-light hover:shadow-[0px_0px_20px_#9900EE] p-12"
+      class={`dark-gradient !rounded-xl border-2 border-transparent hover:border-stamp-purple-bright ${shadowGlowPurple} p-12`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -52,7 +53,7 @@ export function SRC20CardBase({
         <div class="flex items-center gap-4 p-3">
           <img
             src={imageUrl}
-            class="w-8 h-8 rounded-sm cursor-pointer"
+            class="w-8 h-8 rounded cursor-pointer"
             onClick={(e) => {
               e.preventDefault();
               onImageClick?.(imageUrl);

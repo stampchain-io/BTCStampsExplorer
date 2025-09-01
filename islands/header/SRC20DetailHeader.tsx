@@ -2,6 +2,7 @@
 import { StatItem, StatTitle } from "$components/section/WalletComponents.tsx";
 import { Icon } from "$icon";
 import { SearchSRC20Modal } from "$islands/modal/SearchSRC20Modal.tsx";
+import { body, containerBackground, gapSectionSlim } from "$layout";
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import {
   abbreviateAddress,
@@ -94,15 +95,15 @@ export function SRC20DetailHeader({
   return (
     <>
       <SearchSRC20Modal showButton={false} />
-      <div class="flex w-full flex-col gap-6">
+      <div class={`${body} ${gapSectionSlim}`}>
         {/* ===== TOKEN INFO CARD ===== */}
-        <div class="relative w-full flex flex-wrap gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient rounded-lg">
+        <div class={`relative ${containerBackground} flex-wrap`}>
           <div class="flex flex-row w-full">
             {/* ===== TOKEN IMAGE AND CREATOR ===== */}
             <div class="flex gap-[18px] mobileMd:gap-[30px]">
               <img
                 src={imageUrl}
-                class="max-w-[80px] rounded-sm relative z-10"
+                class="max-w-[80px] rounded-md relative z-10"
                 alt={`${deployment.tick} token image`}
                 loading="lazy"
               />
@@ -237,7 +238,7 @@ export function SRC20DetailHeader({
         </div>
 
         {/* ===== MARKET INFORMATION CARD ===== */}
-        <div class="flex flex-col dark-gradient rounded-lg p-6">
+        <div class={containerBackground}>
           {/* Market cap */}
           <div class="flex flex-col">
             <StatTitle

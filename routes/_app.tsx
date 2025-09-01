@@ -158,8 +158,8 @@ export default function App({ Component, state, url }: PageProps<unknown>) {
               scroll-behavior: auto !important;
             }
 
-            /* Performance-based animation controls */
-            .performance-low * {
+            /* Performance-based animation controls - TEMPORARILY DISABLED */
+            /* .performance-low * {
               animation-duration: 1.5s !important;
               transition-duration: 1.5s !important;
             }
@@ -172,7 +172,7 @@ export default function App({ Component, state, url }: PageProps<unknown>) {
             .performance-medium * {
               animation-duration: 1s !important;
               transition-duration: 1s !important;
-            }
+            } */
 
             /* Intersection observer based controls */
             .animation-paused {
@@ -193,14 +193,14 @@ export default function App({ Component, state, url }: PageProps<unknown>) {
               animation-play-state: paused !important;
             }
 
-            /* Transition optimizations for low performance */
-            .performance-low .transition-all {
+            /* Transition optimizations for low performance - TEMPORARILY DISABLED */
+            /* .performance-low .transition-all {
               transition: none !important;
             }
 
             .performance-low .hover\\:scale-105:hover {
               transform: none !important;
-            }
+            } */
 
             /* Match StampCard grid layout - doesnt apply to StampCardRows */
             .stamp-grid-skeleton {
@@ -212,7 +212,7 @@ export default function App({ Component, state, url }: PageProps<unknown>) {
 
             .stamp-card-skeleton {
               aspect-ratio: 1;
-              border-radius: 0.5rem; /* rounded-lg */
+              border-radius: 0.75rem; /* rounded-xl */
             }
 
             /* Match SRC20Section layout */

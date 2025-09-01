@@ -1,8 +1,10 @@
 /* ===== STAMP OVERVIEW CONTENT COMPONENT ===== */
 import { StampCard } from "$card";
-import type { StampOverviewContentProps } from "$types/ui.d.ts";
-import type { StampRow } from "$types/stamp.d.ts";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
+import { containerBackground } from "$layout";
+import { valueDark } from "$text";
+import type { StampRow } from "$types/stamp.d.ts";
+import type { StampOverviewContentProps } from "$types/ui.d.ts";
 
 /* ===== TYPES ===== */
 
@@ -34,9 +36,11 @@ export function StampOverviewContent({
           </div>
         )
         : (
-          <div class="w-full flex-col flex justify-center items-center">
+          <div
+            class={`${containerBackground} flex-col flex justify-center items-center`}
+          >
             <img src="/img/ic_content.svg" width="160" />
-            <span class="text-stamp-grey">NO STAMPS</span>
+            <h6 class={`py-2 ${valueDark} text-center`}>NO STAMPS</h6>
           </div>
         )}
       {pagination && pagination.totalPages > 1 && (

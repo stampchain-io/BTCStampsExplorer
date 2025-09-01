@@ -1,10 +1,8 @@
 import { IS_BROWSER } from "$fresh/runtime.ts";
 import { Icon } from "$icon";
+import { useSSRSafeNavigation } from "$lib/hooks/useSSRSafeNavigation.ts";
 import type { PaginationProps } from "$types/pagination.d.ts";
-import {
-  getWindowWidth,
-  safeNavigate,
-} from "$utils/navigation/freshNavigationUtils.ts";
+import { getWindowWidth } from "$utils/navigation/freshNavigationUtils.ts";
 import { useEffect, useState } from "preact/hooks";
 
 // Update pagination range constants
@@ -15,10 +13,10 @@ const DESKTOP_MAX_PAGE_RANGE = 4;
 
 const navArrow = `
   flex items-center justify-center
-  w-9 h-9 rounded-md hover:bg-stamp-purple-bright`;
+  w-9 h-9 rounded-lg hover:bg-stamp-purple-bright`;
 const navContent = `
   flex items-center justify-center
-  h-9 desktop:pt-0.5 px-[14px] rounded-md hover:bg-stamp-purple-bright
+  h-9 desktop:pt-0.5 px-[14px] rounded-lg hover:bg-stamp-purple-bright
   font-medium text-black text-sm leading-[16.5px]`;
 
 // SSR-safe screen size hook
@@ -58,6 +56,7 @@ export function Pagination({
   onPageChange,
 }: PaginationProps) {
   const screenSize = useScreenSize();
+  const { setSearchParam } = useSSRSafeNavigation();
 
   // Update maxPageRange logic based on screen size
   const getMaxPageRange = (size: string) => {
@@ -83,15 +82,9 @@ export function Pagination({
       return;
     }
 
-    // Use Fresh partial navigation if available, fallback to URL parameter update
-    if (IS_BROWSER) {
-      const url = new URL(globalThis.location.href);
-      const paramName = prefix ? `${prefix}_page` : "page";
-      url.searchParams.set(paramName, newPage.toString());
-
-      // Try Fresh partial navigation first
-      safeNavigate(url.toString());
-    }
+    // SSR-safe URL parameter update using the navigation hook
+    const paramName = prefix ? `${prefix}_page` : "page";
+    setSearchParam(paramName, newPage.toString());
   };
 
   const renderPageButton = (pageNum: number, iconName?: string) => {
@@ -102,14 +95,12 @@ export function Pagination({
       ? `${baseClass} bg-stamp-purple`
       : `${baseClass} bg-stamp-purple-dark`;
 
-    // Always use button with click handler for consistent navigation
     return (
       <button
         type="button"
         class={buttonClass}
         onClick={() => handlePageChange(pageNum)}
         disabled={isCurrentPage}
-        {...(isCurrentPage && { "aria-current": "page" })}
       >
         {iconName
           ? (

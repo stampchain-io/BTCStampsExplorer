@@ -242,7 +242,7 @@ export const BTCValueSummary = memo(function BTCValueSummary({
   } = useValueSummary(stamps ?? []);
 
   return (
-    <div class={`bg-gray-50 rounded-lg p-4 ${className}`}>
+    <div class={`bg-gray-50 rounded-xl p-4 ${className}`}>
       <div class="flex justify-between items-center mb-3">
         <h3 class="text-lg font-semibold">Portfolio Value</h3>
         <div class="text-lg font-semibold">

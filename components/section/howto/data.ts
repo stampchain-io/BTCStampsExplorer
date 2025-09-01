@@ -129,6 +129,7 @@ export const LEATHER_CONNECT_SUPPORTED_WALLETS = [
   "OKX",
   "TapWallet",
   "Phantom",
+  "Horizon",
 ];
 
 export const LEATHER_CONNECT_IMPORTANT_NOTES = [
