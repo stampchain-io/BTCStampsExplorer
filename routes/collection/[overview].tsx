@@ -169,6 +169,7 @@ export default function CollectionOverviewPage(
               <Pagination
                 page={page ?? 1}
                 totalPages={pages ?? 1}
+                // Remove onPageChange to let Pagination component use its built-in Fresh navigation
                 prefix=""
               />
             </div>
@@ -190,6 +191,7 @@ export default function CollectionOverviewPage(
                 pagination={{
                   page: page ?? 1,
                   totalPages: pages ?? 1,
+                  // Remove onPageChange to let Pagination component use its built-in Fresh navigation
                   prefix: "",
                 }}
               />

@@ -6,7 +6,7 @@ import {
   LIBRARY_FILE_IMAGE,
   NOT_AVAILABLE_IMAGE,
 } from "$constants";
-import { Icon, LoadingIcon } from "$icon";
+import { Icon } from "$icon";
 import TextContentIsland from "$islands/content/stampDetailContent/StampTextContent.tsx";
 import PreviewCodeModal from "$islands/modal/PreviewCodeModal.tsx";
 import PreviewImageModal from "$islands/modal/PreviewImageModal.tsx";
@@ -18,6 +18,7 @@ import {
 } from "$lib/utils/ui/media/imageUtils.ts";
 import { tooltipIcon } from "$notification";
 import type { StampRow } from "$types/stamp.d.ts";
+import { Skeleton } from "$ui";
 import { VNode } from "preact";
 import { useEffect, useRef, useState } from "preact/hooks";
 
@@ -730,7 +731,15 @@ export function StampImage(
       <div class={`${body} ${gapSectionSlim}`}>
         <div className={`${containerDetailImage} ${containerClassName || ""}`}>
           <div className="stamp-container">
-            <LoadingIcon containerClassName="rounded-lg" />
+            <div className="relative w-full h-full bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+              <div className="flex flex-col items-center gap-4 p-8">
+                <Skeleton width="120px" height="120px" borderRadius="0.5rem" />
+                <div className="text-center">
+                  <Skeleton width="100px" height="16px" className="mb-2" />
+                  <Skeleton width="80px" height="14px" />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

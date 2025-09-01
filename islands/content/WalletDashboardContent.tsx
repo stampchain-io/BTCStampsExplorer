@@ -2,17 +2,14 @@
 import type { DispenserRow as Dispenser, StampRow } from "$types/stamp.d.ts";
 
 import { NOT_AVAILABLE_IMAGE } from "$constants";
-import { Icon, LoadingIcon } from "$icon";
+import { Icon } from "$icon";
 import { SortButton } from "$islands/button/SortButton.tsx";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { Setting } from "$islands/datacontrol/Setting.tsx";
 import FreshSRC20Gallery from "$islands/section/gallery/FreshSRC20Gallery.tsx";
 import { FreshStampGallery } from "$islands/section/gallery/FreshStampGallery.tsx";
-import {
-  createPaginationHandler,
-  getCurrentUrl,
-  navigateWithFresh,
-} from "$lib/utils/navigation/freshNavigationUtils.ts";
+import { Skeleton } from "$ui";
+
 import {
   abbreviateAddress,
   formatBTCAmount,
@@ -191,10 +188,15 @@ function DispenserItem({
             page={pagination.page}
             totalPages={pagination.totalPages}
             prefix="dispensers"
-            onPageChange={createPaginationHandler(
-              "dispensers_page",
-              "closed_listings",
-            )}
+            onPageChange={(newPage: number) => {
+              // SSR-safe browser environment check
+              if (typeof globalThis === "undefined" || !globalThis?.location) {
+                return; // Cannot navigate during SSR
+              }
+              const url = new URL(globalThis.location.href);
+              url.searchParams.set("dispensers_page", newPage.toString());
+              globalThis.location.href = url.toString();
+            }}
           />
         </div>
       )}
@@ -243,19 +245,30 @@ function DispenserRow(
           <div class="relative p-[6px] mobileMd:p-3 bg-[#1F002E] rounded-lg aspect-square">
             <div class="stamp-container absolute inset-0 flex items-center justify-center">
               <div class="relative z-10 w-full h-full">
-                {loading && !src ? <LoadingIcon /> : (
-                  <img
-                    width="100%"
-                    height="100%"
-                    loading="lazy"
-                    class="max-w-none w-full h-full object-contain rounded pixelart stamp-image"
-                    src={src}
-                    alt={`Stamp ${dispenser.stamp.stamp}`}
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = NOT_AVAILABLE_IMAGE;
-                    }}
-                  />
-                )}
+                {loading && !src
+                  ? (
+                    <div class="w-full h-full bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+                      <Skeleton
+                        width="60%"
+                        height="60%"
+                        borderRadius="0.25rem"
+                      />
+                    </div>
+                  )
+                  : (
+                    <img
+                      width="100%"
+                      height="100%"
+                      loading="lazy"
+                      class="max-w-none w-full h-full object-contain rounded pixelart stamp-image"
+                      src={src}
+                      alt={`Stamp ${dispenser.stamp.stamp}`}
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src =
+                          NOT_AVAILABLE_IMAGE;
+                      }}
+                    />
+                  )}
               </div>
             </div>
           </div>
@@ -385,8 +398,6 @@ const WalletDashboardContent = ({
   const [openSetting, setOpenSetting] = useState<boolean>(false);
 
   /* ===== COMPUTED VALUES ===== */
-  const openDispensersCount =
-    dispensers.data?.filter((d: any) => d.give_remaining > 0)?.length ?? 0;
 
   /* ===== EFFECTS ===== */
   useEffect(() => {
@@ -408,8 +419,11 @@ const WalletDashboardContent = ({
   }, [anchor, stamps, src20, dispensers]);
 
   useEffect(() => {
-    const currentUrl = getCurrentUrl();
-    const url = new URL(currentUrl);
+    // SSR-safe URL access
+    if (typeof globalThis === "undefined" || !globalThis?.location) {
+      return; // Cannot access URL during SSR
+    }
+    const url = new URL(globalThis.location.href);
     const filterByValue = url.searchParams.get("filterBy") || "";
     if (filterByValue === "Transfer") {
       setOpenSetting(true);
@@ -424,35 +438,38 @@ const WalletDashboardContent = ({
   /* ===== SORT HANDLERS ===== */
   const handleChangeSort = (newSort: "ASC" | "DESC") => {
     setSortStamps(newSort);
-    navigateWithFresh(
-      {
-        "stampsSortBy": newSort,
-        "stamps_page": "1", // Reset to page 1 when sorting
-      },
-      "stamps",
-    );
+    // SSR-safe navigation
+    if (typeof globalThis === "undefined" || !globalThis?.location) {
+      return; // Cannot navigate during SSR
+    }
+    const url = new URL(globalThis.location.href);
+    url.searchParams.set("stampsSortBy", newSort);
+    url.searchParams.set("stamps_page", "1"); // Reset to page 1 when sorting
+    globalThis.location.href = url.toString();
   };
 
   const handleTokenSort = (newSort: "ASC" | "DESC") => {
     setSortTokens(newSort);
-    navigateWithFresh(
-      {
-        "src20SortBy": newSort,
-        "src20_page": "1", // Reset to page 1 when sorting
-      },
-      "src20",
-    );
+    // SSR-safe navigation
+    if (typeof globalThis === "undefined" || !globalThis?.location) {
+      return; // Cannot navigate during SSR
+    }
+    const url = new URL(globalThis.location.href);
+    url.searchParams.set("src20SortBy", newSort);
+    url.searchParams.set("src20_page", "1"); // Reset to page 1 when sorting
+    globalThis.location.href = url.toString();
   };
 
   const handleDispenserSort = (newSort: "ASC" | "DESC") => {
     setSortDispensers(newSort);
-    navigateWithFresh(
-      {
-        "dispensersSortBy": newSort,
-        "dispensers_page": "1", // Reset to page 1 when sorting
-      },
-      openDispensersCount > 0 ? "open_listings" : "closed_listings",
-    );
+    // SSR-safe navigation
+    if (typeof globalThis === "undefined" || !globalThis?.location) {
+      return; // Cannot navigate during SSR
+    }
+    const url = new URL(globalThis.location.href);
+    url.searchParams.set("dispensersSortBy", newSort);
+    url.searchParams.set("dispensers_page", "1"); // Reset to page 1 when sorting
+    globalThis.location.href = url.toString();
   };
 
   /* ===== RENDER ===== */
@@ -577,10 +594,17 @@ const WalletDashboardContent = ({
                 page: dispensers.pagination.page,
                 totalPages: dispensers.pagination.totalPages,
                 prefix: "dispensers",
-                onPageChange: createPaginationHandler(
-                  "dispensers_page",
-                  "closed_listings",
-                ),
+                onPageChange: (newPage: number) => {
+                  // SSR-safe browser environment check
+                  if (
+                    typeof globalThis === "undefined" || !globalThis?.location
+                  ) {
+                    return; // Cannot navigate during SSR
+                  }
+                  const url = new URL(globalThis.location.href);
+                  url.searchParams.set("dispensers_page", newPage.toString());
+                  globalThis.location.href = url.toString();
+                },
               }}
             />
           </div>

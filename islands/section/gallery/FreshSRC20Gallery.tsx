@@ -5,13 +5,13 @@
  */
 
 import { SRC20CardSm } from "$components/card/SRC20CardSm.tsx";
-import type { SRC20GalleryProps as FreshSRC20GalleryProps } from "$types/ui.d.ts";
-import type { EnrichedSRC20Row } from "$types/src20.d.ts";
 import { LoadingIcon } from "$icon";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
-import { hasProperty, isNumber } from "$lib/utils/errorTypeGuards.ts";
-import { useEffect, useMemo, useState } from "preact/hooks";
 import { useSSRSafeNavigation } from "$lib/hooks/useSSRSafeNavigation.ts";
+import { hasProperty, isNumber } from "$lib/utils/errorTypeGuards.ts";
+import type { EnrichedSRC20Row } from "$types/src20.d.ts";
+import type { SRC20GalleryProps as FreshSRC20GalleryProps } from "$types/ui.d.ts";
+import { useEffect, useMemo, useState } from "preact/hooks";
 
 // ===== TYPES =====
 
@@ -349,11 +349,27 @@ export default function FreshSRC20Gallery({
   const renderLoadingSkeleton = () => {
     if (!showLoadingSkeleton) return null;
 
+    // 🚀 PERFORMANCE OPTIMIZATION: Use enhanced skeleton loading
     return (
-      <div class="absolute inset-0 bg-black/50 flex items-center justify-center z-10 rounded-lg">
-        <div class="flex flex-col items-center gap-4">
-          <LoadingIcon />
-          <div class="text-white text-sm">Loading SRC-20 tokens...</div>
+      <div class="absolute inset-0 bg-white dark:bg-gray-900 flex items-center justify-center z-10 rounded-lg">
+        <div class="flex flex-col items-center gap-6 p-8">
+          {/* Enhanced loading with skeleton grid */}
+          <div class="grid grid-cols-2 gap-3 w-full max-w-sm">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <div
+                key={index}
+                class="aspect-square bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"
+              />
+            ))}
+          </div>
+          <div class="text-center">
+            <div class="text-gray-600 dark:text-gray-400 text-sm mb-2">
+              Loading SRC-20 tokens...
+            </div>
+            <div class="flex justify-center">
+              <LoadingIcon />
+            </div>
+          </div>
         </div>
       </div>
     );

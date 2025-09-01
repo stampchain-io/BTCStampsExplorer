@@ -1,8 +1,6 @@
 /* ===== STAMP INFO COMPONENT ===== */
 /*@baba-750+764+815+icons - refactor to StatItems */
 import { Button } from "$button";
-import type { StampRow } from "$lib/types/stamp.d.ts";
-import type { Src101Detail } from "$lib/types/src101.d.ts";
 import { Icon } from "$icon";
 import BuyStampModal from "$islands/modal/BuyStampModal.tsx";
 import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
@@ -13,6 +11,8 @@ import {
   containerColData,
   gapSectionSlim,
 } from "$layout";
+import type { Src101Detail } from "$lib/types/src101.d.ts";
+import type { StampRow } from "$lib/types/stamp.d.ts";
 import { calculateTransactionSize } from "$lib/utils/data/identifiers/identifierUtils.ts";
 import {
   abbreviateAddress,
@@ -578,12 +578,18 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   // Calculate display price: dispenser price > floor price
   const displayPrice = selectedDispenser
     ? parseInt(selectedDispenser.satoshirate.toString(), 10) / 100000000
+    : lowestPriceDispenser
+    ? parseInt(lowestPriceDispenser.satoshirate.toString(), 10) / 100000000
     : (floorPriceBTC || 0);
 
-  const displayPriceUSD = selectedDispenser && btcPrice
-    ? (parseInt(selectedDispenser.satoshirate.toString(), 10) / 100000000) *
-      btcPrice
-    : floorPriceUSD;
+  const displayPriceUSD =
+    (selectedDispenser || lowestPriceDispenser) && btcPrice
+      ? (parseInt(
+        (selectedDispenser || lowestPriceDispenser).satoshirate.toString(),
+        10,
+      ) / 100000000) *
+        btcPrice
+      : floorPriceUSD;
 
   // Debug effects for development only
   useEffect(() => {
@@ -823,7 +829,11 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                     <h6 className={value2xl}>
                       {formatBTCAmount(
                         typeof displayPrice === "number" ? displayPrice : 0,
-                        { excludeSuffix: true },
+                        {
+                          excludeSuffix: true,
+                          decimals: 8,
+                          stripZeros: true,
+                        },
                       )} <span className="font-extralight">BTC</span>
                     </h6>
                   </div>

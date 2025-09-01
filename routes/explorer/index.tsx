@@ -4,12 +4,12 @@ import type { SUBPROTOCOLS } from "$types/base.d.ts";
 import { ExplorerContent } from "$content";
 import { Handlers } from "$fresh/server.ts";
 
+import type { StampFilterType, StampType } from "$constants";
 import { ExplorerHeader } from "$header";
-import { createFreshPaginationHandler } from "$utils/navigation/freshNavigationUtils.ts";
+import { headerSpacing } from "$layout";
 import { StampController } from "$server/controller/stampController.ts";
 import { CollectionService } from "$server/services/core/collectionService.ts";
 import type { StampPageProps } from "$types/api.d.ts";
-import type { StampFilterType, StampType } from "$constants";
 
 /* ===== CONSTANTS ===== */
 const MAX_PAGE_SIZE = 120;
@@ -125,7 +125,11 @@ export function ExplorerPage(props: StampPageProps) {
 
   /* ===== RENDER ===== */
   return (
-    <div class="w-full" f-client-nav data-partial="/explorer">
+    <div
+      class={`${headerSpacing} w-full`}
+      f-client-nav
+      data-partial="/explorer"
+    >
       {/* Header Component with Filter Controls */}
       <ExplorerHeader />
 
@@ -136,7 +140,7 @@ export function ExplorerPage(props: StampPageProps) {
         pagination={{
           page,
           totalPages,
-          onPageChange: createFreshPaginationHandler("/explorer"),
+          // Remove onPageChange to let Pagination component use its built-in Fresh navigation
         }}
       />
     </div>

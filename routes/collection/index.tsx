@@ -8,7 +8,7 @@ import type {
 } from "$types/ui.d.ts";
 
 import { CollectionOverviewHeader } from "$header";
-import { body, gapSection } from "$layout";
+import { body, gapSection, headerSpacing } from "$layout";
 import {
   CollectionDetailGallery,
   RecursiveContactCta,
@@ -151,7 +151,7 @@ export default function CollectionLandingPage(
   /* ===== COMPONENT ===== */
   return (
     <div
-      class={`${body} ${gapSection}`}
+      class={`${headerSpacing} ${body} ${gapSection}`}
       f-client-nav
       data-partial="/collection"
     >

@@ -78,48 +78,67 @@ export const handler: Handlers = {
       }
 
       // Transform data to new clean structure
-      const cleanedSales = result.recentSales.map((sale: any) => ({
-        // Core stamp fields (from StampRow interface)
-        tx_hash: sale.tx_hash,
-        cpid: sale.cpid,
-        stamp: sale.stamp,
-        block_index: sale.block_index,
-        timestamp: sale.timestamp,
-        stamp_url: sale.stamp_url,
-        stamp_mimetype: sale.stamp_mimetype,
-        creator: sale.creator,
-        creator_name: sale.creator_name,
-        source: sale.source,
-        destination: sale.destination,
-        activity_level: sale.activity_level,
-        last_activity_time: sale.last_activity_time,
+      const cleanedSales = result.recentSales.map(
+        (sale: any, index: number) => {
+          // Debug: Log stamp_url values to identify corruption point
+          if (!sale.stamp_url) {
+            console.warn(
+              `[API] Sale ${index} missing stamp_url. Raw sale data:`,
+              {
+                stamp: sale.stamp,
+                stamp_url: sale.stamp_url,
+                stamp_mimetype: sale.stamp_mimetype,
+                has_stamp_url: "stamp_url" in sale,
+                stamp_url_type: typeof sale.stamp_url,
+              },
+            );
+          }
 
-        // Sale data nested structure (matches StampWithEnhancedSaleData.sale_data interface)
-        sale_data: {
-          btc_amount: sale.btc_amount,
-          block_index: sale.block_index,
-          tx_hash: sale.tx_hash,
-          buyer_address: sale.buyer_address,
-          dispenser_address: sale.dispenser_address,
-          time_ago: sale.time_ago,
-          btc_amount_satoshis: sale.btc_amount_satoshis,
-          dispenser_tx_hash: sale.dispenser_tx_hash,
+          return {
+            // Core stamp fields (from StampRow interface)
+            tx_hash: sale.tx_hash,
+            cpid: sale.cpid,
+            stamp: sale.stamp,
+            block_index: sale.block_index,
+            timestamp: sale.timestamp,
+            stamp_url: sale.stamp_url,
+            stamp_mimetype: sale.stamp_mimetype,
+            creator: sale.creator,
+            creator_name: sale.creator_name,
+            source: sale.source,
+            destination: sale.destination,
+            activity_level: sale.activity_level,
+            last_activity_time: sale.last_activity_time,
+
+            // Sale data nested structure (matches StampWithEnhancedSaleData.sale_data interface)
+            sale_data: {
+              btc_amount: sale.btc_amount,
+              block_index: sale.block_index,
+              tx_hash: sale.tx_hash,
+              buyer_address: sale.buyer_address,
+              dispenser_address: sale.dispenser_address,
+              time_ago: sale.time_ago,
+              btc_amount_satoshis: sale.btc_amount_satoshis,
+              dispenser_tx_hash: sale.dispenser_tx_hash,
+              dispense_quantity: sale.dispense_quantity,
+            },
+
+            // Newman test compatibility fields - use snake_case
+            last_sale_price: sale.btc_amount, // Map to btc_amount for Newman tests
+            last_sale_price_usd: sale.usd_price, // Map to usd_price for Newman tests
+            buyer_address: sale.buyer_address, // Top-level buyer_address for Newman tests
+
+            // Additional fields for backward compatibility and enhanced data
+            usd_amount: sale.usd_price, // Renamed from usd_price for consistency
+            btc_price_usd: sale.btc_price_usd,
+            last_sale_date: sale.lastSaleDate,
+            btc_rate: sale.btc_rate,
+            satoshi_rate: sale.satoshi_rate,
+            dispense_quantity: sale.dispense_quantity,
+            transaction_details: sale.transaction_details,
+          };
         },
-
-        // Newman test compatibility fields - use snake_case
-        last_sale_price: sale.btc_amount, // Map to btc_amount for Newman tests
-        last_sale_price_usd: sale.usd_price, // Map to usd_price for Newman tests
-        buyer_address: sale.buyer_address, // Top-level buyer_address for Newman tests
-
-        // Additional fields for backward compatibility and enhanced data
-        usd_amount: sale.usd_price, // Renamed from usd_price for consistency
-        btc_price_usd: sale.btc_price_usd,
-        last_sale_date: sale.lastSaleDate,
-        btc_rate: sale.btc_rate,
-        satoshi_rate: sale.satoshi_rate,
-        dispense_quantity: sale.dispense_quantity,
-        transaction_details: sale.transaction_details,
-      }));
+      );
 
       // Get last block for response consistency
       const lastBlock = await BlockService.getLastBlock();

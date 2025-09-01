@@ -11,7 +11,7 @@ import { type StampType } from "$constants";
 import { StampRepository } from "$server/database/index.ts";
 import { BlockService } from "$server/services/core/blockService.ts";
 import { CounterpartyApiManager, CounterpartyDispenserService } from "$server/services/counterpartyApiService.ts";
-import type {SUBPROTOCOLS} from "$types/base.d.ts";
+import type { SUBPROTOCOLS } from "$types/base.d.ts";
 
 import { logger, LogNamespace } from "$lib/utils/logger.ts";
 import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
@@ -382,12 +382,28 @@ export class StampService {
       type: options?.type || "all"
     });
 
+    // Log warning if no sales found - indicates stamp_sales_history table is empty
+    if (result.stamps.length === 0) {
+      console.warn(`[RECENT SALES] No sales data found in stamp_sales_history table. This indicates the table is not being populated.`);
+      console.warn(`[RECENT SALES] Check if background process for populating stamp_sales_history is running.`);
+    }
+
     // Get current BTC price for USD conversion
     const btcPriceData = await BTCPriceService.getPrice();
     const btcPriceUSD = btcPriceData.price;
 
     // Transform the data to match schema (EnhancedStampSale format)
-    const recentSales = result.stamps.map((stamp: any) => {
+    const recentSales = result.stamps.map((stamp: any, index: number) => {
+      // Debug: Check stamp data before transformation
+      if (!stamp.stamp_url) {
+        console.warn(`[Service] Stamp ${index} missing stamp_url. Stamp data:`, {
+          stamp: stamp.stamp,
+          cpid: stamp.cpid,
+          stamp_url: stamp.stamp_url,
+          has_stamp_url: 'stamp_url' in stamp,
+          stamp_url_type: typeof stamp.stamp_url,
+        });
+      }
       const marketData = stamp.marketData;
       if (!marketData) return null;
 
@@ -422,7 +438,7 @@ export class StampService {
 
         // Dispenser info
         dispenser_tx_hash: marketData.lastSaleDispenserTxHash || null,
-        dispense_quantity: 1, // Stamps are typically quantity 1
+        dispense_quantity: marketData.lastSaleQuantity || 1, // Use actual quantity from sales history
 
         // Price info
         btc_amount: btcAmount,

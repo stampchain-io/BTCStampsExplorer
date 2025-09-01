@@ -1,7 +1,7 @@
 /* ===== WALLET PROFILE CONTENT COMPONENT ===== */
 import type { DispenserRow as Dispenser, StampRow } from "$types/stamp.d.ts";
 
-import { Icon, LoadingIcon } from "$icon";
+import { Icon } from "$icon";
 import { SortButton } from "$islands/button/SortButton.tsx";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { Setting } from "$islands/datacontrol/Setting.tsx";
@@ -9,6 +9,7 @@ import type {
   EnhancedWalletContentProps,
   SectionHeaderProps,
 } from "$types/ui.d.ts";
+import { Skeleton } from "$ui";
 // AjaxStampGallery has been replaced with FreshStampGallery for Fresh.js partial navigation
 import { NOT_AVAILABLE_IMAGE } from "$constants";
 import FreshSRC20Gallery from "$islands/section/gallery/FreshSRC20Gallery.tsx";
@@ -19,7 +20,6 @@ import {
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
 import {
-  createPaginationHandler,
   isBrowser,
   safeNavigate,
 } from "$utils/navigation/freshNavigationUtils.ts";
@@ -313,10 +313,15 @@ function DispenserItem({
             page={pagination.page}
             totalPages={pagination.totalPages}
             prefix="dispensers"
-            onPageChange={createPaginationHandler(
-              "dispensers_page",
-              "closed_listings",
-            )}
+            onPageChange={(newPage: number) => {
+              // SSR-safe browser environment check
+              if (typeof globalThis === "undefined" || !globalThis?.location) {
+                return; // Cannot navigate during SSR
+              }
+              const url = new URL(globalThis.location.href);
+              url.searchParams.set("dispensers_page", newPage.toString());
+              globalThis.location.href = url.toString();
+            }}
           />
         </div>
       )}
@@ -365,19 +370,30 @@ function DispenserRow(
           <div class="relative p-[6px] mobileMd:p-3 bg-[#1F002E] rounded-lg aspect-square">
             <div class="stamp-container absolute inset-0 flex items-center justify-center">
               <div class="relative z-10 w-full h-full">
-                {loading && !src ? <LoadingIcon /> : (
-                  <img
-                    width="100%"
-                    height="100%"
-                    loading="lazy"
-                    class="max-w-none w-full h-full object-contain rounded pixelart stamp-image"
-                    src={src}
-                    alt={`Stamp ${dispenser.stamp.stamp}`}
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = NOT_AVAILABLE_IMAGE;
-                    }}
-                  />
-                )}
+                {loading && !src
+                  ? (
+                    <div class="w-full h-full bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+                      <Skeleton
+                        width="60%"
+                        height="60%"
+                        borderRadius="0.25rem"
+                      />
+                    </div>
+                  )
+                  : (
+                    <img
+                      width="100%"
+                      height="100%"
+                      loading="lazy"
+                      class="max-w-none w-full h-full object-contain rounded pixelart stamp-image"
+                      src={src}
+                      alt={`Stamp ${dispenser.stamp.stamp}`}
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src =
+                          NOT_AVAILABLE_IMAGE;
+                      }}
+                    />
+                  )}
               </div>
             </div>
           </div>

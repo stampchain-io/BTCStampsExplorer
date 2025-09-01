@@ -5,9 +5,10 @@ import { BREAKPOINTS } from "$constants";
 import { SortButton } from "$islands/button/SortButton.tsx";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
-import { useLoadingSkeleton } from "$lib/hooks/useLoadingSkeleton.ts";
+
 import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
 import type { StampGalleryProps, StampRow } from "$types/stamp.d.ts";
+import { GallerySkeleton } from "$ui";
 import { useEffect, useRef, useState } from "preact/hooks";
 import Swiper from "swiper";
 import { Autoplay, Navigation } from "swiper/modules";
@@ -241,19 +242,11 @@ export default function StampGallery({
           <div class={containerClass}>
             {isLoading
               ? (
-                // Grid view loading skeleton with optimized animation control - IS THIS WORKING @baba-check
-                [...Array(displayCount)].map((_, index) => {
-                  const skeletonClasses = useLoadingSkeleton(
-                    isLoading,
-                    "aspect-square rounded-lg",
-                  );
-                  return (
-                    <div
-                      key={index}
-                      class={skeletonClasses}
-                    />
-                  );
-                })
+                // 🚀 PERFORMANCE OPTIMIZATION: Enhanced gallery skeleton
+                <GallerySkeleton
+                  count={displayCount}
+                  type="stamp"
+                />
               )
               : (
                 filteredStamps.slice(0, displayCount).map((
