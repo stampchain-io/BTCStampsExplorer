@@ -219,11 +219,26 @@ export class Src20Controller {
       }
 
       // ✅ Return structured error response with graceful degradation
-      return {
+      let errorResponse: any = {
         last_block: lastBlock,
         data: balanceParams.address && balanceParams.tick ? {} : [],
         // Note: API middleware will add appropriate error metadata if needed
       };
+
+      // ✅ Include pagination fields if this was a paginated request
+      if (balanceParams.includePagination) {
+        const limit = balanceParams.limit || 50;
+        const page = balanceParams.page || 1;
+        errorResponse = {
+          page,
+          limit,
+          totalPages: 0, // No data available due to error
+          total: 0, // No data available due to error
+          ...errorResponse,
+        };
+      }
+
+      return errorResponse;
     }
   }
 
