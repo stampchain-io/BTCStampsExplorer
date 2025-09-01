@@ -1,24 +1,26 @@
 /* reinamora - update Trending calculations */
 import { Button } from "$button";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
-import type { SRC20Row } from "$types/src20.d.ts";
-import type { SRC20CardMintingProps } from "$types/ui.d.ts";
-import type { TargetedEvent } from "preact/compat";
 import { Icon } from "$icon";
+import {
+  cellCenterCard,
+  cellLeftCard,
+  cellRightCard,
+  cellStickyLeft,
+  glassmorphism,
+  shadowGlowPurple,
+} from "$layout";
 import {
   isBrowser,
   safeNavigate,
 } from "$lib/utils/navigation/freshNavigationUtils.ts";
-import {
-  containerCardTable,
-  rowCardBorderCenter,
-  rowCardBorderLeft,
-  rowCardBorderRight,
-} from "$layout";
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { formatDate } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
 import { labelXs, textSm, valueDarkSm } from "$text";
+import type { SRC20Row } from "$types/src20.d.ts";
+import type { SRC20CardMintingProps } from "$types/ui.d.ts";
+import type { TargetedEvent } from "preact/compat";
 
 export function SRC20CardMinting({
   data,
@@ -34,7 +36,7 @@ export function SRC20CardMinting({
     "TRENDING",
     "DEPLOY",
     "HOLDERS",
-    "", // MINT button
+    "MINT",
   ];
 
   // Helper function to handle header clicks for sorting
@@ -100,10 +102,10 @@ export function SRC20CardMinting({
 
     // Row background color and rounded corners
     const rowClass = isFirst
-      ? "bg-stamp-grey-darkest/15 rounded-l-lg"
+      ? cellLeftCard
       : isLast
-      ? "bg-stamp-grey-darkest/15 rounded-r-lg"
-      : "bg-stamp-grey-darkest/15";
+      ? cellRightCard
+      : cellCenterCard;
 
     // Selected segment styling
     const selectedClass = isSelected ? "text-stamp-grey-light" : "";
@@ -148,7 +150,7 @@ export function SRC20CardMinting({
           weight="normal"
           size="xxxs"
           color="custom"
-          className={` stroke-stamp-grey-light transition-all duration-300 transform ${
+          className={`stroke-stamp-grey-light transition-all duration-200 transform ${
             currentSort.direction === "desc" ? "scale-y-[-1]" : ""
           }`}
         />
@@ -170,8 +172,8 @@ export function SRC20CardMinting({
   }
 
   return (
-    <div class="overflow-x-auto">
-      <table class={`w-full ${textSm} border-separate border-spacing-y-3`}>
+    <div class="overflow-x-auto tablet:overflow-x-visible scrollbar-hide">
+      <table class={`w-full border-separate border-spacing-y-3 ${textSm}`}>
         <colgroup>
           {colGroup([
             {
@@ -187,7 +189,7 @@ export function SRC20CardMinting({
           ]).map((col) => <col key={col.key} class={col.className} />)}
         </colgroup>
         <thead>
-          <tr>
+          <tr class={`${glassmorphism}`}>
             {headers.map((header, i) => {
               const isFirst = i === 0;
               const isLast = i === (headers?.length ?? 0) - 1;
@@ -215,11 +217,7 @@ export function SRC20CardMinting({
                       isSelected,
                       isClickable,
                     )
-                  } ${
-                    isFirst
-                      ? "sticky left-0 tablet:static backdrop-blur-sm tablet:backdrop-blur-none z-10"
-                      : ""
-                  }`}
+                  } ${isFirst ? cellStickyLeft : ""}`}
                   onClick={() => handleHeaderClick(header)}
                 >
                   <span class="relative inline-block">
@@ -270,7 +268,7 @@ export function SRC20CardMinting({
                 return (
                   <tr
                     key={src20.tx_hash}
-                    class={`${containerCardTable} cursor-pointer group`}
+                    class={`${glassmorphism} ${shadowGlowPurple}`}
                     onClick={(e) => {
                       // Only navigate if not clicking on image or button
                       const target = e.target as HTMLElement;
@@ -296,7 +294,7 @@ export function SRC20CardMinting({
                     <td
                       class={`${
                         cellAlign(0, headers?.length ?? 0)
-                      } ${rowCardBorderLeft} sticky left-0 tablet:static backdrop-blur-sm tablet:backdrop-blur-none z-10`}
+                      } ${cellLeftCard} ${cellStickyLeft}`}
                     >
                       <div class="flex items-center gap-4">
                         <img
@@ -318,7 +316,7 @@ export function SRC20CardMinting({
                               return (
                                 <>
                                   {text && (
-                                    <span class="gray-gradient1 group-hover:[-webkit-text-fill-color:#AA00FF] inline-block transition-colors duration-300">
+                                    <span class="gray-gradient1 group-hover:[-webkit-text-fill-color:#AA00FF] inline-block transition-colors duration-200">
                                       {text.toUpperCase()}
                                     </span>
                                   )}
@@ -336,7 +334,7 @@ export function SRC20CardMinting({
                     <td
                       class={`${
                         cellAlign(1, headers?.length ?? 0)
-                      } ${rowCardBorderCenter}`}
+                      } ${cellCenterCard}`}
                     >
                       {src20.mint_progress?.total_mints || "N/A"}
                     </td>
@@ -344,15 +342,21 @@ export function SRC20CardMinting({
                     <td
                       class={`${
                         cellAlign(2, headers?.length ?? 0)
-                      } ${rowCardBorderCenter}`}
+                      } ${cellCenterCard}`}
                     >
                       <div class="flex items-center justify-center w-full">
                         <div class="flex flex-col w-[100px] min-[420px]:w-[120px] mobileLg:w-[160px] gap-1">
                           <div class="!text-xs text-center">
-                            {Number(
-                              src20.mint_progress?.progress || src20.progress ||
-                                0,
-                            )}
+                            {(() => {
+                              const progressRaw =
+                                src20.mint_progress?.progress ??
+                                  src20.progress ?? 0;
+                              const progressValue = Number(progressRaw);
+                              if (isNaN(progressValue)) {
+                                return "0";
+                              }
+                              return progressValue.toFixed(1);
+                            })()}
                             <span class="text-stamp-grey-light">%</span>
                           </div>
                           <div class="relative h-1.5 bg-stamp-grey rounded-full">
@@ -360,8 +364,19 @@ export function SRC20CardMinting({
                               class="absolute left-0 top-0 h-1.5 bg-stamp-purple-dark rounded-full"
                               style={{
                                 width: `${
-                                  src20.mint_progress?.progress ||
-                                  src20.progress || 0
+                                  (() => {
+                                    const progressRaw =
+                                      src20.mint_progress?.progress ??
+                                        src20.progress ?? 0;
+                                    const progressValue = Number(progressRaw);
+                                    if (isNaN(progressValue)) {
+                                      return 0;
+                                    }
+                                    return Math.min(
+                                      100,
+                                      Math.max(0, progressValue),
+                                    );
+                                  })()
                                 }%`,
                               }}
                             />
@@ -373,7 +388,7 @@ export function SRC20CardMinting({
                     <td
                       class={`${
                         cellAlign(3, headers?.length ?? 0)
-                      } ${rowCardBorderCenter}`}
+                      } ${cellCenterCard}`}
                     >
                       {"N/A"}
                     </td>
@@ -381,7 +396,7 @@ export function SRC20CardMinting({
                     <td
                       class={`${
                         cellAlign(4, headers?.length ?? 0)
-                      } ${rowCardBorderCenter}`}
+                      } ${cellCenterCard}`}
                     >
                       {formatDate(new Date(src20.block_time), {
                         month: "numeric",
@@ -393,7 +408,7 @@ export function SRC20CardMinting({
                     <td
                       class={`${
                         cellAlign(5, headers?.length ?? 0)
-                      } ${rowCardBorderCenter}`}
+                      } ${cellCenterCard}`}
                     >
                       {Number(
                         (src20 as any)?.market_data?.holder_count ||
@@ -402,13 +417,12 @@ export function SRC20CardMinting({
                     </td>
                     {/* MINT BUTTON */}
                     <td
-                      class={`text-right ${rowCardBorderRight}`}
+                      class={`text-right ${cellRightCard}`}
                     >
                       <Button
-                        variant="outline"
-                        color="custom"
-                        size="xxs"
-                        class="[--default-color:#999999] [--hover-color:#AA00FF]"
+                        variant="glassmorphismColor"
+                        color="grey"
+                        size="xsR"
                         href={mintHref}
                         onClick={handleMintClick}
                       >

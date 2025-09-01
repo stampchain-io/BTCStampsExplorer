@@ -9,7 +9,12 @@ import { RegisterToolSkeleton } from "$indicators";
 import { InputField } from "$islands/form/InputField.tsx";
 import DetailSRC101Modal from "$islands/modal/DetailSRC101Modal.tsx";
 import { openModal } from "$islands/modal/states.ts";
-import { bodyTool, containerBackground } from "$layout";
+import {
+  bodyTool,
+  containerBackground,
+  glassmorphismL2Hover,
+  transitionAll,
+} from "$layout";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { mapProgressiveFeeDetails } from "$lib/utils/performance/fees/fee-estimation-utils.ts";
@@ -263,12 +268,12 @@ export function SRC101RegisterTool({
             aria-label="Bitname input"
           />
 
-          {/* TLD Dropdown InputField - styled like glassmorphismLayer2 */}
+          {/* TLD Dropdown InputField - styled like glassmorphismL2/Hover */}
           <div class="relative w-[64px]" ref={tldDropdownRef}>
             <div
-              class={`h-10 px-4 border-[1px] border-[#1d191d]/80 rounded-lg
-                !bg-[#171417]/20 hover:bg-[#1d191d] hover:border-[#33333380]
-                font-semibold text-sm text-stamp-grey text-right backdrop-blur-sm hover:text-stamp-grey-light tracking-wider transition-all duration-50 focus-visible:!outline-none cursor-pointer flex items-center justify-end ${
+              class={`h-10 px-4 border-[1px] border-[#1b1b1b]/80 rounded-xl
+                !bg-[#100a10]/30 ${glassmorphismL2Hover}
+                font-semibold text-sm text-stamp-grey text-right backdrop-blur-sm hover:text-stamp-grey-light tracking-wider ${transitionAll} focus-visible:!outline-none cursor-pointer flex items-center justify-end ${
                 openTldDropdown && !isSelectingTld ? "input-open-bottom" : ""
               }`}
               onClick={() => {
@@ -378,7 +383,7 @@ export function SRC101RegisterTool({
 
         {/* ===== 🚨 FEE ESTIMATION ERROR HANDLING ===== */}
         {feeEstimationError && (
-          <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+          <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-xl">
             <div className="flex items-center justify-between">
               <span className="text-red-700 text-sm">
                 Fee estimation error: {feeEstimationError}

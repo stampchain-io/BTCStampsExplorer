@@ -2,6 +2,7 @@
 import { HamburgerMenuIcon } from "$components/icon/MenuIcon.tsx"; // Import HamburgerMenuIcon directly to ensure it's available
 import { CloseIcon, GearIcon } from "$icon";
 import { ConnectButton } from "$islands/button/ConnectButton.tsx";
+import { glassmorphismOverlay, transitionTransform } from "$layout";
 import { tooltipIcon } from "$notification";
 import {
   labelXs,
@@ -327,7 +328,7 @@ export function Header() {
                     ? link.title
                     : link.title.default) === "TOOLS"
                   ? (
-                    <div class="hidden group-hover:flex absolute top-full -right-[18px] min-w-[300px] z-10 pt-1 pb-3.5 px-[18px] whitespace-nowrap backdrop-blur-md bg-gradient-to-b from-transparent to-[#111011]/30 rounded-b-lg">
+                    <div class="hidden group-hover:flex absolute top-full -right-[18px] min-w-[300px] z-10 pt-1 pb-3.5 px-[18px] whitespace-nowrap backdrop-blur-md bg-gradient-to-b from-transparent to-[#0a070a]/30 rounded-b-lg">
                       <div class="grid grid-cols-3 gap-4 w-full">
                         {/* Column 1: Left aligned - Stamp tools */}
                         <div class="flex flex-col space-y-1 text-left">
@@ -423,7 +424,7 @@ export function Header() {
                   )
                   : (
                     // Default single-column layout for other dropdowns
-                    <div class="hidden group-hover:flex flex-col absolute top-full left-1/2 -translate-x-1/2 min-w-[calc(100%+36px)] z-10 pt-1 pb-3.5 px-[18px] space-y-1 whitespace-nowrap backdrop-blur-md bg-gradient-to-b from-transparent to-[#111011]/30 rounded-b-lg">
+                    <div class="hidden group-hover:flex flex-col absolute top-full left-1/2 -translate-x-1/2 min-w-[calc(100%+36px)] z-10 pt-1 pb-3.5 px-[18px] space-y-1 whitespace-nowrap backdrop-blur-md bg-gradient-to-b from-transparent to-[#0a070a]/30 rounded-b-lg">
                       {link.subLinks?.map((subLink) => (
                         <a
                           key={subLink.href}
@@ -483,10 +484,9 @@ export function Header() {
         ref={drawerRef}
         class={`flex tablet:hidden flex-col justify-between
            fixed top-0 right-0 left-auto w-full min-[420px]:w-[340px] h-[100dvh] z-30
-           bg-gradient-to-b from-[#111011]/100 via-[#111011]/70 to-[#111011]/100 backdrop-blur-lg
-           min-[420px]:rounded-r-xl min-[420px]:border-r-[1px] min-[420px]:border-l-0 min-[420px]:border-r-[#111011]
-           min-[420px]:shadow-[12px_0_12px_-6px_rgba(17,16,17,0.5)]
-           transition-transform duration-500 will-change-transform
+           ${glassmorphismOverlay} ${transitionTransform}
+           min-[420px]:rounded-r-xl min-[420px]:border-r-[1px] min-[420px]:border-l-0 min-[420px]:border-r-[#1b1b1b]
+           min-[420px]:shadow-[12px_0_12px_-6px_rgba(10,7,10,0.5)]
            overflow-y-auto overflow-x-hidden scrollbar-black
            ${open ? "translate-x-0" : "translate-x-full"}`}
         style="transition-timing-function: cubic-bezier(0.46,0.03,0.52,0.96);"
@@ -523,7 +523,7 @@ export function Header() {
           </div>
 
           <div class="flex flex-col w-full sticky bottom-0
-          bg-[#111011]/60 shadow-[0_-36px_36px_-6px_rgba(17,16,17,0.6)]">
+          bg-[#0a070a]/60 shadow-[0_-36px_36px_-6px_rgba(10,7,10,0.6)]">
             {/* Tools section with gear icon */}
             <div class="flex w-full justify-between pt-3 pb-8 px-9">
               <div class="flex justify-start items-end -ml-1">
@@ -547,7 +547,7 @@ export function Header() {
             </div>
 
             <div
-              class={`overflow-hidden transition-all duration-500
+              class={`overflow-hidden ${transitionTransform}
                 ${
                 toolsOpen ? "max-h-[260px] opacity-100" : "max-h-0 opacity-0"
               }`}
@@ -587,7 +587,7 @@ export function Header() {
 class={`${
   isMobile
     ? "hidden group-hover:flex flex-col z-10 w-full pt-3 gap-2 group"
-    : "hidden group-hover:flex flex-col absolute top-full left-1/2 -translate-x-1/2 min-w-[calc(100%+36px)] z-10 pt-1 pb-3.5 px-[18px] space-y-1 whitespace-nowrap backdrop-blur-lg bg-gradient-to-b from-transparent to-[#111011]/30 rounded-b-lg"
+    : "hidden group-hover:flex flex-col absolute top-full left-1/2 -translate-x-1/2 min-w-[calc(100%+36px)] z-10 pt-1 pb-3.5 px-[18px] space-y-1 whitespace-nowrap backdrop-blur-lg bg-gradient-to-b from-transparent to-[#0a070a]/30 rounded-b-lg"
 }`}
 > */
 /*

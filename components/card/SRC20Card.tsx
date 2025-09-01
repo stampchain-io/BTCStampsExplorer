@@ -1,24 +1,32 @@
 import { cellAlign, colGroup } from "$components/layout/types.ts";
-import type { SRC20Row } from "$types/src20.d.ts";
-import type { HighchartsData } from "$types/ui.d.ts";
+import { SSRSafeUrlBuilder } from "$components/navigation/SSRSafeUrlBuilder.tsx";
 import { Icon } from "$icon";
 import ChartWidget from "$islands/layout/ChartWidget.tsx";
+import {
+  cellCenterCard,
+  cellLeftCard,
+  cellRightCard,
+  cellStickyLeft,
+  glassmorphism,
+  shadowGlowPurple,
+} from "$layout";
 import {
   isBrowser,
   safeNavigate,
 } from "$lib/utils/navigation/freshNavigationUtils.ts";
-import { SSRSafeUrlBuilder } from "$components/navigation/SSRSafeUrlBuilder.tsx";
-import {
-  containerCardTable,
-  glassmorphism,
-  rowCardBorderCenter,
-  rowCardBorderLeft,
-  rowCardBorderRight,
-} from "$layout";
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { formatDate } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
-import { labelXs, textSm, valueDarkSm } from "$text";
+import {
+  labelXs,
+  textSm,
+  valueDarkSm,
+  valueNegative,
+  valueNeutral,
+  valuePositive,
+} from "$text";
+import type { SRC20Row } from "$types/src20.d.ts";
+import type { HighchartsData } from "$types/ui.d.ts";
 
 function getMarketCap(src20: any): number {
   const marketCap = src20?.market_data?.market_cap_btc;
@@ -149,10 +157,10 @@ export function SRC20Card({
 
     // Row background color and rounded corners
     const rowClass = isFirst
-      ? rowCardBorderLeft
+      ? cellLeftCard
       : isLast
-      ? rowCardBorderRight
-      : rowCardBorderCenter;
+      ? cellRightCard
+      : cellCenterCard;
 
     // Selected segment styling
     const selectedClass = isSelected ? "text-stamp-grey-light" : "";
@@ -199,7 +207,7 @@ export function SRC20Card({
           weight="normal"
           size="xxxs"
           color="custom"
-          className={`stroke-stamp-grey-light transition-all duration-300 transform ${
+          className={`stroke-stamp-grey-light transition-all duration-200 transform ${
             currentSort.direction === "desc" ? "scale-y-[-1]" : ""
           }`}
         />
@@ -225,17 +233,15 @@ export function SRC20Card({
   }
 
   return (
-    <div class="overflow-x-auto">
-      <table
-        class={`w-full ${textSm} border-separate border-spacing-y-3`}
-      >
+    <div class="overflow-x-auto tablet:overflow-x-visible scrollbar-hide">
+      <table class={`w-full border-separate border-spacing-y-3 ${textSm}`}>
         <colgroup>
           {colGroup([
             {
               width:
                 "min-w-[150px] max-w-[180px] w-auto sticky left-0 tablet:static",
             }, // TOKEN
-            { width: "min-w-[100px] w-auto" }, // PRICE
+            { width: "min-w-[120px] w-auto" }, // PRICE
             { width: "min-w-[90px] w-auto" }, // CHANGE
             { width: "min-w-[110px] w-auto" }, // VOLUME
             { width: "min-w-[110px] w-auto" }, // MARKETCAP
@@ -275,11 +281,7 @@ export function SRC20Card({
                       isSelected,
                       isClickable,
                     )
-                  } ${
-                    isFirst
-                      ? "sticky left-0 tablet:static backdrop-blur-sm tablet:backdrop-blur-none z-10"
-                      : ""
-                  }`}
+                  } ${isFirst ? cellStickyLeft : ""}`}
                   onClick={() => handleHeaderClick(header)}
                 >
                   <span class="relative inline-block">
@@ -312,7 +314,7 @@ export function SRC20Card({
                 return (
                   <tr
                     key={src20.tx_hash}
-                    class={`${containerCardTable} cursor-pointer group`}
+                    class={`${glassmorphism} ${shadowGlowPurple}`}
                     onClick={(e) => {
                       // Only navigate if not clicking on image or chart
                       const target = e.target as HTMLElement;
@@ -340,7 +342,7 @@ export function SRC20Card({
                     <td
                       class={`${
                         cellAlign(0, headers?.length ?? 0)
-                      } ${rowCardBorderLeft} sticky left-0 tablet:static backdrop-blur-sm tablet:backdrop-blur-none z-10`}
+                      } ${cellLeftCard} ${cellStickyLeft}`}
                     >
                       <div class="flex items-center gap-4">
                         <img
@@ -384,7 +386,7 @@ export function SRC20Card({
                     <td
                       class={`${
                         cellAlign(1, headers?.length ?? 0)
-                      } ${rowCardBorderCenter}`}
+                      } ${cellCenterCard}`}
                     >
                       {(() => {
                         // ✅ CLEANED: No more root-level field access
@@ -444,7 +446,7 @@ export function SRC20Card({
                     </td>
                     {/* CHANGE */}
                     <td
-                      class={`text-center ${rowCardBorderCenter}`}
+                      class={`${cellCenterCard} text-center`}
                     >
                       {(() => {
                         const change = src20.market_data?.change_24h_percent;
@@ -453,24 +455,26 @@ export function SRC20Card({
                           if (!isNaN(changeNum)) {
                             return (
                               <span
-                                class={changeNum >= 0
-                                  ? "text-[#44cc00]"
-                                  : "text-[#aa0000]"}
+                                class={changeNum > 0
+                                  ? valuePositive
+                                  : changeNum < 0
+                                  ? valueNegative
+                                  : valueNeutral}
                               >
-                                {changeNum >= 0 ? "+" : ""}
+                                {changeNum > 0 ? "+" : ""}
                                 {changeNum.toFixed(2)}%
                               </span>
                             );
                           }
                         }
-                        return <span class="text-stamp-grey-light">N/A</span>;
+                        return <span class="text-stamp-grey">N/A</span>;
                       })()}
                     </td>
                     {/* VOLUME */}
                     <td
                       class={`${
                         cellAlign(3, headers?.length ?? 0)
-                      } ${rowCardBorderCenter}`}
+                      } ${cellCenterCard}`}
                     >
                       {(() => {
                         // ✅ CLEANED: No more type casting chaos
@@ -505,7 +509,7 @@ export function SRC20Card({
                     <td
                       class={`${
                         cellAlign(4, headers?.length ?? 0)
-                      } ${rowCardBorderCenter}`}
+                      } ${cellCenterCard}`}
                     >
                       {(() => {
                         // ✅ FIXED: Use correct market data path with proper typing
@@ -533,7 +537,7 @@ export function SRC20Card({
                     <td
                       class={`${
                         cellAlign(5, headers?.length ?? 0)
-                      } ${rowCardBorderCenter}`}
+                      } ${cellCenterCard}`}
                     >
                       {formatDate(new Date(src20.block_time), {
                         month: "numeric",
@@ -545,7 +549,7 @@ export function SRC20Card({
                     <td
                       class={`${
                         cellAlign(6, headers?.length ?? 0)
-                      } ${rowCardBorderCenter}`}
+                      } ${cellCenterCard}`}
                     >
                       {(() => {
                         // First try market_data.holder_count (v2.3 structure)
@@ -561,7 +565,7 @@ export function SRC20Card({
                     <td
                       class={`${
                         cellAlign(7, headers?.length ?? 0)
-                      } ${rowCardBorderRight} !py-0`}
+                      } ${cellRightCard} !py-0`}
                     >
                       {src20.chart
                         ? (

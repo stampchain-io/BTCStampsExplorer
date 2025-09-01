@@ -1,13 +1,13 @@
 /* ===== RECENT SALES GALLERY COMPONENT ===== */
-import { useEffect, useState } from "preact/hooks";
-import type { RecentSalesGalleryProps } from "$types/ui.d.ts";
+import { BREAKPOINTS } from "$constants";
+import { LoadingIcon } from "$icon";
 import { RecentSaleCard } from "$islands/card/RecentSaleCard.tsx";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
-import { LoadingIcon } from "$icon";
-import { subtitlePurple, titlePurpleDL } from "$text";
 import { useLoadingSkeleton } from "$lib/hooks/useLoadingSkeleton.ts";
 import { AccessibilityUtils } from "$lib/utils/ui/accessibility/accessibilityUtils.ts";
-import { BREAKPOINTS } from "$constants";
+import { subtitlePurple, titlePurpleDL } from "$text";
+import type { RecentSalesGalleryProps } from "$types/ui.d.ts";
+import { useEffect, useState } from "preact/hooks";
 
 export default function RecentSalesGallery({
   title = "Recent Sales",
@@ -167,7 +167,7 @@ export default function RecentSalesGallery({
               onClick={handleRefresh}
               disabled={refreshLoading}
               aria-label={refreshButtonLabel}
-              class="px-3 py-2 text-sm bg-stamp-purple-bright hover:bg-stamp-purple-dark text-white rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              class="px-3 py-2 text-sm bg-stamp-purple-bright hover:bg-stamp-purple-dark text-white rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {refreshLoading ? "Refreshing..." : "Refresh"}
             </button>
@@ -243,7 +243,7 @@ export default function RecentSalesGallery({
       {/* ===== LOADING OVERLAY FOR REFRESH ===== */}
       {refreshLoading && (
         <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div class="bg-stamp-card-bg p-6 rounded-lg flex items-center gap-3">
+          <div class="bg-stamp-card-bg p-6 rounded-xl flex items-center gap-3">
             <LoadingIcon />
             <span class="text-white">Refreshing sales data...</span>
           </div>

@@ -13,7 +13,7 @@ function mockShowNotification(title: string, text: string, icon: string) {
     confirmButtonText: "O K",
     customClass: {
       confirmButton:
-        "inline-flex items-center justify-center border-2 border-solid border-stamp-purple rounded-md text-sm mobileLg:text-base font-extrabold text-stamp-purple tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-purple-highlight hover:text-stamp-purple-highlight transition-colors",
+        "inline-flex items-center justify-center border-2 border-solid border-stamp-purple rounded-xl text-sm mobileLg:text-base font-extrabold text-stamp-purple tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-purple-highlight hover:text-stamp-purple-highlight transition-colors",
     },
   };
 

@@ -881,7 +881,7 @@ Deno.test("showFallback - handles regular HTML element", () => {
     assertEquals(mockElement.lastAppendedChild?.alt, "Content not available");
     assertEquals(
       mockElement.lastAppendedChild?.className,
-      "w-full h-full object-contain rounded-lg pixelart",
+      "w-full h-full object-contain rounded-xl pixelart",
     );
   } catch (error) {
     // Expected in test environment - DOM APIs not available

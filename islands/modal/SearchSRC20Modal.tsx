@@ -226,8 +226,8 @@ function SearchContent({
         class={`relative z-[2] h-12 w-full !bg-[#221826] pl-[18px] pr-[52px] font-medium text-sm text-stamp-grey-light placeholder:!bg-[#221826] placeholder:font-light placeholder:!text-stamp-grey no-outline ${
           searchState.value.error ||
             (searchState.value.results?.length ?? 0) > 0
-            ? "rounded-t-md"
-            : "rounded-md"
+            ? "rounded-t-lg"
+            : "rounded-lg"
         }`}
       />
       <div class="absolute z-[3] right-4 top-[11px] cursor-pointer">

@@ -1,7 +1,7 @@
 /* ===== SRC20 TOOLS PAGE ===== */
 /*@baba-154+159*/
 import { Handlers, PageProps } from "$fresh/server.ts";
-import { body, gapSectionSlim } from "$layout";
+import { body, containerBackground, gapSectionSlim } from "$layout";
 import {
   SRC20DeployHowto,
   SRC20DeploysGallery,
@@ -150,7 +150,7 @@ export default function ToolSrc20Page(
         <div class="flex w-full tablet:w-1/2 h-fit">
           {renderLeftSidebar()}
         </div>
-        <div class={`flex w-full tablet:w-1/2 h-fit`}>
+        <div class={`flex w-full tablet:w-1/2 h-fit ${containerBackground}`}>
           {renderRightSidebar()}
         </div>
       </div>

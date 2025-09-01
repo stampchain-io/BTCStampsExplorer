@@ -14,7 +14,7 @@ export function ViewAllButton({ href }: ViewAllButtonProps) {
         f-partial="/collection"
         target="_top"
       >
-        VIEW
+        VIEW ALL
       </Button>
     </div>
   );

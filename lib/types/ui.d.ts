@@ -160,7 +160,7 @@ export interface TableProps<T = any> {
   };
   sortable?: boolean;
   onSort?: (column: string, direction: "asc" | "desc") => void;
-  // Additional props for DataTableBase
+  // Additional props for DetailsTableBase
   type?: TableType;
   configs?: TabConfig[];
   cpid?: string;
@@ -1027,6 +1027,7 @@ export interface StampSalesProps {
     tx_hash: string;
     block_time: number | null;
   }>;
+  isLoading?: boolean;
   // For StampSalesGallery
   initialData?: Array<any>;
   title?: string;
@@ -1219,6 +1220,7 @@ export interface StampOverviewContentProps {
 export interface StampListingsAllProps {
   listings: Array<any>;
   loading?: boolean;
+  isLoading?: boolean;
   error?: string;
   onSelect?: (listing: any) => void;
   dispensers?: import("./stamp.d.ts").Dispenser[];
@@ -3424,6 +3426,8 @@ export interface SRC20MintingProps {
   // For minting card components (SRC20CardMinting, SRC20CardSmMinting)
   data?: SRC20Row[];
   fromPage?: "src20" | "wallet" | "stamping/src20" | "home";
+  // For table components
+  isLoading?: boolean;
   timeframe?: Timeframe;
   onImageClick?: (imgSrc: string) => void;
   // Current sort state for table headers
@@ -3516,6 +3520,7 @@ export interface SRC20OverviewHeaderProps {
 export interface TransferProps {
   transactions: StampTransaction[];
   sends?: any[];
+  isLoading?: boolean;
 }
 
 /**

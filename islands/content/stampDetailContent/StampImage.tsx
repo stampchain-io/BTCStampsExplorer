@@ -6,7 +6,7 @@ import {
   LIBRARY_FILE_IMAGE,
   NOT_AVAILABLE_IMAGE,
 } from "$constants";
-import { Icon } from "$icon";
+import { Icon, LoadingIcon } from "$icon";
 import TextContentIsland from "$islands/content/stampDetailContent/StampTextContent.tsx";
 import PreviewCodeModal from "$islands/modal/PreviewCodeModal.tsx";
 import PreviewImageModal from "$islands/modal/PreviewImageModal.tsx";
@@ -18,7 +18,6 @@ import {
 } from "$lib/utils/ui/media/imageUtils.ts";
 import { tooltipIcon } from "$notification";
 import type { StampRow } from "$types/stamp.d.ts";
-import { Skeleton } from "$ui";
 import { VNode } from "preact";
 import { useEffect, useRef, useState } from "preact/hooks";
 
@@ -576,7 +575,7 @@ export function StampImage(
 
         setValidatedContent(
           <div
-            className="max-w-none object-contain rounded-md pixelart stamp-image h-full w-full flex items-center justify-center"
+            className="max-w-none object-contain rounded-lg pixelart stamp-image h-full w-full flex items-center justify-center"
             dangerouslySetInnerHTML={{ __html: rewrittenSVG }}
             style={{
               width: "100%",
@@ -593,7 +592,7 @@ export function StampImage(
           <img
             width="100%"
             loading="lazy"
-            className="max-w-none object-contain rounded-md pixelart stamp-image h-full w-full"
+            className="max-w-none object-contain rounded-lg pixelart stamp-image h-full w-full"
             src={src}
             onError={handleImageError}
             alt={`Stamp No. ${stamp.stamp}`}
@@ -606,7 +605,7 @@ export function StampImage(
         <img
           width="100%"
           loading="lazy"
-          className="max-w-none object-contain rounded-md pixelart stamp-image h-full w-full"
+          className="max-w-none object-contain rounded-lg pixelart stamp-image h-full w-full"
           src={src}
           onError={handleImageError}
           alt={`Stamp No. ${stamp.stamp}`}
@@ -683,7 +682,7 @@ export function StampImage(
   // Early return if stamp is undefined
   if (!stamp) {
     return (
-      <div className="stamp-container bg-gray-200 rounded-lg p-4 text-center text-gray-500">
+      <div className="stamp-container bg-gray-200 rounded-xl p-4 text-center text-gray-500">
         NO STAMP DATA AVAILABLE
       </div>
     );
@@ -731,15 +730,7 @@ export function StampImage(
       <div class={`${body} ${gapSectionSlim}`}>
         <div className={`${containerDetailImage} ${containerClassName || ""}`}>
           <div className="stamp-container">
-            <div className="relative w-full h-full bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
-              <div className="flex flex-col items-center gap-4 p-8">
-                <Skeleton width="120px" height="120px" borderRadius="0.5rem" />
-                <div className="text-center">
-                  <Skeleton width="100px" height="16px" className="mb-2" />
-                  <Skeleton width="80px" height="14px" />
-                </div>
-              </div>
-            </div>
+            <LoadingIcon containerClassName="rounded-xl" />
           </div>
         </div>
       </div>
@@ -753,7 +744,7 @@ export function StampImage(
           <img
             width="100%"
             loading="lazy"
-            className={`max-w-none object-contain rounded-md ${className} pixelart stamp-image`}
+            className={`max-w-none object-contain rounded-lg ${className} pixelart stamp-image`}
             src={src}
             alt="Not Available"
           />
@@ -768,12 +759,12 @@ export function StampImage(
             }`}
           >
             <div className="stamp-container">
-              <div className="relative pt-[100%] rounded-md overflow-hidden">
+              <div className="relative pt-[100%] rounded-lg overflow-hidden">
                 {/* Show placeholder image as background while loading */}
                 <img
                   src={NOT_AVAILABLE_IMAGE}
                   alt="Loading..."
-                  className="absolute top-0 left-0 w-full h-full object-contain rounded-md pixelart"
+                  className="absolute top-0 left-0 w-full h-full object-contain rounded-lg pixelart"
                   style={{ zIndex: 0 }}
                 />
                 {console.log("Rendering iframe with src:", src)}
@@ -783,7 +774,7 @@ export function StampImage(
                   scrolling="no"
                   className={`${
                     className || ""
-                  } rounded-md absolute top-0 left-0 w-full h-full bg-transparent`}
+                  } rounded-lg absolute top-0 left-0 w-full h-full bg-transparent`}
                   sandbox="allow-scripts allow-same-origin"
                   src={src || ""}
                   loading="lazy"
@@ -855,7 +846,7 @@ export function StampImage(
               <img
                 src={AUDIO_FILE_IMAGE}
                 alt="Audio File"
-                className="absolute top-0 left-0 w-full h-full object-contain rounded-md pixelart stamp-image pointer-events-none select-none"
+                className="absolute top-0 left-0 w-full h-full object-contain rounded-lg pixelart stamp-image pointer-events-none select-none"
                 draggable={false}
               />
               <div className="absolute inset-0 flex items-center justify-center">
@@ -904,7 +895,7 @@ export function StampImage(
               <img
                 src={LIBRARY_FILE_IMAGE}
                 alt="Library File"
-                className="absolute top-0 left-0 w-full h-full object-contain rounded-md pixelart stamp-image pointer-events-none select-none"
+                className="absolute top-0 left-0 w-full h-full object-contain rounded-lg pixelart stamp-image pointer-events-none select-none"
                 draggable={false}
               />
             </div>
@@ -936,7 +927,7 @@ export function StampImage(
                         <img
                           width="100%"
                           loading="lazy"
-                          className="max-w-none object-contain rounded-md pixelart stamp-image h-full w-full"
+                          className="max-w-none object-contain rounded-lg pixelart stamp-image h-full w-full"
                           src={src}
                           onError={handleImageError}
                           alt="Stamp"
@@ -967,7 +958,7 @@ export function StampImage(
                       <img
                         width="100%"
                         loading="lazy"
-                        className="max-w-none object-contain rounded-md pixelart stamp-image h-full w-full"
+                        className="max-w-none object-contain rounded-lg pixelart stamp-image h-full w-full"
                         src={src}
                         onError={handleImageError}
                         alt="Stamp"

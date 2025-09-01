@@ -52,6 +52,6 @@ export const WALLET_PROVIDERS: Record<
   },
   horizon: {
     name: "Horizon",
-    logo: "/img/wallet/horizon/logo_horizon.svg",
+    logo: "/img/wallet/horizon/logo_horizon.png",
   },
 };

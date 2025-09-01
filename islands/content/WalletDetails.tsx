@@ -1,14 +1,14 @@
 /* ===== NOT IN USE ===== */
-import type { StatItemProps } from "$types/ui.d.ts";
-import type { StatTitleProps } from "$types/ui.d.ts";
-import { useEffect, useRef, useState } from "preact/hooks";
+import { Button } from "$button";
+import { Icon } from "$icon";
+import { containerBackground, containerColData } from "$layout";
 import type { WalletData } from "$lib/types/index.d.ts";
 import type { WalletOverviewInfo } from "$lib/types/wallet.d.ts";
 import {
   abbreviateAddress,
   formatBTCAmount,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
-import { containerBackground, containerColData } from "$layout";
+import { tooltipIcon } from "$notification";
 import {
   labelSm,
   subtitleGrey,
@@ -17,9 +17,8 @@ import {
   valueSm,
   valueXl,
 } from "$text";
-import { Button } from "$button";
-import { tooltipIcon } from "$notification";
-import { Icon } from "$icon";
+import type { StatItemProps, StatTitleProps } from "$types/ui.d.ts";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== MAIN WALLET DETAILS COMPONENT ===== */
 function WalletDetails(
@@ -125,7 +124,7 @@ function WalletOverview(
   /* ===== RENDER ===== */
   return (
     <div class="flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6">
-      <div class="flex flex-col w-full tablet:w-1/2 dark-gradient rounded-lg p-3 mobileMd:p-6 space-y-1.5 mobileLg:space-y-3">
+      <div class="flex flex-col w-full tablet:w-1/2 dark-gradient rounded-xl p-3 mobileMd:p-6 space-y-1.5 mobileLg:space-y-3">
         <div class="flex">
           <p class={titleGreyLD}>
             {walletData.address.startsWith("1D") ||

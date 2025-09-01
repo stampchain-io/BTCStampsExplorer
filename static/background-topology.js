@@ -52,7 +52,7 @@
                     ((this.options = Object.assign({
                         minHeight: 200,     // *** MINIMUM CANVAS HEIGHT (pixels) ***
                         minWidth: 200,      // *** MINIMUM CANVAS WIDTH (pixels) ***
-                        scale: 1.00,        // *** DESKTOP SCALE FACTOR (1.0 = normal size) ***
+                        scale: 0.75,        // *** DESKTOP SCALE FACTOR (1.0 = normal size) ***
                         scaleMobile: 0.75   // *** MOBILE SCALE FACTOR ***
                     }, t)),
                     (e instanceof HTMLElement || "string" == typeof e) && (e = { el: e }),
@@ -238,7 +238,7 @@
                                 // *** PARTICLE COUNT ***
                                 // Controls the number of flowing particles in the topology - update the code below too
                                 // Default: 4500 particles
-                                for (let e = 0; e < 600; e++) {
+                                for (let e = 0; e < 700; e++) {
                                     let s = t.random(t.width + 200),
                                         i = t.random(t.height + 200);
                                     a.push({ prev: t.createVector(s, i), pos: t.createVector(s, i), vel: t.createVector(0, 0), acc: t.createVector(0, 0), col: t.random(255), seed: e });
@@ -256,7 +256,7 @@
                             t.translate(-100, -100),
                                 (function () {
                                     // This number should match the particle count above
-                                    for (let i = 0; i < 600; i++) {
+                                    for (let i = 0; i < 700; i++) {
                                         let o = a[i],
                                             n = ((e = o.pos.x), (s = o.pos.y), (e = t.constrain(e, 0, t.width + 200)), (s = t.constrain(s, 0, t.height + 200)), h[t.floor(s / 10)][t.floor(e / 10)]);
                                         (o.prev.x = o.pos.x),
@@ -266,12 +266,12 @@
                                             // *** PARTICLE MOVEMENT SPEED ***
                                             // Controls how fast particles move through the topology
                                             // Default: mult(2.2)
-                                            o.vel.add(o.acc).normalize().mult(3.5),
+                                            o.vel.add(o.acc).normalize().mult(4.5),
                                             (o.acc = t.createVector(0, 0)),
                                             // *** FLOW FIELD RESPONSE STRENGTH ***
                                             // Controls how strongly particles respond to the flow field
                                             // Default: mult(3)
-                                            o.acc.add(n).mult(2.5);
+                                            o.acc.add(n).mult(2.4);
                                     }
                                     var e, s;
                                 })(),
@@ -289,7 +289,7 @@
                                             // *** LINE OPACITY/TRANSPARENCY ***
                                             // Controls how visible/transparent the connecting lines are
                                             // Default: 0.05
-                                            })(e.options.color, 0.05)
+                                            })(e.options.color, 0.1)
                                         );
                                     for (let e = 0; e < a.length; e++) l.Vector.dist(a[e].prev, a[e].pos) < 10 && t.line(a[e].prev.x, a[e].prev.y, a[e].pos.x, a[e].pos.y);
                                 })(),
@@ -297,7 +297,7 @@
                                 // Controls how fast the underlying flow field changes over time
                                 // This creates the "flowing" effect of the topology
                                 // Default: c += 0.002
-                                (c += 0.1);
+                                (c += 0.2);
                         });
                 });
             }

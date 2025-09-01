@@ -1,14 +1,38 @@
 /* ===== LAYOUT STYLES MODULE ===== */
+// Read the doc.md file for more information on the UI design and layout styles
 
 /* ===== BASE STYLES ===== */
-export const glassmorphism = `border-[1px] border-[#1d191d]/60 rounded-xl
-  bg-gradient-to-br from-[#171417]/40 to-[#171417]/60
-  backdrop-blur overflow-hidden
-  shadow-[0_8px_16px_rgba(13,11,13,0.2),inset_0_1px_0_rgba(13,11,13,0.1),inset_0_-1px_0_rgba(13,11,13,0.1),inset_0_0_4px_4px_rgba(13,11,13,0.1)]`;
-export const glassmorphismLayer2 = `border-[1px] border-[#1d191d]/80 rounded-lg
-  bg-[#171417]/20 backdrop-blur-sm overflow-hidden
-  shadow-[0_3px_6px_rgba(13,11,13,0.2),inset_0_1px_0_rgba(13,11,13,0.1),inset_0_-1px_0_rgba(13,11,13,0.1),inset_0_0_1px_1px_rgba(13,11,13,0.1)]`;
-export const transition = "transition-colors duration-200";
+// General styles
+// Transition styles - @baba-refactor codebase to use these instead of hardcoded values
+export const transitionColors = "transition-colors duration-200";
+export const transitionTransform =
+  "transition-transform duration-500 will-change-transform";
+export const transitionAll =
+  "transition-all duration-500 will-change-transform";
+
+// Shadow styles - also used in button/styles.ts
+export const shadow =
+  "shadow-[0_4px_8px_rgba(13,11,13,0.2),inset_0_1px_0_rgba(13,11,13,0.1),inset_0_-1px_0_rgba(13,11,13,0.1),inset_0_0_1px_1px_rgba(13,11,13,0.1)]";
+export const shadowL2 =
+  "shadow-[0_2px_4px_rgba(13,11,13,0.1),inset_0_1px_0_rgba(13,11,13,0.1),inset_0_-1px_0_rgba(13,11,13,0.1),inset_0_0_2px_2px_rgba(13,11,13,0.1)]";
+export const shadowGlowPurple =
+  `group hover:shadow-[0px_0px_16px_#9900EE] ${transitionColors} cursor-pointer`;
+export const shadowGlowGrey =
+  `group hover:shadow-[0px_0px_16px_#FFFFFF7F] ${transitionColors} cursor-pointer`;
+
+// Glassmorphism styles
+// Overlay layer styles - used for drawer and modal containers
+export const glassmorphismOverlay = `rounded-2xl
+  bg-gradient-to-b from-[#0a070a]/95 via-[#0a070a]/70 to-[#0a070a]/100 backdrop-blur-lg overflow-hidden`;
+// 1st layer styles
+export const glassmorphism = `border-[1px] border-[#1b1b1b]/80 rounded-2xl
+  bg-gradient-to-br from-[#100a10]/50 to-[#100a10]/70
+  backdrop-blur overflow-hidden ${shadow}`;
+// 2nd layer styles - register tool tld dropdown uses same hardcoded values
+export const glassmorphismL2 = `border-[1px] border-[#1b1b1b]/80 rounded-xl
+  bg-[#100a10]/30 backdrop-blur-xs overflow-hidden ${shadowL2}`;
+export const glassmorphismL2Hover =
+  `hover:bg-[#100a10]/60 hover:border-[#242424]`;
 
 /* ===== BODY STYLES ===== */
 // Main body styles
@@ -29,39 +53,74 @@ export const headerSpacing = `flex flex-col ${headerMargin}`; // Complete header
 export const gapGrid = "gap-6 mobileLg:gap-9 tablet:gap-12"; // - ToS index page
 
 /* ===== CONTAINER STYLES ===== */
+// Base styles
 export const containerBackground = `${body} p-5 ${glassmorphism}`;
-
 export const containerDetailImage = `relative p-5 ${glassmorphism}`;
 
-export const containerCard = `${glassmorphism}
-  hover:border-stamp-purple-bright hover:shadow-[0px_0px_16px_#9900EE] ${transition} cursor-pointer`; // not in use
+// Stamp Card styles
+export const containerCard = `${glassmorphism} ${shadowGlowPurple}
+  hover:border-stamp-purple-bright`; // check if used
 
-export const containerCardTable = `rounded-xl ${glassmorphism}
-   hover:shadow-[0px_0px_16px_#9900EE] ${transition} cursor-pointer group`; // used for src20 tokencards - the border styling is handled below
+export const containerCardL2 = `${glassmorphismL2} ${shadowGlowPurple}
+  hover:border-stamp-purple-bright`;
 
-export const containerColData = "flex flex-col -space-y-1"; // Data specific (global)
-export const containerColForm = "flex flex-col w-full gap-5"; // Form input fields specific
-export const containerRowForm = "flex w-full gap-5"; // Form input fields specific
+// Table card container styles - check if used
+export const containerCardTable =
+  `rounded-2xl ${glassmorphism} ${shadowGlowPurple}
+  hover:border-stamp-purple-bright`;
+
+// Global styles
+export const containerColData = "flex flex-col -space-y-1"; // Data specific
+// Form styles
+export const containerColForm = "flex flex-col w-full gap-5";
+export const containerRowForm = "flex w-full gap-5";
 
 /* ===== ROW STYLES ===== */
+// Form styles
 export const rowForm = "flex w-full";
 export const rowResponsiveForm =
   "flex flex-col min-[420px]:flex-row w-full gap-5 min-[420px]:[&>*]:flex-1";
-export const rowTable = `h-7 hover:bg-stamp-purple-bright/15 ${transition}`;
-export const rowCardBorderLeft =
-  `p-3 pl-4 rounded-l-xl border-y-[1px] border-l-[1px] border-r-0 border-stamp-grey-darkest/20 group-hover:border-stamp-purple-bright ${transition}`;
-export const rowCardBorderRight =
-  `p-3 pr-4 rounded-r-xl border-y-[1px] border-r-[1px] border-l-0  border-stamp-grey-darkest/20 group-hover:border-stamp-purple-bright ${transition}`;
-export const rowCardBorderCenter =
-  `p-3 border-y-[1px] border-x-0 border-stamp-grey-darkest/20 group-hover:border-stamp-purple-bright ${transition}`;
 
 /* ===== COL STYLES ===== */
 
+/* ===== CELL STYLES ===== */
+// Layer 1
+// Stamp and SRC20 Table Row Cards - Stamp/tokencards
+export const cellLeftCard =
+  `p-3 pl-4 rounded-l-2xl border-y-[1px] border-l-[1px] border-r-0 border-[#1b1b1b]/80
+  group-hover:bg-black/20 group-hover:border-stamp-purple-bright ${transitionColors} whitespace-nowrap`;
+export const cellRightCard =
+  `p-3 pr-4 rounded-r-2xl border-y-[1px] border-r-[1px] border-l-0 border-[#1b1b1b]/80
+  group-hover:bg-black/20 group-hover:border-stamp-purple-bright ${transitionColors} whitespace-nowrap`;
+export const cellCenterCard = `p-3 border-y-[1px] border-x-0 border-[#1b1b1b]/80
+  group-hover:bg-black/20 group-hover:border-stamp-purple-bright ${transitionColors} whitespace-nowrap`;
+// Layer 2
+// Stamp and SRC20 Table Row Cards - Stamp/tokencards inside of layer 1
+export const cellLeftL2Card =
+  `p-3 pl-4 rounded-l-xl border-y-[1px] border-l-[1px] border-r-0 border-[#1b1b1b]/80
+  group-hover:bg-black/20 group-hover:border-stamp-purple-bright ${transitionColors} whitespace-nowrap`;
+export const cellRightL2Card =
+  `p-3 pr-4 rounded-r-xl border-y-[1px] border-r-[1px] border-l-0 border-[#1b1b1b]/80
+  group-hover:bg-black/20 group-hover:border-stamp-purple-bright ${transitionColors} whitespace-nowrap`;
+export const cellCenterL2Card =
+  `p-3 border-y-[1px] border-x-0 border-[#1b1b1b]/80
+  group-hover:bg-black/20 group-hover:border-stamp-purple-bright ${transitionColors} whitespace-nowrap`;
+// Stamp and SRC20 Detail pages Table Rows
+export const cellLeftL2Detail =
+  `p-1.5 pl-3 rounded-l-xl border-y-[1px] border-l-[1px] border-r-0 border-[#1b1b1b]/80 group-hover:bg-black/20 group-hover:border-[#232223] ${transitionColors} whitespace-nowrap`;
+export const cellRightL2Detail =
+  `p-1.5 pr-3 rounded-r-xl border-y-[1px] border-r-[1px] border-l-0 border-[#1b1b1b]/80 group-hover:bg-black/20 group-hover:border-[#232223] ${transitionColors} whitespace-nowrap`;
+export const cellCenterL2Detail =
+  `p-1.5 border-y-[1px] border-x-0 border-[#1b1b1b]/80 group-hover:bg-black/20 group-hover:border-[#232223] ${transitionColors} whitespace-nowrap`;
+
+export const cellStickyLeft =
+  `sticky left-0 bg-black/70 tablet:bg-transparent backdrop-blur-xl tablet:backdrop-blur-none z-10`;
+
 /* ===== IMAGE STYLES ===== */
 export const imagePreviewTool =
-  `flex items-center justify-center min-w-[100px] h-[100px] ${glassmorphismLayer2} overflow-hidden`;
+  `flex items-center justify-center min-w-[100px] h-[100px] ${glassmorphismL2} overflow-hidden`;
 export const imageUploadTool =
-  `flex items-center justify-center min-w-[100px] h-[100px] ${glassmorphismLayer2} hover:bg-stamp-grey-darkest/30 ${transition} cursor-pointer overflow-hidden`;
+  `flex items-center justify-center min-w-[100px] h-[100px] ${glassmorphismL2} hover:bg-stamp-grey-darkest/30 ${transitionColors} cursor-pointer overflow-hidden`;
 
 /* ===== MODAL STYLES ===== */
 export const modalBgCenter =
@@ -73,7 +132,7 @@ export const modalBgCenter =
 // Base loader style
 const loaderSpin = "animate-spin rounded-full border-b-[2px]";
 export const loaderSkeleton =
-  `bg-[#171417]/50 border-[1px] border-[#1d191d]/80 animate-pulse`;
+  `bg-[#100a10]/50 border-[1px] border-[#1b1b1b]/80 animate-pulse`;
 // Spinning loader styles
 export const loaderSpinXsGrey = `${loaderSpin} w-3 h-3 border-stamp-grey`;
 export const loaderSpinSmGrey = `${loaderSpin} w-5 h-5 border-stamp-grey`;
@@ -92,9 +151,19 @@ export const modalSearch = "w-[90%] max-w-[600px] mt-[72px] tablet:mt-24";
 /* ===== TYPE DEFINITIONS ===== */
 export type LayoutStyles = {
   // Base styles
+  transitionColors: string;
+  transitionTransform: string;
+  transitionAll: string;
+
+  shadowGlowPurple: string;
+  shadowGlowGrey: string;
+  shadow: string;
+  shadowL2: string;
+
   glassmorphism: string;
-  glassmorphismLayer2: string;
-  transition: string;
+  glassmorphismOverlay: string;
+  glassmorphismL2: string;
+  glassmorphismL2Hover: string;
 
   // Body styles
   body: string;
@@ -108,6 +177,7 @@ export type LayoutStyles = {
   containerBackground: string;
   containerDetailImage: string;
   containerCard: string;
+  containerCardL2: string;
   containerCardTable: string;
   containerColData: string;
   containerColForm: string;
@@ -120,6 +190,18 @@ export type LayoutStyles = {
   rowCardBorderLeft: string;
   rowCardBorderRight: string;
   rowCardBorderCenter: string;
+
+  // Cell styles
+  cellLeftCard: string;
+  cellRightCard: string;
+  cellCenterCard: string;
+  cellLeftL2Card: string;
+  cellRightL2Card: string;
+  cellCenterL2Card: string;
+  cellLeftL2Detail: string;
+  cellRightL2Detail: string;
+  cellCenterL2Detail: string;
+  cellStickyLeft: string;
 
   // Loader styles
   loaderSpinXsGrey: string;

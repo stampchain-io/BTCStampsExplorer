@@ -20,7 +20,7 @@ export const faqData = {
     {
       title: "COMPATIBLE WALLETS",
       content:
-        "To start creating, sending, and storing Bitcoin Stamps, you'll need a compatible wallet. Some options include: Unisat, Leather, OKX, TapWallet, and Phantom.",
+        "To start creating, sending, and storing Bitcoin Stamps, you'll need a compatible wallet. Supported wallets include: Unisat, Leather, OKX, TapWallet, Phantom, and Horizon.",
     },
     {
       title: "FUND YOUR WALLET",

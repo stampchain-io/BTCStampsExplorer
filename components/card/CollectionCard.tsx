@@ -7,14 +7,7 @@ import {
   formatVolume,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { labelSm, valueSm } from "$text";
-import type { CollectionWithOptionalMarketData } from "$types/index.d.ts";
-
-// Extended type for CollectionCard with the additional fields we need
-interface CollectionCardData extends CollectionWithOptionalMarketData {
-  first_stamp_image?: string | null;
-  stamp_images?: string[] | null;
-  creator_names?: string[];
-}
+import type { CollectionWithOptionalMarketData } from "$types";
 
 /* ===== HELPERS ===== */
 function abbreviateCollectionName(name: string): string {
@@ -24,7 +17,7 @@ function abbreviateCollectionName(name: string): string {
 
 /* ===== COMPONENT ===== */
 export function CollectionCard(
-  { collection }: { collection: CollectionCardData },
+  { collection }: { collection: CollectionWithOptionalMarketData },
 ) {
   // Early return if collection is undefined
   if (!collection) {
@@ -39,12 +32,11 @@ export function CollectionCard(
   return (
     <a
       href={`/collection/detail/${collectionName}`}
-      f-partial="/collection"
       className={`${containerBackground} gap-6 hover:border-stamp-purple-bright hover:shadow-stamp hover:border-solid border-2 border-transparent group`}
     >
       {/* ===== CARD HEADER ===== */}
       <div class="flex w-full gap-6">
-        <div class="min-w-[106px] min-h-[106px] max-w-[106px] max-h-[106px] mobileMd:min-w-[98px] mobileMd:min-h-[98px] mobileMd:max-w-[98px] mobileMd:max-h-[98px] rounded aspect-stamp image-rendering-pixelated overflow-hidden">
+        <div class="min-w-[106px] min-h-[106px] max-w-[106px] max-h-[106px] mobileMd:min-w-[98px] mobileMd:min-h-[98px] mobileMd:max-w-[98px] mobileMd:max-h-[98px] rounded-lg aspect-stamp image-rendering-pixelated overflow-hidden">
           <div class="relative flex items-center justify-center w-full h-full">
             <img
               src={stampImage}
@@ -160,7 +152,7 @@ export function CollectionCard(
             (imageUrl: string, index: number) => {
               return (
                 <div
-                  className={`w-full h-full rounded aspect-stamp image-rendering-pixelated overflow-hidden ${
+                  className={`w-full h-full rounded-lg aspect-stamp image-rendering-pixelated overflow-hidden ${
                     index >= 8
                       ? "hidden desktop:block"
                       : index >= 6

@@ -1,4 +1,4 @@
-import { glassmorphismLayer2 } from "$layout";
+import { glassmorphismL2 } from "$layout";
 import { tooltipButton } from "$notification";
 import type { ProgressiveEstimationIndicatorProps } from "$types/ui.d.ts";
 import { useRef, useState } from "preact/hooks";
@@ -57,7 +57,7 @@ export function ProgressiveEstimationIndicator({
       {!isSubmitting && !feeEstimationError && (
         <div className="relative">
           <div
-            className={`flex items-center py-0.5 min-[420px]:py-2 min-[460px]:py-0.5 px-2 ${glassmorphismLayer2} !rounded-full cursor-default select-none`}
+            className={`flex items-center py-0.5 min-[420px]:py-2 min-[460px]:py-0.5 px-2 ${glassmorphismL2} !rounded-full cursor-default select-none`}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
           >
@@ -116,7 +116,7 @@ export function ProgressiveEstimationIndicator({
       {/* Phase 2: Smart UTXO-based estimation (background pre-fetching) */}
       {isPreFetching && !isSubmitting && (
         <div
-          className={`flex items-center px-3 py-1.5 ${glassmorphismLayer2}`}
+          className={`flex items-center px-3 py-1.5 ${glassmorphismL2}`}
         >
           <div className="relative">
             <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse" />

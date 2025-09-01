@@ -408,7 +408,7 @@ export function SRC20ErrorFallback({
     : "An unexpected error occurred. Please try again.";
 
   return (
-    <div class="p-6 bg-red-50 border border-red-200 rounded-lg">
+    <div class="p-6 bg-red-50 border border-red-200 rounded-xl">
       <h3 class="text-lg font-semibold text-red-800 mb-2">
         Something went wrong
       </h3>
@@ -421,7 +421,7 @@ export function SRC20ErrorFallback({
       <button
         type="button"
         onClick={resetError}
-        class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+        class="px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors"
       >
         Try Again
       </button>

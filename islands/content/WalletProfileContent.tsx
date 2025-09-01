@@ -1,15 +1,15 @@
 /* ===== WALLET PROFILE CONTENT COMPONENT ===== */
 import type { DispenserRow as Dispenser, StampRow } from "$types/stamp.d.ts";
 
-import { Icon } from "$icon";
+import { Icon, LoadingIcon } from "$icon";
 import { SortButton } from "$islands/button/SortButton.tsx";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { Setting } from "$islands/datacontrol/Setting.tsx";
+import { shadowGlowPurple } from "$layout";
 import type {
   EnhancedWalletContentProps,
   SectionHeaderProps,
 } from "$types/ui.d.ts";
-import { Skeleton } from "$ui";
 // AjaxStampGallery has been replaced with FreshStampGallery for Fresh.js partial navigation
 import { NOT_AVAILABLE_IMAGE } from "$constants";
 import FreshSRC20Gallery from "$islands/section/gallery/FreshSRC20Gallery.tsx";
@@ -20,6 +20,7 @@ import {
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
 import {
+  createPaginationHandler,
   isBrowser,
   safeNavigate,
 } from "$utils/navigation/freshNavigationUtils.ts";
@@ -313,15 +314,10 @@ function DispenserItem({
             page={pagination.page}
             totalPages={pagination.totalPages}
             prefix="dispensers"
-            onPageChange={(newPage: number) => {
-              // SSR-safe browser environment check
-              if (typeof globalThis === "undefined" || !globalThis?.location) {
-                return; // Cannot navigate during SSR
-              }
-              const url = new URL(globalThis.location.href);
-              url.searchParams.set("dispensers_page", newPage.toString());
-              globalThis.location.href = url.toString();
-            }}
+            onPageChange={createPaginationHandler(
+              "dispensers_page",
+              "closed_listings",
+            )}
           />
         </div>
       )}
@@ -361,39 +357,30 @@ function DispenserRow(
 
   /* ===== RENDER DISPENSER ROW ===== */
   return (
-    <div class="flex justify-between dark-gradient rounded-lg hover:border-stamp-primary-light hover:shadow-[0px_0px_20px_#9900EE] group border-2 border-transparent">
+    <div
+      class={`flex justify-between dark-gradient rounded-xl hover:border-stamp-primary-light ${shadowGlowPurple} border-2 border-transparent`}
+    >
       <div class="flex p-3 mobileLg:p-6 gap-6 uppercase w-full">
         <a
           href={`/stamp/${dispenser.stamp.stamp}`}
           class={`${imageSize} relative flex-shrink-0`}
         >
-          <div class="relative p-[6px] mobileMd:p-3 bg-[#1F002E] rounded-lg aspect-square">
+          <div class="relative p-[6px] mobileMd:p-3 bg-[#1F002E] rounded-xl aspect-square">
             <div class="stamp-container absolute inset-0 flex items-center justify-center">
               <div class="relative z-10 w-full h-full">
-                {loading && !src
-                  ? (
-                    <div class="w-full h-full bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
-                      <Skeleton
-                        width="60%"
-                        height="60%"
-                        borderRadius="0.25rem"
-                      />
-                    </div>
-                  )
-                  : (
-                    <img
-                      width="100%"
-                      height="100%"
-                      loading="lazy"
-                      class="max-w-none w-full h-full object-contain rounded pixelart stamp-image"
-                      src={src}
-                      alt={`Stamp ${dispenser.stamp.stamp}`}
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src =
-                          NOT_AVAILABLE_IMAGE;
-                      }}
-                    />
-                  )}
+                {loading && !src ? <LoadingIcon /> : (
+                  <img
+                    width="100%"
+                    height="100%"
+                    loading="lazy"
+                    class="max-w-none w-full h-full object-contain rounded-lg pixelart stamp-image"
+                    src={src}
+                    alt={`Stamp ${dispenser.stamp.stamp}`}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = NOT_AVAILABLE_IMAGE;
+                    }}
+                  />
+                )}
               </div>
             </div>
           </div>
@@ -805,7 +792,7 @@ function WalletProfileContentInner({
 
       {/* Feature Flag Debug Info */}
       {enableAdvancedSorting && showSortingMetrics && (
-        <div class="mt-8 p-4 bg-stamp-grey-lightest rounded-lg">
+        <div class="mt-8 p-4 bg-stamp-grey-lightest rounded-xl">
           <h3 class="text-sm font-semibold text-stamp-grey-darkest mb-2">
             Advanced Sorting Status
           </h3>

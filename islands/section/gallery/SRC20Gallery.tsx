@@ -8,12 +8,11 @@ import {
   SRC20CardSmMinting,
 } from "$card";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
-import type { EnrichedSRC20Row } from "$types/src20.d.ts";
-import type { SRC20GalleryProps } from "$types/ui.d.ts";
-
+import { useLoadingSkeleton } from "$lib/hooks/useLoadingSkeleton.ts";
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { subtitlePurple, titlePurpleLD } from "$text";
-import { GallerySkeleton } from "$ui";
+import type { EnrichedSRC20Row } from "$types/src20.d.ts";
+import type { SRC20GalleryProps } from "$types/ui.d.ts";
 import { useEffect, useMemo, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
@@ -92,24 +91,14 @@ export function SRC20Gallery({
     ...(currentSort && { currentSort }), // Only pass currentSort if it exists
   }), [processedData, fromPage, timeframe, handleImageClick, currentSort]);
 
-  // 🚀 PERFORMANCE OPTIMIZATION: Enhanced loading with proper skeleton
+  // Always call hooks at the top level
+  const skeletonClasses = useLoadingSkeleton(
+    isLoading,
+    "src20-skeleton h-[400px]",
+  );
+
   if (isLoading) {
-    return (
-      <div class="w-full">
-        {title && (
-          <h1 class={`${titlePurpleLD} opacity-0`}>
-            {title}
-          </h1>
-        )}
-        <GallerySkeleton
-          count={6}
-          type={fromPage === "src20" || fromPage === "stamping/src20"
-            ? "src20"
-            : "stamp"}
-          className="mt-4"
-        />
-      </div>
-    );
+    return <div class={skeletonClasses} />;
   }
 
   // 🚀 DENO FRESH 2.3+ OPTIMIZATION: Early return for src20 page with optimized rendering
@@ -130,7 +119,7 @@ export function SRC20Gallery({
       )}
       {subTitle && (
         <h2
-          class={`${subtitlePurple} mb-6 ${
+          class={`${subtitlePurple} ${
             viewType === "minting" ? "text-left tablet:text-right" : ""
           }`}
         >
@@ -142,7 +131,7 @@ export function SRC20Gallery({
       <CardComponent {...cardProps} />
 
       {fromPage === "home" && (
-        <div class="flex justify-end -mt-3 mobileMd:-mt-6">
+        <div class="flex justify-end -mt-3 mobileLg:-mt-7">
           <ViewAllButton
             href={`/src20${viewType === "minting" ? "/minting" : ""}`}
           />

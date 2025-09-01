@@ -1,5 +1,5 @@
 import { buttonStyles, color, state } from "$button";
-import { glassmorphism } from "$layout";
+import { glassmorphism, transitionColors } from "$layout";
 import type { SelectorButtonsProps } from "$types/ui.d.ts";
 import { useCallback, useEffect, useRef, useState } from "preact/hooks";
 
@@ -155,12 +155,12 @@ export const SelectorButtons = ({
               class={`
                 relative flex items-center justify-center z-20 group
                 font-semibold text-center
-                transition-all duration-50
+                ${transitionColors}
                 ${buttonStyles.size[size]}
                 ${
                 selectedValue === option.value
                   ? "text-black"
-                  : "mx-[1px] !rounded-lg bg-transparent text-[var(--color-text)] hover:text-[var(--color-text-hover)] hover:bg-[#1f1c1f]/50"
+                  : "mx-[1px] !rounded-xl bg-transparent text-[var(--color-text)] hover:text-[var(--color-text-hover)] hover:bg-[#1f1c1f]/50"
               }
                 ${optionDisabled ? state.disabled : "cursor-pointer"}
               `}

@@ -349,27 +349,11 @@ export default function FreshSRC20Gallery({
   const renderLoadingSkeleton = () => {
     if (!showLoadingSkeleton) return null;
 
-    // 🚀 PERFORMANCE OPTIMIZATION: Use enhanced skeleton loading
     return (
-      <div class="absolute inset-0 bg-white dark:bg-gray-900 flex items-center justify-center z-10 rounded-lg">
-        <div class="flex flex-col items-center gap-6 p-8">
-          {/* Enhanced loading with skeleton grid */}
-          <div class="grid grid-cols-2 gap-3 w-full max-w-sm">
-            {Array.from({ length: 4 }).map((_, index) => (
-              <div
-                key={index}
-                class="aspect-square bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"
-              />
-            ))}
-          </div>
-          <div class="text-center">
-            <div class="text-gray-600 dark:text-gray-400 text-sm mb-2">
-              Loading SRC-20 tokens...
-            </div>
-            <div class="flex justify-center">
-              <LoadingIcon />
-            </div>
-          </div>
+      <div class="absolute inset-0 bg-black/50 flex items-center justify-center z-10 rounded-xl">
+        <div class="flex flex-col items-center gap-4">
+          <LoadingIcon />
+          <div class="text-white text-sm">Loading SRC-20 tokens...</div>
         </div>
       </div>
     );
@@ -380,7 +364,7 @@ export default function FreshSRC20Gallery({
     if (!error) return null;
 
     return (
-      <div class="bg-red-500/10 border border-red-500/20 rounded-lg p-4 mb-4">
+      <div class="bg-red-500/10 border border-red-500/20 rounded-xl p-4 mb-4">
         <div class="text-red-400 text-sm">
           Error: {error}
         </div>

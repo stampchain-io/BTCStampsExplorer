@@ -2,7 +2,12 @@
 import { useFairmintForm } from "$client/hooks/useFairmintForm.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { ProgressiveEstimationIndicator } from "$components/indicators/ProgressiveEstimationIndicator.tsx";
-import { bodyTool, containerBackground, containerColForm } from "$layout";
+import {
+  bodyTool,
+  containerBackground,
+  containerColForm,
+  transitionAll,
+} from "$layout";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { mapProgressiveFeeDetails } from "$lib/utils/performance/fees/fee-estimation-utils.ts";
@@ -116,7 +121,7 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
             ? (
               // Render the select dropdown if fairminters are available
               <select
-                class="h-10 p-3 rounded-md bg-[#999999] text-black placeholder:text-black placeholder:font-light"
+                class="h-10 p-3 rounded-xl bg-[#999999] text-black placeholder:text-black placeholder:font-light"
                 value={formState.asset}
                 onChange={handleAssetChange}
               >
@@ -144,7 +149,7 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
               <input
                 type="text"
                 placeholder="ENTER ASSET"
-                class="h-10 p-3 rounded-md bg-[#999999] text-black placeholder:text-black placeholder:font-light"
+                class="h-10 p-3 rounded-xl bg-[#999999] text-black placeholder:text-black placeholder:font-light"
                 value={formState.asset}
                 onChange={(e) => handleInputChange(e, "asset")}
               />
@@ -153,7 +158,7 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
           <input
             type="number"
             placeholder="QUANTITY"
-            class="h-10 p-3 rounded-md bg-[#999999] text-black placeholder:text-black placeholder:font-light"
+            class="h-10 p-3 rounded-xl bg-[#999999] text-black placeholder:text-black placeholder:font-light"
             value={formState.quantity}
             onChange={(e) => handleInputChange(e, "quantity")}
           />
@@ -176,7 +181,7 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
             {/* Phase dots */}
             <div class="flex items-center gap-1">
               <div
-                class={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+                class={`w-1.5 h-1.5 rounded-full ${transitionAll} ${
                   phase1 ? "opacity-100" : "opacity-30"
                 }`}
                 style={{
@@ -187,7 +192,7 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
                 title="Phase 1: Instant estimate"
               />
               <div
-                class={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+                class={`w-1.5 h-1.5 rounded-full ${transitionAll} ${
                   phase2 ? "opacity-100" : "opacity-30"
                 } ${isPreFetching ? "animate-pulse" : ""}`}
                 style={{
@@ -198,7 +203,7 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
                 title="Phase 2: Smart UTXO estimate"
               />
               <div
-                class={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+                class={`w-1.5 h-1.5 rounded-full ${transitionAll} ${
                   phase3 ? "opacity-100" : "opacity-30"
                 } ${isEstimating ? "animate-pulse" : ""}`}
                 style={{
@@ -252,7 +257,7 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
 
         {/* ===== 🚨 FEE ESTIMATION ERROR HANDLING ===== */}
         {feeEstimationError && (
-          <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+          <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-xl">
             <div className="flex items-center justify-between">
               <span className="text-red-700 text-sm">
                 Fee estimation error: {feeEstimationError}

@@ -1,9 +1,9 @@
-import { loaderSpinXsPurple } from "$layout";
+import { containerBackground, loaderSpinLgGrey } from "$layout";
 import type { ChartWidgetProps, HighchartsData } from "$types/ui.d.ts";
 import Highcharts from "highcharts/highstock";
 import { useEffect, useState } from "preact/hooks";
 
-// ✅ Define TypeScript Props Interface with proper imported types
+// Define TypeScript Props Interface with proper imported types
 
 const ChartWidget = (
   { data, fromPage = "detail", tick = "" }: ChartWidgetProps,
@@ -20,7 +20,7 @@ const ChartWidget = (
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    setLoading(true); // ✅ Show loading state
+    setLoading(true); // Show loading state
 
     setTimeout(() => {
       const container = document.getElementById(containerId);
@@ -82,16 +82,45 @@ const ChartWidget = (
           chart: {
             backgroundColor: "transparent",
           },
-          credits: { enabled: false }, // ✅ Remove Highcharts watermark
+          credits: { enabled: false }, // Remove Highcharts watermark
           rangeSelector: {
+            enabled: true, // Must be explicitly enabled
             selected: 1,
-            labelStyle: { display: "none" }, // ✅ Hides "Zoom" text
+            labelStyle: { display: "none" }, // Hides "Zoom" text
+            buttonSpacing: 12, // 12px spacing
+            inputEnabled: false, // Hide date input fields
+            // Button position is defined in styles.css
+            buttonTheme: {
+              width: 40, // Control total width (affects horizontal space)
+              padding: 3, // Internal padding (uniform)
+              r: 8, // Border radius (rounded-xl = 12px)
+              stroke: "rgba(102, 102, 102, 0.4)", // Border color with transparency
+              "stroke-width": 1, // Use quoted property name for SVG
+              fill: "rgba(33, 28, 33, 0.1)", // Glassmorphism button background
+              style: {
+                fontSize: "10px", // Text size
+                color: "#666666", // Text color
+              },
+              states: {
+                hover: {
+                  fill: "rgba(33, 28, 33, 0.4)", // Glassmorphism button hover
+                  stroke: "rgba(102, 102, 102, 0.6)", // Hover border color
+                  style: {
+                    color: "#00ff00", // Hover text color
+                  },
+                },
+                select: {
+                  fill: "#999999", // Fill when selected
+                  stroke: "rgba(102, 102, 102, 0.6)", // Selected border color
+                },
+              },
+            },
             buttons: [
-              { type: "day", count: 1, text: "1D" },
+              { type: "day", count: 1, text: "24H" },
               { type: "day", count: 7, text: "7D" },
               { type: "month", count: 1, text: "1M" },
               { type: "year", count: 1, text: "1Y" },
-              { type: "all", text: "All" },
+              { type: "all", text: "ALL" },
             ],
           },
           yAxis: {
@@ -100,7 +129,7 @@ const ChartWidget = (
                 return this.value.toLocaleString() + " SAT";
               },
             },
-            title: { text: "Price (SAT)" },
+            title: { text: "PRICE (SAT)" },
           },
           xAxis: { type: "datetime" },
           navigator: { enabled: false }, // Remove the navigator
@@ -119,7 +148,7 @@ const ChartWidget = (
             {
               type: chartType, // Chart type constant
               name: "Price in SAT",
-              color: "#8800CC",
+              color: "#999999",
               data: chartData,
               tooltip: {
                 valueSuffix: " SAT",
@@ -129,17 +158,27 @@ const ChartWidget = (
         });
       }
       console.log("Highcharts initialized for", containerId);
-      setLoading(false); // ✅ Hide loading after chart renders
+      setLoading(false); // Hide loading after chart renders
     }, 1000); // Simulate loading delay
   }, [data]);
 
   if (!data || data.length === 0) {
-    return <div class="text-sm text-stamp-grey">NO DATA</div>;
+    return (
+      <div class={`${containerBackground} text-sm text-stamp-grey text-center`}>
+        NO DATA
+      </div>
+    );
   }
 
   return (
-    <div>
-      {loading ? <div class={loaderSpinXsPurple} /> : null}
+    <div class={containerBackground}>
+      {loading
+        ? (
+          <div
+            class={`${loaderSpinLgGrey} my-[182px] mx-auto`}
+          />
+        )
+        : null}
       <div id={containerId} />
     </div>
   );

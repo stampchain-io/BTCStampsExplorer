@@ -1,4 +1,4 @@
-/* ===== DATA TABLE BASE COMPONENT ===== */
+/* ===== DETAILS TABLE COMPONENT ===== */
 import { containerBackground, ScrollContainer } from "$layout";
 import {
   SRC20MintsTable,
@@ -7,15 +7,15 @@ import {
   StampSalesTable,
   StampTransfersTable,
 } from "$table";
-import { labelSm, loaderText, value3xlTransparent } from "$text";
+import { labelSm, value3xlTransparent } from "$text";
 import type { TabData, TableProps, TableType } from "$types/ui.d.ts";
 import { useEffect, useState } from "preact/hooks";
 
 /* ===== CONSTANTS ===== */
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 16;
 
 /* ===== COMPONENT ===== */
-export default function DataTableBase({
+export default function DetailsTableBase({
   type,
   configs = [],
   cpid,
@@ -138,6 +138,7 @@ export default function DataTableBase({
           return (
             <StampListingsAllTable
               listings={tabData.dispensers || []}
+              isLoading={isLoading}
             />
           );
         case "sales": {
@@ -145,13 +146,19 @@ export default function DataTableBase({
             tabData.dispenses || [],
             tabData.dispensers || [],
           );
-          return <StampSalesTable dispenses={dispensesWithRates} />;
+          return (
+            <StampSalesTable
+              dispenses={dispensesWithRates}
+              isLoading={isLoading}
+            />
+          );
         }
         case "transfers":
           return (
             <StampTransfersTable
               transactions={tabData.sends || []}
               sends={tabData.sends || []}
+              isLoading={isLoading}
             />
           );
         default:
@@ -160,12 +167,18 @@ export default function DataTableBase({
     } else if (type === "src20") {
       switch (selectedTab) {
         case "mints":
-          return <SRC20MintsTable mints={tabData.mints || []} />;
+          return (
+            <SRC20MintsTable
+              mints={tabData.mints || []}
+              isLoading={isLoading}
+            />
+          );
         case "transfers":
           return (
             <SRC20TransfersTable
               transactions={tabData.transfers || []}
               sends={tabData.transfers || []}
+              isLoading={isLoading}
             />
           );
         default:
@@ -314,7 +327,7 @@ export default function DataTableBase({
   return (
     <div class={containerBackground}>
       {/* ===== TABS SECTION ===== */}
-      <div class="flex justify-between items-start w-full mb-6">
+      <div class="flex justify-between items-start w-full mb-5">
         {configs.map(({ id }) => {
           const count = totalCounts[id as keyof typeof totalCounts];
           const alignment = getTabAlignment(id, configs.length);
@@ -342,19 +355,21 @@ export default function DataTableBase({
         })}
       </div>
       {/* ===== TABLE CONTENT ===== */}
-      <ScrollContainer class="max-h-48" onScroll={handleScroll}>
+      <ScrollContainer
+        class="min-h-[72px] max-h-[290px] scrollbar-glassmorphism"
+        onScroll={handleScroll}
+      >
         <div class="">
           {renderTabContent()}
           {/* ===== LOADING INDICATOR ===== */}
           {isLoading && (
-            <div class={loaderText}>
-              <span>L</span>
-              <span>O</span>
-              <span>A</span>
-              <span>D</span>
-              <span>I</span>
-              <span>N</span>
-              <span>G</span>
+            <div class="flex flex-col w-full mb-2 gap-2">
+              {[...Array(6)].map((_, index) => (
+                <div
+                  key={index}
+                  class="loading-skeleton running w-full rounded-xl h-[34px]"
+                />
+              ))}
             </div>
           )}
         </div>

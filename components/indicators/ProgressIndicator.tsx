@@ -1,7 +1,9 @@
 import { Icon } from "$icon";
-import type { SpinnerProps } from "$types/ui.d.ts";
-import type { TransactionProgressProps } from "$types/ui.d.ts";
-import type { ProgressIndicatorProps } from "$types/ui.d.ts";
+import type {
+  ProgressIndicatorProps,
+  SpinnerProps,
+  TransactionProgressProps,
+} from "$types/ui.d.ts";
 
 export function ProgressIndicator({
   state,
@@ -49,7 +51,7 @@ export function ProgressIndicator({
 
   return (
     <div
-      class={`flex items-center gap-2 bg-${config.bgColor} backdrop-blur-sm border border-${config.borderColor} rounded-lg px-3 py-2 ${className}`}
+      class={`flex items-center gap-2 bg-${config.bgColor} backdrop-blur-sm border border-${config.borderColor} rounded-xl px-3 py-2 ${className}`}
     >
       <div class="relative">
         {config.icon === "spinner"

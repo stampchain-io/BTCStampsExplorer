@@ -350,7 +350,7 @@ function SearchContent({
         onKeyDown={handleKeyDown}
         autoFocus={autoFocus}
         class={`relative z-[2] h-12 w-full !bg-[#221826] pl-[18px] pr-[52px] font-mediun text-sm text-stamp-grey-light placeholder:!bg-[#221826] placeholder:font-light placeholder:!text-stamp-grey no-outline ${
-          searchState.value.error ? "rounded-t-md" : "rounded-md"
+          searchState.value.error ? "rounded-t-lg" : "rounded-lg"
         }`}
       />
       <div

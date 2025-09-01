@@ -131,7 +131,7 @@ export const FAQ_CONTENT: FAQContent[] = [
           },
           {
             text: "Leather",
-            href: "https://leather.io/install-extension",
+            href: "https://leather.io/",
             target: "_blank",
             className: "animated-underline",
           },
@@ -143,7 +143,13 @@ export const FAQ_CONTENT: FAQContent[] = [
           },
           {
             text: "TapWallet",
-            href: "https://tapwallet.io/",
+            href: "https://bitcoinuniverse.io/",
+            target: "_blank",
+            className: "animated-underline",
+          },
+          {
+            text: "Horizon",
+            href: "https://www.unspendablelabs.com/",
             target: "_blank",
             className: "animated-underline",
           },

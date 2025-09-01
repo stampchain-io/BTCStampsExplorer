@@ -18,6 +18,7 @@ import { Button } from "$button";
 import { CloseIcon, Icon } from "$icon";
 import type { FilterType } from "$islands/button/FilterButton.tsx";
 import { FilterContentSRC20 } from "$islands/filter/FilterContentSRC20.tsx";
+import { glassmorphismOverlay, transitionTransform } from "$layout";
 import { useBreakpoints } from "$lib/hooks/useBreakpoints.ts";
 import { tooltipIcon } from "$notification";
 import {
@@ -324,13 +325,11 @@ const FilterDrawer = (
     <div
       id={drawerId}
       ref={drawerRef}
-      class={`fixed top-0 z-40 h-[100dvh]
-        bg-gradient-to-b from-[#111011]/100 via-[#111011]/70 to-[#111011]/100 backdrop-blur-lg
-        transition-transform duration-500 will-change-transform
-        left-0 right-auto w-full
-        min-[420px]:w-[340px] min-[420px]:rounded-r-xl min-[420px]:border-l-0  min-[420px]:border-r-[1px] min-[420px]:border-r-[#111011]
-        min-[420px]:shadow-[12px_0_12px_-6px_rgba(17,16,17,0.5)]
-        tablet:right-0 tablet:left-auto tablet:w-[300px] tablet:rounded-l-xl tablet:border-l-[1px] tablet:border-r-0 tablet:border-l-[#111011] tablet:shadow-[-12px_0_12px_-6px_rgba(17,16,17,0.5)]
+      class={`fixed top-0 z-40 h-[100dvh] left-0 right-auto w-full
+        ${glassmorphismOverlay} ${transitionTransform}
+        min-[420px]:w-[340px] min-[420px]:rounded-r-xl min-[420px]:border-l-0  min-[420px]:border-r-[1px] min-[420px]:border-r-[#1b1b1b]
+        min-[420px]:shadow-[12px_0_12px_-6px_rgba(10,7,10,0.5)]
+        tablet:right-0 tablet:left-auto tablet:w-[300px] tablet:rounded-l-xl tablet:border-l-[1px] tablet:border-r-0 tablet:border-l-[#1b1b1b] tablet:shadow-[-12px_0_12px_-6px_rgba(10,7,10,0.5)]
         ${
         open ? "translate-x-0" : "-translate-x-full tablet:translate-x-full"
       }`}
@@ -410,7 +409,7 @@ const FilterDrawer = (
         </div>
       </div>
       {/* Sticky buttons */}
-      <div class="flex justify-between w-full sticky bottom-0 pb-9 tablet:pb-6 px-9 tablet:px-6 gap-6 bg-[#111011]/80 shadow-[0_-36px_36px_-6px_rgba(17,16,17,1)]">
+      <div class="flex justify-between w-full sticky bottom-0 pb-9 tablet:pb-6 px-9 tablet:px-6 gap-6 bg-[#0a070a]/80 shadow-[0_-36px_36px_-6px_rgba(10,7,10,1)]">
         <Button
           variant="glassmorphism"
           color="grey"

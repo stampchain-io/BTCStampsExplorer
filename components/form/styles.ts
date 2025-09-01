@@ -1,15 +1,19 @@
 /* ===== FORM STYLES MODULE ===== */
-import { glassmorphismLayer2, transition } from "$layout";
+import {
+  glassmorphismL2,
+  glassmorphismL2Hover,
+  transitionColors,
+} from "$layout";
 
 /* ===== BASE STYLES ===== */
 // Global sizes
 const inputFieldHeight = "h-10";
 const inputFieldWidth = "!w-10";
 
-// Input field styles
+// Input field styles - focus values must be same as glassmorphismL2Hover
 const inputFieldStyle = `p-3 w-full
-  ${glassmorphismLayer2}
-  focus:[#1d191d] focus:border-[#33333380] focus:outline-none focus-visible:outline-none no-outline
+  ${glassmorphismL2} ${glassmorphismL2Hover}
+  focus:bg-[#100a10]/60 focus:border-[#242424] focus:outline-none focus-visible:outline-none no-outline ${transitionColors}
   font-medium text-sm text-stamp-grey-light
   placeholder:font-light placeholder:text-stamp-grey placeholder:uppercase`;
 
@@ -41,16 +45,15 @@ export const inputTextarea = `
 // Input field dropdown - define height in the component
 export const inputFieldDropdown = `
 absolute top-[100%] left-0 w-full z-[60]
-bg-gradient-to-b from-[#171417]/20 to-[#171417] backdrop-blur-sm
-border border-t-0 border-[#1d191d]/80 rounded-b-lg
+bg-gradient-to-b from-[#100a10]/20 to-[#100a10] backdrop-blur-sm
+border border-t-0 border-[#1b1b1b]/80 rounded-b-xl
 text-stamp-grey-light text-sm font-medium uppercase leading-none
-overflow-y-auto scrollbar-glassmorphism shadow-lg cursor-pointer`;
+overflow-y-auto scrollbar-glassmorphism-slim shadow-lg cursor-pointer`;
 
 export const inputFieldDropdownHover = `
 flex justify-between py-2.5 px-3
-border-b-[1px] border-[#1d191d]/80 last:border-b-0
-hover:bg-[#171417]/80 uppercase
-${transition} cursor-pointer`;
+border-b-[1px] border-[#1b1b1b]/80 last:border-b-0
+${glassmorphismL2Hover} ${transitionColors} uppercase cursor-pointer`;
 
 // Checkbox - used for both checkboxes and radiobuttons
 export const inputCheckbox = (
@@ -116,8 +119,8 @@ export const purple = `
 `;
 
 export const grey = `
-  [--color-dark:#1d191d66]
-  [--color-medium:#1d191d99]
+  [--color-dark:#1e191e66]
+  [--color-medium:#1e191e99]
   [--color-light:#2c262c]
   [--color-border:#66666699]
   [--color-border-hover:#666666CC]
@@ -127,19 +130,19 @@ export const grey = `
 */
 /* ===== GRADIENT INPUT STYLES =====
 export const outlineGradient = `
-  relative !bg-[#141015] !p-[1px] rounded-lg !border-0
-  before:absolute before:inset-0 before:rounded-lg before:z-[1]
+  relative !bg-[#141015] !p-[1px] rounded-xl !border-0
+  before:absolute before:inset-0 before:rounded-xl before:z-[1]
   before:bg-[conic-gradient(from_var(--angle),var(--color-dark),var(--color-medium),var(--color-light),var(--color-medium),var(--color-dark))]
   before:[--angle:0deg] before:animate-rotate
   hover:before:bg-[conic-gradient(from_var(--angle),var(--color-light),var(--color-light),var(--color-light),var(--color-light),var(--color-light))]
   focus-within:before:bg-[conic-gradient(from_var(--angle),var(--color-light),var(--color-light),var(--color-light),var(--color-light),var(--color-light))]
   before:transition-colors before:duration-300
-  [&>*]:relative [&>*]:z-[2] [&>*]:rounded-lg [&>*]:bg-[#141015]
-  [&>div]:flex [&>div]:justify-between [&>div]:relative [&>div]:z-[2] [&>div]:!bg-[#141015] [&>div]:placeholder:!bg-[#141015] [&>div]:rounded-lg
-  [&>div>input]:${inputFieldHeight} [&>div>input]:w-full [&>div>input]:bg-transparent [&>div>input]:rounded-lg [&>div>input]:pl-5
+  [&>*]:relative [&>*]:z-[2] [&>*]:rounded-xl [&>*]:bg-[#141015]
+  [&>div]:flex [&>div]:justify-between [&>div]:relative [&>div]:z-[2] [&>div]:!bg-[#141015] [&>div]:placeholder:!bg-[#141015] [&>div]:rounded-xl
+  [&>div>input]:${inputFieldHeight} [&>div>input]:w-full [&>div>input]:bg-transparent [&>div>input]:rounded-xl [&>div>input]:pl-5
   [&>div>input]:font-normal [&>div>input]:text-base [&>div>input]:text-stamp-grey-light
   [&>div>input]:placeholder:font-light [&>div>input]:placeholder:!text-stamp-grey
-  [&>div>input]:!outline-none [&>div>input]:focus-visible:!outline-none [&>div>input]:focus:!bg-[#1d191d]
+  [&>div>input]:!outline-none [&>div>input]:focus-visible:!outline-none [&>div>input]:focus:!bg-[#1e191e]
 `;
 */
 /* ===== NOT IN USE NOR UPDATED ===== */

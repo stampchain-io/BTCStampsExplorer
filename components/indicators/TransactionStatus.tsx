@@ -105,10 +105,10 @@ export function TransactionStatus({
 
   return (
     <div
-      class={`bg-${config.bgColor} backdrop-blur-sm border border-${config.borderColor} rounded-lg p-4 ${className}`}
+      class={`bg-${config.bgColor} backdrop-blur-sm border border-${config.borderColor} rounded-xl p-4 ${className}`}
     >
       <div class="flex items-start gap-3">
-        <div class={`p-2 bg-${config.iconBg} rounded-lg`}>
+        <div class={`p-2 bg-${config.iconBg} rounded-xl`}>
           <Icon
             type="icon"
             name={config.icon}
@@ -270,10 +270,10 @@ export function MaraSuccessMessage({
 }: MaraSuccessMessageProps) {
   return (
     <div
-      class={`bg-purple-900/20 backdrop-blur-sm border border-purple-500/30 rounded-lg p-4 ${className}`}
+      class={`bg-purple-900/20 backdrop-blur-sm border border-purple-500/30 rounded-xl p-4 ${className}`}
     >
       <div class="flex items-start gap-3">
-        <div class="p-2 bg-purple-500/20 rounded-lg">
+        <div class="p-2 bg-purple-500/20 rounded-xl">
           <Icon
             type="icon"
             name="rocket"

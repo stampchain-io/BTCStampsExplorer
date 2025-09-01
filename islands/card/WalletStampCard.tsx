@@ -401,7 +401,7 @@ const WalletStampCardComponent = (
         class={`
           text-white group relative z-0 flex flex-col
           p-stamp-card mobileLg:p-3
-          rounded-md transition-all
+          rounded-lg transition-all
           w-full h-full
           hover:border-stamp-purple-bright hover:shadow-stamp hover:border-solid border-2 border-transparent
           bg-stamp-card-bg

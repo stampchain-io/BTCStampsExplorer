@@ -1,5 +1,5 @@
 import { sliderKnob, trackFill } from "$button";
-import { glassmorphismLayer2 } from "$layout";
+import { glassmorphismL2 } from "$layout";
 import { useEffect, useRef, useState } from "preact/hooks";
 
 // Single Range Slider Component
@@ -145,7 +145,7 @@ export const RangeSlider = ({
       )}
 
       <div
-        class={`relative h-5 tablet:h-4 !rounded-full ${glassmorphismLayer2} cursor-pointer`}
+        class={`relative h-5 tablet:h-4 !rounded-full ${glassmorphismL2} cursor-pointer`}
         ref={sliderRef}
         onClick={handleTrackClick}
         onMouseEnter={onMouseEnter}

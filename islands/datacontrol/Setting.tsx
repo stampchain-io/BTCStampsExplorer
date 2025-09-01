@@ -1,6 +1,6 @@
-import { useEffect, useState } from "preact/hooks";
-import type { SettingProps } from "$types/ui.d.ts";
 import { Icon } from "$icon";
+import type { SettingProps } from "$types/ui.d.ts";
+import { useEffect, useState } from "preact/hooks";
 
 export function Setting({
   initFilter = [],
@@ -25,7 +25,7 @@ export function Setting({
 
   return (
     <div
-      class={`rounded-md flex flex-col items-center gap-1 h-fit relative z-[10] ${
+      class={`rounded-lg flex flex-col items-center gap-1 h-fit relative z-[10] ${
         open ? "px-6 py-4 border-2 border-stamp-purple bg-[#0B0B0B]" : ""
       }`}
     >
@@ -76,7 +76,7 @@ export function Setting({
       {visible && (
         <div
           role="tooltip"
-          className="absolute bottom-full right-[0.3px] mb-2 z-10 px-3 py-2 text-sm font-medium text-white bg-stamp-bg-grey-darkest rounded-lg shadow-md"
+          className="absolute bottom-full right-[0.3px] mb-2 z-10 px-3 py-2 text-sm font-medium text-white bg-stamp-bg-grey-darkest rounded-xl shadow-md"
         >
           Settings
           <div class="tooltip-arrow" />

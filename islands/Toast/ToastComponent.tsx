@@ -49,17 +49,17 @@ export const ToastComponent = (
   return (
     <div
       id={`toast-${id}`}
-      class="fixed flex items-center w-full max-w-md p-4 space-x-4 text-gray-500 bg-white divide-x rtl:divide-x-reverse divide-gray-200 rounded-lg shadow top-5 left-5 dark:text-gray-400 dark:divide-gray-700 space-x dark:bg-gray-800 z-50"
+      class="fixed flex items-center w-full max-w-md p-4 space-x-4 text-gray-500 bg-white divide-x rtl:divide-x-reverse divide-gray-200 rounded-xl shadow top-5 left-5 dark:text-gray-400 dark:divide-gray-700 space-x dark:bg-gray-800 z-50"
       role="alert"
     >
-      <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 rounded-lg">
+      <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 rounded-xl">
         {getIcon(type)}
       </div>
       <div class="ml-3 text-sm font-normal break-words">{message}</div>
       <button
         onClick={onClose}
         type="button"
-        class="ml-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700"
+        class="ml-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-xl focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700"
         aria-label="Close"
       >
         <span class="sr-only">Close</span>

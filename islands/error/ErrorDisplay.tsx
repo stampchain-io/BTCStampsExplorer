@@ -1,12 +1,12 @@
 /* ===== ERROR DISPLAY COMPONENT ===== */
 import { Icon } from "$icon";
-import type { ErrorDisplayProps } from "$types/ui.d.ts";
 import {
   ErrorHandlingUtils,
   ErrorInfo,
   ErrorSeverity,
   ErrorType,
 } from "$lib/utils/errorHandling.ts";
+import type { ErrorDisplayProps } from "$types/ui.d.ts";
 
 export function ErrorDisplay({
   error,
@@ -138,7 +138,7 @@ export function ErrorDisplay({
 
   return (
     <div
-      class={`p-4 rounded-lg border ${styles.container} ${className}`}
+      class={`p-4 rounded-xl border ${styles.container} ${className}`}
       role="alert"
       aria-live="assertive"
     >

@@ -1,8 +1,14 @@
-/* ===== SRC20 HOLDERS TABLE COMPONENT ===== */
+/* ===== HOLDERS TABLE COMPONENT ===== */
 import { cellAlign, colGroup } from "$components/layout/types.ts";
-import { rowTable, ScrollContainer } from "$layout";
+import {
+  cellCenterL2Detail,
+  cellLeftL2Detail,
+  cellRightL2Detail,
+  glassmorphismL2,
+  ScrollContainer,
+} from "$layout";
 import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
-import { labelXs, loaderText, textSm, textSmLink } from "$text";
+import { labelXs, textSm, valueSmLink } from "$text";
 import type { HoldersTableProps } from "$types/ui.d.ts";
 import { useEffect, useMemo, useState } from "preact/hooks";
 
@@ -83,102 +89,153 @@ const HoldersTableBase = (
 
   /* ===== RENDER ===== */
   return (
-    <ScrollContainer
-      class="h-[188px] mobileLg:h-[248px] mt-6 w-full"
-      onScroll={handleScroll}
-    >
-      <table class={`${textSm} w-full`}>
-        {/* ===== TABLE STRUCTURE ===== */}
-        <colgroup>
-          {colGroup([
-            { width: "w-[50%]" },
-            { width: "w-[25%]" },
-            { width: "w-[25%]" },
-          ]).map((col) => (
-            <col
-              key={col.key}
-              class={col.className}
-            />
-          ))}
-        </colgroup>
+    <div class="w-full">
+      <ScrollContainer
+        class="min-h-[80px] max-h-[290px] mt-5 w-full scrollbar-glassmorphism"
+        onScroll={handleScroll}
+      >
+        <div class="!-my-2 overflow-x-auto tablet:overflow-x-visible scrollbar-hide">
+          <table class={`w-full border-separate border-spacing-y-2 ${textSm}`}>
+            {/* ===== TABLE STRUCTURE ===== */}
+            <colgroup>
+              {colGroup([
+                { width: "min-w-[200px] w-auto" }, // ADDRESS
+                { width: "min-w-[80px] w-auto" }, // AMOUNT
+                { width: "min-w-[80px] w-auto" }, // PERCENT
+              ]).map((col) => (
+                <col
+                  key={col.key}
+                  class={col.className}
+                />
+              ))}
+            </colgroup>
 
-        {/* ===== TABLE HEADER ===== */}
-        <thead>
-          <tr>
-            {headers.map((header, i) => (
-              <th
-                key={i}
-                scope="col"
-                class={`${labelXs} pb-1.5 ${cellAlign(i, headers.length)}`}
-              >
-                {header}
-              </th>
-            ))}
-          </tr>
-        </thead>
+            {/* ===== TABLE HEADER ===== */}
+            <thead class="sticky top-0 z-10">
+              {/* Only sticky on desktop */}
+              <tr class={`${glassmorphismL2}`}>
+                {headers.map((header, i) => {
+                  const isFirst = i === 0;
+                  const isLast = i === (headers?.length ?? 0) - 1;
 
-        {/* ===== TABLE CONTENT ===== */}
-        <tbody class={textSm}>
-          {!isLoading && data.map((holder, index) => {
-            if (!holder.address) {
-              return (
-                <tr class={rowTable}>
-                  <td class={cellAlign(0, headers.length)}>UNKNOWN</td>
-                  <td class={cellAlign(1, headers.length)}>
-                    {holder.amt}
-                  </td>
-                  <td class={cellAlign(2, headers.length)}>
-                    {holder.percentage}%
-                  </td>
-                </tr>
-              );
-            }
+                  // Apply row border classes for segmented styling
+                  const rowClass = isFirst
+                    ? cellLeftL2Detail
+                    : isLast
+                    ? cellRightL2Detail
+                    : cellCenterL2Detail;
 
-            return (
-              <tr key={index} class={rowTable}>
-                <td class={cellAlign(0, headers.length)}>
-                  <a
-                    target="_top"
-                    href={`/wallet/${holder.address}`}
-                    class={textSmLink}
-                  >
-                    <span class="mobileLg:hidden">
-                      {abbreviateAddress(holder.address, 8)}
-                    </span>
-                    <span class="hidden mobileLg:inline">
-                      {holder.address}
-                    </span>
-                  </a>
-                </td>
-                <td class={cellAlign(1, headers.length)}>
-                  {holder.amt}
-                </td>
-                <td class={cellAlign(2, headers.length)}>
-                  {holder.percentage}%
-                </td>
+                  return (
+                    <th
+                      key={header}
+                      scope="col"
+                      class={`${
+                        cellAlign(i, headers?.length ?? 0)
+                      } !py-1.5 ${rowClass} ${labelXs}`}
+                    >
+                      {header}
+                    </th>
+                  );
+                })}
               </tr>
-            );
-          })}
+            </thead>
 
+            {/* ===== TABLE CONTENT ===== */}
+            <tbody>
+              {!isLoading && data.map((holder, index) => {
+                if (!holder.address) {
+                  return (
+                    <tr
+                      key={`unknown-${index}`}
+                      class={`${glassmorphismL2} group`}
+                    >
+                      {/* ADDRESS */}
+                      <td
+                        class={`${
+                          cellAlign(0, headers?.length ?? 0)
+                        } ${cellLeftL2Detail}`}
+                      >
+                        UNKNOWN
+                      </td>
+                      {/* AMOUNT */}
+                      <td
+                        class={`${
+                          cellAlign(1, headers?.length ?? 0)
+                        } ${cellCenterL2Detail}`}
+                      >
+                        {Number(holder.amt).toLocaleString()}
+                      </td>
+                      {/* PERCENT */}
+                      <td
+                        class={`${
+                          cellAlign(2, headers?.length ?? 0)
+                        } ${cellRightL2Detail} text-stamp-grey`}
+                      >
+                        {holder.percentage}%
+                      </td>
+                    </tr>
+                  );
+                }
+
+                return (
+                  <tr
+                    key={index}
+                    class={`${glassmorphismL2} group`}
+                  >
+                    {/* ADDRESS */}
+                    <td
+                      class={`${
+                        cellAlign(0, headers?.length ?? 0)
+                      } ${cellLeftL2Detail}`}
+                    >
+                      <a
+                        target="_top"
+                        href={`/wallet/${holder.address}`}
+                        className={valueSmLink}
+                      >
+                        <span class="mobileLg:hidden">
+                          {abbreviateAddress(holder.address, 8)}
+                        </span>
+                        <span class="hidden mobileLg:inline">
+                          {holder.address}
+                        </span>
+                      </a>
+                    </td>
+                    {/* AMOUNT */}
+                    <td
+                      class={`${
+                        cellAlign(1, headers?.length ?? 0)
+                      } ${cellCenterL2Detail}`}
+                    >
+                      {Number(holder.amt).toLocaleString()}
+                    </td>
+                    {/* PERCENT */}
+                    <td
+                      class={`${
+                        cellAlign(2, headers?.length ?? 0)
+                      } ${cellRightL2Detail} text-stamp-grey`}
+                    >
+                      {holder.percentage}%
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
           {/* ===== LOADING INDICATOR ===== */}
           {isLoading && (
-            <tr colSpan={3}>
-              <td colSpan={3}>
-                <div class={loaderText}>
-                  <span>L</span>
-                  <span>O</span>
-                  <span>A</span>
-                  <span>D</span>
-                  <span>I</span>
-                  <span>N</span>
-                  <span>G</span>
-                </div>
-              </td>
-            </tr>
+            <div class="flex flex-col w-full mb-2 gap-2">
+              {[...Array(6)].map((_, index) => (
+                <div
+                  key={index}
+                  class="loading-skeleton running w-full rounded-xl h-[34px]"
+                />
+              ))}
+            </div>
           )}
-        </tbody>
-      </table>
-    </ScrollContainer>
+        </div>
+      </ScrollContainer>
+    </div>
   );
 };
 

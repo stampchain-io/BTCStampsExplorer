@@ -287,10 +287,9 @@ import * as $sorting_adapters_index from "./islands/sorting/adapters/index.ts";
 import * as $sorting_examples_EnhancedSortButton from "./islands/sorting/examples/EnhancedSortButton.tsx";
 import * as $sorting_hooks_useSortingURL from "./islands/sorting/hooks/useSortingURL.tsx";
 import * as $sorting_index from "./islands/sorting/index.ts";
-import * as $table_DataTableBase from "./islands/table/DataTableBase.tsx";
+import * as $table_DetailsTableBase from "./islands/table/DetailsTableBase.tsx";
 import * as $table_HoldersPieChart from "./islands/table/HoldersPieChart.tsx";
 import * as $table_HoldersTableBase from "./islands/table/HoldersTableBase.tsx";
-import * as $table_Tables from "./islands/table/Tables.tsx";
 import * as $table_UploadImageTable from "./islands/table/UploadImageTable.tsx";
 import * as $table_index from "./islands/table/index.ts";
 import * as $tool_StatusMessages from "./islands/tool/StatusMessages.tsx";
@@ -659,10 +658,9 @@ const manifest = {
       $sorting_examples_EnhancedSortButton,
     "./islands/sorting/hooks/useSortingURL.tsx": $sorting_hooks_useSortingURL,
     "./islands/sorting/index.ts": $sorting_index,
-    "./islands/table/DataTableBase.tsx": $table_DataTableBase,
+    "./islands/table/DetailsTableBase.tsx": $table_DetailsTableBase,
     "./islands/table/HoldersPieChart.tsx": $table_HoldersPieChart,
     "./islands/table/HoldersTableBase.tsx": $table_HoldersTableBase,
-    "./islands/table/Tables.tsx": $table_Tables,
     "./islands/table/UploadImageTable.tsx": $table_UploadImageTable,
     "./islands/table/index.ts": $table_index,
     "./islands/tool/StatusMessages.tsx": $tool_StatusMessages,

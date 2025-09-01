@@ -824,7 +824,7 @@ export function FeeCalculatorBase({
               className={`
                 w-4 h-4 tablet:w-3 tablet:h-3 mr-3 tablet:mr-2
                 flex items-center justify-center
-                rounded-sm
+                rounded-[3px]
                 transition-all duration-200 ease-in-out
                 border
                 relative
@@ -842,7 +842,7 @@ export function FeeCalculatorBase({
             >
               <div
                 className={`
-                  absolute inset-[1px] rounded-sm
+                  absolute inset-[1px] rounded-[2px]
                   transform transition-all duration-200 ease-in-out
                   ${tosAgreed ? "scale-100" : "scale-0"}
                   ${

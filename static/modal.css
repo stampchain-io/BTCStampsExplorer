@@ -6,7 +6,7 @@
 defined individually
   */
   --animation-timing: cubic-bezier(0.46,0.03,0.52,0.96);
-  --animation-bg: rgba(18, 15, 19, 0.9);
+  --animation-bg: rgba(0, 0, 0, 0.25);
   --animation-duration-background: .5s;
   --animation-cleanup-delay: .5s;
 
@@ -100,8 +100,8 @@ defined individually
   .animation-modal-background {
     display: table-cell;
     background: var(--animation-bg);
-    -webkit-backdrop-filter: blur(6px);
-    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
     text-align: center;
     vertical-align: middle;
 
@@ -187,7 +187,7 @@ defined individually
 
 @keyframes fadeModalIn {
   0% {
-    background: rgba(18, 15, 19, 0);
+    background: rgba(0, 0, 0, 0);
   }
 
   100% {
@@ -201,7 +201,7 @@ defined individually
   }
 
   100% {
-    background: rgba(18, 15, 19, 0);
+    background: rgba(0, 0, 0, 0);
   }
 }
 

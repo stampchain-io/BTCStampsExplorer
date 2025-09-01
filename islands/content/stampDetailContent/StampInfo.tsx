@@ -845,7 +845,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                       className={`overflow-hidden transition-all duration-500 ease-in-out
                       ${
                         showListings
-                          ? "max-h-[300px] opacity-100"
+                          ? "max-h-[244px] mt-1 mb-3 opacity-100"
                           : "max-h-0 opacity-0"
                       }`}
                     >

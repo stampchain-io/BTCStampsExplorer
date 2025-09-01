@@ -7,13 +7,13 @@ const scrollbarPadding = `
 
     const checkScrollbar = () => {
       const hasScrollbar = container.scrollHeight > container.clientHeight;
-      container.style.paddingRight = hasScrollbar 
-        ? (globalThis.innerWidth >= 568 ? '24px' : '18px')
+      container.style.paddingRight = hasScrollbar
+        ? (globalThis.innerWidth >= 1024 ? '16px' : '24px')
         : '0px';
     };
 
     checkScrollbar();
-    
+
     const resizeObserver = new ResizeObserver(checkScrollbar);
     resizeObserver.observe(container);
   })();
@@ -24,7 +24,10 @@ export function ScrollContainer(
 ) {
   return (
     <>
-      <div class={`overflow-auto ${className}`} onScroll={onScroll}>
+      <div
+        class={`overflow-auto ${className}`}
+        onScroll={onScroll}
+      >
         {children}
       </div>
       <script dangerouslySetInnerHTML={{ __html: scrollbarPadding }} />

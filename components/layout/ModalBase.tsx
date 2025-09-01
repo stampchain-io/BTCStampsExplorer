@@ -1,5 +1,6 @@
 import { CloseIcon } from "$icon";
 import { closeModal } from "$islands/modal/states.ts";
+import { glassmorphismOverlay, shadow } from "$layout";
 import { logger } from "$lib/utils/logger.ts";
 import { tooltipIcon } from "$notification";
 import { titleGreyLD } from "$text";
@@ -81,14 +82,12 @@ export function ModalBase({
   }, []);
 
   return (
-    <div /* same as glassmorphism, but importing the styles doesn't display properly */
+    <div /* similar to glassmorphism design on the drawers - importing the class consts doesn't display properly */
       className={`
-        relative w-[340px] min-[420px]:w-[360px] mobileMd:w-[380px]
-        p-5 border-[1px] border-stamp-grey-darkest/20 rounded-xl
-  bg-gradient-to-br from-stamp-grey-darkest/15 to-stamp-grey-darkest/30
-  backdrop-blur overflow-hidden
-  shadow-[0_8px_16px_rgba(22,22,22,0.1),inset_0_1px_0_rgba(22,22,22,0.3),inset_0_-1px_0_rgba(22,22,22,0.1),inset_0_0_4px_4px_rgba(22,22,22,0.2)]
-        ${className}
+        relative w-[340px] min-[420px]:w-[360px] mobileMd:w-[380px] p-5
+        ${glassmorphismOverlay}
+        border-[1px] border-[#1b1b1b]/80
+        ${shadow} ${className}
       `}
       onClick={(e) => e.stopPropagation()}
     >
@@ -116,7 +115,7 @@ export function ModalBase({
             </div>
 
             <div class="w-full text-center">
-              <h2 class={`${titleGreyLD} pt-6 pb-9`}>
+              <h2 class={`${titleGreyLD} pb-6`}>
                 {title}
               </h2>
             </div>
