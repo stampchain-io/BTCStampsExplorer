@@ -1,21 +1,21 @@
-import type { MAX_PAGINATION_LIMIT } from "$constants";
+import { MAX_PAGINATION_LIMIT } from "$constants";
 import blockFixturesData from "../fixtures/blockData.json" with {
-  type: "json",
+    type: "json"
 };
 import collectionFixturesData from "../fixtures/collectionData.json" with {
-  type: "json",
+    type: "json"
 };
 import marketDataFixturesData from "../fixtures/marketData.json" with {
-  type: "json",
+    type: "json"
 };
 import src101FixturesData from "../fixtures/src101Data.json" with {
-  type: "json",
+    type: "json"
 };
 import src20FixturesData from "../fixtures/src20Data.json" with {
-  type: "json",
+    type: "json"
 };
 import stampFixturesData from "../fixtures/stampData.json" with {
-  type: "json",
+    type: "json"
 };
 
 interface QueryResult {

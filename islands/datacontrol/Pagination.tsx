@@ -1,8 +1,10 @@
 import { IS_BROWSER } from "$fresh/runtime.ts";
 import { Icon } from "$icon";
-import { useSSRSafeNavigation } from "$lib/hooks/useSSRSafeNavigation.ts";
 import type { PaginationProps } from "$types/pagination.d.ts";
-import { getWindowWidth } from "$utils/navigation/freshNavigationUtils.ts";
+import {
+    getWindowWidth,
+    safeNavigate,
+} from "$utils/navigation/freshNavigationUtils.ts";
 import { useEffect, useState } from "preact/hooks";
 
 // Update pagination range constants
@@ -56,7 +58,6 @@ export function Pagination({
   onPageChange,
 }: PaginationProps) {
   const screenSize = useScreenSize();
-  const { setSearchParam } = useSSRSafeNavigation();
 
   // Update maxPageRange logic based on screen size
   const getMaxPageRange = (size: string) => {
@@ -82,9 +83,15 @@ export function Pagination({
       return;
     }
 
-    // SSR-safe URL parameter update using the navigation hook
-    const paramName = prefix ? `${prefix}_page` : "page";
-    setSearchParam(paramName, newPage.toString());
+    // Use Fresh partial navigation if available, fallback to URL parameter update
+    if (IS_BROWSER) {
+      const url = new URL(globalThis.location.href);
+      const paramName = prefix ? `${prefix}_page` : "page";
+      url.searchParams.set(paramName, newPage.toString());
+
+      // Try Fresh partial navigation first
+      safeNavigate(url.toString());
+    }
   };
 
   const renderPageButton = (pageNum: number, iconName?: string) => {
