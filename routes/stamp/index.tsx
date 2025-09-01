@@ -8,9 +8,9 @@ import { StampOverviewHeader } from "$header";
 import { headerSpacing } from "$layout";
 
 import {
-  queryParamsToFilters,
-  queryParamsToServicePayload,
-  StampFilters,
+    queryParamsToFilters,
+    queryParamsToServicePayload,
+    StampFilters,
 } from "$islands/filter/FilterOptionsStamp.tsx";
 import type { StampPageProps } from "$types/api.d.ts";
 import type { StampRow, StampSaleRow } from "$types/stamp.d.ts";
