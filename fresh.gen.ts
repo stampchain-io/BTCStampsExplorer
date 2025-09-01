@@ -9,6 +9,7 @@ import * as $_middleware from "./routes/_middleware.ts";
 import * as $about_index from "./routes/about/index.tsx";
 import * as $api_path_ from "./routes/api/[...path].ts";
 import * as $api_middleware from "./routes/api/_middleware.ts";
+import * as $api_health from "./routes/api/health.ts";
 import * as $api_health_memory from "./routes/api/health/memory.ts";
 import * as $api_internal_background_fee_status from "./routes/api/internal/background-fee-status.ts";
 import * as $api_internal_bitcoinNotifications from "./routes/api/internal/bitcoinNotifications.ts";
@@ -313,6 +314,7 @@ const manifest = {
     "./routes/about/index.tsx": $about_index,
     "./routes/api/[...path].ts": $api_path_,
     "./routes/api/_middleware.ts": $api_middleware,
+    "./routes/api/health.ts": $api_health,
     "./routes/api/health/memory.ts": $api_health_memory,
     "./routes/api/internal/background-fee-status.ts":
       $api_internal_background_fee_status,

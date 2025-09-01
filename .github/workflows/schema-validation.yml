@@ -63,6 +63,7 @@ jobs:
       - name: Run Schema Validation Tests
         run: |
           echo "🔍 Running critical schema validation tests..."
+          mkdir -p reports
           newman run tests/postman/collections/schema-validation.json \
             --environment tests/postman/environments/local.json \
             --reporters cli,json \
