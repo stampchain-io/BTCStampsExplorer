@@ -6,35 +6,34 @@ import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
  * Always returns 200 OK with minimal checks for fast response
  */
 export const handler: Handlers = {
-  async GET(_req) {
+  GET(_req) {
     try {
       // Simple health check that just verifies the API server is running
       const health = {
         status: "OK",
         timestamp: new Date().toISOString(),
-        uptime: Math.floor(process.uptime?.() ?? 0),
-        api: true
+        api: true,
       };
 
-      return ApiResponseUtil.success(health, { 
+      return ApiResponseUtil.success(health, {
         forceNoCache: true,
         headers: {
-          "Cache-Control": "no-cache, no-store, must-revalidate"
-        }
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+        },
       });
     } catch (error) {
       console.error("Health check failed:", error);
-      
+
       return ApiResponseUtil.internalError(
         error instanceof Error ? error : new Error(String(error)),
         "Health check failed",
         {
           status: 503,
           headers: {
-            "Cache-Control": "no-cache"
-          }
-        }
+            "Cache-Control": "no-cache",
+          },
+        },
       );
     }
-  }
+  },
 };

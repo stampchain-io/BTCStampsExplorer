@@ -36,7 +36,7 @@ export const PaginationSSRSafe = ({
     }
 
     // Use Fresh partial navigation if available, fallback to URL parameter update
-    const url = new URL(globalThis.location.href);
+    const url = new URL(globalThis.location?.href || "http://localhost:8000");
     const paramName = prefix ? `${prefix}_page` : "page";
     url.searchParams.set(paramName, newPage.toString());
 
