@@ -112,7 +112,7 @@ export class ApiResponseUtil {
     if (typeof obj === "bigint") return true;
     if (obj === null || typeof obj !== "object") return false;
     if (Array.isArray(obj)) {
-      return obj.some(item => this.hasBigInt(item));
+      return obj.some((item) => this.hasBigInt(item));
     }
     for (const value of Object.values(obj)) {
       if (this.hasBigInt(value)) return true;

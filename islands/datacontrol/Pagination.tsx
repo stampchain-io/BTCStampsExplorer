@@ -2,8 +2,8 @@ import { IS_BROWSER } from "$fresh/runtime.ts";
 import { Icon } from "$icon";
 import type { PaginationProps } from "$types/pagination.d.ts";
 import {
-    getWindowWidth,
-    safeNavigate,
+  getWindowWidth,
+  safeNavigate,
 } from "$utils/navigation/freshNavigationUtils.ts";
 import { useEffect, useState } from "preact/hooks";
 
