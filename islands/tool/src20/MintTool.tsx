@@ -434,7 +434,8 @@ export function SRC20MintTool({
                   name="previewImage"
                   weight="extraLight"
                   size="xxl"
-                  color="grey"
+                  color="custom"
+                  className="stroke-[#242424]/80"
                 />
               )}
           </div>

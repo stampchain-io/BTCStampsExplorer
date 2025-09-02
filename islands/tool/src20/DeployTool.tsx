@@ -347,7 +347,7 @@ export function SRC20DeployTool(
               id="image-preview"
               class={`relative flex flex-col items-center justify-center content-center mx-auto min-h-[100px] min-w-[100px]
               ${glassmorphismL2} ${glassmorphismL2Hover}
-              ${transitionColors} cursor-pointer`}
+              ${transitionColors} cursor-pointer group`}
               onMouseMove={handleMouseMove}
               onMouseEnter={handleUploadMouseEnter}
               onMouseLeave={handleUploadMouseLeave}
@@ -386,7 +386,8 @@ export function SRC20DeployTool(
                     name="uploadImage"
                     weight="extraLight"
                     size="xxl"
-                    color="grey"
+                    color="custom"
+                    className="stroke-stamp-grey-darkest group-hover:stroke-stamp-grey-darker/80"
                   />
                   <div
                     class={`${tooltipImage} ${

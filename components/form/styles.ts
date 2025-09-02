@@ -15,7 +15,7 @@ const inputFieldStyle = `p-3 w-full
   ${glassmorphismL2} ${glassmorphismL2Hover}
   focus:bg-[#100a10]/60 focus:border-[#242424] focus:outline-none focus-visible:outline-none no-outline ${transitionColors}
   font-medium text-sm text-stamp-grey-light
-  placeholder:font-light placeholder:text-stamp-grey placeholder:uppercase`;
+  placeholder:font-light placeholder:text-stamp-grey-darker placeholder:uppercase`;
 
 /* ===== INPUT STYLES ===== */
 // Base input
