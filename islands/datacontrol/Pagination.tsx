@@ -1,5 +1,6 @@
 import { IS_BROWSER } from "$fresh/runtime.ts";
 import { Icon } from "$icon";
+import { glassmorphismL2, glassmorphismL2Hover } from "$layout";
 import { useSSRSafeNavigation } from "$lib/hooks/useSSRSafeNavigation.ts";
 import type { PaginationProps } from "$types/pagination.d.ts";
 import { getWindowWidth } from "$utils/navigation/freshNavigationUtils.ts";
@@ -11,13 +12,15 @@ const MOBILEMD_MAX_PAGE_RANGE = 2;
 const TABLET_MAX_PAGE_RANGE = 3;
 const DESKTOP_MAX_PAGE_RANGE = 4;
 
-const navArrow = `
+const navBase = `
   flex items-center justify-center
-  w-9 h-9 rounded-lg hover:bg-stamp-purple-bright`;
-const navContent = `
-  flex items-center justify-center
-  h-9 desktop:pt-0.5 px-[14px] rounded-lg hover:bg-stamp-purple-bright
-  font-medium text-black text-sm leading-[16.5px]`;
+${glassmorphismL2} ${glassmorphismL2Hover}
+!backdrop-blur-md`;
+const navArrow = `${navBase} group
+  w-10 h-10 tablet:w-9 tablet:h-9`;
+const navContent = `${navBase} group
+  h-10 px-[16px] tablet:h-9 tablet:px-[14px]
+  font-light text-sm text-stamp-grey-darker hover:text-green-500 leading-[16.5px]`;
 
 // SSR-safe screen size hook
 const useScreenSize = () => {
@@ -92,8 +95,10 @@ export function Pagination({
     // Use navArrow class for caret buttons, otherwise use navContent
     const baseClass = iconName ? navArrow : navContent;
     const buttonClass = isCurrentPage
-      ? `${baseClass} bg-stamp-purple`
-      : `${baseClass} bg-stamp-purple-dark`;
+      ? `${baseClass} bg-[#100a10]/60 border-[#242424]
+       text-stamp-grey-light/60 font-normal
+       hover:bg-[#100a10]/60 hover:border-[#242424] `
+      : `${baseClass}`;
 
     return (
       <button
@@ -110,7 +115,7 @@ export function Pagination({
               weight="bold"
               size="xxs"
               color="custom"
-              className="stroke-black"
+              className="stroke-stamp-grey-darker group-hover:stroke-stamp-grey"
             />
           )
           : <span>{pageNum}</span>}
@@ -133,8 +138,13 @@ export function Pagination({
   }
 
   return (
-    <nav aria-label="Page navigation" class="flex items-center justify-center">
-      <ul class="inline-flex items-center -space-x-px gap-3">
+    <nav
+      aria-label="Page navigation"
+      class="flex items-center justify-center"
+    >
+      <ul
+        class={`inline-flex items-center -space-x-px gap-2.5`}
+      >
         {/* First and Previous */}
         {page > 1 && (
           <>
@@ -147,21 +157,21 @@ export function Pagination({
         {startPage > 1 && (
           <>
             {page < 1 && renderPageButton(1)}
-            <span class="text-stamp-purple-dark">...</span>
+            <span class="w-1"></span>
           </>
         )}
 
         {/* Page numbers */}
-        {Array.from({ length: endPage - startPage + 1 }, (_, i) =>
-          startPage + i)
-          .map((pageNum) =>
-            renderPageButton(pageNum)
-          )}
+        {Array.from(
+          { length: endPage - startPage + 1 },
+          (_, i) => startPage + i,
+        )
+          .map((pageNum) => renderPageButton(pageNum))}
 
         {/* Show ellipsis if there are pages after the range */}
         {endPage < totalPages && (
           <>
-            <span class="text-stamp-purple-dark">...</span>
+            <span class="w-1"></span>
             {page > totalPages && renderPageButton(totalPages)}
           </>
         )}
