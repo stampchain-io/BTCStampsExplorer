@@ -158,6 +158,7 @@ import * as $badge_index from "./islands/badge/index.ts";
 import * as $button_ConnectButton from "./islands/button/ConnectButton.tsx";
 import * as $button_FilterButton from "./islands/button/FilterButton.tsx";
 import * as $button_PaginationButtons from "./islands/button/PaginationButtons.tsx";
+import * as $button_PaginationButtonsSSRSafe from "./islands/button/PaginationButtonsSSRSafe.tsx";
 import * as $button_RangeSlider from "./islands/button/RangeSlider.tsx";
 import * as $button_RangeSliderDual from "./islands/button/RangeSliderDual.tsx";
 import * as $button_SelectorButtons from "./islands/button/SelectorButtons.tsx";
@@ -190,8 +191,6 @@ import * as $content_index from "./islands/content/index.ts";
 import * as $content_stampDetailContent_StampImage from "./islands/content/stampDetailContent/StampImage.tsx";
 import * as $content_stampDetailContent_StampInfo from "./islands/content/stampDetailContent/StampInfo.tsx";
 import * as $content_stampDetailContent_StampTextContent from "./islands/content/stampDetailContent/StampTextContent.tsx";
-import * as $datacontrol_Pagination from "./islands/datacontrol/Pagination.tsx";
-import * as $datacontrol_PaginationSSRSafe from "./islands/datacontrol/PaginationSSRSafe.tsx";
 import * as $datacontrol_Setting from "./islands/datacontrol/Setting.tsx";
 import * as $datacontrol_faq from "./islands/datacontrol/faq.ts";
 import * as $error_ErrorDisplay from "./islands/error/ErrorDisplay.tsx";
@@ -495,6 +494,8 @@ const manifest = {
     "./islands/button/ConnectButton.tsx": $button_ConnectButton,
     "./islands/button/FilterButton.tsx": $button_FilterButton,
     "./islands/button/PaginationButtons.tsx": $button_PaginationButtons,
+    "./islands/button/PaginationButtonsSSRSafe.tsx":
+      $button_PaginationButtonsSSRSafe,
     "./islands/button/RangeSlider.tsx": $button_RangeSlider,
     "./islands/button/RangeSliderDual.tsx": $button_RangeSliderDual,
     "./islands/button/SelectorButtons.tsx": $button_SelectorButtons,
@@ -538,9 +539,6 @@ const manifest = {
       $content_stampDetailContent_StampInfo,
     "./islands/content/stampDetailContent/StampTextContent.tsx":
       $content_stampDetailContent_StampTextContent,
-    "./islands/datacontrol/Pagination.tsx": $datacontrol_Pagination,
-    "./islands/datacontrol/PaginationSSRSafe.tsx":
-      $datacontrol_PaginationSSRSafe,
     "./islands/datacontrol/Setting.tsx": $datacontrol_Setting,
     "./islands/datacontrol/faq.ts": $datacontrol_faq,
     "./islands/error/ErrorDisplay.tsx": $error_ErrorDisplay,

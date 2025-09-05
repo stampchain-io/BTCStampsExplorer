@@ -17,13 +17,12 @@ interface PaginationProps {
   class?: string;
 }
 
-export const PaginationSSRSafe = ({
+export const PaginationButtonsSSRSafe = ({
   page,
   totalPages,
   maxPageRange = 2,
   onPageChange,
   prefix,
-  class: className = "",
 }: PaginationProps): JSX.Element | null => {
   const navBase = `
   flex items-center justify-center
