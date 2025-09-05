@@ -20,7 +20,7 @@ const navArrow = `${navBase} group
   w-10 h-10 tablet:w-9 tablet:h-9`;
 const navContent = `${navBase} group
   h-10 px-[16px] tablet:h-9 tablet:px-[14px]
-  font-light text-sm text-stamp-grey-darker hover:text-green-500 leading-[16.5px]`;
+  font-light text-sm text-stamp-grey-darker hover:text-stamp-grey leading-[16.5px]`;
 
 // SSR-safe screen size hook
 const useScreenSize = () => {
@@ -153,28 +153,12 @@ export function Pagination({
           </>
         )}
 
-        {/* Show ellipsis if there are pages before the range */}
-        {startPage > 1 && (
-          <>
-            {page < 1 && renderPageButton(1)}
-            <span class="w-1"></span>
-          </>
-        )}
-
         {/* Page numbers */}
         {Array.from(
           { length: endPage - startPage + 1 },
           (_, i) => startPage + i,
         )
           .map((pageNum) => renderPageButton(pageNum))}
-
-        {/* Show ellipsis if there are pages after the range */}
-        {endPage < totalPages && (
-          <>
-            <span class="w-1"></span>
-            {page > totalPages && renderPageButton(totalPages)}
-          </>
-        )}
 
         {/* Next and Last */}
         {page < totalPages && (
