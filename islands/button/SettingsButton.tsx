@@ -2,7 +2,7 @@ import { Icon } from "$icon";
 import type { SettingProps } from "$types/ui.d.ts";
 import { useEffect, useState } from "preact/hooks";
 
-export function Setting({
+export function SettingsButton({
   initFilter = [],
   open = false,
   handleOpen,
