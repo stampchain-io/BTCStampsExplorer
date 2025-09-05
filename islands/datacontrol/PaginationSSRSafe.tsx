@@ -4,6 +4,7 @@
  */
 
 import { Icon } from "$icon";
+import { glassmorphismL2, glassmorphismL2Hover } from "$layout";
 import { safeNavigate } from "$utils/navigation/freshNavigationUtils.ts";
 import type { JSX } from "preact";
 
@@ -24,10 +25,15 @@ export const PaginationSSRSafe = ({
   prefix,
   class: className = "",
 }: PaginationProps): JSX.Element | null => {
-  const navArrow =
-    "rounded-none border-none h-6 w-6 hover:bg-stamp-purple-md active:bg-stamp-purple-dark transition-all flex items-center justify-center text-white";
-  const navContent =
-    "min-w-8 text-xs font-semibold font-mono hover:bg-stamp-purple-md rounded-none active:bg-stamp-purple-dark border-none text-center py-1 px-2 text-white transition-all";
+  const navBase = `
+  flex items-center justify-center
+${glassmorphismL2} ${glassmorphismL2Hover}
+!backdrop-blur-md`;
+  const navArrow = `${navBase} group
+  w-10 h-10 tablet:w-9 tablet:h-9`;
+  const navContent = `${navBase} group
+  h-10 px-[16px] tablet:h-9 tablet:px-[14px]
+  font-light text-sm text-stamp-grey-darker hover:text-stamp-grey leading-[16.5px]`;
 
   const handlePageChange = (newPage: number) => {
     if (onPageChange) {
@@ -46,10 +52,13 @@ export const PaginationSSRSafe = ({
 
   const renderPageButton = (pageNum: number, iconName?: string) => {
     const isCurrentPage = pageNum === page;
+    // Use navArrow class for caret buttons, otherwise use navContent
     const baseClass = iconName ? navArrow : navContent;
     const buttonClass = isCurrentPage
-      ? `${baseClass} bg-stamp-purple`
-      : `${baseClass} bg-stamp-purple-dark`;
+      ? `${baseClass} bg-[#100a10]/60 border-[#242424]
+       text-stamp-grey-light/60 font-normal
+       hover:bg-[#100a10]/60 hover:border-[#242424] `
+      : `${baseClass}`;
 
     return (
       <button
@@ -66,7 +75,7 @@ export const PaginationSSRSafe = ({
               weight="bold"
               size="xxs"
               color="custom"
-              className="stroke-black"
+              className="stroke-stamp-grey-darker group-hover:stroke-stamp-grey"
             />
           )
           : <span>{pageNum}</span>}
@@ -91,22 +100,16 @@ export const PaginationSSRSafe = ({
   return (
     <nav
       aria-label="Page navigation"
-      class={`flex items-center justify-center ${className}`}
+      class="flex items-center justify-center"
     >
-      <ul class="inline-flex items-center -space-x-px gap-3">
+      <ul
+        class={`inline-flex items-center -space-x-px gap-2.5`}
+      >
         {/* First and Previous */}
         {page > 1 && (
           <>
             {renderPageButton(1, "caretDoubleLeft")}
             {renderPageButton(page - 1, "caretLeft")}
-          </>
-        )}
-
-        {/* Show ellipsis if there are pages before the range */}
-        {startPage > 1 && (
-          <>
-            {page < 1 && renderPageButton(1)}
-            <span class="text-stamp-purple-dark">...</span>
           </>
         )}
 
@@ -116,14 +119,6 @@ export const PaginationSSRSafe = ({
           (_, i) => startPage + i,
         )
           .map((pageNum) => renderPageButton(pageNum))}
-
-        {/* Show ellipsis if there are pages after the range */}
-        {endPage < totalPages && (
-          <>
-            <span class="text-stamp-purple-dark">...</span>
-            {page > totalPages && renderPageButton(totalPages)}
-          </>
-        )}
 
         {/* Next and Last */}
         {page < totalPages && (
