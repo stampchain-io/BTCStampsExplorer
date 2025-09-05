@@ -4,9 +4,9 @@
  * maintains existing sorting functionality (ASC/DESC)
  */
 
+import { PaginationButtons } from "$button";
 import { SRC20CardSm } from "$components/card/SRC20CardSm.tsx";
 import { LoadingIcon } from "$icon";
-import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { useSSRSafeNavigation } from "$lib/hooks/useSSRSafeNavigation.ts";
 import { hasProperty, isNumber } from "$lib/utils/errorTypeGuards.ts";
 import type { EnrichedSRC20Row } from "$types/src20.d.ts";
@@ -414,7 +414,7 @@ export default function FreshSRC20Gallery({
           : 0;
         return totalPages > 1 && (
           <div class="mt-6">
-            <Pagination
+            <PaginationButtons
               page={pagination?.page ?? 1}
               totalPages={totalPages}
               prefix="src20"

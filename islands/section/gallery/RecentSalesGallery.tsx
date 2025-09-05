@@ -1,8 +1,8 @@
 /* ===== RECENT SALES GALLERY COMPONENT ===== */
+import { PaginationButtons } from "$button";
 import { BREAKPOINTS } from "$constants";
 import { LoadingIcon } from "$icon";
 import { RecentSaleCard } from "$islands/card/RecentSaleCard.tsx";
-import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { useLoadingSkeleton } from "$lib/hooks/useLoadingSkeleton.ts";
 import { AccessibilityUtils } from "$lib/utils/ui/accessibility/accessibilityUtils.ts";
 import { subtitlePurple, titlePurpleDL } from "$text";
@@ -231,7 +231,7 @@ export default function RecentSalesGallery({
       {/* ===== PAGINATION ===== */}
       {pagination && pagination.totalPages > 1 && (
         <div class="mt-12 mobileLg:mt-[72px]">
-          <Pagination
+          <PaginationButtons
             page={pagination.page}
             totalPages={pagination.totalPages}
             {...(pagination.prefix && { prefix: pagination.prefix })}

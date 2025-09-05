@@ -1,9 +1,8 @@
 /* ===== COLLECTION DETAIL GALLERY COMPONENT ===== */
 /* @baba - not updated */
-import { ViewAllButton } from "$button";
+import { PaginationButtons, ViewAllButton } from "$button";
 import { CollectionCard } from "$card";
 import { BREAKPOINTS } from "$constants";
-import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
 import { subtitlePurple, titlePurpleLD } from "$text";
 import type { Collection } from "$types/stamp.d.ts";
@@ -116,7 +115,7 @@ export default function CollectionDetailGallery({
 
       {pagination && pagination.totalPages > 1 && (
         <div class="mt-12 mobileLg:mt-[72px]">
-          <Pagination
+          <PaginationButtons
             page={pagination.page}
             totalPages={pagination.totalPages}
             {...(pagination.prefix && { prefix: pagination.prefix })}

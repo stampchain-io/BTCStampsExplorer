@@ -4,9 +4,9 @@
  * world-class sorting infrastructure integration
  */
 
+import { PaginationButtons } from "$button";
 import { LoadingIcon } from "$icon";
 import { StampCard } from "$islands/card/StampCard.tsx";
-import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import type { FreshStampGalleryProps, StampRow } from "$types/stamp.d.ts";
 import type { PaginationState } from "$types/ui.d.ts";
 import { useEffect, useState } from "preact/hooks";
@@ -303,7 +303,7 @@ export function FreshStampGallery({
       {/* Pagination */}
       {pagination.totalPages > 1 && (
         <div class="mt-6">
-          <Pagination
+          <PaginationButtons
             page={pagination.page}
             totalPages={pagination.totalPages}
             onPageChange={handlePageChange}

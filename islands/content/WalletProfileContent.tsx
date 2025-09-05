@@ -1,9 +1,9 @@
 /* ===== WALLET PROFILE CONTENT COMPONENT ===== */
 import type { DispenserRow as Dispenser, StampRow } from "$types/stamp.d.ts";
 
+import { PaginationButtons } from "$button";
 import { Icon, LoadingIcon } from "$icon";
 import { SortButton } from "$islands/button/SortButton.tsx";
-import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { Setting } from "$islands/datacontrol/Setting.tsx";
 import { shadowGlowPurple } from "$layout";
 import type {
@@ -310,7 +310,7 @@ function DispenserItem({
       {/* Pagination */}
       {pagination && pagination.totalPages > 1 && (
         <div class="mt-6">
-          <Pagination
+          <PaginationButtons
             page={pagination.page}
             totalPages={pagination.totalPages}
             prefix="dispensers"

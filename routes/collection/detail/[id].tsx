@@ -6,8 +6,8 @@ import { CollectionDetailContent } from "$content";
 import { FreshContext, Handlers } from "$fresh/server.ts";
 import type { CollectionDetailsPageProps } from "$types/ui.d.ts";
 
+import { PaginationButtons } from "$button";
 import { CollectionDetailHeader } from "$header";
-import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { StampController } from "$server/controller/stampController.ts";
 import { CollectionService } from "$server/services/core/collectionService.ts";
 /* ===== TYPES ===== */
@@ -98,10 +98,10 @@ export default function CollectionDetailPage(
       <CollectionDetailHeader collection={collection} stamps={stamps} />
       <CollectionDetailContent stamps={stamps} />
       <div class="mt-12 mobileLg:mt-[72px]">
-        <Pagination
+        <PaginationButtons
           page={page}
           totalPages={pages}
-          // Remove onPageChange to let Pagination component use its built-in Fresh navigation
+          // Remove onPageChange to let PaginationButtons component use its built-in Fresh navigation
         />
       </div>
     </div>

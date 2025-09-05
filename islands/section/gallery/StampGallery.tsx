@@ -1,9 +1,8 @@
 /* ===== STAMP GALLERY COMPONENT ===== */
-import { ViewAllButton } from "$button";
+import { PaginationButtons, ViewAllButton } from "$button";
 import { StampCard } from "$card";
 import { BREAKPOINTS } from "$constants";
 import { SortButton } from "$islands/button/SortButton.tsx";
-import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
 import { useLoadingSkeleton } from "$lib/hooks/useLoadingSkeleton.ts";
 import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
@@ -285,7 +284,7 @@ export default function StampGallery({
 
       {pagination && pagination.totalPages > 1 && (
         <div class="mt-12 mobileLg:mt-[72px]">
-          <Pagination
+          <PaginationButtons
             page={pagination.page}
             totalPages={pagination.totalPages}
             {...(pagination.prefix && { prefix: pagination.prefix })}

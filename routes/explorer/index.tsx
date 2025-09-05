@@ -140,7 +140,7 @@ export function ExplorerPage(props: StampPageProps) {
         pagination={{
           page,
           totalPages,
-          // Remove onPageChange to let Pagination component use its built-in Fresh navigation
+          // Remove onPageChange to let PaginationButtons component use its built-in Fresh navigation
         }}
       />
     </div>
