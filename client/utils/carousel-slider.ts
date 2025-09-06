@@ -198,7 +198,6 @@ export default function createCarouselSlider(
       disableOnInteraction: false,
       pauseOnMouseEnter: false,
       waitForTransition: false,
-      enabled: true,
     },
 
     effect: "custom",
@@ -314,15 +313,15 @@ export default function createCarouselSlider(
             if (
               index >= visibleSlides
             ) {
-              bullet.style.display = "block";
+              (bullet as HTMLElement).style.display = "block";
             } else {
-              bullet.style.display = "none";
+              (bullet as HTMLElement).style.display = "none";
             }
           } else {
             if (index >= visibleSlides) {
-              bullet.style.display = "none";
+              (bullet as HTMLElement).style.display = "none";
             } else {
-              bullet.style.display = "block";
+              (bullet as HTMLElement).style.display = "block";
             }
           }
         });

@@ -1,35 +1,88 @@
-# Adding version control information for better AI context
-version_info:
-  deno: "2.1.5"
-  fresh: "1.7.3"
-  project: "BTCStampsExplorer"
+# 🚀 BTCStampsExplorer - Cursor Rules v2.0
+# Based on Cursor's latest best practices for large codebases
 
-# Emoji and Unicode handling patterns
-emoji_handling:
-  description: "Standardized approach for handling emoji ticks across the application"
-  flow:
-    api_layer:
-      - accepts_both_formats: ["emoji (🧧)", "unicode escape (\\U0001F9E7)"]
-      - decodes_uri: "decodeURIComponent for URL-encoded ticks"
-      - passes_through: "No format conversion at API layer"
-    repository_layer:
-      - converts_to_unicode: "For DB operations"
-      - converts_to_emoji: "For API responses"
-      - helper_functions:
-        - ensureUnicodeEscape: "Checks and converts to unicode escape if needed"
-        - convertResponseToEmoji: "Converts DB response ticks back to emoji"
-    database_layer:
-      - stores_unicode: "Always stores in unicode escape format"
-  examples:
-    emoji: "🧧"
-    unicode_escape: "\\U0001F9E7"
-    url_encoded: "%F0%9F%A7%A7"
-  rules:
-    - "API routes accept any format"
-    - "Repository handles all format conversions"
-    - "Database always stores unicode escape"
-    - "Responses always return emoji format"
-    - "No manual conversions in controllers or services"
+# Core Project Identity
+project_info:
+  name: "BTCStampsExplorer"
+  version: "2.0.0"
+  framework: "Deno Fresh 1.7.3"
+  language: "TypeScript"
+  description: "Bitcoin Stamps (SRC-20 tokens) block explorer and API"
+  domain: "Bitcoin ecosystem, token standards, blockchain exploration"
+
+# AI Agent Coordination
+agent_coordination:
+  primary_agent: "Project Architect"
+  specialized_agents:
+    - "Type System Guardian"
+    - "API Design Specialist"
+    - "Performance Optimizer"
+    - "Security Sentinel"
+    - "UI/UX Designer"
+    - "Testing Maestro"
+  agent_files:
+    - "agents/project-architect.cursorrules"
+    - "agents/type-system-guardian.cursorrules"
+    - "agents/api-design-specialist.cursorrules"
+    - "agents/performance-optimizer.cursorrules"
+    - "agents/security-sentinel.cursorrules"
+    - "agents/ui-ux-designer.cursorrules"
+    - "agents/testing-maestro.cursorrules"
+  communication_protocol:
+    - "Use @agent_name for specialized tasks"
+    - "Reference agent-specific rule files"
+    - "Maintain context with project_info"
+    - "Reference existing patterns and decisions"
+    - "Document decisions for future reference"
+
+# Development Workflow (Updated for BTCStampsExplorer)
+workflow:
+  planning_phase:
+    - "Use COMPREHENSIVE_IMPLEMENTATION_PLAN.md as primary reference"
+    - "Focus on user workflow optimization at every step"
+    - "Ask clarifying questions about user experience impact"
+    - "Reference existing patterns and maintain consistency"
+    - "Document decisions for PR submission readiness"
+  implementation_phase:
+    - "Follow Cursor best practices: scoped changes, tight feedback loops"
+    - "Test user workflows after every significant change"
+    - "Maintain type safety and error handling"
+    - "Use existing utilities and patterns"
+    - "Update documentation inline with code changes"
+  review_phase:
+    - "Validate user workflow completion"
+    - "Test against OpenAPI schema compliance"
+    - "Review for PR submission readiness"
+    - "Consider performance impact on user experience"
+    - "Ensure mobile responsiveness"
+
+# Critical Business Rules
+business_rules:
+  emoji_handling:
+    description: "Standardized approach for handling emoji ticks across the application"
+    flow:
+      api_layer:
+        - accepts_both_formats: ["emoji (🧧)", "unicode escape (\\U0001F9E7)"]
+        - decodes_uri: "decodeURIComponent for URL-encoded ticks"
+        - passes_through: "No format conversion at API layer"
+      repository_layer:
+        - converts_to_unicode: "For DB operations"
+        - converts_to_emoji: "For API responses"
+        - helper_functions:
+          - ensureUnicodeEscape: "Checks and converts to unicode escape if needed"
+          - convertResponseToEmoji: "Converts DB response ticks back to emoji"
+      database_layer:
+        - stores_unicode: "Always stores in unicode escape format"
+    examples:
+      emoji: "🧧"
+      unicode_escape: "\\U0001F9E7"
+      url_encoded: "%F0%9F%A7%A7"
+    rules:
+      - "API routes accept any format"
+      - "Repository handles all format conversions"
+      - "Database always stores unicode escape"
+      - "Responses always return emoji format"
+      - "No manual conversions in controllers or services"
 
 # Expanding code style with project-specific patterns
 code_style:

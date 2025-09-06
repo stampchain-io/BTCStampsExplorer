@@ -3,7 +3,7 @@ import { BlockController } from "$server/controller/blockController.ts";
 import { BlockHandlerContext } from "$globals";
 import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 
-export const sharedBlockWithStampsHandler: Handlers<BlockHandlerContext> = {
+export const handler: Handlers<BlockHandlerContext> = {
   async GET(_req, ctx) {
     const { block_index } = ctx.params;
     const type = ctx.url.pathname.includes("/stamps/") ? "stamps" : "cursed";

@@ -53,7 +53,7 @@ function shouldLog(namespace: LogNamespace): boolean {
 
     const namespaces = (globalThis.__DEBUG.namespaces || "")
       .split(",")
-      .map((n) => n.trim().toLowerCase());
+      .map((n: string) => n.trim().toLowerCase());
 
     return namespaces.includes("all") ||
       namespaces.includes(namespace.toLowerCase());

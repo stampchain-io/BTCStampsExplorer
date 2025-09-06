@@ -1,4 +1,4 @@
-import { MusicSection } from "$components/media/MusicSection.tsx";
+import { MusicSection } from "$islands/media/MusicSection.tsx";
 
 export default function Music() {
   const titleGreyDL =

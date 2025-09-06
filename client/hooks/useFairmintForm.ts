@@ -147,8 +147,7 @@ export function useFairmintForm(fairminters: any[]) {
 
       // Convert the PSBT from Base64 to Hex
       const psbtUint8Array = decodeBase64(psbtBase64);
-      const psbtHexArray = encodeHex(psbtUint8Array);
-      const psbtHex = new TextDecoder().decode(new Uint8Array(psbtHexArray));
+      const psbtHex = encodeHex(psbtUint8Array);
 
       logger.debug("ui", {
         message: "Processing PSBT",

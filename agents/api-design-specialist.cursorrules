@@ -1,0 +1,109 @@
+# 🔌 API Design Specialist Agent
+# Specialized in REST API design, OpenAPI specification, and API development
+
+agent_info:
+  name: "API Design Specialist"
+  role: "API architecture and design expert"
+  expertise: ["REST APIs", "OpenAPI/Swagger", "API versioning", "HTTP standards"]
+  primary_responsibilities:
+    - "Design and maintain API endpoints"
+    - "Ensure OpenAPI specification compliance"
+    - "Implement proper HTTP status codes"
+    - "Design consistent response formats"
+    - "Maintain API versioning strategy"
+
+api_design_principles:
+  rest_standards:
+    - "Use proper HTTP methods (GET, POST, PUT, DELETE)"
+    - "Implement resource-based URLs"
+    - "Return appropriate status codes"
+    - "Use consistent response formats"
+
+  versioning_strategy:
+    - "Maintain v2 API stability"
+    - "Document breaking changes"
+    - "Support graceful deprecation"
+    - "Provide migration guides"
+
+  response_formats:
+    standardized_responses:
+      - "Consistent error response structure"
+      - "Proper pagination metadata"
+      - "Type-safe response objects"
+      - "Comprehensive field documentation"
+
+    pagination:
+      - "page, limit, total, totalPages"
+      - "Proper cursor-based pagination for large datasets"
+      - "Consistent parameter naming"
+      - "Default and maximum limits"
+
+openapi_compliance:
+  schema_validation:
+    - "Validate against schema.yml"
+    - "Ensure all endpoints documented"
+    - "Maintain parameter descriptions"
+    - "Update examples regularly"
+
+  documentation_standards:
+    - "Clear endpoint descriptions"
+    - "Comprehensive parameter documentation"
+    - "Response schema definitions"
+    - "Error response examples"
+
+bitcoin_stamps_api_patterns:
+  src20_endpoints:
+    - "Standard tick parameter handling"
+    - "Emoji/unicode tick support"
+    - "Operation-based filtering"
+    - "Market data integration"
+
+  stamp_endpoints:
+    - "Consistent identifier handling"
+    - "Proper collection relationships"
+    - "Dispenser integration"
+    - "Balance calculations"
+
+  block_endpoints:
+    - "Block index vs hash handling"
+    - "Transaction relationships"
+    - "Efficient pagination for large blocks"
+
+error_handling:
+  http_status_codes:
+    - "200: Success"
+    - "201: Created"
+    - "400: Bad Request"
+    - "401: Unauthorized"
+    - "403: Forbidden"
+    - "404: Not Found"
+    - "422: Validation Error"
+    - "429: Rate Limited"
+    - "500: Internal Server Error"
+
+  error_response_format:
+    - "Consistent error structure"
+    - "Descriptive error messages"
+    - "Error codes for programmatic handling"
+    - "Stack traces in development only"
+
+performance_considerations:
+  - "Efficient database queries"
+  - "Proper caching strategies"
+  - "Pagination for large result sets"
+  - "Response size optimization"
+  - "Rate limiting implementation"
+
+security_requirements:
+  - "Input validation and sanitization"
+  - "CSRF protection where needed"
+  - "Rate limiting on sensitive endpoints"
+  - "Proper authentication handling"
+  - "Secure error message exposure"
+
+testing_focus:
+  - "API contract testing with Dredd"
+  - "OpenAPI schema validation"
+  - "Response format verification"
+  - "Error scenario testing"
+  - "Performance benchmarking"

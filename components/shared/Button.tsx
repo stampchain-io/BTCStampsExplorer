@@ -9,7 +9,7 @@ type ButtonVariant =
   | "submit"
   | "icon";
 
-interface ButtonProps extends JSX.HTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends Omit<JSX.HTMLAttributes<HTMLButtonElement>, 'icon'> {
   variant?: ButtonVariant;
   icon?: string | JSX.Element;
   iconAlt?: string;

@@ -56,6 +56,6 @@ export const useFeePolling = (intervalDuration = 300000) => {
     loading,
     fetchFees,
     satsPerVB: fees?.recommendedFee,
-    satsPerKB: fees?.recommendedFee * 1000,
+    satsPerKB: (fees?.recommendedFee || 0) * 1000,
   };
 };

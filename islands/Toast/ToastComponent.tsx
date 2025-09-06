@@ -6,9 +6,10 @@ type ToastComponentProps = {
 };
 
 export const ToastComponent = ({ message, type }: ToastComponentProps) => {
-  const { removeToast } = useToast();
+  const toastContext = useToast();
+  const removeToast = toastContext?.removeToast;
 
-  const getIcon = (type) => {
+  const getIcon = (type: string) => {
     switch (type) {
       case "error":
         return (

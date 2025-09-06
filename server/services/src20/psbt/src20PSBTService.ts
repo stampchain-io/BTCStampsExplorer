@@ -37,32 +37,6 @@ interface PSBTParams {
   }>;
 }
 
-interface PSBTResponse {
-  psbt?: Psbt;
-  estimatedTxSize: number;
-  totalInputValue: number;
-  totalOutputValue: number;
-  totalChangeOutput: number;
-  totalDustValue: number;
-  estMinerFee: number;
-  feeDetails: {
-    baseFee: number;
-    ancestorFee: number;
-    effectiveFeeRate: number;
-    ancestorCount: number;
-    totalVsize: number;
-    total: number;
-    minerFee: number;
-    dustValue: number;
-    totalValue: number;
-  };
-  changeAddress?: string;
-  inputs: Array<{
-    index: number;
-    address: string;
-    sighashType?: number;
-  }>;
-}
 
 export class SRC20PSBTService {
   private static readonly DUST_SIZE = 420;

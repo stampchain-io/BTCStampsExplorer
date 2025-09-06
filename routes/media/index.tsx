@@ -1,4 +1,4 @@
-import { MusicSection } from "$components/media/MusicSection.tsx";
+import { MusicSection } from "$islands/media/MusicSection.tsx";
 
 export default function Media() {
   const body = "flex flex-col gap-12 mobileLg:gap-[72px] desktop:gap-24";

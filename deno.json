@@ -62,7 +62,7 @@
     ]
   },
   "exclude": ["**/_fresh/*", "**/server/**/*"],
-  "nodeModulesDir": true,
+  "nodeModulesDir": "auto",
   "imports": {
     "stream": "node:stream",
     "stream/promises": "node:stream/promises",
@@ -129,7 +129,7 @@
     "jsx": "react-jsx",
     "jsxImportSource": "preact",
     "strict": true,
-    "types": ["npm:@types/node", "npm:@types/bitcoinjs-lib"],
+    "types": ["npm:@types/node"],
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,

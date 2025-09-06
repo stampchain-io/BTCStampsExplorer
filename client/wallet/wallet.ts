@@ -19,13 +19,6 @@ declare global {
   }
 }
 
-interface GlobalWithDebug {
-  __DEBUG?: {
-    namespaces: string;
-    enabled: boolean;
-  };
-}
-
 // Move interfaces and variables to the top
 interface WalletProviders {
   LeatherProvider?: any;

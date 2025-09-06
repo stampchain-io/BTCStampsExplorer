@@ -54,6 +54,7 @@ export interface SignPSBTResult {
   txid?: string;
   cancelled?: boolean;
   error?: string;
+  broadcast?: boolean;
 }
 
 export interface Deployment {

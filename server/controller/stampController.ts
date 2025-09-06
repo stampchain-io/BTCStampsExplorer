@@ -31,9 +31,6 @@ import { API_RESPONSE_VERSION } from "$lib/utils/responseUtil.ts";
 import { normalizeHeaders } from "$lib/utils/headerUtils.ts";
 import { WebResponseUtil } from "$lib/utils/webResponseUtil.ts";
 
-interface StampControllerOptions {
-  cacheType: RouteType;
-}
 
 export class StampController {
   static async getStamps({

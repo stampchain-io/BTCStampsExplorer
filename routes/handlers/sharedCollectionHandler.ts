@@ -2,7 +2,7 @@ import { Handlers } from "$fresh/server.ts";
 import { CollectionService } from "$server/services/collectionService.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 
-export const collectionHandler: Handlers = {
+export const handler: Handlers = {
   async GET(req: Request, _ctx) {
     try {
       const url = new URL(req.url);

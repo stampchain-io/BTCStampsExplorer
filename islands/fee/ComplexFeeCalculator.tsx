@@ -11,7 +11,7 @@ export function ComplexFeeCalculator({
   fileSize,
   issuance,
   serviceFee,
-  _userAddress,
+  userAddress,
   _outputTypes,
   utxoAncestors = [],
   feeDetails: providedFeeDetails,

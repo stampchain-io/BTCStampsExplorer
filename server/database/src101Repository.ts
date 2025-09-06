@@ -251,7 +251,7 @@ export class SRC101Repository {
       [deploy_hash],
       1000 * 60 * 2, // Cache duration
     )).rows.map((result) => (
-      result["address"],
+      result["address"]
     ));
 
     const queryParams = [];

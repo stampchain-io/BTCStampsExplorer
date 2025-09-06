@@ -1,5 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
-import { MusicSection } from "$components/media/MusicSection.tsx";
+import { MusicSection } from "$islands/media/MusicSection.tsx";
 import { walletContext } from "$client/wallet/wallet.ts";
 
 interface StampifyPageProps {

@@ -180,7 +180,7 @@ export const signPSBT = async (
       return {
         signed: true,
         psbt: result.psbt,
-        txid: result.txid,
+        txid: (result.txid as any)?.txid || result.txid as any,
         error: result.error, // Include error if any
       };
     } else if (result.cancelled) {

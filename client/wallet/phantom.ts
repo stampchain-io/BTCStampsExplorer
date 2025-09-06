@@ -157,15 +157,15 @@ const signPSBT = async (
 
     if (autoBroadcast) {
       try {
-        const txid = await broadcastTransaction(signedPsbtHex);
+        const broadcastResult = await broadcastTransaction(signedPsbtHex);
         logger.debug("ui", {
           message: "Transaction broadcast successful",
-          data: { txid },
+          data: { txid: broadcastResult.txid },
         });
         return {
           signed: true,
           psbt: signedPsbtHex,
-          txid,
+          txid: broadcastResult.txid,
           broadcast: true,
         };
       } catch (broadcastError) {

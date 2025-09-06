@@ -15,6 +15,9 @@ interface PSBTFees {
   effectiveFeeRate: number;
   estimatedSize?: number;
   totalVsize?: number;
+  est_tx_size?: number;
+  hex?: string;
+  inputsToSign?: number[];
 }
 
 interface SRC20FormState {
@@ -41,19 +44,6 @@ interface SRC20FormState {
   file: File | null;
   psbtFees?: PSBTFees;
   maxAmount?: string;
-}
-
-interface TxDetails {
-  hex: string;
-  est_tx_size: number;
-  input_value: number;
-  total_dust_value: number;
-  est_miner_fee: number;
-  fee: number;
-  change_value: number;
-  inputsToSign: number[];
-  sourceAddress: string;
-  changeAddress: string;
 }
 
 export class SRC20FormController {

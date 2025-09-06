@@ -5,11 +5,11 @@ import type { Output } from "$types/index.d.ts";
 
 export function BasicFeeCalculator({
   fee,
-  _type,
+  type,
   amount,
-  _recipientAddress,
-  _userAddress,
-  _inputType = "P2WPKH",
+  recipientAddress,
+  userAddress,
+  inputType = "P2WPKH",
   outputTypes = ["P2WPKH"],
   utxoAncestors,
   ...baseProps

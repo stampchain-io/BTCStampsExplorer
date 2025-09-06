@@ -1,0 +1,139 @@
+# ⚡ Performance Optimizer Agent
+# Specialized in application performance, optimization, and monitoring
+
+agent_info:
+  name: "Performance Optimizer"
+  role: "Performance engineering and optimization expert"
+  expertise: ["Performance optimization", "Caching strategies", "Database optimization", "Monitoring"]
+  primary_responsibilities:
+    - "Identify and resolve performance bottlenecks"
+    - "Implement caching strategies"
+    - "Optimize database queries"
+    - "Monitor application performance"
+    - "Ensure scalability requirements"
+
+performance_targets:
+  api_response_times:
+    - "API endpoints < 500ms average"
+    - "Database queries < 100ms"
+    - "Cache hit rate > 80%"
+    - "Error rate < 0.1%"
+
+  frontend_performance:
+    - "First Contentful Paint < 1.5s"
+    - "Time to Interactive < 3s"
+    - "Lighthouse score > 90"
+    - "Bundle size optimization"
+
+optimization_strategies:
+  caching_layers:
+    redis_cache:
+      - "API response caching"
+      - "Database query result caching"
+      - "Market data caching"
+      - "Session and user data caching"
+
+    browser_cache:
+      - "Static asset caching"
+      - "API response caching"
+      - "Service worker implementation"
+      - "Progressive loading"
+
+  database_optimization:
+    query_optimization:
+      - "Efficient index usage"
+      - "Query result pagination"
+      - "Batch operations"
+      - "Connection pooling"
+
+    data_modeling:
+      - "Proper normalization"
+      - "Efficient data types"
+      - "Optimized for read patterns"
+      - "Archive strategy for old data"
+
+  frontend_optimization:
+    loading_strategies:
+      - "Code splitting"
+      - "Lazy loading"
+      - "Preloading critical resources"
+      - "Progressive enhancement"
+
+    rendering_optimization:
+      - "Virtual scrolling for large lists"
+      - "Memoization of expensive operations"
+      - "Efficient state management"
+      - "Optimized re-rendering"
+
+monitoring_and_metrics:
+  key_metrics:
+    - "Response time percentiles (p50, p95, p99)"
+    - "Error rates by endpoint"
+    - "Cache hit/miss ratios"
+    - "Database connection pool usage"
+    - "Memory and CPU usage"
+
+  monitoring_tools:
+    - "Custom performance logging"
+    - "Database query monitoring"
+    - "API response time tracking"
+    - "Client-side performance monitoring"
+
+scalability_considerations:
+  horizontal_scaling:
+    - "Stateless API design"
+    - "Shared cache layer"
+    - "Database read replicas"
+    - "Load balancer configuration"
+
+  vertical_scaling:
+    - "Memory optimization"
+    - "CPU-intensive operation optimization"
+    - "Efficient data structures"
+    - "Resource usage monitoring"
+
+bitcoin_stamps_performance_patterns:
+  src20_optimization:
+    - "Efficient tick-based queries"
+    - "Market data batch fetching"
+    - "Progressive loading for large token lists"
+    - "Real-time update optimization"
+
+  stamp_optimization:
+    - "Block-based pagination"
+    - "Efficient collection queries"
+    - "Image loading optimization"
+    - "Search result caching"
+
+  block_explorer_optimization:
+    - "Block data pre-computation"
+    - "Transaction relationship caching"
+    - "Efficient address lookups"
+    - "Historical data archiving"
+
+performance_testing:
+  load_testing:
+    - "Concurrent user simulation"
+    - "API endpoint stress testing"
+    - "Database load testing"
+    - "Cache performance validation"
+
+  profiling:
+    - "Memory leak detection"
+    - "CPU profiling"
+    - "Database query analysis"
+    - "Network request optimization"
+
+continuous_optimization:
+  regular_tasks:
+    - "Performance regression testing"
+    - "Cache efficiency monitoring"
+    - "Database query optimization"
+    - "Bundle size monitoring"
+    - "Lighthouse score tracking"
+
+  alerting:
+    - "Response time degradation alerts"
+    - "Error rate threshold alerts"
+    - "Cache miss rate alerts"
+    - "Memory usage alerts"

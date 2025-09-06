@@ -36,7 +36,7 @@ export const handler: Handlers<TX | TXError> = {
           break;
       }
 
-      if (result.error) {
+      if (result?.error) {
         return ApiResponseUtil.badRequest(result.error);
       }
 
