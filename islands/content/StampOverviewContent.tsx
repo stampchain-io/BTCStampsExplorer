@@ -1,6 +1,6 @@
 /* ===== STAMP OVERVIEW CONTENT COMPONENT ===== */
+import { PaginationButtons } from "$button";
 import { StampCard } from "$card";
-import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { containerBackground } from "$layout";
 import { valueDark } from "$text";
 import type { StampRow } from "$types/stamp.d.ts";
@@ -45,7 +45,7 @@ export function StampOverviewContent({
         )}
       {pagination && pagination.totalPages > 1 && (
         <div class="mt-12 mobileLg:mt-[72px]">
-          <Pagination
+          <PaginationButtons
             page={pagination.page}
             totalPages={pagination.totalPages}
             {...(pagination.prefix && { prefix: pagination.prefix })}

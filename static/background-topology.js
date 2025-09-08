@@ -238,7 +238,7 @@
                                 // *** PARTICLE COUNT ***
                                 // Controls the number of flowing particles in the topology - update the code below too
                                 // Default: 4500 particles
-                                for (let e = 0; e < 700; e++) {
+                                for (let e = 0; e < 500; e++) {
                                     let s = t.random(t.width + 200),
                                         i = t.random(t.height + 200);
                                     a.push({ prev: t.createVector(s, i), pos: t.createVector(s, i), vel: t.createVector(0, 0), acc: t.createVector(0, 0), col: t.random(255), seed: e });
@@ -256,7 +256,7 @@
                             t.translate(-100, -100),
                                 (function () {
                                     // This number should match the particle count above
-                                    for (let i = 0; i < 700; i++) {
+                                    for (let i = 0; i < 500; i++) {
                                         let o = a[i],
                                             n = ((e = o.pos.x), (s = o.pos.y), (e = t.constrain(e, 0, t.width + 200)), (s = t.constrain(s, 0, t.height + 200)), h[t.floor(s / 10)][t.floor(e / 10)]);
                                         (o.prev.x = o.pos.x),

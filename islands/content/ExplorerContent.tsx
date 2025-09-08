@@ -1,8 +1,8 @@
 /* ===== EXPLORER CONTENT COMPONENT ===== */
+import { PaginationButtons } from "$button";
 import { StampCard } from "$card";
-import type { ExplorerContentProps } from "$types/ui.d.ts";
 import type { StampRow } from "$types/stamp.d.ts";
-import { Pagination } from "$islands/datacontrol/Pagination.tsx";
+import type { ExplorerContentProps } from "$types/ui.d.ts";
 
 /* ===== TYPES ===== */
 
@@ -35,7 +35,7 @@ export function ExplorerContent({
       {/* ===== PAGINATION ===== */}
       {pagination && pagination.totalPages > 1 && (
         <div class="mt-12 mobileLg:mt-[72px]">
-          <Pagination
+          <PaginationButtons
             page={pagination.page}
             totalPages={pagination.totalPages}
             {...(pagination.prefix && { prefix: pagination.prefix })}

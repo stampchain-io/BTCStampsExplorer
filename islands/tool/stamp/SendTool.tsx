@@ -432,7 +432,8 @@ export function StampSendTool() {
           name="previewImage"
           weight="extraLight"
           size="xxl"
-          color="grey"
+          color="custom"
+          className="stroke-[#242424]/80"
         />
       );
     }
@@ -486,7 +487,8 @@ export function StampSendTool() {
               name="image"
               weight="normal"
               size="xxl"
-              color="grey"
+              color="custom"
+              className="stroke-[#1b1b1b]/80"
             />
           </div>
         )}

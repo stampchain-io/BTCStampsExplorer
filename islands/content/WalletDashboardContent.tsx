@@ -1,11 +1,11 @@
 /* ===== WALLET DASHBOARD CONTENT COMPONENT ===== */
 import type { DispenserRow as Dispenser, StampRow } from "$types/stamp.d.ts";
 
+import { PaginationButtons } from "$button";
 import { NOT_AVAILABLE_IMAGE } from "$constants";
 import { Icon, LoadingIcon } from "$icon";
+import { SettingsButton } from "$islands/button/SettingsButton.tsx";
 import { SortButton } from "$islands/button/SortButton.tsx";
-import { Pagination } from "$islands/datacontrol/Pagination.tsx";
-import { Setting } from "$islands/datacontrol/Setting.tsx";
 import FreshSRC20Gallery from "$islands/section/gallery/FreshSRC20Gallery.tsx";
 import { FreshStampGallery } from "$islands/section/gallery/FreshStampGallery.tsx";
 import { shadowGlowPurple } from "$layout";
@@ -52,7 +52,7 @@ const ItemHeader = ({
       </div>
       <div class="flex gap-3 justify-between h-[36px] items-center">
         {setting && (
-          <Setting
+          <SettingsButton
             initFilter={[]}
             open={isOpenSetting}
             handleOpen={handleOpenSetting}
@@ -188,7 +188,7 @@ function DispenserItem({
       {/* Pagination */}
       {pagination && pagination.totalPages > 1 && (
         <div class="mt-6">
-          <Pagination
+          <PaginationButtons
             page={pagination.page}
             totalPages={pagination.totalPages}
             prefix="dispensers"

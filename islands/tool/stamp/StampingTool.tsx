@@ -1720,7 +1720,7 @@ function StampingToolMain({ config }: { config: Config }) {
                 weight="extraLight"
                 size="xxl"
                 color="custom"
-                className="stroke-stamp-grey"
+                className="stroke-stamp-grey-darkest group-hover:stroke-stamp-grey-darker/80"
               />
             </div>
           </label>
@@ -1735,7 +1735,8 @@ function StampingToolMain({ config }: { config: Config }) {
               name="uploadImage"
               weight="extraLight"
               size="xxl"
-              color="grey"
+              color="custom"
+              className="stroke-stamp-grey-darkest group-hover:stroke-stamp-grey-darker/80"
             />
           </label>
         )}

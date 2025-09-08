@@ -5,8 +5,8 @@ import { StampOverviewContent } from "$content";
 import { FreshContext, Handlers, PageProps } from "$fresh/server.ts";
 import type { CollectionOverviewPageProps } from "$types/index.d.ts";
 
+import { PaginationButtons } from "$button";
 import { CollectionOverviewHeader } from "$header";
-import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { CollectionDetailGallery } from "$section";
 import { CollectionController } from "$server/controller/collectionController.ts";
 import { StampController } from "$server/controller/stampController.ts";
@@ -166,10 +166,10 @@ export default function CollectionOverviewPage(
           <>
             <CollectionDetailGallery collections={collections || []} />
             <div class="mt-12 mobileLg:mt-[72px]">
-              <Pagination
+              <PaginationButtons
                 page={page ?? 1}
                 totalPages={pages ?? 1}
-                // Remove onPageChange to let Pagination component use its built-in Fresh navigation
+                // Remove onPageChange to let PaginationButtons component use its built-in Fresh navigation
                 prefix=""
               />
             </div>
@@ -191,7 +191,7 @@ export default function CollectionOverviewPage(
                 pagination={{
                   page: page ?? 1,
                   totalPages: pages ?? 1,
-                  // Remove onPageChange to let Pagination component use its built-in Fresh navigation
+                  // Remove onPageChange to let PaginationButtons component use its built-in Fresh navigation
                   prefix: "",
                 }}
               />

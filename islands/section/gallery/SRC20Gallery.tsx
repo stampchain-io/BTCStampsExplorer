@@ -1,13 +1,12 @@
 /* ===== SRC20 GALLERY COMPONENT ===== */
 // @baba - add token cards specific to wallet page
-import { ViewAllButton } from "$button";
+import { PaginationButtons, ViewAllButton } from "$button";
 import {
   SRC20Card,
   SRC20CardMinting,
   SRC20CardSm,
   SRC20CardSmMinting,
 } from "$card";
-import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { useLoadingSkeleton } from "$lib/hooks/useLoadingSkeleton.ts";
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { subtitlePurple, titlePurpleLD } from "$text";
@@ -140,7 +139,7 @@ export function SRC20Gallery({
 
       {pagination && pagination.totalPages > 1 && (
         <div class="mt-12 mobileLg:mt-[72px]">
-          <Pagination
+          <PaginationButtons
             page={pagination.page}
             totalPages={pagination.totalPages}
             prefix={fromPage === "wallet" ? "src20" : ""}

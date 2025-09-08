@@ -591,9 +591,11 @@ export function SRC20Card({
               <tr>
                 <td
                   colSpan={headers?.length ?? 0}
-                  class={`${valueDarkSm} w-full`}
+                  class={`w-full h-[46px] ${glassmorphism}`}
                 >
-                  NO TOKENS TO DISPLAY
+                  <h6 class={`${valueDarkSm} text-center`}>
+                    NO TOKENS TO DISPLAY
+                  </h6>
                 </td>
               </tr>
             )}

@@ -166,8 +166,8 @@ export function SkeletonImage({
         name="uploadImage"
         weight="extraLight"
         size="xxl"
-        color="grey"
-        className="opacity-30"
+        color="custom"
+        className="stroke-[#242424]/80"
       />
     </div>
   );

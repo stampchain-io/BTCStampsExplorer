@@ -318,9 +318,11 @@ export function SRC20CardSmMinting({
               <tr>
                 <td
                   colSpan={headers?.length ?? 0}
-                  class={`${valueDarkSm} w-full`}
+                  class={`w-full h-[46px] ${glassmorphismL2}`}
                 >
-                  NO MINTING TOKENS
+                  <h6 class={`${valueDarkSm} text-center`}>
+                    NO MINTING TOKENS
+                  </h6>
                 </td>
               </tr>
             )}
