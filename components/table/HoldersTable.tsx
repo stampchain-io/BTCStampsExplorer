@@ -1,7 +1,7 @@
 /* ===== HOLDERS TABLE COMPONENT ===== */
 import { containerBackground } from "$layout";
 import { HoldersPieChart, HoldersTableBase } from "$table";
-import { labelSm, value3xl } from "$text";
+import { labelSm, value3xl, valueDarkSm } from "$text";
 import type { HoldersTableProps } from "$types/ui.d.ts";
 
 /* ===== COMPONENT ===== */
@@ -9,8 +9,10 @@ export function HoldersTable({ holders = [] }: HoldersTableProps) {
   /* ===== EMPTY STATE ===== */
   if (!holders?.length) {
     return (
-      <div class="flex flex-col bg-gradient-to-br primary-gradient p-6 relative rounded-xl">
-        <div class="text-center py-10">No holder data available</div>
+      <div class={containerBackground}>
+        <div class={`text-center py-10 ${valueDarkSm}`}>
+          NO HOLDER DATA AVAILABLE
+        </div>
       </div>
     );
   }
