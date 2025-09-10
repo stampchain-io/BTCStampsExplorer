@@ -431,7 +431,7 @@ export function StampSendTool() {
           type="icon"
           name="previewImage"
           weight="extraLight"
-          size="xxl"
+          size="xl"
           color="custom"
           className="stroke-[#242424]/80"
         />
@@ -484,9 +484,9 @@ export function StampSendTool() {
           <div class="absolute inset-0 flex items-center justify-center w-full h-full">
             <Icon
               type="icon"
-              name="image"
+              name="previewImage"
               weight="normal"
-              size="xxl"
+              size="xl"
               color="custom"
               className="stroke-[#1b1b1b]/80"
             />

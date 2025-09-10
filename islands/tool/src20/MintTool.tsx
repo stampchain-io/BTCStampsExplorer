@@ -433,7 +433,7 @@ export function SRC20MintTool({
                   type="icon"
                   name="previewImage"
                   weight="extraLight"
-                  size="xxl"
+                  size="xl"
                   color="custom"
                   className="stroke-[#242424]/80"
                 />
