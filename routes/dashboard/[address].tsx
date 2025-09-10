@@ -66,6 +66,11 @@ export const handler: Handlers = {
 
     /* ===== DATA FETCHING ===== */
     try {
+      // Validate address parameter
+      if (!address || typeof address !== "string") {
+        throw new Error(`Invalid address parameter: ${address}`);
+      }
+
       const [
         stampsResponse,
         src20Response,
@@ -187,11 +192,11 @@ export const handler: Handlers = {
       );
 
       /* ===== WALLET DATA ASSEMBLY ===== */
-      // Build wallet data
+      // Build wallet data with validation
       const walletData = {
         balance: btcInfo?.balance ?? 0,
         usdValue: (btcInfo?.balance ?? 0) * (btcInfo?.btcPrice ?? 0),
-        address,
+        address: address, // Ensure address is always present
         btcPrice: btcInfo?.btcPrice ?? 0,
         fee: 0,
         txCount: btcInfo?.txCount ?? 0,
@@ -207,89 +212,106 @@ export const handler: Handlers = {
         },
       };
 
+      // Validate walletData construction
+      if (!walletData.address) {
+        throw new Error(`Failed to construct walletData: address is missing`);
+      }
+
       /* ===== RESPONSE RENDERING ===== */
       return ctx.render({
         data: {
-          stamps: {
-            data: stampsData.data,
-            pagination: {
-              page: stampsParams.page,
-              limit: stampsParams.limit,
-              total: stampsData.total,
-              totalPages: Math.ceil(stampsData.total / stampsParams.limit),
+          data: {
+            stamps: {
+              data: stampsData.data,
+              pagination: {
+                page: stampsParams.page,
+                limit: stampsParams.limit,
+                total: stampsData.total,
+                totalPages: Math.ceil(stampsData.total / stampsParams.limit),
+              },
+            },
+            src20: {
+              data: src20Data.data,
+              pagination: {
+                page: src20Params.page,
+                limit: src20Params.limit,
+                total: src20Data.total,
+                totalPages: Math.ceil(src20Data.total / src20Params.limit),
+              },
+            },
+            dispensers: {
+              data: dispensersData.data,
+              pagination: {
+                page: dispensersParams.page,
+                limit: dispensersParams.limit,
+                total: dispensersData.total,
+                totalPages: Math.ceil(
+                  dispensersData.total / dispensersParams.limit,
+                ),
+              },
             },
           },
-          src20: {
-            data: src20Data.data,
-            pagination: {
-              page: src20Params.page,
-              limit: src20Params.limit,
-              total: src20Data.total,
-              totalPages: Math.ceil(src20Data.total / src20Params.limit),
-            },
-          },
-          dispensers: {
-            data: dispensersData.data,
-            pagination: {
-              page: dispensersParams.page,
-              limit: dispensersParams.limit,
-              total: dispensersData.total,
-              totalPages: Math.ceil(
-                dispensersData.total / dispensersParams.limit,
-              ),
-            },
-          },
+          address,
+          walletData,
+          stampsTotal: stampsData.total,
+          src20Total: src20Data.total,
+          stampsCreated: stampsCreatedCount.status === "fulfilled"
+            ? stampsCreatedCount.value
+            : 0,
+          anchor,
         },
-        walletData,
-        stampsTotal: stampsData.total,
-        src20Total: src20Data.total,
-        stampsCreated: stampsCreatedCount.status === "fulfilled"
-          ? stampsCreatedCount.value
-          : 0,
-        anchor,
         stampsSortBy,
         src20SortBy,
         dispensersSortBy,
       });
     } catch (error) {
       /* ===== ERROR HANDLING ===== */
-      console.error("Error:", error);
+      console.error("Dashboard error:", error);
+
+      // Ensure we have a valid address even in error case
+      const safeAddress = address || "unknown";
+
       // Return safe default state with empty data
       return ctx.render({
         data: {
-          stamps: {
-            data: [],
-            pagination: { page: 1, limit: 8, total: 0, totalPages: 0 },
+          data: {
+            stamps: {
+              data: [],
+              pagination: { page: 1, limit: 8, total: 0, totalPages: 0 },
+            },
+            src20: {
+              data: [],
+              pagination: { page: 1, limit: 8, total: 0, totalPages: 0 },
+            },
+            dispensers: {
+              data: [],
+              pagination: { page: 1, limit: 8, total: 0, totalPages: 0 },
+            },
           },
-          src20: {
-            data: [],
-            pagination: { page: 1, limit: 8, total: 0, totalPages: 0 },
+          address: safeAddress,
+          walletData: {
+            balance: 0,
+            usdValue: 0,
+            address: safeAddress,
+            btcPrice: 0,
+            fee: 0,
+            txCount: 0,
+            unconfirmedBalance: 0,
+            unconfirmedTxCount: 0,
+            stampValue: 0,
+            src20Value: 0,
+            dispensers: {
+              open: 0,
+              closed: 0,
+              total: 0,
+              items: [],
+            },
           },
-          dispensers: {
-            data: [],
-            pagination: { page: 1, limit: 8, total: 0, totalPages: 0 },
-          },
+          stampsTotal: 0,
+          src20Total: 0,
+          stampsCreated: 0,
+          anchor: "",
         },
-        walletData: {
-          balance: 0,
-          usdValue: 0,
-          address,
-          btcPrice: 0,
-          fee: 0,
-          txCount: 0,
-          unconfirmedBalance: 0,
-          unconfirmedTxCount: 0,
-          dispensers: {
-            open: 0,
-            closed: 0,
-            total: 0,
-            items: [],
-          },
-        },
-        stampsTotal: 0,
-        src20Total: 0,
-        stampsCreated: 0,
-        anchor: "",
         stampsSortBy: "DESC",
         src20SortBy: "DESC",
         dispensersSortBy: "DESC",
@@ -299,16 +321,22 @@ export const handler: Handlers = {
 };
 
 /* ===== PAGE COMPONENT ===== */
-export default function DashboardPage(props: WalletPageProps) {
-  const {
-    data,
-    walletData,
-    stampsTotal,
-    src20Total,
-    stampsCreated,
-    stampsSortBy,
-    src20SortBy,
-  } = props;
+export default function DashboardPage(props: { data: WalletPageProps }) {
+  const pageData = props.data;
+  const routeData = pageData.data as any; // Type assertion to handle nested structure
+
+  // Add safety check for walletData
+  if (!routeData.walletData) {
+    console.error("walletData is undefined in DashboardPage props:", props);
+    return (
+      <div class={`${headerSpacing} gap-6`}>
+        <WalletDashboardHeader />
+        <div class="text-center text-red-500 p-8">
+          Error: Unable to load wallet data. Please try again.
+        </div>
+      </div>
+    );
+  }
 
   /* ===== RENDER ===== */
   return (
@@ -319,20 +347,20 @@ export default function DashboardPage(props: WalletPageProps) {
     >
       <WalletDashboardHeader />
       <WalletDashboardDetails
-        walletData={walletData as WalletOverviewInfo}
-        stampsTotal={stampsTotal}
-        src20Total={src20Total}
-        stampsCreated={stampsCreated}
+        walletData={routeData.walletData as WalletOverviewInfo}
+        stampsTotal={routeData.stampsTotal}
+        src20Total={routeData.src20Total}
+        stampsCreated={routeData.stampsCreated}
         setShowItem={() => {}} // Add missing required prop
       />
       <WalletDashboardContent
-        stamps={data.stamps}
-        src20={data.src20}
-        dispensers={data.dispensers}
-        address={walletData.address}
+        stamps={routeData.data?.stamps || routeData.stamps}
+        src20={routeData.data?.src20 || routeData.src20}
+        dispensers={routeData.data?.dispensers || routeData.dispensers}
+        address={routeData.address}
         anchor=""
-        stampsSortBy={stampsSortBy || "DESC"}
-        src20SortBy={src20SortBy || "DESC"}
+        stampsSortBy={props.data.stampsSortBy || "DESC"}
+        src20SortBy={props.data.src20SortBy || "DESC"}
       />
     </div>
   );
