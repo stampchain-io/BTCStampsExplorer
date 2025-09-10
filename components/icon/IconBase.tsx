@@ -1,5 +1,5 @@
 /* ===== ICON COMPONENT ===== */
-import * as iconPaths from "$components/icon/paths.ts";
+import * as iconPaths from "$components/icon/pathsHugeIcons.ts";
 import {
   BadgeVariants,
   globalSvgAttributes,
@@ -40,8 +40,7 @@ export function Icon(props: IconVariants) {
   /* ===== HELPERS ===== */
   const getIconPath = () => {
     const iconNameMap = {
-      // General Icons used across the app
-      // - Social Media Icons
+      // Social Media Icons
       twitter: "twitter",
       telegram: "telegram",
       github: "github",
@@ -60,7 +59,7 @@ export function Icon(props: IconVariants) {
       sortDesc: "listDesc",
       tools: "gear",
 
-      // - Caret Icons
+      // Caret Icons
       caretUp: "caretUp",
       caretDown: "caretDown",
       caretLeft: "caretLeft",
@@ -71,8 +70,8 @@ export function Icon(props: IconVariants) {
       // Stamp Specific
       // - Image Right Panel Icons
       share: "share",
-      copy: "copy",
-      // twitter is used too
+      copyLink: "copyLink",
+      twitterImage: "twitterImage",
       previewImage: "image",
       previewCode: "imageCode",
       previewImageRaw: "imageOut",
@@ -91,17 +90,16 @@ export function Icon(props: IconVariants) {
       view: "eye",
       hide: "eyeSlash",
       collection: "images",
-      profile: "imageProfile",
-      send: "coinsOut",
-      receive: "coinsIn",
-      history: "clockCounterClockwise",
-      // copy is used too
+      copy: "copy",
+      send: "bitcoinOut",
+      receive: "bitcoinIn",
+      history: "bitcoinHistory",
 
       // Misc Icons
       // - Tools, loader placeholder and donate CTA icons
-      donate: "coinsHand",
+      donate: "bitcoinHand",
       stamp: "stamp",
-      uploadImage: "image",
+      uploadImage: "imageUpload",
       previewImageCornersOut: "cornersOut",
 
       // Error Display Icons (fallback to existing icons)
@@ -204,7 +202,7 @@ export function BadgeIcon({ text, className = "" }: BadgeVariants) {
         size-5 rounded-full
         font-bold text-[10px] text-stamp-grey group-hover:text-black tracking-wider
         bg-stamp-purple group-hover:bg-stamp-purple-bright
-        transition-all duration-300 cursor-pointer
+        transition-all duration-200 cursor-pointer
         ${text === "0" ? "opacity-0" : "opacity-100"}
         ${className}
       `}

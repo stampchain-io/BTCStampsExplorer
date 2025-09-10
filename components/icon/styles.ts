@@ -75,7 +75,7 @@ export interface BadgeVariants {
 /* ===== GLOBAL SVG ATTRIBUTES ===== */
 export const globalSvgAttributes = {
   xmlns: "http://www.w3.org/2000/svg",
-  viewBox: "0 0 32 32",
+  viewBox: "0 0 24 24",
   "stroke-linecap": "round" as const,
   "stroke-linejoin": "round" as const,
 } as const;
@@ -83,7 +83,7 @@ export const globalSvgAttributes = {
 /* ===== ICON STYLE DEFINITIONS ===== */
 export const iconStyles = {
   /* ===== BASE STYLES ===== */
-  base: "inline-block transition-colors duration-300",
+  base: "inline-block transition-colors duration-200",
 
   /* ===== ICON VARIANTS & COLOR STYLES ===== */
   // Note: Two-tone colors are built into the icon styles below
@@ -111,10 +111,10 @@ export const iconStyles = {
 
   /* ===== WEIGHT VARIANTS ===== */
   weight: {
-    extraLight: "[stroke-width:1.25]", // used for loading icon and tool image icons
-    light: "[stroke-width:1.75]",
-    normal: "[stroke-width:2.25] tablet:[stroke-width:2]",
-    bold: "[stroke-width:3] tablet:[stroke-width:2.5]",
+    extraLight: "[stroke-width:0.75]", // used for loading icon and tool image icons
+    light: "[stroke-width:1.0]",
+    normal: "[stroke-width:1.5] tablet:[stroke-width:1.25]",
+    bold: "[stroke-width:2.5] tablet:[stroke-width:2.0]",
     custom: "",
   },
 
