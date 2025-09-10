@@ -1,7 +1,6 @@
 /* ===== WALLET DASHBOARD DETAILS COMPONENT ===== */
 /* @baba - cleanup button/icon code */
 import { StatItem, StatTitle } from "$components/section/WalletComponents.tsx";
-import type { WalletDashboardDetailsProps } from "$types/ui.d.ts";
 import { Icon } from "$icon";
 import RecieveAddyModal from "$islands/modal/RecieveAddyModal.tsx";
 import SendBTCModal from "$islands/modal/SendBTCModal.tsx";
@@ -11,6 +10,7 @@ import type { WalletOverviewInfo } from "$lib/types/index.d.ts";
 import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { tooltipIcon } from "$notification";
 import { titleGreyLD } from "$text";
+import type { WalletDashboardDetailsProps } from "$types/ui.d.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
@@ -309,7 +309,7 @@ function WalletOverview(
             name="copy"
             weight="normal"
             size="mdR"
-            color="purple"
+            color="grey"
             onClick={copy}
           />
           <div
@@ -336,7 +336,7 @@ function WalletOverview(
             name="send"
             weight="normal"
             size="mdR"
-            color="purple"
+            color="grey"
             onClick={() => {
               setIsSendTooltipVisible(false);
               onSend();
@@ -361,7 +361,7 @@ function WalletOverview(
             name="receive"
             weight="normal"
             size="mdR"
-            color="purple"
+            color="grey"
             onClick={() => {
               setIsReceiveTooltipVisible(false);
               onReceive();
@@ -391,7 +391,7 @@ function WalletOverview(
               name="history"
               weight="normal"
               size="mdR"
-              color="purple"
+              color="grey"
             />
           </a>
           <div
@@ -451,7 +451,7 @@ function DashboardProfile() {
         <div class="flex flex-col gap-1.5 mobileMd:gap-3">
           <Icon
             type="iconButton"
-            name="image"
+            name="website"
             weight="normal"
             size="mdR"
             color="grey"
