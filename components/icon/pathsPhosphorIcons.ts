@@ -1,4 +1,4 @@
-/* ===== ICON PATHS ===== */
+/* ===== PHOSPHOR ICON PATHS ===== */
 /* ===== SOCIAL MEDIA ICONS ===== */
 export const twitter = [
   "M6 5H12L26 27H20L6 5Z",
