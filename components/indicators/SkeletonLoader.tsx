@@ -163,9 +163,9 @@ export function SkeletonImage({
     >
       <Icon
         type="icon"
-        name="uploadImage"
+        name="previewImage"
         weight="extraLight"
-        size="xxl"
+        size="xl"
         color="custom"
         className="stroke-[#242424]/80"
       />

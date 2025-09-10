@@ -1718,9 +1718,9 @@ function StampingToolMain({ config }: { config: Config }) {
                 type="icon"
                 name="uploadImage"
                 weight="extraLight"
-                size="xxl"
+                size="xl"
                 color="custom"
-                className="stroke-stamp-grey-darkest group-hover:stroke-stamp-grey-darker/80"
+                className="stroke-stamp-grey-darkest group-hover:stroke-stamp-grey"
               />
             </div>
           </label>
@@ -1734,7 +1734,7 @@ function StampingToolMain({ config }: { config: Config }) {
               type="icon"
               name="uploadImage"
               weight="extraLight"
-              size="xxl"
+              size="xl"
               color="custom"
               className="stroke-stamp-grey-darkest group-hover:stroke-stamp-grey-darker/80"
             />
