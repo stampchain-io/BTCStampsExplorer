@@ -36,7 +36,7 @@ export function CollectionCard(
     >
       {/* ===== CARD HEADER ===== */}
       <div class="flex w-full gap-6">
-        <div class="min-w-[106px] min-h-[106px] max-w-[106px] max-h-[106px] mobileMd:min-w-[98px] mobileMd:min-h-[98px] mobileMd:max-w-[98px] mobileMd:max-h-[98px] rounded-lg aspect-stamp image-rendering-pixelated overflow-hidden">
+        <div class="min-w-[106px] min-h-[106px] max-w-[106px] max-h-[106px] mobileMd:min-w-[98px] mobileMd:min-h-[98px] mobileMd:max-w-[98px] mobileMd:max-h-[98px] stamp-container">
           <div class="relative flex items-center justify-center w-full h-full">
             <img
               src={stampImage}
@@ -152,7 +152,7 @@ export function CollectionCard(
             (imageUrl: string, index: number) => {
               return (
                 <div
-                  className={`w-full h-full rounded-lg aspect-stamp image-rendering-pixelated overflow-hidden ${
+                  className={`w-full h-full stamp-container ${
                     index >= 8
                       ? "hidden desktop:block"
                       : index >= 6
