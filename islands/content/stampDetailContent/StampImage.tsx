@@ -273,7 +273,7 @@ function RightPanel(
 
   /* ===== RENDER ===== */
   return (
-    <div className={`${containerDetailImage} flex justify-between`}>
+    <div className={`${containerDetailImage} !py-4 px-5 flex justify-between`}>
       <div className="flex gap-[18px] tablet:gap-3">
         <div
           ref={copyButtonRef}
@@ -283,10 +283,11 @@ function RightPanel(
         >
           <Icon
             type="iconButton"
-            name="copy"
+            name="copyLink"
             weight="normal"
-            size="mdR"
+            size="custom"
             color="grey"
+            className="w-[29px] h-[29px] tablet:w-[27px] tablet:h-[27px]"
             onClick={copyLink}
           />
           <div
@@ -303,6 +304,30 @@ function RightPanel(
           </div>
         </div>
         <div
+          ref={shareButtonRef}
+          class="relative"
+          onMouseEnter={handleShareMouseEnter}
+          onMouseLeave={handleShareMouseLeave}
+        >
+          <Icon
+            type="iconButton"
+            name="share"
+            weight="normal"
+            size="custom"
+            color="grey"
+            className="w-[29px] h-[29px] tablet:w-[27px] tablet:h-[27px]"
+            onClick={shareContent}
+            ariaLabel="Share content"
+          />
+          <div
+            class={`${tooltipIcon} ${
+              isShareTooltipVisible ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            SHARE
+          </div>
+        </div>
+        <div
           ref={xButtonRef}
           class="relative"
           onMouseEnter={handleXMouseEnter}
@@ -310,7 +335,7 @@ function RightPanel(
         >
           <Icon
             type="iconButton"
-            name="twitter"
+            name="twitterImage"
             weight="normal"
             size="mdR"
             color="grey"
@@ -323,30 +348,6 @@ function RightPanel(
             }`}
           >
             SHARE ON X
-          </div>
-        </div>
-        <div
-          ref={shareButtonRef}
-          class="relative"
-          onMouseEnter={handleShareMouseEnter}
-          onMouseLeave={handleShareMouseLeave}
-        >
-          <Icon
-            type="iconButton"
-            name="share"
-            weight="normal"
-            size="custom"
-            color="grey"
-            className="w-[24px] h-[24px] tablet:w-6 tablet:h-6 mt-[1px]"
-            onClick={shareContent}
-            ariaLabel="Share content"
-          />
-          <div
-            class={`${tooltipIcon} ${
-              isShareTooltipVisible ? "opacity-100" : "opacity-0"
-            }`}
-          >
-            SHARE
           </div>
         </div>
       </div>
