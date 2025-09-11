@@ -941,9 +941,8 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                     type="icon"
                     name="divisible"
                     weight="normal"
-                    size="custom"
+                    size="xs"
                     color="grey"
-                    className="w-[23px] h-[23px]"
                     ariaLabel="Divisible"
                   />
                   <div
@@ -967,7 +966,6 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                     weight="normal"
                     size="xs"
                     color="grey"
-                    className="mb-0.5"
                     ariaLabel="Keyburned"
                   />
                   <div
