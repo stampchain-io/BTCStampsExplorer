@@ -3237,7 +3237,6 @@ export type SRC20BalanceTableProps = {
 export interface AnimationState {
   pageVisible: boolean;
   reducedMotion: boolean;
-  performanceMode: "high" | "medium" | "low";
 }
 
 /**

@@ -43,7 +43,7 @@ export const CollectionDetailHeader = (
                 loading="lazy"
                 onError={handleImageError}
                 alt="Collection image"
-                class="h-[91px] w-[91px] object-contain items-center pixelart image-rendering-pixelated"
+                class="h-[91px] w-[91px] object-contain items-center pixelart stamp-container"
               />
             )}
             {(!stamps || stamps.length === 0) && (

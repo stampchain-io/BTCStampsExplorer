@@ -15,11 +15,11 @@ export const MIN_FEE_RATE_SATS_PER_VB = 0.1; // Minimum allowed fee rate in sats
 /* ===== CAROUSEL STAMPS ===== */
 // Update constants.test.ts to reflect these defs
 export const CAROUSEL_STAMP_IDS = [
-  42158,
-  336082,
-  57356,
-  1163993,
-  74607,
+  1185908,
+  1121162,
+  1040705,
+  932199,
+  897330,
 ];
 
 /* ===== TOP LEVEL DOMAINS - FOR BITNAME ===== */
