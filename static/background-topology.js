@@ -271,7 +271,7 @@
                                             // *** FLOW FIELD RESPONSE STRENGTH ***
                                             // Controls how strongly particles respond to the flow field
                                             // Default: mult(3)
-                                            o.acc.add(n).mult(2.4);
+                                            o.acc.add(n).mult(2.7);
                                     }
                                     var e, s;
                                 })(),
@@ -281,7 +281,7 @@
                                     // Default: strokeWeight(1)
                                     t.strokeWeight(1),
                                         t.stroke(
-                                            ((e, t = 1) => {
+                                            ((e, t = 2) => {
                                                 const i = s(e),
                                                     o = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(i),
                                                     n = o ? { r: parseInt(o[1], 16), g: parseInt(o[2], 16), b: parseInt(o[3], 16) } : null;
@@ -289,7 +289,7 @@
                                             // *** LINE OPACITY/TRANSPARENCY ***
                                             // Controls how visible/transparent the connecting lines are
                                             // Default: 0.05
-                                            })(e.options.color, 0.1)
+                                            })(e.options.color, 0.02)
                                         );
                                     for (let e = 0; e < a.length; e++) l.Vector.dist(a[e].prev, a[e].pos) < 10 && t.line(a[e].prev.x, a[e].prev.y, a[e].pos.x, a[e].pos.y);
                                 })(),
