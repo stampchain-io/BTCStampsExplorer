@@ -2084,26 +2084,13 @@ function StampingToolMain({ config }: { config: Config }) {
               onMouseEnter={handleLockMouseEnter}
               onMouseLeave={handleLockMouseLeave}
             >
-              {isLocked
-                ? (
-                  <Icon
-                    type="iconButton"
-                    name="locked"
-                    weight="bold"
-                    size="xs"
-                    color="grey"
-                  />
-                )
-                : (
-                  <Icon
-                    type="iconButton"
-                    name="unlocked"
-                    weight="bold"
-                    size="xs"
-                    color="custom"
-                    className="stroke-stamp-grey-light group-hover:stroke-stamp-grey"
-                  />
-                )}
+              <Icon
+                type="iconButton"
+                name={isLocked ? "locked" : "unlocked"}
+                weight="normal"
+                size="xs"
+                color="greyDark"
+              />
             </div>
           </div>
           <div className={containerRowForm}>
@@ -2132,10 +2119,10 @@ function StampingToolMain({ config }: { config: Config }) {
             >
               <Icon
                 type="iconButton"
-                name="previewImageCornersOut"
-                weight="bold"
+                name="previewImage"
+                weight="normal"
                 size="xs"
-                color="grey"
+                color="greyDark"
               />
               <div
                 class={`${tooltipButton} ${
@@ -2315,7 +2302,7 @@ function StampingToolMain({ config }: { config: Config }) {
           transform: "translate(-50%, 0)",
         }}
       >
-        FULLSCREEN
+        PREVIEW STAMP
       </div>
     </div>
   );
