@@ -278,7 +278,7 @@ export function SearchStampModal({
           weight="bold"
           size="smR"
           color="purple"
-          className="mt-[7px]"
+          className="mt-1.5"
           onClick={() => {
             handleOpenSearch();
             setIsTooltipVisible(false);
@@ -349,7 +349,7 @@ function SearchContent({
         onInput={(e) => setSearchTerm((e.target as HTMLInputElement).value)}
         onKeyDown={handleKeyDown}
         autoFocus={autoFocus}
-        class={`relative z-[2] h-12 w-full !bg-[#221826] pl-[18px] pr-[52px] font-mediun text-sm text-stamp-grey-light placeholder:!bg-[#221826] placeholder:font-light placeholder:!text-stamp-grey no-outline ${
+        class={`relative z-[2] h-12 w-full !bg-[#0a070a] pl-[18px] pr-[52px] font-mediun text-sm text-stamp-grey-light placeholder:!bg-[#0a070a] placeholder:font-light placeholder:!text-stamp-grey no-outline ${
           searchState.value.error ? "rounded-t-lg" : "rounded-lg"
         }`}
       />
@@ -371,7 +371,7 @@ function SearchContent({
         />
       </div>
       {searchState.value.error && (
-        <ul class="!bg-[#221826] rounded-b-md z-[2] overflow-y-auto">
+        <ul class="!bg-[#0a070a] rounded-b-md z-[2] overflow-y-auto">
           <li class="flex flex-col items-center justify-end pt-1.5 pb-3 px-[18px]">
             <img
               src="/img/placeholder/broken.png"
