@@ -1,7 +1,7 @@
 /*@baba-styles is not config properly*/
 import { Icon } from "$icon";
 import { closeModal, openModal, searchState } from "$islands/modal/states.ts";
-import { ModalSearchBase } from "$layout";
+import { ModalSearchBase, transitionColors } from "$layout";
 import { tooltipIcon } from "$notification";
 import { textSm } from "$text";
 import { useCallback, useEffect, useRef, useState } from "preact/hooks";
@@ -148,7 +148,7 @@ export function SearchSRC20Modal({
           weight="bold"
           size="smR"
           color="purple"
-          className="mt-[6px]"
+          className="mt-1"
           onClick={() => {
             handleOpenSearch();
             setIsTooltipVisible(false);
@@ -223,7 +223,7 @@ function SearchContent({
           setSearchTerm(newTerm);
         }}
         autoFocus={autoFocus}
-        class={`relative z-[2] h-12 w-full !bg-[#221826] pl-[18px] pr-[52px] font-medium text-sm text-stamp-grey-light placeholder:!bg-[#221826] placeholder:font-light placeholder:!text-stamp-grey no-outline ${
+        class={`relative z-[2] h-12 w-full !bg-[#0a070a] pl-[18px] pr-[52px] font-medium text-sm text-stamp-grey-light placeholder:!bg-[#0a070a] placeholder:font-light placeholder:!text-stamp-grey no-outline ${
           searchState.value.error ||
             (searchState.value.results?.length ?? 0) > 0
             ? "rounded-t-lg"
@@ -247,7 +247,7 @@ function SearchContent({
 
       {searchState.value.error
         ? (
-          <ul class="!bg-[#221826] rounded-b-md z-[2] overflow-y-auto">
+          <ul class="!bg-[#0a070a] rounded-b-md z-[2] overflow-y-auto">
             <li class="flex flex-col items-center justify-end pt-1.5 pb-3 px-[18px]">
               <img
                 src="/img/placeholder/broken.png"
@@ -276,12 +276,12 @@ function SearchContent({
         )
         : searchState.value.results && searchState.value.results.length > 0
         ? (
-          <ul class="max-h-[266px] !bg-[#221826] rounded-b-md z-[2] overflow-y-auto scrollbar-black [&::-webkit-scrollbar]:!rounded-[2px] [&::-webkit-scrollbar]:!w-[4px]">
+          <ul class="max-h-[266px] !bg-[#0a070a] rounded-b-md z-[2] overflow-y-auto scrollbar-black [&::-webkit-scrollbar]:!rounded-[2px] [&::-webkit-scrollbar]:!w-[4px]">
             {searchState.value.results.map((result: { tick: string }) => (
               <li
                 key={result.tick}
                 onClick={() => handleResultClick(result.tick)}
-                class={`${textSm} px-[18px] py-[9px] hover:bg-[#2f2032] transition-colors duration-300 cursor-pointer`}
+                class={`${textSm} px-[18px] py-[9px] hover:bg-[#130d13] ${transitionColors} cursor-pointer`}
               >
                 {result.tick}
               </li>
