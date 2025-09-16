@@ -24,7 +24,7 @@ export interface IconVariants {
     | "xlR"
     | "xxlR"
     | "custom";
-  color: "grey" | "purple" | "custom";
+  color: "grey" | "greyDark" | "purple" | "custom";
   className?: string;
   role?: JSX.AriaRole;
   ariaLabel?: string;
@@ -103,6 +103,8 @@ export const iconStyles = {
   iconButton: {
     grey:
       "stroke-stamp-grey hover:stroke-stamp-grey-light group-hover:stroke-stamp-grey-light fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_*]:cursor-pointer [&_path]:cursor-pointer [&_svg]:cursor-pointer [&_path[class*='fill-stroke']]:fill-stamp-grey [&:hover_path[class*='fill-stroke']]:fill-stamp-grey-light [&:group-hover_path[class*='fill-stroke']]:fill-stamp-grey-light",
+    greyDark:
+      "stroke-stamp-grey-darker hover:stroke-stamp-grey group-hover:stroke-stamp-grey fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_*]:cursor-pointer [&_path]:cursor-pointer [&_svg]:cursor-pointer [&_path[class*='fill-stroke']]:fill-stamp-grey-darker [&:hover_path[class*='fill-stroke']]:fill-stamp-grey [&:group-hover_path[class*='fill-stroke']]:fill-stamp-grey",
     purple:
       "stroke-stamp-purple hover:stroke-stamp-purple-bright group-hover:stroke-stamp-purple-bright fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_*]:cursor-pointer [&_path]:cursor-pointer [&_svg]:cursor-pointer [&_path[class*='fill-stroke']]:fill-stamp-purple [&:hover_path[class*='fill-stroke']]:fill-stamp-purple-bright [&:group-hover_path[class*='fill-stroke']]:fill-stamp-purple-bright",
     custom:
@@ -114,7 +116,7 @@ export const iconStyles = {
     extraLight: "[stroke-width:0.75]", // used for loading icon and tool image icons
     light: "[stroke-width:1.0]",
     normal: "[stroke-width:1.5] tablet:[stroke-width:1.25]",
-    bold: "[stroke-width:2.5] tablet:[stroke-width:2.0]",
+    bold: "[stroke-width:2] tablet:[stroke-width:1.75]",
     custom: "",
   },
 

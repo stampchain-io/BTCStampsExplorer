@@ -82,9 +82,9 @@ export function Icon(props: IconVariants) {
       locked: "lockClosed",
       unlocked: "lockOpen",
       keyburned: "flame",
-      divisible: "percent",
+      divisible: "imageDivide",
       atom: "atom",
-      dispenserListings: "listStar",
+      dispenserListings: "imagesStar",
 
       // Wallet Specific Icons
       view: "eye",
@@ -100,7 +100,6 @@ export function Icon(props: IconVariants) {
       donate: "bitcoinHand",
       stamp: "stamp",
       uploadImage: "imageUpload",
-      previewImageCornersOut: "cornersOut",
 
       // Error Display Icons (fallback to existing icons)
       "info": "magnifingGlass", // Using magnifying glass as placeholder for info
@@ -145,11 +144,24 @@ export function Icon(props: IconVariants) {
             `group-hover:${hoverStroke.replace("stroke-", "fill-")}`,
           ].filter(Boolean).join(" ");
 
+          // Parse custom attributes from style string
+          const styleParts = pathItem.style.split(" ");
+          const attributes: Record<string, string> = {};
+
+          styleParts.forEach((part) => {
+            if (part.startsWith("fill-rule-")) {
+              attributes["fill-rule"] = part.replace("fill-rule-", "");
+            } else if (part.startsWith("clip-rule-")) {
+              attributes["clip-rule"] = part.replace("clip-rule-", "");
+            }
+          });
+
           return (
             <path
               key={index}
               d={pathItem.path}
               class={`${pathItem.style} ${fillColor}`}
+              {...attributes}
             />
           );
         }
