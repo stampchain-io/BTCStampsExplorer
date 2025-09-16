@@ -1,8 +1,8 @@
 /* ===== ACCORDION BASE COMPONENT ===== */
-import { JSX } from "preact";
-import { signal } from "@preact/signals";
 import { Icon } from "$icon";
 import { text } from "$text";
+import { signal } from "@preact/signals";
+import { JSX } from "preact";
 
 /* ===== STATE  ===== */
 // Create a shared signal outside the component
@@ -30,7 +30,7 @@ export const Accordion = (
       >
         {/* Title with Gradient Styling - cant use headingGreyLDLink styling (gray-gradient1-hover) because of the group hover effect */}
         <h2
-          class={`font-bold text-xl tracking-wide gray-gradient1-hover group-hover:[background:none_!important] group-hover:[-webkit-text-fill-color:#CCCCCC_!important] group-hover:[text-fill-color:#CCCCCC_!important] transition-colors duration-500
+          class={`font-bold text-xl tracking-wide gray-gradient1-hover group-hover:[background:none_!important] group-hover:[-webkit-text-fill-color:#CCCCCC_!important] group-hover:[text-fill-color:#CCCCCC_!important] transition-colors duration-200
             ${
             isOpen
               ? "[background:none_!important] [-webkit-text-fill-color:#CCCCCC_!important] [text-fill-color:#CCCCCC_!important] "
@@ -42,10 +42,10 @@ export const Accordion = (
 
         {/* Toggle Icon */}
         <span
-          class={`transition-transform duration-300 ${
+          class={`transition-transform duration-400 ${
             isOpen
               ? "stroke-stamp-grey-light rotate-45"
-              : "stroke-stamp-grey-darker group-hover:stroke-stamp-grey-light transition-colors duration-100 rotate-0"
+              : "stroke-stamp-grey-darker group-hover:stroke-stamp-grey-light transition-colors duration-400 rotate-0"
           }`}
         >
           <Icon
@@ -54,6 +54,7 @@ export const Accordion = (
             weight="bold"
             size="xsR"
             color="custom"
+            className="-mt-[3px]"
           />
         </span>
       </div>

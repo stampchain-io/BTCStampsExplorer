@@ -1,7 +1,7 @@
-import { useState } from "preact/hooks";
-import { ComponentChildren, JSX } from "preact";
 import { Icon } from "$icon";
 import { labelLogicResponsive } from "$text";
+import { ComponentChildren, JSX } from "preact";
+import { useState } from "preact/hooks";
 
 // CollapsibleSection Component
 export const CollapsibleSection = ({
@@ -80,6 +80,7 @@ export const CollapsibleSection = ({
                   weight="normal"
                   size="xsR"
                   color="custom"
+                  className="mb-[3px]"
                 />
               </div>
             </div>
