@@ -24,7 +24,7 @@ export interface IconVariants {
     | "xlR"
     | "xxlR"
     | "custom";
-  color: "grey" | "greyDark" | "purple" | "custom";
+  color: "grey" | "greyDark" | "purple" | "purpleDark" | "custom";
   className?: string;
   role?: JSX.AriaRole;
   ariaLabel?: string;
@@ -94,21 +94,26 @@ export const iconStyles = {
 
   icon: {
     grey:
+      "stroke-stamp-grey fill-none [&_path[class*='fill-stroke']]:fill-stamp-grey",
+    greyDark:
       "stroke-stamp-grey-darker fill-none [&_path[class*='fill-stroke']]:fill-stamp-grey-darker",
     purple:
       "stroke-stamp-purple fill-none [&_path[class*='fill-stroke']]:fill-stamp-purple",
+    purpleDark:
+      "stroke-stamp-purple-darker fill-none [&_path[class*='fill-stroke']]:fill-stamp-purple-darker",
     custom: "fill-none",
   },
 
   iconButton: {
     grey:
-      "stroke-stamp-grey hover:stroke-stamp-grey-light group-hover:stroke-stamp-grey-light fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_*]:cursor-pointer [&_path]:cursor-pointer [&_svg]:cursor-pointer [&_path[class*='fill-stroke']]:fill-stamp-grey [&:hover_path[class*='fill-stroke']]:fill-stamp-grey-light [&:group-hover_path[class*='fill-stroke']]:fill-stamp-grey-light",
+      "stroke-stamp-grey hover:stroke-stamp-grey-light group-hover:stroke-stamp-grey-light fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-stamp-grey [&:hover_path[class*='fill-stroke']]:fill-stamp-grey-light [&:group-hover_path[class*='fill-stroke']]:fill-stamp-grey-light",
     greyDark:
-      "stroke-stamp-grey-darker hover:stroke-stamp-grey group-hover:stroke-stamp-grey fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_*]:cursor-pointer [&_path]:cursor-pointer [&_svg]:cursor-pointer [&_path[class*='fill-stroke']]:fill-stamp-grey-darker [&:hover_path[class*='fill-stroke']]:fill-stamp-grey [&:group-hover_path[class*='fill-stroke']]:fill-stamp-grey",
+      "stroke-stamp-grey-darker hover:stroke-stamp-grey group-hover:stroke-stamp-grey fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-stamp-grey-darker [&:hover_path[class*='fill-stroke']]:fill-stamp-grey [&:group-hover_path[class*='fill-stroke']]:fill-stamp-grey",
     purple:
-      "stroke-stamp-purple hover:stroke-stamp-purple-bright group-hover:stroke-stamp-purple-bright fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_*]:cursor-pointer [&_path]:cursor-pointer [&_svg]:cursor-pointer [&_path[class*='fill-stroke']]:fill-stamp-purple [&:hover_path[class*='fill-stroke']]:fill-stamp-purple-bright [&:group-hover_path[class*='fill-stroke']]:fill-stamp-purple-bright",
-    custom:
-      "fill-none cursor-pointer [&_*]:cursor-pointer [&_path]:cursor-pointer [&_svg]:cursor-pointer",
+      "stroke-stamp-purple hover:stroke-stamp-purple-bright group-hover:stroke-stamp-purple-bright fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-stamp-purple [&:hover_path[class*='fill-stroke']]:fill-stamp-purple-bright [&:group-hover_path[class*='fill-stroke']]:fill-stamp-purple-bright",
+    purpleDark:
+      "stroke-stamp-purple-darker hover:stroke-stamp-purple group-hover:stroke-stamp-purple fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-stamp-purple-darker [&:hover_path[class*='fill-stroke']]:fill-stamp-purple [&:group-hover_path[class*='fill-stroke']]:fill-stamp-purple",
+    custom: "fill-none cursor-pointer",
   },
 
   /* ===== WEIGHT VARIANTS ===== */

@@ -2075,7 +2075,7 @@ function StampingToolMain({ config }: { config: Config }) {
             {poshToggleButton}
             <div
               ref={lockButtonRef}
-              className={`flex items-center justify-center !w-10 !h-10 ${glassmorphismL2} ${glassmorphismL2Hover} group`}
+              className={`flex items-center justify-center !w-10 !h-10 ${glassmorphismL2} ${glassmorphismL2Hover} cursor-pointer group`}
               onClick={() => {
                 setIsLocked(!isLocked);
                 setIsLockTooltipVisible(false);
@@ -2108,7 +2108,7 @@ function StampingToolMain({ config }: { config: Config }) {
 
             <div
               ref={previewButtonRef}
-              className={`flex items-center justify-center !w-[46px] !h-10 ${glassmorphismL2} ${glassmorphismL2Hover} group`} // dunno why, but the width has to be +6px ?!?!
+              className={`flex items-center justify-center !w-[46px] !h-10 ${glassmorphismL2} ${glassmorphismL2Hover} cursor-pointer group`} // dunno why, but the width has to be +6px ?!?!
               onClick={() => {
                 toggleFullScreenModal();
                 setIsPreviewTooltipVisible(false);

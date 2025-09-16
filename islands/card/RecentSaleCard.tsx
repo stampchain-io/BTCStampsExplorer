@@ -107,7 +107,7 @@ export function RecentSaleCard({
                   size="xs"
                   type="icon"
                   weight="normal"
-                  color="grey"
+                  color="greyDark"
                 />
               </a>
             </div>
