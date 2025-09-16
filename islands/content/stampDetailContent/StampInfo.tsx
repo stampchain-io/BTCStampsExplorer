@@ -942,7 +942,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                     name="divisible"
                     weight="normal"
                     size="xs"
-                    color="grey"
+                    color="greyDark"
                     ariaLabel="Divisible"
                   />
                   <div
@@ -965,7 +965,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                     name="keyburned"
                     weight="normal"
                     size="xs"
-                    color="grey"
+                    color="greyDark"
                     ariaLabel="Keyburned"
                   />
                   <div
@@ -989,7 +989,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                       name="locked"
                       weight="normal"
                       size="xs"
-                      color="grey"
+                      color="greyDark"
                       ariaLabel="Locked"
                     />
                     <div
@@ -1012,7 +1012,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                       name="unlocked"
                       weight="normal"
                       size="xs"
-                      color="grey"
+                      color="greyDark"
                       ariaLabel="Unlocked"
                     />
                     <div
