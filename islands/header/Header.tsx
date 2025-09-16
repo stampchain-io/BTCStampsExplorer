@@ -494,7 +494,7 @@ export function Header() {
       >
         {/* ===== MOBILE MENU LINKS AND CONNECT BUTTON ===== */}
         <div class="flex flex-col h-full">
-          <div class="flex pt-[30px] px-9">
+          <div class="flex pt-[40px] px-9">
             <div class="relative">
               <div
                 class={`${tooltipIcon} ${
@@ -504,7 +504,7 @@ export function Header() {
                 {closeTooltipText}
               </div>
               <CloseIcon
-                size="sm"
+                size="md"
                 weight="bold"
                 color="grey"
                 onClick={() => {

@@ -351,7 +351,7 @@ const FilterDrawer = (
                   text={closeTooltipText}
                 />
                 <CloseIcon
-                  size="sm"
+                  size="md"
                   weight="bold"
                   color="grey"
                   onClick={handleCloseDrawer}
