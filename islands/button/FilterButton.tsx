@@ -59,7 +59,7 @@ export function FilterButton(
         weight="bold"
         size="smR"
         color="purple"
-        className="mt-[6px] group-hover:stroke-stamp-purple-bright transition-all duration-200"
+        className="mt-1.5"
         onClick={() => {
           setOpen(!open);
           setIsTooltipVisible(false);

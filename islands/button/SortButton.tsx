@@ -1,8 +1,8 @@
 import { Icon } from "$components/icon/IconBase.tsx";
-import type { SortProps } from "$types/ui.d.ts";
-import { tooltipIcon } from "$notification";
-import { useEffect, useRef, useState } from "preact/hooks";
 import { useSSRSafeNavigation } from "$lib/hooks/useSSRSafeNavigation.ts";
+import { tooltipIcon } from "$notification";
+import type { SortProps } from "$types/ui.d.ts";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 export function SortButton(
   { searchParams, initSort, sortParam = "sortBy" }: SortProps,
@@ -96,12 +96,12 @@ export function SortButton(
       >
         <Icon
           type="iconButton"
-          name={sort === "DESC" ? "sortAsc" : "sortDesc"}
+          name={sort === "DESC" ? "sortDesc" : "sortAsc"}
           weight="bold"
-          size="custom"
+          size="smR"
           color="purple"
-          className="mt-[4px] tablet:mt-[5px] w-[28px] h-[28px] tablet:w-[25px] tablet:h-[25px] transform transition-all duration-300"
-          ariaLabel={`Sort ${sort === "DESC" ? "ascending" : "descending"}`}
+          className="mt-1.5"
+          ariaLabel={`Sorted ${sort === "DESC" ? "descending" : "ascending"}`}
         />
       </a>
       <div
