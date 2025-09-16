@@ -22,10 +22,10 @@ export function LoadingIcon({
         <Icon
           type="icon"
           name="stamp"
-          weight="custom"
+          weight="extraLight"
           size="custom"
           color="purple"
-          className={`p-[25%] w-full h-full stroke-width:1.0 ${className}`}
+          className={`p-[25%] w-full h-full ${className}`}
         />
       </div>
     </div>
