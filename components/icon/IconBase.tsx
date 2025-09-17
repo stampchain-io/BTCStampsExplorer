@@ -109,9 +109,9 @@ export function Icon(props: IconVariants) {
       "x": "x",
 
       // Other common icons
-      "external-link": "pageOut", // Using pageOut as external link
-      "loading": "clockCounterClockwise", // Using clock as loading spinner
-      "refresh": "clockCounterClockwise", // Using clock for refresh too
+      "external-link": "imageOut", // Using imageOut as external link
+      "loading": "refresh", // Loading spinner
+      "refresh": "refresh", // Refresh spinner
       "eye": "eye",
     };
 
