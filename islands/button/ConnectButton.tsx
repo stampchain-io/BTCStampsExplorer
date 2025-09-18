@@ -3,11 +3,13 @@
 import { Button } from "$button";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { DEFAULT_WALLET_CONNECTORS } from "$constants";
+import { Icon } from "$icon";
 import { WalletProvider } from "$islands/layout/WalletProvider.tsx";
 import { ConnectWalletModal } from "$islands/modal/ConnectWalletModal.tsx";
 import { closeModal, openModal } from "$islands/modal/states.ts";
+import { glassmorphism } from "$layout";
 import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
-import { navSublinkPurple, valueDarkSm, valueDarkXs } from "$text";
+import { navSublinkPurple, valueDark, valueDarkSm } from "$text";
 import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== MAIN WALLET MODAL COMPONENT ===== */
@@ -70,31 +72,15 @@ export const ConnectButton = () => {
     <div class="relative z-10">
       {/* ===== CONNECT WALLET BUTTON ===== */}
       {!(isConnected && address) && (
-        <div class="relative">
-          <div class={`hidden tablet:block`}>
-            <Button
-              variant="outlineGradient"
-              color="purple"
-              size="sm"
-              class="!w-[100px]"
-              onClick={handleOpenModal}
-              ref={buttonRef}
-            >
-              CONNECT
-            </Button>
-          </div>
-          <div class="block tablet:hidden">
-            <Button
-              variant="text"
-              color="custom"
-              size="md"
-              onClick={handleOpenModal}
-              ref={buttonRef}
-              class="!justify-end gray-gradient3-hover"
-            >
-              CONNECT
-            </Button>
-          </div>
+        <div class={`mt-0.5 -mx-0.5`}>
+          <Icon
+            type="iconButton"
+            name="bitcoinWallet"
+            weight="normal"
+            size="sm"
+            color="purple"
+            onClick={handleOpenModal}
+          />
         </div>
       )}
 
@@ -103,7 +89,7 @@ export const ConnectButton = () => {
         <>
           {/* ===== MOBILE/TABLET MENU ===== */}
           <div class="flex flex-col tablet:hidden w-full justify-between gap-3 text-right group">
-            <h6 class={valueDarkSm}>
+            <h6 class={valueDark}>
               {abbreviateAddress(address, 6)}
             </h6>
             <Button
@@ -140,16 +126,22 @@ export const ConnectButton = () => {
           </div>
 
           {/* ===== DESKTOP DROPDOWN MENU ===== */}
-          <div class="hidden tablet:flex items-center relative group">
-            <div class="font-extrabold text-sm text-transparent bg-clip-text bg-gradient-to-r from-stamp-purple to-stamp-purple-bright group-hover:text-stamp-purple-bright tracking-wider cursor-pointer select-none">
-              CONNECTED
-            </div>
-
-            <div class="hidden group-hover:flex flex-col absolute top-full left-1/2 -translate-x-1/2 z-20
-                        min-w-[calc(100%+36px)] pt-1 pb-3.5 rounded-b-lg
-                        backdrop-blur-md bg-gradient-to-b from-transparent to-[#000000]/30">
-              <div class="flex flex-col px-[18px] gap-1 text-center whitespace-nowrap">
-                <h6 class={`${valueDarkXs} py-0.5`}>
+          <div class="mt-0.5 hidden tablet:flex items-center relative group">
+            <Icon
+              type="iconButton"
+              name="bitcoinWallet"
+              weight="normal"
+              size="sm"
+              color="custom"
+              className="stroke-stamp-purple-bright hover:stroke-stamp-purple"
+            />
+            <div
+              class={`hidden group-hover:flex flex-col absolute
+                 top-[calc(100%+6px)] right-0 z-20
+                min-w-[calc(100%+36px)] py-3.5 px-5 ${glassmorphism} !rounded-t-none`}
+            >
+              <div class="flex flex-col gap-1 text-center whitespace-nowrap">
+                <h6 class={`${valueDarkSm} py-0.5`}>
                   {abbreviateAddress(address, 5)}
                 </h6>
                 <a
