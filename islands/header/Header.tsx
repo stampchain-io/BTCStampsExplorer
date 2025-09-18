@@ -1,16 +1,15 @@
 /* ===== HEADER COMPONENT ===== */
 import { HamburgerMenuIcon } from "$components/icon/MenuIcon.tsx"; // Import HamburgerMenuIcon directly to ensure it's available
-import { CloseIcon, GearIcon } from "$icon";
+import { CloseIcon, GearIcon, Icon } from "$icon";
 import { ConnectButton } from "$islands/button/ConnectButton.tsx";
-import { glassmorphismOverlay, transitionTransform } from "$layout";
-import { tooltipIcon } from "$notification";
 import {
-  labelXs,
-  logoPurpleLDLink,
-  navLinkGrey,
-  navLinkGreyLD,
-  navLinkPurple,
-} from "$text";
+  glassmorphism,
+  glassmorphismOverlay,
+  transitionColors,
+  transitionTransform,
+} from "$layout";
+import { tooltipIcon } from "$notification";
+import { labelXs, navLinkGrey, navLinkGreyLD, navLinkPurple } from "$text";
 import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== NAVIGATION LINK INTERFACE ===== */
@@ -64,10 +63,7 @@ const desktopNavLinks: NavLink[] = [
     href: "/explorer",
   },
   {
-    title: {
-      default: "TOOLS",
-      tablet: "TOOLS",
-    },
+    title: "tools",
     href: "#",
     subLinks: [
       { title: "CREATE", href: "/tool/stamp/create" },
@@ -306,29 +302,48 @@ export function Header() {
                   : navLinkPurple
               }`}
             >
-              {/* Hidden tablet version of title */}
-              <span class="tablet:block min-[1180px]:hidden">
-                {typeof link.title === "string"
-                  ? link.title
-                  : link.title.tablet}
-              </span>
-              {/* Visible default version of title */}
-              <span class="hidden min-[1180px]:block">
-                {typeof link.title === "string"
-                  ? link.title
-                  : link.title.default}
-              </span>
+              {/* Tools icon or responsive text label */}
+              {typeof link.title === "string"
+                ? (link.title === "tools"
+                  ? (
+                    <Icon
+                      type="iconButton"
+                      name="tools"
+                      weight="normal"
+                      size="sm"
+                      color="purple"
+                    />
+                  )
+                  : link.title)
+                : (
+                  isMobile
+                    ? (
+                      // On mobile drawer, always show default label
+                      <span>{link.title.default}</span>
+                    )
+                    : (
+                      // Show abbreviated label initially and default label at tablet - 1024px
+                      <>
+                        <span class="hidden tablet:inline">
+                          {link.title.default}
+                        </span>
+                        <span class="inline tablet:hidden">
+                          {link.title.tablet}
+                        </span>
+                      </>
+                    )
+                )}
             </a>
 
             {/* Dropdown menu - only rendered on desktop */}
             {link.subLinks && (
               isMobile ? null : (
-                // Check if this is the TOOLS dropdown for special 3-column layout
-                (typeof link.title === "string"
-                    ? link.title
-                    : link.title.default) === "TOOLS"
+                // Check if this is the tools dropdown for special 3-column layout
+                link.title === "tools"
                   ? (
-                    <div class="hidden group-hover:flex absolute top-full -right-[18px] min-w-[300px] z-10 pt-1 pb-3.5 px-[18px] whitespace-nowrap backdrop-blur-md bg-gradient-to-b from-transparent to-[#0a070a]/30 rounded-b-lg">
+                    <div
+                      class={`hidden group-hover:flex absolute top-[calc(100%+6px)] right-0 min-w-[360px] z-90 py-3.5 px-5 whitespace-nowrap ${glassmorphism} !rounded-t-none`}
+                    >
                       <div class="grid grid-cols-3 gap-4 w-full">
                         {/* Column 1: Left aligned - Stamp tools */}
                         <div class="flex flex-col space-y-1 text-left">
@@ -349,7 +364,7 @@ export function Header() {
                                   subLink?.href ? subLink?.href : null,
                                 );
                               }}
-                              class={`font-semibold text-xs transition-colors duration-200 ${
+                              class={`font-light text-sm ${transitionColors} ${
                                 currentPath === subLink.href
                                   ? "text-sm text-stamp-purple-bright hover:text-stamp-purple"
                                   : "text-sm text-stamp-purple hover:text-stamp-purple-bright"
@@ -380,7 +395,7 @@ export function Header() {
                                   subLink?.href ? subLink?.href : null,
                                 );
                               }}
-                              class={`font-semibold text-xs transition-colors duration-200 ${
+                              class={`font-light text-sm ${transitionColors} ${
                                 currentPath === subLink.href
                                   ? "text-sm text-stamp-purple-bright hover:text-stamp-purple"
                                   : "text-sm text-stamp-purple hover:text-stamp-purple-bright"
@@ -409,7 +424,7 @@ export function Header() {
                                   subLink?.href ? subLink?.href : null,
                                 );
                               }}
-                              class={`font-semibold text-xs transition-colors duration-200 ${
+                              class={`font-light text-sm ${transitionColors} ${
                                 currentPath === subLink.href
                                   ? "text-sm text-stamp-purple-bright hover:text-stamp-purple"
                                   : "text-sm text-stamp-purple hover:text-stamp-purple-bright"
@@ -424,7 +439,11 @@ export function Header() {
                   )
                   : (
                     // Default single-column layout for other dropdowns
-                    <div class="hidden group-hover:flex flex-col absolute top-full left-1/2 -translate-x-1/2 min-w-[calc(100%+36px)] z-10 pt-1 pb-3.5 px-[18px] space-y-1 whitespace-nowrap backdrop-blur-md bg-gradient-to-b from-transparent to-[#0a070a]/30 rounded-b-lg">
+                    <div
+                      class={`hidden group-hover:flex flex-col absolute
+                     top-full left-1/2 -translate-x-1/2 min-w-[calc(100%+36px)] z-10 py-3.5 px-5 space-y-1 whitespace-nowrap
+                     ${glassmorphism} !rounded-t-none`}
+                    >
                       {link.subLinks?.map((subLink) => (
                         <a
                           key={subLink.href}
@@ -434,7 +453,7 @@ export function Header() {
                               subLink?.href ? subLink?.href : null,
                             );
                           }}
-                          class={`font-semibold text-center text-xs transition-colors duration-200 ${
+                          class={`font-light text-right text-sm ${transitionColors} ${
                             currentPath === subLink.href
                               ? "text-sm text-stamp-purple-bright hover:text-stamp-purple"
                               : "text-sm text-stamp-purple hover:text-stamp-purple-bright"
@@ -455,34 +474,46 @@ export function Header() {
 
   /* ===== COMPONENT RENDER ===== */
   return (
-    <header class="tablet:flex justify-between items-center max-w-desktop w-full mx-auto
+    <header class="mobileLg:flex justify-between items-center max-w-desktop w-full mx-auto
      px-gutter-mobile mobileLg:px-gutter-tablet tablet:px-gutter-desktop
-     pt-6 pb-9 mobileLg:pt-9 mobileLg:pb-14">
-      {/* ===== LOGO AND MOBILE MENU TOGGLE BUTTON ===== */}
-      <div class="flex justify-between items-center w-full ">
-        <a
-          href="/home"
-          f-partial="/home"
-          onClick={() => setCurrentPath("home")}
-          class={`${logoPurpleLDLink} pr-3`}
-        >
-          STAMPCHAIN
-        </a>
-        <div class="tablet:hidden block relative -ml-1">
-          <HamburgerMenuIcon isOpen={open} onClick={toggleMenu} />
+     pt-6 pb-9 mobileLg:pt-9 tablet:pb-14">
+      {/* ===== LOGO, TEXT MENUS (DESKTOP) HAMBURGER MENU (MOBILE), TOOLS, SEARCH AND CONNECT BUTTON ===== */}
+      <div
+        class={`flex justify-between items-center w-full py-1.5 px-4 ${glassmorphism} !overflow-visible`}
+      >
+        <div class="flex items-center">
+          <Icon
+            type="iconButton"
+            name="stamp"
+            weight="bold"
+            size="md"
+            color="purple"
+            href="/home"
+            f-partial="/home"
+            onClick={() => setCurrentPath("home")}
+          />
         </div>
-      </div>
 
-      {/* ===== DESKTOP NAVIGATION ===== */}
-      <div class="hidden tablet:flex justify-between items-center gap-6">
-        {renderNavLinks()}
-        <ConnectButton />
+        {/* ===== MOBILE NAVIGATION ===== */}
+        <div class="mobileLg:hidden flex items-center gap-6">
+          <HamburgerMenuIcon isOpen={open} onClick={toggleMenu} />
+          <ConnectButton />
+        </div>
+
+        {/* ===== DESKTOP NAVIGATION ===== */}
+        <div
+          class={`hidden mobileLg:flex justify-between items-center
+          gap-5 desktop:gap-[30px]`}
+        >
+          {renderNavLinks()}
+          <ConnectButton />
+        </div>
       </div>
 
       {/* ===== MOBILE NAVIGATION DRAWER ===== */}
       <div
         ref={drawerRef}
-        class={`flex tablet:hidden flex-col justify-between
+        class={`flex mobileLg:hidden flex-col justify-between
            fixed top-0 right-0 left-auto w-full min-[420px]:w-[340px] h-[100dvh] z-30
            ${glassmorphismOverlay} ${transitionTransform}
            min-[420px]:rounded-r-xl min-[420px]:border-r-[1px] min-[420px]:border-l-0 min-[420px]:border-r-[#1b1b1b]
@@ -518,14 +549,14 @@ export function Header() {
               />
             </div>
           </div>
-          <div class="flex flex-col flex-1 items-start py-9 tablet:py-6 px-9 tablet:px-6 gap-5">
+          <div class="flex flex-col flex-1 items-start py-9 mobileLg:py-6 px-9 mobileLg:px-6 gap-5">
             {renderNavLinks(true)}
           </div>
 
           <div class="flex flex-col w-full sticky bottom-0
           bg-[#0a070a]/60 shadow-[0_-36px_36px_-6px_rgba(10,7,10,0.6)]">
             {/* Tools section with gear icon */}
-            <div class="flex w-full justify-between pt-3 pb-8 px-9">
+            <div class="flex w-full justify-start pt-3 pb-8 px-9">
               <div class="flex justify-start items-end -ml-1">
                 <GearIcon
                   size="md"
@@ -534,15 +565,6 @@ export function Header() {
                   isOpen={toolsOpen}
                   onToggle={toggleTools}
                 />
-              </div>
-              <div
-                class={`flex justify-end items-center transition-opacity duration-200
-                  ${toolsOpen ? "opacity-0" : "opacity-100"}`}
-                style={{
-                  transitionDelay: toolsOpen ? "0ms" : "425ms",
-                }}
-              >
-                <ConnectButton />
               </div>
             </div>
 
@@ -562,7 +584,7 @@ export function Header() {
                       toggleMenu();
                       setCurrentPath(link.href);
                     }}
-                    class={`font-bold transition-colors duration-200 ${
+                    class={`font-bold ${transitionColors} ${
                       currentPath === link.href
                         ? "text-base text-stamp-grey-darker hover:text-stamp-grey-light"
                         : "text-base text-stamp-grey-light hover:!text-stamp-grey-darker"
@@ -601,7 +623,7 @@ Map through dropdown items
       setCurrentPath(subLink?.href ? subLink?.href : null); // Update current path
     }}
     // Complex conditional styling for active/inactive states
-    class={`font-bold transition-colors duration-200 ${
+    class={`font-bold ${transitionColors} ${
       isMobile
         ? currentPath === subLink.href
           ? "text-base text-stamp-grey-light hover:text-stamp-grey py-1"
