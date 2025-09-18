@@ -57,7 +57,7 @@ export function Icon(props: IconVariants) {
       listDesc: "listDesc",
       sortAsc: "listAsc",
       sortDesc: "listDesc",
-      tools: "gear",
+      tools: "gearWrench",
 
       // Caret Icons
       caretUp: "caretUp",
@@ -94,6 +94,8 @@ export function Icon(props: IconVariants) {
       send: "bitcoinOut",
       receive: "bitcoinIn",
       history: "bitcoinHistory",
+      bitcoinWallet: "bitcoinWallet",
+      wallet: "wallet",
 
       // Misc Icons
       // - Tools, loader placeholder and donate CTA icons
