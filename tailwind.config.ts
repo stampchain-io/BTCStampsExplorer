@@ -182,10 +182,10 @@ export default {
         },
       },
       spacing: {
-        // PAGE GUTTERS (horizontal padding from screen edges to header, footer and body)
+        // PAGE GUTTERS (horizontal padding from screen edges to header, footer and body containers)
         "gutter-mobile": "20px", // updated breakpoint naming convention
-        "gutter-tablet": "36px", // updated breakpoint naming convention
-        "gutter-desktop": "48px", // updated breakpoint naming convention
+        "gutter-tablet": "20px", // updated breakpoint naming convention
+        "gutter-desktop": "40px", // updated breakpoint naming convention
 
         // LAYOUT GAP (vertical spacing between the body, and the header and footer)
         // Defined in the header and footer files - /islands/layout/

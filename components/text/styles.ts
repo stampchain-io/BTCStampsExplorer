@@ -26,9 +26,9 @@ export const logoPurpleLDLink =
 /* ===== NAVIGATION STYLES ===== */
 // Header - Desktop
 export const navLinkPurple =
-  `font-bold text-stamp-purple text-sm group-hover:text-stamp-purple-bright tracking-wide ${transitionColors} cursor-pointer ${select}`;
+  `font-medium text-stamp-purple text-sm group-hover:text-stamp-purple-bright tracking-wide ${transitionColors} cursor-pointer ${select}`;
 export const navSublinkPurple =
-  `font-semibold text-stamp-purple text-xs hover:text-stamp-purple-bright ${transitionColors} cursor-pointer ${select}`; // used in ConnectButton.tsx for connected sunmenu links - header uses custom styles
+  `font-light text-stamp-purple text-sm hover:text-stamp-purple-bright ${transitionColors} cursor-pointer ${select}`; // used in ConnectButton.tsx for connected sunmenu links - header uses custom styles
 // Header - Mobile/tablet
 export const navLinkGrey =
   `font-bold text-lg text-stamp-grey-darker group-hover:text-stamp-grey tracking-wide ${transitionColors} cursor-pointer ${select}`;
