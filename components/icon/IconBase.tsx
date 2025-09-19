@@ -18,8 +18,11 @@ export function Icon(props: IconVariants) {
     className = "",
     role,
     ariaLabel,
-    isOpen,
+    colorAccent,
+    colorAccentHover,
+    isOpen: _isOpen,
     onClick,
+    ["f-partial"]: _fPartial,
     ...rest
   } = props;
 
@@ -42,6 +45,7 @@ export function Icon(props: IconVariants) {
   const getIconPath = () => {
     const iconNameMap = {
       // Social Media Icons
+      stampchain: "stampchain",
       twitter: "twitter",
       telegram: "telegram",
       github: "github",
@@ -96,8 +100,7 @@ export function Icon(props: IconVariants) {
       send: "bitcoinOut",
       receive: "bitcoinIn",
       history: "bitcoinHistory",
-      bitcoinWallet: "bitcoinWallet",
-      wallet: "wallet",
+      wallet: "bitcoinWallet",
 
       // Misc Icons
       // - Tools, loader placeholder and donate CTA icons
@@ -132,6 +135,7 @@ export function Icon(props: IconVariants) {
     // Handle array of paths - can include path objects with custom styles
     if (Array.isArray(pathData)) {
       return pathData.map((pathItem, index) => {
+        const isLast = index === pathData.length - 1;
         // Handle path object with custom styling
         if (typeof pathItem === "object" && pathItem.path && pathItem.style) {
           // Extract stroke colors and convert to fill
@@ -164,13 +168,25 @@ export function Icon(props: IconVariants) {
             <path
               key={index}
               d={pathItem.path}
-              class={`${pathItem.style} ${fillColor}`}
+              class={`${pathItem.style} ${fillColor} ${
+                isLast && colorAccent
+                  ? "stroke-[var(--color-accent)] group-hover:stroke-[var(--color-accent-hover)]"
+                  : ""
+              }`}
               {...attributes}
             />
           );
         }
         // Handle regular string path
-        return <path key={index} d={pathItem as string} />;
+        return (
+          <path
+            key={index}
+            d={pathItem as string}
+            class={isLast && colorAccent
+              ? "stroke-[var(--color-accent)] group-hover:stroke-[var(--color-accent-hover)]"
+              : undefined}
+          />
+        );
       });
     }
 
@@ -179,8 +195,19 @@ export function Icon(props: IconVariants) {
   };
 
   /* ===== SVG ELEMENT ===== */
+  const svgProps: Record<string, unknown> = {
+    ...commonProps,
+    ...globalSvgAttributes,
+  };
+  if (colorAccent) {
+    (svgProps as any).style = {
+      "--color-accent": colorAccent,
+      "--color-accent-hover": colorAccentHover || colorAccent,
+    };
+  }
+
   const svgElement = (
-    <svg {...commonProps} {...globalSvgAttributes}>
+    <svg {...(svgProps as any)}>
       {renderPaths()}
     </svg>
   );
