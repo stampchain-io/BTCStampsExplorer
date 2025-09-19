@@ -3,22 +3,25 @@
 import { Button } from "$button";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { DEFAULT_WALLET_CONNECTORS } from "$constants";
-import { Icon } from "$icon";
+import { WalletIcon } from "$icon";
 import { WalletProvider } from "$islands/layout/WalletProvider.tsx";
 import { ConnectWalletModal } from "$islands/modal/ConnectWalletModal.tsx";
 import { closeModal, openModal } from "$islands/modal/states.ts";
 import { glassmorphism } from "$layout";
 import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { navSublinkPurple, valueDark, valueDarkSm } from "$text";
-import { useEffect, useRef, useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
+
+interface ConnectButtonProps {
+  onOpenDrawer?: (content: "wallet") => void;
+}
 
 /* ===== MAIN WALLET MODAL COMPONENT ===== */
-export const ConnectButton = () => {
+export const ConnectButton = ({ onOpenDrawer }: ConnectButtonProps) => {
   const connectors = DEFAULT_WALLET_CONNECTORS;
 
   const { wallet, isConnected, disconnect } = walletContext;
   const { address } = wallet;
-  const buttonRef = useRef<HTMLButtonElement>(null);
   const [path, setPath] = useState<string | null>(null);
 
   /* ===== PATH INITIALIZATION ===== */
@@ -67,102 +70,157 @@ export const ConnectButton = () => {
     }
   };
 
-  /* ===== COMPONENT RENDER ===== */
-  return (
-    <div class="relative z-10">
-      {/* ===== CONNECT WALLET BUTTON ===== */}
-      {!(isConnected && address) && (
-        <div class={`mt-0.5 -mx-0.5`}>
-          <Icon
-            type="iconButton"
-            name="bitcoinWallet"
-            weight="normal"
-            size="sm"
-            color="purple"
-            onClick={handleOpenModal}
-          />
-        </div>
-      )}
+  /* ===== WALLET ICON CLICK HANDLER ===== */
+  const handleWalletIconClick = () => {
+    if (!isConnected) {
+      handleOpenModal();
+    } else {
+      // On mobile/tablet, open wallet drawer; on desktop, do nothing (dropdown handles it)
+      if (typeof globalThis !== "undefined" && globalThis.innerWidth < 1024) {
+        onOpenDrawer?.("wallet");
+      }
+    }
+  };
 
-      {/* ===== CONNECTED WALLET DISPLAY ===== */}
-      {isConnected && address && (
-        <>
-          {/* ===== MOBILE/TABLET MENU ===== */}
-          <div class="flex flex-col tablet:hidden w-full justify-between gap-3 text-right group">
-            <h6 class={valueDark}>
-              {abbreviateAddress(address, 6)}
-            </h6>
+  // Wallet drawer content
+  const walletDrawerContent = (
+    <div class="flex flex-col flex-1 items-center justify-center px-9 gap-6">
+      {isConnected && address
+        ? (
+          <>
+            {/* Address Display */}
+            <div class="text-center">
+              <h6 class={valueDark}>
+                {abbreviateAddress(address, 8)}
+              </h6>
+            </div>
+
+            {/* Dashboard Button */}
             <Button
               variant="text"
               color="custom"
-              size="md"
+              size="lg"
               onClick={() => {
                 if (isConnected && address) {
                   // SSR-safe browser environment check
                   if (
-                    typeof globalThis === "undefined" || !globalThis?.location
+                    typeof globalThis === "undefined" ||
+                    !globalThis?.location
                   ) {
                     return; // Cannot navigate during SSR
                   }
                   globalThis.location.href = `/wallet/${address}`;
                 }
               }}
-              ref={buttonRef}
-              class="!justify-end gray-gradient3-hover"
+              class="!justify-center gray-gradient3-hover w-full"
             >
               DASHBOARD
             </Button>
 
+            {/* Disconnect Button */}
             <Button
               variant="text"
               color="custom"
-              size="md"
+              size="lg"
               onClick={() => walletSignOut()}
-              ref={buttonRef}
-              class="!justify-end gray-gradient3-hover"
+              class="!justify-center gray-gradient3-hover w-full"
             >
               DISCONNECT
             </Button>
-          </div>
-
-          {/* ===== DESKTOP DROPDOWN MENU ===== */}
-          <div class="mt-0.5 hidden tablet:flex items-center relative group">
-            <Icon
-              type="iconButton"
-              name="bitcoinWallet"
-              weight="normal"
-              size="sm"
-              color="custom"
-              className="stroke-stamp-purple-bright hover:stroke-stamp-purple"
-            />
-            <div
-              class={`hidden group-hover:flex flex-col absolute
-                 top-[calc(100%+6px)] right-0 z-20
-                min-w-[calc(100%+36px)] py-3.5 px-5 ${glassmorphism} !rounded-t-none`}
-            >
-              <div class="flex flex-col gap-1 text-center whitespace-nowrap">
-                <h6 class={`${valueDarkSm} py-0.5`}>
-                  {abbreviateAddress(address, 5)}
-                </h6>
-                <a
-                  href={`/wallet/${address}`}
-                  class={`${navSublinkPurple}`}
-                >
-                  DASHBOARD
-                </a>
-                <a
-                  onClick={() => walletSignOut()}
-                  class={`${navSublinkPurple}`}
-                >
-                  DISCONNECT
-                </a>
-              </div>
-            </div>
-          </div>
-        </>
-      )}
+          </>
+        )
+        : (
+          <Button
+            variant="text"
+            color="custom"
+            size="lg"
+            onClick={handleOpenModal}
+            class="!justify-center gray-gradient3-hover w-full"
+          >
+            CONNECT WALLET
+          </Button>
+        )}
     </div>
   );
+
+  /* ===== COMPONENT RENDER ===== */
+  return {
+    // The wallet icon component
+    icon: (
+      <div class="relative z-10">
+        {/* ===== CONNECT WALLET BUTTON ===== */}
+        {!(isConnected && address) && (
+          <div class={`mt-0.5 -mx-0.5`}>
+            <WalletIcon
+              type="iconButton"
+              weight="normal"
+              size="mdR"
+              color="purple"
+              colorAccent="#66666699"
+              colorAccentHover="#AA00FF"
+              onClick={handleWalletIconClick}
+            />
+          </div>
+        )}
+
+        {/* ===== CONNECTED WALLET DISPLAY ===== */}
+        {isConnected && address && (
+          <>
+            {/* ===== MOBILE/TABLET WALLET ICON ===== */}
+            <div class="tablet:hidden">
+              <WalletIcon
+                type="iconButton"
+                weight="normal"
+                size="md"
+                color="purple"
+                colorAccent="#999999CC"
+                colorAccentHover="#AA00FF"
+                onClick={handleWalletIconClick}
+              />
+            </div>
+
+            {/* ===== DESKTOP WALLET ICON AND DROPDOWN MENU ===== */}
+            <div class="mt-0.5 hidden tablet:flex items-center relative group">
+              <WalletIcon
+                type="iconButton"
+                weight="normal"
+                size="sm"
+                color="purple"
+                colorAccent="#999999CC"
+                colorAccentHover="#AA00FF"
+                onClick={handleWalletIconClick}
+              />
+              <div
+                class={`hidden group-hover:flex flex-col absolute
+                   top-[calc(100%+6px)] right-0 z-20
+                  min-w-[calc(100%+36px)] py-3.5 px-5 ${glassmorphism} !rounded-t-none`}
+              >
+                <div class="flex flex-col gap-1 text-center whitespace-nowrap">
+                  <h6 class={`${valueDarkSm} py-0.5`}>
+                    {abbreviateAddress(address, 5)}
+                  </h6>
+                  <a
+                    href={`/wallet/${address}`}
+                    class={`${navSublinkPurple}`}
+                  >
+                    DASHBOARD
+                  </a>
+                  <a
+                    onClick={() => walletSignOut()}
+                    class={`${navSublinkPurple}`}
+                  >
+                    DISCONNECT
+                  </a>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    ),
+    // The wallet content for the drawer
+    content: walletDrawerContent,
+  };
 };
 
 /*

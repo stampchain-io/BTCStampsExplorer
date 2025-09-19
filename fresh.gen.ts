@@ -157,6 +157,7 @@ import * as $badge_ActivityBadge from "./islands/badge/ActivityBadge.tsx";
 import * as $badge_index from "./islands/badge/index.ts";
 import * as $button_ConnectButton from "./islands/button/ConnectButton.tsx";
 import * as $button_FilterButton from "./islands/button/FilterButton.tsx";
+import * as $button_MenuButton from "./islands/button/MenuButton.tsx";
 import * as $button_PaginationButtons from "./islands/button/PaginationButtons.tsx";
 import * as $button_PaginationButtonsSSRSafe from "./islands/button/PaginationButtonsSSRSafe.tsx";
 import * as $button_RangeSlider from "./islands/button/RangeSlider.tsx";
@@ -165,6 +166,7 @@ import * as $button_SelectorButtons from "./islands/button/SelectorButtons.tsx";
 import * as $button_SettingsButton from "./islands/button/SettingsButton.tsx";
 import * as $button_SortButton from "./islands/button/SortButton.tsx";
 import * as $button_ToggleButton from "./islands/button/ToggleButton.tsx";
+import * as $button_ToolsButton from "./islands/button/ToolsButton.tsx";
 import * as $button_buttonActions from "./islands/button/buttonActions.tsx";
 import * as $card_RecentSaleCard from "./islands/card/RecentSaleCard.tsx";
 import * as $card_SRC20CardBase from "./islands/card/SRC20CardBase.tsx";
@@ -492,6 +494,7 @@ const manifest = {
     "./islands/badge/index.ts": $badge_index,
     "./islands/button/ConnectButton.tsx": $button_ConnectButton,
     "./islands/button/FilterButton.tsx": $button_FilterButton,
+    "./islands/button/MenuButton.tsx": $button_MenuButton,
     "./islands/button/PaginationButtons.tsx": $button_PaginationButtons,
     "./islands/button/PaginationButtonsSSRSafe.tsx":
       $button_PaginationButtonsSSRSafe,
@@ -501,6 +504,7 @@ const manifest = {
     "./islands/button/SettingsButton.tsx": $button_SettingsButton,
     "./islands/button/SortButton.tsx": $button_SortButton,
     "./islands/button/ToggleButton.tsx": $button_ToggleButton,
+    "./islands/button/ToolsButton.tsx": $button_ToolsButton,
     "./islands/button/buttonActions.tsx": $button_buttonActions,
     "./islands/card/RecentSaleCard.tsx": $card_RecentSaleCard,
     "./islands/card/SRC20CardBase.tsx": $card_SRC20CardBase,
