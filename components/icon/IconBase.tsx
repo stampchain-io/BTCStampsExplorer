@@ -18,6 +18,7 @@ export function Icon(props: IconVariants) {
     className = "",
     role,
     ariaLabel,
+    isOpen,
     onClick,
     ...rest
   } = props;
@@ -49,6 +50,7 @@ export function Icon(props: IconVariants) {
       email: "envelope",
 
       // UI Icons
+      menu: "listMenu",
       close: "x",
       expand: "plus",
       search: "magnifingGlass",
