@@ -62,6 +62,12 @@ export const list = [
 ];
 */
 
+export const listMenu = [
+  "M4 5L16 5",
+  "M4 12L20 12",
+  "M4 19L12 19",
+];
+
 export const listAsc = [
   "M3 15L14 14.9999",
   "M3 9H10",
