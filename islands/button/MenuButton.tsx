@@ -1,5 +1,10 @@
 import { Icon } from "$icon";
-import { navLinkGrey, navLinkGreyLD, navLinkGreyLDActive } from "$text";
+import {
+  navLinkGrey,
+  navLinkGreyActive,
+  navLinkGreyLD,
+  navLinkGreyLDActive,
+} from "$text";
 import { useEffect, useState } from "preact/hooks";
 
 interface NavLink {
@@ -13,7 +18,7 @@ interface MenuButtonProps {
 }
 
 /* ===== MOBILE NAVIGATION CONFIGURATION ===== */
-const mobileNavLinks: NavLink[] = [
+const navLinks: NavLink[] = [
   {
     title: "ART STAMPS",
     href: "/stamp?type=classic",
@@ -30,6 +35,12 @@ const mobileNavLinks: NavLink[] = [
     title: "EXPLORER",
     href: "/explorer",
   },
+];
+
+const subNavLinks: NavLink[] = [
+  { title: "HOW-TO", href: "/howto" },
+  { title: "FAQ", href: "/faq" },
+  { title: "MEDIA", href: "/media" },
 ];
 
 export function MenuButton({ onOpenDrawer }: MenuButtonProps) {
@@ -66,7 +77,7 @@ export function MenuButton({ onOpenDrawer }: MenuButtonProps) {
   const renderNavLinks = () => {
     return (
       <>
-        {mobileNavLinks.map((link) => (
+        {navLinks.map((link) => (
           <div key={link.title} class="relative group w-full">
             <a
               href={link.subLinks ? undefined : link.href}
@@ -95,6 +106,27 @@ export function MenuButton({ onOpenDrawer }: MenuButtonProps) {
     );
   };
 
+  const renderSubNavLinks = () => {
+    return (
+      <div class="flex flex-col gap-3">
+        {subNavLinks.map((link) => (
+          <a
+            key={link.title}
+            href={link.href}
+            onClick={() => {
+              if (link?.href) {
+                setCurrentPath(link.href);
+              }
+            }}
+            class={`${isActive(link.href) ? navLinkGreyActive : navLinkGrey}`}
+          >
+            {link.title}
+          </a>
+        ))}
+      </div>
+    );
+  };
+
   return {
     // The hamburger icon component
     icon: (
@@ -110,8 +142,16 @@ export function MenuButton({ onOpenDrawer }: MenuButtonProps) {
     ),
     // The menu content for the drawer
     content: (
-      <div class="flex flex-col flex-1 items-start py-9 mobileLg:py-6 px-9 mobileLg:px-6 gap-5">
-        {renderNavLinks()}
+      <div class="flex flex-col h-full">
+        {/* Main navigation content */}
+        <div class="flex flex-col flex-1 items-start py-9 mobileLg:py-6 px-9 mobileLg:px-6 gap-5">
+          {renderNavLinks()}
+        </div>
+
+        {/* Sub navigation links at bottom left */}
+        <div class="sticky bottom-0 pb-9 mobileLg:pb-6 px-9 mobileLg:px-6 bg-[#0a070a]/80 shadow-[0_-36px_36px_-6px_rgba(10,7,10,1)]">
+          {renderSubNavLinks()}
+        </div>
       </div>
     ),
     // Current path for external use
