@@ -1,15 +1,21 @@
 /* ===== HEADER COMPONENT ===== */
-import { HamburgerMenuIcon } from "$components/icon/MenuIcon.tsx"; // Import HamburgerMenuIcon directly to ensure it's available
-import { CloseIcon, GearIcon, Icon } from "$icon";
+import { LogoIcon } from "$components/icon/LogoIcon.tsx";
+import { CloseIcon } from "$icon";
 import { ConnectButton } from "$islands/button/ConnectButton.tsx";
+import { MenuButton } from "$islands/button/MenuButton.tsx";
+import { ToolsButton } from "$islands/button/ToolsButton.tsx";
 import {
   glassmorphism,
   glassmorphismOverlay,
-  transitionColors,
   transitionTransform,
 } from "$layout";
 import { tooltipIcon } from "$notification";
-import { labelXs, navLinkGrey, navLinkGreyLD, navLinkPurple } from "$text";
+import {
+  navLinkGreyLD,
+  navLinkGreyLDActive,
+  navLinkPurple,
+  navLinkPurpleActive,
+} from "$text";
 import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== NAVIGATION LINK INTERFACE ===== */
@@ -19,18 +25,9 @@ interface NavLink {
     tablet: string;
   };
   href?: string;
-  subLinks?: NavLink[];
 }
 
 /* ===== TOOLS CONFIGURATION ===== */
-const toolLinks = [
-  { title: "CREATE STAMP", href: "/tool/stamp/create" },
-  { title: "SEND STAMP", href: "/tool/stamp/send" },
-  { title: "DEPLOY TOKEN", href: "/tool/src20/deploy" },
-  { title: "MINT TOKEN", href: "/tool/src20/mint" },
-  { title: "TRANSFER TOKEN", href: "/tool/src20/transfer" },
-  { title: "REGISTER BITNAME", href: "/tool/src101/mint" },
-];
 
 /* ===== DESKTOP NAVIGATION CONFIGURATION ===== */
 const desktopNavLinks: NavLink[] = [
@@ -62,18 +59,6 @@ const desktopNavLinks: NavLink[] = [
     },
     href: "/explorer",
   },
-  {
-    title: "tools",
-    href: "#",
-    subLinks: [
-      { title: "CREATE", href: "/tool/stamp/create" },
-      { title: "SEND", href: "/tool/stamp/send" },
-      { title: "DEPLOY", href: "/tool/src20/deploy" },
-      { title: "MINT", href: "/tool/src20/mint" },
-      { title: "TRANSFER", href: "/tool/src20/transfer" },
-      { title: "REGISTER", href: "/tool/src101/mint" },
-    ],
-  },
 ];
 
 /* ===== MOBILE NAVIGATION CONFIGURATION ===== */
@@ -100,7 +85,9 @@ const mobileNavLinks: NavLink[] = [
 export function Header() {
   const [open, setOpen] = useState(false);
   const [currentPath, setCurrentPath] = useState<string | null>(null);
-  const [toolsOpen, setToolsOpen] = useState(false);
+  const [drawerContent, setDrawerContent] = useState<
+    "menu" | "wallet" | "tools"
+  >("menu");
   // Add tooltip state for close button
   const [isCloseTooltipVisible, setIsCloseTooltipVisible] = useState(false);
   const [allowCloseTooltip, setAllowCloseTooltip] = useState(true);
@@ -228,44 +215,30 @@ export function Header() {
   const closeMenu = () => {
     // Close menu by updating state
     setOpen(false);
-
-    // Close tools section after drawer is closed
-    setTimeout(() => {
-      if (toolsOpen) {
-        setToolsOpen(false);
-      }
-    }, 500); // Wait for drawer close animation to finish
   };
 
-  /* ===== MENU TOGGLE FUNCTION ===== */
+  /* ===== DRAWER CONTROL FUNCTIONS ===== */
+  const openDrawer = (content: "menu" | "wallet" | "tools") => {
+    setDrawerContent(content);
+    setOpen(true);
+  };
+
   const toggleMenu = () => {
     if (open) {
       closeMenu();
     } else {
-      setOpen(true);
-      if (toolsOpen) {
-        setToolsOpen(false);
-      }
-    }
-  };
-
-  /* ===== TOOLS TOGGLE FUNCTION ===== */
-  const toggleTools = () => {
-    if (toolsOpen) {
-      // When closing
-      setTimeout(() => {
-        setToolsOpen(false);
-      }, 250);
-    } else {
-      // When opening
-      setTimeout(() => {
-        setToolsOpen(true);
-      }, 250);
+      openDrawer("menu");
     }
   };
 
   /* ===== NAVIGATION LINKS RENDERER ===== */
   const renderNavLinks = (isMobile = false) => {
+    const isActive = (href?: string) => {
+      if (!href || !currentPath) return false;
+      const hrefPath = href.split("?")[0];
+      return currentPath === hrefPath || currentPath.startsWith(`${hrefPath}/`);
+    };
+
     // Choose which navigation links to use based on mobile/desktop view
     const filteredNavLinks = isMobile ? mobileNavLinks : desktopNavLinks;
 
@@ -284,11 +257,9 @@ export function Header() {
           >
             {/* Main navigation link */}
             <a
-              // Only set href if there are no sublinks (dropdown items)
-              href={link.subLinks ? undefined : link.href}
+              href={link.href}
               // Click handler for navigation
               onClick={() => {
-                if (link.subLinks) return; // Don't navigate if has dropdown
                 if (!link?.href) return; // Don't navigate if no href
                 toggleMenu(); // Close mobile menu if open
                 setCurrentPath(link?.href ? link?.href : null); // Update current path
@@ -296,176 +267,32 @@ export function Header() {
               // Complex conditional styling for mobile/desktop
               class={`inline-block w-full ${
                 isMobile
-                  ? ` ${
-                    // Title of menus
-                    link.subLinks ? navLinkGrey : navLinkGreyLD}`
+                  ? isActive(link.href) ? navLinkGreyLDActive : navLinkGreyLD
+                  : isActive(link.href)
+                  ? navLinkPurpleActive
                   : navLinkPurple
               }`}
             >
-              {/* Tools icon or responsive text label */}
-              {typeof link.title === "string"
-                ? (link.title === "tools"
+              {/* Responsive text label */}
+              {typeof link.title === "string" ? link.title : (
+                isMobile
                   ? (
-                    <Icon
-                      type="iconButton"
-                      name="tools"
-                      weight="normal"
-                      size="sm"
-                      color="purple"
-                    />
-                  )
-                  : link.title)
-                : (
-                  isMobile
-                    ? (
-                      // On mobile drawer, always show default label
-                      <span>{link.title.default}</span>
-                    )
-                    : (
-                      // Show abbreviated label initially and default label at tablet - 1024px
-                      <>
-                        <span class="hidden tablet:inline">
-                          {link.title.default}
-                        </span>
-                        <span class="inline tablet:hidden">
-                          {link.title.tablet}
-                        </span>
-                      </>
-                    )
-                )}
-            </a>
-
-            {/* Dropdown menu - only rendered on desktop */}
-            {link.subLinks && (
-              isMobile ? null : (
-                // Check if this is the tools dropdown for special 3-column layout
-                link.title === "tools"
-                  ? (
-                    <div
-                      class={`hidden group-hover:flex absolute top-[calc(100%+6px)] right-0 min-w-[360px] z-90 py-3.5 px-5 whitespace-nowrap ${glassmorphism} !rounded-t-none`}
-                    >
-                      <div class="grid grid-cols-3 gap-4 w-full">
-                        {/* Column 1: Left aligned - Stamp tools */}
-                        <div class="flex flex-col space-y-1 text-left">
-                          <h6
-                            class={labelXs}
-                          >
-                            STAMPS
-                          </h6>
-                          {link.subLinks?.filter((subLink) =>
-                            subLink.href === "/tool/stamp/create" ||
-                            subLink.href === "/tool/stamp/send"
-                          ).map((subLink) => (
-                            <a
-                              key={subLink.href}
-                              href={subLink.href}
-                              onClick={() => {
-                                setCurrentPath(
-                                  subLink?.href ? subLink?.href : null,
-                                );
-                              }}
-                              class={`font-light text-sm ${transitionColors} ${
-                                currentPath === subLink.href
-                                  ? "text-sm text-stamp-purple-bright hover:text-stamp-purple"
-                                  : "text-sm text-stamp-purple hover:text-stamp-purple-bright"
-                              }`}
-                            >
-                              {subLink.title}
-                            </a>
-                          ))}
-                        </div>
-
-                        {/* Column 2: Center aligned - Token tools */}
-                        <div class="flex flex-col space-y-1 text-center">
-                          <h6
-                            class={labelXs}
-                          >
-                            TOKENS
-                          </h6>
-                          {link.subLinks?.filter((subLink) =>
-                            subLink.href === "/tool/src20/deploy" ||
-                            subLink.href === "/tool/src20/mint" ||
-                            subLink.href === "/tool/src20/transfer"
-                          ).map((subLink) => (
-                            <a
-                              key={subLink.href}
-                              href={subLink.href}
-                              onClick={() => {
-                                setCurrentPath(
-                                  subLink?.href ? subLink?.href : null,
-                                );
-                              }}
-                              class={`font-light text-sm ${transitionColors} ${
-                                currentPath === subLink.href
-                                  ? "text-sm text-stamp-purple-bright hover:text-stamp-purple"
-                                  : "text-sm text-stamp-purple hover:text-stamp-purple-bright"
-                              }`}
-                            >
-                              {subLink.title}
-                            </a>
-                          ))}
-                        </div>
-
-                        {/* Column 3: Right aligned - Register */}
-                        <div class="flex flex-col space-y-1 text-right">
-                          <h6
-                            class={labelXs}
-                          >
-                            BITNAME
-                          </h6>
-                          {link.subLinks?.filter((subLink) =>
-                            subLink.href === "/tool/src101/mint"
-                          ).map((subLink) => (
-                            <a
-                              key={subLink.href}
-                              href={subLink.href}
-                              onClick={() => {
-                                setCurrentPath(
-                                  subLink?.href ? subLink?.href : null,
-                                );
-                              }}
-                              class={`font-light text-sm ${transitionColors} ${
-                                currentPath === subLink.href
-                                  ? "text-sm text-stamp-purple-bright hover:text-stamp-purple"
-                                  : "text-sm text-stamp-purple hover:text-stamp-purple-bright"
-                              }`}
-                            >
-                              {subLink.title}
-                            </a>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
+                    // On mobile drawer, always show default label
+                    <span>{link.title.default}</span>
                   )
                   : (
-                    // Default single-column layout for other dropdowns
-                    <div
-                      class={`hidden group-hover:flex flex-col absolute
-                     top-full left-1/2 -translate-x-1/2 min-w-[calc(100%+36px)] z-10 py-3.5 px-5 space-y-1 whitespace-nowrap
-                     ${glassmorphism} !rounded-t-none`}
-                    >
-                      {link.subLinks?.map((subLink) => (
-                        <a
-                          key={subLink.href}
-                          href={subLink.href}
-                          onClick={() => {
-                            setCurrentPath(
-                              subLink?.href ? subLink?.href : null,
-                            );
-                          }}
-                          class={`font-light text-right text-sm ${transitionColors} ${
-                            currentPath === subLink.href
-                              ? "text-sm text-stamp-purple-bright hover:text-stamp-purple"
-                              : "text-sm text-stamp-purple hover:text-stamp-purple-bright"
-                          }`}
-                        >
-                          {subLink.title}
-                        </a>
-                      ))}
-                    </div>
+                    // Show abbreviated label initially and default label at tablet - 1024px
+                    <>
+                      <span class="hidden tablet:inline">
+                        {link.title.default}
+                      </span>
+                      <span class="inline tablet:hidden">
+                        {link.title.tablet}
+                      </span>
+                    </>
                   )
-              )
-            )}
+              )}
+            </a>
           </div>
         ))}
       </>
@@ -481,12 +308,37 @@ export function Header() {
       <div
         class={`flex justify-between items-center w-full py-1.5 px-4 ${glassmorphism} !overflow-visible`}
       >
-        <div class="flex items-center">
-          <Icon
-            type="iconButton"
-            name="stamp"
-            weight="bold"
+        {/* ===== MOBILE NAVIGATION ===== */}
+        <div class="mobileLg:hidden flex items-center w-full">
+          {/* Left: Menu Button */}
+          <div class="flex items-center">
+            {MenuButton({ onOpenDrawer: openDrawer }).icon}
+          </div>
+
+          {/* Center: Logo Icon */}
+          <div class="flex-1 flex justify-center">
+            <LogoIcon
+              size="lg"
+              weight="bold"
+              color="purple"
+              href="/home"
+              f-partial="/home"
+              onClick={() => setCurrentPath("home")}
+            />
+          </div>
+
+          {/* Right: Tools and Connect Buttons */}
+          <div class="flex items-center gap-5">
+            {ToolsButton({ onOpenDrawer: openDrawer }).icon}
+            {ConnectButton({ onOpenDrawer: openDrawer }).icon}
+          </div>
+        </div>
+
+        {/* ===== DESKTOP LOGO ===== */}
+        <div class="hidden mobileLg:flex items-center">
+          <LogoIcon
             size="md"
+            weight="bold"
             color="purple"
             href="/home"
             f-partial="/home"
@@ -494,19 +346,22 @@ export function Header() {
           />
         </div>
 
-        {/* ===== MOBILE NAVIGATION ===== */}
-        <div class="mobileLg:hidden flex items-center gap-6">
-          <HamburgerMenuIcon isOpen={open} onClick={toggleMenu} />
-          <ConnectButton />
-        </div>
-
         {/* ===== DESKTOP NAVIGATION ===== */}
-        <div
-          class={`hidden mobileLg:flex justify-between items-center
-          gap-5 desktop:gap-[30px]`}
-        >
-          {renderNavLinks()}
-          <ConnectButton />
+        <div class="hidden mobileLg:flex items-center w-full">
+          {/* Left: Logo (already positioned) */}
+
+          {/* Center: Navigation Links */}
+          <div class="flex-1 flex justify-center">
+            <div class="flex items-center gap-5 tablet:gap-[30px]">
+              {renderNavLinks()}
+            </div>
+          </div>
+
+          {/* Right: Tools and Connect Buttons */}
+          <div class="flex items-center gap-5">
+            {ToolsButton({ onOpenDrawer: openDrawer }).icon}
+            {ConnectButton({ onOpenDrawer: openDrawer }).icon}
+          </div>
         </div>
       </div>
 
@@ -523,9 +378,9 @@ export function Header() {
         style="transition-timing-function: cubic-bezier(0.46,0.03,0.52,0.96);"
         id="navbar-collapse"
       >
-        {/* ===== MOBILE MENU LINKS AND CONNECT BUTTON ===== */}
+        {/* ===== MOBILE DRAWER CONTENT ===== */}
         <div class="flex flex-col h-full">
-          <div class="flex pt-[40px] px-9">
+          <div class="flex pt-[32px] px-9">
             <div class="relative">
               <div
                 class={`${tooltipIcon} ${
@@ -536,7 +391,7 @@ export function Header() {
               </div>
               <CloseIcon
                 size="md"
-                weight="bold"
+                weight="normal"
                 color="grey"
                 onClick={() => {
                   if (open) {
@@ -549,95 +404,28 @@ export function Header() {
               />
             </div>
           </div>
-          <div class="flex flex-col flex-1 items-start py-9 mobileLg:py-6 px-9 mobileLg:px-6 gap-5">
-            {renderNavLinks(true)}
-          </div>
 
-          <div class="flex flex-col w-full sticky bottom-0
-          bg-[#0a070a]/60 shadow-[0_-36px_36px_-6px_rgba(10,7,10,0.6)]">
-            {/* Tools section with gear icon */}
-            <div class="flex w-full justify-start pt-3 pb-8 px-9">
-              <div class="flex justify-start items-end -ml-1">
-                <GearIcon
-                  size="md"
-                  weight="normal"
-                  color="greyLogicDL"
-                  isOpen={toolsOpen}
-                  onToggle={toggleTools}
-                />
-              </div>
-            </div>
+          {/* Render appropriate content based on drawerContent */}
+          {(() => {
+            const menuButton = MenuButton({ onOpenDrawer: openDrawer });
+            const connectButton = ConnectButton({ onOpenDrawer: openDrawer });
 
-            <div
-              class={`overflow-hidden ${transitionTransform}
-                ${
-                toolsOpen ? "max-h-[260px] opacity-100" : "max-h-0 opacity-0"
-              }`}
-              style="transition-timing-function: cubic-bezier(0.46,0.03,0.52,0.96);"
-            >
-              <div class="flex flex-col pl-9 pb-9 gap-3">
-                {toolLinks.map((link) => (
-                  <a
-                    key={link.href}
-                    href={link.href}
-                    onClick={() => {
-                      toggleMenu();
-                      setCurrentPath(link.href);
-                    }}
-                    class={`font-bold ${transitionColors} ${
-                      currentPath === link.href
-                        ? "text-base text-stamp-grey-darker hover:text-stamp-grey-light"
-                        : "text-base text-stamp-grey-light hover:!text-stamp-grey-darker"
-                    }`}
-                  >
-                    {link.title}
-                  </a>
-                ))}
-              </div>
-            </div>
-          </div>
+            switch (drawerContent) {
+              case "menu":
+                return menuButton.content;
+              case "wallet":
+                return connectButton.content;
+              case "tools":
+                return ToolsButton({ onOpenDrawer: openDrawer }).content;
+              default:
+                return menuButton.content;
+            }
+          })()}
         </div>
       </div>
     </header>
   );
 }
-
-/* ===== DROPDOWN SUBLINKS FOR MOBILE AND DESKTOP ===== */
-/*
-<div
-// Different dropdown styles for mobile/desktop
-class={`${
-  isMobile
-    ? "hidden group-hover:flex flex-col z-10 w-full pt-3 gap-2 group"
-    : "hidden group-hover:flex flex-col absolute top-full left-1/2 -translate-x-1/2 min-w-[calc(100%+36px)] z-10 pt-1 pb-3.5 px-[18px] space-y-1 whitespace-nowrap backdrop-blur-lg bg-gradient-to-b from-transparent to-[#0a070a]/30 rounded-b-lg"
-}`}
-> */
-/*
-Map through dropdown items
-{link.subLinks?.map((subLink) => (
-  <a
-    key={subLink.href}
-    href={subLink.href}
-    onClick={() => {
-      toggleMenu(); // Close mobile menu
-      setCurrentPath(subLink?.href ? subLink?.href : null); // Update current path
-    }}
-    // Complex conditional styling for active/inactive states
-    class={`font-bold ${transitionColors} ${
-      isMobile
-        ? currentPath === subLink.href
-          ? "text-base text-stamp-grey-light hover:text-stamp-grey py-1"
-          : "text-base text-stamp-grey hover:text-stamp-grey-light py-1"
-        : currentPath === subLink.href
-        ? "text-sm text-stamp-purple-bright hover:text-stamp-purple"
-        : "text-sm text-stamp-purple hover:text-stamp-purple-bright"
-    }`}
-  >
-    {subLink.title}
-  </a>
-))}
-</div>
-  */
 
 /* ===== OLD DESKTOP MENUS===== */
 /*
