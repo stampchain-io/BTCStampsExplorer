@@ -97,14 +97,21 @@ export function Icon(props: IconVariants) {
       hide: "eyeSlash",
       collection: "images",
       copy: "copy",
+
+      // Bitcoin Specific Icons
+      bitcoin: "bitcoin",
+      bitcoins: "bitcoins",
+      bitcoinTx: "bitcoinTx",
+      bitcoinBlock: "bitcoinBlock",
+      version: "bitcoinShield",
       send: "bitcoinOut",
       receive: "bitcoinIn",
       history: "bitcoinHistory",
       wallet: "bitcoinWallet",
+      donate: "bitcoinHand",
 
       // Misc Icons
       // - Tools, loader placeholder and donate CTA icons
-      donate: "bitcoinHand",
       stamp: "stamp",
       uploadImage: "imageUpload",
 
