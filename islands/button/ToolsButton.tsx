@@ -232,7 +232,7 @@ export function ToolsButton({ onOpenDrawer }: ToolsButtonProps) {
 
         {/* Desktop dropdown menu */}
         <div
-          class={`hidden mobileLg:group-hover:flex absolute top-[calc(100%+6px)] right-0 min-w-[400px] z-90 py-3.5 px-5 whitespace-nowrap ${glassmorphism} !rounded-t-none`}
+          class={`hidden tablet:group-hover:flex absolute top-[calc(100%+6px)] right-0 min-w-[400px] z-90 py-3.5 px-5 whitespace-nowrap ${glassmorphism} !rounded-t-none`}
         >
           <div class="grid grid-cols-3 gap-4 w-full">
             {/* Column 1: Left aligned - Stamp tools */}
@@ -311,14 +311,14 @@ export function ToolsButton({ onOpenDrawer }: ToolsButtonProps) {
     ),
     // The tools content for the drawer
     content: (
-      <div class="flex flex-col h-full px-9 mobileLg:px-6">
+      <div class="flex flex-col h-full px-9 tablet:px-6">
         {/* Top - Main navigation content */}
-        <div class="flex flex-col flex-1 items-start py-9 mobileLg:py-6 gap-3">
+        <div class="flex flex-col flex-1 items-start pt-9 tablet:pt-6 gap-3">
           {renderToolLinks()}
         </div>
 
         {/* Bottom - Bitcoin Stats */}
-        <div class="sticky bottom-0 pb-9 mobileLg:pb-6">
+        <div class="sticky bottom-0 pb-9 tablet:pb-6">
           {/* ===== PRICE/FEE/BLOCK INFO ===== */}
           <div
             class={`flex-col ${glassmorphismL2} items-end !backdrop-blur-md px-3 py-2 space-y-1 ${labelLightSm}`}
