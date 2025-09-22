@@ -1,8 +1,9 @@
 import { Icon } from "$icon";
-import { glassmorphism } from "$layout";
+import { glassmorphism, glassmorphismL2 } from "$layout";
 import { getCSRFToken } from "$lib/utils/security/clientSecurityUtils.ts";
 import { formatUSDValue } from "$lib/utils/ui/formatting/formatUtils.ts";
 import {
+  labelLightSm,
   labelXs,
   navLinkGrey,
   navLinkGreyActive,
@@ -34,6 +35,7 @@ export function ToolsButton({ onOpenDrawer }: ToolsButtonProps) {
   const [currentPath, setCurrentPath] = useState<string | null>(null);
   const [btcPrice, setBtcPrice] = useState(0);
   const [recommendedFee, setRecommendedFee] = useState(6);
+  const [latestBlock, setLatestBlock] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
   /* ===== PATH TRACKING EFFECT ===== */
@@ -56,31 +58,49 @@ export function ToolsButton({ onOpenDrawer }: ToolsButtonProps) {
 
   /* ===== DATA FETCHING ===== */
   useEffect(() => {
-    const fetchFees = async () => {
+    const fetchData = async () => {
       try {
         const csrfToken = await getCSRFToken();
 
-        const response = await fetch("/api/internal/fees", {
-          headers: {
-            "X-CSRF-Token": csrfToken,
-          },
-        });
+        const [feesResponse, healthResponse] = await Promise.all([
+          fetch("/api/internal/fees", {
+            headers: {
+              "X-CSRF-Token": csrfToken,
+            },
+          }),
+          fetch("/api/v2/health", {
+            headers: {
+              "X-CSRF-Token": csrfToken,
+            },
+          }),
+        ]);
 
-        if (!response.ok) {
-          throw new Error(`Failed to fetch fees: ${response.status}`);
+        if (!feesResponse.ok) {
+          throw new Error(`Failed to fetch fees: ${feesResponse.status}`);
         }
 
-        const data = await response.json();
-        setBtcPrice(data.btcPrice);
-        setRecommendedFee(data.recommendedFee);
+        if (!healthResponse.ok) {
+          throw new Error(
+            `Failed to fetch health data: ${healthResponse.status}`,
+          );
+        }
+
+        const [feesData, healthData] = await Promise.all([
+          feesResponse.json(),
+          healthResponse.json(),
+        ]);
+
+        setBtcPrice(feesData.btcPrice);
+        setRecommendedFee(feesData.recommendedFee);
+        setLatestBlock(healthData.services?.blockSync?.indexed || 0);
         setIsLoading(false);
       } catch (err) {
-        console.error("Fees fetch error:", err);
+        console.error("Data fetch error:", err);
         setIsLoading(false);
       }
     };
 
-    fetchFees();
+    fetchData();
   }, []);
 
   /* ===== HELPERS ===== */
@@ -291,29 +311,61 @@ export function ToolsButton({ onOpenDrawer }: ToolsButtonProps) {
     ),
     // The tools content for the drawer
     content: (
-      <div class="flex flex-col h-full">
-        {/* Main navigation content */}
-        <div class="flex flex-col flex-1 items-start py-9 mobileLg:py-6 px-9 mobileLg:px-6 gap-3">
+      <div class="flex flex-col h-full px-9 mobileLg:px-6">
+        {/* Top - Main navigation content */}
+        <div class="flex flex-col flex-1 items-start py-9 mobileLg:py-6 gap-3">
           {renderToolLinks()}
         </div>
 
-        {/* Sub navigation links at bottom */}
-        <div class="sticky bottom-0 pb-9 mobileLg:pb-6 px-9 mobileLg:px-6 bg-[#0a070a]/80 shadow-[0_-36px_36px_-6px_rgba(10,7,10,1)]">
-          {/* ===== PRICE/FEE INFO ===== */}
-          <div class="flex-col -space-y-3
-          font-light text-sm text-stamp-grey">
-            <p>
-              <span class="text-stamp-grey-darker">FEE</span>&nbsp;
-              {isLoading
-                ? <span class="animate-pulse">XX</span>
-                : <span class="font-medium">{displayFee}</span>} SAT/vB
-            </p>
-            <p>
-              <span class="text-stamp-grey-darker">BTC</span>&nbsp;
+        {/* Bottom - Bitcoin Stats */}
+        <div class="sticky bottom-0 pb-9 mobileLg:pb-6">
+          {/* ===== PRICE/FEE/BLOCK INFO ===== */}
+          <div
+            class={`flex-col ${glassmorphismL2} items-end !backdrop-blur-md px-3 py-2 space-y-1 ${labelLightSm}`}
+          >
+            <div class="flex items-center">
+              <Icon
+                type="icon"
+                name="bitcoinBlock"
+                weight="normal"
+                size="xxs"
+                color="greyDark"
+                className="mb-[1px] mr-2.5"
+              />
               {isLoading
                 ? <span class="animate-pulse">XXX,XXX</span>
-                : <span class="font-medium">{displayPrice}</span>} USD
-            </p>
+                : (
+                  <span class="font-medium">
+                    {latestBlock.toLocaleString()}
+                  </span>
+                )}
+            </div>
+            <div class="flex items-center">
+              <Icon
+                type="icon"
+                name="bitcoinTx"
+                weight="normal"
+                size="xxs"
+                color="greyDark"
+                className="mb-[1px] mr-2.5"
+              />
+              {isLoading
+                ? <span class="animate-pulse">XX</span>
+                : <span class="font-medium">{displayFee}</span>}&nbsp;SAT/vB
+            </div>
+            <div class="flex items-center">
+              <Icon
+                type="icon"
+                name="bitcoin"
+                weight="normal"
+                size="xxs"
+                color="greyDark"
+                className="mb-[1px] mr-2.5"
+              />
+              {isLoading
+                ? <span class="animate-pulse">XXX,XXX</span>
+                : <span class="font-medium mr-1">{displayPrice}</span>}&nbsp;USD
+            </div>
           </div>
         </div>
       </div>

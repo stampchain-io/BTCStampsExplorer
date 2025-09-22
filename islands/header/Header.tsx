@@ -1,9 +1,8 @@
 /* ===== HEADER COMPONENT ===== */
-import { LogoIcon } from "$components/icon/LogoIcon.tsx";
-import { CloseIcon } from "$icon";
-import { ConnectButton } from "$islands/button/ConnectButton.tsx";
+import { CloseIcon, Icon } from "$icon";
 import { MenuButton } from "$islands/button/MenuButton.tsx";
 import { ToolsButton } from "$islands/button/ToolsButton.tsx";
+import { WalletButton } from "$islands/button/WalletButton.tsx";
 import {
   glassmorphism,
   glassmorphismOverlay,
@@ -306,7 +305,7 @@ export function Header() {
      pt-6 pb-9 mobileLg:pt-9 tablet:pb-14">
       {/* ===== LOGO, TEXT MENUS (DESKTOP) HAMBURGER MENU (MOBILE), TOOLS, SEARCH AND CONNECT BUTTON ===== */}
       <div
-        class={`flex justify-between items-center w-full py-1.5 px-4 ${glassmorphism} !overflow-visible`}
+        class={`flex justify-between items-center w-full py-1.5 px-3 ${glassmorphism} !overflow-visible`}
       >
         {/* ===== MOBILE NAVIGATION ===== */}
         <div class="mobileLg:hidden flex items-center w-full">
@@ -317,10 +316,14 @@ export function Header() {
 
           {/* Center: Logo Icon */}
           <div class="flex-1 flex justify-center">
-            <LogoIcon
-              size="lg"
-              weight="bold"
+            <Icon
+              type="iconButton"
+              name="stampchain"
+              size="xl"
+              weight="light"
               color="purple"
+              colorAccent="#660099"
+              colorAccentHover="#8800CC"
               href="/home"
               f-partial="/home"
               onClick={() => setCurrentPath("home")}
@@ -330,16 +333,23 @@ export function Header() {
           {/* Right: Tools and Connect Buttons */}
           <div class="flex items-center gap-5">
             {ToolsButton({ onOpenDrawer: openDrawer }).icon}
-            {ConnectButton({ onOpenDrawer: openDrawer }).icon}
+            {WalletButton({
+              onOpenDrawer: openDrawer,
+              onCloseDrawer: closeMenu,
+            }).icon}
           </div>
         </div>
 
         {/* ===== DESKTOP LOGO ===== */}
         <div class="hidden mobileLg:flex items-center">
-          <LogoIcon
-            size="md"
-            weight="bold"
+          <Icon
+            type="iconButton"
+            name="stampchain"
+            size="lg"
+            weight="light"
             color="purple"
+            colorAccent="#660099"
+            colorAccentHover="#8800CC"
             href="/home"
             f-partial="/home"
             onClick={() => setCurrentPath("home")}
@@ -360,7 +370,10 @@ export function Header() {
           {/* Right: Tools and Connect Buttons */}
           <div class="flex items-center gap-5">
             {ToolsButton({ onOpenDrawer: openDrawer }).icon}
-            {ConnectButton({ onOpenDrawer: openDrawer }).icon}
+            {WalletButton({
+              onOpenDrawer: openDrawer,
+              onCloseDrawer: closeMenu,
+            }).icon}
           </div>
         </div>
       </div>
@@ -408,13 +421,16 @@ export function Header() {
           {/* Render appropriate content based on drawerContent */}
           {(() => {
             const menuButton = MenuButton({ onOpenDrawer: openDrawer });
-            const connectButton = ConnectButton({ onOpenDrawer: openDrawer });
+            const walletButton = WalletButton({
+              onOpenDrawer: openDrawer,
+              onCloseDrawer: closeMenu,
+            });
 
             switch (drawerContent) {
               case "menu":
                 return menuButton.content;
               case "wallet":
-                return connectButton.content;
+                return walletButton.content;
               case "tools":
                 return ToolsButton({ onOpenDrawer: openDrawer }).content;
               default:
