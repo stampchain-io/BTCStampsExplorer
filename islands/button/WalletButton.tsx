@@ -13,7 +13,9 @@ import {
   labelLg,
   labelXs,
   navLinkGreyLD,
+  navLinkGreyLDActive,
   navSublinkPurple,
+  navSublinkPurpleActive,
   valueDarkSm,
   valueLg,
 } from "$text";
@@ -44,6 +46,7 @@ export const WalletButton = (
   const { wallet, isConnected, disconnect } = walletContext;
   const { address, btcBalance } = wallet;
   const [path, setPath] = useState<string | null>(null);
+  const [currentPath, setCurrentPath] = useState<string | null>(null);
 
   /* ===== COPY STATE ===== */
   const [showCopied, setShowCopied] = useState(false);
@@ -71,6 +74,20 @@ export const WalletButton = (
       }
     };
   }, []);
+
+  /* ===== ACTIVE-STATE PATH TRACKING ===== */
+  useEffect(() => {
+    setCurrentPath(globalThis?.location?.pathname || null);
+    const onPop = () => setCurrentPath(globalThis?.location?.pathname || null);
+    globalThis.addEventListener("popstate", onPop);
+    return () => globalThis.removeEventListener("popstate", onPop);
+  }, []);
+
+  const isActive = (href?: string) => {
+    if (!href || !currentPath) return false;
+    const hrefPath = href.split("?")[0];
+    return currentPath === hrefPath || currentPath.startsWith(`${hrefPath}/`);
+  };
 
   /* ===== COPY EVENT HANDLERS ===== */
   const handleCopyMouseEnter = () => {
@@ -227,7 +244,9 @@ export const WalletButton = (
                   </h6>
                   <a
                     href={`/wallet/${address}`}
-                    class={`${navSublinkPurple}`}
+                    class={isActive(`/wallet/${address}`)
+                      ? `${navSublinkPurpleActive}`
+                      : `${navSublinkPurple}`}
                   >
                     DASHBOARD
                   </a>
@@ -308,8 +327,15 @@ export const WalletButton = (
                 if (link.title === "DISCONNECT") {
                   walletSignOut();
                 }
+                if (link.href) {
+                  setCurrentPath(link.href);
+                }
               }}
-              class={`inline-block w-full ${navLinkGreyLD}`}
+              class={`inline-block w-full ${
+                link.href && link.title === "DASHBOARD" && isActive(link.href)
+                  ? navLinkGreyLDActive
+                  : navLinkGreyLD
+              }`}
             >
               {link.title}
             </a>

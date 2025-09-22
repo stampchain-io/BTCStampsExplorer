@@ -222,12 +222,78 @@ export function Header() {
     setOpen(true);
   };
 
-  const toggleMenu = () => {
-    if (open) {
-      closeMenu();
-    } else {
-      openDrawer("menu");
-    }
+  /* ===== DRAWER RENDERER ===== */
+  const renderDrawer = (type: "menu" | "wallet" | "tools") => {
+    const isMenu = type === "menu";
+    const isActive = drawerContent === type && open;
+
+    const getContent = () => {
+      switch (type) {
+        case "menu":
+          return MenuButton({ onOpenDrawer: openDrawer }).content;
+        case "wallet":
+          return WalletButton({
+            onOpenDrawer: openDrawer,
+            onCloseDrawer: closeMenu,
+          }).content;
+        case "tools":
+          return ToolsButton({ onOpenDrawer: openDrawer }).content;
+      }
+    };
+
+    return (
+      <div
+        ref={drawerContent === type ? drawerRef : null}
+        class={`flex tablet:hidden flex-col justify-between
+          fixed top-0 ${
+          isMenu ? "left-0 right-auto" : "right-0 left-auto"
+        } w-full min-[420px]:w-[340px] h-[100dvh] z-30
+          ${
+          isMenu
+            ? "min-[420px]:rounded-l-xl min-[420px]:border-l-[1px] min-[420px]:border-r-0 min-[420px]:border-l-[#1b1b1b] min-[420px]:shadow-[-12px_0_12px_-6px_rgba(10,7,10,0.5)]"
+            : "min-[420px]:rounded-r-xl min-[420px]:border-r-[1px] min-[420px]:border-l-0 min-[420px]:border-r-[#1b1b1b] min-[420px]:shadow-[12px_0_12px_-6px_rgba(10,7,10,0.5)]"
+        }
+          ${glassmorphismOverlay} ${transitionTransform} transition-transform will-change-transform
+          overflow-y-auto overflow-x-hidden scrollbar-black
+          ${
+          isActive
+            ? "translate-x-0"
+            : isMenu
+            ? "-translate-x-full"
+            : "translate-x-full"
+        }`}
+        style="transition-timing-function: cubic-bezier(0.46,0.03,0.52,0.96);"
+        id={`navbar-collapse-${type}`}
+      >
+        <div class="flex flex-col h-full">
+          <div class={`flex pt-[34px] px-9 ${isMenu ? "justify-end" : ""}`}>
+            <div class="relative">
+              <div
+                class={`${tooltipIcon} ${
+                  isCloseTooltipVisible ? "opacity-100" : "opacity-0"
+                }`}
+              >
+                {closeTooltipText}
+              </div>
+              <CloseIcon
+                size="md"
+                weight="normal"
+                color="grey"
+                onClick={() => {
+                  if (open) {
+                    closeMenu();
+                  }
+                }}
+                onMouseEnter={handleCloseMouseEnter}
+                onMouseLeave={handleCloseMouseLeave}
+                aria-label="Close menu"
+              />
+            </div>
+          </div>
+          {getContent()}
+        </div>
+      </div>
+    );
   };
 
   /* ===== NAVIGATION LINKS RENDERER ===== */
@@ -260,7 +326,9 @@ export function Header() {
               // Click handler for navigation
               onClick={() => {
                 if (!link?.href) return; // Don't navigate if no href
-                toggleMenu(); // Close mobile menu if open
+                if (open) {
+                  closeMenu(); // Never open; only close if already open
+                }
                 setCurrentPath(link?.href ? link?.href : null); // Update current path
               }}
               // Complex conditional styling for mobile/desktop
@@ -319,7 +387,7 @@ export function Header() {
             <Icon
               type="iconButton"
               name="stampchain"
-              size="xl"
+              size="lg"
               weight="light"
               color="purple"
               colorAccent="#660099"
@@ -378,67 +446,10 @@ export function Header() {
         </div>
       </div>
 
-      {/* ===== MOBILE NAVIGATION DRAWER ===== */}
-      <div
-        ref={drawerRef}
-        class={`flex tablet:hidden flex-col justify-between
-           fixed top-0 right-0 left-auto w-full min-[420px]:w-[340px] h-[100dvh] z-30
-           ${glassmorphismOverlay} ${transitionTransform}
-           min-[420px]:rounded-r-xl min-[420px]:border-r-[1px] min-[420px]:border-l-0 min-[420px]:border-r-[#1b1b1b]
-           min-[420px]:shadow-[12px_0_12px_-6px_rgba(10,7,10,0.5)]
-           overflow-y-auto overflow-x-hidden scrollbar-black
-           ${open ? "translate-x-0" : "translate-x-full"}`}
-        style="transition-timing-function: cubic-bezier(0.46,0.03,0.52,0.96);"
-        id="navbar-collapse"
-      >
-        {/* ===== MOBILE DRAWER CONTENT ===== */}
-        <div class="flex flex-col h-full">
-          <div class="flex pt-[32px] px-9">
-            <div class="relative">
-              <div
-                class={`${tooltipIcon} ${
-                  isCloseTooltipVisible ? "opacity-100" : "opacity-0"
-                }`}
-              >
-                {closeTooltipText}
-              </div>
-              <CloseIcon
-                size="md"
-                weight="normal"
-                color="grey"
-                onClick={() => {
-                  if (open) {
-                    closeMenu();
-                  }
-                }}
-                onMouseEnter={handleCloseMouseEnter}
-                onMouseLeave={handleCloseMouseLeave}
-                aria-label="Close menu"
-              />
-            </div>
-          </div>
-
-          {/* Render appropriate content based on drawerContent */}
-          {(() => {
-            const menuButton = MenuButton({ onOpenDrawer: openDrawer });
-            const walletButton = WalletButton({
-              onOpenDrawer: openDrawer,
-              onCloseDrawer: closeMenu,
-            });
-
-            switch (drawerContent) {
-              case "menu":
-                return menuButton.content;
-              case "wallet":
-                return walletButton.content;
-              case "tools":
-                return ToolsButton({ onOpenDrawer: openDrawer }).content;
-              default:
-                return menuButton.content;
-            }
-          })()}
-        </div>
-      </div>
+      {/* ===== MOBILE NAVIGATION DRAWERS ===== */}
+      {renderDrawer("menu")}
+      {renderDrawer("tools")}
+      {renderDrawer("wallet")}
     </header>
   );
 }
