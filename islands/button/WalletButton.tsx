@@ -1,21 +1,39 @@
 // KEEP file for reference on the handleUpdateDisplayName to move into the new wallet / dashboard page
 // UPDATE COMMENTARY
-import { Button } from "$button";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { DEFAULT_WALLET_CONNECTORS } from "$constants";
 import { Icon } from "$icon";
 import { WalletProvider } from "$islands/layout/WalletProvider.tsx";
 import { ConnectWalletModal } from "$islands/modal/ConnectWalletModal.tsx";
 import { closeModal, openModal } from "$islands/modal/states.ts";
-import { glassmorphism } from "$layout";
+import { glassmorphism, glassmorphismL2 } from "$layout";
 import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
-import { navSublinkPurple, valueDark, valueDarkSm } from "$text";
-import { useEffect, useState } from "preact/hooks";
+import { tooltipIcon } from "$notification";
+import {
+  labelLg,
+  labelXs,
+  navLinkGreyLD,
+  navSublinkPurple,
+  valueDarkSm,
+  valueLg,
+} from "$text";
+import { useEffect, useRef, useState } from "preact/hooks";
+
+interface WalletLink {
+  title: string;
+  href?: string;
+}
 
 interface WalletButtonProps {
   onOpenDrawer?: (content: "wallet") => void;
   onCloseDrawer?: () => void;
 }
+
+/* ===== WALLET CONFIGURATION ===== */
+const getWalletLinks = (address: string): WalletLink[] => [
+  { title: "DASHBOARD", href: `/wallet/${address}` },
+  { title: "DISCONNECT" },
+];
 
 /* ===== MAIN WALLET MODAL COMPONENT ===== */
 export const WalletButton = (
@@ -24,8 +42,17 @@ export const WalletButton = (
   const connectors = DEFAULT_WALLET_CONNECTORS;
 
   const { wallet, isConnected, disconnect } = walletContext;
-  const { address } = wallet;
+  const { address, btcBalance } = wallet;
   const [path, setPath] = useState<string | null>(null);
+
+  /* ===== COPY STATE ===== */
+  const [showCopied, setShowCopied] = useState(false);
+  const [isTooltipVisible, setIsTooltipVisible] = useState(false);
+  const [allowTooltip, setAllowTooltip] = useState(true);
+
+  /* ===== REFS ===== */
+  const copyButtonRef = useRef<HTMLDivElement>(null);
+  const tooltipTimeoutRef = useRef<number | null>(null);
 
   /* ===== PATH INITIALIZATION ===== */
   useEffect(() => {
@@ -35,6 +62,59 @@ export const WalletButton = (
     }
     setPath(globalThis.location.pathname?.split("/")[1] || null);
   }, []);
+
+  /* ===== COPY CLEANUP EFFECT ===== */
+  useEffect(() => {
+    return () => {
+      if (tooltipTimeoutRef.current) {
+        globalThis.clearTimeout(tooltipTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  /* ===== COPY EVENT HANDLERS ===== */
+  const handleCopyMouseEnter = () => {
+    if (allowTooltip) {
+      if (tooltipTimeoutRef.current) {
+        globalThis.clearTimeout(tooltipTimeoutRef.current);
+      }
+
+      tooltipTimeoutRef.current = globalThis.setTimeout(() => {
+        const buttonRect = copyButtonRef.current?.getBoundingClientRect();
+        if (buttonRect) {
+          setIsTooltipVisible(true);
+        }
+      }, 1500);
+    }
+  };
+
+  const handleCopyMouseLeave = () => {
+    if (tooltipTimeoutRef.current) {
+      globalThis.clearTimeout(tooltipTimeoutRef.current);
+    }
+    setIsTooltipVisible(false);
+    setShowCopied(false);
+    setAllowTooltip(true);
+  };
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(address);
+      setShowCopied(true);
+      setIsTooltipVisible(false);
+      setAllowTooltip(false);
+
+      if (tooltipTimeoutRef.current) {
+        globalThis.clearTimeout(tooltipTimeoutRef.current);
+      }
+
+      tooltipTimeoutRef.current = globalThis.setTimeout(() => {
+        setShowCopied(false);
+      }, 1500);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  };
 
   /* ===== MODAL VISIBILITY HANDLER ===== */
   const handleOpenModal = () => {
@@ -88,62 +168,82 @@ export const WalletButton = (
 
   // Wallet drawer content
   const walletDrawerContent = (
-    <div class="flex flex-col flex-1 items-start py-9 mobileLg:py-6 px-9 mobileLg:px-6 gap-5">
-      {isConnected && address
-        ? (
-          <>
-            {/* Address Display */}
-            <div class="text-center">
-              <h6 class={valueDark}>
-                {abbreviateAddress(address, 10)}
-              </h6>
+    <div class="flex flex-col h-full px-9 mobileLg:px-6">
+      {/* Top - Main navigation content */}
+      <div class="flex flex-col flex-1 items-start pt-9 mobileLg:pt-6 gap-5">
+        <div
+          class={`flex-col ${glassmorphismL2} w-full -mt-3 mb-3 px-3 py-2 space-y-1`}
+        >
+          <div class="flex items-center gap-3">
+            <h6 class={valueDarkSm}>
+              {abbreviateAddress(address, 12)}
+            </h6>
+            <div
+              ref={copyButtonRef}
+              class="relative"
+              onMouseEnter={handleCopyMouseEnter}
+              onMouseLeave={handleCopyMouseLeave}
+            >
+              <Icon
+                type="iconButton"
+                name="copy"
+                weight="normal"
+                size="xsR"
+                color="greyDark"
+                onClick={copy}
+              />
+              <div
+                class={`${tooltipIcon} ${
+                  isTooltipVisible ? "opacity-100" : "opacity-0"
+                }`}
+              >
+                COPY ADDY
+              </div>
+              <div
+                class={`${tooltipIcon} ${
+                  showCopied ? "opacity-100" : "opacity-0"
+                }`}
+              >
+                ADDY COPIED
+              </div>
             </div>
+          </div>
+          <div class="flex items-center gap-2.5">
+            <Icon
+              type="icon"
+              name="bitcoins"
+              weight="normal"
+              size="xs"
+              color="greyDark"
+            />
+            <h6 class={valueLg}>
+              {btcBalance.total.toFixed(8)} <span class={labelLg}>BTC</span>
+            </h6>
+          </div>
+        </div>
 
-            {/* Dashboard Button */}
-            <Button
-              variant="text"
-              color="custom"
-              size="lg"
-              onClick={() => {
-                if (isConnected && address) {
-                  // SSR-safe browser environment check
-                  if (
-                    typeof globalThis === "undefined" ||
-                    !globalThis?.location
-                  ) {
-                    return; // Cannot navigate during SSR
-                  }
-                  globalThis.location.href = `/wallet/${address}`;
-                }
-              }}
-              class="gray-gradient3-hover w-full"
-            >
-              DASHBOARD
-            </Button>
-
-            {/* Disconnect Button */}
-            <Button
-              variant="text"
-              color="custom"
-              size="lg"
-              onClick={() => walletSignOut()}
-              class="gray-gradient3-hover w-full"
-            >
-              DISCONNECT
-            </Button>
-          </>
-        )
-        : (
-          <Button
-            variant="text"
-            color="custom"
-            size="lg"
-            onClick={handleOpenModal}
-            class="!justify-center gray-gradient3-hover w-full"
+        {getWalletLinks(address).map((link) => (
+          <a
+            key={link.title}
+            href={link.href}
+            onClick={() => {
+              if (link.title === "DISCONNECT") {
+                walletSignOut();
+              }
+            }}
+            class={`inline-block w-full ${navLinkGreyLD}`}
           >
-            CONNECT WALLET
-          </Button>
-        )}
+            {link.title}
+          </a>
+        ))}
+
+        {/* Bottom - Counterparty version */}
+        <div class="sticky bottom-0 w-full mt-auto pb-9 mobileLg:pb-6 bg-[#0a070a]/80 shadow-[0_-36px_36px_-6px_rgba(10,7,10,1)]">
+          <div class={`flex items-end`}>
+            <CounterpartyVersion />
+          </div>
+        </div>
+      </div>
     </div>
   );
 
@@ -229,3 +329,56 @@ export const WalletButton = (
     content: walletDrawerContent,
   };
 };
+
+function CounterpartyVersion() {
+  const [version, setVersion] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    const fetchVersion = async () => {
+      try {
+        const res = await fetch("/api/v2/counterparty/version", {
+          headers: { "X-CSRF-Token": "safe" },
+        });
+        const data = await res.json();
+        if (!cancelled) {
+          setVersion(data?.version ?? null);
+        }
+      } catch (_e) {
+        if (!cancelled) setVersion(null);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    fetchVersion();
+
+    // Refresh periodically to keep up-to-date
+    const interval = globalThis.setInterval(fetchVersion, 24 * 60 * 60 * 1000);
+    return () => {
+      cancelled = true;
+      globalThis.clearInterval(interval);
+    };
+  }, []);
+
+  return (
+    <div class={`flex items-center`}>
+      <Icon
+        type="icon"
+        name="version"
+        weight="normal"
+        size="xxs"
+        color="greyDark"
+        className="mb-[1px] mr-2.5"
+      />
+      <span class={labelXs}>
+        COUNTERPARTY {loading
+          ? <span class="animate-pulse">vXX.X.XX</span>
+          : version
+          ? <>v{version}</>
+          : <>v N/A</>}
+      </span>
+    </div>
+  );
+}

@@ -142,14 +142,14 @@ export function MenuButton({ onOpenDrawer }: MenuButtonProps) {
     ),
     // The menu content for the drawer
     content: (
-      <div class="flex flex-col h-full">
-        {/* Main navigation content */}
-        <div class="flex flex-col flex-1 items-start py-9 mobileLg:py-6 px-9 mobileLg:px-6 gap-5">
+      <div class="flex flex-col h-full px-9 mobileLg:px-6">
+        {/* Top - Main navigation content */}
+        <div class="flex flex-col flex-1 items-start py-9 mobileLg:py-6 gap-5">
           {renderNavLinks()}
         </div>
 
-        {/* Sub navigation links at bottom left */}
-        <div class="sticky bottom-0 pb-9 mobileLg:pb-6 px-9 mobileLg:px-6 bg-[#0a070a]/80 shadow-[0_-36px_36px_-6px_rgba(10,7,10,1)]">
+        {/* Bottom - Sub navigation content */}
+        <div class="sticky bottom-0 pb-9 mobileLg:pb-6 bg-[#0a070a]/80 shadow-[0_-36px_36px_-6px_rgba(10,7,10,1)]">
           {renderSubNavLinks()}
         </div>
       </div>
