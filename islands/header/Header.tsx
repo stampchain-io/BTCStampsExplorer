@@ -381,7 +381,7 @@ export function Header() {
       {/* ===== MOBILE NAVIGATION DRAWER ===== */}
       <div
         ref={drawerRef}
-        class={`flex mobileLg:hidden flex-col justify-between
+        class={`flex tablet:hidden flex-col justify-between
            fixed top-0 right-0 left-auto w-full min-[420px]:w-[340px] h-[100dvh] z-30
            ${glassmorphismOverlay} ${transitionTransform}
            min-[420px]:rounded-r-xl min-[420px]:border-r-[1px] min-[420px]:border-l-0 min-[420px]:border-r-[#1b1b1b]

@@ -166,87 +166,6 @@ export const WalletButton = (
     }
   };
 
-  // Wallet drawer content
-  const walletDrawerContent = (
-    <div class="flex flex-col h-full px-9 mobileLg:px-6">
-      {/* Top - Main navigation content */}
-      <div class="flex flex-col flex-1 items-start pt-9 mobileLg:pt-6 gap-5">
-        <div
-          class={`flex-col ${glassmorphismL2} w-full -mt-3 mb-3 px-3 py-2 space-y-1`}
-        >
-          <div class="flex items-center gap-3">
-            <h6 class={valueDarkSm}>
-              {abbreviateAddress(address, 12)}
-            </h6>
-            <div
-              ref={copyButtonRef}
-              class="relative"
-              onMouseEnter={handleCopyMouseEnter}
-              onMouseLeave={handleCopyMouseLeave}
-            >
-              <Icon
-                type="iconButton"
-                name="copy"
-                weight="normal"
-                size="xsR"
-                color="greyDark"
-                onClick={copy}
-              />
-              <div
-                class={`${tooltipIcon} ${
-                  isTooltipVisible ? "opacity-100" : "opacity-0"
-                }`}
-              >
-                COPY ADDY
-              </div>
-              <div
-                class={`${tooltipIcon} ${
-                  showCopied ? "opacity-100" : "opacity-0"
-                }`}
-              >
-                ADDY COPIED
-              </div>
-            </div>
-          </div>
-          <div class="flex items-center gap-2.5">
-            <Icon
-              type="icon"
-              name="bitcoins"
-              weight="normal"
-              size="xs"
-              color="greyDark"
-            />
-            <h6 class={valueLg}>
-              {btcBalance.total.toFixed(8)} <span class={labelLg}>BTC</span>
-            </h6>
-          </div>
-        </div>
-
-        {getWalletLinks(address).map((link) => (
-          <a
-            key={link.title}
-            href={link.href}
-            onClick={() => {
-              if (link.title === "DISCONNECT") {
-                walletSignOut();
-              }
-            }}
-            class={`inline-block w-full ${navLinkGreyLD}`}
-          >
-            {link.title}
-          </a>
-        ))}
-
-        {/* Bottom - Counterparty version */}
-        <div class="sticky bottom-0 w-full mt-auto pb-9 mobileLg:pb-6 bg-[#0a070a]/80 shadow-[0_-36px_36px_-6px_rgba(10,7,10,1)]">
-          <div class={`flex items-end`}>
-            <CounterpartyVersion />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
   /* ===== COMPONENT RENDER ===== */
   return {
     // The wallet icon component
@@ -326,7 +245,86 @@ export const WalletButton = (
       </div>
     ),
     // The wallet content for the drawer
-    content: walletDrawerContent,
+    content: (
+      <div class="flex flex-col h-full px-9 tablet:px-6">
+        {/* Top - Main navigation content */}
+        <div class="flex flex-col flex-1 items-start pt-9 tablet:pt-6 gap-5">
+          <div
+            class={`flex-col ${glassmorphismL2} w-full -mt-3 mb-3 px-3 py-2 space-y-1`}
+          >
+            <div class="flex items-center gap-3">
+              <h6 class={valueDarkSm}>
+                {abbreviateAddress(address, 12)}
+              </h6>
+              <div
+                ref={copyButtonRef}
+                class="relative"
+                onMouseEnter={handleCopyMouseEnter}
+                onMouseLeave={handleCopyMouseLeave}
+              >
+                <Icon
+                  type="iconButton"
+                  name="copy"
+                  weight="normal"
+                  size="xsR"
+                  color="greyDark"
+                  onClick={copy}
+                />
+                <div
+                  class={`${tooltipIcon} ${
+                    isTooltipVisible ? "opacity-100" : "opacity-0"
+                  }`}
+                >
+                  COPY ADDY
+                </div>
+                <div
+                  class={`${tooltipIcon} ${
+                    showCopied ? "opacity-100" : "opacity-0"
+                  }`}
+                >
+                  ADDY COPIED
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <Icon
+                type="icon"
+                name="bitcoins"
+                weight="normal"
+                size="xs"
+                color="greyDark"
+              />
+              <h6 class={valueLg}>
+                {btcBalance.total.toFixed(8)} <span class={labelLg}>BTC</span>
+              </h6>
+            </div>
+          </div>
+
+          {getWalletLinks(address).map((link) => (
+            <a
+              key={link.title}
+              href={link.href}
+              onClick={() => {
+                if (link.title === "DISCONNECT") {
+                  walletSignOut();
+                }
+              }}
+              class={`inline-block w-full ${navLinkGreyLD}`}
+            >
+              {link.title}
+            </a>
+          ))}
+
+          {/* Bottom - Counterparty version */}
+          <div class="sticky bottom-0 w-full mt-auto pb-9 tablet:pb-6 bg-[#0a070a]/80 shadow-[0_-36px_36px_-6px_rgba(10,7,10,1)]">
+            <div class={`flex items-end`}>
+              <CounterpartyVersion />
+            </div>
+          </div>
+        </div>
+      </div>
+    ),
+    currentPath: path,
   };
 };
 
