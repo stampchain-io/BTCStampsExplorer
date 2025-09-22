@@ -108,7 +108,7 @@ export function MenuButton({ onOpenDrawer }: MenuButtonProps) {
 
   const renderSubNavLinks = () => {
     return (
-      <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-3 -mb-1.5">
         {subNavLinks.map((link) => (
           <a
             key={link.title}

@@ -269,7 +269,7 @@ export const WalletButton = (
         {/* Top - Main navigation content */}
         <div class="flex flex-col flex-1 items-start pt-9 tablet:pt-6 gap-5">
           <div
-            class={`flex-col ${glassmorphismL2} w-full -mt-3 mb-3 px-3 py-2 space-y-1`}
+            class={`flex-col ${glassmorphismL2} w-full -mt-1.5 mb-3 px-3 py-2 space-y-1`}
           >
             <div class="flex items-center gap-3">
               <h6 class={valueDarkSm}>
@@ -343,7 +343,7 @@ export const WalletButton = (
 
           {/* Bottom - Counterparty version */}
           <div class="sticky bottom-0 w-full mt-auto pb-9 tablet:pb-6 bg-[#0a070a]/80 shadow-[0_-36px_36px_-6px_rgba(10,7,10,1)]">
-            <div class={`flex items-end`}>
+            <div class={`flex items-end -mb-1.5`}>
               <CounterpartyVersion />
             </div>
           </div>

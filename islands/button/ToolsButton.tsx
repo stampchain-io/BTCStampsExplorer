@@ -326,7 +326,7 @@ export function ToolsButton({ onOpenDrawer }: ToolsButtonProps) {
             <div class="flex items-center">
               <Icon
                 type="icon"
-                name="bitcoinBlock"
+                name="bitcoin"
                 weight="normal"
                 size="xxs"
                 color="greyDark"
@@ -334,11 +334,7 @@ export function ToolsButton({ onOpenDrawer }: ToolsButtonProps) {
               />
               {isLoading
                 ? <span class="animate-pulse">XXX,XXX</span>
-                : (
-                  <span class="font-medium">
-                    {latestBlock.toLocaleString()}
-                  </span>
-                )}
+                : <span class="font-medium mr-1">{displayPrice}</span>}&nbsp;USD
             </div>
             <div class="flex items-center">
               <Icon
@@ -356,7 +352,7 @@ export function ToolsButton({ onOpenDrawer }: ToolsButtonProps) {
             <div class="flex items-center">
               <Icon
                 type="icon"
-                name="bitcoin"
+                name="bitcoinBlock"
                 weight="normal"
                 size="xxs"
                 color="greyDark"
@@ -364,7 +360,11 @@ export function ToolsButton({ onOpenDrawer }: ToolsButtonProps) {
               />
               {isLoading
                 ? <span class="animate-pulse">XXX,XXX</span>
-                : <span class="font-medium mr-1">{displayPrice}</span>}&nbsp;USD
+                : (
+                  <span class="font-medium">
+                    {latestBlock.toLocaleString()}
+                  </span>
+                )}
             </div>
           </div>
         </div>

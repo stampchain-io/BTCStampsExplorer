@@ -266,7 +266,11 @@ export function Header() {
         id={`navbar-collapse-${type}`}
       >
         <div class="flex flex-col h-full">
-          <div class={`flex pt-[34px] px-9 ${isMenu ? "justify-end" : ""}`}>
+          <div
+            class={`flex pt-[34px] mobileLg:pt-[22px] px-9 ${
+              isMenu ? "justify-end" : ""
+            }`}
+          >
             <div class="relative">
               <div
                 class={`${tooltipIcon} ${
