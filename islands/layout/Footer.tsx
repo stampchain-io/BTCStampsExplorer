@@ -40,10 +40,13 @@ const aboutLinks: FooterLink[] = [
 
 const mobileLinks: FooterLink[] = [
   { title: "ABOUT", href: "/about" },
-  { title: "MEDIA", href: "/media" },
-  { title: "HOW-TO", href: "/howto" },
-  { title: "FAQ", href: "/faq" },
   { title: "DONATE", href: "/about#donate" },
+  {
+    title: "PRESS KIT",
+    href:
+      "https://drive.google.com/drive/folders/18QsMTZ_ZII5FVxuAs2CLFoLdZE3NOdlT",
+    isExternal: true,
+  },
   { title: "TERMS", href: "/termsofservice", hiddenOnMobile: true },
 ];
 
@@ -204,8 +207,9 @@ export function Footer() {
 
           {/* ===== MOBILE BOTTOM ROW SECTION ===== */}
           {/* ===== MIXED LINKS  ===== */}
-          <div class="flex tablet:hidden w-[360px] mobileMd:w-full justify-center mobileMd:justify-start mx-auto mt-2 mobileMd:mt-1 mb-2">
-            <div class="flex flex-row w-full justify-between">
+          <div class="flex tablet:hidden w-[360px] mobileMd:w-full justify-center mobileMd:justify-start mx-auto mt-3 mobileMd:mt-2 mb-2 mobileMd:mb-0">
+            {/* ===== BASE/MOBILESM: EVENLY DISTRIBUTED LINKS ===== */}
+            <div class="flex mobileMd:hidden flex-row w-full justify-between">
               {mobileLinks.map((link) => (
                 <a
                   key={link.href}
@@ -218,12 +222,52 @@ export function Footer() {
                   {link.title}
                 </a>
               ))}
-              {/* ===== COPYRIGHT SECTION - MOBILEMD + MOBILELG ===== */}
-              <h6
-                class={`${copyright} hidden mobileMd:block tablet:hidden`}
-              >
-                <span class="italic">STAMPCHAIN</span> &copy; 2025
-              </h6>
+            </div>
+
+            {/* ===== MOBILEMD+: LEFT/RIGHT GROUPED LAYOUT ===== */}
+            <div class="hidden mobileMd:flex flex-row w-full justify-between">
+              {/* ===== LEFT ALIGNED LINKS WITH GAP-5 ===== */}
+              <div class="flex gap-5">
+                {mobileLinks.filter((link) => link.title !== "TERMS").map((
+                  link,
+                ) => (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    f-partial={link.isExternal ? "" : link.href}
+                    class={`${navLinkTransparentPurple}`}
+                    target={link.isExternal ? "_blank" : undefined}
+                    rel={link.isExternal ? "noopener noreferrer" : undefined}
+                  >
+                    {link.title}
+                  </a>
+                ))}
+              </div>
+
+              {/* ===== RIGHT ALIGNED TERMS LINK AND COPYRIGHT ===== */}
+              <div class="flex flex-row items-center text-right gap-5">
+                {mobileLinks.filter((link) => link.title === "TERMS").map((
+                  link,
+                ) => (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    f-partial={link.isExternal ? "" : link.href}
+                    class={`${navLinkTransparentPurple}`}
+                    target={link.isExternal ? "_blank" : undefined}
+                    rel={link.isExternal ? "noopener noreferrer" : undefined}
+                  >
+                    {link.title}
+                  </a>
+                ))}
+
+                {/* ===== COPYRIGHT SECTION - MOBILEMD + MOBILELG ===== */}
+                <h6
+                  class={`${copyright} hidden mobileMd:inline tablet:hidden`}
+                >
+                  <span class="italic">STAMPCHAIN</span> &copy; 2025
+                </h6>
+              </div>
             </div>
           </div>
 
