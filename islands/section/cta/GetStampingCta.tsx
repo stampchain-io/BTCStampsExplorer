@@ -1,50 +1,11 @@
 /* ===== GET STAMPING CTA COMPONENT ===== */
 import { Button } from "$button";
 import { containerBackground, gapGrid } from "$layout";
-import { getCSRFToken } from "$lib/utils/security/clientSecurityUtils.ts";
-import { formatUSDValue } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { subtitleGrey, text, titleGreyDL } from "$text";
-import { useEffect, useState } from "preact/hooks";
 
 /* ===== COMPONENT ===== */
 export default function GetStampingCta() {
   /* ===== STATE ===== */
-  const [btcPrice, setBtcPrice] = useState(0);
-  const [recommendedFee, setRecommendedFee] = useState(6);
-  const [isLoading, setIsLoading] = useState(true);
-
-  /* ===== DATA FETCHING ===== */
-  useEffect(() => {
-    const fetchFees = async () => {
-      try {
-        const csrfToken = await getCSRFToken();
-
-        const response = await fetch("/api/internal/fees", {
-          headers: {
-            "X-CSRF-Token": csrfToken,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch fees: ${response.status}`);
-        }
-
-        const data = await response.json();
-        setBtcPrice(data.btcPrice);
-        setRecommendedFee(data.recommendedFee);
-        setIsLoading(false);
-      } catch (err) {
-        console.error("Fees fetch error:", err);
-        setIsLoading(false);
-      }
-    };
-
-    fetchFees();
-  }, []);
-
-  /* ===== HELPERS ===== */
-  const displayPrice = formatUSDValue(btcPrice).toLocaleString();
-  const displayFee = typeof recommendedFee === "number" ? recommendedFee : "0";
 
   /* ===== RENDER ===== */
   return (
@@ -113,23 +74,6 @@ export default function GetStampingCta() {
           >
             STAMP
           </Button>
-        </div>
-
-        {/* ===== PRICE/FEE INFO ===== */}
-        <div class="flex justify-end -mb-6 gap-5
-        font-light text-sm text-stamp-grey">
-          <p>
-            <span class="text-stamp-grey-darker">FEE</span>&nbsp;
-            {isLoading
-              ? <span class="animate-pulse">XX</span>
-              : <span class="font-medium">{displayFee}</span>} SAT/vB
-          </p>
-          <p>
-            <span class="text-stamp-grey-darker">BTC</span>&nbsp;
-            {isLoading
-              ? <span class="animate-pulse">XX,XXX</span>
-              : <span class="font-medium">{displayPrice}</span>} USD
-          </p>
         </div>
       </div>
     </div>
