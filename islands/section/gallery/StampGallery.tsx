@@ -195,9 +195,7 @@ export default function StampGallery({
         {fromPage === "collection" &&
           (
             <div class="flex gap-1 items-center">
-              <div>
-                <SortButton initSort={sortBy} />
-              </div>
+              <SortButton initSort={sortBy} />
             </div>
           )}
       </div>
