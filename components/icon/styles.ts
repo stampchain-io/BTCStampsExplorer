@@ -25,9 +25,10 @@ export interface IconVariants {
     | "xxlR"
     | "custom";
   color: "grey" | "greyDark" | "purple" | "purpleDark" | "custom";
-  className?: string;
+  className?: string | undefined;
   role?: JSX.AriaRole;
   ariaLabel?: string;
+  isOpen?: boolean;
   onClick?:
     | ((
       e: MouseEvent & {
@@ -61,10 +62,14 @@ export interface IconVariants {
       },
     ) => void)
     | undefined;
-  href?: string;
-  target?: string;
-  rel?: string;
-  text?: string;
+  href?: string | undefined;
+  target?: string | undefined;
+  rel?: string | undefined;
+  text?: string | undefined;
+  "f-partial"?: string | undefined;
+  // Optional two-tone accent support (applies to the last path when provided)
+  colorAccent?: string | undefined;
+  colorAccentHover?: string | undefined;
 }
 
 export interface BadgeVariants {
@@ -121,7 +126,7 @@ export const iconStyles = {
     extraLight: "[stroke-width:0.75]", // used for loading icon and tool image icons
     light: "[stroke-width:1.0]",
     normal: "[stroke-width:1.5] tablet:[stroke-width:1.25]",
-    bold: "[stroke-width:2] tablet:[stroke-width:1.75]",
+    bold: "[stroke-width:1.75] tablet:[stroke-width:1.5]",
     custom: "",
   },
 
@@ -135,13 +140,13 @@ export const iconStyles = {
     lg: "w-8 h-8",
     xl: "w-9 h-9",
     xxl: "w-10 h-10",
-    xxsR: "w-4 h-4 tablet:w-[14px] tablet:h-[14px]",
-    xsR: "w-5 h-5 tablet:w-[18px] tablet:h-[18px]",
-    smR: "w-6 h-6 tablet:w-[22px] tablet:h-[22px]",
-    mdR: "w-7 h-7 tablet:w-[26px] tablet:h-[26px]",
-    lgR: "w-8 h-8 tablet:w-[30px] tablet:h-[30px]",
-    xlR: "w-9 h-9 tablet:w-[34px] tablet:h-[34px]",
-    xxlR: "w-10 h-10 tablet:w-[38px] tablet:h-[38px]",
+    xxsR: "w-4 h-4 tablet:w-3 tablet:h-3",
+    xsR: "w-5 h-5 tablet:w-4 tablet:h-4",
+    smR: "w-6 h-6 tablet:w-5 tablet:h-5",
+    mdR: "w-7 h-7 tablet:w-6 tablet:h-6",
+    lgR: "w-8 h-8 tablet:w-7 tablet:h-7",
+    xlR: "w-9 h-9 tablet:w-8 tablet:h-8",
+    xxlR: "w-10 h-10 tablet:w-9 tablet:h-9",
     custom: "",
   },
 } as const;
