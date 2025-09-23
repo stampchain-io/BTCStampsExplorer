@@ -8,7 +8,6 @@ function CollectionOverviewHeader() {
       <h1 class={titlePurpleLD}>
         COLLECTIONS
       </h1>
-      {/* Search moved to global header */}
     </div>
   );
 }

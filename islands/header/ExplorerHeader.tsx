@@ -13,12 +13,7 @@ export const ExplorerHeader = () => {
       {/* Controls Section */}
       <div class="flex flex-col">
         <div class="flex relative items-start justify-between gap-4 tablet:gap-3">
-          {/* Sort Component */}
-          <div>
-            <SortButton />
-          </div>
-
-          {/* Search moved to global header */}
+          <SortButton />
         </div>
       </div>
     </div>
