@@ -2,23 +2,13 @@
 import { Icon } from "$icon";
 import { closeModal, openModal, searchState } from "$islands/modal/states.ts";
 import { ModalSearchBase, transitionColors } from "$layout";
-import { tooltipIcon } from "$notification";
 import { textSm } from "$text";
-import { useCallback, useEffect, useRef, useState } from "preact/hooks";
+import { useEffect } from "preact/hooks";
 
-export function SearchSRC20Modal({
-  showButton = true,
-}: {
-  showButton?: boolean;
-}) {
-  const inputRef = useRef<HTMLInputElement>(null);
+export function openSRC20Search() {
+  const inputRef = { current: null } as preact.RefObject<HTMLInputElement>;
 
-  // Add tooltip state
-  const [isTooltipVisible, setIsTooltipVisible] = useState(false);
-  const [allowTooltip, setAllowTooltip] = useState(true);
-  const tooltipTimeoutRef = useRef<number | null>(null);
-
-  const handleSearch = useCallback(async () => {
+  const handleSearch = async () => {
     const currentTerm = searchState.value.term;
 
     if (!currentTerm?.trim()) {
@@ -64,110 +54,35 @@ export function SearchSRC20Modal({
         results: [],
       };
     }
-  }, []);
+  };
 
-  const handleOpenSearch = () => {
-    console.log("Opening search modal");
-    searchState.value = { term: "", error: "", results: [] };
-    const modalContent = (
-      <ModalSearchBase
-        title="Search SRC-20 Tokens"
-        onClose={() => {
-          console.log("Modal closing, resetting state");
-          searchState.value = { term: "", error: "", results: [] };
-          closeModal();
+  // Open modal
+  searchState.value = { term: "", error: "", results: [] };
+  const modalContent = (
+    <ModalSearchBase
+      title="Search SRC-20 Tokens"
+      onClose={() => {
+        searchState.value = { term: "", error: "", results: [] };
+        closeModal();
+      }}
+    >
+      <SearchContent
+        searchTerm={searchState.value.term}
+        setSearchTerm={(term) => {
+          searchState.value = { ...searchState.value, term };
         }}
-      >
-        <SearchContent
-          searchTerm={searchState.value.term}
-          setSearchTerm={(term) => {
-            searchState.value = { ...searchState.value, term };
-          }}
-          error={searchState.value.error}
-          results={searchState.value.results || []}
-          inputRef={inputRef}
-          onSearch={handleSearch}
-          setError={(error) => {
-            searchState.value = { ...searchState.value, error };
-          }}
-          autoFocus
-        />
-      </ModalSearchBase>
-    );
-    openModal(modalContent, "slideDownUp");
-  };
-
-  // Add tooltip handlers
-  const handleMouseEnter = () => {
-    if (allowTooltip) {
-      if (tooltipTimeoutRef.current) {
-        globalThis.clearTimeout(tooltipTimeoutRef.current);
-      }
-      tooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        setIsTooltipVisible(true);
-      }, 1500);
-    }
-  };
-
-  const handleMouseLeave = () => {
-    if (tooltipTimeoutRef.current) {
-      globalThis.clearTimeout(tooltipTimeoutRef.current);
-    }
-    setIsTooltipVisible(false);
-    setAllowTooltip(true);
-  };
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (tooltipTimeoutRef.current) {
-        globalThis.clearTimeout(tooltipTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    const handleKeyboardShortcut = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "s") {
-        e.preventDefault();
-        handleOpenSearch();
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyboardShortcut);
-    return () =>
-      document.removeEventListener("keydown", handleKeyboardShortcut);
-  }, []);
-
-  return (
-    <div class="relative">
-      {showButton && (
-        <Icon
-          type="iconButton"
-          name="search"
-          weight="bold"
-          size="smR"
-          color="purple"
-          className="mt-1"
-          onClick={() => {
-            handleOpenSearch();
-            setIsTooltipVisible(false);
-            setAllowTooltip(false);
-          }}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-          role="button"
-        />
-      )}
-      <div
-        className={`${tooltipIcon} ${
-          isTooltipVisible ? "opacity-100" : "opacity-0"
-        }`}
-      >
-        SEARCH
-      </div>
-    </div>
+        error={searchState.value.error}
+        results={searchState.value.results || []}
+        inputRef={inputRef}
+        onSearch={handleSearch}
+        setError={(error) => {
+          searchState.value = { ...searchState.value, error };
+        }}
+        autoFocus
+      />
+    </ModalSearchBase>
   );
+  openModal(modalContent, "slideDownUp");
 }
 
 function SearchContent({
