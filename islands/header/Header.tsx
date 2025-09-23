@@ -1,6 +1,7 @@
 /* ===== HEADER COMPONENT ===== */
 import { CloseIcon, Icon } from "$icon";
 import { MenuButton } from "$islands/button/MenuButton.tsx";
+import { SearchButton } from "$islands/button/SearchButton.tsx";
 import { ToolsButton } from "$islands/button/ToolsButton.tsx";
 import { WalletButton } from "$islands/button/WalletButton.tsx";
 import {
@@ -402,8 +403,9 @@ export function Header() {
             />
           </div>
 
-          {/* Right: Tools and Connect Buttons (Mobile: icons only) */}
+          {/* Right: Search, Tools and Connect Buttons (Mobile: icons only) */}
           <div class="flex items-center gap-5">
+            <SearchButton />
             {ToolsButton({ onOpenDrawer: openDrawer }).icon}
             {WalletButton({
               onOpenDrawer: openDrawer,
@@ -437,8 +439,11 @@ export function Header() {
             </div>
           </div>
 
-          {/* Right: Tools and Connect Buttons (Desktop with dropdowns) */}
+          {/* Right: Search, Tools and Connect Buttons (Desktop with dropdowns) */}
           <div class="flex items-center gap-5">
+            <div class="relative group">
+              <SearchButton />
+            </div>
             <div class="relative group">
               {ToolsButton({ onOpenDrawer: openDrawer }).icon}
               {/* Hover bridge to avoid gap between icon and dropdown */}
