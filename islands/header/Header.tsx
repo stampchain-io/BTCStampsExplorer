@@ -230,14 +230,14 @@ export function Header() {
     const getContent = () => {
       switch (type) {
         case "menu":
-          return MenuButton({ onOpenDrawer: openDrawer }).content;
+          return MenuButton({ onOpenDrawer: openDrawer }).drawer;
         case "wallet":
           return WalletButton({
             onOpenDrawer: openDrawer,
             onCloseDrawer: closeMenu,
-          }).content;
+          }).drawer;
         case "tools":
-          return ToolsButton({ onOpenDrawer: openDrawer }).content;
+          return ToolsButton({ onOpenDrawer: openDrawer }).drawer;
       }
     };
 
@@ -377,7 +377,7 @@ export function Header() {
      pt-6 pb-9 mobileLg:pt-9 tablet:pb-14">
       {/* ===== LOGO, TEXT MENUS (DESKTOP) HAMBURGER MENU (MOBILE), TOOLS, SEARCH AND CONNECT BUTTON ===== */}
       <div
-        class={`flex justify-between items-center w-full py-1.5 px-3 ${glassmorphism} !overflow-visible`}
+        class={`flex justify-between items-center w-full py-1.5 px-3 ${glassmorphism} relative z-header`}
       >
         {/* ===== MOBILE NAVIGATION ===== */}
         <div class="mobileLg:hidden flex items-center w-full">
@@ -402,7 +402,7 @@ export function Header() {
             />
           </div>
 
-          {/* Right: Tools and Connect Buttons */}
+          {/* Right: Tools and Connect Buttons (Mobile: icons only) */}
           <div class="flex items-center gap-5">
             {ToolsButton({ onOpenDrawer: openDrawer }).icon}
             {WalletButton({
@@ -420,8 +420,6 @@ export function Header() {
             size="lg"
             weight="light"
             color="purple"
-            colorAccent="#660099"
-            colorAccentHover="#8800CC"
             href="/home"
             f-partial="/home"
             onClick={() => setCurrentPath("home")}
@@ -439,13 +437,50 @@ export function Header() {
             </div>
           </div>
 
-          {/* Right: Tools and Connect Buttons */}
+          {/* Right: Tools and Connect Buttons (Desktop with dropdowns) */}
           <div class="flex items-center gap-5">
-            {ToolsButton({ onOpenDrawer: openDrawer }).icon}
-            {WalletButton({
-              onOpenDrawer: openDrawer,
-              onCloseDrawer: closeMenu,
-            }).icon}
+            <div class="relative group">
+              {ToolsButton({ onOpenDrawer: openDrawer }).icon}
+              {/* Hover bridge to avoid gap between icon and dropdown */}
+              <div class="hidden tablet:group-hover:block absolute top-full -right-14 h-6 min-w-[600px]">
+              </div>
+              {/* Dropdown menu */}
+              <div
+                class={`hidden tablet:group-hover:flex absolute top-11 -right-14 min-w-[600px] z-dropdown py-3.5 px-5 whitespace-nowrap ${glassmorphism}`}
+              >
+                <div class="grid grid-cols-4 gap-6 w-full">
+                  {ToolsButton({ onOpenDrawer: openDrawer }).dropdown}
+                </div>
+              </div>
+            </div>
+            <div class="relative group">
+              {WalletButton({
+                onOpenDrawer: openDrawer,
+                onCloseDrawer: closeMenu,
+              }).icon}
+              {/* Only render dropdown when connected on tablet/desktop */}
+              {(() => {
+                const wb = WalletButton({
+                  onOpenDrawer: openDrawer,
+                  onCloseDrawer: closeMenu,
+                });
+                return wb.isConnected
+                  ? (
+                    <>
+                      {/* Hover bridge */}
+                      <div class="hidden tablet:group-hover:block absolute top-full -right-3 h-6 min-w-[140px]">
+                      </div>
+                      {/* Dropdown menu */}
+                      <div
+                        class={`hidden tablet:group-hover:flex absolute top-11 -right-3 z-dropdown min-w-[140px] py-3.5 px-5 justify-end whitespace-nowrap ${glassmorphism}`}
+                      >
+                        {wb.dropdown}
+                      </div>
+                    </>
+                  )
+                  : null;
+              })()}
+            </div>
           </div>
         </div>
       </div>
@@ -457,46 +492,3 @@ export function Header() {
     </header>
   );
 }
-
-/* ===== OLD DESKTOP MENUS===== */
-/*
-const desktopNavLinks: NavLink[] = [
-  {
-    title: {
-      default: "ART STAMPS",
-      tablet: "STAMPS",
-    },
-    href: "#",
-    subLinks: [
-      { title: "ALL", href: "/stamp?type=classic" },
-      { title: "COLLECTIONS", href: "/collection" },
-      { title: "STAMPING", href: "/tool/stamp/stamping" },
-      { title: "TRANSFER", href: "/tool/stamp/transfer" },
-    ],
-  },
-  {
-    title: {
-      default: "SRC-20 TOKENS",
-      tablet: "TOKENS",
-    },
-    href: "#",
-    subLinks: [
-      { title: "ALL", href: "/src20" },
-      { title: "TRENDING", href: "/src20?type=trending" },
-      { title: "DEPLOY", href: "/tool/src20/deploy" },
-      { title: "MINT", href: "/tool/src20/mint" },
-      { title: "TRANSFER", href: "/tool/src20/transfer" },
-    ],
-  },
-  {
-    title: {
-      default: "BITNAME DOMAINS",
-      tablet: "BITNAME",
-    },
-    href: "#",
-    subLinks: [
-      { title: "REGISTER", href: "/tool/src101/mint" },
-    ],
-  },
-];
-*/
