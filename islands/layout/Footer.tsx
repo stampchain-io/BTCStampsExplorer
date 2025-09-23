@@ -9,6 +9,7 @@ import {
   overlayPurple,
   tagline,
 } from "$text";
+import { useEffect, useState } from "preact/hooks";
 
 /* ===== FOOTER LINK INTERFACE ===== */
 interface FooterLink {
@@ -163,6 +164,11 @@ export function Footer() {
               </div>
             ))}
           </div>
+          <div class="hidden tablet:flex w-full  mt-3 mb-1">
+            <h6 class={`${copyright}`}>
+              <span class="italic">STAMPCHAIN</span> &copy; 2025
+            </h6>
+          </div>
         </div>
 
         {/* ===== DESKTOP RIGHT SECTION ===== */}
@@ -271,14 +277,59 @@ export function Footer() {
             </div>
           </div>
 
-          {/* ===== COPYRIGHT SECTION - BASE/MOBILESM + TABLET/DESKTOP ===== */}
-          <div class="flex flex-row mobileMd:hidden tablet:block w-full justify-center tablet:justify-end tablet:text-right mt-3 tablet:mt-2">
+          {/* ===== COPYRIGHT SECTION - BASE/MOBILESM ===== */}
+          <div class="flex flex-row mobileMd:hidden w-full justify-center  mt-3">
             <h6 class={`${copyright}`}>
               <span class="italic">STAMPCHAIN</span> &copy; 2025
             </h6>
           </div>
+          <div class="hidden tablet:flex mt-[18px] justify-end">
+            <CounterpartyVersion />
+          </div>
         </div>
       </div>
     </footer>
+  );
+}
+
+function CounterpartyVersion() {
+  const [version, setVersion] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    const fetchVersion = async () => {
+      try {
+        const res = await fetch("/api/v2/counterparty/version", {
+          headers: { "X-CSRF-Token": "safe" },
+        });
+        const data = await res.json();
+        if (!cancelled) {
+          setVersion(data?.version ?? null);
+        }
+      } catch (_e) {
+        if (!cancelled) setVersion(null);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    fetchVersion();
+
+    const interval = globalThis.setInterval(fetchVersion, 24 * 60 * 60 * 1000);
+    return () => {
+      cancelled = true;
+      globalThis.clearInterval(interval);
+    };
+  }, []);
+
+  return (
+    <div class={copyright}>
+      COUNTERPARTY {loading
+        ? <span class="animate-pulse">vXX.X.X</span>
+        : version
+        ? <>v{version}</>
+        : <>v N/A</>}
+    </div>
   );
 }
