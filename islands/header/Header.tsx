@@ -447,13 +447,13 @@ export function Header() {
             <div class="relative group">
               {ToolsButton({ onOpenDrawer: openDrawer }).icon}
               {/* Hover bridge to avoid gap between icon and dropdown */}
-              <div class="hidden tablet:group-hover:block absolute top-full -right-14 h-6 min-w-[600px]">
+              <div class="hidden tablet:group-hover:block absolute top-full -right-14 h-6 w-[520px]">
               </div>
               {/* Dropdown menu */}
               <div
-                class={`hidden tablet:group-hover:flex absolute top-11 -right-14 min-w-[600px] z-dropdown py-3.5 px-5 whitespace-nowrap ${glassmorphism}`}
+                class={`hidden tablet:group-hover:flex absolute top-11 -right-14 w-[520px] z-dropdown py-3.5 px-5 whitespace-nowrap ${glassmorphism}`}
               >
-                <div class="grid grid-cols-4 gap-6 w-full">
+                <div class="grid grid-cols-5 w-full">
                   {ToolsButton({ onOpenDrawer: openDrawer }).dropdown}
                 </div>
               </div>

@@ -209,7 +209,7 @@ export function ToolsButton({ onOpenDrawer }: ToolsButtonProps) {
         />
         {isLoading
           ? <span class="animate-pulse">XXX,XXX</span>
-          : <span class="font-medium mr-1">{displayPrice}</span>}&nbsp;USD
+          : <span class="font-medium">{displayPrice}</span>}&nbsp;USD
       </div>
       <div class="flex items-center">
         <Icon
@@ -247,7 +247,7 @@ export function ToolsButton({ onOpenDrawer }: ToolsButtonProps) {
   return {
     // The tools icon component with desktop dropdown
     icon: (
-      <div class="relative">
+      <div class="relative mt-[1px] mr-0.5 tablet:-ml-0.5 tablet:mr-0">
         {/* Mobile icon */}
         <div class="block tablet:hidden">
           <Icon
@@ -256,7 +256,7 @@ export function ToolsButton({ onOpenDrawer }: ToolsButtonProps) {
             weight="normal"
             size="custom"
             color="purple"
-            className="mt-[1px] mr-0.5 tablet:-ml-0.5 tablet:mr-0 w-[27px] h-[27px]"
+            className=" w-[27px] h-[27px]"
             onClick={handleToolsClick}
             colorAccent="#666666CC"
             colorAccentHover="#999999"
@@ -270,7 +270,7 @@ export function ToolsButton({ onOpenDrawer }: ToolsButtonProps) {
             name="tools"
             weight="normal"
             size="custom"
-            className="mt-[1px] mr-0.5 tablet:-ml-0.5 tablet:mr-0 w-[23px] h-[23px]"
+            className="w-[23px] h-[23px]"
             color="purple"
             onClick={handleToolsClick}
             colorAccent="#666666CC"
@@ -286,11 +286,14 @@ export function ToolsButton({ onOpenDrawer }: ToolsButtonProps) {
       <>
         {/* Column 1: Left aligned - Stats */}
         {bitcoinStats(
-          `flex-col w-[146px] ${glassmorphismL2} !backdrop-blur-md px-3 py-2 space-y-1 ${labelLightSm}`,
+          `flex-col ${glassmorphismL2} !backdrop-blur-md -ml-1 w-[136px] px-3 py-2 space-y-1 ${labelLightSm}`,
         )}
 
+        {/* Spacer column */}
+        <div class="w-0" />
+
         {/* Column 2: Left aligned - Stamp tools */}
-        <div class="flex flex-col space-y-1 text-left !ml-6">
+        <div class="flex flex-col -ml-10 space-y-1 text-left">
           <h6 class={labelXs}>
             STAMPS
           </h6>
@@ -314,7 +317,7 @@ export function ToolsButton({ onOpenDrawer }: ToolsButtonProps) {
         </div>
 
         {/* Column 3: Center aligned - Token tools */}
-        <div class="flex flex-col space-y-1 text-center">
+        <div class="flex flex-col -ml-12 space-y-1 text-center">
           <h6 class={labelXs}>
             TOKENS
           </h6>
