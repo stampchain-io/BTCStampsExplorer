@@ -132,7 +132,6 @@ import * as $presskit_index from "./routes/presskit/index.tsx";
 import * as $s_id_ from "./routes/s/[...id].tsx";
 import * as $src20_tick_ from "./routes/src20/[tick].tsx";
 import * as $src20_index from "./routes/src20/index.tsx";
-import * as $src20_minting from "./routes/src20/minting.tsx";
 import * as $stamp_id_ from "./routes/stamp/[id].tsx";
 import * as $stamp_art from "./routes/stamp/art.tsx";
 import * as $stamp_index from "./routes/stamp/index.tsx";
@@ -162,6 +161,7 @@ import * as $button_PaginationButtons from "./islands/button/PaginationButtons.t
 import * as $button_PaginationButtonsSSRSafe from "./islands/button/PaginationButtonsSSRSafe.tsx";
 import * as $button_RangeSlider from "./islands/button/RangeSlider.tsx";
 import * as $button_RangeSliderDual from "./islands/button/RangeSliderDual.tsx";
+import * as $button_SearchButton from "./islands/button/SearchButton.tsx";
 import * as $button_SelectorButtons from "./islands/button/SelectorButtons.tsx";
 import * as $button_SettingsButton from "./islands/button/SettingsButton.tsx";
 import * as $button_SortButton from "./islands/button/SortButton.tsx";
@@ -468,7 +468,6 @@ const manifest = {
     "./routes/s/[...id].tsx": $s_id_,
     "./routes/src20/[tick].tsx": $src20_tick_,
     "./routes/src20/index.tsx": $src20_index,
-    "./routes/src20/minting.tsx": $src20_minting,
     "./routes/stamp/[id].tsx": $stamp_id_,
     "./routes/stamp/art.tsx": $stamp_art,
     "./routes/stamp/index.tsx": $stamp_index,
@@ -501,6 +500,7 @@ const manifest = {
       $button_PaginationButtonsSSRSafe,
     "./islands/button/RangeSlider.tsx": $button_RangeSlider,
     "./islands/button/RangeSliderDual.tsx": $button_RangeSliderDual,
+    "./islands/button/SearchButton.tsx": $button_SearchButton,
     "./islands/button/SelectorButtons.tsx": $button_SelectorButtons,
     "./islands/button/SettingsButton.tsx": $button_SettingsButton,
     "./islands/button/SortButton.tsx": $button_SortButton,
