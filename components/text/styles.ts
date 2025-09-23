@@ -26,17 +26,26 @@ export const logoPurpleLDLink =
 /* ===== NAVIGATION STYLES ===== */
 // Header - Desktop
 export const navLinkPurple =
-  `font-medium text-stamp-purple text-sm group-hover:text-stamp-purple-bright tracking-wide ${transitionColors} cursor-pointer ${select}`;
+  `font-semibold tablet:font-normal text-stamp-purple text-sm group-hover:text-stamp-purple-bright tracking-wide ${transitionColors} cursor-pointer ${select}`;
+export const navLinkPurpleActive =
+  `${navLinkPurple} !text-stamp-purple-bright hover:!text-stamp-purple`;
 export const navSublinkPurple =
-  `font-light text-stamp-purple text-sm hover:text-stamp-purple-bright ${transitionColors} cursor-pointer ${select}`; // used in ConnectButton.tsx for connected sunmenu links - header uses custom styles
+  `font-light text-stamp-purple text-[13px] hover:text-stamp-purple-bright ${transitionColors} cursor-pointer ${select}`; // used in WalletButton.tsx for connected sunmenu links - header uses custom styles
+export const navSublinkPurpleActive =
+  `${navSublinkPurple} !text-stamp-purple-bright hover:!text-stamp-purple`;
 // Header - Mobile/tablet
 export const navLinkGrey =
-  `font-bold text-lg text-stamp-grey-darker group-hover:text-stamp-grey tracking-wide ${transitionColors} cursor-pointer ${select}`;
+  `font-semibold text-sm tablet:text-xs text-stamp-grey hover:text-stamp-grey-light
+  tracking-wide ${transitionColors} cursor-pointer ${select}`;
+export const navLinkGreyActive =
+  `${navLinkGrey} !text-stamp-grey-light hover:!text-stamp-grey`;
 export const navLinkGreyLD =
-  `font-extrabold text-xl gray-gradient1-hover tracking-wide inline-block w-fit ${transitionColors} cursor-pointer ${select}`;
+  `font-light text-xl tablet:text-lg gray-gradient1-hover tracking-wide inline-block w-fit ${transitionColors} cursor-pointer ${select}`;
+export const navLinkGreyLDActive =
+  `${navLinkGreyLD} text-stamp-grey-light [background:none_!important] [-webkit-text-fill-color:#CCCCCC_!important] [text-fill-color:#CCCCCC_!important] hover:[-webkit-text-fill-color:#999999!important] hover:[text-fill-color:#999999!important]`;
 // Footer - transparent text - ued with the overlayPurple class
 export const navLinkTransparentPurple =
-  `font-semibold text-xs hover:text-stamp-purple-bright ${transitionColors} cursor-pointer ${select}`;
+  `font-light text-[13px] hover:text-stamp-purple-bright tracking-wide ${transitionColors} cursor-pointer ${select}`;
 
 /* ===== TITLE STYLES ===== */
 export const titleGreyLD =
@@ -93,8 +102,11 @@ export const labelXl = `${labelFont} text-xl ${select}`;
 export const labelXsR = `${labelFont} text-xs tablet:text-[10px] ${select}`; // used for the filter file type labels
 export const labelXsPosition =
   `flex justify-end mt-1 tablet:mt-0 -mb-5 tablet:-mb-4`; // used for the filter file type label positioning
+export const labelLightSm = `font-light text-sm text-stamp-grey ${select}`;
+
 export const labelSmPurple =
   `font-light text-sm text-stamp-purple-bright tracking-wide mb-0.5 ${select}`;
+
 export const labelLogicResponsive = ( // used for the filter labels
   checked: boolean,
   canHoverSelected: boolean,
@@ -162,7 +174,7 @@ export const valueNeutral = `text-stamp-grey-darker`;
 export const tagline =
   `font-regular text-xs bg-gradient-to-r from-[#660099] via-[#8800CC] to-[#AA00FF] text-transparent bg-clip-text cursor-default ${select}`; // used in footer
 export const copyright =
-  `font-normal text-xs cursor-default cursor-default ${select}`; // transparent text - combined with the overlayPurple class - used in footer
+  `font-normal text-xs mobileMd:text-sm tablet:text-xs text-[#1b1b1b] cursor-default ${select}`; // used in footer
 export const loaderText =
   `font-medium text-sm text-stamp-grey uppercase text-center py-3 animated-text-loader ${select}`; // table more rows loader
 export const toggleSymbol =
@@ -224,9 +236,12 @@ export type TextStyles = {
   logoPurpleLDLink: string;
   // Navigation styles
   navLinkPurple: string;
+  navLinkPurpleActive: string;
   navSublinkPurple: string;
+  navSublinkPurpleActive: string;
   navLinkGrey: string;
   navLinkGreyLD: string;
+  navLinkGreyLDActive: string;
   navLinkTransparentPurple: string;
   // Title styles
   titleGreyLD: string;
@@ -261,6 +276,7 @@ export type TextStyles = {
   labelXl: string;
   labelXsR: string;
   labelXsPosition: string;
+  labelLightSm: string;
   labelSmPurple: string;
   labelLogicResponsive: (
     checked: boolean,

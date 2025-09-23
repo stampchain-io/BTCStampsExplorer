@@ -23,14 +23,14 @@ export const shadowGlowGrey =
 // Glassmorphism styles
 // Overlay layer styles - used for drawer and modal containers
 export const glassmorphismOverlay = `rounded-2xl
-  bg-gradient-to-b from-[#0a070a]/95 via-[#0a070a]/70 to-[#0a070a]/100 backdrop-blur-lg overflow-hidden`;
+  bg-gradient-to-b from-[#0a070a]/95 via-[#0a070a]/70 to-[#0a070a]/100 backdrop-blur-lg`;
 // 1st layer styles
 export const glassmorphism = `border-[1px] border-[#1b1b1b]/80 rounded-2xl
   bg-gradient-to-br from-[#100a10]/50 to-[#100a10]/70
-  backdrop-blur overflow-hidden ${shadow}`;
+  backdrop-blur ${shadow}`;
 // 2nd layer styles - register tool tld dropdown uses same hardcoded values
 export const glassmorphismL2 = `border-[1px] border-[#1b1b1b]/80 rounded-xl
-  bg-[#100a10]/30 backdrop-blur-xs overflow-hidden ${shadowL2}`;
+  bg-[#100a10]/30 backdrop-blur-xs ${shadowL2}`;
 export const glassmorphismL2Hover =
   `hover:bg-[#100a10]/60 hover:border-[#242424]`;
 
@@ -118,13 +118,13 @@ export const cellStickyLeft =
 
 /* ===== IMAGE STYLES ===== */
 export const imagePreviewTool =
-  `flex items-center justify-center min-w-[100px] h-[100px] ${glassmorphismL2} overflow-hidden`;
+  `flex items-center justify-center min-w-[100px] h-[100px] ${glassmorphismL2}`;
 export const imageUploadTool =
-  `flex items-center justify-center min-w-[100px] h-[100px] ${glassmorphismL2} hover:bg-stamp-grey-darkest/30 ${transitionColors} cursor-pointer overflow-hidden`;
+  `flex items-center justify-center min-w-[100px] h-[100px] ${glassmorphismL2} hover:bg-stamp-grey-darkest/30 ${transitionColors} cursor-pointer`;
 
 /* ===== MODAL STYLES ===== */
 export const modalBgCenter =
-  "fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-[#000000] bg-opacity-70 backdrop-filter backdrop-blur-md";
+  "fixed inset-0 z-50 flex items-center justify-center bg-[#000000] bg-opacity-70 backdrop-filter backdrop-blur-md";
 
 /* ===== LOADER STYLES ===== */
 // Text loader styles are defined in /text/styles.ts

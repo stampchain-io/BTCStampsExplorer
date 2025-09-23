@@ -41,6 +41,7 @@ import * as $api_v2_block_block_count_number_ from "./routes/api/v2/block/block_
 import * as $api_v2_collections_by_name_name_ from "./routes/api/v2/collections/by-name/[name].ts";
 import * as $api_v2_collections_creator_creator_ from "./routes/api/v2/collections/creator/[creator].ts";
 import * as $api_v2_collections_index from "./routes/api/v2/collections/index.ts";
+import * as $api_v2_counterparty_version from "./routes/api/v2/counterparty/version.ts";
 import * as $api_v2_create_dispense from "./routes/api/v2/create/dispense.ts";
 import * as $api_v2_create_send from "./routes/api/v2/create/send.ts";
 import * as $api_v2_cursed_id_ from "./routes/api/v2/cursed/[id].ts";
@@ -155,7 +156,6 @@ import * as $Toast_ToastComponent from "./islands/Toast/ToastComponent.tsx";
 import * as $Toast_ToastProvider from "./islands/Toast/ToastProvider.tsx";
 import * as $badge_ActivityBadge from "./islands/badge/ActivityBadge.tsx";
 import * as $badge_index from "./islands/badge/index.ts";
-import * as $button_ConnectButton from "./islands/button/ConnectButton.tsx";
 import * as $button_FilterButton from "./islands/button/FilterButton.tsx";
 import * as $button_MenuButton from "./islands/button/MenuButton.tsx";
 import * as $button_PaginationButtons from "./islands/button/PaginationButtons.tsx";
@@ -167,6 +167,7 @@ import * as $button_SettingsButton from "./islands/button/SettingsButton.tsx";
 import * as $button_SortButton from "./islands/button/SortButton.tsx";
 import * as $button_ToggleButton from "./islands/button/ToggleButton.tsx";
 import * as $button_ToolsButton from "./islands/button/ToolsButton.tsx";
+import * as $button_WalletButton from "./islands/button/WalletButton.tsx";
 import * as $button_buttonActions from "./islands/button/buttonActions.tsx";
 import * as $card_RecentSaleCard from "./islands/card/RecentSaleCard.tsx";
 import * as $card_SRC20CardBase from "./islands/card/SRC20CardBase.tsx";
@@ -355,6 +356,7 @@ const manifest = {
     "./routes/api/v2/collections/creator/[creator].ts":
       $api_v2_collections_creator_creator_,
     "./routes/api/v2/collections/index.ts": $api_v2_collections_index,
+    "./routes/api/v2/counterparty/version.ts": $api_v2_counterparty_version,
     "./routes/api/v2/create/dispense.ts": $api_v2_create_dispense,
     "./routes/api/v2/create/send.ts": $api_v2_create_send,
     "./routes/api/v2/cursed/[id].ts": $api_v2_cursed_id_,
@@ -492,7 +494,6 @@ const manifest = {
     "./islands/Toast/ToastProvider.tsx": $Toast_ToastProvider,
     "./islands/badge/ActivityBadge.tsx": $badge_ActivityBadge,
     "./islands/badge/index.ts": $badge_index,
-    "./islands/button/ConnectButton.tsx": $button_ConnectButton,
     "./islands/button/FilterButton.tsx": $button_FilterButton,
     "./islands/button/MenuButton.tsx": $button_MenuButton,
     "./islands/button/PaginationButtons.tsx": $button_PaginationButtons,
@@ -505,6 +506,7 @@ const manifest = {
     "./islands/button/SortButton.tsx": $button_SortButton,
     "./islands/button/ToggleButton.tsx": $button_ToggleButton,
     "./islands/button/ToolsButton.tsx": $button_ToolsButton,
+    "./islands/button/WalletButton.tsx": $button_WalletButton,
     "./islands/button/buttonActions.tsx": $button_buttonActions,
     "./islands/card/RecentSaleCard.tsx": $card_RecentSaleCard,
     "./islands/card/SRC20CardBase.tsx": $card_SRC20CardBase,
