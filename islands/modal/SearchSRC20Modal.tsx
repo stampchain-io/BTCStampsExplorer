@@ -138,11 +138,11 @@ function SearchContent({
           setSearchTerm(newTerm);
         }}
         autoFocus={autoFocus}
-        class={`relative z-[2] h-12 w-full !bg-[#0a070a] pl-[18px] pr-[52px] font-medium text-sm text-stamp-grey-light placeholder:!bg-[#0a070a] placeholder:font-light placeholder:!text-stamp-grey no-outline ${
+        class={`relative z-[2] h-12 w-full bg-[#100a10]/50 pl-[18px] pr-[52px] font-medium text-sm text-stamp-grey-light placeholder:bg-[#100a10]/50 placeholder:font-light placeholder:!text-stamp-grey no-outline ${
           searchState.value.error ||
             (searchState.value.results?.length ?? 0) > 0
-            ? "rounded-t-lg"
-            : "rounded-lg"
+            ? "rounded-t-2xl"
+            : "rounded-2xl"
         }`}
       />
       <div class="absolute z-[3] right-4 top-[11px] cursor-pointer">
@@ -162,7 +162,7 @@ function SearchContent({
 
       {searchState.value.error
         ? (
-          <ul class="!bg-[#0a070a] rounded-b-md z-[2] overflow-y-auto">
+          <ul class="bg-[#100a10]/50 rounded-b-2xl z-[2] overflow-y-auto">
             <li class="flex flex-col items-center justify-end pt-1.5 pb-3 px-[18px]">
               <img
                 src="/img/placeholder/broken.png"
@@ -191,7 +191,7 @@ function SearchContent({
         )
         : searchState.value.results && searchState.value.results.length > 0
         ? (
-          <ul class="max-h-[266px] !bg-[#0a070a] rounded-b-md z-[2] overflow-y-auto scrollbar-black [&::-webkit-scrollbar]:!rounded-[2px] [&::-webkit-scrollbar]:!w-[4px]">
+          <ul class="max-h-[266px] bg-[#100a10]/50 rounded-b-2xl z-[2] overflow-y-auto scrollbar-black [&::-webkit-scrollbar]:!rounded-[2px] [&::-webkit-scrollbar]:!w-[4px]">
             {searchState.value.results.map((result: { tick: string }) => (
               <li
                 key={result.tick}
