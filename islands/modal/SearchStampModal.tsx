@@ -2,21 +2,11 @@
 import { Icon } from "$icon";
 import { closeModal, openModal, searchState } from "$islands/modal/states.ts";
 import { ModalSearchBase } from "$layout";
-import { tooltipIcon } from "$notification";
 import { textSm } from "$text";
-import { useCallback, useEffect, useRef, useState } from "preact/hooks";
+import { useEffect } from "preact/hooks";
 
-export function SearchStampModal({
-  showButton = true,
-}: {
-  showButton?: boolean;
-}) {
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  // Add tooltip state
-  const [isTooltipVisible, setIsTooltipVisible] = useState(false);
-  const [allowTooltip, setAllowTooltip] = useState(true);
-  const tooltipTimeoutRef = useRef<number | null>(null);
+export function openStampSearch() {
+  const inputRef = { current: null } as preact.RefObject<HTMLInputElement>;
 
   // Helper functions
   const isHexString = (str: string): boolean => {
@@ -55,7 +45,7 @@ export function SearchStampModal({
     }
   };
 
-  const handleSearch = useCallback(async () => {
+  const handleSearch = async () => {
     const currentTerm = searchState.value.term;
     console.log("handleSearch executing with term:", currentTerm);
 
@@ -195,109 +185,34 @@ export function SearchStampModal({
           `SYSTEM ERROR\n${currentTerm}\nSomething went wrong, please try again`,
       };
     }
-  }, []); // No dependencies needed since we're using signals
+  }; // plain function; not a hook
 
-  const handleOpenSearch = () => {
-    console.log("Opening search modal");
-    searchState.value = { term: "", error: "" }; // Reset state
-    const modalContent = (
-      <ModalSearchBase
-        title="Search Stamps"
-        onClose={() => {
-          console.log("Modal closing, resetting state");
-          searchState.value = { term: "", error: "" };
-          closeModal();
+  // Open modal
+  searchState.value = { term: "", error: "" };
+  const modalContent = (
+    <ModalSearchBase
+      title="Search Stamps"
+      onClose={() => {
+        searchState.value = { term: "", error: "" };
+        closeModal();
+      }}
+    >
+      <SearchContent
+        searchTerm={searchState.value.term}
+        setSearchTerm={(term) => {
+          searchState.value = { ...searchState.value, term };
         }}
-      >
-        <SearchContent
-          searchTerm={searchState.value.term}
-          setSearchTerm={(term) => {
-            searchState.value = { ...searchState.value, term };
-          }}
-          error={searchState.value.error}
-          setError={(error) => {
-            searchState.value = { ...searchState.value, error };
-          }}
-          inputRef={inputRef}
-          onSearch={handleSearch}
-          autoFocus
-        />
-      </ModalSearchBase>
-    );
-    openModal(modalContent, "slideDownUp");
-  };
-
-  useEffect(() => {
-    const handleKeyboardShortcut = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "s") {
-        e.preventDefault();
-        handleOpenSearch();
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyboardShortcut);
-    return () =>
-      document.removeEventListener("keydown", handleKeyboardShortcut);
-  }, []);
-
-  // Add tooltip handlers
-  const handleMouseEnter = () => {
-    if (allowTooltip) {
-      if (tooltipTimeoutRef.current) {
-        globalThis.clearTimeout(tooltipTimeoutRef.current);
-      }
-      tooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        setIsTooltipVisible(true);
-      }, 1500);
-    }
-  };
-
-  const handleMouseLeave = () => {
-    if (tooltipTimeoutRef.current) {
-      globalThis.clearTimeout(tooltipTimeoutRef.current);
-    }
-    setIsTooltipVisible(false);
-    setAllowTooltip(true);
-  };
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (tooltipTimeoutRef.current) {
-        globalThis.clearTimeout(tooltipTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  return (
-    <div class="relative">
-      {showButton && (
-        <Icon
-          type="iconButton"
-          name="search"
-          weight="bold"
-          size="smR"
-          color="purple"
-          className="mt-1.5"
-          onClick={() => {
-            handleOpenSearch();
-            setIsTooltipVisible(false);
-            setAllowTooltip(false);
-          }}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-          role="button"
-        />
-      )}
-      <div
-        className={`${tooltipIcon} ${
-          isTooltipVisible ? "opacity-100" : "opacity-0"
-        }`}
-      >
-        SEARCH
-      </div>
-    </div>
+        error={searchState.value.error}
+        setError={(error) => {
+          searchState.value = { ...searchState.value, error };
+        }}
+        inputRef={inputRef}
+        onSearch={handleSearch}
+        autoFocus
+      />
+    </ModalSearchBase>
   );
+  openModal(modalContent, "slideDownUp");
 }
 
 function SearchContent({
