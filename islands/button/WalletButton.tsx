@@ -193,7 +193,7 @@ export const WalletButton = (
       <div class="relative z-10">
         {/* ===== CONNECT WALLET BUTTON ===== */}
         {!(isConnected && address) && (
-          <div class={`mt-0.5 -mx-0.5`}>
+          <div class="mt-0.5">
             <Icon
               type="iconButton"
               name="wallet"
