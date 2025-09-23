@@ -227,7 +227,8 @@ export default {
       zIndex: {
         "modal": "50",
         "tooltip": "40",
-        "dropdown": "30",
+        "header": "30",
+        "dropdown": "20",
       },
       maxWidth: {
         "desktop": "1920px",
