@@ -3,7 +3,6 @@ import { PaginationButtons, ViewAllButton } from "$button";
 import { StampCard } from "$card";
 import { BREAKPOINTS } from "$constants";
 import { SortButton } from "$islands/button/SortButton.tsx";
-import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
 import { useLoadingSkeleton } from "$lib/hooks/useLoadingSkeleton.ts";
 import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
 import type { StampGalleryProps, StampRow } from "$types/stamp.d.ts";
@@ -198,9 +197,6 @@ export default function StampGallery({
             <div class="flex gap-1 items-center">
               <div>
                 <SortButton initSort={sortBy} />
-              </div>
-              <div>
-                <SearchStampModal showButton />
               </div>
             </div>
           )}

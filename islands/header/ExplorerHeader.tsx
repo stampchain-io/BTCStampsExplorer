@@ -1,6 +1,5 @@
 /* ===== EXPLORER HEADER COMPONENT ===== */
 import { SortButton } from "$islands/button/SortButton.tsx";
-import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
 import { titlePurpleLD } from "$text";
 
 /* ===== COMPONENT ===== */
@@ -19,10 +18,7 @@ export const ExplorerHeader = () => {
             <SortButton />
           </div>
 
-          {/* Search Component */}
-          <div>
-            <SearchStampModal showButton />
-          </div>
+          {/* Search moved to global header */}
         </div>
       </div>
     </div>

@@ -7,7 +7,6 @@ import {
   defaultFilters,
   StampFilters as FilterStampFilters,
 } from "$islands/filter/FilterOptionsStamp.tsx";
-import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
 import { titlePurpleLD } from "$text";
 import type { StampOverviewHeaderProps } from "$types/ui.d.ts";
 import { useState } from "preact/hooks";
@@ -76,7 +75,6 @@ export const StampOverviewHeader = (
             type="stamp"
           />
           <SortButton />
-          <SearchStampModal showButton />
         </div>
       </div>
 

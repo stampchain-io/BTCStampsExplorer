@@ -1,5 +1,4 @@
 /* ===== COLLECTION DETAILS HEADER COMPONENT ===== */
-import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
 import { containerBackground, containerColData } from "$layout";
 import {
   abbreviateAddress,
@@ -32,7 +31,6 @@ export const CollectionDetailHeader = (
   /* ===== COMPONENT ===== */
   return (
     <div class="flex flex-col gap-6">
-      <SearchStampModal showButton={false} />
       {/* ===== COLLECTION INFO SECTION ===== */}
       <div class={containerBackground}>
         <div class="flex justify-between">
