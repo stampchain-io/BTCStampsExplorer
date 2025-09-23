@@ -74,7 +74,7 @@ export function MenuButton({ onOpenDrawer }: MenuButtonProps) {
     return currentPath === hrefPath || currentPath.startsWith(`${hrefPath}/`);
   };
 
-  const renderNavLinks = () => {
+  const navigation = () => {
     return (
       <>
         {navLinks.map((link) => (
@@ -106,7 +106,7 @@ export function MenuButton({ onOpenDrawer }: MenuButtonProps) {
     );
   };
 
-  const renderSubNavLinks = () => {
+  const subnavigation = () => {
     return (
       <div class="flex flex-col gap-3 -mb-1.5">
         {subNavLinks.map((link) => (
@@ -140,17 +140,17 @@ export function MenuButton({ onOpenDrawer }: MenuButtonProps) {
         onClick={handleMenuClick}
       />
     ),
-    // The menu content for the drawer
-    content: (
+    // The menu drawer content
+    drawer: (
       <div class="flex flex-col h-full px-9 tablet:px-6">
         {/* Top - Main navigation content */}
         <div class="flex flex-col flex-1 items-start pt-9 tablet:pt-6 gap-5">
-          {renderNavLinks()}
+          {navigation()}
         </div>
 
         {/* Bottom - Sub navigation content */}
         <div class="sticky bottom-0 pb-9 tablet:pb-6 bg-[#0a070a]/80 shadow-[0_-36px_36px_-6px_rgba(10,7,10,1)]">
-          {renderSubNavLinks()}
+          {subnavigation()}
         </div>
       </div>
     ),

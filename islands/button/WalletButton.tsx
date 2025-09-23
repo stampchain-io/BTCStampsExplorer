@@ -6,18 +6,21 @@ import { Icon } from "$icon";
 import { WalletProvider } from "$islands/layout/WalletProvider.tsx";
 import { ConnectWalletModal } from "$islands/modal/ConnectWalletModal.tsx";
 import { closeModal, openModal } from "$islands/modal/states.ts";
-import { glassmorphism, glassmorphismL2 } from "$layout";
+import { glassmorphismL2 } from "$layout";
 import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { tooltipIcon } from "$notification";
 import {
   labelLg,
+  labelSm,
   labelXs,
   navLinkGreyLD,
   navLinkGreyLDActive,
   navSublinkPurple,
   navSublinkPurpleActive,
   valueDarkSm,
+  valueDarkXs,
   valueLg,
+  valueSm,
 } from "$text";
 import { useEffect, useRef, useState } from "preact/hooks";
 
@@ -197,8 +200,8 @@ export const WalletButton = (
               weight="normal"
               size="mdR"
               color="purple"
-              colorAccent="#660099"
-              colorAccentHover="#8800CC"
+              colorAccent="#666666CC"
+              colorAccentHover="#666666"
               onClick={handleWalletIconClick}
             />
           </div>
@@ -208,63 +211,93 @@ export const WalletButton = (
         {isConnected && address && (
           <>
             {/* ===== MOBILE/TABLET WALLET ICON ===== */}
-            <div class="tablet:hidden">
+            <div class="flex mt-0.5 items-center relative">
               <Icon
                 type="iconButton"
                 name="wallet"
                 weight="normal"
-                size="md"
+                size="mdR"
                 color="purple"
                 colorAccent="#999999CC"
-                colorAccentHover="#8800CC"
+                colorAccentHover="#999999"
                 onClick={handleWalletIconClick}
               />
-            </div>
-
-            {/* ===== DESKTOP WALLET ICON AND DROPDOWN MENU ===== */}
-            <div class="mt-0.5 hidden tablet:flex items-center relative group">
-              <Icon
-                type="iconButton"
-                name="wallet"
-                weight="normal"
-                size="sm"
-                color="purple"
-                colorAccent="#999999CC"
-                colorAccentHover="#8800CC"
-                onClick={handleWalletIconClick}
-              />
-              <div
-                class={`hidden group-hover:flex flex-col absolute
-                   top-[calc(100%+6px)] right-0 z-20
-                  min-w-[calc(100%+36px)] py-3.5 px-5 ${glassmorphism} !rounded-t-none`}
-              >
-                <div class="flex flex-col gap-1 text-center whitespace-nowrap">
-                  <h6 class={`${valueDarkSm} py-0.5`}>
-                    {abbreviateAddress(address, 5)}
-                  </h6>
-                  <a
-                    href={`/wallet/${address}`}
-                    class={isActive(`/wallet/${address}`)
-                      ? `${navSublinkPurpleActive}`
-                      : `${navSublinkPurple}`}
-                  >
-                    DASHBOARD
-                  </a>
-                  <a
-                    onClick={() => walletSignOut()}
-                    class={`${navSublinkPurple}`}
-                  >
-                    DISCONNECT
-                  </a>
-                </div>
-              </div>
             </div>
           </>
         )}
       </div>
     ),
-    // The wallet content for the drawer
-    content: (
+    // The wallet dropdown content
+    dropdown: (
+      isConnected && address
+        ? (
+          <div class="flex flex-col gap-1.5 text-right whitespace-nowrap">
+            <div class="flex items-center justify-end gap-3">
+              <h6 class={valueDarkXs}>
+                {abbreviateAddress(address, 7)}
+              </h6>
+              <div
+                ref={copyButtonRef}
+                class="relative"
+                onMouseEnter={handleCopyMouseEnter}
+                onMouseLeave={handleCopyMouseLeave}
+              >
+                <Icon
+                  type="iconButton"
+                  name="copy"
+                  weight="normal"
+                  size="xxs"
+                  color="greyDark"
+                  onClick={copy}
+                />
+                <div
+                  class={`${tooltipIcon} ${
+                    isTooltipVisible ? "opacity-100" : "opacity-0"
+                  }`}
+                >
+                  COPY ADDY
+                </div>
+                <div
+                  class={`${tooltipIcon} ${
+                    showCopied ? "opacity-100" : "opacity-0"
+                  }`}
+                >
+                  ADDY COPIED
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 mb-0.5">
+              <Icon
+                type="icon"
+                name="bitcoins"
+                weight="normal"
+                size="xxs"
+                color="greyDark"
+              />
+              <h6 class={valueSm}>
+                {btcBalance.total.toFixed(8)} <span class={labelSm}>BTC</span>
+              </h6>
+            </div>
+            <a
+              href={`/wallet/${address}`}
+              class={isActive(`/wallet/${address}`)
+                ? `${navSublinkPurpleActive}`
+                : `${navSublinkPurple}`}
+            >
+              DASHBOARD
+            </a>
+            <a
+              onClick={() => walletSignOut()}
+              class={`${navSublinkPurple}`}
+            >
+              DISCONNECT
+            </a>
+          </div>
+        )
+        : null
+    ),
+    // The wallet drawer content
+    drawer: (
       <div class="flex flex-col h-full px-9 tablet:px-6">
         {/* Top - Main navigation content */}
         <div class="flex flex-col flex-1 items-start pt-9 tablet:pt-6 gap-5">
@@ -351,6 +384,7 @@ export const WalletButton = (
       </div>
     ),
     currentPath: path,
+    isConnected: Boolean(isConnected && address),
   };
 };
 
@@ -398,7 +432,7 @@ function CounterpartyVersion() {
       />
       <span class={labelXs}>
         COUNTERPARTY {loading
-          ? <span class="animate-pulse">vXX.X.XX</span>
+          ? <span class="animate-pulse">vXX.X.X</span>
           : version
           ? <>v{version}</>
           : <>v N/A</>}
