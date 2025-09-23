@@ -1,7 +1,6 @@
 /* ===== SRC20 HEADER COMPONENT ===== */
 /* @baba - update search button styling */
 import { SelectorButtons, ToggleButton } from "$button";
-import { SearchSRC20Modal } from "$islands/modal/SearchSRC20Modal.tsx";
 import { titlePurpleLD } from "$text";
 import type { SRC20OverviewHeaderProps } from "$types/ui.d.ts";
 import { useCallback, useState } from "preact/hooks";
@@ -53,13 +52,6 @@ export const SRC20OverviewHeader = (
         <h1 class={`${titlePurpleLD} hidden mobileLg:block`}>
           SRC-20 TOKENS
         </h1>
-
-        {/* ===== CONTROLS SECTION ===== */}
-        <div class="flex flex-col">
-          <div class="flex">
-            <SearchSRC20Modal showButton />
-          </div>
-        </div>
       </div>
 
       {/* ===== TRENDING, MINTED/MINTING AND TIMEFRAME BUTTONS ===== */}

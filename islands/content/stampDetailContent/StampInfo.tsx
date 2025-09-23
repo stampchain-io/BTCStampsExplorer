@@ -3,7 +3,6 @@
 import { Button } from "$button";
 import { Icon } from "$icon";
 import BuyStampModal from "$islands/modal/BuyStampModal.tsx";
-import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
 import { openModal } from "$islands/modal/states.ts";
 import {
   body,
@@ -719,7 +718,6 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   /* ===== RENDER ===== */
   return (
     <>
-      <SearchStampModal showButton={false} />
       <div className={`${body} ${gapSectionSlim}`}>
         <div
           className={containerBackground}

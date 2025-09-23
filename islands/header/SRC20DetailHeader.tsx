@@ -1,7 +1,6 @@
 /* ===== SRC20 DETAIL HEADER COMPONENT ===== */
 import { StatItem, StatTitle } from "$components/section/WalletComponents.tsx";
 import { Icon } from "$icon";
-import { SearchSRC20Modal } from "$islands/modal/SearchSRC20Modal.tsx";
 import { body, containerBackground, gapSectionSlim } from "$layout";
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import {
@@ -94,7 +93,6 @@ export function SRC20DetailHeader({
   /* ===== RENDER ===== */
   return (
     <>
-      <SearchSRC20Modal showButton={false} />
       <div class={`${body} ${gapSectionSlim}`}>
         {/* ===== TOKEN INFO CARD ===== */}
         <div class={`relative ${containerBackground} flex-wrap`}>

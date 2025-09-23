@@ -287,7 +287,7 @@ function RightPanel(
             weight="normal"
             size="custom"
             color="grey"
-            className="w-[29px] h-[29px] tablet:w-[27px] tablet:h-[27px]"
+            className="w-[29px] h-[29px] tablet:w-[25px] tablet:h-[25px]"
             onClick={copyLink}
           />
           <div
@@ -315,7 +315,7 @@ function RightPanel(
             weight="normal"
             size="custom"
             color="grey"
-            className="w-[29px] h-[29px] tablet:w-[27px] tablet:h-[27px]"
+            className="w-[29px] h-[29px] tablet:w-[25px] tablet:h-[25px]"
             onClick={shareContent}
             ariaLabel="Share content"
           />

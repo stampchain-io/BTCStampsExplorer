@@ -1,5 +1,4 @@
 /* ===== COLLECTION OVERVIEW HEADER COMPONENT ===== */
-import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
 import { titlePurpleLD } from "$text";
 
 /* ===== COMPONENT ===== */
@@ -9,7 +8,7 @@ function CollectionOverviewHeader() {
       <h1 class={titlePurpleLD}>
         COLLECTIONS
       </h1>
-      <SearchStampModal showButton />
+      {/* Search moved to global header */}
     </div>
   );
 }
