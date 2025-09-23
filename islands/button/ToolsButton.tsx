@@ -1,5 +1,5 @@
 import { Icon } from "$icon";
-import { glassmorphism, glassmorphismL2 } from "$layout";
+import { glassmorphismL2 } from "$layout";
 import { getCSRFToken } from "$lib/utils/security/clientSecurityUtils.ts";
 import { formatUSDValue } from "$lib/utils/ui/formatting/formatUtils.ts";
 import {
@@ -119,7 +119,7 @@ export function ToolsButton({ onOpenDrawer }: ToolsButtonProps) {
     return currentPath === href || currentPath.startsWith(`${href}/`);
   };
 
-  const renderToolLinks = () => {
+  const tools = () => {
     return (
       <div class="flex flex-col space-y-0 w-full">
         {/* STAMPS Section */}
@@ -196,10 +196,58 @@ export function ToolsButton({ onOpenDrawer }: ToolsButtonProps) {
     );
   };
 
+  const bitcoinStats = (containerClass: string) => (
+    <div class={containerClass}>
+      <div class="flex items-center">
+        <Icon
+          type="icon"
+          name="bitcoin"
+          weight="normal"
+          size="xxs"
+          color="greyDark"
+          className="mb-[1px] mr-2.5"
+        />
+        {isLoading
+          ? <span class="animate-pulse">XXX,XXX</span>
+          : <span class="font-medium mr-1">{displayPrice}</span>}&nbsp;USD
+      </div>
+      <div class="flex items-center">
+        <Icon
+          type="icon"
+          name="bitcoinTx"
+          weight="normal"
+          size="xxs"
+          color="greyDark"
+          className="mb-[1px] mr-2.5"
+        />
+        {isLoading
+          ? <span class="animate-pulse">XX</span>
+          : <span class="font-medium">{displayFee}</span>}&nbsp;SAT/vB
+      </div>
+      <div class="flex items-center">
+        <Icon
+          type="icon"
+          name="bitcoinBlock"
+          weight="normal"
+          size="xxs"
+          color="greyDark"
+          className="mb-[1px] mr-2.5"
+        />
+        {isLoading
+          ? <span class="animate-pulse">XXX,XXX</span>
+          : (
+            <span class="font-medium">
+              {latestBlock.toLocaleString()}
+            </span>
+          )}
+      </div>
+    </div>
+  );
+
   return {
     // The tools icon component with desktop dropdown
     icon: (
-      <div class="relative group">
+      <div class="relative">
         {/* Mobile icon */}
         <div class="block tablet:hidden">
           <Icon
@@ -210,8 +258,8 @@ export function ToolsButton({ onOpenDrawer }: ToolsButtonProps) {
             color="purple"
             className="w-[26px] h-[26px]"
             onClick={handleToolsClick}
-            colorAccent="#660099"
-            colorAccentHover="#8800CC"
+            colorAccent="#666666CC"
+            colorAccentHover="#999999"
           />
         </div>
 
@@ -225,148 +273,108 @@ export function ToolsButton({ onOpenDrawer }: ToolsButtonProps) {
             className="w-[22px] h-[22px]"
             color="purple"
             onClick={handleToolsClick}
-            colorAccent="#660099"
-            colorAccentHover="#8800CC"
+            colorAccent="#666666CC"
+            colorAccentHover="#666666"
           />
         </div>
 
-        {/* Desktop dropdown menu */}
-        <div
-          class={`hidden tablet:group-hover:flex absolute top-[calc(100%+6px)] right-0 min-w-[400px] z-90 py-3.5 px-5 whitespace-nowrap ${glassmorphism} !rounded-t-none`}
-        >
-          <div class="grid grid-cols-3 gap-4 w-full">
-            {/* Column 1: Left aligned - Stamp tools */}
-            <div class="flex flex-col space-y-1 text-left">
-              <h6 class={labelXs}>
-                STAMPS
-              </h6>
-              {toolLinks.filter((link) =>
-                link.href === "/tool/stamp/create" ||
-                link.href === "/tool/stamp/send"
-              ).map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => {
-                    setCurrentPath(link.href);
-                  }}
-                  class={isActive(link.href)
-                    ? navSublinkPurpleActive
-                    : navSublinkPurple}
-                >
-                  {link.title}
-                </a>
-              ))}
-            </div>
-
-            {/* Column 2: Center aligned - Token tools */}
-            <div class="flex flex-col space-y-1 text-center">
-              <h6 class={labelXs}>
-                TOKENS
-              </h6>
-              {toolLinks.filter((link) =>
-                link.href === "/tool/src20/deploy" ||
-                link.href === "/tool/src20/mint" ||
-                link.href === "/tool/src20/transfer"
-              ).map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => {
-                    setCurrentPath(link.href);
-                  }}
-                  class={isActive(link.href)
-                    ? navSublinkPurpleActive
-                    : navSublinkPurple}
-                >
-                  {link.title}
-                </a>
-              ))}
-            </div>
-
-            {/* Column 3: Right aligned - Register */}
-            <div class="flex flex-col space-y-1 text-right">
-              <h6 class={labelXs}>
-                BITNAME
-              </h6>
-              {toolLinks.filter((link) => link.href === "/tool/src101/mint")
-                .map((link) => (
-                  <a
-                    key={link.href}
-                    href={link.href}
-                    onClick={() => {
-                      setCurrentPath(link.href);
-                    }}
-                    class={isActive(link.href)
-                      ? navSublinkPurpleActive
-                      : navSublinkPurple}
-                  >
-                    {link.title}
-                  </a>
-                ))}
-            </div>
-          </div>
-        </div>
+        {/* Dropdown content is rendered by Header.tsx */}
       </div>
     ),
-    // The tools content for the drawer
-    content: (
+    // The tools dropdown content (without container)
+    dropdown: (
+      <>
+        {/* Column 1: Left aligned - Stats */}
+        {bitcoinStats(
+          `flex-col w-[146px] ${glassmorphismL2} !backdrop-blur-md px-3 py-2 space-y-1 ${labelLightSm}`,
+        )}
+
+        {/* Column 2: Left aligned - Stamp tools */}
+        <div class="flex flex-col space-y-1 text-left !ml-6">
+          <h6 class={labelXs}>
+            STAMPS
+          </h6>
+          {toolLinks.filter((link) =>
+            link.href === "/tool/stamp/create" ||
+            link.href === "/tool/stamp/send"
+          ).map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              onClick={() => {
+                setCurrentPath(link.href);
+              }}
+              class={isActive(link.href)
+                ? navSublinkPurpleActive
+                : navSublinkPurple}
+            >
+              {link.title}
+            </a>
+          ))}
+        </div>
+
+        {/* Column 3: Center aligned - Token tools */}
+        <div class="flex flex-col space-y-1 text-center">
+          <h6 class={labelXs}>
+            TOKENS
+          </h6>
+          {toolLinks.filter((link) =>
+            link.href === "/tool/src20/deploy" ||
+            link.href === "/tool/src20/mint" ||
+            link.href === "/tool/src20/transfer"
+          ).map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              onClick={() => {
+                setCurrentPath(link.href);
+              }}
+              class={isActive(link.href)
+                ? navSublinkPurpleActive
+                : navSublinkPurple}
+            >
+              {link.title}
+            </a>
+          ))}
+        </div>
+
+        {/* Column 4: Right aligned - Register */}
+        <div class="flex flex-col space-y-1 text-right">
+          <h6 class={labelXs}>
+            BITNAME
+          </h6>
+          {toolLinks.filter((link) => link.href === "/tool/src101/mint")
+            .map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={() => {
+                  setCurrentPath(link.href);
+                }}
+                class={isActive(link.href)
+                  ? navSublinkPurpleActive
+                  : navSublinkPurple}
+              >
+                {link.title}
+              </a>
+            ))}
+        </div>
+      </>
+    ),
+    // The tools drawer content
+    drawer: (
       <div class="flex flex-col h-full px-9 tablet:px-6">
         {/* Top - Main navigation content */}
         <div class="flex flex-col flex-1 items-start pt-9 tablet:pt-6 gap-3">
-          {renderToolLinks()}
+          {tools()}
         </div>
 
         {/* Bottom - Bitcoin Stats */}
         <div class="sticky bottom-0 pb-9 tablet:pb-6">
           {/* ===== PRICE/FEE/BLOCK INFO ===== */}
-          <div
-            class={`flex-col ${glassmorphismL2} items-end !backdrop-blur-md px-3 py-2 space-y-1 ${labelLightSm}`}
-          >
-            <div class="flex items-center">
-              <Icon
-                type="icon"
-                name="bitcoin"
-                weight="normal"
-                size="xxs"
-                color="greyDark"
-                className="mb-[1px] mr-2.5"
-              />
-              {isLoading
-                ? <span class="animate-pulse">XXX,XXX</span>
-                : <span class="font-medium mr-1">{displayPrice}</span>}&nbsp;USD
-            </div>
-            <div class="flex items-center">
-              <Icon
-                type="icon"
-                name="bitcoinTx"
-                weight="normal"
-                size="xxs"
-                color="greyDark"
-                className="mb-[1px] mr-2.5"
-              />
-              {isLoading
-                ? <span class="animate-pulse">XX</span>
-                : <span class="font-medium">{displayFee}</span>}&nbsp;SAT/vB
-            </div>
-            <div class="flex items-center">
-              <Icon
-                type="icon"
-                name="bitcoinBlock"
-                weight="normal"
-                size="xxs"
-                color="greyDark"
-                className="mb-[1px] mr-2.5"
-              />
-              {isLoading
-                ? <span class="animate-pulse">XXX,XXX</span>
-                : (
-                  <span class="font-medium">
-                    {latestBlock.toLocaleString()}
-                  </span>
-                )}
-            </div>
-          </div>
+          {bitcoinStats(
+            `flex-col ${glassmorphismL2} items-end !backdrop-blur-md px-3 py-2 space-y-1 ${labelLightSm}`,
+          )}
         </div>
       </div>
     ),
