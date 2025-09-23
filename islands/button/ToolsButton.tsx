@@ -256,7 +256,7 @@ export function ToolsButton({ onOpenDrawer }: ToolsButtonProps) {
             weight="normal"
             size="custom"
             color="purple"
-            className="w-[26px] h-[26px]"
+            className="mt-[1px] mr-0.5 tablet:-ml-0.5 tablet:mr-0 w-[27px] h-[27px]"
             onClick={handleToolsClick}
             colorAccent="#666666CC"
             colorAccentHover="#999999"
@@ -270,7 +270,7 @@ export function ToolsButton({ onOpenDrawer }: ToolsButtonProps) {
             name="tools"
             weight="normal"
             size="custom"
-            className="w-[22px] h-[22px]"
+            className="mt-[1px] mr-0.5 tablet:-ml-0.5 tablet:mr-0 w-[23px] h-[23px]"
             color="purple"
             onClick={handleToolsClick}
             colorAccent="#666666CC"
