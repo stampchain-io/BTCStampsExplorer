@@ -248,6 +248,7 @@ export const WalletButton = (
                   weight="normal"
                   size="xxs"
                   color="greyDark"
+                  className="mb-0.5"
                   onClick={copy}
                 />
                 <div
@@ -320,6 +321,7 @@ export const WalletButton = (
                   weight="normal"
                   size="xsR"
                   color="greyDark"
+                  className="mb-0.5"
                   onClick={copy}
                 />
                 <div

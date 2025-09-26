@@ -16,6 +16,7 @@ import {
   navLinkPurple,
   navLinkPurpleActive,
 } from "$text";
+import { createPortal } from "preact/compat";
 import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== NAVIGATION LINK INTERFACE ===== */
@@ -94,6 +95,20 @@ export function Header() {
   const [closeTooltipText, setCloseTooltipText] = useState("CLOSE");
   const closeTooltipTimeoutRef = useRef<number | null>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
+
+  // Portal dropdown state
+  const [toolsDropdownPos, setToolsDropdownPos] = useState<
+    { top: number; left: number } | null
+  >(null);
+  const [walletDropdownPos, setWalletDropdownPos] = useState<
+    { top: number; left: number } | null
+  >(null);
+  const toolsButtonRef = useRef<HTMLDivElement>(null);
+  const walletButtonRef = useRef<HTMLDivElement>(null);
+
+  // Hover delay timeouts
+  const toolsTimeoutRef = useRef<number | null>(null);
+  const walletTimeoutRef = useRef<number | null>(null);
 
   // Scroll lock
   useEffect(() => {
@@ -221,6 +236,67 @@ export function Header() {
   const openDrawer = (content: "menu" | "wallet" | "tools") => {
     setDrawerContent(content);
     setOpen(true);
+  };
+
+  /* ===== PORTAL DROPDOWN HANDLERS ===== */
+  const handleToolsMouseEnter = () => {
+    // Clear any existing timeout
+    if (toolsTimeoutRef.current) {
+      clearTimeout(toolsTimeoutRef.current);
+      toolsTimeoutRef.current = null;
+    }
+
+    // Close wallet dropdown immediately
+    if (walletTimeoutRef.current) {
+      clearTimeout(walletTimeoutRef.current);
+      walletTimeoutRef.current = null;
+    }
+    setWalletDropdownPos(null);
+
+    if (toolsButtonRef.current) {
+      const rect = toolsButtonRef.current.getBoundingClientRect();
+      setToolsDropdownPos({
+        top: rect.bottom + 20,
+        left: rect.right - 520 + 58,
+      });
+    }
+  };
+
+  const handleWalletMouseEnter = () => {
+    // Clear any existing timeout
+    if (walletTimeoutRef.current) {
+      clearTimeout(walletTimeoutRef.current);
+      walletTimeoutRef.current = null;
+    }
+
+    // Close tools dropdown immediately
+    if (toolsTimeoutRef.current) {
+      clearTimeout(toolsTimeoutRef.current);
+      toolsTimeoutRef.current = null;
+    }
+    setToolsDropdownPos(null);
+
+    if (walletButtonRef.current) {
+      const rect = walletButtonRef.current.getBoundingClientRect();
+      setWalletDropdownPos({
+        top: rect.bottom + 19,
+        left: rect.right - 140 - 22,
+      });
+    }
+  };
+
+  const handleToolsMouseLeave = () => {
+    // Set timeout to close dropdown after delay
+    toolsTimeoutRef.current = setTimeout(() => {
+      setToolsDropdownPos(null);
+    }, 300); // 300ms delay
+  };
+
+  const handleWalletMouseLeave = () => {
+    // Set timeout to close dropdown after delay
+    walletTimeoutRef.current = setTimeout(() => {
+      setWalletDropdownPos(null);
+    }, 300); // 300ms delay
   };
 
   /* ===== DRAWER RENDERER ===== */
@@ -444,47 +520,24 @@ export function Header() {
             <div class="relative group">
               <SearchButton />
             </div>
-            <div class="relative group">
+            <div
+              class="relative group"
+              ref={toolsButtonRef}
+              onMouseEnter={handleToolsMouseEnter}
+              onMouseLeave={handleToolsMouseLeave}
+            >
               {ToolsButton({ onOpenDrawer: openDrawer }).icon}
-              {/* Hover bridge to avoid gap between icon and dropdown */}
-              <div class="hidden tablet:group-hover:block absolute top-full -right-14 h-6 w-[520px]">
-              </div>
-              {/* Dropdown menu */}
-              <div
-                class={`hidden tablet:group-hover:flex absolute top-11 -right-14 w-[520px] z-dropdown py-3.5 px-5 whitespace-nowrap ${glassmorphism}`}
-              >
-                <div class="grid grid-cols-5 w-full">
-                  {ToolsButton({ onOpenDrawer: openDrawer }).dropdown}
-                </div>
-              </div>
             </div>
-            <div class="relative group">
+            <div
+              class="relative group"
+              ref={walletButtonRef}
+              onMouseEnter={handleWalletMouseEnter}
+              onMouseLeave={handleWalletMouseLeave}
+            >
               {WalletButton({
                 onOpenDrawer: openDrawer,
                 onCloseDrawer: closeMenu,
               }).icon}
-              {/* Only render dropdown when connected on tablet/desktop */}
-              {(() => {
-                const wb = WalletButton({
-                  onOpenDrawer: openDrawer,
-                  onCloseDrawer: closeMenu,
-                });
-                return wb.isConnected
-                  ? (
-                    <>
-                      {/* Hover bridge */}
-                      <div class="hidden tablet:group-hover:block absolute top-full -right-3 h-6 min-w-[140px]">
-                      </div>
-                      {/* Dropdown menu */}
-                      <div
-                        class={`hidden tablet:group-hover:flex absolute top-11 -right-3 z-dropdown min-w-[140px] py-3.5 px-5 justify-end whitespace-nowrap ${glassmorphism}`}
-                      >
-                        {wb.dropdown}
-                      </div>
-                    </>
-                  )
-                  : null;
-              })()}
             </div>
           </div>
         </div>
@@ -494,6 +547,45 @@ export function Header() {
       {renderDrawer("menu")}
       {renderDrawer("tools")}
       {renderDrawer("wallet")}
+
+      {/* ===== PORTAL DROPDOWNS ===== */}
+      {toolsDropdownPos && createPortal(
+        <div
+          class={`hidden tablet:block fixed z-dropdown w-[520px] py-3.5 px-5 whitespace-nowrap ${glassmorphism}`}
+          style={{
+            top: `${toolsDropdownPos.top}px`,
+            left: `${toolsDropdownPos.left}px`,
+          }}
+          onMouseEnter={handleToolsMouseEnter}
+          onMouseLeave={handleToolsMouseLeave}
+        >
+          <div class="grid grid-cols-5 w-full">
+            {ToolsButton({ onOpenDrawer: openDrawer }).dropdown}
+          </div>
+        </div>,
+        document.body,
+      )}
+
+      {walletDropdownPos && (() => {
+        const wb = WalletButton({
+          onOpenDrawer: openDrawer,
+          onCloseDrawer: closeMenu,
+        });
+        return wb.isConnected && createPortal(
+          <div
+            class={`hidden tablet:block fixed z-dropdown min-w-[140px] py-3.5 px-5 justify-end whitespace-nowrap ${glassmorphism}`}
+            style={{
+              top: `${walletDropdownPos.top}px`,
+              left: `${walletDropdownPos.left}px`,
+            }}
+            onMouseEnter={handleWalletMouseEnter}
+            onMouseLeave={handleWalletMouseLeave}
+          >
+            {wb.dropdown}
+          </div>,
+          document.body,
+        );
+      })()}
     </header>
   );
 }

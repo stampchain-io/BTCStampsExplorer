@@ -90,7 +90,7 @@ export function ToolsButton({ onOpenDrawer }: ToolsButtonProps) {
           healthResponse.json(),
         ]);
 
-        setBtcPrice(feesData.btcPrice);
+        setBtcPrice(feesData.btcPrice || 0);
         setRecommendedFee(feesData.recommendedFee);
         setLatestBlock(healthData.services?.blockSync?.indexed || 0);
         setIsLoading(false);
