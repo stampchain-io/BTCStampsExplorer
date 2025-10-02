@@ -9,6 +9,7 @@ import {
   glassmorphismOverlay,
   transitionTransform,
 } from "$layout";
+import { useFees } from "$lib/hooks/useFees.ts";
 import { tooltipIcon } from "$notification";
 import {
   navLinkGreyLD,
@@ -96,6 +97,11 @@ export function Header() {
   const closeTooltipTimeoutRef = useRef<number | null>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
 
+  // Centralized data fetching - starts immediately on page load
+  const { fees, loading: feesLoading } = useFees();
+  const [latestBlock, setLatestBlock] = useState(0);
+  const [healthLoading, setHealthLoading] = useState(true);
+
   // Single atomic dropdown state
   const [dropdownState, setDropdownState] = useState<{
     active: "tools" | "wallet" | null;
@@ -111,6 +117,36 @@ export function Header() {
 
   // Hover delay timeout
   const dropdownTimeoutRef = useRef<number | null>(null);
+
+  /* ===== HEALTH DATA FETCHING ===== */
+  useEffect(() => {
+    const fetchHealthData = async () => {
+      try {
+        const response = await fetch("/api/v2/health");
+        if (response.ok) {
+          const healthData = await response.json();
+          const blockHeight = healthData.services?.blockSync?.indexed || 0;
+          setLatestBlock(blockHeight);
+
+          if (blockHeight === 0) {
+            // Set -1 to indicate service is unavailable
+            setLatestBlock(-1);
+          }
+        } else {
+          // API failed, set -1 to indicate service is unavailable
+          setLatestBlock(-1);
+        }
+      } catch (err) {
+        console.error("Health data fetch error:", err);
+        // Set -1 to indicate service is unavailable
+        setLatestBlock(-1);
+      } finally {
+        setHealthLoading(false);
+      }
+    };
+
+    fetchHealthData();
+  }, []);
 
   // Scroll lock
   useEffect(() => {
@@ -254,11 +290,11 @@ export function Header() {
       const rect = toolsButtonRef.current.getBoundingClientRect();
       toolsPos = {
         top: rect.bottom + 20,
-        left: rect.right - 520 + 58,
+        left: rect.right - 600 + 58,
       };
     }
 
-    // Atomic state update - all changes happen together
+    // Atomic state update
     const newState = {
       active: "tools" as const,
       toolsPos: toolsPos,
@@ -280,7 +316,7 @@ export function Header() {
       const rect = walletButtonRef.current.getBoundingClientRect();
       walletPos = {
         top: rect.bottom + 19,
-        left: rect.right - 140 - 22,
+        left: rect.right - 150 - 22,
       };
     }
 
@@ -312,6 +348,18 @@ export function Header() {
     });
   }, [openDrawer, closeMenu]);
 
+  // Create centralized data object to pass to ToolsButton
+  const toolsData = useMemo(() => ({
+    btcPrice: fees?.btcPrice || 0,
+    recommendedFee: fees?.recommendedFee || 6,
+    latestBlock,
+    isLoading: feesLoading || healthLoading,
+    // Priority fees from mempool.space
+    lowFee: fees?.hourFee || 0,
+    mediumFee: fees?.halfHourFee || 0,
+    highFee: fees?.fastestFee || 0,
+  }), [fees, latestBlock, feesLoading, healthLoading]);
+
   /* ===== DRAWER RENDERER ===== */
   const renderDrawer = (type: "menu" | "wallet" | "tools") => {
     const isMenu = type === "menu";
@@ -327,7 +375,8 @@ export function Header() {
             onCloseDrawer: closeMenu,
           }).drawer;
         case "tools":
-          return ToolsButton({ onOpenDrawer: openDrawer }).drawer;
+          return ToolsButton({ onOpenDrawer: openDrawer, data: toolsData })
+            .drawer;
       }
     };
 
@@ -495,7 +544,7 @@ export function Header() {
           {/* Right: Search, Tools and Connect Buttons (Mobile: icons only) */}
           <div class="flex items-center gap-5">
             <SearchButton />
-            {ToolsButton({ onOpenDrawer: openDrawer }).icon}
+            {ToolsButton({ onOpenDrawer: openDrawer, data: toolsData }).icon}
             {WalletButton({
               onOpenDrawer: openDrawer,
               onCloseDrawer: closeMenu,
@@ -539,7 +588,7 @@ export function Header() {
               onMouseEnter={handleToolsMouseEnter}
               onMouseLeave={handleDropdownMouseLeave}
             >
-              {ToolsButton({ onOpenDrawer: openDrawer }).icon}
+              {ToolsButton({ onOpenDrawer: openDrawer, data: toolsData }).icon}
             </div>
             <div
               class="relative group"
@@ -568,7 +617,7 @@ export function Header() {
 
         return shouldRenderTools && createPortal(
           <div
-            class={`hidden tablet:block fixed z-dropdown w-[520px] py-3.5 px-5 whitespace-nowrap ${glassmorphism}`}
+            class={`hidden tablet:block fixed z-dropdown w-[600px] py-3.5 px-5 whitespace-nowrap ${glassmorphism}`}
             style={{
               top: `${dropdownState.toolsPos!.top}px`,
               left: `${dropdownState.toolsPos!.left}px`,
@@ -583,7 +632,8 @@ export function Header() {
             onMouseLeave={handleDropdownMouseLeave}
           >
             <div class="grid grid-cols-5 w-full">
-              {ToolsButton({ onOpenDrawer: openDrawer }).dropdown}
+              {ToolsButton({ onOpenDrawer: openDrawer, data: toolsData })
+                .dropdown}
             </div>
           </div>,
           document.body,
@@ -596,7 +646,7 @@ export function Header() {
 
         return shouldRenderWallet && createPortal(
           <div
-            class={`hidden tablet:block fixed z-dropdown min-w-[140px] py-3.5 px-5 justify-end whitespace-nowrap ${glassmorphism}`}
+            class={`hidden tablet:block fixed z-dropdown min-w-[150px] py-3.5 px-5 justify-end whitespace-nowrap ${glassmorphism}`}
             style={{
               top: `${dropdownState.walletPos!.top}px`,
               left: `${dropdownState.walletPos!.left}px`,
