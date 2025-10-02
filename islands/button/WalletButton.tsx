@@ -267,18 +267,19 @@ export const WalletButton = (
                 </div>
               </div>
             </div>
-            <div class="flex items-center gap-2 mb-0.5">
+            <div class="flex items-center gap-3 mb-0.5">
               <Icon
                 type="icon"
                 name="bitcoins"
                 weight="normal"
-                size="xxs"
+                size="xs"
                 color="greyDark"
               />
               <h6 class={valueSm}>
                 {btcBalance.total.toFixed(8)} <span class={labelSm}>BTC</span>
               </h6>
             </div>
+            <hr class="!mt-2 !mb-2" />
             <a
               href={`/wallet/${address}`}
               class={isActive(`/wallet/${address}`)
@@ -319,7 +320,7 @@ export const WalletButton = (
                   type="iconButton"
                   name="copy"
                   weight="normal"
-                  size="xsR"
+                  size="xs"
                   color="greyDark"
                   className="mb-0.5"
                   onClick={copy}
@@ -340,7 +341,7 @@ export const WalletButton = (
                 </div>
               </div>
             </div>
-            <div class="flex items-center gap-2.5">
+            <div class="flex items-center gap-3">
               <Icon
                 type="icon"
                 name="bitcoins"
@@ -428,9 +429,9 @@ function CounterpartyVersion() {
         type="icon"
         name="version"
         weight="normal"
-        size="xxs"
+        size="xs"
         color="greyDark"
-        className="mb-[1px] mr-2.5"
+        className="mr-3"
       />
       <span class={labelXs}>
         COUNTERPARTY {loading

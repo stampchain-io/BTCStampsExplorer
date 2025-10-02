@@ -1,6 +1,5 @@
 import { Icon } from "$icon";
 import { glassmorphismL2 } from "$layout";
-import { getCSRFToken } from "$lib/utils/security/clientSecurityUtils.ts";
 import { formatUSDValue } from "$lib/utils/ui/formatting/formatUtils.ts";
 import {
   labelLightSm,
@@ -17,8 +16,20 @@ interface ToolLink {
   href: string;
 }
 
+interface ToolsData {
+  btcPrice: number;
+  recommendedFee: number;
+  latestBlock: number;
+  isLoading: boolean;
+  // Priority fees from mempool.space
+  lowFee?: number; // hourFee
+  mediumFee?: number; // halfHourFee
+  highFee?: number; // fastestFee
+}
+
 interface ToolsButtonProps {
   onOpenDrawer: (content: "tools") => void;
+  data?: ToolsData;
 }
 
 /* ===== TOOLS CONFIGURATION ===== */
@@ -31,12 +42,18 @@ const toolLinks: ToolLink[] = [
   { title: "REGISTER", href: "/tool/src101/mint" },
 ];
 
-export function ToolsButton({ onOpenDrawer }: ToolsButtonProps) {
+export function ToolsButton({ onOpenDrawer, data }: ToolsButtonProps) {
   const [currentPath, setCurrentPath] = useState<string | null>(null);
-  const [btcPrice, setBtcPrice] = useState(0);
-  const [recommendedFee, setRecommendedFee] = useState(6);
-  const [latestBlock, setLatestBlock] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
+
+  // Use centralized data if provided, otherwise fallback to local state
+  const btcPrice = data?.btcPrice ?? 0;
+  const latestBlock = data?.latestBlock ?? 0;
+  const isLoading = data?.isLoading ?? false;
+
+  // Priority fees
+  const lowFee = data?.lowFee ?? 0;
+  const mediumFee = data?.mediumFee ?? 0;
+  const highFee = data?.highFee ?? 0;
 
   /* ===== PATH TRACKING EFFECT ===== */
   useEffect(() => {
@@ -56,56 +73,12 @@ export function ToolsButton({ onOpenDrawer }: ToolsButtonProps) {
     };
   }, []);
 
-  /* ===== DATA FETCHING ===== */
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const csrfToken = await getCSRFToken();
-
-        const [feesResponse, healthResponse] = await Promise.all([
-          fetch("/api/internal/fees", {
-            headers: {
-              "X-CSRF-Token": csrfToken,
-            },
-          }),
-          fetch("/api/v2/health", {
-            headers: {
-              "X-CSRF-Token": csrfToken,
-            },
-          }),
-        ]);
-
-        if (!feesResponse.ok) {
-          throw new Error(`Failed to fetch fees: ${feesResponse.status}`);
-        }
-
-        if (!healthResponse.ok) {
-          throw new Error(
-            `Failed to fetch health data: ${healthResponse.status}`,
-          );
-        }
-
-        const [feesData, healthData] = await Promise.all([
-          feesResponse.json(),
-          healthResponse.json(),
-        ]);
-
-        setBtcPrice(feesData.btcPrice || 0);
-        setRecommendedFee(feesData.recommendedFee);
-        setLatestBlock(healthData.services?.blockSync?.indexed || 0);
-        setIsLoading(false);
-      } catch (err) {
-        console.error("Data fetch error:", err);
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
+  // Data fetching is now handled by the Header component
 
   /* ===== HELPERS ===== */
-  const displayPrice = formatUSDValue(btcPrice).toLocaleString();
-  const displayFee = typeof recommendedFee === "number" ? recommendedFee : "0";
+  const displayPrice = btcPrice && typeof btcPrice === "number"
+    ? formatUSDValue(btcPrice).toLocaleString()
+    : "0";
 
   const handleToolsClick = () => {
     // On mobile/tablet, open drawer; on desktop, do nothing (dropdown handles it)
@@ -198,48 +171,89 @@ export function ToolsButton({ onOpenDrawer }: ToolsButtonProps) {
 
   const bitcoinStats = (containerClass: string) => (
     <div class={containerClass}>
-      <div class="flex items-center">
-        <Icon
-          type="icon"
-          name="bitcoin"
-          weight="normal"
-          size="xxs"
-          color="greyDark"
-          className="mb-[1px] mr-2.5"
-        />
-        {isLoading
-          ? <span class="animate-pulse">XXX,XXX</span>
-          : <span class="font-medium">{displayPrice}</span>}&nbsp;USD
-      </div>
-      <div class="flex items-center">
-        <Icon
-          type="icon"
-          name="bitcoinTx"
-          weight="normal"
-          size="xxs"
-          color="greyDark"
-          className="mb-[1px] mr-2.5"
-        />
-        {isLoading
-          ? <span class="animate-pulse">XX</span>
-          : <span class="font-medium">{displayFee}</span>}&nbsp;SAT/vB
-      </div>
+      {/* Latest Block */}
       <div class="flex items-center">
         <Icon
           type="icon"
           name="bitcoinBlock"
           weight="normal"
-          size="xxs"
+          size="xs"
           color="greyDark"
-          className="mb-[1px] mr-2.5"
+          className="mr-3"
         />
         {isLoading
           ? <span class="animate-pulse">XXX,XXX</span>
+          : latestBlock === -1
+          ? <span class="font-medium">N/A</span>
           : (
             <span class="font-medium">
               {latestBlock.toLocaleString()}
             </span>
           )}
+      </div>
+      {/* Price */}
+      <div class="flex items-center">
+        <Icon
+          type="icon"
+          name="bitcoin"
+          weight="normal"
+          size="xs"
+          color="greyDark"
+          className="mr-3"
+        />
+        {isLoading
+          ? <span class="animate-pulse">XXX,XXX</span>
+          : <span class="font-medium">{displayPrice}</span>}&nbsp;USD
+      </div>
+      <hr class="!mt-[14px] !mb-3" />
+      {/* Priority Fees - 3 column layout */}
+      <div class="flex flex-col space-y-1 w-full">
+        {/* Header row */}
+        <h6 class={`pb-1 ${labelXs} text-center`}>
+          PRIORITY FEES
+        </h6>
+        {/* Icons row */}
+        <div class="flex justify-between">
+          <Icon
+            type="icon"
+            name="speedSlow"
+            weight="normal"
+            size="xs"
+            color="greyDark"
+          />
+          <Icon
+            type="icon"
+            name="speedMedium"
+            weight="normal"
+            size="xs"
+            color="greyDark"
+          />
+          <Icon
+            type="icon"
+            name="speedFast"
+            weight="normal"
+            size="xs"
+            color="greyDark"
+          />
+        </div>
+        {/* Data row */}
+        <div class="flex justify-between">
+          {isLoading
+            ? (
+              <>
+                <span class="animate-pulse pl-0.5">XX</span>
+                <span class="animate-pulse">XX</span>
+                <span class="animate-pulse pr-0.5">XX</span>
+              </>
+            )
+            : (
+              <>
+                <span class="font-medium pl-0.5">{lowFee || "N/A"}</span>
+                <span class="font-medium">{mediumFee || "N/A"}</span>
+                <span class="font-medium pr-0.5">{highFee || "N/A"}</span>
+              </>
+            )}
+        </div>
       </div>
     </div>
   );
@@ -286,14 +300,14 @@ export function ToolsButton({ onOpenDrawer }: ToolsButtonProps) {
       <>
         {/* Column 1: Left aligned - Stats */}
         {bitcoinStats(
-          `flex-col ${glassmorphismL2} !backdrop-blur-md -ml-1 w-[136px] px-3 py-2 space-y-1 ${labelLightSm}`,
+          `flex-col ${glassmorphismL2} -ml-1 w-[156px] px-3 py-2 space-y-1 ${labelLightSm}`,
         )}
 
         {/* Spacer column */}
-        <div class="w-0" />
+        <div class="w-1" />
 
         {/* Column 2: Left aligned - Stamp tools */}
-        <div class="flex flex-col -ml-10 space-y-1 text-left">
+        <div class="flex flex-col -ml-9 space-y-1 text-left">
           <h6 class={labelXs}>
             STAMPS
           </h6>
@@ -376,7 +390,7 @@ export function ToolsButton({ onOpenDrawer }: ToolsButtonProps) {
         <div class="sticky bottom-0 pb-9 tablet:pb-6">
           {/* ===== PRICE/FEE/BLOCK INFO ===== */}
           {bitcoinStats(
-            `flex-col ${glassmorphismL2} items-end !backdrop-blur-md px-3 py-2 space-y-1 ${labelLightSm}`,
+            `flex-col ${glassmorphismL2} items-end px-3 py-2 space-y-1 ${labelLightSm}`,
           )}
         </div>
       </div>
