@@ -17,7 +17,7 @@ import {
   navLinkPurpleActive,
 } from "$text";
 import { createPortal } from "preact/compat";
-import { useEffect, useRef, useState } from "preact/hooks";
+import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 
 /* ===== NAVIGATION LINK INTERFACE ===== */
 interface NavLink {
@@ -96,19 +96,21 @@ export function Header() {
   const closeTooltipTimeoutRef = useRef<number | null>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
 
-  // Portal dropdown state
-  const [toolsDropdownPos, setToolsDropdownPos] = useState<
-    { top: number; left: number } | null
-  >(null);
-  const [walletDropdownPos, setWalletDropdownPos] = useState<
-    { top: number; left: number } | null
-  >(null);
+  // Single atomic dropdown state
+  const [dropdownState, setDropdownState] = useState<{
+    active: "tools" | "wallet" | null;
+    toolsPos: { top: number; left: number } | null;
+    walletPos: { top: number; left: number } | null;
+  }>({
+    active: null,
+    toolsPos: null,
+    walletPos: null,
+  });
   const toolsButtonRef = useRef<HTMLDivElement>(null);
   const walletButtonRef = useRef<HTMLDivElement>(null);
 
-  // Hover delay timeouts
-  const toolsTimeoutRef = useRef<number | null>(null);
-  const walletTimeoutRef = useRef<number | null>(null);
+  // Hover delay timeout
+  const dropdownTimeoutRef = useRef<number | null>(null);
 
   // Scroll lock
   useEffect(() => {
@@ -241,63 +243,74 @@ export function Header() {
   /* ===== PORTAL DROPDOWN HANDLERS ===== */
   const handleToolsMouseEnter = () => {
     // Clear any existing timeout
-    if (toolsTimeoutRef.current) {
-      clearTimeout(toolsTimeoutRef.current);
-      toolsTimeoutRef.current = null;
+    if (dropdownTimeoutRef.current) {
+      clearTimeout(dropdownTimeoutRef.current);
+      dropdownTimeoutRef.current = null;
     }
 
-    // Close wallet dropdown immediately
-    if (walletTimeoutRef.current) {
-      clearTimeout(walletTimeoutRef.current);
-      walletTimeoutRef.current = null;
-    }
-    setWalletDropdownPos(null);
-
+    // Calculate tools position
+    let toolsPos = null;
     if (toolsButtonRef.current) {
       const rect = toolsButtonRef.current.getBoundingClientRect();
-      setToolsDropdownPos({
+      toolsPos = {
         top: rect.bottom + 20,
         left: rect.right - 520 + 58,
-      });
+      };
     }
+
+    // Atomic state update - all changes happen together
+    const newState = {
+      active: "tools" as const,
+      toolsPos: toolsPos,
+      walletPos: null,
+    };
+    setDropdownState(newState);
   };
 
   const handleWalletMouseEnter = () => {
     // Clear any existing timeout
-    if (walletTimeoutRef.current) {
-      clearTimeout(walletTimeoutRef.current);
-      walletTimeoutRef.current = null;
+    if (dropdownTimeoutRef.current) {
+      clearTimeout(dropdownTimeoutRef.current);
+      dropdownTimeoutRef.current = null;
     }
 
-    // Close tools dropdown immediately
-    if (toolsTimeoutRef.current) {
-      clearTimeout(toolsTimeoutRef.current);
-      toolsTimeoutRef.current = null;
-    }
-    setToolsDropdownPos(null);
-
+    // Calculate wallet position
+    let walletPos = null;
     if (walletButtonRef.current) {
       const rect = walletButtonRef.current.getBoundingClientRect();
-      setWalletDropdownPos({
+      walletPos = {
         top: rect.bottom + 19,
         left: rect.right - 140 - 22,
-      });
+      };
     }
+
+    // Atomic state update - all changes happen together
+    const newState = {
+      active: "wallet" as const,
+      toolsPos: null,
+      walletPos: walletPos,
+    };
+    setDropdownState(newState);
   };
 
-  const handleToolsMouseLeave = () => {
+  const handleDropdownMouseLeave = () => {
     // Set timeout to close dropdown after delay
-    toolsTimeoutRef.current = setTimeout(() => {
-      setToolsDropdownPos(null);
+    dropdownTimeoutRef.current = setTimeout(() => {
+      setDropdownState({
+        active: null,
+        toolsPos: null,
+        walletPos: null,
+      });
     }, 300); // 300ms delay
   };
 
-  const handleWalletMouseLeave = () => {
-    // Set timeout to close dropdown after delay
-    walletTimeoutRef.current = setTimeout(() => {
-      setWalletDropdownPos(null);
-    }, 300); // 300ms delay
-  };
+  // Create a single wallet button instance to prevent state pollution
+  const walletButtonInstance = useMemo(() => {
+    return WalletButton({
+      onOpenDrawer: openDrawer,
+      onCloseDrawer: closeMenu,
+    });
+  }, [openDrawer, closeMenu]);
 
   /* ===== DRAWER RENDERER ===== */
   const renderDrawer = (type: "menu" | "wallet" | "tools") => {
@@ -524,7 +537,7 @@ export function Header() {
               class="relative group"
               ref={toolsButtonRef}
               onMouseEnter={handleToolsMouseEnter}
-              onMouseLeave={handleToolsMouseLeave}
+              onMouseLeave={handleDropdownMouseLeave}
             >
               {ToolsButton({ onOpenDrawer: openDrawer }).icon}
             </div>
@@ -532,7 +545,7 @@ export function Header() {
               class="relative group"
               ref={walletButtonRef}
               onMouseEnter={handleWalletMouseEnter}
-              onMouseLeave={handleWalletMouseLeave}
+              onMouseLeave={handleDropdownMouseLeave}
             >
               {WalletButton({
                 onOpenDrawer: openDrawer,
@@ -549,39 +562,59 @@ export function Header() {
       {renderDrawer("wallet")}
 
       {/* ===== PORTAL DROPDOWNS ===== */}
-      {toolsDropdownPos && createPortal(
-        <div
-          class={`hidden tablet:block fixed z-dropdown w-[520px] py-3.5 px-5 whitespace-nowrap ${glassmorphism}`}
-          style={{
-            top: `${toolsDropdownPos.top}px`,
-            left: `${toolsDropdownPos.left}px`,
-          }}
-          onMouseEnter={handleToolsMouseEnter}
-          onMouseLeave={handleToolsMouseLeave}
-        >
-          <div class="grid grid-cols-5 w-full">
-            {ToolsButton({ onOpenDrawer: openDrawer }).dropdown}
-          </div>
-        </div>,
-        document.body,
-      )}
+      {(() => {
+        const shouldRenderTools = dropdownState.active === "tools" &&
+          dropdownState.toolsPos;
 
-      {walletDropdownPos && (() => {
-        const wb = WalletButton({
-          onOpenDrawer: openDrawer,
-          onCloseDrawer: closeMenu,
-        });
-        return wb.isConnected && createPortal(
+        return shouldRenderTools && createPortal(
+          <div
+            class={`hidden tablet:block fixed z-dropdown w-[520px] py-3.5 px-5 whitespace-nowrap ${glassmorphism}`}
+            style={{
+              top: `${dropdownState.toolsPos!.top}px`,
+              left: `${dropdownState.toolsPos!.left}px`,
+            }}
+            onMouseEnter={() => {
+              // Clear timeout when hovering over dropdown
+              if (dropdownTimeoutRef.current) {
+                clearTimeout(dropdownTimeoutRef.current);
+                dropdownTimeoutRef.current = null;
+              }
+            }}
+            onMouseLeave={handleDropdownMouseLeave}
+          >
+            <div class="grid grid-cols-5 w-full">
+              {ToolsButton({ onOpenDrawer: openDrawer }).dropdown}
+            </div>
+          </div>,
+          document.body,
+        );
+      })()}
+
+      {(() => {
+        const shouldRenderWallet = dropdownState.active === "wallet" &&
+          dropdownState.walletPos;
+
+        return shouldRenderWallet && createPortal(
           <div
             class={`hidden tablet:block fixed z-dropdown min-w-[140px] py-3.5 px-5 justify-end whitespace-nowrap ${glassmorphism}`}
             style={{
-              top: `${walletDropdownPos.top}px`,
-              left: `${walletDropdownPos.left}px`,
+              top: `${dropdownState.walletPos!.top}px`,
+              left: `${dropdownState.walletPos!.left}px`,
             }}
-            onMouseEnter={handleWalletMouseEnter}
-            onMouseLeave={handleWalletMouseLeave}
+            onMouseEnter={() => {
+              // Clear timeout when hovering over dropdown
+              if (dropdownTimeoutRef.current) {
+                clearTimeout(dropdownTimeoutRef.current);
+                dropdownTimeoutRef.current = null;
+              }
+            }}
+            onMouseLeave={handleDropdownMouseLeave}
           >
-            {wb.dropdown}
+            {(() => {
+              return walletButtonInstance.isConnected
+                ? walletButtonInstance.dropdown
+                : null;
+            })()}
           </div>,
           document.body,
         );
