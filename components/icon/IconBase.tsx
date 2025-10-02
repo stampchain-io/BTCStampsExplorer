@@ -64,6 +64,9 @@ export function Icon(props: IconVariants) {
       sortAsc: "listAsc",
       sortDesc: "listDesc",
       tools: "gearWrench",
+      speedSlow: "speedometerSlow",
+      speedMedium: "speedometerMedium",
+      speedFast: "speedometerFast",
 
       // Caret Icons
       caretUp: "caretUp",
