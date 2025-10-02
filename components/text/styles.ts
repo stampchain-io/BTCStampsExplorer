@@ -26,11 +26,11 @@ export const logoPurpleLDLink =
 /* ===== NAVIGATION STYLES ===== */
 // Header - Desktop
 export const navLinkPurple =
-  `font-semibold tablet:font-normal text-stamp-purple text-sm group-hover:text-stamp-purple-bright tracking-wide ${transitionColors} cursor-pointer ${select}`;
+  `font-semibold tablet:font-normal text-stamp-purple text-sm group-hover:text-stamp-purple-bright tracking-wider ${transitionColors} cursor-pointer ${select}`;
 export const navLinkPurpleActive =
   `${navLinkPurple} !text-stamp-purple-bright hover:!text-stamp-purple`;
 export const navSublinkPurple =
-  `font-light text-stamp-purple text-[13px] hover:text-stamp-purple-bright ${transitionColors} cursor-pointer ${select}`; // used in WalletButton.tsx for connected sunmenu links - header uses custom styles
+  `font-light text-stamp-purple text-sm hover:text-stamp-purple-bright tracking-wider ${transitionColors} cursor-pointer ${select}`; // used in WalletButton.tsx for connected sunmenu links - header uses custom styles
 export const navSublinkPurpleActive =
   `${navSublinkPurple} !text-stamp-purple-bright hover:!text-stamp-purple`;
 // Header - Mobile/tablet
@@ -40,12 +40,12 @@ export const navLinkGrey =
 export const navLinkGreyActive =
   `${navLinkGrey} !text-stamp-grey-light hover:!text-stamp-grey`;
 export const navLinkGreyLD =
-  `font-light text-xl tablet:text-lg gray-gradient1-hover tracking-wide inline-block w-fit ${transitionColors} cursor-pointer ${select}`;
+  `font-light text-xl tablet:text-lg gray-gradient1-hover tracking-wider inline-block w-fit ${transitionColors} cursor-pointer ${select}`;
 export const navLinkGreyLDActive =
   `${navLinkGreyLD} text-stamp-grey-light [background:none_!important] [-webkit-text-fill-color:#CCCCCC_!important] [text-fill-color:#CCCCCC_!important] hover:[-webkit-text-fill-color:#999999!important] hover:[text-fill-color:#999999!important]`;
 // Footer - transparent text - ued with the overlayPurple class
 export const navLinkTransparentPurple =
-  `font-light text-[13px] hover:text-stamp-purple-bright tracking-wide ${transitionColors} cursor-pointer ${select}`;
+  `font-light text-[13px] hover:text-stamp-purple-bright tracking-wider ${transitionColors} cursor-pointer ${select}`;
 
 /* ===== TITLE STYLES ===== */
 export const titleGreyLD =

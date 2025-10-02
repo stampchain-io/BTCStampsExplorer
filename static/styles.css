@@ -184,6 +184,13 @@ body {
 
 
 
+/* Global <hr> styling: full width and consistent border color */
+@layer base {
+  hr {
+    @apply w-full border-0 border-t border-[#1b1b1b]/80;
+  }
+}
+
 @layer base {
 
   input[type="number"]::-webkit-inner-spin-button,
