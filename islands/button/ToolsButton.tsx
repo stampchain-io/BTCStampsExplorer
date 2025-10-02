@@ -21,7 +21,7 @@ interface ToolsData {
   recommendedFee: number;
   latestBlock: number;
   isLoading: boolean;
-  // Priority fees from mempool.space
+  // Transaction fees from mempool.space
   lowFee?: number; // hourFee
   mediumFee?: number; // halfHourFee
   highFee?: number; // fastestFee
@@ -50,7 +50,7 @@ export function ToolsButton({ onOpenDrawer, data }: ToolsButtonProps) {
   const latestBlock = data?.latestBlock ?? 0;
   const isLoading = data?.isLoading ?? false;
 
-  // Priority fees
+  // Transaction fees
   const lowFee = data?.lowFee ?? 0;
   const mediumFee = data?.mediumFee ?? 0;
   const highFee = data?.highFee ?? 0;
@@ -210,7 +210,7 @@ export function ToolsButton({ onOpenDrawer, data }: ToolsButtonProps) {
       <div class="flex flex-col space-y-1 w-full">
         {/* Header row */}
         <h6 class={`pb-1 ${labelXs} text-center`}>
-          PRIORITY FEES
+          TRANSACTION FEES
         </h6>
         {/* Icons row */}
         <div class="flex justify-between">
@@ -300,7 +300,7 @@ export function ToolsButton({ onOpenDrawer, data }: ToolsButtonProps) {
       <>
         {/* Column 1: Left aligned - Stats */}
         {bitcoinStats(
-          `flex-col ${glassmorphismL2} -ml-1 w-[156px] px-3 py-2 space-y-1 ${labelLightSm}`,
+          `flex-col ${glassmorphismL2} -ml-1 w-[168px] px-3 py-2 space-y-1 ${labelLightSm}`,
         )}
 
         {/* Spacer column */}
