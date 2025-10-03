@@ -18,15 +18,15 @@ export const notificationBody = `font-normal text-sm text-stamp-grey`;
 
 /* Info */
 export const notificationContainerInfo =
-  `${notificationContainer} bg-gradient-to-br from-[#333333]/60 via-[#333333]/40 to-[#080708]/80 border-[#666666]/60`;
+  `${notificationContainer} bg-gradient-to-br from-[#333333]/60 via-[#333333]/40 to-[#080708]/80 border-[#666666]/40`;
 
 /* Error */
 export const notificationContainerError =
-  `${notificationContainer} bg-gradient-to-br from-[#330000]/60 via-[#330000]/40 to-[#080708]/80 border-[#660000]/60`;
+  `${notificationContainer} bg-gradient-to-br from-[#330000]/60 via-[#330000]/40 to-[#080708]/80 border-[#660000]/40`;
 
 /* Success */
 export const notificationContainerSuccess =
-  `${notificationContainer} bg-gradient-to-br from-[#003300]/60 via-[#003300]/40 to-[#080708]/80 border-[#006600]/60`;
+  `${notificationContainer} bg-gradient-to-br from-[#003300]/60 via-[#003300]/40 to-[#080708]/80 border-[#006600]/40`;
 
 /* ===== TOOLTIP STYLES ===== */
 export const tooltipButton = `

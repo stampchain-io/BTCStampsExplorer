@@ -217,7 +217,7 @@ export function validateConstants(
   }
 
   if (errors.length > 0) {
-    throw new Error(`Constant validation failed:\n${errors.join("\n")}`);
+    throw new Error(`Constant validation failed.\n${errors.join("\n")}`);
   }
 }
 
