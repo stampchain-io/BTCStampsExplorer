@@ -16,7 +16,6 @@ export function showToast(
   type: BaseToast["type"],
   autoDismiss = true,
 ) {
-  console.log("[showToast Global Signal]", { message, type, autoDismiss });
   toastSignal.value = { message, type, autoDismiss };
   // Clear the signal after a short delay to allow the ToastProvider to pick up the change.
   // This ensures that if showToast is called multiple times quickly with the same content,
