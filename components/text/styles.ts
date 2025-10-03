@@ -26,7 +26,7 @@ export const logoPurpleLDLink =
 /* ===== NAVIGATION STYLES ===== */
 // Header - Desktop
 export const navLinkPurple =
-  `font-semibold tablet:font-normal text-stamp-purple text-sm group-hover:text-stamp-purple-bright tracking-wider ${transitionColors} cursor-pointer ${select}`;
+  `font-semibold tablet:font-normal text-stamp-purple text-sm tablet:text-[13px] group-hover:text-stamp-purple-bright tracking-wider ${transitionColors} cursor-pointer ${select}`;
 export const navLinkPurpleActive =
   `${navLinkPurple} !text-stamp-purple-bright hover:!text-stamp-purple`;
 export const navSublinkPurple =
@@ -94,6 +94,7 @@ export const textLinkUnderline =
 // Use the specific link styles created or just add "animated-underline" to the class name to apply an animated underline effect
 
 /* ===== LABEL STYLES ===== */
+export const labelXxs = `${labelFont} text-[10px] ${select}`;
 export const labelXs = `${labelFont} text-xs ${select}`;
 export const labelSm = `${labelFont} text-sm ${select}`;
 export const label = `${labelFont} text-base ${select}`; // old dataLabel name
@@ -269,6 +270,7 @@ export type TextStyles = {
   text2xl: string;
   textLinkUnderline: string;
   // Label styles
+  labelXxs: string;
   labelXs: string;
   labelSm: string;
   label: string;
