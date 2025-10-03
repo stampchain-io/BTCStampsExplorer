@@ -45,7 +45,7 @@ export const connectOKX = async (
       error: errorMessage,
     });
     addToast(
-      `Failed to connect to OKX wallet:\n${errorMessage}`,
+      `Failed to connect to OKX wallet.\n${errorMessage}`,
       "error",
     );
   }

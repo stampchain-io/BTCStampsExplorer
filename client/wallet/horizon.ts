@@ -69,7 +69,7 @@ export const connectHorizon = async (
       details: error,
     });
     addToast(
-      `Failed to connect to Horizon wallet:\n${errorMessage}`,
+      `Failed to connect to Horizon wallet.\n${errorMessage}`,
       "error",
     );
   }

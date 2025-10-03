@@ -43,7 +43,7 @@ export const connectTapWallet = async (
       context: "connectTapWallet",
       error: errorMessage,
     });
-    addToast(`Failed to connect to TapWallet:\n${errorMessage}`, "error");
+    addToast(`Failed to connect to TapWallet.\n${errorMessage}`, "error");
   }
 };
 

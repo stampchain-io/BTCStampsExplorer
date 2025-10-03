@@ -56,7 +56,7 @@ export const connectUnisat = async (
       error: errorMessage,
     });
     addToast(
-      `Failed to connect to Unisat wallet:\n${errorMessage}`,
+      `Failed to connect to Unisat wallet.\n${errorMessage}`,
       "error",
     );
   }

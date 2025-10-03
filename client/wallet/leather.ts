@@ -79,7 +79,7 @@ export const connectLeather = async (addToast: AddToastFunction) => {
       details: error,
     });
     addToast(
-      `Failed to connect to Leather wallet:\n${errorMessage}`,
+      `Failed to connect to Leather wallet.\n${errorMessage}`,
       "error",
     );
   }
