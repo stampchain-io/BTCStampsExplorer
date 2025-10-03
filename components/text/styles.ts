@@ -30,7 +30,7 @@ export const navLinkPurple =
 export const navLinkPurpleActive =
   `${navLinkPurple} !text-stamp-purple-bright hover:!text-stamp-purple`;
 export const navSublinkPurple =
-  `font-light text-stamp-purple text-sm hover:text-stamp-purple-bright tracking-wider ${transitionColors} cursor-pointer ${select}`; // used in WalletButton.tsx for connected sunmenu links - header uses custom styles
+  `font-light text-stamp-purple text-[13px] hover:text-stamp-purple-bright tracking-wider ${transitionColors} cursor-pointer ${select}`; // used in WalletButton.tsx for connected sunmenu links - header uses custom styles
 export const navSublinkPurpleActive =
   `${navSublinkPurple} !text-stamp-purple-bright hover:!text-stamp-purple`;
 // Header - Mobile/tablet

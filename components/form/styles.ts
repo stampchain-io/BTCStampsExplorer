@@ -13,7 +13,7 @@ const inputFieldWidth = "!w-10";
 // Input field styles - focus values must be same as glassmorphismL2Hover
 const inputFieldStyle = `p-3 w-full
   ${glassmorphismL2} ${glassmorphismL2Hover}
-  focus:bg-[#100a10]/60 focus:border-[#242424] focus:outline-none focus-visible:outline-none no-outline ${transitionColors}
+  focus:bg-[#080708]/60 focus:border-[#242424] focus:outline-none focus-visible:outline-none no-outline ${transitionColors}
   font-medium text-sm text-stamp-grey-light
   placeholder:font-light placeholder:text-stamp-grey-darker placeholder:uppercase`;
 
@@ -45,7 +45,7 @@ export const inputTextarea = `
 // Input field dropdown - define height in the component
 export const inputFieldDropdown = `
 absolute top-[100%] left-0 w-full z-[60]
-bg-gradient-to-b from-[#100a10]/20 to-[#100a10] backdrop-blur-sm
+bg-gradient-to-b from-[#080708]/20 to-[#080708] backdrop-blur-sm
 border border-t-0 border-[#1b1b1b]/80 rounded-b-xl
 text-stamp-grey-light text-sm font-medium uppercase leading-none
 overflow-y-auto scrollbar-glassmorphism-slim shadow-lg cursor-pointer`;

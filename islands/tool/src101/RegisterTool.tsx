@@ -272,7 +272,7 @@ export function SRC101RegisterTool({
           <div class="relative w-[64px]" ref={tldDropdownRef}>
             <div
               class={`h-10 px-4 border-[1px] border-[#1b1b1b]/80 rounded-xl
-                !bg-[#100a10]/30 ${glassmorphismL2Hover}
+                !bg-[#080708]/60 ${glassmorphismL2Hover}
                 font-semibold text-sm text-stamp-grey text-right backdrop-blur-sm hover:text-stamp-grey-light tracking-wider ${transitionAll} focus-visible:!outline-none cursor-pointer flex items-center justify-end ${
                 openTldDropdown && !isSelectingTld ? "input-open-bottom" : ""
               }`}
