@@ -3472,6 +3472,8 @@ export interface ToastComponentProps {
   message: string;
   type: "success" | "error" | "warning" | "info";
   onClose: () => void;
+  autoDismiss: boolean;
+  duration: number;
 }
 
 /**

@@ -1,84 +1,135 @@
+import { Icon } from "$icon";
 import type { Toast as ToastTypeFromProvider } from "$islands/Toast/ToastProvider.tsx";
+import {
+  notificationBody,
+  notificationContainerError,
+  notificationContainerInfo,
+  notificationContainerSuccess,
+  notificationHeading,
+} from "$notification";
 import type { ToastComponentProps } from "$types/ui.d.ts";
 
 export const ToastComponent = (
-  { id, message, type, onClose }: ToastComponentProps,
+  { id, message, type, onClose, autoDismiss, duration = 4000 }:
+    ToastComponentProps,
 ) => {
-  const getIcon = (toastType: ToastTypeFromProvider["type"]) => {
+  const getIconName = (toastType: ToastTypeFromProvider["type"]) => {
     switch (toastType) {
       case "error":
-        return (
-          <svg
-            class="w-5 h-5"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
-            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 11.793a1 1 0 1 1-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 0 1-1.414-1.414L8.586 10 6.293 7.707a1 1 0 0 1 1.414-1.414L10 8.586l2.293-2.293a1 1 0 0 1 1.414 1.414L11.414 10l2.293 2.293Z" />
-          </svg>
-        );
+        return "error";
       case "success":
-        return (
-          <svg
-            class="w-5 h-5"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
-            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z" />
-          </svg>
-        );
+        return "success";
       case "info":
       default:
-        return (
-          <svg
-            class="w-5 h-5"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
-            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM10 15a1 1 0 1 1 0-2 1 1 0 0 1 0 2Zm1-4a1 1 0 0 1-2 0V6a1 1 0 0 1 2 0v5Z" />
-          </svg>
-        );
+        return "info";
     }
   };
+
+  const getIconColor = (toastType: ToastTypeFromProvider["type"]) => {
+    switch (toastType) {
+      case "error":
+        return "stroke-[#990000]";
+      case "success":
+        return "stroke-[#009900]";
+      case "info":
+      default:
+        return "stroke-[#999999]";
+    }
+  };
+
+  const getContainerStyle = (toastType: ToastTypeFromProvider["type"]) => {
+    switch (toastType) {
+      case "error":
+        return notificationContainerError;
+      case "success":
+        return notificationContainerSuccess;
+      case "info":
+      default:
+        return notificationContainerInfo;
+    }
+  };
+
+  const getProgressBarColor = (toastType: ToastTypeFromProvider["type"]) => {
+    switch (toastType) {
+      case "error":
+        return "bg-[#660000]";
+      case "success":
+        return "bg-[#006600]";
+      case "info":
+      default:
+        return "bg-[#666666]";
+    }
+  };
+
+  // Split message into first line and remaining lines
+  const lines = message.split("\n");
+  const firstLine = lines[0];
+  const remainingLines = lines.slice(1);
 
   return (
     <div
       id={`toast-${id}`}
-      class="fixed flex items-center w-full max-w-md p-4 space-x-4 text-gray-500 bg-white divide-x rtl:divide-x-reverse divide-gray-200 rounded-xl shadow top-5 left-5 dark:text-gray-400 dark:divide-gray-700 space-x dark:bg-gray-800 z-50"
+      class={`fixed top-5 left-5 z-50 w-full max-w-md overflow-hidden ${
+        getContainerStyle(type)
+      }`}
       role="alert"
     >
-      <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 rounded-xl">
-        {getIcon(type)}
+      <div class="flex items-center space-x-6">
+        <Icon
+          type="icon"
+          name={getIconName(type)}
+          weight="bold"
+          size="sm"
+          color="custom"
+          className={getIconColor(type)}
+          ariaLabel={`${type} notification`}
+        />
+
+        <div class="flex-1 ml-6 break-words">
+          <div class={notificationHeading}>{firstLine}</div>
+          {remainingLines.length > 0 && (
+            <div class={notificationBody}>
+              {remainingLines.join("\n")}
+            </div>
+          )}
+        </div>
+
+        <Icon
+          type="iconButton"
+          name="close"
+          weight="bold"
+          size="xs"
+          color="grey"
+          onClick={onClose}
+          className="ml-auto"
+        />
       </div>
-      <div class="ml-3 text-sm font-normal break-words">{message}</div>
-      <button
-        onClick={onClose}
-        type="button"
-        class="ml-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-xl focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700"
-        aria-label="Close"
-      >
-        <span class="sr-only">Close</span>
-        <svg
-          class="w-3 h-3"
-          aria-hidden="true"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 14 14"
-        >
-          <path
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+
+      {autoDismiss && (
+        <div class="mt-2 w-full h-1 rounded-full bg-[#1b1b1b]/70">
+          <div
+            class={`h-full rounded-full ${
+              getProgressBarColor(type)
+            } transition-all ease-linear`}
+            style={{
+              animation: `toast-progress ${duration}ms linear forwards`,
+            }}
           />
-        </svg>
-      </button>
+        </div>
+      )}
+
+      <style>
+        {`
+          @keyframes toast-progress {
+            from {
+              width: 100%;
+            }
+            to {
+              width: 0%;
+            }
+          }
+        `}
+      </style>
     </div>
   );
 };
