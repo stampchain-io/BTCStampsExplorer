@@ -1,15 +1,18 @@
-import { signal } from "@preact/signals";
-import { walletContext } from "$client/wallet/wallet.ts";
-import type { SignPSBTResult, Wallet } from "$types/index.d.ts";
 import {
   checkWalletAvailability,
   getGlobalWallets,
+  walletContext,
 } from "$client/wallet/wallet.ts";
-import { handleWalletError } from "$client/wallet/walletHelper.ts";
+import {
+  handleWalletError,
+  parseConnectionError,
+} from "$client/wallet/walletHelper.ts";
 import { getBTCBalanceInfo } from "$lib/utils/data/processing/balanceUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { broadcastTransaction } from "$lib/utils/minting/broadcast.ts";
 import type { BaseToast } from "$lib/utils/ui/notifications/toastSignal.ts";
+import type { SignPSBTResult, Wallet } from "$types/index.d.ts";
+import { signal } from "@preact/signals";
 
 export const isPhantomInstalled = signal<boolean>(false);
 
@@ -19,20 +22,32 @@ export const connectPhantom = async (
   try {
     const provider = getProvider();
     if (!provider) {
+      logger.error("ui", {
+        message: "Phantom wallet not detected",
+        context: "connectPhantom",
+      });
       addToast(
-        "Phantom wallet not detected. Please install the Phantom extension.",
+        "Phantom wallet not detected.\nPlease install the Phantom extension.",
         "error",
       );
       return;
     }
     const accounts = await provider.requestAccounts();
     await handleAccountsChanged(accounts);
-    addToast("Successfully connected to Phantom wallet", "success");
+    logger.info("ui", {
+      message: "Successfully connected to Phantom wallet",
+      context: "connectPhantom",
+    });
+    addToast("Successfully connected to Phantom wallet.", "success");
   } catch (error: unknown) {
+    const errorMessage = parseConnectionError(error);
+    logger.error("ui", {
+      message: "Failed to connect to Phantom wallet",
+      context: "connectPhantom",
+      error: errorMessage,
+    });
     addToast(
-      `Failed to connect to Phantom wallet: ${
-        error instanceof Error ? error.message : "Unknown error"
-      }`,
+      `Failed to connect to Phantom wallet:\n${errorMessage}`,
       "error",
     );
   }

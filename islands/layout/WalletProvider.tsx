@@ -56,12 +56,8 @@ export function WalletProvider(
       }
 
       await connectFunction((message: string, type: BaseToast["type"]) => {
-        showToast(message, type, type === "error" ? false : true);
-        console.log(
-          "[WalletProvider] Toast via connectFunction callback:",
-          message,
-          type,
-        );
+        // Let the toast provider handle autoDismiss defaults based on type
+        showToast(message, type);
       });
 
       const modalContainer = document.getElementById(
@@ -88,7 +84,8 @@ export function WalletProvider(
         unknownError,
         `Failed to connect to ${providerKey} wallet`,
       );
-      showToast(error.message, "error", false);
+      // Let the toast provider handle autoDismiss defaults based on type
+      showToast(error.message, "error");
       console.error(error.message);
     }
   };

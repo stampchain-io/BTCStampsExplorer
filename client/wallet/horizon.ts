@@ -2,12 +2,26 @@
 // Based on API discovery from testing - supports 6 methods:
 // getAddresses, signPsbt, signMessage, fairmint, dispense, openOrder
 
-import { getGlobalWallets, walletContext } from "$client/wallet/wallet.ts";
+import {
+  checkWalletAvailability,
+  getGlobalWallets,
+  walletContext,
+} from "$client/wallet/wallet.ts";
+import { parseConnectionError } from "$client/wallet/walletHelper.ts";
 import type { HorizonAddress, HorizonWalletAPI } from "$lib/types/wallet.d.ts";
 import { getBTCBalanceInfo } from "$lib/utils/data/processing/balanceUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import type { BaseToast } from "$lib/utils/ui/notifications/toastSignal.ts";
 import type { SignPSBTResult, Wallet } from "$types/index.d.ts";
+import { signal } from "@preact/signals";
+
+export const isHorizonInstalled = signal<boolean>(false);
+
+export const checkHorizon = () => {
+  const isAvailable = checkWalletAvailability("horizon");
+  isHorizonInstalled.value = isAvailable;
+  return isAvailable;
+};
 
 // Helper function to get Horizon provider safely
 const getHorizonProvider = (): HorizonWalletAPI | undefined => {
@@ -26,7 +40,7 @@ export const connectHorizon = async (
         message: "Horizon wallet not detected",
       });
       addToast(
-        "Horizon wallet not detected. Please install the Horizon extension.",
+        "Horizon wallet not detected.\nPlease install the Horizon extension.",
         "error",
       );
       return;
@@ -46,17 +60,16 @@ export const connectHorizon = async (
     logger.info("ui", {
       message: "Successfully connected to Horizon wallet",
     });
-    addToast("Successfully connected to Horizon wallet", "success");
+    addToast("Successfully connected to Horizon wallet.", "success");
   } catch (error) {
+    const errorMessage = parseConnectionError(error);
     logger.error("ui", {
       message: "Error connecting to Horizon wallet",
-      error: error instanceof Error ? error.message : String(error),
+      error: errorMessage,
       details: error,
     });
     addToast(
-      `Failed to connect to Horizon wallet: ${
-        error instanceof Error ? error.message : "Unknown error"
-      }`,
+      `Failed to connect to Horizon wallet:\n${errorMessage}`,
       "error",
     );
   }
@@ -419,6 +432,7 @@ export const detectHorizonWallet = (): boolean => {
 
 // Horizon Wallet Provider Implementation - Compatible with WalletProvider interface
 export const horizonProvider = {
+  checkHorizon,
   connectHorizon,
   signMessage: async (message: string): Promise<string> => {
     const wallet = new HorizonWallet();
