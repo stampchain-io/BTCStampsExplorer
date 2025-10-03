@@ -47,7 +47,7 @@ export const connectPhantom = async (
       error: errorMessage,
     });
     addToast(
-      `Failed to connect to Phantom wallet:\n${errorMessage}`,
+      `Failed to connect to Phantom wallet.\n${errorMessage}`,
       "error",
     );
   }
