@@ -1,17 +1,17 @@
 /* ===== SEND BTC MODAL COMPONENT ===== */
-import { useEffect, useRef, useState } from "preact/hooks";
-import type { SendBTCModalProps } from "$types/ui.d.ts";
-import { walletContext } from "$client/wallet/wallet.ts";
-import { FeeCalculatorBase } from "$section";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
-import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
-import { mapProgressiveFeeDetails } from "$lib/utils/performance/fees/fee-estimation-utils.ts";
-import { ModalBase } from "$layout";
+import { walletContext } from "$client/wallet/wallet.ts";
 import { inputField } from "$form";
-import { tooltipIcon } from "$notification";
 import { closeModal } from "$islands/modal/states.ts";
+import { ModalBase } from "$layout";
+import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
 import { logger } from "$lib/utils/logger.ts";
+import { mapProgressiveFeeDetails } from "$lib/utils/performance/fees/fee-estimation-utils.ts";
 import { showToast } from "$lib/utils/ui/notifications/toastSignal.ts";
+import { tooltipIcon } from "$notification";
+import { FeeCalculatorBase } from "$section";
+import type { SendBTCModalProps } from "$types/ui.d.ts";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
 
@@ -142,7 +142,7 @@ function SendBTCModal({
 
   useEffect(() => {
     if (formHookError) {
-      showToast(formHookError, "error", false);
+      showToast(formHookError, "error");
       setFormHookError(null);
     }
   }, [formHookError, setFormHookError]);
@@ -254,20 +254,20 @@ function SendBTCModal({
       if (signResult.signed) {
         if (signResult.txid) {
           showToast(
-            `Transaction sent! TXID: ${signResult.txid.substring(0, 10)}...`,
+            `Transaction sent!\nTXID: ${signResult.txid.substring(0, 10)}`,
             "success",
             false,
           );
           setTimeout(closeModal, 1000);
         } else if (signResult.psbt) {
           try {
-            showToast("Transaction signed. Broadcasting...", "info", true);
+            showToast("Transaction signed.\nBroadcasting...", "info");
             const broadcastTxid = await walletContext.broadcastPSBT(
               signResult.psbt,
             );
             if (broadcastTxid && typeof broadcastTxid === "string") {
               showToast(
-                `Broadcasted! : ${broadcastTxid.substring(0, 10)}...`,
+                `Broadcasted:\n${broadcastTxid.substring(0, 10)}...`,
                 "success",
                 false,
               );
@@ -307,7 +307,7 @@ function SendBTCModal({
           );
         }
       } else if (signResult.cancelled) {
-        showToast("Transaction signing was cancelled.", "info", true);
+        showToast("Transaction signing was cancelled.", "info");
       } else {
         const signError = signResult.error || "Unknown signing error";
         logger.error("ui", {
@@ -360,8 +360,8 @@ function SendBTCModal({
     } catch (error) {
       const errorMsg = error instanceof Error
         ? error.message
-        : "Failed to calculate max amount";
-      showToast(errorMsg, "error", false);
+        : "Failed to calculate max amount.";
+      showToast(errorMsg, "error");
     }
   };
 

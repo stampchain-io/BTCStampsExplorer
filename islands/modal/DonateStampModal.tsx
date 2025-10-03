@@ -1,8 +1,8 @@
 /* ===== DONATE STAMP MODAL COMPONENT ===== */
 import { sliderBar, sliderKnob } from "$button";
-import type { DonateStampModalProps } from "$types/ui.d.ts";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
+import type { DonateStampModalProps } from "$types/ui.d.ts";
 // Using simplified fee display approach
 import { handleModalClose } from "$components/layout/ModalBase.tsx";
 import { StampImage } from "$content";
@@ -10,8 +10,8 @@ import { stackConnectWalletModal } from "$islands/layout/ModalStack.tsx";
 import { closeModal, openModal } from "$islands/modal/states.ts";
 import { ModalBase } from "$layout";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
-import { mapProgressiveFeeDetails } from "$lib/utils/performance/fees/fee-estimation-utils.ts";
 import { logger } from "$lib/utils/logger.ts";
+import { mapProgressiveFeeDetails } from "$lib/utils/performance/fees/fee-estimation-utils.ts";
 import { showToast } from "$lib/utils/ui/notifications/toastSignal.ts";
 import { tooltipImage } from "$notification";
 import { FeeCalculatorBase } from "$section";
@@ -151,7 +151,7 @@ const DonateStampModal = ({
   // Handle form errors with toast notifications
   useEffect(() => {
     if (formHookError) {
-      showToast(formHookError, "error", false);
+      showToast(formHookError, "error");
       setFormHookError(null);
     }
   }, [formHookError, setFormHookError]);
@@ -295,20 +295,20 @@ const DonateStampModal = ({
       if (signResult.signed) {
         if (signResult.txid) {
           showToast(
-            `Broadcasted: ${signResult.txid.substring(0, 10)}...`,
+            `Broadcasted:\n${signResult.txid.substring(0, 10)}`,
             "success",
             false,
           );
           closeModal();
         } else if (signResult.psbt) {
           try {
-            showToast("Transaction signed. Broadcasting...", "info", true);
+            showToast("Transaction signed.\nBroadcasting...", "info");
             const broadcastTxid = await walletContext.broadcastPSBT(
               signResult.psbt,
             );
             if (broadcastTxid && typeof broadcastTxid === "string") {
               showToast(
-                ` Broadcasted: ${broadcastTxid.substring(0, 10)}...`,
+                ` Broadcasted:\n${broadcastTxid.substring(0, 10)}...`,
                 "success",
                 false,
               );
@@ -360,7 +360,7 @@ const DonateStampModal = ({
           }`,
         );
       } else {
-        showToast("Transaction signing was cancelled.", "info", true);
+        showToast("Transaction signing was cancelled.", "info");
       }
     });
   };
