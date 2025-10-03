@@ -184,7 +184,7 @@ body {
 
 
 
-/* Global <hr> styling: full width and consistent border color */
+/* Global <hr> styling */
 @layer base {
   hr {
     @apply w-full border-0 border-t border-[#1b1b1b]/80;
@@ -200,14 +200,14 @@ body {
   }
 }
 
-/* conic gradient for input field animated border */
+/* Conic gradient for input field animated border */
 @property --angle {
   syntax: '<angle>';
   initial-value: 0deg;
   inherits: false;
 }
 
-/* remove border radius for input field when dropdown is open */
+/* Remove border radius for input field when dropdown is open */
 .input-open input {
   border-bottom-left-radius: 0 !important;
   border-bottom-right-radius: 0 !important;
@@ -237,8 +237,6 @@ body {
   outline-offset: 0 !important;
   outline-style: none !important;
 }
-
-
 
 /* Stamp Items Marquee */
 .marquee {
@@ -399,49 +397,3 @@ strong {
   font-weight: bold;
 }
 */
-
-
-/* SYSTEMIC FIX: Force cursor inheritance for glassmorphism elements */
-/* This fixes the issue where backdrop-blur and pseudo-elements override cursor styles */
-
-/* Fix for all buttons with glassmorphism
-button,
-button *,
-button::before,
-button::after {
-  cursor: inherit !important;
-}
-
-/* Fix for glassmorphism containers that should inherit cursor
-.backdrop-blur-sm,
-.backdrop-blur-sm *,
-.backdrop-blur-sm::before,
-.backdrop-blur-sm::after {
-  cursor: inherit !important;
-}
-
-/* Fix for overflow-hidden containers
-.overflow-hidden,
-.overflow-hidden *,
-.overflow-hidden::before,
-.overflow-hidden::after {
-  cursor: inherit !important;
-}
-
-/* Specific fix for range sliders
-input[type="range"],
-input[type="range"]::-webkit-slider-thumb,
-input[type="range"]::-moz-range-thumb {
-  cursor: inherit !important;
-}
-
-/* Override any text cursor defaults in interactive elements
-button span,
-button div,
-button p,
-[role="button"] span,
-[role="button"] div,
-[role="button"] p {
-  cursor: inherit !important;
-}
- */
