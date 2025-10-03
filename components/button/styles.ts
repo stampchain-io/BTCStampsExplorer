@@ -77,7 +77,7 @@ export interface ButtonVariants {
 const baseGlassmorphism =
   "border-[1px] rounded-xl backdrop-blur-sm overflow-hidden";
 const baseGlassmorphismColor =
-  "relative text-[#100a10] before:blur-sm hover:border-[var(--color-border-hover)] hover:before:scale-105";
+  "relative text-[#080708] before:blur-sm hover:border-[var(--color-border-hover)] hover:before:scale-105";
 const baseBefore =
   "before:absolute before:inset-0 before:rounded-xl before:z-[-1] before:transition-transform before:duration-50 before:origin-center";
 const gradientOverlay =
@@ -127,7 +127,7 @@ export const buttonStyles: ButtonVariants = {
       bg-[#211c21]/10 border-[var(--color-border)]
       text-[var(--color-text)] before:bg-none
       hover:bg-[#211c21]/10 hover:!border-[var(--color-border)]
-      hover:text-[#100a10] hover:before:!scale-100 hover:before:!blur-sm
+      hover:text-[#080708] hover:before:!scale-100 hover:before:!blur-sm
       ${baseBefore} ${shadowL2}
       ${gradientOverlayHover}
     `,
