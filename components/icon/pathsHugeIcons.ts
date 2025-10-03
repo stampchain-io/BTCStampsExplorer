@@ -104,9 +104,9 @@ export const list = [
 */
 
 export const listMenu = [
-  "M4 5L16 5",
+  "M7 5L17 5",
   "M4 12L20 12",
-  "M4 19L12 19",
+  "M7 19L17 19",
 ];
 
 export const listAsc = [
@@ -371,6 +371,23 @@ export const atom = [
   "M12.009 12H12",
 ];
 
+/* ===== NOTIFICATION ICONS ===== */
+export const info = [
+  "M 22,12 A 10,10 0 0 1 12,22 10,10 0 0 1 2,12 10,10 0 0 1 12,2 10,10 0 0 1 22,12 Z",
+  "M12 8V12.5",
+  "M12 15.9883V15.9983",
+];
+
+export const error = [
+  "M22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12Z",
+  "M14.9994 15L9 9M9.00064 15L15 9",
+];
+
+export const success = [
+  "M22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12Z",
+  "M8 12.5L10.5 15L16 9",
+];
+
 /* === MEDIA ICONS === */
 // Both icons use fill values and must be defined inline in className - eg. fill-stamp-grey hover:fill-stamp-purple-bright
 export const play = [
@@ -431,7 +448,7 @@ export const time60 = [
 ];
 
 /* ===== DASHBOARD SPEEDOMETER ICONS ===== */
-/* Custom icons */
+/* Custom icons
 export const speedometerSlow = [
   "M22 13C22 7.47715 17.5228 3 12 3C6.47715 3 2 7.47715 2 13",
   "m 15,18 a 3,3 0 0 1 -3,3 3,3 0 0 1 -3,-3 3,3 0 0 1 3,-3 3,3 0 0 1 3,3 z",
@@ -448,3 +465,4 @@ export const speedometerFast = [
   "M22 13C22 7.47715 17.5228 3 12 3C6.47715 3 2 7.47715 2 13",
   "m 13.999885,15.682192 3.182306,-3.182307",
 ];
+*/

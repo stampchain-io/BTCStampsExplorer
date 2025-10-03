@@ -118,18 +118,16 @@ export function Icon(props: IconVariants) {
       stamp: "stamp",
       uploadImage: "imageUpload",
 
-      // Error Display Icons (fallback to existing icons)
-      "info": "magnifingGlass", // Using magnifying glass as placeholder for info
-      "alert-triangle": "flame", // Using flame as placeholder for warning triangle
-      "alert-circle": "atom", // Using atom as placeholder for alert circle
-      "x-circle": "x", // Using x as placeholder for x-circle
-      "x": "x",
+      // Notification Display Icons
+      info: "info",
+      error: "error",
+      success: "success",
 
       // Other common icons
-      "external-link": "imageOut", // Using imageOut as external link
-      "loading": "refresh", // Loading spinner
-      "refresh": "refresh", // Refresh spinner
-      "eye": "eye",
+      externallink: "imageOut",
+      loading: "refresh",
+      refresh: "refresh",
+      eye: "eye",
     };
 
     const iconName = iconNameMap[name as keyof typeof iconNameMap];
