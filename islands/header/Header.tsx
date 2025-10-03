@@ -289,8 +289,8 @@ export function Header() {
     if (toolsButtonRef.current) {
       const rect = toolsButtonRef.current.getBoundingClientRect();
       toolsPos = {
-        top: rect.bottom + 20,
-        left: rect.right - 600 + 58,
+        top: rect.bottom + 12,
+        left: rect.right - 550 + 61,
       };
     }
 
@@ -315,8 +315,8 @@ export function Header() {
     if (walletButtonRef.current) {
       const rect = walletButtonRef.current.getBoundingClientRect();
       walletPos = {
-        top: rect.bottom + 19,
-        left: rect.right - 150 - 22,
+        top: rect.bottom + 12,
+        left: rect.right - 150 - 15,
       };
     }
 
@@ -362,7 +362,6 @@ export function Header() {
 
   /* ===== DRAWER RENDERER ===== */
   const renderDrawer = (type: "menu" | "wallet" | "tools") => {
-    const isMenu = type === "menu";
     const isActive = drawerContent === type && open;
 
     const getContent = () => {
@@ -380,57 +379,62 @@ export function Header() {
       }
     };
 
+    const getTitle = () => {
+      switch (type) {
+        case "menu":
+          return "STAMPCHAIN";
+        case "wallet":
+          return "WALLET";
+        case "tools":
+          return "TOOLS";
+      }
+    };
+
     return (
       <div
         ref={drawerContent === type ? drawerRef : null}
         class={`flex tablet:hidden flex-col justify-between
-          fixed top-0 ${
-          isMenu ? "left-0 right-auto" : "right-0 left-auto"
-        } w-full min-[420px]:w-[340px] h-[100dvh] z-30
-          ${
-          isMenu
-            ? "min-[420px]:rounded-l-xl min-[420px]:border-l-[1px] min-[420px]:border-r-0 min-[420px]:border-l-[#1b1b1b] min-[420px]:shadow-[-12px_0_12px_-6px_rgba(10,7,10,0.5)]"
-            : "min-[420px]:rounded-r-xl min-[420px]:border-r-[1px] min-[420px]:border-l-0 min-[420px]:border-r-[#1b1b1b] min-[420px]:shadow-[12px_0_12px_-6px_rgba(10,7,10,0.5)]"
-        }
+          fixed top-0 right-0 left-auto w-full min-[420px]:w-[340px] h-[100dvh] z-30
+          min-[420px]:rounded-r-xl min-[420px]:border-r-[1px] min-[420px]:border-l-0
+          min-[420px]:border-r-[#1b1b1b] min-[420px]:shadow-[12px_0_12px_-6px_rgba(10,7,10,0.5)]
           ${glassmorphismOverlay} ${transitionTransform} transition-transform will-change-transform
           overflow-y-auto overflow-x-hidden scrollbar-black
-          ${
-          isActive
-            ? "translate-x-0"
-            : isMenu
-            ? "-translate-x-full"
-            : "translate-x-full"
-        }`}
+          ${isActive ? "translate-x-0" : "translate-x-full"}`}
         style="transition-timing-function: cubic-bezier(0.46,0.03,0.52,0.96);"
         id={`navbar-collapse-${type}`}
       >
         <div class="flex flex-col h-full">
-          <div
-            class={`flex pt-[34px] mobileLg:pt-[22px] px-9 ${
-              isMenu ? "justify-end" : ""
-            }`}
-          >
-            <div class="relative">
-              <div
-                class={`${tooltipIcon} ${
-                  isCloseTooltipVisible ? "opacity-100" : "opacity-0"
+          <div class="pt-[29px] mobileLg:pt-[41px] px-9">
+            <div class="flex flex-row justify-between items-center w-full">
+              <div class="relative">
+                <div
+                  class={`${tooltipIcon} ${
+                    isCloseTooltipVisible ? "opacity-100" : "opacity-0"
+                  }`}
+                >
+                  {closeTooltipText}
+                </div>
+                <CloseIcon
+                  size="md"
+                  weight="bold"
+                  color="grey"
+                  onClick={() => {
+                    if (open) {
+                      closeMenu();
+                    }
+                  }}
+                  onMouseEnter={handleCloseMouseEnter}
+                  onMouseLeave={handleCloseMouseLeave}
+                  aria-label="Close menu"
+                />
+              </div>
+              <h6
+                class={`font-extrabold text-2xl gray-gradient1 tracking-wide select-none inline-block w-fit ${
+                  type === "menu" ? "italic font-black pr-0.5" : ""
                 }`}
               >
-                {closeTooltipText}
-              </div>
-              <CloseIcon
-                size="md"
-                weight="normal"
-                color="grey"
-                onClick={() => {
-                  if (open) {
-                    closeMenu();
-                  }
-                }}
-                onMouseEnter={handleCloseMouseEnter}
-                onMouseLeave={handleCloseMouseLeave}
-                aria-label="Close menu"
-              />
+                {getTitle()}
+              </h6>
             </div>
           </div>
           {getContent()}
@@ -461,7 +465,7 @@ export function Header() {
               ? link.title
               : link.title.default}
             // Base styles for nav container with conditional mobile styling
-            class={`relative group ${isMobile ? "" : ""}`}
+            class={`relative group ${isMobile ? "" : "mb-[2px]"}`}
           >
             {/* Main navigation link */}
             <a
@@ -509,75 +513,58 @@ export function Header() {
     );
   };
 
+  /* ===== LOGO ICON ===== */
+  const logoIcon = (
+    <Icon
+      type="iconButton"
+      name="stampchain"
+      size="xxl"
+      weight="light"
+      color="purple"
+      className="ml-3"
+      href="/home"
+      f-partial="/home"
+      onClick={() => setCurrentPath("home")}
+    />
+  );
+
   /* ===== COMPONENT RENDER ===== */
   return (
     <header class="mobileLg:flex justify-between items-center max-w-desktop w-full mx-auto
      px-gutter-mobile mobileLg:px-gutter-tablet tablet:px-gutter-desktop
      pt-6 pb-9 mobileLg:pt-9 tablet:pb-14">
-      {/* ===== LOGO, TEXT MENUS (DESKTOP) HAMBURGER MENU (MOBILE), TOOLS, SEARCH AND CONNECT BUTTON ===== */}
-      <div
-        class={`flex justify-between items-center w-full py-1.5 px-3 ${glassmorphism} relative z-header`}
-      >
-        {/* ===== MOBILE NAVIGATION ===== */}
-        <div class="mobileLg:hidden flex items-center w-full">
-          {/* Left: Menu Button */}
-          <div class="flex items-center">
-            {MenuButton({ onOpenDrawer: openDrawer }).icon}
-          </div>
+      {/* ===== MOBILE NAVIGATION ===== */}
+      <div class="mobileLg:hidden flex justify-between items-center w-full relative z-header">
+        {/* Left: Logo Icon */}
+        {logoIcon}
 
-          {/* Center: Logo Icon */}
-          <div class="flex-1 flex justify-center">
-            <Icon
-              type="iconButton"
-              name="stampchain"
-              size="lg"
-              weight="light"
-              color="purple"
-              colorAccent="#660099"
-              colorAccentHover="#8800CC"
-              href="/home"
-              f-partial="/home"
-              onClick={() => setCurrentPath("home")}
-            />
-          </div>
-
-          {/* Right: Search, Tools and Connect Buttons (Mobile: icons only) */}
-          <div class="flex items-center gap-5">
-            <SearchButton />
-            {ToolsButton({ onOpenDrawer: openDrawer, data: toolsData }).icon}
-            {WalletButton({
-              onOpenDrawer: openDrawer,
-              onCloseDrawer: closeMenu,
-            }).icon}
-          </div>
+        {/* Right: Search, Tools, Wallet and Menu Buttons */}
+        <div
+          class={`flex items-center gap-7 py-1.5 px-5 ${glassmorphism} !rounded-full`}
+        >
+          <SearchButton />
+          {ToolsButton({ onOpenDrawer: openDrawer, data: toolsData }).icon}
+          {WalletButton({
+            onOpenDrawer: openDrawer,
+            onCloseDrawer: closeMenu,
+          }).icon}
+          {MenuButton({ onOpenDrawer: openDrawer }).icon}
         </div>
+      </div>
 
-        {/* ===== DESKTOP LOGO ===== */}
-        <div class="hidden mobileLg:flex items-center">
-          <Icon
-            type="iconButton"
-            name="stampchain"
-            size="lg"
-            weight="light"
-            color="purple"
-            href="/home"
-            f-partial="/home"
-            onClick={() => setCurrentPath("home")}
-          />
-        </div>
+      {/* ===== TABLET/DESKTOP NAVIGATION ===== */}
+      <div class="hidden mobileLg:flex justify-between items-center w-full relative z-header">
+        {/* Left: Logo Icon */}
+        {logoIcon}
 
-        {/* ===== DESKTOP NAVIGATION ===== */}
-        <div class="hidden mobileLg:flex items-center w-full">
-          {/* Left: Logo (already positioned) */}
+        {/* Right: Navigation Links and Icon Buttons */}
+        <div
+          class={`flex items-center gap-6 py-1.5 tablet:py-1 px-5 tablet:px-4 ${glassmorphism} !rounded-full`}
+        >
+          {/* Navigation Links */}
+          {renderNavLinks()}
 
-          {/* Center: Navigation Links */}
-          <div class="flex-1 flex justify-center">
-            <div class="flex items-center gap-5 tablet:gap-[30px]">
-              {renderNavLinks()}
-            </div>
-          </div>
-
-          {/* Right: Search, Tools and Connect Buttons (Desktop with dropdowns) */}
+          {/* Icon Buttons */}
           <div class="flex items-center gap-5">
             <div class="relative group">
               <SearchButton />
@@ -617,7 +604,7 @@ export function Header() {
 
         return shouldRenderTools && createPortal(
           <div
-            class={`hidden tablet:block fixed z-dropdown w-[600px] py-3.5 px-5 whitespace-nowrap ${glassmorphism}`}
+            class={`hidden tablet:block fixed z-dropdown w-[550px] py-3.5 px-5 whitespace-nowrap ${glassmorphism}`}
             style={{
               top: `${dropdownState.toolsPos!.top}px`,
               left: `${dropdownState.toolsPos!.left}px`,
