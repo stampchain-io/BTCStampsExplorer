@@ -1,10 +1,32 @@
-/* ===== NOTIFICATION STYLES MODULE ===== */
+import { shadow } from "$layout";
 
 /* ===== BASE STYLES ===== */
-const tooltipText =
-  "font-normal text-[10px] text-stamp-grey-light whitespace-nowrap";
+/* ===== NOTIFICATION STYLES ===== */
+const notificationContainer = `
+  w-full px-5 py-2.5 border-[1px] rounded-2xl backdrop-blur-lg ${shadow}`;
+
+/* ===== TOOLTIPS STYLES ===== */
 const tooltipBackground =
   "bg-[#000000BF] px-2 py-1 rounded-md transition-opacity duration-200 pointer-events-none";
+const tooltipText =
+  "font-normal text-[10px] text-stamp-grey-light whitespace-nowrap";
+
+/* ===== NOTIFICATION STYLES ===== */
+/* General */
+export const notificationHeading = `font-semibold text-base text-stamp-grey`;
+export const notificationBody = `font-normal text-sm text-stamp-grey`;
+
+/* Info */
+export const notificationContainerInfo =
+  `${notificationContainer} bg-gradient-to-br from-[#333333]/60 via-[#333333]/40 to-[#080708]/80 border-[#666666]/60`;
+
+/* Error */
+export const notificationContainerError =
+  `${notificationContainer} bg-gradient-to-br from-[#330000]/60 via-[#330000]/40 to-[#080708]/80 border-[#660000]/60`;
+
+/* Success */
+export const notificationContainerSuccess =
+  `${notificationContainer} bg-gradient-to-br from-[#003300]/60 via-[#003300]/40 to-[#080708]/80 border-[#006600]/60`;
 
 /* ===== TOOLTIP STYLES ===== */
 export const tooltipButton = `
@@ -35,6 +57,3 @@ export const tooltipIcon = `
   bottom-full
   ${tooltipText}
 `;
-
-/* ===== TOAST STYLES ===== */
-// TODO(@baba): Implement toast notification styles
