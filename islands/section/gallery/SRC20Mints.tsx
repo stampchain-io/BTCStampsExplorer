@@ -87,10 +87,10 @@ export default function SRC20MintsGallery() {
         : error
         ? (
           <div class={`mt-3 ${notificationContainerError}`}>
-            <h6 class={`${notificationHeading} !text-[#990000]`}>
+            <h6 class={`${notificationHeading} !text-[#660000]`}>
               ERROR LOADING TRENDING TOKENS
             </h6>
-            <h6 class={`${notificationBody} !text-[#990000]`}>{error}</h6>
+            <h6 class={`${notificationBody} !text-[#660000]`}>{error}</h6>
           </div>
         )
         : transactions.length === 0
