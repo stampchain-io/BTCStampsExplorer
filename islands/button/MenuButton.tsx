@@ -133,7 +133,7 @@ export function MenuButton({ onOpenDrawer }: MenuButtonProps) {
       <Icon
         type="iconButton"
         name="menu"
-        weight="bold"
+        weight="normal"
         size="md"
         color="purple"
         isOpen={false}

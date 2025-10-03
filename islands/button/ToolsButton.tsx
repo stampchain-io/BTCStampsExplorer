@@ -4,6 +4,7 @@ import { formatUSDValue } from "$lib/utils/ui/formatting/formatUtils.ts";
 import {
   labelLightSm,
   labelXs,
+  labelXxs,
   navLinkGrey,
   navLinkGreyActive,
   navSublinkPurple,
@@ -261,37 +262,18 @@ export function ToolsButton({ onOpenDrawer, data }: ToolsButtonProps) {
   return {
     // The tools icon component with desktop dropdown
     icon: (
-      <div class="relative mt-[1px] mr-0.5 tablet:-ml-0.5 tablet:mr-0">
-        {/* Mobile icon */}
-        <div class="block tablet:hidden">
-          <Icon
-            type="iconButton"
-            name="tools"
-            weight="normal"
-            size="custom"
-            color="purple"
-            className=" w-[27px] h-[27px]"
-            onClick={handleToolsClick}
-            colorAccent="#666666CC"
-            colorAccentHover="#999999"
-          />
-        </div>
-
-        {/* Desktop icon  */}
-        <div class="hidden tablet:block">
-          <Icon
-            type="iconButton"
-            name="tools"
-            weight="normal"
-            size="custom"
-            className="w-[23px] h-[23px]"
-            color="purple"
-            onClick={handleToolsClick}
-            colorAccent="#666666CC"
-            colorAccentHover="#666666"
-          />
-        </div>
-
+      <div class="relative">
+        <Icon
+          type="iconButton"
+          name="tools"
+          weight="normal"
+          size="mdR"
+          color="purple"
+          className="mb-[1px]"
+          onClick={handleToolsClick}
+          colorAccent="#666666CC"
+          colorAccentHover="#666666"
+        />
         {/* Dropdown content is rendered by Header.tsx */}
       </div>
     ),
@@ -304,11 +286,11 @@ export function ToolsButton({ onOpenDrawer, data }: ToolsButtonProps) {
         )}
 
         {/* Spacer column */}
-        <div class="w-1" />
+        <div class="w-0" />
 
         {/* Column 2: Left aligned - Stamp tools */}
-        <div class="flex flex-col -ml-9 space-y-1 text-left">
-          <h6 class={labelXs}>
+        <div class="flex flex-col -ml-3 space-y-1 text-left">
+          <h6 class={labelXxs}>
             STAMPS
           </h6>
           {toolLinks.filter((link) =>
@@ -331,8 +313,8 @@ export function ToolsButton({ onOpenDrawer, data }: ToolsButtonProps) {
         </div>
 
         {/* Column 3: Center aligned - Token tools */}
-        <div class="flex flex-col -ml-12 space-y-1 text-center">
-          <h6 class={labelXs}>
+        <div class="flex flex-col -ml-6 space-y-1 text-center">
+          <h6 class={labelXxs}>
             TOKENS
           </h6>
           {toolLinks.filter((link) =>
@@ -357,7 +339,7 @@ export function ToolsButton({ onOpenDrawer, data }: ToolsButtonProps) {
 
         {/* Column 4: Right aligned - Register */}
         <div class="flex flex-col space-y-1 text-right">
-          <h6 class={labelXs}>
+          <h6 class={labelXxs}>
             BITNAME
           </h6>
           {toolLinks.filter((link) => link.href === "/tool/src101/mint")
@@ -387,7 +369,7 @@ export function ToolsButton({ onOpenDrawer, data }: ToolsButtonProps) {
         </div>
 
         {/* Bottom - Bitcoin Stats */}
-        <div class="sticky bottom-0 pb-9 tablet:pb-6">
+        <div class="sticky bottom-0 w-full mt-auto pb-9 tablet:pb-6 bg-[#080708]/80 shadow-[0_-36px_36px_-6px_rgba(10,7,10,1)]">
           {/* ===== PRICE/FEE/BLOCK INFO ===== */}
           {bitcoinStats(
             `flex-col ${glassmorphismL2} items-end px-3 py-2 space-y-1 ${labelLightSm}`,

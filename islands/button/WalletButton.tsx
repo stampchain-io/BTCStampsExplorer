@@ -193,25 +193,23 @@ export const WalletButton = (
       <div class="relative z-10">
         {/* ===== CONNECT WALLET BUTTON ===== */}
         {!(isConnected && address) && (
-          <div class="mt-0.5">
-            <Icon
-              type="iconButton"
-              name="wallet"
-              weight="normal"
-              size="mdR"
-              color="purple"
-              colorAccent="#666666CC"
-              colorAccentHover="#666666"
-              onClick={handleWalletIconClick}
-            />
-          </div>
+          <Icon
+            type="iconButton"
+            name="wallet"
+            weight="normal"
+            size="mdR"
+            color="purple"
+            colorAccent="#666666CC"
+            colorAccentHover="#666666"
+            onClick={handleWalletIconClick}
+          />
         )}
 
         {/* ===== CONNECTED WALLET DISPLAY ===== */}
         {isConnected && address && (
           <>
             {/* ===== MOBILE/TABLET WALLET ICON ===== */}
-            <div class="flex mt-0.5 items-center relative">
+            <div class="flex items-center relative">
               <Icon
                 type="iconButton"
                 name="wallet"
