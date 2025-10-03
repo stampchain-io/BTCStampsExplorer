@@ -1,14 +1,17 @@
-import { signal } from "@preact/signals";
-import { walletContext } from "$client/wallet/wallet.ts";
-import type { SignPSBTResult, Wallet } from "$types/index.d.ts";
-import { logger } from "$lib/utils/logger.ts";
 import {
   checkWalletAvailability,
   getGlobalWallets,
+  walletContext,
 } from "$client/wallet/wallet.ts";
-import { handleWalletError } from "$client/wallet/walletHelper.ts";
+import {
+  handleWalletError,
+  parseConnectionError,
+} from "$client/wallet/walletHelper.ts";
 import { getBTCBalanceInfo } from "$lib/utils/data/processing/balanceUtils.ts";
+import { logger } from "$lib/utils/logger.ts";
 import type { BaseToast } from "$lib/utils/ui/notifications/toastSignal.ts";
+import type { SignPSBTResult, Wallet } from "$types/index.d.ts";
+import { signal } from "@preact/signals";
 
 interface LeatherAddress {
   symbol: "BTC" | "STX";
@@ -37,7 +40,7 @@ export const connectLeather = async (addToast: AddToastFunction) => {
         message: "Leather wallet not detected",
       });
       addToast(
-        "Leather wallet not detected. Please install the Leather extension.",
+        "Leather wallet not detected.\nPlease install the Leather extension.",
         "error",
       );
       return;
@@ -67,17 +70,16 @@ export const connectLeather = async (addToast: AddToastFunction) => {
     logger.info("ui", {
       message: "Successfully connected to Leather wallet",
     });
-    addToast("Successfully connected to Leather wallet", "success");
+    addToast("Successfully connected to Leather wallet.", "success");
   } catch (error) {
+    const errorMessage = parseConnectionError(error);
     logger.error("ui", {
       message: "Error connecting to Leather wallet",
-      error: error instanceof Error ? error.message : String(error),
+      error: errorMessage,
       details: error,
     });
     addToast(
-      `Failed to connect to Leather wallet: ${
-        error instanceof Error ? error.message : "Unknown error"
-      }`,
+      `Failed to connect to Leather wallet:\n${errorMessage}`,
       "error",
     );
   }

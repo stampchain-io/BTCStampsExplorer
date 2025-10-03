@@ -1,12 +1,12 @@
-import { logger } from "$lib/utils/logger.ts";
-import type { SignPSBTResult, Wallet } from "$types/index.d.ts";
-import type { PSBTInputToSign } from "$types/wallet.d.ts";
 import { horizonProvider } from "$client/wallet/horizon.ts";
 import { leatherProvider } from "$client/wallet/leather.ts";
 import { okxProvider } from "$client/wallet/okx.ts";
 import { phantomProvider } from "$client/wallet/phantom.ts";
 import { tapWalletProvider } from "$client/wallet/tapwallet.ts";
 import { unisatProvider } from "$client/wallet/unisat.ts";
+import { logger } from "$lib/utils/logger.ts";
+import type { SignPSBTResult, Wallet } from "$types/index.d.ts";
+import type { PSBTInputToSign } from "$types/wallet.d.ts";
 
 interface WalletProvider {
   signMessage: (message: string) => Promise<string>;
@@ -39,6 +39,58 @@ interface WalletError extends JSONRPCError {
     };
   };
   message?: string;
+}
+
+// Helper function to parse connection errors
+export function parseConnectionError(error: unknown): string {
+  // Handle string errors directly
+  if (typeof error === "string") {
+    return error;
+  }
+
+  // Handle Error instances
+  if (error instanceof Error) {
+    // Check for user rejection patterns
+    const message = error.message.toLowerCase();
+    if (
+      message.includes("user rejected") ||
+      message.includes("user denied") ||
+      message.includes("user cancelled") ||
+      message.includes("rejected by user") ||
+      message.includes("cancelled by user") ||
+      message === "cancelled"
+    ) {
+      return "User rejected the connection request.";
+    }
+    return error.message || "Unknown error";
+  }
+
+  // Handle JSON-RPC style errors (error code 4001 = user rejection)
+  const jsonRpcError = error as JSONRPCError;
+  if (jsonRpcError?.error) {
+    if (jsonRpcError.error.code === 4001) {
+      return "User rejected the connection request.";
+    }
+    if (jsonRpcError.error.message) {
+      return jsonRpcError.error.message;
+    }
+  }
+
+  // Cast to our known error structure for other cases
+  const walletError = error as WalletError;
+
+  // Check for nested error structures
+  if (walletError?.details?.error?.message) {
+    return walletError.details.error.message;
+  }
+
+  // Check for direct message property
+  if (walletError?.message) {
+    return walletError.message;
+  }
+
+  // Default error
+  return "Unknown error";
 }
 
 export function handleWalletError(

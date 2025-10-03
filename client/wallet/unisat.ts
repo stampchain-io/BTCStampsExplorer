@@ -1,13 +1,16 @@
-import { signal } from "@preact/signals";
-import { walletContext } from "$client/wallet/wallet.ts";
-import type { SignPSBTResult, Wallet } from "$types/index.d.ts";
 import {
   checkWalletAvailability,
   getGlobalWallets,
+  walletContext,
 } from "$client/wallet/wallet.ts";
-import { handleWalletError } from "$client/wallet/walletHelper.ts";
+import {
+  handleWalletError,
+  parseConnectionError,
+} from "$client/wallet/walletHelper.ts";
 import { logger } from "$lib/utils/logger.ts";
 import type { BaseToast } from "$lib/utils/ui/notifications/toastSignal.ts";
+import type { SignPSBTResult, Wallet } from "$types/index.d.ts";
+import { signal } from "@preact/signals";
 
 export const isUnisatInstalled = signal<boolean>(false);
 
@@ -25,14 +28,38 @@ const getProvider = () => {
 export const connectUnisat = async (
   addToast: (message: string, type: BaseToast["type"]) => void,
 ) => {
-  const unisat = getProvider();
-  if (!unisat) {
-    addToast("Unisat not installed", "error");
-    return;
+  try {
+    const unisat = getProvider();
+    if (!unisat) {
+      logger.error("ui", {
+        message: "Unisat wallet not detected",
+        context: "connectUnisat",
+      });
+      addToast(
+        "Unisat wallet not detected.\nPlease install the Unisat extension.",
+        "error",
+      );
+      return;
+    }
+    const result = await unisat.requestAccounts();
+    handleAccountsChanged(result);
+    logger.info("ui", {
+      message: "Successfully connected to Unisat wallet",
+      context: "connectUnisat",
+    });
+    addToast("Connected using Unisat wallet.", "success");
+  } catch (error: unknown) {
+    const errorMessage = parseConnectionError(error);
+    logger.error("ui", {
+      message: "Failed to connect to Unisat wallet",
+      context: "connectUnisat",
+      error: errorMessage,
+    });
+    addToast(
+      `Failed to connect to Unisat wallet:\n${errorMessage}`,
+      "error",
+    );
   }
-  const result = await unisat.requestAccounts();
-  handleAccountsChanged(result);
-  addToast("Connected using Unisat wallet", "success");
 };
 
 const handleAccountsChanged = async (accounts: string[]) => {
