@@ -88,10 +88,10 @@ export default function SRC20DeploysGallery(): JSX.Element {
         : error
         ? (
           <div class={`mt-3 ${notificationContainerError}`}>
-            <h6 class={`${notificationHeading} !text-[#990000]`}>
+            <h6 class={`${notificationHeading} !text-[#660000]`}>
               ERROR LOADING RECENT DEPLOYS
             </h6>
-            <h6 class={`${notificationBody} !text-[#990000]`}>{error}</h6>
+            <h6 class={`${notificationBody} !text-[#660000]`}>{error}</h6>
           </div>
         )
         : transactions.length === 0
