@@ -5,7 +5,7 @@ import { useState } from "preact/hooks";
 // Glassmorphism color effect styling - must be identical to the glassmorphismColor variant in the button/styles.ts file - cannot directly import the styles const
 const glassmorphismColor = `
   ${transitionColors}
-  [&:hover]:!bg-[#211c21]/10 [&:hover]:border-[var(--color-border)] [&:hover]:!text-[#100a10]
+  [&:hover]:!bg-[#211c21]/10 [&:hover]:border-[var(--color-border)] [&:hover]:!text-[#080708]
   [&:hover::before]:!scale-100 [&:hover::before]:!blur-sm
   [&:hover::before]:!bg-[linear-gradient(to_bottom_right,var(--color-dark)_0%,var(--color-dark)_20%,var(--color-medium)_20%,var(--color-medium)_45%,var(--color-light)_45%,var(--color-light)_52%,var(--color-medium)_52%,var(--color-medium)_70%,var(--color-dark)_70%,var(--color-dark)_100%)]
   shadow-[0_2px_4px_rgba(13,11,13,0.1),inset_0_1px_0_rgba(13,11,13,0.1),inset_0_-1px_0_rgba(13,11,13,0.1),inset_0_0_2px_2px_rgba(13,11,13,0.1)]`;

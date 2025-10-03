@@ -3,6 +3,8 @@
 
 /* ===== BASE STYLES ===== */
 // General styles
+// Horisontal Rule is defined in /styles.css using border color #1b1b1b/80
+
 // Transition styles - @baba-refactor codebase to use these instead of hardcoded values
 export const transitionColors = "transition-colors duration-200";
 export const transitionTransform =
@@ -23,16 +25,16 @@ export const shadowGlowGrey =
 // Glassmorphism styles
 // Overlay layer styles - used for drawer and modal containers
 export const glassmorphismOverlay = `rounded-2xl
-  bg-gradient-to-b from-[#0a070a]/95 via-[#0a070a]/70 to-[#0a070a]/100 backdrop-blur-lg`;
+  bg-gradient-to-b from-[#080708]/95 via-[#080708]/70 to-[#080708]/100 backdrop-blur-lg`;
 // 1st layer styles
 export const glassmorphism = `border-[1px] border-[#1b1b1b]/80 rounded-2xl
-  bg-gradient-to-br from-[#100a10]/50 to-[#100a10]/70
+  bg-gradient-to-br from-[#080708]/50 to-[#080708]/70
   backdrop-blur ${shadow}`;
 // 2nd layer styles - register tool tld dropdown uses same hardcoded values
 export const glassmorphismL2 = `border-[1px] border-[#1b1b1b]/80 rounded-xl
-  bg-[#100a10]/30 backdrop-blur-xs ${shadowL2}`;
+  bg-[#080708]/30 backdrop-blur-xs ${shadowL2}`;
 export const glassmorphismL2Hover =
-  `hover:bg-[#100a10]/60 hover:border-[#242424]`;
+  `hover:bg-[#080708]/60 hover:border-[#242424]`;
 
 /* ===== BODY STYLES ===== */
 // Main body styles
@@ -132,7 +134,7 @@ export const modalBgCenter =
 // Base loader style
 const loaderSpin = "animate-spin rounded-full border-b-[2px]";
 export const loaderSkeleton =
-  `bg-[#100a10]/50 border-[1px] border-[#1b1b1b]/80 animate-pulse`;
+  `bg-[#080708]/50 border-[1px] border-[#1b1b1b]/80 animate-pulse`;
 // Spinning loader styles
 export const loaderSpinXsGrey = `${loaderSpin} w-3 h-3 border-stamp-grey`;
 export const loaderSpinSmGrey = `${loaderSpin} w-5 h-5 border-stamp-grey`;
@@ -151,6 +153,7 @@ export const modalSearch = "w-[90%] max-w-[600px] mt-[72px] tablet:mt-24";
 /* ===== TYPE DEFINITIONS ===== */
 export type LayoutStyles = {
   // Base styles
+  hr: string;
   transitionColors: string;
   transitionTransform: string;
   transitionAll: string;

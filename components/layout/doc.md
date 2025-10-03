@@ -16,7 +16,7 @@ The app UI is inspired by Apple design principles, with dark themed multilayered
     - Darker black background and less opacity
     - Rounded corners (16px) and large background blur: rounded-2xl backdrop-blur-lg
     - Background: Linear gradient to bottom
-      - bg-gradient-to-b from-[#0a070a]/95 via-[#0a070a]/70 to-[#0a070a]/100
+      - bg-gradient-to-b from-[#080708]/95 via-[#080708]/70 to-[#080708]/100
     - Border: border-[#1b1b1b]/80
     - Shadow:
       - Modal ontainers
@@ -31,7 +31,7 @@ The app UI is inspired by Apple design principles, with dark themed multilayered
     - Black background with medium opacity
     - Rounded corners (16px) and background blur: rounded-2xl backdrop-blur
     - Background: Linear gradient to bottom right
-      - bg-gradient-to-br from-[#100a10]/50 to-[#100a10]/70
+      - bg-gradient-to-br from-[#080708]/50 to-[#080708]/70
     - Border: border-[#1b1b1b]/80
     - Shadow: Outer and inner shadows:
       - shadow-[0_4px_8px_rgba(13,11,13,0.2),inset_0_1px_0_rgba(13,11,13,0.1),inset_0_-1px_0_rgba(13,11,13,0.1),inset_0_0_1px_1px_rgba(13,11,13,0.1)]
@@ -42,7 +42,7 @@ The app UI is inspired by Apple design principles, with dark themed multilayered
     - Used for child containers inside of parent layer 1 glassmorphism containers
     - Black background with high opacity
     - Smaller rounded corners (12px) and small background blur: rounded-xl backdrop-blur-xs
-    - Background: bg-[#100a10]/20
+    - Background: bg-[#080708]/20
     - Border: border-[#1b1a1b]
     - Shadow: Smaller outer and inner shadows:
       - shadow-shadow-[0_2px_4px_rgba(13,11,13,0.1),inset_0_1px_0_rgba(13,11,13,0.1),inset_0_-1px_0_rgba(13,11,13,0.1),inset_0_0_2px_2px_rgba(13,11,13,0.1)]
@@ -50,7 +50,7 @@ The app UI is inspired by Apple design principles, with dark themed multilayered
   - GlassmorphismL2Hover
     - Combines background and border hover styles
     - Intended to be used with layer 2 elements
-    - Background: bg-[#100a10]/60
+    - Background: bg-[#080708]/60
     - Border: border-[#242424]
 
 ## Core Components

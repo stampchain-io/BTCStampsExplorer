@@ -409,7 +409,7 @@ const FilterDrawer = (
         </div>
       </div>
       {/* Sticky buttons */}
-      <div class="flex justify-between w-full sticky bottom-0 pb-9 tablet:pb-6 px-9 tablet:px-6 gap-6 bg-[#0a070a]/80 shadow-[0_-36px_36px_-6px_rgba(10,7,10,1)]">
+      <div class="flex justify-between w-full sticky bottom-0 pb-9 tablet:pb-6 px-9 tablet:px-6 gap-6 bg-[#080708]/80 shadow-[0_-36px_36px_-6px_rgba(10,7,10,1)]">
         <Button
           variant="glassmorphism"
           color="grey"

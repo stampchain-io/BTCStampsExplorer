@@ -378,7 +378,7 @@ export const WalletButton = (
           ))}
 
           {/* Bottom - Counterparty version */}
-          <div class="sticky bottom-0 w-full mt-auto pb-9 tablet:pb-6 bg-[#0a070a]/80 shadow-[0_-36px_36px_-6px_rgba(10,7,10,1)]">
+          <div class="sticky bottom-0 w-full mt-auto pb-9 tablet:pb-6 bg-[#080708]/80 shadow-[0_-36px_36px_-6px_rgba(10,7,10,1)]">
             <div class={`flex items-end -mb-1.5`}>
               <CounterpartyVersion />
             </div>

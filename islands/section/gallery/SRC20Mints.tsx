@@ -82,7 +82,7 @@ export default function SRC20MintsGallery() {
         )
         : error
         ? (
-          <div class="w-full p-5 bg-[#100a10]/50 border border-red-500/40 text-red-500/70 rounded-xl">
+          <div class="w-full p-5 bg-[#080708]/50 border border-red-500/40 text-red-500/70 rounded-xl">
             <p class="font-bold">ERROR LOADING TRENDING TOKENS:</p>
             <p class="text-sm">{error}</p>
           </div>

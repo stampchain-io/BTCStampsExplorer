@@ -1713,7 +1713,7 @@ function StampingToolMain({ config }: { config: Config }) {
                   alt={`File: ${file.name}`}
                 />
               )}
-            <div class="flex items-center justify-center absolute inset-0 rounded-lg hover:bg-[#100a10]/60 hover:border-[#242424] opacity-0 hover:opacity-100 transition-opacity">
+            <div class="flex items-center justify-center absolute inset-0 rounded-lg hover:bg-[#080708]/60 hover:border-[#242424] opacity-0 hover:opacity-100 transition-opacity">
               <Icon
                 type="icon"
                 name="uploadImage"
