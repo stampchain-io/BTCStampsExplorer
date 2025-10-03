@@ -3,6 +3,11 @@ import { StampCard } from "$card";
 import { containerBackground } from "$layout";
 import type { StampTransaction } from "$lib/types/stamping.ts";
 import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
+import {
+  notificationBody,
+  notificationContainerError,
+  notificationHeading,
+} from "$notification";
 import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
 import type { JSX } from "preact";
 import { useEffect, useState } from "preact/hooks";
@@ -12,6 +17,7 @@ export default function SRC20DeploysGallery(): JSX.Element {
   /* ===== STATE ===== */
   const [isLoading, setIsLoading] = useState(true);
   const [transactions, setTransactions] = useState<StampTransaction[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   /* ===== EFFECTS ===== */
   useEffect(() => {
@@ -26,12 +32,17 @@ export default function SRC20DeploysGallery(): JSX.Element {
           },
         );
         if (!response.ok) {
-          throw new Error("Failed to fetch recent transactions");
+          throw new Error(
+            `Failed to fetch recent deploys: ${response.status}`,
+          );
         }
         const data = await response.json();
         setTransactions(data.data || []);
+        setError(null);
       } catch (error) {
         console.error("Error fetching recent deploys:", error);
+        setError(error instanceof Error ? error.message : "Unknown error");
+        setTransactions([]);
       } finally {
         setIsLoading(false);
       }
@@ -72,6 +83,21 @@ export default function SRC20DeploysGallery(): JSX.Element {
                 class="loading-skeleton running aspect-square rounded-xl"
               />
             ))}
+          </div>
+        )
+        : error
+        ? (
+          <div class={`mt-3 ${notificationContainerError}`}>
+            <h6 class={`${notificationHeading} !text-[#990000]`}>
+              ERROR LOADING RECENT DEPLOYS
+            </h6>
+            <h6 class={`${notificationBody} !text-[#990000]`}>{error}</h6>
+          </div>
+        )
+        : transactions.length === 0
+        ? (
+          <div class="text-stamp-grey-darkest text-sm">
+            NO RECENT DEPLOYS FOUND
           </div>
         )
         : (
