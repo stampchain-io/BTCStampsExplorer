@@ -267,7 +267,7 @@ function SendBTCModal({
             );
             if (broadcastTxid && typeof broadcastTxid === "string") {
               showToast(
-                `Broadcasted:\n${broadcastTxid.substring(0, 10)}...`,
+                `Broadcasted.\n${broadcastTxid.substring(0, 10)}...`,
                 "success",
                 false,
               );

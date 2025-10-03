@@ -273,7 +273,7 @@ const BuyStampModal = ({
       if (signResult.signed) {
         if (signResult.txid) {
           showToast(
-            `Broadcasted:\n${signResult.txid.substring(0, 10)}`,
+            `Broadcasted.\n${signResult.txid.substring(0, 10)}`,
             "success",
             false,
           );
@@ -286,7 +286,7 @@ const BuyStampModal = ({
             );
             if (broadcastTxid && typeof broadcastTxid === "string") {
               showToast(
-                ` Broadcasted:\n${broadcastTxid.substring(0, 10)}`,
+                ` Broadcasted.\n${broadcastTxid.substring(0, 10)}`,
                 "success",
                 false,
               );
@@ -311,7 +311,7 @@ const BuyStampModal = ({
               psbtHex: signResult.psbt,
             });
             throw new Error(
-              `Broadcast failed:\n${beMsg.substring(0, 50)}${
+              `Broadcast failed.\n${beMsg.substring(0, 50)}${
                 beMsg.length > 50 ? "..." : ""
               }`,
             );

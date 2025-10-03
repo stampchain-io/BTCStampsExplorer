@@ -295,7 +295,7 @@ const DonateStampModal = ({
       if (signResult.signed) {
         if (signResult.txid) {
           showToast(
-            `Broadcasted:\n${signResult.txid.substring(0, 10)}`,
+            `Broadcasted.\n${signResult.txid.substring(0, 10)}`,
             "success",
             false,
           );
@@ -308,7 +308,7 @@ const DonateStampModal = ({
             );
             if (broadcastTxid && typeof broadcastTxid === "string") {
               showToast(
-                ` Broadcasted:\n${broadcastTxid.substring(0, 10)}...`,
+                ` Broadcasted.\n${broadcastTxid.substring(0, 10)}...`,
                 "success",
                 false,
               );

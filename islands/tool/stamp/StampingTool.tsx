@@ -1156,6 +1156,8 @@ function StampingToolMain({ config }: { config: Config }) {
             error: result.error,
           });
 
+          const errorLower = result.error.toLowerCase();
+
           if (result.error.includes("insufficient funds")) {
             showToast(
               "Insufficient funds in wallet to cover transaction fees.",
@@ -1171,6 +1173,13 @@ function StampingToolMain({ config }: { config: Config }) {
               "error",
               false,
             );
+          } else if (
+            errorLower.includes("rejected") ||
+            errorLower.includes("declined") ||
+            errorLower.includes("cancelled") ||
+            errorLower.includes("user denied")
+          ) {
+            showToast("Transaction signing was cancelled.", "info");
           } else {
             showToast(result.error, "error");
           }
@@ -1212,7 +1221,7 @@ function StampingToolMain({ config }: { config: Config }) {
               txid: result.txid,
             });
             showToast(
-              `Transaction broadcast by wallet:\n${
+              `Transaction broadcast by wallet.\n${
                 result.txid.substring(0, 10)
               }`,
               "success",
@@ -1304,7 +1313,7 @@ function StampingToolMain({ config }: { config: Config }) {
                   txid: result.txid,
                 });
                 showToast(
-                  `MARA failed, but transaction was broadcast:\n${
+                  `MARA failed, but transaction was broadcast.\n${
                     result.txid.substring(0, 10)
                   }`,
                   "info",
@@ -1330,7 +1339,7 @@ function StampingToolMain({ config }: { config: Config }) {
                     method: "wallet_broadcast_psbt",
                   });
                   showToast(
-                    `MARA failed, broadcasted via wallet:\n${
+                    `MARA failed, broadcasted via wallet.\n${
                       fallbackTxid.substring(0, 10)
                     }`,
                     "info",
@@ -1374,7 +1383,7 @@ function StampingToolMain({ config }: { config: Config }) {
             data: { txid: result.txid },
           });
           showToast(
-            `Broadcasted:\n${result.txid.substring(0, 10)}`,
+            `Broadcasted.\n${result.txid.substring(0, 10)}`,
             "success",
             false,
           );
