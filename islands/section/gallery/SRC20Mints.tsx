@@ -1,6 +1,11 @@
 /* ===== SRC20 RECENT MINTS GALLERY COMPONENT ===== */
 import { SRC20CardSmMinting } from "$card";
 import { containerBackground } from "$layout";
+import {
+  notificationBody,
+  notificationContainerError,
+  notificationHeading,
+} from "$notification";
 import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
 import type { SRC20Row } from "$types/src20.d.ts";
 import { useEffect, useState } from "preact/hooks";
@@ -82,9 +87,11 @@ export default function SRC20MintsGallery() {
         )
         : error
         ? (
-          <div class="w-full p-5 bg-[#080708]/50 border border-red-500/40 text-red-500/70 rounded-xl">
-            <p class="font-bold">ERROR LOADING TRENDING TOKENS:</p>
-            <p class="text-sm">{error}</p>
+          <div class={`mt-3 ${notificationContainerError}`}>
+            <h6 class={`${notificationHeading} !text-[#990000]`}>
+              ERROR LOADING TRENDING TOKENS
+            </h6>
+            <h6 class={`${notificationBody} !text-[#990000]`}>{error}</h6>
           </div>
         )
         : transactions.length === 0
