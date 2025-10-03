@@ -145,7 +145,7 @@ const BuyStampModal = ({
 
   useEffect(() => {
     if (formHookError) {
-      showToast(formHookError, "error", false);
+      showToast(formHookError, "error");
       setFormHookError(null);
     }
   }, [formHookError, setFormHookError]);
@@ -273,20 +273,20 @@ const BuyStampModal = ({
       if (signResult.signed) {
         if (signResult.txid) {
           showToast(
-            `Broadcasted: ${signResult.txid.substring(0, 10)}...`,
+            `Broadcasted:\n${signResult.txid.substring(0, 10)}`,
             "success",
             false,
           );
           closeModal();
         } else if (signResult.psbt) {
           try {
-            showToast("Transaction signed. Broadcasting...", "info", true);
+            showToast("Transaction signed.\nBroadcasting...", "info");
             const broadcastTxid = await walletContext.broadcastPSBT(
               signResult.psbt,
             );
             if (broadcastTxid && typeof broadcastTxid === "string") {
               showToast(
-                ` Broadcasted: ${broadcastTxid.substring(0, 10)}...`,
+                ` Broadcasted:\n${broadcastTxid.substring(0, 10)}`,
                 "success",
                 false,
               );
@@ -298,7 +298,7 @@ const BuyStampModal = ({
                 psbtHex: signResult.psbt,
               });
               throw new Error(
-                "Broadcast failed after signing. Please check transaction status.",
+                "Broadcast failed after signing.\nPlease check transaction status.",
               );
             }
           } catch (broadcastError: unknown) {
@@ -311,7 +311,7 @@ const BuyStampModal = ({
               psbtHex: signResult.psbt,
             });
             throw new Error(
-              `Broadcast failed: ${beMsg.substring(0, 50)}${
+              `Broadcast failed:\n${beMsg.substring(0, 50)}${
                 beMsg.length > 50 ? "..." : ""
               }`,
             );
@@ -338,7 +338,7 @@ const BuyStampModal = ({
           }`,
         );
       } else {
-        showToast("Transaction signing was cancelled.", "info", true);
+        showToast("Transaction signing was cancelled.", "info");
       }
     });
   };

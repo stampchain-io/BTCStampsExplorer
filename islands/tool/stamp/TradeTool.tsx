@@ -293,7 +293,7 @@ export function StampTradeTool() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        showToast(`Error creating PSBT: ${errorData.error}`, "error", false);
+        showToast(`Error creating PSBT:\n${errorData.error}`, "error");
         setIsSubmitting(false);
         return;
       }
@@ -315,7 +315,7 @@ export function StampTradeTool() {
 
       if (walletResult.signed) {
         showToast(
-          "PSBT signed successfully! Share the signed PSBT with the buyer.",
+          "PSBT signed successfully!\nShare the signed PSBT with the buyer.",
           "success",
           false,
         );
@@ -324,12 +324,12 @@ export function StampTradeTool() {
         });
         setTradeFormState((prev) => ({ ...prev, psbtHex: walletResult.psbt }));
       } else if (walletResult.cancelled) {
-        showToast("PSBT signing cancelled by user.", "info", false);
+        showToast("PSBT signing cancelled by user.", "info");
         setSubmissionMessage({
           message: "PSBT signing cancelled by user.",
         });
       } else {
-        showToast(`PSBT signing failed: ${walletResult.error}`, "error", false);
+        showToast(`PSBT signing failed:\n${walletResult.error}`, "error");
         setSubmissionMessage({
           message: `PSBT signing failed: ${walletResult.error}`,
         });

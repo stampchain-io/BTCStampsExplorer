@@ -473,7 +473,7 @@ function StampingToolMain({ config }: { config: Config }) {
       message: "Switched from MARA mode to standard stamping",
     });
 
-    showToast("Switched to standard stamping (333 sat outputs)", "info", true);
+    showToast("Switched to standard stamping (333 sat outputs).", "info");
   };
 
   /* ===== MARA TRANSACTION SUBMISSION WITH RETRY LOGIC ===== */
@@ -1158,7 +1158,7 @@ function StampingToolMain({ config }: { config: Config }) {
 
           if (result.error.includes("insufficient funds")) {
             showToast(
-              "Insufficient funds in wallet to cover transaction fees",
+              "Insufficient funds in wallet to cover transaction fees.",
               "error",
               false,
             );
@@ -1167,12 +1167,12 @@ function StampingToolMain({ config }: { config: Config }) {
             result.error.includes("timed out")
           ) {
             showToast(
-              "Wallet connection timed out. Please try again",
+              "Wallet connection timed out. Please try again.",
               "error",
               false,
             );
           } else {
-            showToast(result.error, "error", false);
+            showToast(result.error, "error");
           }
           setIsSubmitting(false);
           return;
@@ -1182,7 +1182,7 @@ function StampingToolMain({ config }: { config: Config }) {
           logger.debug("stamps", {
             message: "Transaction was cancelled by user",
           });
-          showToast("Transaction signing was cancelled", "info", true);
+          showToast("Transaction signing was cancelled.", "info");
           setIsSubmitting(false);
           return;
         }
@@ -1192,7 +1192,7 @@ function StampingToolMain({ config }: { config: Config }) {
           data: { result },
         });
         showToast(
-          "Failed to sign transaction. Please check wallet connection and try again",
+          "Failed to sign transaction.\nPlease check wallet connection and try again.",
           "error",
           false,
         );
@@ -1212,9 +1212,9 @@ function StampingToolMain({ config }: { config: Config }) {
               txid: result.txid,
             });
             showToast(
-              `Transaction broadcast by wallet: ${
+              `Transaction broadcast by wallet:\n${
                 result.txid.substring(0, 10)
-              }...`,
+              }`,
               "success",
               false,
             );
@@ -1304,9 +1304,9 @@ function StampingToolMain({ config }: { config: Config }) {
                   txid: result.txid,
                 });
                 showToast(
-                  `MARA failed, but transaction was broadcast: ${
+                  `MARA failed, but transaction was broadcast:\n${
                     result.txid.substring(0, 10)
-                  }...`,
+                  }`,
                   "info",
                   false,
                 );
@@ -1330,9 +1330,9 @@ function StampingToolMain({ config }: { config: Config }) {
                     method: "wallet_broadcast_psbt",
                   });
                   showToast(
-                    `MARA failed, broadcasted via wallet: ${
+                    `MARA failed, broadcasted via wallet:\n${
                       fallbackTxid.substring(0, 10)
-                    }...`,
+                    }`,
                     "info",
                     false,
                   );
@@ -1344,7 +1344,7 @@ function StampingToolMain({ config }: { config: Config }) {
 
               // If no fallback method worked, show error
               setApiError(
-                `MARA submission failed and automatic fallback unsuccessful. Error: ${errorMessage}. Please try switching to standard stamping mode.`,
+                `MARA submission failed and automatic fallback unsuccessful.\nError: ${errorMessage}.\nPlease try switching to standard stamping mode.`,
               );
               setIsSubmitting(false);
               // Show the unavailable modal for this error
@@ -1374,7 +1374,7 @@ function StampingToolMain({ config }: { config: Config }) {
             data: { txid: result.txid },
           });
           showToast(
-            `Broadcasted: ${result.txid.substring(0, 10)}...`,
+            `Broadcasted:\n${result.txid.substring(0, 10)}`,
             "success",
             false,
           );
@@ -1385,7 +1385,7 @@ function StampingToolMain({ config }: { config: Config }) {
             message: "Transaction signed successfully, but txid not returned",
           });
           showToast(
-            "Transaction signed and broadcasted successfully. Please check your wallet or a block explorer for confirmation.",
+            "Transaction signed and broadcasted successfully.\nPlease check your wallet or a block explorer for confirmation.",
             "success",
             false,
           );
@@ -2206,9 +2206,9 @@ function StampingToolMain({ config }: { config: Config }) {
               (async () => {
                 try {
                   await navigator.clipboard.writeText(debugTransactionHex);
-                  showToast("Transaction hex copied!", "success", false);
+                  showToast("Transaction hex copied!", "success");
                 } catch (_error) {
-                  showToast("Failed to copy transaction hex", "error", false);
+                  showToast("Failed to copy transaction hex.", "error");
                 }
               })();
             }) as () => void,
