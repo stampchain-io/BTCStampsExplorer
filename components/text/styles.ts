@@ -176,8 +176,6 @@ export const tagline =
   `font-regular text-xs bg-gradient-to-r from-[#660099] via-[#8800CC] to-[#AA00FF] text-transparent bg-clip-text cursor-default ${select}`; // used in footer
 export const copyright =
   `font-normal text-xs mobileMd:text-sm tablet:text-xs text-stamp-grey-darkest cursor-default ${select}`; // used in the footer for copyright and counterparty version text
-export const loaderText =
-  `font-medium text-sm text-stamp-grey uppercase text-center py-3 animated-text-loader ${select}`; // table more rows loader
 export const toggleSymbol =
   `font-bold text-[10px] text-black cursor-default ${select}`; // used in ToggleSwitchButton.tsx
 

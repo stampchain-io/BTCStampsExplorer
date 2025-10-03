@@ -208,7 +208,7 @@ body {
 
 
 
-/* Global <hr> styling: full width and consistent border color */
+/* Global <hr> styling */
 @layer base {
   hr {
     @apply w-full border-0 border-t border-[#1b1b1b]/80;
@@ -224,14 +224,14 @@ body {
   }
 }
 
-/* conic gradient for input field animated border */
+/* Conic gradient for input field animated border */
 @property --angle {
   syntax: '<angle>';
   initial-value: 0deg;
   inherits: false;
 }
 
-/* remove border radius for input field when dropdown is open */
+/* Remove border radius for input field when dropdown is open */
 .input-open input {
   border-bottom-left-radius: 0 !important;
   border-bottom-right-radius: 0 !important;
@@ -260,55 +260,6 @@ body {
   outline: 0px solid transparent !important;
   outline-offset: 0 !important;
   outline-style: none !important;
-}
-
-/* Animated loader text */
-.animated-text-loader span {
-  display: inline-block;
-  margin: 0 0;
-}
-
-
-.animated-text-loader span {
-  animation: fadeInOut 0.6s infinite alternate;
-}
-
-.animated-text-loader span:nth-child(1) {
-  animation-delay: 0s;
-}
-
-.animated-text-loader span:nth-child(2) {
-  animation-delay: 0.05s;
-}
-
-.animated-text-loader span:nth-child(3) {
-  animation-delay: 0.1s;
-}
-
-.animated-text-loader span:nth-child(4) {
-  animation-delay: 0.15s;
-}
-
-.animated-text-loader span:nth-child(5) {
-  animation-delay: 0.2s;
-}
-
-.animated-text-loader span:nth-child(6) {
-  animation-delay: 0.25s;
-}
-
-.animated-text-loader span:nth-child(7) {
-  animation-delay: 0.3s;
-}
-
-@keyframes fadeInOut {
-  0% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0;
-  }
 }
 
 /* Stamp Items Marquee */
@@ -470,49 +421,3 @@ strong {
   font-weight: bold;
 }
 */
-
-
-/* SYSTEMIC FIX: Force cursor inheritance for glassmorphism elements */
-/* This fixes the issue where backdrop-blur and pseudo-elements override cursor styles */
-
-/* Fix for all buttons with glassmorphism
-button,
-button *,
-button::before,
-button::after {
-  cursor: inherit !important;
-}
-
-/* Fix for glassmorphism containers that should inherit cursor
-.backdrop-blur-sm,
-.backdrop-blur-sm *,
-.backdrop-blur-sm::before,
-.backdrop-blur-sm::after {
-  cursor: inherit !important;
-}
-
-/* Fix for overflow-hidden containers
-.overflow-hidden,
-.overflow-hidden *,
-.overflow-hidden::before,
-.overflow-hidden::after {
-  cursor: inherit !important;
-}
-
-/* Specific fix for range sliders
-input[type="range"],
-input[type="range"]::-webkit-slider-thumb,
-input[type="range"]::-moz-range-thumb {
-  cursor: inherit !important;
-}
-
-/* Override any text cursor defaults in interactive elements
-button span,
-button div,
-button p,
-[role="button"] span,
-[role="button"] div,
-[role="button"] p {
-  cursor: inherit !important;
-}
- */

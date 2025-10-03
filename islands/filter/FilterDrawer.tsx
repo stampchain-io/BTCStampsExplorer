@@ -337,12 +337,12 @@ const FilterDrawer = (
       aria-labelledby="drawer-form-label"
     >
       {/* Scrollable content area */}
-      <div class="h-full overflow-y-auto scrollbar-black pt-[25px] mobileLg:pt-[37px] tablet:pt-[38px]">
+      <div class="h-full overflow-y-auto scrollbar-black pt-[29px] mobileLg:pt-[41px] tablet:pt-[40px]">
         <div class="px-9 tablet:px-6">
           <div class="relative w-full">
             {/* Mobile CloseIcon - shows by default, hidden on tablet+ */}
             <div class="flex flex-row tablet:hidden justify-between items-center w-full">
-              <h6 class="font-extrabold text-2xl gray-gradient1 mt-[1px] select-none">
+              <h6 class="font-extrabold text-2xl gray-gradient1 tracking-wide select-none inline-block w-fit">
                 FILTERS
               </h6>
               <div class="relative">
@@ -380,7 +380,7 @@ const FilterDrawer = (
                   aria-label="Close menu"
                 />
               </div>
-              <h6 class="font-normal text-lg gray-gradient1 mt-[2px] select-none">
+              <h6 class="font-normal text-lg gray-gradient1 mt-[2px] select-none inline-block w-fit">
                 FILTERS
               </h6>
             </div>
