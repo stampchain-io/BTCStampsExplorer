@@ -3,28 +3,55 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ===== BASE STYLES ===== */
+/* ================== GLOBAL STYLES ================== */
 /* Ensure html and body take full height without overflow */
 html,
 body {
   min-height: 100vh;
   margin: 0;
   padding: 0;
-  background-color: #000;
-  /* Fallback color */
+  background-color: #000; /* Fallback color */
   overflow-x: hidden;
   overflow-y: auto;
   position: relative !important;
 }
 
-/* ===== ALIGNMENT UTILITIES ===== */
+/* Flex center */
 .center {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* ===== SCROLLBAR STYLES ===== */
+/* Paragraph text styling  */
+/* Styled specifically for the How-To articles - other text uses header tags */
+/* Space between paragraphs */
+@layer base {
+  p {
+    margin-bottom: 18px;
+  }
+
+  p:last-child {
+    margin-bottom: 0;
+  }
+}
+
+/* Bold text styling */
+b, strong {
+  font-weight: 600;
+}
+
+/* Horizontal ruler styling */
+@layer base {
+  hr {
+    @apply w-full border-0 border-t border-[#1b1b1b]/80;
+  }
+}
+
+/* ========================================================================== */
+
+
+/* ================== SCROLLBAR STYLES ================== */
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
@@ -94,7 +121,6 @@ body {
   /* Custom handle hover color */
 }
 
-/* Custom scrollar colors */
 .scrollbar-purple {
   @apply [&::-webkit-scrollbar-track]:bg-[#AA00FF] [&::-webkit-scrollbar-thumb]:bg-[#8800CC] [&::-webkit-scrollbar-thumb:hover]:bg-[#660099];
 }
@@ -115,7 +141,39 @@ body {
   @apply [&::-webkit-scrollbar]:w-[2px] [&::-webkit-scrollbar-track]:bg-[#141015] [&::-webkit-scrollbar-thumb]:bg-[#666666]/50 [&::-webkit-scrollbar-thumb:hover]:bg-[#666666];
 }
 
-/* ===== STAMP IMAGE STYLES ===== */
+/* ========================================================================== */
+
+
+/* ================== IMAGE RENDERING STYLES ================== */
+
+.image-rendering-pixelated {
+  position: relative;
+}
+
+.image-rendering-pixelated::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: repeating-conic-gradient(rgba(128, 128, 128, 0.2) 0% 25%,
+      rgba(128, 128, 128, 0.1) 25% 50%);
+  background-size: 4px 4px;
+  z-index: 1;
+}
+
+.image-rendering-pixelated img,
+.image-rendering-pixelated iframe,
+.image-rendering-pixelated>div {
+  position: relative;
+  z-index: 2;
+}
+
+.image-rendering-pixelated img {
+  mix-blend-mode: multiply;
+}
+
 .pixelart {
   image-rendering: pixelated;
   image-rendering: -moz-crisp-edges;
@@ -134,9 +192,6 @@ body {
   /* Prevent iOS image stretching */
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
-  /* Apply rounded-xl and clip children to rounded corners */
-  overflow: hidden;
-  border-radius: 0.75rem; /* Tailwind rounded-xl */
 }
 
 .stamp-container::before {
@@ -150,7 +205,6 @@ body {
       rgba(128, 128, 128, 0.1) 25% 50%);
   background-size: 4px 4px;
   z-index: 0;
-  border-radius: inherit;
 }
 
 /* Add specific iOS handling for SVG */
@@ -182,17 +236,13 @@ body {
   backface-visibility: hidden;
 }
 
+/* ========================================================================== */
 
 
-/* Global <hr> styling */
+/* ================== INPUT FIELD STYLES ================== */
+
+/* Remove spinner buttons and up/down arrow buttons from number inputs */
 @layer base {
-  hr {
-    @apply w-full border-0 border-t border-[#1b1b1b]/80;
-  }
-}
-
-@layer base {
-
   input[type="number"]::-webkit-inner-spin-button,
   input[type="number"]::-webkit-outer-spin-button {
     -webkit-appearance: none;
@@ -200,11 +250,11 @@ body {
   }
 }
 
-/* Conic gradient for input field animated border */
-@property --angle {
-  syntax: '<angle>';
-  initial-value: 0deg;
-  inherits: false;
+/* Remove outline from input fields */
+.no-outline:focus-visible {
+  outline: 0px solid transparent !important;
+  outline-offset: 0 !important;
+  outline-style: none !important;
 }
 
 /* Remove border radius for input field when dropdown is open */
@@ -221,24 +271,12 @@ body {
   @apply rounded-t-lg rounded-b-[0px] !important;
 }
 
+/* ========================================================================== */
 
-/* Emoji ticker styling for SRC20 cards */
-.emoji-ticker {
-  @apply text-stamp-primary-hover;
-  font-family: system-ui;
-  line-height: 1;
-  display: inline-flex;
-  align-items: center;
-}
 
-/* Remove outline from input fields */
-.no-outline:focus-visible {
-  outline: 0px solid transparent !important;
-  outline-offset: 0 !important;
-  outline-style: none !important;
-}
+/* ================== ANIMATIONS ================== */
 
-/* Stamp Items Marquee */
+/* Marquee Animation for stamp items  */
 .marquee {
   overflow: hidden;
   white-space: nowrap;
@@ -255,6 +293,23 @@ body {
   animation-play-state: paused;
 }
 
+/* Animations for menu dropdowns, toast notifications and progress bar */
+.slide-in {
+  animation: slide-in 400ms cubic-bezier(0.46,0.03,0.52,0.96) forwards;
+}
+
+.slide-out {
+  animation: slide-out 400ms cubic-bezier(0.46,0.03,0.52,0.96) forwards;
+}
+
+.slide-up {
+  animation: slide-up 400ms cubic-bezier(0.46,0.03,0.52,0.96) forwards;
+}
+
+.slide-down {
+  animation: slide-down 400ms cubic-bezier(0.46,0.03,0.52,0.96) forwards;
+}
+
 @keyframes marquee {
   0% {
     transform: translateX(0);
@@ -265,24 +320,63 @@ body {
   }
 }
 
-/* Custom text styles */
-/* Space between paragraphs */
-@layer base {
-  p {
-    margin-bottom: 18px;
+@keyframes slide-in {
+  from {
+    transform: translateX(-100%);
+    opacity: 0.25;
   }
-
-  /* Remove margin from last paragraph in a container */
-  p:last-child {
-    margin-bottom: 0;
+  to {
+    transform: translateX(0);
+    opacity: 1;
   }
 }
 
-/* Bold text */
-b,
-strong {
-  font-weight: 600;
+@keyframes slide-out {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100%);
+    opacity: 0.25;
+  }
 }
+
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0.25;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-down {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(100%);
+    opacity: 0.25;
+  }
+}
+
+@keyframes progress {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+/* ========================================================================== */
+
+
+/* ================== TEXT STYLES ================== */
 
 /* Animated underline for links */
 /* Animate right to left - background-position controls the direction of the animation */
@@ -339,11 +433,40 @@ strong {
   color: #999999;
 }
 
+/* ========================================================================== */
+
+
+/* ================== MISCELLANEOUS STYLES ================== */
+
+/* Emoji ticker styling for SRC20 cards */
+.emoji-ticker {
+  @apply text-stamp-primary-hover;
+  font-family: system-ui;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+}
+
 /* ChartWidget Styles */
 /* Position range selector buttons to the left */
 .highcharts-range-selector-buttons {
   transform: translateX(-40px); /* Move 40px to the left */
 }
+
+/* ========================================================================== */
+
+
+/* ==================UNUSED STYLES ================== */
+
+/* Conic gradient for input field animated border
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+ */
+
+/* ================== CHARTWIDGET STYLES ================== */
 
 /* Style for all zoom buttons - @baba - check if this is needed */
 /*
