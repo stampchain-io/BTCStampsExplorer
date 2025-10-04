@@ -448,8 +448,8 @@ export function Header() {
         ref={drawerContent === type ? drawerRef : null}
         class={`flex tablet:hidden flex-col justify-between
           fixed top-0 right-0 left-auto w-full min-[420px]:w-[340px] h-[100dvh] z-30
-          min-[420px]:rounded-r-xl min-[420px]:border-r-[1px] min-[420px]:border-l-0
-          min-[420px]:border-r-[#1b1b1b] min-[420px]:shadow-[12px_0_12px_-6px_rgba(10,7,10,0.5)]
+          min-[420px]:rounded-l-3xl min-[420px]:border-l-[1px]
+          min-[420px]:border-l-[#242424]/75 min-[420px]:shadow-[-12px_0_12px_-6px_rgba(8,7,8,0.75)]
           ${glassmorphismOverlay} ${transitionTransform} transition-transform will-change-transform
           overflow-y-auto overflow-x-hidden scrollbar-black
           ${isActive ? "translate-x-0" : "translate-x-full"}`}
@@ -612,7 +612,7 @@ export function Header() {
 
         {/* Right: Navigation Links and Icon Buttons */}
         <div
-          class={`flex items-center gap-6 py-1.5 tablet:py-1 px-5 tablet:px-4 ${glassmorphism} !rounded-full`}
+          class={`flex items-center gap-7 tablet:gap-6 py-1.5 tablet:py-1 px-5 tablet:px-4 ${glassmorphism} !rounded-full`}
         >
           {/* Navigation Links */}
           {renderNavLinks()}
