@@ -6,7 +6,7 @@ import { Icon } from "$icon";
 import { WalletProvider } from "$islands/layout/WalletProvider.tsx";
 import { ConnectWalletModal } from "$islands/modal/ConnectWalletModal.tsx";
 import { closeModal, openModal } from "$islands/modal/states.ts";
-import { glassmorphismL2 } from "$layout";
+import { containerStickyBottom, glassmorphismL2 } from "$layout";
 import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { tooltipIcon } from "$notification";
 import {
@@ -376,7 +376,7 @@ export const WalletButton = (
           ))}
 
           {/* Bottom - Counterparty version */}
-          <div class="sticky bottom-0 w-full mt-auto pb-9 tablet:pb-6 bg-[#080708]/80 shadow-[0_-36px_36px_-6px_rgba(10,7,10,1)]">
+          <div class={containerStickyBottom}>
             <div class={`flex items-end -mb-1.5`}>
               <CounterpartyVersion />
             </div>

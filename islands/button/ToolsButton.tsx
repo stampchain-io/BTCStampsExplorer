@@ -1,5 +1,5 @@
 import { Icon } from "$icon";
-import { glassmorphismL2 } from "$layout";
+import { containerStickyBottom, glassmorphismL2 } from "$layout";
 import { formatUSDValue } from "$lib/utils/ui/formatting/formatUtils.ts";
 import {
   labelLightSm,
@@ -369,10 +369,10 @@ export function ToolsButton({ onOpenDrawer, data }: ToolsButtonProps) {
         </div>
 
         {/* Bottom - Bitcoin Stats */}
-        <div class="sticky bottom-0 w-full mt-auto pb-9 tablet:pb-6 bg-[#080708]/80 shadow-[0_-36px_36px_-6px_rgba(10,7,10,1)]">
+        <div class={containerStickyBottom}>
           {/* ===== PRICE/FEE/BLOCK INFO ===== */}
           {bitcoinStats(
-            `flex-col ${glassmorphismL2} items-end px-3 py-2 space-y-1 ${labelLightSm}`,
+            `flex-col ${glassmorphismL2} items-end px-5 py-4 space-y-1 ${labelLightSm}`,
           )}
         </div>
       </div>
