@@ -1262,7 +1262,7 @@ export function createDefaultErrorFallback({
 
     const defaultStyles = {
       container:
-        "p-5 bg-red-50 border border-red-200 rounded-2xl max-w-md mx-auto",
+        "p-5 bg-red-50 border border-red-200 rounded-3xl max-w-md mx-auto",
       title: "text-lg font-semibold text-red-800 mb-2",
       message: "text-red-600 mb-4",
       details: "text-xs text-red-500 mb-4 font-mono bg-red-100 p-2 rounded-xl",
