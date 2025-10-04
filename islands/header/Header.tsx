@@ -118,6 +118,16 @@ export function Header() {
   // Hover delay timeout
   const dropdownTimeoutRef = useRef<number | null>(null);
 
+  // Animation state for dropdowns
+  const [dropdownAnimation, setDropdownAnimation] = useState<{
+    tools: "enter" | "exit" | null;
+    wallet: "enter" | "exit" | null;
+  }>({
+    tools: null,
+    wallet: null,
+  });
+  const animationTimeoutRef = useRef<number | null>(null);
+
   /* ===== HEALTH DATA FETCHING ===== */
   useEffect(() => {
     const fetchHealthData = async () => {
@@ -242,6 +252,15 @@ export function Header() {
     };
   }, []);
 
+  // Add cleanup effect for animation timeout
+  useEffect(() => {
+    return () => {
+      if (animationTimeoutRef.current) {
+        globalThis.clearTimeout(animationTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const handleCloseMouseEnter = () => {
     if (allowCloseTooltip) {
       setCloseTooltipText("CLOSE");
@@ -283,6 +302,10 @@ export function Header() {
       clearTimeout(dropdownTimeoutRef.current);
       dropdownTimeoutRef.current = null;
     }
+    if (animationTimeoutRef.current) {
+      clearTimeout(animationTimeoutRef.current);
+      animationTimeoutRef.current = null;
+    }
 
     // Calculate tools position
     let toolsPos = null;
@@ -301,6 +324,12 @@ export function Header() {
       walletPos: null,
     };
     setDropdownState(newState);
+
+    // Trigger enter animation
+    setDropdownAnimation({
+      tools: "enter",
+      wallet: null,
+    });
   };
 
   const handleWalletMouseEnter = () => {
@@ -308,6 +337,10 @@ export function Header() {
     if (dropdownTimeoutRef.current) {
       clearTimeout(dropdownTimeoutRef.current);
       dropdownTimeoutRef.current = null;
+    }
+    if (animationTimeoutRef.current) {
+      clearTimeout(animationTimeoutRef.current);
+      animationTimeoutRef.current = null;
     }
 
     // Calculate wallet position
@@ -327,17 +360,37 @@ export function Header() {
       walletPos: walletPos,
     };
     setDropdownState(newState);
+
+    // Trigger enter animation
+    setDropdownAnimation({
+      tools: null,
+      wallet: "enter",
+    });
   };
 
   const handleDropdownMouseLeave = () => {
-    // Set timeout to close dropdown after delay
+    // Set timeout to start exit animation
     dropdownTimeoutRef.current = setTimeout(() => {
-      setDropdownState({
-        active: null,
-        toolsPos: null,
-        walletPos: null,
-      });
-    }, 300); // 300ms delay
+      // Trigger exit animation based on what's currently active
+      if (dropdownState.active === "tools") {
+        setDropdownAnimation((prev) => ({ ...prev, tools: "exit" }));
+      } else if (dropdownState.active === "wallet") {
+        setDropdownAnimation((prev) => ({ ...prev, wallet: "exit" }));
+      }
+
+      // Close dropdown after animation completes (200ms animation duration)
+      animationTimeoutRef.current = setTimeout(() => {
+        setDropdownState({
+          active: null,
+          toolsPos: null,
+          walletPos: null,
+        });
+        setDropdownAnimation({
+          tools: null,
+          wallet: null,
+        });
+      }, 200);
+    }, 300); // 300ms hover delay that works as a bridge between icon button and dropdown
   };
 
   // Create a single wallet button instance to prevent state pollution
@@ -599,12 +652,19 @@ export function Header() {
 
       {/* ===== PORTAL DROPDOWNS ===== */}
       {(() => {
-        const shouldRenderTools = dropdownState.active === "tools" &&
+        const shouldRenderTools = (dropdownState.active === "tools" ||
+          dropdownAnimation.tools === "exit") &&
           dropdownState.toolsPos;
+
+        const animationClass = dropdownAnimation.tools === "enter"
+          ? "dropdown-enter"
+          : dropdownAnimation.tools === "exit"
+          ? "dropdown-exit"
+          : "";
 
         return shouldRenderTools && createPortal(
           <div
-            class={`hidden tablet:block fixed z-dropdown w-[550px] py-3.5 px-5 whitespace-nowrap ${glassmorphism}`}
+            class={`hidden tablet:block fixed z-dropdown w-[550px] py-3.5 px-5 whitespace-nowrap ${glassmorphism} ${animationClass}`}
             style={{
               top: `${dropdownState.toolsPos!.top}px`,
               left: `${dropdownState.toolsPos!.left}px`,
@@ -614,6 +674,14 @@ export function Header() {
               if (dropdownTimeoutRef.current) {
                 clearTimeout(dropdownTimeoutRef.current);
                 dropdownTimeoutRef.current = null;
+              }
+              if (animationTimeoutRef.current) {
+                clearTimeout(animationTimeoutRef.current);
+                animationTimeoutRef.current = null;
+              }
+              // If we were exiting, switch back to enter
+              if (dropdownAnimation.tools === "exit") {
+                setDropdownAnimation((prev) => ({ ...prev, tools: "enter" }));
               }
             }}
             onMouseLeave={handleDropdownMouseLeave}
@@ -628,12 +696,20 @@ export function Header() {
       })()}
 
       {(() => {
-        const shouldRenderWallet = dropdownState.active === "wallet" &&
-          dropdownState.walletPos;
+        const shouldRenderWallet = (dropdownState.active === "wallet" ||
+          dropdownAnimation.wallet === "exit") &&
+          dropdownState.walletPos &&
+          walletButtonInstance.isConnected;
+
+        const animationClass = dropdownAnimation.wallet === "enter"
+          ? "dropdown-enter"
+          : dropdownAnimation.wallet === "exit"
+          ? "dropdown-exit"
+          : "";
 
         return shouldRenderWallet && createPortal(
           <div
-            class={`hidden tablet:block fixed z-dropdown min-w-[150px] py-3.5 px-5 justify-end whitespace-nowrap ${glassmorphism}`}
+            class={`hidden tablet:block fixed z-dropdown min-w-[150px] py-3.5 px-5 justify-end whitespace-nowrap ${glassmorphism} ${animationClass}`}
             style={{
               top: `${dropdownState.walletPos!.top}px`,
               left: `${dropdownState.walletPos!.left}px`,
@@ -643,6 +719,14 @@ export function Header() {
               if (dropdownTimeoutRef.current) {
                 clearTimeout(dropdownTimeoutRef.current);
                 dropdownTimeoutRef.current = null;
+              }
+              if (animationTimeoutRef.current) {
+                clearTimeout(animationTimeoutRef.current);
+                animationTimeoutRef.current = null;
+              }
+              // If we were exiting, switch back to enter
+              if (dropdownAnimation.wallet === "exit") {
+                setDropdownAnimation((prev) => ({ ...prev, wallet: "enter" }));
               }
             }}
             onMouseLeave={handleDropdownMouseLeave}
