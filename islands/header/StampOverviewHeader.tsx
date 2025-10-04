@@ -1,5 +1,6 @@
 /* ===== STAMP OVERVIEW HEADER COMPONENT ===== */
 /* TODO (@baba) - update filter and styling */
+import { SelectorButtons } from "$button";
 import { FilterButton } from "$islands/button/FilterButton.tsx";
 import { SortButton } from "$islands/button/SortButton.tsx";
 import FilterDrawer from "$islands/filter/FilterDrawer.tsx";
@@ -7,9 +8,10 @@ import {
   defaultFilters,
   StampFilters as FilterStampFilters,
 } from "$islands/filter/FilterOptionsStamp.tsx";
+import { glassmorphism } from "$layout";
 import { titlePurpleLD } from "$text";
 import type { StampOverviewHeaderProps } from "$types/ui.d.ts";
-import { useState } from "preact/hooks";
+import { useCallback, useState } from "preact/hooks";
 
 /* ===== COMPONENT ===== */
 export const StampOverviewHeader = (
@@ -17,11 +19,17 @@ export const StampOverviewHeader = (
 ) => {
   /* ===== STATE MANAGEMENT ===== */
   const [isOpen1, setIsOpen1] = useState(false);
+  const [stampType, setStampType] = useState<string>("classic");
 
   /* ===== EVENT HANDLERS ===== */
   const handleOpen1 = (open: boolean) => {
     setIsOpen1(open);
   };
+
+  const handleStampTypeChange = useCallback((type: string) => {
+    setStampType(type);
+    // TODO(@baba): Implement stamp type filtering logic
+  }, []);
 
   /* ===== HELPER FUNCTION ===== */
   function countActiveStampFilters(filters: FilterStampFilters): number {
@@ -56,25 +64,49 @@ export const StampOverviewHeader = (
 
   /* ===== RENDER ===== */
   return (
-    <div
-      class={`relative flex flex-row justify-between items-start w-full gap-3`}
-    >
-      {/* Responsive Title Section */}
-      <h1 class={`${titlePurpleLD} block mobileMd:hidden`}>STAMPS</h1>
-      <h1 class={`${titlePurpleLD} hidden mobileMd:block`}>ART STAMPS</h1>
+    <div class="relative flex flex-col w-full gap-1.5">
+      <div class="flex flex-row justify-between items-start w-full">
+        {/* ===== RESPONSIVE TITLE ===== */}
+        <h1 class={`${titlePurpleLD} block mobileMd:hidden`}>STAMPS</h1>
+        <h1 class={`${titlePurpleLD} hidden mobileMd:block`}>ART STAMPS</h1>
+      </div>
 
-      {/* Controls Section */}
-      <div class="flex flex-col">
-        <div class="flex relative items-start justify-between gap-[18px] tablet:gap-3">
-          <FilterButton
-            count={countActiveStampFilters(
-              currentFilters as FilterStampFilters,
-            )}
-            open={isOpen1}
-            setOpen={handleOpen1}
-            type="stamp"
+      {/* ===== STAMP TYPE SELECTOR AND CONTROLS ===== */}
+      <div class="flex flex-col mobileLg:flex-row justify-between w-full">
+        {/* Stamp Type Selector - Left */}
+        <div class="flex gap-3 w-full mobileMd:w-auto">
+          <SelectorButtons
+            options={[
+              { value: "classic", label: "CLASSIC" },
+              { value: "posh", label: "POSH" },
+              { value: "cursed", label: "CURSED" },
+            ]}
+            value={stampType}
+            onChange={handleStampTypeChange}
+            size="smR"
+            color="grey"
+            className="w-full mobileMd:w-auto"
           />
-          <SortButton />
+        </div>
+
+        {/* Filter and Sort Controls - Right */}
+        <div class="flex justify-end pt-3 mobileLg:pt-0">
+          <div
+            class={`flex relative ${glassmorphism}
+             items-start justify-between
+             gap-7 py-1.5 px-5
+             tablet:gap-5 tablet:py-1 tablet:px-4 `}
+          >
+            <FilterButton
+              count={countActiveStampFilters(
+                currentFilters as FilterStampFilters,
+              )}
+              open={isOpen1}
+              setOpen={handleOpen1}
+              type="stamp"
+            />
+            <SortButton />
+          </div>
         </div>
       </div>
 
