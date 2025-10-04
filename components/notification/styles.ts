@@ -15,6 +15,8 @@ const tooltipText =
 /* General */
 export const notificationHeading = `font-semibold text-base text-stamp-grey`;
 export const notificationBody = `font-normal text-sm text-stamp-grey`;
+export const notificationTextError = `!text-[#990000]`;
+export const notificationTextSuccess = `!text-[#009900]`;
 
 /* Info */
 export const notificationContainerInfo =
