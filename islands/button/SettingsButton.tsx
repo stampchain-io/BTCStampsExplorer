@@ -63,7 +63,7 @@ export function SettingsButton({
           <Icon
             type="iconButton"
             name="gear"
-            weight="bold"
+            weight="normal"
             size="custom"
             color="purple"
             className="mt-[5px] w-[26px] h-[26px] tablet:w-[24px] tablet:h-[24px] transform transition-all duration-300"
