@@ -7,6 +7,7 @@ import {
   notificationBody,
   notificationContainerError,
   notificationHeading,
+  notificationTextError,
 } from "$notification";
 import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
 import type { JSX } from "preact";
@@ -88,10 +89,12 @@ export default function SRC20DeploysGallery(): JSX.Element {
         : error
         ? (
           <div class={`mt-3 ${notificationContainerError}`}>
-            <h6 class={`${notificationHeading} !text-[#660000]`}>
+            <h6 class={`${notificationHeading} ${notificationTextError}`}>
               ERROR LOADING RECENT DEPLOYS
             </h6>
-            <h6 class={`${notificationBody} !text-[#660000]`}>{error}</h6>
+            <h6 class={`${notificationBody} ${notificationTextError}`}>
+              {error}
+            </h6>
           </div>
         )
         : transactions.length === 0

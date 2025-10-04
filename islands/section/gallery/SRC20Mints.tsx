@@ -5,6 +5,7 @@ import {
   notificationBody,
   notificationContainerError,
   notificationHeading,
+  notificationTextError,
 } from "$notification";
 import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
 import type { SRC20Row } from "$types/src20.d.ts";
@@ -88,10 +89,12 @@ export default function SRC20MintsGallery() {
         : error
         ? (
           <div class={`mt-3 ${notificationContainerError}`}>
-            <h6 class={`${notificationHeading} !text-[#660000]`}>
+            <h6 class={`${notificationHeading} ${notificationTextError}`}>
               ERROR LOADING TRENDING TOKENS
             </h6>
-            <h6 class={`${notificationBody} !text-[#660000]`}>{error}</h6>
+            <h6 class={`${notificationBody} ${notificationTextError}`}>
+              {error}
+            </h6>
           </div>
         )
         : transactions.length === 0
