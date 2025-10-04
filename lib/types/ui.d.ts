@@ -3474,6 +3474,7 @@ export interface ToastComponentProps {
   onClose: () => void;
   autoDismiss: boolean;
   duration: number;
+  isAnimatingOut?: boolean;
 }
 
 /**
