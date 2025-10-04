@@ -85,8 +85,8 @@ export function ModalBase({
     <div /* similar to glassmorphism design on the drawers - importing the class consts doesn't display properly */
       className={`
         relative w-[340px] min-[420px]:w-[360px] mobileMd:w-[380px] p-5
-        ${glassmorphismOverlay}
-        border-[1px] border-[#1b1b1b]/80
+        ${glassmorphismOverlay} rounded-3xl
+        border-[1px] border-[#242424]/50
         ${shadow} ${className}
       `}
       onClick={(e) => e.stopPropagation()}
