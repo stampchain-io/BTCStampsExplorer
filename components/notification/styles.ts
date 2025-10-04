@@ -13,22 +13,22 @@ const tooltipText =
 
 /* ===== NOTIFICATION STYLES ===== */
 /* General */
-export const notificationHeading = `font-semibold text-base text-stamp-grey`;
+export const notificationHeading = `font-semibold text-sm text-stamp-grey`;
 export const notificationBody = `font-normal text-sm text-stamp-grey`;
 export const notificationTextError = `!text-[#990000]`;
 export const notificationTextSuccess = `!text-[#009900]`;
 
 /* Info */
 export const notificationContainerInfo =
-  `${notificationContainer} bg-gradient-to-br from-[#333333]/60 via-[#333333]/40 to-[#080708]/80 border-[#666666]/40`;
+  `${notificationContainer} bg-gradient-to-br from-[#333333]/60 via-[#222222]/60 to-[#080708]/80 border-[#666666]/80`;
 
 /* Error */
 export const notificationContainerError =
-  `${notificationContainer} bg-gradient-to-br from-[#330000]/60 via-[#330000]/40 to-[#080708]/80 border-[#660000]/40`;
+  `${notificationContainer} bg-gradient-to-br from-[#330000]/60 via-[#220000]/60 to-[#080708]/80 border-[#660000]/80`;
 
 /* Success */
 export const notificationContainerSuccess =
-  `${notificationContainer} bg-gradient-to-br from-[#003300]/60 via-[#003300]/40 to-[#080708]/80 border-[#006600]/40`;
+  `${notificationContainer} bg-gradient-to-br from-[#003300]/60 via-[#002200]/60 to-[#080708]/80 border-[#006600]/80`;
 
 /* ===== TOOLTIP STYLES ===== */
 export const tooltipButton = `

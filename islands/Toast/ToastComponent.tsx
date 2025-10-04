@@ -10,13 +10,24 @@ import {
 import type { ToastComponentProps } from "$types/ui.d.ts";
 
 export const ToastComponent = (
-  { id, message, type, onClose, autoDismiss, duration = 4000 }:
-    ToastComponentProps,
+  {
+    id,
+    message,
+    type,
+    onClose,
+    autoDismiss,
+    duration = 3000,
+    isAnimatingOut: externalIsAnimatingOut,
+  }: ToastComponentProps & { isAnimatingOut?: boolean },
 ) => {
+  // Use the external animation state from the provider
+  const shouldAnimateOut = externalIsAnimatingOut ?? false;
   const getIconName = (toastType: ToastTypeFromProvider["type"]) => {
     switch (toastType) {
       case "error":
         return "error";
+      case "warning":
+        return "info";
       case "success":
         return "success";
       case "info":
@@ -28,6 +39,7 @@ export const ToastComponent = (
   const getIconColor = (toastType: ToastTypeFromProvider["type"]) => {
     switch (toastType) {
       case "error":
+      case "warning":
         return "stroke-[#990000]";
       case "success":
         return "stroke-[#009900]";
@@ -40,6 +52,7 @@ export const ToastComponent = (
   const getContainerStyle = (toastType: ToastTypeFromProvider["type"]) => {
     switch (toastType) {
       case "error":
+      case "warning":
         return notificationContainerError;
       case "success":
         return notificationContainerSuccess;
@@ -52,6 +65,7 @@ export const ToastComponent = (
   const getProgressBarColor = (toastType: ToastTypeFromProvider["type"]) => {
     switch (toastType) {
       case "error":
+      case "warning":
         return "bg-[#660000]";
       case "success":
         return "bg-[#006600]";
@@ -69,9 +83,9 @@ export const ToastComponent = (
   return (
     <div
       id={`toast-${id}`}
-      class={`fixed top-5 left-5 z-50 w-full max-w-md overflow-hidden ${
-        getContainerStyle(type)
-      }`}
+      class={`fixed top-5 left-5 z-50 w-full max-w-md overflow-hidden slide-in ${
+        shouldAnimateOut ? "slide-out" : ""
+      } ${getContainerStyle(type)}`}
       role="alert"
     >
       <div class="flex items-center space-x-6">
@@ -112,24 +126,11 @@ export const ToastComponent = (
               getProgressBarColor(type)
             } transition-all ease-linear`}
             style={{
-              animation: `toast-progress ${duration}ms linear forwards`,
+              animation: `progress ${duration}ms linear forwards`,
             }}
           />
         </div>
       )}
-
-      <style>
-        {`
-          @keyframes toast-progress {
-            from {
-              width: 100%;
-            }
-            to {
-              width: 0%;
-            }
-          }
-        `}
-      </style>
     </div>
   );
 };
