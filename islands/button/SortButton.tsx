@@ -97,10 +97,9 @@ export function SortButton(
         <Icon
           type="iconButton"
           name={sort === "DESC" ? "sortDesc" : "sortAsc"}
-          weight="bold"
+          weight="normal"
           size="smR"
           color="purple"
-          className="mt-1.5"
           ariaLabel={`Sorted ${sort === "DESC" ? "descending" : "ascending"}`}
         />
       </a>
