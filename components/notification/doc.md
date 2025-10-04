@@ -136,19 +136,19 @@ showToast("Custom behavior message", "success", false);
 
 - **Close button**: Always available in center-right corner
 - **Icon**: Uses Icon component with "close" name, grey color
-- **Instant response**: Triggers slide-out animation immediately
+- **Instant response**: Triggers notification-exit animation immediately
 - **Accessible**: Proper ARIA labels and keyboard support
 
 ### Smooth Animations
 
 Defined in `static/styles.css`:
 
-#### Slide-in Animation (400ms)
+#### notification-enter Animation (400ms)
 ```css
-@keyframes slide-in {
+@keyframes notification-enter {
   from {
     transform: translateX(-100%);
-    opacity: 0.25;
+    opacity: 0;
   }
   to {
     transform: translateX(0);
@@ -157,16 +157,16 @@ Defined in `static/styles.css`:
 }
 ```
 
-#### Slide-out Animation (400ms)
+#### notification-exit Animation (400ms)
 ```css
-@keyframes slide-out {
+@keyframes notification-exit {
   from {
     transform: translateX(0);
     opacity: 1;
   }
   to {
-    transform: translateX(-100%);
-    opacity: 0.25;
+    transform: translateX(--100%);
+    opacity: 0;
   }
 }
 ```
@@ -241,7 +241,7 @@ The system uses **Preact Signals** for reactive state management:
   - Subscribes to global toast signal
   - Generates unique toast IDs
   - Manages duration and auto-dismiss logic
-  - Coordinates slide-out animations
+  - Coordinates notification-exit animations
   - Cleans up completed toasts
 - **Location**: `islands/Toast/ToastProvider.tsx`
 
