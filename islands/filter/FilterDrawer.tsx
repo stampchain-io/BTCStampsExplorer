@@ -327,9 +327,9 @@ const FilterDrawer = (
       ref={drawerRef}
       class={`fixed top-0 z-40 h-[100dvh] left-0 right-auto w-full
         ${glassmorphismOverlay} ${transitionTransform}
-        min-[420px]:w-[340px] min-[420px]:rounded-r-xl min-[420px]:border-l-0  min-[420px]:border-r-[1px] min-[420px]:border-r-[#1b1b1b]
-        min-[420px]:shadow-[12px_0_12px_-6px_rgba(10,7,10,0.5)]
-        tablet:right-0 tablet:left-auto tablet:w-[300px] tablet:rounded-l-xl tablet:border-l-[1px] tablet:border-r-0 tablet:border-l-[#1b1b1b] tablet:shadow-[-12px_0_12px_-6px_rgba(10,7,10,0.5)]
+        min-[420px]:w-[340px] min-[420px]:rounded-r-3xl min-[420px]:border-r-[1px] min-[420px]:border-r-[#242424]/75
+        min-[420px]:shadow-[12px_0_12px_-6px_rgba(8,7,8,0.75)]
+        tablet:right-0 tablet:left-auto tablet:w-[300px] tablet:rounded-l-3xl tablet:border-l-[1px] tablet:border-l-[#242424]/75 tablet:shadow-[-12px_0_12px_-6px_rgba(8,7,8,0.75)]
         ${
         open ? "translate-x-0" : "-translate-x-full tablet:translate-x-full"
       }`}
@@ -409,7 +409,7 @@ const FilterDrawer = (
         </div>
       </div>
       {/* Sticky buttons */}
-      <div class="flex justify-between w-full sticky bottom-0 pb-9 tablet:pb-6 px-9 tablet:px-6 gap-6 bg-[#080708]/80 shadow-[0_-36px_36px_-6px_rgba(10,7,10,1)]">
+      <div class="flex justify-between w-full sticky bottom-0 p-9 tablet:p-6 gap-6 bg-black/50 backdrop-blur-lg">
         <Button
           variant="glassmorphism"
           color="grey"

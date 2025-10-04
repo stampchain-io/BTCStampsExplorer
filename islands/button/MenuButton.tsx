@@ -1,4 +1,5 @@
 import { Icon } from "$icon";
+import { containerStickyBottom } from "$layout";
 import {
   navLinkGrey,
   navLinkGreyActive,
@@ -149,7 +150,7 @@ export function MenuButton({ onOpenDrawer }: MenuButtonProps) {
         </div>
 
         {/* Bottom - Sub navigation content */}
-        <div class="sticky bottom-0 pb-9 tablet:pb-6 bg-[#080708]/80 shadow-[0_-36px_36px_-6px_rgba(10,7,10,1)]">
+        <div class={containerStickyBottom}>
           {subnavigation()}
         </div>
       </div>
