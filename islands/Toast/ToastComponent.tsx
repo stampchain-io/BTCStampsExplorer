@@ -83,8 +83,9 @@ export const ToastComponent = (
   return (
     <div
       id={`toast-${id}`}
-      class={`fixed top-5 left-5 z-50 w-full max-w-md overflow-hidden slide-in ${
-        shouldAnimateOut ? "slide-out" : ""
+      class={`fixed top-5 inset-x-5 z-notification !w-auto
+        min-[460px]:left-5 min-[460px]:right-auto min-[460px]:max-w-[460px] overflow-hidden ${
+        shouldAnimateOut ? "notification-exit" : "notification-enter"
       } ${getContainerStyle(type)}`}
       role="alert"
     >

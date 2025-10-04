@@ -1,8 +1,8 @@
-import type { WalletContext } from "$types/ui.d.ts";
 import { stackConnectWalletModal } from "$islands/layout/ModalStack.tsx";
 import { openModal } from "$islands/modal/states.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { showToast } from "$lib/utils/ui/notifications/toastSignal.ts";
+import type { WalletContext } from "$types/ui.d.ts";
 import { signal } from "@preact/signals";
 
 import type { Wallet } from "$types/index.d.ts";
@@ -92,7 +92,7 @@ export const disconnect = () => {
   walletSignal.value = initialWallet;
   isConnectedSignal.value = false;
   localStorage.removeItem("wallet");
-  showToast("Wallet is disconnected.", "success");
+  showToast("Wallet has been disconnected.", "success");
 };
 
 export const getBasicStampInfo = async (address: string) => {

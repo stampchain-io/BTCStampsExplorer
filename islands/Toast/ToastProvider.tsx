@@ -52,17 +52,17 @@ export const ToastProvider = ({ children }: ToastProviderProps) => {
       },
     ]);
     if (shouldDismiss) {
-      // Wait for progress bar to complete, then start slide-out animation
+      // Wait for progress bar to complete, then start notification-exit animation
       setTimeout(() => {
         setToasts((prevToasts) =>
           prevToasts.map((toast) =>
             toast.id === id ? { ...toast, isAnimatingOut: true } : toast
           )
         );
-        // Remove toast after slide-out animation completes
+        // Remove toast after notification-exit animation completes
         setTimeout(() => {
           internalRemoveToast(id);
-        }, 400); // Slide-out animation duration
+        }, 400); // notification-exit animation duration
       }, duration); // Wait for full progress bar duration
     }
   };
