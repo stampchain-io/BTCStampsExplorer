@@ -32,7 +32,7 @@ export function List({ title, image, description }: HowToStepProps) {
           src={image}
           width="100%"
           alt="Screenshot"
-          class="rounded-xl aspect-16/9"
+          class="rounded-2xl aspect-16/9"
         />
 
         {/* ===== LIST DESCRIPTION ===== */}

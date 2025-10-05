@@ -51,7 +51,7 @@ export function ProgressIndicator({
 
   return (
     <div
-      class={`flex items-center gap-2 bg-${config.bgColor} backdrop-blur-sm border border-${config.borderColor} rounded-xl px-3 py-2 ${className}`}
+      class={`flex items-center gap-2 bg-${config.bgColor} backdrop-blur-sm border border-${config.borderColor} rounded-2xl px-3 py-2 ${className}`}
     >
       <div class="relative">
         {config.icon === "spinner"

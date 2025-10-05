@@ -16,7 +16,7 @@ import type { SkeletonLoaderProps } from "$types/ui.d.ts";
 export function SkeletonContainer({
   height = "h-auto",
   width = "w-full",
-  rounded = "rounded-xl",
+  rounded = "rounded-2xl",
   className = "flex p-5 gap-5",
   children,
 }: {
@@ -39,7 +39,7 @@ export function SkeletonContainer({
 export function SkeletonInput({
   height = "h-10",
   width = "w-full",
-  rounded = "rounded-xl",
+  rounded = "rounded-2xl",
   className = "",
 }: {
   width?: string;
@@ -57,7 +57,7 @@ export function SkeletonInput({
 /* Skeleton for buttons */
 export function SkeletonButton({
   width = "w-32",
-  rounded = "rounded-xl",
+  rounded = "rounded-full",
   size = "mdR",
   className = "",
 }: {
@@ -150,7 +150,7 @@ export function SkeletonText({
 /* Skeleton for image previews */
 export function SkeletonImage({
   size = "w-[100px] h-[100px]",
-  rounded = "rounded-xl",
+  rounded = "rounded-2xl",
   className = "",
 }: {
   size?: string;
