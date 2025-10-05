@@ -97,7 +97,7 @@ export const SelectorButtons = ({
     <div
       ref={containerRef}
       class={`relative grid p-0.5 select-none
-        ${glassmorphism}
+        ${glassmorphism} !rounded-full
         ${
         (colorProp === "purple" || colorProp === "grey")
           ? colorVariants[colorProp]
@@ -160,7 +160,7 @@ export const SelectorButtons = ({
                 ${
                 selectedValue === option.value
                   ? "text-black"
-                  : "mx-[1px] !rounded-xl bg-transparent text-[var(--color-text)] hover:text-[var(--color-text-hover)] hover:bg-[#1f1c1f]/50"
+                  : "mx-[1px] !rounded-full bg-transparent text-[var(--color-text)] hover:text-[var(--color-text-hover)] hover:bg-[#1f1c1f]/50"
               }
                 ${optionDisabled ? state.disabled : "cursor-pointer"}
               `}
