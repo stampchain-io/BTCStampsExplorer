@@ -182,6 +182,9 @@ export default {
         },
       },
       spacing: {
+        // CUSTOM SPACING
+        "7.5": "30px",
+
         // PAGE GUTTERS (horizontal padding from screen edges to header, footer and body containers)
         "gutter-mobile": "20px", // updated breakpoint naming convention
         "gutter-tablet": "20px", // updated breakpoint naming convention
@@ -225,6 +228,7 @@ export default {
         "stamp": "1",
       },
       zIndex: {
+        "notification": "60",
         "modal": "50",
         "tooltip": "40",
         "dropdown": "30",
