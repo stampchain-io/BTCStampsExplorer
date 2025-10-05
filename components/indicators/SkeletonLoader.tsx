@@ -16,7 +16,7 @@ import type { SkeletonLoaderProps } from "$types/ui.d.ts";
 export function SkeletonContainer({
   height = "h-auto",
   width = "w-full",
-  rounded = "rounded-2xl",
+  rounded = "rounded-3xl",
   className = "flex p-5 gap-5",
   children,
 }: {

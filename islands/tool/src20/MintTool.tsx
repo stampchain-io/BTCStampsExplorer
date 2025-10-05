@@ -141,9 +141,14 @@ export function SRC20MintTool({
   );
   const [isImageLoading, setIsImageLoading] = useState(false);
   const [isSwitchingFields, setIsSwitchingFields] = useState(false);
+  // Animation state for dropdown
+  const [dropdownAnimation, setDropdownAnimation] = useState<
+    "enter" | "exit" | null
+  >(null);
 
   /* ===== REFS ===== */
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const animationTimeoutRef = useRef<number | null>(null);
 
   /* ===== TOKEN DATA RESET FUNCTION ===== */
   const resetTokenData = () => {
@@ -156,13 +161,34 @@ export function SRC20MintTool({
     }));
   };
 
+  /* ===== DROPDOWN ANIMATION HANDLER ===== */
+  const closeDropdownWithAnimation = () => {
+    setDropdownAnimation("exit");
+    if (animationTimeoutRef.current) {
+      clearTimeout(animationTimeoutRef.current);
+    }
+    animationTimeoutRef.current = setTimeout(() => {
+      setOpenDrop(false);
+      setDropdownAnimation(null);
+    }, 200); // Match animation duration
+  };
+
+  /* ===== ANIMATION CLEANUP ===== */
+  useEffect(() => {
+    return () => {
+      if (animationTimeoutRef.current) {
+        clearTimeout(animationTimeoutRef.current);
+      }
+    };
+  }, []);
+
   /* ===== URL PARAMETER HANDLING EFFECT ===== */
   useEffect(() => {
     if (tick) {
-      setOpenDrop(false);
+      closeDropdownWithAnimation();
       setSearchTerm(tick);
       handleResultClick(tick).then(() => {
-        setOpenDrop(false);
+        closeDropdownWithAnimation();
         setSearchResults([]);
       });
     }
@@ -173,10 +199,10 @@ export function SRC20MintTool({
     const handleMintTokenSelected = (event: CustomEvent) => {
       const { tick: selectedTick } = event.detail;
       if (selectedTick) {
-        setOpenDrop(false);
+        closeDropdownWithAnimation();
         setSearchTerm(selectedTick);
         handleResultClick(selectedTick).then(() => {
-          setOpenDrop(false);
+          closeDropdownWithAnimation();
           setSearchResults([]);
         });
       }
@@ -203,7 +229,7 @@ export function SRC20MintTool({
 
     if (!searchTerm.trim()) {
       setSearchResults([]);
-      setOpenDrop(false);
+      closeDropdownWithAnimation();
       return;
     }
 
@@ -216,7 +242,10 @@ export function SRC20MintTool({
 
         if (data.data && Array.isArray(data.data)) {
           setSearchResults(data.data);
-          setOpenDrop(!isSelecting && !isSwitchingFields);
+          if (!isSelecting && !isSwitchingFields) {
+            setOpenDrop(true);
+            setDropdownAnimation("enter");
+          }
         }
       } catch (error) {
         logger.error("stamps", {
@@ -225,7 +254,7 @@ export function SRC20MintTool({
           searchTerm,
         });
         setSearchResults([]);
-        setOpenDrop(false);
+        closeDropdownWithAnimation();
       }
     }, 300);
 
@@ -236,7 +265,7 @@ export function SRC20MintTool({
 
   /* ===== TOKEN SELECTION HANDLER ===== */
   const handleResultClick = async (tick: string) => {
-    setOpenDrop(false);
+    closeDropdownWithAnimation();
     setIsSelecting(true);
     setIsSwitchingFields(true);
     setSearchResults([]);
@@ -400,7 +429,7 @@ export function SRC20MintTool({
       )}
 
       <form
-        class={`${containerBackground} mb-6`}
+        class={`${containerBackground} mb-6 relative z-dropdown`}
         onSubmit={(e) => {
           e.preventDefault();
           handleMint();
@@ -461,6 +490,7 @@ export function SRC20MintTool({
                   if (newValue !== searchTerm) {
                     if (!isSelecting && !isSwitchingFields) {
                       setOpenDrop(true);
+                      setDropdownAnimation("enter");
                     }
                     setIsSelecting(false);
                     setSearchTerm(newValue);
@@ -471,13 +501,14 @@ export function SRC20MintTool({
                     !searchTerm.trim() && !isSwitchingFields && !isSelecting
                   ) {
                     setOpenDrop(true);
+                    setDropdownAnimation("enter");
                   }
                   setIsSelecting(false);
                 }}
                 onBlur={() => {
                   setIsSwitchingFields(true);
                   setTimeout(() => {
-                    setOpenDrop(false);
+                    closeDropdownWithAnimation();
                     setIsSwitchingFields(false);
                     if (!searchTerm.trim()) {
                       setIsSelecting(false);
@@ -489,12 +520,19 @@ export function SRC20MintTool({
               />
 
               {/* Search results dropdown */}
-              {(() => {
-                const shouldShow = openDrop && searchResults.length > 0 &&
-                  !isSelecting;
-                return shouldShow;
-              })() && (
-                <ul class={`${inputFieldDropdown} max-h-[148px]`}>
+              {(openDrop || dropdownAnimation === "exit") &&
+                searchResults.length > 0 && !isSelecting && (
+                <ul
+                  class={`${inputFieldDropdown} max-h-[148px]
+                  ${
+                    dropdownAnimation === "exit"
+                      ? "dropdown-exit"
+                      : dropdownAnimation === "enter"
+                      ? "dropdown-enter"
+                      : ""
+                  }
+                `}
+                >
                   {searchResults.map((result: SearchResult) => (
                     <li
                       key={result.tick}

@@ -56,6 +56,11 @@ export function SRC101RegisterTool({
   const [isTldTooltipVisible, setIsTldTooltipVisible] = useState(false);
   const [allowTldTooltip, setAllowTldTooltip] = useState(true);
   const tldTooltipTimeoutRef = useRef<number | null>(null);
+  // Animation state for dropdown
+  const [dropdownAnimation, setDropdownAnimation] = useState<
+    "enter" | "exit" | null
+  >(null);
+  const animationTimeoutRef = useRef<number | null>(null);
 
   /* ===== PROGRESSIVE FEE ESTIMATION ===== */
   const {
@@ -125,13 +130,22 @@ export function SRC101RegisterTool({
         tldDropdownRef.current &&
         !tldDropdownRef.current.contains(event.target as Node)
       ) {
-        setOpenTldDropdown(false);
+        closeDropdownWithAnimation();
       }
     }
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  /* ===== ANIMATION CLEANUP ===== */
+  useEffect(() => {
+    return () => {
+      if (animationTimeoutRef.current) {
+        clearTimeout(animationTimeoutRef.current);
+      }
     };
   }, []);
 
@@ -145,8 +159,19 @@ export function SRC101RegisterTool({
   }, []);
 
   /* ===== TLD HANDLERS ===== */
+  const closeDropdownWithAnimation = () => {
+    setDropdownAnimation("exit");
+    if (animationTimeoutRef.current) {
+      clearTimeout(animationTimeoutRef.current);
+    }
+    animationTimeoutRef.current = setTimeout(() => {
+      setOpenTldDropdown(false);
+      setDropdownAnimation(null);
+    }, 200); // Match animation duration
+  };
+
   const handleTldSelect = (tld: ROOT_DOMAIN_TYPES) => {
-    setOpenTldDropdown(false);
+    closeDropdownWithAnimation();
     setIsSelectingTld(true);
     handleInputChange(
       {
@@ -246,7 +271,7 @@ export function SRC101RegisterTool({
       <h1 class={`${titleGreyLD} mx-auto mb-4`}>REGISTER</h1>
 
       <form
-        class={`${containerBackground} gap-5 mb-6`}
+        class={`${containerBackground} gap-5 mb-6 relative z-dropdown`}
         onSubmit={(e) => {
           e.preventDefault();
           handleTransferSubmit();
@@ -273,11 +298,16 @@ export function SRC101RegisterTool({
             <div
               class={`h-10 px-4 border-[1px] border-[#242424]/75 rounded-2xl
                 !bg-[#080708]/60 ${glassmorphismL2Hover}
-                font-semibold text-sm text-stamp-grey text-right backdrop-blur-sm hover:text-stamp-grey-light tracking-wider ${transitionAll} focus-visible:!outline-none cursor-pointer flex items-center justify-end ${
+                font-semibold text-sm text-stamp-grey text-right backdrop-blur-sm hover:text-stamp-grey-light tracking-wider ${transitionAll} !duration-200 focus-visible:!outline-none cursor-pointer flex items-center justify-end ${
                 openTldDropdown && !isSelectingTld ? "input-open-bottom" : ""
               }`}
               onClick={() => {
-                setOpenTldDropdown(!openTldDropdown);
+                if (openTldDropdown) {
+                  closeDropdownWithAnimation();
+                } else {
+                  setOpenTldDropdown(true);
+                  setDropdownAnimation("enter");
+                }
                 setAllowTldTooltip(false);
                 setIsTldTooltipVisible(false);
               }}
@@ -294,9 +324,16 @@ export function SRC101RegisterTool({
               </div>
               {formState.root}
             </div>
-            {openTldDropdown && (
+            {(openTldDropdown || dropdownAnimation === "exit") && (
               <ul
-                class={`${inputFieldDropdown} !left-0 max-h-[73px] !w-[64px] !z-[9999]
+                class={`${inputFieldDropdown} !left-0 max-h-[110px] !w-[64px]
+                ${
+                  dropdownAnimation === "exit"
+                    ? "dropdown-exit"
+                    : dropdownAnimation === "enter"
+                    ? "dropdown-enter"
+                    : ""
+                }
               `}
               >
                 {ROOT_DOMAINS.map((tld) => (
