@@ -1,6 +1,6 @@
 /* ===== WALLET STAMP CARD COMPONENT ===== */
 /* Specialized version of StampCard for wallet pages showing user-specific details */
-import { Icon, LoadingIcon } from "$icon";
+import { Icon, LoadingIcon, PlaceholderImage } from "$icon";
 import StampTextContent from "$islands/content/stampDetailContent/StampTextContent.tsx";
 import type { WalletStampCardProps } from "$types/ui.d.ts";
 import { VNode } from "preact";
@@ -18,11 +18,6 @@ import {
   cardStampNumberGrey,
   cardSupply,
 } from "$components/text/styles.ts";
-import {
-  AUDIO_FILE_IMAGE,
-  LIBRARY_FILE_IMAGE,
-  NOT_AVAILABLE_IMAGE,
-} from "$constants";
 import { isAtomicIconVisible } from "$lib/utils/bitcoin/stamps/stampUtils.ts";
 import {
   abbreviateAddress,
@@ -56,7 +51,7 @@ const WalletStampCardComponent = (
 ) => {
   /* ===== STATE ===== */
   const [loading, setLoading] = useState<boolean>(true);
-  const [src, setSrc] = useState<string>("");
+  const [src, setSrc] = useState<string | null>(null);
   const [validatedContent, setValidatedContent] = useState<VNode | null>(null);
 
   // Audio-related state (always declared to avoid conditional hooks)
@@ -72,7 +67,9 @@ const WalletStampCardComponent = (
   /* ===== HANDLERS ===== */
   const handleImageError = (e: Event) => {
     if (e.currentTarget instanceof HTMLImageElement) {
-      e.currentTarget.src = NOT_AVAILABLE_IMAGE;
+      // Set src to empty string to trigger placeholder rendering
+      e.currentTarget.src = "";
+      e.currentTarget.alt = "Content not available";
     }
   };
 
@@ -179,15 +176,11 @@ const WalletStampCardComponent = (
             );
           }
         } catch (_error) {
-          // Fallback to NOT_AVAILABLE_IMAGE
+          // Fallback to PlaceholderImage
           setValidatedContent(
             <div class="stamp-container">
               <div class="relative z-10 aspect-square">
-                <img
-                  src={NOT_AVAILABLE_IMAGE}
-                  alt="Invalid SVG"
-                  class="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
-                />
+                <PlaceholderImage variant="error" />
               </div>
             </div>,
           );
@@ -229,12 +222,7 @@ const WalletStampCardComponent = (
         <div class="stamp-audio-container relative w-full h-full flex items-center justify-center">
           <div class="absolute inset-0 flex items-center justify-center">
             {/* Fallback image for audio files */}
-            <img
-              src={AUDIO_FILE_IMAGE}
-              alt="Audio File"
-              class="absolute top-0 left-0 w-full h-full object-contain rounded pixelart stamp-image pointer-events-none select-none"
-              draggable={false}
-            />
+            <PlaceholderImage variant="audio" />
             <audio
               ref={audioRef}
               class="hidden"
@@ -306,12 +294,7 @@ const WalletStampCardComponent = (
       return (
         <div class="stamp-container relative">
           <div class="relative z-10 aspect-square">
-            <img
-              src={LIBRARY_FILE_IMAGE}
-              alt="Library File"
-              class="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
-              loading="lazy"
-            />
+            <PlaceholderImage variant="library" />
           </div>
         </div>
       );
@@ -321,11 +304,7 @@ const WalletStampCardComponent = (
       return validatedContent || (
         <div class="stamp-container">
           <div class="relative z-10 aspect-square">
-            <img
-              src={NOT_AVAILABLE_IMAGE}
-              alt="Loading..."
-              class="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
-            />
+            <PlaceholderImage variant="no-image" />
           </div>
         </div>
       );

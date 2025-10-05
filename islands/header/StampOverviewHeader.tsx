@@ -9,7 +9,7 @@ import {
   StampFilters as FilterStampFilters,
 } from "$islands/filter/FilterOptionsStamp.tsx";
 import { glassmorphism } from "$layout";
-import { titlePurpleLD } from "$text";
+import { titleGreyLD } from "$text";
 import type { StampOverviewHeaderProps } from "$types/ui.d.ts";
 import { useCallback, useState } from "preact/hooks";
 
@@ -67,12 +67,12 @@ export const StampOverviewHeader = (
     <div class="relative flex flex-col w-full gap-1.5">
       <div class="flex flex-row justify-between items-start w-full">
         {/* ===== RESPONSIVE TITLE ===== */}
-        <h1 class={`${titlePurpleLD} block mobileMd:hidden`}>STAMPS</h1>
-        <h1 class={`${titlePurpleLD} hidden mobileMd:block`}>ART STAMPS</h1>
+        <h1 class={`${titleGreyLD} block mobileMd:hidden`}>STAMPS</h1>
+        <h1 class={`${titleGreyLD} hidden mobileMd:block`}>ART STAMPS</h1>
       </div>
 
       {/* ===== STAMP TYPE SELECTOR AND CONTROLS ===== */}
-      <div class="flex flex-col mobileLg:flex-row justify-between w-full">
+      <div class="flex flex-col mobileMd:flex-row justify-between w-full">
         {/* Stamp Type Selector - Left */}
         <div class="flex gap-3 w-full mobileMd:w-auto">
           <SelectorButtons
@@ -90,9 +90,9 @@ export const StampOverviewHeader = (
         </div>
 
         {/* Filter and Sort Controls - Right */}
-        <div class="flex justify-end pt-3 mobileLg:pt-0">
+        <div class="flex justify-start mobileMd:justify-end pt-3 mobileMd:pt-0">
           <div
-            class={`flex relative ${glassmorphism}
+            class={`flex relative ${glassmorphism} !rounded-full
              items-start justify-between
              gap-7 py-1.5 px-5
              tablet:gap-5 tablet:py-1 tablet:px-4 `}

@@ -7,7 +7,7 @@ import { CollectionService } from "$server/services/core/collectionService.ts";
 import { BTCPriceService } from "$server/services/price/btcPriceService.ts";
 import { StampService } from "$server/services/stampService.ts";
 import type { CollectionRow } from "$server/types/collection.d.ts";
-import type {SUBPROTOCOLS} from "$types/base.d.ts";
+import type { SUBPROTOCOLS } from "$types/base.d.ts";
 // import { formatSatoshisToBTC } from "$lib/utils/ui/formatting/formatUtils.ts"; // Fixed: Removed unused import
 import { normalizeHeaders } from "$lib/utils/api/headers/headerUtils.ts";
 import { API_RESPONSE_VERSION, ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
@@ -15,7 +15,7 @@ import { WebResponseUtil } from "$lib/utils/api/responses/webResponseUtil.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { isCpid } from "$lib/utils/typeGuards.ts";
 import { decodeBase64 } from "$lib/utils/ui/formatting/formatUtils.ts";
-import { detectContentType, getMimeType } from "$lib/utils/ui/media/imageUtils.ts";
+import { getMimeTypeFromExtension } from "$lib/utils/ui/media/imageUtils.ts";
 import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
 import { RouteType } from "$server/services/infrastructure/cacheService.ts";
 import type { PaginatedStampBalanceResponseBody } from "$types/api.d.ts";
@@ -844,7 +844,7 @@ export class StampController {
 
   private static handleFullPathStamp(identifier: string, baseUrl?: string) {
     const [, extension] = identifier.split(".");
-    const contentType = getMimeType(extension);
+    const contentType = getMimeTypeFromExtension(extension || "");
 
     return this.proxyContentRouteToStampsRoute(
       identifier,
@@ -855,23 +855,19 @@ export class StampController {
   }
 
   private static handleStampContent(result: any, identifier: string) {
-    const contentInfo = detectContentType(
-      result.body,
-      undefined,
-      result.headers["Content-Type"] as string | undefined
-    );
+    const mimeType = result.headers["Content-Type"] as string || "application/octet-stream";
 
     const needsDecoding =
-      contentInfo.mimeType.includes('javascript') ||
-      contentInfo.mimeType.includes('text/') ||
-      contentInfo.mimeType.includes('application/json') ||
-      contentInfo.mimeType.includes('xml');
+      mimeType.includes('javascript') ||
+      mimeType.includes('text/') ||
+      mimeType.includes('application/json') ||
+      mimeType.includes('xml');
 
     if (needsDecoding) {
-      return this.handleTextContent(result, contentInfo, identifier);
+      return this.handleTextContent(result, { mimeType, isSvg: mimeType.includes("svg") }, identifier);
     }
 
-    return this.handleBinaryContent(result, contentInfo);
+    return this.handleBinaryContent(result, { mimeType, isSvg: mimeType.includes("svg") });
   }
 
   private static async handleTextContent(result: any, contentInfo: any, identifier: string) {

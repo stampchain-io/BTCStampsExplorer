@@ -32,7 +32,7 @@ import {
 } from "$lib/utils/bitcoin/psbt/psbtUtils.ts";
 import type { Config } from "$types/base.d.ts";
 
-import { NOT_AVAILABLE_IMAGE } from "$constants";
+import { PlaceholderImage } from "$icon";
 import { useSSRSafeNavigation } from "$lib/hooks/useSSRSafeNavigation.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { validateWalletAddressForMinting } from "$lib/utils/scriptTypeUtils.ts";
@@ -1679,7 +1679,7 @@ function StampingToolMain({ config }: { config: Config }) {
             {file.name.match(/\.(jpg|jpeg|png|gif|webp|svg|avif)$/i)
               ? (
                 <img
-                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded-lg bg-conic-pattern bg-[length:4px_4px] bg-stamp-grey/30 [image-rendering:pixelated]`}
+                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded-2xl bg-conic-pattern bg-[length:4px_4px] bg-stamp-grey/30 [image-rendering:pixelated]`}
                   src={URL.createObjectURL(file)}
                   alt="Preview"
                   onError={(e) => {
@@ -1700,7 +1700,7 @@ function StampingToolMain({ config }: { config: Config }) {
                   loading="lazy"
                   sandbox="allow-scripts allow-same-origin"
                   src={URL.createObjectURL(file)}
-                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded-lg bg-stamp-grey/30 [image-rendering:pixelated]`}
+                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded-2xl bg-stamp-grey/30 [image-rendering:pixelated]`}
                   onError={(e) => {
                     console.error("iframe error (detailed):", {
                       error: e,
@@ -1716,13 +1716,13 @@ function StampingToolMain({ config }: { config: Config }) {
                 />
               )
               : (
-                <img
-                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded-lg bg-conic-pattern bg-[length:4px_4px] [image-rendering:pixelated]`}
-                  src={NOT_AVAILABLE_IMAGE}
-                  alt={`File: ${file.name}`}
-                />
+                <div
+                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded-2xl bg-conic-pattern bg-[length:4px_4px]`}
+                >
+                  <PlaceholderImage variant="no-image" />
+                </div>
               )}
-            <div class="flex items-center justify-center absolute inset-0 rounded-lg hover:bg-[#080708]/60 hover:border-[#242424] opacity-0 hover:opacity-100 transition-opacity">
+            <div class="flex items-center justify-center absolute inset-0 rounded-2xl hover:bg-[#080708]/60 hover:border-[#242424] opacity-0 hover:opacity-100 transition-opacity">
               <Icon
                 type="icon"
                 name="uploadImage"

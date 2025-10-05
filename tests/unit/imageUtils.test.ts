@@ -1,4 +1,3 @@
-import { NOT_AVAILABLE_IMAGE } from "$constants";
 import {
   detectContentType,
   getMimeType,
@@ -132,10 +131,10 @@ Deno.test("detectContentType - handles filename extension extraction", () => {
 });
 
 // Tests for getStampImageSrc
-Deno.test("getStampImageSrc - returns placeholder when no stamp_url", () => {
+Deno.test("getStampImageSrc - returns null when no stamp_url", () => {
   const stamp = { stamp_url: null } as any;
   const result = getStampImageSrc(stamp);
-  assertEquals(result, NOT_AVAILABLE_IMAGE);
+  assertEquals(result, null);
 });
 
 Deno.test("getStampImageSrc - handles SRC-20 JSON stamps", () => {
@@ -147,13 +146,13 @@ Deno.test("getStampImageSrc - handles SRC-20 JSON stamps", () => {
   assertEquals(result, "https://stampchain.io/stamps/abc123.svg");
 });
 
-Deno.test("getStampImageSrc - returns placeholder for SRC-20 with invalid URL", () => {
+Deno.test("getStampImageSrc - returns null for SRC-20 with invalid URL", () => {
   const stamp = {
     stamp_url: "https://example.com/invalid.json",
     ident: "SRC-20",
   } as any;
   const result = getStampImageSrc(stamp);
-  assertEquals(result, NOT_AVAILABLE_IMAGE);
+  assertEquals(result, null);
 });
 
 Deno.test("getStampImageSrc - handles SRC-20 fetch errors", () => {
@@ -227,8 +226,8 @@ Deno.test("getStampImageSrc - handles SRC-101 stamps", () => {
     ident: "SRC-101",
   } as any;
   const result = getStampImageSrc(stamp);
-  // SRC-101 JSON stamps now return placeholder (can't fetch synchronously)
-  assertEquals(result, NOT_AVAILABLE_IMAGE);
+  // SRC-101 JSON stamps now return null (can't fetch synchronously)
+  assertEquals(result, null);
 });
 
 // SRC-101 tests removed since getStampImageSrc is now synchronous
@@ -259,19 +258,19 @@ Deno.test("getStampImageSrc - handles other JSON stamps (not SRC-20/101)", () =>
     ident: "OTHER",
   } as any;
   const result = getStampImageSrc(stamp);
-  assertEquals(result, NOT_AVAILABLE_IMAGE);
+  assertEquals(result, null);
 });
 
 Deno.test("getStampImageSrc - handles empty stamp_url string", () => {
   const stamp = { stamp_url: "" } as any;
   const result = getStampImageSrc(stamp);
-  assertEquals(result, NOT_AVAILABLE_IMAGE);
+  assertEquals(result, null);
 });
 
 Deno.test("getStampImageSrc - handles undefined stamp_url", () => {
   const stamp = { stamp_url: undefined } as any;
   const result = getStampImageSrc(stamp);
-  assertEquals(result, NOT_AVAILABLE_IMAGE);
+  assertEquals(result, null);
 });
 
 // Tests for getSRC101Data
@@ -846,51 +845,38 @@ Deno.test("validateStampContent - handles SVG validation", async () => {
 });
 
 // Mock DOM functions for testing - these simulate browser behavior
-Deno.test("showFallback - handles regular HTML element", () => {
-  const originalDocument = globalThis.document;
-  const originalHTMLIFrameElement = globalThis.HTMLIFrameElement;
+Deno.test("showFallback - deprecated function warns user", () => {
+  const originalConsole = globalThis.console;
+  let warningCalled = false;
+  let warningMessage = "";
 
-  // Mock document.createElement
-  globalThis.document = {
-    createElement: (tagName: string) => {
-      if (tagName === "img") {
-        return {
-          src: "",
-          alt: "",
-          className: "",
-        };
-      }
-      return null;
+  globalThis.console = {
+    ...originalConsole,
+    warn: (message: string) => {
+      warningCalled = true;
+      warningMessage = message;
     },
   } as any;
 
-  globalThis.HTMLIFrameElement = class {} as any;
-
-  const mockElement = {
-    innerHTML: "original content",
-    appendChild: (child: any) => {
-      mockElement.lastAppendedChild = child;
-    },
-    lastAppendedChild: null as any,
-  };
+  const mockElement = {} as any;
 
   try {
-    showFallback(mockElement as any);
-    assertEquals(mockElement.innerHTML, "");
-    assertEquals(mockElement.lastAppendedChild?.src, NOT_AVAILABLE_IMAGE);
-    assertEquals(mockElement.lastAppendedChild?.alt, "Content not available");
+    showFallback(mockElement);
+    assertEquals(warningCalled, true);
     assertEquals(
-      mockElement.lastAppendedChild?.className,
-      "w-full h-full object-contain rounded-2xl pixelart",
+      warningMessage.includes("deprecated"),
+      true,
+      "Should warn about deprecation",
     );
-  } catch (error) {
-    // Expected in test environment - DOM APIs not available
-    assertEquals(error instanceof ReferenceError, true);
+    assertEquals(
+      warningMessage.includes("PlaceholderImage"),
+      true,
+      "Should mention PlaceholderImage component",
+    );
+  } finally {
+    // Restore
+    globalThis.console = originalConsole;
   }
-
-  // Restore
-  globalThis.document = originalDocument;
-  globalThis.HTMLIFrameElement = originalHTMLIFrameElement;
 });
 
 Deno.test("handleImageError - handles HTMLImageElement", () => {
@@ -902,6 +888,7 @@ Deno.test("handleImageError - handles HTMLImageElement", () => {
 
   const mockImg = {
     src: "original.jpg",
+    alt: "Original alt text",
   };
 
   // Make it instance of HTMLImageElement
@@ -913,7 +900,8 @@ Deno.test("handleImageError - handles HTMLImageElement", () => {
 
   try {
     handleImageError(event as any);
-    assertEquals(mockImg.src, NOT_AVAILABLE_IMAGE);
+    assertEquals(mockImg.src, "");
+    assertEquals(mockImg.alt, "Content not available");
   } catch (error) {
     // Expected in test environment - DOM APIs not available
     assertEquals(error instanceof ReferenceError, true);

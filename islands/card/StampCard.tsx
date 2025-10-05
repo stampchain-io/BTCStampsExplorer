@@ -1,17 +1,8 @@
 /* ===== STAMP CARD COMPONENT ===== */
 /* @baba-update audio icon size (custom) - 247*/
 /*@baba-check styles+icon*/
-import { Icon, LoadingIcon } from "$icon";
+import { Icon, LoadingIcon, PlaceholderImage } from "$icon";
 import StampTextContent from "$islands/content/stampDetailContent/StampTextContent.tsx";
-import type { StampRow } from "$types/stamp.d.ts";
-import { VNode } from "preact";
-import { useEffect, useRef, useState } from "preact/hooks";
-
-import {
-  AUDIO_FILE_IMAGE,
-  LIBRARY_FILE_IMAGE,
-  NOT_AVAILABLE_IMAGE,
-} from "$constants";
 import { glassmorphism, glassmorphismL2, transitionColors } from "$layout";
 import {
   abbreviateAddress,
@@ -19,6 +10,9 @@ import {
   stripTrailingZeros,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
+import type { StampRow } from "$types/stamp.d.ts";
+import { VNode } from "preact";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { TEXT_STYLES } from "./styles.ts";
 
 /* ===== TYPES ===== */
@@ -49,7 +43,7 @@ export function StampCard({
 }) {
   /* ===== STATE ===== */
   const [loading, setLoading] = useState<boolean>(true);
-  const [src, setSrc] = useState<string>("");
+  const [src, setSrc] = useState<string | null>(null);
   const [validatedContent, setValidatedContent] = useState<VNode | null>(null);
 
   // Audio-related state (always declared to avoid conditional hooks)
@@ -65,7 +59,9 @@ export function StampCard({
   /* ===== HANDLERS ===== */
   const handleImageError = (e: Event) => {
     if (e.currentTarget instanceof HTMLImageElement) {
-      e.currentTarget.src = NOT_AVAILABLE_IMAGE;
+      // Set src to empty string to trigger placeholder image rendering
+      e.currentTarget.src = "";
+      e.currentTarget.alt = "Content not available";
     }
   };
 
@@ -81,9 +77,7 @@ export function StampCard({
   const fetchStampImage = () => {
     setLoading(true);
     const res = getStampImageSrc(stamp as StampRow);
-    if (res) {
-      setSrc(res);
-    } else setSrc(NOT_AVAILABLE_IMAGE);
+    setSrc(res);
     setLoading(false);
   };
 
@@ -173,15 +167,11 @@ export function StampCard({
             );
           }
         } catch (_error) {
-          // Fallback to NOT_AVAILABLE_IMAGE
+          // Error placeholder image
           setValidatedContent(
             <div class="stamp-container">
               <div class="relative z-10 aspect-square">
-                <img
-                  src={NOT_AVAILABLE_IMAGE}
-                  alt="Invalid SVG"
-                  class="max-w-none object-contain rounded-2xl pixelart stamp-image h-full w-full"
-                />
+                <PlaceholderImage variant="error" />
               </div>
             </div>,
           );
@@ -222,13 +212,8 @@ export function StampCard({
       return (
         <div class="stamp-audio-container relative w-full h-full flex items-center justify-center">
           <div class="absolute inset-0 flex items-center justify-center">
-            {/* Fallback image for audio files */}
-            <img
-              src={AUDIO_FILE_IMAGE}
-              alt="Audio File"
-              class="absolute top-0 left-0 w-full h-full object-contain rounded-2xl pixelart stamp-image pointer-events-none select-none"
-              draggable={false}
-            />
+            {/* Audio placeholder image */}
+            <PlaceholderImage variant="audio" />
             <audio
               ref={audioRef}
               class="hidden"
@@ -300,12 +285,7 @@ export function StampCard({
       return (
         <div class="stamp-container relative">
           <div class="relative z-10 aspect-square">
-            <img
-              src={LIBRARY_FILE_IMAGE}
-              alt="Library File"
-              class="max-w-none object-contain rounded-2xl pixelart stamp-image h-full w-full"
-              loading="lazy"
-            />
+            <PlaceholderImage variant="library" />
           </div>
         </div>
       );
@@ -315,11 +295,7 @@ export function StampCard({
       return validatedContent || (
         <div class="stamp-container">
           <div class="relative z-10 aspect-square">
-            <img
-              src={NOT_AVAILABLE_IMAGE}
-              alt="Loading..."
-              class="max-w-none object-contain rounded-2xl pixelart stamp-image h-full w-full"
-            />
+            <PlaceholderImage variant="no-image" />
           </div>
         </div>
       );

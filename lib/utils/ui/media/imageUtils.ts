@@ -1,5 +1,4 @@
 /// <reference lib="dom" />
-import { NOT_AVAILABLE_IMAGE } from "$constants";
 import type { SRC20Row } from "$types/src20.d.ts";
 import type { StampRow } from "$types/stamp.d.ts";
 
@@ -121,10 +120,10 @@ export const mimeTypeToSuffix = Object.entries(mimeTypes).reduce(
   {} as { [key: string]: string },
 );
 
-export const getStampImageSrc = (stamp: StampRow): string => {
+export const getStampImageSrc = (stamp: StampRow): string | undefined => {
   const baseUrl = getBaseUrl();
   if (!stamp.stamp_url) {
-    return NOT_AVAILABLE_IMAGE;
+    return undefined;
   }
 
   // SRC-20 stamps have JSON metadata but also have SVG images
@@ -138,13 +137,13 @@ export const getStampImageSrc = (stamp: StampRow): string => {
       const cdnUrl = getCdnUrl();
       return `${cdnUrl}/stamps/${filename}`;
     }
-    return NOT_AVAILABLE_IMAGE;
+    return undefined;
   }
 
   // For JSON stamps (including SRC-101), just show placeholder
   // We can't fetch JSON synchronously, and these are data stamps anyway
   if (stamp.stamp_url.includes("json")) {
-    return NOT_AVAILABLE_IMAGE;
+    return undefined;
   }
 
   // Extract filename from full URL if present
@@ -159,78 +158,86 @@ export const getStampImageSrc = (stamp: StampRow): string => {
     return `${baseUrl}/content/${htmlFilename}`;
   }
 
-  // For SVG stamps, also use /content/ to handle external references
-  if (stamp.stamp_mimetype === "image/svg+xml" || filename.endsWith(".svg")) {
-    return `${baseUrl}/content/${filename}`;
-  }
-
-  // For other stamps (images, etc.), use the /content/ endpoint
-  return `${baseUrl}/content/${filename}`;
+  // For all other stamps, use the CDN
+  const cdnUrl = getCdnUrl();
+  return `${cdnUrl}/stamps/${filename}`;
 };
 
-/**
- * Get the image source URL for an SRC-20 token
- * Handles deploy_img, stamp_url, and constructs from deploy_tx
- */
-export const getSRC20ImageSrc = (src20: SRC20Row): string => {
-  // Priority order for SRC-20 images:
-  // 1. Use deploy_img if provided (for deploy operations)
-  // 2. Use stamp_url if provided (for transaction stamps)
-  // 3. Fallback to constructing URL from deploy_tx if available
-  // 4. Final fallback to placeholder image
-
-  if (src20.deploy_img) {
-    return src20.deploy_img;
+export const getSRC20ImageSrc = (src20: SRC20Row): string | undefined => {
+  // If there's no stamp_url, return undefined
+  if (!src20.stamp_url) {
+    return undefined;
   }
 
-  if (src20.stamp_url) {
-    return src20.stamp_url;
+  // SRC-20 stamps have JSON metadata but also have SVG images
+  // The SVG is at /stamps/txhash.svg (managed by Cloudflare CDN)
+  if (src20.stamp_url.includes("json")) {
+    // Extract the transaction hash from the JSON URL and construct SVG URL
+    const urlParts = src20.stamp_url.split("/stamps/");
+    if (urlParts.length > 1) {
+      const filename = urlParts[1].replace(".json", ".svg");
+      // Always use CDN for /stamps/ assets
+      const cdnUrl = getCdnUrl();
+      return `${cdnUrl}/stamps/${filename}`;
+    }
+    return undefined;
   }
 
-  if (src20.deploy_tx) {
-    return constructStampUrl(src20.deploy_tx, "svg");
-  }
+  // For non-JSON stamps, use the stamp_url directly with CDN
+  const urlParts = src20.stamp_url.split("/stamps/");
+  const filename = urlParts.length > 1 ? urlParts[1] : src20.stamp_url;
 
-  return "/img/placeholder/stamp-no-image.svg";
+  const cdnUrl = getCdnUrl();
+  return `${cdnUrl}/stamps/${filename}`;
 };
 
-export const getSRC101Data = async (stamp: StampRow) => {
-  if (stamp.ident !== "SRC-101") {
-    return {};
-  }
-
-  const res = await fetch(stamp.stamp_url);
-  const jsonData = await res.json();
-  return jsonData;
-};
-
-export const getMimeType = (extension: string): string => {
-  const normalizedExt = extension.toLowerCase().trim();
+export const getMimeTypeFromExtension = (filename: string): string => {
+  const ext = filename.split(".").pop()?.toLowerCase() || "";
+  const normalizedExt = ext.replace(/^\./, "");
   return mimeTypes[normalizedExt] || "application/octet-stream";
 };
 
-export function showFallback(element: HTMLElement) {
-  const fallback = document.createElement("img");
-  fallback.src = NOT_AVAILABLE_IMAGE;
-  fallback.alt = "Content not available";
-  fallback.className = "w-full h-full object-contain rounded-2xl pixelart";
-
-  if (element instanceof HTMLIFrameElement) {
-    element.style.display = "none";
-    if (element.parentNode) {
-      element.parentNode.appendChild(fallback);
-    }
-  } else {
-    element.innerHTML = "";
-    element.appendChild(fallback);
+/**
+ * Fetches and returns JSON data for SRC-101 stamps
+ * Returns empty object if not an SRC-101 stamp
+ */
+export async function getSRC101Data(
+  stamp: { ident?: string; stamp_url?: string },
+): Promise<Record<string, any>> {
+  // Only process SRC-101 stamps
+  if (stamp.ident !== "SRC-101" || !stamp.stamp_url) {
+    return {};
   }
+
+  try {
+    const response = await fetch(stamp.stamp_url);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    // Re-throw to allow caller to handle
+    throw error;
+  }
+}
+
+export function showFallback(_element: HTMLElement) {
+  // Fallback is now handled by PlaceholderImage component
+  // This function is kept for backward compatibility but does nothing
+  console.warn(
+    "showFallback is deprecated - use PlaceholderImage component instead",
+  );
 }
 
 export function handleImageError(e: Event) {
   if (e.currentTarget instanceof HTMLImageElement) {
-    e.currentTarget.src = NOT_AVAILABLE_IMAGE;
+    // Set src to empty string to trigger placeholder rendering
+    e.currentTarget.src = "";
+    e.currentTarget.alt = "Content not available";
   } else if (e.currentTarget instanceof HTMLIFrameElement) {
-    showFallback(e.currentTarget);
+    // Hide the iframe - parent component should handle placeholder
+    e.currentTarget.style.display = "none";
   }
 }
 
@@ -238,239 +245,105 @@ export function handleImageError(e: Event) {
 const TRUSTED_DOMAINS = [
   "ordinals.com",
   "arweave.net",
-  "stampchain.io",
-  "www.w3.org", // Standard SVG and XML namespaces
 ];
 
-export function isValidSVG(svgContent: string): boolean {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(svgContent, "image/svg+xml");
-
-  // Check for parsing errors
-  const parserError = doc.querySelector("parsererror");
-  if (parserError) {
+/**
+ * Check if a URL is from a trusted domain
+ */
+export function isTrustedDomain(url: string): boolean {
+  try {
+    const urlObj = new URL(url);
+    return TRUSTED_DOMAINS.some((domain) => urlObj.hostname.endsWith(domain));
+  } catch {
     return false;
   }
-
-  // Check for potentially dangerous elements (but allow trusted domains)
-  const dangerous = doc.querySelectorAll(
-    "foreignObject, use[href*='http'], image[href*='http'], a[href*='http']",
-  );
-
-  // Check if external references are from trusted domains
-  for (const element of Array.from(dangerous)) {
-    const href = element.getAttribute("href") ||
-      element.getAttribute("xlink:href");
-    if (href && href.startsWith("http")) {
-      try {
-        const url = new URL(href);
-        if (!TRUSTED_DOMAINS.includes(url.hostname)) {
-          return false;
-        }
-      } catch {
-        return false;
-      }
-    }
-  }
-
-  // Check all elements for event handlers and untrusted external references
-  const allElements = doc.getElementsByTagName("*");
-  for (const element of Array.from(allElements)) {
-    const attributes = element.attributes;
-    for (const attr of Array.from(attributes)) {
-      // Check for event handlers
-      if (attr.name.startsWith("on")) {
-        return false;
-      }
-
-      // Check for external URLs - allow trusted domains
-      // Skip namespace declarations (xmlns attributes)
-      if (attr.value.match(/^https?:/i) && !attr.name.startsWith("xmlns")) {
-        try {
-          const url = new URL(attr.value);
-          if (!TRUSTED_DOMAINS.includes(url.hostname)) {
-            return false;
-          }
-        } catch {
-          // Invalid URL, block it
-          return false;
-        }
-      }
-
-      // Block data URIs (keep existing behavior)
-      if (attr.value.match(/^data:/i)) {
-        return false;
-      }
-    }
-  }
-
-  return true;
 }
 
-export function isValidDataUrl(url: string): boolean {
-  // Basic data URL format check
-  if (!url.startsWith("data:")) return false;
+/**
+ * Validate and sanitize SVG content
+ * Returns undefined if SVG is invalid or contains untrusted external references
+ */
+export function validateSVG(svgContent: string): string | undefined {
+  // Check for script tags (case insensitive)
+  if (/<script[\s>]/i.test(svgContent)) {
+    return undefined;
+  }
 
-  // Split into media type and data
-  const [header, ...rest] = url.split(",");
-  if (!header || rest.length === 0) return false;
+  // Check for event handlers
+  const eventHandlers = /on\w+\s*=/i;
+  if (eventHandlers.test(svgContent)) {
+    return undefined;
+  }
 
-  // Check media type format
-  const [mediaType] = header.slice(5).split(";");
-  if (!mediaType) return false;
+  // Check for javascript: protocol
+  if (/javascript:/i.test(svgContent)) {
+    return undefined;
+  }
 
-  // Ensure only one media type declaration
-  const mediaTypeParts = mediaType.split("+");
-  if (mediaTypeParts.length > 2) return false;
+  // Check for external references
+  const externalRefs =
+    /(?:href|src|xlink:href)\s*=\s*["']?(https?:\/\/[^"'\s>]+)/gi;
+  let match;
+  while ((match = externalRefs.exec(svgContent)) !== null) {
+    const url = match[1];
+    if (!isTrustedDomain(url)) {
+      return undefined;
+    }
+  }
 
-  return true;
+  return svgContent;
 }
 
-// Keep validation logic without JSX
-export const validateStampContent = async (src: string): Promise<{
-  isValid: boolean;
-  error?: string;
-}> => {
-  try {
-    const response = await fetch(src);
-    if (!response.ok) {
-      return { isValid: false, error: "Failed to fetch content" };
-    }
-
-    const content = await response.text();
-    if (!content || content.includes('"deploy"')) {
-      return { isValid: false, error: "Invalid content" };
-    }
-
-    // For SVG content, use the comprehensive SVG validation
-    if (src.endsWith(".svg") || content.trim().startsWith("<svg")) {
-      if (!isValidSVG(content)) {
-        return {
-          isValid: false,
-          error: "SVG contains unsafe content or untrusted external references",
-        };
-      }
-    }
-
-    return { isValid: true };
-  } catch (error) {
-    return {
-      isValid: false,
-      error: error instanceof Error
-        ? error.message
-        : "Error validating content",
-    };
-  }
-};
-
-export interface ContentTypeResult {
-  mimeType: string;
-  isGzipped: boolean;
-  isJavaScript?: boolean;
+/**
+ * Rewrite external references in SVG to use proxy
+ */
+export function rewriteSVGReferences(svgContent: string): string {
+  return svgContent
+    .replace(
+      /https:\/\/ordinals\.com\/content\/([^"'\s>]+)/g,
+      "/api/proxy/ordinals/$1",
+    )
+    .replace(
+      /https:\/\/arweave\.net\/([^"'\s>]+)/g,
+      "/api/proxy/arweave/$1",
+    );
 }
 
-export function detectContentType(
-  content: string,
-  fileName?: string | undefined,
-  providedMimeType?: string | undefined,
-): ContentTypeResult {
-  try {
-    // Handle null or undefined content
-    if (!content || content === null || content === undefined) {
-      return {
-        mimeType: providedMimeType || "application/octet-stream",
-        isGzipped: false,
-        isJavaScript: false,
-      };
-    }
-
-    // First check for gzip magic bytes
-    if (content.startsWith("\x1f\x8b\x08")) {
-      return {
-        mimeType: "application/javascript",
-        isGzipped: true,
-        isJavaScript: true,
-      };
-    }
-
-    // Decode base64 for content inspection
-    let decoded: string;
-    try {
-      decoded = atob(content);
-    } catch (_e) {
-      // If base64 decoding fails, trust the provided mime type
-      if (providedMimeType) {
-        return {
-          mimeType: providedMimeType,
-          isGzipped: false,
-          isJavaScript: providedMimeType.includes("javascript"),
-        };
-      }
-      // Otherwise, try to detect from filename
-      if (fileName) {
-        const extension = fileName.split(".").pop()?.toLowerCase() || "";
-        return {
-          mimeType: getMimeType(extension),
-          isGzipped: false,
-          isJavaScript: extension === "js",
-        };
-      }
-      // Default fallback
-      return {
-        mimeType: "application/octet-stream",
-        isGzipped: false,
-        isJavaScript: false,
-      };
-    }
-
-    // Special case: If database says text/html but content is clearly JavaScript
-    if (providedMimeType === "text/html") {
-      const jsPatterns = [
-        /^document\.head\.insertAdjacentHTML/,
-        /^!function/,
-        /^window\.onload\s*=/,
-      ];
-
-      if (jsPatterns.some((pattern) => pattern.test(decoded.trim()))) {
-        return {
-          mimeType: "application/javascript",
-          isGzipped: false,
-          isJavaScript: true,
-        };
-      }
-    }
-
-    // For all other cases, trust the database mime type
-    if (providedMimeType) {
-      return {
-        mimeType: providedMimeType,
-        isGzipped: false,
-        isJavaScript: providedMimeType.includes("javascript"),
-      };
-    }
-
-    // Only use filename detection if no mime type provided
-    if (fileName) {
-      const extension = fileName.split(".").pop()?.toLowerCase() || "";
-      return {
-        mimeType: getMimeType(extension),
-        isGzipped: false,
-        isJavaScript: extension === "js",
-      };
-    }
-
-    // Default fallback
-    return {
-      mimeType: "application/octet-stream",
-      isGzipped: false,
-      isJavaScript: false,
-    };
-  } catch (error) {
-    console.error("Error detecting content type:", error);
-    return {
-      mimeType: "application/octet-stream",
-      isGzipped: false,
-      isJavaScript: false,
-    };
+/**
+ * Process SVG content for safe display
+ * Returns processed SVG or undefined if invalid
+ */
+export function processSVG(svgContent: string): string | undefined {
+  // First validate the SVG
+  const validated = validateSVG(svgContent);
+  if (!validated) {
+    return undefined;
   }
+
+  // Rewrite external references to use proxy
+  let processed = rewriteSVGReferences(validated);
+
+  // Ensure SVG fills container by removing fixed dimensions
+  if (processed.includes("<svg")) {
+    // Remove width and height attributes
+    processed = processed
+      .replace(/<svg([^>]*)\s+width="([^"]*)"([^>]*)/, "<svg$1$3")
+      .replace(/<svg([^>]*)\s+height="([^"]*)"([^>]*)/, "<svg$1$3");
+
+    // Add viewBox if not present
+    if (!processed.includes("viewBox")) {
+      processed = processed.replace(
+        /<svg([^>]*)>/,
+        '<svg$1 viewBox="0 0 460 500">',
+      );
+    }
+
+    // Add responsive styling
+    processed = processed.replace(
+      /<svg([^>]*)>/,
+      '<svg$1 style="max-width: 100%; max-height: 100%; width: auto; height: auto; display: block;">',
+    );
+  }
+
+  return processed;
 }

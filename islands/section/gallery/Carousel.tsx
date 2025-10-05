@@ -1,21 +1,13 @@
 /* ===== CAROUSEL GALLERY COMPONENT ===== */
 /* TODO (@baba)-update styling */
 import createCarouselSlider from "$client/utils/carousel-slider.ts";
-import { ERROR_IMAGE } from "$constants";
 import { IS_BROWSER } from "$fresh/runtime.ts";
+import { PlaceholderImage } from "$icon";
 import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
-import {
-  getStampImageSrc,
-  validateStampContent,
-} from "$lib/utils/ui/media/imageUtils.ts";
+import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
 import type { CarouselHomeProps } from "$types/ui.d.ts";
 import { ComponentChildren } from "preact";
 import { useEffect, useMemo, useRef, useState } from "preact/hooks";
-
-/* ===== TYPES ===== */
-
-// Cache for validation results to prevent re-validation
-const validationCache = new Map<string, boolean>();
 
 /* ===== COMPONENT ===== */
 export default function CarouselGallery(props: CarouselHomeProps) {
@@ -57,7 +49,9 @@ export default function CarouselGallery(props: CarouselHomeProps) {
   const [validatedContent, setValidatedContent] = useState<
     Record<string, ComponentChildren>
   >({});
-  const [stampSources, setStampSources] = useState<Record<string, string>>({});
+  const [stampSources, setStampSources] = useState<
+    Record<string, string | null>
+  >({});
 
   /* ===== EVENT HANDLERS ===== */
   const handleLoad = () => {
@@ -66,7 +60,7 @@ export default function CarouselGallery(props: CarouselHomeProps) {
 
   /* ===== VALIDATION EFFECT ===== */
   useEffect(() => {
-    const validateStamps = async () => {
+    const validateStamps = () => {
       const validated: Record<string, ComponentChildren> = {};
       const sources: Record<string, string> = {};
 
@@ -75,7 +69,7 @@ export default function CarouselGallery(props: CarouselHomeProps) {
       for (let i = 0; i < duplicatedStamps.length; i += batchSize) {
         const batch = duplicatedStamps.slice(i, i + batchSize);
 
-        await Promise.all(batch.map(async (stamp) => {
+        batch.forEach((stamp) => {
           // Skip if already validated
           if (validatedContent[stamp.tx_hash]) {
             return;
@@ -83,7 +77,21 @@ export default function CarouselGallery(props: CarouselHomeProps) {
 
           // Get proper stamp URL using getStampImageSrc
           const src = getStampImageSrc(stamp);
-          sources[stamp.tx_hash] = src;
+          if (src) {
+            sources[stamp.tx_hash] = src;
+          }
+
+          // If no src, show placeholder
+          if (!src) {
+            validated[stamp.tx_hash] = (
+              <a target="_top" href={`/stamp/${stamp.tx_hash}`}>
+                <div class="object-contain cursor-pointer desktop:min-w-[408px] tablet:min-w-[269px] mobileLg:min-w-[200px] mobileMd:min-w-[242px] min-w-[150px] rounded-2xl aspect-square">
+                  <PlaceholderImage variant="no-image" />
+                </div>
+              </a>
+            );
+            return;
+          }
 
           // Handle HTML content
           if (stamp.stamp_mimetype === "text/html") {
@@ -103,33 +111,7 @@ export default function CarouselGallery(props: CarouselHomeProps) {
             );
             return;
           }
-
-          // Handle SVG content with caching
-          if (stamp.stamp_mimetype === "image/svg+xml") {
-            // Check cache first
-            let isValid = validationCache.get(src);
-
-            if (isValid === undefined) {
-              // Only validate if not in cache
-              const validationResult = await validateStampContent(src);
-              isValid = validationResult.isValid;
-              validationCache.set(src, isValid);
-            }
-
-            if (!isValid) {
-              validated[stamp.tx_hash] = (
-                <a target="_top" href={`/stamp/${stamp.tx_hash}`}>
-                  <img
-                    src={ERROR_IMAGE}
-                    alt="Invalid SVG"
-                    class="object-contain cursor-pointer desktop:min-w-[408px] tablet:min-w-[269px] mobileLg:min-w-[200px] mobileMd:min-w-[242px] min-w-[150px] rounded-2xl"
-                    onLoad={handleLoad}
-                  />
-                </a>
-              );
-            }
-          }
-        }));
+        });
 
         // Update state after each batch
         if (Object.keys(validated).length > 0) {

@@ -1,7 +1,7 @@
 /* ===== PREVIEW IMAGE MODAL COMPONENT ===== */
 import { ModalBase } from "$components/layout/ModalBase.tsx";
-import { AUDIO_FILE_IMAGE } from "$constants";
 import { StampTextContent } from "$content";
+import { PlaceholderImage } from "$icon";
 import { closeModal } from "$islands/modal/states.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { handleImageError } from "$lib/utils/ui/media/imageUtils.ts";
@@ -60,13 +60,7 @@ const PreviewImageModal = ({
             </div>
           )
           : contentType === "audio"
-          ? (
-            <img
-              className="rounded-xl mobileMd:rounded-2xl stamp-image aspect-square"
-              src={AUDIO_FILE_IMAGE}
-              alt="Audio File Preview"
-            />
-          )
+          ? <PlaceholderImage variant="audio" />
           : (
             <img
               className="rounded-xl mobileMd:rounded-2xl pixelart stamp-image aspect-square"
