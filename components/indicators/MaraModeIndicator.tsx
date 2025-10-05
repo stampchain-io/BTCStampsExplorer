@@ -62,7 +62,7 @@ export function MaraModeIndicator({
   return (
     <div
       ref={containerRef}
-      class={`flex items-center gap-2 bg-purple-900/20 backdrop-blur-sm border border-purple-500/30 rounded-xl px-3 py-2 cursor-help focus:outline-none focus:ring-2 focus:ring-purple-400 ${className}`}
+      class={`flex items-center gap-2 bg-purple-900/20 backdrop-blur-sm border border-purple-500/30 rounded-2xl px-3 py-2 cursor-help focus:outline-none focus:ring-2 focus:ring-purple-400 ${className}`}
       role="button"
       tabIndex={0}
       aria-label={getMaraAccessibilityLabel()}
@@ -125,7 +125,7 @@ export function MaraModeIndicator({
       {/* Tooltip */}
       {showTooltip && (
         <div
-          class="fixed z-50 bg-stamp-grey-darkest/95 backdrop-blur-sm border border-stamp-grey-light/20 rounded-xl px-4 py-3 shadow-lg max-w-xs text-sm pointer-events-none"
+          class="fixed z-50 bg-stamp-grey-darkest/95 backdrop-blur-sm border border-stamp-grey-light/20 rounded-2xl px-4 py-3 shadow-lg max-w-xs text-sm pointer-events-none"
           style={{
             left: `${tooltipPosition.x}px`,
             top: `${tooltipPosition.y - 10}px`,

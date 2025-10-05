@@ -156,14 +156,14 @@ export function MaraServiceUnavailableModal({
         <button
           type="button"
           onClick={onRetry}
-          class={`flex-1 px-4 py-2 rounded-xl transition-colors ${glassmorphism} bg-gradient-to-br from-stamp-grey-darkest/20 to-stamp-grey-darkest/40 text-stamp-grey-light hover:from-stamp-grey-darkest/30 hover:to-stamp-grey-darkest/50`}
+          class={`flex-1 px-4 py-2 rounded-2xl transition-colors ${glassmorphism} bg-gradient-to-br from-stamp-grey-darkest/20 to-stamp-grey-darkest/40 text-stamp-grey-light hover:from-stamp-grey-darkest/30 hover:to-stamp-grey-darkest/50`}
         >
           Retry MARA
         </button>
         <button
           type="button"
           onClick={onSwitchToStandard}
-          class={`flex-1 px-4 py-2 rounded-xl transition-colors font-semibold ${glassmorphism} bg-gradient-to-br from-purple-600/80 to-purple-700/80 text-white hover:from-purple-600 hover:to-purple-700`}
+          class={`flex-1 px-4 py-2 rounded-2xl transition-colors font-semibold ${glassmorphism} bg-gradient-to-br from-purple-600/80 to-purple-700/80 text-white hover:from-purple-600 hover:to-purple-700`}
         >
           Switch to Standard
         </button>

@@ -25,7 +25,7 @@ export function Article(
             src={headerImage}
             width="100%"
             alt="Screenshot"
-            class="pt-2 pb-9 mobileMd:pb-12 rounded-xl"
+            class="pt-2 pb-9 mobileMd:pb-12 rounded-2xl"
           />
 
           {/* ===== CONTENT ===== */}
