@@ -1,6 +1,6 @@
 /* ===== TEAM GALLERY COMPONENT ===== */
 import { containerBackground, gapGrid } from "$layout";
-import { headingPurpleLD, subtitlePurple, valueSmPurple } from "$text";
+import { headingGreyLD, subtitleGrey, valueSm } from "$text";
 
 /* ===== COMPONENT ===== */
 export default function TeamBanner() {
@@ -12,7 +12,7 @@ export default function TeamBanner() {
         <div class="w-full flex justify-start items-start">
           <div class="w-full">
             {/* ===== SECTION TITLE ===== */}
-            <h2 class={subtitlePurple}>THE TEAM</h2>
+            <h2 class={subtitleGrey}>THE TEAM</h2>
 
             {/* ===== TEAM MEMBERS GRID ===== */}
             <div
@@ -23,10 +23,10 @@ export default function TeamBanner() {
               {/* ===== MIKE IN SPACE CARD ===== */}
               <div class="flex flex-col items-center">
                 <img src="/img/profile/mike.png" />
-                <h5 class={headingPurpleLD}>
+                <h5 class={`${headingGreyLD} pt-2`}>
                   MIKE IN SPACE
                 </h5>
-                <h6 class={valueSmPurple}>
+                <h6 class={`${valueSm} !text-stamp-grey`}>
                   CODE{" "}
                   <span class="mobileMd:hidden">
                     <br />
@@ -38,10 +38,10 @@ export default function TeamBanner() {
               {/* ===== REINAMORA CARD ===== */}
               <div class="flex flex-col items-center">
                 <img src="/img/profile/kevin.png" />
-                <h5 class={headingPurpleLD}>
+                <h5 class={`${headingGreyLD} pt-2`}>
                   REINAMORA
                 </h5>
-                <h6 class={valueSmPurple}>
+                <h6 class={`${valueSm} !text-stamp-grey`}>
                   BACKEND{" "}
                   <span class="mobileMd:hidden">
                     <br />
@@ -53,10 +53,10 @@ export default function TeamBanner() {
               {/* ===== ARWYN CARD ===== */}
               <div class="flex flex-col items-center">
                 <img src="/img/profile/arwyn.png" />
-                <h5 class={headingPurpleLD}>
+                <h5 class={`${headingGreyLD} pt-2`}>
                   ARWYN
                 </h5>
-                <h6 class={valueSmPurple}>
+                <h6 class={`${valueSm} !text-stamp-grey`}>
                   MEMETIC{" "}
                   <span class="mobileMd:hidden">
                     <br />

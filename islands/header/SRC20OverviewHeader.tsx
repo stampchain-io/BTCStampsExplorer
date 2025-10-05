@@ -1,7 +1,7 @@
 /* ===== SRC20 HEADER COMPONENT ===== */
 /* @baba - update search button styling */
 import { SelectorButtons, ToggleButton } from "$button";
-import { titlePurpleLD } from "$text";
+import { titleGreyLD } from "$text";
 import type { SRC20OverviewHeaderProps } from "$types/ui.d.ts";
 import { useCallback, useState } from "preact/hooks";
 
@@ -48,8 +48,8 @@ export const SRC20OverviewHeader = (
     <div class="relative flex flex-col w-full gap-1.5">
       <div class="flex flex-row justify-between items-start w-full">
         {/* ===== RESPONSIVE TITLE ===== */}
-        <h1 class={`${titlePurpleLD} block mobileLg:hidden`}>TOKENS</h1>
-        <h1 class={`${titlePurpleLD} hidden mobileLg:block`}>SRC-20 TOKENS</h1>
+        <h1 class={`${titleGreyLD} block mobileLg:hidden`}>TOKENS</h1>
+        <h1 class={`${titleGreyLD} hidden mobileLg:block`}>SRC-20 TOKENS</h1>
       </div>
 
       {/* ===== TRENDING, MINTED/MINTING AND TIMEFRAME BUTTONS ===== */}
@@ -65,7 +65,7 @@ export const SRC20OverviewHeader = (
             value={viewType}
             onChange={handleViewTypeClick}
             size="smR"
-            color="purple"
+            color="grey"
             className="w-full mobileMd:w-auto"
           />
         </div>

@@ -99,7 +99,7 @@ export function SortButton(
           name={sort === "DESC" ? "sortDesc" : "sortAsc"}
           weight="normal"
           size="smR"
-          color="purple"
+          color="greyDark"
           ariaLabel={`Sorted ${sort === "DESC" ? "descending" : "ascending"}`}
         />
       </a>
