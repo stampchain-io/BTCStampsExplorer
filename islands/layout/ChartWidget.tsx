@@ -93,7 +93,7 @@ const ChartWidget = (
             buttonTheme: {
               width: 40, // Control total width (affects horizontal space)
               padding: 3, // Internal padding (uniform)
-              r: 8, // Border radius (rounded-xl = 12px)
+              r: 12, // Border radius (rounded-xl = 12px)
               stroke: "rgba(102, 102, 102, 0.4)", // Border color with transparency
               "stroke-width": 1, // Use quoted property name for SVG
               fill: "rgba(33, 28, 33, 0.1)", // Glassmorphism button background

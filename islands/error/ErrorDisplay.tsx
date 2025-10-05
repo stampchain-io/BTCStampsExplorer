@@ -138,7 +138,7 @@ export function ErrorDisplay({
 
   return (
     <div
-      class={`p-4 rounded-xl border ${styles.container} ${className}`}
+      class={`p-4 rounded-2xl border ${styles.container} ${className}`}
       role="alert"
       aria-live="assertive"
     >

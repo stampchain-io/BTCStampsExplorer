@@ -86,7 +86,7 @@ export default function PreviewCodeModal({ src }: PreviewCodeModalProps) {
       title=""
       hideHeader
       className="w-[calc(100vw-48px)] h-[calc(100vh-48px)] mobileLg:w-[calc(100vw-96px)] mobileLg:h-[calc(100vh-96px)] max-w-[800px]"
-      contentClassName="h-full bg-[#FAFAFA] rounded-lg mobileMd:rounded-xl overflow-auto scrollbar-grey"
+      contentClassName="h-full bg-[#FAFAFA] rounded-xl mobileMd:rounded-2xl overflow-auto scrollbar-grey"
     >
       {/* ===== CODE DISPLAY ===== */}
       <div class="flex flex-col w-full h-full p-6 mobileMd:p-9">
