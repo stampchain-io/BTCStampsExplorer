@@ -96,7 +96,7 @@ export function WalletProvider(
       onClick={handleConnect}
       role="button"
       aria-label={`Connect to ${providerInfo.name}`}
-      class={`flex justify-between items-center p-4 ${containerCardL2} !rounded-xl`}
+      class={`flex justify-between items-center p-5 ${containerCardL2}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >

@@ -683,7 +683,7 @@ export function StampImage(
   // Early return if stamp is undefined
   if (!stamp) {
     return (
-      <div className="stamp-container bg-gray-200 rounded-xl p-4 text-center text-gray-500">
+      <div className="stamp-container bg-gray-200 rounded-2xl p-4 text-center text-gray-500">
         NO STAMP DATA AVAILABLE
       </div>
     );
@@ -731,7 +731,7 @@ export function StampImage(
       <div class={`${body} ${gapSectionSlim}`}>
         <div className={`${containerDetailImage} ${containerClassName || ""}`}>
           <div className="stamp-container">
-            <LoadingIcon containerClassName="rounded-xl" />
+            <LoadingIcon containerClassName="rounded-2xl" />
           </div>
         </div>
       </div>

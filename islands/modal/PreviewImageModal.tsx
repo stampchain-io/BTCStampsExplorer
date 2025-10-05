@@ -46,7 +46,7 @@ const PreviewImageModal = ({
               width="100%"
               height="100%"
               scrolling="no"
-              className="rounded-lg mobileMd:rounded-xl w-full h-full"
+              className="rounded-xl mobileMd:rounded-2xl w-full h-full"
               sandbox="allow-scripts allow-same-origin"
               src={imageUrl}
               loading="lazy"
@@ -55,21 +55,21 @@ const PreviewImageModal = ({
           )
           : contentType === "text"
           ? (
-            <div className="w-full h-full rounded-lg mobileMd:rounded-xl aspect-square">
+            <div className="w-full h-full rounded-xl mobileMd:rounded-2xl aspect-square">
               <StampTextContent src={imageUrl} />
             </div>
           )
           : contentType === "audio"
           ? (
             <img
-              className="rounded-lg mobileMd:rounded-xl stamp-image aspect-square"
+              className="rounded-xl mobileMd:rounded-2xl stamp-image aspect-square"
               src={AUDIO_FILE_IMAGE}
               alt="Audio File Preview"
             />
           )
           : (
             <img
-              className="rounded-lg mobileMd:rounded-xl pixelart stamp-image aspect-square"
+              className="rounded-xl mobileMd:rounded-2xl pixelart stamp-image aspect-square"
               style={{
                 imageRendering: "pixelated",
               }}

@@ -32,7 +32,7 @@ export default function BlockSelector(props: BlockProps) {
       class={`${
         isSelected ? "bg-blue-100 text-gray-800" : "bg-gray-800 text-blue-100"
       } transition-all transform hover:shadow-xl
-        rounded-xl overflow-hidden flex flex-col justify-between p-3 mobileLg:p-4 m-2
+        rounded-2xl overflow-hidden flex flex-col justify-between p-3 mobileLg:p-4 m-2
         cursor-pointer hover:bg-gray-700 hover:text-blue-200`}
       onClick={handleClick}
     >
