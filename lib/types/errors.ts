@@ -1265,10 +1265,10 @@ export function createDefaultErrorFallback({
         "p-5 bg-red-50 border border-red-200 rounded-3xl max-w-md mx-auto",
       title: "text-lg font-semibold text-red-800 mb-2",
       message: "text-red-600 mb-4",
-      details: "text-xs text-red-500 mb-4 font-mono bg-red-100 p-2 rounded-xl",
+      details: "text-xs text-red-500 mb-4 font-mono bg-red-100 p-2 rounded-2xl",
       errorId: "text-xs text-red-500 mb-4",
       button:
-        "px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors",
+        "px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors",
       ...customStyles,
     };
 

@@ -213,7 +213,7 @@ export function showFallback(element: HTMLElement) {
   const fallback = document.createElement("img");
   fallback.src = NOT_AVAILABLE_IMAGE;
   fallback.alt = "Content not available";
-  fallback.className = "w-full h-full object-contain rounded-xl pixelart";
+  fallback.className = "w-full h-full object-contain rounded-2xl pixelart";
 
   if (element instanceof HTMLIFrameElement) {
     element.style.display = "none";

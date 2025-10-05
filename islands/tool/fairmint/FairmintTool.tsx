@@ -121,7 +121,7 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
             ? (
               // Render the select dropdown if fairminters are available
               <select
-                class="h-10 p-3 rounded-xl bg-[#999999] text-black placeholder:text-black placeholder:font-light"
+                class="h-10 p-3 rounded-2xl bg-[#999999] text-black placeholder:text-black placeholder:font-light"
                 value={formState.asset}
                 onChange={handleAssetChange}
               >
@@ -149,7 +149,7 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
               <input
                 type="text"
                 placeholder="ENTER ASSET"
-                class="h-10 p-3 rounded-xl bg-[#999999] text-black placeholder:text-black placeholder:font-light"
+                class="h-10 p-3 rounded-2xl bg-[#999999] text-black placeholder:text-black placeholder:font-light"
                 value={formState.asset}
                 onChange={(e) => handleInputChange(e, "asset")}
               />
@@ -158,7 +158,7 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
           <input
             type="number"
             placeholder="QUANTITY"
-            class="h-10 p-3 rounded-xl bg-[#999999] text-black placeholder:text-black placeholder:font-light"
+            class="h-10 p-3 rounded-2xl bg-[#999999] text-black placeholder:text-black placeholder:font-light"
             value={formState.quantity}
             onChange={(e) => handleInputChange(e, "quantity")}
           />
@@ -257,7 +257,7 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
 
         {/* ===== 🚨 FEE ESTIMATION ERROR HANDLING ===== */}
         {feeEstimationError && (
-          <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-xl">
+          <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-2xl">
             <div className="flex items-center justify-between">
               <span className="text-red-700 text-sm">
                 Fee estimation error: {feeEstimationError}

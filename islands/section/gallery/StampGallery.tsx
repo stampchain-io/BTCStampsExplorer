@@ -238,7 +238,7 @@ export default function StampGallery({
                 [...Array(displayCount)].map((_, index) => {
                   const skeletonClasses = useLoadingSkeleton(
                     isLoading,
-                    "aspect-square rounded-xl",
+                    "aspect-square rounded-2xl",
                   );
                   return (
                     <div
