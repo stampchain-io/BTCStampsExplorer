@@ -11,7 +11,7 @@ const inputFieldHeight = "h-10";
 const inputFieldWidth = "!w-10";
 
 // Input field styles - focus values must be same as glassmorphismL2Hover
-const inputFieldStyle = `p-3 w-full
+const inputFieldStyle = `px-5 w-full
   ${glassmorphismL2} ${glassmorphismL2Hover}
   focus:bg-[#080708]/60 focus:border-[#242424] focus:outline-none focus-visible:outline-none no-outline ${transitionColors}
   font-medium text-sm text-stamp-grey-light
@@ -28,7 +28,7 @@ export const inputField = `
 export const inputFieldSquare = `
   ${inputField}
   ${inputFieldWidth}
-  text-center
+  !px-0.5 text-center
 `;
 
 // Outline input - most styling of this input field is done in the outlineGradient constant
@@ -45,14 +45,14 @@ export const inputTextarea = `
 // Input field dropdown - define height in the component
 export const inputFieldDropdown = `
 absolute top-[100%] left-0 w-full z-[60]
-bg-gradient-to-b from-[#080708]/20 to-[#080708] backdrop-blur-sm
-border border-t-0 border-[#1b1b1b]/80 rounded-b-xl
+bg-gradient-to-b from-[#080708]/30 to-[#080708] backdrop-blur-sm
+border border-t-0 border-[#242424]/75 rounded-b-xl
 text-stamp-grey-light text-sm font-medium uppercase leading-none
 overflow-y-auto scrollbar-glassmorphism-slim shadow-lg cursor-pointer`;
 
 export const inputFieldDropdownHover = `
 flex justify-between py-2.5 px-3
-border-b-[1px] border-[#1b1b1b]/80 last:border-b-0
+border-b-[1px] border-[#242424] last:border-b-0
 ${glassmorphismL2Hover} ${transitionColors} uppercase cursor-pointer`;
 
 // Checkbox - used for both checkboxes and radiobuttons
@@ -130,16 +130,16 @@ export const grey = `
 */
 /* ===== GRADIENT INPUT STYLES =====
 export const outlineGradient = `
-  relative !bg-[#141015] !p-[1px] rounded-xl !border-0
-  before:absolute before:inset-0 before:rounded-xl before:z-[1]
+  relative !bg-[#141015] !p-[1px] rounded-2xl !border-0
+  before:absolute before:inset-0 before:rounded-2xl before:z-[1]
   before:bg-[conic-gradient(from_var(--angle),var(--color-dark),var(--color-medium),var(--color-light),var(--color-medium),var(--color-dark))]
   before:[--angle:0deg] before:animate-rotate
   hover:before:bg-[conic-gradient(from_var(--angle),var(--color-light),var(--color-light),var(--color-light),var(--color-light),var(--color-light))]
   focus-within:before:bg-[conic-gradient(from_var(--angle),var(--color-light),var(--color-light),var(--color-light),var(--color-light),var(--color-light))]
   before:transition-colors before:duration-300
-  [&>*]:relative [&>*]:z-[2] [&>*]:rounded-xl [&>*]:bg-[#141015]
-  [&>div]:flex [&>div]:justify-between [&>div]:relative [&>div]:z-[2] [&>div]:!bg-[#141015] [&>div]:placeholder:!bg-[#141015] [&>div]:rounded-xl
-  [&>div>input]:${inputFieldHeight} [&>div>input]:w-full [&>div>input]:bg-transparent [&>div>input]:rounded-xl [&>div>input]:pl-5
+  [&>*]:relative [&>*]:z-[2] [&>*]:rounded-2xl [&>*]:bg-[#141015]
+  [&>div]:flex [&>div]:justify-between [&>div]:relative [&>div]:z-[2] [&>div]:!bg-[#141015] [&>div]:placeholder:!bg-[#141015] [&>div]:rounded-2xl
+  [&>div>input]:${inputFieldHeight} [&>div>input]:w-full [&>div>input]:bg-transparent [&>div>input]:rounded-2xl [&>div>input]:pl-5
   [&>div>input]:font-normal [&>div>input]:text-base [&>div>input]:text-stamp-grey-light
   [&>div>input]:placeholder:font-light [&>div>input]:placeholder:!text-stamp-grey
   [&>div>input]:!outline-none [&>div>input]:focus-visible:!outline-none [&>div>input]:focus:!bg-[#1e191e]

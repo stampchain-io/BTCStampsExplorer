@@ -1,6 +1,6 @@
-/* ===== Modified version of vanta topology background animation ===== */
-/* https://www.vantajs.com/?effect=topology */
-/* https://cdn.jsdelivr.net/npm/vanta@0.5.24/dist/vanta.topology.min.js */
+/* ===== Modified version of Vanta Topology background animation ===== */
+/* Source: https://www.vantajs.com/?effect=topology */
+/* Version: vanta@0.5.24 (topology) */
 
 !(function (e, t) {
     "object" == typeof exports && "object" == typeof module ? (module.exports = t()) : "function" == typeof define && define.amd ? define([], t) : "object" == typeof exports ? (exports._vantaEffect = t()) : (e._vantaEffect = t());
@@ -44,17 +44,21 @@
             constructor(e = {}) {
                 if (!o) return !1;
                 (r.current = this),
+                    (this.windowMouseMoveWrapper = this.windowMouseMoveWrapper.bind(this)),
+                    (this.windowTouchWrapper = this.windowTouchWrapper.bind(this)),
+                    (this.windowGyroWrapper = this.windowGyroWrapper.bind(this)),
                     (this.resize = this.resize.bind(this)),
                     (this.animationLoop = this.animationLoop.bind(this)),
                     (this.restart = this.restart.bind(this));
                 const t = "function" == typeof this.getDefaultOptions ? this.getDefaultOptions() : this.defaultOptions;
                 if (
-                    ((this.options = Object.assign({
-                        minHeight: 200,     // *** MINIMUM CANVAS HEIGHT (pixels) ***
-                        minWidth: 200,      // *** MINIMUM CANVAS WIDTH (pixels) ***
-                        scale: 0.75,        // *** DESKTOP SCALE FACTOR (1.0 = normal size) ***
-                        scaleMobile: 0.75   // *** MOBILE SCALE FACTOR ***
-                    }, t)),
+                    /* === BASIC SIZING (defaults) ===
+                     * minHeight: 200   // minimum canvas height (px)
+                     * minWidth: 200    // minimum canvas width (px)
+                     * scale: 1         // desktop scale factor (1.0 = normal)
+                     * scaleMobile: 1   // mobile scale factor
+                     */
+                    ((this.options = Object.assign({ mouseControls: !0, touchControls: !0, gyroControls: !1, minHeight: 200, minWidth: 200, scale: 1, scaleMobile: 1 }, t)),
                     (e instanceof HTMLElement || "string" == typeof e) && (e = { el: e }),
                     Object.assign(this.options, e),
                     this.options.THREE && (n = this.options.THREE),
@@ -77,13 +81,16 @@
                         void (this.options.backgroundColor && (console.log("[VANTA] Falling back to backgroundColor"), (this.el.style.background = s(this.options.backgroundColor))))
                     );
                 }
-                this.resize(), this.animationLoop();
+                this.initMouse(), this.resize(), this.animationLoop();
                 const a = window.addEventListener;
                 a("resize", this.resize),
-                    window.requestAnimationFrame(this.resize);
+                    window.requestAnimationFrame(this.resize),
+                    this.options.mouseControls && (a("scroll", this.windowMouseMoveWrapper), a("mousemove", this.windowMouseMoveWrapper)),
+                    this.options.touchControls && (a("touchstart", this.windowTouchWrapper), a("touchmove", this.windowTouchWrapper)),
+                    this.options.gyroControls && a("deviceorientation", this.windowGyroWrapper);
             }
             setOptions(e = {}) {
-                Object.assign(this.options, e);
+                Object.assign(this.options, e), this.triggerMouseMove();
             }
             prepareEl() {
                 let e, t;
@@ -117,6 +124,36 @@
                 const e = this.getCanvasElement();
                 return !!e && e.getBoundingClientRect();
             }
+            windowMouseMoveWrapper(e) {
+                const t = this.getCanvasRect();
+                if (!t) return !1;
+                const s = e.clientX - t.left,
+                    i = e.clientY - t.top;
+                s >= 0 && i >= 0 && s <= t.width && i <= t.height && ((this.mouseX = s), (this.mouseY = i), this.options.mouseEase || this.triggerMouseMove(s, i));
+            }
+            windowTouchWrapper(e) {
+                const t = this.getCanvasRect();
+                if (!t) return !1;
+                if (1 === e.touches.length) {
+                    const s = e.touches[0].clientX - t.left,
+                        i = e.touches[0].clientY - t.top;
+                    s >= 0 && i >= 0 && s <= t.width && i <= t.height && ((this.mouseX = s), (this.mouseY = i), this.options.mouseEase || this.triggerMouseMove(s, i));
+                }
+            }
+            windowGyroWrapper(e) {
+                const t = this.getCanvasRect();
+                if (!t) return !1;
+                const s = Math.round(2 * e.alpha) - t.left,
+                    i = Math.round(2 * e.beta) - t.top;
+                s >= 0 && i >= 0 && s <= t.width && i <= t.height && ((this.mouseX = s), (this.mouseY = i), this.options.mouseEase || this.triggerMouseMove(s, i));
+            }
+            triggerMouseMove(e, t) {
+                void 0 === e && void 0 === t && (this.options.mouseEase ? ((e = this.mouseEaseX), (t = this.mouseEaseY)) : ((e = this.mouseX), (t = this.mouseY))),
+                    this.uniforms && ((this.uniforms.iMouse.value.x = e / this.scale), (this.uniforms.iMouse.value.y = t / this.scale));
+                const s = e / this.width,
+                    i = t / this.height;
+                "function" == typeof this.onMouseMove && this.onMouseMove(s, i);
+            }
             setSize() {
                 this.scale || (this.scale = 1),
                     "undefined" != typeof navigator && (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 600) && this.options.scaleMobile
@@ -124,6 +161,10 @@
                         : this.options.scale && (this.scale = this.options.scale),
                     (this.width = Math.max(this.el.offsetWidth, this.options.minWidth)),
                     (this.height = Math.max(this.el.offsetHeight, this.options.minHeight));
+            }
+            initMouse() {
+                ((!this.mouseX && !this.mouseY) || (this.mouseX === this.options.minWidth / 2 && this.mouseY === this.options.minHeight / 2)) &&
+                    ((this.mouseX = this.width / 2), (this.mouseY = this.height / 2), this.triggerMouseMove(this.mouseX, this.mouseY));
             }
             resize() {
                 this.setSize(),
@@ -147,6 +188,11 @@
                 }
                 return (
                     (this.prevNow = e),
+                    this.options.mouseEase &&
+                        ((this.mouseEaseX = this.mouseEaseX || this.mouseX || 0),
+                        (this.mouseEaseY = this.mouseEaseY || this.mouseY || 0),
+                        Math.abs(this.mouseEaseX - this.mouseX) + Math.abs(this.mouseEaseY - this.mouseY) > 0.1 &&
+                            ((this.mouseEaseX += 0.05 * (this.mouseX - this.mouseEaseX)), (this.mouseEaseY += 0.05 * (this.mouseY - this.mouseEaseY)), this.triggerMouseMove(this.mouseEaseX, this.mouseEaseY))),
                     (this.isOnScreen() || this.options.forceAnimate) &&
                         ("function" == typeof this.onUpdate && this.onUpdate(),
                         this.scene && this.camera && (this.renderer.render(this.scene, this.camera), this.renderer.setClearColor(this.options.backgroundColor, this.options.backgroundAlpha)),
@@ -165,7 +211,12 @@
             destroy() {
                 "function" == typeof this.onDestroy && this.onDestroy();
                 const e = window.removeEventListener;
-                e("resize", this.resize),
+                e("touchstart", this.windowTouchWrapper),
+                    e("touchmove", this.windowTouchWrapper),
+                    e("scroll", this.windowMouseMoveWrapper),
+                    e("mousemove", this.windowMouseMoveWrapper),
+                    e("deviceorientation", this.windowGyroWrapper),
+                    e("resize", this.resize),
                     window.cancelAnimationFrame(this.req);
                 const t = this.scene;
                 t && t.children && i(t), this.renderer && (this.renderer.domElement && this.el.removeChild(this.renderer.domElement), (this.renderer = null), (this.scene = null)), r.current === this && (r.current = null);
@@ -195,10 +246,12 @@
         let l = "object" == typeof window && window.p5;
         class d extends p {
             static initClass() {
-                (this.prototype.p5 = !0), (this.prototype.defaultOptions = {
-                  color: 8913100,        // *** 8913100 = #8800cc (light purple) ***
-                  backgroundColor: 0     // *** 0 = #000000 (black) ***
-                });
+                (this.prototype.p5 = !0),
+                    /* === VISUAL COLORS (defaults) ===
+                     * color: "#8800cc"   // light purple
+                     * backgroundColor: "#000000" // black
+                     */
+                    (this.prototype.defaultOptions = { color: "#440066", backgroundColor: "#000000" });
             }
             constructor(e) {
                 (l = e.p5 || l), super(e);
@@ -235,10 +288,10 @@
                             t.smooth(),
                             t.noStroke(),
                             (function () {
-                                // *** PARTICLE COUNT ***
-                                // Controls the number of flowing particles in the topology - update the code below too
+                                // === PARTICLE COUNT ===
+                                // Controls number of flowing particles in the topology
                                 // Default: 4500 particles
-                                for (let e = 0; e < 500; e++) {
+                                for (let e = 0; e < 2000; e++) {
                                     let s = t.random(t.width + 200),
                                         i = t.random(t.height + 200);
                                     a.push({ prev: t.createVector(s, i), pos: t.createVector(s, i), vel: t.createVector(0, 0), acc: t.createVector(0, 0), col: t.random(255), seed: e });
@@ -255,49 +308,48 @@
                         (t.draw = function () {
                             t.translate(-100, -100),
                                 (function () {
-                                    // This number should match the particle count above
-                                    for (let i = 0; i < 500; i++) {
+                                    // This number should match the particle count set in setup()
+                                    for (let i = 0; i < 2000; i++) {
                                         let o = a[i],
                                             n = ((e = o.pos.x), (s = o.pos.y), (e = t.constrain(e, 0, t.width + 200)), (s = t.constrain(s, 0, t.height + 200)), h[t.floor(s / 10)][t.floor(e / 10)]);
                                         (o.prev.x = o.pos.x),
                                             (o.prev.y = o.pos.y),
                                             (o.pos.x = d(o.pos.x + o.vel.x, t.width + 200)),
                                             (o.pos.y = d(o.pos.y + o.vel.y, t.height + 200)),
-                                            // *** PARTICLE MOVEMENT SPEED ***
+                                            // === PARTICLE MOVEMENT SPEED ===
                                             // Controls how fast particles move through the topology
                                             // Default: mult(2.2)
-                                            o.vel.add(o.acc).normalize().mult(4.5),
+                                            o.vel.add(o.acc).normalize().mult(4.7),
                                             (o.acc = t.createVector(0, 0)),
-                                            // *** FLOW FIELD RESPONSE STRENGTH ***
+                                            // === FLOW FIELD RESPONSE STRENGTH ===
                                             // Controls how strongly particles respond to the flow field
                                             // Default: mult(3)
-                                            o.acc.add(n).mult(2.7);
+                                            o.acc.add(n).mult(2.5);
                                     }
                                     var e, s;
                                 })(),
                                 (function () {
-                                    // *** LINE THICKNESS ***
-                                    // Controls the thickness of the connecting lines between particles
+                                    // === LINE THICKNESS ===
+                                    // Controls thickness of connecting lines between particles
                                     // Default: strokeWeight(1)
                                     t.strokeWeight(1),
+                                        // === LINE OPACITY/TRANSPARENCY ===
+                                        // Controls how visible/transparent the connecting lines are
+                                        // Default alpha: 0.05
                                         t.stroke(
-                                            ((e, t = 2) => {
+                                            ((e, t = 1) => {
                                                 const i = s(e),
                                                     o = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(i),
                                                     n = o ? { r: parseInt(o[1], 16), g: parseInt(o[2], 16), b: parseInt(o[3], 16) } : null;
                                                 return "rgba(" + n.r + "," + n.g + "," + n.b + "," + t + ")";
-                                            // *** LINE OPACITY/TRANSPARENCY ***
-                                            // Controls how visible/transparent the connecting lines are
-                                            // Default: 0.05
-                                            })(e.options.color, 0.02)
+                                            })(e.options.color, 0.05)
                                         );
                                     for (let e = 0; e < a.length; e++) l.Vector.dist(a[e].prev, a[e].pos) < 10 && t.line(a[e].prev.x, a[e].prev.y, a[e].pos.x, a[e].pos.y);
                                 })(),
-                                // *** FLOW FIELD EVOLUTION SPEED ***
+                                // === FLOW FIELD EVOLUTION SPEED ===
                                 // Controls how fast the underlying flow field changes over time
-                                // This creates the "flowing" effect of the topology
                                 // Default: c += 0.002
-                                (c += 0.2);
+                                (c += 0.01);
                         });
                 });
             }
@@ -311,23 +363,23 @@
 /*
  * CUSTOMIZABLE VARIABLES (default values):
  *
- * === BASIC SIZING (Line ~50) ===
+ * === BASIC SIZING ===
  * minHeight: 200
  * minWidth: 200
  * scale: 1
  * scaleMobile: 1
  *
- * === VISUAL COLORS (Line ~247) ===
- * color: 3670090 (0x38004a purple)
+ * === VISUAL COLORS ===
+ * color: 8913100 (0x8800cc purple)
  * backgroundColor: 0 (0x000000 black)
  *
- * === PARTICLE SYSTEM (Lines ~290 & ~308) ===
+ * === PARTICLE SYSTEM ===
  * Particle count: 4500 (in both loops)
  *
  * === ANIMATION BEHAVIOR ===
- * Particle speed: mult(2.2) - Line ~318
- * Flow field strength: mult(3) - Line ~323
- * Line thickness: strokeWeight(1) - Line ~331
- * Line opacity: 0.05 - Line ~341
- * Flow animation speed: c += 0.002 - Line ~349
+ * Particle speed: mult(2.2)
+ * Flow field strength: mult(3)
+ * Line thickness: strokeWeight(1)
+ * Line opacity: 0.05
+ * Flow animation speed: c += 0.002
  */
