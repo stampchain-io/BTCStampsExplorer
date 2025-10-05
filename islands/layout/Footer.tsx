@@ -47,8 +47,9 @@ const mobileLinks: FooterLink[] = [
     href:
       "https://drive.google.com/drive/folders/18QsMTZ_ZII5FVxuAs2CLFoLdZE3NOdlT",
     isExternal: true,
+    hiddenOnMobile: true,
   },
-  { title: "TERMS", href: "/termsofservice", hiddenOnMobile: true },
+  { title: "TERMS", href: "/termsofservice" },
 ];
 
 /* ===== SOCIAL MEDIA CONFIGURATION ===== */
@@ -213,10 +214,12 @@ export function Footer() {
 
           {/* ===== MOBILE BOTTOM ROW SECTION ===== */}
           {/* ===== MIXED LINKS  ===== */}
-          <div class="flex tablet:hidden w-[360px] mobileMd:w-full justify-center mobileMd:justify-start mx-auto mt-3 mobileMd:mt-2 mb-2 mobileMd:mb-0">
+          <div class="flex tablet:hidden w-full justify-center mobileMd:justify-start mx-auto mt-3 mobileMd:mt-2 mb-2 mobileMd:mb-0 overflow-hidden">
             {/* ===== BASE/MOBILESM: EVENLY DISTRIBUTED LINKS ===== */}
-            <div class="flex mobileMd:hidden flex-row w-full justify-between">
-              {mobileLinks.map((link) => (
+            <div class="flex mobileMd:hidden flex-row flex-wrap w-full justify-center items-center mx-auto gap-6">
+              {mobileLinks.filter((link) => !link.hiddenOnMobile).map((
+                link,
+              ) => (
                 <a
                   key={link.href}
                   href={link.href}

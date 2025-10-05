@@ -156,7 +156,7 @@
             }
             setSize() {
                 this.scale || (this.scale = 1),
-                    "undefined" != typeof navigator && (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 600) && this.options.scaleMobile
+                    "undefined" != typeof navigator && (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768) && this.options.scaleMobile
                         ? (this.scale = this.options.scaleMobile)
                         : this.options.scale && (this.scale = this.options.scale),
                     (this.width = Math.max(this.el.offsetWidth, this.options.minWidth)),
@@ -250,8 +250,13 @@
                     /* === VISUAL COLORS (defaults) ===
                      * color: "#8800cc"   // light purple
                      * backgroundColor: "#000000" // black
+                     * colorPalette: array of colors that randomly alternate
                      */
-                    (this.prototype.defaultOptions = { color: "#440066", backgroundColor: "#000000" });
+                    (this.prototype.defaultOptions = {
+                        color: "#440066",
+                        backgroundColor: "#000000",
+                        colorPalette: ["#8800cc", "#000000", "#440066", "#000000", "#450045"]
+                    });
             }
             constructor(e) {
                 (l = e.p5 || l), super(e);
@@ -290,11 +295,15 @@
                             (function () {
                                 // === PARTICLE COUNT ===
                                 // Controls number of flowing particles in the topology
-                                // Default: 4500 particles
-                                for (let e = 0; e < 2000; e++) {
+                                // Mobile: 1000 particles, Tablet/Desktop: 4000 particles
+                                const isMobile = "undefined" != typeof navigator && (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768);
+                                c = isMobile ? 1000 : 4000;
+                                const colorPalette = e.options.colorPalette || ["#8800cc", "#000000", "#440066", "#000000", "#450045"];
+                                for (let e = 0; e < c; e++) {
                                     let s = t.random(t.width + 200),
                                         i = t.random(t.height + 200);
-                                    a.push({ prev: t.createVector(s, i), pos: t.createVector(s, i), vel: t.createVector(0, 0), acc: t.createVector(0, 0), col: t.random(255), seed: e });
+                                    const randomColor = colorPalette[t.floor(t.random(colorPalette.length))];
+                                    a.push({ prev: t.createVector(s, i), pos: t.createVector(s, i), vel: t.createVector(0, 0), acc: t.createVector(0, 0), col: t.random(255), color: randomColor, seed: e });
                                 }
                             })(),
                             (function () {
@@ -308,8 +317,7 @@
                         (t.draw = function () {
                             t.translate(-100, -100),
                                 (function () {
-                                    // This number should match the particle count set in setup()
-                                    for (let i = 0; i < 2000; i++) {
+                                    for (let i = 0; i < a.length; i++) {
                                         let o = a[i],
                                             n = ((e = o.pos.x), (s = o.pos.y), (e = t.constrain(e, 0, t.width + 200)), (s = t.constrain(s, 0, t.height + 200)), h[t.floor(s / 10)][t.floor(e / 10)]);
                                         (o.prev.x = o.pos.x),
@@ -324,7 +332,7 @@
                                             // === FLOW FIELD RESPONSE STRENGTH ===
                                             // Controls how strongly particles respond to the flow field
                                             // Default: mult(3)
-                                            o.acc.add(n).mult(2.5);
+                                            o.acc.add(n).mult(3.3);
                                     }
                                     var e, s;
                                 })(),
@@ -332,19 +340,24 @@
                                     // === LINE THICKNESS ===
                                     // Controls thickness of connecting lines between particles
                                     // Default: strokeWeight(1)
-                                    t.strokeWeight(1),
-                                        // === LINE OPACITY/TRANSPARENCY ===
-                                        // Controls how visible/transparent the connecting lines are
-                                        // Default alpha: 0.05
-                                        t.stroke(
-                                            ((e, t = 1) => {
-                                                const i = s(e),
-                                                    o = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(i),
-                                                    n = o ? { r: parseInt(o[1], 16), g: parseInt(o[2], 16), b: parseInt(o[3], 16) } : null;
-                                                return "rgba(" + n.r + "," + n.g + "," + n.b + "," + t + ")";
-                                            })(e.options.color, 0.05)
-                                        );
-                                    for (let e = 0; e < a.length; e++) l.Vector.dist(a[e].prev, a[e].pos) < 10 && t.line(a[e].prev.x, a[e].prev.y, a[e].pos.x, a[e].pos.y);
+                                    t.strokeWeight(1);
+                                    // Helper function to convert hex to rgba
+                                    const hexToRgba = (hexColor, alpha = 1) => {
+                                        const i = s(hexColor),
+                                            o = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(i),
+                                            n = o ? { r: parseInt(o[1], 16), g: parseInt(o[2], 16), b: parseInt(o[3], 16) } : null;
+                                        return "rgba(" + n.r + "," + n.g + "," + n.b + "," + alpha + ")";
+                                    };
+                                    // === LINE OPACITY/TRANSPARENCY ===
+                                    // Controls how visible/transparent the connecting lines are
+                                    // Default alpha: 0.05
+                                    // Draw each particle's line with its own color
+                                    for (let e = 0; e < a.length; e++) {
+                                        if (l.Vector.dist(a[e].prev, a[e].pos) < 10) {
+                                            t.stroke(hexToRgba(a[e].color, 0.05));
+                                            t.line(a[e].prev.x, a[e].prev.y, a[e].pos.x, a[e].pos.y);
+                                        }
+                                    }
                                 })(),
                                 // === FLOW FIELD EVOLUTION SPEED ===
                                 // Controls how fast the underlying flow field changes over time
@@ -361,7 +374,7 @@
 );
 
 /*
- * CUSTOMIZABLE VARIABLES (default values):
+ * CUSTOMIZABLE VARIABLES (current values):
  *
  * === BASIC SIZING ===
  * minHeight: 200
@@ -370,16 +383,26 @@
  * scaleMobile: 1
  *
  * === VISUAL COLORS ===
- * color: 8913100 (0x8800cc purple)
- * backgroundColor: 0 (0x000000 black)
+ * color: "#440066" (dark purple) - legacy single color
+ * backgroundColor: "#000000" (black)
+ * colorPalette: ["#8800cc", "#000000", "#440066", "#000000", "#450045"]
+ *   Array of 5 colors for random alternation - each particle randomly assigned one color at creation
+ *   Colors breakdown:
+ *     - #8800cc: bright purple (20% chance)
+ *     - #000000: black - appears twice (40% chance total)
+ *     - #440066: dark purple (20% chance)
+ *     - #450045: dark magenta (20% chance)
  *
  * === PARTICLE SYSTEM ===
- * Particle count: 4500 (in both loops)
+ * Particle count: Dynamic based on device
+ *   Mobile/Tablet: 2000 particles
+ *   Desktop: 4000 particles
+ *   Detection: user agent check + window width < 768px
  *
  * === ANIMATION BEHAVIOR ===
- * Particle speed: mult(2.2)
- * Flow field strength: mult(3)
+ * Particle speed: mult(4.7) - controls particle movement speed through topology
+ * Flow field strength: mult(2.5) - controls particle response to flow field
  * Line thickness: strokeWeight(1)
- * Line opacity: 0.05
- * Flow animation speed: c += 0.002
+ * Line opacity: 0.05 - transparency of connecting lines between particles
+ * Flow animation speed: c += 0.01 - speed of underlying flow field evolution
  */
