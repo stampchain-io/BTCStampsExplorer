@@ -36,7 +36,7 @@ export default function HowToPage() {
             src="/img/how-tos/createleatherwallet/00.png"
             width="100%"
             alt="Create, setup and install Bitcoin Leather wallet"
-            class="rounded-xl"
+            class="rounded-2xl"
           />
           <div class="flex flex-col desktop:col-span-2 gap-2">
             <h2 class={`${headingGrey} mb-2`}>CREATE A LEATHER WALLET</h2>
@@ -67,7 +67,7 @@ export default function HowToPage() {
             src="/img/how-tos/connectleatherwallet/00.png"
             width="100%"
             alt="Connect your Bitcoin Leather wallet to the Stampchain website"
-            class="block tablet:order-last rounded-xl"
+            class="block tablet:order-last rounded-2xl"
           />
           <div class="flex flex-col desktop:col-span-2 gap-2">
             <h2 class={`${headingGrey} mb-2`}>CONNECT YOUR LEATHER WALLET</h2>
@@ -98,7 +98,7 @@ export default function HowToPage() {
             src="/img/how-tos/deploy/00.png"
             width="100%"
             alt="Deploy a SRC-20 token on Bitcoin"
-            class="rounded-xl"
+            class="rounded-2xl"
           />
           <div class="flex flex-col desktop:col-span-2 gap-2">
             <h2 class={`${headingGrey} mb-2`}>DEPLOY YOUR OWN TOKEN</h2>
@@ -129,7 +129,7 @@ export default function HowToPage() {
             src="/img/how-tos/mintsrc20/00.png"
             width="100%"
             alt="How to mint a SRC-20 Bitcoin stamps token"
-            class="block tablet:order-last rounded-xl"
+            class="block tablet:order-last rounded-2xl"
           />
           <div class="flex flex-col desktop:col-span-2 gap-2">
             <h2 class={`${headingGrey} mb-2`}>MINT YOUR TOKEN</h2>
@@ -159,7 +159,7 @@ export default function HowToPage() {
             src="/img/how-tos/stamping/00.png"
             width="100%"
             alt="Guide on how to create NFTs on Bitcoin using the stamps protocol"
-            class="rounded-xl"
+            class="rounded-2xl"
           />
           <div class="flex flex-col desktop:col-span-2 gap-2">
             <h2 class={`${headingGrey} mb-2`}>CREATE A STAMP</h2>

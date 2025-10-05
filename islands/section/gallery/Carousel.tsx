@@ -93,7 +93,7 @@ export default function CarouselGallery(props: CarouselHomeProps) {
                   width="100%"
                   height="100%"
                   scrolling="no"
-                  class="object-contain cursor-pointer desktop:min-w-[408px] tablet:min-w-[269px] mobileLg:min-w-[200px] mobileMd:min-w-[242px] min-w-[150px] rounded-xl aspect-square"
+                  class="object-contain cursor-pointer desktop:min-w-[408px] tablet:min-w-[269px] mobileLg:min-w-[200px] mobileMd:min-w-[242px] min-w-[150px] rounded-2xl aspect-square"
                   sandbox="allow-scripts allow-same-origin"
                   src={src}
                   loading="lazy"
@@ -122,7 +122,7 @@ export default function CarouselGallery(props: CarouselHomeProps) {
                   <img
                     src={ERROR_IMAGE}
                     alt="Invalid SVG"
-                    class="object-contain cursor-pointer desktop:min-w-[408px] tablet:min-w-[269px] mobileLg:min-w-[200px] mobileMd:min-w-[242px] min-w-[150px] rounded-xl"
+                    class="object-contain cursor-pointer desktop:min-w-[408px] tablet:min-w-[269px] mobileLg:min-w-[200px] mobileMd:min-w-[242px] min-w-[150px] rounded-2xl"
                     onLoad={handleLoad}
                   />
                 </a>
@@ -172,7 +172,7 @@ export default function CarouselGallery(props: CarouselHomeProps) {
           <div class="swiper-wrapper">
             {[...Array(5)].map((_, i) => (
               <div class="swiper-slide" key={`skeleton-${i}`}>
-                <div class="loading-skeleton rounded-2xl h-full min-h-[150px] mobileMd:min-h-[242px] mobileLg:min-h-[200px] tablet:min-h-[269px] desktop:min-h-[408px]" />
+                <div class="loading-skeleton rounded-3xl h-full min-h-[150px] mobileMd:min-h-[242px] mobileLg:min-h-[200px] tablet:min-h-[269px] desktop:min-h-[408px]" />
               </div>
             ))}
           </div>
@@ -196,14 +196,14 @@ export default function CarouselGallery(props: CarouselHomeProps) {
                   data-hash={stamp.tx_hash}
                 >
                   <a target="_top" href={`/stamp/${stamp.tx_hash}`}>
-                    <div class="hover-gradient hover:bg-stamp-purple-bright hover:shadow-stamp p-0.5 rounded-2xl">
-                      <div class="relative min-h-[150px] mobileMd:min-h-[242px] mobileLg:min-h-[200px] tablet:min-h-[269px] desktop:min-h-[408px] p-[6px] mobileMd:p-[12px] desktop:p-[18px] rounded-2xl bg-stamp-card-bg hover:bg-black">
+                    <div class="hover-gradient hover:bg-stamp-purple-bright hover:shadow-stamp p-0.5 rounded-3xl">
+                      <div class="relative min-h-[150px] mobileMd:min-h-[242px] mobileLg:min-h-[200px] tablet:min-h-[269px] desktop:min-h-[408px] p-[6px] mobileMd:p-[12px] desktop:p-[18px] rounded-3xl bg-stamp-card-bg hover:bg-black">
                         {validatedContent[stamp.tx_hash] || (
                           <img
                             src={stampSources[stamp.tx_hash] || stamp.stamp_url}
                             alt={`Stamp #${stamp.stamp}`}
                             loading="lazy"
-                            class="object-contain cursor-pointer desktop:min-w-[408px] tablet:min-w-[269px] mobileLg:min-w-[200px] mobileMd:min-w-[242px] min-w-[150px] rounded-xl pixelart stamp-image"
+                            class="object-contain cursor-pointer desktop:min-w-[408px] tablet:min-w-[269px] mobileLg:min-w-[200px] mobileMd:min-w-[242px] min-w-[150px] rounded-2xl pixelart stamp-image"
                             onLoad={handleLoad}
                           />
                         )}
@@ -223,7 +223,7 @@ export default function CarouselGallery(props: CarouselHomeProps) {
                                 </h3>
                               </div>
                               <div class="hidden mobileLg:flex justify-between items-end w-full flex-1 px-1 desktop:px-3 pb-1.5 desktop:pb-2">
-                                <h3 class="hidden desktop:block font-black text-2xl gray-gradient1 desktop:text-left">
+                                <h3 class="hidden desktop:block font-black text-3xl gray-gradient1 desktop:text-left">
                                   <span class="font-light text-stamp-grey-light">
                                     #
                                   </span>

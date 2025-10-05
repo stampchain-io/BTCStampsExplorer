@@ -9,8 +9,8 @@ export function HoldersTable({ holders = [] }: HoldersTableProps) {
   /* ===== EMPTY STATE ===== */
   if (!holders?.length) {
     return (
-      <div class="flex flex-col bg-gradient-to-br primary-gradient p-6 relative rounded-xl">
-        <div class="text-center py-10">No holder data available</div>
+      <div class={containerBackground}>
+        <div class="text-center py-10">NO HOLDER DATA AVAILABLE</div>
       </div>
     );
   }
