@@ -228,7 +228,7 @@ const HoldersTableBase = (
               {[...Array(6)].map((_, index) => (
                 <div
                   key={index}
-                  class="loading-skeleton running w-full rounded-xl h-[34px]"
+                  class="loading-skeleton running w-full rounded-2xl h-[34px]"
                 />
               ))}
             </div>

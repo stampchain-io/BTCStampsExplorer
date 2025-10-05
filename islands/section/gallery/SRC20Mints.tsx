@@ -79,8 +79,8 @@ export default function SRC20MintsGallery() {
             {[...Array(6)].map((_, index) => (
               <div
                 key={index}
-                class={`loading-skeleton running w-full rounded-xl ${
-                  index === 0 ? "h-[34px]" : "h-[54px]"
+                class={`loading-skeleton running w-full rounded-2xl ${
+                  index === 0 ? "h-[34px]" : "h-[56px]"
                 }`}
               />
             ))}

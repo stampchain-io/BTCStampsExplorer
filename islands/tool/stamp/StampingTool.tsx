@@ -2000,7 +2000,7 @@ function StampingToolMain({ config }: { config: Config }) {
             <button
               type="button"
               onClick={switchToStandardMode}
-              class={`px-4 py-2 ${glassmorphism} bg-gradient-to-br from-purple-600/80 to-purple-700/80 text-white text-sm rounded-xl hover:from-purple-600 hover:to-purple-700 transition-colors font-semibold`}
+              class={`px-4 py-2 ${glassmorphism} bg-gradient-to-br from-purple-600/80 to-purple-700/80 text-white text-sm rounded-2xl hover:from-purple-600 hover:to-purple-700 transition-colors font-semibold`}
             >
               Switch to Standard
             </button>
@@ -2067,7 +2067,7 @@ function StampingToolMain({ config }: { config: Config }) {
                 onChange={(e) => handleIssuanceChange(e)}
                 error={issuanceError}
                 textAlign="center"
-                class="!w-10"
+                class="!w-10 !px-2"
               />
             </div>
           </div>
@@ -2099,6 +2099,7 @@ function StampingToolMain({ config }: { config: Config }) {
                 weight="normal"
                 size="xs"
                 color="greyDark"
+                className="mb-0.5"
               />
             </div>
           </div>
@@ -2132,6 +2133,7 @@ function StampingToolMain({ config }: { config: Config }) {
                 weight="normal"
                 size="xs"
                 color="greyDark"
+                className="mb-0.5"
               />
               <div
                 class={`${tooltipButton} ${

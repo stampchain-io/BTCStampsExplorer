@@ -45,7 +45,7 @@ function PartnerCard({ name, largeImage, smallImage, url }: Partner) {
         isHovered
           ? `border-stamp-grey ${shadowGlowGrey}`
           : "border-stamp-grey-darker"
-      } rounded-xl`}
+      } rounded-2xl`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -53,12 +53,12 @@ function PartnerCard({ name, largeImage, smallImage, url }: Partner) {
       <img
         src={largeImage}
         alt=""
-        class="hidden mobileMd:block w-full invisible rounded-xl"
+        class="hidden mobileMd:block w-full invisible rounded-2xl"
       />
       <img
         src={smallImage}
         alt=""
-        class="block mobileMd:hidden w-full invisible rounded-xl"
+        class="block mobileMd:hidden w-full invisible rounded-2xl"
       />
 
       {/* ===== DISPLAY IMAGES ===== */}
@@ -66,7 +66,7 @@ function PartnerCard({ name, largeImage, smallImage, url }: Partner) {
         src={largeImage}
         alt={`${name} banner`}
         loading="lazy"
-        class={`hidden mobileMd:block absolute inset-0 w-full cursor-pointer transition-all duration-50 rounded-xl ${
+        class={`hidden mobileMd:block absolute inset-0 w-full cursor-pointer transition-all duration-50 rounded-2xl ${
           isHovered ? "grayscale-0" : "grayscale"
         }`}
       />
@@ -74,14 +74,14 @@ function PartnerCard({ name, largeImage, smallImage, url }: Partner) {
         src={smallImage}
         alt={`${name} banner`}
         loading="lazy"
-        class={`block mobileMd:hidden absolute inset-0 w-full cursor-pointer transition-all duration-50 rounded-xl ${
+        class={`block mobileMd:hidden absolute inset-0 w-full cursor-pointer transition-all duration-50 rounded-2xl ${
           isHovered ? "grayscale-0" : "grayscale"
         }`}
       />
 
       {/* ===== GRADIENT OVERLAY ===== */}
       <div
-        class={`w-full h-full bg-gradient-to-tr from-[#666666FF] via-[#9999997F] to-[#CCCCCC00] absolute left-0 top-0 transition-opacity duration-50 rounded-xl ${
+        class={`w-full h-full bg-gradient-to-tr from-[#666666FF] via-[#9999997F] to-[#CCCCCC00] absolute left-0 top-0 transition-opacity duration-50 rounded-2xl ${
           isHovered ? "!hidden" : ""
         }`}
       />

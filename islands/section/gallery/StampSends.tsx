@@ -45,7 +45,7 @@ export default function StampSendsGallery({
             [...Array(5)].map((_, index) => (
               <div
                 key={index}
-                class="aspect-square rounded-xl bg-gray-200 animate-pulse"
+                class="aspect-square rounded-2xl bg-gray-200 animate-pulse"
               />
             ))
           )}

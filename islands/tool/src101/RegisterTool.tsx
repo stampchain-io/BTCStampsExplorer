@@ -271,7 +271,7 @@ export function SRC101RegisterTool({
           {/* TLD Dropdown InputField - styled like glassmorphismL2/Hover */}
           <div class="relative w-[64px]" ref={tldDropdownRef}>
             <div
-              class={`h-10 px-4 border-[1px] border-[#1b1b1b]/80 rounded-xl
+              class={`h-10 px-4 border-[1px] border-[#242424]/75 rounded-2xl
                 !bg-[#080708]/60 ${glassmorphismL2Hover}
                 font-semibold text-sm text-stamp-grey text-right backdrop-blur-sm hover:text-stamp-grey-light tracking-wider ${transitionAll} focus-visible:!outline-none cursor-pointer flex items-center justify-end ${
                 openTldDropdown && !isSelectingTld ? "input-open-bottom" : ""
@@ -383,7 +383,7 @@ export function SRC101RegisterTool({
 
         {/* ===== 🚨 FEE ESTIMATION ERROR HANDLING ===== */}
         {feeEstimationError && (
-          <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-xl">
+          <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-2xl">
             <div className="flex items-center justify-between">
               <span className="text-red-700 text-sm">
                 Fee estimation error: {feeEstimationError}

@@ -81,7 +81,7 @@ export default function SRC20DeploysGallery(): JSX.Element {
             {[...Array(5)].map((_, index) => (
               <div
                 key={index}
-                class="loading-skeleton running aspect-square rounded-xl"
+                class="loading-skeleton running aspect-square rounded-2xl"
               />
             ))}
           </div>
