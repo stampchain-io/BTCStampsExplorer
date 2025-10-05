@@ -58,7 +58,7 @@ export function FilterButton(
         name="filter"
         weight="normal"
         size="smR"
-        color="purple"
+        color="greyDark"
         onClick={() => {
           setOpen(!open);
           setIsTooltipVisible(false);

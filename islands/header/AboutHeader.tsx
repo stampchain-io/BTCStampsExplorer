@@ -1,6 +1,6 @@
 /* ===== ABOUT HEADER COMPONENT ===== */
 import { containerBackground } from "$layout";
-import { subtitlePurple, text, textLg, titlePurpleLD } from "$text";
+import { subtitleGrey, text, textLg, titleGreyLD } from "$text";
 
 /* ===== COMPONENT ===== */
 export default function AboutHeader() {
@@ -8,15 +8,12 @@ export default function AboutHeader() {
     <section class={containerBackground}>
       <div class="flex flex-col">
         {/* ===== HEADER SECTION ===== */}
-        <h1 class={titlePurpleLD}>ABOUT</h1>
-        <h2 class={subtitlePurple}>STAMPCHAIN</h2>
+        <h1 class={titleGreyLD}>ABOUT</h1>
+        <h2 class={subtitleGrey}>STAMPCHAIN</h2>
 
         {/* ===== INTRODUCTION SECTION ===== */}
         <p class={textLg}>
-          The{" "}
-          <span class="text-stamp-purple-highlight">
-            Bitcoin Stamps meta-protocol
-          </span>{" "}
+          The <b>Bitcoin Stamps meta-protocol</b>{" "}
           was conceived by Mike In Space, a maverick figure in the Bitcoin and
           Counterparty community with deep roots in underground memetic culture.
           While others saw Bitcoin's UTXO model as just a ledger, Mike glimpsed
@@ -38,8 +35,7 @@ export default function AboutHeader() {
           temporary Post-it notes.
         </p>
         <p class={text}>
-          The introduction of{" "}
-          <span class="text-stamp-purple-highlight">SRC-20 tokens</span>{" "}
+          The introduction of <b>SRC-20 tokens</b>{" "}
           marked a watershed moment, proving that Bitcoin Stamps could do more
           than just store data—it could breathe new life into the entire
           ecosystem. In a delightful twist of fate, the success of this
@@ -49,9 +45,9 @@ export default function AboutHeader() {
         </p>
         <p class={text}>
           Today,{" "}
-          <span class="text-stamp-purple-highlight">
+          <b>
             Bitcoin Stamps stands as an immutable testament to human ingenuity
-          </span>, combining Bitcoin's unshakeable security with groundbreaking
+          </b>, combining Bitcoin's unshakeable security with groundbreaking
           on-chain capabilities. Every stamp is a story, every transaction a
           timestamp in the grand narrative of human creativity, preserved
           forever in the most enduring medium mankind has ever devised.

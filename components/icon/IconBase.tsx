@@ -252,7 +252,7 @@ export function BadgeIcon({ text, className = "" }: BadgeVariants) {
         absolute top-[-4px] left-[-12px] z-10
         size-5 rounded-full
         font-bold text-[10px] text-stamp-grey group-hover:text-black tracking-wider
-        bg-stamp-purple group-hover:bg-stamp-purple-bright
+        bg-stamp-grey-darker group-hover:bg-stamp-grey
         transition-all duration-200 cursor-pointer
         ${text === "0" ? "opacity-0" : "opacity-100"}
         ${className}
