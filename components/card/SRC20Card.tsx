@@ -1,6 +1,6 @@
 import { cellAlign, colGroup } from "$components/layout/types.ts";
 import { SSRSafeUrlBuilder } from "$components/navigation/SSRSafeUrlBuilder.tsx";
-import { Icon } from "$icon";
+import { Icon, PlaceholderImage } from "$icon";
 import ChartWidget from "$islands/layout/ChartWidget.tsx";
 import {
   cellCenterCard,
@@ -303,13 +303,10 @@ export function SRC20Card({
                 // 1. Use deploy_img if provided (for deploy operations: https://stampchain.io/stamps/{deploy_tx}.svg)
                 // 2. Use stamp_url if provided (for transaction stamps: https://stampchain.io/stamps/{tx_hash}.svg)
                 // 3. Fallback to constructing URL from deploy_tx if available
-                // 4. Final fallback to placeholder image
+                // 4. Final fallback to null (will render PlaceholderImage component)
                 const imageUrl = src20.deploy_img ||
                   src20.stamp_url ||
-                  (src20.deploy_tx
-                    ? constructStampUrl(src20.deploy_tx)
-                    : null) ||
-                  "/img/placeholder/stamp-no-image.svg";
+                  (src20.deploy_tx ? constructStampUrl(src20.deploy_tx) : null);
 
                 return (
                   <tr
@@ -345,16 +342,30 @@ export function SRC20Card({
                       } ${cellLeftCard} ${cellStickyLeft}`}
                     >
                       <div class="flex items-center gap-4">
-                        <img
-                          src={imageUrl}
-                          class="w-7 h-7 rounded cursor-pointer"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation(); // Prevent row click
-                            onImageClick?.(imageUrl);
-                          }}
-                          alt={unicodeEscapeToEmoji(src20.tick ?? "")}
-                        />
+                        {imageUrl
+                          ? (
+                            <img
+                              src={imageUrl}
+                              class="w-7 h-7 rounded cursor-pointer"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation(); // Prevent row click
+                                onImageClick?.(imageUrl);
+                              }}
+                              alt={unicodeEscapeToEmoji(src20.tick ?? "")}
+                            />
+                          )
+                          : (
+                            <div
+                              class="w-7 h-7 rounded cursor-pointer overflow-hidden"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation(); // Prevent row click
+                              }}
+                            >
+                              <PlaceholderImage variant="no-image" />
+                            </div>
+                          )}
                         <div class="flex flex-col">
                           <div class="font-bold text-base uppercase tracking-wide">
                             {(() => {

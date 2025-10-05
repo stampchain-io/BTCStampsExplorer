@@ -2,8 +2,7 @@
 import type { DispenserRow as Dispenser, StampRow } from "$types/stamp.d.ts";
 
 import { PaginationButtons } from "$button";
-import { NOT_AVAILABLE_IMAGE } from "$constants";
-import { Icon, LoadingIcon } from "$icon";
+import { Icon, LoadingIcon, PlaceholderImage } from "$icon";
 import { SettingsButton } from "$islands/button/SettingsButton.tsx";
 import { SortButton } from "$islands/button/SortButton.tsx";
 import FreshSRC20Gallery from "$islands/section/gallery/FreshSRC20Gallery.tsx";
@@ -212,15 +211,13 @@ function DispenserRow(
     ? "w-[146px] h-[146px]"
     : "w-[172px] h-[172px]";
   const [loading, setLoading] = useState(true);
-  const [src, setSrc] = useState("");
+  const [src, setSrc] = useState<string | null>(null);
 
   /* ===== IMAGE FETCHING ===== */
   const fetchStampImage = () => {
     setLoading(true);
     const res = getStampImageSrc(dispenser.stamp as StampRow);
-    if (res) {
-      setSrc(res);
-    } else setSrc(NOT_AVAILABLE_IMAGE);
+    setSrc(res);
     setLoading(false);
   };
 
@@ -246,19 +243,23 @@ function DispenserRow(
           <div class="relative p-[6px] mobileMd:p-3 bg-[#1F002E] rounded-2xl aspect-square">
             <div class="stamp-container absolute inset-0 flex items-center justify-center">
               <div class="relative z-10 w-full h-full">
-                {loading && !src ? <LoadingIcon /> : (
-                  <img
-                    width="100%"
-                    height="100%"
-                    loading="lazy"
-                    class="max-w-none w-full h-full object-contain rounded pixelart stamp-image"
-                    src={src}
-                    alt={`Stamp ${dispenser.stamp.stamp}`}
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = NOT_AVAILABLE_IMAGE;
-                    }}
-                  />
-                )}
+                {loading && !src ? <LoadingIcon /> : src
+                  ? (
+                    <img
+                      width="100%"
+                      height="100%"
+                      loading="lazy"
+                      class="max-w-none w-full h-full object-contain rounded pixelart stamp-image"
+                      src={src}
+                      alt={`Stamp ${dispenser.stamp.stamp}`}
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = "";
+                        (e.target as HTMLImageElement).alt =
+                          "Content not available";
+                      }}
+                    />
+                  )
+                  : <PlaceholderImage variant="no-image" />}
               </div>
             </div>
           </div>
