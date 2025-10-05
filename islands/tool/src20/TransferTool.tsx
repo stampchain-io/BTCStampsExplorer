@@ -53,10 +53,15 @@ export function SRC20TransferTool(
   const [searchResults, setSearchResults] = useState<Balance[]>([]);
   const [openDrop, setOpenDrop] = useState<boolean>(false);
   const [isSelecting, setIsSelecting] = useState(false);
+  // Animation state for dropdown
+  const [dropdownAnimation, setDropdownAnimation] = useState<
+    "enter" | "exit" | null
+  >(null);
 
   /* ===== REFS ===== */
   const dropdownRef = useRef<HTMLDivElement>(null);
   const tokenInputRef = useRef<HTMLInputElement>(null);
+  const animationTimeoutRef = useRef<number | null>(null);
 
   /* ===== WALLET CONTEXT ===== */
   const { wallet, isConnected } = walletContext;
@@ -121,6 +126,18 @@ export function SRC20TransferTool(
     }
   };
 
+  /* ===== DROPDOWN ANIMATION HANDLER ===== */
+  const closeDropdownWithAnimation = () => {
+    setDropdownAnimation("exit");
+    if (animationTimeoutRef.current) {
+      clearTimeout(animationTimeoutRef.current);
+    }
+    animationTimeoutRef.current = setTimeout(() => {
+      setOpenDrop(false);
+      setDropdownAnimation(null);
+    }, 200); // Match animation duration
+  };
+
   /* ===== CLICK OUTSIDE HANDLER ===== */
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -128,7 +145,7 @@ export function SRC20TransferTool(
         dropdownRef.current &&
         !dropdownRef.current.contains(event.target as Node)
       ) {
-        setOpenDrop(false);
+        closeDropdownWithAnimation();
       }
     }
 
@@ -138,9 +155,18 @@ export function SRC20TransferTool(
     };
   }, []);
 
+  /* ===== ANIMATION CLEANUP ===== */
+  useEffect(() => {
+    return () => {
+      if (animationTimeoutRef.current) {
+        clearTimeout(animationTimeoutRef.current);
+      }
+    };
+  }, []);
+
   /* ===== TOKEN SELECTION HANDLER ===== */
   const handleDropDown = (ticker: string, _amount: string) => {
-    setOpenDrop(false);
+    closeDropdownWithAnimation();
     setIsSelecting(true);
 
     const selectedBalance = balances.find((b) => b.tick === ticker);
@@ -172,12 +198,13 @@ export function SRC20TransferTool(
     if (!formState.token?.trim() && !isSelecting) {
       setSearchResults(balances);
       setOpenDrop(true);
+      setDropdownAnimation("enter");
     }
   };
 
   const handleTokenBlur = () => {
     setTimeout(() => {
-      setOpenDrop(false);
+      closeDropdownWithAnimation();
       setIsSelecting(false);
     }, 200);
   };
@@ -199,7 +226,12 @@ export function SRC20TransferTool(
       });
 
       setSearchResults(filteredResults);
-      setOpenDrop(filteredResults.length > 0);
+      if (filteredResults.length > 0) {
+        setOpenDrop(true);
+        setDropdownAnimation("enter");
+      } else {
+        closeDropdownWithAnimation();
+      }
     }, 300);
 
     return () => clearTimeout(delayDebounceFn);
@@ -258,6 +290,7 @@ export function SRC20TransferTool(
     if (newValue !== formState.token && !isSelecting) {
       handleInputChange(newValue, "token");
       setOpenDrop(true);
+      setDropdownAnimation("enter");
     }
   };
 
@@ -282,7 +315,7 @@ export function SRC20TransferTool(
 
       {/* ===== FORM  ===== */}
       <form
-        class={`${containerBackground} ${containerColForm} mb-6`}
+        class={`${containerBackground} ${containerColForm} mb-6 relative z-dropdown`}
         onSubmit={(e) => {
           e.preventDefault();
           handleSubmit();
@@ -313,9 +346,18 @@ export function SRC20TransferTool(
             />
 
             {/* Token Dropdown */}
-            {openDrop && searchResults.length > 0 && !isSelecting && (
+            {(openDrop || dropdownAnimation === "exit") &&
+              searchResults.length > 0 && !isSelecting && (
               <ul
-                class={`${inputFieldDropdown} max-h-[111px] min-[420px]:max-h-[74px]`}
+                class={`${inputFieldDropdown} max-h-[111px] min-[420px]:max-h-[74px]
+                ${
+                  dropdownAnimation === "exit"
+                    ? "dropdown-exit"
+                    : dropdownAnimation === "enter"
+                    ? "dropdown-enter"
+                    : ""
+                }
+              `}
                 role="listbox"
                 aria-label="Available tokens"
               >
