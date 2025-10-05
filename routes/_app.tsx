@@ -191,7 +191,7 @@ export default function App({ Component, state, url }: PageProps<unknown>) {
 
             .stamp-card-skeleton {
               aspect-ratio: 1;
-              border-radius: 0.75rem; /* rounded-xl */
+              border-radius: 1rem; /* rounded-2xl */
             }
 
             /* Match SRC20Section layout */
