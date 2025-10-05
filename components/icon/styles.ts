@@ -166,3 +166,50 @@ export const handleIcon = `
   [&::-moz-range-thumb]:hover:bg-stamp-grey-light [&::-moz-range-thumb]:cursor-grab
   [&::-moz-range-thumb]:active:cursor-grabbing [&::-moz-range-thumb]:border-0
 `;
+
+/* ===== PLACEHOLDER IMAGE ICON STYLES ===== */
+export type PlaceholderVariant = "no-image" | "audio" | "library" | "error";
+
+type Palette = { bg: string; stroke: string; fill: string };
+
+export const placeholderColor: Record<
+  "grey" | "red" | "green" | "orange",
+  Palette
+> = {
+  grey: {
+    bg: "bg-gradient-to-br from-[#666666]/75 via-[#333333]/75 to-[#000000]",
+    stroke: "stroke-stamp-grey-darker",
+    fill: "fill-stamp-grey-darker",
+  },
+  red: {
+    bg: "bg-gradient-to-br from-[#660000]/75 via-[#330000]/75 to-[#000000]",
+    stroke: "stroke-[#660000]",
+    fill: "fill-[#660000]",
+  },
+  green: {
+    bg: "bg-gradient-to-br from-[#006600]/75 via-[#003300]/75 to-[#000000]",
+    stroke: "stroke-[#006600]",
+    fill: "fill-[#006600]",
+  },
+  orange: {
+    bg: "bg-gradient-to-br from-[#662900]/75 via-[#331400]/75 to-[#000000]",
+    stroke: "stroke-[#662900]",
+    fill: "fill-[#662900]",
+  },
+};
+
+export const variantColor: Record<
+  PlaceholderVariant,
+  keyof typeof placeholderColor
+> = {
+  "no-image": "grey",
+  "audio": "orange",
+  "library": "green",
+  "error": "red",
+};
+
+export function placeholderPalette(variant: PlaceholderVariant): Palette {
+  const key = variantColor[variant];
+  if (!key) throw new Error(`Unknown placeholder variant: ${variant}`);
+  return placeholderColor[key];
+}
