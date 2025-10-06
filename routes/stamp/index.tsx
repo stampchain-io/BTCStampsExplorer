@@ -1,28 +1,22 @@
 /* ===== STAMP OVERVIEW PAGE ===== */
 
+import { FRONTEND_STAMP_TYPE_VALUES } from "$constants";
 import { StampOverviewContent } from "$content";
 import { Handlers } from "$fresh/server.ts";
-
-import { FRONTEND_STAMP_TYPE_VALUES } from "$constants";
 import { StampOverviewHeader } from "$header";
-import { headerSpacing } from "$layout";
+import { body } from "$layout";
 
 import {
   queryParamsToFilters,
-  queryParamsToServicePayload,
   StampFilters,
 } from "$islands/filter/FilterOptionsStamp.tsx";
 import type { StampPageProps } from "$types/api.d.ts";
 import type { StampRow, StampSaleRow } from "$types/stamp.d.ts";
 
-// ✅ PROPER SEPARATION: Use HTTP client for API calls
-import { FetchHttpClient } from "$server/interfaces/httpClient.ts";
+import { StampController } from "$server/controller/stampController.ts";
 
 /* ===== CONSTANTS ===== */
 const MAX_PAGE_SIZE = 120;
-
-// ✅ PROPER SEPARATION: Create httpClient instance
-const httpClient = new FetchHttpClient();
 
 /* ===== SERVER HANDLER ===== */
 export const handler: Handlers = {
@@ -195,47 +189,29 @@ export const handler: Handlers = {
           if (typeFilter !== "all") {
             /* ===== TYPE-BASED STAMP FILTERING ===== */
             try {
-              // Get filter and sort parameters from URL
-              const filterBy = url.searchParams.getAll("filterBy");
-
-              // Build stamps API parameters for type filtering
-              const params = new URLSearchParams({
-                page: page.toString(),
-                limit: page_size.toString(),
-                sortBy,
-                type: typeFilter, // Add type parameter for filtering
+              // Call StampController directly instead of HTTP request
+              const controllerResult = await StampController.getStamps({
+                page,
+                limit: page_size,
+                sortBy: sortBy as "ASC" | "DESC",
+                type: typeFilter as any,
+                url: url.toString(),
               });
 
-              if (filterBy.length > 0) {
-                params.set("filterBy", filterBy.join(","));
-              }
-
-              // Add other query parameters from filters
-              const queryParams = queryParamsToServicePayload(url.search);
-              Object.entries(queryParams).forEach(([key, value]) => {
-                if (value !== undefined && !params.has(key)) {
-                  params.set(key, value.toString());
-                }
-              });
-
-              const stampsResponse = await httpClient.get(
-                `${baseUrl}/api/v2/stamps?${params}`,
-              );
-
-              if (!stampsResponse.ok) {
-                throw new Error(
-                  `Stamps API error: ${stampsResponse.status} ${stampsResponse.statusText}`,
-                );
-              }
-
-              // Extract data (correct API response structure)
-              const apiData = stampsResponse.data || {};
               stampsData = {
-                data: apiData.data || [],
+                data: Array.isArray(controllerResult.data)
+                  ? controllerResult.data
+                  : [],
                 pagination: {
-                  total: apiData.total || 0,
-                  page: apiData.page || page,
-                  totalPages: apiData.totalPages || 0,
+                  total: "total" in controllerResult
+                    ? (controllerResult.total || 0)
+                    : 0,
+                  page: "page" in controllerResult
+                    ? (controllerResult.page || page)
+                    : page,
+                  totalPages: "totalPages" in controllerResult
+                    ? (controllerResult.totalPages || 0)
+                    : 0,
                 },
               };
 
@@ -258,16 +234,16 @@ export const handler: Handlers = {
             /* ===== DEFAULT: POSH COLLECTION ===== */
             let poshCollection = null;
             try {
-              const poshResponse = await httpClient.get(
-                `${baseUrl}/api/v2/collections/by-name/posh`,
+              // Import CollectionService to get collection directly
+              const { CollectionService } = await import(
+                "$server/services/core/collectionService.ts"
               );
-
-              if (poshResponse.ok) {
-                poshCollection = poshResponse.data?.data || poshResponse.data;
-              }
+              poshCollection = await CollectionService.getCollectionByName(
+                "posh",
+              );
             } catch (poshError) {
               console.error(
-                "[POSH Collection API Error]",
+                "[POSH Collection Service Error]",
                 (poshError as Error).message || "Unknown error",
               );
             }
@@ -275,47 +251,29 @@ export const handler: Handlers = {
             /* ===== STAMPS FOR COLLECTION ===== */
             if (poshCollection) {
               try {
-                // Get filter and sort parameters from URL
-                const filterBy = url.searchParams.getAll("filterBy");
-
-                // Build stamps API parameters
-                const params = new URLSearchParams({
-                  page: page.toString(),
-                  limit: page_size.toString(),
-                  sortBy,
+                // Call StampController directly instead of making HTTP request
+                const controllerResult = await StampController.getStamps({
+                  page,
+                  limit: page_size,
+                  sortBy: sortBy as "ASC" | "DESC",
                   collectionId: poshCollection.collection_id.toString(),
+                  url: url.toString(),
                 });
 
-                if (filterBy.length > 0) {
-                  params.set("filterBy", filterBy.join(","));
-                }
-
-                // Add other query parameters
-                const queryParams = queryParamsToServicePayload(url.search);
-                Object.entries(queryParams).forEach(([key, value]) => {
-                  if (value !== undefined && !params.has(key)) {
-                    params.set(key, value.toString());
-                  }
-                });
-
-                const stampsResponse = await httpClient.get(
-                  `${baseUrl}/api/v2/stamps?${params}`,
-                );
-
-                if (!stampsResponse.ok) {
-                  throw new Error(
-                    `Stamps API error: ${stampsResponse.status} ${stampsResponse.statusText}`,
-                  );
-                }
-
-                // Extract data (correct API response structure)
-                const apiData = stampsResponse.data || {};
                 stampsData = {
-                  data: apiData.data || [],
+                  data: Array.isArray(controllerResult.data)
+                    ? controllerResult.data
+                    : [],
                   pagination: {
-                    total: apiData.total || 0,
-                    page: apiData.page || page,
-                    totalPages: apiData.totalPages || 0,
+                    total: "total" in controllerResult
+                      ? (controllerResult.total || 0)
+                      : 0,
+                    page: "page" in controllerResult
+                      ? (controllerResult.page || page)
+                      : page,
+                    totalPages: "totalPages" in controllerResult
+                      ? (controllerResult.totalPages || 0)
+                      : 0,
                   },
                 };
               } catch (stampError) {
@@ -391,7 +349,7 @@ export function StampOverviewPage(props: StampPageProps) {
   /* ===== RENDER ===== */
   return (
     <div
-      class={`${headerSpacing} w-full`}
+      class={body}
       f-client-nav
       data-partial="/stamp"
     >
