@@ -1,12 +1,11 @@
-import type { SUBPROTOCOLS } from "$types/base.d.ts";
 /* ===== EXPLORER PAGE ===== */
-
 import { ExplorerContent } from "$content";
 import { Handlers } from "$fresh/server.ts";
+import { body } from "$layout";
+import type { SUBPROTOCOLS } from "$types/base.d.ts";
 
 import type { StampFilterType, StampType } from "$constants";
 import { ExplorerHeader } from "$header";
-import { headerSpacing } from "$layout";
 import { StampController } from "$server/controller/stampController.ts";
 import { CollectionService } from "$server/services/core/collectionService.ts";
 import type { StampPageProps } from "$types/api.d.ts";
@@ -126,7 +125,7 @@ export function ExplorerPage(props: StampPageProps) {
   /* ===== RENDER ===== */
   return (
     <div
-      class={`${headerSpacing} w-full`}
+      class={body}
       f-client-nav
       data-partial="/explorer"
     >

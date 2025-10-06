@@ -2,6 +2,7 @@
 /*@baba-149*/
 import { SRC20OverviewContent } from "$content";
 import { Handlers } from "$fresh/server.ts";
+import { body } from "$layout";
 
 /* ===== HELPER FUNCTIONS ===== */
 /**
@@ -250,7 +251,11 @@ export default function SRC20OverviewPage({ data }: any) {
   } = data;
 
   return (
-    <div f-client-nav data-partial="/src20">
+    <div
+      class={body}
+      f-client-nav
+      data-partial="/src20"
+    >
       <SRC20OverviewContent
         mintingData={mintingData}
         timeframe={timeframe}

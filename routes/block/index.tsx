@@ -4,8 +4,8 @@ import { Handlers, PageProps } from "$fresh/server.ts";
 import { BlockController } from "$server/controller/blockController.ts";
 import type { BlockRow } from "$types/base.d.ts";
 
-import { BlockHeader } from "$header";
 import { BlockSelector, BlockTransactions } from "$content";
+import { BlockHeader } from "$header";
 import { signal } from "@preact/signals";
 
 /* ===== TYPES ===== */
@@ -17,7 +17,7 @@ interface BlockIndexData {
 }
 
 import { body } from "$layout";
-import { subtitlePurple, textLg } from "$text";
+import { subtitleGrey, textLg } from "$text";
 
 /* ===== SERVER HANDLER ===== */
 export const handler: Handlers<BlockIndexData> = {
@@ -78,7 +78,7 @@ export default function BlockIndexPage({ data }: PageProps<BlockIndexData>) {
 
       {/* ===== PAGE TITLE ===== */}
       <div class="mb-6">
-        <h2 class={subtitlePurple}>
+        <h2 class={subtitleGrey}>
           CURRENT BLOCK
           <span class="font-bold ml-3">{data.lastBlock.toLocaleString()}</span>
         </h2>
@@ -90,7 +90,7 @@ export default function BlockIndexPage({ data }: PageProps<BlockIndexData>) {
       {/* ===== MAIN CONTENT ===== */}
       <div class="flex flex-col gap-6">
         <div class="flex flex-col gap-4">
-          <h3 class={subtitlePurple}>RELATED BLOCKS</h3>
+          <h3 class={subtitleGrey}>RELATED BLOCKS</h3>
           {data.relatedBlocks.map((block) => (
             <BlockSelector
               key={block.block_index}

@@ -1,16 +1,16 @@
 /* ===== COLLECTION OVERVIEW PAGE ===== */
 
+import { PaginationButtons } from "$button";
 import type { StampFilterType } from "$constants";
 import { StampOverviewContent } from "$content";
 import { FreshContext, Handlers, PageProps } from "$fresh/server.ts";
-import type { CollectionOverviewPageProps } from "$types/index.d.ts";
-
-import { PaginationButtons } from "$button";
 import { CollectionOverviewHeader } from "$header";
+import { body } from "$layout";
 import { CollectionDetailGallery } from "$section";
 import { CollectionController } from "$server/controller/collectionController.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { CollectionService } from "$server/services/core/collectionService.ts";
+import type { CollectionOverviewPageProps } from "$types/index.d.ts";
 
 /* ===== CONSTANTS ===== */
 const MAX_PAGE_SIZE = 120;
@@ -206,7 +206,7 @@ export default function CollectionOverviewPage(
 
   /* ===== COMPONENT ===== */
   return (
-    <div class="flex flex-col">
+    <div class={body}>
       <CollectionOverviewHeader />
       {collectionOverviewContent()}
     </div>

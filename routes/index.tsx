@@ -6,9 +6,9 @@ import type { StampRow, StampSaleRow } from "$types/stamp.d.ts";
 
 import { HomeHeader } from "$header";
 import {
+  body,
   containerBackground,
   gapSectionSlim,
-  headerSpacing,
   Micro5FontLoader,
 } from "$layout";
 import { ResponseUtil } from "$lib/utils/api/responses/responseUtil.ts";
@@ -303,7 +303,7 @@ export default function Home({ data }: PageProps<HomePageData>) {
 
       {/* ===== MAIN CONTENT ===== */}
       <div
-        class={`${headerSpacing} ${gapSectionSlim}`}
+        class={`${body} ${gapSectionSlim}`}
       >
         {/* ===== CRITICAL ABOVE FOLD CONTENT ===== */}
         <HomeHeader />
