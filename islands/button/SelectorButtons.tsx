@@ -1,3 +1,5 @@
+/* @baba - before:blur-sm is causing a flash of the pill before it is mounted */
+
 import { buttonStyles, color, state } from "$button";
 import { glassmorphism, transitionColors } from "$layout";
 import type { SelectorButtonsProps } from "$types/ui.d.ts";
@@ -21,18 +23,34 @@ export const SelectorButtons = ({
   className = "",
   disabled: disabledProp = false,
 }: SelectorButtonsProps) => {
-  const [selectedValue, setSelectedValue] = useState<string>(
-    value || defaultValue || options[0]?.value || "",
-  );
+  const [selectedValue, setSelectedValue] = useState<string>(() => {
+    // Use function form to ensure correct initial value on SSR/hydration
+    return value !== undefined
+      ? value
+      : (defaultValue || options[0]?.value || "");
+  });
   const [selectionTransform, setSelectionTransform] = useState(
     "translateX(0px)",
   );
+  const [isMounted, setIsMounted] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const optionRefs = useRef<(HTMLDivElement | null)[]>([]);
+  // Generate unique name for this instance to avoid radio button conflicts
+  const uniqueName = useRef(
+    `selector-${Math.random().toString(36).substr(2, 9)}`,
+  );
+  // Track the last prop value to detect actual changes (not navigation flickers)
+  const lastPropValue = useRef(value);
 
-  // Update internal state when controlled value changes
+  // Set mounted flag after initial render
   useEffect(() => {
-    if (value !== undefined) {
+    setIsMounted(true);
+  }, []);
+
+  // Update internal state when controlled value actually changes (not during navigation)
+  useEffect(() => {
+    if (value !== undefined && value !== lastPropValue.current) {
+      lastPropValue.current = value;
       setSelectedValue(value);
     }
   }, [value]);
@@ -78,7 +96,9 @@ export const SelectorButtons = ({
     const option = options.find((opt) => opt.value === optionValue);
     if (option?.disabled) return;
 
+    // Optimistic update - set both local state and ref to prevent flicker during navigation
     setSelectedValue(optionValue);
+    lastPropValue.current = optionValue;
     onChange?.(optionValue);
   }, [disabledProp, options, onChange]);
 
@@ -110,20 +130,33 @@ export const SelectorButtons = ({
         gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))`,
       }}
     >
-      {/* Selection button */}
-      <div
-        class={`!absolute top-0.5 bottom-0.5 z-10
-          ${buttonStyles.variant.glassmorphismColor}
-        `}
-        style={{
-          transform: selectionTransform,
-          width: `calc((100% - ${options.length * 4}px) / ${options.length})`,
-        }}
-      />
+      {/* Selection button - only render after mount to prevent SSR flash */}
+      {isMounted && (
+        <div
+          class={`!absolute top-0.5 bottom-0.5 z-10
+            ${buttonStyles.variant.glassmorphismColor}
+          `}
+          style={{
+            transform: selectionTransform,
+            width: `calc((100% - ${options.length * 4}px) / ${options.length})`,
+            transition: "transform 200ms ease-out",
+          }}
+        />
+      )}
 
       {/* Options */}
       {options.map((option, index) => {
         const optionDisabled = isOptionDisabled(option);
+        const isSelected = selectedValue === option.value;
+
+        // Compute label styling based on selection and mount state
+        const labelClass = isSelected
+          ? isMounted
+            ? `text-black ${transitionColors}` // After mount: fancy pill behind
+            : `text-black ${buttonStyles.variant.glassmorphismColor} !px-1 transition-none pointer-events-none` // Before mount: glassmorphism
+          : isMounted
+          ? `mx-0.5 bg-transparent text-[var(--color-text)] ${transitionColors} hover:text-[var(--color-text-hover)] hover:bg-[#1f1c1f]/50` // Unselected after mount
+          : "mx-0.5 bg-transparent text-[var(--color-text)] transition-none pointer-events-none"; // Unselected before mount
 
         return (
           <div
@@ -134,7 +167,7 @@ export const SelectorButtons = ({
               ${
               optionDisabled
                 ? state.disabled
-                : selectedValue === option.value
+                : isSelected
                 ? "cursor-default"
                 : "cursor-pointer"
             }
@@ -142,27 +175,28 @@ export const SelectorButtons = ({
           >
             <input
               type="radio"
-              id={`selector-${option.value}`}
-              name="selector-buttons"
+              id={`${uniqueName.current}-${option.value}`}
+              name={uniqueName.current}
               value={option.value}
-              checked={selectedValue === option.value}
+              checked={isSelected}
               disabled={optionDisabled}
               onChange={() => handleOptionChange(option.value)}
               class="absolute inset-0 w-full h-full opacity-0"
             />
             <label
-              for={`selector-${option.value}`}
+              for={`${uniqueName.current}-${option.value}`}
               class={`
                 relative flex items-center justify-center z-20 group
-                font-semibold text-center
-                ${transitionColors}
+                font-semibold text-center !rounded-full
                 ${buttonStyles.size[size]}
+                ${labelClass}
                 ${
-                selectedValue === option.value
-                  ? "text-black"
-                  : "mx-[1px] !rounded-full bg-transparent text-[var(--color-text)] hover:text-[var(--color-text-hover)] hover:bg-[#1f1c1f]/50"
+                optionDisabled
+                  ? state.disabled
+                  : isMounted
+                  ? "cursor-pointer"
+                  : ""
               }
-                ${optionDisabled ? state.disabled : "cursor-pointer"}
               `}
             >
               <span class="block relative z-20">

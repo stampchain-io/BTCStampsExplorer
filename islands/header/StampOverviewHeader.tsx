@@ -1,14 +1,17 @@
 /* ===== STAMP OVERVIEW HEADER COMPONENT ===== */
 /* TODO (@baba) - update filter and styling */
 import { SelectorButtons } from "$button";
+import type { FrontendStampType } from "$constants";
 import { FilterButton } from "$islands/button/FilterButton.tsx";
 import { SortButton } from "$islands/button/SortButton.tsx";
 import FilterDrawer from "$islands/filter/FilterDrawer.tsx";
 import {
   defaultFilters,
+  filtersToQueryParams,
   StampFilters as FilterStampFilters,
 } from "$islands/filter/FilterOptionsStamp.tsx";
 import { glassmorphism } from "$layout";
+import { safeNavigate } from "$lib/utils/navigation/freshNavigationUtils.ts";
 import { titleGreyLD } from "$text";
 import type { StampOverviewHeaderProps } from "$types/ui.d.ts";
 import { useCallback, useState } from "preact/hooks";
@@ -19,17 +22,37 @@ export const StampOverviewHeader = (
 ) => {
   /* ===== STATE MANAGEMENT ===== */
   const [isOpen1, setIsOpen1] = useState(false);
-  const [stampType, setStampType] = useState<string>("classic");
 
   /* ===== EVENT HANDLERS ===== */
   const handleOpen1 = (open: boolean) => {
     setIsOpen1(open);
   };
 
-  const handleStampTypeChange = useCallback((type: string) => {
-    setStampType(type);
-    // TODO(@baba): Implement stamp type filtering logic
-  }, []);
+  const handleStampTypeChange = useCallback(
+    (type: string) => {
+      // SSR-safe browser environment check
+      if (typeof globalThis === "undefined" || !globalThis?.location) {
+        return;
+      }
+
+      // Create updated filters with new stamp type
+      const updatedFilters: FilterStampFilters = {
+        ...currentFilters,
+        stampType: type as FrontendStampType,
+      };
+
+      // Convert filters to query params
+      const queryParams = filtersToQueryParams("", updatedFilters);
+
+      // Construct new URL
+      const newUrl = globalThis.location.pathname +
+        (queryParams ? `?${queryParams}` : "");
+
+      // Navigate immediately - page reloads with new data
+      safeNavigate(newUrl);
+    },
+    [currentFilters],
+  );
 
   /* ===== HELPER FUNCTION ===== */
   function countActiveStampFilters(filters: FilterStampFilters): number {
@@ -81,7 +104,7 @@ export const StampOverviewHeader = (
               { value: "posh", label: "POSH" },
               { value: "cursed", label: "CURSED" },
             ]}
-            value={stampType}
+            value={currentFilters.stampType || "classic"}
             onChange={handleStampTypeChange}
             size="smR"
             color="grey"

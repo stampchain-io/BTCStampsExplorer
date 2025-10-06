@@ -122,6 +122,7 @@ export const buttonStyles: ButtonVariants = {
     `,
     glassmorphismSelected: `
       ${baseGlassmorphism} ${baseGlassmorphismColor}
+      !items-center !justify-center
       bg-[#211c21]/10 border-[var(--color-border)]
       ${baseBefore} ${shadowL2}
       ${gradientOverlay}
@@ -129,6 +130,7 @@ export const buttonStyles: ButtonVariants = {
     `,
     glassmorphismDeselected: `
       ${baseGlassmorphism} ${baseGlassmorphismColor}
+      !items-center !justify-center
       bg-[#211c21]/10 border-[var(--color-border)]
       text-[var(--color-text)] before:bg-none
       hover:bg-[#211c21]/10 hover:!border-[var(--color-border)]
