@@ -1,5 +1,5 @@
 /* ===== ICON COMPONENT ===== */
-import * as iconPaths from "$components/icon/pathsHugeIcons.ts";
+import * as iconPaths from "$components/icon/paths.ts";
 import {
   BadgeVariants,
   globalSvgAttributes,

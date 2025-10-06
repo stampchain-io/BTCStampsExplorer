@@ -1,4 +1,4 @@
-export * from "$components/icon/pathsHugeIcons.ts";
+export * from "$components/icon/paths.ts";
 export * from "$components/icon/styles.ts";
 
 export * from "$components/icon/IconBase.tsx";
