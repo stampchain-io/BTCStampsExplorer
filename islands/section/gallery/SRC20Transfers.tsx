@@ -9,7 +9,7 @@ import {
   notificationHeading,
   notificationTextError,
 } from "$notification";
-import { subtitlePurple, titleGreyDL, titleGreyLD } from "$text";
+import { subtitleGrey, titleGreyDL, titleGreyLD } from "$text";
 import type { JSX } from "preact";
 import { useEffect, useState } from "preact/hooks";
 
@@ -68,7 +68,7 @@ export default function SRC20TransfersGallery(): JSX.Element {
       </div>
 
       {/* Show block title with loading state */}
-      <h3 class={`w-full tablet:text-right ${subtitlePurple}`}>
+      <h3 class={`w-full tablet:text-right ${subtitleGrey}`}>
         {isLoading ? <span class="animate-pulse">BLOCK #XXXXXX</span> : (
           transactions.length > 0 && `BLOCK #${transactions[0].block_index}`
         )}
