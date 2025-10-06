@@ -420,5 +420,5 @@ As outlined in [Issue #860](https://github.com/stampchain-io/BTCStampsExplorer/i
 
 ---
 
-**Last Updated:** October 4, 2025
+**Last Updated:** October 6, 2025
 **Author:** baba
