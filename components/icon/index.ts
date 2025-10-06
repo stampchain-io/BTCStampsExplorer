@@ -5,3 +5,4 @@ export * from "$components/icon/IconBase.tsx";
 
 export * from "$components/icon/CloseIcon.tsx";
 export { LoadingIcon } from "$components/icon/LoadingIcon.tsx";
+export { PlaceholderImage } from "$components/icon/PlaceholderImageIcon.tsx";

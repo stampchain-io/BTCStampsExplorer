@@ -295,9 +295,9 @@
                             (function () {
                                 // === PARTICLE COUNT ===
                                 // Controls number of flowing particles in the topology
-                                // Mobile: 1000 particles, Tablet/Desktop: 4000 particles
+                                // Mobile: 1000 particles, Tablet/Desktop: 3000 particles
                                 const isMobile = "undefined" != typeof navigator && (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768);
-                                c = isMobile ? 1000 : 4000;
+                                c = isMobile ? 1000 : 3000;
                                 const colorPalette = e.options.colorPalette || ["#8800cc", "#000000", "#440066", "#000000", "#450045"];
                                 for (let e = 0; e < c; e++) {
                                     let s = t.random(t.width + 200),
@@ -327,12 +327,12 @@
                                             // === PARTICLE MOVEMENT SPEED ===
                                             // Controls how fast particles move through the topology
                                             // Default: mult(2.2)
-                                            o.vel.add(o.acc).normalize().mult(4.7),
+                                            o.vel.add(o.acc).normalize().mult(6.7),
                                             (o.acc = t.createVector(0, 0)),
                                             // === FLOW FIELD RESPONSE STRENGTH ===
                                             // Controls how strongly particles respond to the flow field
                                             // Default: mult(3)
-                                            o.acc.add(n).mult(3.3);
+                                            o.acc.add(n).mult(4.3);
                                     }
                                     var e, s;
                                 })(),
@@ -395,8 +395,8 @@
  *
  * === PARTICLE SYSTEM ===
  * Particle count: Dynamic based on device
- *   Mobile/Tablet: 2000 particles
- *   Desktop: 4000 particles
+ *   Mobile/Tablet: 1000 particles
+ *   Desktop: 3000 particles
  *   Detection: user agent check + window width < 768px
  *
  * === ANIMATION BEHAVIOR ===
