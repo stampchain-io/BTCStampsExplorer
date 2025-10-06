@@ -183,6 +183,7 @@ export default {
       },
       spacing: {
         // CUSTOM SPACING
+        "3.5": "14px",
         "7.5": "30px",
 
         // PAGE GUTTERS (horizontal padding from screen edges to header, footer and body containers)
