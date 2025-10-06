@@ -4,8 +4,8 @@ import { Handlers, PageProps } from "$fresh/server.ts";
 import { BlockController } from "$server/controller/blockController.ts";
 import type { BlockRow } from "$types/base.d.ts";
 
-import { BlockHeader } from "$header";
 import { BlockSelector, BlockTransactions } from "$content";
+import { BlockHeader } from "$header";
 import { signal } from "@preact/signals";
 
 /* ===== TYPES ===== */
@@ -15,8 +15,8 @@ interface BlockPageData {
   error?: string;
 }
 
-import { subtitlePurple, textLg } from "$text";
 import { body } from "$layout";
+import { subtitleGrey, textLg } from "$text";
 
 /* ===== SERVER HANDLER ===== */
 export const handler: Handlers<BlockPageData> = {
@@ -75,7 +75,7 @@ export default function BlockPage({ data }: PageProps<BlockPageData>) {
 
       {/* ===== PAGE TITLE ===== */}
       <div class="mb-6">
-        <h2 class={subtitlePurple}>
+        <h2 class={subtitleGrey}>
           BLOCK{" "}
           {data.currentBlock?.block_index?.toLocaleString() || "Not Found"}
         </h2>
@@ -87,7 +87,7 @@ export default function BlockPage({ data }: PageProps<BlockPageData>) {
       {/* ===== MAIN CONTENT ===== */}
       <div class="flex flex-col gap-6">
         <div class="flex flex-col gap-4">
-          <h3 class={subtitlePurple}>RELATED BLOCKS</h3>
+          <h3 class={subtitleGrey}>RELATED BLOCKS</h3>
           {Array.isArray(data.relatedBlocks) && data.relatedBlocks.length > 0
             ? (
               data.relatedBlocks.map((block) => (

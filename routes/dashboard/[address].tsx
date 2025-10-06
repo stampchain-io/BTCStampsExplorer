@@ -6,7 +6,7 @@ import { Handlers } from "$fresh/server.ts";
 
 import { WalletDashboardHeader } from "$header";
 import WalletDashboardDetails from "$islands/content/WalletDashboardDetails.tsx";
-import { headerSpacing } from "$layout";
+import { body } from "$layout";
 import type { PaginatedResponse } from "$lib/types/pagination.d.ts";
 import { getBTCBalanceInfo } from "$lib/utils/data/processing/balanceUtils.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
@@ -329,7 +329,7 @@ export default function DashboardPage(props: { data: WalletPageProps }) {
   if (!routeData.walletData) {
     console.error("walletData is undefined in DashboardPage props:", props);
     return (
-      <div class={`${headerSpacing} gap-6`}>
+      <div class={`${body} gap-6`}>
         <WalletDashboardHeader />
         <div class="text-center text-red-500 p-8">
           Error: Unable to load wallet data. Please try again.
@@ -341,7 +341,7 @@ export default function DashboardPage(props: { data: WalletPageProps }) {
   /* ===== RENDER ===== */
   return (
     <div
-      class={`${headerSpacing} gap-6`}
+      class={`${body} gap-6`}
       f-client-nav
       data-partial="/dashboard"
     >
