@@ -6,13 +6,14 @@ The icon management system offers a light-weight versatile solution for handling
 
 ## Core Components
 
-- **styles.ts**: Style definitions for the icons
-- **paths.ts**: SVG paths for supported icons
+- **styles.ts**: Style definitions for the icons (includes placeholder palettes)
+- **pathsHugeIcons.ts**: SVG paths for HugeIcons set (includes placeholder paths)
+- **pathsPhosphorIcons.ts**: SVG paths for Phosphor icon set
 - **IconBase.tsx**: Handles icon selection and integration - combining styles with paths. Contains additional icon styles (e.g. BadgeIcon)
-- **Close/GearIcon/LoadingIcon.tsx**: More complex custom icons - using special styling, gradient or conditional logic for coloring
-- **index.ts**: Bullet loader file
+- **CloseIcon.tsx / LoadingIcon.tsx**: Custom icons with special styling or gradient effects
+- **PlaceholderImageIcon.tsx**: Component for rendering placeholder images (no-image, audio, library, error)
+- **index.ts**: Barrel export file
 - **doc.md**: This documentation
-- **MenuIcon.tsx**: Doesn't use the icon management system - it's a HTML/CSS icon and not SVG
 
 ## Integration
 
@@ -231,5 +232,136 @@ Now you can use the icon anywhere in the app:
 
 ---
 
-**Last Updated:** June 18, 2025
+## PlaceholderImage Component
+
+The `PlaceholderImage` component provides a unified system for rendering placeholder images throughout the app. It replaces the legacy approach of using static SVG files and string constants.
+
+### Overview
+
+The placeholder system uses inline SVG paths with dynamic styling, offering:
+- ✅ **Type Safety**: TypeScript types for all variants and palettes
+- ✅ **Consistency**: Matches HugeIcons and LoadingIcon styling
+- ✅ **Performance**: No external file requests, direct rendering
+- ✅ **Maintainability**: Single source of truth
+
+### Variants
+
+Four placeholder variants are available:
+
+- **`no-image`**: Grey palette - Default placeholder for missing/unavailable images
+- **`audio`**: Orange palette - Audio file placeholder
+- **`library`**: Green palette - Library/collection file placeholder
+- **`error`**: Red palette - Error state placeholder
+
+### Usage
+
+#### Basic Usage
+
+```tsx
+import { PlaceholderImage } from "$components/icon";
+
+<PlaceholderImage variant="no-image" />
+```
+
+#### Conditional Rendering Pattern
+
+```tsx
+{imageUrl ? (
+  <img src={imageUrl} alt="Stamp" />
+) : (
+  <PlaceholderImage variant="no-image" />
+)}
+```
+
+#### With Audio Content
+
+```tsx
+{isAudio ? (
+  <PlaceholderImage variant="audio" />
+) : (
+  <img src={contentUrl} alt="Content" />
+)}
+```
+
+### Component Structure
+
+**Location**: `components/icon/PlaceholderImageIcon.tsx`
+
+The component internally:
+1. Retrieves the appropriate palette from `placeholderPalette(variant)`
+2. Combines base paths (shared geometry) with variant-specific text paths
+3. Applies dynamic `stroke`, `fill`, and `bg` classes from the palette
+4. Renders inline SVG with proper styling
+
+### Palette System
+
+**Location**: `components/icon/styles.ts`
+
+Each variant has a defined palette:
+
+```typescript
+export const placeholderColor = {
+  grey: { bg: "bg-stamp-grey", stroke: "stroke-stamp-grey-dark", fill: "fill-stamp-grey-dark" },
+  red: { bg: "bg-stamp-red", stroke: "stroke-stamp-red-dark", fill: "fill-stamp-red-dark" },
+  green: { bg: "bg-stamp-green", stroke: "stroke-stamp-green-dark", fill: "fill-stamp-green-dark" },
+  orange: { bg: "bg-stamp-orange", stroke: "stroke-stamp-orange-dark", fill: "fill-stamp-orange-dark" },
+};
+
+export const variantColor = {
+  "no-image": "grey",
+  "audio": "orange",
+  "library": "green",
+  "error": "red",
+};
+```
+
+### SVG Paths
+
+**Location**: `components/icon/pathsHugeIcons.ts`
+
+- **`placeholderBasePaths`**: Shared SVG geometry (frame, container)
+- **`placeholderTextPaths`**: Variant-specific text converted to paths
+
+### Styling
+
+The component uses a consistent wrapper style:
+```typescript
+className="p-[25%] [stroke-width:0.5] w-full h-full"
+```
+
+This matches the styling of `HugeIcons` and `LoadingIcon` for visual consistency.
+
+### Migration from Legacy System
+
+**Before (Legacy)**:
+```tsx
+import { NOT_AVAILABLE_IMAGE, AUDIO_FILE_IMAGE } from "$constants/images";
+
+<img src={NOT_AVAILABLE_IMAGE} alt="Not available" />
+<img src={AUDIO_FILE_IMAGE} alt="Audio file" />
+```
+
+**After (Current)**:
+```tsx
+import { PlaceholderImage } from "$components/icon";
+
+<PlaceholderImage variant="no-image" />
+<PlaceholderImage variant="audio" />
+```
+
+### Utility Function Changes
+
+The `imageUtils.ts` functions now return `null` instead of placeholder constants:
+
+```typescript
+// Returns string | null (not string with placeholder constant)
+getStampImageSrc(stamp)    // null if no image available
+getSRC20ImageSrc(src20)    // null if no image available
+```
+
+Components check for `null` or falsy values and render `PlaceholderImage` accordingly.
+
+---
+
+**Last Updated:** October 5 2025
 **Author:** baba
