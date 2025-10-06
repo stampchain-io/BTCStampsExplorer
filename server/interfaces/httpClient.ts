@@ -326,9 +326,23 @@ export class FetchHttpClient implements HttpClient {
 
           lastError = error;
 
-          // If it's an abort error, don't retry
+          // If it's an abort error, don't retry. Log minimal info in dev.
           if (error.name === "AbortError") {
-            throw error;
+            try {
+              if (typeof Deno !== "undefined" && Deno?.env?.get("DENO_ENV") !== "production") {
+                console.warn("[HttpClient] Request aborted due to timeout", {
+                  url,
+                  method,
+                  timeoutMs: timeout,
+                });
+              }
+            } catch (_e) {
+              // no-op logging failure
+            }
+            // Convert AbortError to a standard Error with more context
+            const timeoutError = new Error(`Request timeout after ${timeout}ms: ${method} ${url}`);
+            timeoutError.name = "TimeoutError";
+            throw timeoutError;
           }
 
           // If it's not retryable or we've exhausted retries, throw

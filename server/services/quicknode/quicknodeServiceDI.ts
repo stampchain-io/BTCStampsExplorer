@@ -55,7 +55,7 @@ export interface NormalizedFeeEstimate {
 
 export interface MultipleFeeEstimates {
   fast: NormalizedFeeEstimate | null;    // 1-2 blocks
-  normal: NormalizedFeeEstimate | null;  // 6 blocks  
+  normal: NormalizedFeeEstimate | null;  // 6 blocks
   economy: NormalizedFeeEstimate | null; // 144 blocks
 }
 
@@ -64,7 +64,7 @@ const DEFAULT_CONFIG: Partial<QuicknodeConfig> = {
   fallbackApiUrl: "https://blockchain.info/api",
   maxRetries: 3,
   retryDelay: 1000,
-  requestTimeout: 30000,
+  requestTimeout: (typeof Deno !== "undefined" && Deno?.env?.get("DENO_ENV") !== "production") ? 60000 : 30000,
 };
 
 export class QuicknodeServiceDI {
@@ -72,7 +72,7 @@ export class QuicknodeServiceDI {
 
   constructor(private dependencies: QuicknodeServiceDependencies) {
     this.config = { ...DEFAULT_CONFIG, ...dependencies.config } as QuicknodeConfig;
-    
+
     // Validate required configuration
     if (!this.config.endpoint || !this.config.apiKey) {
       throw new Error("QuickNode API configuration is missing - endpoint and apiKey are required");
@@ -100,7 +100,7 @@ export class QuicknodeServiceDI {
         });
 
         const response = await this.makeRPCRequest<T>(method, params);
-        
+
         // Check for RPC-level errors
         if (response.error) {
           throw new Error(`RPC Error: ${response.error.message} (Code: ${response.error.code})`);
@@ -109,7 +109,7 @@ export class QuicknodeServiceDI {
         return response;
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
-        
+
         console.error(`[QuicknodeServiceDI] RPC attempt ${attempt + 1} failed:`, {
           error: lastError.message,
           method,
@@ -146,11 +146,11 @@ export class QuicknodeServiceDI {
   async getRawTx(txHash: string): Promise<string> {
     try {
       const response = await this.executeRPC<string>("getrawtransaction", [txHash, 0]);
-      
+
       if (!response.result) {
         return await this.fallbackGetRawTx(txHash);
       }
-      
+
       return response.result;
     } catch (error) {
       console.error(`[QuicknodeServiceDI] Error getting raw tx from QuickNode:`, error);
@@ -189,19 +189,19 @@ export class QuicknodeServiceDI {
   ): Promise<NormalizedFeeEstimate | null> {
     try {
       console.log(`[QuicknodeServiceDI] Estimating smart fee for ${confTarget} blocks (${estimateMode} mode)`);
-      
+
       const response = await this.executeRPC<EstimateSmartFeeResponse>(
         "estimatesmartfee",
         [confTarget, estimateMode]
       );
-      
+
       if (!response.result) {
         console.error("[QuicknodeServiceDI] estimatesmartfee: No result in response");
         return null;
       }
 
       const feeData = response.result;
-      
+
       // Check for errors in the response
       if (feeData.errors && feeData.errors.length > 0) {
         console.error("[QuicknodeServiceDI] estimatesmartfee errors:", feeData.errors);
@@ -219,10 +219,10 @@ export class QuicknodeServiceDI {
       // 1 kB = 1000 vB (virtual bytes)
       // Formula: (feerate_btc_per_kb * 100000000) / 1000
       const feeRateSatsPerVB = Math.round((feeData.feerate * 100000000) / 1000);
-      
+
       // Ensure minimum fee rate of 1 sat/vB
       const normalizedFeeRate = Math.max(feeRateSatsPerVB, 1);
-      
+
       // Determine confidence based on confirmation target
       let confidence: 'high' | 'medium' | 'low';
       if (confTarget <= 2) {
@@ -248,7 +248,7 @@ export class QuicknodeServiceDI {
       });
 
       return estimate;
-      
+
     } catch (error) {
       console.error("[QuicknodeServiceDI] estimateSmartFee failed:", {
         error: error instanceof Error ? error.message : String(error),
@@ -266,7 +266,7 @@ export class QuicknodeServiceDI {
   async getMultipleFeeEstimates(): Promise<MultipleFeeEstimates> {
     try {
       console.log("[QuicknodeServiceDI] Fetching multiple fee estimates");
-      
+
       // Fetch all estimates in parallel
       const [fastEstimate, normalEstimate, economyEstimate] = await Promise.all([
         this.estimateSmartFee(1, 'conservative'),  // Fast: 1 block, conservative
@@ -279,7 +279,7 @@ export class QuicknodeServiceDI {
         normal: normalEstimate,
         economy: economyEstimate
       };
-      
+
     } catch (error) {
       console.error("[QuicknodeServiceDI] getMultipleFeeEstimates failed:", error);
       return {
@@ -303,7 +303,7 @@ export class QuicknodeServiceDI {
    */
   private async makeRPCRequest<T>(method: string, params: any[]): Promise<QuicknodeRPCResponse<T>> {
     const url = this.getQuickNodeUrl();
-    
+
     const requestBody: QuicknodeRPCRequest = {
       id: 1,
       jsonrpc: "2.0",
@@ -320,12 +320,12 @@ export class QuicknodeServiceDI {
 
     if (!response.ok) {
       const errorMessage = response.data ? String(response.data) : `HTTP ${response.status}`;
-      
+
       // Check for client errors that shouldn't be retried
       if (response.status === 402 || (response.status >= 400 && response.status < 500)) {
         throw new Error(`Fatal QuickNode error: ${response.status} - ${errorMessage}`);
       }
-      
+
       throw new Error(`QuickNode HTTP error: ${response.status} - ${errorMessage}`);
     }
 
@@ -341,21 +341,21 @@ export class QuicknodeServiceDI {
     }
 
     console.log(`[QuicknodeServiceDI] Attempting fallback for transaction: ${txHash}`);
-    
+
     try {
       const fallbackUrl = `${this.config.fallbackApiUrl}/rawtx/${txHash}?format=hex`;
       const response = await this.dependencies.httpClient.get(fallbackUrl, {
         timeout: this.config.requestTimeout,
       });
-      
+
       if (!response.ok) {
         throw new Error(`Fallback API error: ${response.status}`);
       }
-      
+
       if (typeof response.data !== 'string') {
         throw new Error("Invalid fallback API response format");
       }
-      
+
       return response.data;
     } catch (error) {
       console.error(`[QuicknodeServiceDI] Fallback failed for tx:`, error);
@@ -368,10 +368,10 @@ export class QuicknodeServiceDI {
    */
   private getQuickNodeUrl(): string {
     const { endpoint, apiKey } = this.config;
-    
+
     // Ensure the endpoint doesn't already contain a protocol
     const formattedEndpoint = endpoint.replace(/^https?:\/\//, '');
-    
+
     // Return the properly formatted URL
     return `https://${formattedEndpoint}/${apiKey}`;
   }
@@ -435,7 +435,7 @@ export class MockQuicknodeProvider implements QuicknodeProvider {
 
     const key = `${method}:${JSON.stringify(params)}`;
     const mockResponse = this.mockResponses.get(key);
-    
+
     if (mockResponse) {
       return mockResponse;
     }
@@ -491,7 +491,7 @@ export class MockQuicknodeProvider implements QuicknodeProvider {
     const baseFee = 10; // Base 10 sats/vB
     const targetMultiplier = confTarget <= 2 ? 2 : confTarget <= 6 ? 1.5 : 1;
     const modeMultiplier = estimateMode === 'conservative' ? 1.2 : 1;
-    
+
     const feeRateSatsPerVB = Math.round(baseFee * targetMultiplier * modeMultiplier);
 
     return {

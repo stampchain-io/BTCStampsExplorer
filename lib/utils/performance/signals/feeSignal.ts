@@ -1,15 +1,15 @@
-import { signal } from "@preact/signals";
-import axiod from "axiod";
-import {
-  loadFeeData,
-  saveFeeData,
-} from "$lib/utils/performance/storage/localStorage.ts";
 import {
   recordFeeFailure,
   recordFeeSuccess,
 } from "$lib/utils/performance/fees/feeMonitoring.ts";
+import {
+  loadFeeData,
+  saveFeeData,
+} from "$lib/utils/performance/storage/localStorage.ts";
 import { getCSRFToken } from "$lib/utils/security/clientSecurityUtils.ts";
 import type { FeeState } from "$types/ui.d.ts";
+import { signal } from "@preact/signals";
+import axiod from "axiod";
 
 // Fee data interface matching the API response with enhanced metadata
 export interface FeeData {
@@ -99,7 +99,12 @@ function loadFeeDataFromStorage(): FeeData | null {
 }
 
 // Fetch fees from API with retry logic
+let inflight = false;
 const fetchFees = async (retryCount = 0): Promise<void> => {
+  if (inflight) {
+    return;
+  }
+  inflight = true;
   const startTime = Date.now();
 
   // Set loading state
@@ -118,14 +123,20 @@ const fetchFees = async (retryCount = 0): Promise<void> => {
       })`,
     );
 
-    // Get CSRF token for the request
-    const csrfToken = await getCSRFToken();
+    // In local dev, do not send CSRF for a GET request
+    const host = globalThis.location?.hostname || "";
+    const isLocal = host === "localhost" || host === "127.0.0.1" ||
+      host === "[::1]";
 
-    const response = await axiod.get<FeeData>("/api/internal/fees", {
-      headers: {
-        "X-CSRF-Token": csrfToken,
-      },
-    });
+    let headers: Record<string, string> | undefined = undefined;
+    if (!isLocal) {
+      const csrfToken = await getCSRFToken();
+      headers = { "X-CSRF-Token": csrfToken };
+    }
+
+    const response = headers
+      ? await axiod.get<FeeData>("/api/internal/fees", { headers })
+      : await axiod.get<FeeData>("/api/internal/fees");
 
     if (response.data && typeof response.data.recommendedFee === "number") {
       // Extract full fee data from response
@@ -263,6 +274,8 @@ const fetchFees = async (retryCount = 0): Promise<void> => {
       retryCount: 0, // Reset for next polling cycle
       lastKnownGoodData: feeSignal.value.lastKnownGoodData, // Preserve last known good
     };
+  } finally {
+    inflight = false;
   }
 };
 

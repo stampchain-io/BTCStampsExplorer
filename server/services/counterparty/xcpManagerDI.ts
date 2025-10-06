@@ -3,10 +3,10 @@
  * Enables better testing, flexibility, and maintainability
  */
 
-import type { HttpClient } from "$server/interfaces/httpClient.ts";
-import type { CacheService } from "$server/interfaces/cacheService.ts";
-import type { XcpBalance } from "$types/services.d.ts";
 import { SATS_PER_KB_MULTIPLIER } from "$constants";
+import type { CacheService } from "$server/interfaces/cacheService.ts";
+import type { HttpClient } from "$server/interfaces/httpClient.ts";
+import type { XcpBalance } from "$types/services.d.ts";
 
 // Core configuration interface
 export interface CounterpartyApiManagerConfig {
@@ -131,14 +131,14 @@ const DEFAULT_CONFIG: Partial<CounterpartyApiManagerConfig> = {
       url: "https://api.counterparty.io:4000/v2",
     },
     {
-      name: "dev.counterparty.io", 
+      name: "dev.counterparty.io",
       url: "https://api.counterparty.io:4000/v2",
     },
   ],
   defaultCacheTimeout: 300, // 5 minutes
   maxRetries: 3,
   retryDelay: 1000,
-  requestTimeout: 30000,
+  requestTimeout: (typeof Deno !== "undefined" && Deno?.env?.get("DENO_ENV") !== "production") ? 60000 : 30000,
 };
 
 export class CounterpartyApiManagerDI {
@@ -146,7 +146,7 @@ export class CounterpartyApiManagerDI {
 
   constructor(private dependencies: CounterpartyApiManagerDependencies) {
     this.config = { ...DEFAULT_CONFIG, ...dependencies.config } as CounterpartyApiManagerConfig;
-    
+
     // Validate configuration
     if (!this.config.nodes || this.config.nodes.length === 0) {
       throw new Error("XCP Manager configuration requires at least one node");
@@ -164,14 +164,14 @@ export class CounterpartyApiManagerDI {
     normalizedSatsPerKB: number;
   } {
     let normalizedSatsPerVB: number;
-    
+
     try {
       if (params.satsPerVB !== undefined) {
         normalizedSatsPerVB = params.satsPerVB;
       } else if (params.satsPerKB !== undefined) {
         // If satsPerKB/1000 < 1, assume it was intended as sats/vB
-        normalizedSatsPerVB = params.satsPerKB < SATS_PER_KB_MULTIPLIER 
-          ? params.satsPerKB 
+        normalizedSatsPerVB = params.satsPerKB < SATS_PER_KB_MULTIPLIER
+          ? params.satsPerKB
           : params.satsPerKB / SATS_PER_KB_MULTIPLIER;
       } else {
         throw new Error("Either satsPerKB or satsPerVB must be provided");
@@ -213,10 +213,10 @@ export class CounterpartyApiManagerDI {
       cacheKey,
       async () => {
         let errorMessage = null;
-        
+
         for (const node of this.config.nodes) {
           const url = `${node.url}${endpoint}?${queryParams.toString()}`;
-          
+
           await this.dependencies.logger.debug("api", {
             message: "Attempting XCP node fetch",
             node: node.name,
@@ -229,7 +229,7 @@ export class CounterpartyApiManagerDI {
             const response = await this.dependencies.httpClient.get(url, {
               timeout: this.config.requestTimeout,
             });
-            
+
             await this.dependencies.logger.debug("api", {
               message: "XCP node response received",
               node: node.name,
@@ -277,7 +277,7 @@ export class CounterpartyApiManagerDI {
           queryParams: queryParams.toString(),
           error: errorMessage
         });
-        
+
         return {
           result: [],
           next_cursor: null,
@@ -285,9 +285,9 @@ export class CounterpartyApiManagerDI {
           error: errorMessage
         } as T;
       },
-      { 
+      {
         duration: cacheTimeout,
-        staleWhileRevalidate: 300, // 5 minutes  
+        staleWhileRevalidate: 300, // 5 minutes
         staleIfError: 3600 // 1 hour
       },
     );
@@ -344,7 +344,7 @@ export class CounterpartyApiManagerDI {
   ): Promise<{ balances: XcpBalance[]; total: number; next_cursor?: string }> {
     const baseEndpoint = `/addresses/${address}/balances`;
     const endpoint = cpid ? `${baseEndpoint}/${cpid}` : baseEndpoint;
-    
+
     const defaultParams = new URLSearchParams();
     defaultParams.append("type", options.type || "all");
     defaultParams.append("limit", (options.limit || 50).toString());
@@ -387,11 +387,11 @@ export class CounterpartyApiManagerDI {
                 .filter((balance: any) => balance.quantity > 0)
                 .forEach((balance: any,index:number) => {
                     const effectiveAddress = balance.address || balance.utxo_address;
-                    
+
                     if (effectiveAddress) {
                         const key = `${effectiveAddress}-${balance.asset}-${index}`;
                         const existing = balanceMap.get(key);
-                        
+
                         if (existing) {
                             existing.quantity += balance.quantity;
                         } else {
@@ -465,7 +465,7 @@ export class CounterpartyApiManagerDI {
     try {
       const MAX_RETRIES = 3;
       let lastError: Error | null = null;
-      
+
       for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
         try {
           await this.dependencies.logger.info("api", {
@@ -480,7 +480,7 @@ export class CounterpartyApiManagerDI {
         let allBalances: XcpBalance[] = [];
         let cursor: string | null = null;
         let expectedTotal: number | null = null;
-        
+
         do {
           // Prepare options for each request
           const options: XcpBalanceOptions = {
@@ -488,7 +488,7 @@ export class CounterpartyApiManagerDI {
             limit: 500,
             verbose: true
           };
-          
+
           if (cursor) {
             options.cursor = cursor;
           }
@@ -540,7 +540,7 @@ export class CounterpartyApiManagerDI {
             address
           });
           return { balances: allBalances, total: allBalances.length };
-          
+
         } catch (attemptError) {
           lastError = attemptError instanceof Error ? attemptError : new Error(String(attemptError));
           await this.dependencies.logger.warn("api", {
@@ -550,7 +550,7 @@ export class CounterpartyApiManagerDI {
             error: lastError.message,
             address
           });
-          
+
           // If this is the last attempt, don't wait
           if (attempt < MAX_RETRIES - 1) {
             await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
@@ -607,7 +607,7 @@ export class CounterpartyApiManagerDI {
 
     queryParams.append("dispenser", dispenser);
     queryParams.append("quantity", quantity.toString());
-    
+
     // Handle options carefully to avoid deprecated fields and prioritize correct ones
     const finalApiOptions: Record<string, string | number | boolean> = {};
 
@@ -625,14 +625,14 @@ export class CounterpartyApiManagerDI {
       if (value !== undefined && value !== null) {
         if (key === 'regular_dust_size') continue; // Skip deprecated
         if (key === 'fee_per_kb' && options.sat_per_vbyte !== undefined) continue; // Skip if sat_per_vbyte is used
-        
+
         // If key is already set (like sat_per_vbyte from fee_per_kb), don't override from generic options spread
         if (!(key in finalApiOptions)) {
             finalApiOptions[key] = value.toString();
         }
       }
     }
-    
+
     // Ensure return_psbt is explicitly set based on what the route wants (which is now false)
     if (options.return_psbt !== undefined) {
         finalApiOptions.return_psbt = options.return_psbt;
@@ -649,7 +649,7 @@ export class CounterpartyApiManagerDI {
 
     for (const node of this.config.nodes) {
       const url = `${node.url}${endpoint}?${queryParams.toString()}`;
-      
+
       await this.dependencies.logger.debug("api", {
         message: "Attempting dispense compose",
         node: node.name,
@@ -752,7 +752,7 @@ export class CounterpartyApiManagerDI {
     queryParams.append("destination", destination);
     queryParams.append("asset", asset);
     queryParams.append("quantity", quantity.toString());
-    
+
     // Set default dust size if not provided
     if (!options.regular_dust_size) {
       queryParams.append("regular_dust_size", "546"); // Bitcoin's standard dust limit
@@ -769,7 +769,7 @@ export class CounterpartyApiManagerDI {
 
     for (const node of this.config.nodes) {
       const url = `${node.url}${endpoint}?${queryParams.toString()}`;
-      
+
       await this.dependencies.logger.debug("api", {
         message: "Attempting send compose",
         node: node.name,
@@ -842,7 +842,7 @@ export class CounterpartyApiManagerDI {
 
     // Default return_psbt to false if not specified by the caller for this new flow
     if (options.return_psbt === undefined) {
-        queryParams.append("return_psbt", "false"); 
+        queryParams.append("return_psbt", "false");
     } else {
         queryParams.append("return_psbt", options.return_psbt.toString());
     }
@@ -930,7 +930,7 @@ export class CounterpartyApiManagerDI {
 
     for (const node of this.config.nodes) {
       const url = `${node.url}${endpoint}?${queryParams.toString()}`;
-      
+
       await this.dependencies.logger.debug("api", {
         message: "Attempting detach compose",
         node: node.name,
@@ -1071,13 +1071,13 @@ export class MockXcpProvider implements XcpProvider {
     if (this.shouldFailCheck()) {
       throw new Error(`Mock XCP provider configured to fail`);
     }
-    
+
     // Check for custom mock response
     const mockKey = `getXcpAsset:${JSON.stringify([cpid])}`;
     if (this.mockResponses.has(mockKey)) {
       return this.mockResponses.get(mockKey);
     }
-    
+
     return {
       result: {
         asset: cpid,
