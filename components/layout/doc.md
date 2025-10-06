@@ -293,11 +293,11 @@ interface MetaTagsProps {
 
 ### Creating a Page Layout
 ```tsx
-import { body, containerBackground, glassmorphism, headerSpacing } from "$layout";
+import { body, containerBackground, glassmorphism } from "$layout";
 
 export default function StampPage() {
   return (
-    <div class={`${body} ${headerSpacing}`}>
+    <div class={body}>
       <div class={containerBackground}>
         {/* Page content */}
       </div>

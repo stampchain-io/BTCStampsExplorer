@@ -574,7 +574,7 @@ export function Header() {
       size="lg"
       weight="light"
       color="purple"
-      className="ml-3"
+      className="ml-1.5"
       href="/home"
       f-partial="/home"
       onClick={() => setCurrentPath("home")}
