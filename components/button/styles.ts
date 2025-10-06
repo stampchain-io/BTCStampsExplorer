@@ -75,11 +75,11 @@ export interface ButtonVariants {
 /* ===== BUTTON STYLE DEFINITIONS ===== */
 /* gradientOverlay and gradientOverlayHover must be identical */
 const baseGlassmorphism =
-  "border-[1px] rounded-xl backdrop-blur-sm overflow-hidden";
+  "border-[1px] rounded-full backdrop-blur-sm overflow-hidden";
 const baseGlassmorphismColor =
   "relative text-[#080708] before:blur-sm hover:border-[var(--color-border-hover)] hover:before:scale-105";
 const baseBefore =
-  "before:absolute before:inset-0 before:rounded-xl before:z-[-1] before:transition-transform before:duration-50 before:origin-center";
+  "before:absolute before:inset-0 before:rounded-full before:z-[-1] before:transition-transform before:duration-50 before:origin-center";
 const gradientOverlay =
   "before:bg-[linear-gradient(to_bottom_right,var(--color-dark)_0%,var(--color-dark)_20%,var(--color-medium)_20%,var(--color-medium)_45%,var(--color-light)_45%,var(--color-light)_52%,var(--color-medium)_52%,var(--color-medium)_70%,var(--color-dark)_70%,var(--color-dark)_100%)]";
 const gradientOverlayHover =
@@ -89,7 +89,7 @@ export const buttonStyles: ButtonVariants = {
   /* ===== BASE STYLES ===== */
   base: `
     inline-flex items-center justify-center
-    rounded-xl border-[1px]
+    rounded-full border-[1px]
     font-semibold tracking-wide
     ${transitionColors}
     cursor-pointer
@@ -132,13 +132,13 @@ export const buttonStyles: ButtonVariants = {
       ${gradientOverlayHover}
     `,
     outlineGradient: `
-      relative !bg-[#000000] !p-[1px] rounded-xl !border-0
-      before:absolute before:inset-0 before:rounded-xl before:z-[1]
+      relative !bg-[#000000] !p-[1px] rounded-full !border-0
+      before:absolute before:inset-0 before:rounded-full before:z-[1]
       before:bg-[conic-gradient(from_var(--angle),var(--color-dark),var(--color-medium),var(--color-light),var(--color-medium),var(--color-dark))]
       before:[--angle:0deg] before:animate-rotate
       hover:before:bg-[conic-gradient(from_var(--angle),var(--color-light),var(--color-light),var(--color-light),var(--color-light),var(--color-light))]
       before:transition-colors before:duration-50
-      [&>*]:relative [&>*]:z-[2] [&>*]:rounded-xl [&>*]:bg-[#000000] [&>*]:!border-0
+      [&>*]:relative [&>*]:z-[2] [&>*]:rounded-full [&>*]:bg-[#000000] [&>*]:!border-0
       [&>*]:inline-flex [&>*]:items-center [&>*]:justify-center [&>*]:w-full [&>*]:h-full [&>*]:px-5
       [&>*]:font-bold [&>*]:tracking-wider
       [&>*]:text-[var(--color-text)] hover:[&>*]:text-[var(--color-text-hover)]

@@ -24,14 +24,14 @@ export const shadowGlowGrey =
 
 // Glassmorphism styles
 // Overlay layer styles - used for drawer and modal containers
-export const glassmorphismOverlay = `rounded-2xl
-  bg-gradient-to-b from-[#080708]/95 via-[#080708]/70 to-[#080708]/100 backdrop-blur-lg`;
+export const glassmorphismOverlay =
+  `bg-gradient-to-b from-[#080708]/95 via-[#080708]/70 to-[#000000]/90 backdrop-blur-lg`;
 // 1st layer styles
-export const glassmorphism = `border-[1px] border-[#1b1b1b]/80 rounded-2xl
-  bg-gradient-to-br from-[#080708]/50 to-[#080708]/70
+export const glassmorphism = `border-[1px] border-[#242424]/50 rounded-3xl
+  bg-gradient-to-br from-[#1b191b]/50 via-[#080708]/50 to-[#000000]/50
   backdrop-blur ${shadow}`;
 // 2nd layer styles - register tool tld dropdown uses same hardcoded values
-export const glassmorphismL2 = `border-[1px] border-[#1b1b1b]/80 rounded-xl
+export const glassmorphismL2 = `border-[1px] border-[#242424]/75 rounded-2xl
   bg-[#080708]/30 backdrop-blur-xs ${shadowL2}`;
 export const glassmorphismL2Hover =
   `hover:bg-[#080708]/60 hover:border-[#242424]`;
@@ -58,6 +58,8 @@ export const gapGrid = "gap-6 mobileLg:gap-9 tablet:gap-12"; // - ToS index page
 // Base styles
 export const containerBackground = `${body} p-5 ${glassmorphism}`;
 export const containerDetailImage = `relative p-5 ${glassmorphism}`;
+export const containerStickyBottom =
+  `sticky bottom-0 mt-auto py-9 tablet:py-6 bg-black/50 backdrop-blur-lg`;
 
 // Stamp Card styles
 export const containerCard = `${glassmorphism} ${shadowGlowPurple}
@@ -68,7 +70,7 @@ export const containerCardL2 = `${glassmorphismL2} ${shadowGlowPurple}
 
 // Table card container styles - check if used
 export const containerCardTable =
-  `rounded-2xl ${glassmorphism} ${shadowGlowPurple}
+  `rounded-3xl ${glassmorphism} ${shadowGlowPurple}
   hover:border-stamp-purple-bright`;
 
 // Global styles
@@ -89,31 +91,31 @@ export const rowResponsiveForm =
 // Layer 1
 // Stamp and SRC20 Table Row Cards - Stamp/tokencards
 export const cellLeftCard =
-  `p-3 pl-4 rounded-l-2xl border-y-[1px] border-l-[1px] border-r-0 border-[#1b1b1b]/80
+  `p-3 pl-4 rounded-l-3xl border-y-[1px] border-l-[1px] border-r-0 border-[#242424]/50
   group-hover:bg-black/20 group-hover:border-stamp-purple-bright ${transitionColors} whitespace-nowrap`;
 export const cellRightCard =
-  `p-3 pr-4 rounded-r-2xl border-y-[1px] border-r-[1px] border-l-0 border-[#1b1b1b]/80
+  `p-3 pr-4 rounded-r-3xl border-y-[1px] border-r-[1px] border-l-0 border-[#242424]/50
   group-hover:bg-black/20 group-hover:border-stamp-purple-bright ${transitionColors} whitespace-nowrap`;
-export const cellCenterCard = `p-3 border-y-[1px] border-x-0 border-[#1b1b1b]/80
+export const cellCenterCard = `p-3 border-y-[1px] border-x-0 border-[#242424]/50
   group-hover:bg-black/20 group-hover:border-stamp-purple-bright ${transitionColors} whitespace-nowrap`;
 // Layer 2
 // Stamp and SRC20 Table Row Cards - Stamp/tokencards inside of layer 1
 export const cellLeftL2Card =
-  `p-3 pl-4 rounded-l-xl border-y-[1px] border-l-[1px] border-r-0 border-[#1b1b1b]/80
+  `p-3 pl-4 rounded-l-2xl border-y-[1px] border-l-[1px] border-r-0 border-[#242424]/75
   group-hover:bg-black/20 group-hover:border-stamp-purple-bright ${transitionColors} whitespace-nowrap`;
 export const cellRightL2Card =
-  `p-3 pr-4 rounded-r-xl border-y-[1px] border-r-[1px] border-l-0 border-[#1b1b1b]/80
+  `p-3 pr-4 rounded-r-2xl border-y-[1px] border-r-[1px] border-l-0 border-[#242424]/75
   group-hover:bg-black/20 group-hover:border-stamp-purple-bright ${transitionColors} whitespace-nowrap`;
 export const cellCenterL2Card =
-  `p-3 border-y-[1px] border-x-0 border-[#1b1b1b]/80
+  `p-3 border-y-[1px] border-x-0 border-[#242424]/75
   group-hover:bg-black/20 group-hover:border-stamp-purple-bright ${transitionColors} whitespace-nowrap`;
 // Stamp and SRC20 Detail pages Table Rows
 export const cellLeftL2Detail =
-  `p-1.5 pl-3 rounded-l-xl border-y-[1px] border-l-[1px] border-r-0 border-[#1b1b1b]/80 group-hover:bg-black/20 group-hover:border-[#232223] ${transitionColors} whitespace-nowrap`;
+  `p-1.5 pl-3 rounded-l-2xl border-y-[1px] border-l-[1px] border-r-0 border-[#242424]/75 group-hover:bg-black/20 group-hover:border-[#232223] ${transitionColors} whitespace-nowrap`;
 export const cellRightL2Detail =
-  `p-1.5 pr-3 rounded-r-xl border-y-[1px] border-r-[1px] border-l-0 border-[#1b1b1b]/80 group-hover:bg-black/20 group-hover:border-[#232223] ${transitionColors} whitespace-nowrap`;
+  `p-1.5 pr-3 rounded-r-2xl border-y-[1px] border-r-[1px] border-l-0 border-[#242424]/75 group-hover:bg-black/20 group-hover:border-[#232223] ${transitionColors} whitespace-nowrap`;
 export const cellCenterL2Detail =
-  `p-1.5 border-y-[1px] border-x-0 border-[#1b1b1b]/80 group-hover:bg-black/20 group-hover:border-[#232223] ${transitionColors} whitespace-nowrap`;
+  `p-1.5 border-y-[1px] border-x-0 border-[#242424]/75 group-hover:bg-black/20 group-hover:border-[#232223] ${transitionColors} whitespace-nowrap`;
 
 export const cellStickyLeft =
   `sticky left-0 bg-black/70 tablet:bg-transparent backdrop-blur-xl tablet:backdrop-blur-none z-10`;
@@ -134,7 +136,7 @@ export const modalBgCenter =
 // Base loader style
 const loaderSpin = "animate-spin rounded-full border-b-[2px]";
 export const loaderSkeleton =
-  `bg-[#080708]/50 border-[1px] border-[#1b1b1b]/80 animate-pulse`;
+  `bg-[#080708]/50 border-[1px] border-[#242424]/50 animate-pulse`;
 // Spinning loader styles
 export const loaderSpinXsGrey = `${loaderSpin} w-3 h-3 border-stamp-grey`;
 export const loaderSpinSmGrey = `${loaderSpin} w-5 h-5 border-stamp-grey`;
@@ -179,6 +181,7 @@ export type LayoutStyles = {
   // Container styles
   containerBackground: string;
   containerDetailImage: string;
+  containerStickyBottom: string;
   containerCard: string;
   containerCardL2: string;
   containerCardTable: string;

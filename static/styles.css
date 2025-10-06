@@ -264,11 +264,11 @@ b, strong {
 }
 
 .input-open-bottom {
-  @apply rounded-t-lg rounded-b-[0px] !important;
+  @apply rounded-t-2xl rounded-b-[0px] !important;
 }
 
 .input-open-bottom > * {
-  @apply rounded-t-lg rounded-b-[0px] !important;
+  @apply rounded-t-2xl rounded-b-[0px] !important;
 }
 
 /* ========================================================================== */
