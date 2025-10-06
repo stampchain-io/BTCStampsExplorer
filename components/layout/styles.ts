@@ -55,8 +55,7 @@ export const gapGrid = "gap-6 mobileLg:gap-9 tablet:gap-12"; // - ToS index page
 // Base styles
 export const containerBackground = `${body} p-5 ${glassmorphism}`;
 export const containerDetailImage = `relative p-5 ${glassmorphism}`;
-export const containerStickyBottom =
-  `sticky bottom-0 mt-auto py-9 tablet:py-6 bg-black/50 backdrop-blur-lg`;
+export const containerStickyBottom = `sticky bottom-0 mt-auto py-9 tablet:py-6`;
 
 // Stamp Card styles
 export const containerCard = `${glassmorphism} ${shadowGlowPurple}
