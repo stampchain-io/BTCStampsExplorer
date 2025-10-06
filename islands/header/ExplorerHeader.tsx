@@ -9,7 +9,7 @@ export const ExplorerHeader = () => {
   return (
     <div class="flex flex-row justify-between items-start w-full">
       {/* Responsive Title Section */}
-      <h1 class={titleGreyLD}>EXPLORER</h1>
+      <h1 class={`${titleGreyLD} ml-1.5`}>EXPLORER</h1>
 
       {/* Controls Section */}
       <div class="flex flex-col">

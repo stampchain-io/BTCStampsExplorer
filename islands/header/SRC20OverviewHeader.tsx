@@ -47,9 +47,8 @@ export const SRC20OverviewHeader = (
   return (
     <div class="relative flex flex-col w-full gap-1.5">
       <div class="flex flex-row justify-between items-start w-full">
-        {/* ===== RESPONSIVE TITLE ===== */}
-        <h1 class={`${titleGreyLD} block mobileLg:hidden`}>TOKENS</h1>
-        <h1 class={`${titleGreyLD} hidden mobileLg:block`}>SRC-20 TOKENS</h1>
+        {/* ===== TITLE ===== */}
+        <h1 class={`${titleGreyLD} ml-1.5`}>SRC-20 TOKENS</h1>
       </div>
 
       {/* ===== TRENDING, MINTED/MINTING AND TIMEFRAME BUTTONS ===== */}

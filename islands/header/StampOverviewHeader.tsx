@@ -89,9 +89,8 @@ export const StampOverviewHeader = (
   return (
     <div class="relative flex flex-col w-full gap-1.5">
       <div class="flex flex-row justify-between items-start w-full">
-        {/* ===== RESPONSIVE TITLE ===== */}
-        <h1 class={`${titleGreyLD} block mobileMd:hidden`}>STAMPS</h1>
-        <h1 class={`${titleGreyLD} hidden mobileMd:block`}>ART STAMPS</h1>
+        {/* ===== TITLE ===== */}
+        <h1 class={`${titleGreyLD} ml-1.5`}>ART STAMPS</h1>
       </div>
 
       {/* ===== STAMP TYPE SELECTOR AND CONTROLS ===== */}
