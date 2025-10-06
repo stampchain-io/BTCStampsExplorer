@@ -193,7 +193,7 @@ export default function CarouselGallery(props: CarouselHomeProps) {
                         {activeSlideIndex - 1 == index && (
                           <div
                             id="hover"
-                            class="flex items-end mobileLg:w-calc-24 w-calc-12 h-[100%] hover-dark-gradient absolute bottom-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                            class="flex items-end mobileLg:w-calc-24 w-calc-12 h-[100%] hover-dark-gradient absolute bottom-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
                           >
                             <div class="w-full pb-1">
                               <div class="desktop:hidden flex justify-center items-center w-full">

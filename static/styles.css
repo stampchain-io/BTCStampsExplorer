@@ -3,7 +3,8 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ================== GLOBAL STYLES ================== */
+
+/* ===== BASE STYLES ===== */
 /* Ensure html and body take full height without overflow */
 html,
 body {
@@ -16,7 +17,9 @@ body {
   position: relative !important;
 }
 
+
 /* Flex center */
+/* ===== ALIGNMENT UTILITIES ===== */
 .center {
   display: flex;
   align-items: center;
@@ -52,6 +55,7 @@ b, strong {
 
 
 /* ================== SCROLLBAR STYLES ================== */
+/* ===== SCROLLBAR STYLES ===== */
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
@@ -121,6 +125,7 @@ b, strong {
   /* Custom handle hover color */
 }
 
+/* Custom scrollar colors */
 .scrollbar-purple {
   @apply [&::-webkit-scrollbar-track]:bg-[#AA00FF] [&::-webkit-scrollbar-thumb]:bg-[#8800CC] [&::-webkit-scrollbar-thumb:hover]:bg-[#660099];
 }
@@ -175,6 +180,7 @@ b, strong {
   mix-blend-mode: multiply;
 }
 
+/* ===== STAMP IMAGE STYLES ===== */
 .pixelart {
   image-rendering: pixelated;
   image-rendering: -moz-crisp-edges;
@@ -193,6 +199,9 @@ b, strong {
   /* Prevent iOS image stretching */
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
+  /* Apply rounded-xl and clip children to rounded corners */
+  overflow: hidden;
+  border-radius: 0.75rem; /* Tailwind rounded-xl */
 }
 
 .stamp-container::before {
@@ -207,6 +216,7 @@ b, strong {
   background-size: 4px 4px;
   border-radius: 1rem;
   z-index: 0;
+  border-radius: inherit;
 }
 
 /* Add specific iOS handling for SVG */
@@ -279,6 +289,8 @@ b, strong {
 /* ================== ANIMATIONS ================== */
 
 /* Marquee Animation for stamp items  */
+/* Stamp Items Marquee */
+
 .marquee {
   overflow: hidden;
   white-space: nowrap;

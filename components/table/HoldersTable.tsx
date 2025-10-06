@@ -1,7 +1,7 @@
 /* ===== HOLDERS TABLE COMPONENT ===== */
 import { containerBackground } from "$layout";
 import { HoldersPieChart, HoldersTableBase } from "$table";
-import { labelSm, value3xl } from "$text";
+import { labelSm, value3xl, valueDarkSm } from "$text";
 import type { HoldersTableProps } from "$types/ui.d.ts";
 
 /* ===== COMPONENT ===== */
@@ -10,7 +10,9 @@ export function HoldersTable({ holders = [] }: HoldersTableProps) {
   if (!holders?.length) {
     return (
       <div class={containerBackground}>
-        <div class="text-center py-10">NO HOLDER DATA AVAILABLE</div>
+        <div class={`text-center py-10 ${valueDarkSm}`}>
+          NO HOLDER DATA AVAILABLE
+        </div>
       </div>
     );
   }

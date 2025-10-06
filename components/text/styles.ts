@@ -305,7 +305,6 @@ export type TextStyles = {
   // Special text styles
   tagline: string;
   copyright: string;
-  loaderText: string;
   toggleSymbol: string;
   // Card text styles
   cardHashSymbol: string;

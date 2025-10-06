@@ -1,6 +1,6 @@
 
 import type { SRC20MarketData } from "$lib/types/marketData.d.ts";
-import type {SRC20BalanceRequestParams, SRC20TickPageData} from "$lib/types/src20.d.ts";
+import type { SRC20BalanceRequestParams, SRC20TickPageData } from "$lib/types/src20.d.ts";
 import { formatAmount } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { SRC20Repository } from "$server/database/src20Repository.ts";
 import { BlockService } from "$server/services/core/blockService.ts";
@@ -93,7 +93,7 @@ export class Src20Controller {
       // For paginated requests: ensure data is array for consistency
       // For single object requests: maintain single object structure per schema
       let processedData: any;
-      
+
       if (balanceParams.includePagination) {
         // Paginated endpoint: data must be array
         processedData = Array.isArray(rawData) ? [...rawData] : (rawData ? [rawData] : []);
@@ -353,7 +353,7 @@ export class Src20Controller {
       const balanceParams = {
         tick,
         sortBy: "DESC",
-        includePagination: false,
+        includePagination: true,
         limit: 1000000
       };
 

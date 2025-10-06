@@ -1,12 +1,13 @@
 /* ===== SRC20 RECENT MINTS GALLERY COMPONENT ===== */
 import { SRC20CardSmMinting } from "$card";
+import { containerBackground } from "$layout";
 import {
   notificationBody,
   notificationContainerError,
   notificationHeading,
   notificationTextError,
 } from "$notification";
-import { subtitleGrey, titleGreyDL, titleGreyLD } from "$text";
+import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
 import type { SRC20Row } from "$types/src20.d.ts";
 import { useEffect, useState } from "preact/hooks";
 
@@ -53,19 +54,19 @@ export default function SRC20MintsGallery() {
 
   /* ===== RENDER ===== */
   return (
-    <div class="w-full items-start tablet:items-end">
+    <div class={`${containerBackground} items-start tablet:items-end`}>
       {/* ===== TITLE SECTION ===== */}
       <div class="w-full">
-        <h4 class={`${titleGreyLD} tablet:hidden`}>
+        <h4 class={`${titlePurpleLD} tablet:hidden`}>
           TRENDING
         </h4>
         <h4
-          class={`hidden tablet:block w-full tablet:text-right ${titleGreyDL}`}
+          class={`hidden tablet:block w-full tablet:text-right ${titlePurpleDL}`}
         >
           TRENDING
         </h4>
       </div>
-      <h3 class={`${subtitleGrey} w-full tablet:text-right mb-2`}>
+      <h3 class={`${subtitlePurple} w-full tablet:text-right mb-2`}>
         {isLoading ? <span class="animate-pulse">POPULAR TOKENS</span> : (
           "POPULAR TOKENS"
         )}
@@ -74,12 +75,12 @@ export default function SRC20MintsGallery() {
       {/* ===== LOADING OR CONTENT ===== */}
       {isLoading
         ? (
-          <div class="flex flex-col w-full gap-3 mt-3">
+          <div class="flex flex-col w-full gap-3 mt-1">
             {[...Array(6)].map((_, index) => (
               <div
                 key={index}
                 class={`loading-skeleton running w-full rounded-2xl ${
-                  index === 0 ? "h-[34px]" : "h-[56px]"
+                  index === 0 ? "h-[34px]" : "h-[54px]"
                 }`}
               />
             ))}
@@ -103,12 +104,14 @@ export default function SRC20MintsGallery() {
           </div>
         )
         : (
-          <SRC20CardSmMinting
-            data={transactions}
-            fromPage="stamping/src20"
-            timeframe="24H"
-            onImageClick={() => {}}
-          />
+          <div class="-mb-3">
+            <SRC20CardSmMinting
+              data={transactions}
+              fromPage="stamping/src20"
+              timeframe="24H"
+              onImageClick={() => {}}
+            />
+          </div>
         )}
     </div>
   );

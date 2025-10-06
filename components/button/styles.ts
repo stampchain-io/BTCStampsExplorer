@@ -1,5 +1,10 @@
 /* ===== BUTTON STYLES MODULE ===== */
-import { glassmorphismL2, shadowL2, transitionColors } from "$layout";
+import {
+  glassmorphismL2,
+  glassmorphismL2Hover,
+  shadowL2,
+  transitionColors,
+} from "$layout";
 import { JSX } from "preact";
 
 /* ===== TYPE DEFINITIONS ===== */
@@ -279,10 +284,17 @@ export const buttonStyles: ButtonVariants = {
 /* ===== ADDITIONAL STYLES ===== */
 /* ===== TOGGLE SWITCH BUTTON STYLES ===== */
 export const toggleButton =
-  `flex items-center relative w-10 h-5 !rounded-full ${glassmorphismL2} focus:outline-none transition duration-50`;
+  `flex items-center relative w-10 h-5 !rounded-full ${glassmorphismL2}
+  ${glassmorphismL2Hover} focus:outline-none transition duration-50`;
 export const toggleKnobBackground =
   "flex justify-center items-center relative w-5 h-5 bg-transparent rounded-full transition ease-in-out transform duration-400";
 export const toggleKnob = "w-[14px] h-[14px] rounded-full";
+/* ===== SLIDER BUTTON STYLES ===== */
+export const sliderBar =
+  `w-full h-5 tablet:h-4 !rounded-full ${glassmorphismL2} ${glassmorphismL2Hover} cursor-pointer`;
+export const trackFill = `
+  absolute top-0.5 bottom-0.5 h-[14px] tablet:h-[10px] rounded-full transition-colors duration-200 pointer-events-none
+  `;
 export const sliderKnob = `
   absolute top-0.5 bottom-0.5 w-full h-[14px] tablet:h-[10px] rounded-full appearance-none bg-transparent pointer-events-none
   [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:pointer-events-auto
@@ -296,11 +308,6 @@ export const sliderKnob = `
   [&::-moz-range-thumb]:hover:bg-stamp-grey-light [&::-moz-range-thumb]:cursor-grab
   [&::-moz-range-thumb]:active:cursor-grabbing [&::-moz-range-thumb]:border-0
   `;
-export const trackFill = `
-  absolute top-0.5 bottom-0.5 h-[14px] tablet:h-[10px] rounded-full transition-colors duration-200 pointer-events-none
-  `;
-export const sliderBar =
-  `w-full h-5 tablet:h-4 !rounded-full ${glassmorphismL2} cursor-pointer`;
 
 /* ===== STYLE COMPOSITION FUNCTION ===== */
 export const button = (
