@@ -13,7 +13,7 @@ import { logger } from "$lib/utils/logger.ts";
 import { mapProgressiveFeeDetails } from "$lib/utils/performance/fees/fee-estimation-utils.ts";
 import { StatusMessages } from "$notification";
 import { FeeCalculatorBase } from "$section";
-import { titlePurpleLD } from "$text";
+import { titleGreyLD } from "$text";
 import type { FairmintToolProps } from "$types/ui.d.ts";
 import { useEffect, useState } from "preact/hooks";
 
@@ -112,7 +112,7 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
 
   return (
     <div class={bodyTool} data-testid="fairmint-tool">
-      <h1 class={`${titlePurpleLD} mobileMd:mx-auto mb-1`}>FAIRMINT</h1>
+      <h1 class={`${titleGreyLD} mobileMd:mx-auto mb-1`}>FAIRMINT</h1>
 
       <form class={`${containerBackground} mb-6`}>
         {/* ===== TOKEN SELECTION ===== */}

@@ -6,7 +6,12 @@ import TextContentIsland from "$islands/content/stampDetailContent/StampTextCont
 import PreviewCodeModal from "$islands/modal/PreviewCodeModal.tsx";
 import PreviewImageModal from "$islands/modal/PreviewImageModal.tsx";
 import { openModal } from "$islands/modal/states.ts";
-import { body, containerDetailImage, gapSectionSlim } from "$layout";
+import {
+  body,
+  containerDetailImage,
+  gapSectionSlim,
+  glassmorphism,
+} from "$layout";
 import {
   getStampImageSrc,
   handleImageError,
@@ -269,7 +274,7 @@ function RightPanel(
   /* ===== RENDER ===== */
   return (
     <div className={`${containerDetailImage} !py-4 px-5 flex justify-between`}>
-      <div className="flex gap-[18px] tablet:gap-3">
+      <div className="flex gap-5 tablet:gap-3.5">
         <div
           ref={copyButtonRef}
           class="relative"
@@ -346,7 +351,7 @@ function RightPanel(
           </div>
         </div>
       </div>
-      <div className="flex gap-[18px] tablet:gap-3">
+      <div className="flex gap-5 tablet:gap-3.5">
         {showCodeButton && (
           <div
             ref={codeButtonRef}
@@ -474,7 +479,7 @@ export function StampImage(
     if (!stamp) return;
     setLoading(true);
     const res = getStampImageSrc(stamp);
-    setSrc(res);
+    setSrc(res ?? null);
     setLoading(false);
   };
 
@@ -682,6 +687,7 @@ export function StampImage(
   }
 
   const toggleFullScreenModal = () => {
+    if (!src) return;
     const modalContent = (
       <PreviewImageModal
         src={src}
@@ -707,9 +713,11 @@ export function StampImage(
 
   // Update the toggleCodeModal function to use the new pattern
   const toggleCodeModal = () => {
+    const content = htmlContent || src;
+    if (!content) return;
     const modalContent = (
       <PreviewCodeModal
-        src={htmlContent || src}
+        src={content}
       />
     );
     openModal(modalContent, "zoomInOut");
@@ -732,7 +740,11 @@ export function StampImage(
 
   return (
     <>
-      {!src && <PlaceholderImage variant="no-image" />}
+      {!src && (
+        <div className={`${glassmorphism} p-5`}>
+          <PlaceholderImage variant="no-image" />
+        </div>
+      )}
 
       {src && isHtml && (
         <div className={`${className} ${body} ${gapSectionSlim}`}>

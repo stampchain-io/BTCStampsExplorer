@@ -9,7 +9,7 @@ import {
   notificationHeading,
   notificationTextError,
 } from "$notification";
-import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
+import { subtitleGrey, titleGreyDL, titleGreyLD } from "$text";
 import type { JSX } from "preact";
 import { useEffect, useState } from "preact/hooks";
 
@@ -57,18 +57,18 @@ export default function SRC20DeploysGallery(): JSX.Element {
     <div class={`${containerBackground} items-start tablet:items-end`}>
       {/* ===== TITLE SECTION ===== */}
       <div class="w-full">
-        <h4 class={`${titlePurpleLD} tablet:hidden`}>
+        <h4 class={`${titleGreyLD} tablet:hidden`}>
           RECENT DEPLOYS
         </h4>
         <h4
-          class={`${titlePurpleDL} hidden tablet:block w-full tablet:text-right`}
+          class={`${titleGreyDL} hidden tablet:block w-full tablet:text-right`}
         >
           RECENT DEPLOYS
         </h4>
       </div>
 
       {/* Show block title with loading state */}
-      <h3 class={`${subtitlePurple} w-full tablet:text-right`}>
+      <h3 class={`${subtitleGrey} w-full tablet:text-right`}>
         {isLoading ? <span class="animate-pulse">BLOCK #XXX,XXX</span> : (
           transactions.length > 0 && `BLOCK #${transactions[0].block_index}`
         )}
