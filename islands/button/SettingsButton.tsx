@@ -25,7 +25,7 @@ export function SettingsButton({
 
   return (
     <div
-      class={`rounded-lg flex flex-col items-center gap-1 h-fit relative z-[10] ${
+      class={`rounded-full flex flex-col items-center gap-1 h-fit relative z-[10] ${
         open ? "px-6 py-4 border-2 border-stamp-purple bg-[#0B0B0B]" : ""
       }`}
     >

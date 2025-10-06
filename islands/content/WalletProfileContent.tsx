@@ -371,7 +371,7 @@ function DispenserRow(
                       width="100%"
                       height="100%"
                       loading="lazy"
-                      class="max-w-none w-full h-full object-contain rounded-lg pixelart stamp-image"
+                      class="max-w-none w-full h-full object-contain rounded-2xl pixelart stamp-image"
                       src={src}
                       alt={`Stamp ${dispenser.stamp.stamp}`}
                       onError={(e) => {
