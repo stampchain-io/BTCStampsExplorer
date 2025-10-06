@@ -73,7 +73,7 @@ function StyledSortingDropdown({
         className={`
           sorting-dropdown--styled
           ${sizeClasses[size]}
-          rounded-lg
+          rounded-2xl
           bg-stamp-grey focus:bg-stamp-grey-light
           border-2 border-transparent
           hover:border-stamp-purple-bright
@@ -155,7 +155,7 @@ function StyledSortingButtons({
             className={`
               ${getVariantClasses(variant, isActive)}
               ${showLoading ? "opacity-50 cursor-not-allowed" : ""}
-              rounded-lg
+              rounded-2xl
               flex items-center gap-2
               whitespace-nowrap
             `}
@@ -250,7 +250,7 @@ function StyledSortingError({
         className={`
           sorting-error--styled
           bg-red-900/20 border border-red-500/30
-          rounded-lg p-4
+          rounded-2xl p-4
           text-red-400
           flex items-center gap-3
           ${className}

@@ -45,7 +45,7 @@ export function Skeleton({
  */
 export function SRC20CardSkeleton() {
   return (
-    <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-4">
       {/* Header */}
       <div class="flex items-center justify-between mb-3">
         <Skeleton width="120px" height="20px" />
@@ -84,7 +84,7 @@ export function SRC20CardSkeleton() {
  */
 export function StampCardSkeleton() {
   return (
-    <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
       {/* Image placeholder */}
       <div class="aspect-square bg-gray-200 dark:bg-gray-700">
         <Skeleton width="100%" height="100%" borderRadius="0" />
@@ -111,10 +111,10 @@ export function StampCardSkeleton() {
  */
 export function WalletStampCardSkeleton() {
   return (
-    <div class="flex gap-4 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+    <div class="flex gap-4 p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700">
       {/* Stamp Image */}
       <div class="w-16 h-16 flex-shrink-0">
-        <div class="w-full h-full bg-gray-200 dark:bg-gray-700 rounded-lg">
+        <div class="w-full h-full bg-gray-200 dark:bg-gray-700 rounded-2xl">
           <Skeleton width="100%" height="100%" borderRadius="0.5rem" />
         </div>
       </div>

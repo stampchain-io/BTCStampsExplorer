@@ -4,7 +4,7 @@ import { PaginationButtons, ViewAllButton } from "$button";
 import { CollectionCard } from "$card";
 import { BREAKPOINTS } from "$constants";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
-import { subtitlePurple, titlePurpleLD } from "$text";
+import { subtitleGrey, titleGreyLD } from "$text";
 import type { Collection } from "$types/stamp.d.ts";
 import { useEffect, useState } from "preact/hooks";
 // Local copy of props to avoid importing server-only types
@@ -92,10 +92,10 @@ export default function CollectionDetailGallery({
   const grid = gridClass ?? "grid grid-cols-1 gap-4";
   return (
     <div>
-      {title && <h3 class={titlePurpleLD}>{title}</h3>}
+      {title && <h3 class={titleGreyLD}>{title}</h3>}
       {subTitle && (
         <h4
-          class={subtitlePurple +
+          class={subtitleGrey +
             " mb-3 mobileMd:mb-6 desktop:mb-9"}
         >
           {subTitle}
