@@ -15,7 +15,7 @@ const DESKTOP_MAX_PAGE_RANGE = 4;
 const navBase = `
   flex items-center justify-center
 ${glassmorphismL2} ${glassmorphismL2Hover}
-!backdrop-blur-md`;
+!rounded-full !backdrop-blur-md`;
 const navArrow = `${navBase} group
   w-10 h-10 tablet:w-9 tablet:h-9`;
 const navContent = `${navBase} group
@@ -143,7 +143,7 @@ export function PaginationButtons({
       class="flex items-center justify-center"
     >
       <ul
-        class={`inline-flex items-center -space-x-px gap-2.5`}
+        class={`inline-flex items-center -space-x-px gap-3.5`}
       >
         {/* First and Previous */}
         {page > 1 && (
