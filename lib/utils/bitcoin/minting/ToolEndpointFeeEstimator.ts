@@ -12,13 +12,13 @@ import type {
   ToolType,
 } from "$lib/types/toolEndpointAdapter.ts";
 import { ToolEndpointError } from "$lib/types/toolEndpointAdapter.ts";
-import { logger } from "$lib/utils/logger.ts";
 import {
   getToolAdapter,
   isSRC101TransactionOptions,
   isSRC20TransactionOptions,
   isStampTransactionOptions,
 } from "$lib/utils/api/adapters/toolEndpointAdapters.ts";
+import { logger } from "$lib/utils/logger.ts";
 
 /**
  * Cache entry for tool endpoint responses
@@ -56,7 +56,11 @@ export class ToolEndpointFeeEstimator {
   constructor(config: ToolEndpointFeeEstimatorConfig = {}) {
     this.config = {
       cacheTTL: config.cacheTTL ?? 30_000, // 30 seconds default
-      requestTimeout: config.requestTimeout ?? 10_000, // 10 seconds default
+      requestTimeout: config.requestTimeout ??
+        ((typeof Deno !== "undefined" &&
+            Deno?.env?.get("DENO_ENV") !== "production")
+          ? 20_000
+          : 10_000), // longer in dev
       maxCacheSize: config.maxCacheSize ?? 100,
       enableLogging: config.enableLogging ??
         (Deno.env.get("DENO_ENV") === "development"),
@@ -336,7 +340,10 @@ export class ToolEndpointFeeEstimator {
  */
 export const toolEndpointFeeEstimator = new ToolEndpointFeeEstimator({
   cacheTTL: 30_000, // 30 seconds
-  requestTimeout: 15_000, // 15 seconds for tool endpoints (can be slower than UTXO queries)
+  requestTimeout:
+    (typeof Deno !== "undefined" && Deno?.env?.get("DENO_ENV") !== "production")
+      ? 25_000
+      : 15_000,
   maxCacheSize: 50, // Reasonable cache size for fee estimates
   enableLogging: true,
 });

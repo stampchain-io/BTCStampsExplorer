@@ -3,6 +3,15 @@ let tokenExpiry: number | null = null;
 const TOKEN_CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
 
 export async function getCSRFToken(): Promise<string> {
+  const isLocalDevHost = (() => {
+    try {
+      const host = globalThis.location?.hostname || "";
+      return host === "localhost" || host === "127.0.0.1" || host === "[::1]";
+    } catch (_e) {
+      return false;
+    }
+  })();
+
   // Check if we have a valid cached token
   if (cachedToken && tokenExpiry && Date.now() < tokenExpiry) {
     return cachedToken;
@@ -26,7 +35,7 @@ export async function getCSRFToken(): Promise<string> {
   } catch (error) {
     console.error("Error fetching CSRF token:", error);
     // In development, return a dummy token if fetch fails
-    if (globalThis.location?.hostname === "localhost") {
+    if (isLocalDevHost) {
       console.warn("Development mode: Using dummy CSRF token");
       return "dev-csrf-token";
     }
@@ -56,7 +65,8 @@ export async function makeAuthenticatedRequest(
     });
   } catch (error) {
     // In development, try request without CSRF token
-    if (globalThis.location?.hostname === "localhost") {
+    const host = globalThis.location?.hostname || "";
+    if (host === "localhost" || host === "127.0.0.1" || host === "[::1]") {
       console.warn("Development mode: Attempting request without CSRF token");
       return fetch(url, options);
     }
