@@ -92,7 +92,22 @@ const FilterDrawer = (
     getInitialFilters(),
   );
 
-  // Modify the useEffect
+  // Store the initial filters from URL to restore on CLEAR
+  const initialFiltersRef = useRef<AllFilters | null>(null);
+
+  // Capture initial filters ONCE when drawer opens
+  useEffect(() => {
+    if (open && !initialFiltersRef.current) {
+      // Capture the filters from URL at the moment drawer opens
+      initialFiltersRef.current = getInitialFilters();
+    }
+    // Reset when drawer closes
+    if (!open) {
+      initialFiltersRef.current = null;
+    }
+  }, [open]);
+
+  // Update filters when type changes
   useEffect(() => {
     const newFilters = getInitialFilters();
     setCurrentFilters(newFilters);
@@ -416,7 +431,11 @@ const FilterDrawer = (
           size="mdR"
           onClick={() => {
             isClearingRef.current = true;
-            setCurrentFilters(emptyFilters);
+            // Restore to initial filters from when drawer opened (preserves stamp type)
+            const clearedFilters = initialFiltersRef.current
+              ? { ...initialFiltersRef.current }
+              : { ...emptyFilters };
+            setCurrentFilters(clearedFilters);
             setTimeout(() => {
               isClearingRef.current = false;
             }, 100);
