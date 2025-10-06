@@ -2,12 +2,11 @@
 import {
   placeholderBasePaths,
   placeholderTextPaths,
-} from "$components/icon/pathsHugeIcons.ts";
+} from "$components/icon/paths.ts";
 import {
   placeholderPalette,
   PlaceholderVariant,
 } from "$components/icon/styles.ts";
-import { glassmorphism } from "$layout";
 import { JSX } from "preact/jsx-runtime";
 
 type Props = {
@@ -24,33 +23,31 @@ export function PlaceholderImage({
   const { bg, stroke, fill } = placeholderPalette(variant);
 
   return (
-    <div className={`${glassmorphism} p-5`}>
-      <div
-        class={`p-[25%] w-full h-full rounded-2xl aspect-square ${bg} ${className}`}
+    <div
+      class={`p-[25%] w-full h-full rounded-2xl aspect-square ${bg} ${className}`}
+    >
+      <svg
+        viewBox="0 0 24 24"
+        class="w-full h-full"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
       >
-        <svg
-          viewBox="0 0 24 24"
-          class="w-full h-full"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
-        >
-          {/* Base paths use stroke, no fill */}
-          {placeholderBasePaths.map((d, i) => (
-            <path
-              d={d}
-              key={`b-${i}`}
-              class={`${stroke} fill-none`}
-              stroke-width={strokeWidth}
-            />
-          ))}
-          {/* Text path uses fill, no stroke */}
+        {/* Base paths use stroke, no fill */}
+        {placeholderBasePaths.map((d, i) => (
           <path
-            d={placeholderTextPaths[variant]}
-            class={`${fill} stroke-none`}
+            d={d}
+            key={`b-${i}`}
+            class={`${stroke} fill-none`}
+            stroke-width={strokeWidth}
           />
-        </svg>
-      </div>
+        ))}
+        {/* Text path uses fill, no stroke */}
+        <path
+          d={placeholderTextPaths[variant]}
+          class={`${fill} stroke-none`}
+        />
+      </svg>
     </div>
   );
 }
