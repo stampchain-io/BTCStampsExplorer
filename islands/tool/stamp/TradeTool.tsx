@@ -26,7 +26,7 @@ import { bodyTool, containerBackground } from "$layout";
 import type { UTXO, XcpBalance } from "$lib/types/index.d.ts";
 import { normalizeFeeRate } from "$lib/utils/fees.ts";
 import { StatusMessages } from "$notification";
-import { subtitlePurple, titlePurpleLD } from "$text";
+import { subtitleGrey, titleGreyLD } from "$text";
 import type { ComposeAttachOptions } from "$types/services.d.ts";
 
 /* ===== CONSTANTS ===== */
@@ -694,10 +694,10 @@ export function StampTradeTool() {
   return (
     <div class={`${bodyTool}`}>
       {/* ===== SELLER SECTION ===== */}
-      <h1 class={`${titlePurpleLD} mobileMd:mx-auto`}>
+      <h1 class={`${titleGreyLD} mobileMd:mx-auto`}>
         ATTACH TO UTXO
       </h1>
-      <h2 class={`${subtitlePurple} mobileMd:mx-auto`}>SELLER</h2>
+      <h2 class={`${subtitleGrey} mobileMd:mx-auto`}>SELLER</h2>
 
       {/* ===== CREATE PSBT FORM ===== */}
       <div class={containerBackground}>
@@ -1012,7 +1012,7 @@ export function StampTradeTool() {
       {/* ===== BUYER SECTION ===== */}
       {/* ===== COMPLETE SWAP FORM ===== */}
       <div class={containerBackground}>
-        <h2 class={`${subtitlePurple} mobileMd:mx-auto`}>BUYER</h2>
+        <h2 class={`${subtitleGrey} mobileMd:mx-auto`}>BUYER</h2>
         <h3 class=" font-bold text-xl text-stamp-purple mb-2">
           COMPLETE SWAP
         </h3>

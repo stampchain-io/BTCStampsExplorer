@@ -4,7 +4,7 @@ import { StampCard } from "$card";
 import { BREAKPOINTS } from "$constants";
 import { SortButton } from "$islands/button/SortButton.tsx";
 import { useLoadingSkeleton } from "$lib/hooks/useLoadingSkeleton.ts";
-import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
+import { subtitleGrey, titleGreyDL, titleGreyLD } from "$text";
 import type { StampGalleryProps, StampRow } from "$types/stamp.d.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
 import Swiper from "swiper";
@@ -165,14 +165,14 @@ export default function StampGallery({
             >
               <h1
                 class={`${
-                  alignRight ? titlePurpleLD : titlePurpleDL
+                  alignRight ? titleGreyLD : titleGreyDL
                 } tablet:hidden`}
               >
                 {title}
               </h1>
               <h1
                 class={`hidden tablet:block ${
-                  alignRight ? titlePurpleLD : titlePurpleDL
+                  alignRight ? titleGreyLD : titleGreyDL
                 }`}
               >
                 {title}
@@ -185,7 +185,7 @@ export default function StampGallery({
                 alignRight && "tablet:items-end"
               }`}
             >
-              <h2 class={subtitlePurple}>
+              <h2 class={subtitleGrey}>
                 {subTitle}
               </h2>
             </div>

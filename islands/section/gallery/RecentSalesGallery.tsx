@@ -5,7 +5,7 @@ import { LoadingIcon } from "$icon";
 import { RecentSaleCard } from "$islands/card/RecentSaleCard.tsx";
 import { useLoadingSkeleton } from "$lib/hooks/useLoadingSkeleton.ts";
 import { AccessibilityUtils } from "$lib/utils/ui/accessibility/accessibilityUtils.ts";
-import { subtitlePurple, titlePurpleDL } from "$text";
+import { subtitleGrey, titleGreyDL } from "$text";
 import type { RecentSalesGalleryProps } from "$types/ui.d.ts";
 import { useEffect, useState } from "preact/hooks";
 
@@ -142,17 +142,17 @@ export default function RecentSalesGallery({
         <div class="flex flex-col w-full">
           {title && (
             <div class="flex flex-col items-start">
-              <h1 class={`${titlePurpleDL} tablet:hidden`}>
+              <h1 class={`${titleGreyDL} tablet:hidden`}>
                 {title}
               </h1>
-              <h1 class={`hidden tablet:block ${titlePurpleDL}`}>
+              <h1 class={`hidden tablet:block ${titleGreyDL}`}>
                 {title}
               </h1>
             </div>
           )}
           {subTitle && (
             <div class="flex flex-col items-start pb-1">
-              <h2 class={subtitlePurple}>
+              <h2 class={subtitleGrey}>
                 {subTitle}
               </h2>
             </div>

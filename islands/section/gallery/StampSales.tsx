@@ -2,7 +2,7 @@
 /*@baba-153+154-move Refreshing to ViewAllButton-remove default (not used)*/
 import { containerBackground, loaderSpinXsPurple } from "$layout";
 import { StampGallery } from "$section";
-import { titlePurpleLD } from "$text";
+import { titleGreyLD } from "$text";
 import type { StampWithEnhancedSaleData } from "$types/marketData.d.ts";
 import type { StampSalesProps } from "$types/ui.d.ts";
 import { useEffect, useState } from "preact/hooks";
@@ -163,7 +163,7 @@ export function StampSalesGallery({
     <div class={containerBackground}>
       <h3
         class={variant === "home"
-          ? titlePurpleLD
+          ? titleGreyLD
           : "text-3xl tablet:text-7xl text-left mb-2 bg-clip-text text-transparent purple-gradient1 font-black"}
       >
         {title}

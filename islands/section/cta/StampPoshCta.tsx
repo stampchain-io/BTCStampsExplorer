@@ -1,13 +1,14 @@
 /* ===== STAMP POSH CTA COMPONENT ===== */
-import { subtitleGrey, text } from "$text";
 import { Button } from "$button";
+import { containerBackground } from "$layout";
+import { subtitleGrey, text } from "$text";
 
 /* ===== COMPONENT ===== */
 export const StampPoshCta = () => {
   return (
     <>
       {/* ===== CONTENT SECTION ===== */}
-      <div class="flex flex-col mt-6 mobileLg:mt-12">
+      <div class={`${containerBackground} mt-6 mobileLg:mt-12`}>
         <h4 class={subtitleGrey}>
           NAMED ASSETS
         </h4>
