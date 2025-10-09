@@ -151,6 +151,7 @@ import * as $tool_stamp_stamping from "./routes/tool/stamp/stamping.tsx";
 import * as $tool_stamp_trade from "./routes/tool/stamp/trade.tsx";
 import * as $upload_index from "./routes/upload/index.tsx";
 import * as $wallet_address_ from "./routes/wallet/[address].tsx";
+import * as $Toast_NotificationUpdate from "./islands/Toast/NotificationUpdate.tsx";
 import * as $Toast_ToastComponent from "./islands/Toast/ToastComponent.tsx";
 import * as $Toast_ToastProvider from "./islands/Toast/ToastProvider.tsx";
 import * as $badge_ActivityBadge from "./islands/badge/ActivityBadge.tsx";
@@ -489,6 +490,7 @@ const manifest = {
     "./routes/wallet/[address].tsx": $wallet_address_,
   },
   islands: {
+    "./islands/Toast/NotificationUpdate.tsx": $Toast_NotificationUpdate,
     "./islands/Toast/ToastComponent.tsx": $Toast_ToastComponent,
     "./islands/Toast/ToastProvider.tsx": $Toast_ToastProvider,
     "./islands/badge/ActivityBadge.tsx": $badge_ActivityBadge,

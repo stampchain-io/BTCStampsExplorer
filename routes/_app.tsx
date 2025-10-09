@@ -9,6 +9,7 @@ import BackgroundTopology from "$islands/layout/BackgroundTopology.tsx";
 import FontLoader from "$islands/layout/FontLoader.tsx";
 import ModalProvider from "$islands/layout/ModalProvider.tsx";
 import PageVisibilityManager from "$islands/layout/PageVisibilityManager.tsx";
+import { NotificationUpdate } from "$islands/Toast/NotificationUpdate.tsx";
 import { ToastProvider } from "$islands/Toast/ToastProvider.tsx";
 import { Footer, NavigatorProvider } from "$layout";
 
@@ -239,6 +240,7 @@ export default function App({ Component, state, url }: PageProps<unknown>) {
         <div class="flex flex-col min-h-screen font-work-sans relative z-[2]">
           {/* ===== PROVIDERS ===== */}
           <ToastProvider>
+            <NotificationUpdate />
             <NavigatorProvider>
               <div class="flex flex-col min-h-screen">
                 {/* ===== LAYOUT STRUCTURE ===== */}
