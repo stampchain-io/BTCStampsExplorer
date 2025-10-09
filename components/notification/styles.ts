@@ -3,7 +3,7 @@ import { shadow } from "$layout";
 /* ===== BASE STYLES ===== */
 /* ===== NOTIFICATION STYLES ===== */
 const notificationContainer = `
-  w-full px-5 py-2.5 border-[1px] rounded-2xl backdrop-blur-md ${shadow}`;
+  w-full px-4 pt-3 pb-4 border-[1px] rounded-2xl backdrop-blur-md ${shadow}`;
 
 /* ===== TOOLTIPS STYLES ===== */
 const tooltipBackground =
@@ -13,7 +13,7 @@ const tooltipText =
 
 /* ===== NOTIFICATION STYLES ===== */
 /* General */
-export const notificationHeading = `font-semibold text-sm text-stamp-grey`;
+export const notificationHeading = `font-semibold text-[15px] text-stamp-grey`;
 export const notificationBody = `font-normal text-sm text-stamp-grey`;
 export const notificationTextError = `!text-[#990000]`;
 export const notificationTextSuccess = `!text-[#009900]`;

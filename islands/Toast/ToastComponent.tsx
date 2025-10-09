@@ -89,21 +89,21 @@ export const ToastComponent = (
       } ${getContainerStyle(type)}`}
       role="alert"
     >
-      <div class="flex items-center space-x-6">
+      <div class="flex items-start space-x-6">
         <Icon
           type="icon"
           name={getIconName(type)}
           weight="bold"
-          size="sm"
+          size="xs"
           color="custom"
-          className={getIconColor(type)}
+          className={`${getIconColor(type)} mt-0.5`}
           ariaLabel={`${type} notification`}
         />
 
         <div class="flex-1 ml-6 break-words">
           <div class={notificationHeading}>{firstLine}</div>
           {remainingLines.length > 0 && (
-            <div class={notificationBody}>
+            <div class={`${notificationBody} whitespace-pre-line`}>
               {remainingLines.join("\n")}
             </div>
           )}
@@ -116,7 +116,7 @@ export const ToastComponent = (
           size="xs"
           color="grey"
           onClick={onClose}
-          className="ml-auto"
+          className="ml-auto -mt-1.5"
         />
       </div>
 
