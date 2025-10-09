@@ -295,9 +295,9 @@
                             (function () {
                                 // === PARTICLE COUNT ===
                                 // Controls number of flowing particles in the topology
-                                // Mobile: 1000 particles, Tablet/Desktop: 3000 particles
+                                // Mobile: 1000 particles, Tablet/Desktop: 2000 particles
                                 const isMobile = "undefined" != typeof navigator && (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768);
-                                c = isMobile ? 1000 : 3000;
+                                c = isMobile ? 1000 : 2000;
                                 const colorPalette = e.options.colorPalette || ["#8800cc", "#000000", "#440066", "#000000", "#650065", "#220044", "#000000"];
                                 for (let e = 0; e < c; e++) {
                                     let s = t.random(t.width + 200),
@@ -332,7 +332,7 @@
                                             // === FLOW FIELD RESPONSE STRENGTH ===
                                             // Controls how strongly particles respond to the flow field
                                             // Default: mult(3)
-                                            o.acc.add(n).mult(3.3);
+                                            o.acc.add(n).mult(8.3);
                                     }
                                     var e, s;
                                 })(),
@@ -397,7 +397,7 @@
  * === PARTICLE SYSTEM ===
  * Particle count: Dynamic based on device
  *   Mobile/Tablet: 1000 particles
- *   Desktop: 3000 particles
+ *   Desktop: 2000 particles
  *   Detection: user agent check + window width < 768px
  *
  * === ANIMATION BEHAVIOR ===
