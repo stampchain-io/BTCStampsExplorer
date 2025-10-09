@@ -13,7 +13,7 @@ import { InputField } from "$form";
 import { Icon } from "$icon";
 import { StampingToolSkeleton } from "$indicators";
 import PreviewImageModal from "$islands/modal/PreviewImageModal.tsx";
-import { closeModal, openModal } from "$islands/modal/states.ts";
+import { closeModal, globalModal, openModal } from "$islands/modal/states.ts";
 import {
   bodyTool,
   containerBackground,
@@ -1963,6 +1963,71 @@ function StampingToolMain({ config }: { config: Config }) {
       document.removeEventListener("keydown", handleKeyboardShortcut);
   }, [isFullScreenModalOpen]);
 
+  /* ===== MODAL MANAGEMENT ===== */
+  // Handle preview modal
+  useEffect(() => {
+    if (isFullScreenModalOpen && file) {
+      openModal(
+        <PreviewImageModal
+          src={file}
+          contentType={file?.type?.startsWith("text/html") ? "html" : "image"}
+        />,
+        "zoomInOut",
+      );
+    }
+  }, [isFullScreenModalOpen, file]);
+
+  // Sync local state with global modal state for preview modal
+  useEffect(() => {
+    // When modal closes externally, update our local state
+    if (!globalModal.value.isOpen && isFullScreenModalOpen) {
+      setIsFullScreenModalOpen(false);
+    }
+  }, [globalModal.value.isOpen, isFullScreenModalOpen]);
+
+  // Sync MARA warning modal state
+  useEffect(() => {
+    if (!globalModal.value.isOpen && showMaraWarning) {
+      setShowMaraWarning(false);
+    }
+  }, [globalModal.value.isOpen, showMaraWarning]);
+
+  // Sync MARA unavailable modal state
+  useEffect(() => {
+    if (!globalModal.value.isOpen && showMaraUnavailableModal) {
+      setShowMaraUnavailableModal(false);
+    }
+  }, [globalModal.value.isOpen, showMaraUnavailableModal]);
+
+  // Handle MARA warning modal
+  useEffect(() => {
+    if (showMaraWarning && outputValue !== null) {
+      openModal(
+        <MaraModeWarningModal
+          outputValue={outputValue}
+          onConfirm={handleMaraWarningConfirm}
+          onCancel={handleMaraWarningCancel}
+        />,
+        "slideUpDown",
+      );
+    }
+  }, [showMaraWarning, outputValue]);
+
+  // Handle MARA unavailable modal
+  useEffect(() => {
+    if (showMaraUnavailableModal) {
+      openModal(
+        <MaraServiceUnavailableModal
+          isOpen
+          onSwitchToStandard={handleMaraUnavailableSwitchToStandard}
+          onRetry={handleMaraUnavailableRetry}
+          onClose={handleMaraUnavailableClose}
+        />,
+        "slideUpDown",
+      );
+    }
+  }, [showMaraUnavailableModal]);
+
   /* ===== COMPONENT RENDER ===== */
   return (
     <div class={bodyTool}>
@@ -2242,33 +2307,6 @@ function StampingToolMain({ config }: { config: Config }) {
           txid={debugTxid}
           class="mt-4"
         />
-      )}
-
-      {isFullScreenModalOpen && openModal(
-        <PreviewImageModal
-          src={file!}
-          contentType={file?.type?.startsWith("text/html") ? "html" : "image"}
-        />,
-        "zoomInOut",
-      )}
-
-      {showMaraWarning && outputValue !== null && openModal(
-        <MaraModeWarningModal
-          outputValue={outputValue}
-          onConfirm={handleMaraWarningConfirm}
-          onCancel={handleMaraWarningCancel}
-        />,
-        "slideUpDown",
-      )}
-
-      {showMaraUnavailableModal && openModal(
-        <MaraServiceUnavailableModal
-          isOpen
-          onSwitchToStandard={handleMaraUnavailableSwitchToStandard}
-          onRetry={handleMaraUnavailableRetry}
-          onClose={handleMaraUnavailableClose}
-        />,
-        "slideUpDown",
       )}
 
       <div
