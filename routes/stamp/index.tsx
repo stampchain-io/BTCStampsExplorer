@@ -8,6 +8,7 @@ import { body } from "$layout";
 
 import {
   queryParamsToFilters,
+  queryParamsToServicePayload,
   StampFilters,
 } from "$islands/filter/FilterOptionsStamp.tsx";
 import type { StampPageProps } from "$types/api.d.ts";
@@ -35,7 +36,11 @@ export const handler: Handlers = {
 
       // ✅ IMPROVED: Handle view parameter for different stamp display modes
       const viewMode = url.searchParams.get("view") || "all";
+      const marketMode = url.searchParams.get("market") || "";
+
+      // Redirect marketplace sales filter to use the proven sales view logic
       const recentSales = viewMode === "sales" ||
+        marketMode === "sales" || // ✅ NEW: marketplace sales filter uses sales view
         url.searchParams.get("recentSales") === "true"; // Backward compatibility
 
       // ✅ NEW: Handle type parameter for stamp filtering (classic, cursed, posh, etc.)
@@ -189,12 +194,23 @@ export const handler: Handlers = {
           if (typeFilter !== "all") {
             /* ===== TYPE-BASED STAMP FILTERING ===== */
             try {
+              // Parse all filter parameters from URL
+              const filterPayload = queryParamsToServicePayload(url.search);
+
+              // Remove undefined values to satisfy TypeScript's exactOptionalPropertyTypes
+              const cleanFilters = Object.fromEntries(
+                Object.entries(filterPayload).filter(([_, v]) =>
+                  v !== undefined
+                ),
+              );
+
               // Call StampController directly instead of HTTP request
               const controllerResult = await StampController.getStamps({
+                ...cleanFilters, // ✅ Apply all filters from URL first
                 page,
                 limit: page_size,
                 sortBy: sortBy as "ASC" | "DESC",
-                type: typeFilter as any,
+                type: typeFilter as any, // Override type from filters with explicit type
                 url: url.toString(),
               });
 
@@ -251,8 +267,19 @@ export const handler: Handlers = {
             /* ===== STAMPS FOR COLLECTION ===== */
             if (poshCollection) {
               try {
+                // Parse all filter parameters from URL
+                const filterPayload = queryParamsToServicePayload(url.search);
+
+                // Remove undefined values to satisfy TypeScript's exactOptionalPropertyTypes
+                const cleanFilters = Object.fromEntries(
+                  Object.entries(filterPayload).filter(([_, v]) =>
+                    v !== undefined
+                  ),
+                );
+
                 // Call StampController directly instead of making HTTP request
                 const controllerResult = await StampController.getStamps({
+                  ...cleanFilters, // ✅ Apply all filters from URL first
                   page,
                   limit: page_size,
                   sortBy: sortBy as "ASC" | "DESC",

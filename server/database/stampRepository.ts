@@ -50,7 +50,22 @@ export class StampRepository {
     editions?: StampEdition[],
     range?: StampRange,
     rangeMin?: string,
-    rangeMax?: string
+    rangeMax?: string,
+    fileSize?: StampFilesize | null,
+    fileSizeMin?: string,
+    fileSizeMax?: string,
+    market?: "listings" | "sales" | "",
+    dispensers?: boolean,
+    atomics?: boolean,
+    listings?: "all" | "bargain" | "affordable" | "premium" | "custom" | "",
+    listingsMin?: string,
+    listingsMax?: string,
+    sales?: "recent" | "premium" | "custom" | "volume" | "",
+    salesMin?: string,
+    salesMax?: string,
+    volume?: "24h" | "7d" | "30d" | "",
+    volumeMin?: string,
+    volumeMax?: string
   ) {
 
     if (identifier !== undefined) {
@@ -294,6 +309,37 @@ export class StampRepository {
         rangeMax
       );
     }
+
+    // Handle file size filters
+    if (fileSize || fileSizeMin || fileSizeMax) {
+      this.buildFileSizeFilterConditions(
+        fileSize,
+        whereConditions,
+        queryParams,
+        fileSizeMin,
+        fileSizeMax
+      );
+    }
+
+    // Handle market place filters
+    if (market || dispensers || atomics || listings || sales) {
+      this.buildMarketplaceFilterConditions(
+        market,
+        whereConditions,
+        queryParams,
+        dispensers,
+        atomics,
+        listings,
+        listingsMin,
+        listingsMax,
+        sales,
+        salesMin,
+        salesMax,
+        volume,
+        volumeMin,
+        volumeMax
+      );
+    }
   }
 
   static async getTotalStampCountFromDb(options: {
@@ -336,6 +382,22 @@ export class StampRepository {
       filterBy,
       combinedFilters,
       false,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
       undefined,
       undefined,
       undefined
@@ -725,7 +787,22 @@ export class StampRepository {
       editions,
       range,
       rangeMin,
-      rangeMax
+      rangeMax,
+      _fileSize,
+      _fileSizeMin,
+      _fileSizeMax,
+      _market,
+      _dispensers,
+      _atomics,
+      _listings,
+      _listingsMin,
+      _listingsMax,
+      _sales,
+      _salesMin,
+      _salesMax,
+      _volume,
+      _volumeMin,
+      _volumeMax
     );
 
     if (creatorAddress) {
@@ -844,6 +921,28 @@ export class StampRepository {
       `;
     }
 
+    // Add marketplace joins if needed (for listings/sales filters)
+    // Note: Dispensers are tracked via stamp_market_data.open_dispensers_count
+    // Sales history is in stamp_sales table
+    const hasListingsFilter = _market === "listings" || _dispensers || _listings;
+    const hasSalesFilter = _market === "sales" || _sales || _volume;
+
+    if (hasListingsFilter || hasSalesFilter) {
+      // Join with stamp_market_data for dispenser counts and pricing
+      if (!hasMarketDataFilters) { // Only add if not already joined
+        joinClause += `
+          LEFT JOIN stamp_market_data smd ON st.cpid = smd.cpid
+        `;
+      }
+    }
+
+    if (hasSalesFilter) {
+      // Use stamp_sales_history table (same as recent sales component)
+      joinClause += `
+        LEFT JOIN stamp_sales_history ss ON st.cpid = ss.cpid
+      `;
+    }
+
     // Include collection_stamps join only if collectionId is provided
     if (collectionId) {
       // Add warning if collection query is missing required parameters
@@ -927,8 +1026,10 @@ export class StampRepository {
       }
     } else {
       // Standard query for non-collection cases
+      // Add DISTINCT when joining with stamp_sales to avoid duplicates
+      const selectPrefix = hasSalesFilter ? "DISTINCT " : "";
       query = `
-        SELECT ${selectClause}
+        SELECT ${selectPrefix}${selectClause}
         FROM ${STAMP_TABLE} AS st
         ${joinClause}
         ${whereClause}
@@ -1660,6 +1761,228 @@ export class StampRepository {
 
     console.log("[RANGE DEBUG] Final whereConditions:", whereConditions);
     console.log("[RANGE DEBUG] Final queryParams:", queryParams);
+  }
+
+  /**
+   * Build file size filter conditions for SQL WHERE clause
+   * Handles both preset size ranges and custom min/max values
+   *
+   * @param fileSize Preset file size range or "custom"
+   * @param fileSizeMin Minimum file size in bytes (for custom range)
+   * @param fileSizeMax Maximum file size in bytes (for custom range)
+   * @param whereConditions Array of WHERE conditions to append to
+   * @param queryParams Array of parameters to append to
+   */
+  private static buildFileSizeFilterConditions(
+    fileSize: StampFilesize | null | undefined,
+    whereConditions: string[],
+    queryParams: (string | number)[],
+    fileSizeMin?: string,
+    fileSizeMax?: string
+  ) {
+    // Early exit if no file size filter is set
+    if (!fileSize && !fileSizeMin && !fileSizeMax) {
+      return;
+    }
+
+    // Handle preset file size ranges
+    if (fileSize && fileSize !== "custom") {
+      switch (fileSize) {
+        case "<1kb":
+          whereConditions.push("st.file_size_bytes < ?");
+          queryParams.push(1024);
+          break;
+        case "1kb-7kb":
+          whereConditions.push("st.file_size_bytes >= ? AND st.file_size_bytes <= ?");
+          queryParams.push(1024, 7168);
+          break;
+        case "7kb-32kb":
+          whereConditions.push("st.file_size_bytes >= ? AND st.file_size_bytes <= ?");
+          queryParams.push(7168, 32768);
+          break;
+        case "32kb-64kb":
+          whereConditions.push("st.file_size_bytes >= ? AND st.file_size_bytes <= ?");
+          queryParams.push(32768, 65536);
+          break;
+      }
+      return; // Exit early for preset ranges
+    }
+
+    // Handle custom file size range
+    if (fileSize === "custom" || fileSizeMin || fileSizeMax) {
+      if (fileSizeMin && fileSizeMax) {
+        whereConditions.push("st.file_size_bytes >= ? AND st.file_size_bytes <= ?");
+        queryParams.push(parseInt(fileSizeMin), parseInt(fileSizeMax));
+      } else if (fileSizeMin) {
+        whereConditions.push("st.file_size_bytes >= ?");
+        queryParams.push(parseInt(fileSizeMin));
+      } else if (fileSizeMax) {
+        whereConditions.push("st.file_size_bytes <= ?");
+        queryParams.push(parseInt(fileSizeMax));
+      }
+    }
+  }
+
+  /**
+   * Build marketplace filter conditions for SQL WHERE clause
+   * NOTE: Marketplace filters require JOINs with stamp_market_data and stamp_sales_history tables
+   * These JOINs are added in the main query when market filters are active
+   *
+   * @param market Main market type: "listings" or "sales"
+   * @param whereConditions Array of WHERE conditions to append to
+   * @param queryParams Array of parameters to append to
+   * @param dispensers Filter for stamps with active dispensers (listings) or dispenser sales (sales)
+   * @param atomics Filter for stamps with active atomic swaps (not yet implemented)
+   * @param listings Listing price range preset
+   * @param listingsMin Minimum listing price (BTC)
+   * @param listingsMax Maximum listing price (BTC)
+   * @param sales Sales filter type
+   * @param salesMin Minimum sale price (BTC)
+   * @param salesMax Maximum sale price (BTC)
+   * @param volume Volume time period filter
+   * @param volumeMin Minimum volume (BTC)
+   * @param volumeMax Maximum volume (BTC)
+   */
+  private static buildMarketplaceFilterConditions(
+    market: "listings" | "sales" | "" | undefined,
+    whereConditions: string[],
+    queryParams: (string | number)[],
+    dispensers?: boolean,
+    atomics?: boolean,
+    listings?: "all" | "bargain" | "affordable" | "premium" | "custom" | "",
+    listingsMin?: string,
+    listingsMax?: string,
+    sales?: "recent" | "premium" | "custom" | "volume" | "",
+    salesMin?: string,
+    salesMax?: string,
+    volume?: "24h" | "7d" | "30d" | "",
+    volumeMin?: string,
+    volumeMax?: string
+  ) {
+    // Early exit if no market filters are set
+    if (!market && !dispensers && !atomics && !listings && !sales) {
+      return;
+    }
+
+    // Handle LISTINGS market type
+    // Uses stamp_market_data table for dispenser info and floor pricing
+    if (market === "listings") {
+      // Filter for stamps with active dispensers
+      if (dispensers) {
+        // Use open_dispensers_count from stamp_market_data
+        whereConditions.push("smd.open_dispensers_count > 0");
+      }
+
+      // TODO(@user): Atomics filtering would require atomic_swap table (not in current schema)
+      if (atomics) {
+        console.warn("Atomic swap filtering not yet implemented - requires atomic_swap table");
+      }
+
+      // Handle listing price ranges using floor_price_btc from stamp_market_data
+      // floor_price_btc is already in BTC, so we compare directly
+      if (listings && listings !== "all") {
+        if (listings === "bargain") {
+          // 0 to 0.0025 BTC
+          whereConditions.push("smd.floor_price_btc >= ? AND smd.floor_price_btc <= ?");
+          queryParams.push(0, 0.0025);
+        } else if (listings === "affordable") {
+          // 0.005 to 0.01 BTC
+          whereConditions.push("smd.floor_price_btc >= ? AND smd.floor_price_btc <= ?");
+          queryParams.push(0.005, 0.01);
+        } else if (listings === "premium") {
+          // >= 0.1 BTC
+          whereConditions.push("smd.floor_price_btc >= ?");
+          queryParams.push(0.1);
+        } else if (listings === "custom") {
+          if (listingsMin && listingsMax) {
+            whereConditions.push("smd.floor_price_btc >= ? AND smd.floor_price_btc <= ?");
+            queryParams.push(parseFloat(listingsMin), parseFloat(listingsMax));
+          } else if (listingsMin) {
+            whereConditions.push("smd.floor_price_btc >= ?");
+            queryParams.push(parseFloat(listingsMin));
+          } else if (listingsMax) {
+            whereConditions.push("smd.floor_price_btc <= ?");
+            queryParams.push(parseFloat(listingsMax));
+          }
+        }
+      }
+    }
+
+    // Handle SALES market type
+    // Requires JOIN with stamp_sales_history table: LEFT JOIN stamp_sales_history ss ON st.cpid = ss.cpid
+    if (market === "sales") {
+      console.log("[SALES FILTER DEBUG] Applying sales market filters:", {
+        dispensers,
+        sales,
+        volume,
+        salesMin,
+        salesMax,
+      });
+
+      // Ensure we only get stamps that have sales (must come first)
+      whereConditions.push("ss.tx_hash IS NOT NULL");
+
+      // Filter for stamps with dispenser sales specifically
+      if (dispensers) {
+        whereConditions.push("ss.sale_type = 'dispenser'");
+        console.log("[SALES FILTER DEBUG] Added dispenser filter");
+      }
+
+      // Handle sales type filters
+      if (sales) {
+        if (sales === "recent") {
+          // Recent sales in last 30 days
+          // Note: block_time is INT (Unix timestamp), so we calculate the timestamp value
+          const thirtyDaysAgo = Math.floor(Date.now() / 1000) - (30 * 24 * 60 * 60);
+          whereConditions.push("ss.block_time >= ?");
+          queryParams.push(thirtyDaysAgo);
+          console.log("[SALES FILTER DEBUG] Added recent filter, timestamp:", thirtyDaysAgo);
+        } else if (sales === "premium") {
+          // Premium sales >= 0.1 BTC = >= 10,000,000 satoshis
+          whereConditions.push("ss.unit_price_sats >= ?");
+          queryParams.push(10000000);
+          console.log("[SALES FILTER DEBUG] Added premium filter");
+        } else if (sales === "custom") {
+          // Custom price range
+          if (salesMin && salesMax) {
+            const minSats = Math.floor(parseFloat(salesMin) * 100000000);
+            const maxSats = Math.floor(parseFloat(salesMax) * 100000000);
+            whereConditions.push("ss.unit_price_sats >= ? AND ss.unit_price_sats <= ?");
+            queryParams.push(minSats, maxSats);
+            console.log("[SALES FILTER DEBUG] Added custom range:", { minSats, maxSats });
+          } else if (salesMin) {
+            const minSats = Math.floor(parseFloat(salesMin) * 100000000);
+            whereConditions.push("ss.unit_price_sats >= ?");
+            queryParams.push(minSats);
+            console.log("[SALES FILTER DEBUG] Added min:", minSats);
+          } else if (salesMax) {
+            const maxSats = Math.floor(parseFloat(salesMax) * 100000000);
+            whereConditions.push("ss.unit_price_sats <= ?");
+            queryParams.push(maxSats);
+            console.log("[SALES FILTER DEBUG] Added max:", maxSats);
+          }
+        } else if (sales === "volume") {
+          // Volume-based filtering - group by cpid and sum btc_amount
+          let days = 30; // default
+          if (volume === "24h") days = 1;
+          else if (volume === "7d") days = 7;
+          else if (volume === "30d") days = 30;
+
+          const volumeTimestamp = Math.floor(Date.now() / 1000) - (days * 24 * 60 * 60);
+          whereConditions.push("ss.block_time >= ?");
+          queryParams.push(volumeTimestamp);
+          console.log("[SALES FILTER DEBUG] Added volume filter for", days, "days, timestamp:", volumeTimestamp);
+
+          // Volume filters would need a subquery or GROUP BY with HAVING
+          // This is complex and may need to be handled differently in the main query
+          if (volumeMin || volumeMax) {
+            console.warn("Volume min/max filtering requires subquery aggregation - not yet fully implemented");
+          }
+        }
+      }
+
+      console.log("[SALES FILTER DEBUG] Final conditions:", whereConditions.slice(-5));
+    }
   }
 
   private static buildMarketFilterConditions(

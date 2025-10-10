@@ -431,10 +431,8 @@ const FilterDrawer = (
           size="mdR"
           onClick={() => {
             isClearingRef.current = true;
-            // Restore to initial filters from when drawer opened (preserves stamp type)
-            const clearedFilters = initialFiltersRef.current
-              ? { ...initialFiltersRef.current }
-              : { ...emptyFilters };
+            // Always clear to empty default filters (full reset)
+            const clearedFilters = { ...emptyFilters };
             setCurrentFilters(clearedFilters);
             setTimeout(() => {
               isClearingRef.current = false;
