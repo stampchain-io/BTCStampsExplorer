@@ -22,17 +22,18 @@ const NOTIFICATION_UPDATE_VERSION = "feature-update-v3.0";
  * Message content for update notification
  * Supports multi-line formatting with bullet points
  */
-const NOTIFICATION_UPDATE_MESSAGE = `New Website Update
-• Improved glassmorphism design with fluid background animation
-• Enhanced toast notifications and error handling
-• Reimagined header and navigation menus on all screen sizes
-• Updated search feature with global stamp search and token specific search (on SRC20 overview and detail pages)
-• Added keyboard shortcuts, ⌘/⌃ + "S" for search (globally), + "F" for filter navigation (on stamp overview page) and + "ESC" to close
+const NOTIFICATION_UPDATE_MESSAGE = `New Website Updates
+• Enhanced glassmorphism UI design
+• Improved toast notification and messaging
+• Reimagined header and navigation menus
+• Updated search feature with global stamp search and token specific search (on SRC20 Tokens overview and detail pages)
+• Fixed filtering issues on the Art Stamps overview page
+• Added keyboard shortcuts: ⌘/⌃ + "S" to access search (globally) and ⌘/⌃ + "F" to access filters (on the Art Stamps overview page) - "ESC" to close (globally)
 • Integrated blockchain stats with bitcoin block number, price, fee rates, wallet balance and Counterparty version
-• New logo and iconset with bitcoin and stamp specific icons
-• Minor bug fixes and performance improvements
+• New Huge Icons iconset
+• Minor bug fixes and code optimization
 
-Please clear browser cache and refresh the page for all changes to take effect.`;
+Please clear browser cache and refresh the page for all updates to take effect.`;
 
 /**
  * Delay before showing notification (milliseconds)

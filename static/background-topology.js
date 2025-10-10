@@ -255,7 +255,7 @@
                     (this.prototype.defaultOptions = {
                         color: "#440066",
                         backgroundColor: "#000000",
-                        colorPalette: ["#8800cc", "#000000", "#440066", "#000000", "#650065", "#220044", "#000000"]
+                        colorPalette: ["#8800cc", "#000000", "#440066", "#000000", "#650065", "#660099", "#000000"]
                     });
             }
             constructor(e) {
@@ -298,7 +298,7 @@
                                 // Mobile: 1000 particles, Tablet/Desktop: 2000 particles
                                 const isMobile = "undefined" != typeof navigator && (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768);
                                 c = isMobile ? 1000 : 2000;
-                                const colorPalette = e.options.colorPalette || ["#8800cc", "#000000", "#440066", "#000000", "#650065", "#220044", "#000000"];
+                                const colorPalette = e.options.colorPalette || ["#8800cc", "#000000", "#440066", "#000000", "#650065", "#660099", "#000000"];
                                 for (let e = 0; e < c; e++) {
                                     let s = t.random(t.width + 200),
                                         i = t.random(t.height + 200);
@@ -385,14 +385,14 @@
  * === VISUAL COLORS ===
  * color: "#440066" (dark purple) - legacy single color
  * backgroundColor: "#000000" (black)
- * colorPalette: ["#8800cc", "#000000", "#440066", "#000000", "#650065", "#220044", "#000000"]
+ * colorPalette: ["#8800cc", "#000000", "#440066", "#000000", "#650065", "#660099", "#000000"]
  *   Array of 7 colors for random alternation - each particle randomly assigned one color at creation
  *   Colors breakdown:
  *     - #8800cc: bright purple (~14% chance)
  *     - #000000: black - appears three times (~43% chance total)
  *     - #440066: dark purple (~14% chance)
  *     - #650065: dark magenta (~14% chance)
- *     - #220044: very dark purple (~14% chance)
+ *     - #660099: very dark purple (~14% chance)
  *
  * === PARTICLE SYSTEM ===
  * Particle count: Dynamic based on device
