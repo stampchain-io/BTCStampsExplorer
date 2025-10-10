@@ -847,7 +847,7 @@ export const FilterContentStamp = ({
   };
 
   // Handler for volume changes
-  const handleVolumeChange = (period: string) => {
+  const _handleVolumeChange = (period: string) => {
     setFilters((prevFilters) => {
       const newFilters = {
         ...prevFilters,
@@ -1092,7 +1092,9 @@ export const FilterContentStamp = ({
               checked={filters.sales === "recent"}
               onChange={() => handleSalesType("recent")}
             />
-            <Radio
+
+            {
+              /* <Radio
               label="TRENDING"
               value="volume"
               name="salesType"
@@ -1115,20 +1117,24 @@ export const FilterContentStamp = ({
               name="salesType"
               checked={filters.sales === "custom"}
               onChange={() => handleSalesType("custom")}
-            />
+            /> */
+            }
 
             {/* Custom price range slider for sales */}
-            {filters.sales === "custom" && (
+            {
+              /* {filters.sales === "custom" && (
               <div class="mt-3 pl-0.5">
                 <RangeSliderDual
                   variant="price"
                   onChange={handlePriceRangeChange}
                 />
               </div>
-            )}
+            )} */
+            }
 
             {/* Volume Period Selection - only show if TRENDING is selected */}
-            {filters.sales === "volume" && (
+            {
+              /* {filters.sales === "volume" && (
               <div class="mt-3 pl-0.5">
                 <ToggleButton
                   options={["24h", "7d", "30d"]}
@@ -1139,7 +1145,8 @@ export const FilterContentStamp = ({
                   size="smR"
                 />
               </div>
-            )}
+            )} */
+            }
           </div>
         )}
       </CollapsibleSection>
