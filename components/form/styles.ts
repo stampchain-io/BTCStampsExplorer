@@ -106,45 +106,6 @@ export const inputSelect = `
   pr-10
 `;
 /* ===== ===== ===== */
-
-/* ===== GRADIENT STYLES - WIP @baba =====
-export const purple = `
-  [--color-dark:#AA00FF66]
-  [--color-medium:#AA00FF99]
-  [--color-light:#AA00FFcc]
-  [--color-border:#66009999]
-  [--color-border-hover:#660099CC]
-  [--color-text:#660099]
-  [--color-text-hover:#8800CC]
-`;
-
-export const grey = `
-  [--color-dark:#1e191e66]
-  [--color-medium:#1e191e99]
-  [--color-light:#2c262c]
-  [--color-border:#66666699]
-  [--color-border-hover:#666666CC]
-  [--color-text:#666666]
-  [--color-text-hover:#999999]
-`;
-*/
-/* ===== GRADIENT INPUT STYLES =====
-export const outlineGradient = `
-  relative !bg-[#141015] !p-[1px] rounded-2xl !border-0
-  before:absolute before:inset-0 before:rounded-2xl before:z-[1]
-  before:bg-[conic-gradient(from_var(--angle),var(--color-dark),var(--color-medium),var(--color-light),var(--color-medium),var(--color-dark))]
-  before:[--angle:0deg] before:animate-rotate
-  hover:before:bg-[conic-gradient(from_var(--angle),var(--color-light),var(--color-light),var(--color-light),var(--color-light),var(--color-light))]
-  focus-within:before:bg-[conic-gradient(from_var(--angle),var(--color-light),var(--color-light),var(--color-light),var(--color-light),var(--color-light))]
-  before:transition-colors before:duration-300
-  [&>*]:relative [&>*]:z-[2] [&>*]:rounded-2xl [&>*]:bg-[#141015]
-  [&>div]:flex [&>div]:justify-between [&>div]:relative [&>div]:z-[2] [&>div]:!bg-[#141015] [&>div]:placeholder:!bg-[#141015] [&>div]:rounded-2xl
-  [&>div>input]:${inputFieldHeight} [&>div>input]:w-full [&>div>input]:bg-transparent [&>div>input]:rounded-2xl [&>div>input]:pl-5
-  [&>div>input]:font-normal [&>div>input]:text-base [&>div>input]:text-color-neutral-light
-  [&>div>input]:placeholder:font-light [&>div>input]:placeholder:!text-color-neutral
-  [&>div>input]:!outline-none [&>div>input]:focus-visible:!outline-none [&>div>input]:focus:!bg-[#1e191e]
-`;
-*/
 /* ===== NOT IN USE NOR UPDATED ===== */
 /* ===== LABEL STYLES ===== */
 export const labelBase =

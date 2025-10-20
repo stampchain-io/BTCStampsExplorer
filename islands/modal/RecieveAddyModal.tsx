@@ -1,13 +1,13 @@
 /* ===== RECEIVE ADDRESS MODAL COMPONENT ===== */
-import { JSX } from "preact";
-import type { ReceiveAddyModalProps } from "$types/ui.d.ts";
-import { useEffect, useRef, useState } from "preact/hooks";
-import { tooltipIcon } from "$notification";
-import { ModalBase } from "$layout";
 import { Icon } from "$icon";
 import { closeModal } from "$islands/modal/states.ts";
+import { ModalBase } from "$layout";
 import { logger } from "$lib/utils/logger.ts";
+import { tooltipIcon } from "$notification";
+import type { ReceiveAddyModalProps } from "$types/ui.d.ts";
 import QRCodeStyling from "https://esm.sh/qr-code-styling@1.6.0-rc.1";
+import { JSX } from "preact";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
 
@@ -43,8 +43,8 @@ function RecieveAddyModal(
           type: "linear",
           rotation: 45,
           colorStops: [
-            { offset: 0, color: "#CCCCCC" },
-            { offset: 1, color: "#999999" },
+            { offset: 0, color: "var(--color-neutral-semilight)" },
+            { offset: 1, color: "var(--color-neutral)" },
           ],
         },
       },

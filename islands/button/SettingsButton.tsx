@@ -44,7 +44,9 @@ export function SettingsButton({
               onClick={() => handleOpen?.(false)}
               ariaLabel="Close"
             />
-            <p class="text-lg font-black text-[#AA00FF] mb-1">TOOLS</p>
+            <p class="text-lg font-black text-color-primary-light mb-1">
+              TOOLS
+            </p>
             {filterButtons?.map((filter: string) => (
               <button
                 key={filter}

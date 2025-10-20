@@ -148,7 +148,9 @@ export function Footer() {
               class={`${logoPurpleDL} text-center mobileMd:text-left`}
             >
               STAMPCHAIN
-              <span class="font-extralight pr-1">.IO</span>
+              <span class="font-extralight pr-1">
+                .IO
+              </span>
             </h5>
             <h6
               class={`${tagline} text-center mobileMd:text-left`}

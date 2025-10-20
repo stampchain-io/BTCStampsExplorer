@@ -22,16 +22,16 @@ export const logoStampchain = [
   {
     path:
       "m 5.632261,18.50006 h 4.235486 c 0.627238,0 1.132201,0.60591 1.132201,1.358544 V 20.1414 c 0,0.752635 -0.504963,1.358544 -1.132201,1.358544 H 5.632261 c -0.627238,0 -1.132201,-0.605909 -1.132201,-1.358544 v -0.282796 c 0,-0.752634 0.504963,-1.358544 1.132201,-1.358544 z",
-    style: "stroke-[#666666CC] group-hover:stroke-color-neutral-semidark fill-none",
+    style: "stroke-color-neutral-semidark/80 group-hover:stroke-color-neutral-semidark fill-none",
   },
   {
     path:
       "m 14.132261,18.50006 h 4.235486 c 0.627238,0 1.132201,0.60591 1.132201,1.358544 V 20.1414 c 0,0.752635 -0.504963,1.358544 -1.132201,1.358544 h -4.235486 c -0.627238,0 -1.132201,-0.605909 -1.132201,-1.358544 v -0.282796 c 0,-0.752634 0.504963,-1.358544 1.132201,-1.358544 z",
-    style: "stroke-[#666666CC] group-hover:stroke-color-neutral-semidark fill-none",
+    style: "stroke-color-neutral-semidark/80 group-hover:stroke-color-neutral-semidark fill-none",
   },
   {
     path: "M 9.4997728,19.999887 H 14.500227",
-    style: "stroke-[#666666CC] group-hover:stroke-color-neutral-semidark fill-none",
+    style: "stroke-color-neutral-semidark/80 group-hover:stroke-color-neutral-semidark fill-none",
   },
 ];
 

@@ -1,5 +1,5 @@
 /* ===== COLLECTION OVERVIEW CARD COMPONENT ===== */
-import { containerBackground } from "$layout";
+import { containerBackground, shadowGlowPurple } from "$layout";
 import {
   abbreviateAddress,
   formatBTC,
@@ -32,7 +32,7 @@ export function CollectionCard(
   return (
     <a
       href={`/collection/detail/${collectionName}`}
-      className={`${containerBackground} gap-6 hover:border-color-primary-light hover:shadow-stamp hover:border-solid border-2 border-transparent group`}
+      className={`${containerBackground} gap-6 hover:border-color-primary-light ${shadowGlowPurple} hover:border-solid border-2 border-transparent group`}
     >
       {/* ===== CARD HEADER ===== */}
       <div class="flex w-full gap-6">
@@ -48,7 +48,7 @@ export function CollectionCard(
         <div class="w-full">
           <div class="flex flex-col justify-between w-full">
             {/* check code */}
-            <h2 class="font-black text-2xl gray-gradient1 group-hover:[-webkit-text-fill-color:#AA00FF] tracking-wide inline-block w-fit">
+            <h2 class="font-black text-2xl color-neutral-gradientDL group-hover:[-webkit-text-fill-color:var(--color-primary-light)] tracking-wide inline-block w-fit">
               <span class="min-[420px]:hidden">
                 {abbreviateCollectionName(collectionName)
                   .toUpperCase()}

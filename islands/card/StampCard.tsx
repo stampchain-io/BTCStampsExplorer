@@ -3,7 +3,12 @@
 /*@baba-check styles+icon*/
 import { Icon, LoadingIcon, PlaceholderImage } from "$icon";
 import StampTextContent from "$islands/content/stampDetailContent/StampTextContent.tsx";
-import { glassmorphism, glassmorphismL2, transitionColors } from "$layout";
+import {
+  glassmorphism,
+  glassmorphismL2,
+  shadowGlowPurple,
+  transitionColors,
+} from "$layout";
 import {
   abbreviateAddress,
   formatSupplyValue,
@@ -420,7 +425,7 @@ export function StampCard({
           text-white group relative z-0 flex flex-col
           p-stamp-card mobileLg:p-3
           w-full h-full
-          hover:border-color-primary-light hover:shadow-stamp
+          hover:border-color-primary-light ${shadowGlowPurple}
           ${glassmorphism} ${transitionColors}
         `}
       >

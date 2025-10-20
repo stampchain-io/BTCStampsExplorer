@@ -114,7 +114,8 @@ export const RangeSlider = ({
         left: "2px",
         right: `${Math.max(0, rightPosition)}%`,
         width: "auto",
-        background: "linear-gradient(90deg, #666666, #CCCCCC 95%)",
+        background:
+          "linear-gradient(90deg, var(--color-neutral-semidark), var(--color-neutral-semilight) 95%)",
       };
     }
 
@@ -122,7 +123,8 @@ export const RangeSlider = ({
       left: "2px",
       right: `${Math.max(0, rightPosition)}%`,
       width: "auto",
-      background: "linear-gradient(90deg, #666666, #999999 95%)",
+      background:
+        "linear-gradient(90deg, var(--color-neutral-semidark), var(--color-neutral) 95%)",
     };
   };
 

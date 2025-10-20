@@ -81,7 +81,7 @@ function PartnerCard({ name, largeImage, smallImage, url }: Partner) {
 
       {/* ===== GRADIENT OVERLAY ===== */}
       <div
-        class={`w-full h-full bg-gradient-to-tr from-[#666666FF] via-[#9999997F] to-[#CCCCCC00] absolute left-0 top-0 transition-opacity duration-50 rounded-2xl ${
+        class={`w-full h-full bg-gradient-to-tr from-color-neutral-semidark/100 via-color-neutral/50 to-color-neutral-semilight/0 absolute left-0 top-0 transition-opacity duration-50 rounded-2xl ${
           isHovered ? "!hidden" : ""
         }`}
       />

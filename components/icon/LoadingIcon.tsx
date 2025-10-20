@@ -17,7 +17,7 @@ export function LoadingIcon({
       className={`relative z-10 aspect-square animate-pulse ${wrapperClassName}`}
     >
       <div
-        className={`flex items-center justify-center bg-[#220033CC] max-w-none object-contain rounded-2xl ${containerClassName}`}
+        className={`flex items-center justify-center bg-color-primary-dark/80 max-w-none object-contain rounded-2xl ${containerClassName}`}
       >
         <Icon
           type="icon"

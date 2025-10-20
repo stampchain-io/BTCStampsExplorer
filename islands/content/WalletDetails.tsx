@@ -236,7 +236,7 @@ function DispenserStats({
         <div class="flex flex-col items-start pt-1.5 mobileLg:pt-3">
           <p class={labelSm}>BY</p>
           <a
-            class="text-sm mobileLg:text-base font-black gray-gradient3-hover -mt-1"
+            class="text-sm mobileLg:text-base font-black color-neutral-gradientLD-hover -mt-1"
             href={`/wallet/${stampData.creator}`}
             target="_parent"
           >

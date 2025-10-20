@@ -4,10 +4,10 @@ export default function PressKit() {
   return (
     <>
       <Micro5FontLoader />
-      <div class="text-[#CCCCCC] flex flex-col gap-16 tablet:gap-36 py-24 tablet:py-48">
+      <div class="text-color-neutral-semilight flex flex-col gap-16 tablet:gap-36 py-24 tablet:py-48">
         <section class="text-center max-w-full mx-auto">
           <h1 class="text-3xl tablet:text-6xl font-bold">
-            <span class="text-4xl tablet:text-7xl font-black gray-gradient1">
+            <span class="text-4xl tablet:text-7xl font-black color-neutral-gradientDL">
               PRESS KIT
             </span>
             <br />
@@ -18,7 +18,7 @@ export default function PressKit() {
         <section class="flex flex-col tablet:flex-row gap-6 tablet:gap-12">
           <div class="flex flex-col gap-6 tablet:gap-12 w-full tablet:w-1/2">
             <div>
-              <h1 class="text-3xl tablet:text-6xl font-black gray-gradient4 mb-2">
+              <h1 class="text-3xl tablet:text-6xl font-black color-neutral-gradientLD mb-2">
                 BITCOIN STAMPS
               </h1>
               <h2 class="text-2xl tablet:text-5xl font-extralight mb-3">
@@ -83,7 +83,7 @@ export default function PressKit() {
 
             <button
               type="button"
-              class="bg-[#999999] text-[#080808] text-xl font-extrabold rounded-md w-[160px] h-[60px]"
+              class="bg-color-neutral text-[#080808] text-xl font-extrabold rounded-md w-[160px] h-[60px]"
             >
               DOWNLOAD
             </button>
@@ -113,7 +113,7 @@ export default function PressKit() {
         <section class="flex flex-col tablet:flex-row gap-6 tablet:gap-12">
           <div class="flex flex-col gap-6 tablet:gap-12 w-full tablet:w-1/2">
             <div>
-              <h1 class="text-3xl tablet:text-6xl font-black gray-gradient4 mb-2">
+              <h1 class="text-3xl tablet:text-6xl font-black color-neutral-gradientLD mb-2">
                 STAMPCHAIN
               </h1>
               <h2 class="text-2xl tablet:text-5xl font-extralight mb-3">
@@ -173,7 +173,7 @@ export default function PressKit() {
               />
               <button
                 type="button"
-                class="bg-[#999999] text-[#080808] text-xl font-extrabold rounded-md w-[160px] h-[60px]"
+                class="bg-color-neutral text-[#080808] text-xl font-extrabold rounded-md w-[160px] h-[60px]"
               >
                 DOWNLOAD
               </button>
@@ -181,10 +181,10 @@ export default function PressKit() {
           </div>
 
           <div class="flex flex-col items-center tablet:items-end gap-6 tablet:gap-12 w-full tablet:w-1/2">
-            <p class="purple-gradient2 text-4xl tablet:text-7xl font-black italic px-2">
+            <p class="color-primary-gradientDL text-4xl tablet:text-7xl font-black italic px-2">
               STAMPCHAIN
             </p>
-            <p class="purple-gradient2 text-4xl tablet:text-7xl font-black italic px-2">
+            <p class="color-primary-gradientLD text-4xl tablet:text-7xl font-black italic px-2">
               STAMPCHAIN<span class="font-extralight">.IO</span>
             </p>
             <div class="flex gap-6">
@@ -203,11 +203,11 @@ export default function PressKit() {
         <section class="flex flex-col gap-10">
           <div class="flex gap-10">
             <div class="bg-[#D4D4D4] rounded-md p-6 flex gap-6">
-              <div class="bg-[#220033] w-12 h-12 rounded-[3px]" />
-              <div class="bg-[#440066] w-12 h-12 rounded-[3px]" />
-              <div class="bg-[#660099] w-12 h-12 rounded-[3px]" />
-              <div class="bg-[#8800CC] w-12 h-12 rounded-[3px]" />
-              <div class="bg-[#AA00FF] w-12 h-12 rounded-[3px]" />
+              <div class="bg-color-primary-dark w-12 h-12 rounded-[3px]" />
+              <div class="bg-color-primary-semidark w-12 h-12 rounded-[3px]" />
+              <div class="bg-color-primary w-12 h-12 rounded-[3px]" />
+              <div class="bg-color-primary-semilight w-12 h-12 rounded-[3px]" />
+              <div class="bg-color-primary-light w-12 h-12 rounded-[3px]" />
             </div>
             <div class="bg-[#D4D4D4] rounded-md p-6 flex gap-6">
               <div class="bg-[#0A000F] w-12 h-12 rounded-[3px]" />
@@ -217,11 +217,11 @@ export default function PressKit() {
           </div>
           <div class="flex gap-10">
             <div class="bg-[#D4D4D4] rounded-md p-6 flex gap-6">
-              <div class="bg-[#333333] w-12 h-12 rounded-[3px]" />
-              <div class="bg-[#666666] w-12 h-12 rounded-[3px]" />
-              <div class="bg-[#999999] w-12 h-12 rounded-[3px]" />
-              <div class="bg-[#CCCCCC] w-12 h-12 rounded-[3px]" />
-              <div class="bg-[#FFFFFF] w-12 h-12 rounded-[3px]" />
+              <div class="bg-color-neutral-dark w-12 h-12 rounded-[3px]" />
+              <div class="bg-color-neutral-semidark w-12 h-12 rounded-[3px]" />
+              <div class="bg-color-neutral w-12 h-12 rounded-[3px]" />
+              <div class="bg-color-neutral-light w-12 h-12 rounded-[3px]" />
+              <div class="bg-white w-12 h-12 rounded-[3px]" />
             </div>
             <div class="bg-[#D4D4D4] rounded-md p-6 flex gap-6">
               <div class="bg-[#080808] w-12 h-12 rounded-[3px]" />

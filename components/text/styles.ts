@@ -13,15 +13,15 @@ const transitionColors = "transition-colors duration-200";
 /* ===== OVERLAY STYLES ===== */
 // Overlays - used for text overlay effects of whole divs - text must be transparent or not declared with tailwind css
 export const overlayPurple =
-  "bg-gradient-to-r from-[#AA00FF]/80 via-[#AA00FF]/60 to-[#AA00FF]/40 text-transparent bg-clip-text";
+  "bg-gradient-to-r from-color-primary-light/80 via-color-primary-light/60 to-color-primary-light/40 text-transparent bg-clip-text";
 
 /* ===== LOGO STYLES ===== */
-export const logoPurpleDL = `${logoFont} purple-gradient2 ${select}`; // used in footer
+export const logoPurpleDL = `${logoFont} color-primary-gradientDL ${select}`; // used in footer
 export const logoPurpleDLLink =
-  `${logoFont} purple-gradient2-hover ${transitionColors} cursor-pointer ${select}`;
-export const logoPurpleLD = `${logoFont} purple-gradient4 ${select}`;
+  `${logoFont} color-primary-gradientDL-hover ${transitionColors} cursor-pointer ${select}`;
+export const logoPurpleLD = `${logoFont} color-primary-gradientLD ${select}`;
 export const logoPurpleLDLink =
-  `${logoFont} purple-gradient4-hover ${transitionColors} cursor-pointer ${select}`; // used in header
+  `${logoFont} color-primary-gradientLD-hover ${transitionColors} cursor-pointer ${select}`; // used in header
 
 /* ===== NAVIGATION STYLES ===== */
 // Header - Desktop
@@ -40,22 +40,22 @@ export const navLinkGrey =
 export const navLinkGreyActive =
   `${navLinkGrey} !text-color-neutral-light hover:!text-color-neutral`;
 export const navLinkGreyLD =
-  `font-light text-xl tablet:text-lg gray-gradient1-hover tracking-wider inline-block w-fit ${transitionColors} cursor-pointer ${select}`;
+  `font-light text-xl tablet:text-lg color-neutral-gradientDL-hover tracking-wider inline-block w-fit ${transitionColors} cursor-pointer ${select}`;
 export const navLinkGreyLDActive =
-  `${navLinkGreyLD} text-color-neutral-light [background:none_!important] [-webkit-text-fill-color:#CCCCCC_!important] [text-fill-color:#CCCCCC_!important] hover:[-webkit-text-fill-color:#999999!important] hover:[text-fill-color:#999999!important]`;
+  `${navLinkGreyLD} text-color-neutral-light [background:none_!important] [-webkit-text-fill-color:var(--color-neutral-semilight)_!important] [text-fill-color:var(--color-neutral-semilight)_!important] hover:[-webkit-text-fill-color:var(--color-neutral)!important] hover:[text-fill-color:var(--color-neutral)!important]`;
 // Footer - transparent text - ued with the overlayPurple class
 export const navLinkTransparentPurple =
   `font-light text-[13px] hover:text-color-primary-light tracking-wider ${transitionColors} cursor-pointer ${select}`;
 
 /* ===== TITLE STYLES ===== */
 export const titleGreyLD =
-  `${titleFont} gray-gradient1 cursor-default ${select}`;
+  `${titleFont} color-neutral-gradientDL cursor-default ${select}`;
 export const titleGreyDL =
-  `${titleFont} gray-gradient3 cursor-default ${select}`;
+  `${titleFont} color-neutral-gradientLD cursor-default ${select}`;
 export const titlePurpleLD =
-  `${titleFont} purple-gradient3 cursor-default ${select}`;
+  `${titleFont} color-primary-gradientLD cursor-default ${select}`;
 export const titlePurpleDL =
-  `${titleFont} purple-gradient1 cursor-default ${select}`;
+  `${titleFont} color-primary-gradientDL cursor-default ${select}`;
 
 /* ===== SUBTITLE STYLES ===== */
 export const subtitleGrey =
@@ -67,15 +67,15 @@ export const subtitlePurple =
 export const headingGrey2 =
   `font-black text-3xl mobileLg:text-4xl text-color-neutral-light tracking-wide ${select}`; // was used in about donate section - rename
 export const headingGreyLD =
-  `font-bold text-xl gray-gradient1 tracking-wide inline-block w-fit relative ${select}`;
+  `font-bold text-xl color-neutral-gradientDL tracking-wide inline-block w-fit relative ${select}`;
 export const headingGreyLDLink =
-  `font-bold text-lg gray-gradient1-hover tracking-wide inline-block w-fit relative ${transitionColors} cursor-pointer ${select}`; // used in media page / keep reading in howto pages / accordion titles (custom code)
+  `font-bold text-lg color-neutral-gradientDL-hover tracking-wide inline-block w-fit relative ${transitionColors} cursor-pointer ${select}`; // used in media page / keep reading in howto pages / accordion titles (custom code)
 export const headingGreyDLLink =
-  `font-bold text-lg gray-gradient3-hover tracking-wide inline-block w-fit relative -mt-1 ${transitionColors} cursor-pointer ${select}`; // used in collection and stamp detail pages
+  `font-bold text-lg color-neutral-gradientLD-hover tracking-wide inline-block w-fit relative -mt-1 ${transitionColors} cursor-pointer ${select}`; // used in collection and stamp detail pages
 export const headingGrey =
   `font-bold text-2xl text-color-neutral cursor-default ${select}`; // used in howto overview and detail pages / donate CTA
 export const headingPurpleLD =
-  "font-black text-sm mobileMd:text-lg purple-gradient3 tracking-wide inline-block w-fit text-center mt-3 mobileMd:mt-4 mobileLg:mt-5 mb-1 mobileMd:mb-0"; // used specifically in team banner gallery
+  "font-black text-sm mobileMd:text-lg color-primary-gradientLD tracking-wide inline-block w-fit text-center mt-3 mobileMd:mt-4 mobileLg:mt-5 mb-1 mobileMd:mb-0"; // used specifically in team banner gallery
 
 /* ===== BODY TEXT STYLES ===== */
 export const textXxs = `${textFont} text-[10px]`;
@@ -173,7 +173,7 @@ export const valueNeutral = `text-color-neutral-semidark`;
 
 /* ===== SPECIAL TEXT STYLES ===== */
 export const tagline =
-  `font-regular text-xs bg-gradient-to-r from-[#660099] via-[#8800CC] to-[#AA00FF] text-transparent bg-clip-text cursor-default ${select}`; // used in footer
+  `font-regular text-xs bg-gradient-to-r from-color-primary via-color-primary-semilight to-color-primary-light text-transparent bg-clip-text cursor-default ${select}`; // used in footer
 export const copyright =
   `font-normal text-xs mobileMd:text-sm tablet:text-xs text-color-neutral-dark cursor-default ${select}`; // used in the footer for copyright and counterparty version text
 export const toggleSymbol =
@@ -202,7 +202,7 @@ export const cardSupply =
 export const cardHashSymbolMinimal =
   `font-light text-color-neutral-light group-hover:text-color-primary-light text-xs mobileSm:text-base mobileLg:text-xl tablet:text-xl desktop:text-xl ${transitionColors} ${select}`;
 export const cardStampNumberMinimal =
-  `font-black gray-gradient1 group-hover:[-webkit-text-fill-color:#AA00FF] truncate text-sm mobileSm:text-base mobileLg:text-xl tablet:text-xl desktop:text-xl ${transitionColors} ${select}`;
+  `font-black color-neutral-gradientDL group-hover:[-webkit-text-fill-color:var(--color-primary-light)] truncate text-sm mobileSm:text-base mobileLg:text-xl tablet:text-xl desktop:text-xl ${transitionColors} ${select}`;
 export const cardPriceMinimal =
   `font-normal text-color-neutral truncate text-nowrap text-[10px] mobileMd:text-xs mobileLg:text-sm ${select}`;
 
@@ -210,7 +210,7 @@ export const cardPriceMinimal =
 export const cardHashSymbolGrey =
   `font-light text-color-neutral group-hover:text-color-primary-light text-lg min-[420px]:text-xl ${transitionColors} ${select}`;
 export const cardStampNumberGrey =
-  `font-black gray-gradient1 group-hover:[-webkit-text-fill-color:#AA00FF] truncate max-w-full text-lg min-[420px]:text-xl ${transitionColors} ${select}`;
+  `font-black color-neutral-gradientDL group-hover:[-webkit-text-fill-color:var(--color-primary-light)] truncate max-w-full text-lg min-[420px]:text-xl ${transitionColors} ${select}`;
 
 /* ===== CARD CONFIGURATION - check if used ===== */
 export const ABBREVIATION_LENGTHS = {

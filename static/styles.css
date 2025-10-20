@@ -78,11 +78,11 @@ b, strong {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #660099;
+  background: var(--color-primary);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #440066;
+  background: var(--color-primary-semidark);
   border-radius: 3px;
 }
 
@@ -127,11 +127,11 @@ b, strong {
 
 /* Custom scrollar colors */
 .scrollbar-purple {
-  @apply [&::-webkit-scrollbar-track]:bg-[#AA00FF] [&::-webkit-scrollbar-thumb]:bg-[#8800CC] [&::-webkit-scrollbar-thumb:hover]:bg-[#660099];
+  @apply [&::-webkit-scrollbar-track]:bg-[var(--color-primary-light)] [&::-webkit-scrollbar-thumb]:bg-[var(--color-primary-semilight)] [&::-webkit-scrollbar-thumb:hover]:bg-[var(--color-primary)];
 }
 
 .scrollbar-grey {
-  @apply [&::-webkit-scrollbar-track]:bg-[#CCCCCC] [&::-webkit-scrollbar-thumb]:bg-[#999999] [&::-webkit-scrollbar-thumb:hover]:bg-[#666666];
+  @apply [&::-webkit-scrollbar-track]:bg-[var(--color-neutral-semilight)] [&::-webkit-scrollbar-thumb]:bg-[var(--color-neutral)] [&::-webkit-scrollbar-thumb:hover]:bg-[var(--color-neutral-semidark)];
 }
 
 .scrollbar-black {
@@ -398,7 +398,7 @@ b, strong {
 .animated-underline {
   font-weight: 700;
   text-decoration: none;
-  background-image: linear-gradient(#CCCCCC, #CCCCCC);
+  background-image: linear-gradient(var(--color-neutral-semilight), var(--color-neutral-semilight));
   background-position: 0% 100%;
   background-repeat: no-repeat;
   background-size: 100% 2px;
@@ -418,14 +418,14 @@ b, strong {
 .animated-underline:hover,
 .animated-underline:focus {
   background-size: 0% 2px;
-  color: #999999;
+  color: var(--color-neutral);
 }
 
 /* Animate left to right */
 .animated-underline-thin {
   font-weight: 400;
   text-decoration: none;
-  background-image: linear-gradient(#CCCCCC, #CCCCCC);
+  background-image: linear-gradient(var(--color-neutral-semilight), var(--color-neutral-semilight));
   background-position: 100% 100%;
   background-repeat: no-repeat;
   background-size: 100% 1px;
@@ -445,7 +445,7 @@ b, strong {
 .animated-underline-thin:hover,
 .animated-underline-thin:focus {
   background-size: 0% 1px;
-  color: #999999;
+  color: var(--color-neutral);
 }
 
 /* ========================================================================== */

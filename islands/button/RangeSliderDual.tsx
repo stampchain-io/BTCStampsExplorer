@@ -679,19 +679,21 @@ export const RangeSliderDual = ({
     if (hoveredHandle === "min") {
       return {
         ...baseStyle,
-        background: "linear-gradient(90deg, #CCCCCC 5%, #999999 75%)",
+        background:
+          "linear-gradient(90deg, var(--color-neutral-semilight) 5%, var(--color-neutral) 75%)",
       };
     } else if (hoveredHandle === "max") {
       return {
         ...baseStyle,
-        background: "linear-gradient(90deg, #999999 25%, #CCCCCC 95%)",
+        background:
+          "linear-gradient(90deg, var(--color-neutral) 25%, var(--color-neutral-semilight) 95%)",
       };
     }
 
     return {
       ...baseStyle,
       background:
-        "linear-gradient(90deg, #999999 5%, #666666 40%, #666666 60%, #999999 95%)",
+        "linear-gradient(90deg, var(--color-neutral) 5%, var(--color-neutral-semidark) 40%, var(--color-neutral-semidark) 60%, var(--color-neutral) 95%)",
     };
   };
 

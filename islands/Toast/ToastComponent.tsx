@@ -45,7 +45,7 @@ export const ToastComponent = (
         return "stroke-[#009900]";
       case "info":
       default:
-        return "stroke-[#999999]";
+        return "stroke-color-neutral";
     }
   };
 
@@ -71,7 +71,7 @@ export const ToastComponent = (
         return "bg-[#006600]";
       case "info":
       default:
-        return "bg-[#666666]";
+        return "bg-color-neutral-semidark";
     }
   };
 

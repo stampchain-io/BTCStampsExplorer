@@ -33,7 +33,7 @@ export const TEXT_STYLES = {
     },
     stampNumber: {
       base:
-        "font-black gray-gradient1 group-hover:[-webkit-text-fill-color:#AA00FF] truncate transition-colors duration-200",
+        "font-black color-neutral-gradientDL group-hover:[-webkit-text-fill-color:var(--color-primary-light)] truncate transition-colors duration-200",
       sizes:
         "text-sm mobileSm:text-base mobileLg:text-xl tablet:text-xl desktop:text-xl",
     },
@@ -50,7 +50,7 @@ export const TEXT_STYLES = {
     },
     stampNumber: {
       base:
-        "font-black gray-gradient1 group-hover:[-webkit-text-fill-color:#AA00FF] truncate max-w-full transition-colors duration-200",
+        "font-black color-neutral-gradientDL group-hover:[-webkit-text-fill-color:var(--color-primary-light)] truncate max-w-full transition-colors duration-200",
       sizes: "text-lg min-[420px]:text-xl",
     },
   },

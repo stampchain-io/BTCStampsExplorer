@@ -18,9 +18,9 @@ export const shadow =
 export const shadowL2 =
   "shadow-[0_2px_4px_rgba(13,11,13,0.1),inset_0_1px_0_rgba(13,11,13,0.08),inset_0_-1px_0_rgba(13,11,13,0.08),inset_0_0_2px_2px_rgba(13,11,13,0.08)]";
 export const shadowGlowPurple =
-  `group hover:shadow-[0px_0px_16px_#9900EE] ${transitionColors} cursor-pointer`;
+  `group hover:shadow-[0px_0px_16px_color-mix(in_srgb,var(--color-primary-light)/75,transparent)] ${transitionColors} cursor-pointer`;
 export const shadowGlowGrey =
-  `group hover:shadow-[0px_0px_16px_#FFFFFF7F] ${transitionColors} cursor-pointer`;
+  `group hover:shadow-[0px_0px_16px_color-mix(in_srgb,var(--color-neutral-light)/75,transparent)] ${transitionColors} cursor-pointer`;
 
 // Glassmorphism styles
 // Overlay layer styles - used for drawer and modal containers

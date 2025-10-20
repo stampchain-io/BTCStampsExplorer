@@ -177,7 +177,8 @@ export const placeholderColor: Record<
   Palette
 > = {
   grey: {
-    bg: "bg-gradient-to-br from-[#666666]/75 via-[#333333]/75 to-[#000000]",
+    bg:
+      "bg-gradient-to-br from-color-neutral-semidark/75 via-color-neutral-dark/75 to-[#000000]",
     stroke: "stroke-color-neutral-semidark",
     fill: "fill-color-neutral-semidark",
   },

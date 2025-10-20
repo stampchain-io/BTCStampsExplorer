@@ -76,7 +76,7 @@ export function HomeHeader() {
             delay="50"
             class="
               font-black
-              gray-gradient1
+              color-neutral-gradientDL
               text-2xl
               min-[420px]:text-3xl
               mobileMd:text-4xl
@@ -87,7 +87,7 @@ export function HomeHeader() {
             "
           >
             UNPRUNABLE{" "}
-            <span class="purple-gradient1">
+            <span class="color-primary-gradientDL">
               UTXO ART
             </span>
           </TitleText>
@@ -96,7 +96,7 @@ export function HomeHeader() {
             delay="150"
             class="
               font-bold
-              gray-gradient1
+              color-neutral-gradientDL
               uppercase
               text-xl
               min-[420px]:text-2xl

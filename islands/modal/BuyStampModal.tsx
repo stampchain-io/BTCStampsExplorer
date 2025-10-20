@@ -366,7 +366,7 @@ const BuyStampModal = ({
             />
           </div>
           <div className="flex flex-col w-full">
-            <h5 className="font-extrabold text-3xl gray-gradient1 pt-1">
+            <h5 className="font-extrabold text-3xl color-neutral-gradientDL pt-1">
               <span className="font-light text-color-neutral-light">
                 #
               </span>

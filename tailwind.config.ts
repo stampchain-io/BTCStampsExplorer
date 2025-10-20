@@ -24,7 +24,7 @@ export default {
         "micro-5": ['"Micro 5"', "sans-serif"],
       },
       colors: {
-        color: {
+        color: { // colors are also defined
           primary: {
             dark: "#220033",
             semidark: "#440066",
@@ -223,16 +223,19 @@ export default {
           },
         },
         ":root": {
-          // Stamp color palette as CSS variables
+          // Stamp primary color palette as CSS variables
           "--color-primary-dark": "#220033",
           "--color-primary-semidark": "#440066",
           "--color-primary": "#660099",
           "--color-primary-semilight": "#8800CC",
           "--color-primary-light": "#AA00FF",
-          "--color-neutral-light": "#CCCCCC",
-          "--color-neutral": "#999999",
+          // Stamp neutral color palette as CSS variables
+          "--color-neutral-dark": "#333333",
           "--color-neutral-semidark": "#666666",
-          // Global gradient variables
+          "--color-neutral": "#999999",
+          "--color-neutral-semilight": "#CCCCCC",
+          "--color-neutral-light": "#FFFFFF",
+          // Conic gradient variables
           "--conic-pattern":
             "repeating-conic-gradient(rgba(128, 128, 128, 0.2) 0% 25%, rgba(128, 128, 128, 0.1) 25% 50%)",
         },
@@ -247,8 +250,8 @@ export default {
           "outline-offset": "-2px !important",
           "outline-style": "solid !important",
         },
-        // Text Gradient Classes - Purple variants
-        ".purple-gradient1": {
+        // Gradient Classes - Primary variants
+        ".color-primary-gradientDL": {
           "background":
             "linear-gradient(to right, var(--color-primary-semidark), var(--color-primary), var(--color-primary-semilight))",
           "-webkit-background-clip": "text",
@@ -256,15 +259,21 @@ export default {
           "background-clip": "text",
           "text-fill-color": "transparent",
         },
-        ".purple-gradient2": {
+        ".color-primary-gradientDL-hover": {
           "background":
-            "linear-gradient(to right, var(--color-primary-semidark), var(--color-primary), var(--color-primary-semilight), var(--color-primary-light))",
+            "linear-gradient(to right, var(--color-primary-semidark), var(--color-primary), var(--color-primary-semilight))",
           "-webkit-background-clip": "text",
           "-webkit-text-fill-color": "transparent",
           "background-clip": "text",
           "text-fill-color": "transparent",
+          "transition": "background 0.3s ease-in-out",
+          "&:hover": {
+            "background": "none",
+            "-webkit-text-fill-color": "var(--color-primary-light)",
+            "text-fill-color": "var(--color-primary-light)",
+          },
         },
-        ".purple-gradient3": {
+        ".color-primary-gradientLD": {
           "background":
             "linear-gradient(to right, var(--color-primary-semilight), var(--color-primary), var(--color-primary-semidark))",
           "-webkit-background-clip": "text",
@@ -272,16 +281,23 @@ export default {
           "background-clip": "text",
           "text-fill-color": "transparent",
         },
-        ".purple-gradient4": {
+        ".color-primary-gradientLD-hover": {
           "background":
-            "linear-gradient(to right, var(--color-primary-light), var(--color-primary-semilight), var(--color-primary), var(--color-primary-semidark))",
+            "linear-gradient(to right, var(--color-primary-semilight), var(--color-primary), var(--color-primary-semidark))",
           "-webkit-background-clip": "text",
           "-webkit-text-fill-color": "transparent",
           "background-clip": "text",
           "text-fill-color": "transparent",
+          "transition": "background 0.3s ease-in-out",
+          "&:hover": {
+            "background": "none",
+            "-webkit-text-fill-color": "var(--color-primary-light)",
+            "text-fill-color": "var(--color-primary-light)",
+          },
         },
-        // Text Gradient Classes - Gray variants
-        ".gray-gradient1": {
+
+        // Gradient Classes - Neutral variants
+        ".color-neutral-gradientLD": {
           "background":
             "linear-gradient(to right, var(--color-neutral-light), var(--color-neutral), var(--color-neutral-semidark))",
           "-webkit-background-clip": "text",
@@ -289,57 +305,7 @@ export default {
           "background-clip": "text",
           "text-fill-color": "transparent",
         },
-        ".gray-gradient2": {
-          "background":
-            "linear-gradient(to right, var(--color-neutral), var(--color-neutral-semidark))",
-          "-webkit-background-clip": "text",
-          "-webkit-text-fill-color": "transparent",
-          "background-clip": "text",
-          "text-fill-color": "transparent",
-        },
-        ".gray-gradient3": {
-          "background":
-            "linear-gradient(to right, var(--color-neutral-semidark), var(--color-neutral), var(--color-neutral-light))",
-          "-webkit-background-clip": "text",
-          "-webkit-text-fill-color": "transparent",
-          "background-clip": "text",
-        },
-        ".gray-gradient4": {
-          "background":
-            "linear-gradient(to right, var(--color-neutral-semidark), var(--color-neutral))",
-          "-webkit-background-clip": "text",
-          "-webkit-text-fill-color": "transparent",
-          "background-clip": "text",
-          "text-fill-color": "transparent",
-        },
-        // Hoverable Text Gradients
-        ".purple-gradient2-hover": {
-          "background":
-            "linear-gradient(90deg, var(--color-primary-semidark) 0%, var(--color-primary) 50%, var(--color-primary-semilight) 75%, var(--color-primary-light) 100%)",
-          "-webkit-background-clip": "text",
-          "-webkit-text-fill-color": "transparent",
-          "background-clip": "text",
-          "text-fill-color": "transparent",
-          "transition": "background 0.3s ease-in-out",
-          "&:hover": {
-            "background":
-              "linear-gradient(90deg, var(--color-primary-semidark) 0%, var(--color-primary) 25%, var(--color-primary-semilight) 50%, var(--color-primary-light) 75%)",
-          },
-        },
-        ".purple-gradient4-hover": {
-          "background":
-            "linear-gradient(90deg, var(--color-primary-light) 30%, var(--color-primary-semilight) 60%, var(--color-primary) 90%, var(--color-primary-semidark) 100%)",
-          "-webkit-background-clip": "text",
-          "-webkit-text-fill-color": "transparent",
-          "background-clip": "text",
-          "text-fill-color": "transparent",
-          "transition": "background 0.3s ease-in-out",
-          "&:hover": {
-            "background":
-              "linear-gradient(90deg, var(--color-primary-light) 50%, var(--color-primary-semilight) 80%, var(--color-primary) 90%, var(--color-primary-semidark) 100%)",
-          },
-        },
-        ".gray-gradient1-hover": {
+        ".color-neutral-gradientLD-hover": {
           "background":
             "linear-gradient(to right, var(--color-neutral-light), var(--color-neutral), var(--color-neutral-semidark))",
           "-webkit-text-fill-color": "transparent",
@@ -353,7 +319,14 @@ export default {
             "text-fill-color": "var(--color-neutral-light)",
           },
         },
-        ".gray-gradient3-hover": {
+        ".color-neutral-gradientDL": {
+          "background":
+            "linear-gradient(to right, var(--color-neutral-semidark), var(--color-neutral), var(--color-neutral-light))",
+          "-webkit-background-clip": "text",
+          "-webkit-text-fill-color": "transparent",
+          "background-clip": "text",
+        },
+        ".color-neutral-gradientDL-hover": {
           "background":
             "linear-gradient(to right, var(--color-neutral-semidark), var(--color-neutral), var(--color-neutral-light))",
           "-webkit-text-fill-color": "transparent",

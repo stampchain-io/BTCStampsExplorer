@@ -162,7 +162,7 @@ export function SRC20DetailHeader({
                 <h6 class={labelSm}>
                   CREATOR
                 </h6>
-                <h5 class="font-bold text-lg gray-gradient3-hover tracking-wide -mt-1">
+                <h5 class="font-bold text-lg color-neutral-gradientLD-hover tracking-wide -mt-1">
                   {deployment.creator_name ||
                     abbreviateAddress(deployment.destination || "")}
                 </h5>

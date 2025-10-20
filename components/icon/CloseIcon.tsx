@@ -36,10 +36,10 @@ export function CloseIcon({
               id="grey"
               gradientTransform="rotate(45)"
             >
-              <stop offset="0%" stop-color="#666666" />
-              <stop offset="40%" stop-color="#999999" />
-              <stop offset="70%" stop-color="#999999" />
-              <stop offset="100%" stop-color="#CCCCCC" />
+              <stop offset="0%" stop-color="var(--color-neutral-semidark)" />
+              <stop offset="40%" stop-color="var(--color-neutral)" />
+              <stop offset="70%" stop-color="var(--color-neutral)" />
+              <stop offset="100%" stop-color="var(--color-neutral-semilight)" />
             </linearGradient>
           )}
           {color === "purple" && (
@@ -47,10 +47,10 @@ export function CloseIcon({
               id="purple"
               gradientTransform="rotate(130)"
             >
-              <stop offset="0%" stop-color="#AA00FF" />
-              <stop offset="40%" stop-color="#8800CC" />
-              <stop offset="70%" stop-color="#8800CC" />
-              <stop offset="100%" stop-color="#660099" />
+              <stop offset="0%" stop-color="var(--color-primary-light)" />
+              <stop offset="40%" stop-color="var(--color-primary-semilight)" />
+              <stop offset="70%" stop-color="var(--color-primary-semilight)" />
+              <stop offset="100%" stop-color="var(--color-primary)" />
             </linearGradient>
           )}
         </defs>
