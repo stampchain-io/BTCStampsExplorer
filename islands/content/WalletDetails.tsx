@@ -1,7 +1,7 @@
 /* ===== NOT IN USE ===== */
 import { Button } from "$button";
 import { Icon } from "$icon";
-import { containerBackground, containerColData } from "$layout";
+import { containerBackground, containerColData, glassmorphism } from "$layout";
 import type { WalletData } from "$lib/types/index.d.ts";
 import type { WalletOverviewInfo } from "$lib/types/wallet.d.ts";
 import {
@@ -123,8 +123,10 @@ function WalletOverview(
 
   /* ===== RENDER ===== */
   return (
-    <div class="flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6">
-      <div class="flex flex-col w-full tablet:w-1/2 dark-gradient rounded-2xl p-3 mobileMd:p-6 space-y-1.5 mobileLg:space-y-3">
+    <div
+      class={`flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6 ${glassmorphism}`}
+    >
+      <div class="flex flex-col w-full tablet:w-1/2 ${glassmorphism} rounded-2xl p-3 mobileMd:p-6 space-y-1.5 mobileLg:space-y-3">
         <div class="flex">
           <p class={titleGreyLD}>
             {walletData.address.startsWith("1D") ||

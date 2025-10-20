@@ -38,22 +38,22 @@ export default function DesignSystem() {
               <div class="grid grid-cols-1 tablet:grid-cols-4 gap-4">
                 <ColorSwatch
                   name="Primary Default"
-                  bgClass="bg-stamp-primary"
+                  bgClass="bg-color-primary-semilight"
                   color="primary"
                 />
                 <ColorSwatch
                   name="Primary Light"
-                  bgClass="bg-stamp-primary-light"
+                  bgClass="bg-color-primary-light"
                   color="primary-light"
                 />
                 <ColorSwatch
                   name="Primary Dark"
-                  bgClass="bg-stamp-primary-dark"
+                  bgClass="bg-color-primary"
                   color="primary-dark"
                 />
                 <ColorSwatch
                   name="Primary Hover"
-                  bgClass="bg-stamp-primary-hover"
+                  bgClass="bg-color-primary-light"
                   color="primary-hover"
                 />
               </div>

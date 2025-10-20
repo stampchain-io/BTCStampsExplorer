@@ -5,7 +5,7 @@ import { PaginationButtons } from "$button";
 import { Icon, LoadingIcon, PlaceholderImage } from "$icon";
 import { SettingsButton } from "$islands/button/SettingsButton.tsx";
 import { SortButton } from "$islands/button/SortButton.tsx";
-import { shadowGlowPurple } from "$layout";
+import { glassmorphism, shadowGlowPurple } from "$layout";
 import type {
   EnhancedWalletContentProps,
   SectionHeaderProps,
@@ -355,7 +355,7 @@ function DispenserRow(
   /* ===== RENDER DISPENSER ROW ===== */
   return (
     <div
-      class={`flex justify-between dark-gradient rounded-2xl hover:border-stamp-primary-light ${shadowGlowPurple} border-2 border-transparent`}
+      class={`flex justify-between ${glassmorphism} rounded-2xl hover:border-color-primary-light ${shadowGlowPurple} border-2 border-transparent`}
     >
       <div class="flex p-3 mobileLg:p-6 gap-6 uppercase w-full">
         <a
@@ -400,11 +400,11 @@ function DispenserRow(
 
           <div class="flex justify-between flex-row w-full">
             <p
-              class={`text-base text-stamp-primary font-light text-ellipsis overflow-hidden ${
+              class={`text-base text-color-primary-semilight font-light text-ellipsis overflow-hidden ${
                 view === "mobile" ? "tablet:w-full" : ""
               }`}
             >
-              <span class="font-bold text-stamp-primary text-base mobileLg:text-xl normal-case">
+              <span class="font-bold text-color-primary-semilight text-base mobileLg:text-xl normal-case">
                 {/* Abbreviate origin address differently depending on screen size */}
                 <span class="mobileMd:hidden">
                   {abbreviateAddress(dispenser.origin, 4)}

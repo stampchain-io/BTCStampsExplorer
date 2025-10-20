@@ -2,9 +2,9 @@
 /*@baba-check styles*/
 import { Button } from "$button";
 import { cellAlign } from "$components/layout/types.ts";
+import { SRC20CardBase } from "$islands/card/SRC20CardBase.tsx";
 import { formatDate } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { valueSm } from "$text";
-import { SRC20CardBase } from "$islands/card/SRC20CardBase.tsx";
 import type { SRC20CardBaseProps } from "$types/ui.d.ts";
 
 /* ===== COMPONENT ===== */
@@ -91,8 +91,8 @@ export function SRC20CardMinting(
           href={mintHref}
           onClick={handleMintClick}
           class={(fromPage != "stamping/src20" && fromPage != "home")
-            ? "hidden min-[480px]:block hover:bg-stamp-primary-hover transition-colors"
-            : "hover:bg-stamp-primary-hover transition-colors"}
+            ? "hidden min-[480px]:block hover:bg-color-primary-light transition-colors"
+            : "hover:bg-color-primary-light transition-colors"}
         >
           MINT
         </Button>

@@ -1,6 +1,6 @@
+import type { Swiper as SwiperType } from "swiper";
 import { Swiper } from "swiper";
 import { Autoplay, Pagination } from "swiper/modules";
-import type { Swiper as SwiperType } from "swiper";
 
 type CarouselElement = any;
 
@@ -206,7 +206,7 @@ export default function createCarouselSlider(
       el: ".swiper-pagination",
       clickable: true,
       renderBullet: function (_index, className) {
-        return '<div class="w-6 h-1 bg-stamp-primary ' + className +
+        return '<div class="w-6 h-1 bg-color-primary-semilight ' + className +
           '"></div>';
       },
     },
