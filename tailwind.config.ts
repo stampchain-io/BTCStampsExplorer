@@ -360,6 +360,118 @@ export default {
           "outline-offset": "-2px !important",
           "outline-style": "solid !important",
         },
+        // Text Gradient Classes - Purple variants
+        ".purple-gradient1": {
+          "background": "linear-gradient(to right, #440066, #660099, #8800cc)",
+          "-webkit-background-clip": "text",
+          "-webkit-text-fill-color": "transparent",
+          "background-clip": "text",
+          "text-fill-color": "transparent",
+        },
+        ".purple-gradient2": {
+          "background":
+            "linear-gradient(to right, #440066, #660099, #8800cc, #aa00ff)",
+          "-webkit-background-clip": "text",
+          "-webkit-text-fill-color": "transparent",
+          "background-clip": "text",
+          "text-fill-color": "transparent",
+        },
+        ".purple-gradient3": {
+          "background": "linear-gradient(to right, #8800cc, #660099, #440066)",
+          "-webkit-background-clip": "text",
+          "-webkit-text-fill-color": "transparent",
+          "background-clip": "text",
+          "text-fill-color": "transparent",
+        },
+        ".purple-gradient4": {
+          "background":
+            "linear-gradient(to right, #aa00ff, #8800cc, #660099, #440066)",
+          "-webkit-background-clip": "text",
+          "-webkit-text-fill-color": "transparent",
+          "background-clip": "text",
+          "text-fill-color": "transparent",
+        },
+        // Text Gradient Classes - Gray variants
+        ".gray-gradient1": {
+          "background": "linear-gradient(to right, #cccccc, #999999, #666666)",
+          "-webkit-background-clip": "text",
+          "-webkit-text-fill-color": "transparent",
+          "background-clip": "text",
+          "text-fill-color": "transparent",
+        },
+        ".gray-gradient2": {
+          "background": "linear-gradient(to right, #999999, #666666)",
+          "-webkit-background-clip": "text",
+          "-webkit-text-fill-color": "transparent",
+          "background-clip": "text",
+          "text-fill-color": "transparent",
+        },
+        ".gray-gradient3": {
+          "background": "linear-gradient(to right, #666666, #999999, #cccccc)",
+          "-webkit-background-clip": "text",
+          "-webkit-text-fill-color": "transparent",
+          "background-clip": "text",
+        },
+        ".gray-gradient4": {
+          "background": "linear-gradient(to right, #666666, #999999)",
+          "-webkit-background-clip": "text",
+          "-webkit-text-fill-color": "transparent",
+          "background-clip": "text",
+          "text-fill-color": "transparent",
+        },
+        // Hoverable Text Gradients
+        ".purple-gradient2-hover": {
+          "background":
+            "linear-gradient(90deg, #440066 0%, #660099 50%, #8800cc 75%, #aa00ff 100%)",
+          "-webkit-background-clip": "text",
+          "-webkit-text-fill-color": "transparent",
+          "background-clip": "text",
+          "text-fill-color": "transparent",
+          "transition": "background 0.3s ease-in-out",
+          "&:hover": {
+            "background":
+              "linear-gradient(90deg, #440066 0%, #660099 25%, #8800cc 50%, #aa00ff 75%)",
+          },
+        },
+        ".purple-gradient4-hover": {
+          "background":
+            "linear-gradient(90deg, #aa00ff 30%, #8800cc 60%, #660099 90%, #440066 100%)",
+          "-webkit-background-clip": "text",
+          "-webkit-text-fill-color": "transparent",
+          "background-clip": "text",
+          "text-fill-color": "transparent",
+          "transition": "background 0.3s ease-in-out",
+          "&:hover": {
+            "background":
+              "linear-gradient(90deg, #aa00ff 50%, #8800cc 80%, #660099 90%, #440066 100%)",
+          },
+        },
+        ".gray-gradient1-hover": {
+          "background": "linear-gradient(to right, #cccccc, #999999, #666666)",
+          "-webkit-text-fill-color": "transparent",
+          "background-clip": "text",
+          "text-fill-color": "transparent",
+          "transition":
+            "background 0.3s ease-in-out, -webkit-text-fill-color 0.3s ease-in-out, text-fill-color 0.3s ease-in-out",
+          "&:hover": {
+            "background": "none",
+            "-webkit-text-fill-color": "#CCCCCC",
+            "text-fill-color": "#CCCCCC",
+          },
+        },
+        ".gray-gradient3-hover": {
+          "background": "linear-gradient(to right, #666666, #999999, #cccccc)",
+          "-webkit-text-fill-color": "transparent",
+          "background-clip": "text",
+          "text-fill-color": "transparent",
+          "transition":
+            "background 0.3s ease-in-out, -webkit-text-fill-color 0.3s ease-in-out, text-fill-color 0.3s ease-in-out",
+          "&:hover": {
+            "background": "none",
+            "-webkit-text-fill-color": "#CCCCCC",
+            "text-fill-color": "#CCCCCC",
+          },
+        },
       });
     }),
   ],
