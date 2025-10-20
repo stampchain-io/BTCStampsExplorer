@@ -24,22 +24,31 @@ export default {
         "micro-5": ['"Micro 5"', "sans-serif"],
       },
       colors: {
-        stamp: {
+        // New semantic color palette (Phase 1)
+        color: {
           primary: {
-            DEFAULT: "#8800CC",
-            light: "#9900EE",
-            dark: "#660099",
-            hover: "#AA00FF",
+            dark: "#220033",
+            semidark: "#440066",
+            DEFAULT: "#660099",
+            semilight: "#8800CC",
+            light: "#AA00FF",
           },
+          neutral: {
+            dark: "#333333",
+            semidark: "#666666",
+            DEFAULT: "#999999",
+            semilight: "#CCCCCC",
+            light: "#FFFFFF",
+          },
+        },
+        // Legacy stamp colors (to be migrated)
+        stamp: {
           purple: {
             darkest: "#220033",
             darker: "#440066",
             dark: "#660099",
             DEFAULT: "#8800CC",
             bright: "#AA00FF",
-            light: "#4F3666",
-            accent: "#7A00F5",
-            highlight: "#AA00FF",
           },
           grey: {
             darkest: "#333333",
@@ -348,6 +357,15 @@ export default {
           "--stamp-scrollbar-track": "#333333",
           "--stamp-scrollbar-thumb": "#660099",
           "--stamp-scrollbar-hover": "#aa00ff",
+          // Stamp color palette as CSS variables
+          "--stamp-purple-darkest": "#220033",
+          "--stamp-purple-darker": "#440066",
+          "--stamp-purple-dark": "#660099",
+          "--stamp-purple": "#8800CC",
+          "--stamp-purple-bright": "#AA00FF",
+          "--stamp-grey-light": "#CCCCCC",
+          "--stamp-grey": "#999999",
+          "--stamp-grey-darker": "#666666",
         },
         "*::-webkit-scrollbar-corner": {
           "background-color": "transparent !important",
@@ -362,7 +380,8 @@ export default {
         },
         // Text Gradient Classes - Purple variants
         ".purple-gradient1": {
-          "background": "linear-gradient(to right, #440066, #660099, #8800cc)",
+          "background":
+            "linear-gradient(to right, var(--stamp-purple-darker), var(--stamp-purple-dark), var(--stamp-purple))",
           "-webkit-background-clip": "text",
           "-webkit-text-fill-color": "transparent",
           "background-clip": "text",
@@ -370,14 +389,15 @@ export default {
         },
         ".purple-gradient2": {
           "background":
-            "linear-gradient(to right, #440066, #660099, #8800cc, #aa00ff)",
+            "linear-gradient(to right, var(--stamp-purple-darker), var(--stamp-purple-dark), var(--stamp-purple), var(--stamp-purple-bright))",
           "-webkit-background-clip": "text",
           "-webkit-text-fill-color": "transparent",
           "background-clip": "text",
           "text-fill-color": "transparent",
         },
         ".purple-gradient3": {
-          "background": "linear-gradient(to right, #8800cc, #660099, #440066)",
+          "background":
+            "linear-gradient(to right, var(--stamp-purple), var(--stamp-purple-dark), var(--stamp-purple-darker))",
           "-webkit-background-clip": "text",
           "-webkit-text-fill-color": "transparent",
           "background-clip": "text",
@@ -385,7 +405,7 @@ export default {
         },
         ".purple-gradient4": {
           "background":
-            "linear-gradient(to right, #aa00ff, #8800cc, #660099, #440066)",
+            "linear-gradient(to right, var(--stamp-purple-bright), var(--stamp-purple), var(--stamp-purple-dark), var(--stamp-purple-darker))",
           "-webkit-background-clip": "text",
           "-webkit-text-fill-color": "transparent",
           "background-clip": "text",
@@ -393,27 +413,31 @@ export default {
         },
         // Text Gradient Classes - Gray variants
         ".gray-gradient1": {
-          "background": "linear-gradient(to right, #cccccc, #999999, #666666)",
+          "background":
+            "linear-gradient(to right, var(--stamp-grey-light), var(--stamp-grey), var(--stamp-grey-darker))",
           "-webkit-background-clip": "text",
           "-webkit-text-fill-color": "transparent",
           "background-clip": "text",
           "text-fill-color": "transparent",
         },
         ".gray-gradient2": {
-          "background": "linear-gradient(to right, #999999, #666666)",
+          "background":
+            "linear-gradient(to right, var(--stamp-grey), var(--stamp-grey-darker))",
           "-webkit-background-clip": "text",
           "-webkit-text-fill-color": "transparent",
           "background-clip": "text",
           "text-fill-color": "transparent",
         },
         ".gray-gradient3": {
-          "background": "linear-gradient(to right, #666666, #999999, #cccccc)",
+          "background":
+            "linear-gradient(to right, var(--stamp-grey-darker), var(--stamp-grey), var(--stamp-grey-light))",
           "-webkit-background-clip": "text",
           "-webkit-text-fill-color": "transparent",
           "background-clip": "text",
         },
         ".gray-gradient4": {
-          "background": "linear-gradient(to right, #666666, #999999)",
+          "background":
+            "linear-gradient(to right, var(--stamp-grey-darker), var(--stamp-grey))",
           "-webkit-background-clip": "text",
           "-webkit-text-fill-color": "transparent",
           "background-clip": "text",
@@ -422,7 +446,7 @@ export default {
         // Hoverable Text Gradients
         ".purple-gradient2-hover": {
           "background":
-            "linear-gradient(90deg, #440066 0%, #660099 50%, #8800cc 75%, #aa00ff 100%)",
+            "linear-gradient(90deg, var(--stamp-purple-darker) 0%, var(--stamp-purple-dark) 50%, var(--stamp-purple) 75%, var(--stamp-purple-bright) 100%)",
           "-webkit-background-clip": "text",
           "-webkit-text-fill-color": "transparent",
           "background-clip": "text",
@@ -430,12 +454,12 @@ export default {
           "transition": "background 0.3s ease-in-out",
           "&:hover": {
             "background":
-              "linear-gradient(90deg, #440066 0%, #660099 25%, #8800cc 50%, #aa00ff 75%)",
+              "linear-gradient(90deg, var(--stamp-purple-darker) 0%, var(--stamp-purple-dark) 25%, var(--stamp-purple) 50%, var(--stamp-purple-bright) 75%)",
           },
         },
         ".purple-gradient4-hover": {
           "background":
-            "linear-gradient(90deg, #aa00ff 30%, #8800cc 60%, #660099 90%, #440066 100%)",
+            "linear-gradient(90deg, var(--stamp-purple-bright) 30%, var(--stamp-purple) 60%, var(--stamp-purple-dark) 90%, var(--stamp-purple-darker) 100%)",
           "-webkit-background-clip": "text",
           "-webkit-text-fill-color": "transparent",
           "background-clip": "text",
@@ -443,11 +467,12 @@ export default {
           "transition": "background 0.3s ease-in-out",
           "&:hover": {
             "background":
-              "linear-gradient(90deg, #aa00ff 50%, #8800cc 80%, #660099 90%, #440066 100%)",
+              "linear-gradient(90deg, var(--stamp-purple-bright) 50%, var(--stamp-purple) 80%, var(--stamp-purple-dark) 90%, var(--stamp-purple-darker) 100%)",
           },
         },
         ".gray-gradient1-hover": {
-          "background": "linear-gradient(to right, #cccccc, #999999, #666666)",
+          "background":
+            "linear-gradient(to right, var(--stamp-grey-light), var(--stamp-grey), var(--stamp-grey-darker))",
           "-webkit-text-fill-color": "transparent",
           "background-clip": "text",
           "text-fill-color": "transparent",
@@ -455,12 +480,13 @@ export default {
             "background 0.3s ease-in-out, -webkit-text-fill-color 0.3s ease-in-out, text-fill-color 0.3s ease-in-out",
           "&:hover": {
             "background": "none",
-            "-webkit-text-fill-color": "#CCCCCC",
-            "text-fill-color": "#CCCCCC",
+            "-webkit-text-fill-color": "var(--stamp-grey-light)",
+            "text-fill-color": "var(--stamp-grey-light)",
           },
         },
         ".gray-gradient3-hover": {
-          "background": "linear-gradient(to right, #666666, #999999, #cccccc)",
+          "background":
+            "linear-gradient(to right, var(--stamp-grey-darker), var(--stamp-grey), var(--stamp-grey-light))",
           "-webkit-text-fill-color": "transparent",
           "background-clip": "text",
           "text-fill-color": "transparent",
@@ -468,8 +494,8 @@ export default {
             "background 0.3s ease-in-out, -webkit-text-fill-color 0.3s ease-in-out, text-fill-color 0.3s ease-in-out",
           "&:hover": {
             "background": "none",
-            "-webkit-text-fill-color": "#CCCCCC",
-            "text-fill-color": "#CCCCCC",
+            "-webkit-text-fill-color": "var(--stamp-grey-light)",
+            "text-fill-color": "var(--stamp-grey-light)",
           },
         },
       });
