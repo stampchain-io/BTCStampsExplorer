@@ -123,11 +123,11 @@ function SectionHeader({
       f-partial={`/${config.paramName}`}
     >
       <div class="flex items-center gap-4">
-        <h2 class="text-stamp-grey-dark text-lg mobileLg:text-2xl tablet:text-2xl desktop:text-2xl font-nunito font-extrabold">
+        <h2 class="text-color-neutral-dark text-lg mobileLg:text-2xl tablet:text-2xl desktop:text-2xl font-nunito font-extrabold">
           {title}
         </h2>
         {sortMetrics && (
-          <div class="text-xs text-stamp-grey opacity-75">
+          <div class="text-xs text-color-neutral opacity-75">
             {sortMetrics.count} sorts • {sortMetrics.avgDuration}ms avg
           </div>
         )}
@@ -436,17 +436,17 @@ function DispenserRow(
             </div>
           </div>
           <div class="text-center flex justify-between mt-[6px]">
-            <p class="text-base mobileLg:text-lg text-stamp-grey-darker font-light">
+            <p class="text-base mobileLg:text-lg text-color-neutral-semidark font-light">
               GIVE{" "}
-              <span class="font-bold text-stamp-grey-light">
+              <span class="font-bold text-color-neutral-light">
                 {Number(dispenser.give_quantity).toLocaleString()}
               </span>
             </p>
           </div>
           <div class="flex flex-row justify-between w-full">
-            <p class="text-base mobileLg:text-lg text-stamp-grey-darker font-light">
+            <p class="text-base mobileLg:text-lg text-color-neutral-semidark font-light">
               QUANTITY{" "}
-              <span class="font-bold text-stamp-grey-light">
+              <span class="font-bold text-color-neutral-light">
                 {dispenser.give_remaining === 0
                   ? Number(dispenser.escrow_quantity).toLocaleString()
                   : `${Number(dispenser.give_remaining).toLocaleString()}/${
@@ -455,7 +455,7 @@ function DispenserRow(
               </span>
             </p>
             <p
-              class={`text-stamp-grey-darker text-lg font-light -mt-1 ${
+              class={`text-color-neutral-semidark text-lg font-light -mt-1 ${
                 view === "mobile" ? "hidden mobileLg:block" : ""
               }`}
             >
@@ -463,24 +463,24 @@ function DispenserRow(
             </p>
           </div>
           <div class="flex flex-row justify-between w-full">
-            <p class="text-base mobileLg:text-lg text-stamp-grey-darker font-light">
+            <p class="text-base mobileLg:text-lg text-color-neutral-semidark font-light">
               PRICE{" "}
-              <span class="font-bold text-stamp-grey-light">
+              <span class="font-bold text-color-neutral-light">
                 {formatBTCAmount(Number(dispenser.btcrate), {
                   includeSymbol: false,
                 })}
               </span>{" "}
-              <span className="text-stamp-grey-light">BTC</span>
+              <span className="text-color-neutral-light">BTC</span>
             </p>
             <p
-              class={`text-xl mobileMd:text-2xl text-stamp-grey-light font-bold -mt-1 ${
+              class={`text-xl mobileMd:text-2xl text-color-neutral-light font-bold -mt-1 ${
                 view === "mobile" ? "hidden mobileLg:block" : ""
               }`}
             >
               {formatBTCAmount(
                 Number(dispenser.btcrate) * Number(dispenser.escrow_quantity),
                 { includeSymbol: false },
-              )} <span class="text-stamp-grey-light font-light">BTC</span>
+              )} <span class="text-color-neutral-light font-light">BTC</span>
             </p>
           </div>
         </div>
@@ -628,7 +628,7 @@ function WalletProfileContentInner({
       {/* Page Header */}
       <div class="flex flex-row justify-between items-center gap-3 w-full relative mb-6">
         <div class="flex gap-3 items-center">
-          <h1 class="text-2xl mobileMd:text-3xl mobileLg:text-4xl font-extralight text-stamp-purple-bright">
+          <h1 class="text-2xl mobileMd:text-3xl mobileLg:text-4xl font-extralight text-color-primary-semilight-bright">
             WALLET
           </h1>
           <p class="text-sm mobileMd:text-sm mobileLg:text-lg text-stamp-gray">
@@ -708,7 +708,7 @@ function WalletProfileContentInner({
               />
             )
             : (
-              <p class="text-stamp-grey opacity-75 text-center py-8">
+              <p class="text-color-neutral opacity-75 text-center py-8">
                 NO STAMPS IN THE WALLET
               </p>
             )}
@@ -742,7 +742,7 @@ function WalletProfileContentInner({
               />
             )
             : (
-              <p class="text-stamp-grey opacity-75 text-center py-8">
+              <p class="text-color-neutral opacity-75 text-center py-8">
                 NO TOKENS IN THE WALLET
               </p>
             )}
@@ -764,7 +764,7 @@ function WalletProfileContentInner({
           {/* Open Dispensers */}
           {openDispensersCount > 0 && (
             <div id="open-listings-section" class="mb-6">
-              <h3 class="text-lg font-semibold text-stamp-grey-darkest mb-3">
+              <h3 class="text-lg font-semibold text-color-neutral-dark mb-3">
                 Open Listings ({openDispensersCount})
               </h3>
               <DispenserItem
@@ -778,7 +778,7 @@ function WalletProfileContentInner({
           {/* Closed Dispensers */}
           {closedDispensersCount > 0 && (
             <div id="closed-listings-section">
-              <h3 class="text-lg font-semibold text-stamp-grey-darkest mb-3">
+              <h3 class="text-lg font-semibold text-color-neutral-dark mb-3">
                 Closed Listings ({closedDispensersCount})
               </h3>
               <DispenserItem
@@ -793,11 +793,11 @@ function WalletProfileContentInner({
 
       {/* Feature Flag Debug Info */}
       {enableAdvancedSorting && showSortingMetrics && (
-        <div class="mt-8 p-4 bg-stamp-grey-lightest rounded-2xl">
-          <h3 class="text-sm font-semibold text-stamp-grey-darkest mb-2">
+        <div class="mt-8 p-4 bg-color-neutral-lightest rounded-2xl">
+          <h3 class="text-sm font-semibold text-color-neutral-dark mb-2">
             Advanced Sorting Status
           </h3>
-          <div class="text-xs text-stamp-grey space-y-1">
+          <div class="text-xs text-color-neutral space-y-1">
             <div>Status: ✅ Enabled (Phase 1 - Infrastructure)</div>
             <div>URL Sync: {sortingConfig.enableUrlSync ? "✅" : "❌"}</div>
             <div>

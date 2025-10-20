@@ -125,7 +125,7 @@ export function MaraModeIndicator({
       {/* Tooltip */}
       {showTooltip && (
         <div
-          class="fixed z-50 bg-stamp-grey-darkest/95 backdrop-blur-sm border border-stamp-grey-light/20 rounded-2xl px-4 py-3 shadow-lg max-w-xs text-sm pointer-events-none"
+          class="fixed z-50 bg-color-neutral-dark/95 backdrop-blur-sm border border-color-neutral-light/20 rounded-2xl px-4 py-3 shadow-lg max-w-xs text-sm pointer-events-none"
           style={{
             left: `${tooltipPosition.x}px`,
             top: `${tooltipPosition.y - 10}px`,
@@ -139,7 +139,7 @@ export function MaraModeIndicator({
             <h4 class="font-semibold text-purple-400">
               MARA Pool Benefits
             </h4>
-            <ul class="space-y-1 text-stamp-grey-light text-xs">
+            <ul class="space-y-1 text-color-neutral-light text-xs">
               <li class="flex items-start gap-1">
                 <span class="text-purple-400 mt-0.5">•</span>
                 <span>
@@ -163,12 +163,12 @@ export function MaraModeIndicator({
                 <span>Minimum fee rate: {feeRate || "XX"} sat/vB</span>
               </li>
             </ul>
-            <p class="text-[10px] text-stamp-grey-darker mt-2 pt-2 border-t border-stamp-grey-light/10">
+            <p class="text-[10px] text-color-neutral-semidark mt-2 pt-2 border-t border-color-neutral-light/10">
               Note: Standard wallets cannot broadcast these transactions
             </p>
           </div>
           {/* Tooltip arrow */}
-          <div class="absolute left-1/2 -translate-x-1/2 -bottom-1 w-2 h-2 bg-stamp-grey-darkest border-b border-r border-stamp-grey-light/20 rotate-45" />
+          <div class="absolute left-1/2 -translate-x-1/2 -bottom-1 w-2 h-2 bg-color-neutral-dark border-b border-r border-color-neutral-light/20 rotate-45" />
         </div>
       )}
     </div>

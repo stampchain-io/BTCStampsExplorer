@@ -181,7 +181,7 @@ export function StampSalesGallery({
         {isLoading && (
           <div class="flex items-center gap-3 -mt-[29px] mb-[9px]">
             <div class={loaderSpinXsPurple} />
-            <div class="animate-pulse font-medium text-sm text-stamp-purple">
+            <div class="animate-pulse font-medium text-sm text-color-primary-semilight">
               REFRESHING
             </div>
           </div>

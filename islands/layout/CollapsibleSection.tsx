@@ -45,11 +45,13 @@ export const CollapsibleSection = ({
                 font-light tablet:font-normal text-lg tablet:text-sm transition-colors duration-300
                 ${
                 expanded
-                  ? `text-stamp-grey ${
-                    canHoverSelected ? "group-hover:text-stamp-grey-light" : ""
+                  ? `text-color-neutral ${
+                    canHoverSelected
+                      ? "group-hover:text-color-neutral-light"
+                      : ""
                   }`
-                  : `text-stamp-grey-light ${
-                    canHoverSelected ? "group-hover:text-stamp-grey" : ""
+                  : `text-color-neutral-light ${
+                    canHoverSelected ? "group-hover:text-color-neutral" : ""
                   }`
               }`}
             >
@@ -64,13 +66,13 @@ export const CollapsibleSection = ({
               <div
                 class={`${
                   expanded
-                    ? `stroke-stamp-grey ${
+                    ? `stroke-color-neutral ${
                       canHoverSelected
-                        ? "group-hover:stroke-stamp-grey-light"
+                        ? "group-hover:stroke-color-neutral-light"
                         : ""
                     }`
-                    : `stroke-stamp-grey-light ${
-                      canHoverSelected ? "group-hover:stroke-stamp-grey" : ""
+                    : `stroke-color-neutral-light ${
+                      canHoverSelected ? "group-hover:stroke-color-neutral" : ""
                     }`
                 } transition-colors duration-300`}
               >
@@ -114,12 +116,12 @@ export const CollapsibleSection = ({
                 expanded ? "scale-y-[-1]" : "mb-0.5"
               } ${
                 expanded
-                  ? `stroke-stamp-grey-light ${
-                    canHoverSelected ? "group-hover:stroke-stamp-grey" : ""
+                  ? `stroke-color-neutral-light ${
+                    canHoverSelected ? "group-hover:stroke-color-neutral" : ""
                   }`
-                  : `stroke-stamp-grey ${
+                  : `stroke-color-neutral ${
                     canHoverSelected
-                      ? "group-hover:stroke-stamp-grey-light"
+                      ? "group-hover:stroke-color-neutral-light"
                       : ""
                   }`
               } transition-colors duration-300`}

@@ -264,7 +264,7 @@ function SearchContent({
         onInput={(e) => setSearchTerm((e.target as HTMLInputElement).value)}
         onKeyDown={handleKeyDown}
         autoFocus={autoFocus}
-        class={`relative z-modal h-12 w-full bg-[#080708]/50 pl-7.5 pr-[68px]  font-mediun text-sm text-stamp-grey-light placeholder:bg-[#080708]/50 placeholder:font-light placeholder:!text-stamp-grey no-outline ${
+        class={`relative z-modal h-12 w-full bg-[#080708]/50 pl-7.5 pr-[68px]  font-mediun text-sm text-color-neutral-light placeholder:bg-[#080708]/50 placeholder:font-light placeholder:!text-color-neutral no-outline ${
           searchState.value.error ? "rounded-t-3xl" : "rounded-3xl"
         }`}
       />
@@ -280,8 +280,8 @@ function SearchContent({
           color="custom"
           className={`w-5 h-5 ${
             searchState.value.error
-              ? "stroke-stamp-grey-light"
-              : "stroke-stamp-grey"
+              ? "stroke-color-neutral-light"
+              : "stroke-color-neutral"
           }`}
         />
       </div>
@@ -299,10 +299,10 @@ function SearchContent({
                   key={index}
                   class={`${
                     index === 0
-                      ? "font-light text-base text-stamp-grey-light"
+                      ? "font-light text-base text-color-neutral-light"
                       : index === searchState.value.error.split("\n").length - 1
                       ? textSm
-                      : "font-medium text-sm text-stamp-grey pt-0.5 pb-1"
+                      : "font-medium text-sm text-color-neutral pt-0.5 pb-1"
                   } break-all overflow-hidden`}
                 >
                   {text}

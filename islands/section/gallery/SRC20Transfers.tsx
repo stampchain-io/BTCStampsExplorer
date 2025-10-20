@@ -99,7 +99,7 @@ export default function SRC20TransfersGallery(): JSX.Element {
         )
         : transactions.length === 0
         ? (
-          <div class="text-stamp-grey-darkest text-sm">
+          <div class="text-color-neutral-dark text-sm">
             NO RECENT TRANSFERS FOUND
           </div>
         )

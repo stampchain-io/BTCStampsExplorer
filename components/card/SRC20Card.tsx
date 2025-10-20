@@ -163,13 +163,13 @@ export function SRC20Card({
       : cellCenterCard;
 
     // Selected segment styling
-    const selectedClass = isSelected ? "text-stamp-grey-light" : "";
+    const selectedClass = isSelected ? "text-color-neutral-light" : "";
 
     const colorClass = isSelected
-      ? "text-stamp-grey-light"
+      ? "text-color-neutral-light"
       : isClickable
-      ? "text-stamp-grey-darker hover:text-stamp-grey-light"
-      : "text-stamp-grey-darker";
+      ? "text-color-neutral-semidark hover:text-color-neutral-light"
+      : "text-color-neutral-semidark";
 
     const clickableClass = isClickable
       ? "cursor-pointer transition-all duration-200 select-none"
@@ -207,7 +207,7 @@ export function SRC20Card({
           weight="normal"
           size="xxxs"
           color="custom"
-          className={`stroke-stamp-grey-light transition-all duration-200 transform ${
+          className={`stroke-color-neutral-light transition-all duration-200 transform ${
             currentSort.direction === "desc" ? "scale-y-[-1]" : ""
           }`}
         />
@@ -445,7 +445,7 @@ export function SRC20Card({
                           return (
                             <span class="relative">
                               {priceDisplay}
-                              <sup class="text-[8px] text-stamp-grey-light ml-0.5">
+                              <sup class="text-[8px] text-color-neutral-light ml-0.5">
                                 {sourceLabel}
                               </sup>
                             </span>
@@ -478,7 +478,7 @@ export function SRC20Card({
                             );
                           }
                         }
-                        return <span class="text-stamp-grey">N/A</span>;
+                        return <span class="text-color-neutral">N/A</span>;
                       })()}
                     </td>
                     {/* VOLUME */}
@@ -589,7 +589,7 @@ export function SRC20Card({
                           />
                         )
                         : (
-                          <div class="flex items-center justify-center text-xs text-stamp-grey-light opacity-60">
+                          <div class="flex items-center justify-center text-xs text-color-neutral-light opacity-60">
                             <span>—</span>
                           </div>
                         )}

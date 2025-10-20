@@ -120,7 +120,7 @@ export function HomeHeader() {
           max-w-[310px]
           text-center
           font-medium 
-          text-stamp-grey-light
+          text-color-neutral-light
           text-base
           mobileLg:text-xl
           mobileMd:max-w-[380px]

@@ -4,8 +4,8 @@ import type { ColorSwatchProps } from "$types/ui.d.ts";
 function ColorSwatch({ name, bgClass }: ColorSwatchProps) {
   return (
     <div class={`${bgClass} p-6 rounded-2xl`}>
-      <div class="text-stamp-grey-bright font-semibold">{name}</div>
-      <div class="text-stamp-grey-bright text-sm mt-2 opacity-80">
+      <div class="text-color-neutral-light font-semibold">{name}</div>
+      <div class="text-color-neutral-light text-sm mt-2 opacity-80">
         {bgClass}
       </div>
     </div>
@@ -20,19 +20,19 @@ export default function DesignSystem() {
       </Head>
       <div class="min-h-screen bg-stamp-bg-purple-darkest p-8">
         <div class="max-w-full mx-auto space-y-12">
-          <h1 class="text-4xl font-bold text-stamp-grey-bright">
+          <h1 class="text-4xl font-bold text-color-neutral-light">
             Design System
           </h1>
 
           {/* Colors */}
           <section class="space-y-8">
-            <h2 class="text-2xl font-bold text-stamp-grey-bright">
+            <h2 class="text-2xl font-bold text-color-neutral-light">
               Colors
             </h2>
 
             {/* Primary Colors */}
             <div>
-              <h3 class="text-xl text-stamp-grey-bright mb-4">
+              <h3 class="text-xl text-color-neutral-light mb-4">
                 Primary Colors
               </h3>
               <div class="grid grid-cols-1 tablet:grid-cols-4 gap-4">
@@ -61,7 +61,7 @@ export default function DesignSystem() {
 
             {/* Text Colors */}
             <div>
-              <h3 class="text-xl text-stamp-grey-bright mb-4">
+              <h3 class="text-xl text-color-neutral-light mb-4">
                 Text Colors
               </h3>
               <div class="grid grid-cols-1 tablet:grid-cols-4 gap-4">
@@ -90,7 +90,7 @@ export default function DesignSystem() {
 
             {/* Text Gradients */}
             <div>
-              <h3 class="text-xl text-stamp-grey-bright mb-4">
+              <h3 class="text-xl text-color-neutral-light mb-4">
                 Text Gradients
               </h3>
               <div class="space-y-6 bg-stamp-bg-purple-darker p-8 rounded-2xl">

@@ -85,7 +85,7 @@ export function StampListingsAllTable(
                 <tr
                   key={`${dispenser.tx_hash}-${index}`}
                   class={`${glassmorphismL2} group ${
-                    isEmpty ? "text-stamp-grey-darker" : ""
+                    isEmpty ? "text-color-neutral-semidark" : ""
                   }`}
                 >
                   {/* PRICE */}
@@ -142,7 +142,7 @@ export function StampListingsAllTable(
                       href={`/wallet/${dispenser.source}`}
                       className={`${valueSmLink} ${
                         isEmpty
-                          ? "!text-stamp-grey-darker hover:!text-stamp-purple-bright"
+                          ? "!text-color-neutral-semidark hover:!text-color-primary-semilight-bright"
                           : ""
                       }`}
                     >
@@ -170,7 +170,7 @@ export function StampListingsAllTable(
                           href={`https://www.blockchain.com/explorer/transactions/btc/${dispenser.tx_hash}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          class="hover:text-stamp-purple-bright"
+                          class="hover:text-color-primary-semilight-bright"
                         >
                           CLOSED
                         </a>

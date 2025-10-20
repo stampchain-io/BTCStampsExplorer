@@ -101,7 +101,9 @@ export function SkeletonToggle({
       <div
         class={`flex justify-center items-center relative w-5 bg-transparent ${height} ${rounded}`}
       >
-        <div class={`w-[14px] h-[14px] bg-stamp-grey opacity-30 ${rounded}`} />
+        <div
+          class={`w-[14px] h-[14px] bg-color-neutral opacity-30 ${rounded}`}
+        />
       </div>
     </div>
   );

@@ -393,7 +393,7 @@ const DonateStampModal = ({
     >
       {/* ===== PRICE DISPLAY ===== */}
       <div className="mb-6">
-        <h6 className="font-extrabold text-3xl text-stamp-grey-light text-center">
+        <h6 className="font-extrabold text-3xl text-color-neutral-light text-center">
           {(totalPrice / 100000000).toFixed(8)}{" "}
           <span className="font-extralight">BTC</span>
         </h6>
@@ -415,10 +415,10 @@ const DonateStampModal = ({
           {/* ===== QUANTITY SELECTION ===== */}
           <div className="flex flex-col w-full">
             <div className="flex flex-col items-start pt-0.5 -space-y-0.5">
-              <h6 className="font-light text-sm text-stamp-grey-darker">
+              <h6 className="font-light text-sm text-color-neutral-semidark">
                 RECEIVE
               </h6>
-              <h6 className="font-light text-lg text-stamp-grey-light">
+              <h6 className="font-light text-lg text-color-neutral-light">
                 <span className="font-bold">{quantity * 1000}</span> USDSTAMPS
                 {quantity * 1000 > 1 ? "" : ""}
               </h6>

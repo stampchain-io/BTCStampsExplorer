@@ -169,7 +169,7 @@ const HoldersTableBase = (
                       <td
                         class={`${
                           cellAlign(2, headers?.length ?? 0)
-                        } ${cellRightL2Detail} text-stamp-grey`}
+                        } ${cellRightL2Detail} text-color-neutral`}
                       >
                         {holder.percentage}%
                       </td>
@@ -213,7 +213,7 @@ const HoldersTableBase = (
                     <td
                       class={`${
                         cellAlign(2, headers?.length ?? 0)
-                      } ${cellRightL2Detail} text-stamp-grey`}
+                      } ${cellRightL2Detail} text-color-neutral`}
                     >
                       {holder.percentage}%
                     </td>

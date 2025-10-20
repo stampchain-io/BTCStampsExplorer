@@ -1,33 +1,34 @@
 export const TEXT_STYLES = {
   hashSymbol: {
-    base: "font-light text-stamp-purple-bright",
+    base: "font-light text-color-primary-semilight-bright",
     sizes: "text-lg mobileLg:text-xl",
   },
   stampNumber: {
-    base: "font-extrabold text-stamp-purple-bright truncate max-w-full",
+    base:
+      "font-extrabold text-color-primary-semilight-bright truncate max-w-full",
     // sizes: "text-lg mobileSm:text-lg mobileLg:text-xl tablet:text-2xl desktop:text-2xl group-data-[long-number=true]:text-sm group-data-[long-number=true]:mobileSm:text-sm group-data-[long-number=true]:mobileLg:text-base group-data-[long-number=true]:tablet:text-lg group-data-[long-number=true]:desktop:text-xl",
     sizes: "text-lg mobileLg:text-xl",
   },
   creator: {
-    base: "font-semibold text-stamp-grey-light break-words text-center pt-1",
+    base: "font-semibold text-color-neutral-light break-words text-center pt-1",
     sizes: "text-xs mobileMd:text-sm",
   },
   price: {
-    base: "font-normal text-stamp-grey-light text-nowrap",
+    base: "font-normal text-color-neutral-light text-nowrap",
     sizes: "text-xs mobileLg:text-sm",
   },
   mimeType: {
-    base: "font-normal text-stamp-grey text-nowrap",
+    base: "font-normal text-color-neutral text-nowrap",
     sizes: "text-xs mobileLg:text-sm",
   },
   supply: {
-    base: "font-medium text-stamp-grey text-right",
+    base: "font-medium text-color-neutral text-right",
     sizes: "text-xs mobileLg:text-base",
   },
   minimal: {
     hashSymbol: {
       base:
-        "font-light text-stamp-grey-light group-hover:text-stamp-purple-bright",
+        "font-light text-color-neutral-light group-hover:text-color-primary-semilight-bright",
       sizes:
         "text-xs mobileSm:text-base mobileLg:text-xl tablet:text-xl desktop:text-xl",
     },
@@ -38,13 +39,14 @@ export const TEXT_STYLES = {
         "text-sm mobileSm:text-base mobileLg:text-xl tablet:text-xl desktop:text-xl",
     },
     price: {
-      base: "font-normal text-stamp-grey truncate text-nowrap",
+      base: "font-normal text-color-neutral truncate text-nowrap",
       sizes: "text-[10px] mobileMd:text-xs mobileLg:text-sm",
     },
   },
   greyGradient: {
     hashSymbol: {
-      base: "font-light text-stamp-grey group-hover:text-stamp-purple-bright",
+      base:
+        "font-light text-color-neutral group-hover:text-color-primary-semilight-bright",
       sizes: "text-lg min-[420px]:text-xl",
     },
     stampNumber: {

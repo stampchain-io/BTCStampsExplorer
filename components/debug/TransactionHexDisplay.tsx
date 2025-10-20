@@ -81,13 +81,13 @@ export function TransactionHexDisplay({
         </div>
       )}
 
-      <div class="bg-stamp-grey-darkest/50 rounded p-3 overflow-x-auto">
-        <pre class="text-xs text-stamp-grey-light font-mono whitespace-pre-wrap break-all">
+      <div class="bg-color-neutral-dark/50 rounded p-3 overflow-x-auto">
+        <pre class="text-xs text-color-neutral-light font-mono whitespace-pre-wrap break-all">
           {displayHex}
         </pre>
       </div>
 
-      <div class="mt-3 text-xs text-stamp-grey-light">
+      <div class="mt-3 text-xs text-color-neutral-light">
         <p class="mb-1">
           Length: {hex.length} characters
         </p>

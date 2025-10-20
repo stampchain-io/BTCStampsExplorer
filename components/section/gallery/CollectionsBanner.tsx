@@ -5,7 +5,7 @@ import { useState } from "preact/hooks";
 
 /* ===== STYLES ===== */
 const containerClassName =
-  `border-2 border-stamp-grey-darker rounded-2xl relative overflow-hidden
+  `border-2 border-color-neutral-semidark rounded-2xl relative overflow-hidden
   w-full h-[92px] mobileMd:h-[116px] mobileLg:h-[130px] tablet:h-[148px] desktop:h-[160px]`;
 const imageContentClassName =
   "bg-center bg-no-repeat bg-[length:100%] w-full h-full grayscale transition-all duration-300";
@@ -55,7 +55,7 @@ export function CollectionsBanner(
       />
       <h3
         class={`${nameClassName} ${
-          isDarkMode ? "text-stamp-grey-light" : "text-stamp-grey-darkest"
+          isDarkMode ? "text-color-neutral-light" : "text-color-neutral-dark"
         } ${isHovered ? "!hidden" : ""}`}
       >
         {collection.collection_name}

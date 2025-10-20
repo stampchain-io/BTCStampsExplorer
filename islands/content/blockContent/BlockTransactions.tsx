@@ -21,7 +21,7 @@ export default function BlockTransactions() {
   /* ===== RENDER ===== */
   return (
     <div
-      class={`${containerBackground} text-stamp-grey-light gap-6 transition-all`}
+      class={`${containerBackground} text-color-neutral-light gap-6 transition-all`}
     >
       {/* ===== HEADER SECTION ===== */}
       <div class="flex justify-between">

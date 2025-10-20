@@ -59,15 +59,15 @@ export const containerStickyBottom = `sticky bottom-0 mt-auto py-9 tablet:py-6`;
 
 // Stamp Card styles
 export const containerCard = `${glassmorphism} ${shadowGlowPurple}
-  hover:border-stamp-purple-bright`; // check if used
+  hover:border-color-primary-semilight-bright`; // check if used
 
 export const containerCardL2 = `${glassmorphismL2} ${shadowGlowPurple}
-  hover:border-stamp-purple-bright`;
+  hover:border-color-primary-semilight-bright`;
 
 // Table card container styles - check if used
 export const containerCardTable =
   `rounded-3xl ${glassmorphism} ${shadowGlowPurple}
-  hover:border-stamp-purple-bright`;
+  hover:border-color-primary-semilight-bright`;
 
 // Global styles
 export const containerColData = "flex flex-col -space-y-1"; // Data specific
@@ -88,23 +88,23 @@ export const rowResponsiveForm =
 // Stamp and SRC20 Table Row Cards - Stamp/tokencards
 export const cellLeftCard =
   `p-3 pl-4 rounded-l-3xl border-y-[1px] border-l-[1px] border-r-0 border-[#242424]/50
-  group-hover:bg-black/20 group-hover:border-stamp-purple-bright ${transitionColors} whitespace-nowrap`;
+  group-hover:bg-black/20 group-hover:border-color-primary-semilight-bright ${transitionColors} whitespace-nowrap`;
 export const cellRightCard =
   `p-3 pr-4 rounded-r-3xl border-y-[1px] border-r-[1px] border-l-0 border-[#242424]/50
-  group-hover:bg-black/20 group-hover:border-stamp-purple-bright ${transitionColors} whitespace-nowrap`;
+  group-hover:bg-black/20 group-hover:border-color-primary-semilight-bright ${transitionColors} whitespace-nowrap`;
 export const cellCenterCard = `p-3 border-y-[1px] border-x-0 border-[#242424]/50
-  group-hover:bg-black/20 group-hover:border-stamp-purple-bright ${transitionColors} whitespace-nowrap`;
+  group-hover:bg-black/20 group-hover:border-color-primary-semilight-bright ${transitionColors} whitespace-nowrap`;
 // Layer 2
 // Stamp and SRC20 Table Row Cards - Stamp/tokencards inside of layer 1
 export const cellLeftL2Card =
   `p-3 pl-4 rounded-l-2xl border-y-[1px] border-l-[1px] border-r-0 border-[#242424]/75
-  group-hover:bg-black/20 group-hover:border-stamp-purple-bright ${transitionColors} whitespace-nowrap`;
+  group-hover:bg-black/20 group-hover:border-color-primary-semilight-bright ${transitionColors} whitespace-nowrap`;
 export const cellRightL2Card =
   `p-3 pr-4 rounded-r-2xl border-y-[1px] border-r-[1px] border-l-0 border-[#242424]/75
-  group-hover:bg-black/20 group-hover:border-stamp-purple-bright ${transitionColors} whitespace-nowrap`;
+  group-hover:bg-black/20 group-hover:border-color-primary-semilight-bright ${transitionColors} whitespace-nowrap`;
 export const cellCenterL2Card =
   `p-3 border-y-[1px] border-x-0 border-[#242424]/75
-  group-hover:bg-black/20 group-hover:border-stamp-purple-bright ${transitionColors} whitespace-nowrap`;
+  group-hover:bg-black/20 group-hover:border-color-primary-semilight-bright ${transitionColors} whitespace-nowrap`;
 // Stamp and SRC20 Detail pages Table Rows
 export const cellLeftL2Detail =
   `p-1.5 pl-3 rounded-l-2xl border-y-[1px] border-l-[1px] border-r-0 border-[#242424]/75 group-hover:bg-black/20 group-hover:border-[#232223] ${transitionColors} whitespace-nowrap`;
@@ -120,7 +120,7 @@ export const cellStickyLeft =
 export const imagePreviewTool =
   `flex items-center justify-center min-w-[100px] h-[100px] ${glassmorphismL2}`;
 export const imageUploadTool =
-  `flex items-center justify-center min-w-[100px] h-[100px] ${glassmorphismL2} hover:bg-stamp-grey-darkest/30 ${transitionColors} cursor-pointer`;
+  `flex items-center justify-center min-w-[100px] h-[100px] ${glassmorphismL2} hover:bg-color-neutral-dark/30 ${transitionColors} cursor-pointer`;
 
 /* ===== MODAL STYLES ===== */
 export const modalBgCenter =
@@ -134,14 +134,18 @@ const loaderSpin = "animate-spin rounded-full border-b-[2px]";
 export const loaderSkeleton =
   `bg-[#080708]/50 border-[1px] border-[#242424]/50 animate-pulse`;
 // Spinning loader styles
-export const loaderSpinXsGrey = `${loaderSpin} w-3 h-3 border-stamp-grey`;
-export const loaderSpinSmGrey = `${loaderSpin} w-5 h-5 border-stamp-grey`;
-export const loaderSpinGrey = `${loaderSpin} w-7 h-7 border-stamp-grey`;
-export const loaderSpinLgGrey = `${loaderSpin} w-9 h-9 border-stamp-grey`;
-export const loaderSpinXsPurple = `${loaderSpin} w-3 h-3 border-stamp-purple`;
-export const loaderSpinSmPurple = `${loaderSpin} w-5 h-5 border-stamp-purple`;
-export const loaderSpinPurple = `${loaderSpin} w-7 h-7 border-stamp-purple`;
-export const loaderSpinLgPurple = `${loaderSpin} w-9 h-9 border-stamp-purple`;
+export const loaderSpinXsGrey = `${loaderSpin} w-3 h-3 border-color-neutral`;
+export const loaderSpinSmGrey = `${loaderSpin} w-5 h-5 border-color-neutral`;
+export const loaderSpinGrey = `${loaderSpin} w-7 h-7 border-color-neutral`;
+export const loaderSpinLgGrey = `${loaderSpin} w-9 h-9 border-color-neutral`;
+export const loaderSpinXsPurple =
+  `${loaderSpin} w-3 h-3 border-color-primary-semilight`;
+export const loaderSpinSmPurple =
+  `${loaderSpin} w-5 h-5 border-color-primary-semilight`;
+export const loaderSpinPurple =
+  `${loaderSpin} w-7 h-7 border-color-primary-semilight`;
+export const loaderSpinLgPurple =
+  `${loaderSpin} w-9 h-9 border-color-primary-semilight`;
 
 /* ===== LEGACY STYLES - @baba-check and remove ===== */
 export const modalBgTop =

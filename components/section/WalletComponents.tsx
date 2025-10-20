@@ -18,7 +18,7 @@ export function StatItem({
         {label}
       </h5>
       <h6
-        class={`${valueSm} ${alignmentClass} group-hover:text-stamp-grey transition-colors duration-300`}
+        class={`${valueSm} ${alignmentClass} group-hover:text-color-neutral transition-colors duration-300`}
       >
         {value}
       </h6>
@@ -48,7 +48,7 @@ export function StatTitle({
         {label}
       </h5>
       <h6
-        class={`${value3xl} ${alignmentClass} group-hover:text-stamp-grey transition-colors duration-300`}
+        class={`${value3xl} ${alignmentClass} group-hover:text-color-neutral transition-colors duration-300`}
       >
         {value}
       </h6>

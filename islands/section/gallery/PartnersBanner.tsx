@@ -43,8 +43,8 @@ function PartnerCard({ name, largeImage, smallImage, url }: Partner) {
     <div
       class={`relative w-full border-[1px] ${
         isHovered
-          ? `border-stamp-grey ${shadowGlowGrey}`
-          : "border-stamp-grey-darker"
+          ? `border-color-neutral ${shadowGlowGrey}`
+          : "border-color-neutral-semidark"
       } rounded-2xl`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}

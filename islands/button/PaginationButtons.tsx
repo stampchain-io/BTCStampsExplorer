@@ -20,7 +20,7 @@ const navArrow = `${navBase} group
   w-10 h-10 tablet:w-9 tablet:h-9`;
 const navContent = `${navBase} group
   h-10 px-[16px] tablet:h-9 tablet:px-[14px]
-  font-light text-sm text-stamp-grey-darker hover:text-stamp-grey leading-[16.5px]`;
+  font-light text-sm text-color-neutral-semidark hover:text-color-neutral leading-[16.5px]`;
 
 // SSR-safe screen size hook
 const useScreenSize = () => {
@@ -96,7 +96,7 @@ export function PaginationButtons({
     const baseClass = iconName ? navArrow : navContent;
     const buttonClass = isCurrentPage
       ? `${baseClass} bg-[#100a10]/60 border-[#242424]
-       text-stamp-grey font-normal
+       text-color-neutral font-normal
        hover:bg-[#100a10]/60 hover:border-[#242424] `
       : `${baseClass}`;
 
@@ -115,7 +115,7 @@ export function PaginationButtons({
               weight="bold"
               size="xxs"
               color="custom"
-              className="stroke-stamp-grey-darker group-hover:stroke-stamp-grey"
+              className="stroke-color-neutral-semidark group-hover:stroke-color-neutral"
             />
           )
           : <span>{pageNum}</span>}

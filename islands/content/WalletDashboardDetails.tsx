@@ -219,13 +219,13 @@ function WalletOverview(
     <div class="flex flex-col">
       <div class="flex justify-between">
         <div class={`${hideBalance ? "blur-sm" : ""}`}>
-          <h6 class="text-stamp-grey-light font-extralight text-2xl mobileMd:text-3xl mobileLg:text-4xl select-none">
+          <h6 class="text-color-neutral-light font-extralight text-2xl mobileMd:text-3xl mobileLg:text-4xl select-none">
             <span class="font-bold">
               {hideBalance ? "*********" : walletData.balance}
             </span>{" "}
             BTC
           </h6>
-          <h6 class="text-stamp-grey font-extralight text-base mobileMd:text-lg mobileLg:text-xl select-none pt-[3px]">
+          <h6 class="text-color-neutral font-extralight text-base mobileMd:text-lg mobileLg:text-xl select-none pt-[3px]">
             <span class="font-medium">
               {hideBalance ? "*****" : walletData.usdValue.toLocaleString()}
             </span>{" "}
@@ -286,7 +286,7 @@ function WalletOverview(
         </button>
       </div>
 
-      <div class="flex items-center pt-3 mobileMd:pt-6 text-base mobileLg:text-lg text-stamp-purple font-medium select-none">
+      <div class="flex items-center pt-3 mobileMd:pt-6 text-base mobileLg:text-lg text-color-primary-semilight font-medium select-none">
         <h6 class="hidden tablet:block">
           {abbreviateAddress(walletData.address, 12)}
         </h6>
@@ -413,7 +413,7 @@ function DashboardProfile() {
   return (
     <div class="flex flex-col">
       <div class="flex">
-        <div class="flex items-center justify-center relative -top-3 -left-3 mobileMd:-top-6 mobileMd:-left-6 w-[58px] h-[58px] mobileLg:w-[76px] mobileLg:h-[76px] bg-stamp-purple rounded-full">
+        <div class="flex items-center justify-center relative -top-3 -left-3 mobileMd:-top-6 mobileMd:-left-6 w-[58px] h-[58px] mobileLg:w-[76px] mobileLg:h-[76px] bg-color-primary-semilight rounded-full">
           <img
             src="/img/banner/kevin.png"
             alt="Avatar"
@@ -428,21 +428,21 @@ function DashboardProfile() {
       </div>
       <div class="flex justify-between">
         <div class="flex flex-col gap-0.5">
-          <h6 class="text-stamp-grey font-light text-base mobileLg:text-lg">
+          <h6 class="text-color-neutral font-light text-base mobileLg:text-lg">
             anonymous.btc
           </h6>
-          <h6 class="text-stamp-grey font-light text-base mobileLg:text-lg">
+          <h6 class="text-color-neutral font-light text-base mobileLg:text-lg">
             kevin.btc
           </h6>
-          <h6 class="text-stamp-grey font-light text-base mobileLg:text-lg">
+          <h6 class="text-color-neutral font-light text-base mobileLg:text-lg">
             pepe.btc
           </h6>
-          <h6 class="text-stamp-grey font-light text-base mobileLg:text-lg">
+          <h6 class="text-color-neutral font-light text-base mobileLg:text-lg">
             satoshi.btc
           </h6>
         </div>
         <div class="flex">
-          <h6 class="text-stamp-grey-darker font-medium text-sm mobileLg:text-base">
+          <h6 class="text-color-neutral-semidark font-medium text-sm mobileLg:text-base">
             website // X
           </h6>
         </div>

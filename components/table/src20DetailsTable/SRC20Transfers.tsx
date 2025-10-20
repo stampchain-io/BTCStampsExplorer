@@ -133,7 +133,7 @@ export function SRC20TransfersTable(
                 <td
                   class={`${
                     cellAlign(4, headers?.length ?? 0)
-                  } ${cellRightL2Detail} text-stamp-grey`}
+                  } ${cellRightL2Detail} text-color-neutral`}
                 >
                   <a
                     href={`https://www.blockchain.com/explorer/transactions/btc/${send.tx_hash}`}

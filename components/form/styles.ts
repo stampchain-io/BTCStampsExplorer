@@ -14,8 +14,8 @@ const inputFieldWidth = "!w-10";
 const inputFieldStyle = `px-5 w-full
   ${glassmorphismL2} ${glassmorphismL2Hover}
   focus:bg-[#080708]/60 focus:border-[#242424] focus:outline-none focus-visible:outline-none no-outline ${transitionColors}
-  font-medium text-sm text-stamp-grey-light
-  placeholder:font-light placeholder:text-stamp-grey-darker placeholder:uppercase`;
+  font-medium text-sm text-color-neutral-light
+  placeholder:font-light placeholder:text-color-neutral-semidark placeholder:uppercase`;
 
 /* ===== INPUT STYLES ===== */
 // Base input
@@ -47,7 +47,7 @@ export const inputFieldDropdown = `
 absolute top-[100%] left-0 w-full z-dropdown
 bg-gradient-to-b from-[#080708]/30 to-[#080708] backdrop-blur-sm
 border border-t-0 border-[#242424]/75 rounded-b-2xl
-text-stamp-grey-light text-sm font-medium uppercase leading-none
+text-color-neutral-light text-sm font-medium uppercase leading-none
 overflow-y-auto scrollbar-glassmorphism-slim shadow-lg cursor-pointer`;
 
 export const inputFieldDropdownHover = `
@@ -70,11 +70,11 @@ export const inputCheckbox = (
   ${
   checked
     ? canHoverSelected
-      ? "border-stamp-grey-light after:bg-stamp-grey-light group-hover:border-stamp-grey group-hover:after:bg-stamp-grey"
-      : "border-stamp-grey-light after:bg-stamp-grey-light"
+      ? "border-color-neutral-light after:bg-color-neutral-light group-hover:border-color-neutral group-hover:after:bg-color-neutral"
+      : "border-color-neutral-light after:bg-color-neutral-light"
     : canHoverSelected
-    ? "border-stamp-grey group-hover:border-stamp-grey-light"
-    : "border-stamp-grey"
+    ? "border-color-neutral group-hover:border-color-neutral-light"
+    : "border-color-neutral"
 }
     after:content-['']
     after:block
@@ -140,17 +140,17 @@ export const outlineGradient = `
   [&>*]:relative [&>*]:z-[2] [&>*]:rounded-2xl [&>*]:bg-[#141015]
   [&>div]:flex [&>div]:justify-between [&>div]:relative [&>div]:z-[2] [&>div]:!bg-[#141015] [&>div]:placeholder:!bg-[#141015] [&>div]:rounded-2xl
   [&>div>input]:${inputFieldHeight} [&>div>input]:w-full [&>div>input]:bg-transparent [&>div>input]:rounded-2xl [&>div>input]:pl-5
-  [&>div>input]:font-normal [&>div>input]:text-base [&>div>input]:text-stamp-grey-light
-  [&>div>input]:placeholder:font-light [&>div>input]:placeholder:!text-stamp-grey
+  [&>div>input]:font-normal [&>div>input]:text-base [&>div>input]:text-color-neutral-light
+  [&>div>input]:placeholder:font-light [&>div>input]:placeholder:!text-color-neutral
   [&>div>input]:!outline-none [&>div>input]:focus-visible:!outline-none [&>div>input]:focus:!bg-[#1e191e]
 `;
 */
 /* ===== NOT IN USE NOR UPDATED ===== */
 /* ===== LABEL STYLES ===== */
 export const labelBase =
-  "font-medium text-base text-stamp-grey-light cursor-default select-none whitespace-nowrap";
+  "font-medium text-base text-color-neutral-light cursor-default select-none whitespace-nowrap";
 export const labelLarge =
-  "font-medium text-lg text-stamp-grey-light cursor-default select-none whitespace-nowrap";
+  "font-medium text-lg text-color-neutral-light cursor-default select-none whitespace-nowrap";
 
 /* ===== STATE STYLES ===== */
 export const stateDisabled = "opacity-50 cursor-not-allowed";
@@ -161,7 +161,7 @@ export const stateSuccess = "text-xs border-green-500 focus:border-green-500";
 /* ===== MESSAGE STYLES ===== */
 export const messageError = "text-xs text-red-500 mt-2";
 export const messageSuccess = "text-xs text-green-500 mt-2";
-export const messageHelp = "text-xs text-stamp-grey-darkest mt-1";
+export const messageHelp = "text-xs text-color-neutral-dark mt-1";
 /* ===== ===== ===== */
 
 /* ===== TYPE DEFINITIONS ===== */

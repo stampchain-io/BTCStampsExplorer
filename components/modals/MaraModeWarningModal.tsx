@@ -57,7 +57,7 @@ export function MaraModeWarningModal({
     <ModalBase
       title="MARA Mode Transaction Warning"
       onClose={onCancel || (() => {})}
-      className={`!w-[400px] mobileLg:!w-[450px] ${glassmorphism} !bg-gradient-to-br !from-stamp-grey-darkest/70 !to-stamp-grey-darkest/80`}
+      className={`!w-[400px] mobileLg:!w-[450px] ${glassmorphism} !bg-gradient-to-br !from-color-neutral-dark/70 !to-color-neutral-dark/80`}
       contentClassName="space-y-4"
       hideHeader
     >
@@ -90,7 +90,7 @@ export function MaraModeWarningModal({
         </div>
       </div>
 
-      <div class="space-y-5 text-stamp-grey-light">
+      <div class="space-y-5 text-color-neutral-light">
         <div
           class={`${glassmorphism} bg-gradient-to-br from-orange-900/15 to-orange-800/25 border-orange-500/20 p-5`}
         >
@@ -100,12 +100,12 @@ export function MaraModeWarningModal({
               <h3 class="text-orange-200 font-semibold mb-3 text-base">
                 Non-Standard Transaction
               </h3>
-              <p class="text-sm text-stamp-grey-light mb-3">
+              <p class="text-sm text-color-neutral-light mb-3">
                 This transaction contains non-standard outputs ({outputValue}
                 {" "}
                 sat) and must be submitted directly to the MARA pool.
               </p>
-              <p class="text-sm text-stamp-grey-light">
+              <p class="text-sm text-color-neutral-light">
                 <strong class="text-orange-200">
                   Your wallet cannot broadcast this transaction.
                 </strong>{" "}
@@ -125,7 +125,7 @@ export function MaraModeWarningModal({
                 <strong class="text-blue-200 font-semibold text-sm">
                   What happens next:
                 </strong>
-                <ol class="mt-2 ml-4 space-y-1.5 list-decimal text-stamp-grey-light text-sm">
+                <ol class="mt-2 ml-4 space-y-1.5 list-decimal text-color-neutral-light text-sm">
                   <li>Your wallet will sign the transaction (no broadcast)</li>
                   <li>The signed transaction will be sent to MARA pool</li>
                   <li>MARA will handle mining and confirmation</li>
@@ -146,7 +146,7 @@ export function MaraModeWarningModal({
                 <strong class="text-purple-200 font-semibold text-sm">
                   MARA Pool Benefits:
                 </strong>
-                <p class="mt-2 text-stamp-grey-light text-sm">
+                <p class="mt-2 text-color-neutral-light text-sm">
                   Optimized for low-dust transactions with better confirmation
                   rates and fee efficiency.
                 </p>
@@ -160,7 +160,7 @@ export function MaraModeWarningModal({
         <button
           type="button"
           onClick={onCancel || (() => {})}
-          class={`flex-1 px-4 py-2 rounded-2xl transition-colors ${glassmorphism} bg-gradient-to-br from-stamp-grey-darkest/20 to-stamp-grey-darkest/40 text-stamp-grey-light hover:from-stamp-grey-darkest/30 hover:to-stamp-grey-darkest/50`}
+          class={`flex-1 px-4 py-2 rounded-2xl transition-colors ${glassmorphism} bg-gradient-to-br from-color-neutral-dark/20 to-color-neutral-dark/40 text-color-neutral-light hover:from-color-neutral-dark/30 hover:to-color-neutral-dark/50`}
         >
           Cancel
         </button>

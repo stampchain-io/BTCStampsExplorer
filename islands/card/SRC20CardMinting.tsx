@@ -58,7 +58,7 @@ export function SRC20CardMinting(
       {/* TRENDING */}
       <td class={`${cellAlign(3, totalColumns ?? 1)} ${valueSm}`}>
         {src20.top_mints_percentage?.toFixed(1) || "N/A"}
-        <span class="text-stamp-grey-light">%</span>
+        <span class="text-color-neutral-light">%</span>
       </td>
 
       {/* MINTS */}
@@ -71,11 +71,11 @@ export function SRC20CardMinting(
         <div class="flex flex-col gap-1">
           <div class="text-right">
             {Number(src20.progress ?? 0)}
-            <span class="text-stamp-grey-light">%</span>
+            <span class="text-color-neutral-light">%</span>
           </div>
-          <div class="relative h-1.5 bg-stamp-grey rounded-full">
+          <div class="relative h-1.5 bg-color-neutral rounded-full">
             <div
-              class="absolute left-0 top-0 h-1.5 bg-stamp-purple-dark rounded-full"
+              class="absolute left-0 top-0 h-1.5 bg-color-primary-dark rounded-full"
               style={{ width: `${src20.progress ?? 0}%` }}
             />
           </div>

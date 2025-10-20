@@ -136,7 +136,7 @@ function RecieveAddyModal(
 
         {/* ===== ADDRESS SECTION ===== */}
         <div class="flex flex-col items-center">
-          <p class="break-all text-center text-base leading-relaxed text-stamp-grey-light max-w-full pt-4">
+          <p class="break-all text-center text-base leading-relaxed text-color-neutral-light max-w-full pt-4">
             {formatAddress(address ?? "")}
           </p>
         </div>
@@ -178,7 +178,7 @@ function formatAddress(address: string): JSX.Element[] {
     index % 2 === 0 ? <span key={index}>{group}</span> : (
       <span
         key={index}
-        class="font-semibold text-base text-stamp-purple"
+        class="font-semibold text-base text-color-primary-semilight"
       >
         {group}
       </span>

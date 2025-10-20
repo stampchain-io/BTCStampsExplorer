@@ -216,7 +216,7 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
             </div>
 
             {/* Phase text */}
-            <span class="text-xs text-stamp-grey-light font-normal opacity-80">
+            <span class="text-xs text-color-neutral-light font-normal opacity-80">
               {currentPhase === "instant" && "⚡ Instant"}
               {currentPhase === "smart" && "💡 Smart"}
               {currentPhase === "exact" && "🎯 Exact"}

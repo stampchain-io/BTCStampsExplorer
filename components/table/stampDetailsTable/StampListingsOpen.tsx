@@ -85,11 +85,11 @@ export function StampListingsOpenTable({
                   <tr
                     key={dispenser.source}
                     class={`${glassmorphismL2} group cursor-pointer ${
-                      isEmpty ? "text-stamp-grey-darker" : ""
+                      isEmpty ? "text-color-neutral-semidark" : ""
                     } ${
                       isSelected
-                        ? "text-stamp-grey-light"
-                        : "text-stamp-grey-darker"
+                        ? "text-color-neutral-light"
+                        : "text-color-neutral-semidark"
                     }`}
                     onClick={() => onSelectDispenser?.(dispenser)}
                   >
@@ -97,7 +97,7 @@ export function StampListingsOpenTable({
                     <td
                       class={`${
                         cellAlign(0, headers?.length ?? 0)
-                      } ${cellLeftL2Detail} group-hover:text-stamp-purple-bright`}
+                      } ${cellLeftL2Detail} group-hover:text-color-primary-semilight-bright`}
                     >
                       {formatSatoshisToBTC(dispenser.satoshirate, {
                         includeSymbol: true,
@@ -133,7 +133,7 @@ export function StampListingsOpenTable({
                     <td
                       class={`${
                         cellAlign(4, headers?.length ?? 0)
-                      } ${cellRightL2Detail} group-hover:text-stamp-grey-light`}
+                      } ${cellRightL2Detail} group-hover:text-color-neutral-light`}
                     >
                       DISPENSER
                     </td>

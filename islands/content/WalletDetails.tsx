@@ -228,7 +228,7 @@ function DispenserStats({
         </p>
 
         {stampData.cpid && (
-          <p class="-mt-1 pb-1 text-base mobileLg:text-lg font-bold text-stamp-grey-darker block">
+          <p class="-mt-1 pb-1 text-base mobileLg:text-lg font-bold text-color-neutral-semidark block">
             {stampData.cpid}
           </p>
         )}

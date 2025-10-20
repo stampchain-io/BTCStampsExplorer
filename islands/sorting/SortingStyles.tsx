@@ -74,12 +74,12 @@ function StyledSortingDropdown({
           sorting-dropdown--styled
           ${sizeClasses[size]}
           rounded-2xl
-          bg-stamp-grey focus:bg-stamp-grey-light
+          bg-color-neutral focus:bg-color-neutral-light
           border-2 border-transparent
-          hover:border-stamp-purple-bright
-          focus-within:border-stamp-purple-bright
-          font-medium text-stamp-grey-darkest
-          placeholder:font-light placeholder:text-stamp-grey-darkest
+          hover:border-color-primary-semilight-bright
+          focus-within:border-color-primary-semilight-bright
+          font-medium text-color-neutral-dark
+          placeholder:font-light placeholder:text-color-neutral-dark
           outline-none focus:outline-none
           transition-colors duration-300
           ${className}
@@ -117,20 +117,20 @@ function StyledSortingButtons({
       case "primary":
         return `${baseClasses} ${
           isActive
-            ? "bg-stamp-purple-bright border-stamp-purple-bright text-white"
-            : "bg-stamp-purple border-stamp-purple text-white hover:bg-stamp-purple-bright hover:border-stamp-purple-bright"
+            ? "bg-color-primary-semilight-bright border-color-primary-semilight-bright text-white"
+            : "bg-color-primary-semilight border-color-primary-semilight text-white hover:bg-color-primary-semilight-bright hover:border-color-primary-semilight-bright"
         }`;
       case "secondary":
         return `${baseClasses} ${
           isActive
-            ? "bg-stamp-grey-light border-stamp-purple-bright text-stamp-grey-darkest"
-            : "bg-stamp-grey border-stamp-grey text-stamp-grey-darkest hover:bg-stamp-grey-light hover:border-stamp-purple-bright"
+            ? "bg-color-neutral-light border-color-primary-semilight-bright text-color-neutral-dark"
+            : "bg-color-neutral border-color-neutral text-color-neutral-dark hover:bg-color-neutral-light hover:border-color-primary-semilight-bright"
         }`;
       case "ghost":
         return `${baseClasses} ${
           isActive
-            ? "bg-transparent border-stamp-purple-bright text-stamp-purple-bright"
-            : "bg-transparent border-transparent text-stamp-grey-light hover:border-stamp-purple-bright hover:text-stamp-purple-bright"
+            ? "bg-transparent border-color-primary-semilight-bright text-color-primary-semilight-bright"
+            : "bg-transparent border-transparent text-color-neutral-light hover:border-color-primary-semilight-bright hover:text-color-primary-semilight-bright"
         }`;
       default:
         return baseClasses;
@@ -201,16 +201,16 @@ function StyledSortingLabel({
         return `
           ${TEXT_STYLES.minimal.price.base}
           ${TEXT_STYLES.minimal.price.sizes}
-          text-stamp-grey-light
+          text-color-neutral-light
         `;
       case "inline":
         return `
-          font-medium text-stamp-grey-darkest
+          font-medium text-color-neutral-dark
           text-sm mobileLg:text-base
         `;
       default:
         return `
-          font-normal text-stamp-grey-light
+          font-normal text-color-neutral-light
           text-xs mobileLg:text-sm
         `;
     }

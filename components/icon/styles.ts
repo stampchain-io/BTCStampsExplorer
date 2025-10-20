@@ -99,25 +99,25 @@ export const iconStyles = {
 
   icon: {
     grey:
-      "stroke-stamp-grey fill-none [&_path[class*='fill-stroke']]:fill-stamp-grey",
+      "stroke-color-neutral fill-none [&_path[class*='fill-stroke']]:fill-color-neutral",
     greyDark:
-      "stroke-stamp-grey-darker fill-none [&_path[class*='fill-stroke']]:fill-stamp-grey-darker",
+      "stroke-color-neutral-semidark fill-none [&_path[class*='fill-stroke']]:fill-color-neutral-semidark",
     purple:
-      "stroke-stamp-purple fill-none [&_path[class*='fill-stroke']]:fill-stamp-purple",
+      "stroke-color-primary-semilight fill-none [&_path[class*='fill-stroke']]:fill-color-primary-semilight",
     purpleDark:
-      "stroke-stamp-purple-darker fill-none [&_path[class*='fill-stroke']]:fill-stamp-purple-darker",
+      "stroke-color-primary-semidark fill-none [&_path[class*='fill-stroke']]:fill-color-primary-semidark",
     custom: "fill-none",
   },
 
   iconButton: {
     grey:
-      "stroke-stamp-grey hover:stroke-stamp-grey-light group-hover:stroke-stamp-grey-light fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-stamp-grey [&:hover_path[class*='fill-stroke']]:fill-stamp-grey-light [&:group-hover_path[class*='fill-stroke']]:fill-stamp-grey-light",
+      "stroke-color-neutral hover:stroke-color-neutral-light group-hover:stroke-color-neutral-light fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-color-neutral [&:hover_path[class*='fill-stroke']]:fill-color-neutral-light [&:group-hover_path[class*='fill-stroke']]:fill-color-neutral-light",
     greyDark:
-      "stroke-stamp-grey-darker hover:stroke-stamp-grey group-hover:stroke-stamp-grey fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-stamp-grey-darker [&:hover_path[class*='fill-stroke']]:fill-stamp-grey [&:group-hover_path[class*='fill-stroke']]:fill-stamp-grey",
+      "stroke-color-neutral-semidark hover:stroke-color-neutral group-hover:stroke-color-neutral fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-color-neutral-semidark [&:hover_path[class*='fill-stroke']]:fill-color-neutral [&:group-hover_path[class*='fill-stroke']]:fill-color-neutral",
     purple:
-      "stroke-stamp-purple hover:stroke-stamp-purple-bright group-hover:stroke-stamp-purple-bright fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-stamp-purple [&:hover_path[class*='fill-stroke']]:fill-stamp-purple-bright [&:group-hover_path[class*='fill-stroke']]:fill-stamp-purple-bright",
+      "stroke-color-primary-semilight hover:stroke-color-primary-semilight-bright group-hover:stroke-color-primary-semilight-bright fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-color-primary-semilight [&:hover_path[class*='fill-stroke']]:fill-color-primary-semilight-bright [&:group-hover_path[class*='fill-stroke']]:fill-color-primary-semilight-bright",
     purpleDark:
-      "stroke-stamp-purple-darker hover:stroke-stamp-purple group-hover:stroke-stamp-purple fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-stamp-purple-darker [&:hover_path[class*='fill-stroke']]:fill-stamp-purple [&:group-hover_path[class*='fill-stroke']]:fill-stamp-purple",
+      "stroke-color-primary-semidark hover:stroke-color-primary-semilight group-hover:stroke-color-primary-semilight fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-color-primary-semidark [&:hover_path[class*='fill-stroke']]:fill-color-primary-semilight [&:group-hover_path[class*='fill-stroke']]:fill-color-primary-semilight",
     custom: "fill-none cursor-pointer",
   },
 
@@ -157,13 +157,13 @@ export const handleIcon = `
   absolute w-full h-4 tablet:h-3 rounded-full appearance-none bg-transparent pointer-events-none
   [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:pointer-events-auto
   [&::-webkit-slider-thumb]:size-4 [&::-webkit-slider-thumb]:tablet:size-3
-  [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-stamp-grey
-  [&::-webkit-slider-thumb]:hover:bg-stamp-grey-light [&::-webkit-slider-thumb]:cursor-grab
+  [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-color-neutral
+  [&::-webkit-slider-thumb]:hover:bg-color-neutral-light [&::-webkit-slider-thumb]:cursor-grab
   [&::-webkit-slider-thumb]:active:cursor-grabbing
   [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:pointer-events-auto
   [&::-moz-range-thumb]:size-4 [&::-moz-range-thumb]:tablet:size-3
-  [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-stamp-grey
-  [&::-moz-range-thumb]:hover:bg-stamp-grey-light [&::-moz-range-thumb]:cursor-grab
+  [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-color-neutral
+  [&::-moz-range-thumb]:hover:bg-color-neutral-light [&::-moz-range-thumb]:cursor-grab
   [&::-moz-range-thumb]:active:cursor-grabbing [&::-moz-range-thumb]:border-0
 `;
 
@@ -178,8 +178,8 @@ export const placeholderColor: Record<
 > = {
   grey: {
     bg: "bg-gradient-to-br from-[#666666]/75 via-[#333333]/75 to-[#000000]",
-    stroke: "stroke-stamp-grey-darker",
-    fill: "fill-stamp-grey-darker",
+    stroke: "stroke-color-neutral-semidark",
+    fill: "fill-color-neutral-semidark",
   },
   red: {
     bg: "bg-gradient-to-br from-[#660000]/75 via-[#330000]/75 to-[#000000]",

@@ -252,7 +252,7 @@ export function BadgeIcon({ text, className = "" }: BadgeVariants) {
         absolute top-[-19px] left-[-29px]
         tablet:top-[-16px] tablet:left-[-26px]
         size-5 rounded-full backdrop-blur-lg
-        font-normal text-[10px] text-stamp-grey group-hover:text-stamp-grey-light group-hover:font-medium tracking-wider
+        font-normal text-[10px] text-color-neutral group-hover:text-color-neutral-light group-hover:font-medium tracking-wider
         bg-[#080708]/30 group-hover:bg-[#080708]/60
         border-[1px] border-[#242424]/75 group-hover:border-[#242424]
         transition-all duration-200 cursor-pointer

@@ -57,24 +57,24 @@ export function SRC20CardMinted(
       {/* Price Cell - ✅ CLEANED: No more root-level field access */}
       <td class={`${cellAlign(3, totalColumns ?? 1)} ${valueSm}`}>
         {Math.round(getFloorPrice(src20) * 1e8).toLocaleString()}
-        <span class="text-stamp-grey-light ml-1">SATS</span>
+        <span class="text-color-neutral-light ml-1">SATS</span>
       </td>
 
       {/* Change Cell */}
       <td class={`${cellAlign(4, totalColumns ?? 1)} ${valueSm}`}>
-        <span class="text-stamp-grey-light">N/A%</span>
+        <span class="text-color-neutral-light">N/A%</span>
       </td>
 
       {/* Volume Cell - ✅ CLEANED: No more type casting chaos */}
       <td class={`${cellAlign(5, totalColumns ?? 1)} ${valueSm}`}>
         {Math.round(getVolume24h(src20)).toLocaleString()}
-        <span class="text-stamp-grey-light ml-1">BTC</span>
+        <span class="text-color-neutral-light ml-1">BTC</span>
       </td>
 
       {/* Market Cap Cell - ✅ CLEANED: No more type casting chaos */}
       <td class={`${cellAlign(6, totalColumns ?? 1)} ${valueSm}`}>
         {Math.round(getMarketCapBTC(src20) * 1e8).toLocaleString()}
-        <span class="text-stamp-grey-light ml-1">SATS</span>
+        <span class="text-color-neutral-light ml-1">SATS</span>
       </td>
 
       {/* Chart Cell - ✅ IMPROVED: Type-safe chart access */}

@@ -108,13 +108,13 @@ export function SRC20CardMinting({
       : cellCenterCard;
 
     // Selected segment styling
-    const selectedClass = isSelected ? "text-stamp-grey-light" : "";
+    const selectedClass = isSelected ? "text-color-neutral-light" : "";
 
     const colorClass = isSelected
-      ? "text-stamp-grey-light"
+      ? "text-color-neutral-light"
       : isClickable
-      ? "text-stamp-grey-darker hover:text-stamp-grey-light"
-      : "text-stamp-grey-darker";
+      ? "text-color-neutral-semidark hover:text-color-neutral-light"
+      : "text-color-neutral-semidark";
 
     const clickableClass = isClickable
       ? "cursor-pointer transition-all duration-200 select-none"
@@ -150,7 +150,7 @@ export function SRC20CardMinting({
           weight="normal"
           size="xxxs"
           color="custom"
-          className={`stroke-stamp-grey-light transition-all duration-200 transform ${
+          className={`stroke-color-neutral-light transition-all duration-200 transform ${
             currentSort.direction === "desc" ? "scale-y-[-1]" : ""
           }`}
         />
@@ -357,11 +357,11 @@ export function SRC20CardMinting({
                               }
                               return progressValue.toFixed(1);
                             })()}
-                            <span class="text-stamp-grey-light">%</span>
+                            <span class="text-color-neutral-light">%</span>
                           </div>
-                          <div class="relative h-1.5 bg-stamp-grey rounded-full">
+                          <div class="relative h-1.5 bg-color-neutral rounded-full">
                             <div
-                              class="absolute left-0 top-0 h-1.5 bg-stamp-purple-dark rounded-full"
+                              class="absolute left-0 top-0 h-1.5 bg-color-primary rounded-full"
                               style={{
                                 width: `${
                                   (() => {

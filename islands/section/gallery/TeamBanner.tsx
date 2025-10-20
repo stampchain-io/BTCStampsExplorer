@@ -26,7 +26,7 @@ export default function TeamBanner() {
                 <h5 class={`${headingGreyLD} pt-2`}>
                   MIKE IN SPACE
                 </h5>
-                <h6 class={`${valueSm} !text-stamp-grey`}>
+                <h6 class={`${valueSm} !text-color-neutral`}>
                   CODE{" "}
                   <span class="mobileMd:hidden">
                     <br />
@@ -41,7 +41,7 @@ export default function TeamBanner() {
                 <h5 class={`${headingGreyLD} pt-2`}>
                   REINAMORA
                 </h5>
-                <h6 class={`${valueSm} !text-stamp-grey`}>
+                <h6 class={`${valueSm} !text-color-neutral`}>
                   BACKEND{" "}
                   <span class="mobileMd:hidden">
                     <br />
@@ -56,7 +56,7 @@ export default function TeamBanner() {
                 <h5 class={`${headingGreyLD} pt-2`}>
                   ARWYN
                 </h5>
-                <h6 class={`${valueSm} !text-stamp-grey`}>
+                <h6 class={`${valueSm} !text-color-neutral`}>
                   MEMETIC{" "}
                   <span class="mobileMd:hidden">
                     <br />

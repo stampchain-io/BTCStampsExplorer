@@ -339,14 +339,14 @@ export default function DetailsTableBase({
               onClick={() => setSelectedTab(id)}
             >
               <span
-                class={`${labelSm} group-hover:text-stamp-grey-light`}
+                class={`${labelSm} group-hover:text-color-neutral-light`}
               >
                 {type ? getTabLabel(type, id) : id}
               </span>
               <div
-                class={`${value3xlTransparent} text-stamp-grey-darker ${
-                  selectedTab === id ? "text-stamp-grey-light" : ""
-                } group-hover:text-stamp-grey-light`}
+                class={`${value3xlTransparent} text-color-neutral-semidark ${
+                  selectedTab === id ? "text-color-neutral-light" : ""
+                } group-hover:text-color-neutral-light`}
               >
                 {count || 0}
               </div>

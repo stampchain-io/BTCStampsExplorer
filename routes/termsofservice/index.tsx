@@ -15,9 +15,9 @@ export default function TermsOfServicePage() {
             <h2 class={subtitleGrey}>
               AGREEMENT TO OUR LEGAL TERMS
             </h2>
-            <h5 class="text-lg mobileLg:text-xl font-light text-stamp-grey pb-4 mobileLg:pb-2">
+            <h5 class="text-lg mobileLg:text-xl font-light text-color-neutral pb-4 mobileLg:pb-2">
               LAST UPDATED
-              <span class="pl-3 font-medium text-stamp-grey-light">
+              <span class="pl-3 font-medium text-color-neutral-light">
                 SEPTEMBER 11 2024
               </span>
             </h5>
@@ -70,7 +70,7 @@ export default function TermsOfServicePage() {
         </section>
         {/* ===== TABLE OF CONTENTS SECTION ===== */}
         <section>
-          <p class="font-semibold text-lg text-stamp-grey-light font-courier-prime">
+          <p class="font-semibold text-lg text-color-neutral-light font-courier-prime">
             <span class="text-2xl">
               TABLE OF CONTENTS<br />
             </span>

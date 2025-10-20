@@ -157,7 +157,7 @@ export function SRC20CardSm({
                 rowClass = cellCenterL2Card;
               } else if (header === "VOLUME") {
                 rowClass =
-                  `p-3 border-y-[1px] border-x-0 border-[#242424]/75 group-hover:border-stamp-purple-bright transition-all duration-200 tablet:pr-4 tablet:rounded-r-2xl tablet:border-r-[1px] tablet:border-l-0 desktop:pr-3 desktop:rounded-r-none desktop:border-r-0`;
+                  `p-3 border-y-[1px] border-x-0 border-[#242424]/75 group-hover:border-color-primary-semilight-bright transition-all duration-200 tablet:pr-4 tablet:rounded-r-2xl tablet:border-r-[1px] tablet:border-l-0 desktop:pr-3 desktop:rounded-r-none desktop:border-r-0`;
               } else if (header === "MARKETCAP") {
                 rowClass = cellRightL2Card;
               } else {
@@ -331,7 +331,7 @@ export function SRC20CardSm({
                         // Convert to number and validate
                         const changeValue = Number(changePercent);
                         if (isNaN(changeValue)) {
-                          return <span class="text-stamp-grey">N/A</span>;
+                          return <span class="text-color-neutral">N/A</span>;
                         }
 
                         return (
@@ -350,7 +350,7 @@ export function SRC20CardSm({
                     </td>
                     {/* VOLUME */}
                     <td
-                      class={`p-3 border-y-[1px] border-x-0 border-[#242424]/75 group-hover:border-stamp-purple-bright transition-all duration-200
+                      class={`p-3 border-y-[1px] border-x-0 border-[#242424]/75 group-hover:border-color-primary-semilight-bright transition-all duration-200
                       tablet:pr-4 tablet:rounded-r-2xl tablet:border-r-[1px] tablet:border-l-0
                       desktop:pr-3 desktop:rounded-r-none desktop:border-r-0
                       text-center tablet:text-right desktop:text-center`}

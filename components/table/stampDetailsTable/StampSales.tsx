@@ -133,7 +133,7 @@ export function StampSalesTable(
                 <td
                   class={`${
                     cellAlign(4, headers?.length ?? 0)
-                  } ${cellRightL2Detail} text-stamp-grey`}
+                  } ${cellRightL2Detail} text-color-neutral`}
                 >
                   {dispense.block_time
                     ? formatDate(new Date(dispense.block_time), {

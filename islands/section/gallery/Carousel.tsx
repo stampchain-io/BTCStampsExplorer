@@ -178,7 +178,7 @@ export default function CarouselGallery(props: CarouselHomeProps) {
                   data-hash={stamp.tx_hash}
                 >
                   <a target="_top" href={`/stamp/${stamp.tx_hash}`}>
-                    <div class="hover-gradient hover:bg-stamp-purple-bright hover:shadow-stamp p-0.5 rounded-3xl">
+                    <div class="hover-gradient hover:bg-color-primary-semilight-bright hover:shadow-stamp p-0.5 rounded-3xl">
                       <div class="relative min-h-[150px] mobileMd:min-h-[242px] mobileLg:min-h-[200px] tablet:min-h-[269px] desktop:min-h-[408px] p-[6px] mobileMd:p-[12px] desktop:p-[18px] rounded-3xl bg-stamp-card-bg hover:bg-black">
                         {validatedContent[stamp.tx_hash] || (
                           <img
@@ -198,7 +198,7 @@ export default function CarouselGallery(props: CarouselHomeProps) {
                             <div class="w-full pb-1">
                               <div class="desktop:hidden flex justify-center items-center w-full">
                                 <h3 class="font-black text-lg gray-gradient1 text-center">
-                                  <span class="font-light text-stamp-grey-light">
+                                  <span class="font-light text-color-neutral-light">
                                     #
                                   </span>
                                   {stamp.stamp}
@@ -206,7 +206,7 @@ export default function CarouselGallery(props: CarouselHomeProps) {
                               </div>
                               <div class="hidden mobileLg:flex justify-between items-end w-full flex-1 px-1 desktop:px-3 pb-1.5 desktop:pb-2">
                                 <h3 class="hidden desktop:block font-black text-3xl gray-gradient1 desktop:text-left">
-                                  <span class="font-light text-stamp-grey-light">
+                                  <span class="font-light text-color-neutral-light">
                                     #
                                   </span>
                                   {stamp.stamp}

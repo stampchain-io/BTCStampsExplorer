@@ -9,12 +9,13 @@ const notificationContainer = `
 const tooltipBackground =
   "bg-[#000000BF] px-2 py-1 rounded-md transition-opacity duration-200 pointer-events-none";
 const tooltipText =
-  "font-normal text-[10px] text-stamp-grey-light whitespace-nowrap";
+  "font-normal text-[10px] text-color-neutral-light whitespace-nowrap";
 
 /* ===== NOTIFICATION STYLES ===== */
 /* General */
-export const notificationHeading = `font-semibold text-[15px] text-stamp-grey`;
-export const notificationBody = `font-normal text-sm text-stamp-grey`;
+export const notificationHeading =
+  `font-semibold text-[15px] text-color-neutral`;
+export const notificationBody = `font-normal text-sm text-color-neutral`;
 export const notificationTextError = `!text-[#990000]`;
 export const notificationTextSuccess = `!text-[#009900]`;
 

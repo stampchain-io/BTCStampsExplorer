@@ -314,17 +314,17 @@ function DispenserRow(
             </div>
           </div>
           <div class="text-center flex justify-between mt-[6px]">
-            <p class="text-base mobileLg:text-lg text-stamp-grey-darker font-light">
+            <p class="text-base mobileLg:text-lg text-color-neutral-semidark font-light">
               GIVE{" "}
-              <span class="font-bold text-stamp-grey-light">
+              <span class="font-bold text-color-neutral-semilight">
                 {Number(dispenser.give_quantity).toLocaleString()}
               </span>
             </p>
           </div>
           <div class="flex flex-row justify-between w-full">
-            <p class="text-base mobileLg:text-lg text-stamp-grey-darker font-light">
+            <p class="text-base mobileLg:text-lg text-color-neutral-semidark font-light">
               QUANTITY{" "}
-              <span class="font-bold text-stamp-grey-light">
+              <span class="font-bold text-color-neutral-semilight">
                 {dispenser.give_remaining === 0
                   ? Number(dispenser.escrow_quantity).toLocaleString()
                   : `${Number(dispenser.give_remaining).toLocaleString()}/${
@@ -333,7 +333,7 @@ function DispenserRow(
               </span>
             </p>
             <p
-              class={`text-stamp-grey-darker text-lg font-light -mt-1 ${
+              class={`text-color-neutral-semidark text-lg font-light -mt-1 ${
                 view === "mobile" ? "hidden mobileLg:block" : ""
               }`}
             >
@@ -341,24 +341,25 @@ function DispenserRow(
             </p>
           </div>
           <div class="flex flex-row justify-between w-full">
-            <p class="text-base mobileLg:text-lg text-stamp-grey-darker font-light">
+            <p class="text-base mobileLg:text-lg text-color-neutral-semidark font-light">
               PRICE{" "}
-              <span class="font-bold text-stamp-grey-light">
+              <span class="font-bold text-color-neutral-semilight">
                 {formatBTCAmount(Number(dispenser.btcrate), {
                   includeSymbol: false,
                 })}
               </span>{" "}
-              <span class="text-stamp-grey-light">BTC</span>
+              <span class="text-color-neutral-semilight">BTC</span>
             </p>
             <p
-              class={`text-xl mobileMd:text-2xl text-stamp-grey-light font-bold -mt-1 ${
+              class={`text-xl mobileMd:text-2xl text-color-neutral-semilight font-bold -mt-1 ${
                 view === "mobile" ? "hidden mobileLg:block" : ""
               }`}
             >
               {formatBTCAmount(
                 Number(dispenser.btcrate) * Number(dispenser.escrow_quantity),
                 { includeSymbol: false },
-              )} <span class="text-stamp-grey-light font-light">BTC</span>
+              )}{" "}
+              <span class="text-color-neutral-semilight font-light">BTC</span>
             </p>
           </div>
         </div>

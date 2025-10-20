@@ -387,7 +387,7 @@ export function SRC20DeployTool(
                     weight="extraLight"
                     size="xl"
                     color="custom"
-                    className="stroke-stamp-grey-darkest group-hover:stroke-stamp-grey-darker/80"
+                    className="stroke-color-neutral-dark group-hover:stroke-color-neutral-semidark/80"
                   />
                   <div
                     class={`${tooltipImage} ${

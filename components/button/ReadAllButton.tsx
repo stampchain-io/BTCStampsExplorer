@@ -23,7 +23,7 @@ export function ReadAllButton({ href = "/howto" }: ReadAllButtonProps) {
   <a
     href={href}
     target="_top"
-    class="font-semibold text-base text-stamp-grey-light hover:text-stamp-grey animated-underline"
+    class="font-semibold text-base text-color-neutral-light hover:text-color-neutral animated-underline"
   >
     Read the full guide
   </a>

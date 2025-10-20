@@ -137,7 +137,7 @@ export const RangeSlider = ({
       {formatValue && (
         <div class="flex w-full justify-center pb-1.5 tablet:pb-1">
           <div class="flex items-center text-sm tablet:text-xs font-regular">
-            <div class="text-center text-stamp-grey select-none">
+            <div class="text-center text-color-neutral select-none">
               {displayValue}
             </div>
           </div>

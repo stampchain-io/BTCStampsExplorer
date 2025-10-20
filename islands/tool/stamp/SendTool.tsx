@@ -433,7 +433,7 @@ export function StampSendTool() {
           weight="extraLight"
           size="xl"
           color="custom"
-          className="stroke-stamp-grey-darkest"
+          className="stroke-color-neutral-dark"
         />
       );
     }
@@ -451,7 +451,7 @@ export function StampSendTool() {
 
     return (
       <div class="relative w-full h-full">
-        {/* <div class="relative w-full h-full flex items-center justify-center bg-stamp-grey rounded"> */}
+        {/* <div class="relative w-full h-full flex items-center justify-center bg-color-neutral rounded"> */}
         {/* Image - always rendered, visibility controlled by class */}
         <img
           key={`stamp-${selectedStamp.tx_hash}`}
@@ -538,7 +538,7 @@ export function StampSendTool() {
 
             <div class="flex w-full justify-end items-center -my-[3px] gap-5">
               <div class="flex flex-col justify-start -space-y-0.5">
-                <h5 class={`${labelLg} !text-stamp-grey`}>
+                <h5 class={`${labelLg} !text-color-neutral`}>
                   EDITIONS
                 </h5>
                 <h6 class={labelSm}>
