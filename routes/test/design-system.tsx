@@ -18,7 +18,7 @@ export default function DesignSystem() {
       <Head>
         <title>Design System - BTCStamps</title>
       </Head>
-      <div class="min-h-screen bg-stamp-bg-purple-darkest p-8">
+      <div class="min-h-screen bg-color-primary-dark p-8">
         <div class="max-w-full mx-auto space-y-12">
           <h1 class="text-4xl font-bold text-color-neutral-light">
             Design System
@@ -38,7 +38,7 @@ export default function DesignSystem() {
               <div class="grid grid-cols-1 tablet:grid-cols-4 gap-4">
                 <ColorSwatch
                   name="Primary Default"
-                  bgClass="bg-color-primary-semilight"
+                  bgClass="bg-color-primary"
                   color="primary"
                 />
                 <ColorSwatch
@@ -48,13 +48,27 @@ export default function DesignSystem() {
                 />
                 <ColorSwatch
                   name="Primary Dark"
-                  bgClass="bg-color-primary"
+                  bgClass="bg-color-primary-dark"
                   color="primary-dark"
                 />
                 <ColorSwatch
-                  name="Primary Hover"
-                  bgClass="bg-color-primary-light"
-                  color="primary-hover"
+                  name="Primary Semi Light"
+                  bgClass="bg-color-primary-semilight"
+                  color="primary-semilight"
+                />
+              </div>
+            </div>
+
+            {/* Additional Primary Colors */}
+            <div>
+              <h3 class="text-xl text-color-neutral-light mb-4">
+                Additional Primary Colors
+              </h3>
+              <div class="grid grid-cols-1 tablet:grid-cols-4 gap-4">
+                <ColorSwatch
+                  name="Primary Semi Dark"
+                  bgClass="bg-color-primary-semidark"
+                  color="primary-semidark"
                 />
               </div>
             </div>
@@ -67,22 +81,22 @@ export default function DesignSystem() {
               <div class="grid grid-cols-1 tablet:grid-cols-4 gap-4">
                 <ColorSwatch
                   name="Text Primary"
-                  bgClass="bg-stamp-text-primary"
+                  bgClass="bg-color-neutral"
                   color="text-primary"
                 />
                 <ColorSwatch
                   name="Text Secondary"
-                  bgClass="bg-stamp-text-secondary"
+                  bgClass="bg-color-neutral-semidark"
                   color="text-secondary"
                 />
                 <ColorSwatch
                   name="Table Text"
-                  bgClass="bg-stamp-table-text"
+                  bgClass="bg-color-neutral-semilight"
                   color="table-text"
                 />
                 <ColorSwatch
                   name="Search Placeholder"
-                  bgClass="bg-stamp-search-placeholder"
+                  bgClass="bg-color-neutral-semilight"
                   color="search-placeholder"
                 />
               </div>
@@ -93,7 +107,7 @@ export default function DesignSystem() {
               <h3 class="text-xl text-color-neutral-light mb-4">
                 Text Gradients
               </h3>
-              <div class="space-y-6 bg-stamp-bg-purple-darker p-8 rounded-2xl">
+              <div class="space-y-6 bg-color-primary-semidark p-8 rounded-2xl">
                 {/* Purple Gradients */}
                 <p class="bg-text-purple-1 bg-clip-text text-transparent text-4xl font-bold">
                   Purple Gradient Text 1

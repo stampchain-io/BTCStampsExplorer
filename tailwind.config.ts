@@ -41,76 +41,6 @@ export default {
             light: "#FFFFFF",
           },
         },
-        // Legacy stamp colors (to be migrated)
-        stamp: {
-          purple: {
-            darkest: "#220033",
-            darker: "#440066",
-            dark: "#660099",
-            DEFAULT: "#8800CC",
-            bright: "#AA00FF",
-          },
-          grey: {
-            darkest: "#333333",
-            darker: "#666666",
-            DEFAULT: "#999999",
-            light: "#CCCCCC",
-            bright: "#FFFFFF",
-          },
-          bg: {
-            purple: {
-              darkest: "#0A000F",
-              darker: "#14001F",
-              dark: "#1F002E",
-            },
-            grey: {
-              darkest: "#080808",
-              darker: "#0F0F0F",
-              dark: "#171717",
-            },
-          },
-          table: {
-            text: "#DBDBDB",
-            placeholder: "#8D9199",
-            header: "#F5F5F5",
-            inactive: "#B9B9B9",
-          },
-          button: {
-            text: "#330033",
-          },
-          dark: {
-            DEFAULT: "#0B0B0B",
-            lighter: "#181818",
-            gradient: "#1F002E",
-          },
-          text: {
-            primary: "#999999",
-            secondary: "#666666",
-            "custom-stroke-color": "#80C",
-          },
-          input: {
-            bg: "#4F3666",
-            border: "#8A8989",
-          },
-          search: {
-            placeholder: "#8D9199",
-            background: "#660099",
-          },
-          scrollbar: {
-            track: "#333333",
-            thumb: "#660099",
-            hover: "#aa00ff",
-          },
-          overlay: {
-            DEFAULT: "rgba(24, 24, 24, 0.5)",
-            dark: "rgba(8, 8, 8, 0.75)",
-          },
-          border: {
-            light: "#3F2A4E",
-            DEFAULT: "#8A8989",
-            hover: "#AA00FF",
-          },
-        },
       },
       backgroundImage: {
         "stamp-primary":
@@ -327,23 +257,6 @@ export default {
           background:
             "linear-gradient(146.07deg, rgba(102, 0, 153, 0) 0%, #8800CC 49.98%, #AA00FF 99.95%)",
         },
-        ".scrollbar-stamp": {
-          "&::-webkit-scrollbar": {
-            "width": "6px",
-            "border-radius": "3px",
-          },
-          "&::-webkit-scrollbar-track": {
-            "background-color": "var(--stamp-scrollbar-track)",
-            "border-radius": "3px",
-          },
-          "&::-webkit-scrollbar-thumb": {
-            "background-color": "var(--stamp-scrollbar-thumb)",
-            "border-radius": "3px",
-            "&:hover": {
-              "background-color": "var(--stamp-scrollbar-hover)",
-            },
-          },
-        },
         ".scrollbar-hide": {
           /* Hide scrollbar for IE, Edge and Firefox */
           "-ms-overflow-style": "none",
@@ -354,9 +267,6 @@ export default {
           },
         },
         ":root": {
-          "--stamp-scrollbar-track": "#333333",
-          "--stamp-scrollbar-thumb": "#660099",
-          "--stamp-scrollbar-hover": "#aa00ff",
           // Stamp color palette as CSS variables
           "--color-primary-dark": "#220033",
           "--color-primary-semidark": "#440066",

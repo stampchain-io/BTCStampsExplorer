@@ -78,7 +78,7 @@ export function SettingsButton({
       {visible && (
         <div
           role="tooltip"
-          className="absolute bottom-full right-[0.3px] mb-2 z-10 px-3 py-2 text-sm font-medium text-white bg-stamp-bg-grey-darkest rounded-xl shadow-md"
+          className="absolute bottom-full right-[0.3px] mb-2 z-10 px-3 py-2 text-sm font-medium text-white bg-color-neutral-dark rounded-xl shadow-md"
         >
           Settings
           <div class="tooltip-arrow" />
