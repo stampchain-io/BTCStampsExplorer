@@ -97,7 +97,7 @@ export function StampListingsOpenTable({
                     <td
                       class={`${
                         cellAlign(0, headers?.length ?? 0)
-                      } ${cellLeftL2Detail} group-hover:text-color-primary-semilight-bright`}
+                      } ${cellLeftL2Detail} group-hover:text-color-primary-light`}
                     >
                       {formatSatoshisToBTC(dispenser.satoshirate, {
                         includeSymbol: true,

@@ -51,8 +51,8 @@ export function SettingsButton({
                 type="button"
                 class={`cursor-pointer text-xs tablet:text-sm font-black ${
                   localFilters.includes(filter)
-                    ? "text-color-primary-semilight-bright "
-                    : "text-color-primary-semilight hover:text-color-primary-semilight-bright"
+                    ? "text-color-primary-light "
+                    : "text-color-primary-semilight hover:text-color-primary-light"
                 }`}
                 onClick={() => handleFilterClick(filter)}
               >

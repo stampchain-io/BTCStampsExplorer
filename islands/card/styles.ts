@@ -1,11 +1,10 @@
 export const TEXT_STYLES = {
   hashSymbol: {
-    base: "font-light text-color-primary-semilight-bright",
+    base: "font-light text-color-primary-light",
     sizes: "text-lg mobileLg:text-xl",
   },
   stampNumber: {
-    base:
-      "font-extrabold text-color-primary-semilight-bright truncate max-w-full",
+    base: "font-extrabold text-color-primary-light truncate max-w-full",
     // sizes: "text-lg mobileSm:text-lg mobileLg:text-xl tablet:text-2xl desktop:text-2xl group-data-[long-number=true]:text-sm group-data-[long-number=true]:mobileSm:text-sm group-data-[long-number=true]:mobileLg:text-base group-data-[long-number=true]:tablet:text-lg group-data-[long-number=true]:desktop:text-xl",
     sizes: "text-lg mobileLg:text-xl",
   },
@@ -28,7 +27,7 @@ export const TEXT_STYLES = {
   minimal: {
     hashSymbol: {
       base:
-        "font-light text-color-neutral-light group-hover:text-color-primary-semilight-bright",
+        "font-light text-color-neutral-light group-hover:text-color-primary-light",
       sizes:
         "text-xs mobileSm:text-base mobileLg:text-xl tablet:text-xl desktop:text-xl",
     },
@@ -46,7 +45,7 @@ export const TEXT_STYLES = {
   greyGradient: {
     hashSymbol: {
       base:
-        "font-light text-color-neutral group-hover:text-color-primary-semilight-bright",
+        "font-light text-color-neutral group-hover:text-color-primary-light",
       sizes: "text-lg min-[420px]:text-xl",
     },
     stampNumber: {

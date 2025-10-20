@@ -115,7 +115,7 @@ export const iconStyles = {
     greyDark:
       "stroke-color-neutral-semidark hover:stroke-color-neutral group-hover:stroke-color-neutral fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-color-neutral-semidark [&:hover_path[class*='fill-stroke']]:fill-color-neutral [&:group-hover_path[class*='fill-stroke']]:fill-color-neutral",
     purple:
-      "stroke-color-primary-semilight hover:stroke-color-primary-semilight-bright group-hover:stroke-color-primary-semilight-bright fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-color-primary-semilight [&:hover_path[class*='fill-stroke']]:fill-color-primary-semilight-bright [&:group-hover_path[class*='fill-stroke']]:fill-color-primary-semilight-bright",
+      "stroke-color-primary-semilight hover:stroke-color-primary-light group-hover:stroke-color-primary-light fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-color-primary-semilight [&:hover_path[class*='fill-stroke']]:fill-color-primary-light [&:group-hover_path[class*='fill-stroke']]:fill-color-primary-light",
     purpleDark:
       "stroke-color-primary-semidark hover:stroke-color-primary-semilight group-hover:stroke-color-primary-semilight fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-color-primary-semidark [&:hover_path[class*='fill-stroke']]:fill-color-primary-semilight [&:group-hover_path[class*='fill-stroke']]:fill-color-primary-semilight",
     custom: "fill-none cursor-pointer",

@@ -168,7 +168,7 @@ export default function RecentSalesGallery({
               onClick={handleRefresh}
               disabled={refreshLoading}
               aria-label={refreshButtonLabel}
-              class="px-3 py-2 text-sm bg-color-primary-semilight-bright hover:bg-color-primary text-white rounded-2xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              class="px-3 py-2 text-sm bg-color-primary-light hover:bg-color-primary text-white rounded-2xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {refreshLoading ? "Refreshing..." : "Refresh"}
             </button>

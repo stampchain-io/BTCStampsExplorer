@@ -59,15 +59,15 @@ export const containerStickyBottom = `sticky bottom-0 mt-auto py-9 tablet:py-6`;
 
 // Stamp Card styles
 export const containerCard = `${glassmorphism} ${shadowGlowPurple}
-  hover:border-color-primary-semilight-bright`; // check if used
+  hover:border-color-primary-light`; // check if used
 
 export const containerCardL2 = `${glassmorphismL2} ${shadowGlowPurple}
-  hover:border-color-primary-semilight-bright`;
+  hover:border-color-primary-light`;
 
 // Table card container styles - check if used
 export const containerCardTable =
   `rounded-3xl ${glassmorphism} ${shadowGlowPurple}
-  hover:border-color-primary-semilight-bright`;
+  hover:border-color-primary-light`;
 
 // Global styles
 export const containerColData = "flex flex-col -space-y-1"; // Data specific
@@ -88,23 +88,23 @@ export const rowResponsiveForm =
 // Stamp and SRC20 Table Row Cards - Stamp/tokencards
 export const cellLeftCard =
   `p-3 pl-4 rounded-l-3xl border-y-[1px] border-l-[1px] border-r-0 border-[#242424]/50
-  group-hover:bg-black/20 group-hover:border-color-primary-semilight-bright ${transitionColors} whitespace-nowrap`;
+  group-hover:bg-black/20 group-hover:border-color-primary-light ${transitionColors} whitespace-nowrap`;
 export const cellRightCard =
   `p-3 pr-4 rounded-r-3xl border-y-[1px] border-r-[1px] border-l-0 border-[#242424]/50
-  group-hover:bg-black/20 group-hover:border-color-primary-semilight-bright ${transitionColors} whitespace-nowrap`;
+  group-hover:bg-black/20 group-hover:border-color-primary-light ${transitionColors} whitespace-nowrap`;
 export const cellCenterCard = `p-3 border-y-[1px] border-x-0 border-[#242424]/50
-  group-hover:bg-black/20 group-hover:border-color-primary-semilight-bright ${transitionColors} whitespace-nowrap`;
+  group-hover:bg-black/20 group-hover:border-color-primary-light ${transitionColors} whitespace-nowrap`;
 // Layer 2
 // Stamp and SRC20 Table Row Cards - Stamp/tokencards inside of layer 1
 export const cellLeftL2Card =
   `p-3 pl-4 rounded-l-2xl border-y-[1px] border-l-[1px] border-r-0 border-[#242424]/75
-  group-hover:bg-black/20 group-hover:border-color-primary-semilight-bright ${transitionColors} whitespace-nowrap`;
+  group-hover:bg-black/20 group-hover:border-color-primary-light ${transitionColors} whitespace-nowrap`;
 export const cellRightL2Card =
   `p-3 pr-4 rounded-r-2xl border-y-[1px] border-r-[1px] border-l-0 border-[#242424]/75
-  group-hover:bg-black/20 group-hover:border-color-primary-semilight-bright ${transitionColors} whitespace-nowrap`;
+  group-hover:bg-black/20 group-hover:border-color-primary-light ${transitionColors} whitespace-nowrap`;
 export const cellCenterL2Card =
   `p-3 border-y-[1px] border-x-0 border-[#242424]/75
-  group-hover:bg-black/20 group-hover:border-color-primary-semilight-bright ${transitionColors} whitespace-nowrap`;
+  group-hover:bg-black/20 group-hover:border-color-primary-light ${transitionColors} whitespace-nowrap`;
 // Stamp and SRC20 Detail pages Table Rows
 export const cellLeftL2Detail =
   `p-1.5 pl-3 rounded-l-2xl border-y-[1px] border-l-[1px] border-r-0 border-[#242424]/75 group-hover:bg-black/20 group-hover:border-[#232223] ${transitionColors} whitespace-nowrap`;

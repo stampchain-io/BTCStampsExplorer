@@ -32,7 +32,7 @@ export function CollectionCard(
   return (
     <a
       href={`/collection/detail/${collectionName}`}
-      className={`${containerBackground} gap-6 hover:border-color-primary-semilight-bright hover:shadow-stamp hover:border-solid border-2 border-transparent group`}
+      className={`${containerBackground} gap-6 hover:border-color-primary-light hover:shadow-stamp hover:border-solid border-2 border-transparent group`}
     >
       {/* ===== CARD HEADER ===== */}
       <div class="flex w-full gap-6">

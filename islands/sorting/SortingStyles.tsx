@@ -76,12 +76,12 @@ function StyledSortingDropdown({
           rounded-2xl
           bg-color-neutral focus:bg-color-neutral-light
           border-2 border-transparent
-          hover:border-color-primary-semilight-bright
-          focus-within:border-color-primary-semilight-bright
+          hover:border-color-primary-light
+          focus-within:border-color-primary-light
           font-medium text-color-neutral-dark
           placeholder:font-light placeholder:text-color-neutral-dark
           outline-none focus:outline-none
-          transition-colors duration-300
+          transition-colors duration-200
           ${className}
         `}
       />
@@ -117,20 +117,20 @@ function StyledSortingButtons({
       case "primary":
         return `${baseClasses} ${
           isActive
-            ? "bg-color-primary-semilight-bright border-color-primary-semilight-bright text-white"
-            : "bg-color-primary-semilight border-color-primary-semilight text-white hover:bg-color-primary-semilight-bright hover:border-color-primary-semilight-bright"
+            ? "bg-color-primary-light border-color-primary-light text-white"
+            : "bg-color-primary-semilight border-color-primary-semilight text-white hover:bg-color-primary-light hover:border-color-primary-light"
         }`;
       case "secondary":
         return `${baseClasses} ${
           isActive
-            ? "bg-color-neutral-light border-color-primary-semilight-bright text-color-neutral-dark"
-            : "bg-color-neutral border-color-neutral text-color-neutral-dark hover:bg-color-neutral-light hover:border-color-primary-semilight-bright"
+            ? "bg-color-neutral-light border-color-primary-light text-color-neutral-dark"
+            : "bg-color-neutral border-color-neutral text-color-neutral-dark hover:bg-color-neutral-light hover:border-color-primary-light"
         }`;
       case "ghost":
         return `${baseClasses} ${
           isActive
-            ? "bg-transparent border-color-primary-semilight-bright text-color-primary-semilight-bright"
-            : "bg-transparent border-transparent text-color-neutral-light hover:border-color-primary-semilight-bright hover:text-color-primary-semilight-bright"
+            ? "bg-transparent border-color-primary-light text-color-primary-light"
+            : "bg-transparent border-transparent text-color-neutral-light hover:border-color-primary-light hover:text-color-primary-light"
         }`;
       default:
         return baseClasses;

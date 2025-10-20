@@ -142,7 +142,7 @@ export function StampListingsAllTable(
                       href={`/wallet/${dispenser.source}`}
                       className={`${valueSmLink} ${
                         isEmpty
-                          ? "!text-color-neutral-semidark hover:!text-color-primary-semilight-bright"
+                          ? "!text-color-neutral-semidark hover:!text-color-primary-light"
                           : ""
                       }`}
                     >
@@ -170,7 +170,7 @@ export function StampListingsAllTable(
                           href={`https://www.blockchain.com/explorer/transactions/btc/${dispenser.tx_hash}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          class="hover:text-color-primary-semilight-bright"
+                          class="hover:text-color-primary-light"
                         >
                           CLOSED
                         </a>

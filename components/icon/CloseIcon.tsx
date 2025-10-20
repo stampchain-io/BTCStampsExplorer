@@ -23,7 +23,7 @@ export function CloseIcon({
   const colorClasses = color === "grey"
     ? `stroke-[url(#grey)] hover:stroke-color-neutral-light transform transition-colors duration-200`
     : color === "purple"
-    ? `stroke-[url(#purple)] hover:stroke-color-primary-semilight-bright transform transition-colors duration-200`
+    ? `stroke-[url(#purple)] hover:stroke-color-primary-light transform transition-colors duration-200`
     : "";
 
   /* ===== RENDER ICON ===== */

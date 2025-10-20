@@ -24,7 +24,6 @@ export default {
         "micro-5": ['"Micro 5"', "sans-serif"],
       },
       colors: {
-        // New semantic color palette (Phase 1)
         color: {
           primary: {
             dark: "#220033",
@@ -43,8 +42,7 @@ export default {
         },
       },
       backgroundImage: {
-        "conic-pattern":
-          "repeating-conic-gradient(rgba(128, 128, 128, 0.2) 0% 25%, rgba(128, 128, 128, 0.1) 25% 50%)",
+        "conic-pattern": "var(--conic-pattern)",
       },
       animation: {
         "fade-in": "fadeIn",
@@ -90,7 +88,7 @@ export default {
         "3.5": "14px",
         "7.5": "30px",
 
-        // PAGE GUTTERS (horizontal padding from screen edges to header, footer and body containers)
+        // PAGE GUTTERS (horizontal padding from left/rightscreen edges to header, footer and body containers)
         "gutter-mobile": "20px", // updated breakpoint naming convention
         "gutter-tablet": "20px", // updated breakpoint naming convention
         "gutter-desktop": "40px", // updated breakpoint naming convention
@@ -142,13 +140,6 @@ export default {
       maxWidth: {
         "desktop": "1920px",
         "none": "none",
-      },
-      lineClamp: {
-        2: "2",
-      },
-      height: {
-        "gradient-top": "max(140vh, 1400px)",
-        "gradient-bottom": "max(100vh, 700px)",
       },
     },
   },
@@ -206,19 +197,19 @@ export default {
             0 2px 0 #A0F
           `,
         },
-        ".bg-clip-text": {
+        ".bg-clip-text": { // prune and refactor
           "-webkit-background-clip": "text",
           "background-clip": "text",
         },
-        ".text-fill-transparent": {
+        ".text-fill-transparent": { // prune and refactor
           "-webkit-text-fill-color": "transparent",
           "text-fill-color": "transparent",
         },
-        ".hover-dark-gradient": {
+        ".hover-dark-gradient": { // prune and refactor
           background:
             "linear-gradient(180deg, rgba(10, 0, 15, 0) 55%, rgba(20, 0, 31, 0.5) 70%, #1F002E 85%)",
         },
-        ".hover-gradient": {
+        ".hover-gradient": { // prune and refactor
           background:
             "linear-gradient(146.07deg, rgba(102, 0, 153, 0) 0%, #8800CC 49.98%, #AA00FF 99.95%)",
         },
@@ -237,10 +228,13 @@ export default {
           "--color-primary-semidark": "#440066",
           "--color-primary": "#660099",
           "--color-primary-semilight": "#8800CC",
-          "--color-primary-semilight-bright": "#AA00FF",
+          "--color-primary-light": "#AA00FF",
           "--color-neutral-light": "#CCCCCC",
           "--color-neutral": "#999999",
           "--color-neutral-semidark": "#666666",
+          // Global gradient variables
+          "--conic-pattern":
+            "repeating-conic-gradient(rgba(128, 128, 128, 0.2) 0% 25%, rgba(128, 128, 128, 0.1) 25% 50%)",
         },
         "*::-webkit-scrollbar-corner": {
           "background-color": "transparent !important",
@@ -264,7 +258,7 @@ export default {
         },
         ".purple-gradient2": {
           "background":
-            "linear-gradient(to right, var(--color-primary-semidark), var(--color-primary), var(--color-primary-semilight), var(--color-primary-semilight-bright))",
+            "linear-gradient(to right, var(--color-primary-semidark), var(--color-primary), var(--color-primary-semilight), var(--color-primary-light))",
           "-webkit-background-clip": "text",
           "-webkit-text-fill-color": "transparent",
           "background-clip": "text",
@@ -280,7 +274,7 @@ export default {
         },
         ".purple-gradient4": {
           "background":
-            "linear-gradient(to right, var(--color-primary-semilight-bright), var(--color-primary-semilight), var(--color-primary), var(--color-primary-semidark))",
+            "linear-gradient(to right, var(--color-primary-light), var(--color-primary-semilight), var(--color-primary), var(--color-primary-semidark))",
           "-webkit-background-clip": "text",
           "-webkit-text-fill-color": "transparent",
           "background-clip": "text",
@@ -321,7 +315,7 @@ export default {
         // Hoverable Text Gradients
         ".purple-gradient2-hover": {
           "background":
-            "linear-gradient(90deg, var(--color-primary-semidark) 0%, var(--color-primary) 50%, var(--color-primary-semilight) 75%, var(--color-primary-semilight-bright) 100%)",
+            "linear-gradient(90deg, var(--color-primary-semidark) 0%, var(--color-primary) 50%, var(--color-primary-semilight) 75%, var(--color-primary-light) 100%)",
           "-webkit-background-clip": "text",
           "-webkit-text-fill-color": "transparent",
           "background-clip": "text",
@@ -329,12 +323,12 @@ export default {
           "transition": "background 0.3s ease-in-out",
           "&:hover": {
             "background":
-              "linear-gradient(90deg, var(--color-primary-semidark) 0%, var(--color-primary) 25%, var(--color-primary-semilight) 50%, var(--color-primary-semilight-bright) 75%)",
+              "linear-gradient(90deg, var(--color-primary-semidark) 0%, var(--color-primary) 25%, var(--color-primary-semilight) 50%, var(--color-primary-light) 75%)",
           },
         },
         ".purple-gradient4-hover": {
           "background":
-            "linear-gradient(90deg, var(--color-primary-semilight-bright) 30%, var(--color-primary-semilight) 60%, var(--color-primary) 90%, var(--color-primary-semidark) 100%)",
+            "linear-gradient(90deg, var(--color-primary-light) 30%, var(--color-primary-semilight) 60%, var(--color-primary) 90%, var(--color-primary-semidark) 100%)",
           "-webkit-background-clip": "text",
           "-webkit-text-fill-color": "transparent",
           "background-clip": "text",
@@ -342,7 +336,7 @@ export default {
           "transition": "background 0.3s ease-in-out",
           "&:hover": {
             "background":
-              "linear-gradient(90deg, var(--color-primary-semilight-bright) 50%, var(--color-primary-semilight) 80%, var(--color-primary) 90%, var(--color-primary-semidark) 100%)",
+              "linear-gradient(90deg, var(--color-primary-light) 50%, var(--color-primary-semilight) 80%, var(--color-primary) 90%, var(--color-primary-semidark) 100%)",
           },
         },
         ".gray-gradient1-hover": {

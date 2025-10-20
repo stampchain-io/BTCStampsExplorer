@@ -628,7 +628,7 @@ function WalletProfileContentInner({
       {/* Page Header */}
       <div class="flex flex-row justify-between items-center gap-3 w-full relative mb-6">
         <div class="flex gap-3 items-center">
-          <h1 class="text-2xl mobileMd:text-3xl mobileLg:text-4xl font-extralight text-color-primary-semilight-bright">
+          <h1 class="text-2xl mobileMd:text-3xl mobileLg:text-4xl font-extralight text-color-primary-light">
             WALLET
           </h1>
           <p class="text-sm mobileMd:text-sm mobileLg:text-lg text-stamp-gray">

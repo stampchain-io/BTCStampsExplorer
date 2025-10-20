@@ -179,7 +179,7 @@ export default function CarouselGallery(props: CarouselHomeProps) {
                   data-hash={stamp.tx_hash}
                 >
                   <a target="_top" href={`/stamp/${stamp.tx_hash}`}>
-                    <div class="hover-gradient hover:bg-color-primary-semilight-bright hover:shadow-stamp p-0.5 rounded-3xl">
+                    <div class="hover-gradient hover:bg-color-primary-light hover:shadow-stamp p-0.5 rounded-3xl">
                       <div
                         class={`relative min-h-[150px] mobileMd:min-h-[242px] mobileLg:min-h-[200px] tablet:min-h-[269px] desktop:min-h-[408px] p-[6px] mobileMd:p-[12px] desktop:p-[18px] rounded-3xl ${glassmorphismL2} hover:bg-black`}
                       >
