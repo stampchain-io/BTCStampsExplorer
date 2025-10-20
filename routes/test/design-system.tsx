@@ -109,30 +109,30 @@ export default function DesignSystem() {
               </h3>
               <div class="space-y-6 bg-color-primary-semidark p-8 rounded-2xl">
                 {/* Purple Gradients */}
-                <p class="bg-text-purple-1 bg-clip-text text-transparent text-4xl font-bold">
+                <p class="purple-gradient1 text-4xl font-bold">
                   Purple Gradient Text 1
                 </p>
-                <p class="bg-text-purple-2 bg-clip-text text-transparent text-4xl font-bold">
+                <p class="purple-gradient2 text-4xl font-bold">
                   Purple Gradient Text 2
                 </p>
-                <p class="bg-text-purple-3 bg-clip-text text-transparent text-4xl font-bold">
+                <p class="purple-gradient3 text-4xl font-bold">
                   Purple Gradient Text 3
                 </p>
-                <p class="bg-text-purple-4 bg-clip-text text-transparent text-4xl font-bold">
+                <p class="purple-gradient4 text-4xl font-bold">
                   Purple Gradient Text 4
                 </p>
 
                 {/* Gray Gradients */}
-                <p class="bg-text-gray-1 bg-clip-text text-transparent text-4xl font-bold">
+                <p class="gray-gradient1 text-4xl font-bold">
                   Gray Gradient Text 1
                 </p>
-                <p class="bg-text-gray-2 bg-clip-text text-transparent text-4xl font-bold">
+                <p class="gray-gradient2 text-4xl font-bold">
                   Gray Gradient Text 2
                 </p>
-                <p class="bg-text-gray-3 bg-clip-text text-transparent text-4xl font-bold">
+                <p class="gray-gradient3 text-4xl font-bold">
                   Gray Gradient Text 3
                 </p>
-                <p class="bg-text-gray-4 bg-clip-text text-transparent text-4xl font-bold">
+                <p class="gray-gradient4 text-4xl font-bold">
                   Gray Gradient Text 4
                 </p>
               </div>

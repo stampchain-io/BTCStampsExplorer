@@ -3,6 +3,7 @@
 import createCarouselSlider from "$client/utils/carousel-slider.ts";
 import { IS_BROWSER } from "$fresh/runtime.ts";
 import { PlaceholderImage } from "$icon";
+import { glassmorphismL2 } from "$layout";
 import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
 import type { CarouselHomeProps } from "$types/ui.d.ts";
@@ -179,7 +180,9 @@ export default function CarouselGallery(props: CarouselHomeProps) {
                 >
                   <a target="_top" href={`/stamp/${stamp.tx_hash}`}>
                     <div class="hover-gradient hover:bg-color-primary-semilight-bright hover:shadow-stamp p-0.5 rounded-3xl">
-                      <div class="relative min-h-[150px] mobileMd:min-h-[242px] mobileLg:min-h-[200px] tablet:min-h-[269px] desktop:min-h-[408px] p-[6px] mobileMd:p-[12px] desktop:p-[18px] rounded-3xl bg-stamp-card-bg hover:bg-black">
+                      <div
+                        class={`relative min-h-[150px] mobileMd:min-h-[242px] mobileLg:min-h-[200px] tablet:min-h-[269px] desktop:min-h-[408px] p-[6px] mobileMd:p-[12px] desktop:p-[18px] rounded-3xl ${glassmorphismL2} hover:bg-black`}
+                      >
                         {validatedContent[stamp.tx_hash] || (
                           <img
                             src={stampSources[stamp.tx_hash] || stamp.stamp_url}

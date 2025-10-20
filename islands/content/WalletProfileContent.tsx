@@ -217,7 +217,7 @@ function DispenserItem({
   /* ===== EMPTY STATE HANDLING ===== */
   if (!dispensers?.length) {
     return (
-      <div class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-text-purple-3 gradient-text">
+      <div class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black purple-gradient3">
         NO LISTINGS FOUND
       </div>
     );
@@ -235,7 +235,7 @@ function DispenserItem({
   if (!openDispensers.length && !closedDispensers.length) {
     return (
       <div>
-        <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-text-purple-3 gradient-text">
+        <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black purple-gradient3">
           NO LISTINGS FOUND
         </h3>
       </div>
@@ -249,7 +249,7 @@ function DispenserItem({
         {/* Open Dispensers Section */}
         {openDispensers.length > 0 && (
           <div id="open-listings-section">
-            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-text-purple-3 gradient-text mb-6">
+            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black purple-gradient3 mb-6">
               OPEN LISTINGS
             </h3>
             <div class="flex flex-col gap-6">
@@ -263,7 +263,7 @@ function DispenserItem({
         {/* Closed Dispensers Section */}
         {closedDispensers.length > 0 && (
           <div id="closed-listings-section">
-            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-text-purple-3 gradient-text mb-6">
+            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black purple-gradient3 mb-6">
               CLOSED LISTINGS
             </h3>
             <div class="flex flex-col gap-6">
@@ -280,7 +280,7 @@ function DispenserItem({
         {/* Open Dispensers Section */}
         {openDispensers.length > 0 && (
           <div class="mb-8" id="open-listings-section">
-            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-text-purple-3 gradient-text mb-6">
+            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black purple-gradient3 mb-6">
               OPEN LISTINGS
             </h3>
             <div class="flex flex-col gap-6">
@@ -294,7 +294,7 @@ function DispenserItem({
         {/* Closed Dispensers Section */}
         {closedDispensers.length > 0 && (
           <div id="closed-listings-section">
-            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-text-purple-3 gradient-text mb-6">
+            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black purple-gradient3 mb-6">
               CLOSED LISTINGS
             </h3>
             <div class="flex flex-col gap-6">

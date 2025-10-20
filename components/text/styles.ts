@@ -5,7 +5,7 @@ const logoFont = "font-black italic text-3xl tracking-wide inline-block w-fit";
 const titleFont = "font-black text-3xl tracking-wide inline-block w-fit";
 const subtitleFont = "font-extralight text-2xl mb-2";
 const textFont = "font-normal text-color-neutral-light";
-const labelFont = "font-light text-color-neutral-darker tracking-wide";
+const labelFont = "font-light text-color-neutral-semidark tracking-wide";
 const valueFont = "font-medium text-color-neutral-light";
 const select = "select-none whitespace-nowrap";
 const transitionColors = "transition-colors duration-200";
@@ -26,13 +26,13 @@ export const logoPurpleLDLink =
 /* ===== NAVIGATION STYLES ===== */
 // Header - Desktop
 export const navLinkPurple =
-  `font-semibold tablet:font-normal text-color-primary text-sm tablet:text-[13px] group-hover:text-color-primary-bright tracking-wider ${transitionColors} cursor-pointer ${select}`;
+  `font-semibold tablet:font-normal text-color-primary text-sm tablet:text-[13px] group-hover:text-color-primary-light tracking-wider ${transitionColors} cursor-pointer ${select}`;
 export const navLinkPurpleActive =
-  `${navLinkPurple} !text-color-primary-bright hover:!text-color-primary`;
+  `${navLinkPurple} !text-color-primary-light hover:!text-color-primary`;
 export const navSublinkPurple =
-  `font-light text-color-primary text-[13px] hover:text-color-primary-bright tracking-wider ${transitionColors} cursor-pointer ${select}`; // used in WalletButton.tsx for connected sunmenu links - header uses custom styles
+  `font-light text-color-primary text-[13px] hover:text-color-primary-light tracking-wider ${transitionColors} cursor-pointer ${select}`; // used in WalletButton.tsx for connected sunmenu links - header uses custom styles
 export const navSublinkPurpleActive =
-  `${navSublinkPurple} !text-color-primary-bright hover:!text-color-primary`;
+  `${navSublinkPurple} !text-color-primary-light hover:!text-color-primary`;
 // Header - Mobile/tablet
 export const navLinkGrey =
   `font-semibold text-sm tablet:text-xs text-color-neutral hover:text-color-neutral-light
@@ -45,7 +45,7 @@ export const navLinkGreyLDActive =
   `${navLinkGreyLD} text-color-neutral-light [background:none_!important] [-webkit-text-fill-color:#CCCCCC_!important] [text-fill-color:#CCCCCC_!important] hover:[-webkit-text-fill-color:#999999!important] hover:[text-fill-color:#999999!important]`;
 // Footer - transparent text - ued with the overlayPurple class
 export const navLinkTransparentPurple =
-  `font-light text-[13px] hover:text-color-primary-bright tracking-wider ${transitionColors} cursor-pointer ${select}`;
+  `font-light text-[13px] hover:text-color-primary-light tracking-wider ${transitionColors} cursor-pointer ${select}`;
 
 /* ===== TITLE STYLES ===== */
 export const titleGreyLD =
@@ -61,7 +61,7 @@ export const titlePurpleDL =
 export const subtitleGrey =
   `${subtitleFont} text-color-neutral-light cursor-default ${select}`;
 export const subtitlePurple =
-  `${subtitleFont} text-color-primary-bright cursor-default ${select}`;
+  `${subtitleFont} text-color-primary-light cursor-default ${select}`;
 
 /* ===== HEADING STYLES ===== */
 export const headingGrey2 =
@@ -82,7 +82,7 @@ export const textXxs = `${textFont} text-[10px]`;
 export const textXs = `${textFont} text-xs`;
 export const textSm = `${textFont} text-sm`;
 export const textSmLink =
-  `${textFont} text-sm hover:text-color-primary-bright ${transitionColors} cursor-pointer ${select}`;
+  `${textFont} text-sm hover:text-color-primary-light ${transitionColors} cursor-pointer ${select}`;
 export const text = `${textFont} text-base`;
 export const textLg = `${textFont} text-lg`;
 export const textXl = `${textFont} text-xl`;
@@ -106,7 +106,7 @@ export const labelXsPosition =
 export const labelLightSm = `font-light text-sm text-color-neutral ${select}`;
 
 export const labelSmPurple =
-  `font-light text-sm text-color-primary-bright tracking-wide mb-0.5 ${select}`;
+  `font-light text-sm text-color-primary-light tracking-wide mb-0.5 ${select}`;
 
 export const labelLogicResponsive = ( // used for the filter labels
   checked: boolean,
@@ -132,7 +132,7 @@ export const labelLogicResponsive = ( // used for the filter labels
 export const valueXs = `${valueFont} text-xs ${select}`;
 export const valueSm = `${valueFont} text-sm ${select}`;
 export const valueSmLink =
-  `${valueFont} text-sm hover:text-color-primary-bright ${transitionColors} cursor-pointer w-full ${select}`;
+  `${valueFont} text-sm hover:text-color-primary-light ${transitionColors} cursor-pointer w-full ${select}`;
 export const value = `${valueFont} text-base ${select}`;
 export const valueLg = `${valueFont} text-lg ${select}`;
 export const valueXl =
@@ -155,15 +155,15 @@ export const value7xlPurpleGlow =
   `font-black text-7xl text-black text-stroke-glow-large cursor-default ${select}`; // used in about header
 // Dark variants
 export const valueDarkXs =
-  `font-medium text-xs text-color-neutral-darker tracking-tighter ${select}`; // used for addy styling in mobile/table header
+  `font-medium text-xs text-color-neutral-semidark tracking-tighter ${select}`; // used for addy styling in mobile/table header
 export const valueDarkSm =
-  `font-medium text-sm text-color-neutral-darker tracking-tighter ${select}`; // used for addy styling in desktop header
+  `font-medium text-sm text-color-neutral-semidark tracking-tighter ${select}`; // used for addy styling in desktop header
 export const valueDark =
-  `font-semibold text-base text-color-neutral-darker ${select}`; // used in tables
+  `font-semibold text-base text-color-neutral-semidark ${select}`; // used in tables
 // Color variants
 export const valuePositive = `text-green-600`;
 export const valueNegative = `text-red-600`;
-export const valueNeutral = `text-color-neutral-darker`;
+export const valueNeutral = `text-color-neutral-semidark`;
 
 /* ===== TOOLTIP STYLES ===== */
 // One text style for tooltips - defined in /notifications/styles.ts
@@ -175,7 +175,7 @@ export const valueNeutral = `text-color-neutral-darker`;
 export const tagline =
   `font-regular text-xs bg-gradient-to-r from-[#660099] via-[#8800CC] to-[#AA00FF] text-transparent bg-clip-text cursor-default ${select}`; // used in footer
 export const copyright =
-  `font-normal text-xs mobileMd:text-sm tablet:text-xs text-color-neutral-darkest cursor-default ${select}`; // used in the footer for copyright and counterparty version text
+  `font-normal text-xs mobileMd:text-sm tablet:text-xs text-color-neutral-dark cursor-default ${select}`; // used in the footer for copyright and counterparty version text
 export const toggleSymbol =
   `font-bold text-[10px] text-black cursor-default ${select}`; // used in ToggleSwitchButton.tsx
 
@@ -186,9 +186,9 @@ export const toggleSymbol =
 /* ===== CARD TEXT STYLES ===== */
 // Standard card styles
 export const cardHashSymbol =
-  `font-light text-color-primary-bright text-lg mobileLg:text-xl ${select}`;
+  `font-light text-color-primary-light text-lg mobileLg:text-xl ${select}`;
 export const cardStampNumber =
-  `font-extrabold text-color-primary-bright truncate max-w-full text-lg mobileLg:text-xl ${select}`;
+  `font-extrabold text-color-primary-light truncate max-w-full text-lg mobileLg:text-xl ${select}`;
 export const cardCreator =
   `font-semibold text-color-neutral-light break-words text-center pt-1 text-xs mobileMd:text-sm ${select}`;
 export const cardPrice =
@@ -200,7 +200,7 @@ export const cardSupply =
 
 // Minimal card variant styles
 export const cardHashSymbolMinimal =
-  `font-light text-color-neutral-light group-hover:text-color-primary-bright text-xs mobileSm:text-base mobileLg:text-xl tablet:text-xl desktop:text-xl ${transitionColors} ${select}`;
+  `font-light text-color-neutral-light group-hover:text-color-primary-light text-xs mobileSm:text-base mobileLg:text-xl tablet:text-xl desktop:text-xl ${transitionColors} ${select}`;
 export const cardStampNumberMinimal =
   `font-black gray-gradient1 group-hover:[-webkit-text-fill-color:#AA00FF] truncate text-sm mobileSm:text-base mobileLg:text-xl tablet:text-xl desktop:text-xl ${transitionColors} ${select}`;
 export const cardPriceMinimal =
@@ -208,7 +208,7 @@ export const cardPriceMinimal =
 
 // Grey gradient card variant styles
 export const cardHashSymbolGrey =
-  `font-light text-color-neutral group-hover:text-color-primary-bright text-lg min-[420px]:text-xl ${transitionColors} ${select}`;
+  `font-light text-color-neutral group-hover:text-color-primary-light text-lg min-[420px]:text-xl ${transitionColors} ${select}`;
 export const cardStampNumberGrey =
   `font-black gray-gradient1 group-hover:[-webkit-text-fill-color:#AA00FF] truncate max-w-full text-lg min-[420px]:text-xl ${transitionColors} ${select}`;
 

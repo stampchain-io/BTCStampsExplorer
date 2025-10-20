@@ -43,41 +43,6 @@ export default {
         },
       },
       backgroundImage: {
-        "stamp-primary":
-          "linear-gradient(141deg, rgba(10, 0, 15, 0) 0%, #14001F 50%, #1F002E 100%)",
-        "stamp-dark":
-          "linear-gradient(to bottom right, #1f002e00, #14001f7f, #1f002eff)",
-        "purple-bg-gradient":
-          "linear-gradient(to right, #8800cc, #7700aa, #660099)",
-        "text-purple-1": "linear-gradient(to right, #440066, #660099, #8800cc)",
-        "text-purple-2":
-          "linear-gradient(to right, #440066, #660099, #8800cc, #aa00ff)",
-        "text-purple-3": "linear-gradient(to right, #8800cc, #660099, #440066)",
-        "text-purple-4":
-          "linear-gradient(to right, #aa00ff, #8800cc, #660099, #440066)",
-        "text-gray-1": "linear-gradient(to right, #cccccc, #999999, #666666)",
-        "text-gray-2": "linear-gradient(to right, #999999, #666666)",
-        "text-gray-3": "linear-gradient(to right, #666666, #999999, #cccccc)",
-        "text-gray-4": "linear-gradient(to right, #666666, #999999)",
-        "text-purple-hover-default":
-          "linear-gradient(90deg, #440066 0%, #660099 50%, #8800cc 75%, #aa00ff 100%)",
-        "text-purple-hover-active":
-          "linear-gradient(90deg, #440066 0%, #660099 25%, #8800cc 50%, #aa00ff 75%)",
-        "stamp-number":
-          "linear-gradient(to right, var(--tw-gradient-from), var(--tw-gradient-to))",
-        "stamp-hover": "linear-gradient(to right, var(--tw-gradient-stops))",
-        "stamp-bg-dark":
-          "linear-gradient(to bottom right, var(--tw-gradient-from), var(--tw-gradient-to))",
-        "stamp-text-grey": "linear-gradient(to right, #666666, #999999)",
-        "stamp-text-purple":
-          "linear-gradient(to right, #440066, #660099, #8800cc)",
-        "stamp-card-bg":
-          "linear-gradient(141deg, rgba(10, 0, 15, 0) 0%, #14001F 50%, #1F002E 100%)",
-        "slide-content":
-          "linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75))",
-        "gradient-top": "var(--gradient-top)",
-        "gradient-filters":
-          "linear-gradient(to bottom, #080808 100%, #080808 80%)",
         "conic-pattern":
           "repeating-conic-gradient(rgba(128, 128, 128, 0.2) 0% 25%, rgba(128, 128, 128, 0.1) 25% 50%)",
       },

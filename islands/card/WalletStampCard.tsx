@@ -2,6 +2,7 @@
 /* Specialized version of StampCard for wallet pages showing user-specific details */
 import { Icon, LoadingIcon, PlaceholderImage } from "$icon";
 import StampTextContent from "$islands/content/stampDetailContent/StampTextContent.tsx";
+import { glassmorphismL2 } from "$layout";
 import type { WalletStampCardProps } from "$types/ui.d.ts";
 import { VNode } from "preact";
 import { memo } from "preact/compat";
@@ -383,7 +384,7 @@ const WalletStampCardComponent = (
           rounded-2xl transition-all
           w-full h-full
           hover:border-color-primary-semilight-bright hover:shadow-stamp hover:border-solid border-2 border-transparent
-          bg-stamp-card-bg
+           ${glassmorphismL2}
         `}
       >
         {/* ===== WALLET INDICATOR (ATOMIC ICON) ===== */}
