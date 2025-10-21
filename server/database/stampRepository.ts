@@ -667,7 +667,7 @@ export class StampRepository {
       blockIdentifier,
       allColumns = false,
       noPagination = false,
-      cacheDuration = 60 * 3, // Default 3 minute cache in seconds
+      cacheDuration = 60 * 5, // Default 5 minute cache in seconds (increased from 3)
       collectionId,
       sortColumn = "block_index",
       groupBy,
@@ -1079,7 +1079,7 @@ export class StampRepository {
     }
   }
 
-  static async getALLCPIDs(cacheDuration: number | "never" = 60 * 3) {
+  static async getALLCPIDs(cacheDuration: number | "never" = 60 * 5) {  // 5 minutes (was 3)
     const query = `
       SELECT DISTINCT cpid, stamp
       FROM ${STAMP_TABLE}
@@ -1343,8 +1343,8 @@ export class StampRepository {
     try {
       // Execute queries sequentially to avoid connection pool exhaustion
       // This prevents the connection leak that occurs when multiple queries run in parallel
-      const result = await this.db.executeQueryWithCache(salesHistoryQuery, [limit, offset], 60); // 1 minute cache
-      const countResult = await this.db.executeQueryWithCache(salesHistoryCountQuery, [], 300); // 5 minute cache for count
+      const result = await this.db.executeQueryWithCache(salesHistoryQuery, [limit, offset], 300); // 5 minute cache (was 60s)
+      const countResult = await this.db.executeQueryWithCache(salesHistoryCountQuery, [], 600); // 10 minute cache for count (was 300s)
 
       const stamps = (result as any).rows || [];
       const total = (countResult as any).rows[0]?.total || 0;

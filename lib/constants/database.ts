@@ -39,8 +39,11 @@ export const DEFAULT_CACHE_DURATION = 60 * 60 * 12;
 /** Blockchain-synchronized cache duration in seconds (10 minutes - average block time) */
 export const BLOCKCHAIN_SYNC_CACHE_DURATION = 60 * 10;
 
-/** Short-lived cache duration in seconds (30 seconds - for critical balance data) */
-export const BALANCE_CACHE_DURATION = 30;
+/** Balance cache duration in seconds (5 minutes - balances change with blocks, not seconds) */
+export const BALANCE_CACHE_DURATION = 60 * 5; // Increased from 30 seconds to 5 minutes
+
+/** Short-lived cache for rapidly changing data (30 seconds) */
+export const SHORT_CACHE_DURATION = 30;
 
 /** Multiplier for converting KB to vBytes */
 export const SATS_PER_KB_MULTIPLIER = 1000; // 1 KB = 1000 vBytes

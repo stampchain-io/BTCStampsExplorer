@@ -15,7 +15,7 @@ BTCStampsExplorer is the **official Bitcoin Stamps block explorer and API** powe
 ## Task Master AI Integration
 
 **Import Task Master's development workflow commands and guidelines:**
-@./.taskmaster/CLAUDE.md
+[.taskmaster/CLAUDE.md](mdc:.taskmaster/CLAUDE.md)
 
 ## Claude Code 2025 Best Practices
 

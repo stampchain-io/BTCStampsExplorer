@@ -27,7 +27,7 @@ export async function handler(req: Request): Promise<Response> {
 
     return ResponseUtil.success(
       { stampBalance },
-      { routeType: RouteType.DYNAMIC },
+      { routeType: RouteType.BALANCE },
     );
   } catch (error) {
     return ResponseUtil.internalError(error, "Error retrieving stamps balance");
