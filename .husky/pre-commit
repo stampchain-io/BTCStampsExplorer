@@ -1,5 +1,2 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
 # Task Verification Pre-Commit Hook
 deno run --allow-read --allow-run scripts/task-verification.ts pre-commit
