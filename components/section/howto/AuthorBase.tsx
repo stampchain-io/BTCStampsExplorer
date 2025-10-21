@@ -18,7 +18,7 @@ export function AuthorSection({ name, twitter, website }: AuthorProps) {
             ARTICLE BY
           </h6>
           <h5
-            class={`${textLg} tablet:text-base !font-semibold min-[520px]:mb-1`}
+            class={`${textLg} tablet:text-base !font-semibold !text-color-neutral-semilight min-[520px]:mb-1`}
           >
             {name}
           </h5>
@@ -29,7 +29,7 @@ export function AuthorSection({ name, twitter, website }: AuthorProps) {
             name="twitter"
             weight="normal"
             size="smR"
-            color="greyLight"
+            color="grey"
             href={`https://twitter.com/${twitter}`}
             target="_blank"
             rel="noopener noreferrer"
@@ -40,7 +40,7 @@ export function AuthorSection({ name, twitter, website }: AuthorProps) {
               name="website"
               weight="normal"
               size="smR"
-              color="greyLight"
+              color="grey"
               href={website}
               target="_blank"
               rel="noopener noreferrer"
