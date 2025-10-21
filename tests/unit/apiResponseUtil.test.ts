@@ -104,18 +104,17 @@ describe("ApiResponseUtil", () => {
       );
     });
 
-    it("should not add cache headers for dynamic routes", () => {
+    it("should add cache headers for dynamic routes", () => {
       const response = ApiResponseUtil.success({ data: "test" }, {
         routeType: RouteType.DYNAMIC,
         forceNoCache: false,
       });
 
       const cacheControl = response.headers.get("Cache-Control");
-      // Dynamic routes have duration: 0, so no cache headers are added
-      // Default security headers apply
+      // Dynamic routes now have 5-minute cache with stale-while-revalidate
       assertEquals(
         cacheControl,
-        "public, max-age=31536000, immutable",
+        "public, max-age=300, stale-while-revalidate=60, stale-if-error=600",
       );
     });
   });
