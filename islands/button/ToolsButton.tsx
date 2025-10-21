@@ -268,7 +268,7 @@ export function ToolsButton({ onOpenDrawer, data }: ToolsButtonProps) {
           name="tools"
           weight="normal"
           size="mdR"
-          color="purple"
+          color="purpleLight"
           className="mb-[1px]"
           onClick={handleToolsClick}
           colorAccent="color-mix(in srgb, var(--color-neutral-semidark) 75%, transparent)"

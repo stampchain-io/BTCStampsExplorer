@@ -470,7 +470,7 @@ export function Header() {
                 <CloseIcon
                   size="md"
                   weight="bold"
-                  color="grey"
+                  color="greyLight"
                   onClick={() => {
                     if (open) {
                       closeMenu();
@@ -573,7 +573,7 @@ export function Header() {
       name="stampchain"
       size="lg"
       weight="light"
-      color="purple"
+      color="purpleLight"
       className="ml-1.5"
       href="/home"
       f-partial="/home"

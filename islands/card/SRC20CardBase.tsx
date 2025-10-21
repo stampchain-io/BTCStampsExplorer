@@ -101,7 +101,7 @@ const SocialLinks = ({ src20 }: { src20: SRC20Row }) => {
           name="email"
           weight="normal"
           size="xxs"
-          color="grey"
+          color="greyLight"
           href={src20.email}
           target="_blank"
         />
@@ -112,7 +112,7 @@ const SocialLinks = ({ src20 }: { src20: SRC20Row }) => {
           name="website"
           weight="normal"
           size="xxs"
-          color="grey"
+          color="greyLight"
           href={src20.web}
           target="_blank"
         />
@@ -123,7 +123,7 @@ const SocialLinks = ({ src20 }: { src20: SRC20Row }) => {
           name="telegram"
           weight="normal"
           size="xxs"
-          color="grey"
+          color="greyLight"
           href={src20.tg}
         />
       )}
@@ -133,7 +133,7 @@ const SocialLinks = ({ src20 }: { src20: SRC20Row }) => {
           name="twitter"
           weight="normal"
           size="xxs"
-          color="grey"
+          color="greyLight"
           href={src20.x}
           target="_blank"
         />

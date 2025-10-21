@@ -67,7 +67,7 @@ export function MaraServiceUnavailableModal({
           <CloseIcon
             size="sm"
             weight="bold"
-            color="purple"
+            color="purpleLight"
             onClick={onClose}
           />
           <div

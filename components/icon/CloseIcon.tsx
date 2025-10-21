@@ -20,10 +20,10 @@ export function CloseIcon({
   };
 
   /* ===== STYLES ===== */
-  const colorClasses = color === "grey"
-    ? `stroke-[url(#grey)] hover:stroke-color-neutral-light transform transition-colors duration-200`
-    : color === "purple"
-    ? `stroke-[url(#purple)] hover:stroke-color-primary-light transform transition-colors duration-200`
+  const colorClasses = color === "greyLight"
+    ? `stroke-[url(#greyLight)] hover:stroke-color-neutral-light transform transition-colors duration-200`
+    : color === "purpleLight"
+    ? `stroke-[url(#purpleLight)] hover:stroke-color-primary-light transform transition-colors duration-200`
     : "";
 
   /* ===== RENDER ICON ===== */
@@ -31,9 +31,9 @@ export function CloseIcon({
     <>
       <svg width="0" height="0">
         <defs>
-          {color === "grey" && (
+          {color === "greyLight" && (
             <linearGradient
-              id="grey"
+              id="greyLight"
               gradientTransform="rotate(45)"
             >
               <stop offset="0%" stop-color="var(--color-neutral-semidark)" />
@@ -42,9 +42,9 @@ export function CloseIcon({
               <stop offset="100%" stop-color="var(--color-neutral-semilight)" />
             </linearGradient>
           )}
-          {color === "purple" && (
+          {color === "purpleLight" && (
             <linearGradient
-              id="purple"
+              id="purpleLight"
               gradientTransform="rotate(130)"
             >
               <stop offset="0%" stop-color="var(--color-primary-light)" />
@@ -81,7 +81,7 @@ export function CloseIcon({
  * <CloseIcon
  *   size="lg"
  *   weight="light"
- *   color="grey"
+ *   color="greyLight"
  *   onClick={() => handleClose()}
  * />
  *
@@ -89,7 +89,7 @@ export function CloseIcon({
  * <CloseIcon
  *   size="md"
  *   weight="bold"
- *   color="purple"
+ *   color="purpleLight"
  *   onClick={() => {
  *     if (open) {
  *       closeMenu();
@@ -101,7 +101,7 @@ export function CloseIcon({
  * <CloseIcon
  *   size="lg"
  *   weight="normal"
- *   color="grey"
+ *   color="greyLight"
  *   onClick={handleClose}
  *   className="ml-2"
  * />

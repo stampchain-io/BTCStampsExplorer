@@ -160,7 +160,7 @@ function WalletOverview(
               name="copy"
               weight="normal"
               size="mdR"
-              color="grey"
+              color="greyLight"
               onClick={copy}
             />
             <div
@@ -283,7 +283,7 @@ function DispenserStats({
         <div class="flex justify-end pt-6">
           <Button
             variant="outline"
-            color="purple"
+            color="purpleLight"
             size="md"
           >
             BUY

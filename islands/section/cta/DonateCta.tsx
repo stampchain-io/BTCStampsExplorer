@@ -307,7 +307,7 @@ export default function DonateCta() {
       </div>
       <Button
         variant="glassmorphismColor"
-        color="purple"
+        color="purpleLight"
         size="md"
         onClick={onClick}
       >
@@ -385,7 +385,7 @@ export default function DonateCta() {
                   name="donate"
                   weight="normal"
                   size="sm"
-                  color="purple"
+                  color="purpleLight"
                   onClick={() => {
                     setIsReceiveTooltipVisible(false);
                     handleOpenReceiveModal();

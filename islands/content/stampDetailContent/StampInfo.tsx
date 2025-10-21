@@ -809,7 +809,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                       name="dispenserListings"
                       weight="normal"
                       size="mdR"
-                      color="grey"
+                      color="greyLight"
                       ariaLabel="Listings"
                       onClick={() => setShowListings(!showListings)}
                       className="pb-0.5"

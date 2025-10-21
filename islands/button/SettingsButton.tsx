@@ -69,7 +69,7 @@ export function SettingsButton({
             name="gear"
             weight="normal"
             size="custom"
-            color="purple"
+            color="purpleLight"
             className="mt-[5px] w-[26px] h-[26px] tablet:w-[24px] tablet:h-[24px] transform transition-all duration-300"
             ariaLabel="Settings"
             onClick={() => handleOpen?.(true)}

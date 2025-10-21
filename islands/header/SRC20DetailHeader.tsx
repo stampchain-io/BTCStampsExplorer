@@ -118,7 +118,7 @@ export function SRC20DetailHeader({
                         name="email"
                         weight="normal"
                         size="xxs"
-                        color="grey"
+                        color="greyLight"
                         href={deployment.email}
                         target="_blank"
                       />
@@ -129,7 +129,7 @@ export function SRC20DetailHeader({
                         name="website"
                         weight="normal"
                         size="xxs"
-                        color="grey"
+                        color="greyLight"
                         href={deployment.web}
                         target="_blank"
                       />
@@ -140,7 +140,7 @@ export function SRC20DetailHeader({
                         name="telegram"
                         weight="normal"
                         size="xxs"
-                        color="grey"
+                        color="greyLight"
                         href={deployment.tg}
                         target="_blank"
                       />
@@ -151,7 +151,7 @@ export function SRC20DetailHeader({
                         name="twitter"
                         weight="normal"
                         size="xxs"
-                        color="grey"
+                        color="greyLight"
                         href={deployment.x}
                         target="_blank"
                       />

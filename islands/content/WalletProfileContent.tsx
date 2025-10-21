@@ -424,14 +424,14 @@ function DispenserRow(
                 name="copy"
                 weight="normal"
                 size="xs"
-                color="grey"
+                color="greyLight"
               />
               <Icon
                 type="iconButton"
                 name="history"
                 weight="normal"
                 size="xs"
-                color="grey"
+                color="greyLight"
               />
             </div>
           </div>

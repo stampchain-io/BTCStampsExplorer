@@ -61,7 +61,7 @@ const socialLinks = [
         name="twitter"
         weight="light"
         size="md"
-        color="purpleDark"
+        color="purple"
         href="https://x.com/Stampchain"
         target="_blank"
       />
@@ -74,7 +74,7 @@ const socialLinks = [
         name="telegram"
         weight="light"
         size="md"
-        color="purpleDark"
+        color="purple"
         href="https://t.me/BitcoinStamps"
         target="_blank"
       />
@@ -87,7 +87,7 @@ const socialLinks = [
         name="discord"
         weight="light"
         size="md"
-        color="purpleDark"
+        color="purple"
         href="https://discord.gg/BRYRt4bH"
         target="_blank"
       />
@@ -100,7 +100,7 @@ const socialLinks = [
         name="github"
         weight="light"
         size="md"
-        color="purpleDark"
+        color="purple"
         href="https://github.com/stampchain-io/"
         target="_blank"
       />

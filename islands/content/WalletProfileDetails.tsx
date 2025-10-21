@@ -1,12 +1,12 @@
 /* ===== WALLET PROFILE DETAILS COMPONENT ===== */
 import { StatItem, StatTitle } from "$components/section/WalletComponents.tsx";
-import type { WalletProfileDetailsProps } from "$types/ui.d.ts";
 import { Icon } from "$icon";
 import { containerBackground } from "$layout";
 import type { WalletOverviewInfo } from "$lib/types/wallet.d.ts";
 import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { tooltipIcon } from "$notification";
 import { labelSm, subtitleGrey, titleGreyLD } from "$text";
+import type { WalletProfileDetailsProps } from "$types/ui.d.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
@@ -118,7 +118,7 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
             name="copy"
             weight="normal"
             size="mdR"
-            color="grey"
+            color="greyLight"
             onClick={copy}
           />
           <div

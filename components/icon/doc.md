@@ -150,7 +150,7 @@ hover/group-hover: #660099
   - **Location**: `components/icon/styles.ts`
   - **Features**:
     - 2 icon types (icon, iconButton)
-    - 5 color palettes (grey, greyDark, purple, purpleDark, custom)
+    - 5 color palettes (greyLight, grey, purpleLight, purple, custom)
     - 15 size options (8 standard + 7 responsive)
     - 5 weight options
     - Special fill-stroke path support
@@ -220,7 +220,7 @@ export interface IconVariants {
   weight: "extraLight" | "light" | "normal" | "bold" | "custom";
   size: "xxxs" | "xxs" | "xs" | "sm" | "md" | "lg" | "xl" | "xxl" |
         "xxsR" | "xsR" | "smR" | "mdR" | "lgR" | "xlR" | "xxlR" | "custom";
-  color: "grey" | "greyDark" | "purple" | "purpleDark" | "custom";
+  color: "greyLight" | "grey" | "purpleLight" | "purple" | "custom";
   className?: string;
   role?: JSX.AriaRole;
   ariaLabel?: string;
@@ -319,7 +319,7 @@ export function SocialLink() {
       name="telegram"
       weight="normal"
       size="sm"
-      color="grey"
+      color="greyLight"
     />
   );
 }
@@ -336,7 +336,7 @@ export function CloseButton() {
       name="close"
       weight="bold"
       size="md"
-      color="purple"
+      color="purpleLight"
       onClick={() => handleClose()}
       ariaLabel="Close Dialog"
     />
@@ -355,7 +355,7 @@ export function TwitterLink() {
       name="twitter"
       weight="bold"
       size="mdR"
-      color="purple"
+      color="purpleLight"
       href="https://twitter.com/stampchain_io"
       target="_blank"
       rel="noopener noreferrer"
@@ -414,7 +414,7 @@ export function NavIcon() {
       name="search"
       weight="bold"
       size="md"
-      color="purple"
+      color="purpleLight"
       href="/search"
       f-partial="/search"
     />
@@ -729,10 +729,10 @@ All icons share these SVG attributes:
 - Always provide `onClick` handler for iconButton type
 
 ### Color Selection
-- **grey**: Default for neutral elements
-- **greyDark**: Subtle, less prominent icons
-- **purple**: Brand actions, primary emphasis
-- **purpleDark**: Darker purple for specific contexts
+- **greyLight**: Default for neutral elements
+- **grey**: Subtle, less prominent icons
+- **purpleLight**: Brand actions, primary emphasis
+- **purple**: Darker purple for specific contexts
 - **custom**: Full control for special cases (gradients, conditional colors)
 
 ### Size Selection

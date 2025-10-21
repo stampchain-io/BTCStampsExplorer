@@ -114,7 +114,7 @@ export const ToastComponent = (
           name="close"
           weight="bold"
           size="xs"
-          color="grey"
+          color="greyLight"
           onClick={onClose}
           className="ml-auto -mt-1.5"
         />

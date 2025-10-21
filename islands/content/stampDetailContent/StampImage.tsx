@@ -286,7 +286,7 @@ function RightPanel(
             name="copyLink"
             weight="normal"
             size="custom"
-            color="grey"
+            color="greyLight"
             className="w-[29px] h-[29px] tablet:w-[25px] tablet:h-[25px]"
             onClick={copyLink}
           />
@@ -314,7 +314,7 @@ function RightPanel(
             name="share"
             weight="normal"
             size="custom"
-            color="grey"
+            color="greyLight"
             className="w-[29px] h-[29px] tablet:w-[25px] tablet:h-[25px]"
             onClick={shareContent}
             ariaLabel="Share content"
@@ -338,7 +338,7 @@ function RightPanel(
             name="twitterImage"
             weight="normal"
             size="mdR"
-            color="grey"
+            color="greyLight"
             onClick={shareToX}
             ariaLabel="Share on X"
           />
@@ -364,7 +364,7 @@ function RightPanel(
               name="previewCode"
               weight="normal"
               size="mdR"
-              color="grey"
+              color="greyLight"
               onClick={() => {
                 setIsCodeTooltipVisible(false);
                 toggleCodeModal();
@@ -390,7 +390,7 @@ function RightPanel(
             name="previewImageRaw"
             weight="normal"
             size="mdR"
-            color="grey"
+            color="greyLight"
             onClick={() =>
               globalThis.open(
                 `/s/${stamp.cpid}`,
@@ -421,7 +421,7 @@ function RightPanel(
             name="previewImage"
             weight="normal"
             size="mdR"
-            color="grey"
+            color="greyLight"
             onClick={() => {
               setIsFullscreenTooltipVisible(false);
               toggleFullScreenModal();
