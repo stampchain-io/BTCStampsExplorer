@@ -1,2 +1,4 @@
-# Task Verification Pre-Commit Hook
-deno run --allow-read --allow-run scripts/task-verification.ts pre-commit
+# Pre-commit Hook - Quick Validation
+# Aligned with CI/CD strategy - catches issues before commit
+# Runs: format check, lint, type check, import validation (report mode)
+deno task validate:quick
