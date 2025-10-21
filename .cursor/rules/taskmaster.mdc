@@ -123,7 +123,7 @@ This document provides a detailed reference for interacting with Taskmaster, cov
 ### 6. Add Task (`add_task`)
 
 *   **MCP Tool:** `add_task`
-*   **CLI Command:** `task-master add-task [options]`
+*   **CLI Command:** `task-master add_task [options]`
 *   **Description:** `Add a new task to Taskmaster by describing it; AI will structure it.`
 *   **Key Parameters/Options:**
     *   `prompt`: `Required. Describe the new task you want Taskmaster to create, e.g., "Implement user authentication using JWT".` (CLI: `-p, --prompt <text>`)

@@ -42,7 +42,7 @@ Task Master offers two primary ways to interact:
 -   Verify tasks according to test strategies before marking as complete (See [`tests.mdc`](mdc:.cursor/rules/tests.mdc))
 -   Mark completed tasks with `set_task_status` / `task-master set-status --id=<id> --status=done` (see [`taskmaster.mdc`](mdc:.cursor/rules/taskmaster.mdc))
 -   Update dependent tasks when implementation differs from original plan using `update` / `task-master update --from=<id> --prompt="..."` or `update_task` / `task-master update-task --id=<id> --prompt="..."` (see [`taskmaster.mdc`](mdc:.cursor/rules/taskmaster.mdc))
--   Add new tasks discovered during implementation using `add_task` / `task-master add-task --prompt="..." --research` (see [`taskmaster.mdc`](mdc:.cursor/rules/taskmaster.mdc)).
+-   Add new tasks discovered during implementation using `add_task` / `task-master add_task --prompt="..." --research` (see [`taskmaster.mdc`](mdc:.cursor/rules/taskmaster.mdc)).
 -   Add new subtasks as needed using `add_subtask` / `task-master add-subtask --parent=<id> --title="..."` (see [`taskmaster.mdc`](mdc:.cursor/rules/taskmaster.mdc)).
 -   Append notes or details to subtasks using `update_subtask` / `task-master update-subtask --id=<subtaskId> --prompt='Add implementation notes here...\nMore details...'` (see [`taskmaster.mdc`](mdc:.cursor/rules/taskmaster.mdc)).
 -   Generate task files with `generate` / `task-master generate` (see [`taskmaster.mdc`](mdc:.cursor/rules/taskmaster.mdc)) after updating tasks.json

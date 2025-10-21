@@ -51,16 +51,17 @@ export class BitcoinNotificationService {
     await dbManager.invalidateCacheByCategory('src101_balance');
     await dbManager.invalidateCacheByCategory('stamp_balance');
 
-    // ADDITIONAL: Clear categories that balance queries might be miscategorized into
-    await dbManager.invalidateCacheByCategory('stamp');      // Stamp balance queries
-    await dbManager.invalidateCacheByCategory('stamp_detail'); // Individual stamp details
-    await dbManager.invalidateCacheByCategory('stamp_list'); // Full stamp list (new stamps appear)
-    await dbManager.invalidateCacheByCategory('market_data'); // Market data includes balance info
-    await dbManager.invalidateCacheByCategory('block');      // Block queries might include balance data
-    await dbManager.invalidateCacheByCategory('src20_transaction'); // SRC20 transaction queries
-    await dbManager.invalidateCacheByCategory('blockchain_data'); // SRC20 tick counts and other blockchain data
-    await dbManager.invalidateCacheByCategory('dispenser'); // Dispenser state changes with blocks
-    await dbManager.invalidateCacheByCategory('transaction'); // Transaction data changes with blocks
+    // SELECTIVE: Only clear categories that ACTUALLY change with new blocks
+    // Commented out over-aggressive invalidations that hurt cache hit rate
+    // await dbManager.invalidateCacheByCategory('stamp');      // Most stamp data doesn't change with blocks
+    // await dbManager.invalidateCacheByCategory('stamp_detail'); // Individual stamps rarely change
+    await dbManager.invalidateCacheByCategory('stamp_list'); // New stamps may appear
+    await dbManager.invalidateCacheByCategory('market_data'); // Prices/volumes change with trades
+    await dbManager.invalidateCacheByCategory('block');      // Block data obviously changes
+    await dbManager.invalidateCacheByCategory('src20_transaction'); // New transactions in blocks
+    await dbManager.invalidateCacheByCategory('blockchain_data'); // Blockchain state changes
+    await dbManager.invalidateCacheByCategory('dispenser'); // Dispenser state changes with usage
+    await dbManager.invalidateCacheByCategory('transaction'); // New transactions in blocks
 
     // Market data caches - prices/volumes may change with new blocks
     await dbManager.invalidateCacheByPattern('market_data_*');
