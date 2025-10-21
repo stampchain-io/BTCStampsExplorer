@@ -165,14 +165,14 @@ export default function StampGallery({
             >
               <h1
                 class={`${
-                  alignRight ? titleGreyLD : titleGreyDL
+                  alignRight ? titleGreyLD : titleGreyLD
                 } tablet:hidden`}
               >
                 {title}
               </h1>
               <h1
                 class={`hidden tablet:block ${
-                  alignRight ? titleGreyLD : titleGreyDL
+                  alignRight ? titleGreyDL : titleGreyLD
                 }`}
               >
                 {title}

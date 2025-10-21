@@ -275,7 +275,7 @@ export default function MediaPage() {
             <p>
               It utilizes the Counterparty platform, a longstanding Bitcoin meta
               layer, to broadcast Stamping transactions to the Bitcoin Network.
-              In addition, using a Counterparty transaction ...
+              In addition, using a Counterparty ...
             </p>
             <div>
               <Button

@@ -4,7 +4,7 @@ import { Icon } from "$icon";
 import { containerBackground } from "$layout";
 import {
   copyright,
-  logoPurpleDL,
+  logoPurpleLD,
   navLinkTransparentPurple,
   overlayPurple,
   tagline,
@@ -61,7 +61,7 @@ const socialLinks = [
         name="twitter"
         weight="light"
         size="md"
-        color="purple"
+        color="purpleDark"
         href="https://x.com/Stampchain"
         target="_blank"
       />
@@ -74,7 +74,7 @@ const socialLinks = [
         name="telegram"
         weight="light"
         size="md"
-        color="purple"
+        color="purpleDark"
         href="https://t.me/BitcoinStamps"
         target="_blank"
       />
@@ -87,7 +87,7 @@ const socialLinks = [
         name="discord"
         weight="light"
         size="md"
-        color="purple"
+        color="purpleDark"
         href="https://discord.gg/BRYRt4bH"
         target="_blank"
       />
@@ -100,7 +100,7 @@ const socialLinks = [
         name="github"
         weight="light"
         size="md"
-        color="purple"
+        color="purpleDark"
         href="https://github.com/stampchain-io/"
         target="_blank"
       />
@@ -145,7 +145,7 @@ export function Footer() {
           {/* ===== LOGO AND TAGLINE ===== */}
           <div class="flex flex-col">
             <h5
-              class={`${logoPurpleDL} text-center mobileMd:text-left`}
+              class={`${logoPurpleLD} text-center mobileMd:text-left`}
             >
               STAMPCHAIN
               <span class="font-extralight pr-1">
@@ -160,7 +160,7 @@ export function Footer() {
           </div>
 
           {/* ===== SOCIAL MEDIA ICONS ===== */}
-          <div class="flex gap-6 tablet:gap-4 mt-3 mobileMd:mt-0 tablet:mt-3">
+          <div class="flex gap-6 tablet:gap-5 mt-3 mobileMd:mt-0 tablet:mt-3">
             {socialLinks.map((link, index) => (
               <div key={index}>
                 {link.icon}
