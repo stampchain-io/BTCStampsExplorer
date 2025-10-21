@@ -24,20 +24,20 @@ export default {
         "micro-5": ['"Micro 5"', "sans-serif"],
       },
       colors: {
-        color: { // colors are also defined
+        color: { // colors are also defined as CSS variables further down in the doc - update both
           primary: {
-            dark: "#220033",
-            semidark: "#440066",
-            DEFAULT: "#660099",
-            semilight: "#8800CC",
-            light: "#AA00FF",
+            dark: "#43005c",
+            semidark: "#610085",
+            DEFAULT: "#7f00ad",
+            semilight: "#9d00d6",
+            light: "#BB00FF",
           },
           neutral: {
-            dark: "#333333",
-            semidark: "#666666",
-            DEFAULT: "#999999",
-            semilight: "#CCCCCC",
-            light: "#FFFFFF",
+            dark: "#595653",
+            semidark: "#86827d",
+            DEFAULT: "#aca7a1",
+            semilight: "#d8d2ca",
+            light: "#fff8f0",
           },
         },
       },
@@ -197,7 +197,7 @@ export default {
             0 2px 0 #A0F
           `,
         },
-        ".bg-clip-text": { // prune and refactor
+        ".bg-clip-text": { // @baba - prune and refactor
           "-webkit-background-clip": "text",
           "background-clip": "text",
         },
@@ -223,18 +223,18 @@ export default {
           },
         },
         ":root": {
-          // Stamp primary color palette as CSS variables
-          "--color-primary-dark": "#220033",
-          "--color-primary-semidark": "#440066",
-          "--color-primary": "#660099",
-          "--color-primary-semilight": "#8800CC",
-          "--color-primary-light": "#AA00FF",
-          // Stamp neutral color palette as CSS variables
-          "--color-neutral-dark": "#333333",
-          "--color-neutral-semidark": "#666666",
-          "--color-neutral": "#999999",
-          "--color-neutral-semilight": "#CCCCCC",
-          "--color-neutral-light": "#FFFFFF",
+          // Primary color palette as CSS variables
+          "--color-primary-dark": "#43005c",
+          "--color-primary-semidark": "#610085",
+          "--color-primary": "#7f00ad",
+          "--color-primary-semilight": "#9d00d6",
+          "--color-primary-light": "#BB00FF",
+          // Neutral color palette as CSS variables
+          "--color-neutral-dark": "#595653",
+          "--color-neutral-semidark": "#86827d",
+          "--color-neutral": "#aca7a1",
+          "--color-neutral-semilight": "#d8d2ca",
+          "--color-neutral-light": "#fff8f0",
           // Conic gradient variables
           "--conic-pattern":
             "repeating-conic-gradient(rgba(128, 128, 128, 0.2) 0% 25%, rgba(128, 128, 128, 0.1) 25% 50%)",
@@ -253,20 +253,20 @@ export default {
         // Gradient Classes - Primary variants
         ".color-primary-gradientDL": {
           "background":
-            "linear-gradient(to right, var(--color-primary-semidark), var(--color-primary), var(--color-primary-semilight))",
+            "linear-gradient(to right, var(--color-primary-dark), var(--color-primary-semidark), var(--color-primary), var(--color-primary-semilight), var(--color-primary-light))",
           "-webkit-background-clip": "text",
           "-webkit-text-fill-color": "transparent",
           "background-clip": "text",
-          "text-fill-color": "transparent",
         },
         ".color-primary-gradientDL-hover": {
           "background":
-            "linear-gradient(to right, var(--color-primary-semidark), var(--color-primary), var(--color-primary-semilight))",
+            "linear-gradient(to right, var(--color-primary-dark), var(--color-primary-semidark), var(--color-primary), var(--color-primary-semilight), var(--color-primary-light))",
           "-webkit-background-clip": "text",
           "-webkit-text-fill-color": "transparent",
           "background-clip": "text",
           "text-fill-color": "transparent",
-          "transition": "background 0.3s ease-in-out",
+          "transition":
+            "background 0.2s ease-in-out, -webkit-text-fill-color 0.2s ease-in-out, text-fill-color 0.2s ease-in-out",
           "&:hover": {
             "background": "none",
             "-webkit-text-fill-color": "var(--color-primary-light)",
@@ -275,7 +275,7 @@ export default {
         },
         ".color-primary-gradientLD": {
           "background":
-            "linear-gradient(to right, var(--color-primary-semilight), var(--color-primary), var(--color-primary-semidark))",
+            "linear-gradient(to right, var(--color-primary-light), var(--color-primary-semilight), var(--color-primary), var(--color-primary-semidark), var(--color-primary-dark))",
           "-webkit-background-clip": "text",
           "-webkit-text-fill-color": "transparent",
           "background-clip": "text",
@@ -283,12 +283,13 @@ export default {
         },
         ".color-primary-gradientLD-hover": {
           "background":
-            "linear-gradient(to right, var(--color-primary-semilight), var(--color-primary), var(--color-primary-semidark))",
+            "linear-gradient(to right, var(--color-primary-light), var(--color-primary-semilight), var(--color-primary), var(--color-primary-semidark), var(--color-primary-dark))",
           "-webkit-background-clip": "text",
           "-webkit-text-fill-color": "transparent",
           "background-clip": "text",
           "text-fill-color": "transparent",
-          "transition": "background 0.3s ease-in-out",
+          "transition":
+            "background 0.2s ease-in-out, -webkit-text-fill-color 0.2s ease-in-out, text-fill-color 0.2s ease-in-out",
           "&:hover": {
             "background": "none",
             "-webkit-text-fill-color": "var(--color-primary-light)",
@@ -299,7 +300,7 @@ export default {
         // Gradient Classes - Neutral variants
         ".color-neutral-gradientLD": {
           "background":
-            "linear-gradient(to right, var(--color-neutral-light), var(--color-neutral), var(--color-neutral-semidark))",
+            "linear-gradient(to right, var(--color-neutral-light), var(--color-neutral-semilight), var(--color-neutral), var(--color-neutral-semidark), var(--color-neutral-dark))",
           "-webkit-background-clip": "text",
           "-webkit-text-fill-color": "transparent",
           "background-clip": "text",
@@ -307,12 +308,13 @@ export default {
         },
         ".color-neutral-gradientLD-hover": {
           "background":
-            "linear-gradient(to right, var(--color-neutral-light), var(--color-neutral), var(--color-neutral-semidark))",
+            "linear-gradient(to right, var(--color-neutral-light), var(--color-neutral-semilight), var(--color-neutral), var(--color-neutral-semidark), var(--color-neutral-dark))",
+          "-webkit-background-clip": "text",
           "-webkit-text-fill-color": "transparent",
           "background-clip": "text",
           "text-fill-color": "transparent",
           "transition":
-            "background 0.3s ease-in-out, -webkit-text-fill-color 0.3s ease-in-out, text-fill-color 0.3s ease-in-out",
+            "background 0.2s ease-in-out, -webkit-text-fill-color 0.2s ease-in-out, text-fill-color 0.2s ease-in-out",
           "&:hover": {
             "background": "none",
             "-webkit-text-fill-color": "var(--color-neutral-light)",
@@ -321,19 +323,20 @@ export default {
         },
         ".color-neutral-gradientDL": {
           "background":
-            "linear-gradient(to right, var(--color-neutral-semidark), var(--color-neutral), var(--color-neutral-light))",
+            "linear-gradient(to right, var(--color-neutral-dark), var(--color-neutral-semidark), var(--color-neutral), var(--color-neutral-semilight), var(--color-neutral-light))",
           "-webkit-background-clip": "text",
           "-webkit-text-fill-color": "transparent",
           "background-clip": "text",
         },
         ".color-neutral-gradientDL-hover": {
           "background":
-            "linear-gradient(to right, var(--color-neutral-semidark), var(--color-neutral), var(--color-neutral-light))",
+            "linear-gradient(to right, var(--color-neutral-dark), var(--color-neutral-semidark), var(--color-neutral), var(--color-neutral-semilight), var(--color-neutral-light))",
+          "-webkit-background-clip": "text",
           "-webkit-text-fill-color": "transparent",
           "background-clip": "text",
           "text-fill-color": "transparent",
           "transition":
-            "background 0.3s ease-in-out, -webkit-text-fill-color 0.3s ease-in-out, text-fill-color 0.3s ease-in-out",
+            "background 0.2s ease-in-out, -webkit-text-fill-color 0.2s ease-in-out, text-fill-color 0.2s ease-in-out",
           "&:hover": {
             "background": "none",
             "-webkit-text-fill-color": "var(--color-neutral-light)",

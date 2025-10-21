@@ -248,14 +248,14 @@
             static initClass() {
                 (this.prototype.p5 = !0),
                     /* === VISUAL COLORS (defaults) ===
-                     * color: "#8800cc"   // light purple
+                     * color: "#8700e0"   // light purple
                      * backgroundColor: "#000000" // black
                      * colorPalette: array of colors that randomly alternate
                      */
                     (this.prototype.defaultOptions = {
-                        color: "#440066",
+                        color: "#9600e0",
                         backgroundColor: "#000000",
-                        colorPalette: ["#8800cc", "#000000", "#440066", "#000000", "#650065", "#660099", "#000000"]
+                        colorPalette: ["#8700e0", "#000000", "#9600e0", "#000000", "#a500e0", "#000000", "#b400e0"]
                     });
             }
             constructor(e) {
@@ -295,10 +295,10 @@
                             (function () {
                                 // === PARTICLE COUNT ===
                                 // Controls number of flowing particles in the topology
-                                // Mobile: 1000 particles, Tablet/Desktop: 2000 particles
+                                // Mobile: 750 particles, Tablet/Desktop: 1500 particles
                                 const isMobile = "undefined" != typeof navigator && (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768);
-                                c = isMobile ? 1000 : 2000;
-                                const colorPalette = e.options.colorPalette || ["#8800cc", "#000000", "#440066", "#000000", "#650065", "#660099", "#000000"];
+                                c = isMobile ? 750 : 1500;
+                                const colorPalette = e.options.colorPalette || ["#8700e0", "#000000", "#9600e0", "#000000", "#a500e0", "#000000", "#b400e0"];
                                 for (let e = 0; e < c; e++) {
                                     let s = t.random(t.width + 200),
                                         i = t.random(t.height + 200);
@@ -327,12 +327,12 @@
                                             // === PARTICLE MOVEMENT SPEED ===
                                             // Controls how fast particles move through the topology
                                             // Default: mult(2.2)
-                                            o.vel.add(o.acc).normalize().mult(6.3),
+                                            o.vel.add(o.acc).normalize().mult(5.9),
                                             (o.acc = t.createVector(0, 0)),
                                             // === FLOW FIELD RESPONSE STRENGTH ===
                                             // Controls how strongly particles respond to the flow field
                                             // Default: mult(3)
-                                            o.acc.add(n).mult(8.3);
+                                            o.acc.add(n).mult(9.9);
                                     }
                                     var e, s;
                                 })(),
@@ -362,7 +362,7 @@
                                 // === FLOW FIELD EVOLUTION SPEED ===
                                 // Controls how fast the underlying flow field changes over time
                                 // Default: c += 0.002
-                                (c += 0.01);
+                                (c += 0.1);
                         });
                 });
             }
@@ -383,21 +383,21 @@
  * scaleMobile: 1
  *
  * === VISUAL COLORS ===
- * color: "#440066" (dark purple) - legacy single color
+ * color: "#9600e0" (dark purple) - legacy single color
  * backgroundColor: "#000000" (black)
- * colorPalette: ["#8800cc", "#000000", "#440066", "#000000", "#650065", "#660099", "#000000"]
+ * colorPalette: ["#8700e0", "#000000", "#9600e0", "#000000", "#a500e0", "#000000", "#b400e0"]
  *   Array of 7 colors for random alternation - each particle randomly assigned one color at creation
  *   Colors breakdown:
- *     - #8800cc: bright purple (~14% chance)
+ *     - #8700e0: bright purple (~14% chance)
  *     - #000000: black - appears three times (~43% chance total)
- *     - #440066: dark purple (~14% chance)
- *     - #650065: dark magenta (~14% chance)
- *     - #660099: very dark purple (~14% chance)
+ *     - #9600e0: dark purple (~14% chance)
+ *     - #a500e0: dark magenta (~14% chance)
+ *     - #b400e0: very dark purple (~14% chance)
  *
  * === PARTICLE SYSTEM ===
  * Particle count: Dynamic based on device
- *   Mobile/Tablet: 1000 particles
- *   Desktop: 2000 particles
+ *   Mobile/Tablet: 750 particles
+ *   Desktop: 1500 particles
  *   Detection: user agent check + window width < 768px
  *
  * === ANIMATION BEHAVIOR ===

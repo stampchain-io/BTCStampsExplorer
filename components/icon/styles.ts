@@ -98,12 +98,16 @@ export const iconStyles = {
   //   - the gradient defs have to be included in the file, since creating a global gradient file for them requires moving them up in the DOM tree (I abandoned this approach)
 
   icon: {
+    greyLight:
+      "stroke-color-neutral-semilight fill-none [&_path[class*='fill-stroke']]:fill-color-neutral-semilight",
     grey:
       "stroke-color-neutral fill-none [&_path[class*='fill-stroke']]:fill-color-neutral",
     greyDark:
       "stroke-color-neutral-semidark fill-none [&_path[class*='fill-stroke']]:fill-color-neutral-semidark",
-    purple:
+    purpleLight:
       "stroke-color-primary-semilight fill-none [&_path[class*='fill-stroke']]:fill-color-primary-semilight",
+    purple:
+      "stroke-color-primary fill-none [&_path[class*='fill-stroke']]:fill-color-primary",
     purpleDark:
       "stroke-color-primary-semidark fill-none [&_path[class*='fill-stroke']]:fill-color-primary-semidark",
     custom: "fill-none",
@@ -111,13 +115,13 @@ export const iconStyles = {
 
   iconButton: {
     grey:
-      "stroke-color-neutral hover:stroke-color-neutral-light group-hover:stroke-color-neutral-light fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-color-neutral [&:hover_path[class*='fill-stroke']]:fill-color-neutral-light [&:group-hover_path[class*='fill-stroke']]:fill-color-neutral-light",
+      "stroke-color-neutral-semilight hover:stroke-color-neutral-light group-hover:stroke-color-neutral-light fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-color-neutral-semilight [&:hover_path[class*='fill-stroke']]:fill-color-neutral-light [&:group-hover_path[class*='fill-stroke']]:fill-color-neutral-light",
     greyDark:
-      "stroke-color-neutral-semidark hover:stroke-color-neutral group-hover:stroke-color-neutral fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-color-neutral-semidark [&:hover_path[class*='fill-stroke']]:fill-color-neutral [&:group-hover_path[class*='fill-stroke']]:fill-color-neutral",
+      "stroke-color-neutral hover:stroke-color-neutral-light group-hover:stroke-color-neutral-light fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-color-neutral [&:hover_path[class*='fill-stroke']]:fill-color-neutral-light [&:group-hover_path[class*='fill-stroke']]:fill-color-neutral-light",
     purple:
       "stroke-color-primary-semilight hover:stroke-color-primary-light group-hover:stroke-color-primary-light fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-color-primary-semilight [&:hover_path[class*='fill-stroke']]:fill-color-primary-light [&:group-hover_path[class*='fill-stroke']]:fill-color-primary-light",
     purpleDark:
-      "stroke-color-primary-semidark hover:stroke-color-primary-semilight group-hover:stroke-color-primary-semilight fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-color-primary-semidark [&:hover_path[class*='fill-stroke']]:fill-color-primary-semilight [&:group-hover_path[class*='fill-stroke']]:fill-color-primary-semilight",
+      "stroke-color-primary hover:stroke-color-primary-light group-hover:stroke-color-primary-light fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-color-primary [&:hover_path[class*='fill-stroke']]:fill-color-primary-light [&:group-hover_path[class*='fill-stroke']]:fill-color-primary-light",
     custom: "fill-none cursor-pointer",
   },
 

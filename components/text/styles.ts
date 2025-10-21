@@ -13,7 +13,8 @@ const transitionColors = "transition-colors duration-200";
 /* ===== OVERLAY STYLES ===== */
 // Overlays - used for text overlay effects of whole divs - text must be transparent or not declared with tailwind css
 export const overlayPurple =
-  "bg-gradient-to-r from-color-primary-light/80 via-color-primary-light/60 to-color-primary-light/40 text-transparent bg-clip-text";
+  `bg-gradient-to-l from-color-primary-semilight/80 via-color-primary-semilight/90 to-color-primary-semilight
+  tablet:bg-gradient-to-r text-transparent bg-clip-text`;
 
 /* ===== LOGO STYLES ===== */
 export const logoPurpleDL = `${logoFont} color-primary-gradientDL ${select}`; // used in footer
@@ -21,16 +22,16 @@ export const logoPurpleDLLink =
   `${logoFont} color-primary-gradientDL-hover ${transitionColors} cursor-pointer ${select}`;
 export const logoPurpleLD = `${logoFont} color-primary-gradientLD ${select}`;
 export const logoPurpleLDLink =
-  `${logoFont} color-primary-gradientLD-hover ${transitionColors} cursor-pointer ${select}`; // used in header
+  `${logoFont} color-primary-gradientLD-hover ${transitionColors} cursor-pointer ${select}`;
 
 /* ===== NAVIGATION STYLES ===== */
 // Header - Desktop
 export const navLinkPurple =
-  `font-semibold tablet:font-normal text-color-primary text-sm tablet:text-[13px] group-hover:text-color-primary-light tracking-wider ${transitionColors} cursor-pointer ${select}`;
+  `font-semibold tablet:font-normal text-color-primary-semilight text-sm tablet:text-[13px] group-hover:text-color-primary-light tracking-wider ${transitionColors} cursor-pointer ${select}`;
 export const navLinkPurpleActive =
   `${navLinkPurple} !text-color-primary-light hover:!text-color-primary`;
 export const navSublinkPurple =
-  `font-light text-color-primary text-[13px] hover:text-color-primary-light tracking-wider ${transitionColors} cursor-pointer ${select}`; // used in WalletButton.tsx for connected sunmenu links - header uses custom styles
+  `font-light text-color-primary-semilight text-[13px] hover:text-color-primary-light tracking-wider ${transitionColors} cursor-pointer ${select}`; // used in WalletButton and ToolsButton for submenu links
 export const navSublinkPurpleActive =
   `${navSublinkPurple} !text-color-primary-light hover:!text-color-primary`;
 // Header - Mobile/tablet
@@ -40,7 +41,7 @@ export const navLinkGrey =
 export const navLinkGreyActive =
   `${navLinkGrey} !text-color-neutral-light hover:!text-color-neutral`;
 export const navLinkGreyLD =
-  `font-light text-xl tablet:text-lg color-neutral-gradientDL-hover tracking-wider inline-block w-fit ${transitionColors} cursor-pointer ${select}`;
+  `font-light text-xl tablet:text-lg color-neutral-gradientLD-hover tracking-wider inline-block w-fit ${transitionColors} cursor-pointer ${select}`;
 export const navLinkGreyLDActive =
   `${navLinkGreyLD} text-color-neutral-light [background:none_!important] [-webkit-text-fill-color:var(--color-neutral-semilight)_!important] [text-fill-color:var(--color-neutral-semilight)_!important] hover:[-webkit-text-fill-color:var(--color-neutral)!important] hover:[text-fill-color:var(--color-neutral)!important]`;
 // Footer - transparent text - ued with the overlayPurple class
@@ -49,9 +50,9 @@ export const navLinkTransparentPurple =
 
 /* ===== TITLE STYLES ===== */
 export const titleGreyLD =
-  `${titleFont} color-neutral-gradientDL cursor-default ${select}`;
-export const titleGreyDL =
   `${titleFont} color-neutral-gradientLD cursor-default ${select}`;
+export const titleGreyDL =
+  `${titleFont} color-neutral-gradientDL cursor-default ${select}`;
 export const titlePurpleLD =
   `${titleFont} color-primary-gradientLD cursor-default ${select}`;
 export const titlePurpleDL =
@@ -67,11 +68,11 @@ export const subtitlePurple =
 export const headingGrey2 =
   `font-black text-3xl mobileLg:text-4xl text-color-neutral-light tracking-wide ${select}`; // was used in about donate section - rename
 export const headingGreyLD =
-  `font-bold text-xl color-neutral-gradientDL tracking-wide inline-block w-fit relative ${select}`;
+  `font-bold text-xl color-neutral-gradientLD tracking-wide inline-block w-fit relative ${select}`;
 export const headingGreyLDLink =
-  `font-bold text-lg color-neutral-gradientDL-hover tracking-wide inline-block w-fit relative ${transitionColors} cursor-pointer ${select}`; // used in media page / keep reading in howto pages / accordion titles (custom code)
+  `font-bold text-lg color-neutral-gradientLD-hover tracking-wide inline-block w-fit relative ${transitionColors} cursor-pointer ${select}`; // used in media page / keep reading in howto pages / accordion titles (custom code)
 export const headingGreyDLLink =
-  `font-bold text-lg color-neutral-gradientLD-hover tracking-wide inline-block w-fit relative -mt-1 ${transitionColors} cursor-pointer ${select}`; // used in collection and stamp detail pages
+  `font-bold text-lg color-neutral-gradientDL-hover tracking-wide inline-block w-fit relative -mt-1 ${transitionColors} cursor-pointer ${select}`; // used in collection and stamp detail pages
 export const headingGrey =
   `font-bold text-2xl text-color-neutral cursor-default ${select}`; // used in howto overview and detail pages / donate CTA
 export const headingPurpleLD =
@@ -173,11 +174,11 @@ export const valueNeutral = `text-color-neutral-semidark`;
 
 /* ===== SPECIAL TEXT STYLES ===== */
 export const tagline =
-  `font-regular text-xs bg-gradient-to-r from-color-primary via-color-primary-semilight to-color-primary-light text-transparent bg-clip-text cursor-default ${select}`; // used in footer
+  `font-regular text-xs bg-gradient-to-r from-color-primary-light via-color-primary-semilight to-color-primary-semidark text-transparent bg-clip-text cursor-default ${select}`; // used in footer
 export const copyright =
   `font-normal text-xs mobileMd:text-sm tablet:text-xs text-color-neutral-dark cursor-default ${select}`; // used in the footer for copyright and counterparty version text
 export const toggleSymbol =
-  `font-bold text-[10px] text-black cursor-default ${select}`; // used in ToggleSwitchButton.tsx
+  `font-bold text-[10px] text-black cursor-default ${select}`; // used in ToggleSwitchButton.tsx for $/BTC symbols
 
 // Captions - used for stamp/token cards
 // Errors - used for error messages - to be defined in /notifications/styles.ts
@@ -202,7 +203,7 @@ export const cardSupply =
 export const cardHashSymbolMinimal =
   `font-light text-color-neutral-light group-hover:text-color-primary-light text-xs mobileSm:text-base mobileLg:text-xl tablet:text-xl desktop:text-xl ${transitionColors} ${select}`;
 export const cardStampNumberMinimal =
-  `font-black color-neutral-gradientDL group-hover:[-webkit-text-fill-color:var(--color-primary-light)] truncate text-sm mobileSm:text-base mobileLg:text-xl tablet:text-xl desktop:text-xl ${transitionColors} ${select}`;
+  `font-black color-neutral-gradientLD group-hover:[-webkit-text-fill-color:var(--color-primary-light)] truncate text-sm mobileSm:text-base mobileLg:text-xl tablet:text-xl desktop:text-xl ${transitionColors} ${select}`;
 export const cardPriceMinimal =
   `font-normal text-color-neutral truncate text-nowrap text-[10px] mobileMd:text-xs mobileLg:text-sm ${select}`;
 
@@ -210,7 +211,7 @@ export const cardPriceMinimal =
 export const cardHashSymbolGrey =
   `font-light text-color-neutral group-hover:text-color-primary-light text-lg min-[420px]:text-xl ${transitionColors} ${select}`;
 export const cardStampNumberGrey =
-  `font-black color-neutral-gradientDL group-hover:[-webkit-text-fill-color:var(--color-primary-light)] truncate max-w-full text-lg min-[420px]:text-xl ${transitionColors} ${select}`;
+  `font-black color-neutral-gradientLD group-hover:[-webkit-text-fill-color:var(--color-primary-light)] truncate max-w-full text-lg min-[420px]:text-xl ${transitionColors} ${select}`;
 
 /* ===== CARD CONFIGURATION - check if used ===== */
 export const ABBREVIATION_LENGTHS = {
