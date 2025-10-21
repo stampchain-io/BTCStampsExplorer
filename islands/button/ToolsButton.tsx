@@ -271,7 +271,7 @@ export function ToolsButton({ onOpenDrawer, data }: ToolsButtonProps) {
           color="purple"
           className="mb-[1px]"
           onClick={handleToolsClick}
-          colorAccent="color-mix(in srgb, var(--color-neutral-semidark) 80%, transparent)"
+          colorAccent="color-mix(in srgb, var(--color-neutral-semidark) 75%, transparent)"
           colorAccentHover="var(--color-neutral-semidark)"
         />
         {/* Dropdown content is rendered by Header.tsx */}
