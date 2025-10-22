@@ -29,11 +29,11 @@ export const logoPurpleLDLink =
 export const navLinkPurple =
   `font-semibold tablet:font-normal text-color-primary-semilight text-sm tablet:text-[13px] group-hover:text-color-primary-light tracking-wider ${transitionColors} cursor-pointer ${select}`;
 export const navLinkPurpleActive =
-  `${navLinkPurple} !text-color-primary-light hover:!text-color-primary`;
+  `${navLinkPurple} !text-color-primary-light hover:!text-color-primary-semilight`;
 export const navSublinkPurple =
   `font-light text-color-primary-semilight text-[13px] hover:text-color-primary-light tracking-wider ${transitionColors} cursor-pointer ${select}`; // used in WalletButton and ToolsButton for submenu links
 export const navSublinkPurpleActive =
-  `${navSublinkPurple} !text-color-primary-light hover:!text-color-primary`;
+  `${navSublinkPurple} !text-color-primary-light hover:!text-color-primary-semilight`;
 // Header - Mobile/tablet
 export const navLinkGrey =
   `font-semibold text-sm tablet:text-xs text-color-neutral hover:text-color-neutral-light

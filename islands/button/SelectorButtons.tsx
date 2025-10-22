@@ -168,8 +168,8 @@ export const SelectorButtons = ({
               optionDisabled
                 ? state.disabled
                 : isSelected
-                ? "cursor-default"
-                : "cursor-pointer"
+                ? "!cursor-default"
+                : "!cursor-pointer"
             }
             `}
           >
@@ -194,7 +194,7 @@ export const SelectorButtons = ({
                 optionDisabled
                   ? state.disabled
                   : isMounted
-                  ? "cursor-pointer"
+                  ? isSelected ? "!cursor-default" : "!cursor-pointer"
                   : ""
               }
               `}
