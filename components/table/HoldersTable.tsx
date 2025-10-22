@@ -1,7 +1,7 @@
 /* ===== HOLDERS TABLE COMPONENT ===== */
 import { containerBackground } from "$layout";
 import { HoldersPieChart, HoldersTableBase } from "$table";
-import { labelSm, value3xl, valueDarkSm } from "$text";
+import { labelSm, value3xl } from "$text";
 import type { HoldersTableProps } from "$types/ui.d.ts";
 
 /* ===== COMPONENT ===== */
