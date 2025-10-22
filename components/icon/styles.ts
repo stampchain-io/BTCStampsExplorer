@@ -198,24 +198,27 @@ export const placeholderColor: Record<
 > = {
   grey: {
     bg:
-      "bg-gradient-to-br from-color-neutral-semidark/75 via-color-neutral-dark/75 to-[#000000]",
+      "bg-gradient-to-br from-color-neutral-semidark/75 via-color-neutral-dark/75 to-black",
     stroke: "stroke-color-neutral-semidark",
     fill: "fill-color-neutral-semidark",
   },
   red: {
-    bg: "bg-gradient-to-br from-[#660000]/75 via-[#330000]/75 to-[#000000]",
-    stroke: "stroke-[#660000]",
-    fill: "fill-[#660000]",
+    bg:
+      "bg-gradient-to-br from-color-red-semidark/75 via-color-red-dark/75 to-black",
+    stroke: "stroke-color-red-semidark",
+    fill: "fill-color-red-semidark",
   },
   green: {
-    bg: "bg-gradient-to-br from-[#006600]/75 via-[#003300]/75 to-[#000000]",
-    stroke: "stroke-[#006600]",
-    fill: "fill-[#006600]",
+    bg:
+      "bg-gradient-to-br from-color-green-semidark/75 via-color-green-dark/75 to-black",
+    stroke: "stroke-color-green-semidark",
+    fill: "fill-color-green-semidark",
   },
   orange: {
-    bg: "bg-gradient-to-br from-[#662900]/75 via-[#331400]/75 to-[#000000]",
-    stroke: "stroke-[#662900]",
-    fill: "fill-[#662900]",
+    bg:
+      "bg-gradient-to-br from-color-orange-semidark/75 via-color-orange-dark/75 to-black",
+    stroke: "stroke-color-orange-semidark",
+    fill: "fill-color-orange-semidark",
   },
 };
 

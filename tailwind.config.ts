@@ -23,8 +23,8 @@ export default {
         "courier-prime": ['"Courier Prime"', "sans-serif"],
         "micro-5": ['"Micro 5"', "sans-serif"],
       },
-      colors: {
-        color: { // colors are also defined as CSS variables further down in the doc - update both
+      colors: { // color hue defs are calculated using HSL values - decreasing lightness by 8% for each step
+        color: { // colors are also defined as CSS variables further down in the doc - update both if changing anything here
           primary: {
             dark: "#43005c",
             semidark: "#610085",
@@ -38,6 +38,27 @@ export default {
             DEFAULT: "#aca7a1",
             semilight: "#d8d2ca",
             light: "#fff8f0",
+          },
+          red: {
+            dark: "#5c0000",
+            semidark: "#850000",
+            DEFAULT: "#ad0000",
+            semilight: "#d60000",
+            light: "#ff0000",
+          },
+          green: {
+            dark: "#005c00",
+            semidark: "#008500",
+            DEFAULT: "#00ad00",
+            semilight: "#00d600",
+            light: "#00ff00",
+          },
+          orange: {
+            dark: "#5c3700",
+            semidark: "#855000",
+            DEFAULT: "#ad6800",
+            semilight: "#d68100",
+            light: "#ff9900",
           },
         },
       },
@@ -235,6 +256,24 @@ export default {
           "--color-neutral": "#aca7a1",
           "--color-neutral-semilight": "#d8d2ca",
           "--color-neutral-light": "#fff8f0",
+          // Red color palette as CSS variables
+          "--color-red-dark": "#5c0000",
+          "--color-red-semidark": "#850000",
+          "--color-red": "#ad0000",
+          "--color-red-semilight": "#d60000",
+          "--color-red-light": "#ff0000",
+          // Green color palette as CSS variables
+          "--color-green-dark": "#005c00",
+          "--color-green-semidark": "#008500",
+          "--color-green": "#00ad00",
+          "--color-green-semilight": "#00d600",
+          "--color-green-light": "#00ff00",
+          // Orange color palette as CSS variables
+          "--color-orange-dark": "#5c3700",
+          "--color-orange-semidark": "#855000",
+          "--color-orange": "#ad6800",
+          "--color-orange-semilight": "#d68100",
+          "--color-orange-light": "#ff9900",
           // Conic gradient variables
           "--conic-pattern":
             "repeating-conic-gradient(rgba(128, 128, 128, 0.2) 0% 25%, rgba(128, 128, 128, 0.1) 25% 50%)",

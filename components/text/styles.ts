@@ -162,8 +162,8 @@ export const valueDarkSm =
 export const valueDark =
   `font-semibold text-base text-color-neutral-semidark ${select}`; // used in tables
 // Color variants
-export const valuePositive = `text-green-600`;
-export const valueNegative = `text-red-600`;
+export const valuePositive = `text-color-green-semilight`;
+export const valueNegative = `text-color-red-semilight`;
 export const valueNeutral = `text-color-neutral-semidark`;
 
 /* ===== TOOLTIP STYLES ===== */

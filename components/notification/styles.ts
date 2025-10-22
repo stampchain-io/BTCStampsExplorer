@@ -14,22 +14,22 @@ const tooltipText =
 /* ===== NOTIFICATION STYLES ===== */
 /* General */
 export const notificationHeading =
-  `font-semibold text-[15px] text-color-neutral`;
+  `font-semibold text-[15px] text-color-neutral-semilight`;
 export const notificationBody = `font-normal text-sm text-color-neutral`;
-export const notificationTextError = `!text-[#990000]`;
-export const notificationTextSuccess = `!text-[#009900]`;
+export const notificationTextError = `!text-color-red`;
+export const notificationTextSuccess = `!text-color-green`;
 
 /* Info */
 export const notificationContainerInfo =
-  `${notificationContainer} bg-gradient-to-br from-[#333333]/60 via-[#222222]/60 to-[#080708]/80 border-[#666666]/80`;
+  `${notificationContainer} bg-gradient-to-br from-color-neutral-dark/60 via-[#080708]/60 to-[#080708]/90 border-color-neutral-semidark/80`;
 
 /* Error */
 export const notificationContainerError =
-  `${notificationContainer} bg-gradient-to-br from-[#330000]/60 via-[#220000]/60 to-[#080708]/80 border-[#660000]/80`;
+  `${notificationContainer} bg-gradient-to-br from-color-red-dark/60 via-[#080708]/60 to-[#080708]/90 border-color-red-semidark/80`;
 
 /* Success */
 export const notificationContainerSuccess =
-  `${notificationContainer} bg-gradient-to-br from-[#003300]/60 via-[#002200]/60 to-[#080708]/80 border-[#006600]/80`;
+  `${notificationContainer} bg-gradient-to-br from-color-green-dark/60 via-[#080708]/60 to-[#080708]/90 border-color-green-semidark/80`;
 
 /* ===== TOOLTIP STYLES ===== */
 export const tooltipButton = `
