@@ -846,17 +846,18 @@ export const FilterContentStamp = ({
     });
   };
 
+  // TODO(@claude): Implement volume filter when UI is ready
   // Handler for volume changes
-  const _handleVolumeChange = (period: string) => {
-    setFilters((prevFilters) => {
-      const newFilters = {
-        ...prevFilters,
-        volume: period as "24h" | "7d" | "30d",
-      };
-      onFiltersChange(newFilters);
-      return newFilters;
-    });
-  };
+  // const handleVolumeChange = (period: string) => {
+  //   setFilters((prevFilters) => {
+  //     const newFilters = {
+  //       ...prevFilters,
+  //       volume: period as "24h" | "7d" | "30d",
+  //     };
+  //     onFiltersChange(newFilters);
+  //     return newFilters;
+  //   });
+  // };
 
   const handleFileSizeChange = (sizeType: StampFilesize | null) => {
     setFilters((prevFilters) => {

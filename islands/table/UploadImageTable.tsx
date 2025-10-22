@@ -45,7 +45,8 @@ export const UploadImageTable = (props: SRC20BalanceTableProps) => {
     setModalOpen(false);
   };
 
-  const handleImageInteraction = (imgSrc: string) => {
+  const handleImageInteraction = (imgSrc: string | undefined) => {
+    if (!imgSrc) return;
     setModalImg(imgSrc);
     setModalOpen(!isModalOpen);
   };

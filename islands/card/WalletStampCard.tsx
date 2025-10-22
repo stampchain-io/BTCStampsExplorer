@@ -51,7 +51,7 @@ const WalletStampCardComponent = (
 ) => {
   /* ===== STATE ===== */
   const [loading, setLoading] = useState<boolean>(true);
-  const [src, setSrc] = useState<string | null>(null);
+  const [src, setSrc] = useState<string | undefined>(undefined);
   const [validatedContent, setValidatedContent] = useState<VNode | null>(null);
 
   // Audio-related state (always declared to avoid conditional hooks)

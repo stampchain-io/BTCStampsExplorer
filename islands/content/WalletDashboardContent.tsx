@@ -211,7 +211,7 @@ function DispenserRow(
     ? "w-[146px] h-[146px]"
     : "w-[172px] h-[172px]";
   const [loading, setLoading] = useState(true);
-  const [src, setSrc] = useState<string | null>(null);
+  const [src, setSrc] = useState<string | undefined>(undefined);
 
   /* ===== IMAGE FETCHING ===== */
   const fetchStampImage = () => {

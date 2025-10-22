@@ -97,7 +97,7 @@ export class CollectionController {
               stamp.collection_id = collectionId;
 
               const imageUrl = await getStampImageSrc(stamp);
-              if (stamps.length < 12 && !stamps.includes(imageUrl)) {
+              if (imageUrl && stamps.length < 12 && !stamps.includes(imageUrl)) {
                 stamps.push(imageUrl);
               }
             }
