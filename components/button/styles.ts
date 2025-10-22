@@ -28,22 +28,15 @@ export interface ButtonVariants {
   base: string;
   variant: Record<
     | "text"
-    | "glassmorphism"
-    | "glassmorphismColor"
-    | "glassmorphismSelected"
-    | "glassmorphismDeselected"
-    | "flat"
     | "outline"
+    | "flat"
     | "flatOutline"
-    | "outlineFlat"
-    | "outlineGradient",
+    | "outlineFlat",
     string
   >;
   color: Record<
     | "grey"
-    | "greyDark"
     | "purple"
-    | "purpleDark"
     | "test"
     | "custom",
     string
@@ -77,140 +70,74 @@ export interface ButtonVariants {
   spinner: string;
 }
 
-/* ===== BUTTON STYLE DEFINITIONS ===== */
-/* gradientOverlay and gradientOverlayHover must be identical */
-const baseGlassmorphism =
-  "border-[1px] rounded-full backdrop-blur-sm overflow-hidden";
-const baseGlassmorphismColor =
-  "relative text-[#080708] before:blur-sm hover:border-[var(--color-border-hover)] hover:before:scale-105";
-const baseBefore =
-  "before:absolute before:inset-0 before:rounded-full before:z-[-1] before:transition-transform before:duration-50 before:origin-center";
-const gradientOverlay =
-  "before:bg-[linear-gradient(to_bottom_right,var(--color-dark)_0%,var(--color-dark)_20%,var(--color-medium)_20%,var(--color-medium)_45%,var(--color-light)_45%,var(--color-light)_52%,var(--color-medium)_52%,var(--color-medium)_70%,var(--color-dark)_70%,var(--color-dark)_100%)]";
-const gradientOverlayHover =
-  "hover:before:bg-[linear-gradient(to_bottom_right,var(--color-dark)_0%,var(--color-dark)_20%,var(--color-medium)_20%,var(--color-medium)_45%,var(--color-light)_45%,var(--color-light)_52%,var(--color-medium)_52%,var(--color-medium)_70%,var(--color-dark)_70%,var(--color-dark)_100%)]";
+/* ===== BUTTON VARIANT BASE STYLES DEFINITIONS ===== */
+const baseOutline = `
+  bg-[#080708] border border-[var(--color-dark)] rounded-full
+  text-[var(--color-dark)] backdrop-blur-sm opacity-80 hover:opacity-100`;
+const baseFlat = `
+  bg-[linear-gradient(to_bottom_right,var(--color-light),var(--color-semilight),var(--color-medium),var(--color-semidark),var(--color-dark))]
+  border border-[var(--color-dark)] rounded-full
+  text-[#080708] backdrop-blur-sm opacity-80 hover:opacity-90
+  `;
 
 export const buttonStyles: ButtonVariants = {
   /* ===== BASE STYLES ===== */
   base: `
     inline-flex items-center justify-center
-    rounded-full border-[1px]
     font-semibold tracking-wide
-    ${transitionColors}
-    cursor-pointer
+    ${transitionColors} cursor-pointer
   `,
 
   /* ===== VARIANT STYLES  ===== */
-  /* If the glassmorphism/Color variants are changed then the ToggleButton.tsx file must be update too */
+  /* If the outline/flat variants are changed then the SelectorButtons.tsx and ToggleButton.tsx files must be update too */
   variant: {
     text: `
-      !items-start !justify-start !h-auto
-      !p-0 bg-transparent !border-0
-      text-[var(--color-text)] hover:text-[var(--color-text-hover)]
-    `,
-    glassmorphism: `
-      ${baseGlassmorphism} bg-[#211c21]/10 border-[var(--color-border)]
-      hover:bg-[#211c21]/20 hover:border-[var(--color-border-hover)]
+      !items-start !justify-start !h-auto !p-0 bg-transparent
       text-[var(--color-dark)] hover:text-[var(--color-medium)]
-      ${shadowL2}
-    `,
-    glassmorphismColor: `
-      ${baseGlassmorphism} ${baseGlassmorphismColor}
-      bg-[#211c21]/10 border-[var(--color-border)]
-      ${baseBefore} ${shadowL2}
-      ${gradientOverlay}
-    `,
-    glassmorphismSelected: `
-      ${baseGlassmorphism} ${baseGlassmorphismColor}
-      !items-center !justify-center
-      bg-[#211c21]/10 border-[var(--color-border)]
-      ${baseBefore} ${shadowL2}
-      ${gradientOverlay}
-      hover:bg-[#211c21]/10 hover:!border-[var(--color-border)] hover:before:bg-none hover:text-[var(--color-text)] hover:before:blur-0
-    `,
-    glassmorphismDeselected: `
-      ${baseGlassmorphism} ${baseGlassmorphismColor}
-      !items-center !justify-center
-      bg-[#211c21]/10 border-[var(--color-border)]
-      text-[var(--color-text)] before:bg-none
-      hover:bg-[#211c21]/10 hover:!border-[var(--color-border)]
-      hover:text-[#080708] hover:before:!scale-100 hover:before:!blur-sm
-      ${baseBefore} ${shadowL2}
-      ${gradientOverlayHover}
-    `,
-    outlineGradient: `
-      relative !bg-[#000000] !p-[1px] rounded-full !border-0
-      before:absolute before:inset-0 before:rounded-full before:z-[1]
-      before:bg-[conic-gradient(from_var(--angle),var(--color-dark),var(--color-medium),var(--color-light),var(--color-medium),var(--color-dark))]
-      before:[--angle:0deg] before:animate-rotate
-      hover:before:bg-[conic-gradient(from_var(--angle),var(--color-light),var(--color-light),var(--color-light),var(--color-light),var(--color-light))]
-      before:transition-colors before:duration-50
-      [&>*]:relative [&>*]:z-[2] [&>*]:rounded-full [&>*]:bg-[#000000] [&>*]:!border-0
-      [&>*]:inline-flex [&>*]:items-center [&>*]:justify-center [&>*]:w-full [&>*]:h-full [&>*]:px-5
-      [&>*]:font-bold [&>*]:tracking-wider
-      [&>*]:text-[var(--color-text)] hover:[&>*]:text-[var(--color-text-hover)]
-      [&>*]:transition-colors [&>*]:duration-50
-    `,
-    /* LEGACY STYLES - @baba-should be removed */
-    flat: `
-      bg-gradient-to-br from-[var(--color-light)] to-[var(--color-dark)]
-      border-[var(--color-dark)] text-black
-      hover:bg-gradient-to-br hover:from-[var(--color-light)] hover:to-[var(--color-light)]
-      hover:border-[var(--color-light)]
     `,
     outline: `
-      bg-transparent border-[var(--color-dark)] text-[var(--color-text)]
-      hover:border-[var(--color-light)] hover:text-[var(--color-text-hover)]
+      ${baseOutline} ${shadowL2}
+    `,
+    flat: `
+      ${baseFlat} ${shadowL2}
     `,
     flatOutline: `
-      bg-gradient-to-br from-[var(--color-light)] to-[var(--color-dark)]
-      border-[var(--color-dark)] text-black
-      hover:bg-gradient-to-br hover:from-transparent hover:to-transparent
-      hover:border-[var(--color-dark)] hover:text-[var(--color-text-hover)]
+      ${baseFlat} ${shadowL2}
+      !items-center !justify-center
+      hover:!bg-[linear-gradient(to_bottom_right,#080708,#080708,#080708,#080708,#080708)] hover:!border-[var(--color-dark)]
+      hover:!text-[var(--color-dark)] hover:!opacity-100
     `,
     outlineFlat: `
-      bg-transparent border-[var(--color-dark)] text-[var(--color-text)]
-      hover:bg-gradient-to-br hover:from-[var(--color-light)] hover:to-[var(--color-dark)] hover:border-[var(--color-dark)] hover:text-black
+      ${baseOutline} ${shadowL2}
+      !items-center !justify-center
+      hover:!bg-[linear-gradient(to_bottom_right,var(--color-light),var(--color-semilight),var(--color-medium),var(--color-semidark),var(--color-dark))] hover:!border-[var(--color-dark)]
+      hover:!text-[#080708] hover:!opacity-90
     `,
   },
 
   /* ===== COLOR STYLES ===== */
   color: {
     grey: `
-      [--color-dark:#CCCCCC66]
-      [--color-medium:#CCCCCC99]
-      [--color-light:#CCCCCCCC]
+      [--color-dark:var(--color-neutral-dark)]
+      [--color-semidark:var(--color-neutral-semidark)]
+      [--color-medium:var(--color-neutral)]
+      [--color-semilight:var(--color-neutral-semilight)]
+      [--color-light:var(--color-neutral-light)]
       [--color-border:#66666666]
       [--color-border-hover:#666666CC]
       [--color-text:#666666]
       [--color-text-hover:#999999]
     `,
-    greyDark: `
-      [--color-dark:#BBBBBB66]
-      [--color-medium:#BBBBBB99]
-      [--color-light:#BBBBBBCC]
-      [--color-border:#55555566]
-      [--color-border-hover:#555555CC]
-      [--color-text:#555555]
-      [--color-text-hover:#888888]
-    `,
     purple: `
-      [--color-dark:#AA00FF66]
-      [--color-medium:#AA00FF99]
-      [--color-light:#AA00FFCC]
+      [--color-dark:var(--color-primary-dark)]
+      [--color-semidark:var(--color-primary-semidark)]
+      [--color-medium:var(--color-primary-semilight)]
+      [--color-semilight:var(--color-primary-light)]
+      [--color-light:var(--color-primary-light)]
       [--color-border:#66009966]
       [--color-border-hover:#660099CC]
       [--color-text:#660099]
       [--color-text-hover:#8800CC]
-    `,
-    purpleDark: `
-      [--color-dark:#9900E666]
-      [--color-medium:#9900E699]
-      [--color-light:#9900E6CC]
-      [--color-border:#55008066]
-      [--color-border-hover:#550080CC]
-      [--color-text:#550080]
-      [--color-text-hover:#7700b3]
     `,
     test: `
       [--color-dark:#00CC0033]
@@ -249,8 +176,8 @@ export const buttonStyles: ButtonVariants = {
   /* ===== STATE STYLES ===== */
   state: {
     disabled: `
-      opacity-50
-      cursor-not-allowed
+      !opacity-60
+      !cursor-not-allowed
       relative
       [&:after]:content-['SOON™']
       [&:after]:absolute [&:after]:inset-0
@@ -261,7 +188,7 @@ export const buttonStyles: ButtonVariants = {
       [&:after]:text-white [&:after]:text-xs [&:after]:font-bold
     `,
     loading: `
-      opacity-70
+      !opacity-60
       cursor-wait
     `,
     active: `

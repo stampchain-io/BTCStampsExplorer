@@ -134,7 +134,7 @@ export const SelectorButtons = ({
       {isMounted && (
         <div
           class={`!absolute top-0.5 bottom-0.5 z-10
-            ${buttonStyles.variant.glassmorphismColor}
+            ${buttonStyles.variant.flat}
           `}
           style={{
             transform: selectionTransform,
@@ -153,7 +153,7 @@ export const SelectorButtons = ({
         const labelClass = isSelected
           ? isMounted
             ? `text-black ${transitionColors}` // After mount: fancy pill behind
-            : `text-black ${buttonStyles.variant.glassmorphismColor} !px-1 transition-none pointer-events-none` // Before mount: glassmorphism
+            : `text-black ${buttonStyles.variant.flat} !px-1 transition-none pointer-events-none` // Before mount: flat
           : isMounted
           ? `mx-0.5 bg-transparent text-[var(--color-text)] ${transitionColors} hover:text-[var(--color-text-hover)] hover:bg-[#1f1c1f]/50` // Unselected after mount
           : "mx-0.5 bg-transparent text-[var(--color-text)] transition-none pointer-events-none"; // Unselected before mount

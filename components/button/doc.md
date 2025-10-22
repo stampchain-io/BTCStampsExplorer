@@ -45,11 +45,10 @@ The Button system provides a comprehensive set of interactive button components 
 
 | Variant | Visual Style | Use Case | Example |
 |---------|-------------|----------|---------|
-| **glassmorphism** | Semi-transparent with blur, border changes on hover | Primary interactive buttons | Filter, Sort, Navigation |
-| **glassmorphismColor** | Gradient overlay with color blur effect | Colorful call-to-action buttons | Submit, Mint, Create |
-| **glassmorphismSelected** | Gradient background, solid on selected | Toggle buttons (selected state) | Active filters, tabs |
-| **glassmorphismDeselected** | Transparent, gradient on hover | Toggle buttons (deselected state) | Inactive filters, tabs |
-| **outlineGradient** | Animated conic gradient border | Premium/special action buttons | Wallet connect, Featured actions |
+| **outline** | Semi-transparent with blur, border changes on hover | Primary interactive buttons | Filter, Sort, Navigation |
+| **flat** | Gradient overlay with color blur effect | Colorful call-to-action buttons | Submit, Mint, Create |
+| **flatOutline** | Gradient background, solid on selected | Toggle buttons (selected state) | Active filters, tabs |
+| **outlineFlat** | Transparent, gradient on hover | Toggle buttons (deselected state) | Inactive filters, tabs |
 | **text** | No background, text only | Inline links and subtle actions | Read more, View all |
 | **outline** | Transparent with border | Secondary actions | Cancel, Close |
 | **flat** | Solid gradient background | Legacy style (to be removed) | - |
@@ -192,9 +191,8 @@ The Button system provides a comprehensive set of interactive button components 
 ### Button Props
 ```typescript
 export interface ButtonProps extends Omit<JSX.HTMLAttributes<HTMLButtonElement>, "loading" | "size"> {
-  variant?: "text" | "glassmorphism" | "glassmorphismColor" | "glassmorphismSelected" |
-            "glassmorphismDeselected" | "flat" | "outline" | "flatOutline" |
-            "outlineFlat" | "outlineGradient";
+  variant?: "text" | "outline" | "flat" | "flatOutline" |
+            "outlineFlat";
   color?: "grey" | "greyDark" | "purple" | "purpleDark" | "test" | "custom";
   size?: "xxs" | "xs" | "sm" | "md" | "lg" | "xl" | "xxl" |
          "xxsR" | "xsR" | "smR" | "mdR" | "lgR" | "custom";
@@ -250,7 +248,7 @@ import { Button } from "$button";
 
 export function MyComponent() {
   return (
-    <Button variant="glassmorphism" color="grey" size="mdR">
+    <Button variant="outline" color="grey" size="mdR">
       CLICK ME
     </Button>
   );
@@ -269,7 +267,7 @@ export function IconExample() {
 
   return (
     <ButtonIcon
-      variant="glassmorphism"
+      variant="outline"
       color="purple"
       size="md"
       isLoading={isLoading}
@@ -301,7 +299,7 @@ export function FormExample() {
 
   return (
     <ButtonProcessing
-      variant="glassmorphismColor"
+      variant="flat"
       color="purple"
       size="lg"
       isSubmitting={isSubmitting}
@@ -321,7 +319,7 @@ import { Button } from "$button";
 
 export function PremiumButton() {
   return (
-    <Button variant="outlineGradient" color="purple" size="xl">
+    <Button variant="flat" color="purple" size="xl">
       CONNECT WALLET
     </Button>
   );
@@ -348,7 +346,7 @@ import { Button } from "$button";
 export function NavButton() {
   return (
     <Button
-      variant="glassmorphism"
+      variant="outline"
       color="grey"
       size="mdR"
       href="/stamps"
@@ -439,7 +437,7 @@ color: {
 
 // Used in variant styles
 variant: {
-  glassmorphism: `
+  outline: `
     border-[var(--color-border)]
     hover:border-[var(--color-border-hover)]
     text-[var(--color-text)]
@@ -577,12 +575,10 @@ hover:before:scale-105
 ## Best Practices
 
 ### Variant Selection
-- **glassmorphism**: Default for most interactive buttons
-- **glassmorphismColor**: Call-to-action, primary actions
-- **glassmorphismSelected/Deselected**: Toggle states, tabs, filters
-- **outlineGradient**: Premium actions, wallet connections
+- **outline**: Default for most interactive buttons
+- **flat**: Call-to-action, primary actions
+- **flatOutline/outlineFlat**: Toggle states, tabs, filters
 - **text**: Inline links, secondary actions
-- **outline**: Cancel, close, secondary actions
 
 ### Color Selection
 - **grey**: Neutral actions, default state
@@ -614,7 +610,7 @@ hover:before:scale-105
 ### Form Submit Button
 ```tsx
 <ButtonProcessing
-  variant="glassmorphismColor"
+  variant="flat"
   color="purple"
   size="lg"
   isSubmitting={isSubmitting}
@@ -627,7 +623,7 @@ hover:before:scale-105
 ### Icon-Only Action
 ```tsx
 <ButtonIcon
-  variant="glassmorphism"
+  variant="outline"
   color="grey"
   size="md"
   ariaLabel="Close"
@@ -640,7 +636,7 @@ hover:before:scale-105
 ### Navigation Button with Partial
 ```tsx
 <Button
-  variant="glassmorphism"
+  variant="outline"
   color="grey"
   size="mdR"
   href="/collection/bitcoin-stamps"
@@ -654,7 +650,7 @@ hover:before:scale-105
 ```tsx
 <div class="flex gap-2">
   <Button
-    variant={selected === 'grid' ? 'glassmorphismSelected' : 'glassmorphismDeselected'}
+    variant={selected === 'grid' ? 'flatOutline' : 'outlineFlat'}
     color="purple"
     size="sm"
     onClick={() => setSelected('grid')}
@@ -662,7 +658,7 @@ hover:before:scale-105
     GRID
   </Button>
   <Button
-    variant={selected === 'list' ? 'glassmorphismSelected' : 'glassmorphismDeselected'}
+    variant={selected === 'list' ? 'flatOutline' : 'outlineFlat'}
     color="purple"
     size="sm"
     onClick={() => setSelected('list')}
@@ -683,8 +679,6 @@ hover:before:scale-105
 ### Issue: Loading spinner not showing
 **Solution**: For `ButtonIcon`, use `isLoading` prop. For `ButtonProcessing`, use `isSubmitting` prop. Regular `Button` doesn't have built-in loading state.
 
-### Issue: Gradient animation not visible
-**Solution**: `outlineGradient` variant requires specific structure. Ensure you're not overriding the pseudo-element styles.
 
 ### Issue: Button not clickable
 **Solution**: Check if button is disabled or in loading state. Verify `IS_BROWSER` check isn't blocking interaction.
