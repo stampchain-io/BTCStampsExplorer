@@ -516,37 +516,37 @@ Rendered with compiled CSS
 ```css
 /* Conic gradient with CSS animation */
 before:bg-[conic-gradient(from_var(--angle),
-  var(--color-dark),
-  var(--color-medium),
-  var(--color-light),
-  var(--color-medium),
-  var(--color-dark))]
+  var(--color-button-dark),
+  var(--color-button),
+  var(--color-button-light),
+  var(--color-button),
+  var(--color-button-dark))]
 before:[--angle:0deg]
 before:animate-rotate
 
 /* Hover state brightens all stops */
 hover:before:bg-[conic-gradient(from_var(--angle),
-  var(--color-light),
-  var(--color-light),
-  var(--color-light),
-  var(--color-light),
-  var(--color-light))]
+  var(--color-button-light),
+  var(--color-button-light),
+  var(--color-button-light),
+  var(--color-button-light),
+  var(--color-button-light))]
 ```
 
 ### glassmorphismColor Gradient Overlay
 ```css
 /* Multi-stop gradient creating depth */
 before:bg-[linear-gradient(to_bottom_right,
-  var(--color-dark) 0%,
-  var(--color-dark) 20%,
-  var(--color-medium) 20%,
-  var(--color-medium) 45%,
-  var(--color-light) 45%,
-  var(--color-light) 52%,
-  var(--color-medium) 52%,
-  var(--color-medium) 70%,
-  var(--color-dark) 70%,
-  var(--color-dark) 100%)]
+  var(--color-button-dark) 0%,
+  var(--color-button-dark) 20%,
+  var(--color-button) 20%,
+  var(--color-button) 45%,
+  var(--color-button-light) 45%,
+  var(--color-button-light) 52%,
+  var(--color-button) 52%,
+  var(--color-button) 70%,
+  var(--color-button-dark) 70%,
+  var(--color-button-dark) 100%)]
 
 /* Blur and scale on hover */
 before:blur-sm

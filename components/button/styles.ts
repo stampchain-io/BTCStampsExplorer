@@ -72,11 +72,11 @@ export interface ButtonVariants {
 
 /* ===== BUTTON VARIANT BASE STYLES DEFINITIONS ===== */
 const baseOutline = `
-  bg-[#080708] border border-[var(--color-dark)] rounded-full
-  text-[var(--color-dark)] backdrop-blur-sm opacity-80 hover:opacity-100`;
+  bg-[#080708] border border-[var(--color-button-dark)] rounded-full
+  text-[var(--color-button-dark)] backdrop-blur-sm opacity-80 hover:opacity-100`;
 const baseFlat = `
-  bg-[linear-gradient(to_bottom_right,var(--color-light),var(--color-semilight),var(--color-medium),var(--color-semidark),var(--color-dark))]
-  border border-[var(--color-dark)] rounded-full
+  bg-[linear-gradient(to_bottom_right,var(--color-button-light),var(--color-button-semilight),var(--color-button),var(--color-button-semidark),var(--color-button-dark))]
+  border border-[var(--color-button-dark)] rounded-full
   text-[#080708] backdrop-blur-sm opacity-80 hover:opacity-90
   `;
 
@@ -93,7 +93,7 @@ export const buttonStyles: ButtonVariants = {
   variant: {
     text: `
       !items-start !justify-start !h-auto !p-0 bg-transparent
-      text-[var(--color-dark)] hover:text-[var(--color-medium)]
+      text-[var(--color-button-dark)] hover:text-[var(--color-button)]
     `,
     outline: `
       ${baseOutline} ${shadowL2}
@@ -104,45 +104,40 @@ export const buttonStyles: ButtonVariants = {
     flatOutline: `
       ${baseFlat} ${shadowL2}
       !items-center !justify-center
-      hover:!bg-[linear-gradient(to_bottom_right,#080708,#080708,#080708,#080708,#080708)] hover:!border-[var(--color-dark)]
-      hover:!text-[var(--color-dark)] hover:!opacity-100
+      hover:!bg-[linear-gradient(to_bottom_right,#080708,#080708,#080708,#080708,#080708)] hover:!border-[var(--color-button-dark)]
+      hover:!text-[var(--color-button-dark)] hover:!opacity-100
     `,
     outlineFlat: `
       ${baseOutline} ${shadowL2}
       !items-center !justify-center
-      hover:!bg-[linear-gradient(to_bottom_right,var(--color-light),var(--color-semilight),var(--color-medium),var(--color-semidark),var(--color-dark))] hover:!border-[var(--color-dark)]
+      hover:!bg-[linear-gradient(to_bottom_right,var(--color-button-light),var(--color-button-semilight),var(--color-button),var(--color-button-semidark),var(--color-button-dark))] hover:!border-[var(--color-button-dark)]
       hover:!text-[#080708] hover:!opacity-90
     `,
   },
 
   /* ===== COLOR STYLES ===== */
+  /* Must use CSS variables, since Tailwind CSS definitions are utility classes and won't work */
   color: {
     grey: `
-      [--color-dark:var(--color-neutral-dark)]
-      [--color-semidark:var(--color-neutral-semidark)]
-      [--color-medium:var(--color-neutral)]
-      [--color-semilight:var(--color-neutral-semilight)]
-      [--color-light:var(--color-neutral-light)]
-      [--color-border:#66666666]
-      [--color-border-hover:#666666CC]
-      [--color-text:#666666]
-      [--color-text-hover:#999999]
+      [--color-button-dark:var(--color-neutral-dark)]
+      [--color-button-semidark:var(--color-neutral-semidark)]
+      [--color-button:var(--color-neutral)]
+      [--color-button-semilight:var(--color-neutral-semilight)]
+      [--color-button-light:var(--color-neutral-light)]
     `,
     purple: `
-      [--color-dark:var(--color-primary-dark)]
-      [--color-semidark:var(--color-primary-semidark)]
-      [--color-medium:var(--color-primary-semilight)]
-      [--color-semilight:var(--color-primary-light)]
-      [--color-light:var(--color-primary-light)]
-      [--color-border:#66009966]
-      [--color-border-hover:#660099CC]
-      [--color-text:#660099]
-      [--color-text-hover:#8800CC]
+      [--color-button-dark:var(--color-primary-dark)]
+      [--color-button-semidark:var(--color-primary-semidark)]
+      [--color-button:var(--color-primary-semilight)]
+      [--color-button-semilight:var(--color-primary-light)]
+      [--color-button-light:var(--color-primary-light)]
     `,
     test: `
-      [--color-dark:#00CC0033]
-      [--color-medium:#00CC0066]
-      [--color-light:#CC000033]
+      [--color-button-dark:#00CC0033]
+      [--color-button-semidark:#00CC0066]
+      [--color-button:#00CC0066]
+      [--color-button-semilight:#00CC0099]
+      [--color-button-light:#CC000033]
     `,
     custom: "",
   },
@@ -204,7 +199,7 @@ export const buttonStyles: ButtonVariants = {
     rounded-full
     h-5 w-5
     border-b-[3px]
-    border-[var(--color-light)]
+    border-[var(--color-button-semilight)]
   `,
 };
 

@@ -104,22 +104,22 @@ export const ToggleButton = ({
     }
 
     if (isSelected) {
-      // Selected state
+      // Selected state (flatOutline)
       if (canHover) {
-        // WITH hover - use flatOutline (flat base, outline hover)
+        // With hover - use flatOutline (flat base, outline hover)
         return button("flatOutline", color, size);
       } else {
-        // WITHOUT hover - use flat (flat base, no color-change hover)
+        // Without hover - use flat (flat base, no color-change hover, but force opacity 80%)
         return `${button("flat", color, size)} !opacity-80`;
       }
     } else {
-      // Unselected state
+      // Unselected state (outlineFlat)
       if (canHover) {
-        // WITH hover - use outlineFlat (outline base, flat hover)
-        return `${button("outlineFlat", "grey", size)} cursor-pointer`;
+        // With hover - use outlineFlat (outline base, flat hover)
+        return button("outlineFlat", "grey", size);
       } else {
-        // WITHOUT hover - use outline (outline base, no color-change hover)
-        return `${button("outline", "grey", size)} cursor-pointer !opacity-80`;
+        // Without hover - use outline (outline base, no color-change hover, but force opacity 80%)
+        return `${button("outline", "grey", size)} !opacity-80`;
       }
     }
   };
