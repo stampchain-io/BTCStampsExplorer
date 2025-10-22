@@ -28,20 +28,20 @@ The Toast notification system follows the app's dark-themed glassmorphism design
 
 #### Info Notifications
 ```typescript
-bg-gradient-to-br from-[#333333]/60 via-[#222222]/60 to-[#080708]/80
-border-[#666666]/80
+bg-gradient-to-br from-color-neutral-dark/60 via-[#080708]/60 to-[#080708]/90
+border-color-neutral-semidark/80
 ```
 
 #### Success Notifications
 ```typescript
-bg-gradient-to-br from-[#003300]/60 via-[#002200]/60 to-[#080708]/80
-border-[#006600]/80
+bg-gradient-to-br from-color-green-dark/60 via-[#080708]/60 to-[#080708]/90
+border-color-green-semidark/80
 ```
 
 #### Error/Warning Notifications
 ```typescript
-bg-gradient-to-br from-[#330000]/60 via-[#220000]/60 to-[#080708]/80
-border-[#660000]/80
+bg-gradient-to-br from-color-red-dark/60 via-[#080708]/60 to-[#080708]/90
+border-color-red-semidark/80
 ```
 
 ## Notification Types
@@ -50,10 +50,10 @@ The system supports **4 status message types** with distinct visual treatments:
 
 | Type | Icon | Color | Duration | Auto-Dismiss | Use Case |
 |------|------|-------|----------|--------------|----------|
-| **info** | info | grey `#999999` | 7000ms | ✅ Yes | General information, updates |
-| **success** | success | green `#009900` | 3000ms | ✅ Yes | Successful operations |
-| **warning** | info | red `#990000` | 7000ms | ✅ Yes | Warnings requiring attention |
-| **error** | error | red `#990000` | 7000ms | ✅ Yes | Error messages |
+| **info** | info | neutral `color-neutral` | 7000ms | ✅ Yes | General information, updates |
+| **success** | success | green `color-green-semidark` | 3000ms | ✅ Yes | Successful operations |
+| **warning** | info | red `color-red-semidark` | 7000ms | ✅ Yes | Warnings requiring attention |
+| **error** | error | red `color-red-semidark` | 7000ms | ✅ Yes | Error messages |
 
 ### Type Characteristics
 

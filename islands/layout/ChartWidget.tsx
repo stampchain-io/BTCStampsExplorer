@@ -106,7 +106,7 @@ const ChartWidget = (
                   fill: "rgba(33, 28, 33, 0.4)", // Glassmorphism button hover
                   stroke: "rgba(102, 102, 102, 0.6)", // Hover border color
                   style: {
-                    color: "#00ff00", // Hover text color
+                    color: "var(--color-green-light)", // Hover text color
                   },
                 },
                 select: {

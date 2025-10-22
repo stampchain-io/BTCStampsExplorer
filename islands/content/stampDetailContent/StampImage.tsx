@@ -677,14 +677,8 @@ export function StampImage(
     };
   }, []);
 
-  // Early return if stamp is undefined
-  if (!stamp) {
-    return (
-      <div className="stamp-container bg-gray-200 rounded-2xl p-4 text-center text-gray-500">
-        NO STAMP DATA AVAILABLE
-      </div>
-    );
-  }
+  // Early return for TypeScript - in practice, stamp is always defined at call sites
+  if (!stamp) return null;
 
   const toggleFullScreenModal = () => {
     if (!src) return;

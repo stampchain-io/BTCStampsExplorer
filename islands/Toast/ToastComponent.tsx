@@ -40,9 +40,9 @@ export const ToastComponent = (
     switch (toastType) {
       case "error":
       case "warning":
-        return "stroke-[#990000]";
+        return "stroke-color-red-semidark";
       case "success":
-        return "stroke-[#009900]";
+        return "stroke-color-green-semidark";
       case "info":
       default:
         return "stroke-color-neutral";
@@ -66,9 +66,9 @@ export const ToastComponent = (
     switch (toastType) {
       case "error":
       case "warning":
-        return "bg-[#660000]";
+        return "bg-color-red-semidark";
       case "success":
-        return "bg-[#006600]";
+        return "bg-color-green-semidark";
       case "info":
       default:
         return "bg-color-neutral-semidark";

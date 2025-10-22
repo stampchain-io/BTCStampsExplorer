@@ -696,7 +696,7 @@ export function FeeCalculatorBase({
   };
 
   return (
-    <div class={`text-[#00ff00] ${className}`}>
+    <div class={className}>
       <div class="flex">
         {renderFeeSelector()}
         {showCoinToggle && (

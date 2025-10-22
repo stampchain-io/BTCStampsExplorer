@@ -388,8 +388,8 @@ export default function WalletProfileDetails({
             <p
               class={`text-sm ${
                 (walletData as any).marketDataStatus.overallStatus === "partial"
-                  ? "text-yellow-500"
-                  : "text-red-500"
+                  ? "text-color-orange-semilight"
+                  : "text-color-red-semilight"
               }`}
             >
               {(walletData as any).marketDataStatus.overallStatus === "partial"

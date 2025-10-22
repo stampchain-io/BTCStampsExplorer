@@ -9,7 +9,14 @@ import {
   formatNumber,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
-import { labelSm, titleGreyLD, valueSm } from "$text";
+import {
+  labelSm,
+  titleGreyLD,
+  valueNegative,
+  valueNeutral,
+  valuePositive,
+  valueSm,
+} from "$text";
 import type { SRC20DetailHeaderProps } from "$types/ui.d.ts";
 
 /* ===== COMPONENT ===== */
@@ -275,15 +282,13 @@ export function SRC20DetailHeader({
               value={change24h !== null
                 ? (
                   <span
-                    class={change24h >= 0 ? "text-green-500" : "text-red-500"}
+                    class={change24h >= 0 ? valuePositive : valueNegative}
                   >
                     {change24h >= 0 ? "+" : ""}
                     {change24h.toFixed(2)}%
                   </span>
                 )
-                : (
-                  "N/A %"
-                )}
+                : <span class={valueNeutral}>N/A %</span>}
               align="center"
             />
             <StatItem
@@ -291,15 +296,13 @@ export function SRC20DetailHeader({
               value={change7d !== null
                 ? (
                   <span
-                    class={change7d >= 0 ? "text-green-500" : "text-red-500"}
+                    class={change7d >= 0 ? valuePositive : valueNegative}
                   >
                     {change7d >= 0 ? "+" : ""}
                     {change7d.toFixed(2)}%
                   </span>
                 )
-                : (
-                  "N/A %"
-                )}
+                : <span class={valueNeutral}>N/A %</span>}
               align="right"
             />
           </div>

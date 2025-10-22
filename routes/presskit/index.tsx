@@ -89,7 +89,7 @@ export default function PressKit() {
             </button>
           </div>
 
-          <div class="text-[#FFA100] flex flex-col items-center tablet:items-end gap-3 tablet:gap-6 w-full tablet:w-1/2 font-micro-5">
+          <div class="text-color-orange-light flex flex-col items-center tablet:items-end gap-3 tablet:gap-6 w-full tablet:w-1/2 font-micro-5">
             <p class="text-4xl tablet:text-7xl">BITCOIN STAMPS</p>
             <p class="text-6xl tablet:text-9xl">STAMPS</p>
             <div class="flex gap-3 tablet:gap-6">
