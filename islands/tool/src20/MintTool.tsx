@@ -137,8 +137,10 @@ export function SRC20MintTool({
   const [openDrop, setOpenDrop] = useState<boolean>(false);
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isSelecting, setIsSelecting] = useState(false);
-  const [selectedTokenImage, setSelectedTokenImage] = useState<string | null>(
-    null,
+  const [selectedTokenImage, setSelectedTokenImage] = useState<
+    string | undefined
+  >(
+    undefined,
   );
   const [isImageLoading, setIsImageLoading] = useState(false);
   const [isSwitchingFields, setIsSwitchingFields] = useState(false);
@@ -155,7 +157,7 @@ export function SRC20MintTool({
   const resetTokenData = () => {
     setMintStatus(null);
     setHolders(0);
-    setSelectedTokenImage(null);
+    setSelectedTokenImage(undefined);
     setFormState((prevState) => ({
       ...prevState,
       amt: "",

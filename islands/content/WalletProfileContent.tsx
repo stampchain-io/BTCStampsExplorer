@@ -340,7 +340,7 @@ function DispenserRow(
     ? "w-[72px] h-[72px]"
     : "w-[78px] h-[78px]";
   const [loading, setLoading] = useState(true);
-  const [src, setSrc] = useState<string | null>(null);
+  const [src, setSrc] = useState<string | undefined>(undefined);
   const [showCopied, setShowCopied] = useState(false);
   const [isTooltipVisible, setIsTooltipVisible] = useState(false);
   const [allowTooltip, setAllowTooltip] = useState(true);

@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== COMPONENT ===== */
-export default function StampTextContent({ src }: { src: string }) {
+export default function StampTextContent({ src }: { src: string | undefined }) {
   /* ===== STATE MANAGEMENT ===== */
   const [content, setContent] = useState<string>("Loading...");
   const [error, setError] = useState<string | null>(null);
@@ -35,6 +35,7 @@ export default function StampTextContent({ src }: { src: string }) {
 
   // Fetch text content
   useEffect(() => {
+    if (!src) return;
     fetch(src)
       .then((response) => {
         if (!response.ok) {
@@ -47,6 +48,7 @@ export default function StampTextContent({ src }: { src: string }) {
   }, [src]);
 
   /* ===== RENDER ===== */
+  if (!src) return null;
   if (error) return <div class="text-red-500">Error: {error}</div>;
 
   return (

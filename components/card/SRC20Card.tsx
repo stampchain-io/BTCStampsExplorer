@@ -350,7 +350,7 @@ export function SRC20Card({
                               onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation(); // Prevent row click
-                                onImageClick?.(imageUrl);
+                                if (imageUrl) onImageClick?.(imageUrl);
                               }}
                               alt={unicodeEscapeToEmoji(src20.tick ?? "")}
                             />

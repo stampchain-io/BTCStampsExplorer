@@ -237,20 +237,24 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     } else if (stamp.stamp_mimetype?.startsWith("image/")) {
       // Handle images
       const src = await getStampImageSrc(stamp);
-      const img = new Image();
-      img.onload = () => {
-        setImageDimensions({
-          width: img.naturalWidth,
-          height: img.naturalHeight,
-          unit: "px",
-        });
-      };
-      img.src = src;
+      if (src) {
+        const img = new Image();
+        img.onload = () => {
+          setImageDimensions({
+            width: img.naturalWidth,
+            height: img.naturalHeight,
+            unit: "px",
+          });
+        };
+        img.src = src;
 
-      fetch(src)
-        .then((response) => response.blob())
-        .then((blob) => setFileSize(blob.size))
-        .catch((error) => console.error("Failed to fetch image size:", error));
+        fetch(src)
+          .then((response) => response.blob())
+          .then((blob) => setFileSize(blob.size))
+          .catch((error) =>
+            console.error("Failed to fetch image size:", error)
+          );
+      }
     } else if (stamp.stamp_mimetype === "text/html") {
       // Handle HTML
       fetch(stamp.stamp_url)
@@ -535,7 +539,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   const fetchSRC101 = async () => {
     try {
       const res = await getSRC101Data(stamp as StampRow);
-      setSrc101(res);
+      setSrc101(res as Src101Detail);
     } catch (error: any) {
       console.log("Fetch SRC101 Error====>", error.message);
       setSrc101({} as Src101Detail);

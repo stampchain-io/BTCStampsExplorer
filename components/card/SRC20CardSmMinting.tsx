@@ -195,7 +195,7 @@ export function SRC20CardSmMinting({
                           class="w-7 h-7 rounded cursor-pointer"
                           onClick={(e) => {
                             e.preventDefault();
-                            onImageClick?.(imageUrl);
+                            if (imageUrl) onImageClick?.(imageUrl);
                           }}
                           alt={unicodeEscapeToEmoji(src20.tick ?? "")}
                         />

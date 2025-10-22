@@ -454,7 +454,7 @@ export function StampImage(
   const [loading, setLoading] = useState<boolean>(true);
   const imgScopeRef = useRef<HTMLDivElement | null>(null);
   const [transform, setTransform] = useState("");
-  const [src, setSrc] = useState<string | null>(null);
+  const [src, setSrc] = useState<string | undefined>(undefined);
   const [htmlContent, setHtmlContent] = useState<string | null>(null);
   const [validatedContent, setValidatedContent] = useState<VNode | null>(null);
   const [isValidating, setIsValidating] = useState<boolean>(false);
@@ -479,7 +479,7 @@ export function StampImage(
     if (!stamp) return;
     setLoading(true);
     const res = getStampImageSrc(stamp);
-    setSrc(res ?? null);
+    setSrc(res ?? undefined);
     setLoading(false);
   };
 
