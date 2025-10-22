@@ -118,7 +118,7 @@ const ContactCta = () => {
               <div class="w-full flex justify-end">
                 <ButtonProcessing
                   type="submit"
-                  variant="glassmorphismColor"
+                  variant="flat"
                   color="grey"
                   size="mdR"
                   isSubmitting={isSubmitting}

@@ -301,7 +301,7 @@ export function SRC20CardSmMinting({
                       } ${cellRightL2Card}`}
                     >
                       <Button
-                        variant="glassmorphismColor"
+                        variant="flat"
                         color="grey"
                         size="xsR"
                         href={mintHref}

@@ -178,7 +178,7 @@ export function TransactionStatus({
           <div class="flex gap-3">
             {txid && onViewTransaction && (
               <Button
-                variant="glassmorphism"
+                variant="outline"
                 color="grey"
                 size="mdR"
                 onClick={onViewTransaction}
@@ -188,7 +188,7 @@ export function TransactionStatus({
             )}
             {state === "failed" && onRetry && (
               <Button
-                variant="glassmorphismColor"
+                variant="flat"
                 color="grey"
                 size="mdR"
                 onClick={onRetry}

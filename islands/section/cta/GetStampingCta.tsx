@@ -59,7 +59,7 @@ export default function GetStampingCta() {
         {/* ===== BUTTONS ===== */}
         <div class="flex justify-end gap-5">
           <Button
-            variant="glassmorphism"
+            variant="outline"
             color="grey"
             size="mdR"
             href="/faq"
@@ -67,7 +67,7 @@ export default function GetStampingCta() {
             FAQ
           </Button>
           <Button
-            variant="glassmorphismColor"
+            variant="flat"
             color="grey"
             size="mdR"
             href="/tool/stamp/create"

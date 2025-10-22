@@ -372,7 +372,7 @@ export function SRC101RegisterTool({
           <div class="flex flex-col items-end">
             <Button
               type="button"
-              variant="glassmorphism"
+              variant="outline"
               color="grey"
               size="mdR"
               onClick={checkAvailability}

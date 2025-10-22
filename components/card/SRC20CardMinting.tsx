@@ -420,7 +420,7 @@ export function SRC20CardMinting({
                       class={`text-right ${cellRightCard}`}
                     >
                       <Button
-                        variant="glassmorphismColor"
+                        variant="flat"
                         color="grey"
                         size="xsR"
                         href={mintHref}

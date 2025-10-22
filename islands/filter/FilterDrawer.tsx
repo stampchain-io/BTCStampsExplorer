@@ -426,7 +426,7 @@ const FilterDrawer = (
       {/* Sticky buttons */}
       <div class="flex justify-between w-full sticky bottom-0 p-9 tablet:p-6 gap-6 bg-black/50 backdrop-blur-lg">
         <Button
-          variant="glassmorphism"
+          variant="outline"
           color="grey"
           size="mdR"
           onClick={() => {
@@ -443,7 +443,7 @@ const FilterDrawer = (
           CLEAR
         </Button>
         <Button
-          variant="glassmorphismColor"
+          variant="flat"
           color="grey"
           size="mdR"
           onClick={handleApplyFilters}

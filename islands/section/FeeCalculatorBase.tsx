@@ -917,7 +917,7 @@ export function FeeCalculatorBase({
           <div class="flex justify-end gap-5">
             {onCancel && (
               <Button
-                variant="glassmorphism"
+                variant="outline"
                 color="grey"
                 size="mdR"
                 onClick={() => {
@@ -934,7 +934,7 @@ export function FeeCalculatorBase({
               </Button>
             )}
             <Button
-              variant="glassmorphismColor"
+              variant="flat"
               color="grey"
               size="mdR"
               onClick={() => {

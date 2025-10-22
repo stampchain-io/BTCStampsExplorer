@@ -865,7 +865,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
 
                 <div className="flex justify-end">
                   <Button
-                    variant="glassmorphismColor"
+                    variant="flat"
                     color="grey"
                     size="mdR"
                     onClick={() =>

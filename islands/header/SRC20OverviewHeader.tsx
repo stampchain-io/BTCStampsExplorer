@@ -53,13 +53,12 @@ export const SRC20OverviewHeader = (
 
       {/* ===== TRENDING, MINTED/MINTING AND TIMEFRAME BUTTONS ===== */}
       <div class="flex flex-col mobileLg:flex-row justify-between w-full">
-        {/* Minting/Minted/Listings */}
+        {/* Minting/Minted */}
         <div class="flex gap-3 w-full mobileMd:w-auto">
           <SelectorButtons
             options={[
               { value: "minted", label: "MINTED" },
               { value: "minting", label: "MINTING" },
-              { value: "listings", label: "LISTINGS", disabled: true },
             ]}
             value={viewType}
             onChange={handleViewTypeClick}

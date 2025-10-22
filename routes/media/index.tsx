@@ -279,7 +279,7 @@ export default function MediaPage() {
             </p>
             <div>
               <Button
-                variant="glassmorphism"
+                variant="outline"
                 color="grey"
                 size="mdR"
                 href="https://sqrr.xyz/reports/docs/4/1/Stamps%20Protocol_Final_17_May_2023.pdf"
@@ -301,7 +301,7 @@ export default function MediaPage() {
             </p>
             <div class="flex justify-start mobileLg:justify-end">
               <Button
-                variant="glassmorphism"
+                variant="outline"
                 color="grey"
                 size="mdR"
                 href="https://sqrr.xyz/reports/"

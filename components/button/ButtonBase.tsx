@@ -61,7 +61,7 @@ const getCommonButtonProps = ({
 
 /* ===== COMPONENT ===== */
 export function Button({
-  variant = "glassmorphism",
+  variant = "outline",
   color = "grey",
   size = "mdR",
   disabled,
@@ -88,45 +88,6 @@ export function Button({
   });
 
   const combinedClass = `${buttonClass} ${className ?? ""} group`;
-
-  // Special handling for outlineGradient variant
-  if (variant === "outlineGradient") {
-    const innerButtonProps = getCommonButtonProps({
-      disabled: !IS_BROWSER || disabled,
-      onClick,
-      onMouseEnter,
-      onMouseLeave,
-      onFocus,
-      onBlur,
-      role,
-      ariaLabel,
-      dataType,
-      ref,
-      ...props,
-    });
-
-    const innerContent = (
-      <button {...innerButtonProps}>
-        {children}
-      </button>
-    );
-
-    return href
-      ? (
-        <a
-          href={href}
-          f-partial={fPartial ?? href}
-          class={combinedClass}
-        >
-          {innerContent}
-        </a>
-      )
-      : (
-        <div class={combinedClass}>
-          {innerContent}
-        </div>
-      );
-  }
 
   const commonProps = getCommonButtonProps({
     type,
@@ -218,7 +179,7 @@ export function ButtonIcon({
 
 /* ===== PROCESSING BUTTON COMPONENT ===== */
 export function ButtonProcessing({
-  variant = "glassmorphism",
+  variant = "outline",
   color = "grey",
   size = "mdR",
   disabled,
