@@ -1,16 +1,12 @@
 /* ===== BUTTON COMPONENT ===== */
 import { button, buttonStyles } from "$button";
 import { IS_BROWSER } from "$fresh/runtime.ts";
+import { loaderSpinSmGrey } from "$layout";
 import type {
   ExtendedButtonProps,
   ExtendedIconButtonProps,
   ExtendedProcessingButtonProps,
 } from "$types/ui.d.ts";
-
-/* ===== SUBCOMPONENTS - @baba - duplicate of loaderSpin in layout/styles.ts ===== */
-const LoadingSpinner = () => (
-  <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-[var(--hover-color)]" />
-);
 
 /* ===== HELPERS ===== */
 const getButtonClass = (
@@ -162,7 +158,7 @@ export function ButtonIcon({
     ...props,
   });
 
-  const content = isLoading ? <LoadingSpinner /> : children;
+  const content = isLoading ? <div class={loaderSpinSmGrey} /> : children;
 
   return href
     ? (
@@ -223,7 +219,7 @@ export function ButtonProcessing({
     ...props,
   });
 
-  const content = isSubmitting ? <LoadingSpinner /> : children;
+  const content = isSubmitting ? <div class={loaderSpinSmGrey} /> : children;
 
   return href
     ? (

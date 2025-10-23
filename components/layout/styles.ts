@@ -122,10 +122,6 @@ export const imagePreviewTool =
 export const imageUploadTool =
   `flex items-center justify-center min-w-[100px] h-[100px] ${glassmorphismL2} hover:bg-color-neutral-dark/30 ${transitionColors} cursor-pointer`;
 
-/* ===== MODAL STYLES ===== */
-export const modalBgCenter =
-  "fixed inset-0 z-50 flex items-center justify-center bg-[#000000] bg-opacity-70 backdrop-filter backdrop-blur-md";
-
 /* ===== LOADER STYLES ===== */
 // Text loader styles are defined in /text/styles.ts
 // Skeleton loader styles are defined in /layout/SkeletonLoader.tsx
@@ -146,11 +142,6 @@ export const loaderSpinPurple =
   `${loaderSpin} w-7 h-7 border-color-primary-semilight`;
 export const loaderSpinLgPurple =
   `${loaderSpin} w-9 h-9 border-color-primary-semilight`;
-
-/* ===== LEGACY STYLES - @baba-check and remove ===== */
-export const modalBgTop =
-  "fixed inset-0 z-50 flex items-start justify-center bg-black bg-opacity-70 backdrop-filter backdrop-blur-md";
-export const modalSearch = "w-[90%] max-w-[600px] mt-[72px] tablet:mt-24";
 
 /* ===== TYPE DEFINITIONS ===== */
 export type LayoutStyles = {
@@ -223,11 +214,6 @@ export type LayoutStyles = {
   loaderSkeletonMd: string;
   loaderSkeletonLg: string;
   loaderSkeletonFull: string;
-
-  // Modal styles
-  modalBgCenter: string;
-  modalBgTop: string;
-  modalSearch: string;
 };
 
 /* ===== ALIGNMENT UTILITIES ===== */

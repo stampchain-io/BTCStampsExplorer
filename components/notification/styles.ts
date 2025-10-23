@@ -14,8 +14,9 @@ const tooltipText =
 /* ===== NOTIFICATION STYLES ===== */
 /* General */
 export const notificationHeading =
-  `font-semibold text-[15px] text-color-neutral-semilight`;
-export const notificationBody = `font-normal text-sm text-color-neutral`;
+  `font-semibold text-[15px] text-color-neutral-light`;
+export const notificationBody =
+  `font-normal text-sm text-color-neutral-semilight`;
 export const notificationTextError = `!text-color-red`;
 export const notificationTextSuccess = `!text-color-green`;
 

@@ -166,8 +166,9 @@ export const valuePositive = `text-color-green-semilight`;
 export const valueNegative = `text-color-red-semilight`;
 export const valueNeutral = `text-color-neutral-semidark`;
 
-/* ===== TOOLTIP STYLES ===== */
+/* ===== NOTIFICATION AND TOOLTIP STYLES ===== */
 // One text style for tooltips - defined in /notifications/styles.ts
+// Status, Success, Error and Info notification styles are defined in /notifications/styles.ts
 
 /* ===== CODE STYLES ===== */
 // Add "font-courier-prime" to the class name to use the Courier font and make text monospace
@@ -181,8 +182,6 @@ export const toggleSymbol =
   `font-bold text-[10px] text-black cursor-default ${select}`; // used in ToggleSwitchButton.tsx for $/BTC symbols
 
 // Captions - used for stamp/token cards
-// Errors - used for error messages - to be defined in /notifications/styles.ts
-// Success - used for success messages - to be defined in /notifications/styles.ts
 
 /* ===== CARD TEXT STYLES ===== */
 // Standard card styles

@@ -67,7 +67,6 @@ export interface ButtonVariants {
     loading: string;
     active: string;
   };
-  spinner: string;
 }
 
 /* ===== BUTTON VARIANT BASE STYLES DEFINITIONS ===== */
@@ -192,15 +191,6 @@ export const buttonStyles: ButtonVariants = {
       transition-transform
     `,
   },
-
-  /* ===== SPINNER STYLES - @baba - duplicate of loaderSpin in layout/styles.ts ===== */
-  spinner: `
-    animate-spin
-    rounded-full
-    h-5 w-5
-    border-b-[3px]
-    border-[var(--color-button-semilight)]
-  `,
 };
 
 /* ===== ADDITIONAL STYLES ===== */

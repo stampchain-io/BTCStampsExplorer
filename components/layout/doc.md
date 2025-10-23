@@ -583,9 +583,6 @@ import { containerCard, cellLeftCard } from "$layout";
 ### Issue: Rounded corners cut off content
 **Solution**: Apply `overflow-hidden` to parent container or adjust padding to accommodate border radius.
 
-### Issue: Modal not centering
-**Solution**: Ensure modal parent uses `modalBgCenter` class which includes flexbox centering.
-
 ### Issue: Hover effects not working
 **Solution**: Verify that parent element has `group` class when using `group-hover:` utilities.
 
