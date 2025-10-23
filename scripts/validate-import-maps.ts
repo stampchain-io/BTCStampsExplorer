@@ -123,7 +123,7 @@ function findMixedPatterns(content: string, filePath: string): Array<{ file: str
   
   lines.forEach((line, index) => {
     // Check for centralized imports (index.d.ts)
-    if (line.includes('from "$types/index.d.ts"') || line.includes('from "$types"')) {
+    if (line.includes('from "$types/index.d.ts"') || line.includes('from "$types/"')) {
       hasCentralizedImports = true;
       centralizedLines.push(index + 1);
     }

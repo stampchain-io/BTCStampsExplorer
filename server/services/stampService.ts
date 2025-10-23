@@ -18,7 +18,7 @@ import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
 import { CreatorService } from "$server/services/creator/creatorService.ts";
 import { getCacheConfig, RouteType } from "$server/services/infrastructure/cacheService.ts";
 import { BTCPriceService } from "$server/services/price/btcPriceService.ts";
-import type { StampMarketData, XcpBalance } from "$types";
+import type { StampMarketData, XcpBalance } from "$types/";
 
 interface StampServiceOptions {
   cacheType: RouteType;
