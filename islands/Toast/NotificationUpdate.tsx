@@ -16,14 +16,14 @@ import { useEffect } from "preact/hooks";
  * localStorage key for tracking if update notification has been shown
  * INCREMENT VERSION for each new major update announcement
  */
-const NOTIFICATION_UPDATE_VERSION = "feature-update-v3.0";
+const NOTIFICATION_UPDATE_VERSION = "feature-update-v3.02";
 
 /**
  * Message content for update notification
  * Supports multi-line formatting with bullet points
  */
 const NOTIFICATION_UPDATE_MESSAGE = `New Website Updates
-• Enhanced glassmorphism UI design
+• Enhanced UI design with more vibrant color palette
 • Improved toast notification and messaging
 • Reimagined header and navigation menus
 • Updated search feature with global stamp search and token specific search (on SRC20 Tokens overview and detail pages)

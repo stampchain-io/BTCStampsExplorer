@@ -221,7 +221,7 @@ export default function CarouselGallery(props: CarouselHomeProps) {
                                     ? stamp.creator_name
                                     : abbreviateAddress(stamp.creator, 8)}
                                 </h4>
-                                <h5 class="font-bold text-base desktop:text-lg text-[#BBBBBB] text-right">
+                                <h5 class="font-bold text-base desktop:text-lg text-color-neutral text-right">
                                   {stamp.divisible
                                     ? (stamp.supply / 100000000).toFixed(2)
                                     : stamp.supply > 100000

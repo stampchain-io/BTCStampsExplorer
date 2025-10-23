@@ -169,7 +169,7 @@ export function SkeletonImage({
         weight="extraLight"
         size="xl"
         color="custom"
-        className="stroke-[#242424]/75"
+        className="stroke-color-border/75"
       />
     </div>
   );

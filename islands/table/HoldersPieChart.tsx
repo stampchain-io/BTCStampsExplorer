@@ -65,8 +65,8 @@ export const HoldersPieChart = ({ holders: rawHolders }: PieChartProps) => {
           tooltip: {
             enabled: true,
             backgroundColor: "#000000BF",
-            titleColor: "var(--color-neutral-semilight)",
-            bodyColor: "var(--color-neutral-semilight)",
+            titleColor: "#fff8f0",
+            bodyColor: "#d8d2ca",
             position: "nearest" as const,
             yAlign: "bottom" as const,
             callbacks: {
@@ -87,7 +87,7 @@ export const HoldersPieChart = ({ holders: rawHolders }: PieChartProps) => {
         labels: holders.map((h: any) => h.address || "Unknown"),
         datasets: [{
           borderColor: [...Array(holders.length)].fill(
-            "var(--color-primary-dark)",
+            "#000000BF",
           ),
           label: "Graph Holder",
           data: holders.map((holder: any) => Number(holder.amt)),

@@ -69,7 +69,7 @@ const ChartWidget = (
               type: "line",
               name: "",
               data: chartData,
-              color: "var(--color-neutral-semilight)",
+              color: "#aca7a1",
               lineWidth: 2,
               tooltip: {
                 valueSuffix: "",
@@ -99,18 +99,18 @@ const ChartWidget = (
               fill: "rgba(33, 28, 33, 0.1)", // Glassmorphism button background
               style: {
                 fontSize: "10px", // Text size
-                color: "var(--color-neutral-semidark)", // Text color
+                color: "#d8d2ca", // Text color
               },
               states: {
                 hover: {
                   fill: "rgba(33, 28, 33, 0.4)", // Glassmorphism button hover
                   stroke: "rgba(102, 102, 102, 0.6)", // Hover border color
                   style: {
-                    color: "var(--color-green-light)", // Hover text color
+                    color: "#fff8f0", // Hover text color
                   },
                 },
                 select: {
-                  fill: "var(--color-neutral)", // Fill when selected
+                  fill: "#fff8f0", // Fill when selected
                   stroke: "rgba(102, 102, 102, 0.6)", // Selected border color
                 },
               },
@@ -138,7 +138,7 @@ const ChartWidget = (
             enabled: true,
             backgroundColor: "#000000BF", // Black with transparency
             style: {
-              color: "var(--color-neutral-semilight)", // Title & body text color
+              color: "#fff8f0", // Title & body text color
             },
             borderRadius: 8,
             borderWidth: 0,
@@ -148,7 +148,7 @@ const ChartWidget = (
             {
               type: chartType, // Chart type constant
               name: "Price in SAT",
-              color: "var(--color-neutral)",
+              color: "#aca7a1",
               data: chartData,
               tooltip: {
                 valueSuffix: " SAT",

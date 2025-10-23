@@ -216,8 +216,8 @@ export const WalletButton = (
                 weight="normal"
                 size="mdR"
                 color="purpleLight"
-                colorAccent="color-mix(in srgb, var(--color-neutral) 75%, transparent)"
-                colorAccentHover="var(--color-neutral)"
+                colorAccent="color-mix(in srgb, var(--color-neutral-semilight) 75%, transparent)"
+                colorAccentHover="var(--color-neutral-semilight)"
                 onClick={handleWalletIconClick}
               />
             </div>
