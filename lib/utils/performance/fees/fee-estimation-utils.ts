@@ -9,7 +9,7 @@
 
 import type { FeeDetails } from "$types/base.d.ts";
 import type { ProgressiveFeeEstimationResult as FeeEstimationResult } from "$types/fee-estimation.ts";
-import type { ProgressiveFeeEstimationResult as UIProgressiveResult } from "$hooks/useProgressiveFeeEstimation.ts";
+import type { ProgressiveFeeEstimationResult as UIProgressiveResult } from "../../../../hooks/useProgressiveFeeEstimation.ts";
 import type { ProgressiveFeeEstimationProps } from "$types/ui.d.ts";
 
 /**
