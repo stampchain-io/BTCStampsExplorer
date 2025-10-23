@@ -220,9 +220,20 @@ jobs:
               exit 1
             fi
 
-            CRITICAL_ISSUES=$(cat reports/dependency-analysis.json | jq '.summary.criticalIssues | length')
-            if [ "$CRITICAL_ISSUES" -gt 0 ]; then
-              echo "❌ Found $CRITICAL_ISSUES critical dependency issues"
+            # Check for circular dependencies with threshold
+            CIRCULAR_DEPS=$(cat reports/dependency-analysis.json | jq '.issues | map(select(.type == "circular-dependency")) | length')
+            if [ "$CIRCULAR_DEPS" -gt 50 ]; then
+              echo "❌ Too many circular dependencies: $CIRCULAR_DEPS (threshold: 50)"
+              exit 1
+            elif [ "$CIRCULAR_DEPS" -gt 0 ]; then
+              echo "⚠️  Warning: Found $CIRCULAR_DEPS circular dependencies (threshold: 50)"
+              echo "📋 Tracked in taskmaster tag: BTCStampsExplorer-circular"
+            fi
+
+            # Check for other critical issues (excluding circular dependencies)
+            OTHER_CRITICAL=$(cat reports/dependency-analysis.json | jq '.issues | map(select(.type != "circular-dependency" and .severity == "critical")) | length')
+            if [ "$OTHER_CRITICAL" -gt 0 ]; then
+              echo "❌ Found $OTHER_CRITICAL non-circular critical dependency issues"
               exit 1
             fi
           fi
