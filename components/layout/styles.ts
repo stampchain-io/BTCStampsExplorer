@@ -27,11 +27,11 @@ export const shadowGlowGrey =
 export const glassmorphismOverlay =
   `bg-gradient-to-b from-color-background/95 via-color-background/70 to-black/90 backdrop-blur-lg`;
 // 1st layer styles
-export const glassmorphism = `border-[1px] border-color-border/50 rounded-3xl
+export const glassmorphism = `border border-color-border/50 rounded-3xl
   bg-gradient-to-br from-[#1b191b]/50 via-color-background/50 to-black/50
   backdrop-blur ${shadow}`;
 // 2nd layer styles - register tool tld dropdown uses same hardcoded values
-export const glassmorphismL2 = `border-[1px] border-color-border/75 rounded-2xl
+export const glassmorphismL2 = `border border-color-border/75 rounded-2xl
   bg-color-background/30 backdrop-blur-xs ${shadowL2}`;
 export const glassmorphismL2Hover =
   `hover:bg-color-background/60 hover:border-color-border`;
@@ -108,11 +108,11 @@ export const cellCenterL2Card =
   group-hover:bg-black/20 group-hover:border-color-primary-light ${transitionColors} whitespace-nowrap`;
 // Stamp and SRC20 Detail pages Table Rows
 export const cellLeftL2Detail =
-  `p-1.5 pl-3 rounded-l-2xl border-y-[1px] border-l-[1px] border-r-0 border-color-border/75 group-hover:bg-black/20 group-hover:border-[#232223] ${transitionColors} whitespace-nowrap`;
+  `p-1.5 pl-3 rounded-l-2xl border-y-[1px] border-l-[1px] border-r-0 border-color-border/75 group-hover:bg-black/20 group-hover:border-color-border ${transitionColors} whitespace-nowrap`;
 export const cellRightL2Detail =
-  `p-1.5 pr-3 rounded-r-2xl border-y-[1px] border-r-[1px] border-l-0 border-color-border/75 group-hover:bg-black/20 group-hover:border-[#232223] ${transitionColors} whitespace-nowrap`;
+  `p-1.5 pr-3 rounded-r-2xl border-y-[1px] border-r-[1px] border-l-0 border-color-border/75 group-hover:bg-black/20 group-hover:border-color-border ${transitionColors} whitespace-nowrap`;
 export const cellCenterL2Detail =
-  `p-1.5 border-y-[1px] border-x-0 border-color-border/75 group-hover:bg-black/20 group-hover:border-[#232223] ${transitionColors} whitespace-nowrap`;
+  `p-1.5 border-y-[1px] border-x-0 border-color-border/75 group-hover:bg-black/20 group-hover:border-color-border ${transitionColors} whitespace-nowrap`;
 
 export const cellStickyLeft =
   `sticky left-0 bg-black/70 tablet:bg-transparent backdrop-blur-xl tablet:backdrop-blur-none z-10`;
@@ -129,7 +129,7 @@ export const imageUploadTool =
 // Base loader style
 const loaderSpin = "animate-spin rounded-full border-b-[2px]";
 export const loaderSkeleton =
-  `bg-color-background/50 border-[1px] border-color-border/50 animate-pulse`;
+  `bg-color-background/50 border border-color-border/50 animate-pulse`;
 // Spinning loader styles
 export const loaderSpinXsGrey = `${loaderSpin} w-3 h-3 border-color-neutral`;
 export const loaderSpinSmGrey = `${loaderSpin} w-5 h-5 border-color-neutral`;

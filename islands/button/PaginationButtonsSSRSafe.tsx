@@ -26,8 +26,8 @@ export const PaginationButtonsSSRSafe = ({
 }: PaginationProps): JSX.Element | null => {
   const navBase = `
   flex items-center justify-center
-${glassmorphismL2} ${glassmorphismL2Hover}
-!backdrop-blur-md`;
+  ${glassmorphismL2} ${glassmorphismL2Hover}
+  !rounded-full !backdrop-blur-md`;
   const navArrow = `${navBase} group
   w-10 h-10 tablet:w-9 tablet:h-9`;
   const navContent = `${navBase} group
@@ -54,9 +54,9 @@ ${glassmorphismL2} ${glassmorphismL2Hover}
     // Use navArrow class for caret buttons, otherwise use navContent
     const baseClass = iconName ? navArrow : navContent;
     const buttonClass = isCurrentPage
-      ? `${baseClass} bg-[#100a10]/60 border-color-border
-       text-color-neutral font-normal
-       hover:bg-[#100a10]/60 hover:border-color-border`
+      ? `${baseClass} !bg-color-border/15 !border-color-border
+       !text-color-neutral hover:!text-color-neutral font-medium
+       hover:!bg-color-border/15 hover:!border-color-border`
       : `${baseClass}`;
 
     return (

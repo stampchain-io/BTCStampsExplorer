@@ -95,9 +95,9 @@ export function PaginationButtons({
     // Use navArrow class for caret buttons, otherwise use navContent
     const baseClass = iconName ? navArrow : navContent;
     const buttonClass = isCurrentPage
-      ? `${baseClass} bg-[#100a10]/60 border-color-border
-       text-color-neutral font-normal
-       hover:bg-[#100a10]/60 hover:border-color-border `
+      ? `${baseClass} !bg-color-border/15 !border-color-border
+       !text-color-neutral hover:!text-color-neutral font-medium
+       hover:!bg-color-border/15 hover:!border-color-border`
       : `${baseClass}`;
 
     return (

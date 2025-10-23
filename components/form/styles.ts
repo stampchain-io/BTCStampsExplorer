@@ -64,7 +64,7 @@ export const inputCheckbox = (
   relative
   size-4 tablet:size-3
   rounded-full
-  border-[1px]
+  border
   cursor-pointer
   transition-colors duration-200
   ${
