@@ -7,7 +7,7 @@ import {
   formatVolume,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { labelSm, valueSm } from "$text";
-import type { CollectionWithOptionalMarketData } from "$types";
+import type { CollectionWithOptionalMarketData } from "$types/";
 
 /* ===== HELPERS ===== */
 function abbreviateCollectionName(name: string): string {
