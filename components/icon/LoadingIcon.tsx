@@ -1,5 +1,6 @@
 /* ===== LOADING ICON COMPONENT ===== */
-import { Icon } from "$components/icon/IconBase.tsx";
+import { Icon } from "$icon";
+import { transitionColors } from "$layout";
 
 interface LoadingIconProps {
   className?: string;
@@ -17,7 +18,9 @@ export function LoadingIcon({
       className={`relative z-10 aspect-square animate-pulse ${wrapperClassName}`}
     >
       <div
-        className={`flex items-center justify-center bg-color-primary-dark/80 max-w-none object-contain rounded-2xl ${containerClassName}`}
+        className={`flex items-center justify-center max-w-none
+          bg-gradient-to-br from-color-primary-semidark/75 via-color-primary-dark/75 to-black rounded-2xl
+          object-contain ${transitionColors} ${containerClassName}`}
       >
         <Icon
           type="icon"
