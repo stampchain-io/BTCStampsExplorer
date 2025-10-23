@@ -1,7 +1,7 @@
 /* ===== GET STAMPING CTA COMPONENT ===== */
 import { Button } from "$button";
 import { containerBackground, gapGrid } from "$layout";
-import { subtitleGrey, text, titleGreyDL } from "$text";
+import { subtitleGrey, text, titleGreyLD } from "$text";
 
 /* ===== COMPONENT ===== */
 export default function GetStampingCta() {
@@ -11,7 +11,7 @@ export default function GetStampingCta() {
   return (
     <div class={`${containerBackground}`}>
       {/* ===== HEADER SECTION ===== */}
-      <h3 class={titleGreyDL}>GET STAMPING</h3>
+      <h3 class={titleGreyLD}>GET STAMPING</h3>
       <h4 class={subtitleGrey}>IMMORTALISE YOUR ART</h4>
 
       {/* ===== CONTENT SECTION ===== */}

@@ -1,7 +1,7 @@
 /* ===== STAMPCHAIN CONTACT CTA COMPONENT ===== */
 import { Button } from "$button";
 import { containerBackground } from "$layout";
-import { subtitleGrey, text, textLg, titleGreyDL } from "$text";
+import { subtitleGrey, text, textLg, titleGreyLD } from "$text";
 
 /* ===== COMPONENT ===== */
 export const StampchainContactCta = () => {
@@ -13,7 +13,7 @@ export const StampchainContactCta = () => {
     >
       <div class="col-span1 desktop:col-span-2">
         {/* ===== HEADER SECTION ===== */}
-        <h3 class={titleGreyDL}>STAMPCHAIN</h3>
+        <h3 class={titleGreyLD}>STAMPCHAIN</h3>
         <h4 class={subtitleGrey}>
           THE CREATORS OF BITCOIN STAMPS
         </h4>

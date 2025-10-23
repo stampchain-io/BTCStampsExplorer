@@ -34,7 +34,8 @@ export const StampPoshCta = () => {
                 frictionless to create Posh stamps.
               </b>
               <br />
-              We handle the XCP fee and you pay in BTC.
+              You just need a small amount of XCP to pay for the name and we
+              handle the rest.
             </p>
             <p>
               Your most treasured art can now have unique names, instead of just
@@ -42,18 +43,19 @@ export const StampPoshCta = () => {
             </p>
           </div>
         </div>
+        {/* ===== BUTTON SECTION ===== */}
+        <div class="flex justify-end">
+          <Button
+            variant="outline"
+            color="grey"
+            size="md"
+            href="/tool/stamp/create"
+            class="float-right mt-6"
+          >
+            STAMP
+          </Button>
+        </div>
       </div>
-
-      {/* ===== BUTTON SECTION ===== */}
-      <Button
-        variant="flat"
-        color="grey"
-        size="md"
-        href="/tool/stamp/create"
-        class="float-right mt-6"
-      >
-        STAMP
-      </Button>
     </>
   );
 };

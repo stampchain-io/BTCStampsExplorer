@@ -31,7 +31,8 @@ export interface ButtonVariants {
     | "outline"
     | "flat"
     | "flatOutline"
-    | "outlineFlat",
+    | "outlineFlat"
+    | "custom",
     string
   >;
   color: Record<
@@ -112,6 +113,7 @@ export const buttonStyles: ButtonVariants = {
       hover:!bg-[linear-gradient(to_bottom_right,var(--color-button-light),var(--color-button-semilight),var(--color-button),var(--color-button-semidark),var(--color-button-dark))] hover:!border-[var(--color-button-dark)]
       hover:!text-[#080708] hover:!opacity-90
     `,
+    custom: `${shadowL2}`,
   },
 
   /* ===== COLOR STYLES ===== */
@@ -127,8 +129,8 @@ export const buttonStyles: ButtonVariants = {
     purple: `
       [--color-button-dark:var(--color-primary-dark)]
       [--color-button-semidark:var(--color-primary-semidark)]
-      [--color-button:var(--color-primary-semilight)]
-      [--color-button-semilight:var(--color-primary-light)]
+      [--color-button:var(--color-primary)]
+      [--color-button-semilight:var(--color-primary-semilight)]
       [--color-button-light:var(--color-primary-light)]
     `,
     test: `
