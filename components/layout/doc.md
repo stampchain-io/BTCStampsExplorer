@@ -75,7 +75,7 @@ The app UI is inspired by Apple design principles, with dark themed multilayered
     - Rounded corners (24px) and background blur:
       - rounded-3xl backdrop-blur
     - Background: Linear gradient to bottom right
-      - bg-gradient-to-br from-[#1b191b]/50 via-color-background/50 to-black/50
+      - bg-gradient-to-br from-color-border/40 via-color-background/50 to-black/60
     - Border: border border-color-border/50
     - Shadow: Outer and inner shadows:
       - shadow-[0_4px_8px_rgba(13,11,13,0.2),inset_0_1px_0_rgba(13,11,13,0.1),inset_0_-1px_0_rgba(13,11,13,0.1),inset_0_0_1px_1px_rgba(13,11,13,0.1)]
@@ -451,9 +451,8 @@ The layout system integrates with the global style system through:
 ```typescript
 // Pattern used in styles.ts
 export const glassmorphism = `
-  border border-color-border/50
-  rounded-3xl
-  bg-gradient-to-br from-[#1b191b]/50 via-color-background/50 to-black/50
+  border border-color-border/50 rounded-3xl
+  bg-gradient-to-br from-color-border/40 via-color-background/50 to-black/60
   backdrop-blur
   ${shadow}
 `;

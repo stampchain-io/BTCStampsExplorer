@@ -439,7 +439,7 @@ Interactive tables use `ScrollContainer` for enhanced scrolling:
 import { ScrollContainer } from "$layout";
 
 <ScrollContainer
-  class="min-h-[80px] max-h-[290px] scrollbar-glassmorphism"
+  class="min-h-[80px] max-h-[290px] scrollbar-background-layer1"
   onScroll={handleScroll}
 >
   <div class="!-my-2 overflow-x-auto tablet:overflow-x-visible scrollbar-hide">

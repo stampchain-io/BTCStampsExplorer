@@ -48,7 +48,7 @@ absolute top-[100%] left-0 w-full z-dropdown
 bg-gradient-to-b from-color-background/30 to-color-background backdrop-blur-sm
 border border-t-0 border-color-border/75 rounded-b-2xl
 text-color-neutral-light text-sm font-medium uppercase leading-none
-overflow-y-auto scrollbar-glassmorphism-slim shadow-lg cursor-pointer`;
+overflow-y-auto scrollbar-background-layer2 shadow-lg cursor-pointer`;
 
 export const inputFieldDropdownHover = `
 flex justify-between py-2.5 px-3

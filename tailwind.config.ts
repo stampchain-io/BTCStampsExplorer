@@ -232,14 +232,6 @@ export default {
           "-webkit-text-fill-color": "transparent",
           "text-fill-color": "transparent",
         },
-        ".hover-dark-gradient": { // prune and refactor
-          background:
-            "linear-gradient(180deg, rgba(10, 0, 15, 0) 55%, rgba(20, 0, 31, 0.5) 70%, #1F002E 85%)",
-        },
-        ".hover-gradient": { // prune and refactor
-          background:
-            "linear-gradient(146.07deg, rgba(102, 0, 153, 0) 0%, #8800CC 49.98%, #AA00FF 99.95%)",
-        },
         ".scrollbar-hide": {
           /* Hide scrollbar for IE, Edge and Firefox */
           "-ms-overflow-style": "none",

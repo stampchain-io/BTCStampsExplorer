@@ -134,11 +134,11 @@ export const buttonStyles: ButtonVariants = {
       [--color-button-light:var(--color-primary-light)]
     `,
     test: `
-      [--color-button-dark:#00CC0033]
-      [--color-button-semidark:#00CC0066]
-      [--color-button:#00CC0066]
-      [--color-button-semilight:#00CC0099]
-      [--color-button-light:#CC000033]
+      [--color-button-dark:var(--color-red-dark)]
+      [--color-button-semidark:var(--color-red-semidark)]
+      [--color-button:var(--color-green)]
+      [--color-button-semilight:var(--color-orange-semilight)]
+      [--color-button-light:var(--color-orange-light)]
     `,
     custom: "",
   },

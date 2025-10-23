@@ -3,7 +3,7 @@
 
 /* ===== BASE STYLES ===== */
 // General styles
-// Horisontal Rule is defined in /styles.css using border color #1b1b1b/80
+// Horisontal Rule is defined in /styles.css using border color
 
 // Transition styles - @baba-refactor codebase to use these instead of hardcoded values
 export const transitionColors = "transition-colors duration-200";
@@ -28,7 +28,7 @@ export const glassmorphismOverlay =
   `bg-gradient-to-b from-color-background/95 via-color-background/70 to-black/90 backdrop-blur-lg`;
 // 1st layer styles
 export const glassmorphism = `border border-color-border/50 rounded-3xl
-  bg-gradient-to-br from-[#1b191b]/50 via-color-background/50 to-black/50
+  bg-gradient-to-br from-color-border/40 via-color-background/50 to-black/60
   backdrop-blur ${shadow}`;
 // 2nd layer styles - register tool tld dropdown uses same hardcoded values
 export const glassmorphismL2 = `border border-color-border/75 rounded-2xl
