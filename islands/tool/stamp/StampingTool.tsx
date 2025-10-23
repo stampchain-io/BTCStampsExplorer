@@ -1722,7 +1722,7 @@ function StampingToolMain({ config }: { config: Config }) {
                   <PlaceholderImage variant="no-image" />
                 </div>
               )}
-            <div class="flex items-center justify-center absolute inset-0 rounded-2xl hover:bg-[#080708]/60 hover:border-[#242424] opacity-0 hover:opacity-100 transition-opacity">
+            <div class="flex items-center justify-center absolute inset-0 rounded-2xl hover:bg-color-background/60 hover:border-color-border opacity-0 hover:opacity-100 transition-opacity">
               <Icon
                 type="icon"
                 name="uploadImage"

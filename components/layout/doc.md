@@ -57,11 +57,11 @@ The app UI is inspired by Apple design principles, with dark themed multilayered
     - Background blur:
       - backdrop-blur-lg
     - Background: Linear gradient to bottom
-      - bg-gradient-to-b from-[#080708]/95 via-[#080708]/70 to-[#000000]/90
+      - bg-gradient-to-b from-color-background/95 via-color-background/70 to-black/90
     - Note: Rounded corners and shadows are applied by individual components using this overlay
       - Drawers (FilterDrawer, Header mobile menu) typically use:
         - Rounded corners (24px): rounded-3xl (applied to left or right side depending on drawer position)
-        - Border: border-[1px] border-[#242424]/75
+        - Border: border-[1px] border-color-border/75
         - Shadows:
           - Left drawer: shadow-[-12px_0_12px_-6px_rgba(8,7,8,0.75)]
           - Right drawer: shadow-[12px_0_12px_-6px_rgba(8,7,8,0.75)]
@@ -75,8 +75,8 @@ The app UI is inspired by Apple design principles, with dark themed multilayered
     - Rounded corners (24px) and background blur:
       - rounded-3xl backdrop-blur
     - Background: Linear gradient to bottom right
-      - bg-gradient-to-br from-[#1b191b]/50 via-[#080708]/50 to-[#000000]/50
-    - Border: border-[1px] border-[#242424]/50
+      - bg-gradient-to-br from-[#1b191b]/50 via-color-background/50 to-black/50
+    - Border: border-[1px] border-color-border/50
     - Shadow: Outer and inner shadows:
       - shadow-[0_4px_8px_rgba(13,11,13,0.2),inset_0_1px_0_rgba(13,11,13,0.1),inset_0_-1px_0_rgba(13,11,13,0.1),inset_0_0_1px_1px_rgba(13,11,13,0.1)]
 
@@ -86,16 +86,16 @@ The app UI is inspired by Apple design principles, with dark themed multilayered
     - Black background with high opacity
     - Rounded corners (16px) and small background blur:
       - rounded-2xl backdrop-blur-xs
-    - Background: bg-[#080708]/30
-    - Border: border-[1px] border-[#242424]/75
+    - Background: bg-color-background/30
+    - Border: border-[1px] border-color-border/75
     - Shadow: Smaller outer and inner shadows:
       - shadow-[0_2px_4px_rgba(13,11,13,0.1),inset_0_1px_0_rgba(13,11,13,0.08),inset_0_-1px_0_rgba(13,11,13,0.08),inset_0_0_2px_2px_rgba(13,11,13,0.08)]
 
   - GlassmorphismL2Hover
     - Combines background and border hover styles
     - Intended to be used with layer 2 elements
-    - Background: bg-[#080708]/60
-    - Border: border-[#242424]
+    - Background: bg-color-background/60
+    - Border: border-color-border
 
 ### Layer Comparison
 
@@ -451,9 +451,9 @@ The layout system integrates with the global style system through:
 ```typescript
 // Pattern used in styles.ts
 export const glassmorphism = `
-  border-[1px] border-[#242424]/50
+  border-[1px] border-color-border/50
   rounded-3xl
-  bg-gradient-to-br from-[#1b191b]/50 via-[#080708]/50 to-[#000000]/50
+  bg-gradient-to-br from-[#1b191b]/50 via-color-background/50 to-black/50
   backdrop-blur
   ${shadow}
 `;

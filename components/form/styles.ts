@@ -13,7 +13,7 @@ const inputFieldWidth = "!w-10";
 // Input field styles - focus values must be same as glassmorphismL2Hover
 const inputFieldStyle = `px-5 w-full
   ${glassmorphismL2} ${glassmorphismL2Hover}
-  focus:bg-[#080708]/60 focus:border-[#242424] focus:outline-none focus-visible:outline-none no-outline ${transitionColors}
+  focus:bg-color-background/60 focus:border-color-border focus:outline-none focus-visible:outline-none no-outline ${transitionColors}
   font-medium text-sm text-color-neutral-light
   placeholder:font-light placeholder:text-color-neutral-semidark placeholder:uppercase`;
 
@@ -45,14 +45,14 @@ export const inputTextarea = `
 // Input field dropdown - define height in the component
 export const inputFieldDropdown = `
 absolute top-[100%] left-0 w-full z-dropdown
-bg-gradient-to-b from-[#080708]/30 to-[#080708] backdrop-blur-sm
-border border-t-0 border-[#242424]/75 rounded-b-2xl
+bg-gradient-to-b from-color-background/30 to-color-background backdrop-blur-sm
+border border-t-0 border-color-border/75 rounded-b-2xl
 text-color-neutral-light text-sm font-medium uppercase leading-none
 overflow-y-auto scrollbar-glassmorphism-slim shadow-lg cursor-pointer`;
 
 export const inputFieldDropdownHover = `
 flex justify-between py-2.5 px-3
-border-b-[1px] border-[#242424] last:border-b-0
+border-b-[1px] border-color-border last:border-b-0
 ${glassmorphismL2Hover} ${transitionColors} uppercase cursor-pointer`;
 
 // Checkbox - used for both checkboxes and radiobuttons

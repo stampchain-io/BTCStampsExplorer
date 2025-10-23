@@ -27,7 +27,7 @@ export function SettingsButton({
     <div
       class={`rounded-full flex flex-col items-center gap-1 h-fit relative z-[10] ${
         open
-          ? "px-6 py-4 border-2 border-color-primary-semilight bg-[#0B0B0B]"
+          ? "px-6 py-4 border-2 border-color-primary-semilight bg-color-background"
           : ""
       }`}
     >

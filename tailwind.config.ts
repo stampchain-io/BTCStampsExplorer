@@ -60,6 +60,12 @@ export default {
             semilight: "#d68100",
             light: "#ff9900",
           },
+          background: {
+            DEFAULT: "#080708",
+          },
+          border: {
+            DEFAULT: "#242424",
+          },
         },
       },
       backgroundImage: {
@@ -274,6 +280,9 @@ export default {
           "--color-orange": "#ad6800",
           "--color-orange-semilight": "#d68100",
           "--color-orange-light": "#ff9900",
+          // Background and border color palette as CSS variables
+          "--color-background": "#080708",
+          "--color-border": "#242424",
           // Conic gradient variables
           "--conic-pattern":
             "repeating-conic-gradient(rgba(128, 128, 128, 0.2) 0% 25%, rgba(128, 128, 128, 0.1) 25% 50%)",

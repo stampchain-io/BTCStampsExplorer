@@ -83,7 +83,7 @@ export default function PressKit() {
 
             <button
               type="button"
-              class="bg-color-neutral text-[#080808] text-xl font-extrabold rounded-md w-[160px] h-[60px]"
+              class="bg-color-neutral text-color-background text-xl font-extrabold rounded-md w-[160px] h-[60px]"
             >
               DOWNLOAD
             </button>
@@ -173,7 +173,7 @@ export default function PressKit() {
               />
               <button
                 type="button"
-                class="bg-color-neutral text-[#080808] text-xl font-extrabold rounded-md w-[160px] h-[60px]"
+                class="bg-color-neutral text-color-background text-xl font-extrabold rounded-md w-[160px] h-[60px]"
               >
                 DOWNLOAD
               </button>
@@ -224,7 +224,7 @@ export default function PressKit() {
               <div class="bg-white w-12 h-12 rounded-[3px]" />
             </div>
             <div class="bg-[#D4D4D4] rounded-md p-6 flex gap-6">
-              <div class="bg-[#080808] w-12 h-12 rounded-[3px]" />
+              <div class="bg-color-background w-12 h-12 rounded-[3px]" />
               <div class="bg-[#0F0F0F] w-12 h-12 rounded-[3px]" />
               <div class="bg-[#171717] w-12 h-12 rounded-[3px]" />
             </div>

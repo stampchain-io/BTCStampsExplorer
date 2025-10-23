@@ -69,7 +69,7 @@ const ChartWidget = (
               type: "line",
               name: "",
               data: chartData,
-              color: "var(--color-primary-semilight)",
+              color: "var(--color-neutral-semilight)",
               lineWidth: 2,
               tooltip: {
                 valueSuffix: "",

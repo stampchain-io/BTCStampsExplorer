@@ -296,8 +296,8 @@ export function SRC101RegisterTool({
           {/* TLD Dropdown InputField - styled like glassmorphismL2/Hover */}
           <div class="relative w-[64px]" ref={tldDropdownRef}>
             <div
-              class={`h-10 px-4 border-[1px] border-[#242424]/75 rounded-2xl
-                !bg-[#080708]/60 ${glassmorphismL2Hover}
+              class={`h-10 px-4 border-[1px] border-color-border/75 rounded-2xl
+                !bg-color-background/60 ${glassmorphismL2Hover}
                 font-semibold text-sm text-color-neutral text-right backdrop-blur-sm hover:text-color-neutral-light tracking-wider ${transitionAll} !duration-200 focus-visible:!outline-none cursor-pointer flex items-center justify-end ${
                 openTldDropdown && !isSelectingTld ? "input-open-bottom" : ""
               }`}

@@ -342,9 +342,9 @@ const FilterDrawer = (
       ref={drawerRef}
       class={`fixed top-0 z-40 h-[100dvh] left-0 right-auto w-full
         ${glassmorphismOverlay} ${transitionTransform}
-        min-[420px]:w-[340px] min-[420px]:rounded-r-3xl min-[420px]:border-r-[1px] min-[420px]:border-r-[#242424]/75
+        min-[420px]:w-[340px] min-[420px]:rounded-r-3xl min-[420px]:border-r-[1px] min-[420px]:border-r-color-border/75
         min-[420px]:shadow-[12px_0_12px_-6px_rgba(8,7,8,0.75)]
-        tablet:right-0 tablet:left-auto tablet:w-[300px] tablet:rounded-l-3xl tablet:border-l-[1px] tablet:border-l-[#242424]/75 tablet:shadow-[-12px_0_12px_-6px_rgba(8,7,8,0.75)]
+        tablet:right-0 tablet:left-auto tablet:w-[300px] tablet:rounded-l-3xl tablet:border-l-[1px] tablet:border-l-color-border/75 tablet:shadow-[-12px_0_12px_-6px_rgba(8,7,8,0.75)]
         ${
         open ? "translate-x-0" : "-translate-x-full tablet:translate-x-full"
       }`}

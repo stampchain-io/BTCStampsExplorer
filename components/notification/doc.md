@@ -28,19 +28,19 @@ The Toast notification system follows the app's dark-themed glassmorphism design
 
 #### Info Notifications
 ```typescript
-bg-gradient-to-br from-color-neutral-dark/60 via-[#080708]/60 to-[#080708]/90
+bg-gradient-to-br from-color-neutral-dark/60 via-color-background/60 to-color-background/90
 border-color-neutral-semidark/80
 ```
 
 #### Success Notifications
 ```typescript
-bg-gradient-to-br from-color-green-dark/60 via-[#080708]/60 to-[#080708]/90
+bg-gradient-to-br from-color-green-dark/60 via-color-background/60 to-color-background/90
 border-color-green-semidark/80
 ```
 
 #### Error/Warning Notifications
 ```typescript
-bg-gradient-to-br from-color-red-dark/60 via-[#080708]/60 to-[#080708]/90
+bg-gradient-to-br from-color-red-dark/60 via-color-background/60 to-color-background/90
 border-color-red-semidark/80
 ```
 

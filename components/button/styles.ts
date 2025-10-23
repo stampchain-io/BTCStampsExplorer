@@ -72,12 +72,12 @@ export interface ButtonVariants {
 
 /* ===== BUTTON VARIANT BASE STYLES DEFINITIONS ===== */
 const baseOutline = `
-  bg-[#080708] border border-[var(--color-button-dark)] rounded-full
+  bg-color-background border border-[var(--color-button-dark)] rounded-full
   text-[var(--color-button-dark)] backdrop-blur-sm opacity-80 hover:opacity-100`;
 const baseFlat = `
   bg-[linear-gradient(to_bottom_right,var(--color-button-light),var(--color-button-semilight),var(--color-button),var(--color-button-semidark),var(--color-button-dark))]
   border border-[var(--color-button-dark)] rounded-full
-  text-[#080708] backdrop-blur-sm opacity-80 hover:opacity-90
+  text-color-background backdrop-blur-sm opacity-80 hover:opacity-90
   `;
 
 export const buttonStyles: ButtonVariants = {
@@ -104,14 +104,14 @@ export const buttonStyles: ButtonVariants = {
     flatOutline: `
       ${baseFlat} ${shadowL2}
       !items-center !justify-center
-      hover:!bg-[linear-gradient(to_bottom_right,#080708,#080708,#080708,#080708,#080708)] hover:!border-[var(--color-button-dark)]
+      hover:!bg-[linear-gradient(to_bottom_right,var(--color-background),var(--color-background),var(--color-background),var(--color-background),var(--color-background))] hover:!border-[var(--color-button-dark)]
       hover:!text-[var(--color-button-dark)] hover:!opacity-100
     `,
     outlineFlat: `
       ${baseOutline} ${shadowL2}
       !items-center !justify-center
       hover:!bg-[linear-gradient(to_bottom_right,var(--color-button-light),var(--color-button-semilight),var(--color-button),var(--color-button-semidark),var(--color-button-dark))] hover:!border-[var(--color-button-dark)]
-      hover:!text-[#080708] hover:!opacity-90
+      hover:!text-color-background hover:!opacity-90
     `,
     custom: `${shadowL2}`,
   },
