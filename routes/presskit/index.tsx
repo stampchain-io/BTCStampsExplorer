@@ -202,31 +202,31 @@ export default function PressKit() {
 
         <section class="flex flex-col gap-10">
           <div class="flex gap-10">
-            <div class="bg-[#D4D4D4] rounded-md p-6 flex gap-6">
+            <div class="bg-white rounded-md p-6 flex gap-6">
               <div class="bg-color-primary-dark w-12 h-12 rounded-[3px]" />
               <div class="bg-color-primary-semidark w-12 h-12 rounded-[3px]" />
               <div class="bg-color-primary w-12 h-12 rounded-[3px]" />
               <div class="bg-color-primary-semilight w-12 h-12 rounded-[3px]" />
               <div class="bg-color-primary-light w-12 h-12 rounded-[3px]" />
             </div>
-            <div class="bg-[#D4D4D4] rounded-md p-6 flex gap-6">
-              <div class="bg-[#0A000F] w-12 h-12 rounded-[3px]" />
-              <div class="bg-[#14001F] w-12 h-12 rounded-[3px]" />
-              <div class="bg-[#1F002E] w-12 h-12 rounded-[3px]" />
+            <div class="bg-white rounded-md p-6 flex gap-6">
+              <div class="bg-white w-12 h-12 rounded-[3px]" />
+              <div class="bg-white w-12 h-12 rounded-[3px]" />
+              <div class="bg-white w-12 h-12 rounded-[3px]" />
             </div>
           </div>
           <div class="flex gap-10">
-            <div class="bg-[#D4D4D4] rounded-md p-6 flex gap-6">
+            <div class="bg-white rounded-md p-6 flex gap-6">
               <div class="bg-color-neutral-dark w-12 h-12 rounded-[3px]" />
               <div class="bg-color-neutral-semidark w-12 h-12 rounded-[3px]" />
               <div class="bg-color-neutral w-12 h-12 rounded-[3px]" />
               <div class="bg-color-neutral-light w-12 h-12 rounded-[3px]" />
               <div class="bg-white w-12 h-12 rounded-[3px]" />
             </div>
-            <div class="bg-[#D4D4D4] rounded-md p-6 flex gap-6">
+            <div class="bg-white rounded-md p-6 flex gap-6">
               <div class="bg-color-background w-12 h-12 rounded-[3px]" />
-              <div class="bg-[#0F0F0F] w-12 h-12 rounded-[3px]" />
-              <div class="bg-[#171717] w-12 h-12 rounded-[3px]" />
+              <div class="bg-white w-12 h-12 rounded-[3px]" />
+              <div class="bg-white w-12 h-12 rounded-[3px]" />
             </div>
           </div>
         </section>

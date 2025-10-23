@@ -41,7 +41,7 @@ function PartnerCard({ name, largeImage, smallImage, url }: Partner) {
   /* ===== RENDER ===== */
   const content = (
     <div
-      class={`relative w-full border-[1px] ${
+      class={`relative w-full border ${
         isHovered
           ? `border-color-neutral ${shadowGlowGrey}`
           : "border-color-neutral-semidark"

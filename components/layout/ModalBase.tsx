@@ -86,7 +86,7 @@ export function ModalBase({
       className={`
         relative w-[340px] min-[420px]:w-[360px] mobileMd:w-[380px] p-5
         ${glassmorphismOverlay} rounded-3xl
-        border-[1px] border-color-border/50
+        border border-color-border/50
         ${shadow} ${className}
       `}
       onClick={(e) => e.stopPropagation()}
