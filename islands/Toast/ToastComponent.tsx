@@ -121,7 +121,7 @@ export const ToastComponent = (
       </div>
 
       {autoDismiss && (
-        <div class="mt-2 w-full h-0.5 rounded-full bg-[#1b1b1b]/70">
+        <div class="mt-2 w-full h-0.5 rounded-full bg-color-border">
           <div
             class={`h-full rounded-full ${
               getProgressBarColor(type)

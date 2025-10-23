@@ -191,7 +191,7 @@ function SearchContent({
         )
         : searchState.value.results && searchState.value.results.length > 0
         ? (
-          <ul class="max-h-[266px] bg-color-background/50 rounded-b-3xl z-modal overflow-y-auto scrollbar-black [&::-webkit-scrollbar]:!rounded-[2px] [&::-webkit-scrollbar]:!w-[4px]">
+          <ul class="max-h-[266px] bg-color-background/50 rounded-b-3xl z-modal overflow-y-auto scrollbar-background-overlay [&::-webkit-scrollbar]:!rounded-[2px] [&::-webkit-scrollbar]:!w-[4px]">
             {searchState.value.results.map((result: { tick: string }) => (
               <li
                 key={result.tick}

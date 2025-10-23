@@ -389,7 +389,7 @@ const WalletStampCardComponent = (
       >
         {/* ===== WALLET INDICATOR (ATOMIC ICON) ===== */}
         {fromPage && fromPage === "wallet" && isAtomicIconVisible(stamp) && (
-          <div class="absolute top-0 right-0 w-[31px] h-[31px] z-10 rounded-[3px] bg-[#1F002E] p-[3px] desktop:block hidden">
+          <div class="absolute top-0 right-0 w-[31px] h-[31px] z-10 rounded-[3px] bg-color-background p-[3px] desktop:block hidden">
             <Icon
               type="icon"
               name="atom"

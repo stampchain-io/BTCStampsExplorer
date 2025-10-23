@@ -356,7 +356,7 @@ export default function DetailsTableBase({
       </div>
       {/* ===== TABLE CONTENT ===== */}
       <ScrollContainer
-        class="min-h-[72px] max-h-[290px] scrollbar-glassmorphism"
+        class="min-h-[72px] max-h-[290px] scrollbar-background-layer1"
         onScroll={handleScroll}
       >
         <div class="">

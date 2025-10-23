@@ -362,7 +362,7 @@ function DispenserRow(
           href={`/stamp/${dispenser.stamp.stamp}`}
           class={`${imageSize} relative flex-shrink-0`}
         >
-          <div class="relative p-[6px] mobileMd:p-3 bg-[#1F002E] rounded-2xl aspect-square">
+          <div class="relative p-[6px] mobileMd:p-3 bg-color-background rounded-2xl aspect-square">
             <div class="stamp-container absolute inset-0 flex items-center justify-center">
               <div class="relative z-10 w-full h-full">
                 {loading && !src ? <LoadingIcon /> : src

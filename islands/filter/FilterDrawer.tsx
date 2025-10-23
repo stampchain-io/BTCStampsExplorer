@@ -352,7 +352,7 @@ const FilterDrawer = (
       aria-labelledby="drawer-form-label"
     >
       {/* Scrollable content area */}
-      <div class="h-full overflow-y-auto scrollbar-black pt-[29px] mobileLg:pt-[41px] tablet:pt-[40px]">
+      <div class="h-full overflow-y-auto scrollbar-background-overlay pt-[29px] mobileLg:pt-[41px] tablet:pt-[40px]">
         <div class="px-9 tablet:px-6">
           <div class="relative w-full">
             {/* Mobile CloseIcon - shows by default, hidden on tablet+ */}

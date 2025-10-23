@@ -82,7 +82,7 @@ b, strong {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-primary-semidark);
+  background: var(--color-primary-dark);
   border-radius: 3px;
 }
 
@@ -91,59 +91,17 @@ b, strong {
   border-radius: 3px;
 }
 
-/* Custom scrollbar styles for specific class */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 28px;
-  height: 20px;
-  border-radius: 0px;
+/* Custom scrollbar colors */
+.scrollbar-background-overlay {
+  @apply [&::-webkit-scrollbar-track]:bg-[var(--color-background)] [&::-webkit-scrollbar-thumb]:bg-[var(--color-neutral-dark)] [&::-webkit-scrollbar-thumb]:opacity-50 [&::-webkit-scrollbar-thumb:hover]:bg-[var(--color-neutral-semidark)];
 }
 
-@media (max-width: 768px) {
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 17px;
-    height: 14px;
-    border-radius: 0px;
-  }
+.scrollbar-background-layer1 {
+  @apply [&::-webkit-scrollbar-track]:bg-[var(--color-background)] [&::-webkit-scrollbar-thumb]:bg-[var(--color-neutral-dark)] [&::-webkit-scrollbar-thumb]:opacity-50 [&::-webkit-scrollbar-thumb:hover]:bg-[var(--color-neutral-semidark)];
 }
 
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: #2b0e49;
-  /* Custom track color */
-  padding: 4px;
-  border-radius: 0px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #b9b9b9;
-  /* Custom handle color */
-  border-radius: 0px;
-  background-clip: padding-box;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #d9d9d9;
-  /* Custom handle hover color */
-}
-
-/* Custom scrollar colors */
-.scrollbar-purple {
-  @apply [&::-webkit-scrollbar-track]:bg-[var(--color-primary-light)] [&::-webkit-scrollbar-thumb]:bg-[var(--color-primary-semilight)] [&::-webkit-scrollbar-thumb:hover]:bg-[var(--color-primary)];
-}
-
-.scrollbar-grey {
-  @apply [&::-webkit-scrollbar-track]:bg-[var(--color-neutral-semilight)] [&::-webkit-scrollbar-thumb]:bg-[var(--color-neutral)] [&::-webkit-scrollbar-thumb:hover]:bg-[var(--color-neutral-semidark)];
-}
-
-.scrollbar-black {
-  @apply [&::-webkit-scrollbar-track]:bg-[#111011]/20 [&::-webkit-scrollbar-thumb]:bg-[#666666] [&::-webkit-scrollbar-thumb:hover]:bg-[#999999];
-}
-
-.scrollbar-glassmorphism {
-  @apply [&::-webkit-scrollbar-track]:bg-[#141015] [&::-webkit-scrollbar-thumb]:bg-[#666666]/50 [&::-webkit-scrollbar-thumb:hover]:bg-[#666666];
-}
-
-.scrollbar-glassmorphism-slim {
-  @apply [&::-webkit-scrollbar]:w-[2px] [&::-webkit-scrollbar-track]:bg-[#141015] [&::-webkit-scrollbar-thumb]:bg-[#666666]/50 [&::-webkit-scrollbar-thumb:hover]:bg-[#666666];
+.scrollbar-background-layer2 {
+  @apply [&::-webkit-scrollbar]:w-[2px] [&::-webkit-scrollbar-track]:bg-[var(--color-background)] [&::-webkit-scrollbar-thumb]:bg-[var(--color-neutral-dark)] [&::-webkit-scrollbar-thumb]:opacity-50 [&::-webkit-scrollbar-thumb:hover]:bg-[var(--color-neutral-semidark)];
 }
 
 /* ========================================================================== */
@@ -469,17 +427,6 @@ b, strong {
 }
 
 /* ========================================================================== */
-
-
-/* ==================UNUSED STYLES ================== */
-
-/* Conic gradient for input field animated border
-@property --angle {
-  syntax: '<angle>';
-  initial-value: 0deg;
-  inherits: false;
-}
- */
 
 /* ================== CHARTWIDGET STYLES ================== */
 

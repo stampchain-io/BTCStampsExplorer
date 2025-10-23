@@ -451,7 +451,7 @@ export function Header() {
           min-[420px]:rounded-l-3xl min-[420px]:border-l-[1px]
           min-[420px]:border-l-color-border/75 min-[420px]:shadow-[-12px_0_12px_-6px_rgba(8,7,8,0.75)]
           ${glassmorphismOverlay} ${transitionTransform} transition-transform will-change-transform
-          overflow-y-auto overflow-x-hidden scrollbar-black
+          overflow-y-auto overflow-x-hidden scrollbar-background-overlay
           ${isActive ? "translate-x-0" : "translate-x-full"}`}
         style="transition-timing-function: cubic-bezier(0.46,0.03,0.52,0.96);"
         id={`navbar-collapse-${type}`}

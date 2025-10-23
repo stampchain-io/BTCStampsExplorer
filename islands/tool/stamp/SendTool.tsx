@@ -488,7 +488,7 @@ export function StampSendTool() {
               weight="normal"
               size="xl"
               color="custom"
-              className="stroke-[#1b1b1b]/80"
+              className="stroke-color-neutral-dark"
             />
           </div>
         )}

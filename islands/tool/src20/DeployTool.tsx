@@ -498,7 +498,7 @@ export function SRC20DeployTool(
         >
           <div class={containerColForm}>
             <textarea
-              class={`${inputTextarea} scrollbar-grey`}
+              class={`${inputTextarea} scrollbar-background-layer1`}
               placeholder="Description"
               rows={3}
               value={formState.description || ""}

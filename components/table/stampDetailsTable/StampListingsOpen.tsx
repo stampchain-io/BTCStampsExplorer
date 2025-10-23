@@ -32,7 +32,7 @@ export function StampListingsOpenTable({
   /* ===== RENDER ===== */
   return (
     <div class="relative w-full">
-      <ScrollContainer class="min-h-[76px] max-h-[244px] scrollbar-glassmorphism">
+      <ScrollContainer class="min-h-[76px] max-h-[244px] scrollbar-background-layer1">
         <div class="!-my-2 overflow-x-auto tablet:overflow-x-visible scrollbar-hide">
           <table class={`w-full border-separate border-spacing-y-2 ${textSm}`}>
             {/* ===== TABLE STRUCTURE ===== */}
