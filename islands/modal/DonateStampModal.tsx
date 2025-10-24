@@ -1,11 +1,11 @@
 /* ===== DONATE STAMP MODAL COMPONENT ===== */
-import { sliderBar, sliderKnob } from "$button";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
 import type { DonateStampModalProps } from "$types/ui.d.ts";
 // Using simplified fee display approach
 import { handleModalClose } from "$components/layout/ModalBase.tsx";
 import { StampImage } from "$content";
+import { RangeSlider } from "$islands/button/RangeSlider.tsx";
 import { stackConnectWalletModal } from "$islands/layout/ModalStack.tsx";
 import { closeModal, openModal } from "$islands/modal/states.ts";
 import { ModalBase } from "$layout";
@@ -426,27 +426,18 @@ const DonateStampModal = ({
 
             {/* ===== AMOUNT SLIDER ===== */}
             <div className="mt-[18px]">
-              <div
-                className="relative w-full group"
-                onMouseMove={handleMouseMove}
-                onMouseEnter={handleAmountMouseEnter}
-                onMouseLeave={handleAmountMouseLeave}
-                onMouseDown={handleMouseDown}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <input
-                  type="range"
-                  min="1"
-                  max="100"
-                  step="0.25"
-                  value={amountToSliderPos(quantity)}
-                  onInput={(e) => {
-                    const target = e.target as HTMLInputElement;
-                    setQuantity(
-                      Math.max(1, sliderPosToAmount(parseFloat(target.value))),
-                    );
+              <div className="relative w-full">
+                <RangeSlider
+                  value={quantity}
+                  onChange={(newQuantity) => {
+                    setQuantity(Math.max(1, newQuantity));
                   }}
-                  className={`${sliderBar} ${sliderKnob}`}
+                  valueToPosition={amountToSliderPos}
+                  positionToValue={sliderPosToAmount}
+                  onMouseEnter={handleAmountMouseEnter}
+                  onMouseLeave={handleAmountMouseLeave}
+                  onMouseDown={handleMouseDown}
+                  onMouseMove={handleMouseMove}
                 />
                 <div
                   className={`${tooltipImage} ${

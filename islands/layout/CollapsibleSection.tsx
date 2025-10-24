@@ -37,19 +37,19 @@ export const CollapsibleSection = ({
             type="button"
             onClick={handleClick}
             onMouseLeave={handleMouseLeave}
-            class="flex items-center w-full justify-between pt-2 pb-4 tablet:pt-2 tablet:pb-3 transition-colors duration-300 group"
+            class="flex items-center w-full justify-between pt-2 pb-4 tablet:pt-2 tablet:pb-3 transition-colors duration-200 group"
             data-section-toggle
           >
             <span
               class={`
-                font-light tablet:font-normal text-lg tablet:text-sm transition-colors duration-300
+                font-light tablet:font-normal text-lg tablet:text-sm transition-colors duration-200
                 ${
                 expanded
-                  ? `text-color-grey ${
-                    canHoverSelected ? "group-hover:text-color-grey-light" : ""
-                  }`
-                  : `text-color-grey-light ${
+                  ? `text-color-grey-light ${
                     canHoverSelected ? "group-hover:text-color-grey" : ""
+                  }`
+                  : `text-color-grey ${
+                    canHoverSelected ? "group-hover:text-color-grey-light" : ""
                   }`
               }`}
             >
@@ -57,22 +57,22 @@ export const CollapsibleSection = ({
             </span>
 
             <div
-              class={`transform transition-all duration-300 ${
+              class={`transform transition-all duration-400 ${
                 expanded ? "scale-y-[-1]" : ""
               }`}
             >
               <div
                 class={`${
                   expanded
-                    ? `stroke-color-grey ${
+                    ? `stroke-color-grey-light ${
+                      canHoverSelected ? "group-hover:stroke-color-grey" : ""
+                    }`
+                    : `stroke-color-grey ${
                       canHoverSelected
                         ? "group-hover:stroke-color-grey-light"
                         : ""
                     }`
-                    : `stroke-color-grey-light ${
-                      canHoverSelected ? "group-hover:stroke-color-grey" : ""
-                    }`
-                } transition-colors duration-300`}
+                } transition-colors duration-200`}
               >
                 <Icon
                   type="iconButton"
@@ -87,7 +87,7 @@ export const CollapsibleSection = ({
           </button>
 
           <div
-            class={`overflow-hidden transition-all duration-300 ${
+            class={`overflow-hidden transition-all duration-400 ${
               expanded ? "max-h-[999px] opacity-100" : "max-h-0 opacity-0"
             }`}
             data-section-expanded={expanded}
@@ -107,22 +107,22 @@ export const CollapsibleSection = ({
             type="button"
             onClick={handleClick}
             onMouseLeave={handleMouseLeave}
-            class="flex items-center w-full mt-2 tablet:mt-1.5 group transition-colors duration-300"
+            class="flex items-center w-full mt-2 tablet:mt-1.5 group transition-colors duration-200"
           >
             <div
-              class={`transform transition-all duration-300 ${
+              class={`transform transition-all duration-400 ${
                 expanded ? "scale-y-[-1]" : "mb-0.5"
               } ${
                 expanded
-                  ? `stroke-color-grey-light ${
-                    canHoverSelected ? "group-hover:stroke-color-grey" : ""
-                  }`
-                  : `stroke-color-grey ${
+                  ? `stroke-color-grey ${
                     canHoverSelected
                       ? "group-hover:stroke-color-grey-light"
                       : ""
                   }`
-              } transition-colors duration-300`}
+                  : `stroke-color-grey-light ${
+                    canHoverSelected ? "group-hover:stroke-color-grey" : ""
+                  }`
+              } transition-colors duration-200`}
             >
               <Icon
                 type="iconButton"
@@ -143,7 +143,7 @@ export const CollapsibleSection = ({
           </button>
 
           <div
-            class={`overflow-hidden transition-all duration-300 ${
+            class={`overflow-hidden transition-all duration-400 ${
               expanded ? "max-h-[999px] opacity-100" : "max-h-0 opacity-0"
             }`}
             data-section-expanded={expanded}
@@ -159,7 +159,7 @@ export const CollapsibleSection = ({
     case "collapsibleLabel": {
       return (
         <div
-          class={`overflow-hidden transition-all duration-300 ease-in-out ${
+          class={`overflow-hidden transition-all duration-400 ease-in-out ${
             expanded ? "max-h-[100px] opacity-100" : "max-h-0 opacity-0"
           }`}
           data-section-expanded={expanded}

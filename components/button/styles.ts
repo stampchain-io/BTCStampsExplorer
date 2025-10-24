@@ -72,12 +72,12 @@ export interface ButtonVariants {
 
 /* ===== BUTTON VARIANT BASE STYLES DEFINITIONS ===== */
 const baseOutline = `
-  bg-color-background border border-[var(--color-button-dark)] rounded-full
-  text-[var(--color-button-dark)] backdrop-blur-sm opacity-80 hover:opacity-100`;
+  bg-color-background border border-[var(--color-button-semidark)] rounded-full
+  text-[var(--color-button-semidark)] backdrop-blur-sm opacity-90 hover:opacity-100`;
 const baseFlat = `
   bg-[linear-gradient(to_bottom_right,var(--color-button-light),var(--color-button-semilight),var(--color-button),var(--color-button-semidark),var(--color-button-dark))]
   border border-[var(--color-button-dark)] rounded-full
-  text-color-background backdrop-blur-sm opacity-80 hover:opacity-90
+  text-color-background backdrop-blur-sm opacity-90 hover:opacity-100
   `;
 
 export const buttonStyles: ButtonVariants = {

@@ -92,7 +92,7 @@ export const ToggleButton = ({
     const canHover = canHoverSelected[option];
 
     if (isAlwaysSelected) {
-      return `${button("flat", color, size)} !opacity-80 !cursor-default`;
+      return `${button("flat", color, size)} !opacity-90 !cursor-default`;
     }
 
     if (isDisabled) {
