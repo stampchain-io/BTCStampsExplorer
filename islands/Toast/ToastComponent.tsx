@@ -5,6 +5,7 @@ import {
   notificationContainerError,
   notificationContainerInfo,
   notificationContainerSuccess,
+  notificationContainerWarning,
   notificationHeading,
 } from "$notification";
 import type { ToastComponentProps } from "$types/ui.d.ts";
@@ -39,10 +40,11 @@ export const ToastComponent = (
   const getIconColor = (toastType: ToastTypeFromProvider["type"]) => {
     switch (toastType) {
       case "error":
+        return "stroke-color-red";
       case "warning":
-        return "stroke-color-red-semidark";
+        return "stroke-color-orange";
       case "success":
-        return "stroke-color-green-semidark";
+        return "stroke-color-green";
       case "info":
       default:
         return "stroke-color-grey";
@@ -52,8 +54,9 @@ export const ToastComponent = (
   const getContainerStyle = (toastType: ToastTypeFromProvider["type"]) => {
     switch (toastType) {
       case "error":
-      case "warning":
         return notificationContainerError;
+      case "warning":
+        return notificationContainerWarning;
       case "success":
         return notificationContainerSuccess;
       case "info":
@@ -65,8 +68,9 @@ export const ToastComponent = (
   const getProgressBarColor = (toastType: ToastTypeFromProvider["type"]) => {
     switch (toastType) {
       case "error":
-      case "warning":
         return "bg-color-red-semidark";
+      case "warning":
+        return "bg-color-orange";
       case "success":
         return "bg-color-green-semidark";
       case "info":

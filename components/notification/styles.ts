@@ -27,6 +27,10 @@ export const notificationContainerInfo =
 export const notificationContainerError =
   `${notificationContainer} bg-gradient-to-br from-color-red-dark/60 via-color-background/60 to-color-background/90 border-color-red-semidark/80`;
 
+/* Warning */
+export const notificationContainerWarning =
+  `${notificationContainer} bg-gradient-to-br from-color-orange-dark/60 via-color-background/60 to-color-background/90 border-color-orange/80`;
+
 /* Success */
 export const notificationContainerSuccess =
   `${notificationContainer} bg-gradient-to-br from-color-green-dark/60 via-color-background/60 to-color-background/90 border-color-green-semidark/80`;

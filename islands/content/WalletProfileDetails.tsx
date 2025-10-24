@@ -4,6 +4,7 @@ import { Icon } from "$icon";
 import { containerBackground, gapSectionSlim } from "$layout";
 import type { WalletOverviewInfo } from "$lib/types/wallet.d.ts";
 import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
+import { showToast } from "$lib/utils/ui/notifications/toastSignal.ts";
 import { tooltipIcon } from "$notification";
 import { label, labelSm, titleGreyLD, valueSm } from "$text";
 import type { WalletProfileDetailsProps } from "$types/ui.d.ts";
@@ -265,6 +266,26 @@ export default function WalletProfileDetails({
   stampsCreated,
   setShowItem,
 }: WalletProfileDetailsProps) {
+  /* ===== EFFECTS ===== */
+  useEffect(() => {
+    const status = (walletData as any).marketDataStatus;
+    if (status) {
+      if (status.overallStatus === "partial") {
+        showToast(
+          "Some market data might be delayed or unavailable at the moment",
+          "warning",
+          true,
+        );
+      } else if (status.overallStatus === "unavailable") {
+        showToast(
+          "Market data is currently unavailable",
+          "error",
+          true,
+        );
+      }
+    }
+  }, []); // Empty dependency array - only run on mount
+
   /* ===== RENDER ===== */
   return (
     <div class={`flex flex-col tablet:flex-row ${gapSectionSlim}`}>
@@ -287,24 +308,6 @@ export default function WalletProfileDetails({
             walletData={walletData}
           />
         </div>
-
-        {/* Market Data Status - only show if there are issues */}
-        {(walletData as any).marketDataStatus &&
-          (walletData as any).marketDataStatus.overallStatus !== "full" && (
-          <div class={containerBackground}>
-            <h6
-              class={`text-sm ${
-                (walletData as any).marketDataStatus.overallStatus === "partial"
-                  ? "text-color-orange-semilight"
-                  : "text-color-red-semilight"
-              }`}
-            >
-              {(walletData as any).marketDataStatus.overallStatus === "partial"
-                ? "SOME MARKET DATA IS CURRENTLY UNAVAILABLE"
-                : "MARKET DATA MIGHT BE DELAYED OR UNAVAILABLE"}
-            </h6>
-          </div>
-        )}
       </div>
     </div>
   );
