@@ -4,8 +4,8 @@ import type { ColorSwatchProps } from "$types/ui.d.ts";
 function ColorSwatch({ name, bgClass }: ColorSwatchProps) {
   return (
     <div class={`${bgClass} p-6 rounded-2xl`}>
-      <div class="text-color-neutral-light font-semibold">{name}</div>
-      <div class="text-color-neutral-light text-sm mt-2 opacity-80">
+      <div class="text-color-grey-light font-semibold">{name}</div>
+      <div class="text-color-grey-light text-sm mt-2 opacity-80">
         {bgClass}
       </div>
     </div>
@@ -18,85 +18,85 @@ export default function DesignSystem() {
       <Head>
         <title>Design System - BTCStamps</title>
       </Head>
-      <div class="min-h-screen bg-color-primary-dark p-8">
+      <div class="min-h-screen bg-color-purple-dark p-8">
         <div class="max-w-full mx-auto space-y-12">
-          <h1 class="text-4xl font-bold text-color-neutral-light">
+          <h1 class="text-4xl font-bold text-color-grey-light">
             Design System
           </h1>
 
           {/* Colors */}
           <section class="space-y-8">
-            <h2 class="text-2xl font-bold text-color-neutral-light">
+            <h2 class="text-2xl font-bold text-color-grey-light">
               Colors
             </h2>
 
-            {/* Primary Colors */}
+            {/* Purple Colors */}
             <div>
-              <h3 class="text-xl text-color-neutral-light mb-4">
-                Primary Colors
+              <h3 class="text-xl text-color-grey-light mb-4">
+                Purple Colors
               </h3>
               <div class="grid grid-cols-1 tablet:grid-cols-4 gap-4">
                 <ColorSwatch
-                  name="Primary Default"
-                  bgClass="bg-color-primary"
-                  color="primary"
+                  name="Purple Default"
+                  bgClass="bg-color-purple"
+                  color="purple"
                 />
                 <ColorSwatch
-                  name="Primary Light"
-                  bgClass="bg-color-primary-light"
-                  color="primary-light"
+                  name="Purple Light"
+                  bgClass="bg-color-purple-light"
+                  color="purple-light"
                 />
                 <ColorSwatch
-                  name="Primary Dark"
-                  bgClass="bg-color-primary-dark"
-                  color="primary-dark"
+                  name="Purple Dark"
+                  bgClass="bg-color-purple-dark"
+                  color="purple-dark"
                 />
                 <ColorSwatch
-                  name="Primary Semi Light"
-                  bgClass="bg-color-primary-semilight"
-                  color="primary-semilight"
+                  name="Purple Semi Light"
+                  bgClass="bg-color-purple-semilight"
+                  color="purple-semilight"
                 />
               </div>
             </div>
 
-            {/* Additional Primary Colors */}
+            {/* Additional Purple Colors */}
             <div>
-              <h3 class="text-xl text-color-neutral-light mb-4">
-                Additional Primary Colors
+              <h3 class="text-xl text-color-grey-light mb-4">
+                Additional Purple Colors
               </h3>
               <div class="grid grid-cols-1 tablet:grid-cols-4 gap-4">
                 <ColorSwatch
-                  name="Primary Semi Dark"
-                  bgClass="bg-color-primary-semidark"
-                  color="primary-semidark"
+                  name="Purple Semi Dark"
+                  bgClass="bg-color-purple-semidark"
+                  color="purple-semidark"
                 />
               </div>
             </div>
 
             {/* Text Colors */}
             <div>
-              <h3 class="text-xl text-color-neutral-light mb-4">
+              <h3 class="text-xl text-color-grey-light mb-4">
                 Text Colors
               </h3>
               <div class="grid grid-cols-1 tablet:grid-cols-4 gap-4">
                 <ColorSwatch
                   name="Text Primary"
-                  bgClass="bg-color-neutral"
+                  bgClass="bg-color-grey"
                   color="text-primary"
                 />
                 <ColorSwatch
                   name="Text Secondary"
-                  bgClass="bg-color-neutral-semidark"
+                  bgClass="bg-color-grey-semidark"
                   color="text-secondary"
                 />
                 <ColorSwatch
                   name="Table Text"
-                  bgClass="bg-color-neutral-semilight"
+                  bgClass="bg-color-grey-semilight"
                   color="table-text"
                 />
                 <ColorSwatch
                   name="Search Placeholder"
-                  bgClass="bg-color-neutral-semilight"
+                  bgClass="bg-color-grey-semilight"
                   color="search-placeholder"
                 />
               </div>
@@ -104,23 +104,23 @@ export default function DesignSystem() {
 
             {/* Text Gradients */}
             <div>
-              <h3 class="text-xl text-color-neutral-light mb-4">
+              <h3 class="text-xl text-color-grey-light mb-4">
                 Text Gradients
               </h3>
-              <div class="space-y-6 bg-color-primary-semidark p-8 rounded-2xl">
+              <div class="space-y-6 bg-color-purple-semidark p-8 rounded-2xl">
                 {/* Purple Gradients */}
-                <p class="color-primary-gradientDL text-4xl font-bold">
+                <p class="color-purple-gradientDL text-4xl font-bold">
                   Purple Gradient Text 1
                 </p>
-                <p class="color-primary-gradientLD text-4xl font-bold">
+                <p class="color-purple-gradientLD text-4xl font-bold">
                   Purple Gradient Text 3
                 </p>
 
                 {/* Gray Gradients */}
-                <p class="color-neutral-gradientDL text-4xl font-bold">
+                <p class="color-grey-gradientDL text-4xl font-bold">
                   Gray Gradient Text 1
                 </p>
-                <p class="color-neutral-gradientLD text-4xl font-bold">
+                <p class="color-grey-gradientLD text-4xl font-bold">
                   Gray Gradient Text 3
                 </p>
               </div>

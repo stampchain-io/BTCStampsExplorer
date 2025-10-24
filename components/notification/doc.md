@@ -28,8 +28,8 @@ The Toast notification system follows the app's dark-themed glassmorphism design
 
 #### Info Notifications
 ```typescript
-bg-gradient-to-br from-color-neutral-dark/60 via-color-background/60 to-color-background/90
-border-color-neutral-semidark/80
+bg-gradient-to-br from-color-grey-dark/60 via-color-background/60 to-color-background/90
+border-color-grey-semidark/80
 ```
 
 #### Success Notifications
@@ -50,7 +50,7 @@ The system supports **4 status message types** with distinct visual treatments:
 
 | Type | Icon | Color | Duration | Auto-Dismiss | Use Case |
 |------|------|-------|----------|--------------|----------|
-| **info** | info | neutral `color-neutral` | 7000ms | ✅ Yes | General information, updates |
+| **info** | info | neutral `color-grey` | 7000ms | ✅ Yes | General information, updates |
 | **success** | success | green `color-green-semidark` | 3000ms | ✅ Yes | Successful operations |
 | **warning** | info | red `color-red-semidark` | 7000ms | ✅ Yes | Warnings requiring attention |
 | **error** | error | red `color-red-semidark` | 7000ms | ✅ Yes | Error messages |

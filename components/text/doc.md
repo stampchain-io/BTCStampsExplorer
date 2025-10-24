@@ -83,11 +83,11 @@ const transitionColors = "transition-colors duration-200";
 
 | Gradient | Direction | Colors | Usage |
 |----------|-----------|--------|-------|
-| **color-neutral-gradientDL** | Light → Dark | #CCCCCC → #999999 | Titles, headings, values |
-| **color-neutral-gradientLD** | Dark → Light | #999999 → #CCCCCC | Alternative title style |
-| **color-primary-gradientDL** | Dark → Light | #660099 → #AA00FF | Logo variations |
+| **color-grey-gradientDL** | Light → Dark | #CCCCCC → #999999 | Titles, headings, values |
+| **color-grey-gradientLD** | Dark → Light | #999999 → #CCCCCC | Alternative title style |
+| **color-purple-gradientDL** | Dark → Light | #660099 → #AA00FF | Logo variations |
 | **purple-gradient2** | Dark → Light | Optimized variant | Footer logo |
-| **color-primary-gradientLD** | Light → Dark | #AA00FF → #660099 | Primary titles |
+| **color-purple-gradientLD** | Light → Dark | #AA00FF → #660099 | Primary titles |
 | **purple-gradient4** | Light → Dark | Optimized variant | Header logo |
 
 ### Hover Effects
@@ -143,7 +143,7 @@ navLinkGrey: "font-semibold text-sm text-stamp-grey hover:text-stamp-grey-light"
 navLinkGreyActive: "!text-stamp-grey-light hover:!text-stamp-grey"
 
 // Mobile menu items with gradient
-navLinkGreyLD: "font-light text-xl color-neutral-gradientDL-hover tracking-wider"
+navLinkGreyLD: "font-light text-xl color-grey-gradientDL-hover tracking-wider"
 
 // Active gradient link
 navLinkGreyLDActive: "text-stamp-grey-light [background:none !important]"
@@ -159,16 +159,16 @@ navLinkTransparentPurple: "font-light text-[13px] hover:text-stamp-purple-bright
 
 ```typescript
 // Grey Light to Dark (primary)
-titleGreyLD: "font-black text-3xl color-neutral-gradientDL cursor-default"
+titleGreyLD: "font-black text-3xl color-grey-gradientDL cursor-default"
 
 // Grey Dark to Light (alternative)
-titleGreyDL: "font-black text-3xl color-neutral-gradientLD cursor-default"
+titleGreyDL: "font-black text-3xl color-grey-gradientLD cursor-default"
 
 // Purple Light to Dark
-titlePurpleLD: "font-black text-3xl color-primary-gradientLD cursor-default"
+titlePurpleLD: "font-black text-3xl color-purple-gradientLD cursor-default"
 
 // Purple Dark to Light
-titlePurpleDL: "font-black text-3xl color-primary-gradientDL cursor-default"
+titlePurpleDL: "font-black text-3xl color-purple-gradientDL cursor-default"
 ```
 
 ### Subtitle Styles (2 variants)
@@ -188,19 +188,19 @@ subtitlePurple: "font-extralight text-2xl text-stamp-purple-bright mb-2"
 headingGrey2: "font-black text-3xl mobileLg:text-4xl text-stamp-grey-light"
 
 // Grey gradient heading
-headingGreyLD: "font-bold text-xl color-neutral-gradientDL tracking-wide"
+headingGreyLD: "font-bold text-xl color-grey-gradientDL tracking-wide"
 
 // Grey gradient heading with link
-headingGreyLDLink: "font-bold text-lg color-neutral-gradientDL-hover tracking-wide cursor-pointer"
+headingGreyLDLink: "font-bold text-lg color-grey-gradientDL-hover tracking-wide cursor-pointer"
 
 // Dark to Light gradient link (collection/stamp pages)
-headingGreyDLLink: "font-bold text-lg color-neutral-gradientLD-hover tracking-wide cursor-pointer"
+headingGreyDLLink: "font-bold text-lg color-grey-gradientLD-hover tracking-wide cursor-pointer"
 
 // Standard grey heading
 headingGrey: "font-bold text-2xl text-stamp-grey"
 
 // Purple gradient (team banner)
-headingPurpleLD: "font-black text-sm mobileMd:text-lg color-primary-gradientLD text-center"
+headingPurpleLD: "font-black text-sm mobileMd:text-lg color-purple-gradientLD text-center"
 ```
 
 ### Body Text Styles (9 variants)
@@ -302,14 +302,14 @@ cardSupply: "font-medium text-stamp-grey text-right text-xs mobileLg:text-base"
 #### Minimal Card Variant
 ```typescript
 cardHashSymbolMinimal: "font-light text-stamp-grey-light group-hover:text-stamp-purple-bright text-xs mobileSm:text-base"
-cardStampNumberMinimal: "font-black color-neutral-gradientDL group-hover:[-webkit-text-fill-color:#AA00FF] truncate"
+cardStampNumberMinimal: "font-black color-grey-gradientDL group-hover:[-webkit-text-fill-color:#AA00FF] truncate"
 cardPriceMinimal: "font-normal text-stamp-grey truncate text-[10px] mobileMd:text-xs"
 ```
 
 #### Grey Gradient Card Variant
 ```typescript
 cardHashSymbolGrey: "font-light text-stamp-grey group-hover:text-stamp-purple-bright text-lg"
-cardStampNumberGrey: "font-black color-neutral-gradientDL group-hover:[-webkit-text-fill-color:#AA00FF] truncate"
+cardStampNumberGrey: "font-black color-grey-gradientDL group-hover:[-webkit-text-fill-color:#AA00FF] truncate"
 ```
 
 ### Special Styles (4 variants)
@@ -608,12 +608,12 @@ Gradients are applied via Tailwind custom utilities defined in `tailwind.config.
 ```typescript
 // In tailwind.config.ts
 {
-  '.color-neutral-gradientDL': {
+  '.color-grey-gradientDL': {
     'background': 'linear-gradient(to right, #CCCCCC, #999999)',
     '-webkit-background-clip': 'text',
     '-webkit-text-fill-color': 'transparent'
   },
-  '.color-neutral-gradientDL-hover': {
+  '.color-grey-gradientDL-hover': {
     'background': 'linear-gradient(to right, #CCCCCC, #999999)',
     '-webkit-background-clip': 'text',
     '-webkit-text-fill-color': 'transparent',
@@ -820,7 +820,7 @@ Add to appropriate category in this documentation with:
 ## Troubleshooting
 
 ### Issue: Gradient not displaying
-**Solution**: Ensure you're using the correct gradient class (`color-neutral-gradientDL`, `color-primary-gradientLD`, etc.). Check that Tailwind config includes custom utilities.
+**Solution**: Ensure you're using the correct gradient class (`color-grey-gradientDL`, `color-purple-gradientLD`, etc.). Check that Tailwind config includes custom utilities.
 
 ### Issue: Hover effect not working
 **Solution**: Verify `-hover` suffix gradients are used. Check that `transitionColors` is included in the style. Ensure `cursor-pointer` is present.

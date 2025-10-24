@@ -515,9 +515,9 @@ The `PlaceholderImage` component provides a unified system for rendering placeho
 ```typescript
 export const placeholderColor = {
   grey: {
-    bg: "bg-gradient-to-br from-color-neutral-semidark/75 via-color-neutral-dark/75 to-black",
-    stroke: "stroke-color-neutral-semidark",
-    fill: "fill-color-neutral-semidark"
+    bg: "bg-gradient-to-br from-color-grey-semidark/75 via-color-grey-dark/75 to-black",
+    stroke: "stroke-color-grey-semidark",
+    fill: "fill-color-grey-semidark"
   },
   red: {
     bg: "bg-gradient-to-br from-color-red-semidark/75 via-color-red-dark/75 to-black",

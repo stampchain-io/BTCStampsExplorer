@@ -22,18 +22,18 @@ export const logoStampchain = [
     path:
       "m 5.632261,18.50006 h 4.235486 c 0.627238,0 1.132201,0.60591 1.132201,1.358544 V 20.1414 c 0,0.752635 -0.504963,1.358544 -1.132201,1.358544 H 5.632261 c -0.627238,0 -1.132201,-0.605909 -1.132201,-1.358544 v -0.282796 c 0,-0.752634 0.504963,-1.358544 1.132201,-1.358544 z",
     style:
-      "stroke-color-neutral-semidark/80 group-hover:stroke-color-neutral-semidark fill-none",
+      "stroke-color-grey-semidark/80 group-hover:stroke-color-grey-semidark fill-none",
   },
   {
     path:
       "m 14.132261,18.50006 h 4.235486 c 0.627238,0 1.132201,0.60591 1.132201,1.358544 V 20.1414 c 0,0.752635 -0.504963,1.358544 -1.132201,1.358544 h -4.235486 c -0.627238,0 -1.132201,-0.605909 -1.132201,-1.358544 v -0.282796 c 0,-0.752634 0.504963,-1.358544 1.132201,-1.358544 z",
     style:
-      "stroke-color-neutral-semidark/80 group-hover:stroke-color-neutral-semidark fill-none",
+      "stroke-color-grey-semidark/80 group-hover:stroke-color-grey-semidark fill-none",
   },
   {
     path: "M 9.4997728,19.999887 H 14.500227",
     style:
-      "stroke-color-neutral-semidark/80 group-hover:stroke-color-neutral-semidark fill-none",
+      "stroke-color-grey-semidark/80 group-hover:stroke-color-grey-semidark fill-none",
   },
 ];
 /*
@@ -397,7 +397,7 @@ export const success = [
 ];
 
 /* === MEDIA ICONS === */
-// Both icons use fill values and must be defined inline in className - eg. fill-color-neutral hover:fill-color-primary-light
+// Both icons use fill values and must be defined inline in className - eg. fill-color-grey hover:fill-color-purple-light
 export const play = [
   "M18.8906 12.846C18.5371 14.189 16.8667 15.138 13.5257 17.0361C10.296 18.8709 8.6812 19.7884 7.37983 19.4196C6.8418 19.2671 6.35159 18.9776 5.95624 18.5787C5 17.6139 5 15.7426 5 12C5 8.2574 5 6.3861 5.95624 5.42132C6.35159 5.02245 6.8418 4.73288 7.37983 4.58042C8.6812 4.21165 10.296 5.12907 13.5257 6.96393C16.8667 8.86197 18.5371 9.811 18.8906 11.154C19.0365 11.7084 19.0365 12.2916 18.8906 12.846Z",
 ];

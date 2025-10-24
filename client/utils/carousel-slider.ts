@@ -206,7 +206,7 @@ export default function createCarouselSlider(
       el: ".swiper-pagination",
       clickable: true,
       renderBullet: function (_index, className) {
-        return '<div class="w-6 h-1 bg-color-primary-semilight ' + className +
+        return '<div class="w-6 h-1 bg-color-purple-semilight ' + className +
           '"></div>';
       },
     },
