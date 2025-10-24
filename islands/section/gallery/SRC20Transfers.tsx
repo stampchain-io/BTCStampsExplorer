@@ -56,7 +56,7 @@ export default function SRC20TransfersGallery(): JSX.Element {
   return (
     <div class={`${containerBackground} items-start tablet:items-end`}>
       {/* ===== TITLE SECTION ===== */}
-      <div class="w-full">
+      <div>
         <h4 class={`${titleGreyLD} tablet:hidden`}>
           RECENT TRANSFERS
         </h4>
@@ -68,7 +68,7 @@ export default function SRC20TransfersGallery(): JSX.Element {
       </div>
 
       {/* Show block title with loading state */}
-      <h3 class={`w-full tablet:text-right ${subtitleGrey}`}>
+      <h3 class={`tablet:text-right ${subtitleGrey}`}>
         {isLoading ? <span class="animate-pulse">BLOCK #XXXXXX</span> : (
           transactions.length > 0 && `BLOCK #${transactions[0].block_index}`
         )}
