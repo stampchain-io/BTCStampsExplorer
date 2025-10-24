@@ -4,7 +4,7 @@
 import { StampImage, StampInfo } from "$content";
 import { Head } from "$fresh/runtime.ts";
 import { Handlers } from "$fresh/server.ts";
-import { body, gapSectionSlim } from "$layout";
+import { body, containerBackground, gapSectionSlim } from "$layout";
 import { logger, LogNamespace } from "$lib/utils/logger.ts";
 import { StampGallery } from "$section";
 import { StampController } from "$server/controller/stampController.ts";
@@ -384,7 +384,7 @@ export default function StampDetailPage(props: StampDetailPageProps) {
           />
         )}
 
-        <div class="pt-6 mobileLg:pt-12">
+        <div class={`${containerBackground} mt-6 mobileLg:mt-12`}>
           <StampGallery {...latestStampsSection} />
         </div>
       </div>

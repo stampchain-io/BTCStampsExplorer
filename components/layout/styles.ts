@@ -135,14 +135,10 @@ export const loaderSpinXsGrey = `${loaderSpin} w-3 h-3 border-color-grey`;
 export const loaderSpinSmGrey = `${loaderSpin} w-5 h-5 border-color-grey`;
 export const loaderSpinGrey = `${loaderSpin} w-7 h-7 border-color-grey`;
 export const loaderSpinLgGrey = `${loaderSpin} w-9 h-9 border-color-grey`;
-export const loaderSpinXsPurple =
-  `${loaderSpin} w-3 h-3 border-color-purple-semilight`;
-export const loaderSpinSmPurple =
-  `${loaderSpin} w-5 h-5 border-color-purple-semilight`;
-export const loaderSpinPurple =
-  `${loaderSpin} w-7 h-7 border-color-purple-semilight`;
-export const loaderSpinLgPurple =
-  `${loaderSpin} w-9 h-9 border-color-purple-semilight`;
+export const loaderSpinXsPurple = `${loaderSpin} w-3 h-3 border-color-purple`;
+export const loaderSpinSmPurple = `${loaderSpin} w-5 h-5 border-color-purple`;
+export const loaderSpinPurple = `${loaderSpin} w-7 h-7 border-color-purple`;
+export const loaderSpinLgPurple = `${loaderSpin} w-9 h-9 border-color-purple`;
 
 /* ===== TYPE DEFINITIONS ===== */
 export type LayoutStyles = {
