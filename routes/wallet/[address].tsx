@@ -4,7 +4,7 @@
 import { MetaTags } from "$components/layout/MetaTags.tsx";
 import { WalletProfileContent } from "$content";
 import { Handlers } from "$fresh/server.ts";
-import { body } from "$layout";
+import { body, gapSectionSlim } from "$layout";
 import type { SRC20Balance, SRC20Row } from "$types/src20.d.ts";
 import type { Dispenser, StampRow } from "$types/stamp.d.ts";
 import type { WalletStampWithValue } from "$types/wallet.d.ts";
@@ -591,7 +591,7 @@ export default function WalletPage(props: { data: WalletPageProps }) {
   /* ===== RENDER ===== */
   return (
     <div
-      class={body}
+      class={`${body} ${gapSectionSlim}`}
       f-client-nav
       data-partial={`/wallet/${routeData.address}`}
     >

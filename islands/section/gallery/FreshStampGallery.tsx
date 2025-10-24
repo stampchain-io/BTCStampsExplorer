@@ -30,6 +30,7 @@ export function FreshStampGallery({
   showLoadingSkeleton = true,
   gridClass =
     "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4",
+  showDetails = true,
 }: FreshStampGalleryProps) {
   // ===== STATE =====
   const [stamps, setStamps] = useState<StampRow[]>(initialData);
@@ -295,6 +296,7 @@ export function FreshStampGallery({
             <StampCard
               key={stamp.stamp}
               stamp={stamp}
+              showDetails={showDetails}
             />
           ))}
         </div>

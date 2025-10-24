@@ -2299,6 +2299,7 @@ export interface FreshStampGalleryProps {
   enablePartialNavigation?: boolean;
   showLoadingSkeleton?: boolean;
   gridClass?: string;
+  showDetails?: boolean;
 }
 
 /**

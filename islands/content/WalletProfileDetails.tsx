@@ -1,11 +1,11 @@
 /* ===== WALLET PROFILE DETAILS COMPONENT ===== */
-import { StatItem, StatTitle } from "$components/section/WalletComponents.tsx";
+import { StatTitle } from "$components/section/WalletComponents.tsx";
 import { Icon } from "$icon";
-import { containerBackground } from "$layout";
+import { containerBackground, gapSectionSlim } from "$layout";
 import type { WalletOverviewInfo } from "$lib/types/wallet.d.ts";
 import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { tooltipIcon } from "$notification";
-import { labelSm, subtitleGrey, titleGreyLD } from "$text";
+import { label, labelSm, titleGreyLD, valueSm } from "$text";
 import type { WalletProfileDetailsProps } from "$types/ui.d.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
 
@@ -88,28 +88,24 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
       <div class="flex pb-1.5 mobileLg:pb-3">
         <p class={titleGreyLD}>{walletData.creatorName || "ANONYMOUS"}</p>
       </div>
-      <div class="flex gap-3 mobileMd:gap-6">
+      <div class="flex gap-4">
         <div class="flex">
           <p
-            class={`${subtitleGrey} hidden mobileMd:block mobileLg:hidden tablet:block`}
+            class={`${label} text-color-grey-semilight hidden mobileMd:block`}
           >
             {walletData.address}
           </p>
+
           <p
-            class={`${subtitleGrey} hidden mobileLg:block tablet:hidden`}
+            class={`${label} text-color-grey-semilight block mobileMd:hidden`}
           >
-            {abbreviateAddress(walletData.address, 10)}
-          </p>
-          <p
-            class={`${subtitleGrey} block mobileMd:hidden`}
-          >
-            {abbreviateAddress(walletData.address, 14)}
+            {abbreviateAddress(walletData.address, 12)}
           </p>
         </div>
 
         <div
           ref={copyButtonRef}
-          class="relative -pt-0.5"
+          class="relative"
           onMouseEnter={handleCopyMouseEnter}
           onMouseLeave={handleCopyMouseLeave}
         >
@@ -117,8 +113,9 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
             type="iconButton"
             name="copy"
             weight="normal"
-            size="mdR"
-            color="greyLight"
+            size="sm"
+            color="grey"
+            className="mb-1"
             onClick={copy}
           />
           <div
@@ -136,29 +133,29 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
         </div>
       </div>
 
-      <div className="flex pt-1.5 mobileLg:pt-3 h-[17vh] overflow-y-auto">
+      <div className="flex overflow-y-auto">
         {bitNames.length > 0
           ? (
             <div class="flex flex-col">
               {bitNames.map((name) => (
-                <p
+                <h6
                   key={name}
-                  class="text-color-grey font-light text-base mobileLg:text-lg tracking-[0.05em]"
+                  class={valueSm}
                 >
                   {name}
                   <span class="font-light">.btc</span>
-                </p>
+                </h6>
               ))}
             </div>
           )
           : (
-            <p class={labelSm}>
+            <h6 class={labelSm}>
               NO BITNAMES
-            </p>
+            </h6>
           )}
       </div>
 
-      <div class="flex justify-end pt-3 mobileLg:pt-6">
+      <div class="flex justify-end pt-9">
         <StatTitle
           label={
             <>
@@ -182,129 +179,38 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
 function TokenStats(
   {
     src20Total,
+    stampsTotal,
+    dispensers,
     handleType: _handleType,
-    src20Value = 0,
+
     stampValue: _stampValue,
-    walletData,
   }: {
     src20Total: number;
+    stampsTotal: number;
+    dispensers: { open: number; closed: number; total: number };
     handleType: (type: string) => void;
     src20Value?: number;
     stampValue?: number;
     walletData: WalletOverviewInfo;
   },
 ) {
-  /* ===== COMPUTED VALUES ===== */
-  const src20ValueUSD = (src20Value || 0) * (walletData.btcPrice || 0);
-
   /* ===== RENDER ===== */
   return (
-    <div className="flex flex-col gap-1.5 mobileLg:gap-3">
-      <div className="flex pb-1.5 mobileLg:pb-3">
-        <StatTitle
-          label="SRC-20"
-          value={src20Total?.toString()}
-        />
-      </div>
-
-      <div className="flex justify-between">
-        <StatItem
-          label="TOTAL VALUE"
-          value={
-            <>
-              {src20Value > 0 ? src20Value.toFixed(8) : "N/A"}{" "}
-              <span className="font-light">BTC</span>
-            </>
-          }
-        />
-        <StatItem
-          label="TOTAL VALUE"
-          value={
-            <>
-              {src20ValueUSD > 0
-                ? `$${
-                  src20ValueUSD.toLocaleString("en-US", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })
-                }`
-                : "N/A"} <span className="font-light">USD</span>
-            </>
-          }
-          align="right"
-        />
-      </div>
-    </div>
-  );
-}
-
-/* ===== STAMP STATS SUBCOMPONENT ===== */
-function StampStats(
-  {
-    stampsTotal,
-    stampsCreated,
-    handleType: _handleType,
-    stampValue = 0,
-    dispensers,
-    walletData,
-  }: {
-    stampsTotal: number;
-    stampsCreated: number;
-    handleType: (type: string) => void;
-    stampValue?: number;
-    dispensers: { open: number; closed: number; total: number };
-    walletData: WalletOverviewInfo;
-  },
-) {
-  /* ===== COMPUTED VALUES ===== */
-  const stampValueUSD = (stampValue || 0) * (walletData.btcPrice || 0);
-
-  /* ===== RENDER ===== */
-  return (
-    <div className="flex flex-col gap-1.5 mobileLg:gap-3">
-      <div className="flex pb-1.5 mobileLg:pb-3">
-        <StatTitle
-          label="STAMPS"
-          value={stampsTotal.toString()}
-        />
-      </div>
-
-      <div className="flex justify-between">
-        <StatItem
-          label="TOTAL VALUE"
-          value={
-            <>
-              {stampValue > 0 ? stampValue.toFixed(8) : "N/A"}{" "}
-              <span className="font-light">BTC</span>
-            </>
-          }
-        />
-        <StatItem
-          label="TOTAL VALUE"
-          value={
-            <>
-              {stampValueUSD > 0
-                ? `$${
-                  stampValueUSD.toLocaleString("en-US", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })
-                }`
-                : "N/A"} <span className="font-light">USD</span>
-            </>
-          }
-          align="right"
-        />
-      </div>
-
-      <div className="flex justify-between">
-        <StatItem label="CREATED" value={stampsCreated.toString()} />
-        <StatItem
-          label="LISTINGS"
-          value={dispensers.open.toString()}
-          align="right"
-        />
-      </div>
+    <div className="flex justify-between flex-1">
+      <StatTitle
+        label="SRC-20"
+        value={src20Total?.toString()}
+      />
+      <StatTitle
+        label="STAMPS"
+        value={stampsTotal.toString()}
+        align="center"
+      />
+      <StatTitle
+        label="LISTINGS"
+        value={dispensers.open.toString()}
+        align="right"
+      />
     </div>
   );
 }
@@ -314,7 +220,7 @@ function WalletStats(
   {
     stampsTotal,
     src20Total,
-    stampsCreated,
+    stampsCreated: _stampsCreated,
     setShowItem = () => {},
     stampValue = 0,
     src20Value = 0,
@@ -336,31 +242,17 @@ function WalletStats(
 
   /* ===== RENDER ===== */
   return (
-    <div class="flex flex-col w-full mobileMd:flex-row tablet:flex-col gap-6">
-      <div class="w-full mobileMd:w-1/2 tablet:w-full">
-        <div className={containerBackground}>
-          <TokenStats
-            src20Total={src20Total}
-            handleType={handleType}
-            src20Value={src20Value}
-            stampValue={stampValue}
-            walletData={walletData}
-          />
-        </div>
-      </div>
-      <div class="w-full mobileMd:w-1/2 tablet:w-full">
-        <div className={containerBackground}>
-          <StampStats
-            stampsTotal={stampsTotal}
-            stampsCreated={stampsCreated}
-            handleType={handleType}
-            stampValue={stampValue}
-            dispensers={walletData.dispensers ||
-              { open: 0, closed: 0, total: 0 }}
-            walletData={walletData}
-          />
-        </div>
-      </div>
+    <div class="flex flex-col w-full">
+      <TokenStats
+        src20Total={src20Total}
+        stampsTotal={stampsTotal}
+        dispensers={walletData.dispensers ||
+          { open: 0, closed: 0, total: 0 }}
+        handleType={handleType}
+        src20Value={src20Value}
+        stampValue={stampValue}
+        walletData={walletData}
+      />
     </div>
   );
 }
@@ -375,17 +267,32 @@ export default function WalletProfileDetails({
 }: WalletProfileDetailsProps) {
   /* ===== RENDER ===== */
   return (
-    <div class="flex flex-col tablet:flex-row gap-6">
+    <div class={`flex flex-col tablet:flex-row ${gapSectionSlim}`}>
       <div className="flex flex-col h-fit w-full tablet:w-2/3">
         <div className={containerBackground}>
           <WalletOverview walletData={walletData} />
+        </div>
+      </div>
+      <div class={`flex flex-col w-full tablet:w-1/3 ${gapSectionSlim}`}>
+        <div className={containerBackground}>
+          <WalletStats
+            stampsTotal={stampsTotal}
+            src20Total={src20Total}
+            stampsCreated={stampsCreated}
+            setShowItem={setShowItem}
+            {...(walletData.stampValue !== undefined &&
+              { stampValue: walletData.stampValue })}
+            {...(walletData.src20Value !== undefined &&
+              { src20Value: walletData.src20Value })}
+            walletData={walletData}
+          />
         </div>
 
         {/* Market Data Status - only show if there are issues */}
         {(walletData as any).marketDataStatus &&
           (walletData as any).marketDataStatus.overallStatus !== "full" && (
-          <div class="mt-3">
-            <p
+          <div class={containerBackground}>
+            <h6
               class={`text-sm ${
                 (walletData as any).marketDataStatus.overallStatus === "partial"
                   ? "text-color-orange-semilight"
@@ -393,24 +300,11 @@ export default function WalletProfileDetails({
               }`}
             >
               {(walletData as any).marketDataStatus.overallStatus === "partial"
-                ? "Some market data is currently unavailable."
-                : "Market data might be delayed or unavailable. Please check back later."}
-            </p>
+                ? "SOME MARKET DATA IS CURRENTLY UNAVAILABLE"
+                : "MARKET DATA MIGHT BE DELAYED OR UNAVAILABLE"}
+            </h6>
           </div>
         )}
-      </div>
-      <div class="flex flex-col w-full tablet:w-1/3">
-        <WalletStats
-          stampsTotal={stampsTotal}
-          src20Total={src20Total}
-          stampsCreated={stampsCreated}
-          setShowItem={setShowItem}
-          {...(walletData.stampValue !== undefined &&
-            { stampValue: walletData.stampValue })}
-          {...(walletData.src20Value !== undefined &&
-            { src20Value: walletData.src20Value })}
-          walletData={walletData}
-        />
       </div>
     </div>
   );

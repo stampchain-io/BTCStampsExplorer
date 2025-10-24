@@ -1,11 +1,14 @@
 /* ===== WALLET PROFILE CONTENT COMPONENT ===== */
-import type { DispenserRow as Dispenser, StampRow } from "$types/stamp.d.ts";
-
-import { PaginationButtons } from "$button";
+import { PaginationButtons, SortButton } from "$button";
 import { Icon, LoadingIcon, PlaceholderImage } from "$icon";
-import { SettingsButton } from "$islands/button/SettingsButton.tsx";
-import { SortButton } from "$islands/button/SortButton.tsx";
-import { glassmorphism, shadowGlowPurple } from "$layout";
+import {
+  containerBackground,
+  glassmorphism,
+  rowContainerBackground,
+  shadowGlowPurple,
+} from "$layout";
+import { subtitleGrey, titleGreyLD, valueDarkSm } from "$text";
+import type { DispenserRow as Dispenser, StampRow } from "$types/stamp.d.ts";
 import type {
   EnhancedWalletContentProps,
   SectionHeaderProps,
@@ -26,10 +29,8 @@ import {
 import { useEffect, useState } from "preact/hooks";
 
 // ===== ADVANCED SORTING IMPORTS =====
-import { CompleteSortingInterface } from "$islands/sorting/index.ts";
 import SortingErrorBoundary from "$islands/sorting/SortingErrorBoundary.tsx";
 import { WalletSortingProvider } from "$islands/sorting/SortingProviderWithURL.tsx";
-import type { WalletSortKey } from "$lib/types/sorting.d.ts";
 
 // ===== TYPES AND INTERFACES =====
 
@@ -123,7 +124,7 @@ function SectionHeader({
       f-partial={`/${config.paramName}`}
     >
       <div class="flex items-center gap-4">
-        <h2 class="text-color-grey-dark text-lg mobileLg:text-2xl tablet:text-2xl desktop:text-2xl font-nunito font-extrabold">
+        <h2 class={subtitleGrey}>
           {title}
         </h2>
         {sortMetrics && (
@@ -134,7 +135,8 @@ function SectionHeader({
       </div>
 
       <div class="flex items-center gap-2">
-        {enableAdvancedSorting
+        {
+          /* {enableAdvancedSorting
           ? (
             // Advanced sorting interface
             <SortingErrorBoundary
@@ -171,14 +173,14 @@ function SectionHeader({
               />
             </SortingErrorBoundary>
           )
-          : (
-            // Legacy sorting interface
-            <SortButton
-              initSort={sortBy as "ASC" | "DESC"}
-              onChangeSort={(newSort: any) => onSortChange?.(newSort)}
-              sortParam={config.paramName}
-            />
-          )}
+          : ( */
+        }
+        <SortButton
+          initSort={sortBy as "ASC" | "DESC"}
+          onChangeSort={(newSort: any) => onSortChange?.(newSort)}
+          sortParam={config.paramName}
+        />
+        {/* )} */}
       </div>
     </div>
   );
@@ -217,8 +219,10 @@ function DispenserItem({
   /* ===== EMPTY STATE HANDLING ===== */
   if (!dispensers?.length) {
     return (
-      <div class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black color-purple-gradientLD">
-        NO LISTINGS FOUND
+      <div class={rowContainerBackground}>
+        <h6 class={valueDarkSm}>
+          NO LISTINGS FOUND
+        </h6>
       </div>
     );
   }
@@ -234,10 +238,10 @@ function DispenserItem({
 
   if (!openDispensers.length && !closedDispensers.length) {
     return (
-      <div>
-        <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black color-purple-gradientLD">
+      <div class={rowContainerBackground}>
+        <h6 class={valueDarkSm}>
           NO LISTINGS FOUND
-        </h3>
+        </h6>
       </div>
     );
   }
@@ -399,7 +403,7 @@ function DispenserRow(
           </div>
 
           <div class="flex justify-between flex-row w-full">
-            <p
+            <h5
               class={`text-base text-color-purple-semilight font-light text-ellipsis overflow-hidden ${
                 view === "mobile" ? "tablet:w-full" : ""
               }`}
@@ -417,7 +421,7 @@ function DispenserRow(
                 </span>
                 <span class="hidden tablet:inline">{dispenser.origin}</span>
               </span>
-            </p>
+            </h5>
             <div class="flex flex-row gap-[9px] mobileLg:gap-3">
               <Icon
                 type="iconButton"
@@ -436,15 +440,15 @@ function DispenserRow(
             </div>
           </div>
           <div class="text-center flex justify-between mt-[6px]">
-            <p class="text-base mobileLg:text-lg text-color-grey-semidark font-light">
+            <h6 class="text-base mobileLg:text-lg text-color-grey-semidark font-light">
               GIVE{" "}
               <span class="font-bold text-color-grey-light">
                 {Number(dispenser.give_quantity).toLocaleString()}
               </span>
-            </p>
+            </h6>
           </div>
           <div class="flex flex-row justify-between w-full">
-            <p class="text-base mobileLg:text-lg text-color-grey-semidark font-light">
+            <h6 class="text-base mobileLg:text-lg text-color-grey-semidark font-light">
               QUANTITY{" "}
               <span class="font-bold text-color-grey-light">
                 {dispenser.give_remaining === 0
@@ -453,17 +457,17 @@ function DispenserRow(
                     Number(dispenser.escrow_quantity).toLocaleString()
                   }`}
               </span>
-            </p>
-            <p
+            </h6>
+            <h6
               class={`text-color-grey-semidark text-lg font-light -mt-1 ${
                 view === "mobile" ? "hidden mobileLg:block" : ""
               }`}
             >
               VALUE
-            </p>
+            </h6>
           </div>
           <div class="flex flex-row justify-between w-full">
-            <p class="text-base mobileLg:text-lg text-color-grey-semidark font-light">
+            <h6 class="text-base mobileLg:text-lg text-color-grey-semidark font-light">
               PRICE{" "}
               <span class="font-bold text-color-grey-light">
                 {formatBTCAmount(Number(dispenser.btcrate), {
@@ -471,8 +475,8 @@ function DispenserRow(
                 })}
               </span>{" "}
               <span className="text-color-grey-light">BTC</span>
-            </p>
-            <p
+            </h6>
+            <h6
               class={`text-xl mobileMd:text-2xl text-color-grey-light font-bold -mt-1 ${
                 view === "mobile" ? "hidden mobileLg:block" : ""
               }`}
@@ -481,7 +485,7 @@ function DispenserRow(
                 Number(dispenser.btcrate) * Number(dispenser.escrow_quantity),
                 { includeSymbol: false },
               )} <span class="text-color-grey-light font-light">BTC</span>
-            </p>
+            </h6>
           </div>
         </div>
       </div>
@@ -623,32 +627,9 @@ function WalletProfileContentInner({
 
   /* ===== RENDER ===== */
   return (
-    <div class="flex flex-col w-full z-[2] p-3 bg-[--stamp-sidebar-background] backdrop-blur-[.8rem]
-             desktop:rounded-t-[32px] select-none">
+    <div class={containerBackground}>
       {/* Page Header */}
-      <div class="flex flex-row justify-between items-center gap-3 w-full relative mb-6">
-        <div class="flex gap-3 items-center">
-          <h1 class="text-2xl mobileMd:text-3xl mobileLg:text-4xl font-extralight text-color-purple-light">
-            WALLET
-          </h1>
-          <p class="text-sm mobileMd:text-sm mobileLg:text-lg text-stamp-gray">
-            {abbreviateAddress(address)}
-          </p>
-        </div>
-        <div class="flex gap-3 justify-between h-[36px] items-center">
-          <SettingsButton
-            initFilter={[]}
-            open={openSetting}
-            handleOpen={setOpenSetting}
-            filterButtons={["transfer"]}
-            onFilterClick={(filter: string) => {
-              if (filter === "transfer") {
-                setOpenSettingModal(true);
-              }
-            }}
-          />
-        </div>
-      </div>
+      <h2 class={titleGreyLD}>WALLET</h2>
 
       {/* Stamps Section */}
       <div id="stamps-section" class="mb-8">
@@ -695,22 +676,25 @@ function WalletProfileContentInner({
                 }}
                 address={address}
                 initialSort="DESC"
+                showDetails={false}
                 gridClass={`
                 grid w-full
                 gap-3
                 mobileMd:gap-6
-                grid-cols-4
-                mobileSm:grid-cols-5
-                mobileLg:grid-cols-6
-                tablet:grid-cols-9
-                desktop:grid-cols-10
+                grid-cols-3
+                mobileSm:grid-cols-4
+                mobileLg:grid-cols-5
+                tablet:grid-cols-6
+                desktop:grid-cols-8
                 `}
               />
             )
             : (
-              <p class="text-color-grey opacity-75 text-center py-8">
-                NO STAMPS IN THE WALLET
-              </p>
+              <div class={rowContainerBackground}>
+                <h6 class={valueDarkSm}>
+                  NO STAMPS IN THE WALLET
+                </h6>
+              </div>
             )}
         </div>
       </div>
@@ -742,9 +726,11 @@ function WalletProfileContentInner({
               />
             )
             : (
-              <p class="text-color-grey opacity-75 text-center py-8">
-                NO TOKENS IN THE WALLET
-              </p>
+              <div class={rowContainerBackground}>
+                <h6 class={valueDarkSm}>
+                  NO TOKENS IN THE WALLET
+                </h6>
+              </div>
             )}
         </div>
       </div>
