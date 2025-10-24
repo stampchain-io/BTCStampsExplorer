@@ -25,14 +25,14 @@ export default {
       },
       colors: { // color hue defs are calculated using HSL values - decreasing lightness by 8% for each step
         color: { // colors are also defined as CSS variables further down in the doc - update both if changing anything here
-          primary: {
+          purple: {
             dark: "#43005c",
             semidark: "#610085",
             DEFAULT: "#7f00ad",
             semilight: "#9d00d6",
             light: "#BB00FF",
           },
-          neutral: {
+          grey: {
             dark: "#595653",
             semidark: "#86827d",
             DEFAULT: "#aca7a1",
@@ -242,18 +242,18 @@ export default {
           },
         },
         ":root": {
-          // Primary color palette as CSS variables
-          "--color-primary-dark": "#43005c",
-          "--color-primary-semidark": "#610085",
-          "--color-primary": "#7f00ad",
-          "--color-primary-semilight": "#9d00d6",
-          "--color-primary-light": "#BB00FF",
-          // Neutral color palette as CSS variables
-          "--color-neutral-dark": "#595653",
-          "--color-neutral-semidark": "#86827d",
-          "--color-neutral": "#aca7a1",
-          "--color-neutral-semilight": "#d8d2ca",
-          "--color-neutral-light": "#fff8f0",
+          // Purple color palette as CSS variables
+          "--color-purple-dark": "#43005c",
+          "--color-purple-semidark": "#610085",
+          "--color-purple": "#7f00ad",
+          "--color-purple-semilight": "#9d00d6",
+          "--color-purple-light": "#BB00FF",
+          // Grey color palette as CSS variables
+          "--color-grey-dark": "#595653",
+          "--color-grey-semidark": "#86827d",
+          "--color-grey": "#aca7a1",
+          "--color-grey-semilight": "#d8d2ca",
+          "--color-grey-light": "#fff8f0",
           // Red color palette as CSS variables
           "--color-red-dark": "#5c0000",
           "--color-red-semidark": "#850000",
@@ -290,17 +290,17 @@ export default {
           "outline-offset": "-2px !important",
           "outline-style": "solid !important",
         },
-        // Gradient Classes - Primary variants
-        ".color-primary-gradientDL": {
+        // Gradient Classes - Purple variants
+        ".color-purple-gradientDL": {
           "background":
-            "linear-gradient(to right, var(--color-primary-dark), var(--color-primary-semidark), var(--color-primary), var(--color-primary-semilight), var(--color-primary-light))",
+            "linear-gradient(to right, var(--color-purple-dark), var(--color-purple-semidark), var(--color-purple), var(--color-purple-semilight), var(--color-purple-light))",
           "-webkit-background-clip": "text",
           "-webkit-text-fill-color": "transparent",
           "background-clip": "text",
         },
-        ".color-primary-gradientDL-hover": {
+        ".color-purple-gradientDL-hover": {
           "background":
-            "linear-gradient(to right, var(--color-primary-dark), var(--color-primary-semidark), var(--color-primary), var(--color-primary-semilight), var(--color-primary-light))",
+            "linear-gradient(to right, var(--color-purple-dark), var(--color-purple-semidark), var(--color-purple), var(--color-purple-semilight), var(--color-purple-light))",
           "-webkit-background-clip": "text",
           "-webkit-text-fill-color": "transparent",
           "background-clip": "text",
@@ -309,21 +309,21 @@ export default {
             "background 0.2s ease-in-out, -webkit-text-fill-color 0.2s ease-in-out, text-fill-color 0.2s ease-in-out",
           "&:hover": {
             "background": "none",
-            "-webkit-text-fill-color": "var(--color-primary-light)",
-            "text-fill-color": "var(--color-primary-light)",
+            "-webkit-text-fill-color": "var(--color-purple-light)",
+            "text-fill-color": "var(--color-purple-light)",
           },
         },
-        ".color-primary-gradientLD": {
+        ".color-purple-gradientLD": {
           "background":
-            "linear-gradient(to right, var(--color-primary-light), var(--color-primary-semilight), var(--color-primary), var(--color-primary-semidark), var(--color-primary-dark))",
+            "linear-gradient(to right, var(--color-purple-light), var(--color-purple-semilight), var(--color-purple), var(--color-purple-semidark), var(--color-purple-dark))",
           "-webkit-background-clip": "text",
           "-webkit-text-fill-color": "transparent",
           "background-clip": "text",
           "text-fill-color": "transparent",
         },
-        ".color-primary-gradientLD-hover": {
+        ".color-purple-gradientLD-hover": {
           "background":
-            "linear-gradient(to right, var(--color-primary-light), var(--color-primary-semilight), var(--color-primary), var(--color-primary-semidark), var(--color-primary-dark))",
+            "linear-gradient(to right, var(--color-purple-light), var(--color-purple-semilight), var(--color-purple), var(--color-purple-semidark), var(--color-purple-dark))",
           "-webkit-background-clip": "text",
           "-webkit-text-fill-color": "transparent",
           "background-clip": "text",
@@ -332,23 +332,23 @@ export default {
             "background 0.2s ease-in-out, -webkit-text-fill-color 0.2s ease-in-out, text-fill-color 0.2s ease-in-out",
           "&:hover": {
             "background": "none",
-            "-webkit-text-fill-color": "var(--color-primary-light)",
-            "text-fill-color": "var(--color-primary-light)",
+            "-webkit-text-fill-color": "var(--color-purple-light)",
+            "text-fill-color": "var(--color-purple-light)",
           },
         },
 
-        // Gradient Classes - Neutral variants
-        ".color-neutral-gradientLD": {
+        // Gradient Classes - Grey variants
+        ".color-grey-gradientLD": {
           "background":
-            "linear-gradient(to right, var(--color-neutral-light), var(--color-neutral-semilight), var(--color-neutral), var(--color-neutral-semidark), var(--color-neutral-dark))",
+            "linear-gradient(to right, var(--color-grey-light), var(--color-grey-semilight), var(--color-grey), var(--color-grey-semidark), var(--color-grey-dark))",
           "-webkit-background-clip": "text",
           "-webkit-text-fill-color": "transparent",
           "background-clip": "text",
           "text-fill-color": "transparent",
         },
-        ".color-neutral-gradientLD-hover": {
+        ".color-grey-gradientLD-hover": {
           "background":
-            "linear-gradient(to right, var(--color-neutral-light), var(--color-neutral-semilight), var(--color-neutral), var(--color-neutral-semidark), var(--color-neutral-dark))",
+            "linear-gradient(to right, var(--color-grey-light), var(--color-grey-semilight), var(--color-grey), var(--color-grey-semidark), var(--color-grey-dark))",
           "-webkit-background-clip": "text",
           "-webkit-text-fill-color": "transparent",
           "background-clip": "text",
@@ -357,20 +357,20 @@ export default {
             "background 0.2s ease-in-out, -webkit-text-fill-color 0.2s ease-in-out, text-fill-color 0.2s ease-in-out",
           "&:hover": {
             "background": "none",
-            "-webkit-text-fill-color": "var(--color-neutral-light)",
-            "text-fill-color": "var(--color-neutral-light)",
+            "-webkit-text-fill-color": "var(--color-grey-light)",
+            "text-fill-color": "var(--color-grey-light)",
           },
         },
-        ".color-neutral-gradientDL": {
+        ".color-grey-gradientDL": {
           "background":
-            "linear-gradient(to right, var(--color-neutral-dark), var(--color-neutral-semidark), var(--color-neutral), var(--color-neutral-semilight), var(--color-neutral-light))",
+            "linear-gradient(to right, var(--color-grey-dark), var(--color-grey-semidark), var(--color-grey), var(--color-grey-semilight), var(--color-grey-light))",
           "-webkit-background-clip": "text",
           "-webkit-text-fill-color": "transparent",
           "background-clip": "text",
         },
-        ".color-neutral-gradientDL-hover": {
+        ".color-grey-gradientDL-hover": {
           "background":
-            "linear-gradient(to right, var(--color-neutral-dark), var(--color-neutral-semidark), var(--color-neutral), var(--color-neutral-semilight), var(--color-neutral-light))",
+            "linear-gradient(to right, var(--color-grey-dark), var(--color-grey-semidark), var(--color-grey), var(--color-grey-semilight), var(--color-grey-light))",
           "-webkit-background-clip": "text",
           "-webkit-text-fill-color": "transparent",
           "background-clip": "text",
@@ -379,8 +379,8 @@ export default {
             "background 0.2s ease-in-out, -webkit-text-fill-color 0.2s ease-in-out, text-fill-color 0.2s ease-in-out",
           "&:hover": {
             "background": "none",
-            "-webkit-text-fill-color": "var(--color-neutral-light)",
-            "text-fill-color": "var(--color-neutral-light)",
+            "-webkit-text-fill-color": "var(--color-grey-light)",
+            "text-fill-color": "var(--color-grey-light)",
           },
         },
       });

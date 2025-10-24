@@ -18,9 +18,9 @@ export const shadow =
 export const shadowL2 =
   "shadow-[0_2px_4px_rgba(13,11,13,0.1),inset_0_1px_0_rgba(13,11,13,0.08),inset_0_-1px_0_rgba(13,11,13,0.08),inset_0_0_2px_2px_rgba(13,11,13,0.08)]";
 export const shadowGlowPurple =
-  `group hover:shadow-[0px_0px_16px_color-mix(in_srgb,var(--color-primary-light)_75%,transparent)] ${transitionColors} cursor-pointer`;
+  `group hover:shadow-[0px_0px_16px_color-mix(in_srgb,var(--color-purple-light)_75%,transparent)] ${transitionColors} cursor-pointer`;
 export const shadowGlowGrey =
-  `group hover:shadow-[0px_0px_16px_color-mix(in_srgb,var(--color-neutral-light)_75%,transparent)] ${transitionColors} cursor-pointer`;
+  `group hover:shadow-[0px_0px_16px_color-mix(in_srgb,var(--color-grey-light)_75%,transparent)] ${transitionColors} cursor-pointer`;
 
 // Glassmorphism styles
 // Overlay layer styles - used for drawer and modal containers
@@ -59,15 +59,15 @@ export const containerStickyBottom = `sticky bottom-0 mt-auto py-9 tablet:py-6`;
 
 // Stamp Card styles
 export const containerCard = `${glassmorphism} ${shadowGlowPurple}
-  hover:border-color-primary-light`; // check if used
+  hover:border-color-purple-light`; // check if used
 
 export const containerCardL2 = `${glassmorphismL2} ${shadowGlowPurple}
-  hover:border-color-primary-light`;
+  hover:border-color-purple-light`;
 
 // Table card container styles - check if used
 export const containerCardTable =
   `rounded-3xl ${glassmorphism} ${shadowGlowPurple}
-  hover:border-color-primary-light`;
+  hover:border-color-purple-light`;
 
 // Global styles
 export const containerColData = "flex flex-col -space-y-1"; // Data specific
@@ -88,24 +88,24 @@ export const rowResponsiveForm =
 // Stamp and SRC20 Table Row Cards - Stamp/tokencards
 export const cellLeftCard =
   `p-3 pl-4 rounded-l-3xl border-y-[1px] border-l-[1px] border-r-0 border-color-border/50
-  group-hover:bg-black/20 group-hover:border-color-primary-light ${transitionColors} whitespace-nowrap`;
+  group-hover:bg-black/20 group-hover:border-color-purple-light ${transitionColors} whitespace-nowrap`;
 export const cellRightCard =
   `p-3 pr-4 rounded-r-3xl border-y-[1px] border-r-[1px] border-l-0 border-color-border/50
-  group-hover:bg-black/20 group-hover:border-color-primary-light ${transitionColors} whitespace-nowrap`;
+  group-hover:bg-black/20 group-hover:border-color-purple-light ${transitionColors} whitespace-nowrap`;
 export const cellCenterCard =
   `p-3 border-y-[1px] border-x-0 border-color-border/50
-  group-hover:bg-black/20 group-hover:border-color-primary-light ${transitionColors} whitespace-nowrap`;
+  group-hover:bg-black/20 group-hover:border-color-purple-light ${transitionColors} whitespace-nowrap`;
 // Layer 2
 // Stamp and SRC20 Table Row Cards - Stamp/tokencards inside of layer 1
 export const cellLeftL2Card =
   `p-3 pl-4 rounded-l-2xl border-y-[1px] border-l-[1px] border-r-0 border-color-border/75
-  group-hover:bg-black/20 group-hover:border-color-primary-light ${transitionColors} whitespace-nowrap`;
+  group-hover:bg-black/20 group-hover:border-color-purple-light ${transitionColors} whitespace-nowrap`;
 export const cellRightL2Card =
   `p-3 pr-4 rounded-r-2xl border-y-[1px] border-r-[1px] border-l-0 border-color-border/75
-  group-hover:bg-black/20 group-hover:border-color-primary-light ${transitionColors} whitespace-nowrap`;
+  group-hover:bg-black/20 group-hover:border-color-purple-light ${transitionColors} whitespace-nowrap`;
 export const cellCenterL2Card =
   `p-3 border-y-[1px] border-x-0 border-color-border/75
-  group-hover:bg-black/20 group-hover:border-color-primary-light ${transitionColors} whitespace-nowrap`;
+  group-hover:bg-black/20 group-hover:border-color-purple-light ${transitionColors} whitespace-nowrap`;
 // Stamp and SRC20 Detail pages Table Rows
 export const cellLeftL2Detail =
   `p-1.5 pl-3 rounded-l-2xl border-y-[1px] border-l-[1px] border-r-0 border-color-border/75 group-hover:bg-black/20 group-hover:border-color-border ${transitionColors} whitespace-nowrap`;
@@ -121,7 +121,7 @@ export const cellStickyLeft =
 export const imagePreviewTool =
   `flex items-center justify-center min-w-[100px] h-[100px] ${glassmorphismL2}`;
 export const imageUploadTool =
-  `flex items-center justify-center min-w-[100px] h-[100px] ${glassmorphismL2} hover:bg-color-neutral-dark/30 ${transitionColors} cursor-pointer`;
+  `flex items-center justify-center min-w-[100px] h-[100px] ${glassmorphismL2} hover:bg-color-grey-dark/30 ${transitionColors} cursor-pointer`;
 
 /* ===== LOADER STYLES ===== */
 // Text loader styles are defined in /text/styles.ts
@@ -131,18 +131,18 @@ const loaderSpin = "animate-spin rounded-full border-b-[2px]";
 export const loaderSkeleton =
   `bg-color-background/50 border border-color-border/50 animate-pulse`;
 // Spinning loader styles
-export const loaderSpinXsGrey = `${loaderSpin} w-3 h-3 border-color-neutral`;
-export const loaderSpinSmGrey = `${loaderSpin} w-5 h-5 border-color-neutral`;
-export const loaderSpinGrey = `${loaderSpin} w-7 h-7 border-color-neutral`;
-export const loaderSpinLgGrey = `${loaderSpin} w-9 h-9 border-color-neutral`;
+export const loaderSpinXsGrey = `${loaderSpin} w-3 h-3 border-color-grey`;
+export const loaderSpinSmGrey = `${loaderSpin} w-5 h-5 border-color-grey`;
+export const loaderSpinGrey = `${loaderSpin} w-7 h-7 border-color-grey`;
+export const loaderSpinLgGrey = `${loaderSpin} w-9 h-9 border-color-grey`;
 export const loaderSpinXsPurple =
-  `${loaderSpin} w-3 h-3 border-color-primary-semilight`;
+  `${loaderSpin} w-3 h-3 border-color-purple-semilight`;
 export const loaderSpinSmPurple =
-  `${loaderSpin} w-5 h-5 border-color-primary-semilight`;
+  `${loaderSpin} w-5 h-5 border-color-purple-semilight`;
 export const loaderSpinPurple =
-  `${loaderSpin} w-7 h-7 border-color-primary-semilight`;
+  `${loaderSpin} w-7 h-7 border-color-purple-semilight`;
 export const loaderSpinLgPurple =
-  `${loaderSpin} w-9 h-9 border-color-primary-semilight`;
+  `${loaderSpin} w-9 h-9 border-color-purple-semilight`;
 
 /* ===== TYPE DEFINITIONS ===== */
 export type LayoutStyles = {

@@ -14,8 +14,8 @@ const inputFieldWidth = "!w-10";
 const inputFieldStyle = `px-5 w-full
   ${glassmorphismL2} ${glassmorphismL2Hover}
   focus:bg-color-background/60 focus:border-color-border focus:outline-none focus-visible:outline-none no-outline ${transitionColors}
-  font-medium text-sm text-color-neutral-light
-  placeholder:font-light placeholder:text-color-neutral-semidark placeholder:uppercase`;
+  font-medium text-sm text-color-grey-light
+  placeholder:font-light placeholder:text-color-grey-semidark placeholder:uppercase`;
 
 /* ===== INPUT STYLES ===== */
 // Base input
@@ -47,7 +47,7 @@ export const inputFieldDropdown = `
 absolute top-[100%] left-0 w-full z-dropdown
 bg-gradient-to-b from-color-background/30 to-color-background backdrop-blur-sm
 border border-t-0 border-color-border/75 rounded-b-2xl
-text-color-neutral-light text-sm font-medium uppercase leading-none
+text-color-grey-light text-sm font-medium uppercase leading-none
 overflow-y-auto scrollbar-background-layer2 shadow-lg cursor-pointer`;
 
 export const inputFieldDropdownHover = `
@@ -70,11 +70,11 @@ export const inputCheckbox = (
   ${
   checked
     ? canHoverSelected
-      ? "border-color-neutral-light after:bg-color-neutral-light group-hover:border-color-neutral group-hover:after:bg-color-neutral"
-      : "border-color-neutral-light after:bg-color-neutral-light"
+      ? "border-color-grey-light after:bg-color-grey-light group-hover:border-color-grey group-hover:after:bg-color-grey"
+      : "border-color-grey-light after:bg-color-grey-light"
     : canHoverSelected
-    ? "border-color-neutral group-hover:border-color-neutral-light"
-    : "border-color-neutral"
+    ? "border-color-grey group-hover:border-color-grey-light"
+    : "border-color-grey"
 }
     after:content-['']
     after:block
@@ -109,9 +109,9 @@ export const inputSelect = `
 /* ===== NOT IN USE NOR UPDATED ===== */
 /* ===== LABEL STYLES ===== */
 export const labelBase =
-  "font-medium text-base text-color-neutral-light cursor-default select-none whitespace-nowrap";
+  "font-medium text-base text-color-grey-light cursor-default select-none whitespace-nowrap";
 export const labelLarge =
-  "font-medium text-lg text-color-neutral-light cursor-default select-none whitespace-nowrap";
+  "font-medium text-lg text-color-grey-light cursor-default select-none whitespace-nowrap";
 
 /* ===== STATE STYLES ===== */
 export const stateDisabled = "opacity-50 cursor-not-allowed";
@@ -122,7 +122,7 @@ export const stateSuccess = "text-xs border-green-500 focus:border-green-500";
 /* ===== MESSAGE STYLES ===== */
 export const messageError = "text-xs text-red-500 mt-2";
 export const messageSuccess = "text-xs text-green-500 mt-2";
-export const messageHelp = "text-xs text-color-neutral-dark mt-1";
+export const messageHelp = "text-xs text-color-grey-dark mt-1";
 /* ===== ===== ===== */
 
 /* ===== TYPE DEFINITIONS ===== */

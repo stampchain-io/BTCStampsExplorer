@@ -120,18 +120,18 @@ export const buttonStyles: ButtonVariants = {
   /* Must use CSS variables, since Tailwind CSS definitions are utility classes and won't work */
   color: {
     grey: `
-      [--color-button-dark:var(--color-neutral-dark)]
-      [--color-button-semidark:var(--color-neutral-semidark)]
-      [--color-button:var(--color-neutral)]
-      [--color-button-semilight:var(--color-neutral-semilight)]
-      [--color-button-light:var(--color-neutral-light)]
+      [--color-button-dark:var(--color-grey-dark)]
+      [--color-button-semidark:var(--color-grey-semidark)]
+      [--color-button:var(--color-grey)]
+      [--color-button-semilight:var(--color-grey-semilight)]
+      [--color-button-light:var(--color-grey-light)]
     `,
     purple: `
-      [--color-button-dark:var(--color-primary-dark)]
-      [--color-button-semidark:var(--color-primary-semidark)]
-      [--color-button:var(--color-primary)]
-      [--color-button-semilight:var(--color-primary-semilight)]
-      [--color-button-light:var(--color-primary-light)]
+      [--color-button-dark:var(--color-purple-dark)]
+      [--color-button-semidark:var(--color-purple-semidark)]
+      [--color-button:var(--color-purple)]
+      [--color-button-semilight:var(--color-purple-semilight)]
+      [--color-button-light:var(--color-purple-light)]
     `,
     test: `
       [--color-button-dark:var(--color-red-dark)]
@@ -213,13 +213,13 @@ export const sliderKnob = `
   absolute top-0.5 bottom-0.5 w-full h-[14px] tablet:h-[10px] rounded-full appearance-none bg-transparent pointer-events-none
   [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:pointer-events-auto
   [&::-webkit-slider-thumb]:size-[14px] [&::-webkit-slider-thumb]:tablet:size-[10px]
-  [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-color-neutral
-  [&::-webkit-slider-thumb]:hover:bg-color-neutral-light [&::-webkit-slider-thumb]:cursor-grab
+  [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-color-grey
+  [&::-webkit-slider-thumb]:hover:bg-color-grey-light [&::-webkit-slider-thumb]:cursor-grab
   [&::-webkit-slider-thumb]:active:cursor-grabbing
   [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:pointer-events-auto
   [&::-moz-range-thumb]:size-[14px][&::-moz-range-thumb]:tablet:size-[10px]
-  [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-color-neutral
-  [&::-moz-range-thumb]:hover:bg-color-neutral-light [&::-moz-range-thumb]:cursor-grab
+  [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-color-grey
+  [&::-moz-range-thumb]:hover:bg-color-grey-light [&::-moz-range-thumb]:cursor-grab
   [&::-moz-range-thumb]:active:cursor-grabbing [&::-moz-range-thumb]:border-0
   `;
 

@@ -78,11 +78,11 @@ b, strong {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-primary);
+  background: var(--color-purple);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-primary-dark);
+  background: var(--color-purple-dark);
   border-radius: 3px;
 }
 
@@ -93,15 +93,15 @@ b, strong {
 
 /* Custom scrollbar colors */
 .scrollbar-background-overlay {
-  @apply [&::-webkit-scrollbar-track]:bg-[var(--color-background)] [&::-webkit-scrollbar-thumb]:bg-[var(--color-neutral-dark)] [&::-webkit-scrollbar-thumb]:opacity-50 [&::-webkit-scrollbar-thumb:hover]:bg-[var(--color-neutral-semidark)];
+  @apply [&::-webkit-scrollbar-track]:bg-[var(--color-background)] [&::-webkit-scrollbar-thumb]:bg-[var(--color-grey-dark)] [&::-webkit-scrollbar-thumb]:opacity-50 [&::-webkit-scrollbar-thumb:hover]:bg-[var(--color-grey-semidark)];
 }
 
 .scrollbar-background-layer1 {
-  @apply [&::-webkit-scrollbar-track]:bg-[var(--color-background)] [&::-webkit-scrollbar-thumb]:bg-[var(--color-neutral-dark)] [&::-webkit-scrollbar-thumb]:opacity-50 [&::-webkit-scrollbar-thumb:hover]:bg-[var(--color-neutral-semidark)];
+  @apply [&::-webkit-scrollbar-track]:bg-[var(--color-background)] [&::-webkit-scrollbar-thumb]:bg-[var(--color-grey-dark)] [&::-webkit-scrollbar-thumb]:opacity-50 [&::-webkit-scrollbar-thumb:hover]:bg-[var(--color-grey-semidark)];
 }
 
 .scrollbar-background-layer2 {
-  @apply [&::-webkit-scrollbar]:w-[2px] [&::-webkit-scrollbar-track]:bg-[var(--color-background)] [&::-webkit-scrollbar-thumb]:bg-[var(--color-neutral-dark)] [&::-webkit-scrollbar-thumb]:opacity-50 [&::-webkit-scrollbar-thumb:hover]:bg-[var(--color-neutral-semidark)];
+  @apply [&::-webkit-scrollbar]:w-[2px] [&::-webkit-scrollbar-track]:bg-[var(--color-background)] [&::-webkit-scrollbar-thumb]:bg-[var(--color-grey-dark)] [&::-webkit-scrollbar-thumb]:opacity-50 [&::-webkit-scrollbar-thumb:hover]:bg-[var(--color-grey-semidark)];
 }
 
 /* ========================================================================== */
@@ -356,7 +356,7 @@ b, strong {
 .animated-underline {
   font-weight: 700;
   text-decoration: none;
-  background-image: linear-gradient(var(--color-neutral-semilight), var(--color-neutral-semilight));
+  background-image: linear-gradient(var(--color-grey-semilight), var(--color-grey-semilight));
   background-position: 0% 100%;
   background-repeat: no-repeat;
   background-size: 100% 2px;
@@ -376,14 +376,14 @@ b, strong {
 .animated-underline:hover,
 .animated-underline:focus {
   background-size: 0% 2px;
-  color: var(--color-neutral);
+  color: var(--color-grey);
 }
 
 /* Animate left to right */
 .animated-underline-thin {
   font-weight: 400;
   text-decoration: none;
-  background-image: linear-gradient(var(--color-neutral-semilight), var(--color-neutral-semilight));
+  background-image: linear-gradient(var(--color-grey-semilight), var(--color-grey-semilight));
   background-position: 100% 100%;
   background-repeat: no-repeat;
   background-size: 100% 1px;
@@ -403,7 +403,7 @@ b, strong {
 .animated-underline-thin:hover,
 .animated-underline-thin:focus {
   background-size: 0% 1px;
-  color: var(--color-neutral);
+  color: var(--color-grey);
 }
 
 /* ========================================================================== */
@@ -413,7 +413,7 @@ b, strong {
 
 /* Emoji ticker styling for SRC20 cards */
 .emoji-ticker {
-  @apply text-color-primary-light;
+  @apply text-color-purple-light;
   font-family: system-ui;
   line-height: 1;
   display: inline-flex;
