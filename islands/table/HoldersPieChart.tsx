@@ -64,11 +64,24 @@ export const HoldersPieChart = ({ holders: rawHolders }: PieChartProps) => {
           },
           tooltip: {
             enabled: true,
-            backgroundColor: "#000000BF",
-            titleColor: "#fff8f0",
-            bodyColor: "#d8d2ca",
             position: "nearest" as const,
             yAlign: "bottom" as const,
+            backgroundColor: "#000000BF",
+            borderColor: "#242424",
+            borderWidth: 1,
+            cornerRadius: 12,
+            padding: {
+              top: 12,
+              bottom: 12,
+              left: 16,
+              right: 16,
+            },
+            titleColor: "#fff8f0",
+            bodyColor: "#d8d2ca",
+            usePointStyle: true,
+            boxWidth: 10,
+            boxHeight: 10,
+            boxPadding: 8,
             callbacks: {
               label: (context: any) => {
                 const holder = holders[context.dataIndex];

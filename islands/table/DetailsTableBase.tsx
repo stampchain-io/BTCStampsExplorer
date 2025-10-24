@@ -344,8 +344,10 @@ export default function DetailsTableBase({
                 {type ? getTabLabel(type, id) : id}
               </span>
               <div
-                class={`${value3xlTransparent} text-color-grey-semidark ${
-                  selectedTab === id ? "text-color-grey-light" : ""
+                class={`${value3xlTransparent} ${
+                  selectedTab === id
+                    ? "text-color-grey-light"
+                    : "text-color-grey-semidark"
                 } group-hover:text-color-grey-light`}
               >
                 {count || 0}
