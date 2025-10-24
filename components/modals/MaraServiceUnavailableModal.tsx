@@ -53,7 +53,7 @@ export function MaraServiceUnavailableModal({
     <ModalBase
       title="MARA Service Unavailable"
       onClose={onClose}
-      className={`!w-[400px] mobileLg:!w-[450px] ${glassmorphism} !bg-gradient-to-br !from-color-neutral-dark/70 !to-color-neutral-dark/80`}
+      className={`!w-[400px] mobileLg:!w-[450px] ${glassmorphism} !bg-gradient-to-br !from-color-grey-dark/70 !to-color-grey-dark/80`}
       contentClassName="space-y-4"
       hideHeader
     >
@@ -86,7 +86,7 @@ export function MaraServiceUnavailableModal({
         </div>
       </div>
 
-      <div class="space-y-5 text-color-neutral-light">
+      <div class="space-y-5 text-color-grey-light">
         <div
           class={`${glassmorphism} bg-gradient-to-br from-red-900/15 to-red-800/25 border-red-500/20 p-5`}
         >
@@ -96,11 +96,11 @@ export function MaraServiceUnavailableModal({
               <h3 class="text-red-200 font-semibold mb-3 text-base">
                 Service Connection Error
               </h3>
-              <p class="text-sm text-color-neutral-light mb-3">
+              <p class="text-sm text-color-grey-light mb-3">
                 The MARA pool service is currently unavailable due to temporary
                 connection issues.
               </p>
-              <p class="text-sm text-color-neutral-light">
+              <p class="text-sm text-color-grey-light">
                 This may be due to maintenance or high traffic. You can either
                 retry or switch to standard stamping mode.
               </p>
@@ -118,7 +118,7 @@ export function MaraServiceUnavailableModal({
                 <strong class="text-blue-200 font-semibold text-sm">
                   Your Options:
                 </strong>
-                <ul class="mt-2 ml-4 space-y-1.5 list-disc text-color-neutral-light text-sm">
+                <ul class="mt-2 ml-4 space-y-1.5 list-disc text-color-grey-light text-sm">
                   <li>
                     Switch to Standard Mode: Use regular 333 sat dust outputs
                   </li>
@@ -142,7 +142,7 @@ export function MaraServiceUnavailableModal({
                 <strong class="text-yellow-200 font-semibold text-sm">
                   Note:
                 </strong>
-                <p class="mt-2 text-color-neutral-light text-sm">
+                <p class="mt-2 text-color-grey-light text-sm">
                   Standard mode uses 333 sat outputs and works with all Bitcoin
                   nodes, but may have slightly higher fees.
                 </p>
@@ -156,7 +156,7 @@ export function MaraServiceUnavailableModal({
         <button
           type="button"
           onClick={onRetry}
-          class={`flex-1 px-4 py-2 rounded-2xl transition-colors ${glassmorphism} bg-gradient-to-br from-color-neutral-dark/20 to-color-neutral-dark/40 text-color-neutral-light hover:from-color-neutral-dark/30 hover:to-color-neutral-dark/50`}
+          class={`flex-1 px-4 py-2 rounded-2xl transition-colors ${glassmorphism} bg-gradient-to-br from-color-grey-dark/20 to-color-grey-dark/40 text-color-grey-light hover:from-color-grey-dark/30 hover:to-color-grey-dark/50`}
         >
           Retry MARA
         </button>

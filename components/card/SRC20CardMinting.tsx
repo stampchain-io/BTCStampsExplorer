@@ -108,13 +108,13 @@ export function SRC20CardMinting({
       : cellCenterCard;
 
     // Selected segment styling
-    const selectedClass = isSelected ? "text-color-neutral-light" : "";
+    const selectedClass = isSelected ? "text-color-grey-light" : "";
 
     const colorClass = isSelected
-      ? "text-color-neutral-light"
+      ? "text-color-grey-light"
       : isClickable
-      ? "text-color-neutral-semidark hover:text-color-neutral-light"
-      : "text-color-neutral-semidark";
+      ? "text-color-grey-semidark hover:text-color-grey-light"
+      : "text-color-grey-semidark";
 
     const clickableClass = isClickable
       ? "cursor-pointer transition-all duration-200 select-none"
@@ -150,7 +150,7 @@ export function SRC20CardMinting({
           weight="normal"
           size="xxxs"
           color="custom"
-          className={`stroke-color-neutral-light transition-all duration-200 transform ${
+          className={`stroke-color-grey-light transition-all duration-200 transform ${
             currentSort.direction === "desc" ? "scale-y-[-1]" : ""
           }`}
         />
@@ -316,7 +316,7 @@ export function SRC20CardMinting({
                               return (
                                 <>
                                   {text && (
-                                    <span class="color-neutral-gradientDL group-hover:[-webkit-text-fill-color:var(--color-primary-light)] inline-block transition-colors duration-200">
+                                    <span class="color-grey-gradientDL group-hover:[-webkit-text-fill-color:var(--color-purple-light)] inline-block transition-colors duration-200">
                                       {text.toUpperCase()}
                                     </span>
                                   )}
@@ -357,11 +357,11 @@ export function SRC20CardMinting({
                               }
                               return progressValue.toFixed(1);
                             })()}
-                            <span class="text-color-neutral-light">%</span>
+                            <span class="text-color-grey-light">%</span>
                           </div>
-                          <div class="relative h-1.5 bg-color-neutral rounded-full">
+                          <div class="relative h-1.5 bg-color-grey rounded-full">
                             <div
-                              class="absolute left-0 top-0 h-1.5 bg-color-primary rounded-full"
+                              class="absolute left-0 top-0 h-1.5 bg-color-purple rounded-full"
                               style={{
                                 width: `${
                                   (() => {

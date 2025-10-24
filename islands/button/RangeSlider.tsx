@@ -115,7 +115,7 @@ export const RangeSlider = ({
         right: `${Math.max(0, rightPosition)}%`,
         width: "auto",
         background:
-          "linear-gradient(90deg, var(--color-neutral-semidark), var(--color-neutral-semilight) 95%)",
+          "linear-gradient(90deg, var(--color-grey-semidark), var(--color-grey-semilight) 95%)",
       };
     }
 
@@ -124,7 +124,7 @@ export const RangeSlider = ({
       right: `${Math.max(0, rightPosition)}%`,
       width: "auto",
       background:
-        "linear-gradient(90deg, var(--color-neutral-semidark), var(--color-neutral) 95%)",
+        "linear-gradient(90deg, var(--color-grey-semidark), var(--color-grey) 95%)",
     };
   };
 
@@ -139,7 +139,7 @@ export const RangeSlider = ({
       {formatValue && (
         <div class="flex w-full justify-center pb-1.5 tablet:pb-1">
           <div class="flex items-center text-sm tablet:text-xs font-regular">
-            <div class="text-center text-color-neutral select-none">
+            <div class="text-center text-color-grey select-none">
               {displayValue}
             </div>
           </div>

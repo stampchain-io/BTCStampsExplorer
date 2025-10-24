@@ -235,7 +235,7 @@ SortingComponent.Label = function SortingLabel({
             weight="normal"
             size="xxs"
             color="custom"
-            className={`stroke-color-neutral-light transition-all duration-300 transform ${
+            className={`stroke-color-grey-light transition-all duration-300 transform ${
               sortState.direction === "desc" ? "scale-y-[-1]" : ""
             }`}
           />

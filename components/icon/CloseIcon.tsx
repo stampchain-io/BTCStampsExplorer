@@ -21,9 +21,9 @@ export function CloseIcon({
 
   /* ===== STYLES ===== */
   const colorClasses = color === "greyLight"
-    ? `stroke-[url(#greyLight)] hover:stroke-color-neutral-light transform transition-colors duration-200`
+    ? `stroke-[url(#greyLight)] hover:stroke-color-grey-light transform transition-colors duration-200`
     : color === "purpleLight"
-    ? `stroke-[url(#purpleLight)] hover:stroke-color-primary-light transform transition-colors duration-200`
+    ? `stroke-[url(#purpleLight)] hover:stroke-color-purple-light transform transition-colors duration-200`
     : "";
 
   /* ===== RENDER ICON ===== */
@@ -36,10 +36,10 @@ export function CloseIcon({
               id="greyLight"
               gradientTransform="rotate(45)"
             >
-              <stop offset="0%" stop-color="var(--color-neutral-semidark)" />
-              <stop offset="40%" stop-color="var(--color-neutral)" />
-              <stop offset="70%" stop-color="var(--color-neutral)" />
-              <stop offset="100%" stop-color="var(--color-neutral-semilight)" />
+              <stop offset="0%" stop-color="var(--color-grey-semidark)" />
+              <stop offset="40%" stop-color="var(--color-grey)" />
+              <stop offset="70%" stop-color="var(--color-grey)" />
+              <stop offset="100%" stop-color="var(--color-grey-semilight)" />
             </linearGradient>
           )}
           {color === "purpleLight" && (
@@ -47,10 +47,10 @@ export function CloseIcon({
               id="purpleLight"
               gradientTransform="rotate(130)"
             >
-              <stop offset="0%" stop-color="var(--color-primary-light)" />
-              <stop offset="40%" stop-color="var(--color-primary-semilight)" />
-              <stop offset="70%" stop-color="var(--color-primary-semilight)" />
-              <stop offset="100%" stop-color="var(--color-primary)" />
+              <stop offset="0%" stop-color="var(--color-purple-light)" />
+              <stop offset="40%" stop-color="var(--color-purple-semilight)" />
+              <stop offset="70%" stop-color="var(--color-purple-semilight)" />
+              <stop offset="100%" stop-color="var(--color-purple)" />
             </linearGradient>
           )}
         </defs>

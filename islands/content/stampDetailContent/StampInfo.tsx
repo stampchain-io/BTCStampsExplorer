@@ -768,7 +768,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
               </h6>
             )}
 
-            <h5 className="-mt-1.5 font-light text-xl text-color-neutral block">
+            <h5 className="-mt-1.5 font-light text-xl text-color-grey block">
               {(!isSrc20Stamp() && (isPoshStamp(stamp.cpid) ||
                 (htmlStampTitle && stamp.stamp_mimetype === "text/html"))) && (
                 <>
@@ -1047,7 +1047,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                 href={`https://www.blockchain.com/explorer/transactions/btc/${stamp.tx_hash}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`${valueSm} hover:text-color-neutral transition-colors duration-300`}
+                className={`${valueSm} hover:text-color-grey transition-colors duration-300`}
               >
                 {stamp.tx_hash !== null
                   ? abbreviateAddress(stamp.tx_hash, 4)

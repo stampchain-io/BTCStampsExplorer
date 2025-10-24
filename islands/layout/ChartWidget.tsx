@@ -165,7 +165,7 @@ const ChartWidget = (
   if (!data || data.length === 0) {
     return (
       <div
-        class={`${containerBackground} text-sm text-color-neutral text-center`}
+        class={`${containerBackground} text-sm text-color-grey text-center`}
       >
         NO DATA
       </div>

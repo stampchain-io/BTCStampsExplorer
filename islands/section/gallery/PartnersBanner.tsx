@@ -43,8 +43,8 @@ function PartnerCard({ name, largeImage, smallImage, url }: Partner) {
     <div
       class={`relative w-full border ${
         isHovered
-          ? `border-color-neutral ${shadowGlowGrey}`
-          : "border-color-neutral-semidark"
+          ? `border-color-grey ${shadowGlowGrey}`
+          : "border-color-grey-semidark"
       } rounded-2xl`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -81,7 +81,7 @@ function PartnerCard({ name, largeImage, smallImage, url }: Partner) {
 
       {/* ===== GRADIENT OVERLAY ===== */}
       <div
-        class={`w-full h-full bg-gradient-to-tr from-color-neutral-semidark/100 via-color-neutral/50 to-color-neutral-semilight/0 absolute left-0 top-0 transition-opacity duration-50 rounded-2xl ${
+        class={`w-full h-full bg-gradient-to-tr from-color-grey-semidark/100 via-color-grey/50 to-color-grey-semilight/0 absolute left-0 top-0 transition-opacity duration-50 rounded-2xl ${
           isHovered ? "!hidden" : ""
         }`}
       />

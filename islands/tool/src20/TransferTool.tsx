@@ -371,7 +371,7 @@ export function SRC20TransferTool(
                     aria-selected={formState.token === result.tick}
                   >
                     {result.tick}
-                    <h6 class="text-xs text-color-neutral">
+                    <h6 class="text-xs text-color-grey">
                       {stripTrailingZeros(result.amt)}
                     </h6>
                   </li>

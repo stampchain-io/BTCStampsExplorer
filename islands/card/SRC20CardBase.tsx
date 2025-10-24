@@ -45,7 +45,7 @@ export function SRC20CardBase({
 
   return (
     <tr
-      class={`${glassmorphism} !rounded-2xl border-2 border-transparent hover:border-color-primary-light ${shadowGlowPurple} p-12`}
+      class={`${glassmorphism} !rounded-2xl border-2 border-transparent hover:border-color-purple-light ${shadowGlowPurple} p-12`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -71,8 +71,8 @@ export function SRC20CardBase({
                     {text && (
                       <span
                         class={isHovered
-                          ? "text-color-primary-light"
-                          : "color-neutral-gradientDL"}
+                          ? "text-color-purple-light"
+                          : "color-grey-gradientDL"}
                       >
                         {text.toUpperCase()}
                       </span>

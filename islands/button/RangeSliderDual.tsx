@@ -680,20 +680,20 @@ export const RangeSliderDual = ({
       return {
         ...baseStyle,
         background:
-          "linear-gradient(90deg, var(--color-neutral-semilight) 5%, var(--color-neutral) 75%)",
+          "linear-gradient(90deg, var(--color-grey-semilight) 5%, var(--color-grey) 75%)",
       };
     } else if (hoveredHandle === "max") {
       return {
         ...baseStyle,
         background:
-          "linear-gradient(90deg, var(--color-neutral) 25%, var(--color-neutral-semilight) 95%)",
+          "linear-gradient(90deg, var(--color-grey) 25%, var(--color-grey-semilight) 95%)",
       };
     }
 
     return {
       ...baseStyle,
       background:
-        "linear-gradient(90deg, var(--color-neutral) 5%, var(--color-neutral-semidark) 40%, var(--color-neutral-semidark) 60%, var(--color-neutral) 95%)",
+        "linear-gradient(90deg, var(--color-grey) 5%, var(--color-grey-semidark) 40%, var(--color-grey-semidark) 60%, var(--color-grey) 95%)",
     };
   };
 
@@ -774,7 +774,7 @@ export const RangeSliderDual = ({
                   variant === "price"
                     ? "w-[84px] tablet:w-[72px]"
                     : "w-[72px] tablet:w-16"
-                } text-right bg-transparent text-color-neutral-light placeholder:text-color-neutral-light px-1 text-sm tablet:text-xs outline-none focus:outline-none focus:ring-0 border-0 border-b-[1px] border-color-neutral-light focus:border-b-[1px] focus:border-color-neutral-light no-outline`}
+                } text-right bg-transparent text-color-grey-light placeholder:text-color-grey-light px-1 text-sm tablet:text-xs outline-none focus:outline-none focus:ring-0 border-0 border-b-[1px] border-color-grey-light focus:border-b-[1px] focus:border-color-grey-light no-outline`}
                 autoFocus
               />
             )
@@ -786,16 +786,16 @@ export const RangeSliderDual = ({
                     : "w-[72px] tablet:w-16"
                 } text-right cursor-pointer select-none ${
                   hoveredHandle === "min"
-                    ? "text-color-neutral-light"
-                    : "text-color-neutral"
-                } hover:text-color-neutral-light transition-colors duration-200`}
+                    ? "text-color-grey-light"
+                    : "text-color-grey"
+                } hover:text-color-grey-light transition-colors duration-200`}
                 onClick={() => startEditing("min")}
               >
                 {config.formatValue(minValue)}
               </div>
             )}
 
-          <span class="mx-2 text-color-neutral">-</span>
+          <span class="mx-2 text-color-grey">-</span>
 
           {/* Max Value - Clickable/Editable */}
           {editingMax
@@ -866,7 +866,7 @@ export const RangeSliderDual = ({
                 }}
                 placeholder="NO LIMIT"
                 tabIndex={2}
-                class="w-[72px] tablet:w-16 text-left bg-transparent text-color-neutral-light placeholder:text-color-neutral-light px-1 text-sm tablet:text-xs outline-none focus:outline-none focus:ring-0 border-0 border-b-[1px] border-color-neutral-light focus:border-b-[1px] focus:border-color-neutral-light no-outline"
+                class="w-[72px] tablet:w-16 text-left bg-transparent text-color-grey-light placeholder:text-color-grey-light px-1 text-sm tablet:text-xs outline-none focus:outline-none focus:ring-0 border-0 border-b-[1px] border-color-grey-light focus:border-b-[1px] focus:border-color-grey-light no-outline"
                 autoFocus
               />
             )
@@ -874,9 +874,9 @@ export const RangeSliderDual = ({
               <div
                 class={`w-[72px] tablet:w-16 text-left cursor-pointer select-none ${
                   hoveredHandle === "max"
-                    ? "text-color-neutral-light"
-                    : "text-color-neutral"
-                } hover:text-color-neutral-light transition-colors duration-200`}
+                    ? "text-color-grey-light"
+                    : "text-color-grey"
+                } hover:text-color-grey-light transition-colors duration-200`}
                 onClick={() => startEditing("max")}
               >
                 {config.formatValue(maxValue)}
@@ -932,7 +932,7 @@ export const RangeSliderDual = ({
       </div>
 
       {/* Tick marks for the segment boundaries */}
-      <div class="relative w-full h-6 pt-1.5 tablet:pt-1 text-xs tablet:text-[10px] font-regular text-color-neutral-semidark cursor-default select-none">
+      <div class="relative w-full h-6 pt-1.5 tablet:pt-1 text-xs tablet:text-[10px] font-regular text-color-grey-semidark cursor-default select-none">
         {config.tickMarks.map((mark, index) => {
           const position = config.tickMarkPositions[index];
           const isFirst = index === 0;
@@ -949,8 +949,8 @@ export const RangeSliderDual = ({
                   : "transform -translate-x-1/2"
               } ${
                 hoveredHandle !== null
-                  ? "text-color-neutral"
-                  : "text-color-neutral-semidark"
+                  ? "text-color-grey"
+                  : "text-color-grey-semidark"
               } transition-colors duration-100`}
             >
               {mark}

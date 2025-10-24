@@ -247,7 +247,7 @@ const WalletStampCardComponent = (
                 weight="bold"
                 size="xsR"
                 color="custom"
-                className="relative z-10 fill-color-neutral group-hover/button:fill-color-primary-light"
+                className="relative z-10 fill-color-grey group-hover/button:fill-color-purple-light"
               />
             </button>
           </div>
@@ -383,7 +383,7 @@ const WalletStampCardComponent = (
           p-stamp-card mobileLg:p-3
           rounded-2xl transition-all
           w-full h-full
-          hover:border-color-primary-light ${shadowGlowPurple} hover:border-solid border-2 border-transparent
+          hover:border-color-purple-light ${shadowGlowPurple} hover:border-solid border-2 border-transparent
            ${glassmorphismL2}
         `}
       >

@@ -261,12 +261,12 @@ export function FeeCalculatorBase({
             </div>
           )}
         </div>
-        <h6 class="font-light text-xs text-color-neutral cursor-default select-none text-nowrap">
-          <span class="text-color-neutral-semidark pr-2">
+        <h6 class="font-light text-xs text-color-grey cursor-default select-none text-nowrap">
+          <span class="text-color-grey-semidark pr-2">
             {maraMode ? "MARA REQUIRED" : "RECOMMENDED"}
           </span>
           <span
-            class={`font-medium ${maraMode ? "text-color-neutral-light" : ""}`}
+            class={`font-medium ${maraMode ? "text-color-grey-light" : ""}`}
           >
             {maraMode && maraFeeRate !== null
               ? maraFeeRate
@@ -276,10 +276,10 @@ export function FeeCalculatorBase({
           </span>{" "}
           SAT/vB
         </h6>
-        <h6 class="font-light text-base text-color-neutral-light mb-1.5 cursor-default select-none">
-          <span class="text-color-neutral-semidark pr-2.5">FEE</span>
+        <h6 class="font-light text-base text-color-grey-light mb-1.5 cursor-default select-none">
+          <span class="text-color-grey-semidark pr-2.5">FEE</span>
           <span
-            class={`font-bold ${maraMode ? "text-color-neutral-light" : ""}`}
+            class={`font-bold ${maraMode ? "text-color-grey-light" : ""}`}
           >
             {fee === 0 ? <span class="animate-pulse">XX</span> : fee}
           </span>{" "}
@@ -367,7 +367,7 @@ export function FeeCalculatorBase({
               onMouseMove={handleMouseMove}
             >
               <span class={labelXs}>TX SIZE</span>&nbsp;&nbsp;
-              <span class="text-color-neutral-light pr-1">~</span>
+              <span class="text-color-grey-light pr-1">~</span>
               {(() => {
                 const transactionType = type === "send"
                   ? "send"
@@ -399,7 +399,7 @@ export function FeeCalculatorBase({
               ? (
                 <>
                   {!feeDetails.hasExactFees && (
-                    <span class="text-color-neutral-light pr-1">~</span>
+                    <span class="text-color-grey-light pr-1">~</span>
                   )}
                   {coinType === "BTC"
                     ? formatSatoshisToBTC(feeDetails.minerFee, {
@@ -667,7 +667,7 @@ export function FeeCalculatorBase({
               ? (
                 <>
                   {!feeDetails.hasExactFees && (
-                    <span class="text-color-neutral-light pr-1">~</span>
+                    <span class="text-color-grey-light pr-1">~</span>
                   )}
                   {coinType === "BTC"
                     ? formatSatoshisToBTC(feeDetails.totalValue, {
@@ -728,13 +728,13 @@ export function FeeCalculatorBase({
       </div>
 
       <div class="mt-6 flex flex-col-reverse justify-start min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between">
-        <h6 class="text-lg text-color-neutral-light font-light cursor-default select-none">
-          <span class="text-color-neutral-semidark">ESTIMATE</span>
+        <h6 class="text-lg text-color-grey-light font-light cursor-default select-none">
+          <span class="text-color-grey-semidark">ESTIMATE</span>
           {feeDetails?.totalValue !== undefined
             ? (
               <>
                 {!feeDetails.hasExactFees && (
-                  <span class="text-color-neutral-light pl-2.5 pr-1.5">~</span>
+                  <span class="text-color-grey-light pl-2.5 pr-1.5">~</span>
                 )}
                 {(() => {
                   // Add MARA service fee if in MARA mode
@@ -783,7 +783,7 @@ export function FeeCalculatorBase({
 
       <div
         onClick={() => setVisible(!visible)}
-        className="flex items-center font-normal text-xs text-color-neutral-semidark hover:text-color-neutral-light uppercase transition-colors duration-200 gap-1.5 cursor-pointer group"
+        className="flex items-center font-normal text-xs text-color-grey-semidark hover:text-color-grey-light uppercase transition-colors duration-200 gap-1.5 cursor-pointer group"
       >
         DETAILS
         <Icon
@@ -792,7 +792,7 @@ export function FeeCalculatorBase({
           weight="bold"
           size="xxxs"
           color="custom"
-          className={` stroke-color-neutral-semidark group-hover:stroke-color-neutral-light transition-all duration-200 transform ${
+          className={` stroke-color-grey-semidark group-hover:stroke-color-grey-light transition-all duration-200 transform ${
             visible ? "scale-y-[-1]" : ""
           }`}
         />
@@ -832,11 +832,11 @@ export function FeeCalculatorBase({
                 ${
                 tosAgreed
                   ? canHoverSelected
-                    ? "bg-color-neutral-dark/15 border-color-neutral-dark/20  group-hover:border-color-neutral-light/20"
-                    : "bg-color-neutral-dark/15 border-color-neutral-dark/20"
+                    ? "bg-color-grey-dark/15 border-color-grey-dark/20  group-hover:border-color-grey-light/20"
+                    : "bg-color-grey-dark/15 border-color-grey-dark/20"
                   : canHoverSelected
-                  ? "bg-color-neutral-dark/15 border-color-neutral-light/20 group-hover:border-color-neutral-dark/40"
-                  : "bg-color-neutral-dark/15 border-color-neutral-light/20"
+                  ? "bg-color-grey-dark/15 border-color-grey-light/20 group-hover:border-color-grey-dark/40"
+                  : "bg-color-grey-dark/15 border-color-grey-light/20"
               }
               `}
             >
@@ -847,8 +847,8 @@ export function FeeCalculatorBase({
                   ${tosAgreed ? "scale-100" : "scale-0"}
                   ${
                   canHoverSelected
-                    ? "bg-color-neutral-semidark group-hover:bg-color-neutral-light"
-                    : "bg-color-neutral-semidark"
+                    ? "bg-color-grey-semidark group-hover:bg-color-grey-light"
+                    : "bg-color-grey-semidark"
                 }
                 `}
               />
@@ -858,23 +858,19 @@ export function FeeCalculatorBase({
                 text-xs font-medium select-none
                 transition-colors duration-200
                 ${
-                tosAgreed
-                  ? "text-color-neutral-semidark"
-                  : "text-color-neutral-light"
+                tosAgreed ? "text-color-grey-semidark" : "text-color-grey-light"
               }
                 ${
                 tosAgreed
-                  ? canHoverSelected
-                    ? "group-hover:text-color-neutral-light"
-                    : ""
+                  ? canHoverSelected ? "group-hover:text-color-grey-light" : ""
                   : canHoverSelected
-                  ? "group-hover:text-color-neutral-semidark"
+                  ? "group-hover:text-color-grey-semidark"
                   : ""
               }
               `}
             >
               AGREE TO THE{" "}
-              <span class="text-color-neutral-semidark">
+              <span class="text-color-grey-semidark">
                 <span class="tablet:hidden">
                   <a
                     href="/termsofservice"
@@ -882,10 +878,10 @@ export function FeeCalculatorBase({
                       transition-colors duration-200
                       ${
                       tosAgreed
-                        ? "text-color-neutral-semidark"
-                        : "text-color-neutral-semidark"
+                        ? "text-color-grey-semidark"
+                        : "text-color-grey-semidark"
                     }
-                      hover:text-color-neutral-light
+                      hover:text-color-grey-light
                     `}
                   >
                     TERMS
@@ -898,10 +894,10 @@ export function FeeCalculatorBase({
                       transition-colors duration-200
                       ${
                       tosAgreed
-                        ? "text-color-neutral-semidark"
-                        : "text-color-neutral-semidark"
+                        ? "text-color-grey-semidark"
+                        : "text-color-grey-semidark"
                     }
-                      hover:text-color-neutral-light
+                      hover:text-color-grey-light
                     `}
                   >
                     TERMS OF SERVICE

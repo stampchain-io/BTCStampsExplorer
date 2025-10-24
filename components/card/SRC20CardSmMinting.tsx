@@ -208,7 +208,7 @@ export function SRC20CardSmMinting({
                               return (
                                 <>
                                   {text && (
-                                    <span class="color-neutral-gradientDL group-hover:[-webkit-text-fill-color:var(--color-primary-light)] inline-block transition-colors duration-200">
+                                    <span class="color-grey-gradientDL group-hover:[-webkit-text-fill-color:var(--color-purple-light)] inline-block transition-colors duration-200">
                                       {text.toUpperCase()}
                                     </span>
                                   )}
@@ -251,11 +251,11 @@ export function SRC20CardSmMinting({
                               }
                               return progressValue.toFixed(1);
                             })()}
-                            <span class="text-color-neutral-light">%</span>
+                            <span class="text-color-grey-light">%</span>
                           </div>
-                          <div class="relative h-1.5 bg-color-neutral rounded-full">
+                          <div class="relative h-1.5 bg-color-grey rounded-full">
                             <div
-                              class="absolute left-0 top-0 h-1.5 bg-color-primary rounded-full"
+                              class="absolute left-0 top-0 h-1.5 bg-color-purple rounded-full"
                               style={{
                                 width: `${
                                   (() => {

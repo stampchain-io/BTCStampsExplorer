@@ -199,7 +199,7 @@ export default function MediaPage() {
             </div>
             <div class="flex flex-col w-full -mt-1 mobileMd:-mt-2 mobileLg:-mt-4 tablet:-mt-7 min-[940px]:mt-0
                           min-[940px]:w-1/2 min-[940px]:justify-end min-[940px]:pt-0 min-[940px]:text-right">
-              <p class={`${text} min-[940px]:text-color-neutral-semidark`}>
+              <p class={`${text} min-[940px]:text-color-grey-semidark`}>
                 M2
                 <br />
                 <a
@@ -210,7 +210,7 @@ export default function MediaPage() {
                   WHAT ARE BITCOIN STAMPS
                 </a>
               </p>
-              <p class={`${text} min-[940px]:text-color-neutral-semidark`}>
+              <p class={`${text} min-[940px]:text-color-grey-semidark`}>
                 GATE
                 <br />
                 <a
@@ -221,7 +221,7 @@ export default function MediaPage() {
                   WHAT ARE BITCOIN STAMPS AND SRC-20
                 </a>
               </p>
-              <p class={`${text} min-[940px]:text-color-neutral-semidark`}>
+              <p class={`${text} min-[940px]:text-color-grey-semidark`}>
                 BITCOIN.COM
                 <br />
                 <a
@@ -232,7 +232,7 @@ export default function MediaPage() {
                   UNMATCHED DATA PERMANENCE
                 </a>
               </p>
-              <p class={`${text} min-[940px]:text-color-neutral-semidark`}>
+              <p class={`${text} min-[940px]:text-color-grey-semidark`}>
                 OKX
                 <br />
                 <a
@@ -243,7 +243,7 @@ export default function MediaPage() {
                   WHAT IS SRC-20
                 </a>
               </p>
-              <p class={`${text} min-[940px]:text-color-neutral-semidark`}>
+              <p class={`${text} min-[940px]:text-color-grey-semidark`}>
                 COIN CODEX
                 <br />
                 <a

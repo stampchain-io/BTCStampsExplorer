@@ -157,7 +157,7 @@ export function SRC20CardSm({
                 rowClass = cellCenterL2Card;
               } else if (header === "VOLUME") {
                 rowClass =
-                  `p-3 border-y-[1px] border-x-0 border-color-border/75 group-hover:border-color-primary-light transition-all duration-200 tablet:pr-4 tablet:rounded-r-2xl tablet:border-r-[1px] tablet:border-l-0 desktop:pr-3 desktop:rounded-r-none desktop:border-r-0`;
+                  `p-3 border-y-[1px] border-x-0 border-color-border/75 group-hover:border-color-purple-light transition-all duration-200 tablet:pr-4 tablet:rounded-r-2xl tablet:border-r-[1px] tablet:border-l-0 desktop:pr-3 desktop:rounded-r-none desktop:border-r-0`;
               } else if (header === "MARKETCAP") {
                 rowClass = cellRightL2Card;
               } else {
@@ -249,7 +249,7 @@ export function SRC20CardSm({
                               return (
                                 <>
                                   {text && (
-                                    <span class="color-neutral-gradientDL group-hover:[-webkit-text-fill-color:var(--color-primary-light)] inline-block transition-colors duration-200">
+                                    <span class="color-grey-gradientDL group-hover:[-webkit-text-fill-color:var(--color-purple-light)] inline-block transition-colors duration-200">
                                       {text.toUpperCase()}
                                     </span>
                                   )}
@@ -331,7 +331,7 @@ export function SRC20CardSm({
                         // Convert to number and validate
                         const changeValue = Number(changePercent);
                         if (isNaN(changeValue)) {
-                          return <span class="text-color-neutral">N/A</span>;
+                          return <span class="text-color-grey">N/A</span>;
                         }
 
                         return (
@@ -350,7 +350,7 @@ export function SRC20CardSm({
                     </td>
                     {/* VOLUME */}
                     <td
-                      class={`p-3 border-y-[1px] border-x-0 border-color-border/75 group-hover:border-color-primary-light transition-all duration-200
+                      class={`p-3 border-y-[1px] border-x-0 border-color-border/75 group-hover:border-color-purple-light transition-all duration-200
                       tablet:pr-4 tablet:rounded-r-2xl tablet:border-r-[1px] tablet:border-l-0
                       desktop:pr-3 desktop:rounded-r-none desktop:border-r-0
                       text-center tablet:text-right desktop:text-center`}

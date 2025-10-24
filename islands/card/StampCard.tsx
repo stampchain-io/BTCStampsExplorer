@@ -242,7 +242,7 @@ export function StampCard({
                 weight="bold"
                 size="xsR"
                 color="custom"
-                className="relative z-10 fill-color-neutral group-hover/button:fill-color-primary-light"
+                className="relative z-10 fill-color-grey group-hover/button:fill-color-purple-light"
               />
             </button>
           </div>
@@ -425,7 +425,7 @@ export function StampCard({
           text-white group relative z-0 flex flex-col
           p-stamp-card mobileLg:p-3
           w-full h-full
-          hover:border-color-primary-light ${shadowGlowPurple}
+          hover:border-color-purple-light ${shadowGlowPurple}
           ${glassmorphism} ${transitionColors}
         `}
       >

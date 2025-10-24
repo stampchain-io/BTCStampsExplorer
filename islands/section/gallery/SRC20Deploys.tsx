@@ -99,7 +99,7 @@ export default function SRC20DeploysGallery(): JSX.Element {
         )
         : transactions.length === 0
         ? (
-          <div class="text-color-neutral-dark text-sm">
+          <div class="text-color-grey-dark text-sm">
             NO RECENT DEPLOYS FOUND
           </div>
         )

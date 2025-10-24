@@ -32,7 +32,7 @@ export function CollectionCard(
   return (
     <a
       href={`/collection/detail/${collectionName}`}
-      className={`${containerBackground} gap-6 hover:border-color-primary-light ${shadowGlowPurple} hover:border-solid border-2 border-transparent group`}
+      className={`${containerBackground} gap-6 hover:border-color-purple-light ${shadowGlowPurple} hover:border-solid border-2 border-transparent group`}
     >
       {/* ===== CARD HEADER ===== */}
       <div class="flex w-full gap-6">
@@ -48,7 +48,7 @@ export function CollectionCard(
         <div class="w-full">
           <div class="flex flex-col justify-between w-full">
             {/* check code */}
-            <h2 class="font-black text-2xl color-neutral-gradientDL group-hover:[-webkit-text-fill-color:var(--color-primary-light)] tracking-wide inline-block w-fit">
+            <h2 class="font-black text-2xl color-grey-gradientDL group-hover:[-webkit-text-fill-color:var(--color-purple-light)] tracking-wide inline-block w-fit">
               <span class="min-[420px]:hidden">
                 {abbreviateCollectionName(collectionName)
                   .toUpperCase()}
@@ -113,7 +113,7 @@ export function CollectionCard(
                   ? formatVolume(collection.marketData.totalVolume24hBTC)
                   : "N/A"}
               </span>{"  "}
-              <span class="text-color-neutral-light">BTC</span>
+              <span class="text-color-grey-light">BTC</span>
             </h5>
           </div>
           <div class="flex flex-col mobileLg:flex-row justify-between w-full">
@@ -125,7 +125,7 @@ export function CollectionCard(
                   ? formatBTC(collection.marketData.minFloorPriceBTC)
                   : "N/A"}
               </span>{" "}
-              <span class="text-color-neutral-light">BTC</span>
+              <span class="text-color-grey-light">BTC</span>
             </h5>
             <h5 class={`${labelSm} -mt-0.5`}>
               <span class="min-[400px]:hidden">MCAP</span>
@@ -139,7 +139,7 @@ export function CollectionCard(
                   )
                   : "N/A"}
               </span>{" "}
-              <span class="text-color-neutral-light">BTC</span>
+              <span class="text-color-grey-light">BTC</span>
             </h5>
           </div>
         </div>

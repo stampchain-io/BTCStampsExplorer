@@ -27,7 +27,7 @@ export function SettingsButton({
     <div
       class={`rounded-full flex flex-col items-center gap-1 h-fit relative z-[10] ${
         open
-          ? "px-6 py-4 border-2 border-color-primary-semilight bg-color-background"
+          ? "px-6 py-4 border-2 border-color-purple-semilight bg-color-background"
           : ""
       }`}
     >
@@ -44,7 +44,7 @@ export function SettingsButton({
               onClick={() => handleOpen?.(false)}
               ariaLabel="Close"
             />
-            <p class="text-lg font-black text-color-primary-light mb-1">
+            <p class="text-lg font-black text-color-purple-light mb-1">
               TOOLS
             </p>
             {filterButtons?.map((filter: string) => (
@@ -53,8 +53,8 @@ export function SettingsButton({
                 type="button"
                 class={`cursor-pointer text-xs tablet:text-sm font-black ${
                   localFilters.includes(filter)
-                    ? "text-color-primary-light "
-                    : "text-color-primary-semilight hover:text-color-primary-light"
+                    ? "text-color-purple-light "
+                    : "text-color-purple-semilight hover:text-color-purple-light"
                 }`}
                 onClick={() => handleFilterClick(filter)}
               >
@@ -80,7 +80,7 @@ export function SettingsButton({
       {visible && (
         <div
           role="tooltip"
-          className="absolute bottom-full right-[0.3px] mb-2 z-10 px-3 py-2 text-sm font-medium text-white bg-color-neutral-dark rounded-xl shadow-md"
+          className="absolute bottom-full right-[0.3px] mb-2 z-10 px-3 py-2 text-sm font-medium text-white bg-color-grey-dark rounded-xl shadow-md"
         >
           Settings
           <div class="tooltip-arrow" />

@@ -123,11 +123,11 @@ function SectionHeader({
       f-partial={`/${config.paramName}`}
     >
       <div class="flex items-center gap-4">
-        <h2 class="text-color-neutral-dark text-lg mobileLg:text-2xl tablet:text-2xl desktop:text-2xl font-nunito font-extrabold">
+        <h2 class="text-color-grey-dark text-lg mobileLg:text-2xl tablet:text-2xl desktop:text-2xl font-nunito font-extrabold">
           {title}
         </h2>
         {sortMetrics && (
-          <div class="text-xs text-color-neutral opacity-75">
+          <div class="text-xs text-color-grey opacity-75">
             {sortMetrics.count} sorts • {sortMetrics.avgDuration}ms avg
           </div>
         )}
@@ -217,7 +217,7 @@ function DispenserItem({
   /* ===== EMPTY STATE HANDLING ===== */
   if (!dispensers?.length) {
     return (
-      <div class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black color-primary-gradientLD">
+      <div class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black color-purple-gradientLD">
         NO LISTINGS FOUND
       </div>
     );
@@ -235,7 +235,7 @@ function DispenserItem({
   if (!openDispensers.length && !closedDispensers.length) {
     return (
       <div>
-        <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black color-primary-gradientLD">
+        <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black color-purple-gradientLD">
           NO LISTINGS FOUND
         </h3>
       </div>
@@ -249,7 +249,7 @@ function DispenserItem({
         {/* Open Dispensers Section */}
         {openDispensers.length > 0 && (
           <div id="open-listings-section">
-            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black color-primary-gradientLD mb-6">
+            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black color-purple-gradientLD mb-6">
               OPEN LISTINGS
             </h3>
             <div class="flex flex-col gap-6">
@@ -263,7 +263,7 @@ function DispenserItem({
         {/* Closed Dispensers Section */}
         {closedDispensers.length > 0 && (
           <div id="closed-listings-section">
-            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black color-primary-gradientLD mb-6">
+            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black color-purple-gradientLD mb-6">
               CLOSED LISTINGS
             </h3>
             <div class="flex flex-col gap-6">
@@ -280,7 +280,7 @@ function DispenserItem({
         {/* Open Dispensers Section */}
         {openDispensers.length > 0 && (
           <div class="mb-8" id="open-listings-section">
-            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black color-primary-gradientLD mb-6">
+            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black color-purple-gradientLD mb-6">
               OPEN LISTINGS
             </h3>
             <div class="flex flex-col gap-6">
@@ -294,7 +294,7 @@ function DispenserItem({
         {/* Closed Dispensers Section */}
         {closedDispensers.length > 0 && (
           <div id="closed-listings-section">
-            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black color-primary-gradientLD mb-6">
+            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black color-purple-gradientLD mb-6">
               CLOSED LISTINGS
             </h3>
             <div class="flex flex-col gap-6">
@@ -355,7 +355,7 @@ function DispenserRow(
   /* ===== RENDER DISPENSER ROW ===== */
   return (
     <div
-      class={`flex justify-between ${glassmorphism} rounded-2xl hover:border-color-primary-light ${shadowGlowPurple} border-2 border-transparent`}
+      class={`flex justify-between ${glassmorphism} rounded-2xl hover:border-color-purple-light ${shadowGlowPurple} border-2 border-transparent`}
     >
       <div class="flex p-3 mobileLg:p-6 gap-6 uppercase w-full">
         <a
@@ -391,7 +391,7 @@ function DispenserRow(
             <div class="relative">
               <a
                 href={`/stamp/${dispenser.stamp.stamp}`}
-                class="!inline-block text-2xl mobileLg:text-4xl font-black color-primary-gradientLD group-hover:[-webkit-text-fill-color:var(--color-primary-light)]"
+                class="!inline-block text-2xl mobileLg:text-4xl font-black color-purple-gradientLD group-hover:[-webkit-text-fill-color:var(--color-purple-light)]"
               >
                 {`#${dispenser.stamp.stamp}`}
               </a>
@@ -400,11 +400,11 @@ function DispenserRow(
 
           <div class="flex justify-between flex-row w-full">
             <p
-              class={`text-base text-color-primary-semilight font-light text-ellipsis overflow-hidden ${
+              class={`text-base text-color-purple-semilight font-light text-ellipsis overflow-hidden ${
                 view === "mobile" ? "tablet:w-full" : ""
               }`}
             >
-              <span class="font-bold text-color-primary-semilight text-base mobileLg:text-xl normal-case">
+              <span class="font-bold text-color-purple-semilight text-base mobileLg:text-xl normal-case">
                 {/* Abbreviate origin address differently depending on screen size */}
                 <span class="mobileMd:hidden">
                   {abbreviateAddress(dispenser.origin, 4)}
@@ -436,17 +436,17 @@ function DispenserRow(
             </div>
           </div>
           <div class="text-center flex justify-between mt-[6px]">
-            <p class="text-base mobileLg:text-lg text-color-neutral-semidark font-light">
+            <p class="text-base mobileLg:text-lg text-color-grey-semidark font-light">
               GIVE{" "}
-              <span class="font-bold text-color-neutral-light">
+              <span class="font-bold text-color-grey-light">
                 {Number(dispenser.give_quantity).toLocaleString()}
               </span>
             </p>
           </div>
           <div class="flex flex-row justify-between w-full">
-            <p class="text-base mobileLg:text-lg text-color-neutral-semidark font-light">
+            <p class="text-base mobileLg:text-lg text-color-grey-semidark font-light">
               QUANTITY{" "}
-              <span class="font-bold text-color-neutral-light">
+              <span class="font-bold text-color-grey-light">
                 {dispenser.give_remaining === 0
                   ? Number(dispenser.escrow_quantity).toLocaleString()
                   : `${Number(dispenser.give_remaining).toLocaleString()}/${
@@ -455,7 +455,7 @@ function DispenserRow(
               </span>
             </p>
             <p
-              class={`text-color-neutral-semidark text-lg font-light -mt-1 ${
+              class={`text-color-grey-semidark text-lg font-light -mt-1 ${
                 view === "mobile" ? "hidden mobileLg:block" : ""
               }`}
             >
@@ -463,24 +463,24 @@ function DispenserRow(
             </p>
           </div>
           <div class="flex flex-row justify-between w-full">
-            <p class="text-base mobileLg:text-lg text-color-neutral-semidark font-light">
+            <p class="text-base mobileLg:text-lg text-color-grey-semidark font-light">
               PRICE{" "}
-              <span class="font-bold text-color-neutral-light">
+              <span class="font-bold text-color-grey-light">
                 {formatBTCAmount(Number(dispenser.btcrate), {
                   includeSymbol: false,
                 })}
               </span>{" "}
-              <span className="text-color-neutral-light">BTC</span>
+              <span className="text-color-grey-light">BTC</span>
             </p>
             <p
-              class={`text-xl mobileMd:text-2xl text-color-neutral-light font-bold -mt-1 ${
+              class={`text-xl mobileMd:text-2xl text-color-grey-light font-bold -mt-1 ${
                 view === "mobile" ? "hidden mobileLg:block" : ""
               }`}
             >
               {formatBTCAmount(
                 Number(dispenser.btcrate) * Number(dispenser.escrow_quantity),
                 { includeSymbol: false },
-              )} <span class="text-color-neutral-light font-light">BTC</span>
+              )} <span class="text-color-grey-light font-light">BTC</span>
             </p>
           </div>
         </div>
@@ -628,7 +628,7 @@ function WalletProfileContentInner({
       {/* Page Header */}
       <div class="flex flex-row justify-between items-center gap-3 w-full relative mb-6">
         <div class="flex gap-3 items-center">
-          <h1 class="text-2xl mobileMd:text-3xl mobileLg:text-4xl font-extralight text-color-primary-light">
+          <h1 class="text-2xl mobileMd:text-3xl mobileLg:text-4xl font-extralight text-color-purple-light">
             WALLET
           </h1>
           <p class="text-sm mobileMd:text-sm mobileLg:text-lg text-stamp-gray">
@@ -708,7 +708,7 @@ function WalletProfileContentInner({
               />
             )
             : (
-              <p class="text-color-neutral opacity-75 text-center py-8">
+              <p class="text-color-grey opacity-75 text-center py-8">
                 NO STAMPS IN THE WALLET
               </p>
             )}
@@ -742,7 +742,7 @@ function WalletProfileContentInner({
               />
             )
             : (
-              <p class="text-color-neutral opacity-75 text-center py-8">
+              <p class="text-color-grey opacity-75 text-center py-8">
                 NO TOKENS IN THE WALLET
               </p>
             )}
@@ -764,7 +764,7 @@ function WalletProfileContentInner({
           {/* Open Dispensers */}
           {openDispensersCount > 0 && (
             <div id="open-listings-section" class="mb-6">
-              <h3 class="text-lg font-semibold text-color-neutral-dark mb-3">
+              <h3 class="text-lg font-semibold text-color-grey-dark mb-3">
                 Open Listings ({openDispensersCount})
               </h3>
               <DispenserItem
@@ -778,7 +778,7 @@ function WalletProfileContentInner({
           {/* Closed Dispensers */}
           {closedDispensersCount > 0 && (
             <div id="closed-listings-section">
-              <h3 class="text-lg font-semibold text-color-neutral-dark mb-3">
+              <h3 class="text-lg font-semibold text-color-grey-dark mb-3">
                 Closed Listings ({closedDispensersCount})
               </h3>
               <DispenserItem
@@ -793,11 +793,11 @@ function WalletProfileContentInner({
 
       {/* Feature Flag Debug Info */}
       {enableAdvancedSorting && showSortingMetrics && (
-        <div class="mt-8 p-4 bg-color-neutral-lightest rounded-2xl">
-          <h3 class="text-sm font-semibold text-color-neutral-dark mb-2">
+        <div class="mt-8 p-4 bg-color-grey-lightest rounded-2xl">
+          <h3 class="text-sm font-semibold text-color-grey-dark mb-2">
             Advanced Sorting Status
           </h3>
-          <div class="text-xs text-color-neutral space-y-1">
+          <div class="text-xs text-color-grey space-y-1">
             <div>Status: ✅ Enabled (Phase 1 - Infrastructure)</div>
             <div>URL Sync: {sortingConfig.enableUrlSync ? "✅" : "❌"}</div>
             <div>

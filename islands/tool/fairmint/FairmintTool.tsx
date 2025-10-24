@@ -121,7 +121,7 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
             ? (
               // Render the select dropdown if fairminters are available
               <select
-                class="h-10 p-3 rounded-2xl bg-color-neutral text-black placeholder:text-black placeholder:font-light"
+                class="h-10 p-3 rounded-2xl bg-color-grey text-black placeholder:text-black placeholder:font-light"
                 value={formState.asset}
                 onChange={handleAssetChange}
               >
@@ -149,7 +149,7 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
               <input
                 type="text"
                 placeholder="ENTER ASSET"
-                class="h-10 p-3 rounded-2xl bg-color-neutral text-black placeholder:text-black placeholder:font-light"
+                class="h-10 p-3 rounded-2xl bg-color-grey text-black placeholder:text-black placeholder:font-light"
                 value={formState.asset}
                 onChange={(e) => handleInputChange(e, "asset")}
               />
@@ -158,7 +158,7 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
           <input
             type="number"
             placeholder="QUANTITY"
-            class="h-10 p-3 rounded-2xl bg-color-neutral text-black placeholder:text-black placeholder:font-light"
+            class="h-10 p-3 rounded-2xl bg-color-grey text-black placeholder:text-black placeholder:font-light"
             value={formState.quantity}
             onChange={(e) => handleInputChange(e, "quantity")}
           />
@@ -216,7 +216,7 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
             </div>
 
             {/* Phase text */}
-            <span class="text-xs text-color-neutral-light font-normal opacity-80">
+            <span class="text-xs text-color-grey-light font-normal opacity-80">
               {currentPhase === "instant" && "⚡ Instant"}
               {currentPhase === "smart" && "💡 Smart"}
               {currentPhase === "exact" && "🎯 Exact"}

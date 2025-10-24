@@ -5,7 +5,7 @@ import { useState } from "preact/hooks";
 
 /* ===== STYLES ===== */
 const containerClassName =
-  `border-2 border-color-neutral-semidark rounded-2xl relative overflow-hidden
+  `border-2 border-color-grey-semidark rounded-2xl relative overflow-hidden
   w-full h-[92px] mobileMd:h-[116px] mobileLg:h-[130px] tablet:h-[148px] desktop:h-[160px]`;
 const imageContentClassName =
   "bg-center bg-no-repeat bg-[length:100%] w-full h-full grayscale transition-all duration-300";
@@ -49,13 +49,13 @@ export function CollectionsBanner(
       <div
         class={`${gradientContentClassName} ${
           isDarkMode
-            ? "from-color-neutral-semidark/100 via-color-neutral/50 to-color-neutral-semilight/0"
-            : "from-color-neutral-semilight/100 via-color-neutral/50 to-color-neutral-semidark/0"
+            ? "from-color-grey-semidark/100 via-color-grey/50 to-color-grey-semilight/0"
+            : "from-color-grey-semilight/100 via-color-grey/50 to-color-grey-semidark/0"
         } ${isHovered ? "hidden" : ""}`}
       />
       <h3
         class={`${nameClassName} ${
-          isDarkMode ? "text-color-neutral-light" : "text-color-neutral-dark"
+          isDarkMode ? "text-color-grey-light" : "text-color-grey-dark"
         } ${isHovered ? "!hidden" : ""}`}
       >
         {collection.collection_name}

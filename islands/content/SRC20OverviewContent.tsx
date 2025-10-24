@@ -108,7 +108,7 @@ export function SRC20OverviewContent({
       {isNavigating && (
         <div class="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center">
           <div class={`${glassmorphismL2} p-4 shadow-lg`}>
-            <div class="animate-spin w-6 h-6 border-2 border-color-primary-light border-t-transparent rounded-full">
+            <div class="animate-spin w-6 h-6 border-2 border-color-purple-light border-t-transparent rounded-full">
             </div>
           </div>
         </div>

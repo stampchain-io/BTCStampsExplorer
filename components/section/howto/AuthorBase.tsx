@@ -18,7 +18,7 @@ export function AuthorSection({ name, twitter, website }: AuthorProps) {
             ARTICLE BY
           </h6>
           <h5
-            class={`${textLg} tablet:text-base !font-semibold !text-color-neutral-semilight min-[520px]:mb-1`}
+            class={`${textLg} tablet:text-base !font-semibold !text-color-grey-semilight min-[520px]:mb-1`}
           >
             {name}
           </h5>

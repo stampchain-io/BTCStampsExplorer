@@ -38,7 +38,7 @@ export function Article(
           {/* ===== IMPORTANT NOTES SECTION ===== */}
           {importantNotes?.length > 0 && (
             <div class="mt-0">
-              <p class={`${headingGrey} !text-color-neutral-light mb-0`}>
+              <p class={`${headingGrey} !text-color-grey-light mb-0`}>
                 IMPORTANT
               </p>
               {importantNotes.map((note: string, index: number) => (

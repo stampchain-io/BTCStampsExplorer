@@ -228,7 +228,7 @@ function DispenserStats({
         </p>
 
         {stampData.cpid && (
-          <p class="-mt-1 pb-1 text-base mobileLg:text-lg font-bold text-color-neutral-semidark block">
+          <p class="-mt-1 pb-1 text-base mobileLg:text-lg font-bold text-color-grey-semidark block">
             {stampData.cpid}
           </p>
         )}
@@ -236,7 +236,7 @@ function DispenserStats({
         <div class="flex flex-col items-start pt-1.5 mobileLg:pt-3">
           <p class={labelSm}>BY</p>
           <a
-            class="text-sm mobileLg:text-base font-black color-neutral-gradientLD-hover -mt-1"
+            class="text-sm mobileLg:text-base font-black color-grey-gradientLD-hover -mt-1"
             href={`/wallet/${stampData.creator}`}
             target="_parent"
           >
@@ -283,7 +283,7 @@ function DispenserStats({
         <div class="flex justify-end pt-6">
           <Button
             variant="outline"
-            color="purpleLight"
+            color="purple"
             size="md"
           >
             BUY

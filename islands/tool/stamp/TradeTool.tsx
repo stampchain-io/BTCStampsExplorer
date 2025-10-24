@@ -701,24 +701,22 @@ export function StampTradeTool() {
 
       {/* ===== CREATE PSBT FORM ===== */}
       <div class={containerBackground}>
-        <h3 class=" font-bold text-xl text-color-primary-semilight mb-2">
+        <h3 class=" font-bold text-xl text-color-purple-semilight mb-2">
           CREATE PSBT
         </h3>
 
         {/* ===== 🎯 INLINE FEE STATUS DISPLAY - CREATE PSBT ===== */}
         {createPsbtFeeDetails && (
-          <div className="mb-4 p-3 bg-color-neutral-semidark/50 rounded-2xl border border-color-neutral-light/10">
+          <div className="mb-4 p-3 bg-color-grey-semidark/50 rounded-2xl border border-color-grey-light/10">
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-sm text-color-neutral-light">
+              <span className="text-sm text-color-grey-light">
                 Estimated Fees:
               </span>
               {/* Phase indicators following StampingTool pattern */}
               <div className="flex items-center gap-1">
                 <div
                   className={`w-1.5 h-1.5 rounded-full ${
-                    createPsbtPhase1
-                      ? "bg-green-400"
-                      : "bg-color-neutral-light/30"
+                    createPsbtPhase1 ? "bg-green-400" : "bg-color-grey-light/30"
                   }`}
                   title="Phase 1: Instant estimate"
                 >
@@ -727,16 +725,14 @@ export function StampTradeTool() {
                   className={`w-1.5 h-1.5 rounded-full ${
                     createPsbtIsPreFetching
                       ? "bg-blue-400 animate-pulse"
-                      : "bg-color-neutral-light/30"
+                      : "bg-color-grey-light/30"
                   }`}
                   title="Phase 2: Smart UTXO estimate"
                 >
                 </div>
                 <div
                   className={`w-1.5 h-1.5 rounded-full ${
-                    createPsbtPhase3
-                      ? "bg-green-400"
-                      : "bg-color-neutral-light/30"
+                    createPsbtPhase3 ? "bg-green-400" : "bg-color-grey-light/30"
                   }`}
                   title="Phase 3: Exact estimate"
                 >
@@ -745,13 +741,13 @@ export function StampTradeTool() {
             </div>
             <div className="grid grid-cols-2 gap-4 text-xs">
               <div>
-                <span className="text-color-neutral-light">Miner Fee:</span>
+                <span className="text-color-grey-light">Miner Fee:</span>
                 <span className="ml-2 text-white">
                   {createPsbtFeeDetails.minerFee} sats
                 </span>
               </div>
               <div>
-                <span className="text-color-neutral-light">Total Value:</span>
+                <span className="text-color-grey-light">Total Value:</span>
                 <span className="ml-2 text-white">
                   {createPsbtFeeDetails.totalValue} sats
                 </span>
@@ -818,22 +814,22 @@ export function StampTradeTool() {
 
       {/* ===== UTXO ATTACH FORM ===== */}
       <div class={containerBackground}>
-        <h3 class=" font-bold text-xl text-color-primary-semilight mb-2">
+        <h3 class=" font-bold text-xl text-color-purple-semilight mb-2">
           UTXO ATTACH
         </h3>
 
         {/* ===== 🎯 INLINE FEE STATUS DISPLAY - UTXO ATTACH ===== */}
         {attachFeeDetails && (
-          <div className="mb-4 p-3 bg-color-neutral-semidark/50 rounded-2xl border border-color-neutral-light/10">
+          <div className="mb-4 p-3 bg-color-grey-semidark/50 rounded-2xl border border-color-grey-light/10">
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-sm text-color-neutral-light">
+              <span className="text-sm text-color-grey-light">
                 Estimated Fees:
               </span>
               {/* Phase indicators following StampingTool pattern */}
               <div className="flex items-center gap-1">
                 <div
                   className={`w-1.5 h-1.5 rounded-full ${
-                    attachPhase1 ? "bg-green-400" : "bg-color-neutral-light/30"
+                    attachPhase1 ? "bg-green-400" : "bg-color-grey-light/30"
                   }`}
                   title="Phase 1: Instant estimate"
                 >
@@ -842,14 +838,14 @@ export function StampTradeTool() {
                   className={`w-1.5 h-1.5 rounded-full ${
                     attachIsPreFetching
                       ? "bg-blue-400 animate-pulse"
-                      : "bg-color-neutral-light/30"
+                      : "bg-color-grey-light/30"
                   }`}
                   title="Phase 2: Smart UTXO estimate"
                 >
                 </div>
                 <div
                   className={`w-1.5 h-1.5 rounded-full ${
-                    attachPhase3 ? "bg-green-400" : "bg-color-neutral-light/30"
+                    attachPhase3 ? "bg-green-400" : "bg-color-grey-light/30"
                   }`}
                   title="Phase 3: Exact estimate"
                 >
@@ -858,13 +854,13 @@ export function StampTradeTool() {
             </div>
             <div className="grid grid-cols-2 gap-4 text-xs">
               <div>
-                <span className="text-color-neutral-light">Miner Fee:</span>
+                <span className="text-color-grey-light">Miner Fee:</span>
                 <span className="ml-2 text-white">
                   {attachFeeDetails.minerFee} sats
                 </span>
               </div>
               <div>
-                <span className="text-color-neutral-light">Total Value:</span>
+                <span className="text-color-grey-light">Total Value:</span>
                 <span className="ml-2 text-white">
                   {attachFeeDetails.totalValue} sats
                 </span>
@@ -1017,22 +1013,22 @@ export function StampTradeTool() {
       {/* ===== COMPLETE SWAP FORM ===== */}
       <div class={containerBackground}>
         <h2 class={`${subtitleGrey} mobileMd:mx-auto`}>BUYER</h2>
-        <h3 class=" font-bold text-xl text-color-primary-semilight mb-2">
+        <h3 class=" font-bold text-xl text-color-purple-semilight mb-2">
           COMPLETE SWAP
         </h3>
 
         {/* ===== 🎯 INLINE FEE STATUS DISPLAY - COMPLETE SWAP ===== */}
         {swapFeeDetails && (
-          <div className="mb-4 p-3 bg-color-neutral-semidark/50 rounded-2xl border border-color-neutral-light/10">
+          <div className="mb-4 p-3 bg-color-grey-semidark/50 rounded-2xl border border-color-grey-light/10">
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-sm text-color-neutral-light">
+              <span className="text-sm text-color-grey-light">
                 Estimated Fees:
               </span>
               {/* Phase indicators following StampingTool pattern */}
               <div className="flex items-center gap-1">
                 <div
                   className={`w-1.5 h-1.5 rounded-full ${
-                    swapPhase1 ? "bg-green-400" : "bg-color-neutral-light/30"
+                    swapPhase1 ? "bg-green-400" : "bg-color-grey-light/30"
                   }`}
                   title="Phase 1: Instant estimate"
                 >
@@ -1041,14 +1037,14 @@ export function StampTradeTool() {
                   className={`w-1.5 h-1.5 rounded-full ${
                     swapIsPreFetching
                       ? "bg-blue-400 animate-pulse"
-                      : "bg-color-neutral-light/30"
+                      : "bg-color-grey-light/30"
                   }`}
                   title="Phase 2: Smart UTXO estimate"
                 >
                 </div>
                 <div
                   className={`w-1.5 h-1.5 rounded-full ${
-                    swapPhase3 ? "bg-green-400" : "bg-color-neutral-light/30"
+                    swapPhase3 ? "bg-green-400" : "bg-color-grey-light/30"
                   }`}
                   title="Phase 3: Exact estimate"
                 >
@@ -1057,13 +1053,13 @@ export function StampTradeTool() {
             </div>
             <div className="grid grid-cols-2 gap-4 text-xs">
               <div>
-                <span className="text-color-neutral-light">Miner Fee:</span>
+                <span className="text-color-grey-light">Miner Fee:</span>
                 <span className="ml-2 text-white">
                   {swapFeeDetails.minerFee} sats
                 </span>
               </div>
               <div>
-                <span className="text-color-neutral-light">Total Value:</span>
+                <span className="text-color-grey-light">Total Value:</span>
                 <span className="ml-2 text-white">
                   {swapFeeDetails.totalValue} sats
                 </span>

@@ -199,8 +199,8 @@ export const WalletButton = (
             weight="normal"
             size="mdR"
             color="purpleLight"
-            colorAccent="color-mix(in srgb, var(--color-neutral-semidark) 75%, transparent)"
-            colorAccentHover="var(--color-neutral-semidark)"
+            colorAccent="color-mix(in srgb, var(--color-grey-semidark) 75%, transparent)"
+            colorAccentHover="var(--color-grey-semidark)"
             onClick={handleWalletIconClick}
           />
         )}
@@ -216,8 +216,8 @@ export const WalletButton = (
                 weight="normal"
                 size="mdR"
                 color="purpleLight"
-                colorAccent="color-mix(in srgb, var(--color-neutral-semilight) 75%, transparent)"
-                colorAccentHover="var(--color-neutral-semilight)"
+                colorAccent="color-mix(in srgb, var(--color-grey-semilight) 75%, transparent)"
+                colorAccentHover="var(--color-grey-semilight)"
                 onClick={handleWalletIconClick}
               />
             </div>
@@ -429,7 +429,7 @@ function CounterpartyVersion() {
         weight="normal"
         size="xs"
         color="custom"
-        className="mr-3 stroke-color-neutral-dark"
+        className="mr-3 stroke-color-grey-dark"
       />
       <span class={labelXs}>
         COUNTERPARTY {loading

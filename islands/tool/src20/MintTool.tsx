@@ -57,7 +57,7 @@ const MintProgress = (
           class={`relative w-full max-w-[420px] h-3 ${glassmorphismL2} rounded-full`}
         >
           <div
-            class="absolute top-[1px] left-[1px] right-[1px] h-2 bg-color-neutral rounded-full"
+            class="absolute top-[1px] left-[1px] right-[1px] h-2 bg-color-grey rounded-full"
             style={{ width: progressWidth }}
           />
         </div>
@@ -464,7 +464,7 @@ export function SRC20MintTool({
                   weight="extraLight"
                   size="xl"
                   color="custom"
-                  className="stroke-color-neutral-dark"
+                  className="stroke-color-grey-dark"
                 />
               )}
           </div>
@@ -545,7 +545,7 @@ export function SRC20MintTool({
                       <div class="pt-[1px]">
                         {result.tick}
                       </div>
-                      <div class="text-xs text-color-neutral">
+                      <div class="text-xs text-color-grey">
                         {(result.progress || 0).toFixed(1)}%
                       </div>
                     </li>

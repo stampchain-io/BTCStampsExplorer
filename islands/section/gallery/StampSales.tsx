@@ -164,7 +164,7 @@ export function StampSalesGallery({
       <h3
         class={variant === "home"
           ? titleGreyLD
-          : "text-3xl tablet:text-7xl text-left mb-2 bg-clip-text text-transparent color-primary-gradientDL font-black"}
+          : "text-3xl tablet:text-7xl text-left mb-2 bg-clip-text text-transparent color-purple-gradientDL font-black"}
       >
         {title}
       </h3>
@@ -181,7 +181,7 @@ export function StampSalesGallery({
         {isLoading && (
           <div class="flex items-center gap-3 -mt-[29px] mb-[9px]">
             <div class={loaderSpinXsPurple} />
-            <div class="animate-pulse font-medium text-sm text-color-primary-semilight">
+            <div class="animate-pulse font-medium text-sm text-color-purple-semilight">
               REFRESHING
             </div>
           </div>

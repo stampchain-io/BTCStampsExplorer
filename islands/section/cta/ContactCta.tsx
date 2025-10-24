@@ -109,7 +109,7 @@ const ContactCta = () => {
                 <textarea
                   value={message}
                   onChange={(e) => setMessage(e.currentTarget.value)}
-                  class="h-[108px] mobileMd:h-[120px] p-3 rounded-2xl bg-color-neutral text-color-neutral-dark placeholder:text-color-neutral-dark placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-color-neutral-light"
+                  class="h-[108px] mobileMd:h-[120px] p-3 rounded-2xl bg-color-grey text-color-grey-dark placeholder:text-color-grey-dark placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-color-grey-light"
                   placeholder="Message"
                 />
               </div>

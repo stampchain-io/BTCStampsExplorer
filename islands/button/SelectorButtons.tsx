@@ -155,7 +155,7 @@ export const SelectorButtons = ({
             ? `text-black ${transitionColors}` // After mount: fancy pill behind
             : `text-black ${buttonStyles.variant.flat} !px-1 transition-none pointer-events-none` // Before mount: flat
           : isMounted
-          ? `mx-0.5 bg-transparent text-[var(--color-button-dark)] ${transitionColors} hover:text-[var(--color-button)] hover:bg-color-neutral-dark/25` // Unselected after mount
+          ? `mx-0.5 bg-transparent text-[var(--color-button-dark)] ${transitionColors} hover:text-[var(--color-button)] hover:bg-color-grey-dark/25` // Unselected after mount
           : "mx-0.5 bg-transparent text-[var(--color-button-dark)] transition-none pointer-events-none"; // Unselected before mount
 
         return (

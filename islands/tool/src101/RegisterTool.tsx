@@ -298,7 +298,7 @@ export function SRC101RegisterTool({
             <div
               class={`h-10 px-4 border border-color-border/75 rounded-2xl
                 !bg-color-background/60 ${glassmorphismL2Hover}
-                font-semibold text-sm text-color-neutral text-right backdrop-blur-sm hover:text-color-neutral-light tracking-wider ${transitionAll} !duration-200 focus-visible:!outline-none cursor-pointer flex items-center justify-end ${
+                font-semibold text-sm text-color-grey text-right backdrop-blur-sm hover:text-color-grey-light tracking-wider ${transitionAll} !duration-200 focus-visible:!outline-none cursor-pointer flex items-center justify-end ${
                 openTldDropdown && !isSelectingTld ? "input-open-bottom" : ""
               }`}
               onClick={() => {
@@ -357,7 +357,7 @@ export function SRC101RegisterTool({
         <div class="flex flex-row justify-between w-full">
           <div class="flex flex-col justify-center items-start">
             {/* message - default:noDisplay / display on user input & onClick - either already registered or available */}
-            <h6 class="font-medium text-sm text-color-neutral">
+            <h6 class="font-medium text-sm text-color-grey">
               {formState.toAddress && checkStatus
                 ? isExist
                   ? `${

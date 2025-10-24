@@ -403,7 +403,7 @@ export default function DonateCta() {
               {/* Address Text - second on mobile, first on tablet+ */}
               <a
                 href={`/wallet/${DONATE_ADDRESS}`}
-                class="font-medium text-base text-color-primary-semilight hover:text-color-primary-light transition-colors duration-200 order-2 tablet:order-1"
+                class="font-medium text-base text-color-purple-semilight hover:text-color-purple-light transition-colors duration-200 order-2 tablet:order-1"
               >
                 <span class="hidden tablet:block">{DONATE_ADDRESS}</span>
                 <span class="hidden mobileMd:block tablet:hidden">

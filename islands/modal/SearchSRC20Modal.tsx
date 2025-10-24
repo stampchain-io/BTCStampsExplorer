@@ -138,7 +138,7 @@ function SearchContent({
           setSearchTerm(newTerm);
         }}
         autoFocus={autoFocus}
-        class={`relative z-modal h-12 w-full bg-color-background/50 pl-7.5 pr-[68px] font-medium text-sm text-color-neutral-light placeholder:bg-color-background/50 placeholder:font-light placeholder:!text-color-neutral no-outline ${
+        class={`relative z-modal h-12 w-full bg-color-background/50 pl-7.5 pr-[68px] font-medium text-sm text-color-grey-light placeholder:bg-color-background/50 placeholder:font-light placeholder:!text-color-grey no-outline ${
           searchState.value.error ||
             (searchState.value.results?.length ?? 0) > 0
             ? "rounded-t-3xl"
@@ -154,8 +154,8 @@ function SearchContent({
           color="custom"
           className={`w-5 h-5 ${
             searchState.value.error
-              ? "stroke-color-neutral-light"
-              : "stroke-color-neutral"
+              ? "stroke-color-grey-light"
+              : "stroke-color-grey"
           }`}
         />
       </div>
@@ -175,11 +175,11 @@ function SearchContent({
                     key={index}
                     class={`${
                       index === 0
-                        ? "font-light text-base text-color-neutral-light"
+                        ? "font-light text-base text-color-grey-light"
                         : index ===
                             searchState.value.error.split("\n").length - 1
                         ? textSm
-                        : "font-medium text-sm text-color-neutral pt-0.5 pb-1"
+                        : "font-medium text-sm text-color-grey pt-0.5 pb-1"
                     } break-all overflow-hidden`}
                   >
                     {text}

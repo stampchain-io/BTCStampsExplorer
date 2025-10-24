@@ -66,29 +66,29 @@ export function ProgressiveEstimationIndicator({
               {/* Phase 1: Instant */}
               <div
                 className={`size-1.5 rounded-full tracking-wide ${
-                  phase1 ? "bg-color-neutral-light" : "bg-color-neutral/40"
+                  phase1 ? "bg-color-grey-light" : "bg-color-grey/40"
                 }`}
               />
               {/* Phase 2: Smart */}
               <div
                 className={`size-1.5 rounded-full tracking-wide ${
                   phase2
-                    ? "bg-color-neutral-light"
+                    ? "bg-color-grey-light"
                     : currentPhase === "smart" || isPreFetching
-                    ? "bg-color-neutral-light animate-pulse"
-                    : "bg-color-neutral/40"
+                    ? "bg-color-grey-light animate-pulse"
+                    : "bg-color-grey/40"
                 }`}
               />
               {/* Phase 3: Exact */}
               <div
                 className={`size-1.5 rounded-full tracking-wide ${
-                  phase3 ? "bg-color-neutral-light" : "bg-color-neutral/40"
+                  phase3 ? "bg-color-grey-light" : "bg-color-grey/40"
                 }`}
               />
             </div>
 
             {/* Current phase text */}
-            <span className="inline min-[420px]:hidden min-[460px]:inline ml-1.5 text-[10px] text-color-neutral font-normal">
+            <span className="inline min-[420px]:hidden min-[460px]:inline ml-1.5 text-[10px] text-color-grey font-normal">
               {currentPhase === "instant" && "ROUGH"}
               {currentPhase === "smart" && "SMART"}
               {currentPhase === "exact" && "EXACT"}
@@ -122,7 +122,7 @@ export function ProgressiveEstimationIndicator({
             <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse" />
             <div className="absolute inset-0 w-1.5 h-1.5 bg-blue-400 rounded-full animate-ping opacity-20" />
           </div>
-          <span className="hidden sm:inline text-xs text-color-neutral-light font-normal opacity-80">
+          <span className="hidden sm:inline text-xs text-color-grey-light font-normal opacity-80">
             Smart UTXO analysis
           </span>
           <span className="inline sm:hidden text-blue-400 text-xs opacity-80">

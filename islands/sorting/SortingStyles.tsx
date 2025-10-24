@@ -74,12 +74,12 @@ function StyledSortingDropdown({
           sorting-dropdown--styled
           ${sizeClasses[size]}
           rounded-2xl
-          bg-color-neutral focus:bg-color-neutral-light
+          bg-color-grey focus:bg-color-grey-light
           border-2 border-transparent
-          hover:border-color-primary-light
-          focus-within:border-color-primary-light
-          font-medium text-color-neutral-dark
-          placeholder:font-light placeholder:text-color-neutral-dark
+          hover:border-color-purple-light
+          focus-within:border-color-purple-light
+          font-medium text-color-grey-dark
+          placeholder:font-light placeholder:text-color-grey-dark
           outline-none focus:outline-none
           transition-colors duration-200
           ${className}
@@ -117,20 +117,20 @@ function StyledSortingButtons({
       case "primary":
         return `${baseClasses} ${
           isActive
-            ? "bg-color-primary-light border-color-primary-light text-white"
-            : "bg-color-primary-semilight border-color-primary-semilight text-white hover:bg-color-primary-light hover:border-color-primary-light"
+            ? "bg-color-purple-light border-color-purple-light text-white"
+            : "bg-color-purple-semilight border-color-purple-semilight text-white hover:bg-color-purple-light hover:border-color-purple-light"
         }`;
       case "secondary":
         return `${baseClasses} ${
           isActive
-            ? "bg-color-neutral-light border-color-primary-light text-color-neutral-dark"
-            : "bg-color-neutral border-color-neutral text-color-neutral-dark hover:bg-color-neutral-light hover:border-color-primary-light"
+            ? "bg-color-grey-light border-color-purple-light text-color-grey-dark"
+            : "bg-color-grey border-color-grey text-color-grey-dark hover:bg-color-grey-light hover:border-color-purple-light"
         }`;
       case "ghost":
         return `${baseClasses} ${
           isActive
-            ? "bg-transparent border-color-primary-light text-color-primary-light"
-            : "bg-transparent border-transparent text-color-neutral-light hover:border-color-primary-light hover:text-color-primary-light"
+            ? "bg-transparent border-color-purple-light text-color-purple-light"
+            : "bg-transparent border-transparent text-color-grey-light hover:border-color-purple-light hover:text-color-purple-light"
         }`;
       default:
         return baseClasses;
@@ -201,16 +201,16 @@ function StyledSortingLabel({
         return `
           ${TEXT_STYLES.minimal.price.base}
           ${TEXT_STYLES.minimal.price.sizes}
-          text-color-neutral-light
+          text-color-grey-light
         `;
       case "inline":
         return `
-          font-medium text-color-neutral-dark
+          font-medium text-color-grey-dark
           text-sm mobileLg:text-base
         `;
       default:
         return `
-          font-normal text-color-neutral-light
+          font-normal text-color-grey-light
           text-xs mobileLg:text-sm
         `;
     }

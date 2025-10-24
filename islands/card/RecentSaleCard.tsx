@@ -30,7 +30,7 @@ export function RecentSaleCard({
 
   return (
     <div
-      class={`${glassmorphismL2} border-2 border-transparent hover:border-color-primary-light ${shadowGlowPurple} transition-all duration-200 overflow-hidden`}
+      class={`${glassmorphismL2} border-2 border-transparent hover:border-color-purple-light ${shadowGlowPurple} transition-all duration-200 overflow-hidden`}
       role="article"
       aria-label={cardLabel}
       aria-describedby={showFullDetails

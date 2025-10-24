@@ -143,7 +143,7 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
               {bitNames.map((name) => (
                 <p
                   key={name}
-                  class="text-color-neutral font-light text-base mobileLg:text-lg tracking-[0.05em]"
+                  class="text-color-grey font-light text-base mobileLg:text-lg tracking-[0.05em]"
                 >
                   {name}
                   <span class="font-light">.btc</span>

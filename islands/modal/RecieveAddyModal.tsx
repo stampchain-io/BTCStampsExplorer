@@ -43,8 +43,8 @@ function RecieveAddyModal(
           type: "linear",
           rotation: 45,
           colorStops: [
-            { offset: 0, color: "var(--color-neutral-semilight)" },
-            { offset: 1, color: "var(--color-neutral)" },
+            { offset: 0, color: "var(--color-grey-semilight)" },
+            { offset: 1, color: "var(--color-grey)" },
           ],
         },
       },
@@ -136,7 +136,7 @@ function RecieveAddyModal(
 
         {/* ===== ADDRESS SECTION ===== */}
         <div class="flex flex-col items-center">
-          <p class="break-all text-center text-base leading-relaxed text-color-neutral-light max-w-full pt-4">
+          <p class="break-all text-center text-base leading-relaxed text-color-grey-light max-w-full pt-4">
             {formatAddress(address ?? "")}
           </p>
         </div>
@@ -178,7 +178,7 @@ function formatAddress(address: string): JSX.Element[] {
     index % 2 === 0 ? <span key={index}>{group}</span> : (
       <span
         key={index}
-        class="font-semibold text-base text-color-primary-semilight"
+        class="font-semibold text-base text-color-purple-semilight"
       >
         {group}
       </span>

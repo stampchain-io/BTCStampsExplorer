@@ -99,7 +99,7 @@ export default function SRC20MintsGallery() {
         )
         : transactions.length === 0
         ? (
-          <div class="text-color-neutral-dark text-sm">
+          <div class="text-color-grey-dark text-sm">
             NO TRENDING TOKENS FOUND
           </div>
         )

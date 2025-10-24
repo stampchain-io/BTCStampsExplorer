@@ -19,7 +19,7 @@ export function LoadingIcon({
     >
       <div
         className={`flex items-center justify-center max-w-none
-          bg-gradient-to-br from-color-primary-semidark/75 via-color-primary-dark/75 to-black rounded-2xl
+          bg-gradient-to-br from-color-purple-semidark/75 via-color-purple-dark/75 to-black rounded-2xl
           object-contain ${transitionColors} ${containerClassName}`}
       >
         <Icon

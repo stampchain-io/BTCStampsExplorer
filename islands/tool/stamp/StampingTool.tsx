@@ -1679,7 +1679,7 @@ function StampingToolMain({ config }: { config: Config }) {
             {file.name.match(/\.(jpg|jpeg|png|gif|webp|svg|avif)$/i)
               ? (
                 <img
-                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded-2xl bg-conic-pattern bg-[length:4px_4px] bg-color-neutral/30 [image-rendering:pixelated]`}
+                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded-2xl bg-conic-pattern bg-[length:4px_4px] bg-color-grey/30 [image-rendering:pixelated]`}
                   src={URL.createObjectURL(file)}
                   alt="Preview"
                   onError={(e) => {
@@ -1700,7 +1700,7 @@ function StampingToolMain({ config }: { config: Config }) {
                   loading="lazy"
                   sandbox="allow-scripts allow-same-origin"
                   src={URL.createObjectURL(file)}
-                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded-2xl bg-color-neutral/30 [image-rendering:pixelated]`}
+                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded-2xl bg-color-grey/30 [image-rendering:pixelated]`}
                   onError={(e) => {
                     console.error("iframe error (detailed):", {
                       error: e,
@@ -1729,7 +1729,7 @@ function StampingToolMain({ config }: { config: Config }) {
                 weight="extraLight"
                 size="xl"
                 color="custom"
-                className="stroke-color-neutral-dark group-hover:stroke-color-neutral"
+                className="stroke-color-grey-dark group-hover:stroke-color-grey"
               />
             </div>
           </label>
@@ -1745,7 +1745,7 @@ function StampingToolMain({ config }: { config: Config }) {
               weight="extraLight"
               size="xl"
               color="custom"
-              className="stroke-color-neutral-dark group-hover:stroke-color-neutral-semidark/80"
+              className="stroke-color-grey-dark group-hover:stroke-color-grey-semidark/80"
             />
           </label>
         )}
@@ -2054,7 +2054,7 @@ function StampingToolMain({ config }: { config: Config }) {
               <h3 class="text-orange-300 font-semibold mb-2">
                 MARA Pool Temporarily Unavailable
               </h3>
-              <p class="text-sm text-color-neutral-light">
+              <p class="text-sm text-color-grey-light">
                 The MARA pool submission service is currently unavailable. You
                 can either wait and retry, or switch to standard stamping (333
                 sat outputs).
@@ -2122,7 +2122,7 @@ function StampingToolMain({ config }: { config: Config }) {
               </div>
             </div>
             <div className="flex items-center gap-5">
-              <h5 className={`${labelLg} !text-color-neutral`}>
+              <h5 className={`${labelLg} !text-color-grey`}>
                 EDITIONS
               </h5>
 
