@@ -47,9 +47,9 @@ export const bodyArticle = `
 `;
 // Section gaps
 export const gapSection = "gap-12 mobileLg:gap-[72px]"; // Index pages
-export const gapSectionSlim = "gap-6 mobileLg:gap-9"; // Media index page
+export const gapSectionSlim = "gap-5 mobileLg:gap-7.5";
 // Grid/flex row and column gaps
-export const gapGrid = "gap-6 mobileLg:gap-9 tablet:gap-12"; // - ToS index page
+export const gapGrid = "gap-5 mobileLg:gap-7.5 tablet:gap-10";
 
 /* ===== CONTAINER STYLES ===== */
 // Base styles
@@ -80,7 +80,8 @@ export const containerRowForm = "flex w-full gap-5";
 export const rowForm = "flex w-full";
 export const rowResponsiveForm =
   "flex flex-col min-[420px]:flex-row w-full gap-5 min-[420px]:[&>*]:flex-1";
-
+export const rowContainerBackground =
+  `flex items-center justify-center w-full h-[46px] ${glassmorphism}`;
 /* ===== COL STYLES ===== */
 
 /* ===== CELL STYLES ===== */

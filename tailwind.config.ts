@@ -114,10 +114,11 @@ export default {
         // CUSTOM SPACING
         "3.5": "14px",
         "7.5": "30px",
+        "15": "60px",
 
         // PAGE GUTTERS (horizontal padding from left/rightscreen edges to header, footer and body containers)
         "gutter-mobile": "20px", // updated breakpoint naming convention
-        "gutter-tablet": "20px", // updated breakpoint naming convention
+        "gutter-tablet": "30px", // updated breakpoint naming convention
         "gutter-desktop": "40px", // updated breakpoint naming convention
 
         // LAYOUT GAP (vertical spacing between the body, and the header and footer)
