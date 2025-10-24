@@ -6,6 +6,7 @@ import {
   bodyTool,
   containerBackground,
   containerColForm,
+  gapSectionSlim,
   transitionAll,
 } from "$layout";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
@@ -111,10 +112,12 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
   }
 
   return (
-    <div class={bodyTool} data-testid="fairmint-tool">
-      <h1 class={`${titleGreyLD} mobileMd:mx-auto mb-1`}>FAIRMINT</h1>
+    <div class={`${bodyTool} ${gapSectionSlim}`} data-testid="fairmint-tool">
+      <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
+        FAIRMINT
+      </h1>
 
-      <form class={`${containerBackground} mb-6`}>
+      <form class={containerBackground}>
         {/* ===== TOKEN SELECTION ===== */}
         <div class={containerColForm}>
           {hasFairminters
@@ -151,7 +154,8 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
                 placeholder="ENTER ASSET"
                 class="h-10 p-3 rounded-2xl bg-color-grey text-black placeholder:text-black placeholder:font-light"
                 value={formState.asset}
-                onChange={(e) => handleInputChange(e, "asset")}
+                onChange={(e) =>
+                  handleInputChange(e, "asset")}
               />
             )}
 
@@ -160,7 +164,8 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
             placeholder="QUANTITY"
             class="h-10 p-3 rounded-2xl bg-color-grey text-black placeholder:text-black placeholder:font-light"
             value={formState.quantity}
-            onChange={(e) => handleInputChange(e, "quantity")}
+            onChange={(e) =>
+              handleInputChange(e, "quantity")}
           />
         </div>
       </form>

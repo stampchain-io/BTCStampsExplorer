@@ -14,6 +14,7 @@ import {
   containerBackground,
   containerColForm,
   containerRowForm,
+  gapSectionSlim,
   glassmorphismL2,
   imagePreviewTool,
   loaderSpinGrey,
@@ -409,8 +410,10 @@ export function SRC20MintTool({
   /* ===== CONFIG CHECK ===== */
   if (!config) {
     return (
-      <div class={bodyTool}>
-        <h1 class={`${titleGreyLD} mx-auto mb-4`}>MINT</h1>
+      <div class={`${bodyTool} ${gapSectionSlim}`}>
+        <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
+          MINT
+        </h1>
         <MintToolSkeleton />
       </div>
     );
@@ -418,8 +421,10 @@ export function SRC20MintTool({
 
   /* ===== COMPONENT RENDER ===== */
   return (
-    <div class={bodyTool}>
-      <h1 class={`${titleGreyLD} mx-auto mb-4`}>MINT</h1>
+    <div class={`${bodyTool} ${gapSectionSlim}`}>
+      <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
+        MINT
+      </h1>
 
       {/* ===== ERROR MESSAGE DISPLAY ===== */}
       {error && (
@@ -429,7 +434,7 @@ export function SRC20MintTool({
       )}
 
       <form
-        class={`${containerBackground} mb-6 relative z-dropdown`}
+        class={`${containerBackground} relative z-dropdown`}
         onSubmit={(e) => {
           e.preventDefault();
           handleMint();

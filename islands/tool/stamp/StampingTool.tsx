@@ -18,6 +18,7 @@ import {
   bodyTool,
   containerBackground,
   containerRowForm,
+  gapSectionSlim,
   glassmorphism,
   glassmorphismL2,
   glassmorphismL2Hover,
@@ -233,8 +234,10 @@ export function StampingTool() {
   /* ===== EARLY RETURN CONDITIONS ===== */
   if (isLoading) {
     return (
-      <div class={bodyTool}>
-        <h1 class={`${titleGreyLD} mx-auto mb-4`}>STAMP</h1>
+      <div class={`${bodyTool} ${gapSectionSlim}`}>
+        <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
+          STAMP
+        </h1>
         <StampingToolSkeleton />
       </div>
     );
@@ -2030,8 +2033,10 @@ function StampingToolMain({ config }: { config: Config }) {
 
   /* ===== COMPONENT RENDER ===== */
   return (
-    <div class={bodyTool}>
-      <h1 class={`${titleGreyLD} mx-auto mb-4`}>STAMP</h1>
+    <div class={`${bodyTool} ${gapSectionSlim}`}>
+      <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
+        STAMP
+      </h1>
 
       {/* MARA Mode Indicator */}
       {maraMode && outputValue !== null && (
@@ -2082,7 +2087,7 @@ function StampingToolMain({ config }: { config: Config }) {
       )}
 
       <form
-        class={`${containerBackground} mb-6`}
+        class={containerBackground}
         onSubmit={(e) => {
           e.preventDefault();
           handleMint();

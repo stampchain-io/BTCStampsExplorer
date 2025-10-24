@@ -11,6 +11,7 @@ import {
   containerBackground,
   containerColForm,
   containerRowForm,
+  gapSectionSlim,
   glassmorphismL2,
   glassmorphismL2Hover,
   transitionAll,
@@ -317,8 +318,10 @@ export function SRC20DeployTool(
   /* ===== CONFIG CHECK ===== */
   if (!config) {
     return (
-      <div class={bodyTool}>
-        <h1 class={`${titleGreyLD} mx-auto mb-4`}>DEPLOY</h1>
+      <div class={`${bodyTool} ${gapSectionSlim}`}>
+        <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
+          DEPLOY
+        </h1>
         <DeployToolSkeleton />
       </div>
     );
@@ -326,11 +329,13 @@ export function SRC20DeployTool(
 
   /* ===== COMPONENT RENDER ===== */
   return (
-    <div class={bodyTool}>
-      <h1 class={`${titleGreyLD} mx-auto mb-4`}>DEPLOY</h1>
+    <div class={`${bodyTool} ${gapSectionSlim}`}>
+      <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
+        DEPLOY
+      </h1>
 
       <form
-        class={`${containerBackground} mb-6`}
+        class={containerBackground}
         onSubmit={(e) => {
           e.preventDefault();
           handleSubmitWithUpload();

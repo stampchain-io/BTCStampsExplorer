@@ -12,6 +12,7 @@ import { openModal } from "$islands/modal/states.ts";
 import {
   bodyTool,
   containerBackground,
+  gapSectionSlim,
   glassmorphismL2Hover,
   transitionAll,
 } from "$layout";
@@ -205,8 +206,10 @@ export function SRC101RegisterTool({
   /* ===== CONFIG CHECK ===== */
   if (!config) {
     return (
-      <div class={bodyTool}>
-        <h1 class={`${titleGreyLD} mx-auto mb-4`}>REGISTER</h1>
+      <div class={`${bodyTool} ${gapSectionSlim}`}>
+        <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
+          REGISTER
+        </h1>
         <RegisterToolSkeleton />
       </div>
     );
@@ -267,11 +270,13 @@ export function SRC101RegisterTool({
 
   /* ===== COMPONENT RENDER ===== */
   return (
-    <div class={bodyTool}>
-      <h1 class={`${titleGreyLD} mx-auto mb-4`}>REGISTER</h1>
+    <div class={`${bodyTool} ${gapSectionSlim}`}>
+      <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
+        REGISTER
+      </h1>
 
       <form
-        class={`${containerBackground} gap-5 mb-6 relative z-dropdown`}
+        class={`${containerBackground} gap-5 relative z-dropdown`}
         onSubmit={(e) => {
           e.preventDefault();
           handleTransferSubmit();

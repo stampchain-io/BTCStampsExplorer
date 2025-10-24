@@ -12,6 +12,7 @@ import {
   bodyTool,
   containerBackground,
   containerColForm,
+  gapSectionSlim,
   rowResponsiveForm,
 } from "$layout";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
@@ -302,20 +303,24 @@ export function SRC20TransferTool(
   /* ===== CONFIG CHECK ===== */
   if (!config) {
     return (
-      <div class={bodyTool}>
-        <h1 class={`${titleGreyLD} mx-auto mb-4`}>TRANSFER</h1>
+      <div class={`${bodyTool} ${gapSectionSlim}`}>
+        <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
+          TRANSFER
+        </h1>
         <TransferToolSkeleton />
       </div>
     );
   }
 
   return (
-    <div class={bodyTool}>
-      <h1 class={`${titleGreyLD} mx-auto mb-4`}>TRANSFER</h1>
+    <div class={`${bodyTool} ${gapSectionSlim}`}>
+      <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
+        TRANSFER
+      </h1>
 
       {/* ===== FORM  ===== */}
       <form
-        class={`${containerBackground} ${containerColForm} mb-6 relative z-dropdown`}
+        class={`${containerBackground} ${containerColForm} relative z-dropdown`}
         onSubmit={(e) => {
           e.preventDefault();
           handleSubmit();

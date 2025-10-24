@@ -11,6 +11,7 @@ import {
   containerBackground,
   containerColForm,
   containerRowForm,
+  gapSectionSlim,
   imagePreviewTool,
   loaderSpinGrey,
   rowForm,
@@ -499,8 +500,10 @@ export function StampSendTool() {
   /* ===== EARLY RETURN FOR LOADING STATE ===== */
   if (isLoadingStamps) {
     return (
-      <div class={bodyTool}>
-        <h1 class={`${titleGreyLD} mx-auto mb-4`}>SEND</h1>
+      <div class={`${bodyTool} ${gapSectionSlim}`}>
+        <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
+          SEND
+        </h1>
         <SendToolSkeleton />
       </div>
     );
@@ -508,12 +511,14 @@ export function StampSendTool() {
 
   /* ===== RENDER ===== */
   return (
-    <div class={bodyTool}>
-      <h1 class={`${titleGreyLD} mx-auto mb-4`}>SEND</h1>
+    <div class={`${bodyTool} ${gapSectionSlim}`}>
+      <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
+        SEND
+      </h1>
 
       {/* ===== STAMP SELECTION SECTION ===== */}
       <form
-        class={`${containerBackground} mb-6 relative`}
+        class={`${containerBackground} relative`}
         onSubmit={(e) => {
           e.preventDefault();
           // If we want the form submit to also try, but FeeCalc is primary:
