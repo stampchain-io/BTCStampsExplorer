@@ -28,7 +28,7 @@ export const glassmorphismOverlay =
   `bg-gradient-to-b from-color-background/95 via-color-background/70 to-black/90 backdrop-blur-lg`;
 // 1st layer styles
 export const glassmorphism = `border border-color-border/50 rounded-3xl
-  bg-gradient-to-br from-color-border/40 via-color-background/50 to-black/60
+  bg-gradient-to-br from-[#191919]/40 via-color-background/50 to-black/60
   backdrop-blur ${shadow}`;
 // 2nd layer styles - register tool tld dropdown uses same hardcoded values
 export const glassmorphismL2 = `border border-color-border/75 rounded-2xl

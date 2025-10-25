@@ -72,7 +72,8 @@ export interface ButtonVariants {
 
 /* ===== BUTTON VARIANT BASE STYLES DEFINITIONS ===== */
 const baseOutline = `
-  bg-color-background border border-[var(--color-button-semidark)] rounded-full
+  bg-color-background bg-opacity-10 hover:bg-opacity-50
+  border border-[var(--color-button-semidark)] rounded-full
   text-[var(--color-button-semidark)] backdrop-blur-sm opacity-90 hover:opacity-100`;
 const baseFlat = `
   bg-[linear-gradient(to_bottom_right,var(--color-button-light),var(--color-button-semilight),var(--color-button),var(--color-button-semidark),var(--color-button-dark))]

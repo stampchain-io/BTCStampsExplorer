@@ -171,7 +171,9 @@ export function ToolsButton({ onOpenDrawer, data }: ToolsButtonProps) {
   };
 
   const bitcoinStats = (containerClass: string) => (
-    <div class={containerClass}>
+    <div
+      class={`${containerClass} backdrop-blur-xl tablet:backdrop-blur-xs`}
+    >
       {/* Latest Block */}
       <div class="flex items-center">
         <Icon

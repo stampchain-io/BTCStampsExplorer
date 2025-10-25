@@ -18,7 +18,11 @@ import { Button } from "$button";
 import { CloseIcon, Icon } from "$icon";
 import type { FilterType } from "$islands/button/FilterButton.tsx";
 import { FilterContentSRC20 } from "$islands/filter/FilterContentSRC20.tsx";
-import { glassmorphismOverlay, transitionTransform } from "$layout";
+import {
+  containerStickyBottom,
+  glassmorphismOverlay,
+  transitionTransform,
+} from "$layout";
 import { useBreakpoints } from "$lib/hooks/useBreakpoints.ts";
 import { tooltipIcon } from "$notification";
 import {
@@ -424,7 +428,9 @@ const FilterDrawer = (
         </div>
       </div>
       {/* Sticky buttons */}
-      <div class="flex justify-between w-full sticky bottom-0 p-9 tablet:p-6 gap-6 bg-black/50 backdrop-blur-lg">
+      <div
+        class={`flex justify-between ${containerStickyBottom} w-full px-9 tablet:px-6 gap-6 bg-transparent`}
+      >
         <Button
           variant="outline"
           color="grey"
@@ -438,7 +444,7 @@ const FilterDrawer = (
               isClearingRef.current = false;
             }, 100);
           }}
-          class="w-full"
+          class="w-full !backdrop-blur-xl"
         >
           CLEAR
         </Button>
