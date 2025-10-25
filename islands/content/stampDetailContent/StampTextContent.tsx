@@ -52,7 +52,7 @@ export default function StampTextContent({ src }: { src: string }) {
   return (
     <div
       ref={containerRef}
-      class="flex items-center justify-center w-full h-full overflow-auto bg-[#F7931A] rounded"
+      class="flex items-center justify-center w-full h-full overflow-auto bg-gradient-to-br from-color-orange-light to-color-orange-semilight rounded-2xl"
     >
       {/* ===== TEXT CONTENT ===== */}
       <pre
