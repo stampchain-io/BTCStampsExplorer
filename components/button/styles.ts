@@ -71,14 +71,17 @@ export interface ButtonVariants {
 }
 
 /* ===== BUTTON VARIANT BASE STYLES DEFINITIONS ===== */
+/* ToggleButton.tsx uses custom hover states for the selected state */
 const baseOutline = `
   bg-color-background bg-opacity-10 hover:bg-opacity-50
   border border-[var(--color-button-semidark)] rounded-full
-  text-[var(--color-button-semidark)] backdrop-blur-sm opacity-90 hover:opacity-100`;
+  text-[var(--color-button-semidark)]
+  backdrop-blur-sm opacity-90 hover:opacity-100`;
 const baseFlat = `
   bg-[linear-gradient(to_bottom_right,var(--color-button-light),var(--color-button-semilight),var(--color-button),var(--color-button-semidark),var(--color-button-dark))]
   border border-[var(--color-button-dark)] rounded-full
-  text-color-background backdrop-blur-sm opacity-90 hover:opacity-100
+  text-color-background
+  backdrop-blur-sm opacity-90 hover:opacity-100
   `;
 
 export const buttonStyles: ButtonVariants = {
@@ -105,13 +108,15 @@ export const buttonStyles: ButtonVariants = {
     flatOutline: `
       ${baseFlat} ${shadowL2}
       !items-center !justify-center
-      hover:!bg-[linear-gradient(to_bottom_right,var(--color-background),var(--color-background),var(--color-background),var(--color-background),var(--color-background))] hover:!border-[var(--color-button-dark)]
-      hover:!text-[var(--color-button-dark)] hover:!opacity-100
+      hover:!bg-[linear-gradient(to_bottom_right,var(--color-background),var(--color-background),var(--color-background),var(--color-background),var(--color-background))]
+      hover:!border-[var(--color-button-semidark)]
+      hover:!text-[var(--color-button-semidark)] hover:!opacity-90
     `,
     outlineFlat: `
       ${baseOutline} ${shadowL2}
       !items-center !justify-center
-      hover:!bg-[linear-gradient(to_bottom_right,var(--color-button-light),var(--color-button-semilight),var(--color-button),var(--color-button-semidark),var(--color-button-dark))] hover:!border-[var(--color-button-dark)]
+      hover:!bg-[linear-gradient(to_bottom_right,var(--color-button-light),var(--color-button-semilight),var(--color-button),var(--color-button-semidark),var(--color-button-dark))]
+      hover:!border-[var(--color-button-dark)]
       hover:!text-color-background hover:!opacity-90
     `,
     custom: `${shadowL2}`,

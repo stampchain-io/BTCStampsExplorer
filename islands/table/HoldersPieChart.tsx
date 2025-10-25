@@ -66,8 +66,8 @@ export const HoldersPieChart = ({ holders: rawHolders }: PieChartProps) => {
             enabled: true,
             position: "nearest" as const,
             yAlign: "bottom" as const,
-            backgroundColor: "#000000BF",
-            borderColor: "#242424",
+            backgroundColor: "#0d0a0dbf",
+            borderColor: "#303030",
             borderWidth: 1,
             cornerRadius: 12,
             padding: {
@@ -100,7 +100,7 @@ export const HoldersPieChart = ({ holders: rawHolders }: PieChartProps) => {
         labels: holders.map((h: any) => h.address || "Unknown"),
         datasets: [{
           borderColor: [...Array(holders.length)].fill(
-            "#000000BF",
+            "#0d0a0dbf",
           ),
           label: "Graph Holder",
           data: holders.map((holder: any) => Number(holder.amt)),

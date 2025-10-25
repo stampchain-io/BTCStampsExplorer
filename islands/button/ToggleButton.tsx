@@ -110,7 +110,7 @@ export const ToggleButton = ({
         return button("flatOutline", color, size);
       } else {
         // Without hover - use flat (flat base, no color-change hover, but force opacity 80%)
-        return `${button("flat", color, size)} !opacity-80`;
+        return `${button("flat", color, size)} !opacity-90`;
       }
     } else {
       // Unselected state (outlineFlat)
@@ -119,7 +119,7 @@ export const ToggleButton = ({
         return button("outlineFlat", "grey", size);
       } else {
         // Without hover - use outline (outline base, no color-change hover, but force opacity 80%)
-        return `${button("outline", "grey", size)} !opacity-80`;
+        return `${button("outline", "grey", size)} !opacity-90`;
       }
     }
   };
