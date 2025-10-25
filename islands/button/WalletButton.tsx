@@ -7,7 +7,10 @@ import { WalletProvider } from "$islands/layout/WalletProvider.tsx";
 import { ConnectWalletModal } from "$islands/modal/ConnectWalletModal.tsx";
 import { closeModal, openModal } from "$islands/modal/states.ts";
 import { containerStickyBottom, glassmorphismL2 } from "$layout";
-import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
+import {
+  abbreviateAddress,
+  formatSatoshisToBTC,
+} from "$lib/utils/ui/formatting/formatUtils.ts";
 import { tooltipIcon } from "$notification";
 import {
   labelLg,
@@ -274,7 +277,10 @@ export const WalletButton = (
                 color="greyDark"
               />
               <h6 class={valueSm}>
-                {btcBalance.total.toFixed(8)} <span class={labelSm}>BTC</span>
+                {formatSatoshisToBTC(btcBalance.total, {
+                  includeSymbol: false,
+                  stripZeros: true,
+                })} <span class={labelSm}>BTC</span>
               </h6>
             </div>
             <hr class="!mt-2 !mb-2" />
@@ -348,7 +354,10 @@ export const WalletButton = (
                 color="greyDark"
               />
               <h6 class={valueLg}>
-                {btcBalance.total.toFixed(8)} <span class={labelLg}>BTC</span>
+                {formatSatoshisToBTC(btcBalance.total, {
+                  includeSymbol: false,
+                  stripZeros: true,
+                })} <span class={labelLg}>BTC</span>
               </h6>
             </div>
           </div>

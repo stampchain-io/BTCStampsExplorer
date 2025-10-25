@@ -1,7 +1,7 @@
 /* ===== SRC20 DETAIL HEADER COMPONENT ===== */
 import { StatItem, StatTitle } from "$components/section/WalletComponents.tsx";
 import { Icon } from "$icon";
-import { body, containerBackground, gapSectionSlim } from "$layout";
+import { body, containerBackground, containerGap } from "$layout";
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import {
   abbreviateAddress,
@@ -100,7 +100,7 @@ export function SRC20DetailHeader({
   /* ===== RENDER ===== */
   return (
     <>
-      <div class={`${body} ${gapSectionSlim}`}>
+      <div class={`${body} ${containerGap}`}>
         {/* ===== TOKEN INFO CARD ===== */}
         <div class={`relative ${containerBackground} flex-wrap`}>
           <div class="flex flex-row w-full">

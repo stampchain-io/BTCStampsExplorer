@@ -10,8 +10,8 @@ import {
   bodyTool,
   containerBackground,
   containerColForm,
+  containerGap,
   containerRowForm,
-  gapSectionSlim,
   glassmorphismL2,
   glassmorphismL2Hover,
   transitionAll,
@@ -318,7 +318,7 @@ export function SRC20DeployTool(
   /* ===== CONFIG CHECK ===== */
   if (!config) {
     return (
-      <div class={`${bodyTool} ${gapSectionSlim}`}>
+      <div class={`${bodyTool} ${containerGap}`}>
         <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
           DEPLOY
         </h1>
@@ -329,7 +329,7 @@ export function SRC20DeployTool(
 
   /* ===== COMPONENT RENDER ===== */
   return (
-    <div class={`${bodyTool} ${gapSectionSlim}`}>
+    <div class={`${bodyTool} ${containerGap}`}>
       <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
         DEPLOY
       </h1>

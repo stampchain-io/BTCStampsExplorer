@@ -1,6 +1,6 @@
 /* ===== GET STAMPING CTA COMPONENT ===== */
 import { Button } from "$button";
-import { containerBackground, gapGrid } from "$layout";
+import { containerBackground, containerGap } from "$layout";
 import { subtitleGrey, text, titleGreyLD } from "$text";
 
 /* ===== COMPONENT ===== */
@@ -16,7 +16,7 @@ export default function GetStampingCta() {
 
       {/* ===== CONTENT SECTION ===== */}
       <div
-        class={`flex flex-col tablet:flex-row ${gapGrid} ${text}`}
+        class={`flex flex-col tablet:flex-row ${containerGap} ${text}`}
       >
         <div class="flex flex-col">
           <p>

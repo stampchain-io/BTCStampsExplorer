@@ -4,7 +4,7 @@ import { ButtonProcessing } from "$button";
 import { InputField } from "$form";
 import {
   containerBackground,
-  gapGrid,
+  containerGap,
   rowForm,
   rowResponsiveForm,
 } from "$layout";
@@ -46,7 +46,7 @@ const ContactCta = () => {
           </h5>
         </div>
         {/* ===== CONTENT SECTION ===== */}
-        <div class={`flex flex-col mobileLg:flex-row ${gapGrid}`}>
+        <div class={`flex flex-col mobileLg:flex-row ${containerGap}`}>
           {/* ===== DESCRIPTION TEXT ===== */}
           <div class="w-full mobileLg:w-full">
             <p class={textLg}>

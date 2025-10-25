@@ -1,5 +1,5 @@
 /* ===== TERMS OF SERVICE PAGE ===== */
-import { containerBackground, CourierFontLoader, gapGrid } from "$layout";
+import { containerBackground, containerGap, CourierFontLoader } from "$layout";
 import { subtitleGrey, text, textLg, textSm, titleGreyLD } from "$text";
 
 /* ===== PAGE COMPONENT ===== */
@@ -7,7 +7,7 @@ export default function TermsOfServicePage() {
   return (
     <>
       <CourierFontLoader />
-      <div class={`${containerBackground} ${gapGrid}`}>
+      <div class={`${containerBackground} ${containerGap}`}>
         {/* ===== HEADER SECTION ===== */}
         <section>
           <h1 class={titleGreyLD}>TERMS OF SERVICE</h1>

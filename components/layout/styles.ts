@@ -45,15 +45,11 @@ export const bodyTool = `
 export const bodyArticle = `
   ${body} tablet:max-w-[922px] tablet:mx-auto p-5 ${glassmorphism}
 `;
-// Section gaps
-export const gapSection = "gap-12 mobileLg:gap-[72px]"; // Index pages
-export const gapSectionSlim = "gap-5 mobileLg:gap-7.5";
-// Grid/flex row and column gaps
-export const gapGrid = "gap-5 mobileLg:gap-7.5 tablet:gap-10";
 
 /* ===== CONTAINER STYLES ===== */
 // Base styles
 export const containerBackground = `${body} p-5 ${glassmorphism}`;
+export const containerGap = "gap-5 mobileLg:gap-7.5";
 export const containerDetailImage = `relative p-5 ${glassmorphism}`;
 export const containerStickyBottom = `sticky bottom-0 mt-auto py-9 tablet:py-6`;
 
@@ -163,12 +159,10 @@ export type LayoutStyles = {
   body: string;
   bodyTool: string;
   bodyArticle: string;
-  gapSection: string;
-  gapSectionSlim: string;
-  gapGrid: string;
 
   // Container styles
   containerBackground: string;
+  containerGap: string;
   containerDetailImage: string;
   containerStickyBottom: string;
   containerCard: string;

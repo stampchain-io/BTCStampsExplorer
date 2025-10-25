@@ -13,8 +13,8 @@ import {
   bodyTool,
   containerBackground,
   containerColForm,
+  containerGap,
   containerRowForm,
-  gapSectionSlim,
   glassmorphismL2,
   imagePreviewTool,
   loaderSpinGrey,
@@ -410,7 +410,7 @@ export function SRC20MintTool({
   /* ===== CONFIG CHECK ===== */
   if (!config) {
     return (
-      <div class={`${bodyTool} ${gapSectionSlim}`}>
+      <div class={`${bodyTool} ${containerGap}`}>
         <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
           MINT
         </h1>
@@ -421,7 +421,7 @@ export function SRC20MintTool({
 
   /* ===== COMPONENT RENDER ===== */
   return (
-    <div class={`${bodyTool} ${gapSectionSlim}`}>
+    <div class={`${bodyTool} ${containerGap}`}>
       <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
         MINT
       </h1>

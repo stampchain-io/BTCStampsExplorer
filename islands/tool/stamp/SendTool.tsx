@@ -10,8 +10,8 @@ import {
   bodyTool,
   containerBackground,
   containerColForm,
+  containerGap,
   containerRowForm,
-  gapSectionSlim,
   imagePreviewTool,
   loaderSpinGrey,
   rowForm,
@@ -500,7 +500,7 @@ export function StampSendTool() {
   /* ===== EARLY RETURN FOR LOADING STATE ===== */
   if (isLoadingStamps) {
     return (
-      <div class={`${bodyTool} ${gapSectionSlim}`}>
+      <div class={`${bodyTool} ${containerGap}`}>
         <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
           SEND
         </h1>
@@ -511,7 +511,7 @@ export function StampSendTool() {
 
   /* ===== RENDER ===== */
   return (
-    <div class={`${bodyTool} ${gapSectionSlim}`}>
+    <div class={`${bodyTool} ${containerGap}`}>
       <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
         SEND
       </h1>

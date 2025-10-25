@@ -9,7 +9,7 @@ import { openModal } from "$islands/modal/states.ts";
 import {
   body,
   containerDetailImage,
-  gapSectionSlim,
+  containerGap,
   glassmorphism,
 } from "$layout";
 import {
@@ -722,7 +722,7 @@ export function StampImage(
 
   if (isLoadingOrValidating) {
     return (
-      <div class={`${body} ${gapSectionSlim}`}>
+      <div class={`${body} ${containerGap}`}>
         <div className={`${containerDetailImage} ${containerClassName || ""}`}>
           <div className="stamp-container">
             <LoadingIcon containerClassName="rounded-2xl" />
@@ -741,7 +741,7 @@ export function StampImage(
       )}
 
       {src && isHtml && (
-        <div className={`${className} ${body} ${gapSectionSlim}`}>
+        <div className={`${className} ${body} ${containerGap}`}>
           <div
             className={`relative ${
               flag ? `${containerDetailImage} ${containerClassName || ""}` : ""
@@ -805,7 +805,7 @@ export function StampImage(
       )}
 
       {src && isPlainText && (
-        <div class={`${body} ${gapSectionSlim}`}>
+        <div class={`${body} ${containerGap}`}>
           <div
             className={`${containerDetailImage} ${containerClassName || ""}`}
           >
@@ -827,7 +827,7 @@ export function StampImage(
       )}
 
       {src && isAudio && (
-        <div className={`${className} ${body} ${gapSectionSlim}`}>
+        <div className={`${className} ${body} ${containerGap}`}>
           <div
             className={`${containerDetailImage} ${containerClassName || ""}`}
           >
@@ -871,7 +871,7 @@ export function StampImage(
       )}
 
       {src && isLibraryFile && (
-        <div className={`${className} ${body} ${gapSectionSlim}`}>
+        <div className={`${className} ${body} ${containerGap}`}>
           <div
             className={`${containerDetailImage} ${containerClassName || ""}`}
           >
@@ -894,7 +894,7 @@ export function StampImage(
         !isLibraryFile && (
           flag
             ? (
-              <div class={`${body} ${gapSectionSlim}`}>
+              <div class={`${body} ${containerGap}`}>
                 <div
                   className={`${containerDetailImage} ${
                     containerClassName || ""

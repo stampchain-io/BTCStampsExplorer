@@ -8,7 +8,7 @@ import {
   body,
   containerBackground,
   containerColData,
-  gapSectionSlim,
+  containerGap,
 } from "$layout";
 import type { Src101Detail } from "$lib/types/src101.d.ts";
 import type { StampRow } from "$lib/types/stamp.d.ts";
@@ -718,7 +718,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   /* ===== RENDER ===== */
   return (
     <>
-      <div className={`${body} ${gapSectionSlim}`}>
+      <div className={`${body} ${containerGap}`}>
         <div
           className={containerBackground}
         >

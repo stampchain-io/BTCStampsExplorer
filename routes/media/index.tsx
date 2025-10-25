@@ -4,8 +4,7 @@ import { Button } from "$button";
 import {
   body,
   containerBackground,
-  gapGrid,
-  gapSectionSlim,
+  containerGap,
   glassmorphism,
 } from "$layout";
 import {
@@ -20,7 +19,7 @@ import {
 export default function MediaPage() {
   /* ===== RENDER ===== */
   return (
-    <div class={`${body} ${gapSectionSlim}`}>
+    <div class={`${body} ${containerGap}`}>
       {/* ===== INTRODUCTION SECTION ===== */}
       <section class={containerBackground}>
         <div class={`flex flex-col w-full`}>
@@ -51,7 +50,7 @@ export default function MediaPage() {
       <section class={`flex flex-col ${glassmorphism} p-5`}>
         <h1 class={titleGreyLD}>INTERVIEWS</h1>
         <div
-          class={`grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 ${gapGrid}`}
+          class={`grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 ${containerGap}`}
         >
           {/* ===== RICE TVX INTERVIEW ===== */}
           <div class={`flex flex-col`}>
@@ -139,7 +138,7 @@ export default function MediaPage() {
           <h1 class={titleGreyLD}>IN THE NEWS</h1>
           <h2 class={subtitleGrey}>BREAKING STORIES</h2>
           {/* ===== NEWS ARTICLES LIST ===== */}
-          <div class={`flex flex-col min-[940px]:flex-row ${gapGrid}`}>
+          <div class={`flex flex-col min-[940px]:flex-row ${containerGap}`}>
             <div class="flex flex-col w-full min-[940px]:w-1/2">
               <p class={text}>
                 BINANCE

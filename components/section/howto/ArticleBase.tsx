@@ -1,5 +1,5 @@
 /* ===== ARTICLE COMPONENT ===== */
-import { body, bodyArticle, gapSectionSlim } from "$layout";
+import { body, bodyArticle, containerGap } from "$layout";
 import { ArticlesOverview } from "$section";
 import { headingGrey, subtitleGrey, text, titleGreyLD } from "$text";
 import type { ArticleProps } from "$types/ui.d.ts";
@@ -12,7 +12,7 @@ export function Article(
 ) {
   /* ===== COMPONENT RENDER ===== */
   return (
-    <div class={`${body} ${gapSectionSlim}`}>
+    <div class={`${body} ${containerGap}`}>
       <div class={bodyArticle}>
         {/* ===== MAIN CONTENT SECTION ===== */}
         <section>

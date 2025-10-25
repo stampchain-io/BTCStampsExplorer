@@ -2,7 +2,7 @@
 /*@baba-71-81*/
 
 import { Handlers, PageProps } from "$fresh/server.ts";
-import { body, containerBackground, gapSectionSlim } from "$layout";
+import { body, containerBackground, containerGap } from "$layout";
 import { StampGallery, StampingHowto } from "$section";
 import { StampController } from "$server/controller/stampController.ts";
 import { StampingTool } from "$tool";
@@ -67,12 +67,12 @@ export default function ToolStampingPage({ data }: PageProps<StampPageData>) {
 
   /* ===== RENDER ===== */
   return (
-    <div class={`${body} ${gapSectionSlim}`}>
+    <div class={`${body} ${containerGap}`}>
       <div class={`flex w-full`}>
         <StampingTool />
       </div>
       <div
-        class={`flex flex-col tablet:flex-row justify-between ${gapSectionSlim}`}
+        class={`flex flex-col tablet:flex-row justify-between ${containerGap}`}
       >
         <div class="flex w-full tablet:w-1/2">
           <StampingHowto />

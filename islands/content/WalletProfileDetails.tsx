@@ -1,9 +1,12 @@
 /* ===== WALLET PROFILE DETAILS COMPONENT ===== */
 import { StatTitle } from "$components/section/WalletComponents.tsx";
 import { Icon } from "$icon";
-import { containerBackground, gapSectionSlim } from "$layout";
+import { containerBackground, containerGap } from "$layout";
 import type { WalletOverviewInfo } from "$lib/types/wallet.d.ts";
-import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
+import {
+  abbreviateAddress,
+  formatBTCAmount,
+} from "$lib/utils/ui/formatting/formatUtils.ts";
 import { showToast } from "$lib/utils/ui/notifications/toastSignal.ts";
 import { tooltipIcon } from "$notification";
 import { label, labelSm, titleGreyLD, valueSm } from "$text";
@@ -166,7 +169,10 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
           }
           value={
             <>
-              {walletData.balance} <span class="font-extralight">BTC</span>
+              {formatBTCAmount(walletData.balance, {
+                includeSymbol: false,
+                stripZeros: true,
+              })} <span class="font-extralight">BTC</span>
             </>
           }
           align="right"
@@ -288,13 +294,13 @@ export default function WalletProfileDetails({
 
   /* ===== RENDER ===== */
   return (
-    <div class={`flex flex-col tablet:flex-row ${gapSectionSlim}`}>
+    <div class={`flex flex-col tablet:flex-row ${containerGap}`}>
       <div className="flex flex-col h-fit w-full tablet:w-2/3">
         <div className={containerBackground}>
           <WalletOverview walletData={walletData} />
         </div>
       </div>
-      <div class={`flex flex-col w-full tablet:w-1/3 ${gapSectionSlim}`}>
+      <div class={`flex flex-col w-full tablet:w-1/3 ${containerGap}`}>
         <div className={containerBackground}>
           <WalletStats
             stampsTotal={stampsTotal}

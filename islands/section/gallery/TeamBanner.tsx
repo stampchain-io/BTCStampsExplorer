@@ -1,5 +1,5 @@
 /* ===== TEAM GALLERY COMPONENT ===== */
-import { containerBackground, gapGrid } from "$layout";
+import { containerBackground, containerGap } from "$layout";
 import { headingGreyLD, subtitleGrey, valueSm } from "$text";
 
 /* ===== COMPONENT ===== */
@@ -18,7 +18,7 @@ export default function TeamBanner() {
             <div
               class={`flex justify-between items-start
              mx-0 mobileLg:mx-12 desktop:mx-16 mt-4
-              ${gapGrid}`}
+              ${containerGap}`}
             >
               {/* ===== MIKE IN SPACE CARD ===== */}
               <div class="flex flex-col items-center">

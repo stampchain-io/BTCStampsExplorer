@@ -17,8 +17,8 @@ import { closeModal, globalModal, openModal } from "$islands/modal/states.ts";
 import {
   bodyTool,
   containerBackground,
+  containerGap,
   containerRowForm,
-  gapSectionSlim,
   glassmorphism,
   glassmorphismL2,
   glassmorphismL2Hover,
@@ -234,7 +234,7 @@ export function StampingTool() {
   /* ===== EARLY RETURN CONDITIONS ===== */
   if (isLoading) {
     return (
-      <div class={`${bodyTool} ${gapSectionSlim}`}>
+      <div class={`${bodyTool} ${containerGap}`}>
         <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
           STAMP
         </h1>
@@ -2033,7 +2033,7 @@ function StampingToolMain({ config }: { config: Config }) {
 
   /* ===== COMPONENT RENDER ===== */
   return (
-    <div class={`${bodyTool} ${gapSectionSlim}`}>
+    <div class={`${bodyTool} ${containerGap}`}>
       <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
         STAMP
       </h1>

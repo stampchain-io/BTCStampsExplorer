@@ -12,7 +12,7 @@ import { openModal } from "$islands/modal/states.ts";
 import {
   bodyTool,
   containerBackground,
-  gapSectionSlim,
+  containerGap,
   glassmorphismL2Hover,
   transitionAll,
 } from "$layout";
@@ -206,7 +206,7 @@ export function SRC101RegisterTool({
   /* ===== CONFIG CHECK ===== */
   if (!config) {
     return (
-      <div class={`${bodyTool} ${gapSectionSlim}`}>
+      <div class={`${bodyTool} ${containerGap}`}>
         <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
           REGISTER
         </h1>
@@ -270,7 +270,7 @@ export function SRC101RegisterTool({
 
   /* ===== COMPONENT RENDER ===== */
   return (
-    <div class={`${bodyTool} ${gapSectionSlim}`}>
+    <div class={`${bodyTool} ${containerGap}`}>
       <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
         REGISTER
       </h1>

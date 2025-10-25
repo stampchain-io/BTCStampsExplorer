@@ -12,7 +12,7 @@ import {
   bodyTool,
   containerBackground,
   containerColForm,
-  gapSectionSlim,
+  containerGap,
   rowResponsiveForm,
 } from "$layout";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
@@ -303,7 +303,7 @@ export function SRC20TransferTool(
   /* ===== CONFIG CHECK ===== */
   if (!config) {
     return (
-      <div class={`${bodyTool} ${gapSectionSlim}`}>
+      <div class={`${bodyTool} ${containerGap}`}>
         <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
           TRANSFER
         </h1>
@@ -313,7 +313,7 @@ export function SRC20TransferTool(
   }
 
   return (
-    <div class={`${bodyTool} ${gapSectionSlim}`}>
+    <div class={`${bodyTool} ${containerGap}`}>
       <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
         TRANSFER
       </h1>

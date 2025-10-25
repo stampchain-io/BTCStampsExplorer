@@ -115,7 +115,7 @@ The app UI is inspired by Apple design principles, with dark themed multilayered
     - Transition utilities: `transitionColors`, `transitionTransform`, `transitionAll`
     - Shadow variants: `shadow`, `shadowL2`, `shadowGlowPurple`, `shadowGlowGrey`
     - Glassmorphism layers: `glassmorphism`, `glassmorphismOverlay`, `glassmorphismL2`, `glassmorphismL2Hover`
-    - Body styles: `body`, `bodyTool`, `bodyArticle`, `gapSection`, `gapSectionSlim`, `gapGrid`
+    - Body styles: `body`, `bodyTool`, `bodyArticle`, `gapSection`, `containerGap`, `containerGap`
     - Container styles: `containerBackground`, `containerCard`, `containerCardL2`, `containerColForm`
     - Cell styles: `cellLeftCard`, `cellRightCard`, `cellCenterCard` (+ L2 variants)
     - Loader styles: `loaderSpinPurple`, `loaderSpinGrey`, `loaderSkeleton` (+ size variants)
@@ -225,11 +225,10 @@ export type LayoutStyles = {
   bodyTool: string;
   bodyArticle: string;
   gapSection: string;
-  gapSectionSlim: string;
-  gapGrid: string;
 
   // Container styles
   containerBackground: string;
+  containerGap: string;
   containerCard: string;
   containerCardL2: string;
   containerColForm: string;
@@ -511,7 +510,7 @@ Defined in `tailwind.config.ts`:
 - **Import from central location**: Always use `$layout` alias for imports
 - **Combine with Tailwind**: Layout styles work seamlessly with Tailwind utility classes
 - **Use group hover**: Leverage `group` and `group-hover:` for interactive cards
-- **Consistent spacing**: Use predefined gap utilities (`gapSection`, `gapGrid`)
+- **Consistent spacing**: Use predefined gap utilities (`containerGap`)
 
 ### Responsive Design
 - **Mobile-first approach**: Base styles target mobile, enhance for larger screens

@@ -8,7 +8,7 @@ import { HomeHeader } from "$header";
 import {
   body,
   containerBackground,
-  gapSectionSlim,
+  containerGap,
   Micro5FontLoader,
 } from "$layout";
 import { ResponseUtil } from "$lib/utils/api/responses/responseUtil.ts";
@@ -303,7 +303,7 @@ export default function Home({ data }: PageProps<HomePageData>) {
 
       {/* ===== MAIN CONTENT ===== */}
       <div
-        class={`${body} ${gapSectionSlim}`}
+        class={`${body} ${containerGap}`}
       >
         {/* ===== CRITICAL ABOVE FOLD CONTENT ===== */}
         <HomeHeader />
@@ -345,7 +345,7 @@ export default function Home({ data }: PageProps<HomePageData>) {
           </div>
 
           <div
-            class={`flex flex-col tablet:flex-row ${containerBackground} ${gapSectionSlim}`}
+            class={`flex flex-col tablet:flex-row ${containerBackground} ${containerGap}`}
           >
             <div class="w-full tablet:w-1/2">
               <SRC20Gallery
@@ -370,7 +370,7 @@ export default function Home({ data }: PageProps<HomePageData>) {
           </div>
         </div>
 
-        <div class={`flex flex-col ${gapSectionSlim}`}>
+        <div class={`flex flex-col ${containerGap}`}>
           <StampchainContactCta />
           <PartnersBanner />
         </div>
