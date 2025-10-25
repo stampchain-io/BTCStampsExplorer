@@ -279,7 +279,7 @@ export default function WalletProfileDetails({
       } else if (status.overallStatus === "unavailable") {
         showToast(
           "Market data is currently unavailable",
-          "error",
+          "warning",
           true,
         );
       }

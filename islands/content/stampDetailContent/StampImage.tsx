@@ -852,8 +852,8 @@ export function StampImage(
                     type="iconButton"
                     weight="bold"
                     size="xxl"
-                    color="custom"
-                    className="p-[25%] relative z-10 fill-color-grey group-hover/button:fill-color-grey-light transition-all duration-200"
+                    color="grey"
+                    className="p-[25%] relative z-10"
                   />
                 </button>
               </div>
