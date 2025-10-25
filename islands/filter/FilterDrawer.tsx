@@ -429,7 +429,7 @@ const FilterDrawer = (
       </div>
       {/* Sticky buttons */}
       <div
-        class={`flex justify-between ${containerStickyBottom} w-full px-9 tablet:px-6 gap-6 bg-transparent`}
+        class={`flex justify-between ${containerStickyBottom}!mt-0 w-full px-9 tablet:px-6 gap-6 bg-transparent`}
       >
         <Button
           variant="outline"

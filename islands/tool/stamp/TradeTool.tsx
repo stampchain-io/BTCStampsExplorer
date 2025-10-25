@@ -22,7 +22,7 @@ import { useCallback, useEffect, useState } from "preact/hooks";
 
 import { Button } from "$button";
 import { InputField } from "$form";
-import { bodyTool, containerBackground } from "$layout";
+import { bodyTool, containerBackground, containerGap } from "$layout";
 import type { UTXO, XcpBalance } from "$lib/types/index.d.ts";
 import { normalizeFeeRate } from "$lib/utils/fees.ts";
 import { StatusMessages } from "$notification";
@@ -692,16 +692,16 @@ export function StampTradeTool() {
 
   /* ===== RENDER ===== */
   return (
-    <div class={`${bodyTool}`}>
+    <div class={`${bodyTool} ${containerGap}`}>
       {/* ===== SELLER SECTION ===== */}
-      <h1 class={`${titleGreyLD} mobileMd:mx-auto`}>
-        ATTACH TO UTXO
+      <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
+        TRADE
       </h1>
-      <h2 class={`${subtitleGrey} mobileMd:mx-auto`}>SELLER</h2>
 
       {/* ===== CREATE PSBT FORM ===== */}
       <div class={containerBackground}>
-        <h3 class=" font-bold text-xl text-color-purple-semilight mb-2">
+        <h2 class={`${subtitleGrey} mx-auto`}>SELLER</h2>
+        <h3 class=" font-bold text-xl text-color-grey-semilight mb-2">
           CREATE PSBT
         </h3>
 
@@ -782,8 +782,8 @@ export function StampTradeTool() {
         <div class="flex justify-end mt-5">
           <Button
             variant="flat"
-            color="purple"
-            size="md"
+            color="grey"
+            size="mdR"
             onClick={handleCreatePSBT}
             disabled={isSubmitting}
           >
@@ -814,8 +814,9 @@ export function StampTradeTool() {
 
       {/* ===== UTXO ATTACH FORM ===== */}
       <div class={containerBackground}>
-        <h3 class=" font-bold text-xl text-color-purple-semilight mb-2">
-          UTXO ATTACH
+        <h2 class={`${subtitleGrey} mx-auto`}>SELLER</h2>
+        <h3 class=" font-bold text-xl text-color-grey-semilight mb-2">
+          ATTACH TO UTXO
         </h3>
 
         {/* ===== 🎯 INLINE FEE STATUS DISPLAY - UTXO ATTACH ===== */}
@@ -887,8 +888,8 @@ export function StampTradeTool() {
                 />
               </div>
               <Button
-                variant="flat"
-                color="purple"
+                variant="outline"
+                color="grey"
                 size="sm"
                 onClick={handleQueryAssets}
                 disabled={isSubmitting || isLoadingAssets}
@@ -946,8 +947,8 @@ export function StampTradeTool() {
                 />
               </div>
               <Button
-                variant="flat"
-                color="purple"
+                variant="outline"
+                color="grey"
                 size="sm"
                 onClick={handleQueryUtxos}
                 disabled={isSubmitting || isLoadingUtxos}
@@ -982,8 +983,8 @@ export function StampTradeTool() {
         <div class="flex justify-end mt-5">
           <Button
             variant="flat"
-            color="purple"
-            size="md"
+            color="grey"
+            size="mdR"
             onClick={handleUtxoAttach}
             disabled={isSubmitting}
           >
@@ -1012,8 +1013,8 @@ export function StampTradeTool() {
       {/* ===== BUYER SECTION ===== */}
       {/* ===== COMPLETE SWAP FORM ===== */}
       <div class={containerBackground}>
-        <h2 class={`${subtitleGrey} mobileMd:mx-auto`}>BUYER</h2>
-        <h3 class=" font-bold text-xl text-color-purple-semilight mb-2">
+        <h2 class={`${subtitleGrey} mx-auto`}>BUYER</h2>
+        <h3 class=" font-bold text-xl text-color-grey-semilight mb-2">
           COMPLETE SWAP
         </h3>
 
@@ -1098,8 +1099,8 @@ export function StampTradeTool() {
         <div class="flex justify-end mt-5">
           <Button
             variant="flat"
-            color="purple"
-            size="md"
+            color="grey"
+            size="mdR"
             onClick={handleCompleteSwap}
             disabled={isSubmitting}
           >

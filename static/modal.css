@@ -8,7 +8,6 @@ defined individually
   --animation-timing: cubic-bezier(0.46,0.03,0.52,0.96);
   --animation-bg: rgba(0, 0, 0, 0.25);
   --animation-duration-background: .5s;
-  --animation-cleanup-delay: .5s;
 
   /* Base modal container styles */
   position: fixed;
@@ -27,7 +26,6 @@ defined individually
     transform: scale(1);
 
     .animation-modal-background {
-      background: var(--animation-bg);
       animation: fadeModalIn var(--animation-duration-background) var(--animation-timing) forwards;
 
       .animation-modal {
@@ -57,10 +55,10 @@ defined individually
     }
 
     &.out {
-      animation: slideBottomDown 0s var(--animation-cleanup-delay) linear forwards;
+      animation: slideBottomDown 0.3s var(--animation-timing) forwards;
 
       .animation-modal {
-        animation: slideBottomDown 0.5s var(--animation-timing) forwards;
+        animation: slideBottomDown 0.3s var(--animation-timing) forwards;
       }
     }
   }
@@ -75,24 +73,24 @@ defined individually
     }
 
     &.out {
-      animation: slideTopUp 0s var(--animation-cleanup-delay) linear forwards;
+      animation: slideTopUp 0.3s var(--animation-timing) forwards;
 
       .animation-modal {
-        animation: slideTopUp 0.5s var(--animation-timing) forwards;
+        animation: slideTopUp 0.3s var(--animation-timing) forwards;
       }
     }
   }
 
   &.zoomInOut {
     .animation-modal {
-      animation: zoomCenterIn 0.4s var(--animation-timing) forwards;
+      animation: zoomCenterIn 0.3s var(--animation-timing) forwards;
     }
 
     &.out {
-      animation: zoomCenterOut 0s var(--animation-cleanup-delay) linear forwards;
+      animation: zoomCenterOut 0.3s var(--animation-timing) forwards;
 
       .animation-modal {
-        animation: zoomCenterOut 0.4s var(--animation-timing) forwards;
+        animation: zoomCenterOut 0.3s var(--animation-timing) forwards;
       }
     }
   }
@@ -100,8 +98,7 @@ defined individually
   .animation-modal-background {
     display: table-cell;
     background: var(--animation-bg);
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
+    /* backdrop-filter will be animated in keyframes */
     text-align: center;
     vertical-align: middle;
 
@@ -188,20 +185,40 @@ defined individually
 @keyframes fadeModalIn {
   0% {
     background: rgba(0, 0, 0, 0);
+    -webkit-backdrop-filter: blur(0px);
+    backdrop-filter: blur(0px);
+  }
+
+  70% {
+    background: var(--animation-bg);
+    -webkit-backdrop-filter: blur(0px);
+    backdrop-filter: blur(16px);
   }
 
   100% {
     background: var(--animation-bg);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
   }
 }
 
 @keyframes fadeModalOut {
   0% {
     background: var(--animation-bg);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+  }
+
+  30% {
+    background: var(--animation-bg);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
   }
 
   100% {
     background: rgba(0, 0, 0, 0);
+    -webkit-backdrop-filter: blur(0px);
+    backdrop-filter: blur(0px);
   }
 }
 
@@ -211,16 +228,16 @@ defined individually
   }
 
   100% {
-    transform: scale(.98);
+    transform: scale(0.99);
   }
 }
 
 @keyframes scaleContentForward {
   0% {
-    transform: scale(.98);
+    transform: scale(1);
   }
 
   100% {
-    transform: scale(1);
+    transform: scale(0.99);
   }
 }
