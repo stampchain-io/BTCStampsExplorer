@@ -257,10 +257,26 @@ export function SRC20DeployTool(
   /* ===== TOOLTIP HANDLERS ===== */
   const handleMouseMove = (e: MouseEvent) => {
     setTooltipPosition({
-      x: e.clientX,
+      x: e.clientX, // Viewport coordinates for fixed positioning
       y: e.clientY,
     });
   };
+
+  // Track global mouse movement when tooltip is visible
+  useEffect(() => {
+    if (!isUploadTooltipVisible) return;
+
+    const handleGlobalMouseMove = (e: globalThis.MouseEvent) => {
+      setTooltipPosition({
+        x: e.clientX,
+        y: e.clientY,
+      });
+    };
+
+    document.addEventListener("mousemove", handleGlobalMouseMove);
+    return () =>
+      document.removeEventListener("mousemove", handleGlobalMouseMove);
+  }, [isUploadTooltipVisible]);
 
   const handleUploadMouseEnter = () => {
     if (uploadTooltipTimeoutRef.current) {
@@ -394,18 +410,6 @@ export function SRC20DeployTool(
                     color="custom"
                     className="stroke-color-grey-dark group-hover:stroke-color-grey-semidark/80"
                   />
-                  <div
-                    class={`${tooltipImage} ${
-                      isUploadTooltipVisible ? "opacity-100" : "opacity-0"
-                    }`}
-                    style={{
-                      left: `${tooltipPosition.x}px`,
-                      top: `${tooltipPosition.y - 6}px`,
-                      transform: "translate(-50%, -100%)",
-                    }}
-                  >
-                    UPLOAD COVER IMAGE
-                  </div>
                 </label>
               )}
             </div>
@@ -612,6 +616,20 @@ export function SRC20DeployTool(
           apiError={apiError}
           fileUploadError={fileUploadError}
         />
+      </div>
+
+      {/* Tooltip outside backdrop-blur container to avoid stacking context issues */}
+      <div
+        class={`${tooltipImage} ${
+          isUploadTooltipVisible ? "opacity-100" : "opacity-0"
+        }`}
+        style={{
+          left: `${tooltipPosition.x}px`,
+          top: `${tooltipPosition.y - 6}px`,
+          transform: "translate(-50%, -100%)",
+        }}
+      >
+        UPLOAD COVER IMAGE
       </div>
     </div>
   );

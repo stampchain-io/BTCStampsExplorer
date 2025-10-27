@@ -9,7 +9,7 @@ import { ProgressiveEstimationIndicator } from "$components/indicators/Progressi
 import { MaraStatusLink } from "$components/mara/MaraStatusLink.tsx";
 import { MaraModeWarningModal } from "$components/modals/MaraModeWarningModal.tsx";
 import { MaraServiceUnavailableModal } from "$components/modals/MaraServiceUnavailableModal.tsx";
-import { InputField } from "$form";
+import { InputField, stateDisabled } from "$form";
 import { Icon } from "$icon";
 import { StampingToolSkeleton } from "$indicators";
 import PreviewImageModal from "$islands/modal/PreviewImageModal.tsx";
@@ -1625,10 +1625,26 @@ function StampingToolMain({ config }: { config: Config }) {
   /* ===== TOOLTIP HANDLERS ===== */
   const handleMouseMove = (e: MouseEvent) => {
     setTooltipPosition({
-      x: e.clientX,
+      x: e.clientX, // Viewport coordinates for fixed positioning
       y: e.clientY,
     });
   };
+
+  // Track global mouse movement when tooltip is visible
+  useEffect(() => {
+    if (!isUploadTooltipVisible) return;
+
+    const handleGlobalMouseMove = (e: globalThis.MouseEvent) => {
+      setTooltipPosition({
+        x: e.clientX,
+        y: e.clientY,
+      });
+    };
+
+    document.addEventListener("mousemove", handleGlobalMouseMove);
+    return () =>
+      document.removeEventListener("mousemove", handleGlobalMouseMove);
+  }, [isUploadTooltipVisible]);
 
   const handleUploadMouseEnter = () => {
     if (uploadTooltipTimeoutRef.current) {
@@ -1752,18 +1768,6 @@ function StampingToolMain({ config }: { config: Config }) {
             />
           </label>
         )}
-      <div
-        class={`${tooltipImage} ${
-          isUploadTooltipVisible ? "opacity-100" : "opacity-0"
-        }`}
-        style={{
-          left: `${tooltipPosition.x}px`,
-          top: `${tooltipPosition.y - 6}px`,
-          transform: "translate(-50%, -100%)",
-        }}
-      >
-        UPLOAD FILE
-      </div>
     </div>
   );
 
@@ -2188,14 +2192,24 @@ function StampingToolMain({ config }: { config: Config }) {
 
             <div
               ref={previewButtonRef}
-              className={`flex items-center justify-center !w-[46px] !h-10 ${glassmorphismL2} ${glassmorphismL2Hover} cursor-pointer group`} // dunno why, but the width has to be +6px ?!?!
+              className={`flex items-center justify-center !w-[46px] !h-10
+                 ${
+                file
+                  ? `${glassmorphismL2} ${glassmorphismL2Hover} cursor-pointer group`
+                  : `${glassmorphismL2} ${stateDisabled} group`
+              }`}
               onClick={() => {
+                if (!file) return;
                 toggleFullScreenModal();
                 setIsPreviewTooltipVisible(false);
                 setAllowPreviewTooltip(false);
               }}
-              onMouseEnter={handlePreviewMouseEnter}
-              onMouseLeave={handlePreviewMouseLeave}
+              onMouseEnter={() => {
+                handlePreviewMouseEnter();
+              }}
+              onMouseLeave={() => {
+                handlePreviewMouseLeave();
+              }}
             >
               <Icon
                 type="iconButton"
@@ -2203,7 +2217,7 @@ function StampingToolMain({ config }: { config: Config }) {
                 weight="normal"
                 size="xs"
                 color="greyDark"
-                className="mb-0.5"
+                className={`mb-0.5 ${!file ? "!cursor-not-allowed" : ""}`}
               />
               <div
                 class={`${tooltipButton} ${
@@ -2357,6 +2371,20 @@ function StampingToolMain({ config }: { config: Config }) {
         }}
       >
         PREVIEW STAMP
+      </div>
+
+      {/* Tooltip outside backdrop-blur container to avoid stacking context issues */}
+      <div
+        class={`${tooltipImage} ${
+          isUploadTooltipVisible ? "opacity-100" : "opacity-0"
+        }`}
+        style={{
+          left: `${tooltipPosition.x}px`,
+          top: `${tooltipPosition.y - 6}px`,
+          transform: "translate(-50%, -100%)",
+        }}
+      >
+        UPLOAD FILE
       </div>
     </div>
   );
