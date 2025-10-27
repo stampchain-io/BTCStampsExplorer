@@ -571,7 +571,7 @@ export function Header() {
     <Icon
       type="iconButton"
       name="stampchain"
-      size="xl"
+      size="lg"
       weight="light"
       color="purpleLight"
       className="ml-1.5"
