@@ -23,8 +23,8 @@ export default {
         "courier-prime": ['"Courier Prime"', "sans-serif"],
         "micro-5": ['"Micro 5"', "sans-serif"],
       },
-      colors: { // color hue defs are calculated using HSL values - decreasing lightness by 8% for each step
-        color: { // colors are also defined as CSS variables further down in the doc - update both if changing anything here
+      colors: { // color hue defs are calculated using HSL values - decreasing lightness by 8% for each step (grey hues are estimations)
+        color: { // colors are also defined as CSS variables further down in the file - PieChart and ChartWidget use hardcoded color values
           purple: {
             dark: "#43005c",
             semidark: "#610085",
@@ -33,11 +33,11 @@ export default {
             light: "#BB00FF",
           },
           grey: {
-            dark: "#595653",
-            semidark: "#86827d",
-            DEFAULT: "#aca7a1",
-            semilight: "#d8d2ca",
-            light: "#fff8f0",
+            dark: "#585552",
+            semidark: "#817e78",
+            DEFAULT: "#a8a39d",
+            semilight: "#d1cbc3",
+            light: "#f9f2e9",
           },
           red: {
             dark: "#5c0000",
@@ -54,17 +54,17 @@ export default {
             light: "#00ff00",
           },
           orange: {
-            dark: "#5c3700",
-            semidark: "#855000",
-            DEFAULT: "#ad6800",
-            semilight: "#d68100",
-            light: "#ff9900",
+            dark: "#5c2b00",
+            semidark: "#853e00",
+            DEFAULT: "#ad5100",
+            semilight: "#d66400",
+            light: "#ff7700",
           },
           background: {
-            DEFAULT: "#080708",
+            DEFAULT: "#0d0a0d",
           },
           border: {
-            DEFAULT: "#242424",
+            DEFAULT: "#292626",
           },
         },
       },
@@ -250,11 +250,11 @@ export default {
           "--color-purple-semilight": "#9d00d6",
           "--color-purple-light": "#BB00FF",
           // Grey color palette as CSS variables
-          "--color-grey-dark": "#595653",
-          "--color-grey-semidark": "#86827d",
-          "--color-grey": "#aca7a1",
-          "--color-grey-semilight": "#d8d2ca",
-          "--color-grey-light": "#fff8f0",
+          "--color-grey-dark": "#585552",
+          "--color-grey-semidark": "#817e78",
+          "--color-grey": "#a8a39d",
+          "--color-grey-semilight": "#d1cbc3",
+          "--color-grey-light": "#f9f2e9",
           // Red color palette as CSS variables
           "--color-red-dark": "#5c0000",
           "--color-red-semidark": "#850000",
@@ -268,14 +268,14 @@ export default {
           "--color-green-semilight": "#00d600",
           "--color-green-light": "#00ff00",
           // Orange color palette as CSS variables
-          "--color-orange-dark": "#5c3700",
-          "--color-orange-semidark": "#855000",
-          "--color-orange": "#ad6800",
-          "--color-orange-semilight": "#d68100",
-          "--color-orange-light": "#ff9900",
+          "--color-orange-dark": "#5c2b00",
+          "--color-orange-semidark": "#853e00",
+          "--color-orange": "#ad5100",
+          "--color-orange-semilight": "#d66400",
+          "--color-orange-light": "#ff7700",
           // Background and border color palette as CSS variables
-          "--color-background": "#080708",
-          "--color-border": "#242424",
+          "--color-background": "#0d0a0d",
+          "--color-border": "#292626",
           // Conic gradient variables
           "--conic-pattern":
             "repeating-conic-gradient(rgba(128, 128, 128, 0.2) 0% 25%, rgba(128, 128, 128, 0.1) 25% 50%)",
@@ -383,6 +383,46 @@ export default {
             "-webkit-text-fill-color": "var(--color-grey-light)",
             "text-fill-color": "var(--color-grey-light)",
           },
+        },
+        // Fix for iOS/Safari backdrop-blur issue
+        // Overrides Tailwind's default backdrop-blur utilities that use CSS variables
+        // which webkit browsers fail to parse correctly
+        // See: https://github.com/tailwindlabs/tailwindcss/issues/13844
+        ".backdrop-blur-none": {
+          "-webkit-backdrop-filter": "blur(0)",
+          "backdrop-filter": "blur(0)",
+        },
+        ".backdrop-blur-xs": {
+          "-webkit-backdrop-filter": "blur(4px)",
+          "backdrop-filter": "blur(4px)",
+        },
+        ".backdrop-blur-sm": {
+          "-webkit-backdrop-filter": "blur(8px)",
+          "backdrop-filter": "blur(8px)",
+        },
+        ".backdrop-blur": {
+          "-webkit-backdrop-filter": "blur(12px)",
+          "backdrop-filter": "blur(12px)",
+        },
+        ".backdrop-blur-md": {
+          "-webkit-backdrop-filter": "blur(12px)",
+          "backdrop-filter": "blur(12px)",
+        },
+        ".backdrop-blur-lg": {
+          "-webkit-backdrop-filter": "blur(16px)",
+          "backdrop-filter": "blur(16px)",
+        },
+        ".backdrop-blur-xl": {
+          "-webkit-backdrop-filter": "blur(24px)",
+          "backdrop-filter": "blur(24px)",
+        },
+        ".backdrop-blur-2xl": {
+          "-webkit-backdrop-filter": "blur(40px)",
+          "backdrop-filter": "blur(40px)",
+        },
+        ".backdrop-blur-3xl": {
+          "-webkit-backdrop-filter": "blur(64px)",
+          "backdrop-filter": "blur(64px)",
         },
       });
     }),

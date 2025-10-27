@@ -248,14 +248,14 @@
             static initClass() {
                 (this.prototype.p5 = !0),
                     /* === VISUAL COLORS (defaults) ===
-                     * color: "#8700e0"   // light purple
+                     * color: "#bb00ff"   // light purple
                      * backgroundColor: "#000000" // black
                      * colorPalette: array of colors that randomly alternate
                      */
                     (this.prototype.defaultOptions = {
-                        color: "#9600e0",
+                        color: "#c219ff",
                         backgroundColor: "#000000",
-                        colorPalette: ["#8700e0", "#000000", "#9600e0", "#000000", "#a500e0", "#000000", "#b400e0"]
+                        colorPalette: ["#bb00ff", "#000000", "#c219ff", "#000000", "#c933ff", "#000000", "#cf4dff", "#000000", "#d666ff"]
                     });
             }
             constructor(e) {
@@ -298,7 +298,7 @@
                                 // Mobile: 750 particles, Tablet/Desktop: 1500 particles
                                 const isMobile = "undefined" != typeof navigator && (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768);
                                 c = isMobile ? 750 : 1500;
-                                const colorPalette = e.options.colorPalette || ["#8700e0", "#000000", "#9600e0", "#000000", "#a500e0", "#000000", "#b400e0"];
+                                const colorPalette = e.options.colorPalette || ["#bb00ff", "#000000", "#c219ff", "#000000", "#c933ff", "#000000", "#cf4dff", "#000000", "#d666ff"];
                                 for (let e = 0; e < c; e++) {
                                     let s = t.random(t.width + 200),
                                         i = t.random(t.height + 200);
@@ -383,16 +383,19 @@
  * scaleMobile: 1
  *
  * === VISUAL COLORS ===
- * color: "#9600e0" (dark purple) - legacy single color
+ * color: "#c219ff" (dark purple) - legacy single color
  * backgroundColor: "#000000" (black)
- * colorPalette: ["#8700e0", "#000000", "#9600e0", "#000000", "#a500e0", "#000000", "#b400e0"]
- *   Array of 7 colors for random alternation - each particle randomly assigned one color at creation
+ * colorPalette: ["#bb00ff", "#000000", "#c219ff", "#000000", "#c933ff", "#000000", "#cf4dff", "#000000", "#d666ff"]
+ *   Array of 9 colors for random alternation - each particle randomly assigned one color at creation
  *   Colors breakdown:
- *     - #8700e0: bright purple (~14% chance)
- *     - #000000: black - appears three times (~43% chance total)
- *     - #9600e0: dark purple (~14% chance)
- *     - #a500e0: dark magenta (~14% chance)
- *     - #b400e0: very dark purple (~14% chance)
+ *     - #bb00ff: bright purple (~11% chance)
+ *     - #000000: black - appears four times (~44% chance total)
+ *     - #c219ff: dark purple (~11% chance)
+ *     - #c933ff: dark magenta (~11% chance)
+ *     - #cf4dff: very dark purple (~11% chance)
+ *     - #d666ff: light purple (~11% chance)
+ *
+ * Color hue defs are calculated using HSV values - decreasing saturation by 10% for each step
  *
  * === PARTICLE SYSTEM ===
  * Particle count: Dynamic based on device
