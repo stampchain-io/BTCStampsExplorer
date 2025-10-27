@@ -76,7 +76,7 @@ export function HomeHeader() {
             delay="50"
             class="
               font-black
-              color-grey-gradientDL
+              color-grey-gradientLD
               text-2xl
               min-[420px]:text-3xl
               mobileMd:text-4xl
@@ -96,7 +96,7 @@ export function HomeHeader() {
             delay="150"
             class="
               font-bold
-              color-grey-gradientDL
+              color-grey-gradientLD
               uppercase
               text-xl
               min-[420px]:text-2xl

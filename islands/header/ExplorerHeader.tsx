@@ -8,7 +8,7 @@ export const ExplorerHeader = () => {
   /* ===== RENDER ===== */
   return (
     <div class="flex flex-row justify-between items-start w-full">
-      {/* Responsive Title Section */}
+      {/* Title Section */}
       <h1 class={`${titleGreyLD} ml-1.5`}>EXPLORER</h1>
 
       {/* Controls Section */}

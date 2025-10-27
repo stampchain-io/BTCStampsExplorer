@@ -33,15 +33,12 @@ export const StampchainContactCta = () => {
           </p>
           <p>
             <b>We empower creators and collectors by:</b>
-            <li>
-              Providing battle-tested tools developed by the original Bitcoin
-              Stamps team
-            </li>
-            <li>
-              Maintaining the most comprehensive knowledge base for Stamps
-              technology
-            </li>
-            {/* <li>Offering expert guidance on stamp creation, trading, and collection management</li> */}
+            <br />
+            • Providing battle-tested tools developed by the original Bitcoin
+            Stamps team <br />
+            • Maintaining the most comprehensive knowledge base for Stamps
+            technology
+            {/* • Offering expert guidance on stamp creation, trading, and collection management */}
           </p>
         </div>
       </div>

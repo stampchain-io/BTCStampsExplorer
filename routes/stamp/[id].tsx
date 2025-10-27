@@ -384,7 +384,7 @@ export default function StampDetailPage(props: StampDetailPageProps) {
           />
         )}
 
-        <div class={`${containerBackground} mt-6 mobileLg:mt-12`}>
+        <div class={containerBackground}>
           <StampGallery {...latestStampsSection} />
         </div>
       </div>
