@@ -3,11 +3,18 @@ import { PaginationButtons, SortButton } from "$button";
 import { Icon, LoadingIcon, PlaceholderImage } from "$icon";
 import {
   containerBackground,
-  glassmorphism,
+  glassmorphismL2,
   rowContainerBackground,
-  shadowGlowPurple,
 } from "$layout";
-import { subtitleGrey, titleGreyLD, valueDarkSm } from "$text";
+import { tooltipIcon } from "$notification";
+import {
+  label,
+  labelSm,
+  subtitleGrey,
+  titleGreyLD,
+  valueDarkSm,
+  valueSm,
+} from "$text";
 import type { DispenserRow as Dispenser, StampRow } from "$types/stamp.d.ts";
 import type {
   EnhancedWalletContentProps,
@@ -26,7 +33,7 @@ import {
   isBrowser,
   safeNavigate,
 } from "$utils/navigation/freshNavigationUtils.ts";
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 // ===== ADVANCED SORTING IMPORTS =====
 import SortingErrorBoundary from "$islands/sorting/SortingErrorBoundary.tsx";
@@ -124,7 +131,7 @@ function SectionHeader({
       f-partial={`/${config.paramName}`}
     >
       <div class="flex items-center gap-4">
-        <h2 class={subtitleGrey}>
+        <h2 class={titleGreyLD}>
           {title}
         </h2>
         {sortMetrics && (
@@ -175,11 +182,18 @@ function SectionHeader({
           )
           : ( */
         }
-        <SortButton
-          initSort={sortBy as "ASC" | "DESC"}
-          onChangeSort={(newSort: any) => onSortChange?.(newSort)}
-          sortParam={config.paramName}
-        />
+        <div
+          class={`flex relative ${glassmorphismL2} !rounded-full
+             items-start justify-between
+             gap-7 py-1.5 px-5
+             tablet:gap-5 tablet:py-1 tablet:px-4`}
+        >
+          <SortButton
+            initSort={sortBy as "ASC" | "DESC"}
+            onChangeSort={(newSort: any) => onSortChange?.(newSort)}
+            sortParam={config.paramName}
+          />
+        </div>
         {/* )} */}
       </div>
     </div>
@@ -188,8 +202,9 @@ function SectionHeader({
 
 /**
  * Get human-readable label for sort option
+ * Reserved for future advanced sorting features
  */
-function getSortLabel(option: string): string {
+function _getSortLabel(option: string): string {
   const labels: Record<string, string> = {
     "ASC": "Low to High",
     "DESC": "High to Low",
@@ -249,14 +264,11 @@ function DispenserItem({
   /* ===== RENDER DISPENSER ITEM ===== */
   return (
     <div class="relative shadow-md">
-      <div class="hidden mobileLg:flex flex-col gap-6 -mt-6">
+      <div class="hidden mobileLg:flex flex-col">
         {/* Open Dispensers Section */}
         {openDispensers.length > 0 && (
           <div id="open-listings-section">
-            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black color-purple-gradientLD mb-6">
-              OPEN LISTINGS
-            </h3>
-            <div class="flex flex-col gap-6">
+            <div class="flex flex-col gap-5">
               {openDispensers.map((dispenser) => (
                 <DispenserRow dispenser={dispenser} view="tablet" />
               ))}
@@ -267,10 +279,7 @@ function DispenserItem({
         {/* Closed Dispensers Section */}
         {closedDispensers.length > 0 && (
           <div id="closed-listings-section">
-            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black color-purple-gradientLD mb-6">
-              CLOSED LISTINGS
-            </h3>
-            <div class="flex flex-col gap-6">
+            <div class="flex flex-col gap-5">
               {closedDispensers.map((dispenser) => (
                 <DispenserRow dispenser={dispenser} view="tablet" />
               ))}
@@ -283,10 +292,7 @@ function DispenserItem({
       <div class="flex mobileLg:hidden flex-col gap-3">
         {/* Open Dispensers Section */}
         {openDispensers.length > 0 && (
-          <div class="mb-8" id="open-listings-section">
-            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black color-purple-gradientLD mb-6">
-              OPEN LISTINGS
-            </h3>
+          <div class="mb-10 space-y-10" id="open-listings-section">
             <div class="flex flex-col gap-6">
               {openDispensers.map((dispenser) => (
                 <DispenserRow dispenser={dispenser} view="mobile" />
@@ -297,10 +303,7 @@ function DispenserItem({
 
         {/* Closed Dispensers Section */}
         {closedDispensers.length > 0 && (
-          <div id="closed-listings-section">
-            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black color-purple-gradientLD mb-6">
-              CLOSED LISTINGS
-            </h3>
+          <div class="space-y-10" id="closed-listings-section">
             <div class="flex flex-col gap-6">
               {closedDispensers.map((dispenser) => (
                 <DispenserRow dispenser={dispenser} view="mobile" />
@@ -334,16 +337,23 @@ function DispenserRow(
 ) {
   /* ===== STATE ===== */
   const imageSize = view === "mobile"
-    ? "w-[146px] h-[146px]"
-    : "w-[172px] h-[172px]";
+    ? "w-[72px] h-[72px]"
+    : "w-[78px] h-[78px]";
   const [loading, setLoading] = useState(true);
   const [src, setSrc] = useState<string | null>(null);
+  const [showCopied, setShowCopied] = useState(false);
+  const [isTooltipVisible, setIsTooltipVisible] = useState(false);
+  const [allowTooltip, setAllowTooltip] = useState(true);
+
+  /* ===== REFS ===== */
+  const copyButtonRef = useRef<HTMLDivElement>(null);
+  const tooltipTimeoutRef = useRef<number | null>(null);
 
   /* ===== IMAGE FETCHING ===== */
   const fetchStampImage = () => {
     setLoading(true);
     const res = getStampImageSrc(dispenser.stamp as StampRow);
-    setSrc(res);
+    setSrc(res ?? null);
     setLoading(false);
   };
 
@@ -352,6 +362,58 @@ function DispenserRow(
     fetchStampImage();
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (tooltipTimeoutRef.current) {
+        globalThis.clearTimeout(tooltipTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  /* ===== EVENT HANDLERS ===== */
+  const handleCopyMouseEnter = () => {
+    if (allowTooltip) {
+      if (tooltipTimeoutRef.current) {
+        globalThis.clearTimeout(tooltipTimeoutRef.current);
+      }
+
+      tooltipTimeoutRef.current = globalThis.setTimeout(() => {
+        const buttonRect = copyButtonRef.current?.getBoundingClientRect();
+        if (buttonRect) {
+          setIsTooltipVisible(true);
+        }
+      }, 1500);
+    }
+  };
+
+  const handleCopyMouseLeave = () => {
+    if (tooltipTimeoutRef.current) {
+      globalThis.clearTimeout(tooltipTimeoutRef.current);
+    }
+    setIsTooltipVisible(false);
+    setShowCopied(false);
+    setAllowTooltip(true);
+  };
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(dispenser.origin);
+      setShowCopied(true);
+      setIsTooltipVisible(false);
+      setAllowTooltip(false);
+
+      if (tooltipTimeoutRef.current) {
+        globalThis.clearTimeout(tooltipTimeoutRef.current);
+      }
+
+      tooltipTimeoutRef.current = globalThis.setTimeout(() => {
+        setShowCopied(false);
+      }, 1500);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  };
+
   if (!dispenser.stamp) {
     return null;
   }
@@ -359,15 +421,17 @@ function DispenserRow(
   /* ===== RENDER DISPENSER ROW ===== */
   return (
     <div
-      class={`flex justify-between ${glassmorphism} rounded-2xl hover:border-color-purple-light ${shadowGlowPurple} border-2 border-transparent`}
+      class={`${glassmorphismL2} p-5`}
     >
-      <div class="flex p-3 mobileLg:p-6 gap-6 uppercase w-full">
+      <div class="flex gap-6 w-full">
         <a
           href={`/stamp/${dispenser.stamp.stamp}`}
           class={`${imageSize} relative flex-shrink-0`}
         >
-          <div class="relative p-[6px] mobileMd:p-3 bg-color-background rounded-2xl aspect-square">
-            <div class="stamp-container absolute inset-0 flex items-center justify-center">
+          <div
+            class={`${glassmorphismL2} !border relative aspect-square`}
+          >
+            <div class="stamp-container absolute inset-0 flex items-center justify-center p-1">
               <div class="relative z-10 w-full h-full">
                 {loading && !src ? <LoadingIcon /> : src
                   ? (
@@ -391,101 +455,107 @@ function DispenserRow(
           </div>
         </a>
         <div class="flex flex-col w-full">
-          <div class="flex flex-col justify-between w-full mt-[6px]">
-            <div class="relative">
-              <a
-                href={`/stamp/${dispenser.stamp.stamp}`}
-                class="!inline-block text-2xl mobileLg:text-4xl font-black color-purple-gradientLD group-hover:[-webkit-text-fill-color:var(--color-purple-light)]"
-              >
-                {`#${dispenser.stamp.stamp}`}
-              </a>
-            </div>
-          </div>
+          {/* First Row: Stamp Number + Address (left) and GIVE/QUANTITY/PRICE (right) */}
+          <div class="flex justify-between items-start w-full mt-[6px]">
+            {/* Left side: Stamp number and address */}
+            <div class="flex flex-col gap-1">
+              <div class="relative">
+                <a
+                  href={`/stamp/${dispenser.stamp.stamp}`}
+                  class={subtitleGrey}
+                >
+                  {`#${dispenser.stamp.stamp}`}
+                </a>
+              </div>
 
-          <div class="flex justify-between flex-row w-full">
-            <h5
-              class={`text-base text-color-purple-semilight font-light text-ellipsis overflow-hidden ${
-                view === "mobile" ? "tablet:w-full" : ""
-              }`}
-            >
-              <span class="font-bold text-color-purple-semilight text-base mobileLg:text-xl normal-case">
-                {/* Abbreviate origin address differently depending on screen size */}
-                <span class="mobileMd:hidden">
-                  {abbreviateAddress(dispenser.origin, 4)}
-                </span>
-                <span class="hidden mobileMd:inline mobileLg:hidden">
-                  {abbreviateAddress(dispenser.origin, 7)}
-                </span>
-                <span class="hidden mobileLg:inline tablet:hidden">
-                  {abbreviateAddress(dispenser.origin, 10)}
-                </span>
-                <span class="hidden tablet:inline">{dispenser.origin}</span>
-              </span>
-            </h5>
-            <div class="flex flex-row gap-[9px] mobileLg:gap-3">
-              <Icon
-                type="iconButton"
-                name="copy"
-                weight="normal"
-                size="xs"
-                color="greyLight"
-              />
-              <Icon
-                type="iconButton"
-                name="history"
-                weight="normal"
-                size="xs"
-                color="greyLight"
-              />
+              <div class="flex flex-row-reverse justify-end gap-4">
+                <div
+                  ref={copyButtonRef}
+                  class="relative peer"
+                  onMouseEnter={handleCopyMouseEnter}
+                  onMouseLeave={handleCopyMouseLeave}
+                >
+                  <Icon
+                    type="iconButton"
+                    name="copy"
+                    weight="normal"
+                    size="smR"
+                    color="greyDark"
+                    className="mb-1"
+                    onClick={copy}
+                  />
+                  <div
+                    class={`${tooltipIcon} ${
+                      isTooltipVisible ? "opacity-100" : "opacity-0"
+                    }`}
+                  >
+                    COPY ADDY
+                  </div>
+                  <div
+                    class={`${tooltipIcon} ${
+                      showCopied ? "opacity-100" : "opacity-0"
+                    }`}
+                  >
+                    ADDY COPIED
+                  </div>
+                </div>
+
+                {/* Full address - hidden on smaller screens */}
+                <h6
+                  class={`${label} text-color-grey hidden tablet:block transition-colors duration-200 peer-hover:text-color-grey-light`}
+                >
+                  {dispenser.origin}
+                </h6>
+
+                {/* Abbreviated address for smaller screens */}
+                <h6
+                  class={`${label} text-color-grey hidden mobileLg:block tablet:hidden transition-colors duration-200 peer-hover:text-color-grey-light`}
+                >
+                  {abbreviateAddress(dispenser.origin, 13)}
+                </h6>
+
+                <h6
+                  class={`${label} text-color-grey hidden mobileMd:block mobileLg:hidden transition-colors duration-200 peer-hover:text-color-grey-light`}
+                >
+                  {abbreviateAddress(dispenser.origin, 9)}
+                </h6>
+
+                <h6
+                  class={`${label} text-color-grey block mobileMd:hidden transition-colors duration-200 peer-hover:text-color-grey-light`}
+                >
+                  {abbreviateAddress(dispenser.origin, 5)}
+                </h6>
+              </div>
             </div>
-          </div>
-          <div class="text-center flex justify-between mt-[6px]">
-            <h6 class="text-base mobileLg:text-lg text-color-grey-semidark font-light">
-              GIVE{" "}
-              <span class="font-bold text-color-grey-light">
-                {Number(dispenser.give_quantity).toLocaleString()}
-              </span>
-            </h6>
-          </div>
-          <div class="flex flex-row justify-between w-full">
-            <h6 class="text-base mobileLg:text-lg text-color-grey-semidark font-light">
-              QUANTITY{" "}
-              <span class="font-bold text-color-grey-light">
-                {dispenser.give_remaining === 0
-                  ? Number(dispenser.escrow_quantity).toLocaleString()
-                  : `${Number(dispenser.give_remaining).toLocaleString()}/${
-                    Number(dispenser.escrow_quantity).toLocaleString()
-                  }`}
-              </span>
-            </h6>
-            <h6
-              class={`text-color-grey-semidark text-lg font-light -mt-1 ${
-                view === "mobile" ? "hidden mobileLg:block" : ""
-              }`}
-            >
-              VALUE
-            </h6>
-          </div>
-          <div class="flex flex-row justify-between w-full">
-            <h6 class="text-base mobileLg:text-lg text-color-grey-semidark font-light">
-              PRICE{" "}
-              <span class="font-bold text-color-grey-light">
-                {formatBTCAmount(Number(dispenser.btcrate), {
-                  includeSymbol: false,
-                })}
-              </span>{" "}
-              <span className="text-color-grey-light">BTC</span>
-            </h6>
-            <h6
-              class={`text-xl mobileMd:text-2xl text-color-grey-light font-bold -mt-1 ${
-                view === "mobile" ? "hidden mobileLg:block" : ""
-              }`}
-            >
-              {formatBTCAmount(
-                Number(dispenser.btcrate) * Number(dispenser.escrow_quantity),
-                { includeSymbol: false },
-              )} <span class="text-color-grey-light font-light">BTC</span>
-            </h6>
+
+            {/* Right side: GIVE, QUANTITY, PRICE, VALUE */}
+            <div class="flex flex-col items-end text-right">
+              <h6 class={labelSm}>
+                GIVE{" "}
+                <span class={valueSm}>
+                  {Number(dispenser.give_quantity).toLocaleString()}
+                </span>
+              </h6>
+              <h6 class={labelSm}>
+                QUANTITY{" "}
+                <span class={valueSm}>
+                  {dispenser.give_remaining === 0
+                    ? Number(dispenser.escrow_quantity).toLocaleString()
+                    : `${Number(dispenser.give_remaining).toLocaleString()}/${
+                      Number(dispenser.escrow_quantity).toLocaleString()
+                    }`}
+                </span>
+              </h6>
+              <h6 class={labelSm}>
+                PRICE{" "}
+                <span class={valueSm}>
+                  {formatBTCAmount(Number(dispenser.btcrate), {
+                    includeSymbol: false,
+                  })}
+                </span>{" "}
+                <span className="text-color-grey-light">BTC</span>
+              </h6>
+            </div>
           </div>
         </div>
       </div>
@@ -557,8 +627,8 @@ function WalletProfileContentInner({
   const [sortStamps] = useState<string>(stampsSortBy);
   const [sortTokens] = useState<string>(src20SortBy);
   const [sortDispensers] = useState<string>(dispensersSortBy);
-  const [openSetting, setOpenSetting] = useState(false);
-  const [openSettingModal, setOpenSettingModal] = useState(false);
+  const [_openSetting, _setOpenSetting] = useState(false);
+  const [_openSettingModal, _setOpenSettingModal] = useState(false);
 
   /* ===== COMPUTED VALUES ===== */
   const openDispensersCount =
@@ -627,12 +697,9 @@ function WalletProfileContentInner({
 
   /* ===== RENDER ===== */
   return (
-    <div class={containerBackground}>
-      {/* Page Header */}
-      <h2 class={titleGreyLD}>WALLET</h2>
-
+    <div class="flex flex-col gap-6">
       {/* Stamps Section */}
-      <div id="stamps-section" class="mb-8">
+      <div id="stamps-section" class={containerBackground}>
         <SectionHeader
           title="STAMPS"
           config={SECTION_CONFIGS.stamps}
@@ -700,7 +767,7 @@ function WalletProfileContentInner({
       </div>
 
       {/* SRC20 (TOKENS) Section */}
-      <div id="src20-section" class="mb-8">
+      <div id="src20-section" class={containerBackground}>
         <SectionHeader
           title="TOKENS"
           config={SECTION_CONFIGS.src20}
@@ -737,7 +804,7 @@ function WalletProfileContentInner({
 
       {/* Dispensers Section */}
       {dispensers.data.length > 0 && (
-        <div id="dispensers-section" class="mb-8">
+        <div id="dispensers-section" class={containerBackground}>
           <SectionHeader
             title="LISTINGS"
             config={SECTION_CONFIGS.dispensers}
@@ -749,9 +816,9 @@ function WalletProfileContentInner({
 
           {/* Open Dispensers */}
           {openDispensersCount > 0 && (
-            <div id="open-listings-section" class="mb-6">
-              <h3 class="text-lg font-semibold text-color-grey-dark mb-3">
-                Open Listings ({openDispensersCount})
+            <div id="open-listings-section" class="mb-10">
+              <h3 class={subtitleGrey}>
+                OPEN DISPENSERS - {openDispensersCount}
               </h3>
               <DispenserItem
                 dispensers={dispensers.data.filter((d: any) =>
@@ -764,8 +831,8 @@ function WalletProfileContentInner({
           {/* Closed Dispensers */}
           {closedDispensersCount > 0 && (
             <div id="closed-listings-section">
-              <h3 class="text-lg font-semibold text-color-grey-dark mb-3">
-                Closed Listings ({closedDispensersCount})
+              <h3 class={subtitleGrey}>
+                CLOSED DISPENSERS - {closedDispensersCount}
               </h3>
               <DispenserItem
                 dispensers={dispensers.data.filter((d: any) =>
@@ -798,7 +865,7 @@ function WalletProfileContentInner({
       )}
 
       {/* Transfer Modal */}
-      {openSettingModal && (
+      {_openSettingModal && (
         <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           {/* Modal content would go here */}
         </div>
