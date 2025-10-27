@@ -784,7 +784,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
             )}
 
             <div className="flex flex-col items-start pt-3">
-              <h6 className={labelSm}>BY</h6>
+              <h6 className={labelSm}>ARTIST</h6>
               <a
                 className={headingGreyDLLink}
                 href={`/wallet/${stamp.creator}`}
