@@ -16,22 +16,17 @@ import { useEffect } from "preact/hooks";
  * localStorage key for tracking if update notification has been shown
  * INCREMENT VERSION for each new major update announcement
  */
-const NOTIFICATION_UPDATE_VERSION = "feature-update-v3.02";
+const NOTIFICATION_UPDATE_VERSION = "feature-update-v3.1";
 
 /**
  * Message content for update notification
  * Supports multi-line formatting with bullet points
  */
-const NOTIFICATION_UPDATE_MESSAGE = `New Website Updates
-• Enhanced UI design with more vibrant color palette
-• Improved toast notification and messaging
-• Reimagined header and navigation menus
-• Updated search feature with global stamp search and token specific search (on SRC20 Tokens overview and detail pages)
-• Fixed filtering issues on the Art Stamps overview page
-• Added keyboard shortcuts: ⌘/⌃ + "S" to access search (globally) and ⌘/⌃ + "F" to access filters (on the Art Stamps overview page) - "ESC" to close (globally)
-• Integrated blockchain stats with bitcoin block number, price, fee rates, wallet balance and Counterparty version
-• New Huge Icons iconset
-• Minor bug fixes and code optimization
+const NOTIFICATION_UPDATE_MESSAGE = `Website Updates
+• Enhanced color palette with vibrant hues
+• Improved Wallet Profile page with updated design
+• Minor UI tweaks and bug fixes
+• Major code optimization and performance improvements
 
 Please clear browser cache and refresh the page for all updates to take effect.`;
 
