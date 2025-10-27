@@ -41,14 +41,16 @@ The app UI is inspired by Apple design principles, with dark themed multilayered
 - Layer 0 - Base layer:
   - Background topology animation:
     - Multi-color particle system with purple/black palette on black background
-    - Color palette: ["#8800cc", "#000000", "#440066", "#000000", "#650065"]
-      - #8800cc: bright purple (20% chance)
-      - #000000: black - appears twice (40% chance total)
-      - #440066: dark purple (20% chance)
-      - #650065: dark magenta (20% chance)
+    - Color palette: ["#bb00ff", "#000000", "#c219ff", "#000000", "#c933ff", "#000000", "#cf4dff", "#000000", "#d666ff"]
+      - #bb00ff: bright purple (~11% chance)
+      - #000000: black - appears four times (~44% chance total)
+      - #c219ff: dark purple (~11% chance)
+      - #c933ff: dark magenta (~11% chance)
+      - #cf4dff: very dark purple (~11% chance)
+      - #d666ff: light purple (~11% chance)
     - Particle count: Dynamic based on device
-      - Mobile/Tablet: 1000 particles
-      - Desktop: 3000 particles
+      - Mobile/Tablet: 750 particles
+      - Desktop: 1500 particles
 
 - Overlay layer styles:
   - GlassmorphismOverlay
@@ -75,7 +77,7 @@ The app UI is inspired by Apple design principles, with dark themed multilayered
     - Rounded corners (24px) and background blur:
       - rounded-3xl backdrop-blur
     - Background: Linear gradient to bottom right
-      - bg-gradient-to-br from-color-border/40 via-color-background/50 to-black/60
+      - bg-gradient-to-br from-[#191919]/40 via-color-background/50 to-black/60
     - Border: border border-color-border/50
     - Shadow: Outer and inner shadows:
       - shadow-[0_4px_8px_rgba(13,11,13,0.2),inset_0_1px_0_rgba(13,11,13,0.1),inset_0_-1px_0_rgba(13,11,13,0.1),inset_0_0_1px_1px_rgba(13,11,13,0.1)]
@@ -430,6 +432,117 @@ export default function CustomPage() {
 
 ## Style System Integration
 
+### Tailwind Color System
+
+The application uses a comprehensive color system with dual definitions for maximum flexibility:
+
+#### Dual Definition System
+
+Colors are defined in **two formats** within `tailwind.config.ts`:
+
+1. **Tailwind Color Classes** - Object notation in the `colors` section
+   ```typescript
+   colors: {
+     color: {
+       purple: {
+         dark: "#43005c",
+         semidark: "#610085",
+         DEFAULT: "#7f00ad",
+         // ...
+       }
+     }
+   }
+   ```
+
+2. **CSS Variables** - Defined in the `:root` selector
+   ```css
+   ":root": {
+     "--color-purple-dark": "#43005c",
+     "--color-purple-semidark": "#610085",
+     "--color-purple": "#7f00ad",
+     // ...
+   }
+   ```
+
+#### When to Use Each Format
+
+**Use Tailwind Classes** (`color-purple-dark`) when:
+- Styling directly in JSX/TSX className attributes
+- Using with Tailwind utility classes (e.g., `text-color-purple`, `bg-color-grey-light`, `stroke-color-grey-semidark`)
+- Need IntelliSense autocomplete in editors
+- Static styling that doesn't change
+
+**Use CSS Variables** (`var(--color-purple-dark)`) when:
+- Dynamic styling with JavaScript/TypeScript
+- Creating reusable style constants (as seen in `components/button/styles.ts`)
+- Need to compute or modify colors at runtime
+- Using in custom CSS or inline styles
+- Button color system (maps to CSS vars for dynamic application)
+
+**Example:**
+```typescript
+// Tailwind class usage
+<div className="text-color-purple-light bg-color-grey-dark border-color-border">
+
+// CSS variable usage (in button styles)
+color: {
+  purple: `
+    [--color-button-dark:var(--color-purple-dark)]
+    [--color-button-semidark:var(--color-purple-semidark)]
+    [--color-button:var(--color-purple)]
+  `
+}
+```
+
+#### Color Families
+```typescript
+// Purple (brand color)
+color-purple-dark      // #43005c
+color-purple-semidark  // #610085
+color-purple           // #7f00ad (DEFAULT)
+color-purple-semilight // #9d00d6
+color-purple-light     // #BB00FF
+
+// Grey (neutral)
+color-grey-dark        // #585552
+color-grey-semidark    // #817e78
+color-grey             // #a8a39d (DEFAULT)
+color-grey-semilight   // #d1cbc3
+color-grey-light       // #f9f2e9
+
+// Red (errors/warnings)
+color-red-dark         // #5c0000
+color-red-semidark     // #850000
+color-red              // #ad0000 (DEFAULT)
+color-red-semilight    // #d60000
+color-red-light        // #ff0000
+
+// Green (success)
+color-green-dark       // #005c00
+color-green-semidark   // #008500
+color-green            // #00ad00 (DEFAULT)
+color-green-semilight  // #00d600
+color-green-light      // #00ff00
+
+// Orange (warnings)
+color-orange-dark      // #5c2b00
+color-orange-semidark  // #853e00
+color-orange           // #ad5100 (DEFAULT)
+color-orange-semilight // #d66400
+color-orange-light     // #ff7700
+
+// Background & Border
+color-background       // #0d0a0d
+color-border           // #292626
+```
+
+**Notes:**
+- Color hue definitions are calculated using HSL values with lightness decreasing by 8% for each step (grey hues are estimations)
+- All colors are available as both Tailwind classes (e.g., `color-purple-dark`) and CSS variables (e.g., `var(--color-purple-dark)`)
+- The dual definition ensures compatibility with both Tailwind utilities and custom CSS/style constants
+
+### System Integration
+
 The layout system integrates with the global style system through:
 
 - **Consistent breakpoints**: mobile, mobileLg, mobileMd, tablet, desktop
@@ -449,12 +562,9 @@ The layout system integrates with the global style system through:
 ### Style Constant Pattern
 ```typescript
 // Pattern used in styles.ts
-export const glassmorphism = `
-  border border-color-border/50 rounded-3xl
-  bg-gradient-to-br from-color-border/40 via-color-background/50 to-black/60
-  backdrop-blur
-  ${shadow}
-`;
+export const glassmorphism = `border border-color-border/50 rounded-3xl
+  bg-gradient-to-br from-[#191919]/40 via-color-background/50 to-black/60
+  backdrop-blur ${shadow}`;
 ```
 
 ### Import and Usage Flow
@@ -595,24 +705,26 @@ import { containerCard, cellLeftCard } from "$layout";
 
   - **Configuration Values**:
     - **Particle Count**:
-      - Mobile/Tablet (< 768px): 1000 particles
-      - Desktop (≥ 768px): 3000 particles
+      - Mobile/Tablet (< 768px): 750 particles
+      - Desktop (≥ 768px): 1500 particles
 
     - **Animation Behavior**:
-      - Particle movement speed: `mult(6.3)` - controls particle velocity through topology
-      - Flow field strength: `mult(4.3)` - controls particle response to flow field
+      - Particle movement speed: `mult(4.7)` - controls particle velocity through topology
+      - Flow field strength: `mult(2.5)` - controls particle response to flow field
       - Flow evolution speed: `c += 0.01` - speed of underlying flow field changes
       - Line thickness: `strokeWeight(1)` - thickness of connecting lines
       - Line opacity: `0.05` - transparency of particle connection lines
 
     - **Color Palette**:
-      - `["#8800cc", "#000000", "#440066", "#000000", "#650065"]`
+      - `["#bb00ff", "#000000", "#c219ff", "#000000", "#c933ff", "#000000", "#cf4dff", "#000000", "#d666ff"]`
       - Each particle randomly assigned one color at creation
       - Colors breakdown:
-        - `#8800cc`: bright purple (20% chance)
-        - `#000000`: black - appears twice (40% chance total)
-        - `#440066`: dark purple (20% chance)
-        - `#650065`: dark magenta (20% chance)
+        - `#bb00ff`: bright purple (~11% chance)
+        - `#000000`: black - appears four times (~44% chance total)
+        - `#c219ff`: dark purple (~11% chance)
+        - `#c933ff`: dark magenta (~11% chance)
+        - `#cf4dff`: very dark purple (~11% chance)
+        - `#d666ff`: light purple (~11% chance)
 
     - **Sizing**:
       - `minHeight`: 200px

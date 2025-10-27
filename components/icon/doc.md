@@ -52,47 +52,84 @@ The Icon system provides a lightweight, versatile solution for rendering SVG ico
 
 ### Color Palettes
 
-#### Grey (Default)
+The icon system uses a 5-step gradient color system with Tailwind CSS classes (defined in `tailwind.config.ts`), providing smooth color transitions for both static and interactive icons. See [Layout System Documentation](mdc:components/layout/doc.md#tailwind-color-system) for the complete color palette.
+
+#### greyDark
 ```css
 /* Static (icon type) */
-stroke: #666666 (stamp-grey)
+stroke: color-grey-semidark (#817e78)
 fill: none
-[fill-stroke paths]: #666666
+[fill-stroke paths]: color-grey-semidark
 
 /* Interactive (iconButton type) */
-stroke: #666666 → #999999 (stamp-grey-light)
-hover/group-hover: #999999
+stroke: color-grey-semidark → color-grey-light (#f9f2e9)
+hover/group-hover: color-grey-light
 cursor: pointer
 ```
 
-#### Grey Dark
+#### grey (Default)
 ```css
-/* Static */
-stroke: #444444 (stamp-grey-darker)
+/* Static (icon type) */
+stroke: color-grey (#a8a39d)
+fill: none
+[fill-stroke paths]: color-grey
 
-/* Interactive */
-stroke: #444444 → #666666 (stamp-grey)
-hover/group-hover: #666666
+/* Interactive (iconButton type) */
+stroke: color-grey → color-grey-light (#f9f2e9)
+hover/group-hover: color-grey-light
+cursor: pointer
 ```
 
-#### Purple
+#### greyLight
 ```css
-/* Static */
-stroke: #660099 (stamp-purple)
+/* Static (icon type) */
+stroke: color-grey-semilight (#d1cbc3)
+fill: none
+[fill-stroke paths]: color-grey-semilight
 
-/* Interactive */
-stroke: #660099 → #8800CC (stamp-purple-bright)
-hover/group-hover: #8800CC
+/* Interactive (iconButton type) */
+stroke: color-grey-semilight → color-grey-light (#f9f2e9)
+hover/group-hover: color-grey-light
+cursor: pointer
 ```
 
-#### Purple Dark
+#### purpleDark
 ```css
-/* Static */
-stroke: #440066 (stamp-purple-darker)
+/* Static (icon type) */
+stroke: color-purple-semidark (#610085)
+fill: none
+[fill-stroke paths]: color-purple-semidark
 
-/* Interactive */
-stroke: #440066 → #660099 (stamp-purple)
-hover/group-hover: #660099
+/* Interactive (iconButton type) */
+stroke: color-purple-semidark → color-purple-light (#BB00FF)
+hover/group-hover: color-purple-light
+cursor: pointer
+```
+
+#### purple
+```css
+/* Static (icon type) */
+stroke: color-purple (#7f00ad)
+fill: none
+[fill-stroke paths]: color-purple
+
+/* Interactive (iconButton type) */
+stroke: color-purple → color-purple-light (#BB00FF)
+hover/group-hover: color-purple-light
+cursor: pointer
+```
+
+#### purpleLight
+```css
+/* Static (icon type) */
+stroke: color-purple-semilight (#9d00d6)
+fill: none
+[fill-stroke paths]: color-purple-semilight
+
+/* Interactive (iconButton type) */
+stroke: color-purple-semilight → color-purple-light (#BB00FF)
+hover/group-hover: color-purple-light
+cursor: pointer
 ```
 
 #### Custom
@@ -150,7 +187,7 @@ hover/group-hover: #660099
   - **Location**: `components/icon/styles.ts`
   - **Features**:
     - 2 icon types (icon, iconButton)
-    - 5 color palettes (greyLight, grey, purpleLight, purple, custom)
+    - 6 color palettes with 5-step gradient system (greyDark, grey, greyLight, purpleDark, purple, purpleLight) + custom
     - 15 size options (8 standard + 7 responsive)
     - 5 weight options
     - Special fill-stroke path support
@@ -396,7 +433,7 @@ export function MediaControl({ isPlaying }) {
       weight="bold"
       size="xxl"
       color="custom"
-      className="p-6 fill-stamp-grey hover:fill-stamp-grey-light transition-all duration-300"
+      className="p-6 fill-color-grey hover:fill-color-grey-light transition-all duration-300"
       onClick={() => togglePlay()}
     />
   );
@@ -729,10 +766,12 @@ All icons share these SVG attributes:
 - Always provide `onClick` handler for iconButton type
 
 ### Color Selection
-- **greyLight**: Default for neutral elements
-- **grey**: Subtle, less prominent icons
-- **purpleLight**: Brand actions, primary emphasis
-- **purple**: Darker purple for specific contexts
+- **greyLight**: Brightest grey, high visibility neutral elements
+- **grey**: Default neutral icons, standard visibility
+- **greyDark**: Subtle, less prominent neutral icons
+- **purpleLight**: Brightest purple, brand actions with high emphasis
+- **purple**: Default purple icons, standard brand visibility
+- **purpleDark**: Subtle purple, less prominent brand elements
 - **custom**: Full control for special cases (gradients, conditional colors)
 
 ### Size Selection

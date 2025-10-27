@@ -55,49 +55,33 @@ The Button system provides a comprehensive set of interactive button components 
 
 ### Color Palettes
 
+The button system uses a 5-step gradient color system with CSS variables, providing smooth color transitions from dark to light shades. See [Layout System Documentation](mdc:components/layout/doc.md#tailwind-color-system) for the complete Tailwind color palette.
+
 #### Grey (Default)
 ```css
---color-dark: #CCCCCC66
---color-medium: #CCCCCC99
---color-light: #CCCCCCCC
---color-border: #66666666
---color-border-hover: #666666CC
---color-text: #666666
---color-text-hover: #999999
+/* 5-step gradient system */
+--color-button-dark: var(--color-grey-dark)           /* #585552 */
+--color-button-semidark: var(--color-grey-semidark)   /* #817e78 */
+--color-button: var(--color-grey)                     /* #a8a39d */
+--color-button-semilight: var(--color-grey-semilight) /* #d1cbc3 */
+--color-button-light: var(--color-grey-light)         /* #f9f2e9 */
 ```
 
-#### Grey Dark
-```css
---color-dark: #BBBBBB66
---color-medium: #BBBBBB99
---color-light: #BBBBBBCC
---color-border: #55555566
---color-border-hover: #555555CC
---color-text: #555555
---color-text-hover: #888888
-```
+**Usage:** Neutral actions, default state, secondary buttons
 
 #### Purple
 ```css
---color-dark: #AA00FF66
---color-medium: #AA00FF99
---color-light: #AA00FFCC
---color-border: #66009966
---color-border-hover: #660099CC
---color-text: #660099
---color-text-hover: #8800CC
+/* 5-step gradient system */
+--color-button-dark: var(--color-purple-dark)           /* #43005c */
+--color-button-semidark: var(--color-purple-semidark)   /* #610085 */
+--color-button: var(--color-purple)                     /* #7f00ad */
+--color-button-semilight: var(--color-purple-semilight) /* #9d00d6 */
+--color-button-light: var(--color-purple-light)         /* #BB00FF */
 ```
 
-#### Purple Dark
-```css
---color-dark: #9900E666
---color-medium: #9900E699
---color-light: #9900E6CC
---color-border: #55008066
---color-border-hover: #550080CC
---color-text: #550080
---color-text-hover: #7700b3
-```
+**Usage:** Primary brand actions, emphasis, call-to-action buttons
+
+**Note:** These CSS variables are defined in `tailwind.config.ts` as Tailwind color classes (e.g., `color-purple-dark`, `color-grey-light`) and referenced in button styles via the `color` prop which applies them dynamically.
 
 ### Size Options
 
@@ -132,7 +116,7 @@ The Button system provides a comprehensive set of interactive button components 
   - **Location**: `components/button/styles.ts`
   - **Features**:
     - 9 button variants with glassmorphism effects
-    - 5 color palettes using CSS custom properties
+    - 2 color palettes (grey, purple) with 5-step gradients using CSS custom properties
     - 11 size options including responsive variants
     - State management (disabled, loading, active)
     - Animated gradient overlays
@@ -193,7 +177,7 @@ The Button system provides a comprehensive set of interactive button components 
 export interface ButtonProps extends Omit<JSX.HTMLAttributes<HTMLButtonElement>, "loading" | "size"> {
   variant?: "text" | "outline" | "flat" | "flatOutline" |
             "outlineFlat";
-  color?: "grey" | "greyDark" | "purple" | "purpleDark" | "test" | "custom";
+  color?: "grey" | "purple" | "test" | "custom";
   size?: "xxs" | "xs" | "sm" | "md" | "lg" | "xl" | "xxl" |
          "xxsR" | "xsR" | "smR" | "mdR" | "lgR" | "custom";
   disabled?: boolean;
@@ -575,16 +559,14 @@ hover:before:scale-105
 ## Best Practices
 
 ### Variant Selection
-- **outline**: Default for most interactive buttons
-- **flat**: Call-to-action, primary actions
-- **flatOutline/outlineFlat**: Toggle states, tabs, filters
+- **outline**: Secondary buttons
+- **flat**: Primary action buttons, call-to-action buttons
+- **flatOutline/outlineFlat**: Toggle states, Toggle and Selector buttons
 - **text**: Inline links, secondary actions
 
 ### Color Selection
-- **grey**: Neutral actions, default state
-- **greyDark**: Subtle neutral actions
-- **purple**: Primary brand actions, emphasis
-- **purpleDark**: Darker purple variant for contrast
+- **grey**: Mainly used
+- **purple**: Optional use, to stand out
 
 ### Size Selection
 - Use responsive sizes (`mdR`, `lgR`) for adaptive UI
