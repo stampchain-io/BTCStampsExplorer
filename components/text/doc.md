@@ -70,25 +70,102 @@ The Text system provides a comprehensive typography solution with consistent sty
 const logoFont = "font-black italic text-3xl tracking-wide inline-block w-fit";
 const titleFont = "font-black text-3xl tracking-wide inline-block w-fit";
 const subtitleFont = "font-extralight text-2xl mb-2";
-const textFont = "font-normal text-stamp-grey-light";
-const labelFont = "font-light text-stamp-grey-darker tracking-wide";
-const valueFont = "font-medium text-stamp-grey-light";
+const textFont = "font-normal text-color-grey-light";
+const labelFont = "font-light text-color-grey-semidark tracking-wide";
+const valueFont = "font-medium text-color-grey-light";
 
 // Global modifiers
 const select = "select-none whitespace-nowrap";
 const transitionColors = "transition-colors duration-200";
 ```
 
+**Color Usage:**
+- `text-color-grey-light` (#f9f2e9): Primary text color for body content and values
+- `text-color-grey-semidark` (#817e78): Subdued text color for labels and secondary content
+- Gradients applied via custom utilities for logos, titles, and headings
+
+### Color System
+
+The text system uses a comprehensive **5-step gradient color system** with dual definitions for maximum flexibility. See [Layout System Documentation](mdc:components/layout/doc.md#tailwind-color-system) for complete details.
+
+#### Dual Definition System
+
+Colors are defined in **two formats** within `tailwind.config.ts`:
+
+1. **Tailwind Color Classes** - Object notation for direct use in JSX
+   ```typescript
+   colors: {
+     color: {
+       purple: {
+         dark: "#43005c",
+         semidark: "#610085",
+         DEFAULT: "#7f00ad",
+         semilight: "#9d00d6",
+         light: "#BB00FF",
+       }
+     }
+   }
+   ```
+
+2. **CSS Variables** - For gradients and dynamic styling
+   ```css
+   ":root": {
+     "--color-purple-dark": "#43005c",
+     "--color-purple-semidark": "#610085",
+     "--color-purple": "#7f00ad",
+     "--color-purple-semilight": "#9d00d6",
+     "--color-purple-light": "#BB00FF",
+   }
+   ```
+
+#### When to Use Each Format
+
+**Use Tailwind Classes** (`color-purple-dark`) when:
+- Styling directly in JSX/TSX className attributes
+- Using with Tailwind utility classes (e.g., `text-color-purple-light`)
+- Need IntelliSense autocomplete in editors
+
+**Use CSS Variables** (`var(--color-purple-dark)`) when:
+- Creating gradient effects (as seen in gradient classes below)
+- Dynamic styling with JavaScript/TypeScript
+- Using in custom CSS or inline styles
+
+#### Color Families
+
+```typescript
+// Purple (brand color)
+color-purple-dark      // #43005c
+color-purple-semidark  // #610085
+color-purple           // #7f00ad (DEFAULT)
+color-purple-semilight // #9d00d6
+color-purple-light     // #BB00FF
+
+// Grey (neutral)
+color-grey-dark        // #585552
+color-grey-semidark    // #817e78
+color-grey             // #a8a39d (DEFAULT)
+color-grey-semilight   // #d1cbc3
+color-grey-light       // #f9f2e9
+
+// Semantic Colors (for value indicators)
+color-red-semilight    // #d60000 (negative values)
+color-green-semilight  // #00d600 (positive values)
+```
+
 ### Gradient System
 
-| Gradient | Direction | Colors | Usage |
-|----------|-----------|--------|-------|
-| **color-grey-gradientDL** | Light → Dark | #CCCCCC → #999999 | Titles, headings, values |
-| **color-grey-gradientLD** | Dark → Light | #999999 → #CCCCCC | Alternative title style |
-| **color-purple-gradientDL** | Dark → Light | #660099 → #AA00FF | Logo variations |
-| **purple-gradient2** | Dark → Light | Optimized variant | Footer logo |
-| **color-purple-gradientLD** | Light → Dark | #AA00FF → #660099 | Primary titles |
-| **purple-gradient4** | Light → Dark | Optimized variant | Header logo |
+All gradients use the 5-step color system defined as CSS variables:
+
+| Gradient | Direction | Color Steps | Usage |
+|----------|-----------|------------|-------|
+| **color-grey-gradientLD** | Light → Dark | `light → semilight → DEFAULT → semidark → dark` | Titles, headings, card numbers |
+| **color-grey-gradientLD-hover** | Light → Dark with hover | Same + hover to `light` | Interactive headings, links |
+| **color-grey-gradientDL** | Dark → Light | `dark → semidark → DEFAULT → semilight → light` | Alternative title style |
+| **color-grey-gradientDL-hover** | Dark → Light with hover | Same + hover to `light` | Collection/stamp page headings |
+| **color-purple-gradientLD** | Light → Dark | `light → semilight → DEFAULT → semidark → dark` | Primary titles, header logo |
+| **color-purple-gradientLD-hover** | Light → Dark with hover | Same + hover to `light` | Interactive logo |
+| **color-purple-gradientDL** | Dark → Light | `dark → semidark → DEFAULT → semilight → light` | Footer logo, alt variations |
+| **color-purple-gradientDL-hover** | Dark → Light with hover | Same + hover to `light` | Interactive footer logo |
 
 ### Hover Effects
 
@@ -105,16 +182,20 @@ const transitionColors = "transition-colors duration-200";
 
 ```typescript
 // Footer logo - Dark to Light gradient
-logoPurpleDL: "font-black italic text-3xl purple-gradient2 select-none"
+logoPurpleDL: "font-black italic text-3xl color-purple-gradientDL select-none"
+// Colors: #43005c → #610085 → #7f00ad → #9d00d6 → #BB00FF
 
 // Footer logo with hover - Interactive
-logoPurpleDLLink: "font-black italic text-3xl purple-gradient2-hover transition-colors cursor-pointer"
+logoPurpleDLLink: "font-black italic text-3xl color-purple-gradientDL-hover transition-colors cursor-pointer"
+// Hover: Gradient → solid #BB00FF
 
 // Alternative gradient - Light to Dark
-logoPurpleLD: "font-black italic text-3xl purple-gradient4 select-none"
+logoPurpleLD: "font-black italic text-3xl color-purple-gradientLD select-none"
+// Colors: #BB00FF → #9d00d6 → #7f00ad → #610085 → #43005c
 
 // Header logo - Light to Dark with hover
-logoPurpleLDLink: "font-black italic text-3xl purple-gradient4-hover transition-colors cursor-pointer"
+logoPurpleLDLink: "font-black italic text-3xl color-purple-gradientLD-hover transition-colors cursor-pointer"
+// Hover: Gradient → solid #BB00FF
 ```
 
 ### Navigation Styles (8 variants)
@@ -122,37 +203,46 @@ logoPurpleLDLink: "font-black italic text-3xl purple-gradient4-hover transition-
 #### Desktop Navigation
 ```typescript
 // Purple navigation link
-navLinkPurple: "font-semibold text-stamp-purple text-sm group-hover:text-stamp-purple-bright"
+navLinkPurple: "font-semibold text-color-purple-semilight text-sm group-hover:text-color-purple-light"
+// Default: #9d00d6 | Hover: #BB00FF
 
 // Active state
-navLinkPurpleActive: "!text-stamp-purple-bright hover:!text-stamp-purple"
+navLinkPurpleActive: "!text-color-purple-light hover:!text-color-purple-semilight"
+// Active: #BB00FF | Hover: #9d00d6
 
 // Sublink (dropdown menus)
-navSublinkPurple: "font-light text-stamp-purple text-[13px] hover:text-stamp-purple-bright"
+navSublinkPurple: "font-light text-color-purple-semilight text-[13px] hover:text-color-purple-light"
+// Default: #9d00d6 | Hover: #BB00FF
 
 // Sublink active
-navSublinkPurpleActive: "!text-stamp-purple-bright hover:!text-stamp-purple"
+navSublinkPurpleActive: "!text-color-purple-light hover:!text-color-purple-semilight"
+// Active: #BB00FF | Hover: #9d00d6
 ```
 
 #### Mobile Navigation
 ```typescript
 // Grey mobile link
-navLinkGrey: "font-semibold text-sm text-stamp-grey hover:text-stamp-grey-light"
+navLinkGrey: "font-semibold text-sm text-color-grey hover:text-color-grey-light"
+// Default: #a8a39d | Hover: #f9f2e9
 
 // Active state
-navLinkGreyActive: "!text-stamp-grey-light hover:!text-stamp-grey"
+navLinkGreyActive: "!text-color-grey-light hover:!text-color-grey"
+// Active: #f9f2e9 | Hover: #a8a39d
 
 // Mobile menu items with gradient
-navLinkGreyLD: "font-light text-xl color-grey-gradientDL-hover tracking-wider"
+navLinkGreyLD: "font-light text-xl color-grey-gradientLD-hover tracking-wider"
+// Gradient: #f9f2e9 → #d1cbc3 → #a8a39d → #817e78 → #585552 | Hover: #f9f2e9
 
 // Active gradient link
-navLinkGreyLDActive: "text-stamp-grey-light [background:none !important]"
+navLinkGreyLDActive: "text-color-grey-light [background:none !important]"
+// Color: #f9f2e9 (solid, no gradient)
 ```
 
 #### Footer Navigation
 ```typescript
 // Transparent text for overlay use
-navLinkTransparentPurple: "font-light text-[13px] hover:text-stamp-purple-bright"
+navLinkTransparentPurple: "font-light text-[13px] hover:text-color-purple-light"
+// Hover: #BB00FF
 ```
 
 ### Title Styles (4 variants)
@@ -175,157 +265,221 @@ titlePurpleDL: "font-black text-3xl color-purple-gradientDL cursor-default"
 
 ```typescript
 // Grey subtitle
-subtitleGrey: "font-extralight text-2xl text-stamp-grey-light mb-2"
+subtitleGrey: "font-extralight text-2xl text-color-grey-light mb-2"
+// Color: #f9f2e9
 
 // Purple subtitle
-subtitlePurple: "font-extralight text-2xl text-stamp-purple-bright mb-2"
+subtitlePurple: "font-extralight text-2xl text-color-purple-light mb-2"
+// Color: #BB00FF
 ```
 
 ### Heading Styles (6 variants)
 
 ```typescript
 // Large grey heading (about page donate section)
-headingGrey2: "font-black text-3xl mobileLg:text-4xl text-stamp-grey-light"
+headingGrey2: "font-black text-3xl mobileLg:text-4xl text-color-grey-light"
+// Color: #f9f2e9
 
 // Grey gradient heading
-headingGreyLD: "font-bold text-xl color-grey-gradientDL tracking-wide"
+headingGreyLD: "font-bold text-xl color-grey-gradientLD tracking-wide"
+// Gradient: #f9f2e9 → #d1cbc3 → #a8a39d → #817e78 → #585552
 
 // Grey gradient heading with link
-headingGreyLDLink: "font-bold text-lg color-grey-gradientDL-hover tracking-wide cursor-pointer"
+headingGreyLDLink: "font-bold text-lg color-grey-gradientLD-hover tracking-wide cursor-pointer"
+// Gradient: #f9f2e9 → ... → #585552 | Hover: #f9f2e9 solid
 
 // Dark to Light gradient link (collection/stamp pages)
-headingGreyDLLink: "font-bold text-lg color-grey-gradientLD-hover tracking-wide cursor-pointer"
+headingGreyDLLink: "font-bold text-lg color-grey-gradientDL-hover tracking-wide cursor-pointer"
+// Gradient: #585552 → ... → #f9f2e9 | Hover: #f9f2e9 solid
 
 // Standard grey heading
-headingGrey: "font-bold text-2xl text-stamp-grey"
+headingGrey: "font-bold text-2xl text-color-grey"
+// Color: #a8a39d
 
 // Purple gradient (team banner)
 headingPurpleLD: "font-black text-sm mobileMd:text-lg color-purple-gradientLD text-center"
+// Gradient: #BB00FF → #9d00d6 → #7f00ad → #610085 → #43005c
 ```
 
 ### Body Text Styles (9 variants)
 
+All body text uses `text-color-grey-light` (#f9f2e9) as the base color:
+
 ```typescript
 // Size variants
-textXxs: "font-normal text-stamp-grey-light text-[10px]"
-textXs: "font-normal text-stamp-grey-light text-xs"
-textSm: "font-normal text-stamp-grey-light text-sm"
-text: "font-normal text-stamp-grey-light text-base"      // Default
-textLg: "font-normal text-stamp-grey-light text-lg"
-textXl: "font-normal text-stamp-grey-light text-xl"
-text2xl: "font-normal text-stamp-grey-light text-2xl"
+textXxs: "font-normal text-color-grey-light text-[10px]"
+textXs: "font-normal text-color-grey-light text-xs"
+textSm: "font-normal text-color-grey-light text-sm"
+text: "font-normal text-color-grey-light text-base"      // Default
+textLg: "font-normal text-color-grey-light text-lg"
+textXl: "font-normal text-color-grey-light text-xl"
+text2xl: "font-normal text-color-grey-light text-2xl"
 
 // Link variants
-textSmLink: "text-sm hover:text-stamp-purple-bright transition-colors cursor-pointer"
-textLinkUnderline: "font-bold text-base text-stamp-grey-light animated-underline"
+textSmLink: "text-sm hover:text-color-purple-light transition-colors cursor-pointer"
+// Hover: #BB00FF
+
+textLinkUnderline: "font-bold text-base text-color-grey-light animated-underline"
+// Base: #f9f2e9 with underline animation
 ```
 
 ### Label Styles (10 variants)
 
+Most labels use `text-color-grey-semidark` (#817e78) for subdued secondary text:
+
 ```typescript
 // Size variants
-labelXxs: "font-light text-stamp-grey-darker tracking-wide text-[10px]"
-labelXs: "font-light text-stamp-grey-darker tracking-wide text-xs"
-labelSm: "font-light text-stamp-grey-darker tracking-wide text-sm"
-label: "font-light text-stamp-grey-darker tracking-wide text-base"
-labelLg: "font-light text-stamp-grey-darker tracking-wide text-lg"
-labelXl: "font-light text-stamp-grey-darker tracking-wide text-xl"
+labelXxs: "font-light text-color-grey-semidark tracking-wide text-[10px]"
+labelXs: "font-light text-color-grey-semidark tracking-wide text-xs"
+labelSm: "font-light text-color-grey-semidark tracking-wide text-sm"
+label: "font-light text-color-grey-semidark tracking-wide text-base"
+labelLg: "font-light text-color-grey-semidark tracking-wide text-lg"
+labelXl: "font-light text-color-grey-semidark tracking-wide text-xl"
 
 // Responsive variants
 labelXsR: "text-xs tablet:text-[10px]"                  // Filter file type labels
 labelXsPosition: "flex justify-end mt-1 tablet:mt-0"    // Label positioning
 
 // Special variants
-labelLightSm: "font-light text-sm text-stamp-grey"
-labelSmPurple: "font-light text-sm text-stamp-purple-bright tracking-wide mb-0.5"
+labelLightSm: "font-light text-sm text-color-grey"
+// Color: #a8a39d
+
+labelSmPurple: "font-light text-sm text-color-purple-light tracking-wide mb-0.5"
+// Color: #BB00FF
 
 // Logic-based responsive (filter labels)
+// Uses text-color-grey (#a8a39d) and text-color-grey-light (#f9f2e9)
 labelLogicResponsive: (checked, canHoverSelected) => string
 ```
 
 ### Value Styles (17 variants)
 
 #### Grey Variants
+Primary value text color is `text-color-grey-light` (#f9f2e9):
+
 ```typescript
-valueXs: "font-medium text-stamp-grey-light text-xs"
-valueSm: "font-medium text-stamp-grey-light text-sm"
-value: "font-medium text-stamp-grey-light text-base"
-valueLg: "font-medium text-stamp-grey-light text-lg"
-valueXl: "font-black text-xl text-stamp-grey-light -mt-1"
-value2xl: "font-black text-2xl text-stamp-grey-light -mt-1"
-value3xl: "font-black text-3xl text-stamp-grey-light -mt-1"
+valueXs: "font-medium text-color-grey-light text-xs"
+valueSm: "font-medium text-color-grey-light text-sm"
+value: "font-medium text-color-grey-light text-base"
+valueLg: "font-medium text-color-grey-light text-lg"
+valueXl: "font-black text-xl text-color-grey-light -mt-1"
+value2xl: "font-black text-2xl text-color-grey-light -mt-1"
+value3xl: "font-black text-3xl text-color-grey-light -mt-1"
 
 // Link variant
-valueSmLink: "font-medium text-sm hover:text-stamp-purple-bright cursor-pointer"
+valueSmLink: "font-medium text-sm hover:text-color-purple-light cursor-pointer"
+// Hover: #BB00FF
 ```
 
 #### Transparent Variants
+Used in DetailsTableBase for color-agnostic layouts:
+
 ```typescript
 value2xlTransparent: "font-black text-2xl -mt-1"
-value3xlTransparent: "font-black text-3xl -mt-1"       // DetailsTableBase
+value3xlTransparent: "font-black text-3xl -mt-1"
 ```
 
 #### Purple Variants
+Using the purple color palette:
+
 ```typescript
-valueSmPurple: "font-medium text-xs text-stamp-purple text-center"
+valueSmPurple: "font-medium text-xs text-color-purple text-center"
+// Color: #7f00ad
+
+// Glow effects with purple stroke (about page header)
 value2xlPurpleGlow: "font-black text-2xl text-black text-stroke-glow-small"
 value5xlPurpleGlow: "font-black text-5xl text-black text-stroke-glow-small"
 value7xlPurpleGlow: "font-black text-7xl text-black text-stroke-glow-large"
+// Glow colors: #8800CC (inner), #AA00FF (outer stroke)
 ```
 
 #### Dark Variants
+Using `text-color-grey-semidark` (#817e78) for subdued values:
+
 ```typescript
-valueDarkXs: "font-medium text-xs text-stamp-grey-darker tracking-tighter"
-valueDarkSm: "font-medium text-sm text-stamp-grey-darker tracking-tighter"
-valueDark: "font-semibold text-base text-stamp-grey-darker"
+valueDarkXs: "font-medium text-xs text-color-grey-semidark tracking-tighter"
+valueDarkSm: "font-medium text-sm text-color-grey-semidark tracking-tighter"
+valueDark: "font-semibold text-base text-color-grey-semidark"
 ```
 
 #### Color Indicators
+Semantic colors for value states (gains/losses):
+
 ```typescript
-valuePositive: "text-green-600"      // Gains, positive changes
-valueNegative: "text-red-600"        // Losses, negative changes
-valueNeutral: "text-stamp-grey-darker"
+valuePositive: "text-color-green-semilight"      // #00d600 - Gains, positive changes
+valueNegative: "text-color-red-semilight"        // #d60000 - Losses, negative changes
+valueNeutral: "text-color-grey-semidark"         // #817e78 - Neutral state
 ```
 
 ### Card Text Styles (10 variants)
 
 #### Standard Card Styles
+Default stamp/token card text styles:
+
 ```typescript
-cardHashSymbol: "font-light text-stamp-purple-bright text-lg mobileLg:text-xl"
-cardStampNumber: "font-extrabold text-stamp-purple-bright truncate text-lg mobileLg:text-xl"
-cardCreator: "font-semibold text-stamp-grey-light break-words text-center text-xs mobileMd:text-sm"
-cardPrice: "font-normal text-stamp-grey-light text-nowrap text-xs mobileLg:text-sm"
-cardMimeType: "font-normal text-stamp-grey text-nowrap text-xs mobileLg:text-sm"
-cardSupply: "font-medium text-stamp-grey text-right text-xs mobileLg:text-base"
+cardHashSymbol: "font-light text-color-purple-light text-lg mobileLg:text-xl"
+// Color: #BB00FF
+
+cardStampNumber: "font-extrabold text-color-purple-light truncate text-lg mobileLg:text-xl"
+// Color: #BB00FF
+
+cardCreator: "font-semibold text-color-grey-light break-words text-center text-xs mobileMd:text-sm"
+// Color: #f9f2e9
+
+cardPrice: "font-normal text-color-grey-light text-nowrap text-xs mobileLg:text-sm"
+// Color: #f9f2e9
+
+cardMimeType: "font-normal text-color-grey text-nowrap text-xs mobileLg:text-sm"
+// Color: #a8a39d
+
+cardSupply: "font-medium text-color-grey text-right text-xs mobileLg:text-base"
+// Color: #a8a39d
 ```
 
 #### Minimal Card Variant
+Compact card style with gradient effects:
+
 ```typescript
-cardHashSymbolMinimal: "font-light text-stamp-grey-light group-hover:text-stamp-purple-bright text-xs mobileSm:text-base"
-cardStampNumberMinimal: "font-black color-grey-gradientDL group-hover:[-webkit-text-fill-color:#AA00FF] truncate"
-cardPriceMinimal: "font-normal text-stamp-grey truncate text-[10px] mobileMd:text-xs"
+cardHashSymbolMinimal: "font-light text-color-grey-light group-hover:text-color-purple-light"
+// Default: #f9f2e9 | Hover: #BB00FF
+
+cardStampNumberMinimal: "font-black color-grey-gradientDL group-hover:[-webkit-text-fill-color:var(--color-purple-light)] truncate"
+// Gradient: #585552 → ... → #f9f2e9 | Hover: #BB00FF solid
+
+cardPriceMinimal: "font-normal text-color-grey truncate text-[10px] mobileMd:text-xs"
+// Color: #a8a39d
 ```
 
 #### Grey Gradient Card Variant
+Alternative card style with grey-to-purple hover:
+
 ```typescript
-cardHashSymbolGrey: "font-light text-stamp-grey group-hover:text-stamp-purple-bright text-lg"
-cardStampNumberGrey: "font-black color-grey-gradientDL group-hover:[-webkit-text-fill-color:#AA00FF] truncate"
+cardHashSymbolGrey: "font-light text-color-grey group-hover:text-color-purple-light text-lg"
+// Default: #a8a39d | Hover: #BB00FF
+
+cardStampNumberGrey: "font-black color-grey-gradientDL group-hover:[-webkit-text-fill-color:var(--color-purple-light)] truncate"
+// Gradient: #585552 → ... → #f9f2e9 | Hover: #BB00FF solid
 ```
 
 ### Special Styles (4 variants)
 
 ```typescript
 // Gradient overlay (requires transparent text)
-overlayPurple: "bg-gradient-to-r from-[#AA00FF]/80 via-[#AA00FF]/60 to-[#AA00FF]/40 text-transparent bg-clip-text"
+// Used for text overlay effects on footer links
+overlayPurple: "bg-gradient-to-l from-color-purple-semilight/80 via-color-purple-semilight/90 to-color-purple-semilight tablet:bg-gradient-to-r text-transparent bg-clip-text"
+// Gradient: #9d00d6 with varying opacity (80%, 90%, 100%)
 
 // Footer tagline
-tagline: "font-regular text-xs bg-gradient-to-r from-[#660099] via-[#8800CC] to-[#AA00FF] text-transparent bg-clip-text"
+tagline: "font-regular text-xs bg-gradient-to-r from-color-purple-light via-color-purple-semilight to-color-purple-semidark text-transparent bg-clip-text"
+// Gradient: #BB00FF → #9d00d6 → #610085
 
 // Footer copyright
-copyright: "font-normal text-xs mobileMd:text-sm tablet:text-xs text-stamp-grey-darkest"
+copyright: "font-normal text-xs mobileMd:text-sm tablet:text-xs text-color-grey-dark"
+// Color: #585552
 
 // Toggle switch symbol
 toggleSymbol: "font-bold text-[10px] text-black"
+// Used in ToggleSwitchButton for $/BTC symbols
 ```
 
 ## Type Definitions
@@ -412,6 +566,9 @@ export type TextStyles = {
   valueDarkXs: string;
   valueDarkSm: string;
   valueDark: string;
+  valuePositive: string;
+  valueNegative: string;
+  valueNeutral: string;
 
   // Special styles
   tagline: string;
@@ -593,36 +750,65 @@ export function FilterLabel({ checked, label }) {
 ### Style Composition Pattern
 
 ```typescript
-// Base styles are composed with modifiers
-const textFont = "font-normal text-stamp-grey-light";
+// Base styles are composed with modifiers using new color system
+const textFont = "font-normal text-color-grey-light";  // #f9f2e9
 const transitionColors = "transition-colors duration-200";
 
 // Final composed style
-export const textSmLink = `${textFont} text-sm hover:text-stamp-purple-bright ${transitionColors} cursor-pointer`;
+export const textSmLink = `${textFont} text-sm hover:text-color-purple-light ${transitionColors} cursor-pointer`;
+// Base: #f9f2e9 | Hover: #BB00FF
+
+// Example with gradient
+export const headingGreyLDLink = `font-bold text-lg color-grey-gradientLD-hover tracking-wide inline-block w-fit relative ${transitionColors} cursor-pointer`;
+// Gradient: #f9f2e9 → #d1cbc3 → #a8a39d → #817e78 → #585552 | Hover: #f9f2e9 solid
 ```
 
 ### Gradient Implementation
 
-Gradients are applied via Tailwind custom utilities defined in `tailwind.config.ts`:
+Gradients are applied via Tailwind custom utilities defined in `tailwind.config.ts`, utilizing the CSS variable system for all color values:
 
 ```typescript
 // In tailwind.config.ts
 {
+  // Grey gradient: Dark to Light
   '.color-grey-gradientDL': {
-    'background': 'linear-gradient(to right, #CCCCCC, #999999)',
-    '-webkit-background-clip': 'text',
-    '-webkit-text-fill-color': 'transparent'
-  },
-  '.color-grey-gradientDL-hover': {
-    'background': 'linear-gradient(to right, #CCCCCC, #999999)',
+    'background':
+      'linear-gradient(to right, var(--color-grey-dark), var(--color-grey-semidark), var(--color-grey), var(--color-grey-semilight), var(--color-grey-light))',
     '-webkit-background-clip': 'text',
     '-webkit-text-fill-color': 'transparent',
+    'background-clip': 'text',
+  },
+
+  // Grey gradient with hover: Dark to Light → Light on hover
+  '.color-grey-gradientDL-hover': {
+    'background':
+      'linear-gradient(to right, var(--color-grey-dark), var(--color-grey-semidark), var(--color-grey), var(--color-grey-semilight), var(--color-grey-light))',
+    '-webkit-background-clip': 'text',
+    '-webkit-text-fill-color': 'transparent',
+    'background-clip': 'text',
+    'transition': 'background 0.2s ease-in-out, -webkit-text-fill-color 0.2s ease-in-out',
     '&:hover': {
-      'background': 'linear-gradient(to right, #999999, #666666)'
+      'background': 'none',
+      '-webkit-text-fill-color': 'var(--color-grey-light)',
     }
+  },
+
+  // Purple gradient: Light to Dark
+  '.color-purple-gradientLD': {
+    'background':
+      'linear-gradient(to right, var(--color-purple-light), var(--color-purple-semilight), var(--color-purple), var(--color-purple-semidark), var(--color-purple-dark))',
+    '-webkit-background-clip': 'text',
+    '-webkit-text-fill-color': 'transparent',
+    'background-clip': 'text',
   }
 }
 ```
+
+**Key Features:**
+- All gradients use 5 color stops from the CSS variable system
+- Hover variants transition to solid light color for emphasis
+- Smooth 200ms transitions for hover effects
+- Background clip creates text-only gradient effect
 
 ### Import Flow
 
@@ -793,7 +979,7 @@ const headingClass = isActive ? navLinkPurpleActive : navLinkPurple;
 ### Step 1: Define the Style
 ```typescript
 // Add to styles.ts
-export const newStyleName = `${textFont} text-lg tablet:text-xl text-stamp-purple ${transitionColors}`;
+export const newStyleName = `${textFont} text-lg tablet:text-xl text-color-purple ${transitionColors}`;
 ```
 
 ### Step 2: Update Type Definition
@@ -846,5 +1032,5 @@ Add to appropriate category in this documentation with:
 
 ---
 
-**Last Updated:** October 6, 2025
+**Last Updated:** October 29, 2025
 **Author:** baba
