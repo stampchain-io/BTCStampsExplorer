@@ -10,9 +10,7 @@ export function HoldersTable({ holders = [] }: HoldersTableProps) {
   if (!holders?.length) {
     return (
       <div class={containerBackground}>
-        <div class={`text-center py-10 ${valueDarkSm}`}>
-          NO HOLDER DATA AVAILABLE
-        </div>
+        <div class="text-center py-10">NO HOLDER DATA AVAILABLE</div>
       </div>
     );
   }

@@ -92,7 +92,11 @@ class DatabaseManager {
   readonly #ENABLE_CONNECTION_LOGGING: boolean;
   #logger: ReturnType<typeof getLogger>;
   #redisAvailableAtStartup = false;
-  #inMemoryCache: { [key: string]: { data: any; expiry: number } } = {};
+  #inMemoryCache: { [key: string]: { data: any; expiry: number; lastAccessed: number; size: number } } = {};
+  #inMemoryCacheLRU: string[] = []; // LRU tracking - most recent at end
+  #inMemoryCacheSize = 0; // Track total cache size in bytes
+  readonly #MAX_MEMORY_CACHE_ENTRIES = 5000; // Maximum 5K entries (reduced from 10K for safety)
+  readonly #MAX_MEMORY_CACHE_SIZE = 50 * 1024 * 1024; // 50MB max (conservative limit)
   #lastCacheStatusLog: number = 0;
   #keepAliveInterval: number | undefined;
   readonly #KEEP_ALIVE_INTERVAL = 30000; // 30 seconds
@@ -489,6 +493,55 @@ class DatabaseManager {
     throw lastError || new Error("Failed to create connection");
   }
 
+  // Helper methods for LRU cache management
+  private updateLRUPosition(key: string): void {
+    const index = this.#inMemoryCacheLRU.indexOf(key);
+    if (index > -1) {
+      this.#inMemoryCacheLRU.splice(index, 1);
+      this.#inMemoryCacheLRU.push(key);
+    }
+  }
+  
+  private removeFromLRU(key: string): void {
+    const index = this.#inMemoryCacheLRU.indexOf(key);
+    if (index > -1) {
+      this.#inMemoryCacheLRU.splice(index, 1);
+    }
+  }
+  
+  private removeFromInMemoryCache(key: string): void {
+    const item = this.#inMemoryCache[key];
+    if (item) {
+      this.#inMemoryCacheSize -= item.size;
+      delete this.#inMemoryCache[key];
+      this.removeFromLRU(key);
+    }
+  }
+  
+  private estimateSize(data: unknown): number {
+    // Rough estimation of object size in bytes
+    try {
+      const str = JSON.stringify(data);
+      return new TextEncoder().encode(str).length;
+    } catch {
+      // If serialization fails, use a default size
+      return 1024; // 1KB default
+    }
+  }
+  
+  private clearInMemoryCache(): void {
+    const entriesCleared = Object.keys(this.#inMemoryCache).length;
+    const sizeCleared = this.#inMemoryCacheSize;
+    
+    this.#inMemoryCache = {};
+    this.#inMemoryCacheLRU = [];
+    this.#inMemoryCacheSize = 0;
+    
+    if (entriesCleared > 0) {
+      console.log(`[MEMORY CACHE CLEARED] Cleared ${entriesCleared} entries (${(sizeCleared / 1024 / 1024).toFixed(2)}MB)`);
+    }
+  }
+
   async #attemptConnection(): Promise<Client> {
     const { DB_HOST, DB_USER, DB_PASSWORD, DB_PORT, DB_NAME } = this.config;
     const charset = 'utf8mb4';
@@ -727,6 +780,10 @@ class DatabaseManager {
       this.#logger.info("✅ Connected to Redis successfully with verified read/write");
       this.#redisAvailable = true;
       this.#redisRetryCount = 0;
+      
+      // Clear in-memory cache since Redis is now available
+      this.clearInMemoryCache();
+      console.log(`[REDIS CONNECTION] In-memory cache cleared after successful Redis connection`);
     } catch (error) {
       let errorMessage = "Unknown Redis connection error";
       if (error instanceof Error) {
@@ -772,6 +829,11 @@ class DatabaseManager {
       console.log(`[REDIS RECONNECT] Attempting to reconnect to Redis at ${this.config.ELASTICACHE_ENDPOINT}:6379`);
       await this.connectToRedis();
       console.log(`[REDIS RECONNECT SUCCESS] ✅ Successfully reconnected to Redis`);
+      
+      // Clear in-memory cache after successful reconnection
+      this.clearInMemoryCache();
+      console.log(`[REDIS RECONNECT] In-memory cache cleared after successful reconnection`);
+      
       // Reset retry counter on success
       this.#redisRetryCount = 0;
     } catch (error) {
@@ -898,9 +960,10 @@ class DatabaseManager {
       // Add detailed Redis client status information
       console.log(`[REDIS CACHE STATUS] Redis client initialized: ${!!this.#redisClient}`);
 
-      // Log cache statistics
-      const inMemoryKeys = Object.keys(this.#inMemoryCache).length;
-      console.log(`[REDIS CACHE STATUS] In-memory cache entries: ${inMemoryKeys}`);
+      // Log cache statistics with new metrics
+      const inMemoryKeys = this.#inMemoryCacheLRU.length;
+      const memorySizeMB = (this.#inMemoryCacheSize / 1024 / 1024).toFixed(2);
+      console.log(`[REDIS CACHE STATUS] In-memory cache: ${inMemoryKeys} entries, ${memorySizeMB}MB (max: ${this.#MAX_MEMORY_CACHE_ENTRIES} entries, ${this.#MAX_MEMORY_CACHE_SIZE / 1024 / 1024}MB)`);
 
       // Test connectivity with simple ping if redis is supposed to be available
       if (this.#redisClient && this.#redisAvailable) {
@@ -1024,8 +1087,13 @@ class DatabaseManager {
   ): Promise<void> {
     const REDIS_DEBUG = Deno.env.get("REDIS_DEBUG") === "true";
 
-    // Always set in-memory cache as fallback regardless of Redis status
-    this.setInMemoryCachedData(key, data, expiry);
+    // Only use in-memory cache as fallback when Redis is unavailable
+    if (!this.#redisAvailable || !this.#redisClient) {
+      this.setInMemoryCachedData(key, data, expiry);
+      if (REDIS_DEBUG) {
+        console.log(`[IN-MEMORY CACHE SET] Using fallback for key: ${key.substring(0, 10)}... (Redis unavailable)`);
+      }
+    }
 
     if (this.#redisClient) {
       try {
@@ -1095,6 +1163,10 @@ class DatabaseManager {
           console.log(`[REDIS CONNECTION ISSUE DURING SET] Possible connection loss detected: ${error.message}`);
           this.#redisAvailable = false;
 
+          // Fallback to in-memory cache since Redis failed
+          this.setInMemoryCachedData(key, data, expiry);
+          console.log(`[IN-MEMORY CACHE SET] Fallback after Redis failure for key: ${key.substring(0, 10)}...`);
+
           if (this.#redisAvailableAtStartup) {
             console.log(`[REDIS RECONNECT DURING SET] Scheduling reconnection attempt in background...`);
             this.#connectToRedisInBackground();
@@ -1124,9 +1196,15 @@ class DatabaseManager {
   private getInMemoryCachedData(key: string): unknown | null {
     const item = this.#inMemoryCache[key];
     if (item && item.expiry > Date.now()) {
+      // Update LRU access time and position
+      item.lastAccessed = Date.now();
+      this.updateLRUPosition(key);
       return item.data;
     }
-    delete this.#inMemoryCache[key];
+    // Clean up expired entry
+    if (item) {
+      this.removeFromInMemoryCache(key);
+    }
     return null;
   }
 
@@ -1135,8 +1213,39 @@ class DatabaseManager {
     data: unknown,
     expiry: number | "never",
   ): void {
-    const expiryTime = expiry === "never" ? Infinity : Date.now() + expiry;
-    this.#inMemoryCache[key] = { data, expiry: expiryTime };
+    const expiryTime = expiry === "never" ? Infinity : Date.now() + expiry * 1000; // Convert seconds to ms
+    const dataSize = this.estimateSize(data);
+    
+    // Check if this key already exists (update case)
+    const existingItem = this.#inMemoryCache[key];
+    if (existingItem) {
+      this.#inMemoryCacheSize -= existingItem.size;
+      this.removeFromLRU(key);
+    }
+    
+    // Enforce size limits - evict LRU entries if needed
+    while ((this.#inMemoryCacheLRU.length >= this.#MAX_MEMORY_CACHE_ENTRIES || 
+            this.#inMemoryCacheSize + dataSize > this.#MAX_MEMORY_CACHE_SIZE) && 
+            this.#inMemoryCacheLRU.length > 0) {
+      const oldestKey = this.#inMemoryCacheLRU[0];
+      console.log(`[MEMORY CACHE LRU] Evicting oldest entry: ${oldestKey.substring(0, 10)}...`);
+      this.removeFromInMemoryCache(oldestKey);
+    }
+    
+    // Add new entry
+    this.#inMemoryCache[key] = { 
+      data, 
+      expiry: expiryTime, 
+      lastAccessed: Date.now(),
+      size: dataSize 
+    };
+    this.#inMemoryCacheLRU.push(key);
+    this.#inMemoryCacheSize += dataSize;
+    
+    // Log if cache is getting large
+    if (this.#inMemoryCacheLRU.length % 1000 === 0) {
+      console.log(`[MEMORY CACHE] Size: ${this.#inMemoryCacheLRU.length} entries, ${(this.#inMemoryCacheSize / 1024 / 1024).toFixed(2)}MB`);
+    }
   }
 
   public async invalidateCacheByPattern(pattern: string): Promise<void> {

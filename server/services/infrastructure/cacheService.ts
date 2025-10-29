@@ -13,16 +13,37 @@ export interface CacheConfig {
 
 export function getCacheConfig(routeType: RouteType): CacheConfig {
   switch (routeType) {
-    // No cache - real-time data
-    case RouteType.STAMP_DISPENSER:
-    case RouteType.STAMP_DISPENSE:
-    case RouteType.STAMP_SEND:
-    case RouteType.DYNAMIC:
+    // Real-time internal data - no cache
     case RouteType.INTERNAL:
       return {
         duration: 0,
         staleWhileRevalidate: 0,
         staleIfError: 0,
+      };
+      
+    // Historical stamp send data - long cache (invalidated on new blocks)
+    case RouteType.STAMP_SEND:
+      return {
+        duration: 86400,         // 24 hours (but invalidated on blocks)
+        staleWhileRevalidate: 60,
+        staleIfError: 1200,      // 20 minutes if backend errors
+      };
+      
+    // Dispenser operations - short cache (changes with usage)
+    case RouteType.STAMP_DISPENSER:
+    case RouteType.STAMP_DISPENSE:
+      return {
+        duration: 300,           // 5 minutes - dispensers change with blocks/usage
+        staleWhileRevalidate: 60,
+        staleIfError: 600,
+      };
+      
+    // Dynamic data - moderate cache
+    case RouteType.DYNAMIC:
+      return {
+        duration: 300,           // 5 minutes default for dynamic content
+        staleWhileRevalidate: 60,
+        staleIfError: 600,
       };
 
     // Balance data - invalidated on new blocks
