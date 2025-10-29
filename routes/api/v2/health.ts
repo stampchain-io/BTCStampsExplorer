@@ -4,8 +4,8 @@ import { getCurrentBlock } from "$lib/utils/mempool.ts";
 import { circuitBreakerDbManager } from "$server/database/circuitBreakerDatabaseManager.ts";
 import { SRC20Repository } from "$server/database/src20Repository.ts";
 import { BlockService } from "$server/services/core/blockService.ts";
-import { StampService } from "$server/services/stampService.ts";
 import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
+import { StampService } from "$server/services/stampService.ts";
 
 interface HealthStatus {
   status: "OK" | "ERROR";

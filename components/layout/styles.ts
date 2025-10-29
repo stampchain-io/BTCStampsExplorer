@@ -77,7 +77,7 @@ export const rowForm = "flex w-full";
 export const rowResponsiveForm =
   "flex flex-col min-[420px]:flex-row w-full gap-5 min-[420px]:[&>*]:flex-1";
 export const rowContainerBackground =
-  `flex items-center justify-center w-full h-[46px] ${glassmorphism}`;
+  `flex items-center justify-center w-full h-[46px] ${glassmorphism}`; // update all tables to use this instead of custom code
 /* ===== COL STYLES ===== */
 
 /* ===== CELL STYLES ===== */
