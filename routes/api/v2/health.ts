@@ -67,7 +67,10 @@ export const handler: Handlers = {
         getCurrentBlock(),
         StampService.countTotalStamps(),
         SRC20Repository.checkSrc20Deployments(),
-        CounterpartyApiManager.checkHealth(30), // 30 seconds cache for health checks (was 30000ms)
+        CounterpartyApiManager.checkHealth(30).catch((error) => {
+          console.error("XCP health check failed in health endpoint:", error);
+          return false;
+        }), // 30 seconds cache for health checks (was 30000ms)
       ]);
 
       // Update service statuses
