@@ -1550,7 +1550,7 @@ export interface CloseIconProps {
   onClick: (e?: MouseEvent) => void;
   size: IconVariants["size"];
   weight: IconVariants["weight"];
-  color: "greyLight" | "purpleLight";
+  color: "grey" | "purple";
   className?: string;
   onMouseEnter?: (() => void) | undefined;
   onMouseLeave?: (() => void) | undefined;

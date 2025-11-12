@@ -102,7 +102,7 @@ export function ModalBase({
               <CloseIcon
                 size="sm"
                 weight="bold"
-                color="greyLight"
+                color="grey"
                 onClick={() => handleClose()}
               />
               <div

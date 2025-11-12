@@ -252,7 +252,7 @@ function WalletOverview(
                   name="view"
                   weight="normal"
                   size="mdR"
-                  color="greyLight"
+                  color="grey"
                   ariaLabel="Show Balance"
                 />
                 <div
@@ -271,7 +271,7 @@ function WalletOverview(
                   name="hide"
                   weight="normal"
                   size="mdR"
-                  color="greyLight"
+                  color="grey"
                   ariaLabel="Hide Balance"
                 />
                 <div
@@ -454,7 +454,7 @@ function DashboardProfile() {
             name="website"
             weight="normal"
             size="mdR"
-            color="greyLight"
+            color="grey"
           />
 
           <Icon
@@ -462,7 +462,7 @@ function DashboardProfile() {
             name="collection"
             weight="normal"
             size="mdR"
-            color="greyLight"
+            color="grey"
           />
 
           <Icon
@@ -470,7 +470,7 @@ function DashboardProfile() {
             name="stamp"
             weight="normal"
             size="mdR"
-            color="greyLight"
+            color="grey"
           />
         </div>
       </div>

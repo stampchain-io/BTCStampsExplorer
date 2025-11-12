@@ -447,7 +447,7 @@ b, strong {
 
 /* Emoji ticker styling for SRC20 cards */
 .emoji-ticker {
-  @apply text-stamp-primary-hover;
+  @apply text-color-purple-light;
   font-family: system-ui;
   line-height: 1;
   display: inline-flex;

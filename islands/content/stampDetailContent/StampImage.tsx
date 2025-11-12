@@ -9,6 +9,7 @@ import { openModal } from "$islands/modal/states.ts";
 import {
   body,
   containerDetailImage,
+  containerGap,
   gapSectionSlim,
   glassmorphism,
 } from "$layout";
@@ -364,7 +365,7 @@ function RightPanel(
               name="previewCode"
               weight="normal"
               size="mdR"
-              color="greyLight"
+              color="grey"
               onClick={() => {
                 setIsCodeTooltipVisible(false);
                 toggleCodeModal();
@@ -390,7 +391,7 @@ function RightPanel(
             name="previewImageRaw"
             weight="normal"
             size="mdR"
-            color="greyLight"
+            color="grey"
             onClick={() =>
               globalThis.open(
                 `/s/${stamp.cpid}`,
@@ -421,7 +422,7 @@ function RightPanel(
             name="previewImage"
             weight="normal"
             size="mdR"
-            color="greyLight"
+            color="grey"
             onClick={() => {
               setIsFullscreenTooltipVisible(false);
               toggleFullScreenModal();

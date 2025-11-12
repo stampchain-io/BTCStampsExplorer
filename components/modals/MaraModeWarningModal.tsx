@@ -71,7 +71,7 @@ export function MaraModeWarningModal({
           <CloseIcon
             size="sm"
             weight="bold"
-            color="purpleLight"
+            color="purple"
             onClick={onCancel || (() => {})}
           />
           <div
