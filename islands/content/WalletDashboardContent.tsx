@@ -233,7 +233,7 @@ function DispenserRow(
 
   return (
     <div
-      class={`flex justify-between dark-gradient rounded-2xl hover:border-stamp-primary-light ${shadowGlowPurple} border-2 border-transparent`}
+      class={`flex justify-between dark-gradient rounded-2xl hover:border-color-purple-light ${shadowGlowPurple} border-2 border-transparent`}
     >
       <div class="flex p-3 mobileLg:p-6 gap-6 uppercase w-full">
         <a

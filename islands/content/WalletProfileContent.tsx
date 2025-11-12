@@ -404,7 +404,7 @@ function DispenserRow(
   /* ===== RENDER DISPENSER ROW ===== */
   return (
     <div
-      class={`flex justify-between dark-gradient rounded-2xl hover:border-stamp-primary-light ${shadowGlowPurple} border-2 border-transparent`}
+      class={`flex justify-between dark-gradient rounded-2xl hover:border-color-purple-light ${shadowGlowPurple} border-2 border-transparent`}
     >
       <div class="flex gap-6 w-full">
         <a
