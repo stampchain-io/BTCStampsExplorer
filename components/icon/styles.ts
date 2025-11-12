@@ -98,8 +98,7 @@ export const iconStyles = {
   //   - the gradient defs have to be included in the file, since creating a global gradient file for them requires moving them up in the DOM tree (I abandoned this approach)
 
   icon: {
-    greyDark:
-      "stroke-color-grey-semidark fill-none [&_path[class*='fill-stroke']]:fill-color-grey-semidark",
+    /* Removed legacy greyDark with color-grey-semidark - kept stamp-grey-darker */
     grey:
       "stroke-stamp-grey fill-none [&_path[class*='fill-stroke']]:fill-stamp-grey",
     greyDark:
@@ -112,8 +111,7 @@ export const iconStyles = {
   },
 
   iconButton: {
-    greyDark:
-      "stroke-color-grey-semidark hover:stroke-color-grey-light group-hover:stroke-color-grey-light fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-color-grey-semidark [&:hover_path[class*='fill-stroke']]:fill-color-grey-light [&:group-hover_path[class*='fill-stroke']]:fill-color-grey-light",
+    /* Removed legacy greyDark with color-grey-semidark - kept stamp-grey-darker */
     grey:
       "stroke-stamp-grey hover:stroke-stamp-grey-light group-hover:stroke-stamp-grey-light fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-stamp-grey [&:hover_path[class*='fill-stroke']]:fill-stamp-grey-light [&:group-hover_path[class*='fill-stroke']]:fill-stamp-grey-light",
     greyDark:

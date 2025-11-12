@@ -144,12 +144,7 @@ export const buttonStyles: ButtonVariants = {
       [&>*]:transition-colors [&>*]:duration-50
     `,
     /* LEGACY STYLES - @baba-should be removed */
-    flat: `
-      bg-gradient-to-br from-[var(--color-light)] to-[var(--color-dark)]
-      border-[var(--color-dark)] text-black
-      hover:bg-gradient-to-br hover:from-[var(--color-light)] hover:to-[var(--color-light)]
-      hover:border-[var(--color-light)]
-    `,
+    /* Removed duplicate 'flat' key - kept the one below */
     outline: `
       ${baseOutline} ${shadowL2}
     `,

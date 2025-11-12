@@ -1,6 +1,5 @@
 /* ===== LOADING ICON COMPONENT ===== */
 import { Icon } from "$icon";
-import { transitionColors } from "$layout";
 
 interface LoadingIconProps {
   className?: string;
