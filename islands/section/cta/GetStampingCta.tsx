@@ -11,12 +11,12 @@ export default function GetStampingCta() {
   return (
     <div class={`${containerBackground}`}>
       {/* ===== HEADER SECTION ===== */}
-      <h3 class={titleGreyDL}>GET STAMPING</h3>
+      <h3 class={titleGreyLD}>GET STAMPING</h3>
       <h4 class={subtitleGrey}>IMMORTALISE YOUR ART</h4>
 
       {/* ===== CONTENT SECTION ===== */}
       <div
-        class={`flex flex-col tablet:flex-row ${gapGrid} ${text}`}
+        class={`flex flex-col tablet:flex-row ${containerGap} ${text}`}
       >
         <div class="flex flex-col">
           <p>
@@ -59,7 +59,7 @@ export default function GetStampingCta() {
         {/* ===== BUTTONS ===== */}
         <div class="flex justify-end gap-5">
           <Button
-            variant="glassmorphism"
+            variant="outline"
             color="grey"
             size="mdR"
             href="/faq"
@@ -67,7 +67,7 @@ export default function GetStampingCta() {
             FAQ
           </Button>
           <Button
-            variant="glassmorphismColor"
+            variant="flat"
             color="grey"
             size="mdR"
             href="/tool/stamp/create"

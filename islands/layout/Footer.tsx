@@ -4,7 +4,7 @@ import { Icon } from "$icon";
 import { containerBackground } from "$layout";
 import {
   copyright,
-  logoPurpleDL,
+  logoPurpleLD,
   navLinkTransparentPurple,
   overlayPurple,
   tagline,
@@ -115,7 +115,7 @@ export function Footer() {
     <footer class="
       flex flex-col tablet:flex-row justify-between max-w-desktop w-full mx-auto
       px-gutter-mobile mobileLg:px-gutter-tablet tablet:px-gutter-desktop
-      pt-24 pb-6 tablet:pt-24 tablet:pb-6
+      pt-10 pb-7.5 tablet:pt-15 tablet:pb-10
       gap-2 mobileMd:gap-3 tablet:gap-4
     ">
       {/* ===== BACKGROUND LOGO ===== */}

@@ -1,5 +1,5 @@
 /* ===== STAMP OVERVIEW GALLERY COMPONENT ===== */
-import { containerBackground, gapSectionSlim } from "$layout";
+import { containerBackground, containerGap } from "$layout";
 import { StampGallery } from "$section";
 import { titleGreyLD } from "$text";
 import type {
@@ -92,7 +92,7 @@ export function StampOverviewGallery({
         gap-12 mobileLg:gap-24 desktop:gap-36
       ">
       {/* ===== LATEST ART STAMPS SECTION ===== */}
-      <div class={`${containerBackground} ${gapSectionSlim}`}>
+      <div class={`${containerBackground} ${containerGap}`}>
         <div class="w-full -mb-6 mobileLg:-mb-9">
           <h1 class={titleGreyLD}>
             <span class="block mobileLg:hidden">LATEST STAMPS</span>

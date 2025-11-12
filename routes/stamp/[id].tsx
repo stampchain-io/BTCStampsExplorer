@@ -4,7 +4,7 @@
 import { StampImage, StampInfo } from "$content";
 import { Head } from "$fresh/runtime.ts";
 import { Handlers } from "$fresh/server.ts";
-import { body, gapSectionSlim } from "$layout";
+import { body, containerBackground, containerGap } from "$layout";
 import { logger, LogNamespace } from "$lib/utils/logger.ts";
 import { StampGallery } from "$section";
 import { StampController } from "$server/controller/stampController.ts";
@@ -342,7 +342,7 @@ export default function StampDetailPage(props: StampDetailPageProps) {
         />
       </Head>
 
-      <div class={`${body} ${gapSectionSlim}`}>
+      <div class={`${body} ${containerGap}`}>
         <div class="grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 gap-6 mobileLg:gap-9">
           <div class="desktop:col-span-1">
             {stamp &&
@@ -384,7 +384,7 @@ export default function StampDetailPage(props: StampDetailPageProps) {
           />
         )}
 
-        <div class="pt-6 mobileLg:pt-12">
+        <div class={containerBackground}>
           <StampGallery {...latestStampsSection} />
         </div>
       </div>

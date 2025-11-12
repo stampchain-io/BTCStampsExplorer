@@ -4,8 +4,7 @@ import { Button } from "$button";
 import {
   body,
   containerBackground,
-  gapGrid,
-  gapSectionSlim,
+  containerGap,
   glassmorphism,
 } from "$layout";
 import {
@@ -20,7 +19,7 @@ import {
 export default function MediaPage() {
   /* ===== RENDER ===== */
   return (
-    <div class={`${body} ${gapSectionSlim}`}>
+    <div class={`${body} ${containerGap}`}>
       {/* ===== INTRODUCTION SECTION ===== */}
       <section class={containerBackground}>
         <div class={`flex flex-col w-full`}>
@@ -51,7 +50,7 @@ export default function MediaPage() {
       <section class={`flex flex-col ${glassmorphism} p-5`}>
         <h1 class={titleGreyLD}>INTERVIEWS</h1>
         <div
-          class={`grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 ${gapGrid}`}
+          class={`grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 ${containerGap}`}
         >
           {/* ===== RICE TVX INTERVIEW ===== */}
           <div class={`flex flex-col`}>
@@ -139,7 +138,7 @@ export default function MediaPage() {
           <h1 class={titleGreyLD}>IN THE NEWS</h1>
           <h2 class={subtitleGrey}>BREAKING STORIES</h2>
           {/* ===== NEWS ARTICLES LIST ===== */}
-          <div class={`flex flex-col min-[940px]:flex-row ${gapGrid}`}>
+          <div class={`flex flex-col min-[940px]:flex-row ${containerGap}`}>
             <div class="flex flex-col w-full min-[940px]:w-1/2">
               <p class={text}>
                 BINANCE
@@ -199,7 +198,7 @@ export default function MediaPage() {
             </div>
             <div class="flex flex-col w-full -mt-1 mobileMd:-mt-2 mobileLg:-mt-4 tablet:-mt-7 min-[940px]:mt-0
                           min-[940px]:w-1/2 min-[940px]:justify-end min-[940px]:pt-0 min-[940px]:text-right">
-              <p class={`${text} min-[940px]:text-stamp-grey-darker`}>
+              <p class={`${text} min-[940px]:text-color-grey-semidark`}>
                 M2
                 <br />
                 <a
@@ -210,7 +209,7 @@ export default function MediaPage() {
                   WHAT ARE BITCOIN STAMPS
                 </a>
               </p>
-              <p class={`${text} min-[940px]:text-stamp-grey-darker`}>
+              <p class={`${text} min-[940px]:text-color-grey-semidark`}>
                 GATE
                 <br />
                 <a
@@ -221,7 +220,7 @@ export default function MediaPage() {
                   WHAT ARE BITCOIN STAMPS AND SRC-20
                 </a>
               </p>
-              <p class={`${text} min-[940px]:text-stamp-grey-darker`}>
+              <p class={`${text} min-[940px]:text-color-grey-semidark`}>
                 BITCOIN.COM
                 <br />
                 <a
@@ -232,7 +231,7 @@ export default function MediaPage() {
                   UNMATCHED DATA PERMANENCE
                 </a>
               </p>
-              <p class={`${text} min-[940px]:text-stamp-grey-darker`}>
+              <p class={`${text} min-[940px]:text-color-grey-semidark`}>
                 OKX
                 <br />
                 <a
@@ -243,7 +242,7 @@ export default function MediaPage() {
                   WHAT IS SRC-20
                 </a>
               </p>
-              <p class={`${text} min-[940px]:text-stamp-grey-darker`}>
+              <p class={`${text} min-[940px]:text-color-grey-semidark`}>
                 COIN CODEX
                 <br />
                 <a
@@ -275,11 +274,11 @@ export default function MediaPage() {
             <p>
               It utilizes the Counterparty platform, a longstanding Bitcoin meta
               layer, to broadcast Stamping transactions to the Bitcoin Network.
-              In addition, using a Counterparty transaction ...
+              In addition, using a Counterparty ...
             </p>
             <div>
               <Button
-                variant="glassmorphism"
+                variant="outline"
                 color="grey"
                 size="mdR"
                 href="https://sqrr.xyz/reports/docs/4/1/Stamps%20Protocol_Final_17_May_2023.pdf"
@@ -301,7 +300,7 @@ export default function MediaPage() {
             </p>
             <div class="flex justify-start mobileLg:justify-end">
               <Button
-                variant="glassmorphism"
+                variant="outline"
                 color="grey"
                 size="mdR"
                 href="https://sqrr.xyz/reports/"

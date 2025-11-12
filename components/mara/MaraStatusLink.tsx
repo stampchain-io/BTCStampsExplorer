@@ -26,7 +26,7 @@ export function MaraStatusLink(
             <h4 class="text-purple-300 font-semibold text-sm">
               MARA Pool Status
             </h4>
-            <p class="text-xs text-stamp-grey-light mt-1">
+            <p class="text-xs text-color-grey-light mt-1">
               Track your transaction in the MARA mining pool
             </p>
           </div>
@@ -47,8 +47,8 @@ export function MaraStatusLink(
           />
         </a>
       </div>
-      <div class="mt-3 text-xs text-stamp-grey break-all">
-        <span class="text-stamp-grey-light">Transaction ID:</span> {txid}
+      <div class="mt-3 text-xs text-color-grey break-all">
+        <span class="text-color-grey-light">Transaction ID:</span> {txid}
       </div>
     </div>
   );

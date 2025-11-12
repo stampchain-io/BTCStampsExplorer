@@ -18,7 +18,7 @@ export default function TeamBanner() {
             <div
               class={`flex justify-between items-start
              mx-0 mobileLg:mx-12 desktop:mx-16 mt-4
-              ${gapGrid}`}
+              ${containerGap}`}
             >
               {/* ===== MIKE IN SPACE CARD ===== */}
               <div class="flex flex-col items-center">

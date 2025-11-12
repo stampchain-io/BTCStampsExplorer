@@ -18,71 +18,85 @@ export default function DesignSystem() {
       <Head>
         <title>Design System - BTCStamps</title>
       </Head>
-      <div class="min-h-screen bg-stamp-bg-purple-darkest p-8">
+      <div class="min-h-screen bg-color-purple-dark p-8">
         <div class="max-w-full mx-auto space-y-12">
-          <h1 class="text-4xl font-bold text-stamp-grey-bright">
+          <h1 class="text-4xl font-bold text-color-grey-light">
             Design System
           </h1>
 
           {/* Colors */}
           <section class="space-y-8">
-            <h2 class="text-2xl font-bold text-stamp-grey-bright">
+            <h2 class="text-2xl font-bold text-color-grey-light">
               Colors
             </h2>
 
-            {/* Primary Colors */}
+            {/* Purple Colors */}
             <div>
-              <h3 class="text-xl text-stamp-grey-bright mb-4">
-                Primary Colors
+              <h3 class="text-xl text-color-grey-light mb-4">
+                Purple Colors
               </h3>
               <div class="grid grid-cols-1 tablet:grid-cols-4 gap-4">
                 <ColorSwatch
-                  name="Primary Default"
-                  bgClass="bg-stamp-primary"
-                  color="primary"
+                  name="Purple Default"
+                  bgClass="bg-color-purple"
+                  color="purple"
                 />
                 <ColorSwatch
-                  name="Primary Light"
-                  bgClass="bg-stamp-primary-light"
-                  color="primary-light"
+                  name="Purple Light"
+                  bgClass="bg-color-purple-light"
+                  color="purple-light"
                 />
                 <ColorSwatch
-                  name="Primary Dark"
-                  bgClass="bg-stamp-primary-dark"
-                  color="primary-dark"
+                  name="Purple Dark"
+                  bgClass="bg-color-purple-dark"
+                  color="purple-dark"
                 />
                 <ColorSwatch
-                  name="Primary Hover"
-                  bgClass="bg-stamp-primary-hover"
-                  color="primary-hover"
+                  name="Purple Semi Light"
+                  bgClass="bg-color-purple-semilight"
+                  color="purple-semilight"
+                />
+              </div>
+            </div>
+
+            {/* Additional Purple Colors */}
+            <div>
+              <h3 class="text-xl text-color-grey-light mb-4">
+                Additional Purple Colors
+              </h3>
+              <div class="grid grid-cols-1 tablet:grid-cols-4 gap-4">
+                <ColorSwatch
+                  name="Purple Semi Dark"
+                  bgClass="bg-color-purple-semidark"
+                  color="purple-semidark"
                 />
               </div>
             </div>
 
             {/* Text Colors */}
             <div>
-              <h3 class="text-xl text-stamp-grey-bright mb-4">
+              <h3 class="text-xl text-color-grey-light mb-4">
                 Text Colors
               </h3>
               <div class="grid grid-cols-1 tablet:grid-cols-4 gap-4">
                 <ColorSwatch
                   name="Text Primary"
-                  bgClass="bg-stamp-text-primary"
+                  bgClass="bg-color-grey"
                   color="text-primary"
                 />
                 <ColorSwatch
                   name="Text Secondary"
-                  bgClass="bg-stamp-text-secondary"
+                  bgClass="bg-color-grey-semidark"
                   color="text-secondary"
                 />
                 <ColorSwatch
                   name="Table Text"
-                  bgClass="bg-stamp-table-text"
+                  bgClass="bg-color-grey-semilight"
                   color="table-text"
                 />
                 <ColorSwatch
                   name="Search Placeholder"
-                  bgClass="bg-stamp-search-placeholder"
+                  bgClass="bg-color-grey-semilight"
                   color="search-placeholder"
                 />
               </div>
@@ -90,36 +104,24 @@ export default function DesignSystem() {
 
             {/* Text Gradients */}
             <div>
-              <h3 class="text-xl text-stamp-grey-bright mb-4">
+              <h3 class="text-xl text-color-grey-light mb-4">
                 Text Gradients
               </h3>
               <div class="space-y-6 bg-stamp-bg-purple-darker p-8 rounded-2xl">
                 {/* Purple Gradients */}
-                <p class="bg-text-purple-1 bg-clip-text text-transparent text-4xl font-bold">
+                <p class="color-purple-gradientDL text-4xl font-bold">
                   Purple Gradient Text 1
                 </p>
-                <p class="bg-text-purple-2 bg-clip-text text-transparent text-4xl font-bold">
-                  Purple Gradient Text 2
-                </p>
-                <p class="bg-text-purple-3 bg-clip-text text-transparent text-4xl font-bold">
+                <p class="color-purple-gradientLD text-4xl font-bold">
                   Purple Gradient Text 3
-                </p>
-                <p class="bg-text-purple-4 bg-clip-text text-transparent text-4xl font-bold">
-                  Purple Gradient Text 4
                 </p>
 
                 {/* Gray Gradients */}
-                <p class="bg-text-gray-1 bg-clip-text text-transparent text-4xl font-bold">
+                <p class="color-grey-gradientDL text-4xl font-bold">
                   Gray Gradient Text 1
                 </p>
-                <p class="bg-text-gray-2 bg-clip-text text-transparent text-4xl font-bold">
-                  Gray Gradient Text 2
-                </p>
-                <p class="bg-text-gray-3 bg-clip-text text-transparent text-4xl font-bold">
+                <p class="color-grey-gradientLD text-4xl font-bold">
                   Gray Gradient Text 3
-                </p>
-                <p class="bg-text-gray-4 bg-clip-text text-transparent text-4xl font-bold">
-                  Gray Gradient Text 4
                 </p>
               </div>
             </div>

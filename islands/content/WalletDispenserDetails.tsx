@@ -1,9 +1,7 @@
 /* ===== WALLET DISPENSER DETAILS COMPONENT ===== */
 import { Button } from "$button";
-import type { WalletDispenserDetailsProps } from "$types/ui.d.ts";
 import { StatItem, StatTitle } from "$components/section/WalletComponents.tsx";
 import { StampImage } from "$content";
-import type { StampRow } from "$types/stamp.d.ts";
 import { Icon } from "$icon";
 import BuyStampModal from "$islands/modal/BuyStampModal.tsx";
 import { openModal } from "$islands/modal/states.ts";
@@ -15,6 +13,8 @@ import {
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { tooltipIcon } from "$notification";
 import { headingGreyLD, textXs, titleGreyLD } from "$text";
+import type { StampRow } from "$types/stamp.d.ts";
+import type { WalletDispenserDetailsProps } from "$types/ui.d.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
@@ -181,7 +181,7 @@ function StampStats({
                 name="divisible"
                 weight="normal"
                 size="custom"
-                color="grey"
+                color="greyLight"
                 className="w-[23px] h-[23px]"
               />
               <div
@@ -204,7 +204,7 @@ function StampStats({
                 name="keyburned"
                 weight="normal"
                 size="xs"
-                color="grey"
+                color="greyLight"
               />
               <div
                 className={`${tooltipIcon} ${
@@ -226,7 +226,7 @@ function StampStats({
                 name="locked"
                 weight="normal"
                 size="xs"
-                color="grey"
+                color="greyLight"
               />
               <div
                 className={`${tooltipIcon} ${
@@ -248,7 +248,7 @@ function StampStats({
                 name="unlocked"
                 weight="normal"
                 size="xs"
-                color="grey"
+                color="greyLight"
               />
               <div
                 className={`${tooltipIcon} ${
@@ -380,7 +380,7 @@ function DispenserStats({
         <div className="flex justify-end pt-1.5">
           <Button
             variant="outline"
-            color="purple"
+            color="purpleLight"
             size="md"
             onClick={handleOpenBuyModal}
           >

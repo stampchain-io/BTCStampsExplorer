@@ -91,7 +91,7 @@ const HoldersTableBase = (
   return (
     <div class="w-full">
       <ScrollContainer
-        class="min-h-[80px] max-h-[290px] mt-5 w-full scrollbar-glassmorphism"
+        class="min-h-[80px] max-h-[290px] mt-5 w-full scrollbar-background-layer1"
         onScroll={handleScroll}
       >
         <div class="!-my-2 overflow-x-auto tablet:overflow-x-visible scrollbar-hide">
@@ -169,7 +169,7 @@ const HoldersTableBase = (
                       <td
                         class={`${
                           cellAlign(2, headers?.length ?? 0)
-                        } ${cellRightL2Detail} text-stamp-grey`}
+                        } ${cellRightL2Detail} text-color-grey`}
                       >
                         {holder.percentage}%
                       </td>
@@ -213,7 +213,7 @@ const HoldersTableBase = (
                     <td
                       class={`${
                         cellAlign(2, headers?.length ?? 0)
-                      } ${cellRightL2Detail} text-stamp-grey`}
+                      } ${cellRightL2Detail} text-color-grey`}
                     >
                       {holder.percentage}%
                     </td>

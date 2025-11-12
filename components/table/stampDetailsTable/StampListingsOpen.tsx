@@ -32,7 +32,7 @@ export function StampListingsOpenTable({
   /* ===== RENDER ===== */
   return (
     <div class="relative w-full">
-      <ScrollContainer class="min-h-[76px] max-h-[244px] scrollbar-glassmorphism">
+      <ScrollContainer class="min-h-[76px] max-h-[244px] scrollbar-background-layer1">
         <div class="!-my-2 overflow-x-auto tablet:overflow-x-visible scrollbar-hide">
           <table class={`w-full border-separate border-spacing-y-2 ${textSm}`}>
             {/* ===== TABLE STRUCTURE ===== */}
@@ -85,11 +85,11 @@ export function StampListingsOpenTable({
                   <tr
                     key={dispenser.source}
                     class={`${glassmorphismL2} group cursor-pointer ${
-                      isEmpty ? "text-stamp-grey-darker" : ""
+                      isEmpty ? "text-color-grey-semidark" : ""
                     } ${
                       isSelected
-                        ? "text-stamp-grey-light"
-                        : "text-stamp-grey-darker"
+                        ? "text-color-grey-light"
+                        : "text-color-grey-semidark"
                     }`}
                     onClick={() => onSelectDispenser?.(dispenser)}
                   >
@@ -97,7 +97,7 @@ export function StampListingsOpenTable({
                     <td
                       class={`${
                         cellAlign(0, headers?.length ?? 0)
-                      } ${cellLeftL2Detail} group-hover:text-stamp-purple-bright`}
+                      } ${cellLeftL2Detail} group-hover:text-color-purple-light`}
                     >
                       {formatSatoshisToBTC(dispenser.satoshirate, {
                         includeSymbol: true,
@@ -133,7 +133,7 @@ export function StampListingsOpenTable({
                     <td
                       class={`${
                         cellAlign(4, headers?.length ?? 0)
-                      } ${cellRightL2Detail} group-hover:text-stamp-grey-light`}
+                      } ${cellRightL2Detail} group-hover:text-color-grey-light`}
                     >
                       DISPENSER
                     </td>

@@ -8,24 +8,17 @@
  */
 export type ButtonVariant =
   | "text"
-  | "glassmorphism"
-  | "glassmorphismColor"
-  | "glassmorphismSelected"
-  | "glassmorphismDeselected"
-  | "flat"
   | "outline"
+  | "flat"
   | "flatOutline"
-  | "outlineFlat"
-  | "outlineGradient";
+  | "outlineFlat";
 
 /**
  * Button color types - standardized theme colors
  */
 export type ButtonColor =
   | "purple"
-  | "purpleDark"
   | "grey"
-  | "greyDark"
   | "test"
   | "custom";
 

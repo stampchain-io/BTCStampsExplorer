@@ -249,7 +249,7 @@ export function SRC20CardSm({
                               return (
                                 <>
                                   {text && (
-                                    <span class="gray-gradient1 group-hover:[-webkit-text-fill-color:#AA00FF] inline-block transition-colors duration-200">
+                                    <span class="color-grey-gradientDL group-hover:[-webkit-text-fill-color:var(--color-purple-light)] inline-block transition-colors duration-200">
                                       {text.toUpperCase()}
                                     </span>
                                   )}
@@ -331,7 +331,7 @@ export function SRC20CardSm({
                         // Convert to number and validate
                         const changeValue = Number(changePercent);
                         if (isNaN(changeValue)) {
-                          return <span class="text-stamp-grey">N/A</span>;
+                          return <span class="text-color-grey">N/A</span>;
                         }
 
                         return (

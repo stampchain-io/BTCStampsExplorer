@@ -9,7 +9,7 @@ import { ProgressiveEstimationIndicator } from "$components/indicators/Progressi
 import { MaraStatusLink } from "$components/mara/MaraStatusLink.tsx";
 import { MaraModeWarningModal } from "$components/modals/MaraModeWarningModal.tsx";
 import { MaraServiceUnavailableModal } from "$components/modals/MaraServiceUnavailableModal.tsx";
-import { InputField } from "$form";
+import { InputField, stateDisabled } from "$form";
 import { Icon } from "$icon";
 import { StampingToolSkeleton } from "$indicators";
 import PreviewImageModal from "$islands/modal/PreviewImageModal.tsx";
@@ -17,6 +17,7 @@ import { closeModal, globalModal, openModal } from "$islands/modal/states.ts";
 import {
   bodyTool,
   containerBackground,
+  containerGap,
   containerRowForm,
   glassmorphism,
   glassmorphismL2,
@@ -233,8 +234,10 @@ export function StampingTool() {
   /* ===== EARLY RETURN CONDITIONS ===== */
   if (isLoading) {
     return (
-      <div class={bodyTool}>
-        <h1 class={`${titleGreyLD} mx-auto mb-4`}>STAMP</h1>
+      <div class={`${bodyTool} ${containerGap}`}>
+        <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
+          STAMP
+        </h1>
         <StampingToolSkeleton />
       </div>
     );
@@ -1622,10 +1625,26 @@ function StampingToolMain({ config }: { config: Config }) {
   /* ===== TOOLTIP HANDLERS ===== */
   const handleMouseMove = (e: MouseEvent) => {
     setTooltipPosition({
-      x: e.clientX,
+      x: e.clientX, // Viewport coordinates for fixed positioning
       y: e.clientY,
     });
   };
+
+  // Track global mouse movement when tooltip is visible
+  useEffect(() => {
+    if (!isUploadTooltipVisible) return;
+
+    const handleGlobalMouseMove = (e: globalThis.MouseEvent) => {
+      setTooltipPosition({
+        x: e.clientX,
+        y: e.clientY,
+      });
+    };
+
+    document.addEventListener("mousemove", handleGlobalMouseMove);
+    return () =>
+      document.removeEventListener("mousemove", handleGlobalMouseMove);
+  }, [isUploadTooltipVisible]);
 
   const handleUploadMouseEnter = () => {
     if (uploadTooltipTimeoutRef.current) {
@@ -1745,22 +1764,10 @@ function StampingToolMain({ config }: { config: Config }) {
               weight="extraLight"
               size="xl"
               color="custom"
-              className="stroke-stamp-grey-darkest group-hover:stroke-stamp-grey-darker/80"
+              className="stroke-color-grey-dark group-hover:stroke-color-grey-semidark/80"
             />
           </label>
         )}
-      <div
-        class={`${tooltipImage} ${
-          isUploadTooltipVisible ? "opacity-100" : "opacity-0"
-        }`}
-        style={{
-          left: `${tooltipPosition.x}px`,
-          top: `${tooltipPosition.y - 6}px`,
-          transform: "translate(-50%, -100%)",
-        }}
-      >
-        UPLOAD FILE
-      </div>
     </div>
   );
 
@@ -2030,8 +2037,10 @@ function StampingToolMain({ config }: { config: Config }) {
 
   /* ===== COMPONENT RENDER ===== */
   return (
-    <div class={bodyTool}>
-      <h1 class={`${titleGreyLD} mx-auto mb-4`}>STAMP</h1>
+    <div class={`${bodyTool} ${containerGap}`}>
+      <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
+        STAMP
+      </h1>
 
       {/* MARA Mode Indicator */}
       {maraMode && outputValue !== null && (
@@ -2054,7 +2063,7 @@ function StampingToolMain({ config }: { config: Config }) {
               <h3 class="text-orange-300 font-semibold mb-2">
                 MARA Pool Temporarily Unavailable
               </h3>
-              <p class="text-sm text-stamp-grey-light">
+              <p class="text-sm text-color-grey-light">
                 The MARA pool submission service is currently unavailable. You
                 can either wait and retry, or switch to standard stamping (333
                 sat outputs).
@@ -2082,7 +2091,7 @@ function StampingToolMain({ config }: { config: Config }) {
       )}
 
       <form
-        class={`${containerBackground} mb-6`}
+        class={containerBackground}
         onSubmit={(e) => {
           e.preventDefault();
           handleMint();
@@ -2122,7 +2131,7 @@ function StampingToolMain({ config }: { config: Config }) {
               </div>
             </div>
             <div className="flex items-center gap-5">
-              <h5 className={`${labelLg} !text-stamp-grey`}>
+              <h5 className={`${labelLg} !text-color-grey`}>
                 EDITIONS
               </h5>
 
@@ -2185,12 +2194,17 @@ function StampingToolMain({ config }: { config: Config }) {
               ref={previewButtonRef}
               className={`flex items-center justify-center !w-[46px] !h-10 ${glassmorphismL2} ${glassmorphismL2Hover} cursor-pointer group`} // dunno why, but the width has to be +6px ?!?!
               onClick={() => {
+                if (!file) return;
                 toggleFullScreenModal();
                 setIsPreviewTooltipVisible(false);
                 setAllowPreviewTooltip(false);
               }}
-              onMouseEnter={handlePreviewMouseEnter}
-              onMouseLeave={handlePreviewMouseLeave}
+              onMouseEnter={() => {
+                handlePreviewMouseEnter();
+              }}
+              onMouseLeave={() => {
+                handlePreviewMouseLeave();
+              }}
             >
               <Icon
                 type="iconButton"

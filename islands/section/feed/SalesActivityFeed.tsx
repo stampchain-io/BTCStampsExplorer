@@ -1,5 +1,6 @@
 /* ===== SALES ACTIVITY FEED COMPONENT ===== */
 import { Icon, LoadingIcon } from "$icon";
+import { glassmorphismL2 } from "$layout";
 import {
   abbreviateAddress,
   formatBTCAmount,
@@ -84,7 +85,7 @@ export default function SalesActivityFeed({
     return (
       <div
         key={`${sale.tx_hash}-${saleData.tx_hash}-${index}`}
-        class={`feed-item border-l-2 border-stamp-purple-bright pl-4 pb-6 relative ${
+        class={`feed-item border-l-2 border-color-purple-light pl-4 pb-6 relative ${
           !compact
             ? "hover:bg-gray-800/30 transition-colors cursor-pointer rounded-r-lg p-4 -ml-4"
             : ""
@@ -92,7 +93,7 @@ export default function SalesActivityFeed({
         onClick={() => !compact && handleItemClick(sale)}
       >
         {/* Timeline dot */}
-        <div class="absolute -left-2 top-2 w-4 h-4 bg-stamp-purple-bright rounded-full border-2 border-gray-900">
+        <div class="absolute -left-2 top-2 w-4 h-4 bg-color-purple-light rounded-full border-2 border-gray-900">
         </div>
 
         <div class="flex gap-4">

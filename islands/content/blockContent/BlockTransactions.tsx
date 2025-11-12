@@ -1,9 +1,9 @@
 /* ===== BLOCK TRANSACTIONS COMPONENT ===== */
-import { useState } from "preact/hooks";
 import { useFees } from "$fees";
+import { Icon } from "$icon";
 import { containerBackground } from "$layout";
 import { text, text2xl } from "$text";
-import { Icon } from "$icon";
+import { useState } from "preact/hooks";
 
 /* ===== MAIN COMPONENT ===== */
 export default function BlockTransactions() {
@@ -21,7 +21,7 @@ export default function BlockTransactions() {
   /* ===== RENDER ===== */
   return (
     <div
-      class={`${containerBackground} text-stamp-grey-light gap-6 transition-all`}
+      class={`${containerBackground} text-color-grey-light gap-6 transition-all`}
     >
       {/* ===== HEADER SECTION ===== */}
       <div class="flex justify-between">

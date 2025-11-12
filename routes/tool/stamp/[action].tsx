@@ -1,7 +1,7 @@
 /* ===== STAMP TOOLS PAGE ===== */
 /*@baba-71-82*/
 import { Handlers, PageProps } from "$fresh/server.ts";
-import { body, gapSectionSlim } from "$layout";
+import { body, containerGap } from "$layout";
 import { StampSendHowTo } from "$section";
 import { StampSendTool } from "$tool";
 import type { ToolStampPageProps } from "$types/ui.d.ts";
@@ -67,7 +67,7 @@ export default function ToolStampPage(
 
   /* ===== RENDER ===== */
   return (
-    <div class={`${body} ${gapSectionSlim}`}>
+    <div class={`${body} ${containerGap}`}>
       <div class={`flex w-full`}>
         {renderContent()}
       </div>

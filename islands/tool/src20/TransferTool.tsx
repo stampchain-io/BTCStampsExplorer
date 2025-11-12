@@ -12,6 +12,7 @@ import {
   bodyTool,
   containerBackground,
   containerColForm,
+  containerGap,
   rowResponsiveForm,
 } from "$layout";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
@@ -302,16 +303,20 @@ export function SRC20TransferTool(
   /* ===== CONFIG CHECK ===== */
   if (!config) {
     return (
-      <div class={bodyTool}>
-        <h1 class={`${titleGreyLD} mx-auto mb-4`}>TRANSFER</h1>
+      <div class={`${bodyTool} ${containerGap}`}>
+        <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
+          TRANSFER
+        </h1>
         <TransferToolSkeleton />
       </div>
     );
   }
 
   return (
-    <div class={bodyTool}>
-      <h1 class={`${titleGreyLD} mx-auto mb-4`}>TRANSFER</h1>
+    <div class={`${bodyTool} ${containerGap}`}>
+      <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
+        TRANSFER
+      </h1>
 
       {/* ===== FORM  ===== */}
       <form
@@ -371,7 +376,7 @@ export function SRC20TransferTool(
                     aria-selected={formState.token === result.tick}
                   >
                     {result.tick}
-                    <h6 class="text-xs text-stamp-grey">
+                    <h6 class="text-xs text-color-grey">
                       {stripTrailingZeros(result.amt)}
                     </h6>
                   </li>

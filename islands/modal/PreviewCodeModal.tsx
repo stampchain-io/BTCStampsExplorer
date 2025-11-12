@@ -90,7 +90,7 @@ export default function PreviewCodeModal({ src }: PreviewCodeModalProps) {
     >
       {/* ===== CODE DISPLAY ===== */}
       <div class="flex flex-col w-full h-full p-6 mobileMd:p-9">
-        <code class="whitespace-pre-wrap text-xs text-stamp-grey-darkest leading-tight pb-6 mobileMd:pb-9">
+        <code class="whitespace-pre-wrap text-xs text-color-grey-dark leading-tight pb-6 mobileMd:pb-9">
           {formattedSrc}
         </code>
       </div>

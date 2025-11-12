@@ -429,7 +429,7 @@ function SendBTCModal({
                 value={formState.amount}
                 onInput={handleAmountInput}
                 placeholder="0"
-                class="bg-transparent text-[30px] mobileLg:text-[42px] text-stamp-grey-light placeholder:text-stamp-grey font-black text-right -ms-0 mobileLg:-ms-0 pointer-events-auto no-outline"
+                class="bg-transparent text-[30px] mobileLg:text-[42px] text-color-grey-light placeholder:text-color-grey font-black text-right -ms-0 mobileLg:-ms-0 pointer-events-auto no-outline"
                 style={{
                   width: (() => {
                     const value = formState.amount || "";
@@ -454,14 +454,14 @@ function SendBTCModal({
                   outlineStyle: "none",
                 }}
               />
-              <span class="text-[30px] mobileLg:text-[42px] text-stamp-grey-light font-extralight">
+              <span class="text-[30px] mobileLg:text-[42px] text-color-grey-light font-extralight">
                 BTC
               </span>
             </div>
           </div>
 
           {/* ===== USD CONVERSION ===== */}
-          <div class="text-sm mobileLg:text-base text-stamp-grey-darker font-light">
+          <div class="text-sm mobileLg:text-base text-color-grey-semidark font-light">
             {formState.amount && formState.BTCPrice
               ? (parseFloat(formState.amount) * formState.BTCPrice)
                 .toLocaleString("en-US", {
@@ -473,7 +473,7 @@ function SendBTCModal({
 
           {/* ===== MAX BUTTON ===== */}
           <div
-            className="relative text-base mobileLg:text-lg text-stamp-grey font-medium hover:text-stamp-grey-light mt-2 cursor-pointer"
+            className="relative text-base mobileLg:text-lg text-color-grey font-medium hover:text-color-grey-light mt-2 cursor-pointer"
             onClick={handleMaxClick}
             onMouseEnter={handleMaxMouseEnter}
             onMouseLeave={handleMaxMouseLeave}

@@ -49,13 +49,13 @@ export function CollectionsBanner(
       <div
         class={`${gradientContentClassName} ${
           isDarkMode
-            ? "from-[#666666FF] via-[#9999997F] to-[#CCCCCC00]"
-            : "from-[#CCCCCCFF] via-[#9999997F] to-[#66666600]"
+            ? "from-color-grey-semidark/100 via-color-grey/50 to-color-grey-semilight/0"
+            : "from-color-grey-semilight/100 via-color-grey/50 to-color-grey-semidark/0"
         } ${isHovered ? "hidden" : ""}`}
       />
       <h3
         class={`${nameClassName} ${
-          isDarkMode ? "text-stamp-grey-light" : "text-stamp-grey-darkest"
+          isDarkMode ? "text-color-grey-light" : "text-color-grey-dark"
         } ${isHovered ? "!hidden" : ""}`}
       >
         {collection.collection_name}

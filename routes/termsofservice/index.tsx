@@ -1,5 +1,5 @@
 /* ===== TERMS OF SERVICE PAGE ===== */
-import { containerBackground, CourierFontLoader, gapGrid } from "$layout";
+import { containerBackground, containerGap, CourierFontLoader } from "$layout";
 import { subtitleGrey, text, textLg, textSm, titleGreyLD } from "$text";
 
 /* ===== PAGE COMPONENT ===== */
@@ -7,7 +7,7 @@ export default function TermsOfServicePage() {
   return (
     <>
       <CourierFontLoader />
-      <div class={`${containerBackground} ${gapGrid}`}>
+      <div class={`${containerBackground} ${containerGap}`}>
         {/* ===== HEADER SECTION ===== */}
         <section>
           <h1 class={titleGreyLD}>TERMS OF SERVICE</h1>
@@ -15,9 +15,9 @@ export default function TermsOfServicePage() {
             <h2 class={subtitleGrey}>
               AGREEMENT TO OUR LEGAL TERMS
             </h2>
-            <h5 class="text-lg mobileLg:text-xl font-light text-stamp-grey pb-4 mobileLg:pb-2">
+            <h5 class="text-lg mobileLg:text-xl font-light text-color-grey pb-4 mobileLg:pb-2">
               LAST UPDATED
-              <span class="pl-3 font-medium text-stamp-grey-light">
+              <span class="pl-3 font-medium text-color-grey-light">
                 SEPTEMBER 11 2024
               </span>
             </h5>
@@ -70,7 +70,7 @@ export default function TermsOfServicePage() {
         </section>
         {/* ===== TABLE OF CONTENTS SECTION ===== */}
         <section>
-          <p class="font-semibold text-lg text-stamp-grey-light font-courier-prime">
+          <p class="font-semibold text-lg text-color-grey-light font-courier-prime">
             <span class="text-2xl">
               TABLE OF CONTENTS<br />
             </span>

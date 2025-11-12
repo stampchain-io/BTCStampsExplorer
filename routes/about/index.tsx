@@ -4,13 +4,13 @@ import { AboutHeader } from "$header";
 import ContactCta from "$islands/section/cta/ContactCta.tsx";
 import DonateCta from "$islands/section/cta/DonateCta.tsx";
 import StatsBanner from "$islands/section/gallery/StatsBanner.tsx";
-import { body, gapSectionSlim } from "$layout";
+import { body, containerGap } from "$layout";
 import { PartnersBanner, TeamBanner } from "$section";
 
 /* ===== PAGE COMPONENT ===== */
 export default function AboutPage() {
   return (
-    <div class={`${body} ${gapSectionSlim}`}>
+    <div class={`${body} ${containerGap}`}>
       {/* ===== ABOUT SECTION ===== */}
       <AboutHeader />
 

@@ -39,9 +39,9 @@ export function ProgressIndicator({
       default:
         return {
           icon: "circle",
-          color: "stamp-grey-light",
-          bgColor: "stamp-grey-darker/20",
-          borderColor: "stamp-grey-light/30",
+          color: "color-grey-light",
+          bgColor: "color-grey-semidark/20",
+          borderColor: "color-grey-light/30",
           animate: false,
         };
     }
@@ -106,7 +106,7 @@ export function TransactionProgress({
                     ? "bg-purple-500/20 border-2 border-purple-500 text-purple-400"
                     : step.status === "error"
                     ? "bg-red-500/20 border-2 border-red-500 text-red-400"
-                    : "bg-stamp-grey-darker border-2 border-stamp-grey-light/30 text-stamp-grey-light"
+                    : "bg-color-grey-semidark border-2 border-color-grey-light/30 text-color-grey-light"
                 }`}
               >
                 {step.status === "completed"
@@ -145,7 +145,7 @@ export function TransactionProgress({
                     ? "text-purple-300"
                     : step.status === "error"
                     ? "text-red-400"
-                    : "text-stamp-grey-light"
+                    : "text-color-grey-light"
                 }`}
               >
                 {step.label}
@@ -159,7 +159,7 @@ export function TransactionProgress({
                   class={`h-full transition-all duration-500 ${
                     steps[index + 1].status !== "pending"
                       ? "bg-purple-500"
-                      : "bg-stamp-grey-light/30"
+                      : "bg-color-grey-light/30"
                   }`}
                 />
               </div>
@@ -198,14 +198,14 @@ export function FeeSkeletonLoader() {
   return (
     <div class="animate-pulse">
       <div class="flex items-center gap-2 mb-2">
-        <div class="h-4 w-12 bg-stamp-grey-darker rounded" />
-        <div class="h-6 w-16 bg-stamp-grey-darker rounded" />
-        <div class="h-4 w-20 bg-stamp-grey-darker rounded" />
+        <div class="h-4 w-12 bg-color-grey-semidark rounded" />
+        <div class="h-6 w-16 bg-color-grey-semidark rounded" />
+        <div class="h-4 w-20 bg-color-grey-semidark rounded" />
       </div>
       <div class="flex items-center gap-2">
-        <div class="h-3 w-24 bg-stamp-grey-darker rounded" />
-        <div class="h-4 w-12 bg-stamp-grey-darker rounded" />
-        <div class="h-3 w-16 bg-stamp-grey-darker rounded" />
+        <div class="h-3 w-24 bg-color-grey-semidark rounded" />
+        <div class="h-4 w-12 bg-color-grey-semidark rounded" />
+        <div class="h-3 w-16 bg-color-grey-semidark rounded" />
       </div>
     </div>
   );

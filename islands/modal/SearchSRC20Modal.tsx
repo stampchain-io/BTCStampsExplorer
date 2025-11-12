@@ -154,8 +154,8 @@ function SearchContent({
           color="custom"
           className={`w-5 h-5 ${
             searchState.value.error
-              ? "stroke-stamp-grey-light"
-              : "stroke-stamp-grey"
+              ? "stroke-color-grey-light"
+              : "stroke-color-grey"
           }`}
         />
       </div>
@@ -175,11 +175,11 @@ function SearchContent({
                     key={index}
                     class={`${
                       index === 0
-                        ? "font-light text-base text-stamp-grey-light"
+                        ? "font-light text-base text-color-grey-light"
                         : index ===
                             searchState.value.error.split("\n").length - 1
                         ? textSm
-                        : "font-medium text-sm text-stamp-grey pt-0.5 pb-1"
+                        : "font-medium text-sm text-color-grey pt-0.5 pb-1"
                     } break-all overflow-hidden`}
                   >
                     {text}

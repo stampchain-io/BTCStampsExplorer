@@ -18,9 +18,9 @@ export const shadow =
 export const shadowL2 =
   "shadow-[0_2px_4px_rgba(13,11,13,0.1),inset_0_1px_0_rgba(13,11,13,0.08),inset_0_-1px_0_rgba(13,11,13,0.08),inset_0_0_2px_2px_rgba(13,11,13,0.08)]";
 export const shadowGlowPurple =
-  `group hover:shadow-[0px_0px_16px_#9900EE] ${transitionColors} cursor-pointer`;
+  `group hover:shadow-[0px_0px_16px_color-mix(in_srgb,var(--color-purple-light)_75%,transparent)] ${transitionColors} cursor-pointer`;
 export const shadowGlowGrey =
-  `group hover:shadow-[0px_0px_16px_#FFFFFF7F] ${transitionColors} cursor-pointer`;
+  `group hover:shadow-[0px_0px_16px_color-mix(in_srgb,var(--color-grey-light)_75%,transparent)] ${transitionColors} cursor-pointer`;
 
 // Glassmorphism styles
 // Overlay layer styles - used for drawer and modal containers
@@ -54,15 +54,16 @@ export const gapGrid = "gap-6 mobileLg:gap-9 tablet:gap-12"; // - ToS index page
 /* ===== CONTAINER STYLES ===== */
 // Base styles
 export const containerBackground = `${body} p-5 ${glassmorphism}`;
+export const containerGap = "gap-5 mobileLg:gap-7.5";
 export const containerDetailImage = `relative p-5 ${glassmorphism}`;
 export const containerStickyBottom = `sticky bottom-0 mt-auto py-9 tablet:py-6`;
 
 // Stamp Card styles
 export const containerCard = `${glassmorphism} ${shadowGlowPurple}
-  hover:border-stamp-purple-bright`; // check if used
+  hover:border-color-purple-light`; // check if used
 
 export const containerCardL2 = `${glassmorphismL2} ${shadowGlowPurple}
-  hover:border-stamp-purple-bright`;
+  hover:border-color-purple-light`;
 
 // Table card container styles - check if used
 export const containerCardTable =
@@ -80,7 +81,8 @@ export const containerRowForm = "flex w-full gap-5";
 export const rowForm = "flex w-full";
 export const rowResponsiveForm =
   "flex flex-col min-[420px]:flex-row w-full gap-5 min-[420px]:[&>*]:flex-1";
-
+export const rowContainerBackground =
+  `flex items-center justify-center w-full h-[46px] ${glassmorphism}`;
 /* ===== COL STYLES ===== */
 
 /* ===== CELL STYLES ===== */
@@ -134,19 +136,14 @@ const loaderSpin = "animate-spin rounded-full border-b-[2px]";
 export const loaderSkeleton =
   `bg-[#080708]/50 border-[1px] border-[#242424]/50 animate-pulse`;
 // Spinning loader styles
-export const loaderSpinXsGrey = `${loaderSpin} w-3 h-3 border-stamp-grey`;
-export const loaderSpinSmGrey = `${loaderSpin} w-5 h-5 border-stamp-grey`;
-export const loaderSpinGrey = `${loaderSpin} w-7 h-7 border-stamp-grey`;
-export const loaderSpinLgGrey = `${loaderSpin} w-9 h-9 border-stamp-grey`;
-export const loaderSpinXsPurple = `${loaderSpin} w-3 h-3 border-stamp-purple`;
-export const loaderSpinSmPurple = `${loaderSpin} w-5 h-5 border-stamp-purple`;
-export const loaderSpinPurple = `${loaderSpin} w-7 h-7 border-stamp-purple`;
-export const loaderSpinLgPurple = `${loaderSpin} w-9 h-9 border-stamp-purple`;
-
-/* ===== LEGACY STYLES - @baba-check and remove ===== */
-export const modalBgTop =
-  "fixed inset-0 z-50 flex items-start justify-center bg-black bg-opacity-70 backdrop-filter backdrop-blur-md";
-export const modalSearch = "w-[90%] max-w-[600px] mt-[72px] tablet:mt-24";
+export const loaderSpinXsGrey = `${loaderSpin} w-3 h-3 border-color-grey`;
+export const loaderSpinSmGrey = `${loaderSpin} w-5 h-5 border-color-grey`;
+export const loaderSpinGrey = `${loaderSpin} w-7 h-7 border-color-grey`;
+export const loaderSpinLgGrey = `${loaderSpin} w-9 h-9 border-color-grey`;
+export const loaderSpinXsPurple = `${loaderSpin} w-3 h-3 border-color-purple`;
+export const loaderSpinSmPurple = `${loaderSpin} w-5 h-5 border-color-purple`;
+export const loaderSpinPurple = `${loaderSpin} w-7 h-7 border-color-purple`;
+export const loaderSpinLgPurple = `${loaderSpin} w-9 h-9 border-color-purple`;
 
 /* ===== TYPE DEFINITIONS ===== */
 export type LayoutStyles = {
@@ -170,12 +167,10 @@ export type LayoutStyles = {
   body: string;
   bodyTool: string;
   bodyArticle: string;
-  gapSection: string;
-  gapSectionSlim: string;
-  gapGrid: string;
 
   // Container styles
   containerBackground: string;
+  containerGap: string;
   containerDetailImage: string;
   containerStickyBottom: string;
   containerCard: string;
@@ -219,11 +214,6 @@ export type LayoutStyles = {
   loaderSkeletonMd: string;
   loaderSkeletonLg: string;
   loaderSkeletonFull: string;
-
-  // Modal styles
-  modalBgCenter: string;
-  modalBgTop: string;
-  modalSearch: string;
 };
 
 /* ===== ALIGNMENT UTILITIES ===== */

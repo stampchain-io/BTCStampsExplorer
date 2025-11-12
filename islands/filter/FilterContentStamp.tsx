@@ -991,7 +991,8 @@ export const FilterContentStamp = ({
                 size="smR"
                 spacing="evenFullwidth"
                 disabledOptions={["atomics"]}
-                color="greyDark"
+                alwaysSelectedOptions={["dispensers"]}
+                color="grey"
               />
             </div>
 
@@ -1082,7 +1083,8 @@ export const FilterContentStamp = ({
                 size="smR"
                 spacing="evenFullwidth"
                 disabledOptions={["atomics"]}
-                color="greyDark"
+                alwaysSelectedOptions={["dispensers"]}
+                color="grey"
               />
             </div>
 

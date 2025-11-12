@@ -93,12 +93,12 @@ Deno.test("notificationUtils - mockShowNotification button styling", () => {
 
   // Check that button class contains expected styling keywords
   assert(
-    buttonClass.includes("border-stamp-purple"),
-    "Should have stamp-purple border",
+    buttonClass.includes("border-color-purple-semilight"),
+    "Should have color-purple-semilight border",
   );
   assert(
-    buttonClass.includes("text-stamp-purple"),
-    "Should have stamp-purple text",
+    buttonClass.includes("text-color-purple-semilight"),
+    "Should have color-purple-semilight text",
   );
   assert(buttonClass.includes("hover:"), "Should have hover states");
   assert(

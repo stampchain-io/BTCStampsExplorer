@@ -1,11 +1,11 @@
 /* ===== HOW-TO PAGE ===== */
-import { body, containerBackground, gapGrid, gapSectionSlim } from "$layout";
+import { body, containerBackground, containerGap } from "$layout";
 import { headingGrey, subtitleGrey, text, textLg, titleGreyLD } from "$text";
 
 /* ===== PAGE COMPONENT ===== */
 export default function HowToPage() {
   return (
-    <div class={`${body} ${gapSectionSlim}`}>
+    <div class={`${body} ${containerGap}`}>
       {/* ===== INTRODUCTION SECTION ===== */}
       <section class={containerBackground}>
         <h1 class={titleGreyLD}>HOW-TO</h1>
@@ -30,7 +30,7 @@ export default function HowToPage() {
       {/* ===== LEATHER WALLET CREATION GUIDE ===== */}
       <section class={containerBackground}>
         <div
-          class={`grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 ${gapGrid}`}
+          class={`grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 ${containerGap}`}
         >
           <img
             src="/img/how-tos/createleatherwallet/00.png"
@@ -61,7 +61,7 @@ export default function HowToPage() {
       {/* ===== LEATHER WALLET CONNECTION GUIDE ===== */}
       <section class={containerBackground}>
         <div
-          class={`grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 ${gapGrid}`}
+          class={`grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 ${containerGap}`}
         >
           <img
             src="/img/how-tos/connectleatherwallet/00.png"
@@ -92,7 +92,7 @@ export default function HowToPage() {
       {/* ===== TOKEN DEPLOYMENT GUIDE ===== */}
       <section class={containerBackground}>
         <div
-          class={`grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 ${gapGrid}`}
+          class={`grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 ${containerGap}`}
         >
           <img
             src="/img/how-tos/deploy/00.png"
@@ -123,7 +123,7 @@ export default function HowToPage() {
       {/* ===== TOKEN MINTING GUIDE ===== */}
       <section class={containerBackground}>
         <div
-          class={`grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 ${gapGrid}`}
+          class={`grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 ${containerGap}`}
         >
           <img
             src="/img/how-tos/mintsrc20/00.png"
@@ -153,7 +153,7 @@ export default function HowToPage() {
       {/* ===== CREATE A STAMP GUIDE ===== */}
       <section class={containerBackground}>
         <div
-          class={`grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 ${gapGrid}`}
+          class={`grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 ${containerGap}`}
         >
           <img
             src="/img/how-tos/stamping/00.png"

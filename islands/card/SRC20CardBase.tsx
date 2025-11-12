@@ -1,7 +1,7 @@
 /* ===== SRC20 CARD BASE COMPONENT ===== */
 /*@baba-check styles*/
 import { cellAlign } from "$components/layout/types.ts";
-import { shadowGlowPurple } from "$layout";
+import { glassmorphism, shadowGlowPurple } from "$layout";
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { getSRC20ImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
 import type { SRC20CardBaseProps } from "$types/ui.d.ts";
@@ -71,8 +71,8 @@ export function SRC20CardBase({
                     {text && (
                       <span
                         class={isHovered
-                          ? "text-stamp-purple-bright"
-                          : "gray-gradient1"}
+                          ? "text-color-purple-light"
+                          : "color-grey-gradientDL"}
                       >
                         {text.toUpperCase()}
                       </span>
@@ -101,7 +101,7 @@ const SocialLinks = ({ src20 }: { src20: SRC20Row }) => {
           name="email"
           weight="normal"
           size="xxs"
-          color="grey"
+          color="greyLight"
           href={src20.email}
           target="_blank"
         />
@@ -112,7 +112,7 @@ const SocialLinks = ({ src20 }: { src20: SRC20Row }) => {
           name="website"
           weight="normal"
           size="xxs"
-          color="grey"
+          color="greyLight"
           href={src20.web}
           target="_blank"
         />
@@ -123,7 +123,7 @@ const SocialLinks = ({ src20 }: { src20: SRC20Row }) => {
           name="telegram"
           weight="normal"
           size="xxs"
-          color="grey"
+          color="greyLight"
           href={src20.tg}
         />
       )}
@@ -133,7 +133,7 @@ const SocialLinks = ({ src20 }: { src20: SRC20Row }) => {
           name="twitter"
           weight="normal"
           size="xxs"
-          color="grey"
+          color="greyLight"
           href={src20.x}
           target="_blank"
         />

@@ -3,6 +3,7 @@ import type { SRC20OverviewContentProps } from "$types/ui.d.ts";
 import { useState } from "preact/hooks";
 // import type { SRC20Row } from "$types/src20.d.ts"; // Removed unused import
 import { SRC20OverviewHeader } from "$header";
+import { glassmorphismL2 } from "$layout";
 import { SRC20Gallery } from "$section";
 import {
   createFreshPaginationHandler,

@@ -1,5 +1,5 @@
 /* ===== ARTICLE COMPONENT ===== */
-import { body, bodyArticle, gapSectionSlim } from "$layout";
+import { body, bodyArticle, containerGap } from "$layout";
 import { ArticlesOverview } from "$section";
 import { headingGrey, subtitleGrey, text, titleGreyLD } from "$text";
 import type { ArticleProps } from "$types/ui.d.ts";
@@ -12,7 +12,7 @@ export function Article(
 ) {
   /* ===== COMPONENT RENDER ===== */
   return (
-    <div class={`${body} ${gapSectionSlim}`}>
+    <div class={`${body} ${containerGap}`}>
       <div class={bodyArticle}>
         {/* ===== MAIN CONTENT SECTION ===== */}
         <section>
@@ -38,7 +38,7 @@ export function Article(
           {/* ===== IMPORTANT NOTES SECTION ===== */}
           {importantNotes?.length > 0 && (
             <div class="mt-0">
-              <p class={`${headingGrey} !text-stamp-grey-light mb-0`}>
+              <p class={`${headingGrey} !text-color-grey-light mb-0`}>
                 IMPORTANT
               </p>
               {importantNotes.map((note: string, index: number) => (

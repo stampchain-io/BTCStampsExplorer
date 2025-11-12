@@ -12,6 +12,7 @@ import { openModal } from "$islands/modal/states.ts";
 import {
   bodyTool,
   containerBackground,
+  containerGap,
   glassmorphismL2Hover,
   transitionAll,
 } from "$layout";
@@ -205,8 +206,10 @@ export function SRC101RegisterTool({
   /* ===== CONFIG CHECK ===== */
   if (!config) {
     return (
-      <div class={bodyTool}>
-        <h1 class={`${titleGreyLD} mx-auto mb-4`}>REGISTER</h1>
+      <div class={`${bodyTool} ${containerGap}`}>
+        <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
+          REGISTER
+        </h1>
         <RegisterToolSkeleton />
       </div>
     );
@@ -267,8 +270,10 @@ export function SRC101RegisterTool({
 
   /* ===== COMPONENT RENDER ===== */
   return (
-    <div class={bodyTool}>
-      <h1 class={`${titleGreyLD} mx-auto mb-4`}>REGISTER</h1>
+    <div class={`${bodyTool} ${containerGap}`}>
+      <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
+        REGISTER
+      </h1>
 
       <form
         class={`${containerBackground} gap-5 mb-6 relative z-dropdown`}
@@ -357,7 +362,7 @@ export function SRC101RegisterTool({
         <div class="flex flex-row justify-between w-full">
           <div class="flex flex-col justify-center items-start">
             {/* message - default:noDisplay / display on user input & onClick - either already registered or available */}
-            <h6 class="font-medium text-sm text-stamp-grey">
+            <h6 class="font-medium text-sm text-color-grey">
               {formState.toAddress && checkStatus
                 ? isExist
                   ? `${
@@ -372,7 +377,7 @@ export function SRC101RegisterTool({
           <div class="flex flex-col items-end">
             <Button
               type="button"
-              variant="glassmorphism"
+              variant="outline"
               color="grey"
               size="mdR"
               onClick={checkAvailability}

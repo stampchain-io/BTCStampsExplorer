@@ -64,11 +64,24 @@ export const HoldersPieChart = ({ holders: rawHolders }: PieChartProps) => {
           },
           tooltip: {
             enabled: true,
-            backgroundColor: "#000000BF",
-            titleColor: "#CCCCCC",
-            bodyColor: "#CCCCCC",
             position: "nearest" as const,
             yAlign: "bottom" as const,
+            backgroundColor: "#0d0a0dbf",
+            borderColor: "#303030",
+            borderWidth: 1,
+            cornerRadius: 12,
+            padding: {
+              top: 12,
+              bottom: 12,
+              left: 16,
+              right: 16,
+            },
+            titleColor: "#fff8f0",
+            bodyColor: "#d8d2ca",
+            usePointStyle: true,
+            boxWidth: 10,
+            boxHeight: 10,
+            boxPadding: 8,
             callbacks: {
               label: (context: any) => {
                 const holder = holders[context.dataIndex];
@@ -86,7 +99,9 @@ export const HoldersPieChart = ({ holders: rawHolders }: PieChartProps) => {
       data: {
         labels: holders.map((h: any) => h.address || "Unknown"),
         datasets: [{
-          borderColor: [...Array(holders.length)].fill("#220033"),
+          borderColor: [...Array(holders.length)].fill(
+            "#0d0a0dbf",
+          ),
           label: "Graph Holder",
           data: holders.map((holder: any) => Number(holder.amt)),
           backgroundColor: generateColors(holders.length),

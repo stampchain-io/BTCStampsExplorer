@@ -1,7 +1,7 @@
 /* ===== NOT IN USE ===== */
 import { Button } from "$button";
 import { Icon } from "$icon";
-import { containerBackground, containerColData } from "$layout";
+import { containerBackground, containerColData, glassmorphism } from "$layout";
 import type { WalletData } from "$lib/types/index.d.ts";
 import type { WalletOverviewInfo } from "$lib/types/wallet.d.ts";
 import {
@@ -158,7 +158,7 @@ function WalletOverview(
               name="copy"
               weight="normal"
               size="mdR"
-              color="grey"
+              color="greyLight"
               onClick={copy}
             />
             <div
@@ -226,7 +226,7 @@ function DispenserStats({
         </p>
 
         {stampData.cpid && (
-          <p class="-mt-1 pb-1 text-base mobileLg:text-lg font-bold text-stamp-grey-darker block">
+          <p class="-mt-1 pb-1 text-base mobileLg:text-lg font-bold text-color-grey-semidark block">
             {stampData.cpid}
           </p>
         )}
@@ -234,7 +234,7 @@ function DispenserStats({
         <div class="flex flex-col items-start pt-1.5 mobileLg:pt-3">
           <p class={labelSm}>BY</p>
           <a
-            class="text-sm mobileLg:text-base font-black gray-gradient3-hover -mt-1"
+            class="text-sm mobileLg:text-base font-black color-grey-gradientLD-hover -mt-1"
             href={`/wallet/${stampData.creator}`}
             target="_parent"
           >

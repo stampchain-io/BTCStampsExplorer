@@ -103,7 +103,7 @@ export function WalletProvider(
       {/* ===== PROVIDER NAME ===== */}
       <h6
         class={`font-extrabold text-lg uppercase tracking-wide ${
-          isHovered ? "text-stamp-purple-bright" : "gray-gradient3"
+          isHovered ? "text-color-purple-light" : "color-grey-gradientLD"
         }`}
       >
         {providerInfo.name}

@@ -2,6 +2,7 @@
 /* Specialized version of StampCard for wallet pages showing user-specific details */
 import { Icon, LoadingIcon, PlaceholderImage } from "$icon";
 import StampTextContent from "$islands/content/stampDetailContent/StampTextContent.tsx";
+import { glassmorphismL2, shadowGlowPurple } from "$layout";
 import type { WalletStampCardProps } from "$types/ui.d.ts";
 import { VNode } from "preact";
 import { memo } from "preact/compat";
@@ -246,7 +247,7 @@ const WalletStampCardComponent = (
                 weight="bold"
                 size="xsR"
                 color="custom"
-                className="relative z-10 fill-stamp-grey group-hover/button:fill-stamp-purple-bright"
+                className="relative z-10 [&_path]:fill-color-grey-dark [&_path]:group-hover/button:fill-color-purple-light transition-all duration-200"
               />
             </button>
           </div>
@@ -382,19 +383,19 @@ const WalletStampCardComponent = (
           p-stamp-card mobileLg:p-3
           rounded-2xl transition-all
           w-full h-full
-          hover:border-stamp-purple-bright hover:shadow-stamp hover:border-solid border-2 border-transparent
-          bg-stamp-card-bg
+          hover:border-color-purple-light ${shadowGlowPurple} hover:border-solid border-2 border-transparent
+           ${glassmorphismL2}
         `}
       >
         {/* ===== WALLET INDICATOR (ATOMIC ICON) ===== */}
         {fromPage && fromPage === "wallet" && isAtomicIconVisible(stamp) && (
-          <div class="absolute top-0 right-0 w-[31px] h-[31px] z-10 rounded-[3px] bg-[#1F002E] p-[3px] desktop:block hidden">
+          <div class="absolute top-0 right-0 w-[31px] h-[31px] z-10 rounded-[3px] bg-color-background p-[3px] desktop:block hidden">
             <Icon
               type="icon"
               name="atom"
               weight="normal"
               size="xs"
-              color="grey"
+              color="greyLight"
             />
           </div>
         )}

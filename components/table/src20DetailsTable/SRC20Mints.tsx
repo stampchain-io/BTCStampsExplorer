@@ -141,7 +141,7 @@ export function SRC20MintsTable(
                 <td
                   class={`${
                     cellAlign(4, headers?.length ?? 0)
-                  } ${cellRightL2Detail} text-stamp-grey`}
+                  } ${cellRightL2Detail} text-color-grey`}
                 >
                   {mint.block_index.toLocaleString()}
                 </td>

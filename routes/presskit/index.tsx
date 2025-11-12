@@ -4,10 +4,10 @@ export default function PressKit() {
   return (
     <>
       <Micro5FontLoader />
-      <div class="text-[#CCCCCC] flex flex-col gap-16 tablet:gap-36 py-24 tablet:py-48">
+      <div class="text-color-grey-semilight flex flex-col gap-16 tablet:gap-36 py-24 tablet:py-48">
         <section class="text-center max-w-full mx-auto">
           <h1 class="text-3xl tablet:text-6xl font-bold">
-            <span class="text-4xl tablet:text-7xl font-black gray-gradient1">
+            <span class="text-4xl tablet:text-7xl font-black color-grey-gradientDL">
               PRESS KIT
             </span>
             <br />
@@ -18,7 +18,7 @@ export default function PressKit() {
         <section class="flex flex-col tablet:flex-row gap-6 tablet:gap-12">
           <div class="flex flex-col gap-6 tablet:gap-12 w-full tablet:w-1/2">
             <div>
-              <h1 class="text-3xl tablet:text-6xl font-black gray-gradient4 mb-2">
+              <h1 class="text-3xl tablet:text-6xl font-black color-grey-gradientLD mb-2">
                 BITCOIN STAMPS
               </h1>
               <h2 class="text-2xl tablet:text-5xl font-extralight mb-3">
@@ -83,13 +83,13 @@ export default function PressKit() {
 
             <button
               type="button"
-              class="bg-[#999999] text-[#080808] text-xl font-extrabold rounded-md w-[160px] h-[60px]"
+              class="bg-color-grey text-color-background text-xl font-extrabold rounded-md w-[160px] h-[60px]"
             >
               DOWNLOAD
             </button>
           </div>
 
-          <div class="text-[#FFA100] flex flex-col items-center tablet:items-end gap-3 tablet:gap-6 w-full tablet:w-1/2 font-micro-5">
+          <div class="text-color-orange-light flex flex-col items-center tablet:items-end gap-3 tablet:gap-6 w-full tablet:w-1/2 font-micro-5">
             <p class="text-4xl tablet:text-7xl">BITCOIN STAMPS</p>
             <p class="text-6xl tablet:text-9xl">STAMPS</p>
             <div class="flex gap-3 tablet:gap-6">
@@ -113,7 +113,7 @@ export default function PressKit() {
         <section class="flex flex-col tablet:flex-row gap-6 tablet:gap-12">
           <div class="flex flex-col gap-6 tablet:gap-12 w-full tablet:w-1/2">
             <div>
-              <h1 class="text-3xl tablet:text-6xl font-black gray-gradient4 mb-2">
+              <h1 class="text-3xl tablet:text-6xl font-black color-grey-gradientLD mb-2">
                 STAMPCHAIN
               </h1>
               <h2 class="text-2xl tablet:text-5xl font-extralight mb-3">
@@ -173,7 +173,7 @@ export default function PressKit() {
               />
               <button
                 type="button"
-                class="bg-[#999999] text-[#080808] text-xl font-extrabold rounded-md w-[160px] h-[60px]"
+                class="bg-color-grey text-color-background text-xl font-extrabold rounded-md w-[160px] h-[60px]"
               >
                 DOWNLOAD
               </button>
@@ -181,10 +181,10 @@ export default function PressKit() {
           </div>
 
           <div class="flex flex-col items-center tablet:items-end gap-6 tablet:gap-12 w-full tablet:w-1/2">
-            <p class="purple-gradient2 text-4xl tablet:text-7xl font-black italic px-2">
+            <p class="color-purple-gradientDL text-4xl tablet:text-7xl font-black italic px-2">
               STAMPCHAIN
             </p>
-            <p class="purple-gradient2 text-4xl tablet:text-7xl font-black italic px-2">
+            <p class="color-purple-gradientLD text-4xl tablet:text-7xl font-black italic px-2">
               STAMPCHAIN<span class="font-extralight">.IO</span>
             </p>
             <div class="flex gap-6">
@@ -202,31 +202,31 @@ export default function PressKit() {
 
         <section class="flex flex-col gap-10">
           <div class="flex gap-10">
-            <div class="bg-[#D4D4D4] rounded-md p-6 flex gap-6">
-              <div class="bg-[#220033] w-12 h-12 rounded-[3px]" />
-              <div class="bg-[#440066] w-12 h-12 rounded-[3px]" />
-              <div class="bg-[#660099] w-12 h-12 rounded-[3px]" />
-              <div class="bg-[#8800CC] w-12 h-12 rounded-[3px]" />
-              <div class="bg-[#AA00FF] w-12 h-12 rounded-[3px]" />
+            <div class="bg-white rounded-md p-6 flex gap-6">
+              <div class="bg-color-purple-dark w-12 h-12 rounded-[3px]" />
+              <div class="bg-color-purple-semidark w-12 h-12 rounded-[3px]" />
+              <div class="bg-color-purple w-12 h-12 rounded-[3px]" />
+              <div class="bg-color-purple-semilight w-12 h-12 rounded-[3px]" />
+              <div class="bg-color-purple-light w-12 h-12 rounded-[3px]" />
             </div>
-            <div class="bg-[#D4D4D4] rounded-md p-6 flex gap-6">
-              <div class="bg-[#0A000F] w-12 h-12 rounded-[3px]" />
-              <div class="bg-[#14001F] w-12 h-12 rounded-[3px]" />
-              <div class="bg-[#1F002E] w-12 h-12 rounded-[3px]" />
+            <div class="bg-white rounded-md p-6 flex gap-6">
+              <div class="bg-white w-12 h-12 rounded-[3px]" />
+              <div class="bg-white w-12 h-12 rounded-[3px]" />
+              <div class="bg-white w-12 h-12 rounded-[3px]" />
             </div>
           </div>
           <div class="flex gap-10">
-            <div class="bg-[#D4D4D4] rounded-md p-6 flex gap-6">
-              <div class="bg-[#333333] w-12 h-12 rounded-[3px]" />
-              <div class="bg-[#666666] w-12 h-12 rounded-[3px]" />
-              <div class="bg-[#999999] w-12 h-12 rounded-[3px]" />
-              <div class="bg-[#CCCCCC] w-12 h-12 rounded-[3px]" />
-              <div class="bg-[#FFFFFF] w-12 h-12 rounded-[3px]" />
+            <div class="bg-white rounded-md p-6 flex gap-6">
+              <div class="bg-color-grey-dark w-12 h-12 rounded-[3px]" />
+              <div class="bg-color-grey-semidark w-12 h-12 rounded-[3px]" />
+              <div class="bg-color-grey w-12 h-12 rounded-[3px]" />
+              <div class="bg-color-grey-light w-12 h-12 rounded-[3px]" />
+              <div class="bg-white w-12 h-12 rounded-[3px]" />
             </div>
-            <div class="bg-[#D4D4D4] rounded-md p-6 flex gap-6">
-              <div class="bg-[#080808] w-12 h-12 rounded-[3px]" />
-              <div class="bg-[#0F0F0F] w-12 h-12 rounded-[3px]" />
-              <div class="bg-[#171717] w-12 h-12 rounded-[3px]" />
+            <div class="bg-white rounded-md p-6 flex gap-6">
+              <div class="bg-color-background w-12 h-12 rounded-[3px]" />
+              <div class="bg-white w-12 h-12 rounded-[3px]" />
+              <div class="bg-white w-12 h-12 rounded-[3px]" />
             </div>
           </div>
         </section>

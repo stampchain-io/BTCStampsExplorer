@@ -165,7 +165,7 @@ export function StampTransfersTable(
                 <td
                   class={`${
                     cellAlign(4, headers?.length ?? 0)
-                  } ${cellRightL2Detail} text-stamp-grey`}
+                  } ${cellRightL2Detail} text-color-grey`}
                 >
                   {send.block_time
                     ? formatDate(new Date(send.block_time), {

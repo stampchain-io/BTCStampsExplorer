@@ -28,22 +28,16 @@ export interface ButtonVariants {
   base: string;
   variant: Record<
     | "text"
-    | "glassmorphism"
-    | "glassmorphismColor"
-    | "glassmorphismSelected"
-    | "glassmorphismDeselected"
-    | "flat"
     | "outline"
+    | "flat"
     | "flatOutline"
     | "outlineFlat"
-    | "outlineGradient",
+    | "custom",
     string
   >;
   color: Record<
     | "grey"
-    | "greyDark"
     | "purple"
-    | "purpleDark"
     | "test"
     | "custom",
     string
@@ -74,7 +68,6 @@ export interface ButtonVariants {
     loading: string;
     active: string;
   };
-  spinner: string;
 }
 
 /* ===== BUTTON STYLE DEFINITIONS ===== */
@@ -96,12 +89,11 @@ export const buttonStyles: ButtonVariants = {
     inline-flex items-center justify-center
     rounded-full border-[1px]
     font-semibold tracking-wide
-    ${transitionColors}
-    cursor-pointer
+    ${transitionColors} cursor-pointer
   `,
 
   /* ===== VARIANT STYLES  ===== */
-  /* If the glassmorphism/Color variants are changed then the ToggleButton.tsx file must be update too */
+  /* If the outline/flat variants are changed then the SelectorButtons.tsx and ToggleButton.tsx files must be update too */
   variant: {
     text: `
       !items-start !justify-start !h-auto
@@ -159,63 +151,51 @@ export const buttonStyles: ButtonVariants = {
       hover:border-[var(--color-light)]
     `,
     outline: `
-      bg-transparent border-[var(--color-dark)] text-[var(--color-text)]
-      hover:border-[var(--color-light)] hover:text-[var(--color-text-hover)]
+      ${baseOutline} ${shadowL2}
+    `,
+    flat: `
+      ${baseFlat} ${shadowL2}
     `,
     flatOutline: `
-      bg-gradient-to-br from-[var(--color-light)] to-[var(--color-dark)]
-      border-[var(--color-dark)] text-black
-      hover:bg-gradient-to-br hover:from-transparent hover:to-transparent
-      hover:border-[var(--color-dark)] hover:text-[var(--color-text-hover)]
+      ${baseFlat} ${shadowL2}
+      !items-center !justify-center
+      hover:!bg-[linear-gradient(to_bottom_right,var(--color-background),var(--color-background),var(--color-background),var(--color-background),var(--color-background))]
+      hover:!border-[var(--color-button-semidark)]
+      hover:!text-[var(--color-button-semidark)] hover:!opacity-90
     `,
     outlineFlat: `
-      bg-transparent border-[var(--color-dark)] text-[var(--color-text)]
-      hover:bg-gradient-to-br hover:from-[var(--color-light)] hover:to-[var(--color-dark)] hover:border-[var(--color-dark)] hover:text-black
+      ${baseOutline} ${shadowL2}
+      !items-center !justify-center
+      hover:!bg-[linear-gradient(to_bottom_right,var(--color-button-light),var(--color-button-semilight),var(--color-button),var(--color-button-semidark),var(--color-button-dark))]
+      hover:!border-[var(--color-button-dark)]
+      hover:!text-color-background hover:!opacity-90
     `,
+    custom: `${shadowL2}`,
   },
 
   /* ===== COLOR STYLES ===== */
+  /* Must use CSS variables, since Tailwind CSS definitions are utility classes and won't work */
   color: {
     grey: `
-      [--color-dark:#CCCCCC66]
-      [--color-medium:#CCCCCC99]
-      [--color-light:#CCCCCCCC]
-      [--color-border:#66666666]
-      [--color-border-hover:#666666CC]
-      [--color-text:#666666]
-      [--color-text-hover:#999999]
-    `,
-    greyDark: `
-      [--color-dark:#BBBBBB66]
-      [--color-medium:#BBBBBB99]
-      [--color-light:#BBBBBBCC]
-      [--color-border:#55555566]
-      [--color-border-hover:#555555CC]
-      [--color-text:#555555]
-      [--color-text-hover:#888888]
+      [--color-button-dark:var(--color-grey-dark)]
+      [--color-button-semidark:var(--color-grey-semidark)]
+      [--color-button:var(--color-grey)]
+      [--color-button-semilight:var(--color-grey-semilight)]
+      [--color-button-light:var(--color-grey-light)]
     `,
     purple: `
-      [--color-dark:#AA00FF66]
-      [--color-medium:#AA00FF99]
-      [--color-light:#AA00FFCC]
-      [--color-border:#66009966]
-      [--color-border-hover:#660099CC]
-      [--color-text:#660099]
-      [--color-text-hover:#8800CC]
-    `,
-    purpleDark: `
-      [--color-dark:#9900E666]
-      [--color-medium:#9900E699]
-      [--color-light:#9900E6CC]
-      [--color-border:#55008066]
-      [--color-border-hover:#550080CC]
-      [--color-text:#550080]
-      [--color-text-hover:#7700b3]
+      [--color-button-dark:var(--color-purple-dark)]
+      [--color-button-semidark:var(--color-purple-semidark)]
+      [--color-button:var(--color-purple)]
+      [--color-button-semilight:var(--color-purple-semilight)]
+      [--color-button-light:var(--color-purple-light)]
     `,
     test: `
-      [--color-dark:#00CC0033]
-      [--color-medium:#00CC0066]
-      [--color-light:#CC000033]
+      [--color-button-dark:var(--color-red-dark)]
+      [--color-button-semidark:var(--color-red-semidark)]
+      [--color-button:var(--color-green)]
+      [--color-button-semilight:var(--color-orange-semilight)]
+      [--color-button-light:var(--color-orange-light)]
     `,
     custom: "",
   },
@@ -249,8 +229,8 @@ export const buttonStyles: ButtonVariants = {
   /* ===== STATE STYLES ===== */
   state: {
     disabled: `
-      opacity-50
-      cursor-not-allowed
+      !opacity-60
+      !cursor-not-allowed
       relative
       [&:after]:content-['SOON™']
       [&:after]:absolute [&:after]:inset-0
@@ -261,7 +241,7 @@ export const buttonStyles: ButtonVariants = {
       [&:after]:text-white [&:after]:text-xs [&:after]:font-bold
     `,
     loading: `
-      opacity-70
+      !opacity-60
       cursor-wait
     `,
     active: `
@@ -270,15 +250,6 @@ export const buttonStyles: ButtonVariants = {
       transition-transform
     `,
   },
-
-  /* ===== SPINNER STYLES - @baba - duplicate of loaderSpin in layout/styles.ts ===== */
-  spinner: `
-    animate-spin
-    rounded-full
-    h-5 w-5
-    border-b-[3px]
-    border-[var(--color-light)]
-  `,
 };
 
 /* ===== ADDITIONAL STYLES ===== */
@@ -299,13 +270,13 @@ export const sliderKnob = `
   absolute top-0.5 bottom-0.5 w-full h-[14px] tablet:h-[10px] rounded-full appearance-none bg-transparent pointer-events-none
   [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:pointer-events-auto
   [&::-webkit-slider-thumb]:size-[14px] [&::-webkit-slider-thumb]:tablet:size-[10px]
-  [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-stamp-grey
-  [&::-webkit-slider-thumb]:hover:bg-stamp-grey-light [&::-webkit-slider-thumb]:cursor-grab
+  [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-color-grey
+  [&::-webkit-slider-thumb]:hover:bg-color-grey-light [&::-webkit-slider-thumb]:cursor-grab
   [&::-webkit-slider-thumb]:active:cursor-grabbing
   [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:pointer-events-auto
   [&::-moz-range-thumb]:size-[14px][&::-moz-range-thumb]:tablet:size-[10px]
-  [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-stamp-grey
-  [&::-moz-range-thumb]:hover:bg-stamp-grey-light [&::-moz-range-thumb]:cursor-grab
+  [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-color-grey
+  [&::-moz-range-thumb]:hover:bg-color-grey-light [&::-moz-range-thumb]:cursor-grab
   [&::-moz-range-thumb]:active:cursor-grabbing [&::-moz-range-thumb]:border-0
   `;
 

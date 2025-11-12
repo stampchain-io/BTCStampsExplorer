@@ -364,7 +364,7 @@ function RightPanel(
               name="previewCode"
               weight="normal"
               size="mdR"
-              color="grey"
+              color="greyLight"
               onClick={() => {
                 setIsCodeTooltipVisible(false);
                 toggleCodeModal();
@@ -390,7 +390,7 @@ function RightPanel(
             name="previewImageRaw"
             weight="normal"
             size="mdR"
-            color="grey"
+            color="greyLight"
             onClick={() =>
               globalThis.open(
                 `/s/${stamp.cpid}`,
@@ -421,7 +421,7 @@ function RightPanel(
             name="previewImage"
             weight="normal"
             size="mdR"
-            color="grey"
+            color="greyLight"
             onClick={() => {
               setIsFullscreenTooltipVisible(false);
               toggleFullScreenModal();
@@ -728,7 +728,7 @@ export function StampImage(
 
   if (isLoadingOrValidating) {
     return (
-      <div class={`${body} ${gapSectionSlim}`}>
+      <div class={`${body} ${containerGap}`}>
         <div className={`${containerDetailImage} ${containerClassName || ""}`}>
           <div className="stamp-container">
             <LoadingIcon containerClassName="rounded-2xl" />
@@ -900,7 +900,7 @@ export function StampImage(
         !isLibraryFile && (
           flag
             ? (
-              <div class={`${body} ${gapSectionSlim}`}>
+              <div class={`${body} ${containerGap}`}>
                 <div
                   className={`${containerDetailImage} ${
                     containerClassName || ""
