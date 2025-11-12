@@ -32,6 +32,11 @@ export interface ButtonVariants {
     | "flat"
     | "flatOutline"
     | "outlineFlat"
+    | "glassmorphism"
+    | "glassmorphismColor"
+    | "glassmorphismSelected"
+    | "glassmorphismDeselected"
+    | "outlineGradient"
     | "custom",
     string
   >;

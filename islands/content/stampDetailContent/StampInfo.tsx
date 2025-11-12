@@ -4,7 +4,12 @@ import { Button } from "$button";
 import { Icon } from "$icon";
 import BuyStampModal from "$islands/modal/BuyStampModal.tsx";
 import { openModal } from "$islands/modal/states.ts";
-import { body, containerBackground, containerColData } from "$layout";
+import {
+  body,
+  containerBackground,
+  containerColData,
+  gapSectionSlim,
+} from "$layout";
 import type { Src101Detail } from "$lib/types/src101.d.ts";
 import type { StampRow } from "$lib/types/stamp.d.ts";
 import { calculateTransactionSize } from "$lib/utils/data/identifiers/identifierUtils.ts";
@@ -808,7 +813,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                       name="dispenserListings"
                       weight="normal"
                       size="mdR"
-                      color="greyLight"
+                      color="grey"
                       ariaLabel="Listings"
                       onClick={() => setShowListings(!showListings)}
                       className="pb-0.5"

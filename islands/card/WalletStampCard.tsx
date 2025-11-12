@@ -395,7 +395,7 @@ const WalletStampCardComponent = (
               name="atom"
               weight="normal"
               size="xs"
-              color="greyLight"
+              color="grey"
             />
           </div>
         )}

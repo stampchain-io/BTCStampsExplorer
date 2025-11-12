@@ -158,7 +158,7 @@ function WalletOverview(
               name="copy"
               weight="normal"
               size="mdR"
-              color="greyLight"
+              color="grey"
               onClick={copy}
             />
             <div

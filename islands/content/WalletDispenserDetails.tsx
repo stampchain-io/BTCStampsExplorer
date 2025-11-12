@@ -181,7 +181,7 @@ function StampStats({
                 name="divisible"
                 weight="normal"
                 size="custom"
-                color="greyLight"
+                color="grey"
                 className="w-[23px] h-[23px]"
               />
               <div
@@ -204,7 +204,7 @@ function StampStats({
                 name="keyburned"
                 weight="normal"
                 size="xs"
-                color="greyLight"
+                color="grey"
               />
               <div
                 className={`${tooltipIcon} ${
@@ -226,7 +226,7 @@ function StampStats({
                 name="locked"
                 weight="normal"
                 size="xs"
-                color="greyLight"
+                color="grey"
               />
               <div
                 className={`${tooltipIcon} ${
@@ -248,7 +248,7 @@ function StampStats({
                 name="unlocked"
                 weight="normal"
                 size="xs"
-                color="greyLight"
+                color="grey"
               />
               <div
                 className={`${tooltipIcon} ${
@@ -380,7 +380,7 @@ function DispenserStats({
         <div className="flex justify-end pt-1.5">
           <Button
             variant="outline"
-            color="purpleLight"
+            color="purple"
             size="md"
             onClick={handleOpenBuyModal}
           >

@@ -11,7 +11,12 @@ export type ButtonVariant =
   | "outline"
   | "flat"
   | "flatOutline"
-  | "outlineFlat";
+  | "outlineFlat"
+  | "glassmorphism"
+  | "glassmorphismColor"
+  | "glassmorphismSelected"
+  | "glassmorphismDeselected"
+  | "outlineGradient";
 
 /**
  * Button color types - standardized theme colors
