@@ -1,5 +1,4 @@
 /* ===== DONATE STAMP MODAL COMPONENT ===== */
-import { sliderBar, sliderKnob } from "$button";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
 import type { DonateStampModalProps } from "$types/ui.d.ts";

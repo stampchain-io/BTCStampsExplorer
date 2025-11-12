@@ -9,7 +9,7 @@ import { ProgressiveEstimationIndicator } from "$components/indicators/Progressi
 import { MaraStatusLink } from "$components/mara/MaraStatusLink.tsx";
 import { MaraModeWarningModal } from "$components/modals/MaraModeWarningModal.tsx";
 import { MaraServiceUnavailableModal } from "$components/modals/MaraServiceUnavailableModal.tsx";
-import { InputField, stateDisabled } from "$form";
+import { InputField } from "$form";
 import { Icon } from "$icon";
 import { StampingToolSkeleton } from "$indicators";
 import PreviewImageModal from "$islands/modal/PreviewImageModal.tsx";
@@ -43,7 +43,6 @@ import {
   StatusMessages,
   tooltipButton,
   tooltipButtonInCollapsible,
-  tooltipImage,
 } from "$notification";
 import { FeeCalculatorBase } from "$section";
 import { labelLg, subtitleGrey, titleGreyLD } from "$text";

@@ -385,7 +385,7 @@ export default function DonateCta() {
                   name="donate"
                   weight="normal"
                   size="sm"
-                  color="purpleLight"
+                  color="purple"
                   onClick={() => {
                     setIsReceiveTooltipVisible(false);
                     handleOpenReceiveModal();

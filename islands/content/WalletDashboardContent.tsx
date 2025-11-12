@@ -7,7 +7,7 @@ import { SettingsButton } from "$islands/button/SettingsButton.tsx";
 import { SortButton } from "$islands/button/SortButton.tsx";
 import FreshSRC20Gallery from "$islands/section/gallery/FreshSRC20Gallery.tsx";
 import { FreshStampGallery } from "$islands/section/gallery/FreshStampGallery.tsx";
-import { glassmorphism, shadowGlowPurple } from "$layout";
+import { shadowGlowPurple } from "$layout";
 import {
   createPaginationHandler,
   getCurrentUrl,

@@ -4,7 +4,7 @@ import { Icon } from "$icon";
 import { containerBackground } from "$layout";
 import {
   copyright,
-  logoPurpleLD,
+  logoPurpleDL,
   navLinkTransparentPurple,
   overlayPurple,
   tagline,

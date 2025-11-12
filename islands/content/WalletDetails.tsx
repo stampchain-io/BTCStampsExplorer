@@ -1,7 +1,7 @@
 /* ===== NOT IN USE ===== */
 import { Button } from "$button";
 import { Icon } from "$icon";
-import { containerBackground, containerColData, glassmorphism } from "$layout";
+import { containerBackground, containerColData } from "$layout";
 import type { WalletData } from "$lib/types/index.d.ts";
 import type { WalletOverviewInfo } from "$lib/types/wallet.d.ts";
 import {

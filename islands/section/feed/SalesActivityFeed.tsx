@@ -1,6 +1,5 @@
 /* ===== SALES ACTIVITY FEED COMPONENT ===== */
 import { Icon, LoadingIcon } from "$icon";
-import { glassmorphismL2 } from "$layout";
 import {
   abbreviateAddress,
   formatBTCAmount,

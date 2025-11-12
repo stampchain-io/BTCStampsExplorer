@@ -2,7 +2,6 @@
 import { Icon } from "$icon";
 import { ActivityBadge } from "$islands/badge/index.ts";
 import { StampCard } from "$islands/card/StampCard.tsx";
-import { glassmorphismL2, shadowGlowPurple } from "$layout";
 import { AccessibilityUtils } from "$lib/utils/ui/accessibility/accessibilityUtils.ts";
 import {
   abbreviateAddress,
