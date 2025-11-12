@@ -3,7 +3,12 @@
 /*@baba-check styles+icon*/
 import { Icon, LoadingIcon, PlaceholderImage } from "$icon";
 import StampTextContent from "$islands/content/stampDetailContent/StampTextContent.tsx";
-import { glassmorphism, glassmorphismL2, transitionColors } from "$layout";
+import {
+  glassmorphism,
+  glassmorphismL2,
+  shadowGlowPurple,
+  transitionColors,
+} from "$layout";
 import {
   abbreviateAddress,
   formatSupplyValue,
