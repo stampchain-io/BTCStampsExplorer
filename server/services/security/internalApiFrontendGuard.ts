@@ -33,6 +33,8 @@ export class InternalApiFrontendGuard {
     const allowedDomains = [
       "stampchain.io",
       "www.stampchain.io",
+      "http://stampchain.io",      // Allow HTTP (load balancer may terminate HTTPS)
+      "http://www.stampchain.io",  // Allow HTTP (load balancer may terminate HTTPS)
       "https://stampchain.io",
       "https://www.stampchain.io"
     ];
