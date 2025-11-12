@@ -5,6 +5,7 @@ import {
   containerBackground,
   glassmorphismL2,
   rowContainerBackground,
+  shadowGlowPurple,
 } from "$layout";
 import { tooltipIcon } from "$notification";
 import {
@@ -16,11 +17,6 @@ import {
   valueSm,
 } from "$text";
 import type { DispenserRow as Dispenser, StampRow } from "$types/stamp.d.ts";
-
-import { PaginationButtons } from "$button";
-import { Icon, LoadingIcon, PlaceholderImage } from "$icon";
-import { SortButton } from "$islands/button/SortButton.tsx";
-import { shadowGlowPurple } from "$layout";
 import type {
   EnhancedWalletContentProps,
   SectionHeaderProps,
@@ -38,7 +34,7 @@ import {
   isBrowser,
   safeNavigate,
 } from "$utils/navigation/freshNavigationUtils.ts";
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 // ===== ADVANCED SORTING IMPORTS =====
 import SortingErrorBoundary from "$islands/sorting/SortingErrorBoundary.tsx";
@@ -346,6 +342,13 @@ function DispenserRow(
     : "w-[78px] h-[78px]";
   const [loading, setLoading] = useState(true);
   const [src, setSrc] = useState<string | undefined>(undefined);
+  const [showCopied, setShowCopied] = useState(false);
+  const [isTooltipVisible, setIsTooltipVisible] = useState(false);
+  const [allowTooltip, setAllowTooltip] = useState(true);
+
+  /* ===== REFS ===== */
+  const copyButtonRef = useRef<HTMLDivElement>(null);
+  const tooltipTimeoutRef = useRef<number | null>(null);
 
   /* ===== IMAGE FETCHING ===== */
   const fetchStampImage = () => {
