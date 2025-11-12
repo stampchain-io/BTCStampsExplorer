@@ -64,17 +64,17 @@ export const inputCheckbox = (
   relative
   size-4 tablet:size-3
   rounded-full
-  border-[1px]
+  border
   cursor-pointer
   transition-colors duration-200
   ${
   checked
     ? canHoverSelected
-      ? "border-stamp-grey-light after:bg-stamp-grey-light group-hover:border-stamp-grey group-hover:after:bg-stamp-grey"
-      : "border-stamp-grey-light after:bg-stamp-grey-light"
+      ? "border-color-grey-light after:bg-color-grey-light group-hover:border-color-grey group-hover:after:bg-color-grey"
+      : "border-color-grey-light after:bg-color-grey-light"
     : canHoverSelected
-    ? "border-stamp-grey group-hover:border-stamp-grey-light"
-    : "border-stamp-grey"
+    ? "border-color-grey group-hover:border-color-grey-light"
+    : "border-color-grey"
 }
     after:content-['']
     after:block
@@ -148,9 +148,9 @@ export const outlineGradient = `
 /* ===== NOT IN USE NOR UPDATED ===== */
 /* ===== LABEL STYLES ===== */
 export const labelBase =
-  "font-medium text-base text-stamp-grey-light cursor-default select-none whitespace-nowrap";
+  "font-medium text-base text-color-grey-light cursor-default select-none whitespace-nowrap";
 export const labelLarge =
-  "font-medium text-lg text-stamp-grey-light cursor-default select-none whitespace-nowrap";
+  "font-medium text-lg text-color-grey-light cursor-default select-none whitespace-nowrap";
 
 /* ===== STATE STYLES ===== */
 export const stateDisabled = "opacity-50 cursor-not-allowed";
@@ -161,7 +161,7 @@ export const stateSuccess = "text-xs border-green-500 focus:border-green-500";
 /* ===== MESSAGE STYLES ===== */
 export const messageError = "text-xs text-red-500 mt-2";
 export const messageSuccess = "text-xs text-green-500 mt-2";
-export const messageHelp = "text-xs text-stamp-grey-darkest mt-1";
+export const messageHelp = "text-xs text-color-grey-dark mt-1";
 /* ===== ===== ===== */
 
 /* ===== TYPE DEFINITIONS ===== */

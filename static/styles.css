@@ -74,11 +74,11 @@ b, strong {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #660099;
+  background: var(--color-purple);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #440066;
+  background: var(--color-purple-dark);
   border-radius: 3px;
 }
 
@@ -87,58 +87,47 @@ b, strong {
   border-radius: 3px;
 }
 
-/* Custom scrollbar styles for specific class */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 28px;
-  height: 20px;
-  border-radius: 0px;
+/* Custom scrollbar colors */
+.scrollbar-background-overlay {
+  @apply [&::-webkit-scrollbar-track]:bg-[var(--color-background)] [&::-webkit-scrollbar-thumb]:bg-[var(--color-grey-dark)] [&::-webkit-scrollbar-thumb]:opacity-50 [&::-webkit-scrollbar-thumb:hover]:bg-[var(--color-grey-semidark)];
 }
 
-@media (max-width: 768px) {
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 17px;
-    height: 14px;
-    border-radius: 0px;
-  }
+.scrollbar-background-layer1 {
+  @apply [&::-webkit-scrollbar-track]:bg-[var(--color-background)] [&::-webkit-scrollbar-thumb]:bg-[var(--color-grey-dark)] [&::-webkit-scrollbar-thumb]:opacity-50 [&::-webkit-scrollbar-thumb:hover]:bg-[var(--color-grey-semidark)];
 }
 
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: #2b0e49;
-  /* Custom track color */
-  padding: 4px;
-  border-radius: 0px;
+.scrollbar-background-layer2 {
+  @apply [&::-webkit-scrollbar]:w-[2px] [&::-webkit-scrollbar-track]:bg-[var(--color-background)] [&::-webkit-scrollbar-thumb]:bg-[var(--color-grey-dark)] [&::-webkit-scrollbar-thumb]:opacity-50 [&::-webkit-scrollbar-thumb:hover]:bg-[var(--color-grey-semidark)];
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #b9b9b9;
-  /* Custom handle color */
-  border-radius: 0px;
-  background-clip: padding-box;
+/* ========================================================================== */
+
+
+/* ================== IMAGE RENDERING STYLES ================== */
+
+.image-rendering-pixelated {
+  position: relative;
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #d9d9d9;
-  /* Custom handle hover color */
+.image-rendering-pixelated::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: var(--conic-pattern);
+  background-size: 4px 4px;
+  border-radius: 1rem;
+  z-index: 1;
 }
 
 .scrollbar-purple {
   @apply [&::-webkit-scrollbar-track]:bg-[#AA00FF] [&::-webkit-scrollbar-thumb]:bg-[#8800CC] [&::-webkit-scrollbar-thumb:hover]:bg-[#660099];
 }
 
-.scrollbar-grey {
-  @apply [&::-webkit-scrollbar-track]:bg-[#CCCCCC] [&::-webkit-scrollbar-thumb]:bg-[#999999] [&::-webkit-scrollbar-thumb:hover]:bg-[#666666];
-}
-
-.scrollbar-black {
-  @apply [&::-webkit-scrollbar-track]:bg-[#111011]/20 [&::-webkit-scrollbar-thumb]:bg-[#666666] [&::-webkit-scrollbar-thumb:hover]:bg-[#999999];
-}
-
-.scrollbar-glassmorphism {
-  @apply [&::-webkit-scrollbar-track]:bg-[#141015] [&::-webkit-scrollbar-thumb]:bg-[#666666]/50 [&::-webkit-scrollbar-thumb:hover]:bg-[#666666];
-}
-
-.scrollbar-glassmorphism-slim {
-  @apply [&::-webkit-scrollbar]:w-[2px] [&::-webkit-scrollbar-track]:bg-[#141015] [&::-webkit-scrollbar-thumb]:bg-[#666666]/50 [&::-webkit-scrollbar-thumb:hover]:bg-[#666666];
+.image-rendering-pixelated img {
+  mix-blend-mode: multiply;
 }
 
 /* ========================================================================== */
@@ -202,8 +191,7 @@ b, strong {
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: repeating-conic-gradient(rgba(128, 128, 128, 0.2) 0% 25%,
-      rgba(128, 128, 128, 0.1) 25% 50%);
+  background-image: var(--conic-pattern);
   background-size: 4px 4px;
   border-radius: 1rem;
   z-index: 0;
@@ -388,7 +376,7 @@ b, strong {
 .animated-underline {
   font-weight: 700;
   text-decoration: none;
-  background-image: linear-gradient(#CCCCCC, #CCCCCC);
+  background-image: linear-gradient(var(--color-grey-semilight), var(--color-grey-semilight));
   background-position: 0% 100%;
   background-repeat: no-repeat;
   background-size: 100% 2px;
@@ -408,14 +396,14 @@ b, strong {
 .animated-underline:hover,
 .animated-underline:focus {
   background-size: 0% 2px;
-  color: #999999;
+  color: var(--color-grey);
 }
 
 /* Animate left to right */
 .animated-underline-thin {
   font-weight: 400;
   text-decoration: none;
-  background-image: linear-gradient(#CCCCCC, #CCCCCC);
+  background-image: linear-gradient(var(--color-grey-semilight), var(--color-grey-semilight));
   background-position: 100% 100%;
   background-repeat: no-repeat;
   background-size: 100% 1px;
@@ -435,7 +423,21 @@ b, strong {
 .animated-underline-thin:hover,
 .animated-underline-thin:focus {
   background-size: 0% 1px;
-  color: #999999;
+  color: var(--color-grey);
+}
+
+/* ========================================================================== */
+
+
+/* ================== MISCELLANEOUS STYLES ================== */
+
+/* Emoji ticker styling for SRC20 cards */
+.emoji-ticker {
+  @apply text-color-purple-light;
+  font-family: system-ui;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
 }
 
 /* ========================================================================== */

@@ -1,6 +1,6 @@
 /* ===== RECENT SALES GALLERY COMPONENT ===== */
 /*@baba-153+154-move Refreshing to ViewAllButton-remove default (not used)*/
-import { containerBackground, loaderSpinXsPurple } from "$layout";
+import { containerBackground, loaderSpinXsGrey } from "$layout";
 import { StampGallery } from "$section";
 import { titleGreyLD } from "$text";
 import type { StampWithEnhancedSaleData } from "$types/marketData.d.ts";
@@ -170,9 +170,8 @@ export function StampSalesGallery({
       </h3>
       <div class="flex flex-col">
         {variant === "home" && filteredStamps.length === 0 && !isLoading && (
-          <div class="text-gray-400 text-center py-8">
-            <p class="text-lg">No hot stamps available at the moment.</p>
-            <p class="text-sm mt-2">Check back soon for trending activity!</p>
+          <div class={`${valueDarkSm} text-center py-8`}>
+            <h6 class="text-lg">NO TRENDING STAMPS AVAILABLE AT THE MOMENT</h6>
           </div>
         )}
         {(filteredStamps.length > 0 || variant !== "home") && (
@@ -180,8 +179,8 @@ export function StampSalesGallery({
         )}
         {isLoading && (
           <div class="flex items-center gap-3 -mt-[29px] mb-[9px]">
-            <div class={loaderSpinXsPurple} />
-            <div class="animate-pulse font-medium text-sm text-stamp-purple">
+            <div class={loaderSpinXsGrey} />
+            <div class="animate-pulse font-medium text-sm text-color-grey">
               REFRESHING
             </div>
           </div>

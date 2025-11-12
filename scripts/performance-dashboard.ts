@@ -540,9 +540,9 @@ class PerformanceDashboard {
             margin-left: 10px;
         }
 
-        .status-healthy { background: #4CAF50; color: white; }
-        .status-warning { background: #FF9800; color: white; }
-        .status-critical { background: #F44336; color: white; }
+        .status-healthy { background: var(--color-green); color: white; }
+        .status-warning { background: var(--color-orange-light); color: white; }
+        .status-critical { background: var(--color-red); color: white; }
 
         .dashboard-grid {
             display: grid;
@@ -609,15 +609,15 @@ class PerformanceDashboard {
             margin-bottom: 10px;
             background: #f8f9fa;
             border-radius: 8px;
-            border-left: 4px solid #4CAF50;
+            border-left: 4px solid var(--color-green);
         }
 
         .endpoint-item.warning {
-            border-left-color: #FF9800;
+            border-left-color: var(--color-orange-light);
         }
 
         .endpoint-item.critical {
-            border-left-color: #F44336;
+            border-left-color: var(--color-red);
         }
 
         .endpoint-info h4 {
@@ -713,12 +713,12 @@ class PerformanceDashboard {
 
         .alert-critical {
             background: #ffebee;
-            border-left-color: #f44336;
+            border-left-color: var(--color-red);
         }
 
         .alert-warning {
             background: #fff3e0;
-            border-left-color: #ff9800;
+            border-left-color: var(--color-orange-light);
         }
 
         .alert-info {
@@ -871,7 +871,7 @@ class PerformanceDashboard {
           ? `
                                 <div class="comparison-details">
                                     <div class="env-comparison">
-                                        <span class="env-label">Dev:</span> 
+                                        <span class="env-label">Dev:</span>
                                         <span class="env-time">${endpoint.devResponseTime}ms</span>
                                         <span class="env-status status-${
             endpoint.devStatus >= 200 && endpoint.devStatus < 300
@@ -880,7 +880,7 @@ class PerformanceDashboard {
           }">${endpoint.devStatus}</span>
                                     </div>
                                     <div class="env-comparison">
-                                        <span class="env-label">Prod:</span> 
+                                        <span class="env-label">Prod:</span>
                                         <span class="env-time">${endpoint.prodResponseTime}ms</span>
                                         <span class="env-status status-${
             endpoint.prodStatus >= 200 && endpoint.prodStatus < 300
@@ -891,7 +891,7 @@ class PerformanceDashboard {
                                     <div class="time-diff">
                                         Δ ${
             Math.abs(endpoint.devResponseTime - endpoint.prodResponseTime)
-          }ms 
+          }ms
                                         (${
             endpoint.devResponseTime < endpoint.prodResponseTime
               ? "Dev faster"

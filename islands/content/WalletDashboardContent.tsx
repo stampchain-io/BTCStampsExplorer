@@ -7,7 +7,7 @@ import { SettingsButton } from "$islands/button/SettingsButton.tsx";
 import { SortButton } from "$islands/button/SortButton.tsx";
 import FreshSRC20Gallery from "$islands/section/gallery/FreshSRC20Gallery.tsx";
 import { FreshStampGallery } from "$islands/section/gallery/FreshStampGallery.tsx";
-import { shadowGlowPurple } from "$layout";
+import { glassmorphism, shadowGlowPurple } from "$layout";
 import {
   createPaginationHandler,
   getCurrentUrl,
@@ -45,7 +45,7 @@ const ItemHeader = ({
   return (
     <div class="flex flex-row justify-between items-center gap-3 w-full relative">
       <div class="flex items-end">
-        <p class="text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-purple-highlight">
+        <p class="text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-extralight text-color-purple-light">
           {title}
         </p>
       </div>
@@ -95,7 +95,7 @@ function DispenserItem({
   /* ===== EMPTY STATE HANDLING ===== */
   if (!dispensers?.length) {
     return (
-      <div class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-text-purple-3 gradient-text">
+      <div class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black color-purple-gradientLD">
         NO LISTINGS FOUND
       </div>
     );
@@ -113,7 +113,7 @@ function DispenserItem({
   if (!openDispensers.length && !closedDispensers.length) {
     return (
       <div>
-        <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-text-purple-3 gradient-text">
+        <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black color-purple-gradientLD">
           NO LISTINGS FOUND
         </h3>
       </div>
@@ -127,7 +127,7 @@ function DispenserItem({
         {/* Open Dispensers Section */}
         {openDispensers.length > 0 && (
           <div id="open-listings-section">
-            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-text-purple-3 gradient-text mb-6">
+            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black color-purple-gradientLD mb-6">
               OPEN LISTINGS
             </h3>
             <div class="flex flex-col gap-6">
@@ -141,7 +141,7 @@ function DispenserItem({
         {/* Closed Dispensers Section */}
         {closedDispensers.length > 0 && (
           <div id="closed-listings-section">
-            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-text-purple-3 gradient-text mb-6">
+            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black color-purple-gradientLD mb-6">
               CLOSED LISTINGS
             </h3>
             <div class="flex flex-col gap-6">
@@ -158,7 +158,7 @@ function DispenserItem({
         {/* Open Dispensers Section */}
         {openDispensers.length > 0 && (
           <div class="mb-8" id="open-listings-section">
-            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-text-purple-3 gradient-text mb-6">
+            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black color-purple-gradientLD mb-6">
               OPEN LISTINGS
             </h3>
             <div class="flex flex-col gap-6">
@@ -172,7 +172,7 @@ function DispenserItem({
         {/* Closed Dispensers Section */}
         {closedDispensers.length > 0 && (
           <div id="closed-listings-section">
-            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-text-purple-3 gradient-text mb-6">
+            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black color-purple-gradientLD mb-6">
               CLOSED LISTINGS
             </h3>
             <div class="flex flex-col gap-6">
@@ -269,7 +269,7 @@ function DispenserRow(
             <div class="relative">
               <a
                 href={`/stamp/${dispenser.stamp.stamp}`}
-                class="!inline-block text-2xl mobileLg:text-4xl font-black purple-gradient3 group-hover:[-webkit-text-fill-color:#AA00FF]"
+                class="!inline-block text-2xl mobileLg:text-4xl font-black color-purple-gradientLD group-hover:[-webkit-text-fill-color:var(--color-purple-light)]"
               >
                 {`#${dispenser.stamp.stamp}`}
               </a>
@@ -278,11 +278,11 @@ function DispenserRow(
 
           <div class="flex justify-between flex-row w-full">
             <p
-              class={`text-base text-stamp-primary font-light text-ellipsis overflow-hidden ${
+              class={`text-base text-color-purple-semilight font-light text-ellipsis overflow-hidden ${
                 view === "mobile" ? "tablet:w-full" : ""
               }`}
             >
-              <span class="font-bold text-stamp-primary text-base mobileLg:text-xl normal-case">
+              <span class="font-bold text-color-purple-semilight text-base mobileLg:text-xl normal-case">
                 {/* Abbreviate origin address differently depending on screen size */}
                 <span class="mobileMd:hidden">
                   {abbreviateAddress(dispenser.origin, 4)}
@@ -302,29 +302,29 @@ function DispenserRow(
                 name="copy"
                 weight="normal"
                 size="xs"
-                color="grey"
+                color="greyLight"
               />
               <Icon
                 type="iconButton"
                 name="history"
                 weight="normal"
                 size="xs"
-                color="grey"
+                color="greyLight"
               />
             </div>
           </div>
           <div class="text-center flex justify-between mt-[6px]">
-            <p class="text-base mobileLg:text-lg text-stamp-grey-darker font-light">
+            <p class="text-base mobileLg:text-lg text-color-grey-semidark font-light">
               GIVE{" "}
-              <span class="font-bold text-stamp-grey-light">
+              <span class="font-bold text-color-grey-semilight">
                 {Number(dispenser.give_quantity).toLocaleString()}
               </span>
             </p>
           </div>
           <div class="flex flex-row justify-between w-full">
-            <p class="text-base mobileLg:text-lg text-stamp-grey-darker font-light">
+            <p class="text-base mobileLg:text-lg text-color-grey-semidark font-light">
               QUANTITY{" "}
-              <span class="font-bold text-stamp-grey-light">
+              <span class="font-bold text-color-grey-semilight">
                 {dispenser.give_remaining === 0
                   ? Number(dispenser.escrow_quantity).toLocaleString()
                   : `${Number(dispenser.give_remaining).toLocaleString()}/${
@@ -333,7 +333,7 @@ function DispenserRow(
               </span>
             </p>
             <p
-              class={`text-stamp-grey-darker text-lg font-light -mt-1 ${
+              class={`text-color-grey-semidark text-lg font-light -mt-1 ${
                 view === "mobile" ? "hidden mobileLg:block" : ""
               }`}
             >
@@ -341,24 +341,24 @@ function DispenserRow(
             </p>
           </div>
           <div class="flex flex-row justify-between w-full">
-            <p class="text-base mobileLg:text-lg text-stamp-grey-darker font-light">
+            <p class="text-base mobileLg:text-lg text-color-grey-semidark font-light">
               PRICE{" "}
-              <span class="font-bold text-stamp-grey-light">
+              <span class="font-bold text-color-grey-semilight">
                 {formatBTCAmount(Number(dispenser.btcrate), {
                   includeSymbol: false,
                 })}
               </span>{" "}
-              <span class="text-stamp-grey-light">BTC</span>
+              <span class="text-color-grey-semilight">BTC</span>
             </p>
             <p
-              class={`text-xl mobileMd:text-2xl text-stamp-grey-light font-bold -mt-1 ${
+              class={`text-xl mobileMd:text-2xl text-color-grey-semilight font-bold -mt-1 ${
                 view === "mobile" ? "hidden mobileLg:block" : ""
               }`}
             >
               {formatBTCAmount(
                 Number(dispenser.btcrate) * Number(dispenser.escrow_quantity),
                 { includeSymbol: false },
-              )} <span class="text-stamp-grey-light font-light">BTC</span>
+              )} <span class="text-color-grey-semilight font-light">BTC</span>
             </p>
           </div>
         </div>

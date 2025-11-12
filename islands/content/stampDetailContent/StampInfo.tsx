@@ -8,7 +8,7 @@ import {
   body,
   containerBackground,
   containerColData,
-  gapSectionSlim,
+  containerGap,
 } from "$layout";
 import type { Src101Detail } from "$lib/types/src101.d.ts";
 import type { StampRow } from "$lib/types/stamp.d.ts";
@@ -772,7 +772,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
               </h6>
             )}
 
-            <h5 className="-mt-1.5 font-light text-xl text-stamp-grey block">
+            <h5 className="-mt-1.5 font-light text-xl text-color-grey block">
               {(!isSrc20Stamp() && (isPoshStamp(stamp.cpid) ||
                 (htmlStampTitle && stamp.stamp_mimetype === "text/html"))) && (
                 <>
@@ -788,7 +788,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
             )}
 
             <div className="flex flex-col items-start pt-3">
-              <h6 className={labelSm}>BY</h6>
+              <h6 className={labelSm}>ARTIST</h6>
               <a
                 className={headingGreyDLLink}
                 href={`/wallet/${stamp.creator}`}
@@ -813,7 +813,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                       name="dispenserListings"
                       weight="normal"
                       size="mdR"
-                      color="grey"
+                      color="greyLight"
                       ariaLabel="Listings"
                       onClick={() => setShowListings(!showListings)}
                       className="pb-0.5"
@@ -869,7 +869,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
 
                 <div className="flex justify-end">
                   <Button
-                    variant="glassmorphismColor"
+                    variant="flat"
                     color="grey"
                     size="mdR"
                     onClick={() =>
@@ -1051,7 +1051,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                 href={`https://www.blockchain.com/explorer/transactions/btc/${stamp.tx_hash}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`${valueSm} hover:text-stamp-grey transition-colors duration-300`}
+                className={`${valueSm} hover:text-color-grey transition-colors duration-300`}
               >
                 {stamp.tx_hash !== null
                   ? abbreviateAddress(stamp.tx_hash, 4)

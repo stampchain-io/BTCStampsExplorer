@@ -20,10 +20,10 @@ export function CloseIcon({
   };
 
   /* ===== STYLES ===== */
-  const colorClasses = color === "grey"
-    ? `stroke-[url(#grey)] hover:stroke-stamp-grey-light transform transition-colors duration-200`
-    : color === "purple"
-    ? `stroke-[url(#purple)] hover:stroke-stamp-purple-bright transform transition-colors duration-200`
+  const colorClasses = color === "greyLight"
+    ? `stroke-[url(#greyLight)] hover:stroke-color-grey-light transform transition-colors duration-200`
+    : color === "purpleLight"
+    ? `stroke-[url(#purpleLight)] hover:stroke-color-purple-light transform transition-colors duration-200`
     : "";
 
   /* ===== RENDER ICON ===== */
@@ -31,26 +31,26 @@ export function CloseIcon({
     <>
       <svg width="0" height="0">
         <defs>
-          {color === "grey" && (
+          {color === "greyLight" && (
             <linearGradient
-              id="grey"
+              id="greyLight"
               gradientTransform="rotate(45)"
             >
-              <stop offset="0%" stop-color="#666666" />
-              <stop offset="40%" stop-color="#999999" />
-              <stop offset="70%" stop-color="#999999" />
-              <stop offset="100%" stop-color="#CCCCCC" />
+              <stop offset="0%" stop-color="var(--color-grey-semidark)" />
+              <stop offset="40%" stop-color="var(--color-grey)" />
+              <stop offset="70%" stop-color="var(--color-grey)" />
+              <stop offset="100%" stop-color="var(--color-grey-semilight)" />
             </linearGradient>
           )}
-          {color === "purple" && (
+          {color === "purpleLight" && (
             <linearGradient
-              id="purple"
+              id="purpleLight"
               gradientTransform="rotate(130)"
             >
-              <stop offset="0%" stop-color="#AA00FF" />
-              <stop offset="40%" stop-color="#8800CC" />
-              <stop offset="70%" stop-color="#8800CC" />
-              <stop offset="100%" stop-color="#660099" />
+              <stop offset="0%" stop-color="var(--color-purple-light)" />
+              <stop offset="40%" stop-color="var(--color-purple-semilight)" />
+              <stop offset="70%" stop-color="var(--color-purple-semilight)" />
+              <stop offset="100%" stop-color="var(--color-purple)" />
             </linearGradient>
           )}
         </defs>
@@ -81,7 +81,7 @@ export function CloseIcon({
  * <CloseIcon
  *   size="lg"
  *   weight="light"
- *   color="grey"
+ *   color="greyLight"
  *   onClick={() => handleClose()}
  * />
  *
@@ -89,7 +89,7 @@ export function CloseIcon({
  * <CloseIcon
  *   size="md"
  *   weight="bold"
- *   color="purple"
+ *   color="purpleLight"
  *   onClick={() => {
  *     if (open) {
  *       closeMenu();
@@ -101,7 +101,7 @@ export function CloseIcon({
  * <CloseIcon
  *   size="lg"
  *   weight="normal"
- *   color="grey"
+ *   color="greyLight"
  *   onClick={handleClose}
  *   className="ml-2"
  * />

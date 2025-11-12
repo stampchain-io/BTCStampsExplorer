@@ -6,7 +6,7 @@ export function ReadAllButton({ href = "/howto" }: ReadAllButtonProps) {
   return (
     <div class="flex justify-start">
       <Button
-        variant="glassmorphism"
+        variant="outline"
         color="grey"
         size="mdR"
         href={href}
@@ -23,7 +23,7 @@ export function ReadAllButton({ href = "/howto" }: ReadAllButtonProps) {
   <a
     href={href}
     target="_top"
-    class="font-semibold text-base text-stamp-grey-light hover:text-stamp-grey animated-underline"
+    class="font-semibold text-base text-color-grey-light hover:text-color-grey animated-underline"
   >
     Read the full guide
   </a>

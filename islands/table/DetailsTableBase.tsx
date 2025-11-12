@@ -339,14 +339,16 @@ export default function DetailsTableBase({
               onClick={() => setSelectedTab(id)}
             >
               <span
-                class={`${labelSm} group-hover:text-stamp-grey-light`}
+                class={`${labelSm} group-hover:text-color-grey-light`}
               >
                 {type ? getTabLabel(type, id) : id}
               </span>
               <div
-                class={`${value3xlTransparent} text-stamp-grey-darker ${
-                  selectedTab === id ? "text-stamp-grey-light" : ""
-                } group-hover:text-stamp-grey-light`}
+                class={`${value3xlTransparent} ${
+                  selectedTab === id
+                    ? "text-color-grey-light"
+                    : "text-color-grey-semidark"
+                } group-hover:text-color-grey-light`}
               >
                 {count || 0}
               </div>
@@ -356,7 +358,7 @@ export default function DetailsTableBase({
       </div>
       {/* ===== TABLE CONTENT ===== */}
       <ScrollContainer
-        class="min-h-[72px] max-h-[290px] scrollbar-glassmorphism"
+        class="min-h-[72px] max-h-[290px] scrollbar-background-layer1"
         onScroll={handleScroll}
       >
         <div class="">

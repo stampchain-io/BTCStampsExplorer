@@ -17,7 +17,7 @@ export function StampOverviewContent({
 }: StampOverviewContentProps) {
   /* ===== RENDER ===== */
   return (
-    <div class="w-full pt-3 pb-12 mobileMd:pt-6 mobileMd:pb-[72px]">
+    <div class="w-full pt-3 mobileMd:pt-6">
       {stamps?.length
         ? (
           <div class="grid grid-cols-2 mobileMd:grid-cols-3 mobileLg:grid-cols-4 tablet:grid-cols-5 desktop:grid-cols-6 gap-3 mobileMd:gap-6 w-full auto-rows-fr">
@@ -44,7 +44,7 @@ export function StampOverviewContent({
           </div>
         )}
       {pagination && pagination.totalPages > 1 && (
-        <div class="mt-12 mobileLg:mt-[72px]">
+        <div class="mt-7.5 tablet:mt-10">
           <PaginationButtons
             page={pagination.page}
             totalPages={pagination.totalPages}

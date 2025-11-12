@@ -69,7 +69,7 @@ const ChartWidget = (
               type: "line",
               name: "",
               data: chartData,
-              color: "#8800CC",
+              color: "#aca7a1",
               lineWidth: 2,
               tooltip: {
                 valueSuffix: "",
@@ -99,18 +99,18 @@ const ChartWidget = (
               fill: "rgba(33, 28, 33, 0.1)", // Glassmorphism button background
               style: {
                 fontSize: "10px", // Text size
-                color: "#666666", // Text color
+                color: "#d8d2ca", // Text color
               },
               states: {
                 hover: {
                   fill: "rgba(33, 28, 33, 0.4)", // Glassmorphism button hover
                   stroke: "rgba(102, 102, 102, 0.6)", // Hover border color
                   style: {
-                    color: "#00ff00", // Hover text color
+                    color: "#fff8f0", // Hover text color
                   },
                 },
                 select: {
-                  fill: "#999999", // Fill when selected
+                  fill: "#fff8f0", // Fill when selected
                   stroke: "rgba(102, 102, 102, 0.6)", // Selected border color
                 },
               },
@@ -138,7 +138,7 @@ const ChartWidget = (
             enabled: true,
             backgroundColor: "#000000BF", // Black with transparency
             style: {
-              color: "#CCCCCC", // Title & body text color
+              color: "#fff8f0", // Title & body text color
             },
             borderRadius: 8,
             borderWidth: 0,
@@ -148,7 +148,7 @@ const ChartWidget = (
             {
               type: chartType, // Chart type constant
               name: "Price in SAT",
-              color: "#999999",
+              color: "#aca7a1",
               data: chartData,
               tooltip: {
                 valueSuffix: " SAT",
@@ -164,7 +164,9 @@ const ChartWidget = (
 
   if (!data || data.length === 0) {
     return (
-      <div class={`${containerBackground} text-sm text-stamp-grey text-center`}>
+      <div
+        class={`${containerBackground} text-sm text-color-grey text-center`}
+      >
         NO DATA
       </div>
     );

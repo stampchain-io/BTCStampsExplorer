@@ -76,7 +76,7 @@ export const handler: Handlers = {
 
         .log-area {
             background: #1a1a1a;
-            color: #00ff00;
+            color: var(--color-green-light);
             padding: 15px;
             border-radius: 6px;
             font-family: 'Courier New', monospace;

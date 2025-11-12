@@ -1,13 +1,13 @@
 /* ===== RECEIVE ADDRESS MODAL COMPONENT ===== */
-import { JSX } from "preact";
-import type { ReceiveAddyModalProps } from "$types/ui.d.ts";
-import { useEffect, useRef, useState } from "preact/hooks";
-import { tooltipIcon } from "$notification";
-import { ModalBase } from "$layout";
 import { Icon } from "$icon";
 import { closeModal } from "$islands/modal/states.ts";
+import { ModalBase } from "$layout";
 import { logger } from "$lib/utils/logger.ts";
+import { tooltipIcon } from "$notification";
+import type { ReceiveAddyModalProps } from "$types/ui.d.ts";
 import QRCodeStyling from "https://esm.sh/qr-code-styling@1.6.0-rc.1";
+import { JSX } from "preact";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
 
@@ -43,8 +43,8 @@ function RecieveAddyModal(
           type: "linear",
           rotation: 45,
           colorStops: [
-            { offset: 0, color: "#CCCCCC" },
-            { offset: 1, color: "#999999" },
+            { offset: 0, color: "var(--color-grey-semilight)" },
+            { offset: 1, color: "var(--color-grey)" },
           ],
         },
       },
@@ -136,7 +136,7 @@ function RecieveAddyModal(
 
         {/* ===== ADDRESS SECTION ===== */}
         <div class="flex flex-col items-center">
-          <p class="break-all text-center text-base leading-relaxed text-stamp-grey-light max-w-full pt-4">
+          <p class="break-all text-center text-base leading-relaxed text-color-grey-light max-w-full pt-4">
             {formatAddress(address ?? "")}
           </p>
         </div>
@@ -154,7 +154,7 @@ function RecieveAddyModal(
               name="copy"
               weight="light"
               size="sm"
-              color="purple"
+              color="purpleLight"
               onClick={handleCopy}
             />
             <div
@@ -178,7 +178,7 @@ function formatAddress(address: string): JSX.Element[] {
     index % 2 === 0 ? <span key={index}>{group}</span> : (
       <span
         key={index}
-        class="font-semibold text-base text-stamp-purple"
+        class="font-semibold text-base text-color-purple-semilight"
       >
         {group}
       </span>

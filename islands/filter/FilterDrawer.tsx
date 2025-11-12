@@ -18,7 +18,11 @@ import { Button } from "$button";
 import { CloseIcon, Icon } from "$icon";
 import type { FilterType } from "$islands/button/FilterButton.tsx";
 import { FilterContentSRC20 } from "$islands/filter/FilterContentSRC20.tsx";
-import { glassmorphismOverlay, transitionTransform } from "$layout";
+import {
+  containerStickyBottom,
+  glassmorphismOverlay,
+  transitionTransform,
+} from "$layout";
 import { useBreakpoints } from "$lib/hooks/useBreakpoints.ts";
 import { tooltipIcon } from "$notification";
 import {
@@ -368,7 +372,7 @@ const FilterDrawer = (
                 <CloseIcon
                   size="md"
                   weight="bold"
-                  color="grey"
+                  color="greyLight"
                   onClick={handleCloseDrawer}
                   onMouseEnter={handleCloseMouseEnter}
                   onMouseLeave={handleCloseMouseLeave}
@@ -388,7 +392,7 @@ const FilterDrawer = (
                   name="close"
                   weight="bold"
                   size="xs"
-                  color="grey"
+                  color="greyLight"
                   onClick={handleCloseDrawer}
                   onMouseEnter={handleCloseMouseEnter}
                   onMouseLeave={handleCloseMouseLeave}
@@ -426,7 +430,7 @@ const FilterDrawer = (
       {/* Sticky buttons */}
       <div class="flex justify-between w-full sticky bottom-0 p-9 tablet:p-6 gap-6 bg-black/50 backdrop-blur-lg">
         <Button
-          variant="glassmorphism"
+          variant="outline"
           color="grey"
           size="mdR"
           onClick={() => {
@@ -438,12 +442,12 @@ const FilterDrawer = (
               isClearingRef.current = false;
             }, 100);
           }}
-          class="w-full"
+          class="w-full !backdrop-blur-xl"
         >
           CLEAR
         </Button>
         <Button
-          variant="glassmorphismColor"
+          variant="flat"
           color="grey"
           size="mdR"
           onClick={handleApplyFilters}

@@ -1,18 +1,13 @@
 /* ===== FAQ PAGE ===== */
 import { FaqAccordion } from "$content";
 import { FaqHeader } from "$header";
-import {
-  body,
-  containerBackground,
-  FAQ_CONTENT,
-  gapSectionSlim,
-} from "$layout";
+import { body, containerBackground, containerGap, FAQ_CONTENT } from "$layout";
 import { subtitleGrey, text, titleGreyLD } from "$text";
 
 /* ===== PAGE COMPONENT ===== */
 export default function FaqPage() {
   return (
-    <div class={`${body} ${gapSectionSlim}`}>
+    <div class={`${body} ${containerGap}`}>
       {/* ===== HEADER SECTION ===== */}
       <FaqHeader />
 

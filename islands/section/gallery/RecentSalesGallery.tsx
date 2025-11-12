@@ -3,6 +3,7 @@ import { PaginationButtons } from "$button";
 import { BREAKPOINTS } from "$constants";
 import { LoadingIcon } from "$icon";
 import { RecentSaleCard } from "$islands/card/RecentSaleCard.tsx";
+import { glassmorphismL2 } from "$layout";
 import { useLoadingSkeleton } from "$lib/hooks/useLoadingSkeleton.ts";
 import { AccessibilityUtils } from "$lib/utils/ui/accessibility/accessibilityUtils.ts";
 import { subtitleGrey, titleGreyDL } from "$text";
@@ -230,7 +231,7 @@ export default function RecentSalesGallery({
 
       {/* ===== PAGINATION ===== */}
       {pagination && pagination.totalPages > 1 && (
-        <div class="mt-12 mobileLg:mt-[72px]">
+        <div class="mt-7.5 tablet:mt-10">
           <PaginationButtons
             page={pagination.page}
             totalPages={pagination.totalPages}

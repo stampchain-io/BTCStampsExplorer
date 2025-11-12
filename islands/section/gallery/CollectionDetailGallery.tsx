@@ -114,7 +114,7 @@ export default function CollectionDetailGallery({
       <ViewAllButton href="/collection/artist" />
 
       {pagination && pagination.totalPages > 1 && (
-        <div class="mt-12 mobileLg:mt-[72px]">
+        <div class="mt-7.5 tablet:mt-10">
           <PaginationButtons
             page={pagination.page}
             totalPages={pagination.totalPages}

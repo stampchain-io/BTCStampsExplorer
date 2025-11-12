@@ -33,22 +33,18 @@ export const notificationContainerSuccess =
 /* ===== TOOLTIP STYLES ===== */
 export const tooltipButton = `
   absolute left-1/2 -translate-x-1/2
-  ${tooltipBackground}
-  mb-1 bottom-full
-  ${tooltipText}
+  bottom-full mb-1.5 z-tooltip
+  ${tooltipBackground} ${tooltipText}
 `;
 
 export const tooltipButtonInCollapsible = `
-  fixed z-50
-  ${tooltipBackground}
-  ${tooltipText}
+  fixed -mt-[3px] z-tooltip
+  ${tooltipBackground} ${tooltipText}
 `;
 
 export const tooltipImage = `
-  fixed z-50
-  ${tooltipBackground}
-  mb-1.5
-  ${tooltipText}
+  absolute mb-1.5 z-tooltip
+  ${tooltipBackground} ${tooltipText}
 `;
 
 /* ===== LEGACY STYLES ===== */

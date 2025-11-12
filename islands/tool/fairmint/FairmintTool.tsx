@@ -6,6 +6,7 @@ import {
   bodyTool,
   containerBackground,
   containerColForm,
+  containerGap,
   transitionAll,
 } from "$layout";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
@@ -114,7 +115,7 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
     <div class={bodyTool} data-testid="fairmint-tool">
       <h1 class={`${titleGreyLD} mobileMd:mx-auto mb-1`}>FAIRMINT</h1>
 
-      <form class={`${containerBackground} mb-6`}>
+      <form class={containerBackground}>
         {/* ===== TOKEN SELECTION ===== */}
         <div class={containerColForm}>
           {hasFairminters
@@ -216,7 +217,7 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
             </div>
 
             {/* Phase text */}
-            <span class="text-xs text-stamp-grey-light font-normal opacity-80">
+            <span class="text-xs text-color-grey-light font-normal opacity-80">
               {currentPhase === "instant" && "⚡ Instant"}
               {currentPhase === "smart" && "💡 Smart"}
               {currentPhase === "exact" && "🎯 Exact"}

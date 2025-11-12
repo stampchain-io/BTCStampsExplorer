@@ -22,7 +22,7 @@ import { useCallback, useEffect, useState } from "preact/hooks";
 
 import { Button } from "$button";
 import { InputField } from "$form";
-import { bodyTool, containerBackground } from "$layout";
+import { bodyTool, containerBackground, containerGap } from "$layout";
 import type { UTXO, XcpBalance } from "$lib/types/index.d.ts";
 import { normalizeFeeRate } from "$lib/utils/fees.ts";
 import { StatusMessages } from "$notification";
@@ -692,7 +692,7 @@ export function StampTradeTool() {
 
   /* ===== RENDER ===== */
   return (
-    <div class={`${bodyTool}`}>
+    <div class={`${bodyTool} ${containerGap}`}>
       {/* ===== SELLER SECTION ===== */}
       <h1 class={`${titleGreyLD} mobileMd:mx-auto`}>
         ATTACH TO UTXO
@@ -701,7 +701,8 @@ export function StampTradeTool() {
 
       {/* ===== CREATE PSBT FORM ===== */}
       <div class={containerBackground}>
-        <h3 class=" font-bold text-xl text-stamp-purple mb-2">
+        <h2 class={`${subtitleGrey} mx-auto`}>SELLER</h2>
+        <h3 class=" font-bold text-xl text-color-grey-semilight mb-2">
           CREATE PSBT
         </h3>
 
@@ -709,14 +710,14 @@ export function StampTradeTool() {
         {createPsbtFeeDetails && (
           <div className="mb-4 p-3 bg-stamp-grey-darker/50 rounded-2xl border border-stamp-grey-light/10">
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-sm text-stamp-grey-light">
+              <span className="text-sm text-color-grey-light">
                 Estimated Fees:
               </span>
               {/* Phase indicators following StampingTool pattern */}
               <div className="flex items-center gap-1">
                 <div
                   className={`w-1.5 h-1.5 rounded-full ${
-                    createPsbtPhase1 ? "bg-green-400" : "bg-stamp-grey-light/30"
+                    createPsbtPhase1 ? "bg-green-400" : "bg-color-grey-light/30"
                   }`}
                   title="Phase 1: Instant estimate"
                 >
@@ -725,14 +726,14 @@ export function StampTradeTool() {
                   className={`w-1.5 h-1.5 rounded-full ${
                     createPsbtIsPreFetching
                       ? "bg-blue-400 animate-pulse"
-                      : "bg-stamp-grey-light/30"
+                      : "bg-color-grey-light/30"
                   }`}
                   title="Phase 2: Smart UTXO estimate"
                 >
                 </div>
                 <div
                   className={`w-1.5 h-1.5 rounded-full ${
-                    createPsbtPhase3 ? "bg-green-400" : "bg-stamp-grey-light/30"
+                    createPsbtPhase3 ? "bg-green-400" : "bg-color-grey-light/30"
                   }`}
                   title="Phase 3: Exact estimate"
                 >
@@ -741,13 +742,13 @@ export function StampTradeTool() {
             </div>
             <div className="grid grid-cols-2 gap-4 text-xs">
               <div>
-                <span className="text-stamp-grey-light">Miner Fee:</span>
+                <span className="text-color-grey-light">Miner Fee:</span>
                 <span className="ml-2 text-white">
                   {createPsbtFeeDetails.minerFee} sats
                 </span>
               </div>
               <div>
-                <span className="text-stamp-grey-light">Total Value:</span>
+                <span className="text-color-grey-light">Total Value:</span>
                 <span className="ml-2 text-white">
                   {createPsbtFeeDetails.totalValue} sats
                 </span>
@@ -782,8 +783,8 @@ export function StampTradeTool() {
         <div class="flex justify-end mt-5">
           <Button
             variant="flat"
-            color="purple"
-            size="md"
+            color="grey"
+            size="mdR"
             onClick={handleCreatePSBT}
             disabled={isSubmitting}
           >
@@ -814,22 +815,23 @@ export function StampTradeTool() {
 
       {/* ===== UTXO ATTACH FORM ===== */}
       <div class={containerBackground}>
-        <h3 class=" font-bold text-xl text-stamp-purple mb-2">
-          UTXO ATTACH
+        <h2 class={`${subtitleGrey} mx-auto`}>SELLER</h2>
+        <h3 class=" font-bold text-xl text-color-grey-semilight mb-2">
+          ATTACH TO UTXO
         </h3>
 
         {/* ===== 🎯 INLINE FEE STATUS DISPLAY - UTXO ATTACH ===== */}
         {attachFeeDetails && (
           <div className="mb-4 p-3 bg-stamp-grey-darker/50 rounded-2xl border border-stamp-grey-light/10">
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-sm text-stamp-grey-light">
+              <span className="text-sm text-color-grey-light">
                 Estimated Fees:
               </span>
               {/* Phase indicators following StampingTool pattern */}
               <div className="flex items-center gap-1">
                 <div
                   className={`w-1.5 h-1.5 rounded-full ${
-                    attachPhase1 ? "bg-green-400" : "bg-stamp-grey-light/30"
+                    attachPhase1 ? "bg-green-400" : "bg-color-grey-light/30"
                   }`}
                   title="Phase 1: Instant estimate"
                 >
@@ -838,14 +840,14 @@ export function StampTradeTool() {
                   className={`w-1.5 h-1.5 rounded-full ${
                     attachIsPreFetching
                       ? "bg-blue-400 animate-pulse"
-                      : "bg-stamp-grey-light/30"
+                      : "bg-color-grey-light/30"
                   }`}
                   title="Phase 2: Smart UTXO estimate"
                 >
                 </div>
                 <div
                   className={`w-1.5 h-1.5 rounded-full ${
-                    attachPhase3 ? "bg-green-400" : "bg-stamp-grey-light/30"
+                    attachPhase3 ? "bg-green-400" : "bg-color-grey-light/30"
                   }`}
                   title="Phase 3: Exact estimate"
                 >
@@ -854,13 +856,13 @@ export function StampTradeTool() {
             </div>
             <div className="grid grid-cols-2 gap-4 text-xs">
               <div>
-                <span className="text-stamp-grey-light">Miner Fee:</span>
+                <span className="text-color-grey-light">Miner Fee:</span>
                 <span className="ml-2 text-white">
                   {attachFeeDetails.minerFee} sats
                 </span>
               </div>
               <div>
-                <span className="text-stamp-grey-light">Total Value:</span>
+                <span className="text-color-grey-light">Total Value:</span>
                 <span className="ml-2 text-white">
                   {attachFeeDetails.totalValue} sats
                 </span>
@@ -887,8 +889,8 @@ export function StampTradeTool() {
                 />
               </div>
               <Button
-                variant="flat"
-                color="purple"
+                variant="outline"
+                color="grey"
                 size="sm"
                 onClick={handleQueryAssets}
                 disabled={isSubmitting || isLoadingAssets}
@@ -946,8 +948,8 @@ export function StampTradeTool() {
                 />
               </div>
               <Button
-                variant="flat"
-                color="purple"
+                variant="outline"
+                color="grey"
                 size="sm"
                 onClick={handleQueryUtxos}
                 disabled={isSubmitting || isLoadingUtxos}
@@ -982,8 +984,8 @@ export function StampTradeTool() {
         <div class="flex justify-end mt-5">
           <Button
             variant="flat"
-            color="purple"
-            size="md"
+            color="grey"
+            size="mdR"
             onClick={handleUtxoAttach}
             disabled={isSubmitting}
           >
@@ -1021,14 +1023,14 @@ export function StampTradeTool() {
         {swapFeeDetails && (
           <div className="mb-4 p-3 bg-stamp-grey-darker/50 rounded-2xl border border-stamp-grey-light/10">
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-sm text-stamp-grey-light">
+              <span className="text-sm text-color-grey-light">
                 Estimated Fees:
               </span>
               {/* Phase indicators following StampingTool pattern */}
               <div className="flex items-center gap-1">
                 <div
                   className={`w-1.5 h-1.5 rounded-full ${
-                    swapPhase1 ? "bg-green-400" : "bg-stamp-grey-light/30"
+                    swapPhase1 ? "bg-green-400" : "bg-color-grey-light/30"
                   }`}
                   title="Phase 1: Instant estimate"
                 >
@@ -1037,14 +1039,14 @@ export function StampTradeTool() {
                   className={`w-1.5 h-1.5 rounded-full ${
                     swapIsPreFetching
                       ? "bg-blue-400 animate-pulse"
-                      : "bg-stamp-grey-light/30"
+                      : "bg-color-grey-light/30"
                   }`}
                   title="Phase 2: Smart UTXO estimate"
                 >
                 </div>
                 <div
                   className={`w-1.5 h-1.5 rounded-full ${
-                    swapPhase3 ? "bg-green-400" : "bg-stamp-grey-light/30"
+                    swapPhase3 ? "bg-green-400" : "bg-color-grey-light/30"
                   }`}
                   title="Phase 3: Exact estimate"
                 >
@@ -1053,13 +1055,13 @@ export function StampTradeTool() {
             </div>
             <div className="grid grid-cols-2 gap-4 text-xs">
               <div>
-                <span className="text-stamp-grey-light">Miner Fee:</span>
+                <span className="text-color-grey-light">Miner Fee:</span>
                 <span className="ml-2 text-white">
                   {swapFeeDetails.minerFee} sats
                 </span>
               </div>
               <div>
-                <span className="text-stamp-grey-light">Total Value:</span>
+                <span className="text-color-grey-light">Total Value:</span>
                 <span className="ml-2 text-white">
                   {swapFeeDetails.totalValue} sats
                 </span>
@@ -1098,8 +1100,8 @@ export function StampTradeTool() {
         <div class="flex justify-end mt-5">
           <Button
             variant="flat"
-            color="purple"
-            size="md"
+            color="grey"
+            size="mdR"
             onClick={handleCompleteSwap}
             disabled={isSubmitting}
           >

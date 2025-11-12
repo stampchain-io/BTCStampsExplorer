@@ -1,5 +1,6 @@
 /* ===== LOADING ICON COMPONENT ===== */
-import { Icon } from "$components/icon/IconBase.tsx";
+import { Icon } from "$icon";
+import { transitionColors } from "$layout";
 
 interface LoadingIconProps {
   className?: string;

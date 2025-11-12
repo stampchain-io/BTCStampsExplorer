@@ -306,9 +306,9 @@ export default function DonateCta() {
         />
       </div>
       <Button
-        variant="glassmorphismColor"
+        variant="flat"
         color="purple"
-        size="md"
+        size="mdR"
         onClick={onClick}
       >
         DONATE
@@ -385,7 +385,7 @@ export default function DonateCta() {
                   name="donate"
                   weight="normal"
                   size="sm"
-                  color="purple"
+                  color="purpleLight"
                   onClick={() => {
                     setIsReceiveTooltipVisible(false);
                     handleOpenReceiveModal();
@@ -403,7 +403,7 @@ export default function DonateCta() {
               {/* Address Text - second on mobile, first on tablet+ */}
               <a
                 href={`/wallet/${DONATE_ADDRESS}`}
-                class="font-medium text-base text-stamp-purple hover:text-stamp-purple-bright transition-colors duration-300 order-2 tablet:order-1"
+                class="font-medium text-base text-color-purple-semilight hover:text-color-purple-light transition-colors duration-200 order-2 tablet:order-1"
               >
                 <span class="hidden tablet:block">{DONATE_ADDRESS}</span>
                 <span class="hidden mobileMd:block tablet:hidden">

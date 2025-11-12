@@ -16,7 +16,7 @@ export default function HorizonDiscoveryPage() {
         margin: "0 auto",
         fontFamily: "monospace",
         backgroundColor: "#1a1a1a",
-        color: "#00ff00",
+        color: "var(--color-green-light)",
         minHeight: "100vh",
       }}
     >
@@ -102,11 +102,11 @@ export default function HorizonDiscoveryPage() {
 
       <div
         style={{
-          background: "#004400",
+          background: "var(--color-green-dark)",
           padding: "15px",
           borderRadius: "8px",
           margin: "20px 0",
-          border: "1px solid #008800",
+          border: "1px solid var(--color-green-semidark)",
         }}
       >
         <strong>Next Steps:</strong>{" "}

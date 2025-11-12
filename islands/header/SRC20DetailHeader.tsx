@@ -9,7 +9,14 @@ import {
   formatNumber,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
-import { labelSm, titleGreyLD, valueSm } from "$text";
+import {
+  labelSm,
+  titleGreyLD,
+  valueNegative,
+  valueNeutral,
+  valuePositive,
+  valueSm,
+} from "$text";
 import type { SRC20DetailHeaderProps } from "$types/ui.d.ts";
 
 /* ===== COMPONENT ===== */
@@ -118,7 +125,7 @@ export function SRC20DetailHeader({
                         name="email"
                         weight="normal"
                         size="xxs"
-                        color="grey"
+                        color="greyLight"
                         href={deployment.email}
                         target="_blank"
                       />
@@ -129,7 +136,7 @@ export function SRC20DetailHeader({
                         name="website"
                         weight="normal"
                         size="xxs"
-                        color="grey"
+                        color="greyLight"
                         href={deployment.web}
                         target="_blank"
                       />
@@ -140,7 +147,7 @@ export function SRC20DetailHeader({
                         name="telegram"
                         weight="normal"
                         size="xxs"
-                        color="grey"
+                        color="greyLight"
                         href={deployment.tg}
                         target="_blank"
                       />
@@ -151,7 +158,7 @@ export function SRC20DetailHeader({
                         name="twitter"
                         weight="normal"
                         size="xxs"
-                        color="grey"
+                        color="greyLight"
                         href={deployment.x}
                         target="_blank"
                       />
@@ -162,7 +169,7 @@ export function SRC20DetailHeader({
                 <h6 class={labelSm}>
                   CREATOR
                 </h6>
-                <h5 class="font-bold text-lg gray-gradient3-hover tracking-wide -mt-1">
+                <h5 class="font-bold text-lg color-grey-gradientLD-hover tracking-wide -mt-1">
                   {deployment.creator_name ||
                     abbreviateAddress(deployment.destination || "")}
                 </h5>
@@ -275,15 +282,13 @@ export function SRC20DetailHeader({
               value={change24h !== null
                 ? (
                   <span
-                    class={change24h >= 0 ? "text-green-500" : "text-red-500"}
+                    class={change24h >= 0 ? valuePositive : valueNegative}
                   >
                     {change24h >= 0 ? "+" : ""}
                     {change24h.toFixed(2)}%
                   </span>
                 )
-                : (
-                  "N/A %"
-                )}
+                : <span class={valueNeutral}>N/A %</span>}
               align="center"
             />
             <StatItem
@@ -291,15 +296,13 @@ export function SRC20DetailHeader({
               value={change7d !== null
                 ? (
                   <span
-                    class={change7d >= 0 ? "text-green-500" : "text-red-500"}
+                    class={change7d >= 0 ? valuePositive : valueNegative}
                   >
                     {change7d >= 0 ? "+" : ""}
                     {change7d.toFixed(2)}%
                   </span>
                 )
-                : (
-                  "N/A %"
-                )}
+                : <span class={valueNeutral}>N/A %</span>}
               align="right"
             />
           </div>

@@ -42,15 +42,17 @@ export function SettingsButton({
               onClick={() => handleOpen?.(false)}
               ariaLabel="Close"
             />
-            <p class="text-lg font-black text-[#AA00FF] mb-1">TOOLS</p>
+            <p class="text-lg font-black text-color-purple-light mb-1">
+              TOOLS
+            </p>
             {filterButtons?.map((filter: string) => (
               <button
                 key={filter}
                 type="button"
                 class={`cursor-pointer text-xs tablet:text-sm font-black ${
                   localFilters.includes(filter)
-                    ? "text-stamp-purple-bright "
-                    : "text-stamp-purple hover:text-stamp-purple-bright"
+                    ? "text-color-purple-light "
+                    : "text-color-purple-semilight hover:text-color-purple-light"
                 }`}
                 onClick={() => handleFilterClick(filter)}
               >
@@ -65,7 +67,7 @@ export function SettingsButton({
             name="gear"
             weight="normal"
             size="custom"
-            color="purple"
+            color="purpleLight"
             className="mt-[5px] w-[26px] h-[26px] tablet:w-[24px] tablet:h-[24px] transform transition-all duration-300"
             ariaLabel="Settings"
             onClick={() => handleOpen?.(true)}
@@ -76,7 +78,7 @@ export function SettingsButton({
       {visible && (
         <div
           role="tooltip"
-          className="absolute bottom-full right-[0.3px] mb-2 z-10 px-3 py-2 text-sm font-medium text-white bg-stamp-bg-grey-darkest rounded-xl shadow-md"
+          className="absolute bottom-full right-[0.3px] mb-2 z-10 px-3 py-2 text-sm font-medium text-white bg-color-grey-dark rounded-xl shadow-md"
         >
           Settings
           <div class="tooltip-arrow" />

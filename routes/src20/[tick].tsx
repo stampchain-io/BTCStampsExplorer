@@ -2,7 +2,7 @@
 import { Handlers } from "$fresh/server.ts";
 import { SRC20DetailHeader } from "$islands/header/index.ts";
 import ChartWidget from "$islands/layout/ChartWidget.tsx";
-import { body, gapSectionSlim } from "$layout";
+import { body, containerGap } from "$layout";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { DetailsTableBase, HoldersTable } from "$table";
 import type { ProcessedHolder } from "$types/wallet.d.ts";
@@ -115,7 +115,7 @@ function SRC20DetailPage(props: { data: SRC20DetailPageData }) {
 
   /* ===== RENDER ===== */
   return (
-    <div class={`${body} ${gapSectionSlim}`}>
+    <div class={`${body} ${containerGap}`}>
       <SRC20DetailHeader
         deployment={deployment}
         _mintStatus={mint_status}

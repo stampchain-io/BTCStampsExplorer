@@ -1,7 +1,7 @@
 /* ===== STAMPCHAIN CONTACT CTA COMPONENT ===== */
 import { Button } from "$button";
 import { containerBackground } from "$layout";
-import { subtitleGrey, text, textLg, titleGreyDL } from "$text";
+import { subtitleGrey, text, textLg, titleGreyLD } from "$text";
 
 /* ===== COMPONENT ===== */
 export const StampchainContactCta = () => {
@@ -13,7 +13,7 @@ export const StampchainContactCta = () => {
     >
       <div class="col-span1 desktop:col-span-2">
         {/* ===== HEADER SECTION ===== */}
-        <h3 class={titleGreyDL}>STAMPCHAIN</h3>
+        <h3 class={titleGreyLD}>STAMPCHAIN</h3>
         <h4 class={subtitleGrey}>
           THE CREATORS OF BITCOIN STAMPS
         </h4>
@@ -33,15 +33,12 @@ export const StampchainContactCta = () => {
           </p>
           <p>
             <b>We empower creators and collectors by:</b>
-            <li>
-              Providing battle-tested tools developed by the original Bitcoin
-              Stamps team
-            </li>
-            <li>
-              Maintaining the most comprehensive knowledge base for Stamps
-              technology
-            </li>
-            {/* <li>Offering expert guidance on stamp creation, trading, and collection management</li> */}
+            <br />
+            • Providing battle-tested tools developed by the original Bitcoin
+            Stamps team <br />
+            • Maintaining the most comprehensive knowledge base for Stamps
+            technology
+            {/* • Offering expert guidance on stamp creation, trading, and collection management */}
           </p>
         </div>
       </div>
@@ -49,7 +46,7 @@ export const StampchainContactCta = () => {
       {/* ===== BUTTONS SECTION ===== */}
       <div class="flex gap-5 justify-end">
         <Button
-          variant="glassmorphism"
+          variant="outline"
           color="grey"
           size="mdR"
           href="/about/#contact"
@@ -57,7 +54,7 @@ export const StampchainContactCta = () => {
           CONTACT
         </Button>
         <Button
-          variant="glassmorphismColor"
+          variant="flat"
           color="grey"
           size="mdR"
           href="/about"

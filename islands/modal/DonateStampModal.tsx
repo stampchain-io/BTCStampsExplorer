@@ -6,6 +6,7 @@ import type { DonateStampModalProps } from "$types/ui.d.ts";
 // Using simplified fee display approach
 import { handleModalClose } from "$components/layout/ModalBase.tsx";
 import { StampImage } from "$content";
+import { RangeSlider } from "$islands/button/RangeSlider.tsx";
 import { stackConnectWalletModal } from "$islands/layout/ModalStack.tsx";
 import { closeModal, openModal } from "$islands/modal/states.ts";
 import { ModalBase } from "$layout";
@@ -393,7 +394,7 @@ const DonateStampModal = ({
     >
       {/* ===== PRICE DISPLAY ===== */}
       <div className="mb-6">
-        <h6 className="font-extrabold text-3xl text-stamp-grey-light text-center">
+        <h6 className="font-extrabold text-3xl text-color-grey-light text-center">
           {(totalPrice / 100000000).toFixed(8)}{" "}
           <span className="font-extralight">BTC</span>
         </h6>
@@ -415,10 +416,10 @@ const DonateStampModal = ({
           {/* ===== QUANTITY SELECTION ===== */}
           <div className="flex flex-col w-full">
             <div className="flex flex-col items-start pt-0.5 -space-y-0.5">
-              <h6 className="font-light text-sm text-stamp-grey-darker">
+              <h6 className="font-light text-sm text-color-grey-semidark">
                 RECEIVE
               </h6>
-              <h6 className="font-light text-lg text-stamp-grey-light">
+              <h6 className="font-light text-lg text-color-grey-light">
                 <span className="font-bold">{quantity * 1000}</span> USDSTAMPS
                 {quantity * 1000 > 1 ? "" : ""}
               </h6>
@@ -426,27 +427,18 @@ const DonateStampModal = ({
 
             {/* ===== AMOUNT SLIDER ===== */}
             <div className="mt-[18px]">
-              <div
-                className="relative w-full group"
-                onMouseMove={handleMouseMove}
-                onMouseEnter={handleAmountMouseEnter}
-                onMouseLeave={handleAmountMouseLeave}
-                onMouseDown={handleMouseDown}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <input
-                  type="range"
-                  min="1"
-                  max="100"
-                  step="0.25"
-                  value={amountToSliderPos(quantity)}
-                  onInput={(e) => {
-                    const target = e.target as HTMLInputElement;
-                    setQuantity(
-                      Math.max(1, sliderPosToAmount(parseFloat(target.value))),
-                    );
+              <div className="relative w-full">
+                <RangeSlider
+                  value={quantity}
+                  onChange={(newQuantity) => {
+                    setQuantity(Math.max(1, newQuantity));
                   }}
-                  className={`${sliderBar} ${sliderKnob}`}
+                  valueToPosition={amountToSliderPos}
+                  positionToValue={sliderPosToAmount}
+                  onMouseEnter={handleAmountMouseEnter}
+                  onMouseLeave={handleAmountMouseLeave}
+                  onMouseDown={handleMouseDown}
+                  onMouseMove={handleMouseMove}
                 />
                 <div
                   className={`${tooltipImage} ${

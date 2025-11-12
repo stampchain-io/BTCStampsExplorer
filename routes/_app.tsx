@@ -59,8 +59,6 @@ export default function App({ Component, state, url }: PageProps<unknown>) {
         {/* ===== CRITICAL CSS ===== */}
         <link rel="preload" href="/styles.css" as="style" />
         <link rel="stylesheet" href="/styles.css" />
-        <link rel="preload" href="/gradients.css" as="style" />
-        <link rel="stylesheet" href="/gradients.css" />
         <link rel="preload" href="/modal.css" as="style" />
         <link rel="stylesheet" href="/modal.css" />
         <link rel="preload" href="/slick.css" as="style" />

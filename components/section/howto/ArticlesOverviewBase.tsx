@@ -1,8 +1,8 @@
 /* ===== ARTICLES OVERVIEW COMPONENT ===== */
 import { Button } from "$button";
 import { ARTICLE_LINKS } from "$components/section/howto/data.ts"; // needs direct import - cannot use "$howto"
-import { bodyArticle, gapGrid } from "$layout";
-import { headingGreyLDLink, subtitleGrey, text, titleGreyDL } from "$text";
+import { bodyArticle, containerGap } from "$layout";
+import { headingGreyLDLink, subtitleGrey, text, titleGreyLD } from "$text";
 
 /* ===== COMPONENT ===== */
 export function ArticlesOverview() {
@@ -10,12 +10,12 @@ export function ArticlesOverview() {
   return (
     <section class={bodyArticle}>
       {/* ===== SECTION TITLE ===== */}
-      <h1 class={titleGreyDL}>
+      <h1 class={titleGreyLD}>
         KEEP READING
       </h1>
 
       {/* ===== CONTENT GRID ===== */}
-      <div class={`flex flex-col tablet:flex-row ${gapGrid}`}>
+      <div class={`flex flex-col tablet:flex-row ${containerGap}`}>
         {/* ===== HOW-TO ARTICLES LIST ===== */}
         <div class="w-full tablet:w-2/3">
           <h2 class={subtitleGrey}>HOW-TO</h2>
@@ -42,7 +42,7 @@ export function ArticlesOverview() {
           </p>
           {/* ===== FAQ BUTTON ===== */}
           <div class="w-full flex justify-start tablet:justify-end">
-            <Button variant="glassmorphism" color="grey" size="mdR" href="/faq">
+            <Button variant="outline" color="grey" size="mdR" href="/faq">
               FAQ
             </Button>
           </div>

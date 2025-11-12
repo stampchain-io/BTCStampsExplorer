@@ -13,6 +13,7 @@ import {
   bodyTool,
   containerBackground,
   containerColForm,
+  containerGap,
   containerRowForm,
   glassmorphismL2,
   imagePreviewTool,
@@ -57,7 +58,7 @@ const MintProgress = (
           class={`relative w-full max-w-[420px] h-3 ${glassmorphismL2} rounded-full`}
         >
           <div
-            class="absolute top-[1px] left-[1px] right-[1px] h-2 bg-stamp-grey rounded-full"
+            class="absolute top-[1px] left-[1px] right-[1px] h-2 bg-color-grey rounded-full"
             style={{ width: progressWidth }}
           />
         </div>
@@ -411,8 +412,10 @@ export function SRC20MintTool({
   /* ===== CONFIG CHECK ===== */
   if (!config) {
     return (
-      <div class={bodyTool}>
-        <h1 class={`${titleGreyLD} mx-auto mb-4`}>MINT</h1>
+      <div class={`${bodyTool} ${containerGap}`}>
+        <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
+          MINT
+        </h1>
         <MintToolSkeleton />
       </div>
     );
@@ -420,8 +423,10 @@ export function SRC20MintTool({
 
   /* ===== COMPONENT RENDER ===== */
   return (
-    <div class={bodyTool}>
-      <h1 class={`${titleGreyLD} mx-auto mb-4`}>MINT</h1>
+    <div class={`${bodyTool} ${containerGap}`}>
+      <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
+        MINT
+      </h1>
 
       {/* ===== ERROR MESSAGE DISPLAY ===== */}
       {error && (
@@ -547,7 +552,7 @@ export function SRC20MintTool({
                       <div class="pt-[1px]">
                         {result.tick}
                       </div>
-                      <div class="text-xs text-stamp-grey">
+                      <div class="text-xs text-color-grey">
                         {(result.progress || 0).toFixed(1)}%
                       </div>
                     </li>

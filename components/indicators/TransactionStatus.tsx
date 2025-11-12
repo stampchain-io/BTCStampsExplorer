@@ -148,12 +148,12 @@ export function TransactionStatus({
           {state === "pending" && (
             <div class="mb-3">
               <div class="flex items-center justify-between mb-1">
-                <span class="text-xs text-stamp-grey-light">Progress</span>
-                <span class="text-xs text-stamp-grey-light">
+                <span class="text-xs text-color-grey-light">Progress</span>
+                <span class="text-xs text-color-grey-light">
                   {Math.round((confirmations / targetConfirmations) * 100)}%
                 </span>
               </div>
-              <div class="w-full h-2 bg-stamp-grey-darker rounded-full overflow-hidden">
+              <div class="w-full h-2 bg-color-grey-semidark rounded-full overflow-hidden">
                 <div
                   class={`h-full bg-${config.color}-500 transition-all duration-500`}
                   style={{
@@ -166,7 +166,7 @@ export function TransactionStatus({
 
           {txid && (
             <div class="flex items-center gap-2 mb-3">
-              <span class="text-xs text-stamp-grey-light">TX ID:</span>
+              <span class="text-xs text-color-grey-light">TX ID:</span>
               <span
                 class={`text-xs text-${config.textColor} font-mono truncate flex-1`}
               >
@@ -178,7 +178,7 @@ export function TransactionStatus({
           <div class="flex gap-3">
             {txid && onViewTransaction && (
               <Button
-                variant="glassmorphism"
+                variant="outline"
                 color="grey"
                 size="mdR"
                 onClick={onViewTransaction}
@@ -188,7 +188,7 @@ export function TransactionStatus({
             )}
             {state === "failed" && onRetry && (
               <Button
-                variant="glassmorphismColor"
+                variant="flat"
                 color="grey"
                 size="mdR"
                 onClick={onRetry}

@@ -345,7 +345,7 @@ export default function Home({ data }: PageProps<HomePageData>) {
           </div>
 
           <div
-            class={`flex flex-col tablet:flex-row ${containerBackground} ${gapSectionSlim}`}
+            class={`flex flex-col tablet:flex-row ${containerBackground} ${containerGap}`}
           >
             <div class="w-full tablet:w-1/2">
               <SRC20Gallery
@@ -370,7 +370,7 @@ export default function Home({ data }: PageProps<HomePageData>) {
           </div>
         </div>
 
-        <div class={`flex flex-col ${gapSectionSlim}`}>
+        <div class={`flex flex-col ${containerGap}`}>
           <StampchainContactCta />
           <PartnersBanner />
         </div>

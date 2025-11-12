@@ -40,18 +40,19 @@ export const RecursiveContactCta = () => {
             </p>
           </div>
         </div>
+        {/* ===== BUTTON SECTION ===== */}
+        <div class="flex justify-end">
+          <Button
+            variant="outline"
+            color="grey"
+            size="mdR"
+            href="/about#contact"
+            class="float-right mt-6"
+          >
+            CONTACT
+          </Button>
+        </div>
       </div>
-
-      {/* ===== BUTTON SECTION ===== */}
-      <Button
-        variant="outline"
-        color="grey"
-        size="md"
-        href="/about#contact"
-        class="float-right mt-6"
-      >
-        CONTACT
-      </Button>
     </>
   );
 };

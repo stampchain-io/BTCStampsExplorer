@@ -101,7 +101,9 @@ export function SkeletonToggle({
       <div
         class={`flex justify-center items-center relative w-5 bg-transparent ${height} ${rounded}`}
       >
-        <div class={`w-[14px] h-[14px] bg-stamp-grey opacity-30 ${rounded}`} />
+        <div
+          class={`w-[14px] h-[14px] bg-color-grey opacity-30 ${rounded}`}
+        />
       </div>
     </div>
   );
@@ -242,7 +244,7 @@ export function FeeCalculatorSkeleton() {
 /* CREATE STAMP TOOL */
 export function StampingToolSkeleton({ className = "" }: SkeletonLoaderProps) {
   return (
-    <div class={`space-y-6 ${className}`}>
+    <div class={`space-y-5 mobileLg:space-y-7.5 ${className}`}>
       <SkeletonContainer>
         {/* Left Column Skeleton - Image upload */}
         <div class={`${containerColForm} !w-[100px]`}>
@@ -274,7 +276,7 @@ export function StampingToolSkeleton({ className = "" }: SkeletonLoaderProps) {
 /* SEND STAMP TOOL */
 export function SendToolSkeleton({ className = "" }: SkeletonLoaderProps) {
   return (
-    <div class={`space-y-6 ${className}`}>
+    <div class={`space-y-5 mobileLg:space-y-7.5 ${className}`}>
       <SkeletonContainer>
         <div class={`${containerColForm}`}>
           <div class={`${containerRowForm}`}>
@@ -318,7 +320,7 @@ export function SendToolSkeleton({ className = "" }: SkeletonLoaderProps) {
 /* DEPLOY SRC20 TOOL */
 export function DeployToolSkeleton({ className = "" }: SkeletonLoaderProps) {
   return (
-    <div class={`space-y-6 ${className}`}>
+    <div class={`space-y-5 mobileLg:space-y-7.5 ${className}`}>
       <SkeletonContainer>
         {/* Left Column Skeleton - Image upload and decimals */}
         <div class={`${containerColForm} !w-[100px]`}>
@@ -356,7 +358,7 @@ export function DeployToolSkeleton({ className = "" }: SkeletonLoaderProps) {
 /* MINT SRC20 TOOL */
 export function MintToolSkeleton({ className = "" }: SkeletonLoaderProps) {
   return (
-    <div class={`space-y-6 ${className}`}>
+    <div class={`space-y-5 mobileLg:space-y-7.5 ${className}`}>
       <SkeletonContainer>
         <div class={`${containerColForm}`}>
           <div class={`${containerRowForm}`}>
@@ -421,7 +423,7 @@ export function MintToolSkeleton({ className = "" }: SkeletonLoaderProps) {
 /* TRANSFER SRC20 TOOL */
 export function TransferToolSkeleton({ className = "" }: SkeletonLoaderProps) {
   return (
-    <div class={`space-y-6 ${className}`}>
+    <div class={`space-y-5 mobileLg:space-y-7.5 ${className}`}>
       <SkeletonContainer>
         <div class={`${containerColForm}`}>
           <div class={`${rowResponsiveForm}`}>
@@ -447,7 +449,7 @@ export function TransferToolSkeleton({ className = "" }: SkeletonLoaderProps) {
 /* REGISTER SRC101 TOOL */
 export function RegisterToolSkeleton({ className = "" }: SkeletonLoaderProps) {
   return (
-    <div class={`space-y-6 ${className}`}>
+    <div class={`space-y-5 mobileLg:space-y-7.5 ${className}`}>
       <SkeletonContainer>
         <div class={`${containerColForm} items-end`}>
           <div class={`${rowResponsiveForm}`}>

@@ -165,7 +165,7 @@ export default function CollectionOverviewPage(
         return (
           <>
             <CollectionDetailGallery collections={collections || []} />
-            <div class="mt-12 mobileLg:mt-[72px]">
+            <div class="mt-7.5 tablet:mt-10">
               <PaginationButtons
                 page={page ?? 1}
                 totalPages={pages ?? 1}

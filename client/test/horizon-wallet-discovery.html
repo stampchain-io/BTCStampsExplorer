@@ -11,7 +11,7 @@
             margin: 0 auto;
             padding: 20px;
             background: #1a1a1a;
-            color: #00ff00;
+            color: var(--color-green-light);
         }
         .warning {
             background: #ff4444;
@@ -47,7 +47,7 @@
         }
         #output {
             background: #000;
-            color: #00ff00;
+            color: var(--color-green-light);
             padding: 15px;
             border-radius: 4px;
             height: 400px;
@@ -67,8 +67,8 @@
             border-radius: 4px;
             margin-bottom: 10px;
         }
-        .status.detected { background: #004400; color: #00ff00; }
-        .status.not-detected { background: #440000; color: #ff4444; }
+        .status.detected { background: var(--color-green-dark); color: var(--color-green-light); }
+        .status.not-detected { background: var(--color-red-dark); color: var(--color-red-light); }
         .json-display {
             background: #1e1e1e;
             border: 1px solid #444;

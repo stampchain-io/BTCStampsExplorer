@@ -97,7 +97,7 @@ export default function CollectionDetailPage(
     >
       <CollectionDetailHeader collection={collection} stamps={stamps} />
       <CollectionDetailContent stamps={stamps} />
-      <div class="mt-12 mobileLg:mt-[72px]">
+      <div class="mt-7.5 tablet:mt-10">
         <PaginationButtons
           page={page}
           totalPages={pages}
