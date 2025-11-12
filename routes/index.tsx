@@ -126,10 +126,19 @@ export const handler: Handlers<HomePageData> = {
         baseUrl: string,
       ): Promise<any> => {
         try {
+          // Prepare headers for internal API calls
+          const headers: HeadersInit = {
+            "X-API-Version": "2.3", // Use latest API version with market data
+          };
+
+          // Add internal API key for SSR-to-API authentication
+          const internalApiKey = Deno.env.get("INTERNAL_API_KEY");
+          if (internalApiKey) {
+            headers["X-API-Key"] = internalApiKey;
+          }
+
           const response = await fetch(`${baseUrl}${endpoint}`, {
-            headers: {
-              "X-API-Version": "2.3", // Use latest API version with market data
-            },
+            headers,
           });
 
           if (!response.ok) {
