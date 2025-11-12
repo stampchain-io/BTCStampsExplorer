@@ -8,6 +8,7 @@ import { HomeHeader } from "$header";
 import {
   body,
   containerBackground,
+  containerGap,
   gapSectionSlim,
   Micro5FontLoader,
 } from "$layout";

@@ -1,7 +1,7 @@
 /* ===== SRC20 CARD BASE COMPONENT ===== */
 /*@baba-check styles*/
 import { cellAlign } from "$components/layout/types.ts";
-import { glassmorphism, shadowGlowPurple } from "$layout";
+import { shadowGlowPurple } from "$layout";
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { getSRC20ImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
 import type { SRC20CardBaseProps } from "$types/ui.d.ts";

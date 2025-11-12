@@ -3,7 +3,6 @@ import { PaginationButtons } from "$button";
 import { BREAKPOINTS } from "$constants";
 import { LoadingIcon } from "$icon";
 import { RecentSaleCard } from "$islands/card/RecentSaleCard.tsx";
-import { glassmorphismL2 } from "$layout";
 import { useLoadingSkeleton } from "$lib/hooks/useLoadingSkeleton.ts";
 import { AccessibilityUtils } from "$lib/utils/ui/accessibility/accessibilityUtils.ts";
 import { subtitleGrey, titleGreyDL } from "$text";

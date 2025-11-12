@@ -6,7 +6,6 @@ import {
   bodyTool,
   containerBackground,
   containerColForm,
-  containerGap,
   transitionAll,
 } from "$layout";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";

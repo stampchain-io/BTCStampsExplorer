@@ -18,11 +18,7 @@ import { Button } from "$button";
 import { CloseIcon, Icon } from "$icon";
 import type { FilterType } from "$islands/button/FilterButton.tsx";
 import { FilterContentSRC20 } from "$islands/filter/FilterContentSRC20.tsx";
-import {
-  containerStickyBottom,
-  glassmorphismOverlay,
-  transitionTransform,
-} from "$layout";
+import { glassmorphismOverlay, transitionTransform } from "$layout";
 import { useBreakpoints } from "$lib/hooks/useBreakpoints.ts";
 import { tooltipIcon } from "$notification";
 import {

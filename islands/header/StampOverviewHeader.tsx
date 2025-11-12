@@ -11,7 +11,10 @@ import {
   StampFilters as FilterStampFilters,
 } from "$islands/filter/FilterOptionsStamp.tsx";
 import { glassmorphism } from "$layout";
-import { safeNavigate } from "$lib/utils/navigation/freshNavigationUtils.ts";
+import {
+  getCurrentPathname,
+  safeNavigate,
+} from "$lib/utils/navigation/freshNavigationUtils.ts";
 import { titleGreyLD } from "$text";
 import type { StampOverviewHeaderProps } from "$types/ui.d.ts";
 import { useCallback, useState } from "preact/hooks";
@@ -45,7 +48,7 @@ export const StampOverviewHeader = (
       const queryParams = filtersToQueryParams("", updatedFilters);
 
       // Construct new URL
-      const newUrl = globalThis.location.pathname +
+      const newUrl = getCurrentPathname() +
         (queryParams ? `?${queryParams}` : "");
 
       // Navigate immediately - page reloads with new data

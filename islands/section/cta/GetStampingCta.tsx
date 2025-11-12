@@ -1,7 +1,7 @@
 /* ===== GET STAMPING CTA COMPONENT ===== */
 import { Button } from "$button";
-import { containerBackground, gapGrid } from "$layout";
-import { subtitleGrey, text, titleGreyDL } from "$text";
+import { containerBackground, containerGap } from "$layout";
+import { subtitleGrey, text, titleGreyLD } from "$text";
 
 /* ===== COMPONENT ===== */
 export default function GetStampingCta() {

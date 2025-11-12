@@ -4,12 +4,7 @@ import { Button } from "$button";
 import { Icon } from "$icon";
 import BuyStampModal from "$islands/modal/BuyStampModal.tsx";
 import { openModal } from "$islands/modal/states.ts";
-import {
-  body,
-  containerBackground,
-  containerColData,
-  containerGap,
-} from "$layout";
+import { body, containerBackground, containerColData } from "$layout";
 import type { Src101Detail } from "$lib/types/src101.d.ts";
 import type { StampRow } from "$lib/types/stamp.d.ts";
 import { calculateTransactionSize } from "$lib/utils/data/identifiers/identifierUtils.ts";

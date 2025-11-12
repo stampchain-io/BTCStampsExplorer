@@ -19,7 +19,6 @@ import type { DispenserRow as Dispenser, StampRow } from "$types/stamp.d.ts";
 
 import { PaginationButtons } from "$button";
 import { Icon, LoadingIcon, PlaceholderImage } from "$icon";
-import { SettingsButton } from "$islands/button/SettingsButton.tsx";
 import { SortButton } from "$islands/button/SortButton.tsx";
 import { shadowGlowPurple } from "$layout";
 import type {
@@ -39,7 +38,7 @@ import {
   isBrowser,
   safeNavigate,
 } from "$utils/navigation/freshNavigationUtils.ts";
-import { useEffect, useRef, useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 
 // ===== ADVANCED SORTING IMPORTS =====
 import SortingErrorBoundary from "$islands/sorting/SortingErrorBoundary.tsx";

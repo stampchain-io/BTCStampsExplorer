@@ -78,6 +78,14 @@ const baseGlassmorphismColor =
   "relative text-[#080708] before:blur-sm hover:border-[var(--color-border-hover)] hover:before:scale-105";
 const baseBefore =
   "before:absolute before:inset-0 before:rounded-full before:z-[-1] before:transition-transform before:duration-50 before:origin-center";
+const baseOutline = `
+  bg-color-background bg-opacity-10 hover:bg-opacity-50
+  border border-[var(--color-button-semidark)] rounded-full
+`;
+const baseFlat = `
+  bg-[linear-gradient(to_bottom_right,var(--color-button-light),var(--color-button-semilight),var(--color-button),var(--color-button-semidark),var(--color-button-dark))]
+  border border-[var(--color-button-dark)] rounded-full
+`;
 const gradientOverlay =
   "before:bg-[linear-gradient(to_bottom_right,var(--color-dark)_0%,var(--color-dark)_20%,var(--color-medium)_20%,var(--color-medium)_45%,var(--color-light)_45%,var(--color-light)_52%,var(--color-medium)_52%,var(--color-medium)_70%,var(--color-dark)_70%,var(--color-dark)_100%)]";
 const gradientOverlayHover =

@@ -2,7 +2,7 @@
 /*@baba-153+154-move Refreshing to ViewAllButton-remove default (not used)*/
 import { containerBackground, loaderSpinXsGrey } from "$layout";
 import { StampGallery } from "$section";
-import { titleGreyLD } from "$text";
+import { titleGreyLD, valueDarkSm } from "$text";
 import type { StampWithEnhancedSaleData } from "$types/marketData.d.ts";
 import type { StampSalesProps } from "$types/ui.d.ts";
 import { useEffect, useState } from "preact/hooks";

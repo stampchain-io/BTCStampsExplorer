@@ -1,5 +1,5 @@
 /* ===== TEAM GALLERY COMPONENT ===== */
-import { containerBackground, gapGrid } from "$layout";
+import { containerBackground, containerGap } from "$layout";
 import { headingGreyLD, subtitleGrey, valueSm } from "$text";
 
 /* ===== COMPONENT ===== */

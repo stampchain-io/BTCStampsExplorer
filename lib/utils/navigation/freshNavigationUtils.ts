@@ -27,6 +27,18 @@ export const getCurrentUrl = (fallback: string = "/"): string => {
 };
 
 /**
+ * SSR-safe pathname helper to get current pathname
+ * @param fallback - Fallback pathname for SSR environment
+ * @returns Current pathname or fallback
+ */
+export const getCurrentPathname = (fallback: string = "/"): string => {
+  if (typeof globalThis === "undefined" || !globalThis?.location) {
+    return fallback; // Safe fallback during SSR
+  }
+  return globalThis.location.pathname;
+};
+
+/**
  * SSR-safe window width helper
  * @returns Window width or fallback for SSR
  */
