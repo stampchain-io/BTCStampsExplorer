@@ -380,7 +380,7 @@ function DispenserStats({
         <div className="flex justify-end pt-1.5">
           <Button
             variant="outline"
-            color="purpleLight"
+            color="purple"
             size="md"
             onClick={handleOpenBuyModal}
           >

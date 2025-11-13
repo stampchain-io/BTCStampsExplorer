@@ -43,6 +43,7 @@ import {
   StatusMessages,
   tooltipButton,
   tooltipButtonInCollapsible,
+  tooltipImage,
 } from "$notification";
 import { FeeCalculatorBase } from "$section";
 import { labelLg, subtitleGrey, titleGreyLD } from "$text";
