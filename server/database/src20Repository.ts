@@ -2,6 +2,7 @@
 import {
     BALANCE_CACHE_DURATION,
     BLOCKCHAIN_SYNC_CACHE_DURATION,
+    IMMUTABLE_CACHE_DURATION,
     SRC20_BALANCE_TABLE,
     SRC20_TABLE
 } from "$constants";
@@ -428,7 +429,7 @@ export class SRC20Repository {
       const results = await this.db.executeQueryWithCache(
         query,
         fullQueryParams,
-        BLOCKCHAIN_SYNC_CACHE_DURATION,
+        IMMUTABLE_CACHE_DURATION, // SRC20 transactions are immutable - invalidated on block reorg
       ) as any;
 
       // Convert response ticks to emoji format

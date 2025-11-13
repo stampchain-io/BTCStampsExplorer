@@ -45,6 +45,17 @@ export const BALANCE_CACHE_DURATION = 60 * 5; // Increased from 30 seconds to 5 
 /** Short-lived cache for rapidly changing data (30 seconds) */
 export const SHORT_CACHE_DURATION = 30;
 
+/**
+ * Long-term cache for immutable blockchain data (2 hours)
+ * Balances performance with automatic stale data cleanup
+ * Used for confirmed transactions, stamps, and other immutable blockchain state
+ *
+ * NOTE: Can be changed to "never" (permanent) once webhook integration is active
+ * Webhook endpoint exists at /api/internal/bitcoinNotifications but indexer
+ * does not currently call it. Future indexer team can add webhook support.
+ */
+export const IMMUTABLE_CACHE_DURATION = 60 * 60 * 2; // 2 hours
+
 /** Multiplier for converting KB to vBytes */
 export const SATS_PER_KB_MULTIPLIER = 1000; // 1 KB = 1000 vBytes
 
