@@ -8,6 +8,7 @@ import type {
 } from "$constants";
 import {
   DEFAULT_CACHE_DURATION,
+  IMMUTABLE_CACHE_DURATION,
   MAX_PAGINATION_LIMIT,
   STAMP_TABLE,
   STAMP_TYPES as STAMP_TYPE_CONSTANTS,
@@ -536,7 +537,7 @@ export class StampRepository {
     const result = await this.db.executeQueryWithCache(
       query,
       params,
-      DEFAULT_CACHE_DURATION
+      IMMUTABLE_CACHE_DURATION // Individual stamp data is immutable - invalidated on block reorg
     );
 
     if (!(result as any)?.rows?.length) {
