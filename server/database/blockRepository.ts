@@ -52,7 +52,7 @@ export class BlockRepository {
       FROM blocks;
       `,
       [],
-      0,
+      30, // 30 seconds - current block height changes every ~10 minutes
     );
   }
 
@@ -66,7 +66,7 @@ export class BlockRepository {
         LIMIT ?;
         `,
         [num],
-        0,
+        "never", // Blocks are immutable once confirmed - cache forever
       ) || { rows: [] };
 
       const blocks = (result as any).rows;
@@ -130,7 +130,7 @@ export class BlockRepository {
       ORDER BY block_index DESC;
       `,
         [block_index, block_index],
-        0,
+        "never", // Blocks are immutable once confirmed - cache forever
       ),
       this.db.executeQueryWithCache(
         `

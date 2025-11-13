@@ -200,24 +200,6 @@ function SectionHeader({
   );
 }
 
-/**
- * Get human-readable label for sort option
- * Reserved for future advanced sorting features
- */
-// function _getSortLabel(option: string): string {
-//   const labels: Record<string, string> = {
-//     "ASC": "Low to High",
-//     "DESC": "High to Low",
-//     "value_asc": "Value ↑",
-//     "value_desc": "Value ↓",
-//     "stamp_asc": "Stamp # ↑",
-//     "stamp_desc": "Stamp # ↓",
-//     "quantity_asc": "Quantity ↑",
-//     "quantity_desc": "Quantity ↓",
-//   };
-//   return labels[option] || option;
-// }
-
 // ===== DISPENSER ITEM SUBCOMPONENT =====
 function DispenserItem({
   dispensers = [],
@@ -353,7 +335,7 @@ function DispenserRow(
   const fetchStampImage = () => {
     setLoading(true);
     const res = getStampImageSrc(dispenser.stamp as StampRow);
-    setSrc(res ?? undefined);
+    setSrc(res);
     setLoading(false);
   };
 
