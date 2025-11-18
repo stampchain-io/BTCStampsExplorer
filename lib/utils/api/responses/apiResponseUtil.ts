@@ -265,10 +265,16 @@ export class ApiResponseUtil {
     options: ApiResponseOptions = {},
   ): Response {
     console.error("Internal Error:", error);
+
+    // Check if we're in development mode (server-side only)
+    const isDevelopment = typeof window === "undefined" &&
+      typeof Deno !== "undefined" &&
+      Deno.env.get("DENO_ENV") === "development";
+
     return new Response(
       JSON.stringify(
         this.createErrorResponse(message, "INTERNAL_ERROR", {
-          ...(Deno.env.get("DENO_ENV") === "development" ? { error } : {}),
+          ...(isDevelopment ? { error } : {}),
         }),
       ),
       {
