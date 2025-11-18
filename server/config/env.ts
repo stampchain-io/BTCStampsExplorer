@@ -1,24 +1,28 @@
-// Check for build mode or SKIP_REDIS_CONNECTION before any imports
-const isBuild = Deno.args.includes("build");
-const envMode = Deno.env.get("DENO_ENV");
-const skipRedisForDev = envMode === "development";
-const isTest = envMode === "test";
+// BROWSER GUARD: This file must be safe even if accidentally bundled into client code
+// Only execute server-side Deno code when NOT in browser and Deno is available
+if (typeof window === "undefined" && typeof Deno !== "undefined") {
+  // Check for build mode or SKIP_REDIS_CONNECTION before any imports
+  const isBuild = Deno.args.includes("build");
+  const envMode = Deno.env.get("DENO_ENV");
+  const skipRedisForDev = envMode === "development";
+  const isTest = envMode === "test";
 
-// Skip Redis for build, test, or dev mode (unless forced)
-(globalThis as any).SKIP_REDIS_CONNECTION = isBuild || isTest ||
-  (skipRedisForDev && Deno.env.get("FORCE_REDIS_CONNECTION") !== "true");
+  // Skip Redis for build, test, or dev mode (unless forced)
+  (globalThis as any).SKIP_REDIS_CONNECTION = isBuild || isTest ||
+    (skipRedisForDev && Deno.env.get("FORCE_REDIS_CONNECTION") !== "true");
 
-import { load } from "@std/dotenv";
-await load({ export: true });
+  // Load environment variables from .env file
+  const { load } = await import("@std/dotenv");
+  await load({ export: true });
 
-// Set DENO_ENV to 'development' if not already set
-if (!Deno.env.get("DENO_ENV")) {
-  Deno.env.set("DENO_ENV", "development");
-}
+  // Set DENO_ENV to 'development' if not already set
+  if (!Deno.env.get("DENO_ENV")) {
+    Deno.env.set("DENO_ENV", "development");
+  }
 
-// Only log Redis settings in non-test environments
-if (!isTest) {
-  const redisSettingsMessage = `
+  // Only log Redis settings in non-test environments
+  if (!isTest) {
+    const redisSettingsMessage = `
 *************************************************************************
                     REDIS CONNECTION SETTINGS
 *************************************************************************
@@ -31,7 +35,13 @@ SKIP_REDIS_CONNECTION:    ${(globalThis as any).SKIP_REDIS_CONNECTION ? "yes" : 
 *************************************************************************
 `;
 
-  console.log(redisSettingsMessage);
-  // Also output to stderr for better AWS CloudWatch visibility
-  console.error(redisSettingsMessage);
+    console.log(redisSettingsMessage);
+    // Also output to stderr for better AWS CloudWatch visibility
+    console.error(redisSettingsMessage);
+  }
+} else {
+  // Browser fallback: Set safe defaults for client-side code
+  if (typeof globalThis !== "undefined") {
+    (globalThis as any).SKIP_REDIS_CONNECTION = true;
+  }
 }
