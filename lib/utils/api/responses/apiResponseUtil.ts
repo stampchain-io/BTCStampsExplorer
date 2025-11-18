@@ -5,15 +5,11 @@ import {
   RouteType,
 } from "$server/services/infrastructure/cacheService.ts";
 
-export const API_RESPONSE_VERSION = "v2.2.7";
+// Import types for internal use and re-export for server code
+import type { ApiErrorResponse, APIResponse } from "$lib/types/api.ts";
+export type { ApiErrorResponse, APIResponse };
 
-//  // Future structure
-//  lib/utils/
-//  ├── apiResponseUtil.ts    // API-specific responses
-//  ├── webResponseUtil.ts    // Web/frontend responses
-//  ├── securityHeaders.ts    // Shared security headers
-//  └── headerUtils.ts        // Shared header utilities
-
+// Server-specific version with RouteType enum
 export interface ApiResponseOptions {
   status?: number;
   headers?: Record<string, string>;
@@ -21,21 +17,17 @@ export interface ApiResponseOptions {
   forceNoCache?: boolean;
 }
 
-export interface ApiErrorResponse {
-  error: string;
-  status: "error";
-  code: string;
-  details?: unknown;
-}
+export const API_RESPONSE_VERSION = "v2.2.7";
 
-export interface APIResponse {
-  success: boolean;
-  message?: string;
-  status?: string;
-  error?: string;
-  code?: string;
-  details?: unknown;
-}
+//  // Future structure
+//  lib/utils/
+//  ├── apiResponseUtil.ts    // API-specific responses (server-side utility class)
+//  ├── webResponseUtil.ts    // Web/frontend responses
+//  ├── securityHeaders.ts    // Shared security headers
+//  └── headerUtils.ts        // Shared header utilities
+//
+//  lib/types/
+//  └── api.ts                // Type definitions (client-safe, no Deno dependencies)
 
 export class ApiResponseUtil {
   private static createHeaders(options: ApiResponseOptions = {}): Headers {
