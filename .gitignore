@@ -220,6 +220,7 @@ docs/
 logs/*
 coverage.lcov
 .claude/
+.claude-remote/
 scripts/validate-expected-changes.js
 remove_sensitive_data.sh
 emergency_fix.sh

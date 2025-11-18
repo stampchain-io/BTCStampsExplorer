@@ -7,6 +7,7 @@ import {
 import { BLOCKCYPHER_API_BASE_URL } from "$constants";
 import { formatSatoshisToBTC, formatUSDValue } from "$lib/utils/formatUtils.ts";
 import { getBTCBalanceFromMempool } from "$lib/utils/mempool.ts";
+import { dbManager } from "$server/database/databaseManager.ts";
 
 async function getBTCBalanceFromBlockCypher(
   address: string,
@@ -34,17 +35,67 @@ async function getBTCBalanceFromBlockCypher(
   }
 }
 
+// Cached wrapper for getBTCBalanceFromMempool with Redis caching
+async function getCachedBTCBalanceFromMempool(
+  address: string,
+): Promise<BTCBalance | null> {
+  const cacheKey = `btc_balance:mempool:${address}`;
+  const cacheDuration = 60; // 60 seconds TTL - balances can change frequently
+
+  try {
+    return await dbManager.handleCache(
+      cacheKey,
+      () => getBTCBalanceFromMempool(address),
+      cacheDuration,
+    ) as BTCBalance | null;
+  } catch (error) {
+    console.error("Cached balance fetch error:", error);
+    // Fallback to direct call if caching fails
+    return getBTCBalanceFromMempool(address);
+  }
+}
+
+// Cached wrapper for getBTCBalanceFromBlockCypher with Redis caching
+async function getCachedBTCBalanceFromBlockCypher(
+  address: string,
+): Promise<BTCBalance | null> {
+  const cacheKey = `btc_balance:blockcypher:${address}`;
+  const cacheDuration = 60; // 60 seconds TTL
+
+  try {
+    return await dbManager.handleCache(
+      cacheKey,
+      () => getBTCBalanceFromBlockCypher(address),
+      cacheDuration,
+    ) as BTCBalance | null;
+  } catch (error) {
+    console.error("Cached BlockCypher balance fetch error:", error);
+    // Fallback to direct call if caching fails
+    return getBTCBalanceFromBlockCypher(address);
+  }
+}
+
 export async function getBTCBalanceInfo(
   address: string,
   options: BTCBalanceInfoOptions = {},
 ): Promise<BTCBalanceInfo | null> {
   try {
-    const providers = [getBTCBalanceFromMempool, getBTCBalanceFromBlockCypher];
+    // Use cached versions of balance providers
+    const providers = [
+      {
+        name: "Mempool (cached)",
+        fn: () => getCachedBTCBalanceFromMempool(address),
+      },
+      {
+        name: "BlockCypher (cached)",
+        fn: () => getCachedBTCBalanceFromBlockCypher(address),
+      },
+    ];
     let balance = null;
 
     for (const provider of providers) {
       try {
-        const result = await provider(address);
+        const result = await provider.fn();
         if (result) {
           balance = result;
           console.log(`Using balance data from ${provider.name}`);
