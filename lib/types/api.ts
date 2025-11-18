@@ -202,3 +202,53 @@ export interface ApiResponseWithMarketData<T> {
 /**
  * Error response with market data context
  */
+export interface ErrorResponseWithMarketData extends ApiErrorResponse {
+  cacheInfo?: MarketDataCacheInfo;
+}
+
+/**
+ * =============================================================================
+ * GENERAL API RESPONSE TYPES
+ * =============================================================================
+ *
+ * These types are safe for client-side imports (islands, components).
+ * They contain NO server-side dependencies (Deno APIs, database, etc).
+ *
+ * Islands should ONLY import types from this file, never from server utilities.
+ */
+
+/**
+ * Standard API response structure
+ * Safe for client-side type checking in islands
+ */
+export interface APIResponse {
+  success: boolean;
+  message?: string;
+  status?: string;
+  error?: string;
+  code?: string;
+  details?: unknown;
+}
+
+/**
+ * API error response structure
+ * Safe for client-side type checking in islands
+ */
+export interface ApiErrorResponse {
+  error: string;
+  status: "error";
+  code: string;
+  details?: unknown;
+}
+
+/**
+ * API response options (type-only, no runtime behavior)
+ * Safe for client-side type checking in islands
+ * NOTE: routeType uses string for client safety, server uses RouteType enum
+ */
+export interface ApiResponseOptions {
+  status?: number;
+  headers?: Record<string, string>;
+  routeType?: string; // Server-side: RouteType enum, client-side: string literal
+  forceNoCache?: boolean;
+}

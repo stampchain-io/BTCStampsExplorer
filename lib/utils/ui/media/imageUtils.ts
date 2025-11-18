@@ -7,21 +7,8 @@ import type { StampRow } from "$types/stamp.d.ts";
  * Used for constructing fully qualified URLs
  */
 export const getBaseUrl = (): string => {
-  // Server-side environment check
-  if (typeof Deno !== "undefined") {
-    const env = Deno.env.get("DENO_ENV");
-
-    // In development mode, use relative URLs so they work with localhost dev server
-    if (env === "development") {
-      return ""; // Empty string = relative URLs
-    }
-
-    // For test environment, always return production CDN
-    if (env === "test") {
-      return "https://stampchain.io";
-    }
-  } else {
-    // Client-side: Check if we're on localhost for development
+  // Client-side: Check if we're on localhost for development
+  if (typeof window !== "undefined") {
     try {
       // @ts-ignore - globalThis.location exists in browser
       if (globalThis.location && globalThis.location.hostname === "localhost") {

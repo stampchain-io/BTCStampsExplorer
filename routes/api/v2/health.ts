@@ -56,19 +56,37 @@ export const handler: Handlers = {
     };
 
     try {
+      // Use Promise.allSettled to prevent one failure from breaking entire health check
       const [
-        lastIndexedBlock,
-        currentBlockHeight,
-        stampCount,
-        src20Deployments,
-        xcpHealth,
-      ] = await Promise.all([
+        lastIndexedBlockResult,
+        currentBlockHeightResult,
+        stampCountResult,
+        src20DeploymentsResult,
+        xcpHealthResult,
+      ] = await Promise.allSettled([
         BlockService.getLastBlock(),
-        getCurrentBlock(),
+        getCurrentBlock().catch(() => null), // Catch mempool.space failures
         StampService.countTotalStamps(),
         SRC20Repository.checkSrc20Deployments(),
         CounterpartyApiManager.checkHealth(30), // 30 seconds cache for health checks (was 30000ms)
       ]);
+
+      // Extract values from settled promises
+      const lastIndexedBlock = lastIndexedBlockResult.status === "fulfilled"
+        ? lastIndexedBlockResult.value
+        : null;
+      const currentBlockHeight = currentBlockHeightResult.status === "fulfilled"
+        ? currentBlockHeightResult.value
+        : null;
+      const stampCount = stampCountResult.status === "fulfilled"
+        ? stampCountResult.value
+        : { isValid: false, count: 0 };
+      const src20Deployments = src20DeploymentsResult.status === "fulfilled"
+        ? src20DeploymentsResult.value
+        : { isValid: false, count: 0 };
+      const xcpHealth = xcpHealthResult.status === "fulfilled"
+        ? xcpHealthResult.value
+        : false;
 
       // Update service statuses
       health.services.indexer = !!lastIndexedBlock;

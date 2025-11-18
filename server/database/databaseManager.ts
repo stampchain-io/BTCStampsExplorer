@@ -12,8 +12,9 @@ import {
 } from "@std/log";
 import { Client } from "mysql/mod.ts";
 // Conditionally import Redis based on build mode
+// BROWSER GUARD: Only access Deno when available (server-side)
 let connect: any;
-if (Deno.args.includes("build")) {
+if (typeof Deno !== "undefined" && Deno.args?.includes("build")) {
   console.log("[REDIS IMPORT] Skipping Redis import in build mode");
   // Create dummy implementations for build
   connect = () => Promise.resolve({
@@ -23,7 +24,7 @@ if (Deno.args.includes("build")) {
     keys: () => Promise.resolve([]),
     del: () => Promise.resolve(0)
   });
-} else {
+} else if (typeof Deno !== "undefined") {
   // Use the Deno Redis client in non-build mode
   try {
     const redis = await import("redis");
@@ -42,6 +43,15 @@ if (Deno.args.includes("build")) {
       del: () => Promise.resolve(0)
     });
     }
+} else {
+  // Browser fallback: dummy implementations
+  connect = () => Promise.resolve({
+    ping: () => Promise.resolve("PONG (memory)"),
+    set: () => Promise.resolve("OK"),
+    get: () => Promise.resolve(null),
+    keys: () => Promise.resolve([]),
+    del: () => Promise.resolve(0)
+  });
 }
 
 export interface DatabaseConfig {
@@ -58,8 +68,9 @@ export interface DatabaseConfig {
 }
 
 function shouldInitializeRedis(): boolean {
+  // BROWSER GUARD: Only access Deno when available (server-side)
   // Never initialize Redis during build
-  if (Deno.args.includes("build")) {
+  if (typeof Deno !== "undefined" && Deno.args?.includes("build")) {
     console.log("[REDIS] Build mode detected, skipping Redis initialization");
     return false;
   }
@@ -1449,32 +1460,56 @@ class DatabaseManager {
   }
 }
 
-const dbConfig: DatabaseConfig = {
-  DB_HOST: Deno.env.get("DB_HOST") || "",
-  DB_USER: Deno.env.get("DB_USER") || "",
-  DB_PASSWORD: Deno.env.get("DB_PASSWORD") || "",
-  DB_PORT: Number(Deno.env.get("DB_PORT")) || 3306,
-  DB_NAME: Deno.env.get("DB_NAME") || "",
-  DB_MAX_RETRIES: Number(Deno.env.get("DB_MAX_RETRIES")) || 5,
-  ELASTICACHE_ENDPOINT: Deno.env.get("ELASTICACHE_ENDPOINT") || "",
-  DENO_ENV: Deno.env.get("DENO_ENV") || "development",
-  CACHE: Deno.env.get("CACHE") || "true",
-  REDIS_LOG_LEVEL: Deno.env.get("REDIS_LOG_LEVEL") || "DEBUG",
-};
+// BROWSER GUARD: Only access Deno when available (server-side)
+let dbConfig: DatabaseConfig;
+let dbManagerInstance: DatabaseManager | undefined;
 
-// Log the ElastiCache configuration at startup for troubleshooting
-console.log("=== CACHE CONFIGURATION ===");
-console.log(`ELASTICACHE_ENDPOINT: ${dbConfig.ELASTICACHE_ENDPOINT || 'Not set'}`);
-console.log(`DENO_ENV: ${dbConfig.DENO_ENV}`);
-console.log(`CACHE enabled: ${dbConfig.CACHE}`);
-console.log(`REDIS_LOG_LEVEL: ${dbConfig.REDIS_LOG_LEVEL}`);
-console.log(`SKIP_REDIS_CONNECTION: ${(globalThis as any).SKIP_REDIS_CONNECTION ? 'true' : 'false'}`);
-console.log("===========================");
+if (typeof Deno !== "undefined") {
+  // Server-side: Load config from environment
+  dbConfig = {
+    DB_HOST: Deno.env.get("DB_HOST") || "",
+    DB_USER: Deno.env.get("DB_USER") || "",
+    DB_PASSWORD: Deno.env.get("DB_PASSWORD") || "",
+    DB_PORT: Number(Deno.env.get("DB_PORT")) || 3306,
+    DB_NAME: Deno.env.get("DB_NAME") || "",
+    DB_MAX_RETRIES: Number(Deno.env.get("DB_MAX_RETRIES")) || 5,
+    ELASTICACHE_ENDPOINT: Deno.env.get("ELASTICACHE_ENDPOINT") || "",
+    DENO_ENV: Deno.env.get("DENO_ENV") || "development",
+    CACHE: Deno.env.get("CACHE") || "true",
+    REDIS_LOG_LEVEL: Deno.env.get("REDIS_LOG_LEVEL") || "DEBUG",
+  };
 
-// Only create singleton if not in test mode to prevent resource leaks during testing
-export const dbManager = Deno.env.get("DENO_ENV") === "test"
-  ? (globalThis as any).__mockDbManager || undefined as any as DatabaseManager  // Use mock if available in test mode
-  : new DatabaseManager(dbConfig);
+  // Log the ElastiCache configuration at startup for troubleshooting
+  console.log("=== CACHE CONFIGURATION ===");
+  console.log(`ELASTICACHE_ENDPOINT: ${dbConfig.ELASTICACHE_ENDPOINT || 'Not set'}`);
+  console.log(`DENO_ENV: ${dbConfig.DENO_ENV}`);
+  console.log(`CACHE enabled: ${dbConfig.CACHE}`);
+  console.log(`REDIS_LOG_LEVEL: ${dbConfig.REDIS_LOG_LEVEL}`);
+  console.log(`SKIP_REDIS_CONNECTION: ${(globalThis as any).SKIP_REDIS_CONNECTION ? 'true' : 'false'}`);
+  console.log("===========================");
+
+  // Only create singleton if not in test mode to prevent resource leaks during testing
+  dbManagerInstance = Deno.env.get("DENO_ENV") === "test"
+    ? (globalThis as any).__mockDbManager || undefined as any as DatabaseManager  // Use mock if available in test mode
+    : new DatabaseManager(dbConfig);
+} else {
+  // Browser fallback: Safe defaults (will never actually be used)
+  dbConfig = {
+    DB_HOST: "",
+    DB_USER: "",
+    DB_PASSWORD: "",
+    DB_PORT: 3306,
+    DB_NAME: "",
+    DB_MAX_RETRIES: 5,
+    ELASTICACHE_ENDPOINT: "",
+    DENO_ENV: "development",
+    CACHE: "false",
+    REDIS_LOG_LEVEL: "INFO",
+  };
+  dbManagerInstance = undefined;
+}
+
+export const dbManager = dbManagerInstance as DatabaseManager;
 
 // Export the class for testing and other uses
 export { DatabaseManager };

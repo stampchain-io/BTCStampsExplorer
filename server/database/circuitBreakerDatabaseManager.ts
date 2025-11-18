@@ -108,7 +108,7 @@ class CircuitBreakerDatabaseManager {
   }
 
   close() {
-    return dbManager.close();
+    return dbManager?.closeAllClients();
   }
 
   /**

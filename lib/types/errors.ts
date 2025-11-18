@@ -1147,19 +1147,22 @@ export function createErrorReporter({
       onReport(appError, context, metadata);
     } else {
       // Default reporting - just log to console in development
-      try {
-        if (
-          typeof Deno !== "undefined" &&
-          Deno.env.get("DENO_ENV") === "development"
-        ) {
-          console.error("React Error:", {
-            error: appError,
-            context,
-            metadata,
-          });
+      // Only on server-side (islands/client code should not access Deno)
+      if (typeof window === "undefined") {
+        try {
+          if (
+            typeof Deno !== "undefined" &&
+            Deno.env.get("DENO_ENV") === "development"
+          ) {
+            console.error("React Error:", {
+              error: appError,
+              context,
+              metadata,
+            });
+          }
+        } catch {
+          // Silently ignore permission errors for environment access
         }
-      } catch {
-        // Silently ignore permission errors for environment access
       }
     }
   };

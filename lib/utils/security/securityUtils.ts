@@ -1,11 +1,16 @@
-import "$/server/config/env.ts";
-
 import { create, Header, Payload, verify } from "djwt/mod.ts";
 
 let SECRET_KEY: string | undefined;
 
 function getSecretKey(): string {
-  const key = Deno.env.get("CSRF_SECRET_KEY");
+  // Server-side only - check environment
+  if (typeof window !== "undefined") {
+    throw new Error("CSRF token generation must only run on server");
+  }
+
+  const key = typeof Deno !== "undefined"
+    ? Deno.env.get("CSRF_SECRET_KEY")
+    : undefined;
   if (!key) {
     throw new Error("CSRF_SECRET_KEY is not set in the server configuration");
   }
