@@ -63,7 +63,8 @@ export class ToolEndpointFeeEstimator {
           : 10_000), // longer in dev
       maxCacheSize: config.maxCacheSize ?? 100,
       enableLogging: config.enableLogging ??
-        (Deno.env.get("DENO_ENV") === "development"),
+        (typeof Deno !== "undefined" &&
+          Deno.env.get("DENO_ENV") === "development"),
     };
   }
 

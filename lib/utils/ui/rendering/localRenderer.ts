@@ -46,7 +46,11 @@ export async function renderHtmlLocal(
   let browser;
   try {
     // Use PUPPETEER_EXECUTABLE_PATH if set (Docker), otherwise let Puppeteer use its bundled Chrome
-    const executablePath = Deno.env.get("PUPPETEER_EXECUTABLE_PATH");
+    // Server-side only - Deno APIs not available in browser
+    const executablePath =
+      typeof window === "undefined" && typeof Deno !== "undefined"
+        ? Deno.env.get("PUPPETEER_EXECUTABLE_PATH")
+        : undefined;
 
     // Launch browser with minimal flags for headless environment
     const launchOptions: any = {
@@ -129,10 +133,14 @@ export async function renderHtmlLocal(
     );
     console.error(`[LocalRenderer] Full error stack:`, errorStack);
     console.error(`[LocalRenderer] Error type:`, errorName);
-    console.error(
-      `[LocalRenderer] Chrome path:`,
-      Deno.env.get("PUPPETEER_EXECUTABLE_PATH"),
-    );
+
+    // Server-side only error logging
+    if (typeof window === "undefined" && typeof Deno !== "undefined") {
+      console.error(
+        `[LocalRenderer] Chrome path:`,
+        Deno.env.get("PUPPETEER_EXECUTABLE_PATH"),
+      );
+    }
 
     // Always throw the original error to see what's really happening
     throw new Error(`Chrome launch failed: ${errorMessage}`);

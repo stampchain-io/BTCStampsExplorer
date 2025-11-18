@@ -18,7 +18,7 @@ import {
   transitionColors,
 } from "$layout";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
-import { APIResponse } from "$lib/utils/api/responses/apiResponseUtil.ts";
+import type { APIResponse } from "$lib/types/api.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { mapProgressiveFeeDetails } from "$lib/utils/performance/fees/fee-estimation-utils.ts";
 import { getCSRFToken } from "$lib/utils/security/clientSecurityUtils.ts";

@@ -35,7 +35,9 @@ if (typeof process !== "undefined" && process.emitWarning) {
 // but it's an attempt to hook in earlier.
 const earlyOriginalResolve = import.meta.resolve;
 import.meta.resolve = function (specifier: string): string {
-  const isBuildMode = Deno.args.includes("build"); // Cannot rely on globalThis yet if it's too early
+  // BROWSER GUARD: Only access Deno when available (server-side)
+  const isBuildMode =
+    (typeof Deno !== "undefined" && Deno.args?.includes("build")) || false;
   console.log(
     `[EARLY RESOLVER ENTRY] Specifier: "${specifier}", BuildMode: ${isBuildMode}, Timestamp: ${Date.now()}`,
   );
