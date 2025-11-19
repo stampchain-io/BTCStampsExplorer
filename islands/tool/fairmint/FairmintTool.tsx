@@ -6,6 +6,7 @@ import {
   bodyTool,
   containerBackground,
   containerColForm,
+  containerGap,
   transitionAll,
 } from "$layout";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
@@ -111,8 +112,10 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
   }
 
   return (
-    <div class={bodyTool} data-testid="fairmint-tool">
-      <h1 class={`${titleGreyLD} mobileMd:mx-auto mb-1`}>FAIRMINT</h1>
+    <div class={`${bodyTool} ${containerGap}`} data-testid="fairmint-tool">
+      <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
+        FAIRMINT
+      </h1>
 
       <form class={containerBackground}>
         {/* ===== TOKEN SELECTION ===== */}
@@ -121,7 +124,7 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
             ? (
               // Render the select dropdown if fairminters are available
               <select
-                class="h-10 p-3 rounded-2xl bg-[#999999] text-black placeholder:text-black placeholder:font-light"
+                class="h-10 p-3 rounded-2xl bg-color-grey text-black placeholder:text-black placeholder:font-light"
                 value={formState.asset}
                 onChange={handleAssetChange}
               >
@@ -149,7 +152,7 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
               <input
                 type="text"
                 placeholder="ENTER ASSET"
-                class="h-10 p-3 rounded-2xl bg-[#999999] text-black placeholder:text-black placeholder:font-light"
+                class="h-10 p-3 rounded-2xl bg-color-grey text-black placeholder:text-black placeholder:font-light"
                 value={formState.asset}
                 onChange={(e) => handleInputChange(e, "asset")}
               />
@@ -158,7 +161,7 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
           <input
             type="number"
             placeholder="QUANTITY"
-            class="h-10 p-3 rounded-2xl bg-[#999999] text-black placeholder:text-black placeholder:font-light"
+            class="h-10 p-3 rounded-2xl bg-color-grey text-black placeholder:text-black placeholder:font-light"
             value={formState.quantity}
             onChange={(e) => handleInputChange(e, "quantity")}
           />

@@ -45,60 +45,43 @@ The Button system provides a comprehensive set of interactive button components 
 
 | Variant | Visual Style | Use Case | Example |
 |---------|-------------|----------|---------|
-| **glassmorphism** | Semi-transparent with blur, border changes on hover | Primary interactive buttons | Filter, Sort, Navigation |
-| **glassmorphismColor** | Gradient overlay with color blur effect | Colorful call-to-action buttons | Submit, Mint, Create |
-| **glassmorphismSelected** | Gradient background, solid on selected | Toggle buttons (selected state) | Active filters, tabs |
-| **glassmorphismDeselected** | Transparent, gradient on hover | Toggle buttons (deselected state) | Inactive filters, tabs |
-| **outlineGradient** | Animated conic gradient border | Premium/special action buttons | Wallet connect, Featured actions |
+| **outline** | Semi-transparent with blur, border changes on hover | Primary interactive buttons | Filter, Sort, Navigation |
+| **flat** | Gradient overlay with color blur effect | Colorful call-to-action buttons | Submit, Mint, Create |
+| **flatOutline** | Gradient background, solid on selected | Toggle buttons (selected state) | Active filters, tabs |
+| **outlineFlat** | Transparent, gradient on hover | Toggle buttons (deselected state) | Inactive filters, tabs |
 | **text** | No background, text only | Inline links and subtle actions | Read more, View all |
 | **outline** | Transparent with border | Secondary actions | Cancel, Close |
 | **flat** | Solid gradient background | Legacy style (to be removed) | - |
 
 ### Color Palettes
 
+The button system uses a 5-step gradient color system with CSS variables, providing smooth color transitions from dark to light shades. See [Layout System Documentation](mdc:components/layout/doc.md#tailwind-color-system) for the complete Tailwind color palette.
+
 #### Grey (Default)
 ```css
---color-dark: #CCCCCC66
---color-medium: #CCCCCC99
---color-light: #CCCCCCCC
---color-border: #66666666
---color-border-hover: #666666CC
---color-text: #666666
---color-text-hover: #999999
+/* 5-step gradient system */
+--color-button-dark: var(--color-grey-dark)           /* #585552 */
+--color-button-semidark: var(--color-grey-semidark)   /* #817e78 */
+--color-button: var(--color-grey)                     /* #a8a39d */
+--color-button-semilight: var(--color-grey-semilight) /* #d1cbc3 */
+--color-button-light: var(--color-grey-light)         /* #f9f2e9 */
 ```
 
-#### Grey Dark
-```css
---color-dark: #BBBBBB66
---color-medium: #BBBBBB99
---color-light: #BBBBBBCC
---color-border: #55555566
---color-border-hover: #555555CC
---color-text: #555555
---color-text-hover: #888888
-```
+**Usage:** Neutral actions, default state, secondary buttons
 
 #### Purple
 ```css
---color-dark: #AA00FF66
---color-medium: #AA00FF99
---color-light: #AA00FFCC
---color-border: #66009966
---color-border-hover: #660099CC
---color-text: #660099
---color-text-hover: #8800CC
+/* 5-step gradient system */
+--color-button-dark: var(--color-purple-dark)           /* #43005c */
+--color-button-semidark: var(--color-purple-semidark)   /* #610085 */
+--color-button: var(--color-purple)                     /* #7f00ad */
+--color-button-semilight: var(--color-purple-semilight) /* #9d00d6 */
+--color-button-light: var(--color-purple-light)         /* #BB00FF */
 ```
 
-#### Purple Dark
-```css
---color-dark: #9900E666
---color-medium: #9900E699
---color-light: #9900E6CC
---color-border: #55008066
---color-border-hover: #550080CC
---color-text: #550080
---color-text-hover: #7700b3
-```
+**Usage:** Primary brand actions, emphasis, call-to-action buttons
+
+**Note:** These CSS variables are defined in `tailwind.config.ts` as Tailwind color classes (e.g., `color-purple-dark`, `color-grey-light`) and referenced in button styles via the `color` prop which applies them dynamically.
 
 ### Size Options
 
@@ -133,7 +116,7 @@ The Button system provides a comprehensive set of interactive button components 
   - **Location**: `components/button/styles.ts`
   - **Features**:
     - 9 button variants with glassmorphism effects
-    - 5 color palettes using CSS custom properties
+    - 2 color palettes (grey, purple) with 5-step gradients using CSS custom properties
     - 11 size options including responsive variants
     - State management (disabled, loading, active)
     - Animated gradient overlays
@@ -192,10 +175,9 @@ The Button system provides a comprehensive set of interactive button components 
 ### Button Props
 ```typescript
 export interface ButtonProps extends Omit<JSX.HTMLAttributes<HTMLButtonElement>, "loading" | "size"> {
-  variant?: "text" | "glassmorphism" | "glassmorphismColor" | "glassmorphismSelected" |
-            "glassmorphismDeselected" | "flat" | "outline" | "flatOutline" |
-            "outlineFlat" | "outlineGradient";
-  color?: "grey" | "greyDark" | "purple" | "purpleDark" | "test" | "custom";
+  variant?: "text" | "outline" | "flat" | "flatOutline" |
+            "outlineFlat";
+  color?: "grey" | "purple" | "test" | "custom";
   size?: "xxs" | "xs" | "sm" | "md" | "lg" | "xl" | "xxl" |
          "xxsR" | "xsR" | "smR" | "mdR" | "lgR" | "custom";
   disabled?: boolean;
@@ -250,7 +232,7 @@ import { Button } from "$button";
 
 export function MyComponent() {
   return (
-    <Button variant="glassmorphism" color="grey" size="mdR">
+    <Button variant="outline" color="grey" size="mdR">
       CLICK ME
     </Button>
   );
@@ -269,7 +251,7 @@ export function IconExample() {
 
   return (
     <ButtonIcon
-      variant="glassmorphism"
+      variant="outline"
       color="purple"
       size="md"
       isLoading={isLoading}
@@ -301,7 +283,7 @@ export function FormExample() {
 
   return (
     <ButtonProcessing
-      variant="glassmorphismColor"
+      variant="flat"
       color="purple"
       size="lg"
       isSubmitting={isSubmitting}
@@ -321,7 +303,7 @@ import { Button } from "$button";
 
 export function PremiumButton() {
   return (
-    <Button variant="outlineGradient" color="purple" size="xl">
+    <Button variant="flat" color="purple" size="xl">
       CONNECT WALLET
     </Button>
   );
@@ -348,7 +330,7 @@ import { Button } from "$button";
 export function NavButton() {
   return (
     <Button
-      variant="glassmorphism"
+      variant="outline"
       color="grey"
       size="mdR"
       href="/stamps"
@@ -439,7 +421,7 @@ color: {
 
 // Used in variant styles
 variant: {
-  glassmorphism: `
+  outline: `
     border-[var(--color-border)]
     hover:border-[var(--color-border-hover)]
     text-[var(--color-text)]
@@ -518,37 +500,37 @@ Rendered with compiled CSS
 ```css
 /* Conic gradient with CSS animation */
 before:bg-[conic-gradient(from_var(--angle),
-  var(--color-dark),
-  var(--color-medium),
-  var(--color-light),
-  var(--color-medium),
-  var(--color-dark))]
+  var(--color-button-dark),
+  var(--color-button),
+  var(--color-button-light),
+  var(--color-button),
+  var(--color-button-dark))]
 before:[--angle:0deg]
 before:animate-rotate
 
 /* Hover state brightens all stops */
 hover:before:bg-[conic-gradient(from_var(--angle),
-  var(--color-light),
-  var(--color-light),
-  var(--color-light),
-  var(--color-light),
-  var(--color-light))]
+  var(--color-button-light),
+  var(--color-button-light),
+  var(--color-button-light),
+  var(--color-button-light),
+  var(--color-button-light))]
 ```
 
 ### glassmorphismColor Gradient Overlay
 ```css
 /* Multi-stop gradient creating depth */
 before:bg-[linear-gradient(to_bottom_right,
-  var(--color-dark) 0%,
-  var(--color-dark) 20%,
-  var(--color-medium) 20%,
-  var(--color-medium) 45%,
-  var(--color-light) 45%,
-  var(--color-light) 52%,
-  var(--color-medium) 52%,
-  var(--color-medium) 70%,
-  var(--color-dark) 70%,
-  var(--color-dark) 100%)]
+  var(--color-button-dark) 0%,
+  var(--color-button-dark) 20%,
+  var(--color-button) 20%,
+  var(--color-button) 45%,
+  var(--color-button-light) 45%,
+  var(--color-button-light) 52%,
+  var(--color-button) 52%,
+  var(--color-button) 70%,
+  var(--color-button-dark) 70%,
+  var(--color-button-dark) 100%)]
 
 /* Blur and scale on hover */
 before:blur-sm
@@ -577,18 +559,14 @@ hover:before:scale-105
 ## Best Practices
 
 ### Variant Selection
-- **glassmorphism**: Default for most interactive buttons
-- **glassmorphismColor**: Call-to-action, primary actions
-- **glassmorphismSelected/Deselected**: Toggle states, tabs, filters
-- **outlineGradient**: Premium actions, wallet connections
+- **outline**: Secondary buttons
+- **flat**: Primary action buttons, call-to-action buttons
+- **flatOutline/outlineFlat**: Toggle states, Toggle and Selector buttons
 - **text**: Inline links, secondary actions
-- **outline**: Cancel, close, secondary actions
 
 ### Color Selection
-- **grey**: Neutral actions, default state
-- **greyDark**: Subtle neutral actions
-- **purple**: Primary brand actions, emphasis
-- **purpleDark**: Darker purple variant for contrast
+- **grey**: Mainly used
+- **purple**: Optional use, to stand out
 
 ### Size Selection
 - Use responsive sizes (`mdR`, `lgR`) for adaptive UI
@@ -614,7 +592,7 @@ hover:before:scale-105
 ### Form Submit Button
 ```tsx
 <ButtonProcessing
-  variant="glassmorphismColor"
+  variant="flat"
   color="purple"
   size="lg"
   isSubmitting={isSubmitting}
@@ -627,7 +605,7 @@ hover:before:scale-105
 ### Icon-Only Action
 ```tsx
 <ButtonIcon
-  variant="glassmorphism"
+  variant="outline"
   color="grey"
   size="md"
   ariaLabel="Close"
@@ -640,7 +618,7 @@ hover:before:scale-105
 ### Navigation Button with Partial
 ```tsx
 <Button
-  variant="glassmorphism"
+  variant="outline"
   color="grey"
   size="mdR"
   href="/collection/bitcoin-stamps"
@@ -654,7 +632,7 @@ hover:before:scale-105
 ```tsx
 <div class="flex gap-2">
   <Button
-    variant={selected === 'grid' ? 'glassmorphismSelected' : 'glassmorphismDeselected'}
+    variant={selected === 'grid' ? 'flatOutline' : 'outlineFlat'}
     color="purple"
     size="sm"
     onClick={() => setSelected('grid')}
@@ -662,7 +640,7 @@ hover:before:scale-105
     GRID
   </Button>
   <Button
-    variant={selected === 'list' ? 'glassmorphismSelected' : 'glassmorphismDeselected'}
+    variant={selected === 'list' ? 'flatOutline' : 'outlineFlat'}
     color="purple"
     size="sm"
     onClick={() => setSelected('list')}
@@ -683,8 +661,6 @@ hover:before:scale-105
 ### Issue: Loading spinner not showing
 **Solution**: For `ButtonIcon`, use `isLoading` prop. For `ButtonProcessing`, use `isSubmitting` prop. Regular `Button` doesn't have built-in loading state.
 
-### Issue: Gradient animation not visible
-**Solution**: `outlineGradient` variant requires specific structure. Ensure you're not overriding the pseudo-element styles.
 
 ### Issue: Button not clickable
 **Solution**: Check if button is disabled or in loading state. Verify `IS_BROWSER` check isn't blocking interaction.

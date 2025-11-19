@@ -7,7 +7,7 @@ import { SettingsButton } from "$islands/button/SettingsButton.tsx";
 import { SortButton } from "$islands/button/SortButton.tsx";
 import FreshSRC20Gallery from "$islands/section/gallery/FreshSRC20Gallery.tsx";
 import { FreshStampGallery } from "$islands/section/gallery/FreshStampGallery.tsx";
-import { shadowGlowPurple } from "$layout";
+import { glassmorphism, shadowGlowPurple } from "$layout";
 import {
   createPaginationHandler,
   getCurrentUrl,
@@ -233,14 +233,14 @@ function DispenserRow(
 
   return (
     <div
-      class={`flex justify-between dark-gradient rounded-2xl hover:border-color-purple-light ${shadowGlowPurple} border-2 border-transparent`}
+      class={`flex justify-between ${glassmorphism} rounded-2xl hover:border-color-purple-light ${shadowGlowPurple} border-2 border-transparent`}
     >
       <div class="flex p-3 mobileLg:p-6 gap-6 uppercase w-full">
         <a
           href={`/stamp/${dispenser.stamp.stamp}`}
           class={`${imageSize} relative flex-shrink-0`}
         >
-          <div class="relative p-[6px] mobileMd:p-3 bg-[#1F002E] rounded-2xl aspect-square">
+          <div class="relative p-[6px] mobileMd:p-3 bg-color-background rounded-2xl aspect-square">
             <div class="stamp-container absolute inset-0 flex items-center justify-center">
               <div class="relative z-10 w-full h-full">
                 {loading && !src ? <LoadingIcon /> : src
@@ -302,14 +302,14 @@ function DispenserRow(
                 name="copy"
                 weight="normal"
                 size="xs"
-                color="grey"
+                color="greyLight"
               />
               <Icon
                 type="iconButton"
                 name="history"
                 weight="normal"
                 size="xs"
-                color="grey"
+                color="greyLight"
               />
             </div>
           </div>

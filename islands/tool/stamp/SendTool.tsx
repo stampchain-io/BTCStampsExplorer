@@ -434,7 +434,7 @@ export function StampSendTool() {
           weight="extraLight"
           size="xl"
           color="custom"
-          className="stroke-stamp-grey-darkest"
+          className="stroke-color-grey-dark"
         />
       );
     }

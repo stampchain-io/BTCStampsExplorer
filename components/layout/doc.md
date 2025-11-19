@@ -41,14 +41,16 @@ The app UI is inspired by Apple design principles, with dark themed multilayered
 - Layer 0 - Base layer:
   - Background topology animation:
     - Multi-color particle system with purple/black palette on black background
-    - Color palette: ["#8800cc", "#000000", "#440066", "#000000", "#650065"]
-      - #8800cc: bright purple (20% chance)
-      - #000000: black - appears twice (40% chance total)
-      - #440066: dark purple (20% chance)
-      - #650065: dark magenta (20% chance)
+    - Color palette: ["#bb00ff", "#000000", "#c219ff", "#000000", "#c933ff", "#000000", "#cf4dff", "#000000", "#d666ff"]
+      - #bb00ff: bright purple (~11% chance)
+      - #000000: black - appears four times (~44% chance total)
+      - #c219ff: dark purple (~11% chance)
+      - #c933ff: dark magenta (~11% chance)
+      - #cf4dff: very dark purple (~11% chance)
+      - #d666ff: light purple (~11% chance)
     - Particle count: Dynamic based on device
-      - Mobile/Tablet: 1000 particles
-      - Desktop: 3000 particles
+      - Mobile/Tablet: 750 particles
+      - Desktop: 1500 particles
 
 - Overlay layer styles:
   - GlassmorphismOverlay
@@ -57,11 +59,11 @@ The app UI is inspired by Apple design principles, with dark themed multilayered
     - Background blur:
       - backdrop-blur-lg
     - Background: Linear gradient to bottom
-      - bg-gradient-to-b from-[#080708]/95 via-[#080708]/70 to-[#000000]/90
+      - bg-gradient-to-b from-color-background/95 via-color-background/70 to-black/90
     - Note: Rounded corners and shadows are applied by individual components using this overlay
       - Drawers (FilterDrawer, Header mobile menu) typically use:
         - Rounded corners (24px): rounded-3xl (applied to left or right side depending on drawer position)
-        - Border: border-[1px] border-[#242424]/75
+        - Border: border border-color-border/75
         - Shadows:
           - Left drawer: shadow-[-12px_0_12px_-6px_rgba(8,7,8,0.75)]
           - Right drawer: shadow-[12px_0_12px_-6px_rgba(8,7,8,0.75)]
@@ -75,8 +77,8 @@ The app UI is inspired by Apple design principles, with dark themed multilayered
     - Rounded corners (24px) and background blur:
       - rounded-3xl backdrop-blur
     - Background: Linear gradient to bottom right
-      - bg-gradient-to-br from-[#1b191b]/50 via-[#080708]/50 to-[#000000]/50
-    - Border: border-[1px] border-[#242424]/50
+      - bg-gradient-to-br from-[#191919]/40 via-color-background/50 to-black/60
+    - Border: border border-color-border/50
     - Shadow: Outer and inner shadows:
       - shadow-[0_4px_8px_rgba(13,11,13,0.2),inset_0_1px_0_rgba(13,11,13,0.1),inset_0_-1px_0_rgba(13,11,13,0.1),inset_0_0_1px_1px_rgba(13,11,13,0.1)]
 
@@ -86,16 +88,16 @@ The app UI is inspired by Apple design principles, with dark themed multilayered
     - Black background with high opacity
     - Rounded corners (16px) and small background blur:
       - rounded-2xl backdrop-blur-xs
-    - Background: bg-[#080708]/30
-    - Border: border-[1px] border-[#242424]/75
+    - Background: bg-color-background/30
+    - Border: border border-color-border/75
     - Shadow: Smaller outer and inner shadows:
       - shadow-[0_2px_4px_rgba(13,11,13,0.1),inset_0_1px_0_rgba(13,11,13,0.08),inset_0_-1px_0_rgba(13,11,13,0.08),inset_0_0_2px_2px_rgba(13,11,13,0.08)]
 
   - GlassmorphismL2Hover
     - Combines background and border hover styles
     - Intended to be used with layer 2 elements
-    - Background: bg-[#080708]/60
-    - Border: border-[#242424]
+    - Background: bg-color-background/60
+    - Border: border-color-border
 
 ### Layer Comparison
 
@@ -115,7 +117,7 @@ The app UI is inspired by Apple design principles, with dark themed multilayered
     - Transition utilities: `transitionColors`, `transitionTransform`, `transitionAll`
     - Shadow variants: `shadow`, `shadowL2`, `shadowGlowPurple`, `shadowGlowGrey`
     - Glassmorphism layers: `glassmorphism`, `glassmorphismOverlay`, `glassmorphismL2`, `glassmorphismL2Hover`
-    - Body styles: `body`, `bodyTool`, `bodyArticle`, `gapSection`, `gapSectionSlim`, `gapGrid`
+    - Body styles: `body`, `bodyTool`, `bodyArticle`, `gapSection`, `containerGap`, `containerGap`
     - Container styles: `containerBackground`, `containerCard`, `containerCardL2`, `containerColForm`
     - Cell styles: `cellLeftCard`, `cellRightCard`, `cellCenterCard` (+ L2 variants)
     - Loader styles: `loaderSpinPurple`, `loaderSpinGrey`, `loaderSkeleton` (+ size variants)
@@ -225,11 +227,10 @@ export type LayoutStyles = {
   bodyTool: string;
   bodyArticle: string;
   gapSection: string;
-  gapSectionSlim: string;
-  gapGrid: string;
 
   // Container styles
   containerBackground: string;
+  containerGap: string;
   containerCard: string;
   containerCardL2: string;
   containerColForm: string;
@@ -561,13 +562,9 @@ The layout system integrates with the global style system through:
 ### Style Constant Pattern
 ```typescript
 // Pattern used in styles.ts
-export const glassmorphism = `
-  border-[1px] border-[#242424]/50
-  rounded-3xl
-  bg-gradient-to-br from-[#1b191b]/50 via-[#080708]/50 to-[#000000]/50
-  backdrop-blur
-  ${shadow}
-`;
+export const glassmorphism = `border border-color-border/50 rounded-3xl
+  bg-gradient-to-br from-[#191919]/40 via-color-background/50 to-black/60
+  backdrop-blur ${shadow}`;
 ```
 
 ### Import and Usage Flow
@@ -623,7 +620,7 @@ Defined in `tailwind.config.ts`:
 - **Import from central location**: Always use `$layout` alias for imports
 - **Combine with Tailwind**: Layout styles work seamlessly with Tailwind utility classes
 - **Use group hover**: Leverage `group` and `group-hover:` for interactive cards
-- **Consistent spacing**: Use predefined gap utilities (`gapSection`, `gapGrid`)
+- **Consistent spacing**: Use predefined gap utilities (`containerGap`)
 
 ### Responsive Design
 - **Mobile-first approach**: Base styles target mobile, enhance for larger screens
@@ -694,9 +691,6 @@ import { containerCard, cellLeftCard } from "$layout";
 ### Issue: Rounded corners cut off content
 **Solution**: Apply `overflow-hidden` to parent container or adjust padding to accommodate border radius.
 
-### Issue: Modal not centering
-**Solution**: Ensure modal parent uses `modalBgCenter` class which includes flexbox centering.
-
 ### Issue: Hover effects not working
 **Solution**: Verify that parent element has `group` class when using `group-hover:` utilities.
 
@@ -711,24 +705,26 @@ import { containerCard, cellLeftCard } from "$layout";
 
   - **Configuration Values**:
     - **Particle Count**:
-      - Mobile/Tablet (< 768px): 1000 particles
-      - Desktop (≥ 768px): 3000 particles
+      - Mobile/Tablet (< 768px): 750 particles
+      - Desktop (≥ 768px): 1500 particles
 
     - **Animation Behavior**:
-      - Particle movement speed: `mult(6.3)` - controls particle velocity through topology
-      - Flow field strength: `mult(4.3)` - controls particle response to flow field
+      - Particle movement speed: `mult(4.7)` - controls particle velocity through topology
+      - Flow field strength: `mult(2.5)` - controls particle response to flow field
       - Flow evolution speed: `c += 0.01` - speed of underlying flow field changes
       - Line thickness: `strokeWeight(1)` - thickness of connecting lines
       - Line opacity: `0.05` - transparency of particle connection lines
 
     - **Color Palette**:
-      - `["#8800cc", "#000000", "#440066", "#000000", "#650065"]`
+      - `["#bb00ff", "#000000", "#c219ff", "#000000", "#c933ff", "#000000", "#cf4dff", "#000000", "#d666ff"]`
       - Each particle randomly assigned one color at creation
       - Colors breakdown:
-        - `#8800cc`: bright purple (20% chance)
-        - `#000000`: black - appears twice (40% chance total)
-        - `#440066`: dark purple (20% chance)
-        - `#650065`: dark magenta (20% chance)
+        - `#bb00ff`: bright purple (~11% chance)
+        - `#000000`: black - appears four times (~44% chance total)
+        - `#c219ff`: dark purple (~11% chance)
+        - `#c933ff`: dark magenta (~11% chance)
+        - `#cf4dff`: very dark purple (~11% chance)
+        - `#d666ff`: light purple (~11% chance)
 
     - **Sizing**:
       - `minHeight`: 200px

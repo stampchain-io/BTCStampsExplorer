@@ -3,7 +3,8 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ================== GLOBAL STYLES ================== */
+
+/* ===== BASE STYLES ===== */
 /* Ensure html and body take full height without overflow */
 html,
 body {
@@ -16,7 +17,9 @@ body {
   position: relative !important;
 }
 
+
 /* Flex center */
+/* ===== ALIGNMENT UTILITIES ===== */
 .center {
   display: flex;
   align-items: center;
@@ -44,7 +47,7 @@ b, strong {
 /* Horizontal ruler styling */
 @layer base {
   hr {
-    @apply w-full border-0 border-t border-[#242424]/50;
+    @apply w-full border-0 border-t border-color-border/75;
   }
 }
 
@@ -52,6 +55,7 @@ b, strong {
 
 
 /* ================== SCROLLBAR STYLES ================== */
+/* ===== SCROLLBAR STYLES ===== */
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
@@ -122,37 +126,6 @@ b, strong {
   z-index: 1;
 }
 
-.scrollbar-purple {
-  @apply [&::-webkit-scrollbar-track]:bg-[#AA00FF] [&::-webkit-scrollbar-thumb]:bg-[#8800CC] [&::-webkit-scrollbar-thumb:hover]:bg-[#660099];
-}
-
-.image-rendering-pixelated img {
-  mix-blend-mode: multiply;
-}
-
-/* ========================================================================== */
-
-
-/* ================== IMAGE RENDERING STYLES ================== */
-
-.image-rendering-pixelated {
-  position: relative;
-}
-
-.image-rendering-pixelated::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-image: repeating-conic-gradient(rgba(128, 128, 128, 0.2) 0% 25%,
-      rgba(128, 128, 128, 0.1) 25% 50%);
-  background-size: 4px 4px;
-  border-radius: 1rem;
-  z-index: 1;
-}
-
 .image-rendering-pixelated img,
 .image-rendering-pixelated iframe,
 .image-rendering-pixelated>div {
@@ -164,6 +137,7 @@ b, strong {
   mix-blend-mode: multiply;
 }
 
+/* ===== STAMP IMAGE STYLES ===== */
 .pixelart {
   image-rendering: pixelated;
   image-rendering: -moz-crisp-edges;
@@ -182,6 +156,9 @@ b, strong {
   /* Prevent iOS image stretching */
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
+  /* Apply rounded-xl and clip children to rounded corners */
+  overflow: hidden;
+  border-radius: 0.75rem; /* Tailwind rounded-xl */
 }
 
 .stamp-container::before {
@@ -195,6 +172,7 @@ b, strong {
   background-size: 4px 4px;
   border-radius: 1rem;
   z-index: 0;
+  border-radius: inherit;
 }
 
 /* Add specific iOS handling for SVG */
@@ -267,6 +245,8 @@ b, strong {
 /* ================== ANIMATIONS ================== */
 
 /* Marquee Animation for stamp items  */
+/* Stamp Items Marquee */
+
 .marquee {
   overflow: hidden;
   white-space: nowrap;
@@ -440,20 +420,6 @@ b, strong {
   align-items: center;
 }
 
-/* ========================================================================== */
-
-
-/* ================== MISCELLANEOUS STYLES ================== */
-
-/* Emoji ticker styling for SRC20 cards */
-.emoji-ticker {
-  @apply text-color-purple-light;
-  font-family: system-ui;
-  line-height: 1;
-  display: inline-flex;
-  align-items: center;
-}
-
 /* ChartWidget Styles */
 /* Position range selector buttons to the left */
 .highcharts-range-selector-buttons {
@@ -461,17 +427,6 @@ b, strong {
 }
 
 /* ========================================================================== */
-
-
-/* ==================UNUSED STYLES ================== */
-
-/* Conic gradient for input field animated border
-@property --angle {
-  syntax: '<angle>';
-  initial-value: 0deg;
-  inherits: false;
-}
- */
 
 /* ================== CHARTWIDGET STYLES ================== */
 

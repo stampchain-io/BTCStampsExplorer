@@ -74,7 +74,7 @@ function StyledSortingDropdown({
           sorting-dropdown--styled
           ${sizeClasses[size]}
           rounded-2xl
-          bg-stamp-grey focus:bg-stamp-grey-light
+          bg-color-grey focus:bg-color-grey-light
           border-2 border-transparent
           hover:border-color-purple-light
           focus-within:border-color-purple-light

@@ -181,7 +181,7 @@ function StampStats({
                 name="divisible"
                 weight="normal"
                 size="custom"
-                color="grey"
+                color="greyLight"
                 className="w-[23px] h-[23px]"
               />
               <div
@@ -204,7 +204,7 @@ function StampStats({
                 name="keyburned"
                 weight="normal"
                 size="xs"
-                color="grey"
+                color="greyLight"
               />
               <div
                 className={`${tooltipIcon} ${
@@ -226,7 +226,7 @@ function StampStats({
                 name="locked"
                 weight="normal"
                 size="xs"
-                color="grey"
+                color="greyLight"
               />
               <div
                 className={`${tooltipIcon} ${
@@ -248,7 +248,7 @@ function StampStats({
                 name="unlocked"
                 weight="normal"
                 size="xs"
-                color="grey"
+                color="greyLight"
               />
               <div
                 className={`${tooltipIcon} ${

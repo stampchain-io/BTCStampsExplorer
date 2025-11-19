@@ -18,7 +18,11 @@ import { Button } from "$button";
 import { CloseIcon, Icon } from "$icon";
 import type { FilterType } from "$islands/button/FilterButton.tsx";
 import { FilterContentSRC20 } from "$islands/filter/FilterContentSRC20.tsx";
-import { glassmorphismOverlay, transitionTransform } from "$layout";
+import {
+  containerStickyBottom,
+  glassmorphismOverlay,
+  transitionTransform,
+} from "$layout";
 import { useBreakpoints } from "$lib/hooks/useBreakpoints.ts";
 import { tooltipIcon } from "$notification";
 import {
@@ -342,9 +346,9 @@ const FilterDrawer = (
       ref={drawerRef}
       class={`fixed top-0 z-40 h-[100dvh] left-0 right-auto w-full
         ${glassmorphismOverlay} ${transitionTransform}
-        min-[420px]:w-[340px] min-[420px]:rounded-r-3xl min-[420px]:border-r-[1px] min-[420px]:border-r-[#242424]/75
+        min-[420px]:w-[340px] min-[420px]:rounded-r-3xl min-[420px]:border-r-[1px] min-[420px]:border-r-color-border/75
         min-[420px]:shadow-[12px_0_12px_-6px_rgba(8,7,8,0.75)]
-        tablet:right-0 tablet:left-auto tablet:w-[300px] tablet:rounded-l-3xl tablet:border-l-[1px] tablet:border-l-[#242424]/75 tablet:shadow-[-12px_0_12px_-6px_rgba(8,7,8,0.75)]
+        tablet:right-0 tablet:left-auto tablet:w-[300px] tablet:rounded-l-3xl tablet:border-l-[1px] tablet:border-l-color-border/75 tablet:shadow-[-12px_0_12px_-6px_rgba(8,7,8,0.75)]
         ${
         open ? "translate-x-0" : "-translate-x-full tablet:translate-x-full"
       }`}
@@ -352,12 +356,12 @@ const FilterDrawer = (
       aria-labelledby="drawer-form-label"
     >
       {/* Scrollable content area */}
-      <div class="h-full overflow-y-auto scrollbar-black pt-[29px] mobileLg:pt-[41px] tablet:pt-[40px]">
+      <div class="h-full overflow-y-auto scrollbar-background-overlay pt-[29px] mobileLg:pt-[41px] tablet:pt-[40px]">
         <div class="px-9 tablet:px-6">
           <div class="relative w-full">
             {/* Mobile CloseIcon - shows by default, hidden on tablet+ */}
             <div class="flex flex-row tablet:hidden justify-between items-center w-full">
-              <h6 class="font-extrabold text-2xl gray-gradient1 tracking-wide select-none inline-block w-fit">
+              <h6 class="font-extrabold text-2xl color-grey-gradientLD tracking-wide select-none inline-block w-fit">
                 FILTERS
               </h6>
               <div class="relative">
@@ -368,7 +372,7 @@ const FilterDrawer = (
                 <CloseIcon
                   size="md"
                   weight="bold"
-                  color="grey"
+                  color="greyLight"
                   onClick={handleCloseDrawer}
                   onMouseEnter={handleCloseMouseEnter}
                   onMouseLeave={handleCloseMouseLeave}
@@ -388,14 +392,14 @@ const FilterDrawer = (
                   name="close"
                   weight="bold"
                   size="xs"
-                  color="grey"
+                  color="greyLight"
                   onClick={handleCloseDrawer}
                   onMouseEnter={handleCloseMouseEnter}
                   onMouseLeave={handleCloseMouseLeave}
                   aria-label="Close menu"
                 />
               </div>
-              <h6 class="font-normal text-lg gray-gradient1 mt-[2px] select-none inline-block w-fit">
+              <h6 class="font-normal text-lg color-grey-gradientLD mt-[2px] select-none inline-block w-fit">
                 FILTERS
               </h6>
             </div>
@@ -424,7 +428,9 @@ const FilterDrawer = (
         </div>
       </div>
       {/* Sticky buttons */}
-      <div class="flex justify-between w-full sticky bottom-0 p-9 tablet:p-6 gap-6 bg-black/50 backdrop-blur-lg">
+      <div
+        class={`flex justify-between ${containerStickyBottom}!mt-0 w-full px-9 tablet:px-6 gap-6 bg-transparent`}
+      >
         <Button
           variant="outline"
           color="grey"

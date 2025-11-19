@@ -7,7 +7,10 @@ import { WalletProvider } from "$islands/layout/WalletProvider.tsx";
 import { ConnectWalletModal } from "$islands/modal/ConnectWalletModal.tsx";
 import { closeModal, openModal } from "$islands/modal/states.ts";
 import { containerStickyBottom, glassmorphismL2 } from "$layout";
-import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
+import {
+  abbreviateAddress,
+  formatSatoshisToBTC,
+} from "$lib/utils/ui/formatting/formatUtils.ts";
 import { tooltipIcon } from "$notification";
 import {
   labelLg,
@@ -198,9 +201,9 @@ export const WalletButton = (
             name="wallet"
             weight="normal"
             size="mdR"
-            color="purple"
-            colorAccent="#666666CC"
-            colorAccentHover="#666666"
+            color="purpleLight"
+            colorAccent="color-mix(in srgb, var(--color-grey-semidark) 75%, transparent)"
+            colorAccentHover="var(--color-grey-semidark)"
             onClick={handleWalletIconClick}
           />
         )}
@@ -215,9 +218,9 @@ export const WalletButton = (
                 name="wallet"
                 weight="normal"
                 size="mdR"
-                color="purple"
-                colorAccent="#999999CC"
-                colorAccentHover="#999999"
+                color="purpleLight"
+                colorAccent="color-mix(in srgb, var(--color-grey) 75%, transparent)"
+                colorAccentHover="var(--color-grey)"
                 onClick={handleWalletIconClick}
               />
             </div>
@@ -230,13 +233,10 @@ export const WalletButton = (
       isConnected && address
         ? (
           <div class="flex flex-col gap-1.5 text-right whitespace-nowrap">
-            <div class="flex items-center justify-end gap-3">
-              <h6 class={valueDarkXs}>
-                {abbreviateAddress(address, 7)}
-              </h6>
+            <div class="flex flex-row-reverse justify-end items-center gap-3">
               <div
                 ref={copyButtonRef}
-                class="relative"
+                class="relative peer"
                 onMouseEnter={handleCopyMouseEnter}
                 onMouseLeave={handleCopyMouseLeave}
               >
@@ -264,6 +264,11 @@ export const WalletButton = (
                   ADDY COPIED
                 </div>
               </div>
+              <h6
+                class={`${valueDarkXs} transition-colors duration-200 peer-hover:text-color-grey-light`}
+              >
+                {abbreviateAddress(address, 7)}
+              </h6>
             </div>
             <div class="flex items-center gap-3 mb-0.5">
               <Icon
@@ -274,7 +279,10 @@ export const WalletButton = (
                 color="greyDark"
               />
               <h6 class={valueSm}>
-                {btcBalance.total.toFixed(8)} <span class={labelSm}>BTC</span>
+                {formatSatoshisToBTC(btcBalance.total, {
+                  includeSymbol: false,
+                  stripZeros: true,
+                })} <span class={labelSm}>BTC</span>
               </h6>
             </div>
             <hr class="!mt-2 !mb-2" />
@@ -304,13 +312,10 @@ export const WalletButton = (
           <div
             class={`flex-col ${glassmorphismL2} w-full -mt-1.5 mb-3 px-3 py-2 space-y-1`}
           >
-            <div class="flex items-center gap-3">
-              <h6 class={valueDarkSm}>
-                {abbreviateAddress(address, 12)}
-              </h6>
+            <div class="flex flex-row-reverse justify-start items-center gap-3">
               <div
                 ref={copyButtonRef}
-                class="relative"
+                class="relative peer"
                 onMouseEnter={handleCopyMouseEnter}
                 onMouseLeave={handleCopyMouseLeave}
               >
@@ -338,8 +343,13 @@ export const WalletButton = (
                   ADDY COPIED
                 </div>
               </div>
+              <h6
+                class={`${valueDarkSm} transition-colors duration-200 peer-hover:text-color-grey-light`}
+              >
+                {abbreviateAddress(address, 12)}
+              </h6>
             </div>
-            <div class="flex items-center gap-3">
+            <div class="flex justify-between items-end flex-1">
               <Icon
                 type="icon"
                 name="bitcoins"
@@ -348,7 +358,10 @@ export const WalletButton = (
                 color="greyDark"
               />
               <h6 class={valueLg}>
-                {btcBalance.total.toFixed(8)} <span class={labelLg}>BTC</span>
+                {formatSatoshisToBTC(btcBalance.total, {
+                  includeSymbol: false,
+                  stripZeros: true,
+                })} <span class={labelLg}>BTC</span>
               </h6>
             </div>
           </div>
@@ -428,8 +441,8 @@ function CounterpartyVersion() {
         name="version"
         weight="normal"
         size="xs"
-        color="greyDark"
-        className="mr-3"
+        color="custom"
+        className="mr-3 stroke-color-grey-dark"
       />
       <span class={labelXs}>
         COUNTERPARTY {loading

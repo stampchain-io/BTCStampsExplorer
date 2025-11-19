@@ -171,7 +171,9 @@ export function ToolsButton({ onOpenDrawer, data }: ToolsButtonProps) {
   };
 
   const bitcoinStats = (containerClass: string) => (
-    <div class={containerClass}>
+    <div
+      class={`${containerClass} backdrop-blur-xl tablet:backdrop-blur-xs`}
+    >
       {/* Latest Block */}
       <div class="flex items-center">
         <Icon
@@ -268,11 +270,11 @@ export function ToolsButton({ onOpenDrawer, data }: ToolsButtonProps) {
           name="tools"
           weight="normal"
           size="mdR"
-          color="purple"
+          color="purpleLight"
           className="mb-[1px]"
           onClick={handleToolsClick}
-          colorAccent="#666666CC"
-          colorAccentHover="#666666"
+          colorAccent="color-mix(in srgb, var(--color-grey-semidark) 75%, transparent)"
+          colorAccentHover="var(--color-grey-semidark)"
         />
         {/* Dropdown content is rendered by Header.tsx */}
       </div>

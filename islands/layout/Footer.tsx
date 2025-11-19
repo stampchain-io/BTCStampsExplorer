@@ -4,7 +4,7 @@ import { Icon } from "$icon";
 import { containerBackground } from "$layout";
 import {
   copyright,
-  logoPurpleDL,
+  logoPurpleLD,
   navLinkTransparentPurple,
   overlayPurple,
   tagline,
@@ -145,10 +145,12 @@ export function Footer() {
           {/* ===== LOGO AND TAGLINE ===== */}
           <div class="flex flex-col">
             <h5
-              class={`${logoPurpleDL} text-center mobileMd:text-left`}
+              class={`${logoPurpleLD} text-center mobileMd:text-left`}
             >
               STAMPCHAIN
-              <span class="font-extralight pr-1">.IO</span>
+              <span class="font-extralight pr-1">
+                .IO
+              </span>
             </h5>
             <h6
               class={`${tagline} text-center mobileMd:text-left`}
@@ -158,7 +160,7 @@ export function Footer() {
           </div>
 
           {/* ===== SOCIAL MEDIA ICONS ===== */}
-          <div class="flex gap-6 tablet:gap-4 mt-3 mobileMd:mt-0 tablet:mt-3">
+          <div class="flex gap-6 tablet:gap-5 mt-3 mobileMd:mt-0 tablet:mt-3">
             {socialLinks.map((link, index) => (
               <div key={index}>
                 {link.icon}

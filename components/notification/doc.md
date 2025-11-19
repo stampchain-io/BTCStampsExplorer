@@ -4,13 +4,23 @@
 
 The Toast notification system provides a user-friendly way to display temporary notifications throughout the application. Built with Preact Signals for reactive state management, it offers consistent styling, smooth animations, and flexible configuration options.
 
+**New Feature:** The system now includes a dedicated `NotificationUpdate` component for one-time major release announcements. See [NotificationUpdate Component](#notificationupdate-component) section for details.
+
 ## Core Components
 
-- **styles.ts**: Style definitions for notification containers and variants
-- **ToastComponent.tsx**: Individual toast notification rendering component
-- **ToastProvider.tsx**: Toast state management and lifecycle handler
-- **toastSignal.ts**: Global signal for triggering toasts from anywhere in the app
+### Notification Display Components
+- **ToastComponent.tsx** (`islands/Toast/`): Individual toast notification rendering component
+- **ToastProvider.tsx** (`islands/Toast/`): Toast state management and lifecycle handler
+- **NotificationUpdate.tsx** (`islands/Toast/`): One-time update announcement component for major releases
+
+### Style & Signal Management
+- **styles.ts** (`components/notification/`): Style definitions for notification containers and variants
+- **toastSignal.ts** (`lib/utils/ui/notifications/`): Global signal for triggering toasts from anywhere in the app
+
+### Type Definitions
 - **types**: Type definitions in `lib/types/ui.d.ts` and `lib/types/utils.d.ts`
+
+### Documentation
 - **doc.md**: This documentation
 
 ## Design System Integration
@@ -22,26 +32,32 @@ The Toast notification system follows the app's dark-themed glassmorphism design
 - **Backdrop blur**: Enhanced glassmorphism effect - `backdrop-blur-lg`
 - **Shadow**: Consistent with app shadow system
 - **Position**: Fixed top-left positioning with proper z-index layering
-- **Colors**: Type-specific color palettes (grey, green, red) with gradient backgrounds
+- **Colors**: Type-specific color palettes (grey, green, orange, red) with gradient backgrounds from the [Tailwind color system](mdc:components/layout/doc.md#tailwind-color-system)
 
 ### Style Variants
 
 #### Info Notifications
 ```typescript
-bg-gradient-to-br from-[#333333]/60 via-[#222222]/60 to-[#080708]/80
-border-[#666666]/80
+bg-gradient-to-br from-color-grey-dark/60 via-color-background/60 to-color-background/90
+border-color-grey-semidark/80
 ```
 
 #### Success Notifications
 ```typescript
-bg-gradient-to-br from-[#003300]/60 via-[#002200]/60 to-[#080708]/80
-border-[#006600]/80
+bg-gradient-to-br from-color-green-dark/60 via-color-background/60 to-color-background/90
+border-color-green-semidark/80
 ```
 
-#### Error/Warning Notifications
+#### Warning Notifications
 ```typescript
-bg-gradient-to-br from-[#330000]/60 via-[#220000]/60 to-[#080708]/80
-border-[#660000]/80
+bg-gradient-to-br from-color-orange-dark/60 via-color-background/60 to-color-background/90
+border-color-orange/80
+```
+
+#### Error Notifications
+```typescript
+bg-gradient-to-br from-color-red-dark/60 via-color-background/60 to-color-background/90
+border-color-red-semidark/80
 ```
 
 ## Notification Types
@@ -50,16 +66,16 @@ The system supports **4 status message types** with distinct visual treatments:
 
 | Type | Icon | Color | Duration | Auto-Dismiss | Use Case |
 |------|------|-------|----------|--------------|----------|
-| **info** | info | grey `#999999` | 7000ms | ✅ Yes | General information, updates |
-| **success** | success | green `#009900` | 3000ms | ✅ Yes | Successful operations |
-| **warning** | info | red `#990000` | 7000ms | ✅ Yes | Warnings requiring attention |
-| **error** | error | red `#990000` | 7000ms | ✅ Yes | Error messages |
+| **info** | info | neutral `color-grey` | 7000ms | ✅ Yes | General information, updates |
+| **success** | success | green `color-green-semidark` | 3000ms | ✅ Yes | Successful operations |
+| **warning** | info | orange `color-orange` | 7000ms | ✅ Yes | Warnings requiring attention |
+| **error** | error | red `color-red-semidark` | 7000ms | ✅ Yes | Error messages |
 
 ### Type Characteristics
 
 - **Info**: Uses grey color palette, longer duration for reading informational content
 - **Success**: Quick confirmation with green palette, shorter duration for fast acknowledgment
-- **Warning**: Combines info icon with error color scheme (red) for moderate urgency
+- **Warning**: Uses info icon with orange color palette for moderate urgency warnings
 - **Error**: Full error styling with error icon and red palette for critical messages
 
 ## Integration
@@ -353,6 +369,127 @@ showToast("Connection restored", "success");
 - **Animation performance**: CSS animations use GPU-accelerated transforms
 - **Memory management**: Completed toasts are removed from state array
 
+## NotificationUpdate Component
+
+The `NotificationUpdate` component provides a one-time notification system for announcing major app updates to users.
+
+### Purpose
+- Display update announcements when users visit after a major release
+- Show only once per version using localStorage tracking
+- Configurable message, timing, and behavior
+
+### Location
+- **Component**: `islands/Toast/NotificationUpdate.tsx`
+- **Integration**: Rendered in `routes/_app.tsx` at the app root level
+
+### Configuration
+
+All settings are self-contained within the component:
+
+```typescript
+// Version tracking - increment for new announcements
+const NOTIFICATION_UPDATE_VERSION = "feature-update-v3.04";
+
+// Message content (supports multi-line with bullet points)
+const NOTIFICATION_UPDATE_MESSAGE = `Website Updates
+• Enhanced color palette with vibrant hues
+• Improved Wallet Profile page with updated design
+• Minor UI tweaks and bug fixes
+• Major code optimization and performance improvements
+
+Please clear browser cache and refresh the page for all updates to take effect.`;
+
+// Timing and behavior
+const DELAY = 2000;                    // Delay before showing (ms)
+const TYPE = "info" as const;          // Toast type
+const AUTO_DISMISS = false;            // Requires manual close
+```
+
+### How It Works
+
+1. **Version Check**: On mount, checks localStorage for the current version key
+2. **One-Time Display**: If not shown before, displays toast after delay
+3. **localStorage Tracking**: Marks version as shown to prevent repeats
+4. **User Experience**: 2-second delay allows page to settle before showing
+
+### Usage Example
+
+To create a new update announcement:
+
+```typescript
+// 1. Update the version identifier
+const NOTIFICATION_UPDATE_VERSION = "feature-update-v3.05";
+
+// 2. Update the message content
+const NOTIFICATION_UPDATE_MESSAGE = `New Features Released
+• Feature 1 description
+• Feature 2 description
+• Bug fixes and improvements`;
+
+// 3. Adjust timing if needed (optional)
+const DELAY = 3000;  // Show after 3 seconds
+const AUTO_DISMISS = false;  // Keep manual dismiss
+```
+
+### Implementation Details
+
+The component uses Preact hooks for lifecycle management:
+
+```typescript
+export function NotificationUpdate() {
+  useEffect(() => {
+    // Client-side only check
+    if (typeof window === "undefined") return;
+
+    // Check localStorage for version key
+    const hasBeenShown = localStorage.getItem(NOTIFICATION_UPDATE_VERSION);
+    if (hasBeenShown) return;
+
+    // Delayed notification display
+    const timer = setTimeout(() => {
+      showToast(NOTIFICATION_UPDATE_MESSAGE, TYPE, AUTO_DISMISS);
+      localStorage.setItem(NOTIFICATION_UPDATE_VERSION, "true");
+    }, DELAY);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  return null; // Pure behavior component
+}
+```
+
+**Key Features:**
+- **SSR-Safe**: Checks for `window` existence before running
+- **Zero Visual Footprint**: Returns `null` - pure behavior component
+- **Cleanup**: Properly clears timer on unmount
+- **localStorage**: Uses version key as storage key for tracking
+
+### Integration
+
+Add to `routes/_app.tsx` to run on every page load:
+
+```typescript
+import { NotificationUpdate } from "$islands/Toast/NotificationUpdate.tsx";
+
+export default function App({ Component }: PageProps) {
+  return (
+    <>
+      <NotificationUpdate />
+      <Component />
+    </>
+  );
+}
+```
+
+### Best Practices
+
+- **Version Naming**: Use descriptive version strings (e.g., `feature-update-v3.04`, `major-release-v4.0`)
+- **Message Content**: Keep concise but informative, use bullet points for clarity
+- **Timing**: 2-3 second delay prevents overwhelming users on page load
+- **Auto-Dismiss**: Set to `false` for important announcements requiring acknowledgment
+- **Frequency**: Use sparingly for major updates only, not minor bug fixes
+- **Testing**: Clear localStorage to test multiple times: `localStorage.clear()` in console
+
 ## Future Enhancements
 
 As outlined in [Issue #860](https://github.com/stampchain-io/BTCStampsExplorer/issues/860):
@@ -364,21 +501,16 @@ As outlined in [Issue #860](https://github.com/stampchain-io/BTCStampsExplorer/i
    - Consistent messaging across the application
    - Easier localization support
 
-2. **Update Notifications**
-   - Display "update" messages when app is updated
-   - Inform users about new features
-   - Show on initial open after update
-
-3. **Transaction Confirmations**
+2. **Transaction Confirmations**
    - Real-time transaction status updates
    - Confirmation notifications when transactions complete
    - Display on wallet connection if confirmations occurred while disconnected
 
-4. **Naming Refactor**
+3. **Naming Refactor**
    - Consider renaming "Toast" folders/files to "notification"
    - Improve consistency with component naming conventions
 
-5. **Enhanced Tool Integration**
+4. **Enhanced Tool Integration**
    - Move all tool error messaging to toast notifications
    - Review info messages for manual dismissal requirements
    - Standardize MARA message handling

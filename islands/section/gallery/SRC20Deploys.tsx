@@ -56,7 +56,7 @@ export default function SRC20DeploysGallery(): JSX.Element {
   return (
     <div class={`${containerBackground} items-start tablet:items-end`}>
       {/* ===== TITLE SECTION ===== */}
-      <div class="w-full">
+      <div>
         <h4 class={`${titleGreyLD} tablet:hidden`}>
           RECENT DEPLOYS
         </h4>
@@ -68,7 +68,7 @@ export default function SRC20DeploysGallery(): JSX.Element {
       </div>
 
       {/* Show block title with loading state */}
-      <h3 class={`${subtitleGrey} w-full tablet:text-right`}>
+      <h3 class={`${subtitleGrey} tablet:text-right`}>
         {isLoading ? <span class="animate-pulse">BLOCK #XXX,XXX</span> : (
           transactions.length > 0 && `BLOCK #${transactions[0].block_index}`
         )}
@@ -99,7 +99,7 @@ export default function SRC20DeploysGallery(): JSX.Element {
         )
         : transactions.length === 0
         ? (
-          <div class="text-stamp-grey-darkest text-sm">
+          <div class="text-color-grey-dark text-sm">
             NO RECENT DEPLOYS FOUND
           </div>
         )

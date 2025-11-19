@@ -252,7 +252,7 @@ function WalletOverview(
                   name="view"
                   weight="normal"
                   size="mdR"
-                  color="grey"
+                  color="greyLight"
                   ariaLabel="Show Balance"
                 />
                 <div
@@ -271,7 +271,7 @@ function WalletOverview(
                   name="hide"
                   weight="normal"
                   size="mdR"
-                  color="grey"
+                  color="greyLight"
                   ariaLabel="Hide Balance"
                 />
                 <div
@@ -309,7 +309,7 @@ function WalletOverview(
             name="copy"
             weight="normal"
             size="mdR"
-            color="grey"
+            color="greyLight"
             onClick={copy}
           />
           <div
@@ -336,7 +336,7 @@ function WalletOverview(
             name="send"
             weight="normal"
             size="mdR"
-            color="grey"
+            color="greyLight"
             onClick={() => {
               setIsSendTooltipVisible(false);
               onSend();
@@ -361,7 +361,7 @@ function WalletOverview(
             name="receive"
             weight="normal"
             size="mdR"
-            color="grey"
+            color="greyLight"
             onClick={() => {
               setIsReceiveTooltipVisible(false);
               onReceive();
@@ -391,7 +391,7 @@ function WalletOverview(
               name="history"
               weight="normal"
               size="mdR"
-              color="grey"
+              color="greyLight"
             />
           </a>
           <div
@@ -454,7 +454,7 @@ function DashboardProfile() {
             name="website"
             weight="normal"
             size="mdR"
-            color="grey"
+            color="greyLight"
           />
 
           <Icon
@@ -462,7 +462,7 @@ function DashboardProfile() {
             name="collection"
             weight="normal"
             size="mdR"
-            color="grey"
+            color="greyLight"
           />
 
           <Icon
@@ -470,7 +470,7 @@ function DashboardProfile() {
             name="stamp"
             weight="normal"
             size="mdR"
-            color="grey"
+            color="greyLight"
           />
         </div>
       </div>

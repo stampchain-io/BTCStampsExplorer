@@ -4,8 +4,8 @@ import type { ColorSwatchProps } from "$types/ui.d.ts";
 function ColorSwatch({ name, bgClass }: ColorSwatchProps) {
   return (
     <div class={`${bgClass} p-6 rounded-2xl`}>
-      <div class="text-stamp-grey-bright font-semibold">{name}</div>
-      <div class="text-stamp-grey-bright text-sm mt-2 opacity-80">
+      <div class="text-color-grey-light font-semibold">{name}</div>
+      <div class="text-color-grey-light text-sm mt-2 opacity-80">
         {bgClass}
       </div>
     </div>
@@ -107,7 +107,7 @@ export default function DesignSystem() {
               <h3 class="text-xl text-color-grey-light mb-4">
                 Text Gradients
               </h3>
-              <div class="space-y-6 bg-stamp-bg-purple-darker p-8 rounded-2xl">
+              <div class="space-y-6 bg-color-purple-semidark p-8 rounded-2xl">
                 {/* Purple Gradients */}
                 <p class="color-purple-gradientDL text-4xl font-bold">
                   Purple Gradient Text 1

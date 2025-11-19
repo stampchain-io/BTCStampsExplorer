@@ -1,7 +1,7 @@
 /* ===== SRC20 DETAIL HEADER COMPONENT ===== */
 import { StatItem, StatTitle } from "$components/section/WalletComponents.tsx";
 import { Icon } from "$icon";
-import { body, containerBackground, gapSectionSlim } from "$layout";
+import { body, containerBackground, containerGap } from "$layout";
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import {
   abbreviateAddress,
@@ -100,7 +100,7 @@ export function SRC20DetailHeader({
   /* ===== RENDER ===== */
   return (
     <>
-      <div class={`${body} ${gapSectionSlim}`}>
+      <div class={`${body} ${containerGap}`}>
         {/* ===== TOKEN INFO CARD ===== */}
         <div class={`relative ${containerBackground} flex-wrap`}>
           <div class="flex flex-row w-full">
@@ -125,7 +125,7 @@ export function SRC20DetailHeader({
                         name="email"
                         weight="normal"
                         size="xxs"
-                        color="grey"
+                        color="greyLight"
                         href={deployment.email}
                         target="_blank"
                       />
@@ -136,7 +136,7 @@ export function SRC20DetailHeader({
                         name="website"
                         weight="normal"
                         size="xxs"
-                        color="grey"
+                        color="greyLight"
                         href={deployment.web}
                         target="_blank"
                       />
@@ -147,7 +147,7 @@ export function SRC20DetailHeader({
                         name="telegram"
                         weight="normal"
                         size="xxs"
-                        color="grey"
+                        color="greyLight"
                         href={deployment.tg}
                         target="_blank"
                       />
@@ -158,7 +158,7 @@ export function SRC20DetailHeader({
                         name="twitter"
                         weight="normal"
                         size="xxs"
-                        color="grey"
+                        color="greyLight"
                         href={deployment.x}
                         target="_blank"
                       />

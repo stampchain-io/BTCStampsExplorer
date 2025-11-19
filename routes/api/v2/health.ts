@@ -4,8 +4,8 @@ import { getCurrentBlock } from "$lib/utils/mempool.ts";
 import { circuitBreakerDbManager } from "$server/database/circuitBreakerDatabaseManager.ts";
 import { SRC20Repository } from "$server/database/src20Repository.ts";
 import { BlockService } from "$server/services/core/blockService.ts";
-import { StampService } from "$server/services/stampService.ts";
 import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
+import { StampService } from "$server/services/stampService.ts";
 
 interface HealthStatus {
   status: "OK" | "ERROR";
@@ -68,7 +68,10 @@ export const handler: Handlers = {
         getCurrentBlock().catch(() => null), // Catch mempool.space failures
         StampService.countTotalStamps(),
         SRC20Repository.checkSrc20Deployments(),
-        CounterpartyApiManager.checkHealth(30), // 30 seconds cache for health checks (was 30000ms)
+        CounterpartyApiManager.checkHealth(30).catch((error) => {
+          console.error("XCP health check failed in health endpoint:", error);
+          return false;
+        }), // 30 seconds cache for health checks (was 30000ms)
       ]);
 
       // Extract values from settled promises

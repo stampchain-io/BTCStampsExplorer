@@ -56,7 +56,7 @@ export default function SRC20MintsGallery() {
   return (
     <div class={`${containerBackground} items-start tablet:items-end`}>
       {/* ===== TITLE SECTION ===== */}
-      <div class="w-full">
+      <div>
         <h4 class={`${titleGreyLD} tablet:hidden`}>
           TRENDING
         </h4>
@@ -66,7 +66,7 @@ export default function SRC20MintsGallery() {
           TRENDING
         </h4>
       </div>
-      <h3 class={`${subtitleGrey} w-full tablet:text-right mb-2`}>
+      <h3 class={`${subtitleGrey} tablet:text-right mb-2`}>
         {isLoading ? <span class="animate-pulse">POPULAR TOKENS</span> : (
           "POPULAR TOKENS"
         )}
@@ -80,7 +80,7 @@ export default function SRC20MintsGallery() {
               <div
                 key={index}
                 class={`loading-skeleton running w-full rounded-2xl ${
-                  index === 0 ? "h-[34px]" : "h-[56px]"
+                  index === 0 ? "h-[34px]" : "h-[54px]"
                 }`}
               />
             ))}

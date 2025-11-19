@@ -71,7 +71,7 @@ export function MaraModeWarningModal({
           <CloseIcon
             size="sm"
             weight="bold"
-            color="purple"
+            color="purpleLight"
             onClick={onCancel || (() => {})}
           />
           <div
@@ -160,7 +160,7 @@ export function MaraModeWarningModal({
         <button
           type="button"
           onClick={onCancel || (() => {})}
-          class={`flex-1 px-4 py-2 rounded-2xl transition-colors ${glassmorphism} bg-gradient-to-br from-stamp-grey-darkest/20 to-stamp-grey-darkest/40 text-stamp-grey-light hover:from-stamp-grey-darkest/30 hover:to-stamp-grey-darkest/50`}
+          class={`flex-1 px-4 py-2 rounded-2xl transition-colors ${glassmorphism} bg-gradient-to-br from-color-grey-dark/20 to-color-grey-dark/40 text-color-grey-light hover:from-color-grey-dark/30 hover:to-color-grey-dark/50`}
         >
           Cancel
         </button>
