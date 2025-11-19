@@ -1,5 +1,5 @@
-import { ComponentChildren } from "preact";
 import { STAMPCHAIN_LOGO_IMAGE } from "$constants";
+import { ComponentChildren } from "preact";
 
 function TitleText({
   children,
@@ -22,7 +22,8 @@ function TitleText({
       style={`
         animation-delay: ${delay}ms;
         animation-duration: 300ms;
-        animation-fill-mode: forwards;
+        animation-fill-mode: both;
+        animation-timing-function: ease-out;
         filter: drop-shadow(0.05em 0.05em 0.05em rgba(0, 0, 0, 0.75));
       `}
     >
@@ -34,8 +35,8 @@ function TitleText({
 export function HomeHeader() {
   return (
     <header class="
-      flex flex-col items-center justify-center 
-      gap-1.5 mobileMd:gap-3 mobileLg:gap-[18px] 
+      flex flex-col items-center justify-center
+      gap-1.5 mobileMd:gap-3 mobileLg:gap-[18px]
       w-full
       h-[220px] tablet:h-[250px]
       relative
@@ -48,7 +49,7 @@ export function HomeHeader() {
           absolute
           w-[200px] mobileMd:w-[220px] mobileLg:w-[250px]
           h-[200px] mobileMd:h-[220px] mobileLg:h-[250px]
-          top-[10px] mobileMd:top-[0px] mobileLg:top-[-24px] tablet:top-[3px] 
+          top-[10px] mobileMd:top-[0px] mobileLg:top-[-24px] tablet:top-[3px]
           left-[calc(50%+39px)] min-[420px]:left-[calc(50%+73px)] mobileMd:left-[calc(50%+98px)] mobileLg:left-[calc(50%+153px)]
           pointer-events-none
           opacity-0
@@ -56,8 +57,9 @@ export function HomeHeader() {
           z-[-10]
         "
         style="
-          animation-duration: 500ms;
-          animation-fill-mode: forwards;
+          animation-duration: 400ms;
+          animation-fill-mode: both;
+          animation-timing-function: ease-out;
         "
       />
       <div class="
@@ -71,10 +73,10 @@ export function HomeHeader() {
         ">
         <h1 class="text-center">
           <TitleText
-            delay="100"
+            delay="50"
             class="
               font-black
-              bg-text-gray-1
+              color-grey-gradientLD
               text-2xl
               min-[420px]:text-3xl
               mobileMd:text-4xl
@@ -85,16 +87,16 @@ export function HomeHeader() {
             "
           >
             UNPRUNABLE{" "}
-            <span class="bg-text-purple-1 bg-clip-text text-fill-transparent">
+            <span class="color-purple-gradientDL">
               UTXO ART
             </span>
           </TitleText>
           <br />
           <TitleText
-            delay="400"
+            delay="150"
             class="
               font-bold
-              bg-text-gray-1
+              color-grey-gradientLD
               uppercase
               text-xl
               min-[420px]:text-2xl
@@ -117,20 +119,21 @@ export function HomeHeader() {
           w-full
           max-w-[310px]
           text-center
-          font-medium 
-          text-stamp-grey-light
+          font-medium
+          text-color-grey-light
           text-base
           mobileLg:text-xl
           mobileMd:max-w-[380px]
-          mobileLg:max-w-[515px] 
+          mobileLg:max-w-[515px]
           tablet:max-w-[550px]
           opacity-0
           animate-fade-in
         "
         style={`
-          animation-delay: 700ms;
-          animation-duration: 500ms;
-          animation-fill-mode: forwards;
+          animation-delay: 250ms;
+          animation-duration: 400ms;
+          animation-fill-mode: both;
+          animation-timing-function: ease-out;
         `}
       >
         Welcome to the forefront of digital collectibles, where each stamp is a

@@ -1,16 +1,20 @@
-import { useCallback } from "preact/hooks";
-import {
+import type { StampFilterType } from "$constants";
+import type { SRC20_FILTER_TYPES } from "$types/src20.d.ts";
+import type {
   COLLECTION_FILTER_TYPES,
-  SRC20_FILTER_TYPES,
-  STAMP_FILTER_TYPES,
+  LISTING_FILTER_TYPES,
   WALLET_FILTER_TYPES,
-} from "$globals";
+} from "$types/wallet.d.ts";
+import { useCallback } from "preact/hooks";
+import { IS_BROWSER } from "$fresh/runtime.ts";
+import { SSRSafeUrlBuilder } from "$components/navigation/SSRSafeUrlBuilder.tsx";
 
 type FilterTypes =
-  | STAMP_FILTER_TYPES
+  | StampFilterType
   | SRC20_FILTER_TYPES
   | COLLECTION_FILTER_TYPES
-  | WALLET_FILTER_TYPES;
+  | WALLET_FILTER_TYPES
+  | LISTING_FILTER_TYPES;
 
 interface URLUpdateParams {
   sortBy?: "ASC" | "DESC";
@@ -19,24 +23,24 @@ interface URLUpdateParams {
 
 export function useURLUpdate() {
   const updateURL = useCallback((params: URLUpdateParams) => {
-    if (typeof self === "undefined") return;
+    if (!IS_BROWSER || !globalThis.location) return;
 
-    const url = new URL(self.location.href);
+    const urlBuilder = SSRSafeUrlBuilder.fromCurrent();
 
-    if (params.sortBy) url.searchParams.set("sortBy", params.sortBy);
+    if (params.sortBy) urlBuilder.setParam("sortBy", params.sortBy);
 
     if (params.filterBy !== undefined) {
       params.filterBy.length > 0
-        ? url.searchParams.set("filterBy", params.filterBy.join(","))
-        : url.searchParams.delete("filterBy");
+        ? urlBuilder.setParam("filterBy", params.filterBy.join(","))
+        : urlBuilder.deleteParam("filterBy");
     }
 
-    url.searchParams.set("page", "1");
+    urlBuilder.setParam("page", "1");
 
     const event = new CustomEvent("fresh-navigate", {
-      detail: { url: url.toString() },
+      detail: { url: urlBuilder.toString() },
     });
-    self.dispatchEvent(event);
+    globalThis.dispatchEvent(event);
   }, []);
 
   return { updateURL };

@@ -1,18 +1,20 @@
 /* ===== STAMP DETAIL PAGE ===== */
 /*@baba-365+390*/
-import { StampRow } from "$globals";
-import { Handlers } from "$fresh/server.ts";
-import { Head } from "$fresh/runtime.ts";
-import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
-import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
-import { StampController } from "$server/controller/stampController.ts";
-import { DispenserManager } from "$server/services/xcpService.ts";
-import { RouteType } from "$server/services/cacheService.ts";
-import { DOMParser } from "dom";
-import { body, gapSectionSlim } from "$layout";
+
 import { StampImage, StampInfo } from "$content";
+import { Head } from "$fresh/runtime.ts";
+import { Handlers } from "$fresh/server.ts";
+import { body, containerBackground, containerGap } from "$layout";
+import { logger, LogNamespace } from "$lib/utils/logger.ts";
 import { StampGallery } from "$section";
-import { DataTableBase, HoldersTable } from "$table";
+import { StampController } from "$server/controller/stampController.ts";
+import { CounterpartyDispenserService } from "$server/services/counterpartyApiService.ts";
+import { RouteType } from "$server/services/infrastructure/cacheService.ts";
+import { DetailsTableBase, HoldersTable } from "$table";
+import type { StampRow } from "$types/stamp.d.ts";
+import type { StampDetailPageProps } from "$types/ui.d.ts";
+import type { HolderRow } from "$types/wallet.d.ts";
+import { DOMParser } from "dom";
 
 /* ===== TYPES ===== */
 interface StampData {
@@ -21,7 +23,7 @@ interface StampData {
   sends: any;
   dispensers: any;
   dispenses: any;
-  holders: any[];
+  holders: HolderRow[];
   vaults: any;
   last_block: number;
   stamps_recent: any;
@@ -31,22 +33,33 @@ interface StampData {
   url: string;
 }
 
-interface StampDetailPageProps {
-  data: StampData;
-  url?: string;
-}
-
 /* ===== SERVER HANDLER ===== */
 export const handler: Handlers<StampData> = {
   async GET(req: Request, ctx) {
     try {
       const { id } = ctx.params;
-      const url = new URL(req.url);
-      // Get stamp details first
-      const stampData = await StampController.getStampDetailsById(id);
+      // Get stamp details first with market data
+      const stampData = await StampController.getStampDetailsById(
+        id,
+        "all",
+        RouteType.STAMP_DETAIL,
+        undefined,
+        true,
+        false,
+      );
       if (!stampData?.data?.stamp) {
         return ctx.renderNotFound();
       }
+
+      // Log stamp data with market information
+      await logger.debug("stamps" as LogNamespace, {
+        message: "Stamp data fetched",
+        stamp: stampData.data.stamp.stamp,
+        cpid: stampData.data.stamp.cpid,
+        floorPrice: stampData.data.stamp.floorPrice,
+        floorPriceUSD: stampData.data.stamp.floorPriceUSD,
+        hasMarketData: !!stampData.data.stamp.marketData,
+      });
 
       // Use the CPID from stamp data for other queries
       const [
@@ -70,30 +83,35 @@ export const handler: Handlers<StampData> = {
         ]),
       ]);
 
+      // Log holders data structure
+      await logger.debug("stamps" as LogNamespace, {
+        message: "Holders data fetched",
+        holdersLength: holders.data?.length || 0,
+        hasHolders: holders.data && holders.data.length > 0,
+      });
+
       // Only fetch dispensers for STAMP or SRC-721
       let dispensers = [];
       let lowestPriceDispenser = null;
-      let floorPrice = null;
 
       if (
         stampData.data.stamp.ident === "STAMP" ||
         stampData.data.stamp.ident === "SRC-721"
       ) {
-        // Fetch dispensers separately
-        const dispensersData = await DispenserManager.getDispensersByCpid(
-          stampData.data.stamp.cpid,
-        );
+        // Fetch dispensers separately for display on detail page
+        const dispensersData = await CounterpartyDispenserService
+          .getDispensersByCpid(
+            stampData.data.stamp.cpid,
+          );
         dispensers = dispensersData?.dispensers || [];
         lowestPriceDispenser = findLowestPriceDispenser(dispensers);
-        floorPrice = calculateFloorPrice(lowestPriceDispenser);
       }
 
-      const btcPrice = await fetchBTCPriceInUSD(url.origin);
-      const stampWithPrices = addPricesToStamp(
-        stampData.data.stamp,
-        floorPrice,
-        btcPrice,
-      );
+      // Use market data from cache if available
+      const stamp = stampData.data.stamp;
+
+      // Stamp should already have market data from controller
+      const stampWithPrices = stamp;
 
       let htmlTitle = null;
       if (
@@ -125,7 +143,11 @@ export const handler: Handlers<StampData> = {
         },
       });
     } catch (error) {
-      console.error("Error fetching stamp data:", error);
+      await logger.error("stamps" as LogNamespace, {
+        message: "Error fetching stamp data",
+        error: error instanceof Error ? error.message : String(error),
+        stampId: ctx.params.id,
+      });
       if ((error as Error).message?.includes("Stamp not found")) {
         return ctx.renderNotFound();
       }
@@ -149,9 +171,25 @@ export const handler: Handlers<StampData> = {
 
 /* ===== HELPERS ===== */
 // Helper functions to improve readability
-function findLowestPriceDispenser(dispensers: any[]) {
-  const openDispensers = dispensers.filter((d) => d.give_remaining > 0);
-  return openDispensers.reduce(
+function findLowestPriceDispenser(
+  dispensers: Array<{
+    give_remaining: number;
+    satoshirate: number;
+    close_block_index: number | null;
+  }>,
+): {
+  give_remaining: number;
+  satoshirate: number;
+  close_block_index: number | null;
+} | null {
+  const openDispensers = dispensers?.filter((d) => d.give_remaining > 0) ?? [];
+  return openDispensers.reduce<
+    {
+      give_remaining: number;
+      satoshirate: number;
+      close_block_index: number | null;
+    } | null
+  >(
     (lowest, dispenser) => {
       if (!lowest || dispenser.satoshirate < lowest.satoshirate) {
         return dispenser;
@@ -160,31 +198,6 @@ function findLowestPriceDispenser(dispensers: any[]) {
     },
     null,
   );
-}
-
-function calculateFloorPrice(dispenser: any) {
-  return dispenser
-    ? Number(
-      formatSatoshisToBTC(dispenser.satoshirate, {
-        includeSymbol: false,
-      }),
-    )
-    : null;
-}
-
-function addPricesToStamp(
-  stamp: any,
-  floorPrice: number | null,
-  btcPrice: number,
-) {
-  return {
-    ...stamp,
-    floorPrice,
-    floorPriceUSD: floorPrice !== null ? floorPrice * btcPrice : null,
-    marketCapUSD: typeof stamp.marketCap === "number"
-      ? stamp.marketCap * btcPrice
-      : null,
-  };
 }
 
 /* ===== PAGE COMPONENT ===== */
@@ -200,26 +213,12 @@ export default function StampDetailPage(props: StampDetailPageProps) {
     lowestPriceDispenser = null,
   } = props.data;
 
-  console.log("Initial data:", {
-    dispensers: dispensers,
-    dispenses: dispenses,
-    sends: sends,
-  });
-
-  const totalCounts = {
-    dispensers: dispensers?.length || 0,
-    sales: dispenses?.length || 0,
-    transfers: sends?.length || 0,
-  };
-
-  console.log("Total counts:", totalCounts);
-
   /* ===== META INFORMATION ===== */
   const title = htmlTitle
     ? htmlTitle.toUpperCase()
     : stamp?.cpid?.startsWith("A")
-    ? `Bitcoin Stamp #${stamp?.stamp || ""} - stampchain.io`
-    : stamp?.cpid || "Stamp Not Found";
+    ? `Bitcoin Stamp #${stamp?.stamp ?? ""}`
+    : stamp?.cpid ?? "Stamp Not Found";
 
   // Update the getMetaImageInfo and add dimension handling
   const getMetaImageInfo = (stamp: StampRow | undefined, baseUrl: string) => {
@@ -231,29 +230,21 @@ export default function StampDetailPage(props: StampDetailPageProps) {
       };
     }
 
-    // For HTML/SVG content, use preview endpoint with known dimensions
-    if (
-      stamp.stamp_mimetype === "text/html" ||
-      stamp.stamp_mimetype === "image/svg+xml"
-    ) {
-      return {
-        url: `${baseUrl}/api/v2/stamp/${stamp.stamp}/preview`,
-        width: 1200,
-        height: 1200,
-      };
-    }
-
-    // For direct images, use original URL and dimensions
+    // For all content, use preview endpoint
+    // Default to square (1200x1200) since most stamps are square
     return {
-      url: stamp.stamp_url,
+      url: `${baseUrl}/api/v2/stamp/${stamp.stamp}/preview`,
+      width: 1200,
+      height: 1200, // Square format works best for both X and Telegram
     };
   };
 
-  const baseUrl = new URL(props.url || "").origin;
+  // Ensure HTTPS for production preview URLs
+  const baseUrl = new URL(props.url || "").origin.replace(/^http:/, "https:");
   const metaInfo = getMetaImageInfo(stamp, baseUrl);
   const metaDescription = stamp
-    ? `Bitcoin Stamp #${stamp.stamp} - ${stamp.name || "Unprunable UTXO Art"}`
-    : "Bitcoin Stamp - Unprunable UTXO Art";
+    ? stamp.name || "Unprunable UTXO Art"
+    : "Unprunable UTXO Art";
 
   /* ===== SECTION CONFIGURATION ===== */
   const latestStampsSection = {
@@ -289,14 +280,17 @@ export default function StampDetailPage(props: StampDetailPageProps) {
   const tableConfigs = [
     {
       id: "dispensers",
+      label: "DISPENSERS",
       count: dispensers?.length || 0,
     },
     {
       id: "sales",
+      label: "SALES",
       count: dispenses?.length || 0,
     },
     {
       id: "transfers",
+      label: "TRANSFERS",
       count: sends?.length || 0,
     },
   ];
@@ -312,16 +306,11 @@ export default function StampDetailPage(props: StampDetailPageProps) {
           content={metaDescription}
           key="og-description"
         />
-        <meta property="og:image" content={metaInfo.url} key="og-image" />
-        {/* Add fallback image for SVGs in case preview fails */}
-        {stamp?.stamp_mimetype === "image/svg+xml" && (
-          <meta
-            property="og:image"
-            content={stamp.stamp_url}
-            key="og-image-fallback"
-          />
-        )}
+        {/* Primary og:image - stamp preview (should override app-level meta tag) */}
+        <meta property="og:image" content={metaInfo.url} key="og:image" />
         <meta property="og:type" content="website" key="og-type" />
+        <meta property="og:url" content={props.url} key="og-url" />
+        <meta property="og:locale" content="en_US" key="og-locale" />
         <meta
           name="twitter:card"
           content="summary_large_image"
@@ -333,32 +322,28 @@ export default function StampDetailPage(props: StampDetailPageProps) {
           content={metaDescription}
           key="twitter-description"
         />
-        <meta name="twitter:image" content={metaInfo.url} key="twitter-image" />
-        {/* Add fallback image for SVGs in case preview fails */}
-        {stamp?.stamp_mimetype === "image/svg+xml" && (
-          <meta
-            name="twitter:image"
-            content={stamp.stamp_url}
-            key="twitter-image-fallback"
-          />
-        )}
-        {/* Only add dimension meta tags if we have the dimensions */}
-        {metaInfo.width && metaInfo.height && (
-          <>
-            <meta
-              property="og:image:width"
-              content={metaInfo.width.toString()}
-            />
-            <meta
-              property="og:image:height"
-              content={metaInfo.height.toString()}
-            />
-          </>
-        )}
+        {/* Primary twitter:image - stamp preview (should override app-level meta tag) */}
+        <meta name="twitter:image" content={metaInfo.url} key="twitter:image" />
+        <meta
+          name="twitter:image:alt"
+          content={`Bitcoin Stamp #${stamp?.stamp || ""}`}
+          key="twitter:image:alt"
+        />
+        {/* Always use 1200x1200 for all stamps */}
+        <meta
+          property="og:image:width"
+          content="1200"
+          key="og:image:width"
+        />
+        <meta
+          property="og:image:height"
+          content="1200"
+          key="og:image:height"
+        />
       </Head>
 
-      <div class={`${body} ${gapSectionSlim}`}>
-        <div class="grid grid-cols-1 min-[880px]:grid-cols-2 desktop:grid-cols-3 gap-6 mobileLg:gap-9">
+      <div class={`${body} ${containerGap}`}>
+        <div class="grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 gap-6 mobileLg:gap-9">
           <div class="desktop:col-span-1">
             {stamp &&
               (
@@ -380,18 +365,26 @@ export default function StampDetailPage(props: StampDetailPageProps) {
         </div>
 
         {holders && holders.length > 0 && (
-          <HoldersTable holders={holders || []} />
-        )}
-
-        {stamp.ident !== "SRC-20" && (
-          <DataTableBase
-            type="stamps"
-            configs={tableConfigs}
-            cpid={stamp.cpid}
+          <HoldersTable
+            holders={holders.map((holder) => ({
+              quantity: Number(holder.quantity),
+              divisible: holder.divisible,
+              address: holder.address,
+              amt: Number(holder.amt ?? 0),
+              percentage: Number(holder.percentage ?? 0),
+            }))}
           />
         )}
 
-        <div class="pt-6 mobileLg:pt-12">
+        {stamp?.ident !== "SRC-20" && (
+          <DetailsTableBase
+            type="stamps"
+            configs={tableConfigs}
+            cpid={stamp?.cpid || ""}
+          />
+        )}
+
+        <div class={containerBackground}>
           <StampGallery {...latestStampsSection} />
         </div>
       </div>

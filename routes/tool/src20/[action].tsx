@@ -1,11 +1,7 @@
 /* ===== SRC20 TOOLS PAGE ===== */
 /*@baba-154+159*/
 import { Handlers, PageProps } from "$fresh/server.ts";
-import { Src20Controller } from "$server/controller/src20Controller.ts";
-import { SRC20Service } from "$server/services/src20/index.ts";
-import type { SRC20MintStatus } from "$lib/types/src20.d.ts";
-import { body, gapSection } from "$layout";
-import { SRC20DeployTool, SRC20MintTool, SRC20TransferTool } from "$tool";
+import { body, containerGap } from "$layout";
 import {
   SRC20DeployHowto,
   SRC20DeploysGallery,
@@ -14,16 +10,12 @@ import {
   SRC20TransferHowto,
   SRC20TransfersGallery,
 } from "$section";
+import { Src20Controller } from "$server/controller/src20Controller.ts";
+import { SRC20Service } from "$server/services/src20/index.ts";
+import { SRC20DeployTool, SRC20MintTool, SRC20TransferTool } from "$tool";
+import type { ToolSrc20PageProps } from "$types/ui.d.ts";
 
 /* ===== TYPES ===== */
-interface ToolSrc20PageProps {
-  selectedTab: string;
-  trxType: "multisig" | "olga";
-  tick?: string | null;
-  mintStatus?: SRC20MintStatus | null;
-  holders?: number;
-  error?: string;
-}
 
 /* ===== SERVER HANDLER ===== */
 export const handler: Handlers<ToolSrc20PageProps> = {
@@ -106,9 +98,9 @@ export default function ToolSrc20Page(
         return (
           <SRC20MintTool
             trxType={trxType}
-            tick={tick}
-            mintStatus={mintStatus}
-            holders={holders}
+            {...(tick && { tick })}
+            {...(mintStatus && { mintStatus })}
+            {...(holders !== undefined && { holders })}
           />
         );
       case "deploy":
@@ -148,17 +140,17 @@ export default function ToolSrc20Page(
 
   /* ===== RENDER ===== */
   return (
-    <div className={`${body} ${gapSection}`}>
-      <div className={`flex w-full`}>
+    <div class={`${body} ${containerGap}`}>
+      <div class={`flex w-full`}>
         {renderContent()}
       </div>
       <div
-        className={`flex flex-col tablet:flex-row justify-between ${gapSection}`}
+        class={`flex flex-col tablet:flex-row justify-between ${containerGap}`}
       >
-        <div className="flex w-full tablet:w-1/2 desktop:w-1/3">
+        <div class="flex w-full tablet:w-1/2 h-fit">
           {renderLeftSidebar()}
         </div>
-        <div className={`flex w-full tablet:w-1/2 desktop:w-2/3`}>
+        <div class="flex w-full tablet:w-1/2 h-fit">
           {renderRightSidebar()}
         </div>
       </div>

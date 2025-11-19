@@ -1,22 +1,22 @@
 /* ===== BLOCK SELECTOR COMPONENT ===== */
-import type { Signal } from "@preact/signals";
-import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
-import { BlockRow } from "$globals";
+import {
+  abbreviateAddress,
+  formatDate,
+} from "$lib/utils/ui/formatting/formatUtils.ts";
+import type { BlockProps } from "$types/ui.d.ts";
 
 /* ===== TYPES ===== */
-interface BlockProps {
-  block: BlockRow;
-  selected: Signal<BlockRow>;
-}
 
 /* ===== MAIN COMPONENT ===== */
 export default function BlockSelector(props: BlockProps) {
   /* ===== PROPS EXTRACTION ===== */
-  const { block, selected } = props;
+  const { block, selected = { value: null } } = props;
 
   /* ===== EVENT HANDLERS ===== */
   function handleClick() {
-    selected.value = block;
+    if (selected) {
+      selected.value = block;
+    }
   }
 
   /* ===== COMPUTED VALUES ===== */
@@ -32,7 +32,7 @@ export default function BlockSelector(props: BlockProps) {
       class={`${
         isSelected ? "bg-blue-100 text-gray-800" : "bg-gray-800 text-blue-100"
       } transition-all transform hover:shadow-xl
-        rounded-lg overflow-hidden flex flex-col justify-between p-3 mobileLg:p-4 m-2
+        rounded-2xl overflow-hidden flex flex-col justify-between p-3 mobileLg:p-4 m-2
         cursor-pointer hover:bg-gray-700 hover:text-blue-200`}
       onClick={handleClick}
     >

@@ -1,15 +1,12 @@
 /* ===== SRC101 TOOLS PAGE ===== */
 /*@baba-60+61+65*/
 import { Handlers, PageProps } from "$fresh/server.ts";
-import { body, gapSection } from "$layout";
-import { SRC101RegisterTool } from "$tool";
+import { body, containerGap } from "$layout";
 import { SRC101RegisterHowto } from "$section";
+import { SRC101RegisterTool } from "$tool";
+import type { ToolsSrc101PageProps } from "$types/ui.d.ts";
 
 /* ===== TYPES ===== */
-interface ToolsSrc101PageProps {
-  selectedTab: string;
-  trxType: "multisig" | "olga";
-}
 
 /* ===== SERVER HANDLER ===== */
 export const handler: Handlers<ToolsSrc101PageProps> = {
@@ -57,8 +54,8 @@ export default function ToolsSrc101Page(
 
   /* ===== RENDER ===== */
   return (
-    <div className={`${body} ${gapSection}`}>
-      <div className={`flex w-full`}>
+    <div class={`${body} ${containerGap}`}>
+      <div class={`flex w-full`}>
         {renderContent()}
       </div>
       <div class="flex w-full">

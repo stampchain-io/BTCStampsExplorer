@@ -1,31 +1,14 @@
 /*@baba-styles is not config properly*/
-import { useCallback, useEffect, useRef, useState } from "preact/hooks";
-import { ModalSearchBase } from "$layout";
-import { closeModal, openModal, searchState } from "$islands/modal/states.ts";
-import { textSm } from "$text";
 import { Icon } from "$icon";
-import { tooltipIcon } from "$notification";
+import { closeModal, openModal, searchState } from "$islands/modal/states.ts";
+import { ModalSearchBase, transitionColors } from "$layout";
+import { textSm } from "$text";
+import { useEffect } from "preact/hooks";
 
-// Extend the searchState type to include results
-declare module "$islands/modal/states" {
-  interface SearchState {
-    results?: Array<{ tick: string }>;
-  }
-}
+export function openSRC20Search() {
+  const inputRef = { current: null } as preact.RefObject<HTMLInputElement>;
 
-export function SearchSRC20Modal({
-  showButton = true,
-}: {
-  showButton?: boolean;
-}) {
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  // Add tooltip state
-  const [isTooltipVisible, setIsTooltipVisible] = useState(false);
-  const [allowTooltip, setAllowTooltip] = useState(true);
-  const tooltipTimeoutRef = useRef<number | null>(null);
-
-  const handleSearch = useCallback(async () => {
+  const handleSearch = async () => {
     const currentTerm = searchState.value.term;
 
     if (!currentTerm?.trim()) {
@@ -40,6 +23,11 @@ export function SearchSRC20Modal({
     try {
       const response = await fetch(
         `/api/v2/src20/search?q=${encodeURIComponent(currentTerm.trim())}`,
+        {
+          headers: {
+            "X-API-Version": "2.3",
+          },
+        },
       );
       const data = await response.json();
 
@@ -66,109 +54,35 @@ export function SearchSRC20Modal({
         results: [],
       };
     }
-  }, []);
+  };
 
-  const handleOpenSearch = () => {
-    console.log("Opening search modal");
-    searchState.value = { term: "", error: "", results: [] };
-    const modalContent = (
-      <ModalSearchBase
-        onClose={() => {
-          console.log("Modal closing, resetting state");
-          searchState.value = { term: "", error: "", results: [] };
-          closeModal();
+  // Open modal
+  searchState.value = { term: "", error: "", results: [] };
+  const modalContent = (
+    <ModalSearchBase
+      title="Search SRC-20 Tokens"
+      onClose={() => {
+        searchState.value = { term: "", error: "", results: [] };
+        closeModal();
+      }}
+    >
+      <SearchContent
+        searchTerm={searchState.value.term}
+        setSearchTerm={(term) => {
+          searchState.value = { ...searchState.value, term };
         }}
-      >
-        <SearchContent
-          searchTerm={searchState.value.term}
-          setSearchTerm={(term) => {
-            searchState.value = { ...searchState.value, term };
-          }}
-          error={searchState.value.error}
-          results={searchState.value.results || []}
-          inputRef={inputRef}
-          onSearch={handleSearch}
-          setError={(error) => {
-            searchState.value = { ...searchState.value, error };
-          }}
-          autoFocus
-        />
-      </ModalSearchBase>
-    );
-    openModal(modalContent, "scaleDownUp");
-  };
-
-  // Add tooltip handlers
-  const handleMouseEnter = () => {
-    if (allowTooltip) {
-      if (tooltipTimeoutRef.current) {
-        globalThis.clearTimeout(tooltipTimeoutRef.current);
-      }
-      tooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        setIsTooltipVisible(true);
-      }, 1500);
-    }
-  };
-
-  const handleMouseLeave = () => {
-    if (tooltipTimeoutRef.current) {
-      globalThis.clearTimeout(tooltipTimeoutRef.current);
-    }
-    setIsTooltipVisible(false);
-    setAllowTooltip(true);
-  };
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (tooltipTimeoutRef.current) {
-        globalThis.clearTimeout(tooltipTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    const handleKeyboardShortcut = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "s") {
-        e.preventDefault();
-        handleOpenSearch();
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyboardShortcut);
-    return () =>
-      document.removeEventListener("keydown", handleKeyboardShortcut);
-  }, []);
-
-  return (
-    <div className="relative">
-      {showButton && (
-        <Icon
-          type="iconButton"
-          name="search"
-          weight="bold"
-          size="smR"
-          color="purple"
-          className="mt-[6px]"
-          onClick={() => {
-            handleOpenSearch();
-            setIsTooltipVisible(false);
-            setAllowTooltip(false);
-          }}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-          role="button"
-        />
-      )}
-      <div
-        className={`${tooltipIcon} ${
-          isTooltipVisible ? "opacity-100" : "opacity-0"
-        }`}
-      >
-        SEARCH
-      </div>
-    </div>
+        error={searchState.value.error}
+        results={searchState.value.results || []}
+        inputRef={inputRef}
+        onSearch={handleSearch}
+        setError={(error) => {
+          searchState.value = { ...searchState.value, error };
+        }}
+        autoFocus
+      />
+    </ModalSearchBase>
   );
+  openModal(modalContent, "slideDownUp");
 }
 
 function SearchContent({
@@ -205,6 +119,10 @@ function SearchContent({
   }, [searchState.value.term]);
 
   const handleResultClick = (tick: string) => {
+    // SSR-safe browser environment check
+    if (typeof globalThis === "undefined" || !globalThis?.location) {
+      return; // Cannot navigate during SSR
+    }
     globalThis.location.href = `/src20/${tick}`;
   };
 
@@ -220,14 +138,14 @@ function SearchContent({
           setSearchTerm(newTerm);
         }}
         autoFocus={autoFocus}
-        class={`relative z-[2] h-12 w-full !bg-[#221826] pl-[18px] pr-[52px] font-medium text-sm text-stamp-grey-light placeholder:!bg-[#221826] placeholder:font-light placeholder:!text-stamp-grey no-outline ${
+        class={`relative z-modal h-12 w-full bg-color-background/50 pl-7.5 pr-[68px] font-medium text-sm text-color-grey-light placeholder:bg-color-background/50 placeholder:font-light placeholder:!text-color-grey no-outline ${
           searchState.value.error ||
             (searchState.value.results?.length ?? 0) > 0
-            ? "rounded-t-md"
-            : "rounded-md"
+            ? "rounded-t-3xl"
+            : "rounded-3xl"
         }`}
       />
-      <div class="absolute z-[3] right-4 top-[11px] cursor-pointer">
+      <div class="absolute z-[3] right-6 top-[11px] cursor-pointer">
         <Icon
           type="icon"
           name="search"
@@ -236,16 +154,16 @@ function SearchContent({
           color="custom"
           className={`w-5 h-5 ${
             searchState.value.error
-              ? "stroke-stamp-grey-light"
-              : "stroke-stamp-grey"
+              ? "stroke-color-grey-light"
+              : "stroke-color-grey"
           }`}
         />
       </div>
 
       {searchState.value.error
         ? (
-          <ul class="!bg-[#221826] rounded-b-md z-[2] overflow-y-auto">
-            <li class="flex flex-col items-center justify-end pt-1.5 pb-3 px-[18px]">
+          <ul class="bg-color-background/50 rounded-b-3xl z-modal overflow-y-auto">
+            <li class="flex flex-col items-center justify-end pt-1.5 pb-3 px-7.5">
               <img
                 src="/img/placeholder/broken.png"
                 alt="No results"
@@ -257,11 +175,11 @@ function SearchContent({
                     key={index}
                     class={`${
                       index === 0
-                        ? "font-light text-base text-stamp-grey-light"
+                        ? "font-light text-base text-color-grey-light"
                         : index ===
                             searchState.value.error.split("\n").length - 1
                         ? textSm
-                        : "font-medium text-sm text-stamp-grey pt-0.5 pb-1"
+                        : "font-medium text-sm text-color-grey pt-0.5 pb-1"
                     } break-all overflow-hidden`}
                   >
                     {text}
@@ -273,12 +191,12 @@ function SearchContent({
         )
         : searchState.value.results && searchState.value.results.length > 0
         ? (
-          <ul class="max-h-[266px] !bg-[#221826] rounded-b-md z-[2] overflow-y-auto scrollbar-black [&::-webkit-scrollbar]:!rounded-[2px] [&::-webkit-scrollbar]:!w-[4px]">
+          <ul class="max-h-[266px] bg-color-background/50 rounded-b-3xl z-modal overflow-y-auto scrollbar-background-overlay [&::-webkit-scrollbar]:!rounded-[2px] [&::-webkit-scrollbar]:!w-[4px]">
             {searchState.value.results.map((result: { tick: string }) => (
               <li
                 key={result.tick}
                 onClick={() => handleResultClick(result.tick)}
-                class={`${textSm} px-[18px] py-[9px] hover:bg-[#2f2032] transition-colors duration-300 cursor-pointer`}
+                class={`${textSm} px-7.5 py-[9px] hover:bg-color-background/60 ${transitionColors} cursor-pointer`}
               >
                 {result.tick}
               </li>

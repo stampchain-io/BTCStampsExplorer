@@ -1,0 +1,108 @@
+{
+  "dailyRegression": {
+    "description": "Configuration for daily regression testing",
+    "schedule": {
+      "dailyRun": "0 2 * * *",
+      "weeklyReview": "0 6 * * 0",
+      "timezone": "UTC"
+    },
+    "notifications": {
+      "enabled": true,
+      "createIssues": true,
+      "labels": ["regression", "automated", "critical"],
+      "severity": {
+        "critical": {
+          "unexpectedChanges": ">= 1",
+          "testFailures": ">= 5",
+          "performanceDegradation": ">= 50%"
+        },
+        "warning": {
+          "testFailures": ">= 1",
+          "performanceDegradation": ">= 25%"
+        }
+      }
+    },
+    "reporting": {
+      "retentionDays": {
+        "dailyReports": 90,
+        "weeklyReports": 365,
+        "artifacts": 90
+      },
+      "trendsAnalysis": {
+        "enabled": true,
+        "lookbackDays": 7,
+        "includeWeekends": true
+      }
+    },
+    "testConfiguration": {
+      "iterations": 2,
+      "timeout": 45,
+      "production": {
+        "baseUrl": "https://stampchain.io",
+        "healthCheckEndpoint": "/api/v2/health"
+      },
+      "expectations": {
+        "maxResponseTime": 2000,
+        "maxFailureRate": 0.05,
+        "endpointCoverage": 46
+      }
+    },
+    "holidays": {
+      "skipDays": [
+        "2024-12-25",
+        "2024-12-31",
+        "2025-01-01"
+      ],
+      "description": "Skip testing on major holidays to avoid noise"
+    }
+  },
+  "weeklyAnalysis": {
+    "description": "Configuration for weekly trend analysis",
+    "metrics": [
+      "failureRate",
+      "responseTime",
+      "endpointAvailability",
+      "regressionCount"
+    ],
+    "reports": {
+      "generateTrends": true,
+      "compareWithPreviousWeek": true,
+      "includePerformanceBaseline": true
+    }
+  },
+  "alerting": {
+    "channels": {
+      "github": {
+        "issues": true,
+        "discussions": false
+      },
+      "email": {
+        "enabled": false,
+        "recipients": []
+      }
+    },
+    "conditions": {
+      "criticalRegression": {
+        "description": "Immediate attention required",
+        "triggers": [
+          "unexpected API changes",
+          "endpoint unavailability",
+          "severe performance degradation"
+        ]
+      },
+      "warningLevel": {
+        "description": "Monitoring required",
+        "triggers": [
+          "minor test failures",
+          "performance concerns",
+          "new optional fields"
+        ]
+      }
+    }
+  },
+  "maintenance": {
+    "cleanupSchedule": "0 3 * * 1",
+    "archiveOldReports": true,
+    "maxReportAge": 90
+  }
+}

@@ -1,5 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
-import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { BitcoinNotificationService } from "$server/services/notification/bitcoinNotificationService.ts";
 import { InternalRouteGuard } from "$server/services/security/internalRouteGuard.ts";
 

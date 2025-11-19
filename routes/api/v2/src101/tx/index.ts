@@ -1,7 +1,7 @@
 import { Handlers } from "$fresh/server.ts";
 import { Src101Controller } from "$server/controller/src101Controller.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
+import { ResponseUtil } from "$lib/utils/api/responses/responseUtil.ts";
+import { getPaginationParams } from "$lib/utils/data/pagination/paginationUtils.ts";
 
 export interface SRC101TxParams {
   tick?: string;
@@ -17,17 +17,21 @@ export const handler: Handlers = {
   async GET(req) {
     try {
       const url = new URL(req.url);
-      const { limit, page } = getPaginationParams(url);
+      const paginationResult = getPaginationParams(url);
+      if (paginationResult instanceof Response) {
+        return paginationResult;
+      }
+      const { limit, page } = paginationResult;
       const block_index = url.searchParams.get("block_index");
       const deploy_hash = url.searchParams.get("deploy_hash");
       const valid = Number(url.searchParams.get("valid"));
       const op = url.searchParams.get("op");
 
       const queryParams = {
-        block_index: block_index,
-        deploy_hash: deploy_hash,
-        valid: valid,
-        op: op,
+        ...(block_index && { block_index }),
+        ...(deploy_hash && { deploy_hash }),
+        ...(valid && { valid }),
+        ...(op && { op }),
         limit: limit || 1000,
         page: page || 1,
       };

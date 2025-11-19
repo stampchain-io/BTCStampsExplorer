@@ -1,0 +1,329 @@
+import { normalizeHeaders } from "$lib/utils/api/headers/headerUtils.ts";
+import { getSecurityHeaders } from "$lib/utils/security/securityHeaders.ts";
+import {
+  getCacheConfig,
+  RouteType,
+} from "$server/services/infrastructure/cacheService.ts";
+
+// Import types for internal use and re-export for server code
+import type { ApiErrorResponse, APIResponse } from "$lib/types/api.ts";
+export type { ApiErrorResponse, APIResponse };
+
+// Server-specific version with RouteType enum
+export interface ApiResponseOptions {
+  status?: number;
+  headers?: Record<string, string>;
+  routeType?: RouteType;
+  forceNoCache?: boolean;
+}
+
+export const API_RESPONSE_VERSION = "v2.2.7";
+
+//  // Future structure
+//  lib/utils/
+//  ├── apiResponseUtil.ts    // API-specific responses (server-side utility class)
+//  ├── webResponseUtil.ts    // Web/frontend responses
+//  ├── securityHeaders.ts    // Shared security headers
+//  └── headerUtils.ts        // Shared header utilities
+//
+//  lib/types/
+//  └── api.ts                // Type definitions (client-safe, no Deno dependencies)
+
+export class ApiResponseUtil {
+  private static createHeaders(options: ApiResponseOptions = {}): Headers {
+    const headers: Record<string, string> = {
+      ...getSecurityHeaders({
+        forceNoCache: options.forceNoCache ?? true,
+        context: "api",
+      }),
+      "Content-Type": "application/json",
+      "X-API-Version": API_RESPONSE_VERSION,
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY",
+      "X-Permitted-Cross-Domain-Policies": "none",
+      ...(options.headers || {}),
+    };
+
+    if (options.routeType && !options.forceNoCache) {
+      const { duration, staleWhileRevalidate, staleIfError } = getCacheConfig(
+        options.routeType,
+      );
+
+      if (duration > 0) {
+        const cacheControl = [
+          "public",
+          `max-age=${duration}`,
+          staleWhileRevalidate
+            ? `stale-while-revalidate=${staleWhileRevalidate}`
+            : "",
+          staleIfError ? `stale-if-error=${staleIfError}` : "",
+        ].filter(Boolean).join(", ");
+
+        Object.assign(headers, {
+          "Cache-Control": cacheControl,
+          "CDN-Cache-Control": cacheControl,
+          "Cloudflare-CDN-Cache-Control": cacheControl,
+          "Surrogate-Control": `max-age=${duration}`,
+          "Edge-Control": `cache-maxage=${duration}`,
+        });
+      }
+    }
+
+    return new Headers(headers);
+  }
+
+  private static createErrorResponse(
+    message: string,
+    code: string,
+    details?: unknown,
+  ): ApiErrorResponse {
+    return {
+      error: message,
+      status: "error",
+      code,
+      ...(details ? { details } : {}),
+    };
+  }
+
+  private static serializeWithBigInt(data: unknown): string {
+    // Fast path: if no BigInts, use regular JSON.stringify
+    if (!this.hasBigInt(data)) {
+      return JSON.stringify(data);
+    }
+
+    // Only use reviver when BigInts are present
+    return JSON.stringify(data, (_key, value) => {
+      if (typeof value === "bigint") {
+        return value.toString();
+      }
+      return value;
+    });
+  }
+
+  private static hasBigInt(obj: unknown): boolean {
+    if (typeof obj === "bigint") return true;
+    if (obj === null || typeof obj !== "object") return false;
+    if (Array.isArray(obj)) {
+      return obj.some((item) => this.hasBigInt(item));
+    }
+    for (const value of Object.values(obj)) {
+      if (this.hasBigInt(value)) return true;
+    }
+    return false;
+  }
+
+  static success(data: unknown, options: ApiResponseOptions = {}): Response {
+    return new Response(
+      this.serializeWithBigInt(data),
+      {
+        status: options.status || 200,
+        headers: normalizeHeaders(this.createHeaders(options)),
+      },
+    );
+  }
+
+  static created(
+    data: unknown,
+    options: ApiResponseOptions = {},
+  ): Response {
+    return new Response(
+      this.serializeWithBigInt(data),
+      {
+        status: 201,
+        headers: normalizeHeaders(this.createHeaders(options)),
+      },
+    );
+  }
+
+  static noContent(options: ApiResponseOptions = {}): Response {
+    return new Response(null, {
+      status: 204,
+      headers: normalizeHeaders(this.createHeaders(options)),
+    });
+  }
+
+  static badRequest(
+    message: string,
+    details?: unknown,
+    options: ApiResponseOptions = {},
+  ): Response {
+    console.error("Bad Request:", message, details || "");
+    return new Response(
+      JSON.stringify(this.createErrorResponse(message, "BAD_REQUEST", details)),
+      {
+        status: 400,
+        headers: normalizeHeaders(this.createHeaders(options)),
+      },
+    );
+  }
+
+  static unauthorized(
+    message = "Unauthorized",
+    details?: unknown,
+    options: ApiResponseOptions = {},
+  ): Response {
+    console.error("Unauthorized:", message, details || "");
+    return new Response(
+      JSON.stringify(
+        this.createErrorResponse(message, "UNAUTHORIZED", details),
+      ),
+      {
+        status: 401,
+        headers: normalizeHeaders(this.createHeaders(options)),
+      },
+    );
+  }
+
+  static forbidden(
+    message = "Forbidden",
+    details?: unknown,
+    options: ApiResponseOptions = {},
+  ): Response {
+    console.error("Forbidden:", message, details || "");
+    return new Response(
+      JSON.stringify(this.createErrorResponse(message, "FORBIDDEN", details)),
+      {
+        status: 403,
+        headers: normalizeHeaders(this.createHeaders(options)),
+      },
+    );
+  }
+
+  static notFound(
+    message = "Resource not found",
+    details?: unknown,
+    options: ApiResponseOptions = {},
+  ): Response {
+    return new Response(
+      JSON.stringify(this.createErrorResponse(message, "NOT_FOUND", details)),
+      {
+        status: 404,
+        headers: normalizeHeaders(this.createHeaders(options)),
+      },
+    );
+  }
+
+  static methodNotAllowed(
+    message = "Method not allowed",
+    details?: unknown,
+    options: ApiResponseOptions = {},
+  ): Response {
+    return new Response(
+      JSON.stringify(
+        this.createErrorResponse(message, "METHOD_NOT_ALLOWED", details),
+      ),
+      {
+        status: 405,
+        headers: normalizeHeaders(this.createHeaders(options)),
+      },
+    );
+  }
+
+  static conflict(
+    message: string,
+    details?: unknown,
+    options: ApiResponseOptions = {},
+  ): Response {
+    console.error("Conflict:", message, details || "");
+    return new Response(
+      JSON.stringify(this.createErrorResponse(message, "CONFLICT", details)),
+      {
+        status: 409,
+        headers: normalizeHeaders(this.createHeaders(options)),
+      },
+    );
+  }
+
+  static tooManyRequests(
+    message = "Too many requests",
+    details?: unknown,
+    options: ApiResponseOptions = {},
+  ): Response {
+    console.warn("Rate limit exceeded:", message, details || "");
+    return new Response(
+      JSON.stringify(
+        this.createErrorResponse(message, "TOO_MANY_REQUESTS", details),
+      ),
+      {
+        status: 429,
+        headers: normalizeHeaders(this.createHeaders(options)),
+      },
+    );
+  }
+
+  static internalError(
+    error: unknown,
+    message: string = "Internal server error",
+    options: ApiResponseOptions = {},
+  ): Response {
+    console.error("Internal Error:", error);
+
+    // Check if we're in development mode (server-side only)
+    const isDevelopment = typeof window === "undefined" &&
+      typeof Deno !== "undefined" &&
+      Deno.env.get("DENO_ENV") === "development";
+
+    return new Response(
+      JSON.stringify(
+        this.createErrorResponse(message, "INTERNAL_ERROR", {
+          ...(isDevelopment ? { error } : {}),
+        }),
+      ),
+      {
+        status: 500,
+        headers: normalizeHeaders(this.createHeaders(options)),
+      },
+    );
+  }
+
+  static serviceUnavailable(
+    message = "Service temporarily unavailable",
+    details?: unknown,
+    options: ApiResponseOptions = {},
+  ): Response {
+    console.error("Service Unavailable:", message, details || "");
+    return new Response(
+      JSON.stringify(
+        this.createErrorResponse(message, "SERVICE_UNAVAILABLE", details),
+      ),
+      {
+        status: 503,
+        headers: normalizeHeaders(this.createHeaders(options)),
+      },
+    );
+  }
+
+  static gone(
+    message = "Resource no longer available",
+    details?: unknown,
+    options: ApiResponseOptions = {},
+  ): Response {
+    console.warn("Resource Gone:", message, details || "");
+    return new Response(
+      JSON.stringify(
+        this.createErrorResponse(message, "GONE", details),
+      ),
+      {
+        status: 410,
+        headers: normalizeHeaders(this.createHeaders(options)),
+      },
+    );
+  }
+
+  // Helper method for custom responses
+  static custom<T>(
+    body: T,
+    status: number,
+    options: ApiResponseOptions = {},
+  ): Response {
+    return new Response(
+      body instanceof ArrayBuffer || body instanceof Uint8Array
+        ? body
+        : this.serializeWithBigInt(body),
+      {
+        status,
+        headers: normalizeHeaders(this.createHeaders(options)),
+      },
+    );
+  }
+}

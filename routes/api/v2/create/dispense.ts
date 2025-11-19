@@ -1,15 +1,20 @@
 // routes/api/v2/dispense.ts
 import { Handlers } from "$fresh/server.ts";
-import { normalizeFeeRate, XcpManager } from "$server/services/xcpService.ts";
-import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+// FeeDetails import removed - not used in this file
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { logger } from "$lib/utils/logger.ts";
-import { PSBTService } from "$server/services/transaction/psbtService.ts";
 import { serverConfig } from "$server/config/config.ts";
+import {
+  CounterpartyApiManager,
+  normalizeFeeRate,
+} from "$server/services/counterpartyApiService.ts";
+import { BitcoinTransactionBuilder } from "$server/services/transaction/bitcoinTransactionBuilder.ts";
 
 interface DispenseInput {
   address: string;
   dispenser: string;
   quantity: number;
+  dryRun?: boolean; // Add dryRun support for unified fee estimation system
   options: {
     fee_per_kb?: number;
     satsPerVB?: number;
@@ -30,8 +35,35 @@ export const handler: Handlers = {
         address: buyerAddress,
         dispenser,
         quantity: dispenserPaymentAmountSat,
+        dryRun, // Extract dryRun parameter
         options: clientOptions,
       } = input;
+
+      // For dryRun, return fee estimates without creating actual PSBT
+      if (dryRun === true) {
+        // Dispense transactions are simple Bitcoin transfers - typically 1 input, 2 outputs
+        const estimatedTxSize = 200; // bytes (typical for dispense transaction)
+        const feeRate = clientOptions.satsPerVB || 1;
+        const estMinerFee = Math.ceil(estimatedTxSize * feeRate);
+        const serviceFee = 1000; // Service fee in sats
+        const totalCost = dispenserPaymentAmountSat + estMinerFee + serviceFee;
+
+        return ApiResponseUtil.success({
+          est_miner_fee: estMinerFee,
+          total_dust_value: 0, // No dust for simple Bitcoin transfers
+          total_cost: totalCost,
+          est_tx_size: estimatedTxSize,
+          service_fee: serviceFee,
+          dispenser_payment: dispenserPaymentAmountSat,
+          feeDetails: {
+            total: estMinerFee,
+            effectiveFeeRate: feeRate,
+            estimatedSize: estimatedTxSize,
+          },
+          is_estimate: true,
+          estimation_method: "dryRun_calculation",
+        });
+      }
 
       let normalizedFees;
       try {
@@ -60,10 +92,10 @@ export const handler: Handlers = {
         );
       }
 
-      // Prepare options for XcpManager.createDispense
-      // Only include options relevant to XcpManager.createDispense and use correct param names
+      // Prepare options for CounterpartyApiManager.createDispense
+      // Only include options relevant to CounterpartyApiManager.createDispense and use correct param names
       const xcpDispenseCallOpts = {
-        // Spread known & safe options from clientOptions if needed by XcpManager.createDispense
+        // Spread known & safe options from clientOptions if needed by CounterpartyApiManager.createDispense
         allow_unconfirmed_inputs: clientOptions.allow_unconfirmed_inputs ??
           true,
         validate: clientOptions.validate ?? true,
@@ -71,25 +103,25 @@ export const handler: Handlers = {
         sat_per_vbyte: normalizedFees.normalizedSatsPerVB,
         return_psbt: false, // We need raw tx hex
         // `regular_dust_size` is deprecated and removed.
-        // Add other specific options XcpManager.createDispense might expect from clientOptions if any.
+        // Add other specific options CounterpartyApiManager.createDispense might expect from clientOptions if any.
       };
 
       try {
-        console.log("[Dispense Route] About to call XcpManager.createDispense");
-        const xcpResponse = await XcpManager.createDispense(
+        // Call CounterpartyApiManager.createDispense
+        const xcpResponse = await CounterpartyApiManager.createDispense(
           buyerAddress, // Source for XCP (often buyer if they pay fees)
           dispenser, // Dispenser ID
           dispenserPaymentAmountSat, // BTC quantity buyer pays TO dispenser
           xcpDispenseCallOpts,
         );
         console.log(
-          "[Dispense Route] Response from XcpManager:",
+          "[Dispense Route] Response from CounterpartyApiManager:",
           JSON.stringify(xcpResponse, null, 2),
         );
 
         if (!xcpResponse || xcpResponse.error) {
           console.error(
-            "[Dispense Route] Error from XcpManager or no response.",
+            "[Dispense Route] Error from CounterpartyApiManager or no response.",
             xcpResponse?.error,
           );
           return ApiResponseUtil.badRequest(
@@ -174,16 +206,17 @@ export const handler: Handlers = {
         }
 
         console.log(
-          "[Dispense Route] About to call PSBTService.buildPsbtFromUserFundedRawHex",
+          "[Dispense Route] About to call BitcoinTransactionBuilder.buildPsbtFromUserFundedRawHex",
         );
-        const builtPsbtData = await PSBTService.buildPsbtFromUserFundedRawHex(
-          counterpartyTxHex,
-          buyerAddress, // This is the userAddress
-          normalizedFees.normalizedSatsPerVB,
-          psbtOptions,
-        );
+        const builtPsbtData = await BitcoinTransactionBuilder
+          .buildPsbtFromUserFundedRawHex(
+            counterpartyTxHex,
+            buyerAddress, // This is the userAddress
+            normalizedFees.normalizedSatsPerVB,
+            psbtOptions,
+          );
         console.log(
-          "[Dispense Route] Result from PSBTService.buildPsbtFromUserFundedRawHex:",
+          "[Dispense Route] Result from BitcoinTransactionBuilder.buildPsbtFromUserFundedRawHex:",
           JSON.stringify(builtPsbtData, null, 2),
         );
 
@@ -209,7 +242,6 @@ export const handler: Handlers = {
         });
       }
     } catch (error: unknown) {
-      console.error("Error processing dispense request (outer catch):", error);
       const errorMessage = error instanceof Error
         ? error.message
         : "Invalid request format or unexpected error";

@@ -1,5 +1,5 @@
 import { assertEquals, assertExists } from "@std/assert";
-import { WebResponseUtil } from "$lib/utils/webResponseUtil.ts";
+import { WebResponseUtil } from "$lib/utils/api/responses/webResponseUtil.ts";
 
 // Mock console methods
 const originalConsole = {

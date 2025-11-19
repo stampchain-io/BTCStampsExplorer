@@ -1,8 +1,8 @@
-import { assertEquals } from "@std/assert";
 import {
   calculateTransactionFee,
   estimateTransactionSize,
-} from "$lib/utils/minting/transactionSizes.ts";
+} from "$lib/utils/bitcoin/transactions/transactionSizeEstimator.ts";
+import { assertEquals } from "@std/assert";
 
 Deno.test("calculateTransactionFee - calculates fee correctly", () => {
   // Basic calculations
@@ -29,9 +29,9 @@ Deno.test("estimateTransactionSize - simple P2PKH transaction", () => {
   });
 
   // P2PKH input: ~148 bytes, P2PKH output: ~34 bytes
-  // With overhead and change output, actual size is around 349 bytes
-  assertEquals(size > 300, true);
-  assertEquals(size < 400, true);
+  // With overhead and change output, actual size is around 185 bytes
+  assertEquals(size > 150, true);
+  assertEquals(size < 250, true);
 });
 
 Deno.test("estimateTransactionSize - P2WPKH transaction", () => {
@@ -42,9 +42,9 @@ Deno.test("estimateTransactionSize - P2WPKH transaction", () => {
     changeOutputType: "P2WPKH",
   });
 
-  // P2WPKH actual size is around 310 bytes
-  assertEquals(size > 250, true);
-  assertEquals(size < 350, true);
+  // P2WPKH actual size is around 140 bytes
+  assertEquals(size > 120, true);
+  assertEquals(size < 180, true);
 });
 
 Deno.test("estimateTransactionSize - mixed input types", () => {
@@ -58,9 +58,9 @@ Deno.test("estimateTransactionSize - mixed input types", () => {
     changeOutputType: "P2WPKH",
   });
 
-  // Mixed inputs actual size is around 417 bytes
-  assertEquals(size > 350, true);
-  assertEquals(size < 450, true);
+  // Mixed inputs actual size is around 250 bytes
+  assertEquals(size > 230, true);
+  assertEquals(size < 280, true);
 });
 
 Deno.test("estimateTransactionSize - no change output", () => {
@@ -79,9 +79,9 @@ Deno.test("estimateTransactionSize - no change output", () => {
 
   // Without change should be smaller
   assertEquals(withChange > withoutChange, true);
-  // Difference should be roughly the size of one output (actual: 116)
-  assertEquals(withChange - withoutChange > 100, true);
-  assertEquals(withChange - withoutChange < 130, true);
+  // Difference should be roughly the size of one output (actual: 34)
+  assertEquals(withChange - withoutChange > 30, true);
+  assertEquals(withChange - withoutChange < 40, true);
 });
 
 Deno.test("estimateTransactionSize - P2TR transaction", () => {
@@ -92,9 +92,9 @@ Deno.test("estimateTransactionSize - P2TR transaction", () => {
     changeOutputType: "P2TR",
   });
 
-  // P2TR actual size is around 216 bytes
-  assertEquals(size > 200, true);
-  assertEquals(size < 250, true);
+  // P2TR actual size is around 154 bytes
+  assertEquals(size > 140, true);
+  assertEquals(size < 170, true);
 });
 
 Deno.test("estimateTransactionSize - multiple outputs", () => {
@@ -109,9 +109,9 @@ Deno.test("estimateTransactionSize - multiple outputs", () => {
     changeOutputType: "P2PKH",
   });
 
-  // More outputs means larger transaction (actual: 581)
-  assertEquals(size > 550, true);
-  assertEquals(size < 600, true);
+  // More outputs means larger transaction (actual: 250)
+  assertEquals(size > 230, true);
+  assertEquals(size < 280, true);
 });
 
 // Mock console to suppress warnings

@@ -1,11 +1,11 @@
-import { XcpManager } from "$server/services/xcpService.ts";
-import { generateRandomNumber } from "$lib/utils/numberUtils.ts";
-import { isCpid } from "$lib/utils/identifierUtils.ts";
+import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
+import { generateRandomNumber } from "$lib/utils/data/numbers/numberUtils.ts";
+import { isCpid } from "$lib/utils/typeGuards.ts";
 
 export class StampValidationService {
   static async checkAssetAvailability(assetName: string): Promise<boolean> {
     try {
-      const result = await XcpManager.getAssetInfo(assetName);
+      const result = await CounterpartyApiManager.getAssetInfo(assetName);
       // If we get no result (null), the asset is available
       return result === null;
     } catch (error) {

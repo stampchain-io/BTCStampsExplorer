@@ -4,6 +4,7 @@ import { logger } from "$lib/utils/logger.ts";
 
 interface CSRFPayload {
   exp: number;
+  [key: string]: unknown;
 }
 
 export class SecurityService {
@@ -100,7 +101,7 @@ export class SecurityService {
       });
 
       // Parse the token manually to get the payload
-      const [headerB64, payloadB64] = token.split('.');
+      const [_headerB64, payloadB64] = token.split('.');
       if (!payloadB64) {
         logger.error("stamps", {
           message: "Invalid token format",

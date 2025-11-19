@@ -1,16 +1,14 @@
 /* ===== STAMP GALLERY COMPONENT ===== */
-import { useEffect, useRef, useState } from "preact/hooks";
-import { Pagination } from "$islands/datacontrol/Pagination.tsx";
-import { ViewAllButton } from "$button";
+import { PaginationButtons, ViewAllButton } from "$button";
 import { StampCard } from "$card";
-import { StampGalleryProps, StampRow } from "$globals";
-import { BREAKPOINTS } from "$lib/utils/constants.ts";
+import { BREAKPOINTS } from "$constants";
 import { SortButton } from "$islands/button/SortButton.tsx";
-import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
+import { useLoadingSkeleton } from "$lib/hooks/useLoadingSkeleton.ts";
+import { subtitleGrey, titleGreyDL, titleGreyLD } from "$text";
+import type { StampGalleryProps, StampRow } from "$types/stamp.d.ts";
+import { useEffect, useRef, useState } from "preact/hooks";
 import Swiper from "swiper";
 import { Autoplay, Navigation } from "swiper/modules";
-import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
-import { useLoadingSkeleton } from "$lib/hooks/useLoadingSkeleton.ts";
 
 /* ===== COMPONENT ===== */
 export default function StampGallery({
@@ -167,14 +165,14 @@ export default function StampGallery({
             >
               <h1
                 class={`${
-                  alignRight ? titlePurpleLD : titlePurpleDL
+                  alignRight ? titleGreyLD : titleGreyLD
                 } tablet:hidden`}
               >
                 {title}
               </h1>
               <h1
                 class={`hidden tablet:block ${
-                  alignRight ? titlePurpleLD : titlePurpleDL
+                  alignRight ? titleGreyDL : titleGreyLD
                 }`}
               >
                 {title}
@@ -187,7 +185,7 @@ export default function StampGallery({
                 alignRight && "tablet:items-end"
               }`}
             >
-              <h2 className={subtitlePurple}>
+              <h2 class={subtitleGrey}>
                 {subTitle}
               </h2>
             </div>
@@ -197,12 +195,7 @@ export default function StampGallery({
         {fromPage === "collection" &&
           (
             <div class="flex gap-1 items-center">
-              <div>
-                <SortButton initSort={sortBy} />
-              </div>
-              <div>
-                <SearchStampModal showButton />
-              </div>
+              <SortButton initSort={sortBy} />
             </div>
           )}
       </div>
@@ -215,12 +208,12 @@ export default function StampGallery({
           <div class="swiper-container overflow-hidden">
             <div class="swiper-wrapper">
               {isLoading ? <div>Loading...</div> : (
-                filteredStamps.map((stamp: StampRow) => (
+                filteredStamps.map((stamp: StampRow, index: number) => (
                   <div
                     class="swiper-slide"
                     key={isRecentSales && stamp.sale_data
-                      ? `${stamp.tx_hash}-${stamp.sale_data.tx_hash}`
-                      : stamp.tx_hash}
+                      ? `${stamp.tx_hash}-${stamp.sale_data.tx_hash}-${index}`
+                      : `${stamp.tx_hash}-${index}`}
                   >
                     <StampCard
                       stamp={stamp}
@@ -229,6 +222,7 @@ export default function StampGallery({
                       showEdition={showEdition}
                       showMinDetails={showMinDetails}
                       variant={variant}
+                      {...(fromPage && { fromPage })}
                     />
                   </div>
                 ))
@@ -240,11 +234,11 @@ export default function StampGallery({
           <div class={containerClass}>
             {isLoading
               ? (
-                // Grid view loading skeleton with optimized animation control
+                // Grid view loading skeleton with optimized animation control - IS THIS WORKING @baba-check
                 [...Array(displayCount)].map((_, index) => {
                   const skeletonClasses = useLoadingSkeleton(
                     isLoading,
-                    "aspect-square rounded",
+                    "aspect-square rounded-2xl",
                   );
                   return (
                     <div
@@ -255,11 +249,14 @@ export default function StampGallery({
                 })
               )
               : (
-                filteredStamps.slice(0, displayCount).map((stamp: StampRow) => (
+                filteredStamps.slice(0, displayCount).map((
+                  stamp: StampRow,
+                  index: number,
+                ) => (
                   <div
                     key={isRecentSales && stamp.sale_data
-                      ? `${stamp.tx_hash}-${stamp.sale_data.tx_hash}`
-                      : stamp.tx_hash}
+                      ? `${stamp.tx_hash}-${stamp.sale_data.tx_hash}-${index}`
+                      : `${stamp.tx_hash}-${index}`}
                   >
                     <StampCard
                       stamp={stamp}
@@ -268,6 +265,7 @@ export default function StampGallery({
                       showEdition={showEdition}
                       showMinDetails={showMinDetails}
                       variant={variant}
+                      {...(fromPage && { fromPage })}
                     />
                   </div>
                 ))
@@ -279,11 +277,11 @@ export default function StampGallery({
       {viewAllLink && <ViewAllButton href={seeAllLink} />}
 
       {pagination && pagination.totalPages > 1 && (
-        <div class="mt-12 mobileLg:mt-[72px]">
-          <Pagination
+        <div class="mt-7.5 tablet:mt-10">
+          <PaginationButtons
             page={pagination.page}
             totalPages={pagination.totalPages}
-            prefix={pagination.prefix || ""}
+            {...(pagination.prefix && { prefix: pagination.prefix })}
             onPageChange={handlePageChange}
           />
         </div>

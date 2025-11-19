@@ -1,29 +1,37 @@
 /* ===== WALLET PROVIDER MODAL COMPONENT ===== */
-import { useState } from "preact/hooks";
-import { WALLET_PROVIDERS, WalletProviderKey } from "$lib/utils/constants.ts";
-import { unisatProvider } from "$client/wallet/unisat.ts";
-import { showToast } from "$lib/utils/toastSignal.ts";
+import { horizonProvider } from "$client/wallet/horizon.ts";
 import { leatherProvider } from "$client/wallet/leather.ts";
 import { okxProvider } from "$client/wallet/okx.ts";
-import { tapWalletProvider } from "$client/wallet/tapwallet.ts";
 import { phantomProvider } from "$client/wallet/phantom.ts";
-import { containerCard } from "$layout";
+import { tapWalletProvider } from "$client/wallet/tapwallet.ts";
+import { unisatProvider } from "$client/wallet/unisat.ts";
+import { WALLET_PROVIDERS } from "$constants";
 import { closeForegroundModal, closeModal } from "$islands/modal/states.ts";
-import type { BaseToast } from "$lib/utils/toastSignal.ts";
+import { containerCardL2 } from "$layout";
+import type { WalletProviderKey } from "$lib/constants/walletProviders.ts";
+import { handleUnknownError } from "$lib/utils/errorHandling.ts";
+import type { BaseToast } from "$lib/utils/ui/notifications/toastSignal.ts";
+import { showToast } from "$lib/utils/ui/notifications/toastSignal.ts";
+import type { WalletProviderProps } from "$types/ui.d.ts";
+import { useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
-interface WalletProviderProps {
-  providerKey: WalletProviderKey;
-  onSuccess?: () => void;
-}
+type AddToastFunction = (
+  message: string,
+  type: "error" | "warning" | "info" | "success",
+) => void;
 
 /* ===== WALLET CONNECTORS CONFIG ===== */
-const walletConnectors = {
+const walletConnectors: Record<
+  WalletProviderKey,
+  (addToast: AddToastFunction) => Promise<void>
+> = {
   unisat: unisatProvider.connectUnisat,
   leather: leatherProvider.connectLeather,
   okx: okxProvider.connectOKX,
   tapwallet: tapWalletProvider.connectTapWallet,
   phantom: phantomProvider.connectPhantom,
+  horizon: horizonProvider.connectHorizon,
 } as const;
 
 /* ===== MODAL COMPONENT ===== */
@@ -31,7 +39,9 @@ export function WalletProvider(
   { providerKey, onSuccess }: WalletProviderProps,
 ) {
   /* ===== HOOKS ===== */
-  const providerInfo = WALLET_PROVIDERS[providerKey];
+  const providerInfo = (providerKey in WALLET_PROVIDERS)
+    ? WALLET_PROVIDERS[providerKey as keyof typeof WALLET_PROVIDERS]
+    : { name: "Unknown", logo: "" };
 
   /* ===== STATE ===== */
   const [isHovered, setIsHovered] = useState(false);
@@ -39,18 +49,15 @@ export function WalletProvider(
   /* ===== EVENT HANDLERS ===== */
   const handleConnect = async () => {
     try {
-      const connectFunction = walletConnectors[providerKey];
+      const connectFunction =
+        walletConnectors[providerKey as WalletProviderKey];
       if (!connectFunction) {
         throw new Error(`Unsupported wallet provider: ${providerKey}`);
       }
 
       await connectFunction((message: string, type: BaseToast["type"]) => {
-        showToast(message, type, type === "error" ? false : true);
-        console.log(
-          "[WalletProvider] Toast via connectFunction callback:",
-          message,
-          type,
-        );
+        // Let the toast provider handle autoDismiss defaults based on type
+        showToast(message, type);
       });
 
       const modalContainer = document.getElementById(
@@ -72,12 +79,14 @@ export function WalletProvider(
           closeModal();
         }, 600);
       }
-    } catch (error: unknown) {
-      const errorMessage = `Failed to connect to ${providerKey} wallet: ${
-        error instanceof Error ? error.message : String(error)
-      }`;
-      showToast(errorMessage, "error", false);
-      console.error(errorMessage);
+    } catch (unknownError) {
+      const error = handleUnknownError(
+        unknownError,
+        `Failed to connect to ${providerKey} wallet`,
+      );
+      // Let the toast provider handle autoDismiss defaults based on type
+      showToast(error.message, "error");
+      console.error(error.message);
     }
   };
 
@@ -87,14 +96,14 @@ export function WalletProvider(
       onClick={handleConnect}
       role="button"
       aria-label={`Connect to ${providerInfo.name}`}
-      className={`flex justify-between items-center p-4 ${containerCard}`}
+      class={`flex justify-between items-center px-6 py-4 ${containerCardL2}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* ===== PROVIDER NAME ===== */}
       <h6
-        className={`font-extrabold text-lg uppercase tracking-wide ${
-          isHovered ? "text-stamp-purple-bright" : "gray-gradient3"
+        class={`font-extrabold text-lg uppercase tracking-wide ${
+          isHovered ? "text-color-purple-light" : "color-grey-gradientLD"
         }`}
       >
         {providerInfo.name}
@@ -104,7 +113,7 @@ export function WalletProvider(
       <img
         src={providerInfo.logo}
         alt={providerInfo.name}
-        className="w-8 h-8"
+        class="w-8 h-8 object-contain"
       />
     </div>
   );

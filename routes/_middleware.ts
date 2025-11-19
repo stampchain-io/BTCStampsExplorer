@@ -1,25 +1,26 @@
 import { FreshContext } from "$fresh/server.ts";
+import { WebResponseUtil } from "$utils/api/responses/webResponseUtil.ts";
 
-// Routes that should skip the app layout
-const DIRECT_ROUTES = [
-  "/content/",
-  "/s/",
-  "/api/",
-  "/internal/",
-  "/test/",
-];
+// Route configuration constants
+const ROUTE_CONFIG = {
+  DIRECT_ROUTES: [
+    "/content/",
+    "/s/",
+    "/api/",
+    "/internal/",
+    "/test/",
+  ],
+  CACHED_ROUTES: [
+    "/",
+    "/presskit",
+    "/termsofservice",
+    "/privacy",
+    "/about",
+  ],
+  API_ROUTES: ["/api/", "/s/", "/content/"],
+};
 
-// Add response caching for static routes
-const CACHED_ROUTES = [
-  "/",
-  "/presskit",
-  "/termsofservice",
-  "/privacy",
-  "/about",
-];
-
-const API_ROUTES = ["/api/", "/s/", "/content/"];
-
+// Cache duration constants (in seconds)
 const CACHE_DURATION = {
   YEAR: 31536000,
   DAY: 86400,
@@ -27,11 +28,43 @@ const CACHE_DURATION = {
   MINUTE: 60,
 } as const;
 
+// Response headers interface for type safety
+interface ResponseHeaders {
+  "Timing-Allow-Origin": string;
+  "Server-Timing": string;
+  "Cache-Control"?: string;
+  "Content-Type"?: string;
+  "Location"?: string;
+}
+
 function getBaseUrl(req: Request): string {
-  if (Deno.env.get("DENO_ENV") === "development") {
-    return Deno.env.get("DEV_BASE_URL") || "https://dev.stampchain.io";
+  const env = Deno.env.get("DENO_ENV");
+
+  // Development mode
+  if (env === "development") {
+    return Deno.env.get("DEV_BASE_URL") || "https://stampchain.io";
   }
-  return new URL(req.url).origin;
+
+  // Production mode - ECS-aware base URL detection
+  const url = new URL(req.url);
+
+  // Check for ECS/ALB forwarded headers first
+  const forwardedProto = req.headers.get("x-forwarded-proto");
+  const forwardedHost = req.headers.get("x-forwarded-host") ||
+    req.headers.get("host");
+
+  if (forwardedProto && forwardedHost) {
+    return `${forwardedProto}://${forwardedHost}`;
+  }
+
+  // Fallback to explicit production URL if available
+  const prodUrl = Deno.env.get("PROD_BASE_URL");
+  if (prodUrl) {
+    return prodUrl;
+  }
+
+  // Final fallback to request origin
+  return url.origin;
 }
 
 export async function handler(
@@ -43,21 +76,23 @@ export async function handler(
   ctx.state.route = url.pathname;
   ctx.state.baseUrl = getBaseUrl(req);
 
-  if (API_ROUTES.some((prefix) => url.pathname.startsWith(prefix))) {
+  // Early return for API routes
+  if (
+    ROUTE_CONFIG.API_ROUTES.some((prefix) => url.pathname.startsWith(prefix))
+  ) {
     return ctx.next();
   }
-  // Base cache headers
-  const cacheHeaders = {
+
+  // Base cache headers with proper typing
+  const cacheHeaders: Partial<ResponseHeaders> = {
     "Timing-Allow-Origin": "*",
     "Server-Timing": `start;dur=${performance.now() - startTime}`,
   };
 
-  // Handle different caching scenarios
+  // Handle permanent redirects
   if (url.pathname === "/home") {
-    return new Response("", {
-      status: 308,
+    return WebResponseUtil.redirect("/", 308, {
       headers: {
-        Location: "/",
         "Cache-Control": `public, max-age=${CACHE_DURATION.YEAR}`,
       },
     });
@@ -85,7 +120,7 @@ export async function handler(
   }
 
   // Root and other static routes
-  if (CACHED_ROUTES.includes(url.pathname)) {
+  if (ROUTE_CONFIG.CACHED_ROUTES.includes(url.pathname)) {
     ctx.state.responseInit = {
       headers: {
         ...cacheHeaders,
@@ -95,7 +130,9 @@ export async function handler(
   }
 
   // Direct route check
-  if (DIRECT_ROUTES.some((prefix) => url.pathname.startsWith(prefix))) {
+  if (
+    ROUTE_CONFIG.DIRECT_ROUTES.some((prefix) => url.pathname.startsWith(prefix))
+  ) {
     ctx.state.skipAppLayout = true;
   }
 
@@ -108,6 +145,43 @@ export async function handler(
     "Server-Timing",
     `${existingTiming}, total;dur=${endTime - startTime}`,
   );
+
+  // For HTML responses, reorder meta tags to appear before modulepreload links
+  const contentType = response.headers.get("content-type");
+  if (contentType?.includes("text/html") && response.ok) {
+    try {
+      const html = await response.text();
+
+      // Only process if it looks like a full HTML document
+      if (html.includes("<head>") && html.includes("</head>")) {
+        // Extract all meta tags that should appear early
+        const metaTagRegex =
+          /<meta\s+(?:charset|name="viewport"|property="og:|name="twitter:|name="description")[^>]*>/gi;
+        const metaTags = html.match(metaTagRegex) || [];
+
+        // Remove extracted meta tags from their original position
+        let modifiedHtml = html;
+        metaTags.forEach((tag) => {
+          modifiedHtml = modifiedHtml.replace(tag, "");
+        });
+
+        // Insert meta tags right after <head>
+        const headIndex = modifiedHtml.indexOf("<head>");
+        if (headIndex !== -1) {
+          const insertPosition = headIndex + 6; // Length of "<head>"
+          modifiedHtml = modifiedHtml.slice(0, insertPosition) +
+            "\n" + metaTags.join("\n") + "\n" +
+            modifiedHtml.slice(insertPosition);
+        }
+
+        // Return modified response
+        return WebResponseUtil.modifiedResponse(modifiedHtml, response);
+      }
+    } catch (error) {
+      console.error("Error reordering meta tags:", error);
+      // Return original response if processing fails
+    }
+  }
 
   return response;
 }

@@ -1,9 +1,14 @@
 /* ===== NOT IN USE ===== */
-import { ComponentChildren } from "preact";
-import { useEffect, useRef, useState } from "preact/hooks";
-import { WalletOverviewInfo } from "$lib/types/index.d.ts";
-import { abbreviateAddress, formatBTCAmount } from "$lib/utils/formatUtils.ts";
-import { containerBackground, containerColData } from "$layout";
+import { Button } from "$button";
+import { Icon } from "$icon";
+import { containerBackground, containerColData, glassmorphism } from "$layout";
+import type { WalletData } from "$lib/types/index.d.ts";
+import type { WalletOverviewInfo } from "$lib/types/wallet.d.ts";
+import {
+  abbreviateAddress,
+  formatBTCAmount,
+} from "$lib/utils/ui/formatting/formatUtils.ts";
+import { tooltipIcon } from "$notification";
 import {
   labelSm,
   subtitleGrey,
@@ -12,14 +17,13 @@ import {
   valueSm,
   valueXl,
 } from "$text";
-import { Button } from "$button";
-import { tooltipIcon } from "$notification";
-import { Icon } from "$icon";
+import type { StatItemProps, StatTitleProps } from "$types/ui.d.ts";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== MAIN WALLET DETAILS COMPONENT ===== */
 function WalletDetails(
   { walletData, stampsTotal, src20Total, stampsCreated, setShowItem }: {
-    walletData: WalletOverviewInfo;
+    walletData: WalletData;
     stampsTotal: number;
     src20Total: number;
     stampsCreated: number;
@@ -47,7 +51,7 @@ function WalletDetails(
 /* ===== WALLET OVERVIEW SUBCOMPONENT ===== */
 function WalletOverview(
   { walletData }: {
-    walletData: WalletOverviewInfo;
+    walletData: WalletData;
   },
 ) {
   /* ===== STATE ===== */
@@ -113,20 +117,16 @@ function WalletOverview(
   };
 
   /* ===== COMPUTED VALUES ===== */
-  const displayPrice = walletData.dispensers?.items?.[0]?.satoshirate
-    ? parseInt(walletData.dispensers.items[0].satoshirate.toString(), 10) /
-      100000000
-    : 0;
-
-  const _displayPriceUSD = displayPrice * walletData.btcPrice;
 
   console.log("walletData:", walletData);
   console.log("dispensers:", walletData.dispensers);
 
   /* ===== RENDER ===== */
   return (
-    <div class="flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6">
-      <div class="flex flex-col w-full tablet:w-1/2 dark-gradient rounded-lg p-3 mobileMd:p-6 space-y-1.5 mobileLg:space-y-3">
+    <div
+      class={`flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6 ${glassmorphism}`}
+    >
+      <div class="flex flex-col w-full tablet:w-1/2 ${glassmorphism} rounded-2xl p-3 mobileMd:p-6 space-y-1.5 mobileLg:space-y-3">
         <div class="flex">
           <p class={titleGreyLD}>
             {walletData.address.startsWith("1D") ||
@@ -160,7 +160,7 @@ function WalletOverview(
               name="copy"
               weight="normal"
               size="mdR"
-              color="grey"
+              color="greyLight"
               onClick={copy}
             />
             <div
@@ -198,7 +198,7 @@ function DispenserStats({
 }: {
   dispensers: WalletOverviewInfo["dispensers"];
   btcPrice: number;
-  walletData: WalletOverviewInfo;
+  walletData: WalletData;
 }) {
   /* ===== VALIDATION ===== */
   if (!walletData.address.startsWith("1D") && !walletData.dispensers?.total) {
@@ -206,7 +206,7 @@ function DispenserStats({
   }
 
   /* ===== COMPUTED VALUES ===== */
-  const firstDispenser = dispensers?.items?.[0];
+  const firstDispenser = (dispensers as any)?.items?.[0];
   const stampData = firstDispenser?.stamp;
 
   if (!firstDispenser || !stampData) return null;
@@ -217,26 +217,26 @@ function DispenserStats({
 
   /* ===== RENDER ===== */
   return (
-    <div className="flex flex-col pt-6">
+    <div class="flex flex-col pt-6">
       {/* Stamp Info Section */}
       <div>
         <p
-          className={`${valueLg} whitespace-nowrap overflow-hidden`}
+          class={`${valueLg} whitespace-nowrap overflow-hidden`}
         >
-          <span className="font-light">STAMP #</span>
-          <span className="font-black">{stampData.stamp}</span>
+          <span class="font-light">STAMP #</span>
+          <span class="font-black">{stampData.stamp}</span>
         </p>
 
         {stampData.cpid && (
-          <p className="-mt-1 pb-1 text-base mobileLg:text-lg font-bold text-stamp-grey-darker block">
+          <p class="-mt-1 pb-1 text-base mobileLg:text-lg font-bold text-color-grey-semidark block">
             {stampData.cpid}
           </p>
         )}
 
-        <div className="flex flex-col items-start pt-1.5 mobileLg:pt-3">
-          <p className={labelSm}>BY</p>
+        <div class="flex flex-col items-start pt-1.5 mobileLg:pt-3">
+          <p class={labelSm}>BY</p>
           <a
-            className="text-sm mobileLg:text-base font-black gray-gradient3-hover -mt-1"
+            class="text-sm mobileLg:text-base font-black color-grey-gradientLD-hover -mt-1"
             href={`/wallet/${stampData.creator}`}
             target="_parent"
           >
@@ -246,7 +246,7 @@ function DispenserStats({
       </div>
 
       {/* Dispenser Stats */}
-      <div className="flex justify-between pt-6">
+      <div class="flex justify-between pt-6">
         <StatItem
           label="ESCROW"
           value={firstDispenser.escrow_quantity.toString()}
@@ -264,24 +264,23 @@ function DispenserStats({
       </div>
 
       {/* Price Display */}
-      <div className="flex flex-col justify-end pt-6">
+      <div class="flex flex-col justify-end pt-6">
         <StatTitle
-          label={
-            <>
-              {((firstDispenser.satoshirate || 0) / 100000000 * btcPrice)
-                .toFixed(2)} <span className="font-light">USD</span>
-            </>
-          }
+          label={`${
+            ((firstDispenser.satoshirate || 0) / 100000000 * btcPrice).toFixed(
+              2,
+            )
+          } USD`}
           value={
             <>
               {formatBTCAmount((firstDispenser.satoshirate || 0) / 100000000, {
                 excludeSuffix: true,
-              })} <span className="font-extralight">BTC</span>
+              })} <span class="font-extralight">BTC</span>
             </>
           }
           align="right"
         />
-        <div className="flex justify-end pt-6">
+        <div class="flex justify-end pt-6">
           <Button
             variant="outline"
             color="purple"
@@ -312,7 +311,7 @@ function WalletStats(
     setShowItem?: (type: string) => void;
     stampValue?: number;
     src20Value?: number;
-    walletData: WalletOverviewInfo;
+    walletData: WalletData;
   },
 ) {
   /* ===== EVENT HANDLERS ===== */
@@ -353,13 +352,13 @@ function StampStats(
   /* ===== RENDER ===== */
   return (
     <div
-      className={`${containerBackground} gap-6`}
+      class={`${containerBackground} gap-6`}
       onClick={() => handleType("stamp")}
     >
-      <div className="flex">
+      <div class="flex">
         <StatTitle label="STAMPS" value={stampsTotal.toString()} />
       </div>
-      <div className="flex justify-between">
+      <div class="flex justify-between">
         <StatItem
           label="CREATED"
           value={stampsCreated.toString()}
@@ -370,14 +369,14 @@ function StampStats(
           align="right"
         />
       </div>
-      <div className="flex justify-between">
+      <div class="flex justify-between">
         <StatItem label="LISTINGS" value={dispensers.open.toString()} />
         <StatItem
           label="VALUE"
           value={
             <>
               {stampValue > 0 ? stampValue.toFixed(8) : "N/A"}{" "}
-              <span className="font-light">BTC</span>
+              <span class="font-light">BTC</span>
             </>
           }
           align="right"
@@ -393,7 +392,7 @@ function TokenStats(
     src20Total: number;
     handleType: (type: string) => void;
     src20Value?: number;
-    walletData: WalletOverviewInfo;
+    walletData: WalletData;
   },
 ) {
   /* ===== COMPUTED VALUES ===== */
@@ -402,10 +401,10 @@ function TokenStats(
   /* ===== RENDER ===== */
   return (
     <div
-      className={`${containerBackground} gap-6`}
+      class={`${containerBackground} gap-6`}
       onClick={() => handleType("token")}
     >
-      <div className="flex justify-between">
+      <div class="flex justify-between">
         <StatTitle label="TOKENS" value={src20Total?.toString()} />
         <StatItem
           label={`${walletData.usdValue.toFixed(2)} USD`}
@@ -419,7 +418,7 @@ function TokenStats(
         />
       </div>
 
-      <div className="flex justify-between">
+      <div class="flex justify-between">
         <StatItem
           label="TOP HOLDINGS"
           value={
@@ -468,14 +467,14 @@ function TokenStats(
         />
       </div>
 
-      <div className="flex justify-between">
+      <div class="flex justify-between">
         <StatItem label="24H CHANGE" value="+/- 0.00%" />
         <StatItem
           label="TOTAL VALUE"
           value={
             <>
               {totalValue > 0 ? totalValue.toFixed(8) : "N/A"}{" "}
-              <span className="font-light">BTC</span>
+              <span class="font-light">BTC</span>
             </>
           }
           align="right"
@@ -486,18 +485,6 @@ function TokenStats(
 }
 
 /* ===== TYPES ===== */
-interface StatTitleProps {
-  label: string;
-  value: string | ComponentChildren;
-  align?: "left" | "center" | "right";
-}
-
-interface StatItemProps {
-  label: string;
-  value: string | ComponentChildren;
-  align?: "left" | "center" | "right";
-  class?: string;
-}
 
 /* ===== STAT TITLE SUBCOMPONENT ===== */
 function StatTitle({ label, value, align = "left" }: StatTitleProps) {

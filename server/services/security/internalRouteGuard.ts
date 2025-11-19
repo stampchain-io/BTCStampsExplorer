@@ -1,11 +1,22 @@
-import { SecurityService } from "./securityService.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { SecurityService } from "$server/services/security/securityService.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { serverConfig } from "$server/config/config.ts";
 import { logger } from "$lib/utils/logger.ts";
 
 export class InternalRouteGuard {
   // For routes that require CSRF
   static async requireCSRF(req: Request) {
+    // Skip CSRF check in development environment for easier testing
+    const isDevelopment = Deno.env.get("DENO_ENV") === "development";
+    
+    if (isDevelopment) {
+      logger.debug("stamps", {
+        message: "Development environment - CSRF check skipped",
+        headers: Object.fromEntries(req.headers.entries()),
+      });
+      return null; // Skip CSRF validation in development
+    }
+    
     const csrfToken = req.headers.get("X-CSRF-Token") || req.headers.get("x-csrf-token");
     
     logger.debug("stamps", {
@@ -20,7 +31,7 @@ export class InternalRouteGuard {
         message: "Missing CSRF token",
         headers: Object.fromEntries(req.headers.entries()),
       });
-      return ResponseUtil.badRequest("Missing CSRF token");
+      return ApiResponseUtil.badRequest("Missing CSRF token");
     }
 
     try {
@@ -37,7 +48,7 @@ export class InternalRouteGuard {
           message: "Invalid CSRF token",
           tokenPreview: csrfToken.slice(0, 10) + "...",
         });
-        return ResponseUtil.badRequest("Invalid CSRF token");
+        return ApiResponseUtil.badRequest("Invalid CSRF token");
       }
     } catch (error) {
       logger.error("stamps", {
@@ -45,7 +56,7 @@ export class InternalRouteGuard {
         error: error instanceof Error ? error.message : "Unknown error",
         stack: error instanceof Error ? error.stack : undefined,
       });
-      return ResponseUtil.badRequest("CSRF validation failed");
+      return ApiResponseUtil.badRequest("CSRF validation failed");
     }
 
     return null; // No error
@@ -55,46 +66,47 @@ export class InternalRouteGuard {
   static async requireSignature(req: Request) {
     const { signature, message, address } = await req.json();
     if (!signature || !message || !address) {
-      return ResponseUtil.badRequest("Missing signature data");
+      return ApiResponseUtil.badRequest("Missing signature data");
     }
 
-    const isValid = SecurityService.verifySignature(message, signature, address);
+    const isValid = (SecurityService as any).verifySignature(message, signature, address);
     if (!isValid) {
-      return ResponseUtil.badRequest("Invalid signature");
+      return ApiResponseUtil.badRequest("Invalid signature");
     }
 
     return null;
   }
 
   // For webhook routes
-  static async requireAPIKey(req: Request) {
+  static requireAPIKey(req: Request) {
     const apiKey = req.headers.get("X-API-Key");
-    const configApiKey = serverConfig.API_KEY;
+    // Use INTERNAL_API_KEY from environment instead of serverConfig.API_KEY
+    const configApiKey = Deno.env.get("INTERNAL_API_KEY");
 
     // Check if API key is not configured
     if (!configApiKey || configApiKey.trim() === '') {
-      console.error("API_KEY is not properly configured in server settings");
-      return ResponseUtil.internalError(
+      console.error("INTERNAL_API_KEY is not properly configured in environment");
+      return ApiResponseUtil.internalError(
         "Configuration error",
-        "Server API key is not properly configured"
+        "Internal API key is not properly configured"
       );
     }
 
     // Check if request API key is missing or empty
     if (!apiKey || apiKey.trim() === '') {
-      return ResponseUtil.custom(
+      return ApiResponseUtil.custom(
         { error: "Missing API key" },
         401,
-        { "Cache-Control": "no-store" }
+        { headers: { "Cache-Control": "no-store" } }
       );
     }
 
     // Compare API keys
     if (apiKey !== configApiKey) {
-      return ResponseUtil.custom(
+      return ApiResponseUtil.custom(
         { error: "Invalid API key" },
         401,
-        { "Cache-Control": "no-store" }
+        { headers: { "Cache-Control": "no-store" } }
       );
     }
 
@@ -130,7 +142,7 @@ export class InternalRouteGuard {
     return !!(headers.get("X-Amz-Cf-Id"));
   }
 
-  static async requireTrustedOrigin(req: Request) {
+  static requireTrustedOrigin(req: Request) {
     const requestId = `origin-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     console.log(`[${requestId}] Checking trusted origin...`);
 
@@ -165,7 +177,7 @@ export class InternalRouteGuard {
 
     if (!mainDomain && allowedDomains.length === 0) {
       console.error(`[${requestId}] No domains configured for origin checking`);
-      return ResponseUtil.internalError(
+      return ApiResponseUtil.internalError(
         "Configuration error",
         "Domain configuration missing"
       );
@@ -227,7 +239,7 @@ export class InternalRouteGuard {
 
     // Special case: If no origin/referer, but host matches allowed domains
     if (!origin && !referer && host) {
-      const isValidHost = isDomainMatch(host, mainDomain) || 
+      const isValidHost = (mainDomain && isDomainMatch(host, mainDomain)) || 
         allowedDomains.some(allowed => isDomainMatch(host, allowed));
       
       if (isValidHost) {
@@ -245,7 +257,7 @@ export class InternalRouteGuard {
           cloudfront: this.isCloudFrontRequest(req.headers)
         })}`
       );
-      return ResponseUtil.badRequest("Invalid origin");
+      return ApiResponseUtil.badRequest("Invalid origin");
     }
 
     console.log(`[${requestId}] Origin check passed`);

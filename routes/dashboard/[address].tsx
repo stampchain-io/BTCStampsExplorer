@@ -1,17 +1,21 @@
 /* ===== WALLET DASHBOARD PAGE ===== */
 /*@baba - FINETUNE PAGE */
+
+import { WalletDashboardContent } from "$content";
 import { Handlers } from "$fresh/server.ts";
-import { WalletOverviewInfo, WalletPageProps } from "$lib/types/index.d.ts";
-import { StampController } from "$server/controller/stampController.ts";
-import { getBTCBalanceInfo } from "$lib/utils/balanceUtils.ts";
-import { Src20Controller } from "$server/controller/src20Controller.ts";
-import { SRC20MarketService } from "$server/services/src20/marketService.ts";
-import { enrichTokensWithMarketData } from "$server/services/src20Service.ts";
-import { PaginatedResponse } from "$lib/types/pagination.d.ts";
-import { DispenserRow, SRC20Row, StampRow } from "$globals";
+
 import { WalletDashboardHeader } from "$header";
 import WalletDashboardDetails from "$islands/content/WalletDashboardDetails.tsx";
-import { WalletDashboardContent } from "$content";
+import { body } from "$layout";
+import type { PaginatedResponse } from "$lib/types/pagination.d.ts";
+import { getBTCBalanceInfo } from "$lib/utils/data/processing/balanceUtils.ts";
+import { Src20Controller } from "$server/controller/src20Controller.ts";
+import { StampController } from "$server/controller/stampController.ts";
+import type { SRC20Row } from "$types/src20.d.ts";
+import type { StampRow } from "$types/stamp.d.ts";
+
+import type { WalletPageProps } from "$types/ui.d.ts";
+import type { WalletOverviewInfo } from "$types/wallet.d.ts";
 
 /* ===== HELPERS ===== */
 /**
@@ -62,13 +66,17 @@ export const handler: Handlers = {
 
     /* ===== DATA FETCHING ===== */
     try {
+      // Validate address parameter
+      if (!address || typeof address !== "string") {
+        throw new Error(`Invalid address parameter: ${address}`);
+      }
+
       const [
         stampsResponse,
         src20Response,
         btcInfoResponse,
         dispensersResponse,
         stampsCreatedCount,
-        marketDataResponse,
       ] = await Promise.allSettled([
         // Stamps with sorting and pagination
         StampController.getStampBalancesByAddress(
@@ -85,13 +93,13 @@ export const handler: Handlers = {
           limit: src20Params.limit || 10,
           page: src20Params.page || 1,
           includeMintData: true,
+          includeMarketData: true, // 🚀 FIX: Use controller's built-in market data
           sortBy: src20SortBy,
         }),
 
         // BTC info
         getBTCBalanceInfo(address, {
           includeUSD: true,
-          apiBaseUrl: url.origin,
         }),
 
         // Dispensers with sorting and pagination
@@ -105,7 +113,6 @@ export const handler: Handlers = {
         ),
 
         StampController.getStampsCreatedCount(address),
-        SRC20MarketService.fetchMarketListingSummary(),
       ]);
 
       /* ===== DATA PROCESSING ===== */
@@ -132,32 +139,43 @@ export const handler: Handlers = {
       const src20Data = src20Response.status === "fulfilled"
         ? {
           ...src20Response.value,
-          data: enrichTokensWithMarketData(
-            src20Response.value.data,
-            marketDataResponse.status === "fulfilled"
-              ? marketDataResponse.value
-              : [],
-          ),
+          data: src20Response.value.data, // Use the data directly from the response
         } as PaginatedResponse<SRC20Row>
         : { data: [], total: 0, page: 1, limit: 10, totalPages: 0 };
 
       // Calculate total SRC20 value from enriched tokens
-      const src20Value = src20Data.data.reduce((total, token: any) => {
-        // token.value is added by enrichTokensWithMarketData
-        // it's floor_unit_price * amt
-        return total + (token.value || 0);
-      }, 0);
+      const src20Value = src20Data.data.reduce(
+        (
+          total,
+          token: import("$lib/types/src20.d.ts").SRC20WithOptionalMarketData,
+        ) => {
+          // For v2.3, market data is in token.market_data
+          const marketData = token.market_data;
+          if (marketData?.floor_price_btc && token.amt) {
+            const quantity = typeof token.amt === "bigint"
+              ? Number(token.amt)
+              : Number(token.amt);
+            const valueInBTC = marketData.floor_price_btc * quantity;
+            return total + valueInBTC;
+          }
+          return total;
+        },
+        0,
+      );
 
       const dispensersData = dispensersResponse.status === "fulfilled"
         ? {
-          data: dispensersResponse.value.dispensers,
+          data: dispensersResponse.value.dispensers?.map((dispenser: any) => ({
+            ...dispenser,
+            dispenses: dispenser.dispenses || [], // Ensure dispenses field exists
+          })) ?? [],
           total: dispensersResponse.value.total,
           page: dispensersParams.page,
           limit: dispensersParams.limit,
           totalPages: Math.ceil(
             dispensersResponse.value.total / dispensersParams.limit,
           ),
-        } as PaginatedResponse<DispenserRow>
+        } as PaginatedResponse<any>
         : { data: [], total: 0, page: 1, limit: 10, totalPages: 0 };
 
       const btcInfo = btcInfoResponse.status === "fulfilled"
@@ -166,7 +184,7 @@ export const handler: Handlers = {
 
       // Calculate dispenser counts from the full response
       const allDispensers = dispensersResponse.status === "fulfilled"
-        ? dispensersResponse.value.dispensers
+        ? dispensersResponse.value.dispensers ?? []
         : [];
       const openDispensers = allDispensers.filter((d) => d.give_remaining > 0);
       const closedDispensers = allDispensers.filter((d) =>
@@ -174,11 +192,11 @@ export const handler: Handlers = {
       );
 
       /* ===== WALLET DATA ASSEMBLY ===== */
-      // Build wallet data
+      // Build wallet data with validation
       const walletData = {
         balance: btcInfo?.balance ?? 0,
         usdValue: (btcInfo?.balance ?? 0) * (btcInfo?.btcPrice ?? 0),
-        address,
+        address: address, // Ensure address is always present
         btcPrice: btcInfo?.btcPrice ?? 0,
         fee: 0,
         txCount: btcInfo?.txCount ?? 0,
@@ -194,89 +212,106 @@ export const handler: Handlers = {
         },
       };
 
+      // Validate walletData construction
+      if (!walletData.address) {
+        throw new Error(`Failed to construct walletData: address is missing`);
+      }
+
       /* ===== RESPONSE RENDERING ===== */
       return ctx.render({
         data: {
-          stamps: {
-            data: stampsData.data,
-            pagination: {
-              page: stampsParams.page,
-              limit: stampsParams.limit,
-              total: stampsData.total,
-              totalPages: Math.ceil(stampsData.total / stampsParams.limit),
+          data: {
+            stamps: {
+              data: stampsData.data,
+              pagination: {
+                page: stampsParams.page,
+                limit: stampsParams.limit,
+                total: stampsData.total,
+                totalPages: Math.ceil(stampsData.total / stampsParams.limit),
+              },
+            },
+            src20: {
+              data: src20Data.data,
+              pagination: {
+                page: src20Params.page,
+                limit: src20Params.limit,
+                total: src20Data.total,
+                totalPages: Math.ceil(src20Data.total / src20Params.limit),
+              },
+            },
+            dispensers: {
+              data: dispensersData.data,
+              pagination: {
+                page: dispensersParams.page,
+                limit: dispensersParams.limit,
+                total: dispensersData.total,
+                totalPages: Math.ceil(
+                  dispensersData.total / dispensersParams.limit,
+                ),
+              },
             },
           },
-          src20: {
-            data: src20Data.data,
-            pagination: {
-              page: src20Params.page,
-              limit: src20Params.limit,
-              total: src20Data.total,
-              totalPages: Math.ceil(src20Data.total / src20Params.limit),
-            },
-          },
-          dispensers: {
-            data: dispensersData.data,
-            pagination: {
-              page: dispensersParams.page,
-              limit: dispensersParams.limit,
-              total: dispensersData.total,
-              totalPages: Math.ceil(
-                dispensersData.total / dispensersParams.limit,
-              ),
-            },
-          },
+          address,
+          walletData,
+          stampsTotal: stampsData.total,
+          src20Total: src20Data.total,
+          stampsCreated: stampsCreatedCount.status === "fulfilled"
+            ? stampsCreatedCount.value
+            : 0,
+          anchor,
         },
-        walletData,
-        stampsTotal: stampsData.total,
-        src20Total: src20Data.total,
-        stampsCreated: stampsCreatedCount.status === "fulfilled"
-          ? stampsCreatedCount.value
-          : 0,
-        anchor,
         stampsSortBy,
         src20SortBy,
         dispensersSortBy,
       });
     } catch (error) {
       /* ===== ERROR HANDLING ===== */
-      console.error("Error:", error);
+      console.error("Dashboard error:", error);
+
+      // Ensure we have a valid address even in error case
+      const safeAddress = address || "unknown";
+
       // Return safe default state with empty data
       return ctx.render({
         data: {
-          stamps: {
-            data: [],
-            pagination: { page: 1, limit: 8, total: 0, totalPages: 0 },
+          data: {
+            stamps: {
+              data: [],
+              pagination: { page: 1, limit: 8, total: 0, totalPages: 0 },
+            },
+            src20: {
+              data: [],
+              pagination: { page: 1, limit: 8, total: 0, totalPages: 0 },
+            },
+            dispensers: {
+              data: [],
+              pagination: { page: 1, limit: 8, total: 0, totalPages: 0 },
+            },
           },
-          src20: {
-            data: [],
-            pagination: { page: 1, limit: 8, total: 0, totalPages: 0 },
+          address: safeAddress,
+          walletData: {
+            balance: 0,
+            usdValue: 0,
+            address: safeAddress,
+            btcPrice: 0,
+            fee: 0,
+            txCount: 0,
+            unconfirmedBalance: 0,
+            unconfirmedTxCount: 0,
+            stampValue: 0,
+            src20Value: 0,
+            dispensers: {
+              open: 0,
+              closed: 0,
+              total: 0,
+              items: [],
+            },
           },
-          dispensers: {
-            data: [],
-            pagination: { page: 1, limit: 8, total: 0, totalPages: 0 },
-          },
+          stampsTotal: 0,
+          src20Total: 0,
+          stampsCreated: 0,
+          anchor: "",
         },
-        walletData: {
-          balance: 0,
-          usdValue: 0,
-          address,
-          btcPrice: 0,
-          fee: 0,
-          txCount: 0,
-          unconfirmedBalance: 0,
-          unconfirmedTxCount: 0,
-          dispensers: {
-            open: 0,
-            closed: 0,
-            total: 0,
-            items: [],
-          },
-        },
-        stampsTotal: 0,
-        src20Total: 0,
-        stampsCreated: 0,
-        anchor: "",
         stampsSortBy: "DESC",
         src20SortBy: "DESC",
         dispensersSortBy: "DESC",
@@ -286,28 +321,46 @@ export const handler: Handlers = {
 };
 
 /* ===== PAGE COMPONENT ===== */
-export default function DashboardPage(props: WalletPageProps) {
-  const { data } = props;
+export default function DashboardPage(props: { data: WalletPageProps }) {
+  const pageData = props.data;
+  const routeData = pageData.data as any; // Type assertion to handle nested structure
+
+  // Add safety check for walletData
+  if (!routeData.walletData) {
+    console.error("walletData is undefined in DashboardPage props:", props);
+    return (
+      <div class={`${body} gap-6`}>
+        <WalletDashboardHeader />
+        <div class="text-center text-red-500 p-8">
+          Error: Unable to load wallet data. Please try again.
+        </div>
+      </div>
+    );
+  }
 
   /* ===== RENDER ===== */
   return (
-    <div class="flex flex-col gap-6" f-client-nav>
+    <div
+      class={`${body} gap-6`}
+      f-client-nav
+      data-partial="/dashboard"
+    >
       <WalletDashboardHeader />
       <WalletDashboardDetails
-        walletData={data.walletData as WalletOverviewInfo}
-        stampsTotal={data.stampsTotal}
-        src20Total={data.src20Total}
-        stampsCreated={data.stampsCreated}
-        setShowItem={() => {}}
+        walletData={routeData.walletData as WalletOverviewInfo}
+        stampsTotal={routeData.stampsTotal}
+        src20Total={routeData.src20Total}
+        stampsCreated={routeData.stampsCreated}
+        setShowItem={() => {}} // Add missing required prop
       />
       <WalletDashboardContent
-        stamps={data.data.stamps}
-        src20={data.data.src20}
-        dispensers={data.data.dispensers}
-        address={data.walletData.address as string}
-        anchor={data.anchor}
-        stampsSortBy={props.stampsSortBy ?? "DESC"}
-        src20SortBy={props.src20SortBy ?? "DESC"}
+        stamps={routeData.data?.stamps || routeData.stamps}
+        src20={routeData.data?.src20 || routeData.src20}
+        dispensers={routeData.data?.dispensers || routeData.dispensers}
+        address={routeData.address}
+        anchor=""
+        stampsSortBy={props.data.stampsSortBy || "DESC"}
+        src20SortBy={props.data.src20SortBy || "DESC"}
       />
     </div>
   );

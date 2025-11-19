@@ -1,52 +1,18 @@
 import { Handlers } from "$fresh/server.ts";
+import { WebResponseUtil } from "$lib/utils/api/responses/webResponseUtil.ts";
 
 export const handler: Handlers = {
   GET(req, ctx) {
     const url = new URL(req.url);
     const pathname = url.pathname;
 
-    // Skip handling for known routes
-    if (
-      // Home routes
-      pathname === "/" ||
-      pathname === "/home" ||
-      // Fresh.js internal paths - MUST be allowed to pass through
-      pathname.startsWith("/_frsh/") ||
-      // Main application routes
-      pathname.startsWith("/stamp/") ||
-      pathname.startsWith("/src20/") ||
-      pathname.startsWith("/block/") ||
-      pathname.startsWith("/explorer/") ||
-      pathname.startsWith("/collection/") ||
-      pathname.startsWith("/wallet/") ||
-      pathname.startsWith("/dashboard/") ||
-      pathname.startsWith("/tool/") ||
-      pathname.startsWith("/howto/") ||
-      pathname.startsWith("/faq/") ||
-      pathname.startsWith("/about/") ||
-      pathname.startsWith("/termsofservice/") ||
-      pathname.startsWith("/docs/") ||
-      pathname.startsWith("/presskit/") ||
-      pathname.startsWith("/media/") ||
-      pathname === "/upload"
-    ) {
-      return ctx.next();
-    }
-
-    // Early return for known API routes
-    if (
-      pathname.startsWith("/content/") ||
-      pathname.startsWith("/s/") ||
-      pathname.startsWith("/api/")
-    ) {
-      return ctx.renderNotFound();
-    }
-
-    // Handle legacy redirects more efficiently
+    // Handle legacy redirects first
     if (pathname === "/asset.html" || pathname.startsWith("/asset.html")) {
       return handleLegacyRedirect(url);
     }
 
+    // Only handle unknown routes - don't interfere with existing routes
+    // This catch-all should only handle paths that don't have their own route files
     return ctx.renderNotFound();
   },
 };
@@ -69,8 +35,5 @@ function handleLegacyRedirect(url: URL): Response {
     redirectPath = `/stamp/${params.stampNumber}`;
   }
 
-  return new Response("", {
-    status: 301,
-    headers: { Location: redirectPath },
-  });
+  return WebResponseUtil.redirect(redirectPath, 301);
 }

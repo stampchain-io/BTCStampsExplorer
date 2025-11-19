@@ -1,11 +1,11 @@
 /* ===== SRC20 CARD BASE COMPONENT ===== */
 /*@baba-check styles*/
-import { useState } from "preact/hooks";
-import { SRC20Row } from "$globals";
-import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
-import { Timeframe } from "$components/layout/types.ts";
 import { cellAlign } from "$components/layout/types.ts";
-import { _Icon } from "$icon";
+import { glassmorphism, shadowGlowPurple } from "$layout";
+import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
+import { getSRC20ImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
+import type { SRC20CardBaseProps } from "$types/ui.d.ts";
+import { useState } from "preact/hooks";
 
 /* ===== HELPER FUNCTIONS ===== */
 function splitTextAndEmojis(text: string): { text: string; emoji: string } {
@@ -24,18 +24,6 @@ function splitTextAndEmojis(text: string): { text: string; emoji: string } {
   };
 }
 
-/* ===== TYPES ===== */
-export interface SRC20CardBaseProps {
-  src20: SRC20Row;
-  // fromPage is reserved for future use
-  fromPage?: "src20" | "wallet" | "stamping/src20" | "home";
-  // timeframe is reserved for future use
-  timeframe?: Timeframe;
-  onImageClick?: (imgSrc: string) => void;
-  children?: preact.ComponentChildren;
-  totalColumns: number;
-}
-
 /* ===== COMPONENT ===== */
 export function SRC20CardBase({
   src20,
@@ -47,26 +35,28 @@ export function SRC20CardBase({
 }: SRC20CardBaseProps) {
   const [isHovered, setIsHovered] = useState(false);
 
-  // Ensure proper image URL fallback chain
-  const imageUrl = src20.stamp_url ||
-    src20.deploy_img ||
-    `/content/${src20.tx_hash}.svg` ||
-    `/content/${src20.deploy_tx}`;
+  // Early return if src20 is null or undefined
+  if (!src20) {
+    return null;
+  }
+
+  // Use centralized image URL logic
+  const imageUrl = getSRC20ImageSrc(src20);
 
   return (
     <tr
-      class="dark-gradient !rounded-xl border-2 border-transparent hover:border-stamp-primary-light hover:shadow-[0px_0px_20px_#9900EE] p-12"
+      class={`${glassmorphism} !rounded-2xl border-2 border-transparent hover:border-color-purple-light ${shadowGlowPurple} p-12`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <td class={cellAlign(0, totalColumns)}>
+      <td class={cellAlign(0, totalColumns ?? 1)}>
         <div class="flex items-center gap-4 p-3">
           <img
             src={imageUrl}
-            class="w-8 h-8 rounded-sm cursor-pointer"
+            class="w-8 h-8 rounded cursor-pointer"
             onClick={(e) => {
               e.preventDefault();
-              onImageClick?.(imageUrl);
+              if (imageUrl) onImageClick?.(imageUrl);
             }}
             alt={unicodeEscapeToEmoji(src20.tick)}
           />
@@ -81,8 +71,8 @@ export function SRC20CardBase({
                     {text && (
                       <span
                         class={isHovered
-                          ? "text-stamp-purple-bright"
-                          : "gray-gradient1"}
+                          ? "text-color-purple-light"
+                          : "color-grey-gradientDL"}
                       >
                         {text.toUpperCase()}
                       </span>
@@ -111,7 +101,7 @@ const SocialLinks = ({ src20 }: { src20: SRC20Row }) => {
           name="email"
           weight="normal"
           size="xxs"
-          color="grey"
+          color="greyLight"
           href={src20.email}
           target="_blank"
         />
@@ -122,7 +112,7 @@ const SocialLinks = ({ src20 }: { src20: SRC20Row }) => {
           name="website"
           weight="normal"
           size="xxs"
-          color="grey"
+          color="greyLight"
           href={src20.web}
           target="_blank"
         />
@@ -133,7 +123,7 @@ const SocialLinks = ({ src20 }: { src20: SRC20Row }) => {
           name="telegram"
           weight="normal"
           size="xxs"
-          color="grey"
+          color="greyLight"
           href={src20.tg}
         />
       )}
@@ -143,7 +133,7 @@ const SocialLinks = ({ src20 }: { src20: SRC20Row }) => {
           name="twitter"
           weight="normal"
           size="xxs"
-          color="grey"
+          color="greyLight"
           href={src20.x}
           target="_blank"
         />

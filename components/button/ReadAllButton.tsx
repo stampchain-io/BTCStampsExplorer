@@ -1,34 +1,30 @@
+import { Button } from "$button";
+import type { ReadAllButtonProps } from "$types/ui.d.ts";
 /* ===== READ ALL BUTTON COMPONENT ===== */
-
-/* ===== TYPES ===== */
-interface ReadAllButtonProps {
-  href?: string;
-}
-
 /* ===== COMPONENT ===== */
 export function ReadAllButton({ href = "/howto" }: ReadAllButtonProps) {
   return (
-    <div className="flex justify-end tablet:justify-start mt-0.5 tablet:mt-1">
-      <a
+    <div class="flex justify-start">
+      <Button
+        variant="outline"
+        color="grey"
+        size="mdR"
         href={href}
         target="_top"
-        class="font-semibold text-base text-stamp-grey-light hover:text-stamp-grey animated-underline"
       >
-        Read the full guide
-      </a>
+        READ MORE
+      </Button>
     </div>
   );
 }
 
-/* ===== BUTTON ===== */
+/* ===== TEXT ===== */
 /*
-<Button
-variant="outline"
-color="grey"
-size="lg"
-href={href}
-target="_top"
->
-READ MORE
-</Button>
+  <a
+    href={href}
+    target="_top"
+    class="font-semibold text-base text-color-grey-light hover:text-color-grey animated-underline"
+  >
+    Read the full guide
+  </a>
 */

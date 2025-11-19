@@ -1,41 +1,33 @@
-import type { TransactionInput, TransactionOutput } from "./transaction.d.ts";
+import type { BaseTransaction } from "$types/utils.d.ts";
 
-// Import StampRow and SRC20Row from globals
-import type { SRC20Row, StampRow } from "$globals";
+// Import StampRow and SRC20Row from domain types
+import type { SRC20Row } from "$types/src20.d.ts";
+import type { StampRow } from "$types/stamp.d.ts";
 
 // Base transaction interface with common properties
-interface BaseTransaction {
-  block_index: number;
-  tx_hash: string;
-  inputs: TransactionInput[];
-  outputs: TransactionOutput[];
-}
 
 // For StampCard transactions - extend both StampRow and BaseTransaction
-export interface StampTransaction extends StampRow, BaseTransaction {
+export type StampTransaction = StampRow & BaseTransaction & {
   stamp_type: string;
   file_hash: string;
   file_size: number;
-}
+};
 
 // For SRC20 transactions - extend both SRC20Row and BaseTransaction
-export interface SRC20Transaction extends SRC20Row, BaseTransaction {
+export type SRC20Transaction = SRC20Row & BaseTransaction & {
   progress: string;
-}
+};
 
 // Props interfaces for each component
-export interface StampingProps {
-  transactions: StampTransaction[];
-}
 
-export interface SRC20MintingProps {
-  transactions: SRC20Transaction[];
-}
-
-export interface TransferProps {
-  transactions: StampTransaction[];
-}
-
-export interface DeployProps {
-  transactions: StampTransaction[];
+/**
+ * Stamp transfer details for tracking and processing stamp transfers
+ */
+export interface StampTransferDetails {
+  address: string; // Destination address for the stamp transfer
+  stamp: string; // Unique identifier for the stamp being transferred
+  editions: number; // Number of stamp editions to transfer
+  timestamp?: Date; // Optional timestamp of the transfer
+  txHash?: string; // Optional transaction hash for reference
+  fee?: number; // Optional transfer fee
 }

@@ -1,19 +1,33 @@
 /* ===== TRADE CONTENT COMPONENT ===== */
-/* TODO (@baba):
-  - Clean up styles completely
-  - Add fee calculator
-*/
-import { useCallback, useEffect, useState } from "preact/hooks";
+/*
+ * 🚨 MIGRATION NEEDED: This component needs to be aligned with the unified fee estimation system.
+ *
+ * Current State: Uses 3 separate useTransactionConstructionService instances for attach/detach/dispense operations
+ * Required Changes:
+ * 1. Remove '_' prefixes from unused variables in all 3 estimator instances
+ * 2. Add exact fee handling wrappers (handleAttachWithExactFees, handleDetachWithExactFees, handleDispenseWithExactFees)
+ * 3. Add exactFeeDetails state management for each operation
+ * 4. Update FeeCalculatorBase props to use mapProgressiveFeeDetails(exactFeeDetails || progressiveFeeDetails)
+ * 5. Add 3-phase indicators for each operation
+ * 6. Add error handling for feeEstimationError and clearError
+ *
+ * Reference: See StampingTool.tsx, SendTool.tsx, MintTool.tsx for the unified pattern
+ * Priority: LOW - Component is not actively used in production
+ */
 import { walletContext } from "$client/wallet/wallet.ts";
-import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
-import type { UTXO, XcpBalance } from "$lib/types/index.d.ts";
-import { ComposeAttachOptions } from "$server/services/xcpService.ts";
-import { normalizeFeeRate } from "$server/services/xcpService.ts";
-import { bodyTool, containerBackground } from "$layout";
-import { subtitlePurple, titlePurpleLD } from "$text";
+import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
+import { logger } from "$lib/utils/logger.ts";
+import { showToast } from "$lib/utils/ui/notifications/toastSignal.ts";
+import { useCallback, useEffect, useState } from "preact/hooks";
+
 import { Button } from "$button";
 import { InputField } from "$form";
+import { bodyTool, containerBackground, containerGap } from "$layout";
+import type { UTXO, XcpBalance } from "$lib/types/index.d.ts";
+import { normalizeFeeRate } from "$lib/utils/fees.ts";
 import { StatusMessages } from "$notification";
+import { subtitleGrey, titleGreyLD } from "$text";
+import type { ComposeAttachOptions } from "$types/services.d.ts";
 
 /* ===== CONSTANTS ===== */
 const SIGHASH_SINGLE = 0x03;
@@ -37,7 +51,7 @@ export function StampTradeTool() {
   /* ===== STATE ===== */
   const [availableAssets, setAvailableAssets] = useState<XcpBalance[]>([]);
   const [isLoadingAssets, setIsLoadingAssets] = useState(false);
-  const [maxQuantity, setMaxQuantity] = useState<number | null>(null);
+  const [_maxQuantity, setMaxQuantity] = useState<number | null>(null);
   const [availableUtxos, setAvailableUtxos] = useState<UTXO[]>([]);
   const [isLoadingUtxos, setIsLoadingUtxos] = useState(false);
   const { wallet, isConnected, showConnectModal } = walletContext;
@@ -71,14 +85,159 @@ export function StampTradeTool() {
   >(null);
   const [apiError, setApiError] = useState<string | null>(null);
 
+  /* ===== 🚀 PROGRESSIVE FEE ESTIMATION - CREATE PSBT ===== */
+  const {
+    getBestEstimate: getCreatePsbtBestEstimate,
+    isEstimating: _createPsbtIsEstimating,
+    isPreFetching: createPsbtIsPreFetching,
+    estimateExact: _createPsbtEstimateExact,
+    // Phase-specific results
+    phase1: createPsbtPhase1,
+    phase2: _createPsbtPhase2,
+    phase3: createPsbtPhase3,
+    currentPhase: _createPsbtPhase,
+    error: createPsbtFeeError,
+    clearError: _createPsbtClearError,
+  } = useTransactionConstructionService({
+    toolType: "stamp", // Trade operations use stamp toolType
+    feeRate: isSubmitting ? 0 : 1, // Default to 1 sat/vB for trades
+    walletAddress: wallet?.address || "", // Provide empty string instead of undefined
+    isConnected: !!wallet && !isSubmitting,
+    isSubmitting,
+    // Trade-specific parameters for PSBT creation
+    ...(tradeFormState.utxo && { utxoString: tradeFormState.utxo }),
+    ...(tradeFormState.salePrice && {
+      saleAmount: parseFloat(tradeFormState.salePrice) * 100000000, // Convert BTC to sats
+    }),
+  });
+
+  // Get the best available fee estimate
+  const createPsbtFeeDetails = getCreatePsbtBestEstimate();
+
+  /* ===== 🚀 PROGRESSIVE FEE ESTIMATION - UTXO ATTACH ===== */
+  const {
+    getBestEstimate: getAttachBestEstimate,
+    isEstimating: _attachIsEstimating,
+    isPreFetching: attachIsPreFetching,
+    estimateExact: _attachEstimateExact,
+    // Phase-specific results
+    phase1: attachPhase1,
+    phase2: _attachPhase2,
+    phase3: attachPhase3,
+    currentPhase: _attachPhase,
+    error: attachFeeError,
+    clearError: _attachClearError,
+  } = useTransactionConstructionService({
+    toolType: "stamp", // Attach operations use stamp toolType
+    feeRate: attachFormState.feeRateVB
+      ? parseInt(attachFormState.feeRateVB)
+      : 0,
+    walletAddress: wallet?.address || "", // Provide empty string instead of undefined
+    isConnected: !!wallet && !isSubmitting,
+    isSubmitting,
+    // Attach-specific parameters
+    ...(attachFormState.cpid && { asset: attachFormState.cpid }),
+    ...(attachFormState.quantity &&
+      { quantity: parseInt(attachFormState.quantity) }),
+    ...(attachFormState.utxo && { utxoString: attachFormState.utxo }),
+  });
+
+  // Get the best available fee estimate
+  const attachFeeDetails = getAttachBestEstimate();
+
+  /* ===== 🚀 PROGRESSIVE FEE ESTIMATION - COMPLETE SWAP ===== */
+  const {
+    getBestEstimate: getSwapBestEstimate,
+    isEstimating: _swapIsEstimating,
+    isPreFetching: swapIsPreFetching,
+    estimateExact: _swapEstimateExact,
+    // Phase-specific results
+    phase1: swapPhase1,
+    phase2: _swapPhase2,
+    phase3: swapPhase3,
+    currentPhase: _swapPhase,
+    error: swapFeeError,
+    clearError: _swapClearError,
+  } = useTransactionConstructionService({
+    toolType: "stamp", // Swap completion uses stamp toolType
+    feeRate: buyerFormState.feeRate ? parseInt(buyerFormState.feeRate) : 0,
+    walletAddress: wallet?.address || "", // Provide empty string instead of undefined
+    isConnected: !!wallet && !isSubmitting,
+    isSubmitting,
+    // Swap-specific parameters
+    ...(buyerFormState.buyerUtxo && { utxoString: buyerFormState.buyerUtxo }),
+    ...(buyerFormState.sellerPsbtHex && {
+      psbtSize: buyerFormState.sellerPsbtHex.length / 2, // Hex to bytes
+    }),
+  });
+
+  // Get the best available fee estimate
+  const swapFeeDetails = getSwapBestEstimate();
+
   /* ===== EFFECTS ===== */
   useEffect(() => {
     const fetchPrice = async () => {
-      const price = await fetchBTCPriceInUSD();
-      setTradeFormState((prev) => ({ ...prev, BTCPrice: price }));
+      try {
+        const response = await fetch("/api/internal/btcPrice");
+        if (response.ok) {
+          const data = await response.json();
+          const price = data.data?.price || 0;
+          setTradeFormState((prev) => ({ ...prev, BTCPrice: price }));
+        } else {
+          console.warn("Failed to fetch BTC price");
+          setTradeFormState((prev) => ({ ...prev, BTCPrice: 0 }));
+        }
+      } catch (error) {
+        console.error("Error fetching BTC price:", error);
+        setTradeFormState((prev) => ({ ...prev, BTCPrice: 0 }));
+      }
     };
     fetchPrice();
   }, []);
+
+  // Component mount/unmount logging
+  useEffect(() => {
+    logger.debug("ui", {
+      message: "TradeTool mounted",
+      component: "TradeTool",
+    });
+    return () => {
+      logger.debug("ui", {
+        message: "TradeTool unmounting",
+        component: "TradeTool",
+      });
+    };
+  }, []);
+
+  // Handle fee estimation errors for Create PSBT
+  useEffect(() => {
+    if (createPsbtFeeError) {
+      logger.debug("system", {
+        message: "Fee estimation error in TradeTool - Create PSBT",
+        error: createPsbtFeeError,
+      });
+    }
+  }, [createPsbtFeeError]);
+
+  // Handle fee estimation errors for UTXO Attach
+  useEffect(() => {
+    if (attachFeeError) {
+      logger.debug("system", {
+        message: "Fee estimation error in TradeTool - UTXO Attach",
+        error: attachFeeError,
+      });
+    }
+  }, [attachFeeError]);
+
+  // Handle fee estimation errors for Complete Swap
+  useEffect(() => {
+    if (swapFeeError) {
+      logger.debug("system", {
+        message: "Fee estimation error in TradeTool - Complete Swap",
+        error: swapFeeError,
+      });
+    }
+  }, [swapFeeError]);
 
   /* ===== EVENT HANDLERS ===== */
   const handleTradeInputChange = (e: Event, field: string) => {
@@ -104,7 +263,7 @@ export function StampTradeTool() {
     }
 
     setIsSubmitting(true);
-    setSubmissionMessage("Please wait...");
+    setSubmissionMessage({ message: "Please wait..." });
     setApiError(null);
 
     try {
@@ -112,7 +271,11 @@ export function StampTradeTool() {
 
       // Validate inputs
       if (!utxo || !salePrice) {
-        setApiError("Please fill in all fields with valid values.");
+        showToast(
+          "Please fill in all fields with valid values.",
+          "error",
+          false,
+        );
         setIsSubmitting(false);
         return;
       }
@@ -130,7 +293,7 @@ export function StampTradeTool() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        setApiError(`Error creating PSBT: ${errorData.error}`);
+        showToast(`Error creating PSBT.\n${errorData.error}`, "error");
         setIsSubmitting(false);
         return;
       }
@@ -151,14 +314,25 @@ export function StampTradeTool() {
       );
 
       if (walletResult.signed) {
-        setSubmissionMessage(
-          "PSBT signed successfully. Here's the signed PSBT hex:",
+        showToast(
+          "PSBT signed successfully!\nShare the signed PSBT with the buyer.",
+          "success",
+          false,
         );
+        setSubmissionMessage({
+          message: "PSBT signed successfully. Here's the signed PSBT hex:",
+        });
         setTradeFormState((prev) => ({ ...prev, psbtHex: walletResult.psbt }));
       } else if (walletResult.cancelled) {
-        setSubmissionMessage("PSBT signing cancelled by user.");
+        showToast("PSBT signing cancelled by user.", "info");
+        setSubmissionMessage({
+          message: "PSBT signing cancelled by user.",
+        });
       } else {
-        setSubmissionMessage(`PSBT signing failed: ${walletResult.error}`);
+        showToast(`PSBT signing failed.\n${walletResult.error}`, "error");
+        setSubmissionMessage({
+          message: `PSBT signing failed.\n${walletResult.error}`,
+        });
       }
     } catch (error) {
       console.error("Error creating or signing PSBT:", error);
@@ -184,7 +358,7 @@ export function StampTradeTool() {
       const { cpid, quantity, feeRateVB, utxo } = attachFormState;
 
       // Validate required inputs first
-      if (!cpid || !quantity || !feeRateVB || !utxo) {
+      if (!cpid || !quantity || !feeRateVB || !utxo || !address) {
         setApiError("Please fill in all fields with valid values.");
         setIsSubmitting(false);
         return;
@@ -296,7 +470,7 @@ export function StampTradeTool() {
     }
 
     setIsSubmitting(true);
-    setSubmissionMessage("Please wait...");
+    setSubmissionMessage({ message: "Please wait..." });
     setApiError("");
 
     try {
@@ -362,7 +536,9 @@ export function StampTradeTool() {
         throw new Error(signResult.error || "Failed to sign PSBT");
       }
 
-      setSubmissionMessage("Swap completed and broadcast successfully!");
+      setSubmissionMessage({
+        message: "Swap completed and broadcast successfully!",
+      });
     } catch (error: unknown) {
       console.error("Complete swap error:", error);
       setApiError(
@@ -385,7 +561,9 @@ export function StampTradeTool() {
 
     try {
       console.log("Querying UTXOs for address:", address);
-      const response = await fetch(`/api/v2/trx/utxoquery?address=${address}`);
+      const response = await fetch(
+        `/api/internal/utxoquery?address=${address}`,
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -409,7 +587,9 @@ export function StampTradeTool() {
 
       // Filter UTXOs >= 546 sats and sort them
       const filteredAndSortedUtxos = [...data.utxos]
-        .filter((utxo: UTXO) => utxo.value >= MIN_UTXO_VALUE)
+        .filter((utxo: UTXO) =>
+          utxo.value !== undefined && utxo.value >= MIN_UTXO_VALUE
+        )
         .sort((a: UTXO, b: UTXO) => a.value - b.value);
 
       console.log(`Received ${data.utxos.length} total UTXOs`);
@@ -439,6 +619,11 @@ export function StampTradeTool() {
   const handleQueryAssets = useCallback(async () => {
     if (!isConnected) {
       showConnectModal();
+      return;
+    }
+
+    if (!address) {
+      setApiError("No wallet address available");
       return;
     }
 
@@ -507,19 +692,76 @@ export function StampTradeTool() {
 
   /* ===== RENDER ===== */
   return (
-    <div className={`${bodyTool}`}>
+    <div class={`${bodyTool} ${containerGap}`}>
       {/* ===== SELLER SECTION ===== */}
-      <h1 className={`${titlePurpleLD} mobileMd:mx-auto`}>
-        ATTACH TO UTXO
+      <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
+        TRADE
       </h1>
-      <h2 className={`${subtitlePurple} mobileMd:mx-auto`}>SELLER</h2>
 
       {/* ===== CREATE PSBT FORM ===== */}
-      <div className={containerBackground}>
-        <h3 className=" font-bold text-xl text-stamp-purple mb-2">
+      <div class={containerBackground}>
+        <h2 class={`${subtitleGrey} mx-auto`}>SELLER</h2>
+        <h3 class=" font-bold text-xl text-color-grey-semilight mb-2">
           CREATE PSBT
         </h3>
-        <div className="flex flex-col gap-5">
+
+        {/* ===== 🎯 INLINE FEE STATUS DISPLAY - CREATE PSBT ===== */}
+        {createPsbtFeeDetails && (
+          <div className="mb-4 p-3 bg-color-grey-semidark/50 rounded-2xl border border-color-grey-light/10">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-sm text-color-grey-light">
+                Estimated Fees:
+              </span>
+              {/* Phase indicators following StampingTool pattern */}
+              <div className="flex items-center gap-1">
+                <div
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    createPsbtPhase1 ? "bg-green-400" : "bg-color-grey-light/30"
+                  }`}
+                  title="Phase 1: Instant estimate"
+                >
+                </div>
+                <div
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    createPsbtIsPreFetching
+                      ? "bg-blue-400 animate-pulse"
+                      : "bg-color-grey-light/30"
+                  }`}
+                  title="Phase 2: Smart UTXO estimate"
+                >
+                </div>
+                <div
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    createPsbtPhase3 ? "bg-green-400" : "bg-color-grey-light/30"
+                  }`}
+                  title="Phase 3: Exact estimate"
+                >
+                </div>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4 text-xs">
+              <div>
+                <span className="text-color-grey-light">Miner Fee:</span>
+                <span className="ml-2 text-white">
+                  {createPsbtFeeDetails.minerFee} sats
+                </span>
+              </div>
+              <div>
+                <span className="text-color-grey-light">Total Value:</span>
+                <span className="ml-2 text-white">
+                  {createPsbtFeeDetails.totalValue} sats
+                </span>
+              </div>
+            </div>
+            {createPsbtIsPreFetching && (
+              <div className="mt-2 text-xs text-blue-400 animate-pulse">
+                💡 Smart UTXO analysis in progress...
+              </div>
+            )}
+          </div>
+        )}
+
+        <div class="flex flex-col gap-5">
           <InputField
             type="text"
             placeholder="UTXO (e.g., txid:vout)"
@@ -537,11 +779,11 @@ export function StampTradeTool() {
           />
         </div>
 
-        <div className="flex justify-end mt-5">
+        <div class="flex justify-end mt-5">
           <Button
             variant="flat"
-            color="purple"
-            size="md"
+            color="grey"
+            size="mdR"
             onClick={handleCreatePSBT}
             disabled={isSubmitting}
           >
@@ -556,14 +798,14 @@ export function StampTradeTool() {
         />
 
         {tradeFormState.psbtHex && (
-          <div className={`${containerBackground} break-words mt-6`}>
-            <h2 className="text-xl font-bold mb-2">Signed PSBT (Hex):</h2>
+          <div class={`${containerBackground} break-words mt-6`}>
+            <h2 class="text-xl font-bold mb-2">Signed PSBT (Hex):</h2>
             <textarea
-              className="w-full h-40 p-2 bg-gray-800 text-white rounded-md"
+              class="w-full h-40 p-2 bg-gray-800 text-white rounded-2xl"
               readOnly
               value={tradeFormState.psbtHex}
             />
-            <p className="mt-2">
+            <p class="mt-2">
               Share this signed PSBT with the buyer to complete the transaction.
             </p>
           </div>
@@ -571,106 +813,132 @@ export function StampTradeTool() {
       </div>
 
       {/* ===== UTXO ATTACH FORM ===== */}
-      <div className={containerBackground}>
-        <h3 className=" font-bold text-xl text-stamp-purple mb-2">
-          UTXO ATTACH
+      <div class={containerBackground}>
+        <h2 class={`${subtitleGrey} mx-auto`}>SELLER</h2>
+        <h3 class=" font-bold text-xl text-color-grey-semilight mb-2">
+          ATTACH TO UTXO
         </h3>
-        <div className="flex flex-col gap-5">
+
+        {/* ===== 🎯 INLINE FEE STATUS DISPLAY - UTXO ATTACH ===== */}
+        {attachFeeDetails && (
+          <div className="mb-4 p-3 bg-color-grey-semidark/50 rounded-2xl border border-color-grey-light/10">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-sm text-color-grey-light">
+                Estimated Fees:
+              </span>
+              {/* Phase indicators following StampingTool pattern */}
+              <div className="flex items-center gap-1">
+                <div
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    attachPhase1 ? "bg-green-400" : "bg-color-grey-light/30"
+                  }`}
+                  title="Phase 1: Instant estimate"
+                >
+                </div>
+                <div
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    attachIsPreFetching
+                      ? "bg-blue-400 animate-pulse"
+                      : "bg-color-grey-light/30"
+                  }`}
+                  title="Phase 2: Smart UTXO estimate"
+                >
+                </div>
+                <div
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    attachPhase3 ? "bg-green-400" : "bg-color-grey-light/30"
+                  }`}
+                  title="Phase 3: Exact estimate"
+                >
+                </div>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4 text-xs">
+              <div>
+                <span className="text-color-grey-light">Miner Fee:</span>
+                <span className="ml-2 text-white">
+                  {attachFeeDetails.minerFee} sats
+                </span>
+              </div>
+              <div>
+                <span className="text-color-grey-light">Total Value:</span>
+                <span className="ml-2 text-white">
+                  {attachFeeDetails.totalValue} sats
+                </span>
+              </div>
+            </div>
+            {attachIsPreFetching && (
+              <div className="mt-2 text-xs text-blue-400 animate-pulse">
+                💡 Smart UTXO analysis in progress...
+              </div>
+            )}
+          </div>
+        )}
+
+        <div class="flex flex-col gap-5">
           {/* Asset (CPID) section with query button */}
-          <div className="flex flex-col gap-5">
-            <div className="flex gap-5 items-start">
-              <div className="flex-grow">
+          <div class="flex flex-col gap-5">
+            <div class="flex gap-5 items-start">
+              <div class="flex-grow">
                 <InputField
                   type="text"
-                  placeholder="Asset (cpid)"
+                  placeholder="Asset (CPID)"
                   value={attachFormState.cpid}
                   onChange={(e) => handleAttachInputChange(e, "cpid")}
                 />
               </div>
-
-              <div className="flex justify-end">
-                <Button
-                  variant="outline"
-                  color="purple"
-                  size="md"
-                  onClick={handleQueryAssets}
-                  disabled={isLoadingAssets || !isConnected}
-                >
-                  {isLoadingAssets ? "Loading..." : "QUERY ASSETS"}
-                </Button>
-              </div>
+              <Button
+                variant="outline"
+                color="grey"
+                size="sm"
+                onClick={handleQueryAssets}
+                disabled={isSubmitting || isLoadingAssets}
+              >
+                {isLoadingAssets ? "LOADING..." : "QUERY"}
+              </Button>
             </div>
 
-            {/* Asset list */}
+            {/* Asset selection results */}
             {availableAssets.length > 0 && (
-              <div className="mt-2 max-h-60 overflow-y-auto bg-gray-800 rounded-md">
-                <div className="p-2 border-b border-gray-700 font-bold text-sm">
-                  Available Assets (sorted by CPID)
-                </div>
+              <div class="max-h-40 overflow-y-auto bg-gray-800 rounded-2xl p-3">
+                <h4 class="text-sm font-medium mb-2">Available Assets:</h4>
                 {availableAssets.map((asset) => (
-                  <button
-                    type="button"
+                  <div
                     key={asset.cpid}
+                    class="flex justify-between items-center p-2 hover:bg-gray-700 cursor-pointer rounded"
                     onClick={() => handleAssetSelection(asset)}
-                    className="w-full text-left p-2 hover:bg-gray-700 transition-colors text-sm border-b border-red-500 last:border-b-0"
                   >
-                    <div className="flex justify-between items-center">
-                      <div className="truncate flex-1">
-                        {asset.cpid}
-                      </div>
-                      <div className="ml-2 text-green-400">
-                        {`${asset.quantity.toLocaleString()} units`}
-                      </div>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Quantity input with MAX display */}
-          <div className="flex flex-col gap-2">
-            <div className="flex gap-2 items-start">
-              <div className="flex-grow relative">
-                <InputField
-                  type="number"
-                  placeholder="Quantity"
-                  value={attachFormState.quantity}
-                  onChange={(e) => {
-                    const value = parseInt(
-                      (e.target as HTMLInputElement).value,
-                    );
-                    if (!value || (maxQuantity && value <= maxQuantity)) {
-                      handleAttachInputChange(e, "quantity");
-                    }
-                  }}
-                />
-                {maxQuantity !== null && (
-                  <div className="absolute right-0 -top-6 text-sm text-gray-400">
-                    Max: {maxQuantity.toLocaleString()}
+                    <span class="text-sm">{asset.cpid}</span>
+                    <span class="text-xs text-gray-400">
+                      {asset.quantity} available
+                    </span>
                   </div>
-                )}
-              </div>
-            </div>
-            {attachFormState.quantity && maxQuantity &&
-              parseInt(attachFormState.quantity) > maxQuantity && (
-              <div className="text-red-500 text-sm">
-                Quantity cannot exceed {maxQuantity.toLocaleString()}
+                ))}
               </div>
             )}
           </div>
 
           <InputField
             type="number"
+            placeholder="Quantity"
+            value={attachFormState.quantity}
+            onChange={(e) => handleAttachInputChange(e, "quantity")}
+            min="1"
+          />
+
+          <InputField
+            type="number"
             placeholder="Fee Rate (sat/vB)"
             value={attachFormState.feeRateVB}
             onChange={(e) => handleAttachInputChange(e, "feeRateVB")}
+            step="1"
+            min="1"
           />
 
           {/* UTXO section with query button */}
-          <div className="flex flex-col gap-2">
-            <div className="flex gap-5 items-start">
-              <div className="flex-grow">
+          <div class="flex flex-col gap-5">
+            <div class="flex gap-5 items-start">
+              <div class="flex-grow">
                 <InputField
                   type="text"
                   placeholder="UTXO (e.g., txid:vout)"
@@ -680,88 +948,133 @@ export function StampTradeTool() {
               </div>
               <Button
                 variant="outline"
-                color="purple"
-                size="md"
+                color="grey"
+                size="sm"
                 onClick={handleQueryUtxos}
-                disabled={isLoadingUtxos || !isConnected}
+                disabled={isSubmitting || isLoadingUtxos}
               >
-                {isLoadingUtxos ? "Loading..." : "Query UTXOs"}
+                {isLoadingUtxos ? "LOADING..." : "QUERY"}
               </Button>
             </div>
 
-            {/* UTXO list */}
+            {/* UTXO selection results */}
             {availableUtxos.length > 0 && (
-              <div className="mt-2 max-h-60 overflow-y-auto bg-gray-800 rounded-md">
-                <div className="p-2 border-b border-gray-700 font-bold text-sm">
-                  Available UTXOs ≥ {MIN_UTXO_VALUE} sats (sorted by value)
-                </div>
+              <div class="max-h-40 overflow-y-auto bg-gray-800 rounded-2xl p-3">
+                <h4 class="text-sm font-medium mb-2">Available UTXOs:</h4>
                 {availableUtxos.map((utxo) => (
-                  <button
-                    type="button"
+                  <div
                     key={`${utxo.txid}:${utxo.vout}`}
+                    class="flex justify-between items-center p-2 hover:bg-gray-700 cursor-pointer rounded"
                     onClick={() => handleUtxoSelection(utxo)}
-                    className="w-full text-left p-2 hover:bg-gray-700 transition-colors text-sm border-b border-gray-700 last:border-b-0"
                   >
-                    <div className="flex justify-between items-center">
-                      <div className="truncate flex-1">
-                        {`${utxo.txid.substring(0, 8)}...${
-                          utxo.txid.substring(utxo.txid.length - 8)
-                        }:${utxo.vout}`}
-                      </div>
-                      <div className="ml-2 text-green-400">
-                        {`${utxo.value.toLocaleString()} sats`}
-                      </div>
-                    </div>
-                  </button>
+                    <span class="text-xs font-mono">
+                      {utxo.txid.substring(0, 8)}...:{utxo.vout}
+                    </span>
+                    <span class="text-xs text-gray-400">
+                      {utxo.value} sats
+                    </span>
+                  </div>
                 ))}
               </div>
             )}
           </div>
         </div>
 
-        <div className="flex justify-end mt-5">
+        <div class="flex justify-end mt-5">
           <Button
             variant="flat"
-            color="purple"
-            size="md"
+            color="grey"
+            size="mdR"
             onClick={handleUtxoAttach}
             disabled={isSubmitting}
           >
-            {isSubmitting ? "PROCESSING" : "ATTACH"}
+            {isSubmitting ? "PROCESSING" : "ATTACH UTXO"}
           </Button>
         </div>
 
         <StatusMessages
-          submissionMessage={submissionMessage
-            ? { message: submissionMessage }
-            : null}
+          submissionMessage={submissionMessage}
           apiError={apiError}
           walletError={null}
         />
 
         {attachFormState.psbtHex && (
-          <div className={`${containerBackground} break-words mt-6`}>
-            <h2 className="text-xl font-bold mb-2">Signed PSBT (Hex):</h2>
+          <div class={`${containerBackground} break-words mt-6`}>
+            <h2 class="text-xl font-bold mb-2">Signed PSBT (Hex):</h2>
             <textarea
-              className="w-full h-40 p-2 bg-gray-800 text-white rounded-md"
+              class="w-full h-40 p-2 bg-gray-800 text-white rounded-2xl"
               readOnly
               value={attachFormState.psbtHex}
             />
-            <p className="mt-2">
-              Share this signed PSBT to complete the transaction.
-            </p>
           </div>
         )}
       </div>
 
       {/* ===== BUYER SECTION ===== */}
       {/* ===== COMPLETE SWAP FORM ===== */}
-      <div className={containerBackground}>
-        <h2 className={`${subtitlePurple} mobileMd:mx-auto`}>BUYER</h2>
-        <h3 className=" font-bold text-xl text-stamp-purple mb-2">
+      <div class={containerBackground}>
+        <h2 class={`${subtitleGrey} mx-auto`}>BUYER</h2>
+        <h3 class=" font-bold text-xl text-color-grey-semilight mb-2">
           COMPLETE SWAP
         </h3>
-        <div className="flex flex-col gap-5">
+
+        {/* ===== 🎯 INLINE FEE STATUS DISPLAY - COMPLETE SWAP ===== */}
+        {swapFeeDetails && (
+          <div className="mb-4 p-3 bg-color-grey-semidark/50 rounded-2xl border border-color-grey-light/10">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-sm text-color-grey-light">
+                Estimated Fees:
+              </span>
+              {/* Phase indicators following StampingTool pattern */}
+              <div className="flex items-center gap-1">
+                <div
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    swapPhase1 ? "bg-green-400" : "bg-color-grey-light/30"
+                  }`}
+                  title="Phase 1: Instant estimate"
+                >
+                </div>
+                <div
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    swapIsPreFetching
+                      ? "bg-blue-400 animate-pulse"
+                      : "bg-color-grey-light/30"
+                  }`}
+                  title="Phase 2: Smart UTXO estimate"
+                >
+                </div>
+                <div
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    swapPhase3 ? "bg-green-400" : "bg-color-grey-light/30"
+                  }`}
+                  title="Phase 3: Exact estimate"
+                >
+                </div>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4 text-xs">
+              <div>
+                <span className="text-color-grey-light">Miner Fee:</span>
+                <span className="ml-2 text-white">
+                  {swapFeeDetails.minerFee} sats
+                </span>
+              </div>
+              <div>
+                <span className="text-color-grey-light">Total Value:</span>
+                <span className="ml-2 text-white">
+                  {swapFeeDetails.totalValue} sats
+                </span>
+              </div>
+            </div>
+            {swapIsPreFetching && (
+              <div className="mt-2 text-xs text-blue-400 animate-pulse">
+                💡 Smart UTXO analysis in progress...
+              </div>
+            )}
+          </div>
+        )}
+
+        <div class="flex flex-col gap-5">
           <InputField
             type="text"
             placeholder="Seller's PSBT (Hex)"
@@ -783,11 +1096,11 @@ export function StampTradeTool() {
             min="1"
           />
         </div>
-        <div className="flex justify-end mt-5">
+        <div class="flex justify-end mt-5">
           <Button
             variant="flat"
-            color="purple"
-            size="md"
+            color="grey"
+            size="mdR"
             onClick={handleCompleteSwap}
             disabled={isSubmitting}
           >

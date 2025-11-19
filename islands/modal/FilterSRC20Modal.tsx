@@ -1,36 +1,20 @@
 /* ===== FILTER SRC20 MODAL COMPONENT ===== */
 // @bbaba+@reinamora - are the
 // deno-lint-ignore-file
-import { useState } from "preact/hooks";
-import { ModalBase } from "$layout";
-import { InputField } from "$form";
-import {
-  COLLECTION_FILTER_TYPES,
-  LISTING_FILTER_TYPES,
-  SRC20_FILTER_TYPES,
-  STAMP_FILTER_TYPES,
-  WALLET_FILTER_TYPES,
-} from "$globals";
 import { Button } from "$button";
-import { SelectDate } from "$form";
+import type { FilterSRC20ModalProps } from "$types/ui.d.ts";
+import { InputField, SelectDate } from "$form";
 import { closeModal } from "$islands/modal/states.ts";
+import { ModalBase } from "$layout";
 import { logger } from "$lib/utils/logger.ts";
-import { subtitlePurple } from "$text";
+import { safeNavigate } from "$utils/navigation/freshNavigationUtils.ts";
+import type { JSX } from "preact";
+import { useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
-type FilterTypes =
-  | SRC20_FILTER_TYPES
-  | STAMP_FILTER_TYPES
-  | WALLET_FILTER_TYPES
-  | COLLECTION_FILTER_TYPES
-  | LISTING_FILTER_TYPES;
-
-interface Props {
-  filterOptions: FilterTypes;
-}
 
 /* ===== COMPONENT ===== */
-const FilterSRC20Modal = ({ filterOptions }: Props) => {
+const FilterSRC20Modal = ({ filterOptions }: FilterSRC20ModalProps) => {
   /* ===== STATE ===== */
   const [title, setTitle] = useState("");
   const [progress, setProgress] = useState({ min: "", max: "" });
@@ -38,7 +22,7 @@ const FilterSRC20Modal = ({ filterOptions }: Props) => {
     min: "",
     max: "",
   });
-  const [dateRange, setDateRange] = useState<Date[] | null>([
+  const [dateRange, setDateRange] = useState<(Date | null)[]>([
     null,
     null,
   ]);
@@ -50,37 +34,38 @@ const FilterSRC20Modal = ({ filterOptions }: Props) => {
 
   /* ===== EVENT HANDLERS ===== */
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
+    e: JSX.TargetedEvent<HTMLInputElement>,
     type: string,
   ) => {
+    const target = e.target as HTMLInputElement;
     if (type === "progress_min") {
-      setProgress({ ...progress, min: e.target.value });
+      setProgress({ ...progress, min: target.value });
     } else if (type === "progress_max") {
-      setProgress({ ...progress, max: e.target.value });
+      setProgress({ ...progress, max: target.value });
     } else if (type === "min_tx") {
-      setTransactionCount({ ...transactionCount, min: e.target.value });
+      setTransactionCount({ ...transactionCount, min: target.value });
     } else if (type === "max_tx") {
-      setTransactionCount({ ...transactionCount, max: e.target.value });
+      setTransactionCount({ ...transactionCount, max: target.value });
     } else if (type === "supply_min") {
-      setSupply({ ...supply, min: e.target.value });
+      setSupply({ ...supply, min: target.value });
     } else if (type === "supply_max") {
-      setSupply({ ...supply, max: e.target.value });
+      setSupply({ ...supply, max: target.value });
     } else if (type === "marketcap_min") {
-      setMarketcap({ ...marketcap, min: e.target.value });
+      setMarketcap({ ...marketcap, min: target.value });
     } else if (type === "marketcap_max") {
-      setMarketcap({ ...marketcap, max: e.target.value });
+      setMarketcap({ ...marketcap, max: target.value });
     } else if (type === "holder_min") {
-      setHolder({ ...holder, min: e.target.value });
+      setHolder({ ...holder, min: target.value });
     } else if (type === "holder_max") {
-      setHolder({ ...holder, max: e.target.value });
+      setHolder({ ...holder, max: target.value });
     } else if (type === "volume_max") {
-      setVolume({ ...volume, max: e.target.value });
+      setVolume({ ...volume, max: target.value });
     } else if (type === "volume_min") {
-      setVolume({ ...volume, min: e.target.value });
+      setVolume({ ...volume, min: target.value });
     } else if (type === "price_max") {
-      setPrice({ ...price, max: e.target.value });
+      setPrice({ ...price, max: target.value });
     } else if (type === "price_min") {
-      setPrice({ ...price, min: e.target.value });
+      setPrice({ ...price, min: target.value });
     }
   };
 
@@ -94,6 +79,11 @@ const FilterSRC20Modal = ({ filterOptions }: Props) => {
 
   /* ===== FORM SUBMISSION ===== */
   const handleSubmit = () => {
+    // SSR-safe browser environment check
+    if (typeof globalThis === "undefined" || !globalThis?.location) {
+      return; // Cannot navigate during SSR
+    }
+
     const url = new URL(globalThis.location.href);
     switch (filterOptions[filterOptions.length - 1]) {
       case "minting":
@@ -118,10 +108,12 @@ const FilterSRC20Modal = ({ filterOptions }: Props) => {
           "dateFrom",
           new Date(dateRange[0]).toISOString(),
         );
-        url.searchParams.set(
-          "dateTo",
-          new Date(dateRange[1]).toISOString(),
-        );
+        if (dateRange[1]) {
+          url.searchParams.set(
+            "dateTo",
+            new Date(dateRange[1]).toISOString(),
+          );
+        }
         break;
       case "supply":
         url.searchParams.set(
@@ -166,10 +158,12 @@ const FilterSRC20Modal = ({ filterOptions }: Props) => {
         );
         break;
       case "price change":
-        url.searchParams.set(
-          "trendingDate",
-          new Date(priceDate).toISOString(),
-        );
+        if (dateRange[0]) {
+          url.searchParams.set(
+            "trendingDate",
+            new Date(dateRange[0]).toISOString(),
+          );
+        }
         url.searchParams.set(
           "priceMin",
           price.min,
@@ -177,142 +171,149 @@ const FilterSRC20Modal = ({ filterOptions }: Props) => {
         break;
     }
 
-    window.location.href = url.toString();
+    safeNavigate(url.toString());
     closeModal();
   };
 
   /* ===== FILTER CONTENT RENDERING ===== */
   const renderContent = () => {
-    switch (filterOptions[filterOptions.length - 1]) {
+    const filterType = filterOptions[filterOptions.length - 1];
+
+    switch (filterType) {
       case "minting":
-        setTitle("PROGRESS");
+        if (title !== "PROGRESS") setTitle("PROGRESS");
         return (
           <>
             <InputField
               type="text"
               placeholder="MIN MINT PROGRESS IN PERCENT"
               value={progress.min}
-              onChange={(e) => handleChange(e, "progress_min")}
+              onChange={(e: JSX.TargetedEvent<HTMLInputElement>) =>
+                handleChange(e, "progress_min")}
             />
 
             <InputField
               type="text"
               placeholder="MAX MINT PROGRESS IN PERCENT"
               value={progress.max}
-              onChange={(e) => handleChange(e, "progress_max")}
+              onChange={(e: JSX.TargetedEvent<HTMLInputElement>) =>
+                handleChange(e, "progress_max")}
             />
           </>
         );
-        break;
       case "trending mints":
-        setTitle("TRENDING");
+        if (title !== "TRENDING") setTitle("TRENDING");
         return (
           <>
             <InputField
               type="text"
               placeholder="MIN AMOUNT OF TRANSACTIONS"
               value={transactionCount.min}
-              onChange={(e) => handleChange(e, "min_tx")}
+              onChange={(e: JSX.TargetedEvent<HTMLInputElement>) =>
+                handleChange(e, "min_tx")}
             />
             <InputField
               type="text"
               placeholder="MAX AMOUNT OF TRANSACTIONS"
               value={transactionCount.max}
-              onChange={(e) => handleChange(e, "max_tx")}
+              onChange={(e: JSX.TargetedEvent<HTMLInputElement>) =>
+                handleChange(e, "max_tx")}
             />
           </>
         );
-        break;
       case "deploy":
-        setTitle("DEPLOYED");
+        if (title !== "DEPLOYED") setTitle("DEPLOYED");
         return (
           <>
             <SelectDate setDateRange={setDateRange} isUppercase />
           </>
         );
-        break;
       case "supply":
-        setTitle("SUPPLY");
+        if (title !== "SUPPLY") setTitle("SUPPLY");
         return (
           <>
             <InputField
               type="text"
               placeholder="MIN SUPPLY"
               value={supply.min}
-              onChange={(e) => handleChange(e, "supply_min")}
+              onChange={(e: JSX.TargetedEvent<HTMLInputElement>) =>
+                handleChange(e, "supply_min")}
             />
 
             <InputField
               type="text"
               placeholder="MAX SUPPLY"
               value={supply.max}
-              onChange={(e) => handleChange(e, "supply_max")}
+              onChange={(e: JSX.TargetedEvent<HTMLInputElement>) =>
+                handleChange(e, "supply_max")}
             />
           </>
         );
-        break;
       case "marketcap":
-        setTitle("MARKETCAP");
+        if (title !== "MARKETCAP") setTitle("MARKETCAP");
         return (
           <>
             <InputField
               type="text"
               placeholder="MIN MARKETCAP"
               value={marketcap.min}
-              onChange={(e) => handleChange(e, "marketcap_min")}
+              onChange={(e: JSX.TargetedEvent<HTMLInputElement>) =>
+                handleChange(e, "marketcap_min")}
             />
 
             <InputField
               type="text"
               placeholder="MAX MARKETCAP"
               value={marketcap.max}
-              onChange={(e) => handleChange(e, "marketcap_max")}
+              onChange={(e: JSX.TargetedEvent<HTMLInputElement>) =>
+                handleChange(e, "marketcap_max")}
             />
           </>
         );
-        break;
       case "holders":
-        setTitle("HOLDERS");
+        if (title !== "HOLDERS") setTitle("HOLDERS");
         return (
           <>
             <InputField
               type="text"
               placeholder="MIN HOLDERS AMOUNT"
               value={holder.min}
-              onChange={(e) => handleChange(e, "holder_min")}
+              onChange={(e: JSX.TargetedEvent<HTMLInputElement>) =>
+                handleChange(e, "holder_min")}
             />
 
             <InputField
               type="text"
               placeholder="MAX HOLDERS AMOUNT"
               value={holder.max}
-              onChange={(e) => handleChange(e, "holder_max")}
+              onChange={(e: JSX.TargetedEvent<HTMLInputElement>) =>
+                handleChange(e, "holder_max")}
             />
           </>
         );
-        break;
       case "volume":
-        setTitle("VOLUME");
+        if (title !== "VOLUME") setTitle("VOLUME");
         return (
           <>
             <InputField
               type="text"
               placeholder="MIN"
               value={volume.min}
-              onChange={(e) => handleChange(e, "volume_min")}
+              onChange={(e: JSX.TargetedEvent<HTMLInputElement>) =>
+                handleChange(e, "volume_min")}
             />
 
             <InputField
               type="text"
               placeholder="MAX"
               value={volume.max}
-              onChange={(e) => handleChange(e, "volume_max")}
+              onChange={(e: JSX.TargetedEvent<HTMLInputElement>) =>
+                handleChange(e, "volume_max")}
             />
           </>
         );
-        break;
       case "price change":
-        setTitle("PRICE CHANGE");
+        if (title !== "PRICE CHANGE") setTitle("PRICE CHANGE");
         return (
           <>
             <SelectDate setDateRange={setDateRange} isUppercase />
@@ -321,17 +322,20 @@ const FilterSRC20Modal = ({ filterOptions }: Props) => {
               type="text"
               placeholder="MIN PERCENT CHANGE"
               value={price.min}
-              onChange={(e) => handleChange(e, "price_min")}
+              onChange={(e: JSX.TargetedEvent<HTMLInputElement>) =>
+                handleChange(e, "price_min")}
             />
             <InputField
               type="text"
               placeholder="MAX PERCENT CHANGE"
               value={price.max}
-              onChange={(e) => handleChange(e, "price_max")}
+              onChange={(e: JSX.TargetedEvent<HTMLInputElement>) =>
+                handleChange(e, "price_max")}
             />
           </>
         );
-        break;
+      default:
+        return null;
     }
   };
 
@@ -341,7 +345,7 @@ const FilterSRC20Modal = ({ filterOptions }: Props) => {
       onClose={handleCloseModal}
       title={title}
     >
-      <div className="flex flex-col items-center justify-center gap-5">
+      <div class="flex flex-col items-center justify-center gap-5">
         {renderContent()}
 
         <Button

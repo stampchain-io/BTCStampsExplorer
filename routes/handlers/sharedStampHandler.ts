@@ -1,18 +1,27 @@
-import { Handlers } from "$fresh/server.ts";
-import { StampController } from "$server/controller/stampController.ts";
-import { RouteType } from "$server/services/cacheService.ts";
-import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
-import { validateSortDirection } from "$server/services/validationService.ts";
-import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import type {
+  StampEdition,
+  StampFilesize,
+  StampFiletype,
+  StampMarketplace,
+  StampRange,
+} from "$constants";
+import type { StampRow } from "$lib/types/stamp.d.ts";
 import {
-  STAMP_EDITIONS,
-  STAMP_FILETYPES,
-  STAMP_MARKET,
-  STAMP_RANGES,
-} from "$globals";
+  API_STAMP_TYPE_VALUES,
+  type HandlerStampType,
+  MAX_PAGINATION_LIMIT,
+} from "$constants";
+import { Handlers } from "$fresh/server.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
+import { WebResponseUtil } from "$lib/utils/api/responses/webResponseUtil.ts";
+import { getIdentifierType } from "$lib/utils/data/identifiers/identifierUtils.ts";
+import { getPaginationParams } from "$lib/utils/data/pagination/paginationUtils.ts";
+import { StampController } from "$server/controller/stampController.ts";
+import { RouteType } from "$server/services/infrastructure/cacheService.ts";
+import { validateSortDirection } from "$server/services/validation/validationService.ts";
 
 type StampHandlerConfig = {
-  type: "stamps" | "cursed";
+  type: HandlerStampType;
   isIndex: boolean;
 };
 
@@ -54,54 +63,8 @@ export const createStampHandler = (
   async GET(req: Request, ctx) {
     try {
       const url = new URL(req.url);
-
-      // Log parameters for debugging
-      console.log("[Stamp Handler]", {
-        url: req.url,
-        pathname: url.pathname,
-        params: Object.fromEntries(
-          [...url.searchParams.entries()].filter(([key]) =>
-            key.includes("range") || key === "type"
-          ),
-        ),
-        headers: Object.fromEntries([...req.headers.entries()]),
-      });
-
-      console.log(
-        "All URL parameters:",
-        Object.fromEntries(url.searchParams.entries()),
-      );
-      console.log("Range parameter:", url.searchParams.get("range[sub]"));
-      console.log(
-        "Filetype parameter:",
-        url.searchParams.get("filetypeFilters"),
-      );
-      console.log("Edition parameter:", url.searchParams.get("editionFilters"));
       const cacheType = getCacheType(url.pathname, routeConfig.isIndex);
       const requestQuery = url.searchParams.get("q");
-
-      console.log(
-        "URL parameters:",
-        Object.fromEntries(url.searchParams.entries()),
-      );
-      console.log("Range sub value:", url.searchParams.get("range[sub]"));
-
-      // Try different ways to extract the parameter
-      console.log(
-        "Direct parameter access:",
-        url.searchParams.get("range[sub]"),
-      );
-
-      // Try using entries to see all parameters
-      for (const [key, value] of url.searchParams.entries()) {
-        console.log(`Parameter: ${key} = ${value}`);
-        // Check if any key contains "range"
-        if (key.includes("range")) {
-          console.log("Found range-related parameter:", key, value);
-        }
-      }
-
-      console.log("Full URL being passed:", req.url);
 
       if (routeConfig.isIndex) {
         const pagination = getPaginationParams(url);
@@ -112,8 +75,10 @@ export const createStampHandler = (
         }
 
         const { limit, page } = pagination;
-        const maxLimit = 100;
-        const effectiveLimit = Math.min(limit ?? maxLimit, maxLimit);
+        const effectiveLimit = Math.min(
+          limit ?? MAX_PAGINATION_LIMIT,
+          MAX_PAGINATION_LIMIT,
+        );
 
         // Get and validate sort parameter using new helper
         const sortParam = getSortParameter(url);
@@ -123,60 +88,205 @@ export const createStampHandler = (
         }
 
         // Extract filters
-        const filetypeFilters = url.searchParams.get("filetype")?.split(",")
-          .filter(Boolean) as STAMP_FILETYPES[] | undefined;
-        const editionFilters = url.searchParams.get("editions")?.split(",")
-          .filter(Boolean) as STAMP_EDITIONS[] | undefined;
+        const fileType = url.searchParams.get("filetype")?.split(",")
+          .filter(Boolean) as StampFiletype[] | undefined;
+        const editions = url.searchParams.get("editions")?.split(",")
+          .filter(Boolean) as StampEdition[] | undefined;
 
-        // Add market filter extraction
-        const marketParam = url.searchParams.get("market");
-        const marketFilters = marketParam?.split(",").filter(Boolean) as
-          | STAMP_MARKET[]
-          | undefined;
-        const marketMin = url.searchParams.get("marketMin") || undefined;
-        const marketMax = url.searchParams.get("marketMax") || undefined;
+        // Extract ident parameter
+        const identParam = url.searchParams.get("ident");
+        const ident = identParam
+          ? identParam.split(",").filter(Boolean) as any
+          : undefined;
+
+        // Extract new marketplace filters
+        const market = url.searchParams.get("market") as
+          | Extract<StampMarketplace, "listings" | "sales">
+          | "";
+        const dispensers = url.searchParams.get("dispensers") === "true";
+        const atomics = url.searchParams.get("atomics") === "true";
+        const listings = url.searchParams.get("listings") as
+          | Extract<
+            StampMarketplace,
+            "all" | "bargain" | "affordable" | "premium" | "custom"
+          >
+          | "";
+        const listingsMin = url.searchParams.get("listingsMin") || undefined;
+        const listingsMax = url.searchParams.get("listingsMax") || undefined;
+        const sales = url.searchParams.get("sales") as
+          | Extract<
+            StampMarketplace,
+            "recent" | "premium" | "custom" | "volume"
+          >
+          | "";
+        const salesMin = url.searchParams.get("salesMin") || undefined;
+        const salesMax = url.searchParams.get("salesMax") || undefined;
+        const volume = url.searchParams.get("volume") as
+          | "24h"
+          | "7d"
+          | "30d"
+          | "";
+        const volumeMin = url.searchParams.get("volumeMin") || undefined;
+        const volumeMax = url.searchParams.get("volumeMax") || undefined;
+
+        // Extract file size filters
+        const fileSize = url.searchParams.get("fileSize") as
+          | StampFilesize
+          | null;
+        const fileSizeMin = url.searchParams.get("fileSizeMin") || undefined;
+        const fileSizeMax = url.searchParams.get("fileSizeMax") || undefined;
+
+        // Extract type parameter (NEW: Support for stamp type filtering!)
+        const typeParam = url.searchParams.get("type");
+        const stampType =
+          (typeParam && API_STAMP_TYPE_VALUES.includes(typeParam as any))
+            ? typeParam as
+              | "classic"
+              | "cursed"
+              | "posh"
+              | "src20"
+            : "classic"; // Default to classic
 
         // Extract range filters
         const rangePreset = url.searchParams.get("rangePreset") || "";
         const rangeMin = url.searchParams.get("rangeMin") || "";
         const rangeMax = url.searchParams.get("rangeMax") || "";
 
-        let rangeFilters: STAMP_RANGES | undefined = undefined;
+        let range: StampRange | undefined = undefined;
 
-        // Set rangeFilters based on preset or custom values
+        // Set range based on preset or custom values
         if (
           rangePreset &&
-          ["100", "1000", "5000", "10000"].includes(rangePreset as any)
+          ["100", "1000", "5000", "10000"].includes(rangePreset)
         ) {
-          rangeFilters = rangePreset as STAMP_RANGES;
+          range = rangePreset as StampRange;
         } else if (rangeMin || rangeMax) {
-          rangeFilters = "custom";
+          range = "custom";
         }
+
+        // Extract market data filters (Task 42)
+        const minHolderCount = url.searchParams.get("minHolderCount") ||
+          undefined;
+        const maxHolderCount = url.searchParams.get("maxHolderCount") ||
+          undefined;
+        const minDistributionScore =
+          url.searchParams.get("minDistributionScore") || undefined;
+        const maxTopHolderPercentage =
+          url.searchParams.get("maxTopHolderPercentage") || undefined;
+        const minFloorPriceBTC = url.searchParams.get("minFloorPriceBTC") ||
+          undefined;
+        const maxFloorPriceBTC = url.searchParams.get("maxFloorPriceBTC") ||
+          undefined;
+        const minVolume24h = url.searchParams.get("minVolume24h") || undefined;
+        const minPriceChange24h = url.searchParams.get("minPriceChange24h") ||
+          undefined;
+        const minDataQualityScore =
+          url.searchParams.get("minDataQualityScore") || undefined;
+        const maxCacheAgeMinutes = url.searchParams.get("maxCacheAgeMinutes") ||
+          undefined;
+        const priceSource = url.searchParams.get("priceSource") || undefined;
+
+        // Check for timestamp parameters and validate if present
+        const fromTimestamp = url.searchParams.get("from_timestamp");
+        const toTimestamp = url.searchParams.get("to_timestamp");
+
+        if (fromTimestamp && isNaN(Date.parse(fromTimestamp))) {
+          return ApiResponseUtil.badRequest(
+            `Invalid timestamp format: ${fromTimestamp}. Must be a valid date string.`,
+            undefined,
+            { routeType: cacheType },
+          );
+        }
+
+        if (toTimestamp && isNaN(Date.parse(toTimestamp))) {
+          return ApiResponseUtil.badRequest(
+            `Invalid timestamp format: ${toTimestamp}. Must be a valid date string.`,
+            undefined,
+            { routeType: cacheType },
+          );
+        }
+
+        // Determine if market data should be included based on API version
+        // v2.2: No market data (clean, minimal responses)
+        // v2.3+: Include market data with clean nested structure
+        const apiVersion = (ctx.state.apiVersion as string) || "2.3";
+        const includeMarketData = parseFloat(apiVersion) >= 2.3;
 
         // Important part: Pass the min/max values directly to the controller
         const result = await StampController.getStamps({
           page,
           limit: effectiveLimit,
           sortBy: sortValidation,
-          type: routeConfig.type,
+          type: stampType,
           allColumns: false,
           skipTotalCount: false,
-          includeSecondary: true,
-          cacheType,
-          filetypeFilters,
-          editionFilters,
-          marketFilters,
-          marketMin,
-          marketMax,
-          rangeFilters,
-          rangeMin,
-          rangeMax,
+          ...(ident && { ident }),
+          ...(fileType && { fileType }),
+          ...(editions && { editions }),
+          ...(market && { market }),
+          ...(dispensers !== undefined && { dispensers }),
+          ...(atomics !== undefined && { atomics }),
+          ...(listings && { listings }),
+          ...(listingsMin && { listingsMin }),
+          ...(listingsMax && { listingsMax }),
+          ...(sales && { sales }),
+          ...(salesMin && { salesMin }),
+          ...(salesMax && { salesMax }),
+          ...(volume && { volume }),
+          ...(volumeMin && { volumeMin }),
+          ...(volumeMax && { volumeMax }),
+          ...(fileSize !== null && { fileSize }),
+          ...(fileSizeMin && { fileSizeMin }),
+          ...(fileSizeMax && { fileSizeMax }),
+          ...(range && { range }),
+          ...(rangeMin && { rangeMin }),
+          ...(rangeMax && { rangeMax }),
+          // Market data filters (Task 42)
+          ...(minHolderCount && { minHolderCount }),
+          ...(maxHolderCount && { maxHolderCount }),
+          ...(minDistributionScore && { minDistributionScore }),
+          ...(maxTopHolderPercentage && { maxTopHolderPercentage }),
+          ...(minFloorPriceBTC && { minFloorPriceBTC }),
+          ...(maxFloorPriceBTC && { maxFloorPriceBTC }),
+          ...(minVolume24h && { minVolume24h }),
+          ...(minPriceChange24h && { minPriceChange24h }),
+          ...(minDataQualityScore && { minDataQualityScore }),
+          ...(maxCacheAgeMinutes && { maxCacheAgeMinutes }),
+          ...(priceSource && { priceSource }),
+          // Version-aware market data inclusion
+          includeMarketData,
         });
+
+        // Filter fields based on API version
+        if (parseFloat(apiVersion) < 2.3 && result.data) {
+          // For v2.2, remove file_size_bytes from responses
+          const filterV22Fields = (stamps: StampRow[]) => {
+            return stamps.map((stamp) => {
+              const { file_size_bytes: _file_size_bytes, ...v22Stamp } = stamp;
+              return v22Stamp as StampRow;
+            });
+          };
+
+          if (Array.isArray(result.data)) {
+            result.data = filterV22Fields(result.data);
+          }
+        }
 
         // Return the normal result
         return ApiResponseUtil.success(result, { routeType: cacheType });
       } else {
         const { id } = ctx.params;
+
+        // Validate stamp ID format before processing
+        const identifierType = getIdentifierType(id);
+        if (identifierType === "invalid") {
+          return ApiResponseUtil.notFound(
+            `Invalid stamp identifier: ${id}. Must be a valid stamp number, transaction hash, or CPID.`,
+            undefined,
+            { routeType: getCacheType(new URL(req.url).pathname, false) },
+          );
+        }
+
         const path = new URL(req.url).pathname;
 
         if (path.includes("/holders")) {
@@ -287,8 +397,33 @@ export const createStampHandler = (
           requestQuery ? requestQuery.includes("search") : false,
         );
 
+        // Check for empty stamp data - handle both array and object cases
         if (!stampData) {
           return ApiResponseUtil.notFound("Stamp not found");
+        }
+
+        // When getStampDetailsById returns empty, it might have:
+        // 1. data as empty array: []
+        // 2. data as empty object: {}
+        // 3. data with stamp: undefined (this is what actually happens for invalid IDs)
+        const hasNoData = !stampData.data ||
+          (Array.isArray(stampData.data) && stampData.data.length === 0) ||
+          (typeof stampData.data === "object" &&
+            !Array.isArray(stampData.data) &&
+            (Object.keys(stampData.data).length === 0 ||
+              stampData.data.stamp === undefined));
+
+        if (hasNoData) {
+          return ApiResponseUtil.notFound("Stamp not found");
+        }
+
+        // Filter fields based on API version for single stamp
+        const apiVersion = (ctx.state.apiVersion as string) || "2.3";
+        if (parseFloat(apiVersion) < 2.3 && stampData.data?.stamp) {
+          // For v2.2, remove file_size_bytes from single stamp response
+          const { file_size_bytes: _file_size_bytes, ...v22Stamp } =
+            stampData.data.stamp;
+          stampData.data.stamp = v22Stamp;
         }
 
         return ApiResponseUtil.success(
@@ -303,8 +438,17 @@ export const createStampHandler = (
       console.error("Error in stamp handler:", error);
       const errorMessage = routeConfig.isIndex
         ? `Error fetching paginated ${routeConfig.type}`
-        : `Error fetching stamp details for ID ${id}`;
-      return ApiResponseUtil.error(errorMessage);
+        : `Error fetching stamp details for ID ${ctx.params.id}`;
+      return ApiResponseUtil.internalError(error, errorMessage);
     }
   },
 });
+
+// Export is already done in function declaration above
+
+// Add default export for Fresh manifest compatibility - dummy handler
+export default function () {
+  return WebResponseUtil.success("OK", {
+    headers: { "Content-Type": "text/plain" },
+  });
+}

@@ -1,8 +1,8 @@
 import { assertEquals, assertExists } from "@std/assert";
 import { handleContentRequest } from "$routes/handlers/sharedContentHandler.ts";
 import { StampController } from "$server/controller/stampController.ts";
-import { API_RESPONSE_VERSION } from "$lib/utils/responseUtil.ts";
-import { RouteType } from "$server/services/cacheService.ts";
+import { API_RESPONSE_VERSION } from "$lib/utils/api/responses/responseUtil.ts";
+import { RouteType } from "$server/services/infrastructure/cacheService.ts";
 
 const BASE_URL = "http://localhost:8000";
 const TEST_TX_HASH =

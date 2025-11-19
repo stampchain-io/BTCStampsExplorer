@@ -1,0 +1,267 @@
+{
+  "collections": [
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "collection_name": "KEVIN",
+      "collection_description": null
+    },
+    {
+      "collection_id": "01FB16E3BD5B32AC00892FCAF9023BFD",
+      "collection_name": "stampedninja",
+      "collection_description": null
+    },
+    {
+      "collection_id": "021C0CAD6986A081440A8AACEE166BB1",
+      "collection_name": "INFINITY SEED",
+      "collection_description": "Unleash a universe of visual splendor with INFINITY SEED, where each stroke and hue is a response to your input. In this interactive art series, your chosen seed—a number or a phrase—blooms into a digital tapestry of algorithmic beauty. Every creation is "
+    },
+    {
+      "collection_id": "029CA44721915C4D1D216430D65D457D",
+      "collection_name": "the_pixel_karens",
+      "collection_description": null
+    },
+    {
+      "collection_id": "03B298DB2DE2F73787F81699D87CE224",
+      "collection_name": "homerstamps",
+      "collection_description": null
+    },
+    {
+      "collection_id": "0E5C5B38871676B986F5C444558DC74F",
+      "collection_name": "fleper_rare_stamps",
+      "collection_description": null
+    },
+    {
+      "collection_id": "17B611B335F37C790EF5E6CE35770E3B",
+      "collection_name": "socks_finearts",
+      "collection_description": null
+    },
+    {
+      "collection_id": "1A5976D0A56DA9AD3C22BFC7AA61641C",
+      "collection_name": "warrior-stamps",
+      "collection_description": null
+    },
+    {
+      "collection_id": "1E4339FEE0A5ADF6003F37917F750F4D",
+      "collection_name": "rarestamps",
+      "collection_description": null
+    },
+    {
+      "collection_id": "2531AF5D3A023148764800FAA6CC883F",
+      "collection_name": "STAMPEPES",
+      "collection_description": "STAMPEPES SRC721 is the first 10K collection in Stamp  using SRC721 token standard"
+    }
+  ],
+  "collectionCreators": [
+    {
+      "collection_id": "021C0CAD6986A081440A8AACEE166BB1",
+      "creator_address": "bc1q2uh80zl320nsfs57dc5umkf95rcf0s9ppnlyuj"
+    },
+    {
+      "collection_id": "2531AF5D3A023148764800FAA6CC883F",
+      "creator_address": "bc1qm4fpjqnae723g7naq66846xw8nwgry6zmj5550"
+    }
+  ],
+  "collectionStamps": [
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 4258
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 4262
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 4265
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 4269
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 4283
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 4287
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 4303
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 4307
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 5096
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 5097
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 5104
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 5105
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 5112
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 16494
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 16495
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 16496
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 16497
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 16498
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 16499
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 16508
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 16509
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 16510
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 16511
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 16512
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 16513
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 17721
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 17722
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 18315
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 18317
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 18319
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 18321
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 18322
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 18323
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 18324
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 18325
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 18326
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 18327
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 18328
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 18329
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 18330
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 18332
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 18333
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 18335
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 18336
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 18338
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 18339
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 18340
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 18341
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 18342
+    },
+    {
+      "collection_id": "015F0478516E4273DD90FE59C766DD98",
+      "stamp": 18343
+    }
+  ],
+  "generatedAt": "2025-07-02T06:20:37.697Z"
+}

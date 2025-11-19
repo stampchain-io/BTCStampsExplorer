@@ -1,9 +1,9 @@
 import { Handlers } from "$fresh/server.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
+import { WebResponseUtil } from "$lib/utils/api/responses/webResponseUtil.ts";
 import { BlockController } from "$server/controller/blockController.ts";
-import { BlockHandlerContext } from "$globals";
-import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 
-export const sharedBlockWithStampsHandler: Handlers<BlockHandlerContext> = {
+const sharedBlockWithStampsHandler: Handlers = {
   async GET(_req, ctx) {
     const { block_index } = ctx.params;
     const type = ctx.url.pathname.includes("/stamps/") ? "stamps" : "cursed";
@@ -23,3 +23,12 @@ export const sharedBlockWithStampsHandler: Handlers<BlockHandlerContext> = {
     }
   },
 };
+
+export const handler = sharedBlockWithStampsHandler;
+
+// Add default export for Fresh manifest compatibility - dummy handler
+export default function () {
+  return WebResponseUtil.success("OK", {
+    headers: { "Content-Type": "text/plain" },
+  });
+}

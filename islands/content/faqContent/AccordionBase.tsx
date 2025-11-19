@@ -1,8 +1,8 @@
 /* ===== ACCORDION BASE COMPONENT ===== */
-import { JSX } from "preact";
-import { signal } from "@preact/signals";
 import { Icon } from "$icon";
 import { text } from "$text";
+import { signal } from "@preact/signals";
+import { JSX } from "preact";
 
 /* ===== STATE  ===== */
 // Create a shared signal outside the component
@@ -22,18 +22,18 @@ export const Accordion = (
 
   /* ===== RENDER ===== */
   return (
-    <div className="w-full">
+    <div class="w-full">
       {/* Accordion Header */}
       <div
-        className="flex justify-between items-center cursor-pointer group"
+        class="flex justify-between items-center cursor-pointer group"
         onClick={toggleAccordion}
       >
-        {/* Title with Gradient Styling - cant use headingGreyLDLink styling (gray-gradient1-hover) because of the group hover effect */}
+        {/* Title with Gradient Styling - cant use headingGreyLDLink styling (color-grey-gradientDL-hover) because of the group hover effect */}
         <h2
-          className={`font-bold text-xl tracking-wide gray-gradient1-hover group-hover:[background:none_!important] group-hover:[-webkit-text-fill-color:#CCCCCC_!important] group-hover:[text-fill-color:#CCCCCC_!important] transition-colors duration-500
+          class={`font-bold text-xl tracking-wide color-grey-gradientLD-hover group-hover:[background:none_!important] group-hover:[-webkit-text-fill-color:var(--color-grey-semilight)_!important] group-hover:[text-fill-color:var(--color-grey-semilight)_!important] transition-colors duration-200
             ${
             isOpen
-              ? "[background:none_!important] [-webkit-text-fill-color:#CCCCCC_!important] [text-fill-color:#CCCCCC_!important] "
+              ? "[background:none_!important] [-webkit-text-fill-color:var(--color-grey-semilight)_!important] [text-fill-color:var(--color-grey-semilight)_!important] "
               : ""
           }`}
         >
@@ -42,10 +42,10 @@ export const Accordion = (
 
         {/* Toggle Icon */}
         <span
-          className={`transition-transform duration-300 ${
+          class={`transition-transform duration-400 ${
             isOpen
-              ? "stroke-stamp-grey-light rotate-45"
-              : "stroke-stamp-grey-darker group-hover:stroke-stamp-grey-light transition-colors duration-100 rotate-0"
+              ? "stroke-color-grey-light rotate-45"
+              : "stroke-color-grey-semidark group-hover:stroke-color-grey-light transition-colors duration-400 rotate-0"
           }`}
         >
           <Icon
@@ -54,18 +54,19 @@ export const Accordion = (
             weight="bold"
             size="xsR"
             color="custom"
+            className="-mt-[3px]"
           />
         </span>
       </div>
 
       {/* Accordion Content with Animation */}
       <div
-        className={` ${
+        class={` ${
           isOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-10"
         } mt-3 overflow-hidden transition-all duration-500`}
       >
         <div
-          className={`${text} [&>div>ul]:list-disc [&>div>ul]:list-inside [&>div>ul]:mb-6 [&>div>ul]:flex [&>div>ul]:flex-col [&>div>ul]:gap-1.5 mb-6`}
+          class={`${text} [&>div>ul]:list-disc [&>div>ul]:list-inside [&>div>ul]:mb-6 [&>div>ul]:flex [&>div>ul]:flex-col [&>div>ul]:gap-1.5 mb-6`}
         >
           {children}
         </div>

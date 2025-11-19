@@ -1,8 +1,8 @@
 import { Handlers } from "$fresh/server.ts";
 import { BTCPriceService } from "$server/services/price/btcPriceService.ts";
-import { InternalRouteGuard } from "$server/services/security/internalRouteGuard.ts";
-import { RouteType } from "$server/services/cacheService.ts";
-import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import { InternalApiFrontendGuard } from "$server/services/security/internalApiFrontendGuard.ts";
+import { RouteType } from "$server/services/infrastructure/cacheService.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 
 // Use an atomic counter for round-robin
 let requestCounter = 0;
@@ -19,7 +19,9 @@ export const handler: Handlers = {
     console.log(`[${requestId}] BTC price request started from ${url.origin}`);
 
     try {
-      const originError = await InternalRouteGuard.requireTrustedOrigin(req);
+      const originError = await InternalApiFrontendGuard.requireInternalAccess(
+        req,
+      );
       if (originError) {
         console.warn(
           `[${requestId}] Origin validation failed for ${url.origin}`,

@@ -1,14 +1,15 @@
 import { Handlers } from "$fresh/server.ts";
+import type { AddressHandlerContext } from "$types/base.d.ts";
 import { Src101Controller } from "$server/controller/src101Controller.ts";
-import { AddressHandlerContext } from "$globals";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
+import { RouteType } from "$server/services/infrastructure/cacheService.ts";
+import { getPaginationParams } from "$lib/utils/data/pagination/paginationUtils.ts";
 import {
   checkEmptyResult,
   DEFAULT_PAGINATION,
   validateRequiredParams,
   validateSortParam,
-} from "$server/services/routeValidationService.ts";
+} from "$server/services/validation/routeValidationService.ts";
 
 export const handler: Handlers<AddressHandlerContext> = {
   async GET(req, ctx) {
@@ -41,7 +42,7 @@ export const handler: Handlers<AddressHandlerContext> = {
         address,
         limit: limit || DEFAULT_PAGINATION.limit,
         page: page || DEFAULT_PAGINATION.page,
-        sort: sortValidation.data,
+        sort: sortValidation.data || "ASC",
       };
 
       const result = await Src101Controller.handleSrc101BalanceRequest(
@@ -54,13 +55,13 @@ export const handler: Handlers<AddressHandlerContext> = {
         return emptyCheck;
       }
 
-      return ResponseUtil.success(result);
+      return ApiResponseUtil.success(result, { routeType: RouteType.BALANCE });
     } catch (error) {
       console.error(
         "Error in [deploy_hash]/address/[address_btc] handler:",
         error,
       );
-      return ResponseUtil.internalError(
+      return ApiResponseUtil.internalError(
         error,
         "Error processing src101 tokenids request",
       );

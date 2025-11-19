@@ -1,19 +1,11 @@
-/*@baba-rename to ModalBase */
-import { useEffect, useRef, useState } from "preact/hooks";
+import { CloseIcon } from "$icon";
+import { closeModal } from "$islands/modal/states.ts";
+import { glassmorphismOverlay, shadow } from "$layout";
 import { logger } from "$lib/utils/logger.ts";
 import { tooltipIcon } from "$notification";
-import { closeModal } from "$islands/modal/states.ts";
-import { titlePurpleLD } from "$text";
-import { CloseIcon } from "$icon";
-
-interface ModalBaseProps {
-  onClose?: () => void;
-  title: string;
-  children: preact.ComponentChildren;
-  className?: string;
-  contentClassName?: string;
-  hideHeader?: boolean;
-}
+import { titleGreyLD } from "$text";
+import type { ModalBaseProps } from "$types/ui.d.ts";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 export function ModalBase({
   onClose,
@@ -90,11 +82,12 @@ export function ModalBase({
   }, []);
 
   return (
-    <div
+    <div /* similar to glassmorphism design on the drawers - importing the class consts doesn't display properly */
       className={`
-        relative w-[340px] mobileLg:w-[360px] 
-        p-6 rounded-lg dark-gradient-modal
-        ${className}
+        relative w-[340px] min-[420px]:w-[360px] mobileMd:w-[380px] p-5
+        ${glassmorphismOverlay} rounded-3xl
+        border border-color-border/50
+        ${shadow} ${className}
       `}
       onClick={(e) => e.stopPropagation()}
     >
@@ -109,7 +102,7 @@ export function ModalBase({
               <CloseIcon
                 size="sm"
                 weight="bold"
-                color="purpleGradient"
+                color="greyLight"
                 onClick={() => handleClose()}
               />
               <div
@@ -122,7 +115,7 @@ export function ModalBase({
             </div>
 
             <div class="w-full text-center">
-              <h2 class={`${titlePurpleLD} pt-6 pb-9`}>
+              <h2 class={`${titleGreyLD} pb-6`}>
                 {title}
               </h2>
             </div>

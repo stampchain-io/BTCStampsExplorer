@@ -1,44 +1,64 @@
 /* ===== ROOT APP LAYOUT ROUTE ===== */
-import { type PageProps } from "$fresh/server.ts";
-import { Partial } from "$fresh/runtime.ts";
-import { Head } from "$fresh/runtime.ts";
-import { ToastProvider } from "$islands/Toast/ToastProvider.tsx";
 import { MetaTags } from "$components/layout/MetaTags.tsx";
-import { Footer, NavigatorProvider } from "$layout";
+import { ResourceHints } from "$components/layout/PerformanceUtils.tsx";
+import { Head, Partial } from "$fresh/runtime.ts";
+import { type PageProps } from "$fresh/server.ts";
 import { Header } from "$header";
+import AnimationControlsManager from "$islands/layout/AnimationControlsManager.tsx";
+import BackgroundTopology from "$islands/layout/BackgroundTopology.tsx";
 import FontLoader from "$islands/layout/FontLoader.tsx";
 import ModalProvider from "$islands/layout/ModalProvider.tsx";
 import PageVisibilityManager from "$islands/layout/PageVisibilityManager.tsx";
-import AnimationControlsManager from "$islands/layout/AnimationControlsManager.tsx";
+import { NotificationUpdate } from "$islands/Toast/NotificationUpdate.tsx";
+import { ToastProvider } from "$islands/Toast/ToastProvider.tsx";
+import { Footer, NavigatorProvider } from "$layout";
 
 /* ===== ROOT COMPONENT ===== */
-export default function App({ Component, state }: PageProps<unknown>) {
+export default function App({ Component, state, url }: PageProps<unknown>) {
   /* ===== LAYOUT BYPASS CHECK ===== */
   if (state?.skipAppLayout) {
     return <Component />;
   }
 
+  // Check if this is a stamp page that will have its own og:image
+  const isStampPage = url.pathname.startsWith("/stamp/");
+
   /* ===== RENDER ===== */
   return (
-    <html lang="en">
+    <html
+      lang="en"
+      data-page-type={isStampPage ? "stamp" : "other"}
+      data-pathname={url.pathname}
+    >
       {/* ===== HEAD SECTION ===== */}
       <Head>
         {/* ===== META TAGS ===== */}
-        <MetaTags />
+        <MetaTags
+          skipImage={isStampPage}
+          skipTitle={isStampPage}
+          skipDescription={isStampPage}
+          skipOgMeta={isStampPage}
+        />
 
-        {/* ===== RESOURCE PRELOADING ===== */}
+        {/* ===== ENHANCED RESOURCE PRELOADING ===== */}
+        <ResourceHints />
+
+        {/* ===== VANTA.JS DEPENDENCIES ===== */}
         <link
           rel="preconnect"
-          href="https://esm.sh"
+          href="https://cdn.jsdelivr.net"
           crossOrigin="anonymous"
-          as="script"
         />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js">
+        </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js">
+        </script>
+        <script src="/background-topology.js">
+        </script>
 
         {/* ===== CRITICAL CSS ===== */}
         <link rel="preload" href="/styles.css" as="style" />
         <link rel="stylesheet" href="/styles.css" />
-        <link rel="preload" href="/gradients.css" as="style" />
-        <link rel="stylesheet" href="/gradients.css" />
         <link rel="preload" href="/modal.css" as="style" />
         <link rel="stylesheet" href="/modal.css" />
         <link rel="preload" href="/slick.css" as="style" />
@@ -53,14 +73,14 @@ export default function App({ Component, state }: PageProps<unknown>) {
             .text-fill-transparent {
               -webkit-text-fill-color: transparent;
             }
-            
+
             /* Critical text styles */
             .home-header-text {
               text-rendering: optimizeLegibility;
               -webkit-font-smoothing: antialiased;
               -moz-osx-font-smoothing: grayscale;
             }
-            
+
             /* Mobile menu is handled with CSS classes in the component */
           `}
         </style>
@@ -87,20 +107,13 @@ export default function App({ Component, state }: PageProps<unknown>) {
         <style>
           {`
             .loading-skeleton {
-              background: linear-gradient(
-                110deg,
-                #14001f 30%,
-                #1b0029 40%,
-                #220033 50%,
-                #1b0029 60%,
-                #14001f 70%                
-              );
-              background-size: 200% 100%;
-              animation: shimmer 1.5s infinite linear;
+              background: rgba(23, 20, 23, 0.5);
+              border: 1px solid rgba(29, 25, 29, 0.8);
+              animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
             }
 
             /* ===== COMPREHENSIVE ANIMATION PERFORMANCE CONTROLS ===== */
-            
+
             /* Loading skeleton controls */
             .loading-skeleton.paused {
               animation-play-state: paused;
@@ -118,21 +131,22 @@ export default function App({ Component, state }: PageProps<unknown>) {
             /* Stop animations when loading is complete */
             .loading-skeleton.completed {
               animation: none;
-              background: #14001f; /* Static background color */
+              background: rgba(23, 20, 23, 0.5);
+              border: 1px solid rgba(29, 25, 29, 0.8);
             }
-            
+
             /* Global animation controls based on page visibility */
             .page-hidden * {
               animation-play-state: paused !important;
             }
-            
+
             .page-hidden .animate-pulse,
             .page-hidden .animate-spin,
             .page-hidden .animate-bounce,
             .page-hidden .animate-ping {
               animation-play-state: paused !important;
             }
-            
+
             /* Reduced motion support (accessibility) */
             .reduced-motion *,
             .reduced-motion *::before,
@@ -142,52 +156,31 @@ export default function App({ Component, state }: PageProps<unknown>) {
               transition-duration: 0.01ms !important;
               scroll-behavior: auto !important;
             }
-            
-            /* Performance-based animation controls */
-            .performance-low * {
-              animation-duration: 0.1s !important;
-              transition-duration: 0.1s !important;
-            }
-            
-            .performance-low .animate-pulse,
-            .performance-low .animate-spin {
-              animation: none !important;
-            }
-            
-            .performance-medium * {
-              animation-duration: 0.3s !important;
-              transition-duration: 0.3s !important;
-            }
-            
+
+            /* Performance-based animation controls removed */
+
             /* Intersection observer based controls */
             .animation-paused {
               animation-play-state: paused !important;
             }
-            
+
             .animation-running {
               animation-play-state: running !important;
             }
-            
+
             /* Specific component animation controls */
             .page-hidden .swiper-slide,
             .page-hidden .carousel-slider {
               animation-play-state: paused !important;
             }
-            
+
             .page-hidden .modal-content {
               animation-play-state: paused !important;
             }
-            
-            /* Transition optimizations for low performance */
-            .performance-low .transition-all {
-              transition: none !important;
-            }
-            
-            .performance-low .hover\\:scale-105:hover {
-              transform: none !important;
-            }
 
-            /* Match StampCard grid layout */
+            /* Transition optimizations for low performance removed */
+
+            /* Match StampCard grid layout - doesnt apply to StampCardRows */
             .stamp-grid-skeleton {
               display: grid;
               grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -197,7 +190,7 @@ export default function App({ Component, state }: PageProps<unknown>) {
 
             .stamp-card-skeleton {
               aspect-ratio: 1;
-              border-radius: 0.5rem;
+              border-radius: 1rem; /* rounded-2xl */
             }
 
             /* Match SRC20Section layout */
@@ -206,9 +199,13 @@ export default function App({ Component, state }: PageProps<unknown>) {
               margin: 1rem 0;
             }
 
-            @keyframes shimmer {
-              to {
-                background-position: -200% 0;
+            /* ===== KEYFRAMES ===== */
+            @keyframes pulse {
+              0%, 100% {
+                opacity: 1;
+              }
+              50% {
+                opacity: 0.5;
               }
             }
 
@@ -234,21 +231,14 @@ export default function App({ Component, state }: PageProps<unknown>) {
 
       {/* ===== BODY SECTION ===== */}
       <body class="!relative min-h-screen overflow-x-hidden overflow-hidden">
-        {/* ===== BACKGROUND LAYERS ===== */}
-        {state?.route !== "/"
-          ? <div class="bgGradientTop contain-layout" />
-          : (
-            <>
-              <div class="bgGradientTop contain-layout block" />
-            </>
-          )}
-        <div class="bgGradientBottom contain-layout" />
-        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-stamp-dark-DEFAULT/50 to-transparent z-[1] contain-paint" />
+        {/* ===== BACKGROUND ANIMATION===== */}
+        <BackgroundTopology />
 
         {/* ===== MAIN CONTENT WRAPPER ===== */}
         <div class="flex flex-col min-h-screen font-work-sans relative z-[2]">
           {/* ===== PROVIDERS ===== */}
           <ToastProvider>
+            <NotificationUpdate />
             <NavigatorProvider>
               <div class="flex flex-col min-h-screen">
                 {/* ===== LAYOUT STRUCTURE ===== */}

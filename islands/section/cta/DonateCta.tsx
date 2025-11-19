@@ -1,22 +1,28 @@
 /* ===== DONATE CTA COMPONENT ===== */
-import { useEffect, useRef, useState } from "preact/hooks";
+import { Button } from "$button";
 import { StampCard } from "$card";
-import { StampRow } from "$globals";
-import RecieveAddyModal from "$islands/modal/RecieveAddyModal.tsx";
+import { Icon } from "$icon";
 import DonateStampModal from "$islands/modal/DonateStampModal.tsx";
-import { DonateStampData, Transaction, TxOutput } from "$layout";
+import RecieveAddyModal from "$islands/modal/RecieveAddyModal.tsx";
+import { openModal } from "$islands/modal/states.ts";
+import {
+  containerBackground,
+  DonateStampData,
+  Transaction,
+  TxOutput,
+} from "$layout";
+import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
+import { tooltipIcon } from "$notification";
 import {
   headingGrey,
   labelSm,
   subtitlePurple,
   text,
+  textLg,
   titlePurpleLD,
 } from "$text";
-import { tooltipIcon } from "$notification";
-import { Button } from "$button";
-import { Icon } from "$icon";
-import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
-import { openModal } from "$islands/modal/states.ts";
+import type { StampRow } from "$types/stamp.d.ts";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== CONSTANTS ===== */
 const DONATE_ADDRESS = "bc1qe5sz3mt4a3e57n8e39pprval4qe0xdrkzew203";
@@ -24,7 +30,8 @@ const DONATE_ADDRESS = "bc1qe5sz3mt4a3e57n8e39pprval4qe0xdrkzew203";
 const DONATE_STAMP: DonateStampData = {
   stamp: "-398",
   stamp_mimetype: "png",
-  stamp_url: "6df1763d2df70b21f5fb52c9a47347c7466dfdf8a87d1430f640d363f0efa37a",
+  stamp_url:
+    "https://stampchain.io/stamps/6df1763d2df70b21f5fb52c9a47347c7466dfdf8a87d1430f640d363f0efa37a.png",
   tx_hash: "6df1763d2df70b21f5fb52c9a47347c7466dfdf8a87d1430f640d363f0efa37a",
 };
 
@@ -275,7 +282,7 @@ export default function DonateCta() {
         dispenser={dispenser}
       />
     );
-    openModal(modalContent, "scaleUpDown");
+    openModal(modalContent, "slideUpDown");
   };
 
   const handleOpenReceiveModal = () => {
@@ -285,13 +292,13 @@ export default function DonateCta() {
         title="DONATE"
       />
     );
-    openModal(modalContent, "scaleUpDown");
+    openModal(modalContent, "slideUpDown");
   };
 
   /* ===== SUBCOMPONENTS ===== */
   const DonateStampCard = ({ onClick }: { onClick: () => void }) => (
-    <div className="flex flex-col gap-5 items-center">
-      <div className="w-[134px] mobileLg:w-[174px] tablet:w-[204px]">
+    <div class="flex flex-col gap-5 items-center">
+      <div class="w-[134px] mobileLg:w-[174px] tablet:w-[204px]">
         <StampCard
           stamp={DONATE_STAMP as unknown as StampRow}
           showDetails={false}
@@ -299,9 +306,9 @@ export default function DonateCta() {
         />
       </div>
       <Button
-        variant="outline"
+        variant="flat"
         color="purple"
-        size="md"
+        size="mdR"
         onClick={onClick}
       >
         DONATE
@@ -312,62 +319,61 @@ export default function DonateCta() {
   /* ===== COMPONENT ===== */
   return (
     <>
-      <section>
+      <section class={containerBackground}>
         {/* ===== HEADER SECTION ===== */}
-        <div className="w-full flex flex-col justify-center items-start">
-          <h3 className={titlePurpleLD}>DONATE</h3>
-          <h4 className={subtitlePurple}>TO THE DEV FUND</h4>
+        <div class="w-full flex flex-col justify-center items-start">
+          <h3 class={titlePurpleLD}>DONATE</h3>
+          <h4 class={subtitlePurple}>TO THE DEV FUND</h4>
         </div>
         {/* ===== MAIN CONTENT SECTION ===== */}
-        <p className={`${text} tablet:hidden block mb-0`}>
+        <p class={`${textLg} tablet:hidden block mb-0`}>
           Support the ongoing development of Bitcoin Stamps and contribute to
           the monthly running costs of the backend infrastructure, to help
           ensure the stamping machine keeps running.
         </p>
-        <div className="grid grid-cols-12">
-          <div className="col-span-12 mobileMd:col-span-8">
-            <p className={`${text} tablet:block hidden`}>
+        <div class="grid grid-cols-12">
+          <div class="col-span-12 mobileMd:col-span-8">
+            <p class={`${textLg} tablet:block hidden`}>
               Support the ongoing development of Bitcoin Stamps and contribute
               to the monthly running costs of the backend infrastructure, to
               help ensure the stamping machine keeps running.
             </p>
-            <div className="grid grid-cols-12 mt-6 mb-6">
-              <div className="col-span-6 flex flex-col justify-center items-center">
-                <h6 className={`${labelSm} mb-0`}>
+            <div class="grid grid-cols-12 mt-6 mb-6">
+              <div class="col-span-6 flex flex-col justify-center items-center">
+                <h6 class={`${labelSm} mb-0`}>
                   MONTHLY EXPENSES
                 </h6>
-                <h6 className={headingGrey}>
-                  2,500 <span className="font-extralight">USD</span>
+                <h6 class={headingGrey}>
+                  2,500 <span class="font-extralight">USD</span>
                 </h6>
               </div>
-              <div className="col-span-6 flex flex-col justify-center items-center">
-                <h6 className={labelSm}>
-                  <span className="hidden min-[420px]:inline">
+              <div class="col-span-6 flex flex-col justify-center items-center">
+                <h6 class={labelSm}>
+                  <span class="hidden min-[420px]:inline">
                     {currentMonth}
                   </span>{" "}
                   DONATIONS
                 </h6>
-                <h6 className={headingGrey}>
-                  {monthlyDonations}{" "}
-                  <span className="font-extralight">USD</span>
+                <h6 class={headingGrey}>
+                  {monthlyDonations} <span class="font-extralight">USD</span>
                 </h6>
               </div>
             </div>
-            <p className={text}>
+            <p class={text}>
               Use the Donate button and you'll receive some OG USDSTAMPs as
               thanks for your support.
             </p>
 
             {/* ===== MOBILE STAMP CARD SECTION ===== */}
-            <div className="my-6 mobileMd:hidden">
+            <div class="my-6 mobileMd:hidden">
               <DonateStampCard onClick={handleOpen} />
             </div>
-            <p className={text}>
+            <p class={text}>
               Or you may send BTC, SRC-20 Tokens or Art Stamps directly to the
               dev wallet.
             </p>
 
-            <div className="flex justify-start gap-6 items-center mt-3">
+            <div class="flex justify-start gap-6 items-center mt-3">
               <div
                 ref={receiveButtonRef}
                 class="relative group order-1 tablet:order-2"
@@ -379,7 +385,7 @@ export default function DonateCta() {
                   name="donate"
                   weight="normal"
                   size="sm"
-                  color="purple"
+                  color="purpleLight"
                   onClick={() => {
                     setIsReceiveTooltipVisible(false);
                     handleOpenReceiveModal();
@@ -397,13 +403,13 @@ export default function DonateCta() {
               {/* Address Text - second on mobile, first on tablet+ */}
               <a
                 href={`/wallet/${DONATE_ADDRESS}`}
-                class="font-medium text-base text-stamp-purple hover:text-stamp-purple-bright transition-colors duration-300 order-2 tablet:order-1"
+                class="font-medium text-base text-color-purple-semilight hover:text-color-purple-light transition-colors duration-200 order-2 tablet:order-1"
               >
-                <span className="hidden tablet:block">{DONATE_ADDRESS}</span>
-                <span className="hidden mobileMd:block tablet:hidden">
+                <span class="hidden tablet:block">{DONATE_ADDRESS}</span>
+                <span class="hidden mobileMd:block tablet:hidden">
                   {abbreviateAddress(DONATE_ADDRESS, 8)}
                 </span>
-                <span className="block mobileMd:hidden">
+                <span class="block mobileMd:hidden">
                   {abbreviateAddress(DONATE_ADDRESS, 11)}
                 </span>
               </a>
@@ -411,7 +417,7 @@ export default function DonateCta() {
           </div>
 
           {/* ===== DESKTOP/TABLET STAMP CARD SECTION ===== */}
-          <div className="hidden mobileMd:flex mobileMd:col-span-4 justify-center">
+          <div class="hidden mobileMd:flex mobileMd:col-span-4 justify-center">
             <DonateStampCard onClick={handleOpen} />
           </div>
         </div>

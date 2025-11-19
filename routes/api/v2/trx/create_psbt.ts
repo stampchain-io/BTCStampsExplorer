@@ -1,37 +1,28 @@
 import { Handlers } from "$fresh/server.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import { TransactionService } from "$server/services/transaction/index.ts";
-
-interface CreatePSBTInput {
-  utxo: string;
-  salePrice: number;
-  sellerAddress: string;
-}
-
-interface CreatePSBTResponse {
-  psbt: string;
-}
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
+import { logger } from "$lib/utils/logger.ts";
+import {
+  createBitcoinTransactionBuilder,
+} from "$server/services/transaction/index.ts";
+import type { CreatePSBTInput, CreatePSBTResponse } from "$types/api.d.ts";
 
 export const handler: Handlers = {
   async POST(req: Request) {
     try {
-      // Log the raw request body
+      // Parse the request body
       const rawBody = await req.text();
-      console.log("Raw request body:", rawBody);
-
-      // Parse the JSON
       const input: CreatePSBTInput = JSON.parse(rawBody);
 
       const { utxo, salePrice, sellerAddress } = input;
 
       // Validate inputs
       if (!utxo || !salePrice || !sellerAddress) {
-        return ResponseUtil.badRequest("Missing parameters");
+        return ApiResponseUtil.badRequest("Missing parameters");
       }
 
       // Additional validation can be added here
       if (isNaN(salePrice) || salePrice <= 0) {
-        return ResponseUtil.badRequest("Invalid salePrice value");
+        return ApiResponseUtil.badRequest("Invalid salePrice value");
       }
 
       // const isOwner = await validateUTXOOwnership(utxo, sellerAddress);
@@ -41,34 +32,40 @@ export const handler: Handlers = {
       //     400,
       //   );
       // }
-      // Log the inputs
-      console.log("Creating PSBT with inputs:", {
-        utxo,
-        salePrice,
-        sellerAddress,
-      });
+      // Create PSBT with validated inputs
 
       // Create PSBT
-      const psbtHex = await TransactionService.PSBTService.createPSBT(
-        utxo,
-        salePrice,
-        sellerAddress,
-      );
-      const response: CreatePSBTResponse = { psbt: psbtHex };
+      const builder = createBitcoinTransactionBuilder();
+      const psbtHex = await builder
+        .createPSBT(
+          utxo,
+          salePrice,
+          sellerAddress,
+        );
 
-      return new Response(
-        JSON.stringify(response),
-        { headers: { "Content-Type": "application/json" } },
-      );
+      // TODO(@BitcoinStamps): Get actual values from PSBT analysis
+      const response: CreatePSBTResponse = {
+        psbt: psbtHex,
+        fee: 0, // Placeholder - should be calculated from PSBT
+        inputCount: 1, // Placeholder - should be derived from PSBT
+        outputCount: 2, // Placeholder - should be derived from PSBT
+        estimatedSize: 250, // Placeholder - should be calculated from PSBT
+      };
+
+      return ApiResponseUtil.success(response);
     } catch (error) {
-      console.error(
-        "Error processing request in /api/v2/trx/create_psbt:",
-        error,
-      );
       if (error instanceof SyntaxError) {
-        return ResponseUtil.badRequest("Invalid JSON in request body");
+        logger.error("api", {
+          message: "Invalid JSON in create PSBT request",
+          error: error.message,
+        });
+        return ApiResponseUtil.badRequest("Invalid JSON in request body");
       }
-      return ResponseUtil.internalError(error, "Internal Server Error");
+      logger.error("api", {
+        message: "Error creating PSBT",
+        error: error instanceof Error ? error.message : String(error),
+      });
+      return ApiResponseUtil.internalError(error, "Failed to create PSBT");
     }
   },
 };

@@ -6,9 +6,11 @@ export interface IPrepareSRC101TX {
   // fromAddress: string;
   sourceAddress: string;
   changeAddress: string;
-  recAddress: string;
+  recAddress?: string;
   feeRate: number;
   transferString: string;
+  recVault?: number;
+  enableRBF?: boolean;
 }
 
 export interface IMintSRC101 extends Omit<IPrepareSRC101TX, "transferString"> {
@@ -20,6 +22,7 @@ export interface IMintSRC101 extends Omit<IPrepareSRC101TX, "transferString"> {
   coef: string;
   sig: string;
   img: string[] | null;
+  recVault?: number;
 }
 
 export interface IDeploySRC101 extends Omit<IPrepareSRC101TX, "transferString"> {
@@ -29,13 +32,14 @@ export interface IDeploySRC101 extends Omit<IPrepareSRC101TX, "transferString"> 
   owner: string;
   rec: string[];
   tick: string;
-  pri: JSON;
+  pri: Record<string, any>;
   desc: string;
   mintstart: string;
   mintend: string;
   wla: string;
   imglp: string;
   imgf: string;
+  idua?: string;
   description?: string;
 }
 
@@ -51,7 +55,7 @@ export interface ISetrecordSRC101
   hash: string;
   tokenid: string;
   type: string;
-  data: JSON;
+  data: Record<string, any>;
   prim: string;
 }
 

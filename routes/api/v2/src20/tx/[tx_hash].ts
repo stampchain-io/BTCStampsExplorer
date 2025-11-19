@@ -1,57 +1,37 @@
+import type { SRC20TrxRequestParams } from "$types/api.d.ts";
 import { Handlers } from "$fresh/server.ts";
-import { Src20Controller } from "$server/controller/src20Controller.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import {
-  checkEmptyResult,
-  validateRequiredParams,
-  validateSortParam,
-} from "$server/services/routeValidationService.ts";
-import { SRC20TrxRequestParams } from "$globals";
+import { ApiResponseUtil } from "$utils/api/responses/apiResponseUtil.ts";
+import { SRC20Service } from "$server/services/src20/index.ts";
 
 export const handler: Handlers = {
-  async GET(req, ctx) {
+  async GET(_req, ctx) {
+    const { tx_hash } = ctx.params;
+    // Transaction hash uniquely identifies a transaction - no pagination or sorting needed
+    const params: SRC20TrxRequestParams = {
+      tx_hash,
+      singleResult: true, // Always return single result for transaction endpoint
+    };
+
     try {
-      const { tx_hash } = ctx.params;
-
-      // Validate required parameters
-      const paramsValidation = validateRequiredParams({ tx_hash });
-      if (!paramsValidation.isValid) {
-        return paramsValidation.error!;
-      }
-
-      const url = new URL(req.url);
-
-      // Validate sort parameter
-      const sortValidation = validateSortParam(url);
-      if (!sortValidation.isValid) {
-        return sortValidation.error!;
-      }
-
-      const params: SRC20TrxRequestParams = {
-        tx_hash,
-        sortBy: sortValidation.data,
-        noPagination: true,
-        singleResult: true,
-      };
-
-      const result = await Src20Controller.handleSrc20TransactionsRequest(
-        req,
+      const result = await SRC20Service.QueryService.fetchBasicSrc20Data(
         params,
       );
 
-      // Check for empty result
-      const emptyCheck = checkEmptyResult(result, "transaction data");
-      if (emptyCheck) {
-        return emptyCheck;
+      // Check if result is empty (no transaction found)
+      // For single transactions, we expect data to be an object, not an array or null
+      if (
+        !result.data ||
+        result.data === null ||
+        (Array.isArray(result.data) && result.data.length === 0)
+      ) {
+        return ApiResponseUtil.notFound(
+          `Transaction not found: ${tx_hash}`,
+        );
       }
 
-      return ResponseUtil.success(result);
+      return ApiResponseUtil.success(result);
     } catch (error) {
-      console.error("Error in GET handler:", error);
-      return ResponseUtil.internalError(
-        error,
-        "Error processing SRC20 tx request",
-      );
+      return ApiResponseUtil.internalError(error, "Error processing request");
     }
   },
 };

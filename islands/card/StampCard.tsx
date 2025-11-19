@@ -1,22 +1,24 @@
 /* ===== STAMP CARD COMPONENT ===== */
 /* @baba-update audio icon size (custom) - 247*/
 /*@baba-check styles+icon*/
-import { useEffect, useRef, useState } from "preact/hooks";
-import { VNode } from "preact";
-import { StampRow } from "$globals";
-import { Icon, LoadingIcon } from "$icon";
+import { Icon, LoadingIcon, PlaceholderImage } from "$icon";
 import StampTextContent from "$islands/content/stampDetailContent/StampTextContent.tsx";
-
-import { stripTrailingZeros } from "$lib/utils/formatUtils.ts";
-import { formatSupplyValue } from "$lib/utils/formatUtils.ts";
-import { getStampImageSrc } from "$lib/utils/imageUtils.ts";
-import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 import {
-  AUDIO_FILE_IMAGE,
-  LIBRARY_FILE_IMAGE,
-  NOT_AVAILABLE_IMAGE,
-} from "$lib/utils/constants.ts";
-import { TEXT_STYLES } from "$card";
+  glassmorphism,
+  glassmorphismL2,
+  shadowGlowPurple,
+  transitionColors,
+} from "$layout";
+import {
+  abbreviateAddress,
+  formatSupplyValue,
+  stripTrailingZeros,
+} from "$lib/utils/ui/formatting/formatUtils.ts";
+import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
+import type { StampRow } from "$types/stamp.d.ts";
+import { VNode } from "preact";
+import { useEffect, useRef, useState } from "preact/hooks";
+import { TEXT_STYLES } from "./styles.ts";
 
 /* ===== TYPES ===== */
 interface StampWithSaleData extends Omit<StampRow, "stamp_base64"> {
@@ -36,7 +38,6 @@ export function StampCard({
   showEdition = false,
   showMinDetails = false,
   variant = "default",
-  fromPage,
 }: {
   stamp: StampWithSaleData;
   isRecentSale?: boolean;
@@ -44,11 +45,10 @@ export function StampCard({
   showEdition?: boolean;
   showMinDetails?: boolean;
   variant?: "default" | "grey";
-  fromPage?: string;
 }) {
   /* ===== STATE ===== */
   const [loading, setLoading] = useState<boolean>(true);
-  const [src, setSrc] = useState<string>("");
+  const [src, setSrc] = useState<string | undefined>(undefined);
   const [validatedContent, setValidatedContent] = useState<VNode | null>(null);
 
   // Audio-related state (always declared to avoid conditional hooks)
@@ -64,7 +64,9 @@ export function StampCard({
   /* ===== HANDLERS ===== */
   const handleImageError = (e: Event) => {
     if (e.currentTarget instanceof HTMLImageElement) {
-      e.currentTarget.src = NOT_AVAILABLE_IMAGE;
+      // Set src to empty string to trigger placeholder image rendering
+      e.currentTarget.src = "";
+      e.currentTarget.alt = "Content not available";
     }
   };
 
@@ -77,12 +79,10 @@ export function StampCard({
     return 6;
   };
 
-  const fetchStampImage = async () => {
+  const fetchStampImage = () => {
     setLoading(true);
-    const res = await getStampImageSrc(stamp as StampRow);
-    if (res) {
-      setSrc(res);
-    } else setSrc(NOT_AVAILABLE_IMAGE);
+    const res = getStampImageSrc(stamp as StampRow);
+    setSrc(res);
     setLoading(false);
   };
 
@@ -105,12 +105,18 @@ export function StampCard({
 
           const svgContent = await response.text();
 
-          // Check if SVG has external ordinals.com references
-          if (svgContent.includes("ordinals.com/content/")) {
+          // Check if SVG has external ordinals.com or arweave.net references
+          if (
+            svgContent.includes("ordinals.com/content/") ||
+            svgContent.includes("arweave.net/")
+          ) {
             // Rewrite external references to use our proxy
             let rewrittenSVG = svgContent.replace(
               /https:\/\/ordinals\.com\/content\/([^"'\s>]+)/g,
               "/api/proxy/ordinals/$1",
+            ).replace(
+              /https:\/\/arweave\.net\/([^"'\s>]+)/g,
+              "/api/proxy/arweave/$1",
             );
 
             // Ensure SVG fills container by removing fixed dimensions and adding proper styling
@@ -143,7 +149,7 @@ export function StampCard({
               <div class="stamp-container">
                 <div class="relative z-10 aspect-square flex items-center justify-center">
                   <div
-                    class="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
+                    class="max-w-none object-contain rounded-2xl pixelart stamp-image h-full w-full"
                     dangerouslySetInnerHTML={{ __html: rewrittenSVG }}
                   />
                 </div>
@@ -158,7 +164,7 @@ export function StampCard({
                     src={src}
                     loading="lazy"
                     alt={`Stamp No. ${stamp.stamp}`}
-                    class="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
+                    class="max-w-none object-contain rounded-2xl pixelart stamp-image h-full w-full"
                     onError={handleImageError}
                   />
                 </div>
@@ -166,15 +172,11 @@ export function StampCard({
             );
           }
         } catch (_error) {
-          // Fallback to NOT_AVAILABLE_IMAGE
+          // Error placeholder image
           setValidatedContent(
             <div class="stamp-container">
               <div class="relative z-10 aspect-square">
-                <img
-                  src={NOT_AVAILABLE_IMAGE}
-                  alt="Invalid SVG"
-                  class="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
-                />
+                <PlaceholderImage variant="error" />
               </div>
             </div>,
           );
@@ -190,7 +192,7 @@ export function StampCard({
   const renderContent = () => {
     if (loading && !src) {
       return (
-        <div className="stamp-container">
+        <div class="stamp-container">
           <LoadingIcon />
         </div>
       );
@@ -215,13 +217,8 @@ export function StampCard({
       return (
         <div class="stamp-audio-container relative w-full h-full flex items-center justify-center">
           <div class="absolute inset-0 flex items-center justify-center">
-            {/* Fallback image for audio files */}
-            <img
-              src={AUDIO_FILE_IMAGE}
-              alt="Audio File"
-              class="absolute top-0 left-0 w-full h-full object-contain rounded pixelart stamp-image pointer-events-none select-none"
-              draggable={false}
-            />
+            {/* Audio placeholder image */}
+            <PlaceholderImage variant="audio" />
             <audio
               ref={audioRef}
               class="hidden"
@@ -236,16 +233,16 @@ export function StampCard({
                 e.preventDefault();
                 togglePlayback();
               }}
-              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 w-[40px] tablet:w-[34px] aspect-square flex items-center justify-center group/button"
+              class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 w-[40px] tablet:w-[34px] aspect-square flex items-center justify-center group/button"
             >
-              <div className="absolute inset-0 bg-black opacity-50 rounded-full" />
+              <div class="absolute inset-0 bg-black opacity-50 rounded-full" />
               <Icon
                 name={isPlaying ? "pause" : "play"}
                 type="iconButton"
                 weight="bold"
                 size="xsR"
                 color="custom"
-                className="relative z-10 fill-stamp-grey group-hover/button:fill-stamp-purple-bright"
+                className="relative z-10 [&_path]:fill-color-grey-dark [&_path]:group-hover/button:fill-color-purple-light transition-all duration-200"
               />
             </button>
           </div>
@@ -269,7 +266,7 @@ export function StampCard({
               loading="lazy"
               sandbox="allow-scripts allow-same-origin"
               src={src}
-              class="absolute top-0 left-0 w-full h-full object-contain pointer-events-none"
+              class="absolute top-0 left-0 w-full h-full rounded-2xl object-contain pointer-events-none"
               onError={(e) => {
                 console.error("iframe error (detailed):", {
                   error: e,
@@ -293,12 +290,7 @@ export function StampCard({
       return (
         <div class="stamp-container relative">
           <div class="relative z-10 aspect-square">
-            <img
-              src={LIBRARY_FILE_IMAGE}
-              alt="Library File"
-              class="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
-              loading="lazy"
-            />
+            <PlaceholderImage variant="library" />
           </div>
         </div>
       );
@@ -308,11 +300,7 @@ export function StampCard({
       return validatedContent || (
         <div class="stamp-container">
           <div class="relative z-10 aspect-square">
-            <img
-              src={NOT_AVAILABLE_IMAGE}
-              alt="Loading..."
-              class="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
-            />
+            <PlaceholderImage variant="no-image" />
           </div>
         </div>
       );
@@ -326,7 +314,7 @@ export function StampCard({
             src={src}
             loading="lazy"
             alt={`Stamp No. ${stamp.stamp}`}
-            class="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
+            class="max-w-none object-contain rounded-2xl pixelart stamp-image h-full w-full"
             onError={handleImageError}
           />
         </div>
@@ -340,25 +328,43 @@ export function StampCard({
         text: `${
           stripTrailingZeros(stamp.sale_data.btc_amount.toFixed(8))
         } BTC`,
-        style: TEXT_STYLES.price,
+        style: `${TEXT_STYLES.price.base} ${TEXT_STYLES.price.sizes}`,
       };
     }
 
-    // Handle floor price or recent sale price
-    const price = stamp.floorPrice !== "priceless"
+    // v2.3 API: Use marketData pricing (preferred) - safe access with optional chaining
+    const marketData = (stamp as any).marketData;
+    if (marketData) {
+      // Priority: floorPriceBTC > recentSalePriceBTC (specific business logic for StampCard)
+      const marketPrice = marketData.floorPriceBTC !== null &&
+          marketData.floorPriceBTC > 0
+        ? marketData.floorPriceBTC
+        : marketData.recentSalePriceBTC;
+
+      if (marketPrice !== null && marketPrice > 0) {
+        return {
+          text: `${stripTrailingZeros(Number(marketPrice).toFixed(8))} BTC`,
+          style: `${TEXT_STYLES.price.base} ${TEXT_STYLES.price.sizes}`,
+        };
+      }
+    }
+
+    // Legacy fallback for v2.2 or older data structures
+    // @deprecated - Remove once all data migrated to v2.3 marketData structure
+    const legacyPrice = stamp.floorPrice !== "priceless"
       ? stamp.floorPrice
       : stamp.recentSalePrice;
-    if (price !== "priceless" && !isNaN(Number(price))) {
+    if (legacyPrice !== "priceless" && !isNaN(Number(legacyPrice))) {
       return {
-        text: `${stripTrailingZeros(Number(price).toFixed(8))} BTC`,
-        style: TEXT_STYLES.price,
+        text: `${stripTrailingZeros(Number(legacyPrice).toFixed(8))} BTC`,
+        style: `${TEXT_STYLES.price.base} ${TEXT_STYLES.price.sizes}`,
       };
     }
 
     // Default to mime type if no valid price
     return {
-      text: stamp.stamp_mimetype?.split("/")[1].toUpperCase() || "UNKNOWN",
-      style: TEXT_STYLES.mimeType,
+      text: stamp.stamp_mimetype?.split("/")[1]?.toUpperCase() || "UNKNOWN",
+      style: `${TEXT_STYLES.mimeType.base} ${TEXT_STYLES.mimeType.sizes}`,
     };
   };
 
@@ -366,7 +372,9 @@ export function StampCard({
   const shouldDisplayHash = Number(stamp.stamp ?? 0) >= 0 ||
     (stamp.cpid && stamp.cpid.charAt(0) === "A");
 
-  const supplyDisplay = stamp.ident !== "SRC-20" && stamp.balance
+  const supplyDisplay = isRecentSale
+    ? `Qty: ${stamp.supply || 1}` // For recent sales, show transaction quantity
+    : stamp.ident !== "SRC-20" && stamp.balance
     ? `${formatSupplyValue(Number(stamp.balance), stamp.divisible)}/${
       stamp.supply < 100000 && !stamp.divisible
         ? formatSupplyValue(stamp.supply ?? 0, stamp.divisible)
@@ -393,15 +401,11 @@ export function StampCard({
   /* ===== STYLE HELPERS ===== */
   const getTextStyles = (type: "hashSymbol" | "stampNumber") => {
     if (variant === "grey") {
-      return {
-        base: TEXT_STYLES.greyGradient[type].base,
-        sizes: TEXT_STYLES.greyGradient[type].sizes,
-      };
+      return `${TEXT_STYLES.greyGradient[type].base} ${
+        TEXT_STYLES.greyGradient[type].sizes
+      }`;
     }
-    return {
-      base: TEXT_STYLES[type].base,
-      sizes: TEXT_STYLES[type].sizes,
-    };
+    return `${TEXT_STYLES[type].base} ${TEXT_STYLES[type].sizes}`;
   };
 
   const isLongNumber = (value: string | number) => {
@@ -420,24 +424,14 @@ export function StampCard({
         class={`
           text-white group relative z-0 flex flex-col
           p-stamp-card mobileLg:p-3
-          rounded-md transition-all
           w-full h-full
-          hover:border-stamp-purple-bright hover:shadow-stamp hover:border-solid border-2 border-transparent
-          bg-stamp-card-bg
+          hover:border-color-purple-light ${shadowGlowPurple}
+          ${glassmorphism} ${transitionColors}
         `}
       >
         {/* ===== ATOM ICON ===== */}
-        {fromPage && fromPage === "stamp" && (
-          <div className="absolute top-0 right-0 w-[31px] h-[31px] z-10 rounded-[3px] bg-[#1F002E] p-[3px] desktop:block hidden">
-            <Icon
-              type="icon"
-              name="atom"
-              weight="normal"
-              size="xs"
-              color="grey"
-            />
-          </div>
-        )}
+        {/* Note: Atomic icon is only shown on WalletStampCard for stamps with UTXO attachments */}
+        {/* Regular StampCard does not show atomic icon as it lacks wallet-specific UTXO data */}
 
         {/* ===== CONTENT SECTION ===== */}
         <div class="relative w-full h-full">
@@ -448,22 +442,18 @@ export function StampCard({
 
         {/* ===== DETAILS SECTION ===== */}
         {showDetails && !showMinDetails && (
-          <div class="flex flex-col items-center px-[6px] pt-[18px] pb-0">
+          <div class="flex flex-col items-center px-[6px] pt-5 pb-0">
             {/* Stamp Number with container */}
             <div class="flex items-center justify-center max-w-[90%]">
               {shouldDisplayHash && (
                 <span
-                  class={`${getTextStyles("hashSymbol").base} ${
-                    getTextStyles("hashSymbol").sizes
-                  }`}
+                  class={getTextStyles("hashSymbol")}
                 >
                   #
                 </span>
               )}
               <span
-                class={`${getTextStyles("stampNumber").base} ${
-                  getTextStyles("stampNumber").sizes
-                }`}
+                class={getTextStyles("stampNumber")}
               >
                 {stampValue}
               </span>
@@ -471,23 +461,24 @@ export function StampCard({
 
             {/* Creator Name or Abbreviated Address */}
             <div
-              class={`${TEXT_STYLES.creator.base} ${TEXT_STYLES.creator.sizes} mt-[3px]`}
+              class={`${TEXT_STYLES.creator.base} ${TEXT_STYLES.creator.sizes} mt-1`}
             >
               {creatorDisplay}
             </div>
 
             {/* Price and Supply */}
-            <div class="flex justify-between w-full mt-[6px]">
-              {/* Render Price on the Left */}
-              <div class="flex-1 text-left -mt-[2px] mobileLg:-mt-[0px] desktop:mt-[3px]">
+            <div class="flex justify-between items-center mt-4 w-full">
+              {/* Price on the Left */}
+              <div class={`text-left ${glassmorphismL2} px-3 py-1`}>
                 <span
-                  class={`${renderPrice().style.base} ${renderPrice().style.sizes}`}
+                  class={renderPrice().style}
                 >
                   {renderPrice().text}
                 </span>
               </div>
+              {/* Supply/Editions on the Right */}
               <div
-                class={`${TEXT_STYLES.supply.base} ${TEXT_STYLES.supply.sizes} flex-1 text-right`}
+                class={`${TEXT_STYLES.supply.base} ${TEXT_STYLES.supply.sizes} text-right ${glassmorphismL2} px-3 py-1`}
               >
                 {supplyDisplay}
               </div>

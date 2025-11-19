@@ -1,49 +1,12 @@
-import { useEffect, useState } from "preact/hooks";
-import { walletContext } from "$client/wallet/wallet.ts";
-import axiod from "axiod";
 import { useConfig } from "$client/hooks/useConfig.ts";
+import { walletContext } from "$client/wallet/wallet.ts";
 import { useFees } from "$fees";
-import { Config } from "$globals";
+import type { Config } from "$types/base.d.ts";
+import { debounce } from "$lib/utils/performance/debounce.ts";
 import { logger } from "$lib/utils/logger.ts";
-
-interface PSBTFees {
-  estMinerFee: number;
-  totalDustValue: number;
-  hasExactFees: boolean;
-  totalValue: number;
-  est_tx_size: number;
-  hex?: string;
-  inputsToSign?: Array<
-    { index: number; address?: string; sighashTypes?: number[] }
-  >;
-}
-
-interface SRC101FormState {
-  toAddress: string;
-  token: string;
-  amt: string;
-  fee: number;
-  feeError: string;
-  BTCPrice: number;
-  jsonSize: number;
-  apiError: string;
-  toAddressError: string;
-  tokenError: string;
-  amtError: string;
-  max: string;
-  maxError: string;
-  lim: string;
-  limError: string;
-  dec: string;
-  x: string;
-  tg: string;
-  web: string;
-  email: string;
-  file: File | null;
-  psbtFees?: PSBTFees;
-  maxAmount?: string;
-  root: string;
-}
+import axiod from "axiod";
+import { useEffect, useState } from "preact/hooks";
+import type { SRC101FormState } from "$types/ui.d.ts";
 
 export function useSRC101Form(
   action: string,
@@ -66,7 +29,7 @@ export function useSRC101Form(
     toAddress: "",
     token: initialToken || "",
     amt: "",
-    fee: 0,
+    fee: 10, // Initialize with a safe default fee (10 sat/vB)
     feeError: "",
     BTCPrice: 0,
     jsonSize: 0,
@@ -85,12 +48,17 @@ export function useSRC101Form(
     email: "",
     file: null as File | null,
     psbtFees: {
-      estMinerFee: 0,
+      minerFee: 0,
+      estMinerFee: 0, // backward compatibility
       totalDustValue: 0,
+      totalFee: 0,
+      totalValue: 0, // required by FeeDetails
       hasExactFees: false,
-      totalValue: 0,
+      feeRate: 10,
+      effectiveFeeRate: 10, // backward compatibility
       est_tx_size: 0,
     },
+    isLoading: false,
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -103,12 +71,156 @@ export function useSRC101Form(
 
   const { wallet } = walletContext;
 
+  // Progressive fee estimation for SRC101
+  const estimateSRC101FeesDebounced = debounce(async (
+    formData: Partial<SRC101FormState>,
+    walletAddress?: string,
+  ) => {
+    if (!formData.token || !formData.fee || formData.fee <= 0) return;
+
+    try {
+      // Phase 1: Immediate client-side fee estimation
+      // SRC101 transactions typically have ~300 bytes
+      // 1. Main output (dust to recipient ~546 sats)
+      // 2. OP_RETURN output (0 sats for data)
+      // 3. Change output (variable, back to sender)
+
+      // Simple fee estimation: ~300 bytes for SRC101 transaction
+      const estimatedTxSize = 300;
+      const immediateEstimate = Math.ceil(estimatedTxSize * formData.fee);
+      const dustValue = 546; // Standard SRC101 dust amount
+      const totalEstimate = immediateEstimate + dustValue;
+
+      // Set immediate estimates with hasExactFees: false
+      setFormState((prev) => ({
+        ...prev,
+        psbtFees: {
+          minerFee: immediateEstimate,
+          estMinerFee: immediateEstimate, // backward compatibility
+          totalDustValue: dustValue,
+          totalFee: totalEstimate,
+          totalValue: totalEstimate, // required by FeeDetails
+          hasExactFees: false, // Mark as estimate
+          feeRate: formData.fee || 10,
+          effectiveFeeRate: formData.fee || 10, // backward compatibility
+          est_tx_size: estimatedTxSize,
+        },
+        isLoading: true, // Show that we're upgrading to exact fees
+      }));
+
+      logger.debug("ui", {
+        message: "SRC101 immediate fee estimate",
+        data: {
+          action,
+          fee: formData.fee,
+          immediateEstimate,
+          dustValue,
+          totalEstimate,
+          isEstimate: true,
+        },
+      });
+
+      // Phase 2: Upgrade to exact fees via API with dryRun
+      if (!config) return; // Need config for API call
+
+      const shouldUseDryRun = !walletAddress; // Use dryRun if no wallet connected
+
+      const response = await axiod.post("/api/v2/src101/create", {
+        sourceAddress: walletAddress || "bc1qtest", // Dummy address for dryRun
+        toAddress: formData.toAddress || walletAddress || "bc1qtest",
+        op: action,
+        root: formData.root || ".btc",
+        feeRate: formData.fee,
+        trxType,
+        dryRun: shouldUseDryRun, // Dynamic based on wallet state
+        ...(action === "deploy" && {
+          max: formData.max || "1000",
+          lim: formData.lim || "100",
+          dec: formData.dec || "18",
+        }),
+        ...(["mint", "transfer"].includes(action) && {
+          amt: formData.amt || "1",
+        }),
+      });
+
+      if (response.data) {
+        logger.debug("ui", {
+          message: "SRC101 API fee response",
+          data: {
+            action,
+            shouldUseDryRun,
+            hasExactFees: !shouldUseDryRun,
+            response: response.data,
+          },
+        });
+
+        setFormState((prev) => ({
+          ...prev,
+          psbtFees: {
+            minerFee: Number(response.data.est_miner_fee) ||
+              Number(response.data.estimatedFee) || 0,
+            estMinerFee: Number(response.data.est_miner_fee) ||
+              Number(response.data.estimatedFee) || 0, // backward compatibility
+            totalDustValue: Number(response.data.total_dust_value) || 546,
+            totalFee: (Number(response.data.est_miner_fee) || 0) +
+              (Number(response.data.total_dust_value) || 546),
+            totalValue: (Number(response.data.est_miner_fee) || 0) +
+              (Number(response.data.total_dust_value) || 546), // required by FeeDetails
+            hasExactFees: !shouldUseDryRun, // Exact fees when dryRun=false, estimates when dryRun=true
+            feeRate: formData.fee || 10,
+            effectiveFeeRate: formData.fee || 10, // backward compatibility
+            est_tx_size: Number(response.data.est_tx_size) || 0,
+            hex: response.data.hex,
+            inputsToSign: response.data.inputsToSign,
+          },
+          isLoading: false, // Clear loading state after exact fees are loaded
+        }));
+      }
+    } catch (error) {
+      logger.error("ui", {
+        message: "Failed to estimate SRC101 fees",
+        error: error instanceof Error ? error.message : String(error),
+      });
+
+      // On error, preserve estimates and clear loading state
+      setFormState((prev) => ({
+        ...prev,
+        isLoading: false,
+      }));
+    }
+  }, 750);
+
   useEffect(() => {
     if (fees) {
       const recommendedFee = Math.round(fees.recommendedFee);
-      setFormState((prev) => ({ ...prev, fee: recommendedFee }));
+      // Only update fee if the recommended fee is valid (>= 1 sat/vB)
+      if (recommendedFee >= 1) {
+        setFormState((prev) => ({ ...prev, fee: recommendedFee }));
+      }
     }
   }, [fees]);
+
+  // Trigger progressive fee estimation when form values change
+  useEffect(() => {
+    if (formState.token && formState.fee > 0) {
+      estimateSRC101FeesDebounced(formState, wallet?.address);
+    }
+
+    return () => {
+      estimateSRC101FeesDebounced.cancel();
+    };
+  }, [
+    formState.token,
+    formState.amt,
+    formState.toAddress,
+    formState.fee,
+    formState.max,
+    formState.lim,
+    formState.dec,
+    wallet?.address,
+    config,
+    estimateSRC101FeesDebounced,
+  ]);
 
   useEffect(() => {
     const fetchPrice = async () => {
@@ -133,8 +245,10 @@ export function useSRC101Form(
     fetchPrice();
   }, []);
 
-  const handleInputChange = (e: Event, field: string) => {
-    const value = (e.target as HTMLInputElement).value;
+  const handleInputChange = (e: Event | string, field: string) => {
+    const value = typeof e === "string"
+      ? e
+      : (e.target as HTMLInputElement).value;
     let newValue = value;
 
     if (["lim", "max"].includes(field)) {
@@ -235,84 +349,78 @@ export function useSRC101Form(
         },
       });
 
-      // Use the stored PSBT if available
-      if (formState.psbtFees?.hex && formState.psbtFees?.inputsToSign) {
-        const walletResult = await walletContext.signPSBT(
-          wallet,
-          formState.psbtFees.hex,
-          formState.psbtFees.inputsToSign,
-          true,
-        );
+      // For submission, we always need the actual PSBT (dryRun: false)
+      const response = await axiod.post("/api/v2/src101/create", {
+        sourceAddress: wallet?.address,
+        changeAddress: wallet?.address,
+        recAddress: wallet?.address,
+        toAddress: formState.toAddress || wallet?.address,
+        op: action,
+        root: formState.root || ".btc",
+        feeRate: formState.fee,
+        trxType,
+        dryRun: false, // Always false for actual submission
+        ...(action === "deploy" && {
+          max: formState.max || "1000",
+          lim: formState.lim || "100",
+          dec: formState.dec || "18",
+          ...(formState.x && { x: formState.x }),
+          ...(formState.tg && { tg: formState.tg }),
+          ...(formState.web && { web: formState.web }),
+          ...(formState.email && { email: formState.email }),
+        }),
+        ...(["mint", "transfer"].includes(action) && {
+          amt: formState.amt || "1",
+        }),
+        // Legacy fields for compatibility
+        hash:
+          "77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed",
+        tokenid: [btoa(formState.toAddress || "test")],
+        dua: "999",
+        prim: "true",
+        coef: "1000",
+        sig: "",
+        img: [
+          `https://img.bitname.pro/img/${formState.toAddress || "test"}.png`,
+        ],
+      });
 
-        if (walletResult.signed) {
-          setSubmissionMessage({
-            message: "Transaction broadcasted successfully.",
-            txid: walletResult.txid,
-          });
-        } else if (walletResult.cancelled) {
-          setSubmissionMessage({
-            message: "Transaction signing cancelled by user.",
-          });
-        } else {
-          setSubmissionMessage({
-            message: `Transaction signing failed: ${walletResult.error}`,
-          });
-        }
+      logger.debug("stamps", {
+        message: `${action} response received`,
+        data: response.data,
+      });
 
-        return walletResult;
-      } else {
-        // Create new PSBT only if we don't have one
-        const response = await axiod.post("/api/v2/src101/create", {
-          sourceAddress: wallet?.address,
-          changeAddress: wallet?.address,
-          recAddress: wallet?.address,
-          op: action,
-          hash:
-            "77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed",
-          toaddress: action === "transfer"
-            ? formState.toAddress
-            : wallet?.address,
-          tokenid: [btoa(formState.toAddress)],
-          dua: "999",
-          prim: "true",
-          coef: "1000",
-          sig: "",
-          img: [`https://img.bitname.pro/img/${formState.toAddress}.png`],
-          feeRate: formState.fee,
-        });
-
-        // Log the PSBT response
-        logger.debug("stamps", {
-          message: "Transaction PSBT created",
-          data: {
-            estimatedSize: response.data.est_tx_size,
-            minerFee: response.data.est_miner_fee,
-            totalValue: response.data.input_value,
-            changeValue: response.data.change_value,
+      // Update psbtFees with exact values from submission
+      if (response.data) {
+        setFormState((prev) => ({
+          ...prev,
+          psbtFees: {
+            minerFee: Number(response.data.est_miner_fee) ||
+              Number(response.data.estimatedFee) || 0,
+            estMinerFee: Number(response.data.est_miner_fee) ||
+              Number(response.data.estimatedFee) || 0, // backward compatibility
+            totalDustValue: Number(response.data.total_dust_value) || 546,
+            totalFee: (Number(response.data.est_miner_fee) || 0) +
+              (Number(response.data.total_dust_value) || 546),
+            totalValue: (Number(response.data.est_miner_fee) || 0) +
+              (Number(response.data.total_dust_value) || 546), // required by FeeDetails
+            hasExactFees: true, // Always exact for submission
+            feeRate: formState.fee,
+            effectiveFeeRate: formState.fee, // backward compatibility
+            est_tx_size: Number(response.data.est_tx_size) || 0,
+            hex: response.data.hex,
+            inputsToSign: response.data.inputsToSign,
           },
-        });
+        }));
+      }
 
-        if (!response.data?.hex) {
-          throw new Error("No transaction hex received from server");
-        }
-
-        logger.debug("ui", {
-          message: "Preparing to sign PSBT",
-          hexLength: response.data.hex.length,
-          inputsToSignCount: response.data.inputsToSign?.length,
-        });
-
+      if (response.data?.hex && response.data?.inputsToSign) {
         const walletResult = await walletContext.signPSBT(
           wallet,
           response.data.hex,
-          response.data.inputsToSign || [],
+          response.data.inputsToSign,
           true,
         );
-
-        logger.debug("ui", {
-          message: "Wallet signing completed",
-          result: walletResult,
-        });
 
         if (walletResult.signed) {
           setSubmissionMessage({
@@ -349,7 +457,9 @@ export function useSRC101Form(
   };
 
   const handleChangeFee = (newFee: number) => {
-    setFormState((prev) => ({ ...prev, fee: newFee }));
+    // Ensure fee is never below the minimum required (1 sat/vB)
+    const validatedFee = Math.max(newFee, 1);
+    setFormState((prev) => ({ ...prev, fee: validatedFee }));
   };
 
   return {

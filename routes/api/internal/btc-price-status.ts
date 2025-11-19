@@ -1,12 +1,12 @@
 import { Handlers } from "$fresh/server.ts";
 import { BTCPriceService } from "$server/services/price/btcPriceService.ts";
-import { InternalRouteGuard } from "$server/services/security/internalRouteGuard.ts";
-import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import { InternalApiFrontendGuard } from "$server/services/security/internalApiFrontendGuard.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 
 export const handler: Handlers = {
-  async GET(req) {
+  GET(req) {
     try {
-      const originError = await InternalRouteGuard.requireTrustedOrigin(req);
+      const originError = InternalApiFrontendGuard.requireInternalAccess(req);
       if (originError) return originError;
 
       const cacheInfo = BTCPriceService.getCacheInfo();
@@ -28,7 +28,7 @@ export const handler: Handlers = {
 
   async POST(req) {
     try {
-      const originError = await InternalRouteGuard.requireTrustedOrigin(req);
+      const originError = InternalApiFrontendGuard.requireInternalAccess(req);
       if (originError) return originError;
 
       const url = new URL(req.url);

@@ -1,10 +1,14 @@
 import { Handlers } from "$fresh/server.ts";
 import { StampController } from "$server/controller/stampController.ts";
-import { CAROUSEL_STAMP_IDS } from "$lib/utils/constants.ts";
+import { CAROUSEL_STAMP_IDS } from "$constants";
+import { InternalApiFrontendGuard } from "$server/services/security/internalApiFrontendGuard.ts";
 
 export const handler: Handlers = {
-  async GET(_req, _ctx) {
+  async GET(req, _ctx) {
     try {
+      // Security check for internal endpoints
+      const originError = InternalApiFrontendGuard.requireInternalAccess(req);
+      if (originError) return originError;
       const stamps = await StampController.getStamps({
         identifier: CAROUSEL_STAMP_IDS,
         allColumns: false,

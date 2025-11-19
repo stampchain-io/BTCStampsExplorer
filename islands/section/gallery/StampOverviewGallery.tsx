@@ -1,33 +1,23 @@
 /* ===== STAMP OVERVIEW GALLERY COMPONENT ===== */
-import {
-  Collection,
-  CollectionGalleryProps,
-  StampGalleryProps,
-  StampRow,
-} from "$globals";
-
+import { containerBackground, containerGap } from "$layout";
 import { StampGallery } from "$section";
-import { titlePurpleDL } from "$text";
-
-/* ===== TYPES ===== */
-interface StampOverviewGalleryProps {
-  stamps_art?: StampRow[];
-  stamps_posh?: StampRow[];
-  stamps_src721?: StampRow[];
-  collectionData?: Collection[];
-}
+import { titleGreyLD } from "$text";
+import type {
+  StampGalleryProps,
+  StampOverviewGalleryProps,
+} from "$types/stamp.d.ts";
 
 /* ===== COMPONENT ===== */
 export function StampOverviewGallery({
   stamps_src721 = [],
   stamps_art = [],
   stamps_posh = [],
-  collectionData = [],
+  collectionData: _collectionData = [],
 }: StampOverviewGalleryProps) {
   /* ===== SECTION CONFIGURATIONS ===== */
   const LatestArtStampsSection: StampGalleryProps[] = [
     {
-      subTitle: "ON-CHAIN MARVELS",
+      subTitle: "CLASSIC",
       type: "classic",
       stamps: stamps_art,
       fromPage: "home",
@@ -50,25 +40,8 @@ export function StampOverviewGallery({
     },
   ];
 
-  const _FeaturedArtistsSection: CollectionGalleryProps = {
-    title: "FEATURED ARTISTS",
-    subTitle: "RECURSIVE COLLECTIONS",
-    collections: collectionData,
-    gridClass: `
-      grid
-      grid-cols-2 tablet:grid-cols-3 gap-3 mobileLg:gap-6
-    `,
-    displayCounts: {
-      mobileSm: 2,
-      mobileLg: 2,
-      tablet: 3,
-      desktop: 3,
-    },
-  };
-
   const CollectionsSection: StampGalleryProps[] = [
     {
-      title: "COLLECTIONS",
       subTitle: "FRESH POSH STAMPS",
       type: "posh",
       stamps: stamps_posh,
@@ -112,57 +85,41 @@ export function StampOverviewGallery({
     },
   ];
 
-  const _CuttingEdgeSection: CollectionGalleryProps = {
-    title: "CUTTING EDGE",
-    subTitle: "RECURSIVE COLLECTIONS",
-    collections: collectionData,
-    gridClass: `
-      grid
-      grid-cols-2 tablet:grid-cols-3 gap-3 mobileLg:gap-6
-    `,
-    displayCounts: {
-      mobileSm: 2,
-      mobileLg: 2,
-      tablet: 3,
-      desktop: 3,
-    },
-  };
-
   /* ===== RENDER ===== */
   return (
-    <div className="
+    <div class="
         flex flex-col max-w-desktop w-full mx-auto
         gap-12 mobileLg:gap-24 desktop:gap-36
       ">
       {/* ===== LATEST ART STAMPS SECTION ===== */}
-      <div className="flex flex-col">
-        <div className="w-full">
-          <h1 className={titlePurpleDL}>
-            <span className="block mobileLg:hidden">LATEST STAMPS</span>
-            <span className="hidden mobileLg:block">LATEST ART STAMPS</span>
+      <div class={`${containerBackground} ${containerGap}`}>
+        <div class="w-full -mb-6 mobileLg:-mb-9">
+          <h1 class={titleGreyLD}>
+            <span class="block mobileLg:hidden">LATEST STAMPS</span>
+            <span class="hidden mobileLg:block">LATEST ART STAMPS</span>
           </h1>
         </div>
-        <div className="flex flex-col gap-3 mobileMd:gap-6">
+        <div class="flex flex-col gap-5">
           {LatestArtStampsSection.map((section, index) => (
             <StampGallery key={index} {...section} />
           ))}
         </div>
-      </div>
 
-      {
-        /* ===== FEATURED ARTISTS SECTION =====
+        {
+          /* ===== FEATURED ARTISTS SECTION =====
       <CollectionGallery {...FeaturedArtistsSection} />*/
-      }
+        }
 
-      {/* ===== COLLECTIONS SECTION ===== */}
-      {CollectionsSection.map((section, index) => (
-        <StampGallery key={index} {...section} />
-      ))}
+        {/* ===== COLLECTIONS SECTION ===== */}
+        {CollectionsSection.map((section, index) => (
+          <StampGallery key={index} {...section} />
+        ))}
 
-      {
-        /* ===== CUTTING EDGE SECTION =====
+        {
+          /* ===== CUTTING EDGE SECTION =====
       <CollectionGallery {...CuttingEdgeSection} />*/
-      }
+        }
+      </div>
     </div>
   );
 }

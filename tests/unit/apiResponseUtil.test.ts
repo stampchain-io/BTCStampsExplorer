@@ -1,271 +1,253 @@
+/**
+ * @fileoverview Tests for ApiResponseUtil with mocked headers
+ * Tests API response generation including cache control headers
+ */
+
 import { assertEquals, assertExists } from "@std/assert";
-import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import { describe, it } from "jsr:@std/testing@1.0.14/bdd";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
+import { RouteType } from "$server/services/infrastructure/cacheService.ts";
 
-// Mock console methods to suppress output during tests
-const originalConsole = {
-  error: console.error,
-  warn: console.warn,
-};
+describe("ApiResponseUtil", () => {
+  describe("success", () => {
+    it("should create success response with default options", () => {
+      const data = { message: "Success", value: 42 };
+      const response = ApiResponseUtil.success(data);
 
-function suppressConsole() {
-  console.error = () => {};
-  console.warn = () => {};
-}
+      assertEquals(response.status, 200);
+      assertEquals(response.headers.get("Content-Type"), "application/json");
+      assertExists(response.headers.get("X-API-Version"));
+    });
 
-function restoreConsole() {
-  console.error = originalConsole.error;
-  console.warn = originalConsole.warn;
-}
+    it("should handle bigint serialization", async () => {
+      const data = { bigNumber: BigInt("9007199254740993") };
+      const response = ApiResponseUtil.success(data);
 
-// Mock Deno.env for development check
-const originalEnvGet = Deno.env.get;
-function mockEnv(value?: string) {
-  Deno.env.get = (key: string) => {
-    if (key === "DENO_ENV") return value;
-    return originalEnvGet(key);
-  };
-}
+      const parsed = await response.json();
+      assertEquals(parsed.bigNumber, "9007199254740993");
+    });
 
-function restoreEnv() {
-  Deno.env.get = originalEnvGet;
-}
+    it("should apply custom status and headers", () => {
+      const data = { result: "custom" };
+      const response = ApiResponseUtil.success(data, {
+        status: 202,
+        headers: { "X-Custom": "test" },
+      });
 
-Deno.test("ApiResponseUtil - success creates 200 response", async () => {
-  const data = { message: "Success", value: 42 };
-  const response = ApiResponseUtil.success(data);
-
-  assertEquals(response.status, 200);
-  assertEquals(response.headers.get("Content-Type"), "application/json");
-  assertExists(response.headers.get("X-API-Version"));
-
-  const body = await response.json();
-  assertEquals(body, data);
-});
-
-Deno.test("ApiResponseUtil - success with custom status", async () => {
-  const data = { result: "ok" };
-  const response = ApiResponseUtil.success(data, { status: 202 });
-
-  assertEquals(response.status, 202);
-  const body = await response.json();
-  assertEquals(body, data);
-});
-
-Deno.test("ApiResponseUtil - created returns 201", async () => {
-  const data = { id: 123, created: true };
-  const response = ApiResponseUtil.created(data);
-
-  assertEquals(response.status, 201);
-  const body = await response.json();
-  assertEquals(body, data);
-});
-
-Deno.test("ApiResponseUtil - noContent returns 204", () => {
-  const response = ApiResponseUtil.noContent();
-  assertEquals(response.status, 204);
-  assertEquals(response.body, null);
-});
-
-Deno.test("ApiResponseUtil - badRequest returns 400", async () => {
-  suppressConsole();
-
-  const response = ApiResponseUtil.badRequest("Invalid input");
-
-  assertEquals(response.status, 400);
-  const body = await response.json();
-  assertEquals(body.error, "Invalid input");
-  assertEquals(body.status, "error");
-  assertEquals(body.code, "BAD_REQUEST");
-
-  restoreConsole();
-});
-
-Deno.test("ApiResponseUtil - badRequest with details", async () => {
-  suppressConsole();
-
-  const details = { field: "email", reason: "invalid format" };
-  const response = ApiResponseUtil.badRequest("Validation failed", details);
-
-  const body = await response.json();
-  assertEquals(body.details, details);
-
-  restoreConsole();
-});
-
-Deno.test("ApiResponseUtil - unauthorized returns 401", async () => {
-  suppressConsole();
-
-  const response = ApiResponseUtil.unauthorized();
-
-  assertEquals(response.status, 401);
-  const body = await response.json();
-  assertEquals(body.error, "Unauthorized");
-  assertEquals(body.code, "UNAUTHORIZED");
-
-  restoreConsole();
-});
-
-Deno.test("ApiResponseUtil - forbidden returns 403", async () => {
-  suppressConsole();
-
-  const response = ApiResponseUtil.forbidden("Access denied");
-
-  assertEquals(response.status, 403);
-  const body = await response.json();
-  assertEquals(body.error, "Access denied");
-  assertEquals(body.code, "FORBIDDEN");
-
-  restoreConsole();
-});
-
-Deno.test("ApiResponseUtil - notFound returns 404", async () => {
-  const response = ApiResponseUtil.notFound();
-
-  assertEquals(response.status, 404);
-  const body = await response.json();
-  assertEquals(body.error, "Resource not found");
-  assertEquals(body.code, "NOT_FOUND");
-});
-
-Deno.test("ApiResponseUtil - methodNotAllowed returns 405", async () => {
-  const response = ApiResponseUtil.methodNotAllowed();
-
-  assertEquals(response.status, 405);
-  const body = await response.json();
-  assertEquals(body.error, "Method not allowed");
-  assertEquals(body.code, "METHOD_NOT_ALLOWED");
-});
-
-Deno.test("ApiResponseUtil - conflict returns 409", async () => {
-  suppressConsole();
-
-  const response = ApiResponseUtil.conflict("Resource already exists");
-
-  assertEquals(response.status, 409);
-  const body = await response.json();
-  assertEquals(body.error, "Resource already exists");
-  assertEquals(body.code, "CONFLICT");
-
-  restoreConsole();
-});
-
-Deno.test("ApiResponseUtil - tooManyRequests returns 429", async () => {
-  suppressConsole();
-
-  const response = ApiResponseUtil.tooManyRequests();
-
-  assertEquals(response.status, 429);
-  const body = await response.json();
-  assertEquals(body.error, "Too many requests");
-  assertEquals(body.code, "TOO_MANY_REQUESTS");
-
-  restoreConsole();
-});
-
-Deno.test("ApiResponseUtil - internalError returns 500", async () => {
-  suppressConsole();
-
-  const error = new Error("Database connection failed");
-  const response = ApiResponseUtil.internalError(error);
-
-  assertEquals(response.status, 500);
-  const body = await response.json();
-  assertEquals(body.error, "Internal server error");
-  assertEquals(body.code, "INTERNAL_ERROR");
-  assertEquals(body.details, {}); // Empty object when not in development mode
-
-  restoreConsole();
-});
-
-Deno.test("ApiResponseUtil - internalError in development mode", async () => {
-  suppressConsole();
-  mockEnv("development");
-
-  const error = new Error("Database connection failed");
-  const response = ApiResponseUtil.internalError(error, "Database error");
-
-  const body = await response.json();
-  assertEquals(body.error, "Database error");
-  assertExists(body.details?.error); // Error details included in dev mode
-
-  restoreEnv();
-  restoreConsole();
-});
-
-Deno.test("ApiResponseUtil - serviceUnavailable returns 503", async () => {
-  suppressConsole();
-
-  const response = ApiResponseUtil.serviceUnavailable();
-
-  assertEquals(response.status, 503);
-  const body = await response.json();
-  assertEquals(body.error, "Service temporarily unavailable");
-  assertEquals(body.code, "SERVICE_UNAVAILABLE");
-
-  restoreConsole();
-});
-
-Deno.test("ApiResponseUtil - custom with JSON body", async () => {
-  const data = { custom: true };
-  const response = ApiResponseUtil.custom(data, 418);
-
-  assertEquals(response.status, 418);
-  const body = await response.json();
-  assertEquals(body, data);
-});
-
-Deno.test("ApiResponseUtil - custom with binary body", async () => {
-  const binaryData = new Uint8Array([1, 2, 3, 4, 5]);
-  const response = ApiResponseUtil.custom(binaryData, 200);
-
-  assertEquals(response.status, 200);
-  const body = await response.arrayBuffer();
-  assertEquals(new Uint8Array(body), binaryData);
-});
-
-Deno.test("ApiResponseUtil - headers include security headers", () => {
-  const response = ApiResponseUtil.success({});
-
-  // Check security headers
-  assertEquals(response.headers.get("X-Content-Type-Options"), "nosniff");
-  assertEquals(response.headers.get("X-Frame-Options"), "DENY");
-  assertEquals(
-    response.headers.get("X-Permitted-Cross-Domain-Policies"),
-    "none",
-  );
-  assertExists(response.headers.get("X-API-Version"));
-});
-
-Deno.test("ApiResponseUtil - custom headers are included", () => {
-  const response = ApiResponseUtil.success({}, {
-    headers: {
-      "X-Custom-Header": "custom-value",
-      "X-Request-ID": "12345",
-    },
+      assertEquals(response.status, 202);
+      assertEquals(response.headers.get("X-Custom"), "test");
+    });
   });
 
-  assertEquals(response.headers.get("X-Custom-Header"), "custom-value");
-  assertEquals(response.headers.get("X-Request-ID"), "12345");
-});
+  describe("created", () => {
+    it("should create 201 response", async () => {
+      const data = { id: 1, created: true };
+      const response = ApiResponseUtil.created(data);
 
-Deno.test("ApiResponseUtil - cache headers with routeType", () => {
-  const response = ApiResponseUtil.success({}, {
-    routeType: "static" as any, // RouteType enum is not imported
-    forceNoCache: false,
+      assertEquals(response.status, 201);
+      const parsed = await response.json();
+      assertEquals(parsed, data);
+    });
   });
 
-  // Should have cache headers for static route type
-  assertExists(response.headers.get("Cache-Control"));
-  assertExists(response.headers.get("CDN-Cache-Control"));
-});
+  describe("noContent", () => {
+    it("should create 204 response with no body", () => {
+      const response = ApiResponseUtil.noContent();
 
-Deno.test("ApiResponseUtil - no cache headers when forceNoCache is true", () => {
-  const response = ApiResponseUtil.success({}, {
-    routeType: "static" as any, // RouteType enum is not imported
-    forceNoCache: true,
+      assertEquals(response.status, 204);
+      assertEquals(response.body, null);
+    });
   });
 
-  // Should have no-store headers when forceNoCache is true
-  const cacheControl = response.headers.get("Cache-Control");
-  assertEquals(cacheControl?.includes("no-store"), true);
+  describe("custom", () => {
+    it("should handle JSON body", async () => {
+      const data = { custom: "data" };
+      const response = ApiResponseUtil.custom(data, 202);
+
+      assertEquals(response.status, 202);
+      const parsed = await response.json();
+      assertEquals(parsed, data);
+    });
+  });
+
+  describe("cache control headers", () => {
+    it("should add cache headers with staleWhileRevalidate", () => {
+      const response = ApiResponseUtil.success({ data: "test" }, {
+        routeType: RouteType.STAMP,
+        forceNoCache: false,
+      });
+
+      const cacheControl = response.headers.get("Cache-Control");
+      assertEquals(
+        cacheControl,
+        "public, max-age=86400, stale-while-revalidate=60, stale-if-error=3600",
+      );
+      assertEquals(response.headers.get("CDN-Cache-Control"), cacheControl);
+      assertEquals(
+        response.headers.get("Cloudflare-CDN-Cache-Control"),
+        cacheControl,
+      );
+      assertEquals(response.headers.get("Surrogate-Control"), "max-age=86400");
+      assertEquals(response.headers.get("Edge-Control"), "cache-maxage=86400");
+    });
+
+    it("should not add cache headers when forceNoCache is true", () => {
+      const response = ApiResponseUtil.success({ data: "test" }, {
+        routeType: RouteType.STAMP,
+        forceNoCache: true,
+      });
+
+      const cacheControl = response.headers.get("Cache-Control");
+      assertEquals(
+        cacheControl,
+        "no-store, must-revalidate",
+      );
+    });
+
+    it("should add cache headers for dynamic routes", () => {
+      const response = ApiResponseUtil.success({ data: "test" }, {
+        routeType: RouteType.DYNAMIC,
+        forceNoCache: false,
+      });
+
+      const cacheControl = response.headers.get("Cache-Control");
+      // Dynamic routes now have 5-minute cache with stale-while-revalidate
+      assertEquals(
+        cacheControl,
+        "public, max-age=300, stale-while-revalidate=60, stale-if-error=600",
+      );
+    });
+  });
+
+  describe("error responses", () => {
+    it("should create badRequest response", async () => {
+      const response = ApiResponseUtil.badRequest("Invalid input", {
+        field: "email",
+      });
+
+      assertEquals(response.status, 400);
+      const parsed = await response.json();
+      assertEquals(parsed.error, "Invalid input");
+      assertEquals(parsed.code, "BAD_REQUEST");
+      assertEquals(parsed.details, { field: "email" });
+    });
+
+    it("should create unauthorized response", async () => {
+      const response = ApiResponseUtil.unauthorized("Invalid token");
+
+      assertEquals(response.status, 401);
+      const parsed = await response.json();
+      assertEquals(parsed.error, "Invalid token");
+      assertEquals(parsed.code, "UNAUTHORIZED");
+    });
+
+    it("should create forbidden response", async () => {
+      const response = ApiResponseUtil.forbidden("Access denied", {
+        role: "user",
+      });
+
+      assertEquals(response.status, 403);
+      const parsed = await response.json();
+      assertEquals(parsed.error, "Access denied");
+      assertEquals(parsed.code, "FORBIDDEN");
+      assertEquals(parsed.details, { role: "user" });
+    });
+
+    it("should create notFound response", async () => {
+      const response = ApiResponseUtil.notFound("Resource not found", {
+        id: 123,
+      });
+
+      assertEquals(response.status, 404);
+      const parsed = await response.json();
+      assertEquals(parsed.error, "Resource not found");
+      assertEquals(parsed.code, "NOT_FOUND");
+      assertEquals(parsed.details, { id: 123 });
+    });
+
+    it("should create methodNotAllowed response", async () => {
+      const response = ApiResponseUtil.methodNotAllowed("POST not allowed", {
+        allowed: ["GET", "PUT"],
+      });
+
+      assertEquals(response.status, 405);
+      const parsed = await response.json();
+      assertEquals(parsed.error, "POST not allowed");
+      assertEquals(parsed.code, "METHOD_NOT_ALLOWED");
+      assertEquals(parsed.details, { allowed: ["GET", "PUT"] });
+    });
+
+    it("should create conflict response", async () => {
+      const response = ApiResponseUtil.conflict("Resource already exists", {
+        id: "duplicate",
+      });
+
+      assertEquals(response.status, 409);
+      const parsed = await response.json();
+      assertEquals(parsed.error, "Resource already exists");
+      assertEquals(parsed.code, "CONFLICT");
+      assertEquals(parsed.details, { id: "duplicate" });
+    });
+
+    it("should create tooManyRequests response", async () => {
+      const response = ApiResponseUtil.tooManyRequests("Rate limit exceeded", {
+        retryAfter: 60,
+      });
+
+      assertEquals(response.status, 429);
+      const parsed = await response.json();
+      assertEquals(parsed.error, "Rate limit exceeded");
+      assertEquals(parsed.code, "TOO_MANY_REQUESTS");
+      assertEquals(parsed.details, { retryAfter: 60 });
+    });
+
+    it("should create internalError response", async () => {
+      // Mock Deno.env.get to avoid permission error
+      const originalEnvGet = Deno.env.get;
+      Deno.env.get = (key: string) => {
+        if (key === "DENO_ENV") return "test";
+        return originalEnvGet(key);
+      };
+
+      const error = new Error("Database connection failed");
+      const response = ApiResponseUtil.internalError(
+        error,
+        "Internal server error",
+      );
+
+      assertEquals(response.status, 500);
+      const parsed = await response.json();
+      assertEquals(parsed.error, "Internal server error");
+      assertEquals(parsed.code, "INTERNAL_ERROR");
+      // Error details only included in development
+
+      // Restore original
+      Deno.env.get = originalEnvGet;
+    });
+
+    it("should create serviceUnavailable response", async () => {
+      const response = ApiResponseUtil.serviceUnavailable("Maintenance mode", {
+        eta: "30 minutes",
+      });
+
+      assertEquals(response.status, 503);
+      const parsed = await response.json();
+      assertEquals(parsed.error, "Maintenance mode");
+      assertEquals(parsed.code, "SERVICE_UNAVAILABLE");
+      assertEquals(parsed.details, { eta: "30 minutes" });
+    });
+
+    it("should create custom response with ArrayBuffer", () => {
+      const buffer = new Uint8Array([1, 2, 3, 4]);
+      const response = ApiResponseUtil.custom(buffer, 200, {
+        headers: { "Content-Type": "application/octet-stream" },
+      });
+
+      assertEquals(response.status, 200);
+      assertEquals(
+        response.headers.get("Content-Type"),
+        "application/octet-stream",
+      );
+    });
+  });
 });

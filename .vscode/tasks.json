@@ -2,18 +2,159 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "deno: cleanup-ports",
+      "label": "Dev: Standard",
       "type": "shell",
-      "command": "bash",
-      "args": [
-        "-c",
-        "pids=$(lsof -ti:9229,8000 -sTCP:LISTEN -c deno 2>/dev/null) && if [ ! -z \"$pids\" ]; then echo \"Terminating Deno processes: $pids\" && kill -15 $pids && sleep 2 && kill -0 $pids 2>/dev/null || true; fi || true"
-      ],
+      "command": "deno task dev",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
       "presentation": {
-        "reveal": "never",
-        "panel": "shared",
-        "echo": false,
-        "close": true
+        "reveal": "always",
+        "panel": "new"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Dev: Frontend Fast (500ms)",
+      "type": "shell",
+      "command": "deno task dev:frontend",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Dev: Full-Stack Debounced (1500ms)",
+      "type": "shell",
+      "command": "deno task dev:debounced",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Dev: Clean Start",
+      "type": "shell",
+      "command": "deno task dev:clean",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Kill: All Dev Servers",
+      "type": "shell",
+      "command": "deno task kill",
+      "group": "none",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Kill: Safe (Preserve LSP)",
+      "type": "shell",
+      "command": "deno task kill:safe",
+      "group": "none",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Check Port Status",
+      "type": "shell",
+      "command": "deno task check:ports",
+      "group": "none",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Build: Production",
+      "type": "shell",
+      "command": "deno task build",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Build: Fast (No Check)",
+      "type": "shell",
+      "command": "deno task build:fast",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Check: All (Format, Lint, Types)",
+      "type": "shell",
+      "command": "deno task check",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Test: Unit Tests",
+      "type": "shell",
+      "command": "deno task test:unit",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Test: Integration Tests",
+      "type": "shell",
+      "command": "deno task test:integration",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Monitor: Memory Usage",
+      "type": "shell",
+      "command": "deno task monitor:local",
+      "group": "none",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Advanced: Dev Server Manager",
+      "type": "shell",
+      "command": "deno run --allow-all scripts/dev-server-manager.ts --debug --frontend-only",
+      "group": "none",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
       },
       "problemMatcher": []
     }

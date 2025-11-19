@@ -1,19 +1,18 @@
-import { SRC20Row, WalletDataTypes } from "$globals";
-import { useState } from "preact/hooks";
-import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
-import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
-import { textLg } from "$text";
+/* ===== UPLOAD IMAGE TABLE COMPONENT ===== */
 import { walletSignal } from "$client/wallet/wallet.ts";
-type SRC20BalanceTableProps = {
-  data: SRC20Row[];
-};
+import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
+import {
+  abbreviateAddress,
+  formatDate,
+} from "$lib/utils/ui/formatting/formatUtils.ts";
+import { getSRC20ImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
+import { textLg } from "$text";
+import type { WalletDataTypes } from "$types/base.d.ts";
+import type { SRC20Row } from "$types/src20.d.ts";
+import type { ImageModalProps, SRC20BalanceTableProps } from "$types/ui.d.ts";
+import { useState } from "preact/hooks";
 
-interface ImageModalProps {
-  imgSrc: string;
-  isOpen: boolean;
-  onClose: () => void;
-}
-
+/* ===== IMAGE MODAL COMPONENT ===== */
 const ImageModal = ({ imgSrc, isOpen, onClose }: ImageModalProps) => {
   if (!isOpen) return null;
 
@@ -29,9 +28,11 @@ const ImageModal = ({ imgSrc, isOpen, onClose }: ImageModalProps) => {
   );
 };
 
+/* ===== COMPONENT ===== */
 export const UploadImageTable = (props: SRC20BalanceTableProps) => {
   const { data } = props;
 
+  /* ===== STATE ===== */
   const [modalImg, setModalImg] = useState<string>("");
   const [isModalOpen, setModalOpen] = useState(false);
 
@@ -39,15 +40,18 @@ export const UploadImageTable = (props: SRC20BalanceTableProps) => {
   // This eliminates the 1-second polling that was consuming CPU resources
   const wallet = walletSignal.value as WalletDataTypes;
 
+  /* ===== EVENT HANDLERS ===== */
   const handleCloseModal = () => {
     setModalOpen(false);
   };
 
-  const handleImageInteraction = (imgSrc: string) => {
+  const handleImageInteraction = (imgSrc: string | undefined) => {
+    if (!imgSrc) return;
     setModalImg(imgSrc);
     setModalOpen(!isModalOpen);
   };
 
+  /* ===== RENDER ===== */
   return (
     <>
       <ImageModal
@@ -57,7 +61,7 @@ export const UploadImageTable = (props: SRC20BalanceTableProps) => {
       />
       {wallet
         ? (
-          <div class="relative overflow-x-auto shadow-md mobileLg:rounded-lg">
+          <div class="relative overflow-x-auto shadow-md rounded-2xl">
             <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
               <caption class="p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white dark:text-white dark:bg-gray-800">
                 SRC20
@@ -87,11 +91,17 @@ export const UploadImageTable = (props: SRC20BalanceTableProps) => {
                         </td>
                         <td class="px-6 py-4 uppercase">
                           <img
-                            src={`/content/${src20.tx_hash}.svg`}
+                            src={getSRC20ImageSrc({
+                              ...src20,
+                              deploy_tx: src20.tx_hash,
+                            } as any)}
                             class="w-10 h-10"
                             onClick={() =>
                               handleImageInteraction(
-                                `/content/${src20.tx_hash}.svg`,
+                                getSRC20ImageSrc({
+                                  ...src20,
+                                  deploy_tx: src20.tx_hash,
+                                } as any),
                               )}
                           />
                         </td>
@@ -136,7 +146,7 @@ export const UploadImageTable = (props: SRC20BalanceTableProps) => {
           </div>
         )
         : (
-          <h3 className={textLg}>
+          <h3 class={textLg}>
             CONNECT YOUR WALLET TO SEE YOUR STAMPS
           </h3>
         )}

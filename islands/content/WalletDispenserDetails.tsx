@@ -1,26 +1,23 @@
 /* ===== WALLET DISPENSER DETAILS COMPONENT ===== */
-import { useEffect, useRef, useState } from "preact/hooks";
-import { WalletOverviewInfo } from "$lib/types/wallet.d.ts";
-import { abbreviateAddress, formatBTCAmount } from "$lib/utils/formatUtils.ts";
-import { StampRow } from "$globals";
-import BuyStampModal from "$islands/modal/BuyStampModal.tsx";
+import { Button } from "$button";
 import { StatItem, StatTitle } from "$components/section/WalletComponents.tsx";
 import { StampImage } from "$content";
-import { containerBackground } from "$layout";
-import { headingGreyLD, textXs, titleGreyLD } from "$text";
-import { Button } from "$button";
-import { tooltipIcon } from "$notification";
-import { openModal } from "$islands/modal/states.ts";
 import { Icon } from "$icon";
+import BuyStampModal from "$islands/modal/BuyStampModal.tsx";
+import { openModal } from "$islands/modal/states.ts";
+import { containerBackground } from "$layout";
+import type { WalletOverviewInfo } from "$lib/types/wallet.d.ts";
+import {
+  abbreviateAddress,
+  formatBTCAmount,
+} from "$lib/utils/ui/formatting/formatUtils.ts";
+import { tooltipIcon } from "$notification";
+import { headingGreyLD, textXs, titleGreyLD } from "$text";
+import type { StampRow } from "$types/stamp.d.ts";
+import type { WalletDispenserDetailsProps } from "$types/ui.d.ts";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
-interface WalletDispenserDetailsProps {
-  walletData: WalletOverviewInfo;
-  stampsTotal: number;
-  src20Total: number;
-  stampsCreated: number;
-  setShowItem: (type: string) => void;
-}
 
 /* ===== STAMP STATS SUBCOMPONENT ===== */
 function StampStats({
@@ -123,7 +120,7 @@ function StampStats({
   }
 
   /* ===== COMPUTED VALUES ===== */
-  const firstDispenser = dispensers?.items?.[0];
+  const firstDispenser = (dispensers as any)?.items?.[0];
   const stampData = firstDispenser?.stamp as StampRow;
 
   if (!firstDispenser || !stampData) return null;
@@ -184,7 +181,7 @@ function StampStats({
                 name="divisible"
                 weight="normal"
                 size="custom"
-                color="grey"
+                color="greyLight"
                 className="w-[23px] h-[23px]"
               />
               <div
@@ -207,7 +204,7 @@ function StampStats({
                 name="keyburned"
                 weight="normal"
                 size="xs"
-                color="grey"
+                color="greyLight"
               />
               <div
                 className={`${tooltipIcon} ${
@@ -229,7 +226,7 @@ function StampStats({
                 name="locked"
                 weight="normal"
                 size="xs"
-                color="grey"
+                color="greyLight"
               />
               <div
                 className={`${tooltipIcon} ${
@@ -251,7 +248,7 @@ function StampStats({
                 name="unlocked"
                 weight="normal"
                 size="xs"
-                color="grey"
+                color="greyLight"
               />
               <div
                 className={`${tooltipIcon} ${
@@ -289,7 +286,7 @@ function DispenserStats({
   btcPrice: number;
 }) {
   const [fee, setFee] = useState(1);
-  const firstDispenser = dispensers?.items?.[0];
+  const firstDispenser = (dispensers as any)?.items?.[0];
 
   const handleOpenBuyModal = () => {
     const modalContent = (
@@ -300,7 +297,7 @@ function DispenserStats({
         dispenser={firstDispenser}
       />
     );
-    openModal(modalContent, "scaleUpDown");
+    openModal(modalContent, "slideUpDown");
   };
 
   /* ===== RENDER ===== */
@@ -519,7 +516,7 @@ export default function WalletDispenserDetails({
   walletData,
 }: WalletDispenserDetailsProps) {
   /* ===== COMPUTED VALUES ===== */
-  const firstDispenser = walletData.dispensers?.items?.[0];
+  const firstDispenser = (walletData.dispensers as any)?.items?.[0];
   const stampData = firstDispenser?.stamp;
 
   /* ===== RENDER ===== */

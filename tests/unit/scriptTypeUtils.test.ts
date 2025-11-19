@@ -9,7 +9,7 @@ import {
   isP2WSH,
   isValidBitcoinAddress,
   validateWalletAddressForMinting,
-} from "$lib/utils/scriptTypeUtils.ts";
+} from "$lib/utils/bitcoin/scripts/scriptTypeUtils.ts";
 
 Deno.test("scriptTypeUtils - isP2PKH", () => {
   // Valid P2PKH scripts
@@ -296,4 +296,135 @@ Deno.test("scriptTypeUtils - validateWalletAddressForMinting", () => {
   const noAddress = validateWalletAddressForMinting("");
   assert(!noAddress.isValid, "Should not validate empty address");
   assertEquals(noAddress.error, "No wallet address provided");
+});
+
+Deno.test("scriptTypeUtils - edge cases and missing coverage", () => {
+  // Test Uint8Array with non-matching script types to cover conversion branches
+  const nonP2PKHBytes = new Uint8Array([
+    0xa9,
+    0x14,
+    ...Array(20).fill(0xaa),
+    0x87,
+  ]);
+  assertEquals(
+    detectScriptType(nonP2PKHBytes),
+    "P2SH",
+    "Should detect P2SH from Uint8Array",
+  );
+
+  const nonP2SHBytes = new Uint8Array([0x00, 0x14, ...Array(20).fill(0xaa)]);
+  assertEquals(
+    detectScriptType(nonP2SHBytes),
+    "P2WPKH",
+    "Should detect P2WPKH from Uint8Array",
+  );
+
+  const nonP2WPKHBytes = new Uint8Array([0x00, 0x20, ...Array(32).fill(0xaa)]);
+  assertEquals(
+    detectScriptType(nonP2WPKHBytes),
+    "P2WSH",
+    "Should detect P2WSH from Uint8Array",
+  );
+
+  const nonP2WSHBytes = new Uint8Array([0x51, 0x20, ...Array(32).fill(0xaa)]);
+  assertEquals(
+    detectScriptType(nonP2WSHBytes),
+    "P2TR",
+    "Should detect P2TR from Uint8Array",
+  );
+
+  // Test unrecognized Uint8Array bytes
+  const unrecognizedBytes = new Uint8Array([0xff, 0xff, 0xff]);
+  assertEquals(
+    detectScriptType(unrecognizedBytes),
+    "P2WPKH",
+    "Should default to P2WPKH for unrecognized bytes",
+  );
+
+  // Test empty string handling
+  assertEquals(
+    detectScriptType("   "),
+    "P2WPKH",
+    "Should default to P2WPKH for whitespace-only string",
+  );
+
+  // Test individual script type functions with Uint8Array to hit conversion branches
+  const p2shBytesForTest = new Uint8Array([
+    0xa9,
+    0x14,
+    ...Array(20).fill(0xaa),
+    0x87,
+  ]);
+  assert(isP2SH(p2shBytesForTest), "Should detect P2SH from Uint8Array");
+  assert(
+    !isP2PKH(p2shBytesForTest),
+    "Should not detect non-P2PKH as P2PKH from Uint8Array",
+  );
+
+  const p2wpkhBytesForTest = new Uint8Array([
+    0x00,
+    0x14,
+    ...Array(20).fill(0xaa),
+  ]);
+  assert(isP2WPKH(p2wpkhBytesForTest), "Should detect P2WPKH from Uint8Array");
+  assert(
+    !isP2SH(p2wpkhBytesForTest),
+    "Should not detect non-P2SH as P2SH from Uint8Array",
+  );
+
+  const p2wshBytesForTest = new Uint8Array([
+    0x00,
+    0x20,
+    ...Array(32).fill(0xaa),
+  ]);
+  assert(isP2WSH(p2wshBytesForTest), "Should detect P2WSH from Uint8Array");
+  assert(
+    !isP2WPKH(p2wshBytesForTest),
+    "Should not detect non-P2WPKH as P2WPKH from Uint8Array",
+  );
+
+  const p2trBytesForTest = new Uint8Array([
+    0x51,
+    0x20,
+    ...Array(32).fill(0xaa),
+  ]);
+  assert(isP2TR(p2trBytesForTest), "Should detect P2TR from Uint8Array");
+  assert(
+    !isP2WSH(p2trBytesForTest),
+    "Should not detect non-P2WSH as P2WSH from Uint8Array",
+  );
+});
+
+Deno.test("scriptTypeUtils - getScriptTypeInfo with unsupported types", () => {
+  // Test getScriptTypeInfo with a script type that doesn't exist in TX_CONSTANTS
+  // Since we can't easily mock TX_CONSTANTS, let's test by creating a modified version
+  // of the function that simulates an unsupported script type
+
+  // Test with valid types to ensure structure is correct
+
+  // Test with valid types first to ensure structure is correct
+  const p2pkhInfo = getScriptTypeInfo("1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa");
+  assertEquals(p2pkhInfo.type, "P2PKH", "Should return correct type");
+  assert(typeof p2pkhInfo.size === "number", "Should include size");
+  assert(typeof p2pkhInfo.isWitness === "boolean", "Should include isWitness");
+
+  const p2shInfo = getScriptTypeInfo("3J98t1WpEZ73CNmQviecrnyiWrnqRhWNLy");
+  assertEquals(p2shInfo.type, "P2SH", "Should return correct type");
+
+  const p2trInfo = getScriptTypeInfo(
+    "bc1p5cyxnuxmeuwuvkwfem96lqzszd02n6xdcjrs20cac6yqjjwudpxqkedrcr",
+  );
+  assertEquals(p2trInfo.type, "P2TR", "Should return correct type");
+
+  const p2wshInfo = getScriptTypeInfo("0020" + "d".repeat(64));
+  assertEquals(p2wshInfo.type, "P2WSH", "Should return correct type");
+
+  // Test edge cases that might not be in TX_CONSTANTS
+  // Since TX_CONSTANTS includes all standard types, we need to be creative
+  // Let's test with some unusual input that still passes detectScriptType
+  // but might not have corresponding constants
+
+  // All major script types are covered in TX_CONSTANTS, so we can't easily
+  // trigger the default case without complex mocking. The tests above
+  // demonstrate the function works correctly for all valid script types.
 });

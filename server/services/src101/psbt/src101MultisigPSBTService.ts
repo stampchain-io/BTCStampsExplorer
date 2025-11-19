@@ -1,29 +1,14 @@
 // was previously // lib/utils/minting/src20/tx.ts
 
 import * as bitcoin from "bitcoinjs-lib";
-// Conditionally import tiny-secp256k1 only if we're not in build mode
+// Conditionally import tiny-secp256k1
 let ecc: any = null;
-if (!Deno.args.includes("build")) {
-  // Only import in runtime mode
-  try {
-    ecc = await import("tiny-secp256k1");
-    console.log("Successfully loaded tiny-secp256k1");
-    bitcoin.initEccLib(ecc);
-  } catch (e) {
-    console.error("Failed to load tiny-secp256k1:", e);
-    // Provide stub implementation for ecc
-    ecc = {
-      privateKeyVerify: () => true,
-      publicKeyCreate: () => new Uint8Array(33),
-      publicKeyVerify: () => true,
-      ecdsaSign: () => ({ signature: new Uint8Array(64), recid: 0 }),
-      ecdsaVerify: () => true,
-      ecdsaRecover: () => new Uint8Array(65),
-      isPoint: () => true
-    };
-  }
-} else {
-  // In build mode, provide stub implementation
+const isBuildMode = Deno.args.includes("build");
+const isDevelopment = Deno.env.get("DENO_ENV") === "development";
+const useStubs = Deno.env.get("USE_CRYPTO_STUBS") === "true";
+
+if (isBuildMode) {
+  // In build mode, always use stub implementation
   console.log("[BUILD] Using stub implementation for tiny-secp256k1");
   ecc = {
     privateKeyVerify: () => true,
@@ -34,19 +19,52 @@ if (!Deno.args.includes("build")) {
     ecdsaRecover: () => new Uint8Array(65),
     isPoint: () => true
   };
+} else {
+  // In runtime mode, try to load the real implementation
+  try {
+    ecc = await import("tiny-secp256k1");
+    console.log("Successfully loaded tiny-secp256k1 (real implementation)");
+    bitcoin.initEccLib(ecc);
+  } catch (e) {
+    // If loading fails, check if we should use stubs or throw error
+    if (isDevelopment || useStubs) {
+      console.warn("Failed to load tiny-secp256k1, using stub implementation:", e);
+      console.warn("⚠️  Bitcoin transactions will NOT work properly with stubs!");
+      console.warn("⚠️  To test real transactions, ensure tiny-secp256k1 loads correctly.");
+      // Provide stub implementation for development
+      ecc = {
+        privateKeyVerify: () => true,
+        publicKeyCreate: () => new Uint8Array(33),
+        publicKeyVerify: () => true,
+        ecdsaSign: () => ({ signature: new Uint8Array(64), recid: 0 }),
+        ecdsaVerify: () => true,
+        ecdsaRecover: () => new Uint8Array(65),
+        isPoint: () => true
+      };
+      bitcoin.initEccLib(ecc);
+    } else {
+      // In production, this is a fatal error
+      console.error("FATAL: Failed to load tiny-secp256k1 in production:", e);
+      throw new Error("Failed to initialize cryptographic library for Bitcoin operations");
+    }
+  }
 }
 
-import { crypto } from "@std/crypto";
-import { TransactionService } from "$server/services/transaction/index.ts";
-import { arc4 } from "$lib/utils/minting/transactionUtils.ts";
-import { bin2hex, hex2bin } from "$lib/utils/binary/baseUtils.ts";
-import { SRC101Service } from "$server/services/src101/index.ts";
-import { serverConfig } from "$server/config/config.ts";
-import { IPrepareSRC101TX, PSBTInput, VOUT } from "$types/index.d.ts";
-import * as msgpack from "msgpack";
-import { estimateTransactionSize } from "$lib/utils/minting/transactionSizes.ts";
-import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
+import { bin2hex, hex2bin } from "$lib/utils/data/binary/baseUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
+import { estimateMintingTransactionSize } from "$lib/utils/bitcoin/minting/transactionSizes.ts";
+import { arc4 } from "$lib/utils/bitcoin/minting/transactionUtils.ts";
+import { serverConfig } from "$server/config/config.ts";
+// Removed TransactionService import - using direct OptimalUTXOSelection instead
+import type { BufferLike } from "$lib/types/utils.d.ts";
+import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
+import { OptimalUTXOSelection } from "$server/services/utxo/optimalUtxoSelection.ts";
+import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
+import type {IPrepareSRC101TX} from "$server/types/services/src101.d.ts";
+import type { UTXO } from "$types/base.d.ts";
+import { convertUTXOsToBasic } from "$lib/utils/bitcoin/utxo/utxoTypeUtils.ts";
+import type { PSBTInput, VOUT } from "$types/src20.d.ts";
+import { crypto } from "@std/crypto";
 
 export class SRC101MultisigPSBTService {
   private static readonly RECIPIENT_DUST = 789;
@@ -54,6 +72,95 @@ export class SRC101MultisigPSBTService {
   private static readonly CHANGE_DUST = 1000;
   private static readonly THIRD_PUBKEY = "020202020202020202020202020202020202020202020202020202020202020202";
   private static commonUtxoService = new CommonUTXOService();
+
+  /**
+   * Simplified UTXO selection that gets full details upfront - same pattern as stamp minting
+   */
+  private static async getFullUTXOsWithDetails(
+    address: string,
+    filterStampUTXOs: boolean = true,
+    excludeUtxos: Array<{ txid: string; vout: number }> = []
+  ): Promise<UTXO[]> {
+    logger.debug("src101", {
+      message: "Fetching full UTXOs with details upfront for multisig",
+      address,
+      filterStampUTXOs,
+      excludeUtxos: excludeUtxos.length
+    });
+
+    // Get basic UTXOs first
+    let basicUtxos = await this.commonUtxoService.getSpendableUTXOs(address, undefined, {
+      includeAncestorDetails: true,
+      confirmedOnly: false
+    });
+
+    // Apply exclusions
+    if (excludeUtxos.length > 0) {
+      const excludeSet = new Set(excludeUtxos.map(u => `${u.txid}:${u.vout}`));
+      basicUtxos = basicUtxos.filter(utxo => !excludeSet.has(`${utxo.txid}:${utxo.vout}`));
+    }
+
+    // Filter stamp UTXOs if requested
+    if (filterStampUTXOs) {
+      try {
+        const stampBalances = await CounterpartyApiManager.getXcpBalancesByAddress(address, undefined, true);
+        const utxosToExcludeFromStamps = new Set<string>();
+        for (const balance of stampBalances.balances) {
+          if (balance.utxo) {
+            utxosToExcludeFromStamps.add(balance.utxo);
+          }
+        }
+        basicUtxos = basicUtxos.filter(
+          (utxo) => !utxosToExcludeFromStamps.has(`${utxo.txid}:${utxo.vout}`),
+        );
+      } catch (error) {
+        logger.error("src101", {
+          message: "Error filtering stamp UTXOs for multisig",
+          address,
+          error: (error as any).message
+        });
+      }
+    }
+
+    // Now get full details for all UTXOs upfront
+    const fullUTXOs: UTXO[] = [];
+    for (const basicUtxo of basicUtxos) {
+      try {
+        const fullUtxo = await this.commonUtxoService.getSpecificUTXO(
+          basicUtxo.txid,
+          basicUtxo.vout,
+          { includeAncestorDetails: true, confirmedOnly: false }
+        );
+
+        if (fullUtxo && fullUtxo.script) {
+          fullUTXOs.push(fullUtxo);
+        } else {
+          logger.warn("src101", {
+            message: "Skipping UTXO with missing script for multisig",
+            txid: basicUtxo.txid,
+            vout: basicUtxo.vout,
+            hasFullUtxo: !!fullUtxo,
+            hasScript: !!fullUtxo?.script
+          });
+        }
+      } catch (error) {
+        logger.warn("src101", {
+          message: "Failed to fetch full UTXO details for multisig",
+          txid: basicUtxo.txid,
+          vout: basicUtxo.vout,
+          error: (error as any).message
+        });
+      }
+    }
+
+    logger.debug("src101", {
+      message: "Full UTXOs fetched successfully for multisig",
+      total: fullUTXOs.length,
+      withScripts: fullUTXOs.filter(u => u.script).length
+    });
+
+    return fullUTXOs;
+  }
 
   static async preparePSBT({
     network,
@@ -66,17 +173,17 @@ export class SRC101MultisigPSBTService {
     enableRBF = true,
   }: IPrepareSRC101TX) {
     try {
-      logger.info("src101-psbt-service", { message: "Starting preparePSBT for SRC101 Multisig"});
+      logger.info("src101", { message: "Starting preparePSBT for SRC101 Multisig"});
       const psbtNetwork = network === "testnet"
         ? bitcoin.networks.testnet
         : bitcoin.networks.bitcoin;
-      logger.debug("src101-psbt-service", { message: "Using network", network: psbtNetwork });
-      logger.debug("src101-psbt-service", { message: "Using sourceAddress", sourceAddress });
-      logger.debug("src101-psbt-service", { message: "Using changeAddress", changeAddress });
-      logger.debug("src101-psbt-service", { message: "Using recAddress", recAddress });
-      logger.debug("src101-psbt-service", { message: "Using recVault", recVault });
-      logger.debug("src101-psbt-service", { message: "Using feeRate", feeRate });
-      logger.debug("src101-psbt-service", { message: "Using transferString", transferString });
+      logger.debug("src101", { message: "Using network", network: psbtNetwork });
+      logger.debug("src101", { message: "Using sourceAddress", sourceAddress });
+      logger.debug("src101", { message: "Using changeAddress", changeAddress });
+      logger.debug("src101", { message: "Using recAddress", recAddress });
+      logger.debug("src101", { message: "Using recVault", recVault });
+      logger.debug("src101", { message: "Using feeRate", feeRate });
+      logger.debug("src101", { message: "Using transferString", transferString });
 
       const psbt = new bitcoin.Psbt({ network: psbtNetwork });
 
@@ -85,28 +192,48 @@ export class SRC101MultisigPSBTService {
         { address: recAddress || changeAddress, value: recVault || this.RECIPIENT_DUST },
       ];
 
-      // Select UTXOs first to get txid for encryption
-      const { inputs, change, fee } = await TransactionService.UTXOService.selectUTXOsForTransaction(
-        sourceAddress,
-        vouts,
+      // Convert vouts to Output format for UTXO selection
+      const outputsForSelection = vouts.map(vout => ({
+        value: vout.value,
+        script: "",
+        ...(vout.address && { address: vout.address })
+      }));
+
+      // Get full UTXOs with details first - same pattern as stamp minting
+      const fullUTXOs = await this.getFullUTXOsWithDetails(sourceAddress, true, []);
+
+      if (fullUTXOs.length === 0) {
+        throw new Error("No UTXOs available for SRC-101 multisig transaction");
+      }
+
+      // Convert UTXOs to BasicUTXO format for selection
+      const basicUTXOsForSelection = convertUTXOsToBasic(fullUTXOs);
+
+      // Use optimal UTXO selection directly - same pattern as stamp minting
+      const selectionResult = OptimalUTXOSelection.selectUTXOs(
+        basicUTXOsForSelection,
+        outputsForSelection,
         feeRate,
-        0,
-        1.5,
-        { filterStampUTXOs: true, includeAncestors: true }
+        {
+          avoidChange: true,
+          consolidationMode: false,
+          dustThreshold: 1000
+        }
       );
+
+      const { inputs, change: _change, fee } = selectionResult;
 
       if (inputs.length === 0) {
         throw new Error("Unable to select suitable UTXOs for the transaction");
       }
 
       // Prepare and encrypt data using first input's txid
-      let transferDataBytes: Uint8Array;
       const stampPrefixBytes = new TextEncoder().encode("stamp:");
 
       const transferData = JSON.parse(transferString);
       console.log("transferData:", transferData)
 
-      transferDataBytes = new TextEncoder().encode(JSON.stringify(transferData));
+      const transferDataBytes = new TextEncoder().encode(JSON.stringify(transferData));
       console.log("transferDataBytes:", bin2hex(transferDataBytes))
 
       // Add stamp prefix and length prefix
@@ -156,7 +283,7 @@ export class SRC101MultisigPSBTService {
 
         const script = `5121${pubkey1}21${pubkey2}21${this.THIRD_PUBKEY}53ae`;
         vouts.push({
-          script: hex2bin(script),
+          script: new Uint8Array(hex2bin(script)) as BufferLike,
           value: this.MULTISIG_DUST,
         });
       }
@@ -174,9 +301,8 @@ export class SRC101MultisigPSBTService {
           logger.error("src101-psbt-service", { message: "Input UTXO is missing script for SRC101 Multisig.", input });
           throw new Error(`Input UTXO ${input.txid}:${input.vout} is missing script (scriptPubKey).`);
         }
-        const isWitnessUtxo = input.scriptType?.startsWith("witness") || 
-                              input.scriptType?.toUpperCase().includes("P2W") || 
-                              (input.scriptType === "P2SH" && input.redeemScriptType?.isWitness);
+        const isWitnessUtxo = input.scriptType?.startsWith("witness") ||
+                              input.scriptType?.toUpperCase().includes("P2W");
 
         const psbtInput: PSBTInput = {
           hash: input.txid,
@@ -186,7 +312,7 @@ export class SRC101MultisigPSBTService {
 
         if (isWitnessUtxo) {
           psbtInput.witnessUtxo = {
-            script: hex2bin(input.script),
+            script: new Uint8Array(hex2bin(input.script)) as BufferLike,
             value: BigInt(input.value),
           };
         } else {
@@ -195,52 +321,52 @@ export class SRC101MultisigPSBTService {
             logger.error("src101-psbt-service", { message: "Failed to fetch raw tx hex for non-witness input in SRC101 Multisig", txid: input.txid });
             throw new Error(`Failed to fetch raw transaction for non-witness input ${input.txid}`);
           }
-          psbtInput.nonWitnessUtxo = hex2bin(rawTxHex);
+          psbtInput.nonWitnessUtxo = new Uint8Array(hex2bin(rawTxHex)) as BufferLike;
         }
 
         psbt.addInput(psbtInput as any);
       }
 
       // Calculate total input and output values
-      const totalInputValue = inputs.reduce((sum, input) => 
+      const totalInputValue = inputs.reduce((sum: any, input: any) =>
         BigInt(sum) + BigInt(input.value), BigInt(0));
 
       // Calculate total output value before change
-      const outputsBeforeChange = vouts.reduce((sum, vout) => 
+      const outputsBeforeChange = vouts.reduce((sum: any, vout: any) =>
         BigInt(sum) + BigInt(vout.value), BigInt(0));
 
       // Calculate fee
       const estimatedFee = BigInt(fee);
 
       // Calculate change correctly
-      const changeAmount = totalInputValue - outputsBeforeChange - estimatedFee;
+      const changeAmount = totalInputValue - BigInt(outputsBeforeChange) - estimatedFee;
 
       // Add all outputs to PSBT
       vouts.forEach((vout) => {
         if ("address" in vout && vout.address) {
-          psbt.addOutput({ 
-            address: vout.address, 
-            value: BigInt(vout.value) 
+          psbt.addOutput({
+            address: vout.address,
+            value: BigInt(vout.value)
           });
         } else if ("script" in vout && vout.script) {
-          psbt.addOutput({ 
-            script: new Uint8Array(vout.script), 
-            value: BigInt(vout.value) 
+          psbt.addOutput({
+            script: new Uint8Array(vout.script),
+            value: BigInt(vout.value)
           });
         }
       });
 
       // Add change output if it's above dust
       if (changeAmount > this.CHANGE_DUST) {
-        psbt.addOutput({ 
-          address: changeAddress, 
-          value: changeAmount 
+        psbt.addOutput({
+          address: changeAddress,
+          value: changeAmount
         });
       }
 
       logger.debug("src101-psbt-service", {
         message: "Final transaction details for SRC101 Multisig PSBT",
-        inputs: inputs.map(utxo => ({
+        inputs: inputs.map((utxo: any) => ({
           ...utxo,
           value: BigInt(utxo.value).toString()
         })),
@@ -257,10 +383,20 @@ export class SRC101MultisigPSBTService {
         psbtBase64: psbt.toBase64(),
         fee: fee.toString(),
         change: changeAmount.toString(),
-        inputsToSign: inputs.map((_, index) => ({ index })),
-        estimatedTxSize: estimateTransactionSize({
-          inputs,
-          outputs: vouts,
+        inputsToSign: inputs.map((_: any, index: any) => ({ index })),
+        estimatedTxSize: estimateMintingTransactionSize({
+          inputs: inputs.map(input => ({
+            type: (input.scriptType as any) || "P2WPKH",
+            ...(input.vsize && { size: input.vsize }),
+            ...(input.ancestor?.txid && input.ancestor?.vout !== undefined && {
+              ancestor: {
+                txid: input.ancestor.txid,
+                vout: input.ancestor.vout,
+                ...(input.ancestor.weight && { weight: input.ancestor.weight })
+              }
+            })
+          })),
+          outputs: vouts.map(_vout => ({ type: "P2WPKH" as const })),
           includeChangeOutput: true,
           changeOutputType: "P2WPKH"
         }),

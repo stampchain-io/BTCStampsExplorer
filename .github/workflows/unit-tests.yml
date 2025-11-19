@@ -1,0 +1,145 @@
+name: Unit Tests with Fixtures
+
+on:
+  pull_request:
+    branches: [main, dev]
+    paths:
+      - "tests/unit/**"
+      - "tests/fixtures/**"
+      - "tests/mocks/**"
+      - "server/database/**"
+      - "lib/**"
+      - "deno.json"
+      - ".github/workflows/unit-tests.yml"
+
+jobs:
+  unit-tests:
+    name: Unit Tests with Mock Database
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    env:
+      CI: true
+      DENO_ENV: test
+      # Skip Redis for unit tests
+      SKIP_REDIS_CONNECTION: true
+      # Mock API keys for testing
+      QUICKNODE_API_KEY: test-quicknode-key
+      ANTHROPIC_API_KEY: test-anthropic-key
+      PERPLEXITY_API_KEY: test-perplexity-key
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.4.2
+
+      - name: Cache Deno dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.deno
+            ~/.cache/deno
+          key: ${{ runner.os }}-deno-unit-${{ hashFiles('**/deno.json', '**/import_map.json') }}
+          restore-keys: |
+            ${{ runner.os }}-deno-unit-
+            ${{ runner.os }}-deno-
+
+      - name: Verify fixtures availability
+        run: |
+          echo "Verifying test fixtures are available..."
+          ls -la tests/fixtures/
+          if [ ! -f "tests/fixtures/stampData.json" ]; then
+            echo "❌ Error: stampData.json fixture not found!"
+            exit 1
+          fi
+          if [ ! -f "tests/fixtures/marketData.json" ]; then
+            echo "❌ Error: marketData.json fixture not found!"
+            exit 1
+          fi
+          if [ ! -f "tests/fixtures/src20Data.json" ]; then
+            echo "❌ Error: src20Data.json fixture not found!"
+            exit 1
+          fi
+          if [ ! -f "tests/fixtures/collectionData.json" ]; then
+            echo "❌ Error: collectionData.json fixture not found!"
+            exit 1
+          fi
+          echo "✅ All required fixtures are available"
+
+      - name: Verify mock database manager
+        run: |
+          echo "Verifying mock database manager is available..."
+          if [ ! -f "tests/mocks/mockDatabaseManager.ts" ]; then
+            echo "❌ Error: mockDatabaseManager.ts not found!"
+            exit 1
+          fi
+          echo "✅ Mock database manager is available"
+
+      - name: Cache dependencies
+        run: |
+          echo "Caching dependencies..."
+          deno cache --no-check main.ts dev.ts
+
+      - name: Run unit tests with coverage
+        run: |
+          echo "Running unit tests with mock database and fixtures..."
+          mkdir -p coverage
+
+                    # Run unit tests with coverage using deno task (which handles directory change)
+          deno task test:unit:coverage
+
+          # Generate coverage report
+          echo "Generating coverage report..."
+          deno coverage coverage/
+
+          # Generate LCOV report for Codecov
+          echo "Generating LCOV report..."
+          deno coverage coverage/ --lcov > coverage-unit.lcov
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: stampchain-io/BTCStampsExplorer
+          files: ./coverage-unit.lcov
+          flags: unittests
+          name: unit-tests-coverage
+          fail_ci_if_error: false
+
+      - name: Generate test summary
+        if: always()
+        run: |
+          echo "## Unit Test Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Count test files and tests
+          TEST_FILES=$(find tests/unit -name "*.test.ts" -o -name "*.unit.test.ts" | wc -l)
+          echo "- Test files: $TEST_FILES" >> $GITHUB_STEP_SUMMARY
+          echo "- Using mock database manager for all repository tests" >> $GITHUB_STEP_SUMMARY
+          echo "- Using test fixtures from tests/fixtures/" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "### Repositories with Unit Tests" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Completed:**" >> $GITHUB_STEP_SUMMARY
+          echo "- StampRepository (stampRepository.working.test.ts)" >> $GITHUB_STEP_SUMMARY
+          echo "- MarketDataRepository (marketDataRepository.unit.test.ts)" >> $GITHUB_STEP_SUMMARY
+          echo "- SRC20Repository (src20Repository.unit.test.ts)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "⏳ **Pending:**" >> $GITHUB_STEP_SUMMARY
+          echo "- CollectionRepository" >> $GITHUB_STEP_SUMMARY
+          echo "- BlockRepository" >> $GITHUB_STEP_SUMMARY
+          echo "- SRC101Repository" >> $GITHUB_STEP_SUMMARY
+
+      - name: Check test output
+        if: failure()
+        run: |
+          echo "❌ Unit tests failed. Please check the test output above."
+          echo "Make sure all mock database responses are configured correctly."
+          echo "Verify that fixtures contain the expected test data."

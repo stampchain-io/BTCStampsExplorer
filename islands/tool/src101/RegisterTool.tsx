@@ -1,22 +1,33 @@
 /* ===== SRC101 BITNAME REGISTRATION COMPONENT ===== */
-import { useEffect, useRef, useState } from "preact/hooks";
-import { walletContext } from "$client/wallet/wallet.ts";
-import DetailSRC101Modal from "$islands/modal/DetailSRC101Modal.tsx";
-import { ROOT_DOMAIN_TYPES, SRC101Balance } from "$globals";
-import { useSRC101Form } from "$client/hooks/userSRC101Form.ts";
-import { ROOT_DOMAINS } from "$lib/utils/constants.ts";
-import { FeeCalculatorSimple } from "$components/section/FeeCalculatorSimple.tsx";
-import { bodyTool, containerBackground } from "$layout";
-import { titlePurpleLD } from "$text";
 import { Button } from "$button";
-import { inputFieldOutline, outlineGradient, purpleGradient } from "$form";
-import { StatusMessages, tooltipButton } from "$notification";
+import { useSRC101Form } from "$client/hooks/userSRC101Form.ts";
+import { walletContext } from "$client/wallet/wallet.ts";
+import { ProgressiveEstimationIndicator } from "$components/indicators/ProgressiveEstimationIndicator.tsx";
+import { ROOT_DOMAINS } from "$constants";
+import { inputFieldDropdown, inputFieldDropdownHover } from "$form";
+import { RegisterToolSkeleton } from "$indicators";
+import { InputField } from "$islands/form/InputField.tsx";
+import DetailSRC101Modal from "$islands/modal/DetailSRC101Modal.tsx";
 import { openModal } from "$islands/modal/states.ts";
+import {
+  bodyTool,
+  containerBackground,
+  containerGap,
+  glassmorphismL2Hover,
+  transitionAll,
+} from "$layout";
+import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
+import { logger } from "$lib/utils/logger.ts";
+import { mapProgressiveFeeDetails } from "$lib/utils/performance/fees/fee-estimation-utils.ts";
+import { StatusMessages, tooltipButton } from "$notification";
+import { FeeCalculatorBase } from "$section";
+import { titleGreyLD } from "$text";
+import type { ROOT_DOMAIN_TYPES } from "$types/base.d.ts";
+import type { SRC101Balance } from "$types/src101.d.ts";
+import type { SRC101RegisterToolProps } from "$types/ui.d.ts";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== COMPONENT INTERFACE ===== */
-interface SRC101RegisterToolProps {
-  trxType?: "olga" | "multisig";
-}
 
 /* ===== MAIN COMPONENT IMPLEMENTATION ===== */
 export function SRC101RegisterTool({
@@ -28,7 +39,6 @@ export function SRC101RegisterTool({
     handleChangeFee,
     handleInputChange,
     handleSubmit,
-    fetchFees,
     config,
     isSubmitting,
     submissionMessage,
@@ -37,7 +47,7 @@ export function SRC101RegisterTool({
 
   /* ===== STATE MANAGEMENT ===== */
   const [tosAgreed, setTosAgreed] = useState<boolean>(false);
-  const { wallet, isConnected } = walletContext;
+  const { isConnected, wallet } = walletContext;
   const [isExist, setIsExist] = useState(true);
   const [checkStatus, setCheckStatus] = useState(false);
   const [_modalData, setModalData] = useState<SRC101Balance | null>(null);
@@ -47,6 +57,72 @@ export function SRC101RegisterTool({
   const [isTldTooltipVisible, setIsTldTooltipVisible] = useState(false);
   const [allowTldTooltip, setAllowTldTooltip] = useState(true);
   const tldTooltipTimeoutRef = useRef<number | null>(null);
+  // Animation state for dropdown
+  const [dropdownAnimation, setDropdownAnimation] = useState<
+    "enter" | "exit" | null
+  >(null);
+  const animationTimeoutRef = useRef<number | null>(null);
+
+  /* ===== PROGRESSIVE FEE ESTIMATION ===== */
+  const {
+    getBestEstimate,
+    isPreFetching,
+    estimateExact, // Phase 3: Exact estimation before registering
+    // Phase-specific results for UI indicators
+    phase1,
+    phase2,
+    phase3,
+    currentPhase,
+    error: feeEstimationError,
+    clearError,
+  } = useTransactionConstructionService({
+    toolType: "src101-create",
+    feeRate: isSubmitting ? 0 : formState.fee,
+    walletAddress: wallet?.address || "", // Provide empty string instead of undefined
+    isConnected: !!wallet && !isSubmitting,
+    isSubmitting,
+    // SRC-101 specific parameters
+    bitname: formState.toAddress ? formState.toAddress + formState.root : "",
+  });
+
+  // Get the best available fee estimate
+  const progressiveFeeDetails = getBestEstimate();
+
+  // Local state for exact fee details (updated when Phase 3 completes) - StampingTool pattern
+  const [exactFeeDetails, setExactFeeDetails] = useState<
+    typeof progressiveFeeDetails | null
+  >(null);
+
+  // Reset exactFeeDetails when fee rate changes to allow slider updates - StampingTool pattern
+  useEffect(() => {
+    // Clear exact fee details when fee rate changes so slider updates work
+    setExactFeeDetails(null);
+  }, [formState.fee]);
+
+  // Wrapper function for registering that gets exact fees first - StampingTool pattern
+  const handleRegisterWithExactFees = async () => {
+    try {
+      // Get exact fees before final submission
+      const exactFees = await estimateExact();
+      if (exactFees) {
+        // Calculate net spend amount (matches wallet display)
+        const netSpendAmount = exactFees.totalValue || 0;
+        setExactFeeDetails({
+          ...exactFees,
+          totalValue: netSpendAmount, // Matches wallet
+        });
+      }
+      // Call the original register submission
+      await handleSubmit();
+    } catch (error) {
+      logger.error("stamps", {
+        message: "Error in SRC101 register exact fee estimation",
+        data: { error: error instanceof Error ? error.message : String(error) },
+      });
+      // Still proceed with submission even if exact fees fail
+      await handleSubmit();
+    }
+  };
 
   /* ===== CLICK OUTSIDE HANDLER ===== */
   useEffect(() => {
@@ -55,13 +131,22 @@ export function SRC101RegisterTool({
         tldDropdownRef.current &&
         !tldDropdownRef.current.contains(event.target as Node)
       ) {
-        setOpenTldDropdown(false);
+        closeDropdownWithAnimation();
       }
     }
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  /* ===== ANIMATION CLEANUP ===== */
+  useEffect(() => {
+    return () => {
+      if (animationTimeoutRef.current) {
+        clearTimeout(animationTimeoutRef.current);
+      }
     };
   }, []);
 
@@ -75,13 +160,24 @@ export function SRC101RegisterTool({
   }, []);
 
   /* ===== TLD HANDLERS ===== */
+  const closeDropdownWithAnimation = () => {
+    setDropdownAnimation("exit");
+    if (animationTimeoutRef.current) {
+      clearTimeout(animationTimeoutRef.current);
+    }
+    animationTimeoutRef.current = setTimeout(() => {
+      setOpenTldDropdown(false);
+      setDropdownAnimation(null);
+    }, 200); // Match animation duration
+  };
+
   const handleTldSelect = (tld: ROOT_DOMAIN_TYPES) => {
-    setOpenTldDropdown(false);
+    closeDropdownWithAnimation();
     setIsSelectingTld(true);
     handleInputChange(
       {
         target: { value: tld },
-      },
+      } as Event & { target: { value: string } },
       "root",
     );
     setIsSelectingTld(false);
@@ -109,7 +205,14 @@ export function SRC101RegisterTool({
 
   /* ===== CONFIG CHECK ===== */
   if (!config) {
-    return <div>Error: Failed to load configuration</div>;
+    return (
+      <div class={`${bodyTool} ${containerGap}`}>
+        <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
+          REGISTER
+        </h1>
+        <RegisterToolSkeleton />
+      </div>
+    );
   }
 
   /* ===== MODAL HANDLERS ===== */
@@ -130,7 +233,7 @@ export function SRC101RegisterTool({
       if (!formState.toAddress) return;
       const checkStatus = await checkAvailability();
       if (checkStatus) {
-        await handleSubmit();
+        await handleRegisterWithExactFees();
       }
     } catch (error) {
       console.error("Transfer error:", (error as Error).message);
@@ -167,11 +270,13 @@ export function SRC101RegisterTool({
 
   /* ===== COMPONENT RENDER ===== */
   return (
-    <div class={bodyTool}>
-      <h1 class={`${titlePurpleLD} mobileMd:mx-auto mb-1`}>REGISTER</h1>
+    <div class={`${bodyTool} ${containerGap}`}>
+      <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
+        REGISTER
+      </h1>
 
       <form
-        class={`${containerBackground} gap-5`}
+        class={`${containerBackground} gap-5 relative z-dropdown`}
         onSubmit={(e) => {
           e.preventDefault();
           handleTransferSubmit();
@@ -179,76 +284,85 @@ export function SRC101RegisterTool({
         aria-label="Bitname registration form"
         novalidate
       >
-        {/* Animated Input Container */}
-        <div
-          class={`${outlineGradient} ${purpleGradient} ${
-            openTldDropdown && !isSelectingTld ? "input-open-right" : ""
-          }`}
-        >
-          <div class="flex justify-between relative z-[2]">
-            <input
-              type="text"
-              placeholder="bitname"
-              id="search-dropdown"
-              class={`${inputFieldOutline} pt-1`}
-              required
-              value={formState.toAddress || ""}
-              onChange={(e) => handleInputChange(e, "toAddress")}
-              autocomplete="off"
-              autoCorrect="off"
-              aria-label="Bitname input"
-            />
-            {/* TLD Dropdown Container */}
+        <div class="flex gap-5">
+          {/* Bitname Input Field */}
+          <InputField
+            type="text"
+            placeholder="bitname"
+            id="search-dropdown"
+            value={formState.toAddress || ""}
+            onChange={(e) => handleInputChange(e, "toAddress")}
+            class="flex-1 placeholder:!lowercase"
+            required
+            autoComplete="off"
+            aria-label="Bitname input"
+          />
+
+          {/* TLD Dropdown InputField - styled like glassmorphismL2/Hover */}
+          <div class="relative w-[64px]" ref={tldDropdownRef}>
             <div
-              className="relative"
-              ref={tldDropdownRef}
+              class={`h-10 px-4 border border-color-border/75 rounded-2xl
+                !bg-color-background/60 ${glassmorphismL2Hover}
+                font-semibold text-sm text-color-grey text-right backdrop-blur-sm hover:text-color-grey-light tracking-wider ${transitionAll} !duration-200 focus-visible:!outline-none cursor-pointer flex items-center justify-end ${
+                openTldDropdown && !isSelectingTld ? "input-open-bottom" : ""
+              }`}
+              onClick={() => {
+                if (openTldDropdown) {
+                  closeDropdownWithAnimation();
+                } else {
+                  setOpenTldDropdown(true);
+                  setDropdownAnimation("enter");
+                }
+                setAllowTldTooltip(false);
+                setIsTldTooltipVisible(false);
+              }}
+              onMouseEnter={handleTldMouseEnter}
+              onMouseLeave={handleTldMouseLeave}
+              aria-label="Select top level domain"
             >
-              <button
-                type="button"
-                onClick={() => {
-                  setOpenTldDropdown(!openTldDropdown);
-                  setAllowTldTooltip(false);
-                  setIsTldTooltipVisible(false);
-                }}
-                className="h-11 min-w-20 mt-[1px] px-5 rounded-md bg-transparent font-bold text-base text-stamp-grey text-right hover:text-stamp-grey-light tracking-wider transition-colors duration-300 focus-visible:!outline-none"
-                onMouseEnter={handleTldMouseEnter}
-                onMouseLeave={handleTldMouseLeave}
-                aria-label="Select top level domain"
+              <div
+                class={`${tooltipButton} tracking-normal ${
+                  isTldTooltipVisible ? "opacity-100" : "opacity-0"
+                }`}
               >
-                <div
-                  className={`${tooltipButton} tracking-normal ${
-                    isTldTooltipVisible ? "opacity-100" : "opacity-0"
-                  }`}
-                >
-                  SELECT TOP LEVEL DOMAIN
-                </div>
-                {formState.root}
-              </button>
-              {openTldDropdown && (
-                <ul className="absolute top-[100%] right-[-2px] max-h-[160px] w-[80px] bg-[#100318] bg-opacity-70 backdrop-filter backdrop-blur-md border-2 border-t-0 border-stamp-purple-bright rounded-b-md z-[11] overflow-y-auto">
-                  {ROOT_DOMAINS.map((tld) => (
-                    <li
-                      key={tld}
-                      className="py-2 last:pb-4 tablet:py-1.5 tablet:last:pb-3 pr-5 font-bold text-sm text-stamp-grey text-right tracking-wide leading-none hover:bg-stamp-purple-bright/15 hover:text-stamp-grey-light transition-colors duration-300 cursor-pointer"
-                      onClick={() => handleTldSelect(tld)}
-                      onMouseDown={(e) => e.preventDefault()}
-                      role="option"
-                      aria-selected={formState.root === tld}
-                    >
-                      {tld}
-                    </li>
-                  ))}
-                </ul>
-              )}
+                SELECT TOP LEVEL DOMAIN
+              </div>
+              {formState.root}
             </div>
+            {(openTldDropdown || dropdownAnimation === "exit") && (
+              <ul
+                class={`${inputFieldDropdown} !left-0 max-h-[110px] !w-[64px]
+                ${
+                  dropdownAnimation === "exit"
+                    ? "dropdown-exit"
+                    : dropdownAnimation === "enter"
+                    ? "dropdown-enter"
+                    : ""
+                }
+              `}
+              >
+                {ROOT_DOMAINS.map((tld) => (
+                  <li
+                    key={tld}
+                    class={`${inputFieldDropdownHover} !px-[14px] !text-xs !lowercase !justify-end`}
+                    onClick={() => handleTldSelect(tld)}
+                    onMouseDown={(e) => e.preventDefault()}
+                    role="option"
+                    aria-selected={formState.root === tld}
+                  >
+                    {tld}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
 
         {/* Status and Availability Check Section */}
-        <div className="flex flex-row justify-between w-full">
-          <div className="flex flex-col justify-center items-start">
+        <div class="flex flex-row justify-between w-full">
+          <div class="flex flex-col justify-center items-start">
             {/* message - default:noDisplay / display on user input & onClick - either already registered or available */}
-            <h6 className="font-medium text-sm text-stamp-grey">
+            <h6 class="font-medium text-sm text-color-grey">
               {formState.toAddress && checkStatus
                 ? isExist
                   ? `${
@@ -260,12 +374,12 @@ export function SRC101RegisterTool({
                 : ""}
             </h6>
           </div>
-          <div className="flex flex-col items-end">
+          <div class="flex flex-col items-end">
             <Button
               type="button"
               variant="outline"
-              color="purple"
-              size="md"
+              color="grey"
+              size="mdR"
               onClick={checkAvailability}
               aria-label="Check bitname availability"
             >
@@ -276,27 +390,56 @@ export function SRC101RegisterTool({
       </form>
 
       {/* ===== FEE CALCULATOR AND STATUS MESSAGES ===== */}
-      <div className={containerBackground}>
-        <FeeCalculatorSimple
+      <div class={containerBackground}>
+        <FeeCalculatorBase
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
           type="src101"
           fromPage="src101_bitname"
           fileType="application/json"
-          fileSize={formState.jsonSize}
+          fileSize={formState.jsonSize || 0}
           BTCPrice={formState.BTCPrice}
-          onRefresh={fetchFees}
           isSubmitting={isSubmitting}
-          onSubmit={handleTransferSubmit}
+          onSubmit={handleRegisterWithExactFees}
           buttonName={isConnected ? "REGISTER" : "CONNECT WALLET"}
           tosAgreed={tosAgreed}
           onTosChange={setTosAgreed}
-          userAddress={wallet?.address}
-          utxoAncestors={formState.utxoAncestors}
-          inputType={trxType === "olga" ? "P2WSH" : "P2SH"}
-          outputTypes={trxType === "olga" ? ["P2WSH"] : ["P2SH", "P2WSH"]}
           bitname={formState.toAddress + formState.root}
+          feeDetails={mapProgressiveFeeDetails(
+            exactFeeDetails || progressiveFeeDetails,
+          )}
+          progressIndicator={
+            <ProgressiveEstimationIndicator
+              isConnected={!!wallet && !isSubmitting}
+              isSubmitting={isSubmitting}
+              isPreFetching={isPreFetching}
+              currentPhase={currentPhase}
+              phase1={!!phase1}
+              phase2={!!phase2}
+              phase3={!!phase3}
+              feeEstimationError={feeEstimationError}
+              clearError={clearError}
+            />
+          }
         />
+
+        {/* ===== 🚨 FEE ESTIMATION ERROR HANDLING ===== */}
+        {feeEstimationError && (
+          <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-2xl">
+            <div className="flex items-center justify-between">
+              <span className="text-red-700 text-sm">
+                Fee estimation error: {feeEstimationError}
+              </span>
+              <button
+                type="button"
+                onClick={clearError}
+                className="text-red-500 hover:text-red-700 text-sm font-medium"
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+        )}
 
         <StatusMessages
           submissionMessage={submissionMessage}
@@ -305,34 +448,4 @@ export function SRC101RegisterTool({
       </div>
     </div>
   );
-}
-
-{
-  /* <div className={animatedInputContainer}>
-  <InputField
-    type="text"
-    placeholder="Please input your bitname"
-    value={formState.toAddress?.replace(".btc", "") || ""}
-    onChange={(e) => {
-      const value = (e.target as HTMLInputElement).value.toLowerCase()
-        .replace(
-          ".btc",
-          "",
-        );
-      handleInputChange(
-        {
-          target: {
-            value: value ? `${value}.btc` : "",
-          },
-        },
-        "toAddress",
-      );
-    }}
-    error={formState.toAddressError}
-    class="relative z-[2] h-[54px] mobileLg:h-[60px] w-full !bg-[#100318] rounded-md pl-6 text-base mobileLg:text-lg font-bold text-stamp-grey-light placeholder:!bg-[#100318] placeholder:!text-stamp-grey placeholder:lowercase outline-none focus:!bg-[#100318]"
-  />
-</div>
-<span class="absolute z-[3] right-6 top-1/2 -translate-y-1/2 text-base mobileLg:text-lg font-black text-stamp-purple pointer-events-none">
-  .btc
-</span> */
 }

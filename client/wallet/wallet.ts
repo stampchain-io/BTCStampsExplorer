@@ -1,9 +1,11 @@
-import { signal } from "@preact/signals";
-import { logger } from "$lib/utils/logger.ts";
-import { openModal } from "$islands/modal/states.ts";
 import { stackConnectWalletModal } from "$islands/layout/ModalStack.tsx";
+import { openModal } from "$islands/modal/states.ts";
+import { logger } from "$lib/utils/logger.ts";
+import { showToast } from "$lib/utils/ui/notifications/toastSignal.ts";
+import type { WalletContext } from "$types/ui.d.ts";
+import { signal } from "@preact/signals";
 
-import { Wallet } from "$types/index.d.ts";
+import type { Wallet } from "$types/index.d.ts";
 import {
   broadcastPSBT,
   broadcastRawTX,
@@ -28,57 +30,61 @@ interface WalletProviders {
   unisat?: any;
   tapwallet?: any;
   phantom?: any;
-}
-
-interface WalletContext {
-  readonly wallet: Wallet;
-  readonly isConnected: boolean;
-  updateWallet: (wallet: Wallet) => void;
-  getBasicStampInfo: (address: string) => Promise<any>;
-  disconnect: () => void;
-  signMessage: (message: string) => Promise<any>;
-  signPSBT: (
-    wallet: Wallet,
-    psbt: string,
-    inputsToSign: any[],
-    enableRBF?: boolean,
-    sighashTypes?: number[],
-    autoBroadcast?: boolean,
-  ) => Promise<any>;
-  broadcastRawTX: (rawTx: string) => Promise<any>;
-  broadcastPSBT: (psbtHex: string) => Promise<any>;
-  showConnectModal: () => void;
+  HorizonWalletProvider?: any;
 }
 
 // Initialize wallet state
 export const initialWallet: Wallet = {
   accounts: [],
+  address: "",
   btcBalance: {
     confirmed: 0,
     unconfirmed: 0,
     total: 0,
   },
   stampBalance: [],
+  // Required properties for wallet interface
+  publicKey: "",
+  addressType: "p2wpkh",
+  network: "mainnet",
+  provider: "unisat",
 };
 
 let initialWalletState;
 let initialConnected = false;
 try {
   const savedWallet = localStorage.getItem("wallet");
-  initialConnected = savedWallet ? true : false;
-  initialWalletState = savedWallet ? JSON.parse(savedWallet) : initialWallet;
+  if (savedWallet) {
+    const parsedWallet = JSON.parse(savedWallet);
+    // Only consider connected if wallet has a non-empty address
+    initialConnected = !!parsedWallet.address &&
+      parsedWallet.address.length > 0;
+    initialWalletState = parsedWallet;
+
+    // If wallet data is invalid (no address or empty address), reset to initial state
+    if (!parsedWallet.address || parsedWallet.address.length === 0) {
+      console.warn(
+        "Saved wallet has no valid address, resetting to initial state",
+      );
+      localStorage.removeItem("wallet");
+      initialWalletState = initialWallet;
+    }
+  } else {
+    initialWalletState = initialWallet;
+  }
 } catch (error) {
   console.error("Error reading the wallet state:", error);
   initialWalletState = initialWallet;
+  localStorage.removeItem("wallet");
 }
 
 export const walletSignal = signal<Wallet>(initialWalletState);
 export const isConnectedSignal = signal<boolean>(initialConnected);
 export const showConnectWalletModal = signal<boolean>(false);
 
-export const updateWallet = (_wallet: Wallet) => {
-  walletSignal.value = _wallet;
-  localStorage.setItem("wallet", JSON.stringify(_wallet));
+export const updateWallet = (wallet: Wallet) => {
+  walletSignal.value = wallet;
+  localStorage.setItem("wallet", JSON.stringify(wallet));
   isConnectedSignal.value = true;
 };
 
@@ -86,6 +92,7 @@ export const disconnect = () => {
   walletSignal.value = initialWallet;
   isConnectedSignal.value = false;
   localStorage.removeItem("wallet");
+  showToast("Wallet has been disconnected.", "success");
 };
 
 export const getBasicStampInfo = async (address: string) => {
@@ -103,7 +110,9 @@ export const walletContext: WalletContext = {
     return walletSignal.value;
   },
   get isConnected() {
-    return isConnectedSignal.value;
+    // Double-check that wallet has a non-empty address to be considered connected
+    return isConnectedSignal.value && !!walletSignal.value.address &&
+      walletSignal.value.address.length > 0;
   },
   updateWallet,
   disconnect,
@@ -114,7 +123,7 @@ export const walletContext: WalletContext = {
   signPSBT: async (
     wallet: Wallet,
     psbt: string,
-    inputsToSign: any[],
+    inputsToSign: import("$types/wallet.d.ts").PSBTInputToSign[],
     enableRBF = true,
     sighashTypes?: number[],
     autoBroadcast = true,
@@ -136,9 +145,43 @@ export const walletContext: WalletContext = {
   },
   showConnectModal: () => {
     const { modalContent } = stackConnectWalletModal();
-    openModal(modalContent, "scaleUpDown");
+    openModal(modalContent, "slideUpDown");
   },
 };
+
+// Add SES error suppression for wallet extensions
+if (typeof globalThis !== "undefined" && "addEventListener" in globalThis) {
+  globalThis.addEventListener("error", (event) => {
+    // Suppress SES errors from wallet extensions
+    if (
+      event.error &&
+      (event.error.message?.includes("SES_UNCAUGHT_EXCEPTION") ||
+        event.filename?.includes("lockdown-install.js"))
+    ) {
+      event.preventDefault();
+      console.debug("wallet", {
+        message: "Suppressed SES error from wallet extension",
+        error: event.error?.message,
+        filename: event.filename,
+      });
+    }
+  });
+
+  globalThis.addEventListener("unhandledrejection", (event) => {
+    // Suppress SES promise rejections from wallet extensions
+    if (
+      event.reason &&
+      (event.reason.message?.includes("SES_UNCAUGHT_EXCEPTION") ||
+        event.reason.stack?.includes("lockdown-install.js"))
+    ) {
+      event.preventDefault();
+      console.debug("wallet", {
+        message: "Suppressed SES promise rejection from wallet extension",
+        reason: event.reason?.message,
+      });
+    }
+  });
+}
 
 // Provider checking functions
 export function getGlobalWallets(): WalletProviders {
@@ -155,6 +198,7 @@ export function getGlobalWallets(): WalletProviders {
       unisat?: unknown;
       tapwallet?: unknown;
       phantom?: { bitcoin?: { isPhantom?: boolean } };
+      HorizonWalletProvider?: unknown;
     };
 
     logger.debug("ui", {
@@ -165,6 +209,7 @@ export function getGlobalWallets(): WalletProviders {
         hasUnisat: Boolean(global.unisat),
         hasTapWallet: Boolean(global.tapwallet),
         hasPhantom: Boolean(global.phantom?.bitcoin?.isPhantom),
+        hasHorizon: Boolean(global.HorizonWalletProvider),
         timestamp: new Date().toISOString(),
       },
     });
@@ -175,6 +220,7 @@ export function getGlobalWallets(): WalletProviders {
       unisat: global.unisat,
       tapwallet: global.tapwallet,
       phantom: global.phantom,
+      HorizonWalletProvider: global.HorizonWalletProvider,
     };
   } catch (_error) {
     // Silently handle wallet detection errors to prevent console spam
@@ -203,6 +249,8 @@ export function checkWalletAvailability(provider: string): boolean {
       return !!wallets.tapwallet;
     case "phantom":
       return !!wallets.phantom?.bitcoin?.isPhantom;
+    case "horizon":
+      return !!wallets.HorizonWalletProvider;
     default:
       return false;
   }

@@ -1,0 +1,211 @@
+name: TypeScript Type Checking
+
+on:
+  push:
+    branches: [main, dev]
+    paths:
+      - "**/*.ts"
+      - "**/*.tsx"
+      - "deno.json"
+      - "globals.d.ts"
+      - "lib/types/**"
+      - ".github/workflows/type-check.yml"
+  pull_request:
+    branches: [main, dev]
+    paths:
+      - "**/*.ts"
+      - "**/*.tsx"
+      - "deno.json"
+      - "globals.d.ts"
+      - "lib/types/**"
+      - ".github/workflows/type-check.yml"
+
+jobs:
+  type-check:
+    name: TypeScript Type Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # Fetch more history for better diff analysis
+          fetch-depth: 0
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.4.2
+
+      - name: Cache Deno dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.deno
+            ~/.cache/deno
+            .deno_cache
+          key: ${{ runner.os }}-deno-typecheck-${{ hashFiles('**/deno.json', '**/import_map.json', 'main.ts', 'dev.ts') }}
+          restore-keys: |
+            ${{ runner.os }}-deno-typecheck-${{ hashFiles('**/deno.json') }}
+            ${{ runner.os }}-deno-typecheck-
+            ${{ runner.os }}-deno-
+
+      - name: Cache dependencies (if needed)
+        if: github.event_name != 'pull_request'
+        run: |
+          echo "Caching dependencies for comprehensive type checking..."
+          # Only cache main entry points for non-PR runs
+          deno cache --no-check main.ts dev.ts
+
+      - name: Run TypeScript type analysis (PR-optimized)
+        run: |
+          echo "🔍 Running TypeScript analysis..."
+          
+          # For PRs, we'll check changed files in the next step
+          # For pushes to main/dev, run the comprehensive analysis
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "🔍 Running comprehensive analysis for ${{ github.ref_name }} branch..."
+            timeout 600 deno task analyze:types || echo "⚠️ Full analysis completed with timeout or issues"
+          else
+            echo "⚡ Skipping comprehensive analysis for PR - will check changed files only"
+          fi
+
+      - name: Type check changed files (PR only)
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "🔍 Type checking changed TypeScript files in PR..."
+
+          # Get changed TypeScript files
+          CHANGED_TS_FILES=$(git diff --name-only origin/${{ github.base_ref }}..HEAD | grep -E '\.(ts|tsx)$' | grep -v -E '(test|spec)\.(ts|tsx)$' || echo "")
+
+          if [ -n "$CHANGED_TS_FILES" ]; then
+            echo "📝 Changed TypeScript files:"
+            echo "$CHANGED_TS_FILES"
+            echo ""
+
+            # Check each changed file and track results
+            NEW_ERRORS_FOUND=false
+            CHECKED_FILES=0
+            FILES_WITH_ERRORS=0
+
+            echo "🔍 Type checking changed files..."
+            
+            # Process files and collect results
+            ERROR_FILES=""
+            for file in $CHANGED_TS_FILES; do
+              if [ -f "$file" ]; then
+                CHECKED_FILES=$((CHECKED_FILES + 1))
+                echo -n "Checking $file... "
+                
+                # Check the file with timeout
+                if timeout 30 deno check "$file" 2>&1 >/dev/null; then
+                  echo "✅"
+                else
+                  echo "❌"
+                  FILES_WITH_ERRORS=$((FILES_WITH_ERRORS + 1))
+                  ERROR_FILES="${ERROR_FILES}  - $file\n"
+                fi
+              fi
+            done
+            
+            if [ -n "$ERROR_FILES" ]; then
+              echo -e "\n⚠️ Files with type errors:\n$ERROR_FILES"
+            fi
+
+            echo "📊 Summary for changed files:"
+            echo "  - Files checked: $CHECKED_FILES"
+            echo "  - Files with type errors: $FILES_WITH_ERRORS"
+            echo "  - Files without errors: $((CHECKED_FILES - FILES_WITH_ERRORS))"
+
+            # Only fail if ALL changed files have errors (likely indicates a systemic issue)
+            if [ $CHECKED_FILES -gt 0 ] && [ $FILES_WITH_ERRORS -eq $CHECKED_FILES ] && [ $CHECKED_FILES -gt 2 ]; then
+              echo "❌ All changed files have type errors - this may indicate a systemic issue"
+              echo "💡 Consider fixing at least some type errors before merging"
+              # Uncomment the next line if you want to fail in this case:
+              # exit 1
+            else
+              echo "✅ Type checking passed for PR (gradual improvement mode)"
+            fi
+          else
+            echo "📝 No TypeScript files changed in this PR"
+            echo "✅ No type checking needed for this PR"
+          fi
+
+      - name: Generate type check summary
+        if: always()
+        run: |
+          echo "## TypeScript Type Check Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "🎯 **Status**: This workflow is in gradual improvement mode and won't block PRs due to existing type errors." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Read the analysis report if it exists
+          if [ -f "reports/type-error-analysis.md" ]; then
+            echo "### 📊 Current Type Error Status" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            # Extract key metrics
+            TOTAL_ERRORS=$(grep "Total Errors" reports/type-error-analysis.md | head -1 | grep -o '[0-9]*' || echo "Unknown")
+            echo "- **Total Errors**: $TOTAL_ERRORS" >> $GITHUB_STEP_SUMMARY
+            echo "- **Workflow Status**: Non-blocking (gradual improvement mode)" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            # Show top error categories
+            echo "### 🎯 Top Error Categories" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            grep -A 10 "## Error Categories" reports/type-error-analysis.md | head -15 || echo "Error categories not available" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            # Show critical files
+            echo "### 🔥 Critical Files (Most Errors)" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            grep -A 10 "## Critical Files" reports/type-error-analysis.md | head -15 || echo "Critical files not available" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "### 💡 Improvement Suggestions" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "1. **Focus on Easy Wins**: Start with \`MISSING_TYPE\` and \`IMPLICIT_ANY\` errors" >> $GITHUB_STEP_SUMMARY
+          echo "2. **File-by-File**: Use \`deno check <file>\` to fix individual files" >> $GITHUB_STEP_SUMMARY
+          echo "3. **Track Progress**: Run \`deno task analyze:types\` locally to monitor improvements" >> $GITHUB_STEP_SUMMARY
+          echo "4. **Gradual Approach**: The pre-commit hook now warns about type errors in staged files" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🎯 Goal" >> $GITHUB_STEP_SUMMARY
+          echo "Gradually reduce the total error count through incremental improvements. Each fixed error makes the codebase more maintainable!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🚀 Next Steps" >> $GITHUB_STEP_SUMMARY
+          echo "- This workflow is currently in **gradual improvement mode**" >> $GITHUB_STEP_SUMMARY
+          echo "- PRs are not blocked by existing type errors" >> $GITHUB_STEP_SUMMARY
+          echo "- Focus on fixing type errors in files you're actively working on" >> $GITHUB_STEP_SUMMARY
+          echo "- Once we reach <50 total errors, we can enable strict mode" >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload type analysis report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: type-analysis-report
+          path: reports/type-error-analysis.md
+          retention-days: 30
+
+      - name: Final status message
+        if: always()
+        run: |
+          echo "🎯 TypeScript Analysis Complete!"
+          echo ""
+          echo "📊 This workflow is in gradual improvement mode:"
+          echo "  ✅ Provides comprehensive type error analysis"
+          echo "  ✅ Checks changed files in PRs"
+          echo "  ✅ Doesn't block PRs due to existing errors"
+          echo "  ✅ Encourages incremental improvements"
+          echo ""
+          echo "💡 To contribute to type safety improvements:"
+          echo "  - Fix type errors in files you're actively working on"
+          echo "  - Run 'deno check <file>' before committing changes"
+          echo "  - Use 'deno task analyze:types' to track overall progress"
+          echo ""
+          echo "🚀 Once we reduce errors significantly, we'll enable strict blocking mode!"

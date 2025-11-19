@@ -1,11 +1,23 @@
 import { Handlers } from "$fresh/server.ts";
+import type { AddressHandlerContext } from "$types/base.d.ts";
 import { Src101Controller } from "$server/controller/src101Controller.ts";
-import { AddressHandlerContext } from "$globals";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { ResponseUtil } from "$lib/utils/api/responses/responseUtil.ts";
 
 export const handler: Handlers<AddressHandlerContext> = {
   async GET(_req, ctx) {
     const { deploy_hash } = ctx.params;
+
+    // Validate deploy_hash parameter
+    if (!deploy_hash || typeof deploy_hash !== "string") {
+      return ResponseUtil.badRequest("Deploy hash is required");
+    }
+
+    // Basic validation for deploy hash format (should be alphanumeric)
+    if (!/^[a-fA-F0-9]+$/.test(deploy_hash) || deploy_hash.length < 8) {
+      return ResponseUtil.badRequest(
+        `Invalid deploy hash format: ${deploy_hash}. Must be a valid hexadecimal hash.`,
+      );
+    }
 
     try {
       const result = await Src101Controller.handleSrc101DeployDetailsRequest(

@@ -1,51 +1,24 @@
 /* ===== GET STAMPING CTA COMPONENT ===== */
-import { useEffect, useState } from "preact/hooks";
-import { formatUSDValue } from "$lib/utils/formatUtils.ts";
-import { gapGrid } from "$layout";
 import { Button } from "$button";
-import { subtitleGrey, text, titleGreyDL } from "$text";
+import { containerBackground, containerGap } from "$layout";
+import { subtitleGrey, text, titleGreyLD } from "$text";
 
 /* ===== COMPONENT ===== */
 export default function GetStampingCta() {
   /* ===== STATE ===== */
-  const [btcPrice, setBtcPrice] = useState(0);
-  const [recommendedFee, setRecommendedFee] = useState(6);
-  const [isLoading, setIsLoading] = useState(true);
-
-  /* ===== DATA FETCHING ===== */
-  useEffect(() => {
-    fetch("/api/internal/fees")
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch");
-        return res.json();
-      })
-      .then(({ btcPrice, recommendedFee }) => {
-        setBtcPrice(btcPrice);
-        setRecommendedFee(recommendedFee);
-        setIsLoading(false);
-      })
-      .catch((err) => {
-        console.error("Fees fetch error:", err);
-        setIsLoading(false);
-      });
-  }, []);
-
-  /* ===== HELPERS ===== */
-  const displayPrice = formatUSDValue(btcPrice).toLocaleString();
-  const displayFee = typeof recommendedFee === "number" ? recommendedFee : "0";
 
   /* ===== RENDER ===== */
   return (
-    <div class="flex flex-col">
+    <div class={`${containerBackground}`}>
       {/* ===== HEADER SECTION ===== */}
-      <h3 className={titleGreyDL}>GET STAMPING</h3>
-      <h4 className={subtitleGrey}>IMMORTALISE YOUR ART</h4>
+      <h3 class={titleGreyLD}>GET STAMPING</h3>
+      <h4 class={subtitleGrey}>IMMORTALISE YOUR ART</h4>
 
       {/* ===== CONTENT SECTION ===== */}
       <div
-        className={`flex flex-col tablet:flex-row ${gapGrid} ${text}`}
+        class={`flex flex-col tablet:flex-row ${containerGap} ${text}`}
       >
-        <div className="flex flex-col">
+        <div class="flex flex-col">
           <p>
             <b>
               The Stampchain stamping machine has been revamped and refitted
@@ -63,7 +36,7 @@ export default function GetStampingCta() {
             stamps.
           </p>
         </div>
-        <div className="flex flex-col -mt-1 mobileMd:-mt-2 mobileLg:-mt-4 tablet:mt-0 tablet:text-right">
+        <div class="flex flex-col -mt-1 mobileMd:-mt-2 mobileLg:-mt-4 tablet:mt-0 tablet:text-right">
           <p>
             <b>Wanna stay true to classic A grade numerics ?</b>
             <br />
@@ -82,13 +55,13 @@ export default function GetStampingCta() {
       </div>
 
       {/* ===== BUTTONS SECTION ===== */}
-      <div className="flex flex-col pt-7 gap-3">
+      <div class="flex flex-col pt-7 gap-3">
         {/* ===== BUTTONS ===== */}
-        <div className="flex justify-end gap-6">
+        <div class="flex justify-end gap-5">
           <Button
             variant="outline"
             color="grey"
-            size="md"
+            size="mdR"
             href="/faq"
           >
             FAQ
@@ -96,28 +69,11 @@ export default function GetStampingCta() {
           <Button
             variant="flat"
             color="grey"
-            size="md"
+            size="mdR"
             href="/tool/stamp/create"
           >
             STAMP
           </Button>
-        </div>
-
-        {/* ===== PRICE/FEE INFO ===== */}
-        <div className="flex justify-end gap-5
-        font-light text-sm text-stamp-grey">
-          <p>
-            <span className="text-stamp-grey-darker">FEE</span>&nbsp;
-            {isLoading
-              ? <span className="animate-pulse">XX</span>
-              : <span className="font-medium">{displayFee}</span>} SAT/vB
-          </p>
-          <p>
-            <span className="text-stamp-grey-darker">BTC</span>&nbsp;
-            {isLoading
-              ? <span className="animate-pulse">XX,XXX</span>
-              : <span className="font-medium">{displayPrice}</span>} USD
-          </p>
         </div>
       </div>
     </div>

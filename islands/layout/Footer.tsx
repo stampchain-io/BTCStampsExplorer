@@ -1,13 +1,15 @@
 /* ===== FOOTER COMPONENT ===== */
-import { Icon } from "$icon";
 import { STAMPCHAIN_LOGO_IMAGE } from "$constants";
+import { Icon } from "$icon";
+import { containerBackground } from "$layout";
 import {
   copyright,
-  logoPurpleDL,
+  logoPurpleLD,
   navLinkTransparentPurple,
   overlayPurple,
   tagline,
 } from "$text";
+import { useEffect, useState } from "preact/hooks";
 
 /* ===== FOOTER LINK INTERFACE ===== */
 interface FooterLink {
@@ -39,11 +41,15 @@ const aboutLinks: FooterLink[] = [
 
 const mobileLinks: FooterLink[] = [
   { title: "ABOUT", href: "/about" },
-  { title: "MEDIA", href: "/media" },
-  { title: "HOW-TO", href: "/howto" },
-  { title: "FAQ", href: "/faq" },
   { title: "DONATE", href: "/about#donate" },
-  { title: "TERMS", href: "/termsofservice", hiddenOnMobile: true },
+  {
+    title: "PRESS KIT",
+    href:
+      "https://drive.google.com/drive/folders/18QsMTZ_ZII5FVxuAs2CLFoLdZE3NOdlT",
+    isExternal: true,
+    hiddenOnMobile: true,
+  },
+  { title: "TERMS", href: "/termsofservice" },
 ];
 
 /* ===== SOCIAL MEDIA CONFIGURATION ===== */
@@ -106,17 +112,17 @@ const socialLinks = [
 export function Footer() {
   /* ===== COMPONENT RENDER ===== */
   return (
-    <footer className="
-      flex flex-col tablet:flex-row justify-between max-w-desktop w-full mx-auto 
+    <footer class="
+      flex flex-col tablet:flex-row justify-between max-w-desktop w-full mx-auto
       px-gutter-mobile mobileLg:px-gutter-tablet tablet:px-gutter-desktop
-      pt-24 pb-6 tablet:pt-24 tablet:pb-6
+      pt-10 pb-7.5 tablet:pt-15 tablet:pb-10
       gap-2 mobileMd:gap-3 tablet:gap-4
     ">
       {/* ===== BACKGROUND LOGO ===== */}
       <img
         src={STAMPCHAIN_LOGO_IMAGE}
         alt=""
-        className="
+        class="
           absolute z-[-999]
           size-[270px] mobileMd:size-[250px]
           -bottom-11 mobileMd:-bottom-10
@@ -128,106 +134,207 @@ export function Footer() {
       />
 
       {/* ===== MOBILE SMALL CENTER SECTION - MOBILE MEDIUM+ LEFT SECTION ===== */}
-      <div className="
-        flex flex-col mobileMd:flex-row tablet:flex-col w-full 
-        justify-start mobileMd:justify-between tablet:justify-start 
+      <div
+        class={`${containerBackground} !py-3 tablet:flex-row justify-between`}
+      >
+        <div class="
+        flex flex-col mobileMd:flex-row tablet:flex-col w-full
+        justify-start mobileMd:justify-between tablet:justify-start
         items-center mobileMd:items-end tablet:items-start gap-1
       ">
-        {/* ===== LOGO AND TAGLINE ===== */}
-        <div className="flex flex-col">
-          <h5 className={`${logoPurpleDL} text-center mobileMd:text-left`}>
-            STAMPCHAIN
-            <span className="font-extralight pr-1">.IO</span>
-          </h5>
-          <h6
-            className={`${tagline} text-center mobileMd:text-left`}
-          >
-            IMMORTALISED ART - STORED ON BITCOIN
-          </h6>
-        </div>
-
-        {/* ===== SOCIAL MEDIA ICONS ===== */}
-        <div className="flex gap-6 tablet:gap-4 mt-3 mobileMd:mt-0 tablet:mt-3">
-          {socialLinks.map((link, index) => (
-            <div key={index}>
-              {link.icon}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* ===== DESKTOP RIGHT SECTION ===== */}
-      <div className={`${overlayPurple}`}>
-        <div className="hidden tablet:flex flex-row justify-end w-[300px] pt-1">
-          {/* ===== RESOURCES LINKS ===== */}
-          <div className="flex w-1/2 ">
-            <div className="flex flex-col w-full justify-center gap-1">
-              {resourcesLinks.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  f-partial={link.isExternal ? "" : link.href}
-                  className={`${navLinkTransparentPurple}`}
-                  target={link.isExternal ? "_blank" : undefined}
-                  rel={link.isExternal ? "noopener noreferrer" : undefined}
-                >
-                  {link.title}
-                </a>
-              ))}
-            </div>
-          </div>
-
-          {/* ===== ABOUT LINKS  ===== */}
-          <div className="flex w-1/2">
-            <div className="flex flex-col w-full justify-center gap-1 text-right">
-              {aboutLinks.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  f-partial={link.isExternal ? "" : link.href}
-                  className={`${navLinkTransparentPurple}`}
-                  target={link.isExternal ? "_blank" : undefined}
-                  rel={link.isExternal ? "noopener noreferrer" : undefined}
-                >
-                  {link.title}
-                </a>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* ===== MOBILE BOTTOM ROW SECTION ===== */}
-        {/* ===== MIXED LINKS  ===== */}
-        <div className="flex tablet:hidden w-[360px] mobileMd:w-full justify-center mobileMd:justify-start mx-auto mt-2 mobileMd:mt-1 mb-2">
-          <div className="flex flex-row w-full justify-between">
-            {mobileLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                f-partial={link.isExternal ? "" : link.href}
-                className={`${navLinkTransparentPurple}`}
-                target={link.isExternal ? "_blank" : undefined}
-                rel={link.isExternal ? "noopener noreferrer" : undefined}
-              >
-                {link.title}
-              </a>
-            ))}
-            {/* ===== COPYRIGHT SECTION - MOBILEMD + MOBILELG ===== */}
-            <h6
-              className={`${copyright} hidden mobileMd:block tablet:hidden`}
+          {/* ===== LOGO AND TAGLINE ===== */}
+          <div class="flex flex-col">
+            <h5
+              class={`${logoPurpleLD} text-center mobileMd:text-left`}
             >
-              <span className="italic">STAMPCHAIN</span> &copy; 2025
+              STAMPCHAIN
+              <span class="font-extralight pr-1">
+                .IO
+              </span>
+            </h5>
+            <h6
+              class={`${tagline} text-center mobileMd:text-left`}
+            >
+              IMMORTALISED ART - STORED ON BITCOIN
+            </h6>
+          </div>
+
+          {/* ===== SOCIAL MEDIA ICONS ===== */}
+          <div class="flex gap-6 tablet:gap-5 mt-3 mobileMd:mt-0 tablet:mt-3">
+            {socialLinks.map((link, index) => (
+              <div key={index}>
+                {link.icon}
+              </div>
+            ))}
+          </div>
+          <div class="hidden tablet:flex w-full  mt-3 mb-1">
+            <h6 class={`${copyright}`}>
+              <span class="italic">STAMPCHAIN</span> &copy; 2025
             </h6>
           </div>
         </div>
 
-        {/* ===== COPYRIGHT SECTION - BASE/MOBILESM + TABLET/DESKTOP ===== */}
-        <div className="flex flex-row mobileMd:hidden tablet:block w-full justify-center tablet:justify-end tablet:text-right mt-3 tablet:mt-4">
-          <h6 className={`${copyright}`}>
-            <span className="italic">STAMPCHAIN</span> &copy; 2025
-          </h6>
+        {/* ===== DESKTOP RIGHT SECTION ===== */}
+        <div class={`${overlayPurple}`}>
+          <div class="hidden tablet:flex flex-row justify-end w-[300px] pt-1">
+            {/* ===== RESOURCES LINKS ===== */}
+            <div class="flex w-1/2 ">
+              <div class="flex flex-col w-full justify-center gap-1">
+                {resourcesLinks.map((link) => (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    f-partial={link.isExternal ? "" : link.href}
+                    class={`${navLinkTransparentPurple}`}
+                    target={link.isExternal ? "_blank" : undefined}
+                    rel={link.isExternal ? "noopener noreferrer" : undefined}
+                  >
+                    {link.title}
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            {/* ===== ABOUT LINKS  ===== */}
+            <div class="flex w-1/2">
+              <div class="flex flex-col w-full justify-center gap-1 text-right">
+                {aboutLinks.map((link) => (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    f-partial={link.isExternal ? "" : link.href}
+                    class={`${navLinkTransparentPurple}`}
+                    target={link.isExternal ? "_blank" : undefined}
+                    rel={link.isExternal ? "noopener noreferrer" : undefined}
+                  >
+                    {link.title}
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* ===== MOBILE BOTTOM ROW SECTION ===== */}
+          {/* ===== MIXED LINKS  ===== */}
+          <div class="flex tablet:hidden w-full justify-center mobileMd:justify-start mx-auto mt-3 mobileMd:mt-2 mb-2 mobileMd:mb-0 overflow-hidden">
+            {/* ===== BASE/MOBILESM: EVENLY DISTRIBUTED LINKS ===== */}
+            <div class="flex mobileMd:hidden flex-row flex-wrap w-full justify-center items-center mx-auto gap-6">
+              {mobileLinks.filter((link) => !link.hiddenOnMobile).map((
+                link,
+              ) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  f-partial={link.isExternal ? "" : link.href}
+                  class={`${navLinkTransparentPurple}`}
+                  target={link.isExternal ? "_blank" : undefined}
+                  rel={link.isExternal ? "noopener noreferrer" : undefined}
+                >
+                  {link.title}
+                </a>
+              ))}
+            </div>
+
+            {/* ===== MOBILEMD+: LEFT/RIGHT GROUPED LAYOUT ===== */}
+            <div class="hidden mobileMd:flex flex-row w-full justify-between">
+              {/* ===== LEFT ALIGNED LINKS WITH GAP-5 ===== */}
+              <div class="flex gap-5">
+                {mobileLinks.filter((link) => link.title !== "TERMS").map((
+                  link,
+                ) => (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    f-partial={link.isExternal ? "" : link.href}
+                    class={`${navLinkTransparentPurple}`}
+                    target={link.isExternal ? "_blank" : undefined}
+                    rel={link.isExternal ? "noopener noreferrer" : undefined}
+                  >
+                    {link.title}
+                  </a>
+                ))}
+              </div>
+
+              {/* ===== RIGHT ALIGNED TERMS LINK AND COPYRIGHT ===== */}
+              <div class="flex flex-row items-center text-right gap-5">
+                {mobileLinks.filter((link) => link.title === "TERMS").map((
+                  link,
+                ) => (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    f-partial={link.isExternal ? "" : link.href}
+                    class={`${navLinkTransparentPurple}`}
+                    target={link.isExternal ? "_blank" : undefined}
+                    rel={link.isExternal ? "noopener noreferrer" : undefined}
+                  >
+                    {link.title}
+                  </a>
+                ))}
+
+                {/* ===== COPYRIGHT SECTION - MOBILEMD + MOBILELG ===== */}
+                <h6
+                  class={`${copyright} hidden mobileMd:inline tablet:hidden`}
+                >
+                  <span class="italic">STAMPCHAIN</span> &copy; 2025
+                </h6>
+              </div>
+            </div>
+          </div>
+
+          {/* ===== COPYRIGHT SECTION - BASE/MOBILESM ===== */}
+          <div class="flex flex-row mobileMd:hidden w-full justify-center  mt-3">
+            <h6 class={`${copyright}`}>
+              <span class="italic">STAMPCHAIN</span> &copy; 2025
+            </h6>
+          </div>
+          <div class="hidden tablet:flex mt-[18px] justify-end">
+            <CounterpartyVersion />
+          </div>
         </div>
       </div>
     </footer>
+  );
+}
+
+function CounterpartyVersion() {
+  const [version, setVersion] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    const fetchVersion = async () => {
+      try {
+        const res = await fetch("/api/v2/counterparty/version", {
+          headers: { "X-CSRF-Token": "safe" },
+        });
+        const data = await res.json();
+        if (!cancelled) {
+          setVersion(data?.version ?? null);
+        }
+      } catch (_e) {
+        if (!cancelled) setVersion(null);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    fetchVersion();
+
+    const interval = globalThis.setInterval(fetchVersion, 24 * 60 * 60 * 1000);
+    return () => {
+      cancelled = true;
+      globalThis.clearInterval(interval);
+    };
+  }, []);
+
+  return (
+    <div class={copyright}>
+      COUNTERPARTY {loading
+        ? <span class="animate-pulse">vXX.X.X</span>
+        : version
+        ? <>v{version}</>
+        : <>v N/A</>}
+    </div>
   );
 }

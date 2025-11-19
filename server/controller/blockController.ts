@@ -1,6 +1,7 @@
-import { BlockService } from "$server/services/blockService.ts";
-import { BlockInfoResponseBody, StampBlockResponseBody } from "$globals";
-import { isIntOr32ByteHex } from "$lib/utils/formatUtils.ts";
+import { type BlockStampType } from "$constants";
+import { isIntOr32ByteHex } from "$lib/utils/ui/formatting/formatUtils.ts";
+import { BlockService } from "$server/services/core/blockService.ts";
+import type { BlockInfoResponseBody, StampBlockResponseBody } from "$types/api.d.ts";
 
 export class BlockController {
   static async getLastXBlocks(num: number) {
@@ -9,7 +10,7 @@ export class BlockController {
 
   static async getBlockInfoWithStamps(
     blockIdentifier: number | string,
-    type: "stamps" | "cursed" | "all" = "all",
+    type: BlockStampType = "all",
   ): Promise<StampBlockResponseBody> {
     return await BlockService.getBlockInfoWithStamps(blockIdentifier, type);
   }
@@ -49,9 +50,9 @@ export class BlockController {
 
   static async getBlockInfoResponse(
     blockIdentifier: number | string,
-    type: "stamps" | "cursed" | "all" = "all",
+    type: BlockStampType = "all",
   ) {
-    if (!isIntOr32ByteHex(blockIdentifier)) {
+    if (!isIntOr32ByteHex(blockIdentifier as string)) {
       throw new Error(
         `Invalid input: ${blockIdentifier}. It must be a valid block index (integer) or block hash (64 character string).`,
       );
@@ -63,9 +64,9 @@ export class BlockController {
 
   static async getRelatedBlockInfoResponse(
     blockIdentifier: number | string,
-    type: "stamps" | "cursed",
+    type: Exclude<BlockStampType, "all">,
   ) {
-    if (!isIntOr32ByteHex(blockIdentifier)) {
+    if (!isIntOr32ByteHex(blockIdentifier as string)) {
       throw new Error(
         "Invalid argument provided. Must be an integer or 32 byte hex string.",
       );
@@ -77,7 +78,7 @@ export class BlockController {
 
   static async getSharedBlockWithStamps(
     blockIndex: string | undefined,
-    type: "stamps" | "cursed",
+    type: Exclude<BlockStampType, "all">,
   ) {
     let blockIdentifier: number | string;
 

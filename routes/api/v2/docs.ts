@@ -1,5 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { ResponseUtil } from "$lib/utils/api/responses/responseUtil.ts";
 import { parse as parseYaml } from "@std/yaml";
 import { fromFileUrl, join } from "@std/path";
 
@@ -11,7 +11,10 @@ const openApiSchema = parseYaml(schemaContent) as Record<string, unknown>;
 // Helper function to resolve $ref in schemas
 function resolveRef(ref: string): Record<string, unknown> | null {
   const path = ref.replace("#/components/schemas/", "").split("/");
-  let schema = openApiSchema.components?.schemas as Record<string, unknown>;
+  let schema = (openApiSchema as any).components?.schemas as Record<
+    string,
+    unknown
+  >;
 
   for (const segment of path) {
     if (!schema || typeof schema !== "object") return null;
@@ -137,7 +140,7 @@ export const handler: Handlers = {
 
     // Return filtered documentation in the correct format
     return ResponseUtil.success({
-      documentation: filteredDocs.map((doc) => ({
+      documentation: filteredDocs.map((doc: any) => ({
         path: doc.path,
         method: doc.method,
         summary: doc.summary,
@@ -145,7 +148,7 @@ export const handler: Handlers = {
         tags: doc.tags,
         parameters: doc.parameters || [],
         requestBody: doc.requestBody,
-        responses: doc.responses.map((response) => ({
+        responses: doc.responses.map((response: any) => ({
           code: response.code,
           description: response.description,
           content: response.content,

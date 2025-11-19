@@ -1,9 +1,11 @@
 /* ===== BLOCK INDEX PAGE ROUTE ===== */
+
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { BlockController } from "$server/controller/blockController.ts";
-import { BlockRow } from "$globals";
-import { BlockHeader } from "$header";
+import type { BlockRow } from "$types/base.d.ts";
+
 import { BlockSelector, BlockTransactions } from "$content";
+import { BlockHeader } from "$header";
 import { signal } from "@preact/signals";
 
 /* ===== TYPES ===== */
@@ -15,7 +17,7 @@ interface BlockIndexData {
 }
 
 import { body } from "$layout";
-import { subtitlePurple, textLg } from "$text";
+import { subtitleGrey, textLg } from "$text";
 
 /* ===== SERVER HANDLER ===== */
 export const handler: Handlers<BlockIndexData> = {
@@ -47,9 +49,14 @@ export const handler: Handlers<BlockIndexData> = {
         currentBlock: {
           block_index: 0,
           block_hash: "",
-          block_time: new Date().toISOString(),
+          block_time: new Date(),
           issuances: 0,
-          // ... other required BlockRow properties
+          previous_block_hash: "",
+          difficulty: 0,
+          ledger_hash: "",
+          txlist_hash: "",
+          messages_hash: "",
+          indexed: 1,
         } as BlockRow,
         relatedBlocks: [],
         lastBlock: 0,
@@ -71,7 +78,7 @@ export default function BlockIndexPage({ data }: PageProps<BlockIndexData>) {
 
       {/* ===== PAGE TITLE ===== */}
       <div class="mb-6">
-        <h2 class={subtitlePurple}>
+        <h2 class={subtitleGrey}>
           CURRENT BLOCK
           <span class="font-bold ml-3">{data.lastBlock.toLocaleString()}</span>
         </h2>
@@ -83,12 +90,14 @@ export default function BlockIndexPage({ data }: PageProps<BlockIndexData>) {
       {/* ===== MAIN CONTENT ===== */}
       <div class="flex flex-col gap-6">
         <div class="flex flex-col gap-4">
-          <h3 class={subtitlePurple}>RELATED BLOCKS</h3>
+          <h3 class={subtitleGrey}>RELATED BLOCKS</h3>
           {data.relatedBlocks.map((block) => (
             <BlockSelector
               key={block.block_index}
               block={block}
-              selected={selectedBlock}
+              selected={{
+                value: selectedBlock.value?.block_index === block.block_index,
+              }}
             />
           ))}
         </div>

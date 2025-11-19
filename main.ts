@@ -5,12 +5,39 @@
 /// <reference lib="deno.ns" />
 /// <reference types="npm:@types/node" />
 
+// Fix for EventTarget memory leak warning
+// Suppress MaxListenersExceededWarning for AbortSignal to prevent memory leak warnings
+// This is safe because we properly clean up listeners in our HTTP client
+if (typeof process !== "undefined" && process.emitWarning) {
+  const originalEmitWarning = process.emitWarning;
+  // @ts-ignore - Complex overloaded function signature, but we handle it safely
+  process.emitWarning = function (
+    warning: string | Error,
+    type?: string,
+    code?: string,
+    ctor?: Function,
+  ) {
+    // Suppress MaxListenersExceededWarning for AbortSignal
+    if (
+      type === "MaxListenersExceededWarning" &&
+      typeof warning === "string" &&
+      warning.includes("AbortSignal")
+    ) {
+      return;
+    }
+    // @ts-ignore - Complex overloaded function signature, but we handle it safely
+    return originalEmitWarning.call(this, warning, type, code, ctor);
+  };
+}
+
 // Try to establish the resolver as early as possible.
 // The error happens before the original main.ts logs, so this might not catch it either,
 // but it's an attempt to hook in earlier.
 const earlyOriginalResolve = import.meta.resolve;
 import.meta.resolve = function (specifier: string): string {
-  const isBuildMode = Deno.args.includes("build"); // Cannot rely on globalThis yet if it's too early
+  // BROWSER GUARD: Only access Deno when available (server-side)
+  const isBuildMode =
+    (typeof Deno !== "undefined" && Deno.args?.includes("build")) || false;
   console.log(
     `[EARLY RESOLVER ENTRY] Specifier: "${specifier}", BuildMode: ${isBuildMode}, Timestamp: ${Date.now()}`,
   );
@@ -31,14 +58,28 @@ import.meta.resolve = function (specifier: string): string {
   return earlyOriginalResolve(specifier);
 };
 
-import "$/globals.d.ts";
-import { start } from "$fresh/server.ts";
-import build from "$fresh/dev.ts";
-import manifest from "$/fresh.gen.ts";
 import config from "$/fresh.config.ts";
-import "$server/database/index.ts"; // Ensures dbManager instance is created via its module execution
-import { dbManager } from "$server/database/databaseManager.ts"; // Explicit import for direct use
-import { BackgroundFeeService } from "$server/services/fee/backgroundFeeService.ts";
+import manifest from "$/fresh.gen.ts";
+import "$/globals.d.ts";
+import build from "$fresh/dev.ts";
+import { start } from "$fresh/server.ts";
+const DENO_ROLE = Deno.env.get("DENO_ROLE");
+// Lazy import DB and background services only when not running in pure web mode
+let dbManager:
+  | typeof import("$server/database/databaseManager.ts").dbManager
+  | undefined;
+let BackgroundFeeService:
+  | typeof import("$server/services/fee/backgroundFeeService.ts").BackgroundFeeService
+  | undefined;
+if (DENO_ROLE !== "web") {
+  const dbModule = await import("$server/database/databaseManager.ts");
+  dbManager = dbModule.dbManager;
+  await import("$server/database/index.ts");
+  const feeModule = await import(
+    "$server/services/fee/backgroundFeeService.ts"
+  );
+  BackgroundFeeService = feeModule.BackgroundFeeService;
+}
 
 // Set DENO_BUILD_MODE globally, to be accessible within the resolver
 (globalThis as any).DENO_BUILD_MODE = Deno.args.includes("build");
@@ -100,17 +141,16 @@ import.meta.resolve = function (specifier: string): string {
 };
 
 if (import.meta.main) {
-  if (!Deno.args.includes("build")) {
+  if (!Deno.args.includes("build") && DENO_ROLE !== "web") {
     try {
       console.log(`[MAIN] Attempting dbManager.initialize() at ${Date.now()}`);
-      await dbManager.initialize();
+      await dbManager!.initialize();
       console.log(`[MAIN] dbManager.initialize() completed at ${Date.now()}`);
 
       // Start background fee cache warming service
-      const baseUrl = Deno.env.get("DEV_BASE_URL") || "https://stampchain.io";
-      BackgroundFeeService.start(baseUrl);
+      BackgroundFeeService!.start();
       console.log(
-        `[MAIN] Background fee service started with baseUrl: ${baseUrl}`,
+        `[MAIN] Background fee service started`,
       );
     } catch (e) {
       if (e instanceof Error) {

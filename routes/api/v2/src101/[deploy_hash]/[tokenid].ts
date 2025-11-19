@@ -1,13 +1,13 @@
 import { Handlers } from "$fresh/server.ts";
 import { Src101Controller } from "$server/controller/src101Controller.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
+import { ResponseUtil } from "$lib/utils/api/responses/responseUtil.ts";
+import { getPaginationParams } from "$lib/utils/data/pagination/paginationUtils.ts";
 import {
   checkEmptyResult,
   DEFAULT_PAGINATION,
   validateRequiredParams,
   validateSortParam,
-} from "$server/services/routeValidationService.ts";
+} from "$server/services/validation/routeValidationService.ts";
 
 export const handler: Handlers = {
   async GET(req, ctx) {
@@ -18,6 +18,20 @@ export const handler: Handlers = {
       const paramsValidation = validateRequiredParams({ deploy_hash, tokenid });
       if (!paramsValidation.isValid) {
         return paramsValidation.error!;
+      }
+
+      // Validate deploy_hash format (should be alphanumeric hash)
+      if (!/^[a-fA-F0-9]+$/.test(deploy_hash) || deploy_hash.length < 8) {
+        return ResponseUtil.badRequest(
+          `Invalid deploy hash format: ${deploy_hash}. Must be a valid hexadecimal hash.`,
+        );
+      }
+
+      // Validate tokenid format (should be numeric or alphanumeric)
+      if (!/^[a-zA-Z0-9-]+$/.test(tokenid)) {
+        return ResponseUtil.badRequest(
+          `Invalid token ID format: ${tokenid}. Must be alphanumeric.`,
+        );
       }
 
       const url = new URL(req.url);
@@ -41,7 +55,7 @@ export const handler: Handlers = {
         tokenid,
         limit: limit || DEFAULT_PAGINATION.limit,
         page: page || DEFAULT_PAGINATION.page,
-        sort: sortValidation.data,
+        ...(sortValidation.data && { sort: sortValidation.data }),
       };
 
       const result = await Src101Controller.handleSrc101OwnerRequest(

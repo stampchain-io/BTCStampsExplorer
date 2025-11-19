@@ -1,10 +1,8 @@
-import { assertEquals } from "@std/assert";
 import {
-  convertEmojiToTick,
-  convertToEmoji,
   emojiToUnicodeEscape,
   unicodeEscapeToEmoji,
-} from "$lib/utils/emojiUtils.ts";
+} from "$lib/utils/ui/formatting/emojiUtils.ts";
+import { assertEquals } from "@std/assert";
 
 Deno.test("emojiUtils - emojiToUnicodeEscape", () => {
   // Test basic emoji conversion
@@ -61,17 +59,4 @@ Deno.test("emojiUtils - unicodeEscapeToEmoji", () => {
 
   // Test already emoji (should return as-is)
   assertEquals(unicodeEscapeToEmoji("🔥"), "🔥");
-});
-
-Deno.test("emojiUtils - deprecated functions", () => {
-  // Test that deprecated functions work the same as their replacements
-  assertEquals(convertEmojiToTick("🔥"), emojiToUnicodeEscape("🔥"));
-  assertEquals(
-    convertToEmoji("\\U0001F525"),
-    unicodeEscapeToEmoji("\\U0001F525"),
-  );
-
-  // Verify they produce expected results
-  assertEquals(convertEmojiToTick("🚀"), "\\U0001F680");
-  assertEquals(convertToEmoji("\\U0001F680"), "🚀");
 });

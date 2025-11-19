@@ -1,26 +1,16 @@
+import type { SUBPROTOCOLS } from "$types/base.d.ts";
 /* ===== COLLECTION DETAILS PAGE ===== */
-import { FreshContext, Handlers } from "$fresh/server.ts";
-import { STAMP_FILTER_TYPES, StampRow, SUBPROTOCOLS } from "$globals";
-import { Pagination } from "$islands/datacontrol/Pagination.tsx";
+
+import type { StampFilterType } from "$constants";
 import { CollectionDetailContent } from "$content";
-import { StampController } from "$server/controller/stampController.ts";
-import { CollectionService } from "$server/services/collectionService.ts";
+import { FreshContext, Handlers } from "$fresh/server.ts";
+import type { CollectionDetailsPageProps } from "$types/ui.d.ts";
+
+import { PaginationButtons } from "$button";
 import { CollectionDetailHeader } from "$header";
+import { StampController } from "$server/controller/stampController.ts";
+import { CollectionService } from "$server/services/core/collectionService.ts";
 /* ===== TYPES ===== */
-type CollectionDetailsPageProps = {
-  data: {
-    id: string;
-    collection: any;
-    stamps: StampRow[];
-    total: number;
-    page: number;
-    pages: number;
-    page_size: number;
-    selectedTab: "all" | "classic" | "posh";
-    sortBy: string;
-    filterBy: string[];
-  };
-};
 
 /* ===== SERVER HANDLER ===== */
 export const handler: Handlers = {
@@ -34,7 +24,7 @@ export const handler: Handlers = {
         ? "ASC"
         : "DESC";
       const filterBy = url.searchParams.get("filterBy")?.split(",").map((f) =>
-        f as STAMP_FILTER_TYPES
+        f as StampFilterType
       ) || [];
       const selectedTab = url.searchParams.get("ident") || "all";
       const ident: SUBPROTOCOLS[] = selectedTab === "all"
@@ -66,9 +56,9 @@ export const handler: Handlers = {
         id,
         collection,
         stamps: result.data,
-        page: result.page,
-        pages: result.totalPages,
-        page_size: result.limit,
+        page: (result as any).page,
+        pages: (result as any).totalPages,
+        page_size: (result as any).limit,
         filterBy,
         sortBy,
         selectedTab,
@@ -91,7 +81,7 @@ export default function CollectionDetailPage(
   props: CollectionDetailsPageProps,
 ) {
   const {
-    id: _id,
+    id,
     stamps,
     page,
     pages,
@@ -100,18 +90,18 @@ export default function CollectionDetailPage(
 
   /* ===== COMPONENT ===== */
   return (
-    <div class="flex flex-col gap-6">
+    <div
+      class="flex flex-col gap-6"
+      f-client-nav
+      data-partial={`/collection/detail/${id}`}
+    >
       <CollectionDetailHeader collection={collection} stamps={stamps} />
       <CollectionDetailContent stamps={stamps} />
-      <div class="mt-12 mobileLg:mt-[72px]">
-        <Pagination
+      <div class="mt-7.5 tablet:mt-10">
+        <PaginationButtons
           page={page}
           totalPages={pages}
-          onPageChange={(newPage) => {
-            const url = new URL(globalThis.location.href);
-            url.searchParams.set("page", newPage.toString());
-            globalThis.location.href = url.toString();
-          }}
+          // Remove onPageChange to let PaginationButtons component use its built-in Fresh navigation
         />
       </div>
     </div>

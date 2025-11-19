@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== COMPONENT ===== */
-export default function StampTextContent({ src }: { src: string }) {
+export default function StampTextContent({ src }: { src: string | undefined }) {
   /* ===== STATE MANAGEMENT ===== */
   const [content, setContent] = useState<string>("Loading...");
   const [error, setError] = useState<string | null>(null);
@@ -35,6 +35,7 @@ export default function StampTextContent({ src }: { src: string }) {
 
   // Fetch text content
   useEffect(() => {
+    if (!src) return;
     fetch(src)
       .then((response) => {
         if (!response.ok) {
@@ -47,16 +48,17 @@ export default function StampTextContent({ src }: { src: string }) {
   }, [src]);
 
   /* ===== RENDER ===== */
-  if (error) return <div className="text-red-500">Error: {error}</div>;
+  if (!src) return null;
+  if (error) return <div class="text-red-500">Error: {error}</div>;
 
   return (
     <div
       ref={containerRef}
-      className="flex items-center justify-center w-full h-full overflow-auto bg-[#F7931A] rounded"
+      class="flex items-center justify-center w-full h-full overflow-auto bg-gradient-to-br from-color-orange-light to-color-orange-semilight rounded-2xl"
     >
       {/* ===== TEXT CONTENT ===== */}
       <pre
-        className="whitespace-pre-wrap break-words max-w-full text-black text-center"
+        class="whitespace-pre-wrap break-words max-w-full text-black text-center"
         style={{ fontSize }}
       >
         {content}

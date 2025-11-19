@@ -1,16 +1,18 @@
+import type { TickHandlerContext } from "$types/base.d.ts";
+// Unused imports removed: BlockHandlerContext, IdentHandlerContext, PaginatedTickResponseBody, SRC20TrxRequestParams
 import { Handlers } from "$fresh/server.ts";
-import { AddressTickHandlerContext } from "$globals";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
+import { RouteType } from "$server/services/infrastructure/cacheService.ts";
+import { getPaginationParams } from "$lib/utils/data/pagination/paginationUtils.ts";
 import {
   checkEmptyResult,
   DEFAULT_PAGINATION,
   validateRequiredParams,
   validateSortParam,
-} from "$server/services/routeValidationService.ts";
+} from "$server/services/validation/routeValidationService.ts";
 
-export const handler: Handlers<AddressTickHandlerContext> = {
+export const handler: Handlers<TickHandlerContext> = {
   async GET(req, ctx) {
     try {
       const { tick } = ctx.params;
@@ -42,7 +44,7 @@ export const handler: Handlers<AddressTickHandlerContext> = {
         limit: limit || DEFAULT_PAGINATION.limit,
         page: page || DEFAULT_PAGINATION.page,
         amt: Number(url.searchParams.get("amt")) || 0,
-        sortBy: sortValidation.data,
+        sortBy: sortValidation.data || "DESC",
       };
 
       const result = await Src20Controller.handleSrc20SnapshotRequest(
@@ -55,12 +57,12 @@ export const handler: Handlers<AddressTickHandlerContext> = {
         return emptyCheck;
       }
 
-      return ResponseUtil.success(result);
+      return ApiResponseUtil.success(result, { routeType: RouteType.BALANCE });
     } catch (error) {
-      console.error("Error in GET handler:", error);
-      return ResponseUtil.internalError(
+      console.error("Error in snapshot handler:", error);
+      return ApiResponseUtil.internalError(
         error,
-        "Error processing SRC20 snapshot request",
+        "Error processing snapshot request",
       );
     }
   },

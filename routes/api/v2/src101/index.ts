@@ -1,11 +1,11 @@
 import { Handlers } from "$fresh/server.ts";
 import { Src101Controller } from "$server/controller/src101Controller.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
+import { getPaginationParams } from "$lib/utils/data/pagination/paginationUtils.ts";
 import {
   checkEmptyResult,
   DEFAULT_PAGINATION,
-} from "$server/services/routeValidationService.ts";
+} from "$server/services/validation/routeValidationService.ts";
 
 export const handler: Handlers = {
   async GET(req) {
@@ -35,10 +35,10 @@ export const handler: Handlers = {
         return emptyCheck;
       }
 
-      return ResponseUtil.success(result);
+      return ApiResponseUtil.success(result);
     } catch (error) {
       console.error("Error in index handler:", error);
-      return ResponseUtil.internalError(
+      return ApiResponseUtil.internalError(
         error,
         "Error processing src101 valid tx request",
       );

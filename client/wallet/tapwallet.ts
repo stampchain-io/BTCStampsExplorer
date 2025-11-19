@@ -1,33 +1,49 @@
-import { signal } from "@preact/signals";
-import { walletContext } from "./wallet.ts";
-import { SignPSBTResult, Wallet } from "$types/index.d.ts";
-import { checkWalletAvailability } from "./wallet.ts";
-import { handleWalletError } from "./walletHelper.ts";
+import {
+  checkWalletAvailability,
+  walletContext,
+} from "$client/wallet/wallet.ts";
+import {
+  handleWalletError,
+  parseConnectionError,
+} from "$client/wallet/walletHelper.ts";
 import { logger } from "$lib/utils/logger.ts";
+import type { BaseToast } from "$lib/utils/ui/notifications/toastSignal.ts";
+import type { SignPSBTResult, Wallet } from "$types/index.d.ts";
+import { signal } from "@preact/signals";
 
 export const isTapWalletInstalled = signal<boolean>(false);
 
 export const connectTapWallet = async (
-  addToast: (message: string, type: "error" | "success") => void,
+  addToast: (message: string, type: BaseToast["type"]) => void,
 ) => {
   try {
     const tapwallet = (globalThis as any).tapwallet;
     if (!tapwallet) {
+      logger.error("ui", {
+        message: "TapWallet not detected",
+        context: "connectTapWallet",
+      });
       addToast(
-        "TapWallet not detected. Please install the TapWallet extension.",
+        "TapWallet not detected.\nPlease install the TapWallet extension.",
         "error",
       );
       return;
     }
     const accounts = await tapwallet.requestAccounts();
     await handleAccountsChanged(accounts);
-    addToast("Successfully connected to TapWallet", "success");
+    logger.info("ui", {
+      message: "Successfully connected to TapWallet",
+      context: "connectTapWallet",
+    });
+    addToast("Successfully connected to TapWallet.", "success");
   } catch (error) {
-    if (error instanceof Error) {
-      addToast(`Failed to connect to TapWallet: ${error.message}`, "error");
-    } else {
-      addToast("Failed to connect to TapWallet", "error");
-    }
+    const errorMessage = parseConnectionError(error);
+    logger.error("ui", {
+      message: "Failed to connect to TapWallet",
+      context: "connectTapWallet",
+      error: errorMessage,
+    });
+    addToast(`Failed to connect to TapWallet.\n${errorMessage}`, "error");
   }
 };
 
@@ -44,24 +60,24 @@ const handleAccountsChanged = async (accounts: string[]) => {
   }
 
   const tapwallet = (globalThis as any).tapwallet;
-  const _wallet = {} as Wallet;
-  _wallet.address = accounts[0];
-  _wallet.accounts = accounts;
+  const wallet = {} as Wallet;
+  wallet.address = accounts[0];
+  wallet.accounts = accounts;
 
   const publicKey = await tapwallet.getPublicKey();
-  _wallet.publicKey = publicKey;
+  wallet.publicKey = publicKey;
 
   const balance = await tapwallet.getBalance();
-  _wallet.btcBalance = {
+  wallet.btcBalance = {
     confirmed: balance.confirmed,
     unconfirmed: balance.unconfirmed,
     total: balance.confirmed + balance.unconfirmed,
   };
 
-  _wallet.network = await tapwallet.getNetwork();
-  _wallet.provider = "tapwallet";
+  wallet.network = await tapwallet.getNetwork();
+  wallet.provider = "tapwallet";
 
-  walletContext.updateWallet(_wallet);
+  walletContext.updateWallet(wallet);
 };
 
 const signMessage = async (message: string) => {

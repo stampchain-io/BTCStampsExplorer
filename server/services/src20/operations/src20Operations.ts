@@ -1,5 +1,5 @@
-import { SRC20Service } from "$server/services/src20/index.ts";
-import type { IDeploySRC20, IMintSRC20, ITransferSRC20, IPrepareSRC20TX } from "$types/index.d.ts";
+import { SRC20UtilityService } from "$server/services/src20/utilityService.ts";
+import type { IDeploySRC20, IMintSRC20, ITransferSRC20, IPrepareSRC20TX } from "$server/types/services/src20.d.ts";
 import { SRC20MultisigPSBTService } from "$server/services/src20/psbt/src20MultisigPSBTService.ts";
 import { logger } from "$lib/utils/logger.ts";
 
@@ -10,19 +10,16 @@ interface SRC20Operation {
   [key: string]: unknown;
 }
 
+// Create a union type for all SRC20 operation parameters
+type SRC20OperationParams = IMintSRC20 | IDeploySRC20 | ITransferSRC20;
+
 export class SRC20OperationService {
-  private static async executeSRC20Operation<T extends IPrepareSRC20TX>(
+  private static async executeSRC20Operation<T extends SRC20OperationParams>(
     params: T,
-    validateParams: (params: T) => Promise<void | TXError>,
     createOperationObject: (params: T) => SRC20Operation,
     additionalChecks: (params: T) => Promise<void>,
   ) {
     try {
-      const validationError = await validateParams(params);
-      if (validationError) {
-        throw new Error(validationError.error);
-      }
-      
       await additionalChecks(params);
 
       const operationObject = createOperationObject(params);
@@ -56,10 +53,9 @@ export class SRC20OperationService {
   static mintSRC20(params: IMintSRC20) {
     return this.executeSRC20Operation(
       params,
-      SRC20Service.UtilityService.validateMint,
       ({ tick, amt }) => ({ op: "MINT", p: "SRC-20", tick, amt }),
       async ({ tick, amt }) => {
-        const mintInfo = await SRC20Service.UtilityService.checkMintedOut(tick, amt);
+        const mintInfo = await SRC20UtilityService.checkMintedOut(tick, amt);
         if (mintInfo.minted_out) {
           throw new Error(`Error: token ${tick} already minted out`);
         }
@@ -70,8 +66,7 @@ export class SRC20OperationService {
   static deploySRC20(params: IDeploySRC20) {
     return this.executeSRC20Operation(
       params,
-      SRC20Service.UtilityService.validateDeploy,
-      ({ tick, max, lim, dec, x, web, email, tg, description }) => ({
+      ({ tick, max, lim, dec, x, web, email, tg, description, desc }) => ({
         op: "DEPLOY",
         p: "SRC-20",
         tick,
@@ -82,10 +77,10 @@ export class SRC20OperationService {
         ...(web && { web }),
         ...(email && { email }),
         ...(tg && { tg }),
-        ...(description && { description }),
+        ...((description || desc) && { description: description || desc }),
       }),
       async ({ tick }) => {
-        const mintInfo = await SRC20Service.UtilityService.checkDeployedTick(tick);
+        const mintInfo = await SRC20UtilityService.checkDeployedTick(tick);
         if (mintInfo.deployed) {
           throw new Error(`Error: Token ${tick} already deployed`);
         }
@@ -96,10 +91,9 @@ export class SRC20OperationService {
   static transferSRC20(params: ITransferSRC20) {
     return this.executeSRC20Operation(
       params,
-      SRC20Service.UtilityService.validateTransfer,
       ({ tick, amt }) => ({ op: "TRANSFER", p: "SRC-20", tick, amt }),
       async ({ fromAddress, tick, amt }) => {
-        const hasEnoughBalance = await SRC20Service.UtilityService.checkEnoughBalance(fromAddress, tick, amt);
+        const hasEnoughBalance = await SRC20UtilityService.checkEnoughBalance(fromAddress, tick, amt);
         if (!hasEnoughBalance) {
           throw new Error("Error: Not enough balance");
         }

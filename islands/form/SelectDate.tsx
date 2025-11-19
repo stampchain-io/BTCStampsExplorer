@@ -8,7 +8,7 @@ interface PropTypes {
 }
 
 const SelectDate = ({ setDateRange, isUppercase = true }: PropTypes) => {
-  const calendarRef = useRef<HTMLDivElement>(null);
+  const calendarRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (calendarRef.current) {
@@ -24,7 +24,7 @@ const SelectDate = ({ setDateRange, isUppercase = true }: PropTypes) => {
 
   return (
     <input
-      className={`${inputField} ${isUppercase ? "uppercase" : ""}`}
+      class={`${inputField} ${isUppercase ? "uppercase" : ""}`}
       placeholder="SELECT DATE"
       ref={calendarRef}
     />

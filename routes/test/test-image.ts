@@ -1,6 +1,8 @@
+
 import { Handlers } from "$fresh/server.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { serverConfig } from "$server/config/config.ts";
+import { WebResponseUtil } from "$utils/api/responses/webResponseUtil.ts";
 
 interface TestResult {
   txHash: string;
@@ -46,12 +48,12 @@ export const handler: Handlers = {
     const denoEnv = Deno.env.get("DENO_ENV") || "unknown";
 
     // Log the environment
-    logger.debug("environment", {
+    logger.debug("system", {
       message: "Current DENO_ENV",
       denoEnv,
     });
 
-    logger.debug("images", {
+    logger.debug("content", {
       message: "Testing image endpoints and configurations",
       config: {
         IMAGES_SRC_PATH: serverConfig.IMAGES_SRC_PATH,
@@ -62,7 +64,8 @@ export const handler: Handlers = {
     const testResults: TestResults = {
       config: {
         BASE_URL: baseUrl,
-        IMAGES_SRC_PATH: serverConfig.IMAGES_SRC_PATH,
+        ...(serverConfig.IMAGES_SRC_PATH &&
+          { IMAGES_SRC_PATH: serverConfig.IMAGES_SRC_PATH }),
       },
       stampchainTests: [],
       proxyTests: [],
@@ -489,8 +492,6 @@ export const handler: Handlers = {
       </html>
     `;
 
-    return new Response(htmlResponse, {
-      headers: { "Content-Type": "text/html" },
-    });
+    return WebResponseUtil.htmlResponse(htmlResponse);
   },
 };

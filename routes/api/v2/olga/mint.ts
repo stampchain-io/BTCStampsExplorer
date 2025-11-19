@@ -1,74 +1,24 @@
 import { FreshContext, Handlers } from "$fresh/server.ts";
 // MintStampInputData import removed as RawRequestBody is now explicitly defined
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
+import { SATOSHIS_PER_BTC } from "$constants"; // For XCP decimal handling if values are not base units
+import { logger } from "$lib/utils/logger.ts"; // Import logger
 import { serverConfig } from "$server/config/config.ts";
 import {
-  StampMintService,
+  StampCreationService,
   StampValidationService,
 } from "$server/services/stamp/index.ts";
-import { normalizeFeeRate, XcpManager } from "$server/services/xcpService.ts";
-import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import {
+  CounterpartyApiManager,
+  normalizeFeeRate,
+} from "$server/services/counterpartyApiService.ts";
 import * as bitcoin from "bitcoinjs-lib"; // Keep for Psbt.fromHex
-import { logger } from "$lib/utils/logger.ts"; // Import logger
-import { SATOSHIS_PER_BTC } from "$lib/utils/constants.ts"; // For XCP decimal handling if values are not base units
-
-// Define TransactionInput if not available globally or for clarity here
-interface TransactionInput {
-  txid: string;
-  vout: number;
-  signingIndex: number;
-}
-
-// Interface for the raw request body, allowing flexible types for parsing
-interface RawRequestBody {
-  sourceWallet?: string;
-  assetName?: string;
-  qty?: number | string;
-  locked?: boolean;
-  divisible?: boolean;
-  filename?: string;
-  file?: string;
-  description?: string; // Now explicitly on RawRequestBody
-  prefix?: "stamp" | "file" | "glyph"; // Now explicitly on RawRequestBody
-  dryRun?: boolean;
-  satsPerKB?: number | string;
-  satsPerVB?: number | string;
-  feeRate?: number | string;
-  service_fee?: number | string;
-  service_fee_address?: string;
-  isPoshStamp?: boolean;
-  // Include other fields from MintStampInputData if they can be in the body
-}
-
-// Type for the object passed to StampMintService.createStampIssuance
-// This should match the parameters of that method precisely.
-interface CreateStampIssuanceParams {
-  sourceWallet: string;
-  assetName: string;
-  qty: number;
-  locked: boolean;
-  divisible: boolean;
-  filename: string;
-  file: string;
-  satsPerKB: number;
-  satsPerVB: number;
-  description: string;
-  prefix: "stamp" | "file" | "glyph";
-  isDryRun?: boolean;
-  service_fee: number;
-  service_fee_address: string;
-}
-
-interface NormalizedMintResponse {
-  hex: string;
-  cpid: string;
-  est_tx_size: number;
-  input_value: number;
-  total_dust_value: number;
-  est_miner_fee: number;
-  change_value: number;
-  total_output_value: number;
-  txDetails: TransactionInput[];
-}
+import type {
+  CreateStampIssuanceParams,
+  NormalizedMintResponse,
+  RawRequestBody,
+  TransactionInput,
+} from "$types/api.d.ts";
 
 export const handler: Handlers<NormalizedMintResponse | { error: string }> = {
   async POST(req: Request, _ctx: FreshContext) {
@@ -79,9 +29,27 @@ export const handler: Handlers<NormalizedMintResponse | { error: string }> = {
       return ApiResponseUtil.badRequest("Invalid JSON format in request body");
     }
 
-    // Validate essential fields that StampMintService will require
+    // Check dryRun status early to handle dummy address logic
+    const isDryRun = body.dryRun === true;
+
+    logger.info("api", {
+      message: "Olga mint request received",
+      bodyDryRun: body.dryRun,
+      isDryRun,
+      bodyDryRunType: typeof body.dryRun,
+      hasSourceWallet: !!body.sourceWallet,
+    });
+
+    // For dryRun, use dummy address if sourceWallet is not provided
+    // This allows fee estimation without wallet connection (Phase 1 estimation)
+    const effectiveSourceWallet = isDryRun && !body.sourceWallet
+      ? "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4" // Valid P2WPKH dummy address for estimation
+      : body.sourceWallet;
+
+    // Validate essential fields that StampCreationService will require
+    // Use effectiveSourceWallet instead of body.sourceWallet for validation
     if (
-      !body.sourceWallet || !body.filename || !body.file ||
+      !effectiveSourceWallet || !body.filename || !body.file ||
       body.qty === undefined || body.locked === undefined ||
       body.divisible === undefined
     ) {
@@ -89,6 +57,17 @@ export const handler: Handlers<NormalizedMintResponse | { error: string }> = {
         "Missing required fields: sourceWallet, filename, file, qty, locked, or divisible.",
       );
     }
+
+    // MARA mode detection - activated when outputValue is provided and < 330
+    const outputValueNum = body.outputValue !== undefined
+      ? (typeof body.outputValue === "string"
+        ? parseInt(body.outputValue, 10)
+        : body.outputValue)
+      : undefined;
+
+    const isMaraMode = outputValueNum !== undefined &&
+      outputValueNum >= 1 &&
+      outputValueNum < 330; // 330+ uses standard wallet broadcast
 
     let normalizedFees;
     try {
@@ -113,13 +92,53 @@ export const handler: Handlers<NormalizedMintResponse | { error: string }> = {
           : body.feeRate;
       }
       normalizedFees = normalizeFeeRate(feeInputArgs);
+
+      // Override with MARA fee rate if in MARA mode and rate provided
+      if (isMaraMode && body.maraFeeRate) {
+        const maraFeeRateNum = typeof body.maraFeeRate === "string"
+          ? parseFloat(body.maraFeeRate)
+          : body.maraFeeRate;
+
+        // MARA provides fee rate in sats/vB
+        normalizedFees.normalizedSatsPerVB = maraFeeRateNum;
+        normalizedFees.normalizedSatsPerKB = maraFeeRateNum * 1000;
+
+        logger.info("api", {
+          message: "Using MARA fee rate override",
+          maraFeeRate: maraFeeRateNum,
+          normalizedSatsPerVB: normalizedFees.normalizedSatsPerVB,
+          normalizedSatsPerKB: normalizedFees.normalizedSatsPerKB,
+        });
+      }
+
+      // Log fee rate for debugging
+      console.log("🔧 /api/v2/olga/mint: Processing with fee rate", {
+        rawFeeRate: body.feeRate,
+        rawSatsPerVB: body.satsPerVB,
+        rawSatsPerKB: body.satsPerKB,
+        maraFeeRate: body.maraFeeRate,
+        isMaraMode,
+        normalizedFees,
+        isDryRun: body.dryRun,
+      });
     } catch (error) {
       return ApiResponseUtil.badRequest(
         error instanceof Error ? error.message : "Invalid fee rate",
       );
     }
 
-    const isDryRun = body.dryRun === true;
+    // Log the dryRun mode for clarity
+    logger.debug("api", {
+      message: "Processing olga mint request",
+      isDryRun,
+      dryRunMode: isDryRun
+        ? "estimation_with_dummy_utxos"
+        : "execution_with_real_utxos",
+      originalSourceWallet: body.sourceWallet,
+      effectiveSourceWallet: effectiveSourceWallet,
+      filename: body.filename,
+    });
+
     let validatedAssetName;
     try {
       validatedAssetName = await StampValidationService
@@ -132,18 +151,22 @@ export const handler: Handlers<NormalizedMintResponse | { error: string }> = {
       );
     }
 
-    // XCP Check for POSH stamps
-    if (body.isPoshStamp && validatedAssetName && body.sourceWallet) {
+    // XCP Check for POSH stamps - Only required for actual execution (dryRun: false)
+    if (
+      body.isPoshStamp && validatedAssetName && effectiveSourceWallet &&
+      !isDryRun
+    ) {
       try {
         logger.info("api", {
           message: "Performing XCP balance check for POSH stamp",
           assetName: validatedAssetName,
-          wallet: body.sourceWallet,
+          wallet: effectiveSourceWallet,
         });
-        const balancesResult = await XcpManager.getXcpBalancesByAddress(
-          body.sourceWallet,
-          "XCP",
-        ); // Fetch specific XCP balance
+        const balancesResult = await CounterpartyApiManager
+          .getXcpBalancesByAddress(
+            effectiveSourceWallet,
+            "XCP",
+          ); // Fetch specific XCP balance
 
         const xcpAsset = balancesResult.balances.find((b) => b.cpid === "XCP");
         const xcpBalance = xcpAsset ? xcpAsset.quantity : 0;
@@ -155,7 +178,7 @@ export const handler: Handlers<NormalizedMintResponse | { error: string }> = {
         logger.debug("api", {
           message: "XCP Balance Check Details",
           assetName: validatedAssetName,
-          wallet: body.sourceWallet,
+          wallet: effectiveSourceWallet,
           xcpBalanceBaseUnits: xcpBalance,
           requiredXcpBaseUnits,
           xcpAssetFound: !!xcpAsset,
@@ -187,20 +210,46 @@ export const handler: Handlers<NormalizedMintResponse | { error: string }> = {
       }
     }
 
-    const serviceFeeNum = body.service_fee !== undefined
-      ? (typeof body.service_fee === "string"
-        ? parseInt(body.service_fee, 10)
-        : body.service_fee)
-      : parseInt(serverConfig.MINTING_SERVICE_FEE_FIXED_SATS, 10);
+    // Validate outputValue range if provided
+    if (
+      outputValueNum !== undefined &&
+      (outputValueNum < 1 || outputValueNum > 1000) // Allow higher values for standard mode
+    ) {
+      return ApiResponseUtil.badRequest(
+        "Invalid outputValue: must be between 1 and 5000",
+      );
+    }
 
-    const serviceFeeAddr = body.service_fee_address !== undefined
-      ? body.service_fee_address
-      : serverConfig.MINTING_SERVICE_FEE_ADDRESS || ""; // Provide ultimate fallback for string
+    // Service fee override logic for MARA mode
+    const serviceFeeNum = isMaraMode
+      ? 42000 // MARA pool access fee (42k sats)
+      : (body.service_fee !== undefined
+        ? (typeof body.service_fee === "string"
+          ? parseInt(body.service_fee, 10)
+          : body.service_fee)
+        : parseInt(serverConfig.MINTING_SERVICE_FEE_FIXED_SATS, 10));
+
+    const serviceFeeAddr = isMaraMode
+      ? "bc1qhhv6rmxvq5mj2fc3zne2gpjqduy45urapje64m" // MARA service fee address
+      : (body.service_fee_address !== undefined
+        ? body.service_fee_address
+        : serverConfig.MINTING_SERVICE_FEE_ADDRESS || ""); // Provide ultimate fallback for string
+
+    // Log MARA mode status
+    if (isMaraMode) {
+      logger.info("api", {
+        message: "MARA mode activated",
+        outputValue: outputValueNum,
+        serviceFee: serviceFeeNum,
+        serviceFeeAddress: serviceFeeAddr,
+        maraFeeRate: body.maraFeeRate,
+      });
+    }
 
     const createIssuanceParams: CreateStampIssuanceParams = {
-      sourceWallet: body.sourceWallet,
+      sourceWallet: effectiveSourceWallet,
       assetName: validatedAssetName || "",
-      qty: typeof body.qty === "string" ? parseInt(body.qty, 10) : body.qty,
+      qty: typeof body.qty === "string" ? body.qty : String(body.qty),
       locked: body.locked,
       divisible: body.divisible,
       filename: body.filename,
@@ -212,16 +261,26 @@ export const handler: Handlers<NormalizedMintResponse | { error: string }> = {
       isDryRun: isDryRun,
       service_fee: serviceFeeNum,
       service_fee_address: serviceFeeAddr,
+      ...(outputValueNum !== undefined && { outputValue: outputValueNum }),
     };
 
     try {
-      const mint_tx_details = await StampMintService.createStampIssuance(
+      const mint_tx_details = await StampCreationService.createStampIssuance(
         createIssuanceParams,
       );
 
+      // dryRun: true = Estimation mode (return fee estimates without PSBT hex)
       if (isDryRun) {
+        logger.debug("api", {
+          message: "Returning fee estimation (dryRun: true)",
+          est_tx_size: mint_tx_details.est_tx_size,
+          est_miner_fee: mint_tx_details.est_miner_fee,
+          total_dust_value: mint_tx_details.total_dust_value,
+          total_output_value: mint_tx_details.total_output_value,
+        });
+
         return ApiResponseUtil.success({
-          hex: "",
+          hex: "", // No PSBT hex for estimation
           cpid: validatedAssetName || "",
           est_tx_size: Number(mint_tx_details.est_tx_size),
           input_value: Number(mint_tx_details.input_value),
@@ -229,15 +288,18 @@ export const handler: Handlers<NormalizedMintResponse | { error: string }> = {
           est_miner_fee: Number(mint_tx_details.est_miner_fee),
           change_value: Number(mint_tx_details.change_value),
           total_output_value: Number(mint_tx_details.total_output_value),
-          txDetails: [],
+          txDetails: [], // No transaction details for estimation
+          is_estimate: true,
+          estimation_method: "service_with_dummy_utxos",
         } as NormalizedMintResponse, { forceNoCache: true });
       }
 
+      // dryRun: false = Execution mode (return full PSBT hex for signing)
       if (!mint_tx_details || !mint_tx_details.hex) {
-        console.error(
-          "Invalid mint_tx_details structure (missing hex for PSBT):",
+        logger.error("api", {
+          message: "Invalid mint_tx_details structure (missing hex for PSBT)",
           mint_tx_details,
-        );
+        });
         return ApiResponseUtil.badRequest(
           "Error generating mint transaction: PSBT hex missing",
         );
@@ -261,8 +323,15 @@ export const handler: Handlers<NormalizedMintResponse | { error: string }> = {
         },
       );
 
+      logger.debug("api", {
+        message: "Returning execution PSBT (dryRun: false)",
+        psbtLength: mint_tx_details.hex.length,
+        txDetailsCount: txDetails.length,
+        est_tx_size: mint_tx_details.est_tx_size,
+      });
+
       return ApiResponseUtil.success({
-        hex: mint_tx_details.hex,
+        hex: mint_tx_details.hex, // Full PSBT hex for execution
         cpid: validatedAssetName || "",
         est_tx_size: Number(mint_tx_details.est_tx_size),
         input_value: Number(mint_tx_details.input_value),
@@ -270,10 +339,16 @@ export const handler: Handlers<NormalizedMintResponse | { error: string }> = {
         est_miner_fee: Number(mint_tx_details.est_miner_fee),
         change_value: Number(mint_tx_details.change_value),
         total_output_value: Number(mint_tx_details.total_output_value),
-        txDetails: txDetails,
+        txDetails: txDetails, // Full transaction details for execution
+        is_estimate: false,
+        estimation_method: "exact_with_real_utxos",
       } as NormalizedMintResponse, { forceNoCache: true });
     } catch (error: unknown) {
-      console.error("Minting error in API route:", error);
+      logger.error("api", {
+        message: "Minting error in API route",
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      });
       const errorMessage = error instanceof Error
         ? error.message
         : "An unexpected error occurred during minting";

@@ -1,43 +1,41 @@
-import { HoldersPieChart, HoldersTableBase } from "$table";
+/* ===== HOLDERS TABLE COMPONENT ===== */
 import { containerBackground } from "$layout";
+import { HoldersPieChart, HoldersTableBase } from "$table";
 import { labelSm, value3xl } from "$text";
+import type { HoldersTableProps } from "$types/ui.d.ts";
 
-interface Holder {
-  address: string | null;
-  amt: number;
-  percentage: number;
-}
-
-interface HoldersTableProps {
-  holders?: Holder[];
-}
-
+/* ===== COMPONENT ===== */
 export function HoldersTable({ holders = [] }: HoldersTableProps) {
-  if (!holders.length) {
+  /* ===== EMPTY STATE ===== */
+  if (!holders?.length) {
     return (
-      <div className="flex flex-col bg-gradient-to-br primary-gradient p-6 relative rounded-lg">
-        <div className="text-center py-10">No holder data available</div>
+      <div class={containerBackground}>
+        <div class="text-center py-10">NO HOLDER DATA AVAILABLE</div>
       </div>
     );
   }
 
-  const totalHolders = holders.length;
+  /* ===== CALCULATIONS ===== */
+  const totalHolders = holders?.length ?? 0;
 
+  /* ===== RENDER ===== */
   return (
-    <div className={containerBackground}>
-      <div className="text-left tablet:text-right">
-        <h5 className={labelSm}>HOLDERS</h5>
-        <h6 className={value3xl}>
+    <div class={containerBackground}>
+      {/* ===== HEADER SECTION ===== */}
+      <div class="text-left tablet:text-right">
+        <h5 class={labelSm}>HOLDERS</h5>
+        <h6 class={value3xl}>
           {totalHolders}
         </h6>
       </div>
-      <div className="flex flex-col tablet:flex-row w-full gap-6">
-        <div className="flex justify-center tablet:justify-start">
-          <HoldersPieChart holders={holders} />
+      {/* ===== CONTENT SECTION ===== */}
+      <div class="flex flex-col tablet:flex-row w-full gap-6">
+        <div class="flex justify-center tablet:justify-start">
+          <HoldersPieChart holders={holders as any} />
         </div>
 
-        <div className="relative w-full max-w-full">
-          <HoldersTableBase holders={holders} />
+        <div class="relative w-full max-w-full">
+          <HoldersTableBase holders={holders as any} />
         </div>
       </div>
     </div>

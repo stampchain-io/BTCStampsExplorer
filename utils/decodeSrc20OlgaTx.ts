@@ -1,10 +1,15 @@
 // At the very top of the file, before any imports
 (globalThis as any).SKIP_REDIS_CONNECTION = true;
 
+// Declare global mock data for testing
+declare global {
+  var mockTxData: any;
+}
+
 import { hex2bin } from "$lib/utils/binary/baseUtils.ts";
+import { QuicknodeService } from "$server/services/quicknode/quicknodeService.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
 import * as msgpack from "msgpack";
-import { QuicknodeService } from "$server/services/quicknode/quicknodeService.ts";
 const STAMP_PREFIX = "stamp:";
 
 let mockQuicknodeService: typeof QuicknodeService | undefined;
@@ -14,7 +19,6 @@ if (import.meta.main) {
 } else {
   // In test environment
   mockQuicknodeService = {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     getTransaction: (_txid: string) => globalThis.mockTxData,
   } as typeof QuicknodeService;
 }

@@ -1,34 +1,41 @@
 import { Handlers } from "$fresh/server.ts";
-import { Src20Controller } from "$server/controller/src20Controller.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-
-// TODO(@reinamora_137): add to documentation:
-// This supports multiple operations, separated by a slash.
-// For example, /transfer/mint/deploy  /api/v2/src20/mint/deploy
-
-const validOps = ["transfer", "mint", "deploy"];
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
+import { getPaginationParams } from "$lib/utils/data/pagination/paginationUtils.ts";
+import {
+  DEFAULT_PAGINATION,
+  validateSortParam,
+} from "$server/services/validation/routeValidationService.ts";
+import { SRC20Service } from "$server/services/src20/index.ts";
 
 export const handler: Handlers = {
   async GET(req, ctx) {
+    const { op } = ctx.params;
+    const url = new URL(req.url);
+    const pagination = getPaginationParams(url);
+
+    // Check if pagination validation failed
+    if (pagination instanceof Response) {
+      return pagination;
+    }
+
+    const { limit, page } = pagination;
+
+    // Validate sort parameter
+    const sortValidation = validateSortParam(url);
+    if (!sortValidation.isValid) {
+      return sortValidation.error!;
+    }
+
     try {
-      const opParam = ctx.params.op;
-      const ops = Array.isArray(opParam) ? opParam : [opParam];
-      const splitOps = ops.flatMap((op) => op.split("/"));
-
-      if (!splitOps.every((op) => validOps.includes(op))) {
-        return ResponseUtil.badRequest("Invalid operation");
-      }
-
-      const result = await Src20Controller.handleSrc20TransactionsRequest(req, {
-        op: splitOps,
+      const result = await SRC20Service.QueryService.fetchBasicSrc20Data({
+        op: op.toUpperCase(),
+        ...(sortValidation.data && { sortBy: sortValidation.data }),
+        page: page || DEFAULT_PAGINATION.page,
+        limit: limit || DEFAULT_PAGINATION.limit,
       });
-      return ResponseUtil.success(result);
+      return ApiResponseUtil.success(result);
     } catch (error) {
-      console.error("Error in src20/[...op] handler:", error);
-      return ResponseUtil.internalError(
-        error,
-        "Error processing SRC-20 request",
-      );
+      return ApiResponseUtil.internalError(error, "Error processing request");
     }
   },
 };

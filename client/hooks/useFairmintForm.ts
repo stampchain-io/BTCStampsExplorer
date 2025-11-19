@@ -1,30 +1,19 @@
-import { useEffect, useState } from "preact/hooks";
 import { useConfig } from "$client/hooks/useConfig.ts";
-import { useFees } from "$fees";
 import {
   showConnectWalletModal,
   walletContext,
 } from "$client/wallet/wallet.ts";
-import axiod from "axiod";
+import { useFees } from "$fees";
+import type { Config } from "$types/base.d.ts";
+import { debounce } from "$lib/utils/performance/debounce.ts";
+import { logger } from "$lib/utils/logger.ts";
+import { estimateFee } from "$lib/utils/minting/feeCalculations.ts";
+import { handleUnknownError } from "$lib/utils/errorHandling.ts";
 import { decodeBase64 } from "@std/encoding/base64";
 import { encodeHex } from "@std/encoding/hex";
-import { Config } from "$globals";
-import { logger } from "$lib/utils/logger.ts";
-import type { AncestorInfo } from "$types/index.d.ts";
-
-interface FairmintFormState {
-  asset: string;
-  quantity: string;
-  fee: number;
-  BTCPrice: number;
-  jsonSize: number;
-  utxoAncestors?: AncestorInfo[];
-  psbtFeeDetails?: {
-    estMinerFee: number;
-    totalDustValue: number;
-    hasExactFees: boolean;
-  };
-}
+import axiod from "axiod";
+import { useEffect, useState } from "preact/hooks";
+import type { FairmintFormState } from "$types/ui.d.ts";
 
 export function useFairmintForm(fairminters: any[]) {
   const { config, isLoading: configLoading } = useConfig<Config>();
@@ -46,6 +35,7 @@ export function useFairmintForm(fairminters: any[]) {
     BTCPrice: 0,
     jsonSize: 0,
     utxoAncestors: [],
+    isLoading: false,
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -60,9 +50,150 @@ export function useFairmintForm(fairminters: any[]) {
   const { wallet } = walletContext;
   const address = wallet.address;
 
+  // Progressive fee estimation for fairmint
+  const estimateFairmintFeesDebounced = debounce(async (
+    asset: string,
+    quantity: string,
+    fee: number,
+    walletAddress?: string,
+  ) => {
+    if (!asset || !quantity || fee <= 0) return;
+
+    try {
+      // Phase 1: Immediate client-side fee estimation
+      // Fairmint transactions typically have:
+      // 1. Recipient output (546 sats dust limit)
+      // 2. Change output (variable, back to sender)
+      const outputs = [
+        { type: "P2WPKH", value: 546, script: "" }, // Recipient output
+        { type: "P2WPKH", value: 0, script: "" }, // Change output
+      ];
+
+      const immediateEstimate = estimateFee(outputs, fee, 1);
+      const dustValue = 546; // Standard P2WPKH dust limit
+      const totalEstimate = immediateEstimate + dustValue;
+
+      // Set immediate estimates with hasExactFees: false
+      setFormState((prev) => ({
+        ...prev,
+        psbtFeeDetails: {
+          minerFee: immediateEstimate,
+          estMinerFee: immediateEstimate, // backward compatibility
+          totalDustValue: dustValue,
+          totalFee: totalEstimate,
+          hasExactFees: false, // Mark as estimate
+          feeRate: fee,
+        },
+        isLoading: true, // Show that we're upgrading to exact fees
+      }));
+
+      logger.debug("ui", {
+        message: "Fairmint immediate fee estimate",
+        data: {
+          asset,
+          quantity,
+          fee,
+          immediateEstimate,
+          dustValue,
+          totalEstimate,
+          isEstimate: true,
+        },
+      });
+
+      // Phase 2: Upgrade to exact fees via API with dryRun
+      if (!config) return; // Need config for API call
+
+      const shouldUseDryRun = !walletAddress; // Use dryRun if no wallet connected
+
+      const response = await axiod.post("/api/v2/fairmint/compose", {
+        address: walletAddress || "bc1qtest", // Dummy address for dryRun
+        asset,
+        quantity,
+        options: {
+          fee_per_kb: fee * 1000,
+        },
+        service_fee: config?.MINTING_SERVICE_FEE,
+        service_fee_address: config?.MINTING_SERVICE_FEE_ADDRESS,
+        dryRun: shouldUseDryRun, // Dynamic based on wallet state
+      });
+
+      if (response.data) {
+        logger.debug("ui", {
+          message: "Fairmint API fee response",
+          data: {
+            asset,
+            quantity,
+            shouldUseDryRun,
+            hasExactFees: !shouldUseDryRun,
+            response: response.data,
+          },
+        });
+
+        setFormState((prev) => ({
+          ...prev,
+          psbtFeeDetails: {
+            minerFee: Number(response.data.est_miner_fee) ||
+              Number(response.data.estimatedFee) || 0,
+            estMinerFee: Number(response.data.est_miner_fee) ||
+              Number(response.data.estimatedFee) || 0, // backward compatibility
+            totalDustValue: Number(response.data.total_dust_value) || 546,
+            totalFee: (Number(response.data.est_miner_fee) ||
+              Number(response.data.estimatedFee) || 0) +
+              (Number(response.data.total_dust_value) || 546),
+            hasExactFees: !shouldUseDryRun, // Exact fees when dryRun=false, estimates when dryRun=true
+            feeRate: fee,
+          },
+          isLoading: false, // Clear loading state after exact fees are loaded
+        }));
+      }
+    } catch (unknownError) {
+      const error = handleUnknownError(
+        unknownError,
+        "Failed to estimate fairmint fees",
+      );
+      logger.error("ui", {
+        message: "Failed to estimate fairmint fees",
+        error: error.message,
+        errorDetails: {
+          name: error.name,
+          stack: error.stack,
+        },
+      });
+
+      // On error, preserve estimates and clear loading state
+      setFormState((prev) => ({
+        ...prev,
+        isLoading: false,
+      }));
+    }
+  }, 750);
+
   useEffect(() => {
     setIsLoading(configLoading || feeLoading);
   }, [configLoading, feeLoading]);
+
+  // Trigger progressive fee estimation when form values change
+  useEffect(() => {
+    if (formState.asset && formState.quantity && formState.fee > 0) {
+      estimateFairmintFeesDebounced(
+        formState.asset,
+        formState.quantity,
+        formState.fee,
+        address,
+      );
+    }
+
+    return () => {
+      estimateFairmintFeesDebounced.cancel();
+    };
+  }, [
+    formState.asset,
+    formState.quantity,
+    formState.fee,
+    address,
+    config,
+    estimateFairmintFeesDebounced,
+  ]);
 
   useEffect(() => {
     if (fees && !feeLoading) {
@@ -180,6 +311,7 @@ export function useFairmintForm(fairminters: any[]) {
         },
       });
 
+      // For submission, we always need the actual PSBT (dryRun: false)
       const response = await axiod.post("/api/v2/fairmint/compose", {
         address,
         asset: formState.asset,
@@ -189,6 +321,7 @@ export function useFairmintForm(fairminters: any[]) {
         },
         service_fee: config?.MINTING_SERVICE_FEE,
         service_fee_address: config?.MINTING_SERVICE_FEE_ADDRESS,
+        dryRun: false, // Always false for actual submission
       });
 
       logger.debug("ui", {
@@ -197,27 +330,26 @@ export function useFairmintForm(fairminters: any[]) {
         response: response.data,
       });
 
-      // Populate psbtFeeDetails from the response
-      if (response.data?.result) {
+      // Update psbtFeeDetails with exact values from submission
+      if (response.data) {
         setFormState((prev) => ({
           ...prev,
           psbtFeeDetails: {
-            estMinerFee: response.data.result.estimatedFee || 0,
-            totalDustValue: response.data.result.totalOutputValue &&
-                response.data.result.totalInputValue
-              ? Number(
-                BigInt(response.data.result.totalInputValue) -
-                  BigInt(response.data.result.totalOutputValue) -
-                  BigInt(response.data.result.estimatedFee || 0),
-              )
-              : 0,
-            hasExactFees: response.data.result.estimatedFee !== undefined,
+            minerFee: Number(response.data.est_miner_fee) ||
+              Number(response.data.estimatedFee) || 0,
+            estMinerFee: Number(response.data.est_miner_fee) ||
+              Number(response.data.estimatedFee) || 0, // backward compatibility
+            totalDustValue: Number(response.data.total_dust_value) || 546,
+            totalFee: (Number(response.data.est_miner_fee) ||
+              Number(response.data.estimatedFee) || 0) +
+              (Number(response.data.total_dust_value) || 546),
+            hasExactFees: true, // Always exact for submission
+            feeRate: formState.fee,
           },
         }));
       }
 
-      const psbtBase64 = response.data?.result?.psbtHex ||
-        response.data?.result?.psbt;
+      const psbtBase64 = response.data?.psbtHex || response.data?.psbt;
 
       if (!psbtBase64 || typeof psbtBase64 !== "string") {
         throw new Error("Invalid response from server: PSBT not found.");
@@ -256,17 +388,18 @@ export function useFairmintForm(fairminters: any[]) {
         });
         setSubmissionMessage({ message: `Failed: ${error}` });
       }
-    } catch (error: unknown) {
+    } catch (unknownError) {
+      const error = handleUnknownError(unknownError, "Error during submission");
       logger.error("ui", {
         message: "Error during submission",
         context: "useFairmintForm",
-        error: error instanceof Error ? error.message : String(error),
+        error: error.message,
+        errorDetails: {
+          name: error.name,
+          stack: error.stack,
+        },
       });
-      setApiError(
-        error instanceof Error
-          ? error.message
-          : "An unexpected error occurred.",
-      );
+      setApiError(error.message);
     } finally {
       setIsSubmitting(false);
     }

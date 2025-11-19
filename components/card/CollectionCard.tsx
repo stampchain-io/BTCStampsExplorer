@@ -1,8 +1,13 @@
 /* ===== COLLECTION OVERVIEW CARD COMPONENT ===== */
-import { Collection } from "$globals";
-import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
-import { containerBackground } from "$layout";
+import { containerBackground, shadowGlowPurple } from "$layout";
+import {
+  abbreviateAddress,
+  formatBTC,
+  formatMarketCap,
+  formatVolume,
+} from "$lib/utils/ui/formatting/formatUtils.ts";
 import { labelSm, valueSm } from "$text";
+import type { CollectionWithOptionalMarketData } from "$types/";
 
 /* ===== HELPERS ===== */
 function abbreviateCollectionName(name: string): string {
@@ -12,99 +17,142 @@ function abbreviateCollectionName(name: string): string {
 
 /* ===== COMPONENT ===== */
 export function CollectionCard(
-  { collection }: { collection: Collection },
+  { collection }: { collection: CollectionWithOptionalMarketData },
 ) {
+  // Early return if collection is undefined
+  if (!collection) {
+    return null;
+  }
+
+  // Safe access to collection properties with fallbacks
+  const collectionName = collection.collection_name ?? "Unknown Collection";
+  const stampImage = collection.first_stamp_image ?? collection.img ?? "";
+  const stampCount = collection.stamp_count ?? 0;
+
   return (
     <a
-      href={`/collection/detail/${collection.collection_name}`}
-      className={`${containerBackground} gap-6 hover:border-stamp-purple-bright hover:shadow-stamp hover:border-solid border-2 border-transparent group`}
+      href={`/collection/detail/${collectionName}`}
+      className={`${containerBackground} gap-6 hover:border-color-purple-light ${shadowGlowPurple} hover:border-solid border-2 border-transparent group`}
     >
       {/* ===== CARD HEADER ===== */}
-      <div className="flex w-full gap-6">
-        <div className="min-w-[106px] min-h-[106px] max-w-[106px] max-h-[106px] mobileMd:min-w-[98px] mobileMd:min-h-[98px] mobileMd:max-w-[98px] mobileMd:max-h-[98px] rounded aspect-stamp image-rendering-pixelated overflow-hidden">
-          <div className="relative flex items-center justify-center w-full h-full">
+      <div class="flex w-full gap-6">
+        <div class="min-w-[106px] min-h-[106px] max-w-[106px] max-h-[106px] mobileMd:min-w-[98px] mobileMd:min-h-[98px] mobileMd:max-w-[98px] mobileMd:max-h-[98px] rounded-2xl aspect-stamp image-rendering-pixelated overflow-hidden">
+          <div class="relative flex items-center justify-center w-full h-full">
             <img
-              src={collection.first_stamp_image || collection.img}
+              src={stampImage}
               alt=""
               className="w-full h-full"
             />
           </div>
         </div>
-        <div className="w-full">
-          <div className="flex flex-col justify-between w-full">
+        <div class="w-full">
+          <div class="flex flex-col justify-between w-full">
             {/* check code */}
-            <h2 className="font-black text-2xl gray-gradient1 group-hover:[-webkit-text-fill-color:#AA00FF] tracking-wide inline-block w-fit">
-              <span className="min-[420px]:hidden">
-                {abbreviateCollectionName(collection.collection_name)
+            <h2 class="font-black text-2xl color-grey-gradientDL group-hover:[-webkit-text-fill-color:var(--color-purple-light)] tracking-wide inline-block w-fit">
+              <span class="min-[420px]:hidden">
+                {abbreviateCollectionName(collectionName)
                   .toUpperCase()}
               </span>
-              <span className="hidden min-[420px]:inline">
-                {collection.collection_name.toUpperCase()}
+              <span class="hidden min-[420px]:inline">
+                {collectionName.toUpperCase()}
               </span>
             </h2>
 
-            <h5 className={`${labelSm} pt-0.75 mobileLg:pt-1.5`}>
+            <h5 class={`${labelSm} pt-0.75 mobileLg:pt-1.5`}>
               BY{" "}
-              <span className={`${valueSm} normal-case`}>
-                {collection.creators
+              <span class={`${valueSm} normal-case`}>
+                {collection.creators && collection.creators.length > 0
                   ? (
                     <>
-                      <span className="mobileMd:hidden">
-                        {abbreviateAddress(collection.creators[0], 4)}
-                      </span>
-                      <span className="hidden mobileMd:inline mobileLg:hidden">
-                        {abbreviateAddress(collection.creators[0], 7)}
-                      </span>
-                      <span className="hidden mobileLg:inline tablet:hidden">
-                        {abbreviateAddress(collection.creators[0], 9)}
-                      </span>
-                      <span className="hidden tablet:inline">
-                        {collection.creators[0]}
-                      </span>
+                      {/* Use creator name if available, otherwise fall back to address */}
+                      {collection.creator_names &&
+                          collection.creator_names.length > 0
+                        ? <span>{collection.creator_names?.[0] ?? ""}</span>
+                        : (
+                          <>
+                            <span class="mobileMd:hidden">
+                              {abbreviateAddress(
+                                collection.creators?.[0] ?? "",
+                                4,
+                              )}
+                            </span>
+                            <span class="hidden mobileMd:inline mobileLg:hidden">
+                              {abbreviateAddress(
+                                collection.creators?.[0] ?? "",
+                                7,
+                              )}
+                            </span>
+                            <span class="hidden mobileLg:inline tablet:hidden">
+                              {abbreviateAddress(
+                                collection.creators?.[0] ?? "",
+                                9,
+                              )}
+                            </span>
+                            <span class="hidden tablet:inline">
+                              {collection.creators?.[0] ?? ""}
+                            </span>
+                          </>
+                        )}
                     </>
                   )
                   : "N/A"}
               </span>
             </h5>
           </div>
-          <div className="flex flex-col mobileLg:flex-row justify-between w-full">
-            <h5 className={`${labelSm} -mt-0.5`}>
+          <div class="flex flex-col mobileLg:flex-row justify-between w-full">
+            <h5 class={`${labelSm} -mt-0.5`}>
               STAMPS{" "}
-              <span className={valueSm}>
-                {collection.stamp_count}
+              <span class={valueSm}>
+                {stampCount}
               </span>
             </h5>
-            <h5 className={`${labelSm} -mt-0.5 hidden mobileLg:block`}>
-              VOLUME <span className={valueSm}>N/A</span>{"  "}
-              <span className="text-stamp-grey-light">BTC</span>
+            <h5 class={`${labelSm} -mt-0.5 hidden mobileLg:block`}>
+              VOLUME{" "}
+              <span class={valueSm}>
+                {collection.marketData?.totalVolume24hBTC
+                  ? formatVolume(collection.marketData.totalVolume24hBTC)
+                  : "N/A"}
+              </span>{"  "}
+              <span class="text-color-grey-light">BTC</span>
             </h5>
           </div>
-          <div className="flex flex-col mobileLg:flex-row justify-between w-full">
-            <h5 className={`${labelSm} -mt-0.5`}>
-              <span className="min-[400px]:hidden">PRICE</span>
-              <span className="hidden min-[400px]:inline">FLOOR PRICE</span>
-              {" "}
-              <span className={valueSm}>N/A</span>{" "}
-              <span className="text-stamp-grey-light">BTC</span>
+          <div class="flex flex-col mobileLg:flex-row justify-between w-full">
+            <h5 class={`${labelSm} -mt-0.5`}>
+              <span class="min-[400px]:hidden">PRICE</span>
+              <span class="hidden min-[400px]:inline">FLOOR PRICE</span>{" "}
+              <span class={valueSm}>
+                {collection.marketData?.minFloorPriceBTC
+                  ? formatBTC(collection.marketData.minFloorPriceBTC)
+                  : "N/A"}
+              </span>{" "}
+              <span class="text-color-grey-light">BTC</span>
             </h5>
-            <h5 className={`${labelSm} -mt-0.5`}>
-              <span className="min-[400px]:hidden">MCAP</span>
-              <span className="hidden min-[400px]:inline">MARKETCAP</span>{" "}
-              <span className={valueSm}>N/A</span>{" "}
-              <span className="text-stamp-grey-light">BTC</span>
+            <h5 class={`${labelSm} -mt-0.5`}>
+              <span class="min-[400px]:hidden">MCAP</span>
+              <span class="hidden min-[400px]:inline">MARKETCAP</span>{" "}
+              <span class={valueSm}>
+                {collection.marketData?.minFloorPriceBTC &&
+                    collection.total_editions
+                  ? formatMarketCap(
+                    collection.marketData.minFloorPriceBTC *
+                      collection.total_editions,
+                  )
+                  : "N/A"}
+              </span>{" "}
+              <span class="text-color-grey-light">BTC</span>
             </h5>
           </div>
         </div>
       </div>
 
       {/* ===== CARD GALLERY ===== */}
-      <div className="grid grid-cols-3 mobileMd:grid-cols-4 mobileLg:grid-cols-6 tablet:grid-cols-8 desktop:grid-cols-10 gap-6">
+      <div class="grid grid-cols-3 mobileMd:grid-cols-4 mobileLg:grid-cols-6 tablet:grid-cols-8 desktop:grid-cols-10 gap-6">
         {collection.stamp_images &&
           collection.stamp_images.slice(-10).reverse().map(
-            (imageUrl, index) => {
+            (imageUrl: string, index: number) => {
               return (
                 <div
-                  className={`w-full h-full rounded aspect-stamp image-rendering-pixelated overflow-hidden ${
+                  className={`w-full h-full rounded-2xl aspect-stamp image-rendering-pixelated overflow-hidden ${
                     index >= 8
                       ? "hidden desktop:block"
                       : index >= 6
@@ -116,7 +164,7 @@ export function CollectionCard(
                       : ""
                   }`}
                 >
-                  <div className="relative flex items-center justify-center w-full h-full">
+                  <div class="relative flex items-center justify-center w-full h-full">
                     <img
                       key={index}
                       src={imageUrl}

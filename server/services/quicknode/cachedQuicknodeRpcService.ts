@@ -1,12 +1,12 @@
-import { Buffer } from "node:buffer";
-import { QuicknodeService } from "./quicknodeService.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
+import { Buffer } from "node:buffer";
+import { QuicknodeService } from "$server/services/quicknode/quicknodeService.ts";
 
 export class CachedQuicknodeRPCService {
   private static readonly CACHE_DURATION = 300;  // 5 minutes
 
   static async executeRPC<T>(
-    name: string, 
+    name: string,
     params: any[],
     cacheDuration = this.CACHE_DURATION
   ): Promise<{ result?: T; error?: string }> {
@@ -15,7 +15,7 @@ export class CachedQuicknodeRPCService {
 
     try {
       let isCacheHit = true;
-      const result = await dbManager.handleCache<T | undefined>(
+      const result = await dbManager.handleCache(
         CACHE_KEY,
         async () => {
           isCacheHit = false;
@@ -23,13 +23,12 @@ export class CachedQuicknodeRPCService {
           if (response && response.result) {
             return response.result;
           } else if (response && response.error) {
-            console.warn(`[CACHE] Quicknode call resulted in error (not caching): ${name}, ${JSON.stringify(response.error)}`);
-            throw new Error(typeof response.error === 'string' ? response.error : JSON.stringify(response.error));
+            throw new Error(`QuickNode RPC error: ${response.error}`);
           }
           return undefined;
         },
-        cacheDuration,
-      );
+        cacheDuration
+      ) as T | undefined;
 
       if (isCacheHit && result !== undefined) {
         // console.log(`[CACHE] Cache HIT for: ${CACHE_KEY}, dataRetrieved: ${!!result}`); // Example of a removed log
@@ -39,7 +38,7 @@ export class CachedQuicknodeRPCService {
         console.error(`[CACHE] Cache miss BUT fetch did not return data for: ${CACHE_KEY}`);
         return { error: `Failed to fetch data for RPC ${name} after cache miss` };
       }
-      
+
       return { result: result as T };
 
     } catch (error) {
@@ -47,4 +46,4 @@ export class CachedQuicknodeRPCService {
       return { error: `Failed to execute RPC ${name}: ${error instanceof Error ? error.message : String(error)}` };
     }
   }
-} 
+}

@@ -1,0 +1,58 @@
+{
+  "newman": {
+    "collection": "postman-collection-full-regression.json",
+    "environment": "postman-environment-comprehensive.json",
+    "reporters": ["cli", "html", "json"],
+    "reporterOptions": {
+      "html": {
+        "export": "reports/newman-comprehensive/{{timestamp}}-report.html",
+        "template": "https://raw.githubusercontent.com/postmanlabs/newman-reporter-html/develop/lib/template-default.hbs"
+      },
+      "json": {
+        "export": "reports/newman-comprehensive/{{timestamp}}-results.json"
+      }
+    },
+    "timeoutRequest": 30000,
+    "disableUnicode": true,
+    "color": "auto"
+  },
+  "regression": {
+    "allowedFieldAdditions": ["market_data", "dispenserInfo", "cacheStatus"],
+    "performanceThresholds": {
+      "warning": 10,
+      "critical": 25
+    },
+    "comparisonMode": "dev-vs-prod"
+  },
+  "ci": {
+    "dataSource": "fixtures",
+    "failOnBreakingChanges": true,
+    "generateSummary": true,
+    "uploadArtifacts": true,
+    "notifyOnFailure": true,
+    "retryFailedTests": false,
+    "parallelCollections": false
+  },
+  "performance": {
+    "enabled": true,
+    "benchmarkIterations": 3,
+    "delayBetweenRequests": 100,
+    "trackMetrics": [
+      "responseTime",
+      "responseSize",
+      "totalTime"
+    ],
+    "criticalEndpoints": [
+      "/api/v2/stamps",
+      "/api/v2/src20/valid",
+      "/api/v2/stamp/{identifier}",
+      "/api/v2/src20/balance/{address}"
+    ]
+  },
+  "reporting": {
+    "slackWebhook": "${SLACK_WEBHOOK_URL}",
+    "emailRecipients": [],
+    "githubComments": true,
+    "summaryFormat": "markdown"
+  }
+}

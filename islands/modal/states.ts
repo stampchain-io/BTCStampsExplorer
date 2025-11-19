@@ -1,10 +1,11 @@
 /* ===== STATES ===== */
 /* @baba - refactor and move to shared states file in /layout/ */
+import type { GlobalModalState, SearchState } from "$types/ui.d.ts";
 import { signal } from "@preact/signals";
 import type { ComponentChildren } from "preact";
 
 /* ===== MODAL TYPES ===== */
-export type ModalAnimation = "scaleUpDown" | "scaleDownUp" | "zoomInOut";
+export type ModalAnimation = "slideUpDown" | "slideDownUp" | "zoomInOut";
 
 export interface ModalConfig {
   type: "connect" | "search" | "preview" | "filter";
@@ -13,27 +14,14 @@ export interface ModalConfig {
   props?: Record<string, unknown>;
 }
 
-export const DEFAULT_MODAL_ANIMATION: ModalAnimation = "scaleUpDown";
-
-/* ===== MODAL STATE ===== */
-export interface GlobalModalState {
-  isOpen: boolean;
-  content: ComponentChildren | null;
-  animation: ModalAnimation;
-}
+export const DEFAULT_MODAL_ANIMATION: ModalAnimation = "slideUpDown";
 
 // Create the signal with explicit typing
 export const globalModal = signal<GlobalModalState>({
   isOpen: false,
   content: null,
-  animation: "scaleUpDown",
+  animation: "slideUpDown",
 });
-
-interface SearchState {
-  term: string;
-  error: string;
-  results?: Array<{ tick: string }>;
-}
 
 export const searchState = signal<SearchState>({
   term: "",
@@ -44,7 +32,7 @@ export const searchState = signal<SearchState>({
 /* ===== MODAL ACTIONS ===== */
 export function openModal(
   content: ComponentChildren,
-  animation: ModalAnimation = "scaleUpDown",
+  animation: ModalAnimation = "slideUpDown",
 ) {
   if (!content) {
     return;

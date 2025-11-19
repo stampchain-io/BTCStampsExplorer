@@ -1,10 +1,11 @@
 import { Handlers } from "$fresh/server.ts";
-import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
-import { BlockService } from "$server/services/blockService.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { getCurrentBlock } from "$lib/utils/mempool.ts";
-import { StampService } from "$server/services/stampService.ts";
+import { circuitBreakerDbManager } from "$server/database/circuitBreakerDatabaseManager.ts";
 import { SRC20Repository } from "$server/database/src20Repository.ts";
-import { XcpManager } from "$server/services/xcpService.ts";
+import { BlockService } from "$server/services/core/blockService.ts";
+import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
+import { StampService } from "$server/services/stampService.ts";
 
 interface HealthStatus {
   status: "OK" | "ERROR";
@@ -14,6 +15,10 @@ interface HealthStatus {
     mempool: boolean;
     database: boolean;
     xcp: boolean;
+    circuitBreaker?: {
+      state: string;
+      isHealthy: boolean;
+    };
     blockSync?: {
       indexed: number;
       network: number;
@@ -35,10 +40,7 @@ export const handler: Handlers = {
     // Extract path to check if this is a simple health check
     const url = new URL(ctx.url);
     if (url.searchParams.has("simple")) {
-      return new Response(JSON.stringify({ status: "OK" }), {
-        headers: { "Content-Type": "application/json" },
-        status: 200,
-      });
+      return ApiResponseUtil.success({ status: "OK" }, { forceNoCache: true });
     }
 
     // Continue with full health check if not simple
@@ -54,19 +56,40 @@ export const handler: Handlers = {
     };
 
     try {
+      // Use Promise.allSettled to prevent one failure from breaking entire health check
       const [
-        lastIndexedBlock,
-        currentBlockHeight,
-        stampCount,
-        src20Deployments,
-        xcpHealth,
-      ] = await Promise.all([
+        lastIndexedBlockResult,
+        currentBlockHeightResult,
+        stampCountResult,
+        src20DeploymentsResult,
+        xcpHealthResult,
+      ] = await Promise.allSettled([
         BlockService.getLastBlock(),
-        getCurrentBlock(),
+        getCurrentBlock().catch(() => null), // Catch mempool.space failures
         StampService.countTotalStamps(),
         SRC20Repository.checkSrc20Deployments(),
-        XcpManager.checkHealth(30), // 30 seconds cache for health checks (was 30000ms)
+        CounterpartyApiManager.checkHealth(30).catch((error) => {
+          console.error("XCP health check failed in health endpoint:", error);
+          return false;
+        }), // 30 seconds cache for health checks (was 30000ms)
       ]);
+
+      // Extract values from settled promises
+      const lastIndexedBlock = lastIndexedBlockResult.status === "fulfilled"
+        ? lastIndexedBlockResult.value
+        : null;
+      const currentBlockHeight = currentBlockHeightResult.status === "fulfilled"
+        ? currentBlockHeightResult.value
+        : null;
+      const stampCount = stampCountResult.status === "fulfilled"
+        ? stampCountResult.value
+        : { isValid: false, count: 0 };
+      const src20Deployments = src20DeploymentsResult.status === "fulfilled"
+        ? src20DeploymentsResult.value
+        : { isValid: false, count: 0 };
+      const xcpHealth = xcpHealthResult.status === "fulfilled"
+        ? xcpHealthResult.value
+        : false;
 
       // Update service statuses
       health.services.indexer = !!lastIndexedBlock;
@@ -88,6 +111,28 @@ export const handler: Handlers = {
         src20Deployments: src20Deployments.count,
         totalStamps: stampCount.count,
       };
+
+      // Check database
+      const src20Check = await SRC20Repository.checkSrc20Deployments();
+      health.services.database = src20Check.isValid && src20Check.count > 0;
+      if (health.services.stats) {
+        health.services.stats.src20Deployments = src20Check.count;
+      }
+
+      // Check circuit breaker status
+      try {
+        const cbState = circuitBreakerDbManager.getCircuitBreakerState();
+        health.services.circuitBreaker = {
+          state: cbState.state,
+          isHealthy: cbState.state === "CLOSED",
+        };
+      } catch (error) {
+        console.error("Circuit breaker check failed:", error);
+        health.services.circuitBreaker = {
+          state: "UNKNOWN",
+          isHealthy: false,
+        };
+      }
 
       // Update overall status
       // Make the health check more resilient - only require database and API to be healthy

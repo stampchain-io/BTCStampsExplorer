@@ -1,5 +1,8 @@
 import { assertEquals } from "@std/assert";
-import { arc4, extractOutputs } from "$lib/utils/minting/transactionUtils.ts";
+import {
+  arc4,
+  extractOutputs,
+} from "$lib/utils/bitcoin/minting/transactionUtils.ts";
 import * as bitcoin from "bitcoinjs-lib";
 
 Deno.test("arc4 - encrypts and decrypts correctly", () => {

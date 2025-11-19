@@ -1,40 +1,38 @@
+import type { BlockHandlerContext } from "$types/base.d.ts";
 import { Handlers } from "$fresh/server.ts";
-import { Src20Controller } from "$server/controller/src20Controller.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
-import { DEFAULT_PAGINATION } from "$server/services/routeValidationService.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
+import { getPaginationParams } from "$lib/utils/data/pagination/paginationUtils.ts";
+import { SRC20Service } from "$server/services/src20/index.ts";
 
-export const handler: Handlers = {
+export const handler: Handlers<BlockHandlerContext> = {
   async GET(req, ctx) {
+    const { block_index } = ctx.params;
+    const url = new URL(req.url);
+
+    // Extract pagination parameters
+    const pagination = getPaginationParams(url);
+    if (pagination instanceof Response) {
+      return pagination;
+    }
+    const { limit, page } = pagination;
+
+    // Extract other query parameters
+    const tick = url.searchParams.get("tick");
+    const sort = url.searchParams.get("sort");
+    const op = url.searchParams.get("op");
+
     try {
-      const { block_index } = ctx.params;
-      const url = new URL(req.url);
-      const pagination = getPaginationParams(url);
-
-      // Check if pagination validation failed
-      if (pagination instanceof Response) {
-        return pagination;
-      }
-
-      const { limit, page } = pagination;
-
-      const params = {
-        block_index: parseInt(block_index, 10),
-        limit: limit || DEFAULT_PAGINATION.limit,
-        page: page || DEFAULT_PAGINATION.page,
-      };
-
-      const result = await Src20Controller.handleSrc20TransactionsRequest(
-        req,
-        params,
-      );
-      return ResponseUtil.success(result);
+      const result = await SRC20Service.QueryService.fetchBasicSrc20Data({
+        block_index: Number(block_index),
+        ...(tick && { tick }),
+        ...(limit && { limit }),
+        ...(page && { page }),
+        ...(sort && { sort }),
+        ...(op && { op }),
+      });
+      return ApiResponseUtil.success(result);
     } catch (error) {
-      console.error("Error in block handler:", error);
-      return ResponseUtil.internalError(
-        error,
-        "Error processing block request",
-      );
+      return ApiResponseUtil.internalError(error, "Error processing request");
     }
   },
 };

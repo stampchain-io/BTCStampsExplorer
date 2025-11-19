@@ -1,11 +1,11 @@
 /* ===== ICON COMPONENT ===== */
+import * as iconPaths from "$components/icon/paths.ts";
 import {
   BadgeVariants,
   globalSvgAttributes,
   iconStyles,
   IconVariants,
 } from "$icon";
-import * as iconPaths from "$components/icon/paths.ts";
 
 /* ===== COMPONENT ===== */
 export function Icon(props: IconVariants) {
@@ -18,7 +18,11 @@ export function Icon(props: IconVariants) {
     className = "",
     role,
     ariaLabel,
+    colorAccent,
+    colorAccentHover,
+    isOpen: _isOpen,
     onClick,
+    ["f-partial"]: _fPartial,
     ...rest
   } = props;
 
@@ -40,8 +44,8 @@ export function Icon(props: IconVariants) {
   /* ===== HELPERS ===== */
   const getIconPath = () => {
     const iconNameMap = {
-      // General Icons used across the app
-      // - Social Media Icons
+      // Social Media Icons
+      stampchain: "logoS",
       twitter: "twitter",
       telegram: "telegram",
       github: "github",
@@ -50,6 +54,7 @@ export function Icon(props: IconVariants) {
       email: "envelope",
 
       // UI Icons
+      menu: "listMenu",
       close: "x",
       expand: "plus",
       search: "magnifingGlass",
@@ -58,9 +63,12 @@ export function Icon(props: IconVariants) {
       listDesc: "listDesc",
       sortAsc: "listAsc",
       sortDesc: "listDesc",
-      tools: "gear",
+      tools: "gearWrench",
+      speedSlow: "time10",
+      speedMedium: "time30",
+      speedFast: "time60",
 
-      // - Caret Icons
+      // Caret Icons
       caretUp: "caretUp",
       caretDown: "caretDown",
       caretLeft: "caretLeft",
@@ -71,8 +79,8 @@ export function Icon(props: IconVariants) {
       // Stamp Specific
       // - Image Right Panel Icons
       share: "share",
-      copy: "copy",
-      // twitter is used too
+      copyLink: "copyLink",
+      twitterImage: "twitterImage",
       previewImage: "image",
       previewCode: "imageCode",
       previewImageRaw: "imageOut",
@@ -83,25 +91,43 @@ export function Icon(props: IconVariants) {
       locked: "lockClosed",
       unlocked: "lockOpen",
       keyburned: "flame",
-      divisible: "percent",
+      divisible: "imageDivide",
       atom: "atom",
-      dispenserListings: "listStar",
+      dispenserListings: "imagesStar",
 
       // Wallet Specific Icons
       view: "eye",
       hide: "eyeSlash",
       collection: "images",
-      profile: "imageProfile",
-      send: "coinsOut",
-      receive: "coinsIn",
-      history: "clockCounterClockwise",
-      // copy is used too
+      copy: "copy",
+
+      // Bitcoin Specific Icons
+      bitcoin: "bitcoin",
+      bitcoins: "bitcoins",
+      bitcoinTx: "bitcoinTx",
+      bitcoinBlock: "blockchain",
+      version: "bitcoinCpu",
+      send: "bitcoinOut",
+      receive: "bitcoinIn",
+      history: "bitcoinHistory",
+      wallet: "bitcoinWallet",
+      donate: "bitcoinHand",
 
       // Misc Icons
       // - Tools, loader placeholder and donate CTA icons
-      donate: "coinsHand",
-      stamp: "stamp",
-      uploadImage: "image",
+      stamp: "stampchain",
+      uploadImage: "imageUpload",
+
+      // Notification Display Icons
+      info: "info",
+      error: "error",
+      success: "success",
+
+      // Other common icons
+      externallink: "imageOut",
+      loading: "refresh",
+      refresh: "refresh",
+      eye: "eye",
     };
 
     const iconName = iconNameMap[name as keyof typeof iconNameMap];
@@ -117,6 +143,7 @@ export function Icon(props: IconVariants) {
     // Handle array of paths - can include path objects with custom styles
     if (Array.isArray(pathData)) {
       return pathData.map((pathItem, index) => {
+        const isLast = index === pathData.length - 1;
         // Handle path object with custom styling
         if (typeof pathItem === "object" && pathItem.path && pathItem.style) {
           // Extract stroke colors and convert to fill
@@ -133,16 +160,41 @@ export function Icon(props: IconVariants) {
             `group-hover:${hoverStroke.replace("stroke-", "fill-")}`,
           ].filter(Boolean).join(" ");
 
+          // Parse custom attributes from style string
+          const styleParts = pathItem.style.split(" ");
+          const attributes: Record<string, string> = {};
+
+          styleParts.forEach((part) => {
+            if (part.startsWith("fill-rule-")) {
+              attributes["fill-rule"] = part.replace("fill-rule-", "");
+            } else if (part.startsWith("clip-rule-")) {
+              attributes["clip-rule"] = part.replace("clip-rule-", "");
+            }
+          });
+
           return (
             <path
               key={index}
               d={pathItem.path}
-              className={`${pathItem.style} ${fillColor}`}
+              class={`${pathItem.style} ${fillColor} ${
+                isLast && colorAccent
+                  ? "stroke-[var(--color-accent)] group-hover:stroke-[var(--color-accent-hover)]"
+                  : ""
+              }`}
+              {...attributes}
             />
           );
         }
         // Handle regular string path
-        return <path key={index} d={pathItem as string} />;
+        return (
+          <path
+            key={index}
+            d={pathItem as string}
+            class={isLast && colorAccent
+              ? "stroke-[var(--color-accent)] group-hover:stroke-[var(--color-accent-hover)]"
+              : undefined}
+          />
+        );
       });
     }
 
@@ -151,8 +203,19 @@ export function Icon(props: IconVariants) {
   };
 
   /* ===== SVG ELEMENT ===== */
+  const svgProps: Record<string, unknown> = {
+    ...commonProps,
+    ...globalSvgAttributes,
+  };
+  if (colorAccent) {
+    (svgProps as any).style = {
+      "--color-accent": colorAccent,
+      "--color-accent-hover": colorAccentHover || colorAccent,
+    };
+  }
+
   const svgElement = (
-    <svg {...commonProps} {...globalSvgAttributes}>
+    <svg {...(svgProps as any)}>
       {renderPaths()}
     </svg>
   );
@@ -184,13 +247,15 @@ export function Icon(props: IconVariants) {
 export function BadgeIcon({ text, className = "" }: BadgeVariants) {
   return (
     <span
-      className={`
-        flex items-center justify-center
-        absolute top-[-4px] left-[-12px] z-10
-        size-5 rounded-full
-        font-bold text-[10px] text-stamp-grey group-hover:text-black tracking-wider
-        bg-stamp-purple group-hover:bg-stamp-purple-bright
-        transition-all duration-300 cursor-pointer
+      class={`
+        flex items-center justify-center z-[-999]
+        absolute top-[-19px] left-[-29px]
+        tablet:top-[-16px] tablet:left-[-26px]
+        size-5 rounded-full backdrop-blur-lg
+        font-normal text-[10px] text-color-grey group-hover:text-color-grey-light group-hover:font-medium tracking-wider
+        bg-color-background/30 group-hover:bg-color-background/60
+        border border-color-border/75 group-hover:border-color-border
+        transition-all duration-200 cursor-pointer
         ${text === "0" ? "opacity-0" : "opacity-100"}
         ${className}
       `}

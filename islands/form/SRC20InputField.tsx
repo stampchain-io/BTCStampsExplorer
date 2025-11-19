@@ -1,18 +1,5 @@
 import { inputField } from "$form";
-
-interface SRC20InputFieldProps {
-  type: string;
-  placeholder: string;
-  value: string;
-  onChange: (e: Event) => void;
-  onBlur?: () => void;
-  error?: string;
-  maxLength?: number;
-  isUppercase?: boolean;
-  inputMode?: "numeric" | "text" | "email";
-  pattern?: string;
-  onFocus?: () => void;
-}
+import type { SRC20InputFieldProps } from "$types/ui.d.ts";
 
 export function SRC20InputField({
   type,
@@ -34,7 +21,7 @@ export function SRC20InputField({
         class={`${inputField} ${isUppercase ? "uppercase" : ""}`}
         placeholder={placeholder}
         value={value}
-        onInput={onChange}
+        onInput={(e) => onChange(e.currentTarget.value)}
         onBlur={onBlur}
         onFocus={onFocus}
         maxLength={maxLength}

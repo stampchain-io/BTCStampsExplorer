@@ -1,5 +1,5 @@
 import { Foras, Memory, unzlib, zlib } from "compress";
-import { arraysEqual } from "$lib/utils/binary/baseUtils.ts";
+import { arraysEqual } from "$lib/utils/data/binary/baseUtils.ts";
 
 // Keep track of initialization state
 let initialized = false;

@@ -1,9 +1,14 @@
-import { UTXOService as UTXOServiceClass } from "./utxoService.ts";
-import { PSBTService } from "./psbtService.ts";
+import { createBitcoinTransactionBuilder, BitcoinTransactionBuilderImpl, BitcoinTransactionBuilder } from "$server/services/transaction/bitcoinTransactionBuilder.ts";
+import { BitcoinUtxoManager } from "$server/services/transaction/bitcoinUtxoManager.ts";
 
-export { UTXOServiceClass as UTXOService, PSBTService };
+export { 
+  createBitcoinTransactionBuilder, 
+  BitcoinTransactionBuilderImpl,
+  BitcoinTransactionBuilder,
+  BitcoinUtxoManager 
+};
 
 export class TransactionService {
-  static readonly utxoServiceInstance = new UTXOServiceClass();
-  static readonly PSBTService = PSBTService;
+  static readonly utxoServiceInstance = new BitcoinUtxoManager();
+  static readonly createBitcoinTransactionBuilder = createBitcoinTransactionBuilder;
 }

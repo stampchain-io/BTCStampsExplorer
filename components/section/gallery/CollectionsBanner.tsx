@@ -1,10 +1,11 @@
 /* ===== COLLECTION LIST CARD COMPONENT ===== */
-import { Collection } from "$globals";
+import { shadowGlowGrey } from "$layout";
+import type { CollectionsBannerProps } from "$types/ui.d.ts";
 import { useState } from "preact/hooks";
 
 /* ===== STYLES ===== */
 const containerClassName =
-  `border-2 border-stamp-grey-darker rounded-md relative overflow-hidden
+  `border-2 border-color-grey-semidark rounded-2xl relative overflow-hidden
   w-full h-[92px] mobileMd:h-[116px] mobileLg:h-[130px] tablet:h-[148px] desktop:h-[160px]`;
 const imageContentClassName =
   "bg-center bg-no-repeat bg-[length:100%] w-full h-full grayscale transition-all duration-300";
@@ -16,10 +17,6 @@ const nameClassName = `hidden mobileLg:block
 `;
 
 /* ===== TYPES ===== */
-interface CollectionsBannerProps {
-  collection: Collection;
-  isDarkMode: boolean;
-}
 
 /* ===== COMPONENT ===== */
 export function CollectionsBanner(
@@ -28,11 +25,14 @@ export function CollectionsBanner(
   /* ===== STATE ===== */
   const [isHovered, setIsHovered] = useState(false);
 
+  // Guard against undefined collection
+  if (!collection) return null;
+
   /* ===== COMPONENT ===== */
   return (
     <a
-      href={`/collection/detail/${collection.collection_name}`}
-      class={`${containerClassName} ${isHovered ? "shadow-collection" : ""}`}
+      href={`/collection/detail/${collection.collection_name ?? ""}`}
+      class={`${containerClassName} ${isHovered ? shadowGlowGrey : ""}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -40,7 +40,8 @@ export function CollectionsBanner(
         class={`${imageContentClassName} ${isHovered ? "grayscale-0" : ""}`}
         style={{
           backgroundImage: `url('${
-            collection.first_stamp_image || collection.img
+            collection.first_stamp_image ?? collection.img ??
+              "/default-collection-image.png"
           }')`,
         }}
       >
@@ -48,13 +49,13 @@ export function CollectionsBanner(
       <div
         class={`${gradientContentClassName} ${
           isDarkMode
-            ? "from-[#666666FF] via-[#9999997F] to-[#CCCCCC00]"
-            : "from-[#CCCCCCFF] via-[#9999997F] to-[#66666600]"
+            ? "from-color-grey-semidark/100 via-color-grey/50 to-color-grey-semilight/0"
+            : "from-color-grey-semilight/100 via-color-grey/50 to-color-grey-semidark/0"
         } ${isHovered ? "hidden" : ""}`}
       />
       <h3
         class={`${nameClassName} ${
-          isDarkMode ? "text-stamp-grey-light" : "text-stamp-grey-darkest"
+          isDarkMode ? "text-color-grey-light" : "text-color-grey-dark"
         } ${isHovered ? "!hidden" : ""}`}
       >
         {collection.collection_name}

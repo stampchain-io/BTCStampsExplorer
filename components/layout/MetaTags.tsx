@@ -1,18 +1,17 @@
+import type { MetaTagsProps } from "$types/ui.d.ts";
 import {
   STAMPCHAIN_FAVICON_IMAGE,
   STAMPCHAIN_OPENGRAPH_IMAGE,
 } from "$constants";
 
-interface MetaTagsProps {
-  title?: string;
-  description?: string;
-  image?: string;
-}
-
 export function MetaTags({
   title = "Bitcoin Stamps",
   description = "Unprunable UTXO Art, Because Sats Don't Exist",
   image = STAMPCHAIN_OPENGRAPH_IMAGE,
+  skipImage = false,
+  skipTitle = false,
+  skipDescription = false,
+  skipOgMeta = false,
 }: MetaTagsProps) {
   return (
     <>
@@ -38,33 +37,71 @@ export function MetaTags({
       <link rel="canonical" href="https://stampchain.io" />
 
       {/* OpenGraph tags */}
-      <meta property="og:title" content="Stampchain.io" key="og-title" />
-      <meta
-        property="og:description"
-        content={description}
-        key="og-description"
-      />
-      <meta property="og:image" content={image} key="og-image" />
-      <meta property="og:image:type" content={getImageType(image)} />
-      <meta property="og:image:width" content="1200" />
-      <meta property="og:image:height" content="630" />
-      <meta property="og:type" content="website" key="og-type" />
-      <meta property="og:url" content="https://stampchain.io" key="og-url" />
-      <meta property="og:locale" content="en_US" key="og-locale" />
+      {!skipTitle && (
+        <meta property="og:title" content="Stampchain.io" key="og-title" />
+      )}
+      {!skipDescription && (
+        <meta
+          property="og:description"
+          content={description}
+          key="og-description"
+        />
+      )}
+      {/* Conditionally add og:image - skip if page has its own */}
+      {!skipImage && (
+        <>
+          <meta property="og:image" content={image} key="og:image" />
+          <meta
+            property="og:image:type"
+            content={getImageType(image)}
+            key="og:image:type"
+          />
+          <meta property="og:image:width" content="1200" key="og:image:width" />
+          <meta
+            property="og:image:height"
+            content="630"
+            key="og:image:height"
+          />
+        </>
+      )}
+      {!skipOgMeta && (
+        <>
+          <meta property="og:type" content="website" key="og-type" />
+          <meta
+            property="og:url"
+            content="https://stampchain.io"
+            key="og-url"
+          />
+          <meta property="og:locale" content="en_US" key="og-locale" />
+        </>
+      )}
 
       {/* Twitter Card tags */}
-      <meta
-        name="twitter:card"
-        content="summary_large_image"
-        key="twitter-card"
-      />
-      <meta name="twitter:title" content="stampchain.io" key="twitter-title" />
-      <meta name="twitter:image" content={image} key="twitter-image" />
-      <meta
-        name="twitter:description"
-        content={description}
-        key="twitter-description"
-      />
+      {!skipOgMeta && (
+        <meta
+          name="twitter:card"
+          content="summary_large_image"
+          key="twitter-card"
+        />
+      )}
+      {!skipTitle && (
+        <meta
+          name="twitter:title"
+          content="stampchain.io"
+          key="twitter-title"
+        />
+      )}
+      {/* Conditionally add twitter:image - skip if page has its own */}
+      {!skipImage && (
+        <meta name="twitter:image" content={image} key="twitter:image" />
+      )}
+      {!skipDescription && (
+        <meta
+          name="twitter:description"
+          content={description}
+          key="twitter-description"
+        />
+      )}
     </>
   );
 }

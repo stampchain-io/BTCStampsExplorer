@@ -1,6 +1,6 @@
 import { WalletProvider } from "$islands/layout/WalletProvider.tsx";
 import { ConnectWalletModal } from "$islands/modal/ConnectWalletModal.tsx";
-import { DEFAULT_WALLET_CONNECTORS } from "$lib/utils/constants.ts";
+import { DEFAULT_WALLET_CONNECTORS } from "$constants";
 import { closeForegroundModal } from "$islands/modal/states.ts";
 
 export const stackConnectWalletModal = (onConnected?: () => void) => {
@@ -32,7 +32,7 @@ export const stackConnectWalletModal = (onConnected?: () => void) => {
   const modalContent = (
     <ConnectWalletModal
       connectors={providerComponents}
-      handleClose={closeForegroundModal}
+      onClose={closeForegroundModal}
     />
   );
 

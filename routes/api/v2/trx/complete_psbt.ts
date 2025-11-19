@@ -1,6 +1,9 @@
 import { Handlers } from "$fresh/server.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import { TransactionService } from "$server/services/transaction/index.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
+import { logger } from "$lib/utils/logger.ts";
+import {
+  BitcoinTransactionBuilder,
+} from "$server/services/transaction/index.ts";
 
 export const handler: Handlers = {
   async POST(req: Request) {
@@ -11,12 +14,12 @@ export const handler: Handlers = {
       if (
         !sellerPsbtHex || !buyerUtxo || !buyerAddress || feeRate === undefined
       ) {
-        return ResponseUtil.badRequest("Missing parameters");
+        return ApiResponseUtil.badRequest("Missing parameters");
       }
 
-      console.log(`Completing PSBT with fee rate: ${feeRate} sat/vB`);
+      // Complete PSBT with specified fee rate
 
-      const completedPsbtHex = await TransactionService.PSBTService
+      const completedPsbtHex = await BitcoinTransactionBuilder
         .completePSBT(
           sellerPsbtHex,
           buyerUtxo,
@@ -24,12 +27,13 @@ export const handler: Handlers = {
           feeRate,
         );
 
-      return new Response(JSON.stringify({ completedPsbt: completedPsbtHex }), {
-        headers: { "Content-Type": "application/json" },
-      });
+      return ApiResponseUtil.success({ completedPsbt: completedPsbtHex });
     } catch (error) {
-      console.error("Error completing PSBT:", error);
-      return ResponseUtil.internalError(error, "Internal Server Error");
+      logger.error("api", {
+        message: "Error completing PSBT",
+        error: error instanceof Error ? error.message : String(error),
+      });
+      return ApiResponseUtil.internalError(error, "Failed to complete PSBT");
     }
   },
 };

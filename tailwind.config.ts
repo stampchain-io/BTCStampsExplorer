@@ -1,6 +1,5 @@
 import { type Config } from "tailwindcss";
 import plugin from "tailwindcss/plugin";
-import type { PluginAPI } from "tailwindcss/types/config";
 
 export default {
   content: [
@@ -24,124 +23,106 @@ export default {
         "courier-prime": ['"Courier Prime"', "sans-serif"],
         "micro-5": ['"Micro 5"', "sans-serif"],
       },
-      colors: {
-        stamp: {
-          primary: {
-            DEFAULT: "#8800CC",
-            light: "#9900EE",
-            dark: "#660099",
-            hover: "#AA00FF",
-          },
+      colors: { // color hue defs are calculated using HSL values - decreasing lightness by 8% for each step (grey hues are estimations)
+        color: { // colors are also defined as CSS variables further down in the file - PieChart and ChartWidget use hardcoded color values
           purple: {
-            darkest: "#220033",
-            darker: "#440066",
-            dark: "#660099",
-            DEFAULT: "#8800CC",
-            bright: "#AA00FF",
-            light: "#4F3666",
-            accent: "#7A00F5",
-            highlight: "#AA00FF",
+            dark: "#43005c",
+            semidark: "#610085",
+            DEFAULT: "#7f00ad",
+            semilight: "#9d00d6",
+            light: "#BB00FF",
           },
           grey: {
-            darkest: "#333333",
-            darker: "#666666",
-            DEFAULT: "#999999",
-            light: "#CCCCCC",
-            bright: "#FFFFFF",
+            dark: "#585552",
+            semidark: "#817e78",
+            DEFAULT: "#a8a39d",
+            semilight: "#d1cbc3",
+            light: "#f9f2e9",
           },
-          bg: {
-            purple: {
-              darkest: "#0A000F",
-              darker: "#14001F",
-              dark: "#1F002E",
-            },
-            grey: {
-              darkest: "#080808",
-              darker: "#0F0F0F",
-              dark: "#171717",
-            },
+          red: {
+            dark: "#5c0000",
+            semidark: "#850000",
+            DEFAULT: "#ad0000",
+            semilight: "#d60000",
+            light: "#ff0000",
           },
-          table: {
-            text: "#DBDBDB",
-            placeholder: "#8D9199",
-            header: "#F5F5F5",
-            inactive: "#B9B9B9",
+          green: {
+            dark: "#005c00",
+            semidark: "#008500",
+            DEFAULT: "#00ad00",
+            semilight: "#00d600",
+            light: "#00ff00",
           },
-          button: {
-            text: "#330033",
+          orange: {
+            dark: "#5c2b00",
+            semidark: "#853e00",
+            DEFAULT: "#ad5100",
+            semilight: "#d66400",
+            light: "#ff7700",
           },
-          dark: {
-            DEFAULT: "#0B0B0B",
-            lighter: "#181818",
-            gradient: "#1F002E",
-          },
-          text: {
-            primary: "#999999",
-            secondary: "#666666",
-            "custom-stroke-color": "#80C",
-          },
-          input: {
-            bg: "#4F3666",
-            border: "#8A8989",
-          },
-          search: {
-            placeholder: "#8D9199",
-            background: "#660099",
-          },
-          scrollbar: {
-            track: "#333333",
-            thumb: "#660099",
-            hover: "#aa00ff",
-          },
-          overlay: {
-            DEFAULT: "rgba(24, 24, 24, 0.5)",
-            dark: "rgba(8, 8, 8, 0.75)",
+          background: {
+            DEFAULT: "#0d0a0d",
           },
           border: {
-            light: "#3F2A4E",
-            DEFAULT: "#8A8989",
-            hover: "#AA00FF",
+            DEFAULT: "#292626",
+          },
+        },
+        // Backwards-compatible aliases for old stamp-* naming convention
+        stamp: {
+          // Purple aliases (stamp-primary-* and stamp-purple-* → color-purple-*)
+          primary: {
+            dark: "#43005c",
+            semidark: "#610085",
+            DEFAULT: "#7f00ad",
+            semilight: "#9d00d6",
+            light: "#BB00FF",
+          },
+          purple: {
+            dark: "#43005c",
+            darker: "#610085", // Alias for semidark
+            semidark: "#610085",
+            DEFAULT: "#7f00ad",
+            bright: "#9d00d6", // Alias for semilight
+            semilight: "#9d00d6",
+            light: "#BB00FF",
+          },
+          // Grey aliases (stamp-grey-* → color-grey-*)
+          grey: {
+            dark: "#585552",
+            darker: "#817e78", // Alias for semidark
+            semidark: "#817e78",
+            DEFAULT: "#a8a39d",
+            semilight: "#d1cbc3",
+            light: "#f9f2e9",
+          },
+          // Red aliases
+          red: {
+            dark: "#5c0000",
+            semidark: "#850000",
+            DEFAULT: "#ad0000",
+            semilight: "#d60000",
+            light: "#ff0000",
+          },
+          // Green aliases
+          green: {
+            dark: "#005c00",
+            semidark: "#008500",
+            DEFAULT: "#00ad00",
+            semilight: "#00d600",
+            light: "#00ff00",
+          },
+          // Orange aliases
+          orange: {
+            dark: "#5c2b00",
+            semidark: "#853e00",
+            DEFAULT: "#ad5100",
+            semilight: "#d66400",
+            light: "#ff7700",
           },
         },
       },
       backgroundImage: {
-        "stamp-primary":
-          "linear-gradient(141deg, rgba(10, 0, 15, 0) 0%, #14001F 50%, #1F002E 100%)",
-        "stamp-dark":
-          "linear-gradient(to bottom right, #1f002e00, #14001f7f, #1f002eff)",
-        "purple-bg-gradient":
-          "linear-gradient(to right, #8800cc, #7700aa, #660099)",
-        "text-purple-1": "linear-gradient(to right, #440066, #660099, #8800cc)",
-        "text-purple-2":
-          "linear-gradient(to right, #440066, #660099, #8800cc, #aa00ff)",
-        "text-purple-3": "linear-gradient(to right, #8800cc, #660099, #440066)",
-        "text-purple-4":
-          "linear-gradient(to right, #aa00ff, #8800cc, #660099, #440066)",
-        "text-gray-1": "linear-gradient(to right, #cccccc, #999999, #666666)",
-        "text-gray-2": "linear-gradient(to right, #999999, #666666)",
-        "text-gray-3": "linear-gradient(to right, #666666, #999999, #cccccc)",
-        "text-gray-4": "linear-gradient(to right, #666666, #999999)",
-        "text-purple-hover-default":
-          "linear-gradient(90deg, #440066 0%, #660099 50%, #8800cc 75%, #aa00ff 100%)",
-        "text-purple-hover-active":
-          "linear-gradient(90deg, #440066 0%, #660099 25%, #8800cc 50%, #aa00ff 75%)",
-        "stamp-number":
-          "linear-gradient(to right, var(--tw-gradient-from), var(--tw-gradient-to))",
-        "stamp-hover": "linear-gradient(to right, var(--tw-gradient-stops))",
-        "stamp-bg-dark":
-          "linear-gradient(to bottom right, var(--tw-gradient-from), var(--tw-gradient-to))",
-        "stamp-text-grey": "linear-gradient(to right, #666666, #999999)",
-        "stamp-text-purple":
-          "linear-gradient(to right, #440066, #660099, #8800cc)",
-        "stamp-card-bg":
-          "linear-gradient(141deg, rgba(10, 0, 15, 0) 0%, #14001F 50%, #1F002E 100%)",
-        "slide-content":
-          "linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75))",
-        "gradient-top": "var(--gradient-top)",
-        "gradient-filters":
-          "linear-gradient(to bottom, #080808 100%, #080808 80%)",
-        "conic-pattern":
-          "repeating-conic-gradient(rgba(128, 128, 128, 0.2) 0% 25%, rgba(128, 128, 128, 0.1) 25% 50%)",
+        "conic-pattern": "var(--conic-pattern)",
       },
       animation: {
         "fade-in": "fadeIn",
@@ -183,10 +164,14 @@ export default {
         },
       },
       spacing: {
-        // PAGE GUTTERS (horizontal padding from screen edges to header, footer and body)
-        "gutter-mobile": "24px", // updated breakpoint naming convention
-        "gutter-tablet": "36px", // updated breakpoint naming convention
-        "gutter-desktop": "48px", // updated breakpoint naming convention
+        // CUSTOM SPACING
+        "3.5": "14px",
+        "7.5": "30px",
+
+        // PAGE GUTTERS (horizontal padding from screen edges to header, footer and body containers)
+        "gutter-mobile": "20px", // updated breakpoint naming convention
+        "gutter-tablet": "20px", // updated breakpoint naming convention
+        "gutter-desktop": "40px", // updated breakpoint naming convention
 
         // LAYOUT GAP (vertical spacing between the body, and the header and footer)
         // Defined in the header and footer files - /islands/layout/
@@ -219,33 +204,27 @@ export default {
         "stroke-width": "2px",
       },
       boxShadow: {
-        "stamp": "0px 0px 30px #aa00ff",
-        "stamp-hover": "0px 0px 40px #aa00ff",
-        "collection": "0px 0px 30px #FFFFFF7F",
+        "stamp": "0px 0px 18px #aa00ff",
+        "stamp-hover": "0px 0px 24px #aa00ff",
       },
       aspectRatio: {
         "stamp": "1",
       },
       zIndex: {
+        "notification": "60",
         "modal": "50",
         "tooltip": "40",
         "dropdown": "30",
+        "header": "20",
       },
       maxWidth: {
         "desktop": "1920px",
         "none": "none",
       },
-      lineClamp: {
-        2: "2",
-      },
-      height: {
-        "gradient-top": "max(140vh, 1400px)",
-        "gradient-bottom": "max(100vh, 700px)",
-      },
     },
   },
   plugins: [
-    plugin(function ({ addUtilities }: PluginAPI) {
+    plugin(function ({ addUtilities }: any) {
       addUtilities({
         ".optimize-text": {
           "will-change": "transform",
@@ -263,7 +242,7 @@ export default {
             0.05em 0 0.25em #80C,          /* right */
             0 -0.05em 0.25em #80C,         /* top */
             0 0.05em 0.25em #80C,          /* bottom */
-            
+
             /* Stroke effect */
             -3px -3px 0 #A0F,
             3px -3px 0 #A0F,
@@ -286,7 +265,7 @@ export default {
             0.02em 0 0.3em #80C,          /* right */
             0 -0.02em 0.3em #80C,         /* top */
             0 0.02em 0.3em #80C,          /* bottom */
-            
+
             /* Stroke effect */
             -2px -2px 0 #A0F,
             2px -2px 0 #A0F,
@@ -298,43 +277,60 @@ export default {
             0 2px 0 #A0F
           `,
         },
-        ".bg-clip-text": {
+        ".bg-clip-text": { // @baba - prune and refactor
           "-webkit-background-clip": "text",
           "background-clip": "text",
         },
-        ".text-fill-transparent": {
+        ".text-fill-transparent": { // prune and refactor
           "-webkit-text-fill-color": "transparent",
           "text-fill-color": "transparent",
         },
-        ".hover-dark-gradient": {
-          background:
-            "linear-gradient(180deg, rgba(10, 0, 15, 0) 55%, rgba(20, 0, 31, 0.5) 70%, #1F002E 85%)",
-        },
-        ".hover-gradient": {
-          background:
-            "linear-gradient(146.07deg, rgba(102, 0, 153, 0) 0%, #8800CC 49.98%, #AA00FF 99.95%)",
-        },
-        ".scrollbar-stamp": {
+        ".scrollbar-hide": {
+          /* Hide scrollbar for IE, Edge and Firefox */
+          "-ms-overflow-style": "none",
+          "scrollbar-width": "none",
+          /* Hide scrollbar for Chrome, Safari and Opera */
           "&::-webkit-scrollbar": {
-            "width": "6px",
-            "border-radius": "3px",
-          },
-          "&::-webkit-scrollbar-track": {
-            "background-color": "var(--stamp-scrollbar-track)",
-            "border-radius": "3px",
-          },
-          "&::-webkit-scrollbar-thumb": {
-            "background-color": "var(--stamp-scrollbar-thumb)",
-            "border-radius": "3px",
-            "&:hover": {
-              "background-color": "var(--stamp-scrollbar-hover)",
-            },
+            "display": "none",
           },
         },
         ":root": {
-          "--stamp-scrollbar-track": "#333333",
-          "--stamp-scrollbar-thumb": "#660099",
-          "--stamp-scrollbar-hover": "#aa00ff",
+          // Purple color palette as CSS variables
+          "--color-purple-dark": "#43005c",
+          "--color-purple-semidark": "#610085",
+          "--color-purple": "#7f00ad",
+          "--color-purple-semilight": "#9d00d6",
+          "--color-purple-light": "#BB00FF",
+          // Grey color palette as CSS variables
+          "--color-grey-dark": "#585552",
+          "--color-grey-semidark": "#817e78",
+          "--color-grey": "#a8a39d",
+          "--color-grey-semilight": "#d1cbc3",
+          "--color-grey-light": "#f9f2e9",
+          // Red color palette as CSS variables
+          "--color-red-dark": "#5c0000",
+          "--color-red-semidark": "#850000",
+          "--color-red": "#ad0000",
+          "--color-red-semilight": "#d60000",
+          "--color-red-light": "#ff0000",
+          // Green color palette as CSS variables
+          "--color-green-dark": "#005c00",
+          "--color-green-semidark": "#008500",
+          "--color-green": "#00ad00",
+          "--color-green-semilight": "#00d600",
+          "--color-green-light": "#00ff00",
+          // Orange color palette as CSS variables
+          "--color-orange-dark": "#5c2b00",
+          "--color-orange-semidark": "#853e00",
+          "--color-orange": "#ad5100",
+          "--color-orange-semilight": "#d66400",
+          "--color-orange-light": "#ff7700",
+          // Background and border color palette as CSS variables
+          "--color-background": "#0d0a0d",
+          "--color-border": "#292626",
+          // Conic gradient variables
+          "--conic-pattern":
+            "repeating-conic-gradient(rgba(128, 128, 128, 0.2) 0% 25%, rgba(128, 128, 128, 0.1) 25% 50%)",
         },
         "*::-webkit-scrollbar-corner": {
           "background-color": "transparent !important",
@@ -346,6 +342,139 @@ export default {
           "outline": "2px solid #CCCCCCBF !important",
           "outline-offset": "-2px !important",
           "outline-style": "solid !important",
+        },
+        // Gradient Classes - Purple variants
+        ".color-purple-gradientDL": {
+          "background":
+            "linear-gradient(to right, var(--color-purple-dark), var(--color-purple-semidark), var(--color-purple), var(--color-purple-semilight), var(--color-purple-light))",
+          "-webkit-background-clip": "text",
+          "-webkit-text-fill-color": "transparent",
+          "background-clip": "text",
+        },
+        ".color-purple-gradientDL-hover": {
+          "background":
+            "linear-gradient(to right, var(--color-purple-dark), var(--color-purple-semidark), var(--color-purple), var(--color-purple-semilight), var(--color-purple-light))",
+          "-webkit-background-clip": "text",
+          "-webkit-text-fill-color": "transparent",
+          "background-clip": "text",
+          "text-fill-color": "transparent",
+          "transition":
+            "background 0.2s ease-in-out, -webkit-text-fill-color 0.2s ease-in-out, text-fill-color 0.2s ease-in-out",
+          "&:hover": {
+            "background": "none",
+            "-webkit-text-fill-color": "var(--color-purple-light)",
+            "text-fill-color": "var(--color-purple-light)",
+          },
+        },
+        ".color-purple-gradientLD": {
+          "background":
+            "linear-gradient(to right, var(--color-purple-light), var(--color-purple-semilight), var(--color-purple), var(--color-purple-semidark), var(--color-purple-dark))",
+          "-webkit-background-clip": "text",
+          "-webkit-text-fill-color": "transparent",
+          "background-clip": "text",
+          "text-fill-color": "transparent",
+        },
+        ".color-purple-gradientLD-hover": {
+          "background":
+            "linear-gradient(to right, var(--color-purple-light), var(--color-purple-semilight), var(--color-purple), var(--color-purple-semidark), var(--color-purple-dark))",
+          "-webkit-background-clip": "text",
+          "-webkit-text-fill-color": "transparent",
+          "background-clip": "text",
+          "text-fill-color": "transparent",
+          "transition":
+            "background 0.2s ease-in-out, -webkit-text-fill-color 0.2s ease-in-out, text-fill-color 0.2s ease-in-out",
+          "&:hover": {
+            "background": "none",
+            "-webkit-text-fill-color": "var(--color-purple-light)",
+            "text-fill-color": "var(--color-purple-light)",
+          },
+        },
+
+        // Gradient Classes - Grey variants
+        ".color-grey-gradientLD": {
+          "background":
+            "linear-gradient(to right, var(--color-grey-light), var(--color-grey-semilight), var(--color-grey), var(--color-grey-semidark), var(--color-grey-dark))",
+          "-webkit-background-clip": "text",
+          "-webkit-text-fill-color": "transparent",
+          "background-clip": "text",
+          "text-fill-color": "transparent",
+        },
+        ".color-grey-gradientLD-hover": {
+          "background":
+            "linear-gradient(to right, var(--color-grey-light), var(--color-grey-semilight), var(--color-grey), var(--color-grey-semidark), var(--color-grey-dark))",
+          "-webkit-background-clip": "text",
+          "-webkit-text-fill-color": "transparent",
+          "background-clip": "text",
+          "text-fill-color": "transparent",
+          "transition":
+            "background 0.2s ease-in-out, -webkit-text-fill-color 0.2s ease-in-out, text-fill-color 0.2s ease-in-out",
+          "&:hover": {
+            "background": "none",
+            "-webkit-text-fill-color": "var(--color-grey-light)",
+            "text-fill-color": "var(--color-grey-light)",
+          },
+        },
+        ".color-grey-gradientDL": {
+          "background":
+            "linear-gradient(to right, var(--color-grey-dark), var(--color-grey-semidark), var(--color-grey), var(--color-grey-semilight), var(--color-grey-light))",
+          "-webkit-background-clip": "text",
+          "-webkit-text-fill-color": "transparent",
+          "background-clip": "text",
+        },
+        ".color-grey-gradientDL-hover": {
+          "background":
+            "linear-gradient(to right, var(--color-grey-dark), var(--color-grey-semidark), var(--color-grey), var(--color-grey-semilight), var(--color-grey-light))",
+          "-webkit-background-clip": "text",
+          "-webkit-text-fill-color": "transparent",
+          "background-clip": "text",
+          "text-fill-color": "transparent",
+          "transition":
+            "background 0.2s ease-in-out, -webkit-text-fill-color 0.2s ease-in-out, text-fill-color 0.2s ease-in-out",
+          "&:hover": {
+            "background": "none",
+            "-webkit-text-fill-color": "var(--color-grey-light)",
+            "text-fill-color": "var(--color-grey-light)",
+          },
+        },
+        // Fix for iOS/Safari backdrop-blur issue
+        // Overrides Tailwind's default backdrop-blur utilities that use CSS variables
+        // which webkit browsers fail to parse correctly
+        // See: https://github.com/tailwindlabs/tailwindcss/issues/13844
+        ".backdrop-blur-none": {
+          "-webkit-backdrop-filter": "blur(0)",
+          "backdrop-filter": "blur(0)",
+        },
+        ".backdrop-blur-xs": {
+          "-webkit-backdrop-filter": "blur(4px)",
+          "backdrop-filter": "blur(4px)",
+        },
+        ".backdrop-blur-sm": {
+          "-webkit-backdrop-filter": "blur(8px)",
+          "backdrop-filter": "blur(8px)",
+        },
+        ".backdrop-blur": {
+          "-webkit-backdrop-filter": "blur(12px)",
+          "backdrop-filter": "blur(12px)",
+        },
+        ".backdrop-blur-md": {
+          "-webkit-backdrop-filter": "blur(12px)",
+          "backdrop-filter": "blur(12px)",
+        },
+        ".backdrop-blur-lg": {
+          "-webkit-backdrop-filter": "blur(16px)",
+          "backdrop-filter": "blur(16px)",
+        },
+        ".backdrop-blur-xl": {
+          "-webkit-backdrop-filter": "blur(24px)",
+          "backdrop-filter": "blur(24px)",
+        },
+        ".backdrop-blur-2xl": {
+          "-webkit-backdrop-filter": "blur(40px)",
+          "backdrop-filter": "blur(40px)",
+        },
+        ".backdrop-blur-3xl": {
+          "-webkit-backdrop-filter": "blur(64px)",
+          "backdrop-filter": "blur(64px)",
         },
       });
     }),

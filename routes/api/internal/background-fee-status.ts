@@ -1,9 +1,13 @@
 import { Handlers } from "$fresh/server.ts";
 import { BackgroundFeeService } from "$server/services/fee/backgroundFeeService.ts";
+import { InternalApiFrontendGuard } from "$server/services/security/internalApiFrontendGuard.ts";
 
 export const handler: Handlers = {
-  GET() {
+  GET(req) {
     try {
+      // Security check for internal endpoints
+      const originError = InternalApiFrontendGuard.requireInternalAccess(req);
+      if (originError) return originError;
       const status = BackgroundFeeService.getStatus();
 
       // Enhanced status with separate services information
@@ -48,12 +52,15 @@ export const handler: Handlers = {
 
   async POST(req) {
     try {
+      // Security check for internal endpoints
+      const originError = InternalApiFrontendGuard.requireInternalAccess(req);
+      if (originError) return originError;
+
       const body = await req.json();
       const action = body.action;
 
       if (action === "force-warm") {
-        const baseUrl = body.baseUrl || "https://stampchain.io";
-        await BackgroundFeeService.forceWarm(baseUrl);
+        await BackgroundFeeService.forceWarm();
 
         return Response.json({
           success: true,
@@ -74,8 +81,7 @@ export const handler: Handlers = {
       }
 
       if (action === "force-warm-fee") {
-        const baseUrl = body.baseUrl || "https://stampchain.io";
-        await BackgroundFeeService.forceWarmFee(baseUrl);
+        await BackgroundFeeService.forceWarmFee();
 
         return Response.json({
           success: true,

@@ -1,11 +1,12 @@
 import { Handlers } from "$fresh/server.ts";
-import { TXError } from "$globals";
-import { AncestorInfo, InputData } from "$types/index.d.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import { SRC20Service } from "$server/services/src20/index.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { logger } from "$lib/utils/logger.ts";
-import { normalizeFeeRate } from "$server/services/xcpService.ts";
-import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import { SRC20Service } from "$server/services/src20/index.ts";
+import { normalizeFeeRate } from "$server/services/counterpartyApiService.ts";
+import type { SRC20CreateResponse } from "$types/api.d.ts";
+import type { InputData } from "$types/src20.d.ts";
+import type { TXError } from "$types/transaction.d.ts";
+import type { AncestorInfo } from "$types/wallet.d.ts";
 
 type TrxType = "multisig" | "olga";
 
@@ -19,23 +20,11 @@ interface ExtendedInputData
   service_fee_address?: string;
   dryRun?: boolean;
   trxType?: TrxType;
-}
-
-interface SRC20CreateResponse {
-  hex?: string;
-  est_tx_size?: number;
-  input_value?: number;
-  total_dust_value?: number;
-  est_miner_fee?: number;
-  fee?: number;
-  change_value?: number;
-  inputsToSign?: Array<
-    { index: number; address: string; sighashType?: number }
-  >;
-  sourceAddress?: string;
-  changeAddress?: string;
-  feeDetails?: any;
-  cpid?: string;
+  tg?: string;
+  description?: string;
+  desc?: string;
+  img?: string; // Simple protocol:hash format (max 32 chars)
+  icon?: string; // Simple protocol:hash format (max 32 chars)
 }
 
 export const handler: Handlers<SRC20CreateResponse | TXError> = {
@@ -43,22 +32,62 @@ export const handler: Handlers<SRC20CreateResponse | TXError> = {
     try {
       const rawBody = await req.text();
       if (!rawBody) {
-        return ResponseUtil.badRequest("Empty request body");
+        return ApiResponseUtil.badRequest("Empty request body");
       }
 
       let body: ExtendedInputData;
       try {
         body = JSON.parse(rawBody);
       } catch (_e) {
-        return ResponseUtil.badRequest("Invalid JSON in request body");
+        return ApiResponseUtil.badRequest("Invalid JSON in request body");
       }
+
+      // Debug logging to see what's being received
+      logger.debug("api-src20-create", {
+        message: "Received SRC20 create request",
+        body: {
+          op: body.op,
+          tick: body.tick,
+          sourceAddress: body.sourceAddress,
+          fromAddress: body.fromAddress,
+          changeAddress: body.changeAddress,
+          hasOp: !!body.op,
+          hasTick: !!body.tick,
+          hasAnyAddress:
+            !!(body.sourceAddress || body.fromAddress || body.changeAddress),
+        },
+      });
 
       if (
         !body.op || !body.tick ||
         !(body.sourceAddress || body.fromAddress || body.changeAddress)
       ) {
+        logger.error("api-src20-create", {
+          message: "Missing required fields",
+          missingOp: !body.op,
+          missingTick: !body.tick,
+          missingAddress:
+            !(body.sourceAddress || body.fromAddress || body.changeAddress),
+          addresses: {
+            sourceAddress: body.sourceAddress || "not provided",
+            fromAddress: body.fromAddress || "not provided",
+            changeAddress: body.changeAddress || "not provided",
+          },
+        });
+
+        const missingFields = [];
+        if (!body.op) missingFields.push("op");
+        if (!body.tick) missingFields.push("tick");
+        if (!(body.sourceAddress || body.fromAddress || body.changeAddress)) {
+          missingFields.push(
+            "address (sourceAddress, fromAddress, or changeAddress)",
+          );
+        }
+
         return ApiResponseUtil.badRequest(
-          "Missing required SRC20 operation fields: op, tick, or an address.",
+          `Missing required SRC20 fields: ${
+            missingFields.join(", ")
+          }. Please ensure your wallet is connected.`,
         );
       }
 
@@ -99,20 +128,55 @@ export const handler: Handlers<SRC20CreateResponse | TXError> = {
           opForValidation,
           {
             sourceAddress: effectiveSourceAddress,
-            changeAddress: effectiveChangeAddress,
+            changeAddress: effectiveChangeAddress || "",
             tick: body.tick,
             max: body.max?.toString(),
             lim: body.lim?.toString(),
-            dec: body.dec?.toString(),
+            dec: body.dec !== undefined ? Number(body.dec) : undefined,
             amt: body.amt?.toString(),
             toAddress: body.toAddress,
-          },
+            x: body.x,
+            web: body.web,
+            email: body.email,
+            tg: body.tg,
+            description: body.description || body.desc,
+            img: body.img,
+            icon: body.icon,
+            isEstimate: isEffectivelyDryRun,
+          } as InputData,
         );
       if (validationError) return validationError as Response;
       if (body.trxType === "multisig") {
-        return ResponseUtil.badRequest(
+        return ApiResponseUtil.badRequest(
           "Multisig transactions should use dedicated endpoint",
         );
+      }
+
+      // Simple image validation
+      if (body.img) {
+        const { validateImageReference, normalizeImageReference } =
+          await import(
+            "$lib/utils/data/protocols/imageProtocolUtils.ts"
+          );
+        // Normalize first (truncates st: hashes to 20 chars if needed)
+        body.img = normalizeImageReference(body.img);
+
+        if (!validateImageReference(body.img)) {
+          return ApiResponseUtil.badRequest(
+            "Invalid img format. Use protocol:hash format (max 32 chars). Supported protocols: ar, ipfs, fc, ord, st",
+          );
+        }
+      }
+
+      if (body.icon) {
+        const { validateImageReference } = await import(
+          "$lib/utils/data/protocols/imageProtocolUtils.ts"
+        );
+        if (!validateImageReference(body.icon)) {
+          return ApiResponseUtil.badRequest(
+            "Invalid icon format. Use protocol:hash format (max 32 chars). Supported protocols: ar, ipfs, fc, ord, st",
+          );
+        }
       }
 
       const psbtResult = await SRC20Service.PSBTService.preparePSBT({
@@ -129,6 +193,11 @@ export const handler: Handlers<SRC20CreateResponse | TXError> = {
           ...(body.x && { x: body.x }),
           ...(body.web && { web: body.web }),
           ...(body.email && { email: body.email }),
+          ...(body.tg && { tg: body.tg }),
+          ...((body.description || body.desc) &&
+            { description: body.description || body.desc }),
+          ...(body.img && { img: body.img }),
+          ...(body.icon && { icon: body.icon }),
         },
         satsPerVB: normalizedFees.normalizedSatsPerVB,
         service_fee: body.service_fee !== undefined
@@ -137,7 +206,7 @@ export const handler: Handlers<SRC20CreateResponse | TXError> = {
             : body.service_fee)
           : 0,
         service_fee_address: body.service_fee_address || "",
-        changeAddress: effectiveChangeAddress,
+        changeAddress: effectiveChangeAddress || "",
         trxType: body.trxType || "olga",
         isDryRun: isEffectivelyDryRun,
       });

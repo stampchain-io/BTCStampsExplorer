@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚧 TEMPORARY: Horizon Wallet API Discovery</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: var(--color-green-light);
+        }
+        .warning {
+            background: #ff4444;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 2px solid #ff6666;
+        }
+        .section {
+            background: #2a2a2a;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid #444;
+        }
+        button {
+            background: #0066cc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        button:hover {
+            background: #0088ff;
+        }
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+        #output {
+            background: #000;
+            color: var(--color-green-light);
+            padding: 15px;
+            border-radius: 4px;
+            height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-size: 12px;
+            border: 1px solid #333;
+        }
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .status.detected { background: var(--color-green-dark); color: var(--color-green-light); }
+        .status.not-detected { background: var(--color-red-dark); color: var(--color-red-light); }
+        .json-display {
+            background: #1e1e1e;
+            border: 1px solid #444;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="warning">
+        ⚠️ <strong>TEMPORARY TEST FILE</strong> - This file is for Horizon Wallet API discovery only.
+        Remove after integration analysis is complete.
+    </div>
+
+    <h1>🔍 Horizon Wallet API Discovery Tool</h1>
+
+    <div class="section">
+        <h2>Wallet Detection Status</h2>
+        <div id="detection-status" class="status not-detected">
+            Checking for Horizon Wallet...
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Discovery Controls</h2>
+        <div class="controls">
+            <button id="scan-window">Scan Window Objects</button>
+            <button id="check-extension">Check Extension Injection</button>
+            <button id="analyze-horizon">🎯 Analyze HorizonWalletProvider</button>
+            <button id="test-request-method">🔧 Test Request Method</button>
+            <button id="test-connect-simple">🚀 Test Connect (Simple)</button>
+            <button id="test-accounts-simple">👤 Test Get Accounts (Simple)</button>
+            <button id="test-common-apis">Test Common APIs</button>
+            <button id="test-connection">Test Connection</button>
+            <button id="test-accounts">Get Accounts</button>
+            <button id="test-balance">Get Balance</button>
+            <button id="test-network">Get Network</button>
+            <button id="test-signing">Test Signing</button>
+            <button id="clear-output">Clear Output</button>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>API Discovery Results</h2>
+        <pre id="output">Ready to discover Horizon Wallet API...</pre>
+    </div>
+
+    <div class="section">
+        <h2>Found API Structure</h2>
+        <div id="api-structure" class="json-display">
+            No API structure discovered yet.
+        </div>
+    </div>
+
+    <script>
+        let horizonAPI = null;
+        let discoveredMethods = {};
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : 'ℹ️';
+            const output = document.getElementById('output');
+            output.textContent += `[${timestamp}] ${prefix} ${message}\n`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function updateStatus(detected, walletObj = null) {
+            const status = document.getElementById('detection-status');
+            if (detected) {
+                status.className = 'status detected';
+                status.textContent = `✅ Horizon Wallet detected! Object: ${walletObj}`;
+                horizonAPI = window[walletObj];
+            } else {
+                status.className = 'status not-detected';
+                status.textContent = '❌ Horizon Wallet not detected';
+            }
+        }
+
+        function updateAPIStructure(obj, path = 'horizon') {
+            const container = document.getElementById('api-structure');
+            try {
+                const structure = analyzeObject(obj, path, 0, 3);
+                container.innerHTML = `<pre>${JSON.stringify(structure, null, 2)}</pre>`;
+            } catch (e) {
+                container.textContent = `Error analyzing structure: ${e.message}`;
+            }
+        }
+
+        function analyzeObject(obj, path, depth, maxDepth) {
+            if (depth >= maxDepth || obj === null || obj === undefined) {
+                return typeof obj;
+            }
+
+            if (typeof obj === 'function') {
+                return {
+                    type: 'function',
+                    name: obj.name || 'anonymous',
+                    length: obj.length
+                };
+            }
+
+            if (typeof obj !== 'object') {
+                return obj;
+            }
+
+            const result = {};
+            try {
+                const keys = Object.getOwnPropertyNames(obj);
+                for (const key of keys.slice(0, 20)) { // Limit to first 20 properties
+                    try {
+                        const value = obj[key];
+                        result[key] = analyzeObject(value, `${path}.${key}`, depth + 1, maxDepth);
+                    } catch (e) {
+                        result[key] = `[Error: ${e.message}]`;
+                    }
+                }
+            } catch (e) {
+                return `[Error accessing properties: ${e.message}]`;
+            }
+            return result;
+        }
+
+                // Initial wallet detection
+        function detectWallet() {
+            log('🔍 Starting comprehensive Horizon Wallet detection...');
+
+            // First, scan ALL window properties for anything wallet-related
+            log('📋 Scanning all window properties...');
+            const allWindowProps = Object.getOwnPropertyNames(window);
+            log(`Total window properties: ${allWindowProps.length}`);
+
+            // Check for common wallet patterns
+            const walletKeywords = ['wallet', 'bitcoin', 'btc', 'crypto', 'provider', 'horizon', 'web3', 'ethereum'];
+            const potentialWallets = [];
+
+            allWindowProps.forEach(prop => {
+                const lowerProp = prop.toLowerCase();
+                if (walletKeywords.some(keyword => lowerProp.includes(keyword))) {
+                    potentialWallets.push(prop);
+                    log(`🔍 Found wallet-related property: window.${prop} (${typeof window[prop]})`);
+                }
+            });
+
+            // Specific Horizon checks
+            const possibleNames = [
+                'horizon', 'Horizon', 'horizonWallet', 'HorizonWallet',
+                'horizonProvider', 'HorizonProvider', 'horizonBitcoin',
+                'HorizonBitcoin', 'HORIZON', 'horizonbtc', 'HorizonBTC',
+                'HorizonBTC', 'horizonBTC', 'btcHorizon', 'BTCHorizon'
+            ];
+
+            let detected = false;
+            let detectedName = null;
+
+            possibleNames.forEach(name => {
+                if (window[name]) {
+                    log(`✅ Found potential Horizon API: window.${name}`, 'success');
+                    detected = true;
+                    detectedName = name;
+                    discoveredMethods[name] = window[name];
+                }
+            });
+
+            // Check for objects that might contain horizon
+            Object.keys(window).forEach(key => {
+                if (key.toLowerCase().includes('horizon') && !possibleNames.includes(key)) {
+                    log(`🔍 Found potential Horizon match: window.${key}`);
+                    detected = true;
+                    if (!detectedName) detectedName = key;
+                    discoveredMethods[key] = window[key];
+                }
+            });
+
+            // Check for Bitcoin-specific wallet objects
+            const bitcoinWallets = allWindowProps.filter(prop => {
+                const obj = window[prop];
+                if (typeof obj === 'object' && obj !== null) {
+                    try {
+                        const methods = Object.getOwnPropertyNames(obj);
+                        const hasBitcoinMethods = methods.some(method =>
+                            method.toLowerCase().includes('bitcoin') ||
+                            method.toLowerCase().includes('btc') ||
+                            method.toLowerCase().includes('address') ||
+                            method.toLowerCase().includes('sign') ||
+                            method.toLowerCase().includes('psbt')
+                        );
+                        return hasBitcoinMethods;
+                    } catch (e) {
+                        return false;
+                    }
+                }
+                return false;
+            });
+
+            if (bitcoinWallets.length > 0) {
+                log(`🪙 Found Bitcoin wallet objects: ${bitcoinWallets.join(', ')}`);
+                bitcoinWallets.forEach(wallet => {
+                    if (!detected && wallet.toLowerCase().includes('horizon')) {
+                        detected = true;
+                        detectedName = wallet;
+                        discoveredMethods[wallet] = window[wallet];
+                    }
+                });
+            }
+
+            // Check for extension-injected objects
+            if (window.chrome && window.chrome.runtime) {
+                log('🔌 Chrome extension environment detected');
+            }
+
+            // Check for common extension patterns
+            const extensionPatterns = ['injected', 'provider', 'wallet', 'extension'];
+            extensionPatterns.forEach(pattern => {
+                allWindowProps.forEach(prop => {
+                    if (prop.toLowerCase().includes(pattern)) {
+                        log(`🔌 Found extension-related object: window.${prop}`);
+                        const obj = window[prop];
+                        if (obj && typeof obj === 'object') {
+                            try {
+                                const subProps = Object.getOwnPropertyNames(obj);
+                                const hasHorizon = subProps.some(sub => sub.toLowerCase().includes('horizon'));
+                                if (hasHorizon) {
+                                    log(`✅ Found Horizon reference in window.${prop}!`, 'success');
+                                    detected = true;
+                                    if (!detectedName) detectedName = prop;
+                                    discoveredMethods[prop] = obj;
+                                }
+                            } catch (e) {
+                                // Ignore errors accessing properties
+                            }
+                        }
+                    }
+                });
+            });
+
+            updateStatus(detected, detectedName);
+
+            if (detected && detectedName) {
+                updateAPIStructure(window[detectedName]);
+                log(`📋 Discovered methods on ${detectedName}:`, 'info');
+                try {
+                    const methods = Object.getOwnPropertyNames(window[detectedName]);
+                    methods.forEach(method => {
+                        const type = typeof window[detectedName][method];
+                        log(`  - ${method}: ${type}`);
+                    });
+                } catch (e) {
+                    log(`Error listing methods: ${e.message}`, 'error');
+                }
+            }
+
+            // Check for HorizonWalletProvider specifically
+            if (window.HorizonWalletProvider) {
+                log('🎉 FOUND: window.HorizonWalletProvider!', 'success');
+                detected = true;
+                detectedName = 'HorizonWalletProvider';
+                discoveredMethods['HorizonWalletProvider'] = window.HorizonWalletProvider;
+
+                // Analyze the HorizonWalletProvider object
+                log('🔍 Analyzing HorizonWalletProvider structure...');
+                const provider = window.HorizonWalletProvider;
+
+                log(`Type: ${typeof provider}`);
+
+                if (typeof provider === 'object' && provider !== null) {
+                    const props = Object.getOwnPropertyNames(provider);
+                    const protoProps = provider.constructor ? Object.getOwnPropertyNames(provider.constructor.prototype) : [];
+
+                    log(`📋 Direct properties (${props.length}): ${props.join(', ')}`);
+                    log(`🧬 Prototype methods (${protoProps.length}): ${protoProps.join(', ')}`);
+
+                    // Check for common wallet methods
+                    const commonMethods = ['connect', 'disconnect', 'getAccounts', 'getAddress', 'getBalance', 'signMessage', 'signPsbt', 'sendBitcoin', 'getNetwork', 'switchNetwork'];
+                    const foundMethods = commonMethods.filter(method => typeof provider[method] === 'function');
+
+                    if (foundMethods.length > 0) {
+                        log(`✅ Found wallet methods: ${foundMethods.join(', ')}`, 'success');
+                    }
+
+                    // Check for properties
+                    const commonProps = ['isConnected', 'accounts', 'address', 'network', 'publicKey'];
+                    const foundProps = commonProps.filter(prop => provider.hasOwnProperty(prop));
+
+                    if (foundProps.length > 0) {
+                        log(`📝 Found wallet properties: ${foundProps.join(', ')}`, 'success');
+                    }
+
+                    // Try to get constructor info
+                    if (provider.constructor && provider.constructor.name) {
+                        log(`🏗️ Constructor: ${provider.constructor.name}`);
+                    }
+                }
+            } else {
+                log('❌ No Horizon Wallet API detected with standard patterns.', 'error');
+                log('💡 Try the "Scan Window Objects" button for a complete analysis.');
+
+                // Show some helpful info
+                log(`📊 Summary of findings:`);
+                log(`  - Total window properties: ${allWindowProps.length}`);
+                log(`  - Wallet-related properties: ${potentialWallets.length}`);
+                log(`  - Bitcoin wallet objects: ${bitcoinWallets.length}`);
+
+                if (potentialWallets.length > 0) {
+                    log(`🔍 Wallet-related objects found: ${potentialWallets.slice(0, 10).join(', ')}${potentialWallets.length > 10 ? '...' : ''}`);
+                }
+            }
+        }
+
+                // Scan all window objects for potential wallet APIs
+        document.getElementById('scan-window').onclick = function() {
+            log('🔍 Deep scanning ALL window objects...');
+
+            const walletKeywords = ['wallet', 'bitcoin', 'btc', 'crypto', 'provider', 'horizon', 'web3', 'ethereum'];
+            const foundObjects = [];
+            const allProps = Object.getOwnPropertyNames(window);
+
+            log(`🔍 Scanning ${allProps.length} window properties...`);
+
+            allProps.forEach(key => {
+                const lowerKey = key.toLowerCase();
+                const obj = window[key];
+                const objType = typeof obj;
+
+                // Check for wallet keywords
+                const hasWalletKeyword = walletKeywords.some(keyword => lowerKey.includes(keyword));
+
+                // Check for objects that might be wallets (have wallet-like methods)
+                let hasWalletMethods = false;
+                if (objType === 'object' && obj !== null) {
+                    try {
+                        const methods = Object.getOwnPropertyNames(obj);
+                        const walletMethods = ['connect', 'getAccounts', 'getAddress', 'signMessage', 'signTransaction', 'signPsbt', 'requestAccounts', 'getBalance'];
+                        hasWalletMethods = walletMethods.some(method => methods.includes(method));
+
+                        // Also check for Bitcoin-specific methods
+                        const bitcoinMethods = methods.filter(method => {
+                            const lowerMethod = method.toLowerCase();
+                            return lowerMethod.includes('bitcoin') ||
+                                   lowerMethod.includes('btc') ||
+                                   lowerMethod.includes('psbt') ||
+                                   lowerMethod.includes('address') ||
+                                   lowerMethod.includes('sign');
+                        });
+
+                        if (bitcoinMethods.length > 0) {
+                            hasWalletMethods = true;
+                        }
+                    } catch (e) {
+                        // Ignore errors accessing properties
+                    }
+                }
+
+                if (hasWalletKeyword || hasWalletMethods) {
+                    foundObjects.push({
+                        name: key,
+                        type: objType,
+                        obj: obj,
+                        hasKeyword: hasWalletKeyword,
+                        hasWalletMethods: hasWalletMethods
+                    });
+                }
+            });
+
+            log(`Found ${foundObjects.length} potential wallet-related objects:`);
+
+            foundObjects.forEach(objInfo => {
+                const indicators = [];
+                if (objInfo.hasKeyword) indicators.push('keyword');
+                if (objInfo.hasWalletMethods) indicators.push('methods');
+
+                log(`  🔍 ${objInfo.name} (${objInfo.type}) [${indicators.join(', ')}]`);
+
+                if (objInfo.type === 'object' && objInfo.obj) {
+                    try {
+                        const methods = Object.getOwnPropertyNames(objInfo.obj);
+
+                        // Show all methods for small objects, or just important ones for large objects
+                        if (methods.length <= 10) {
+                            log(`    📋 Methods: ${methods.join(', ')}`);
+                        } else {
+                            const importantMethods = methods.filter(method => {
+                                const lowerMethod = method.toLowerCase();
+                                return lowerMethod.includes('connect') ||
+                                       lowerMethod.includes('account') ||
+                                       lowerMethod.includes('address') ||
+                                       lowerMethod.includes('sign') ||
+                                       lowerMethod.includes('balance') ||
+                                       lowerMethod.includes('bitcoin') ||
+                                       lowerMethod.includes('btc') ||
+                                       lowerMethod.includes('horizon');
+                            });
+
+                            if (importantMethods.length > 0) {
+                                log(`    ⭐ Key methods: ${importantMethods.join(', ')}`);
+                            }
+                            log(`    📋 All methods (${methods.length}): ${methods.slice(0, 8).join(', ')}${methods.length > 8 ? '...' : ''}`);
+                        }
+
+                        // Check if this might be Horizon specifically
+                        const hasHorizonRef = methods.some(method => method.toLowerCase().includes('horizon')) ||
+                                            JSON.stringify(objInfo.obj).toLowerCase().includes('horizon');
+
+                        if (hasHorizonRef) {
+                            log(`    🎯 POTENTIAL HORIZON WALLET FOUND!`, 'success');
+
+                            // Try to set this as our detected wallet
+                            horizonAPI = objInfo.obj;
+                            updateStatus(true, objInfo.name);
+                            updateAPIStructure(objInfo.obj);
+                        }
+
+                    } catch (e) {
+                        log(`    ❌ Error accessing methods: ${e.message}`);
+                    }
+                }
+
+                // For functions, show basic info
+                if (objInfo.type === 'function') {
+                    try {
+                        log(`    📋 Function length: ${objInfo.obj.length}, name: "${objInfo.obj.name}"`);
+                    } catch (e) {
+                        log(`    ❌ Error accessing function info: ${e.message}`);
+                    }
+                }
+            });
+
+            // Additional checks for nested objects
+            log('🔍 Checking for nested wallet objects...');
+            foundObjects.forEach(objInfo => {
+                if (objInfo.type === 'object' && objInfo.obj) {
+                    try {
+                        const subProps = Object.getOwnPropertyNames(objInfo.obj);
+                        subProps.forEach(subProp => {
+                            if (subProp.toLowerCase().includes('horizon') ||
+                                subProp.toLowerCase().includes('wallet') ||
+                                subProp.toLowerCase().includes('bitcoin')) {
+                                log(`    🔍 Found nested property: ${objInfo.name}.${subProp}`);
+
+                                const subObj = objInfo.obj[subProp];
+                                if (typeof subObj === 'object' && subObj !== null) {
+                                    try {
+                                        const subMethods = Object.getOwnPropertyNames(subObj);
+                                        log(`      📋 Sub-methods: ${subMethods.slice(0, 5).join(', ')}${subMethods.length > 5 ? '...' : ''}`);
+                                    } catch (e) {
+                                        // Ignore
+                                    }
+                                }
+                            }
+                        });
+                    } catch (e) {
+                        // Ignore errors
+                    }
+                }
+            });
+        };
+
+        // Check for extension injection patterns
+        document.getElementById('check-extension').onclick = function() {
+            log('🔌 Checking for extension injection patterns...');
+
+            // Common extension injection patterns
+            const checkPatterns = [
+                // Standard Bitcoin wallet patterns
+                'bitcoin', 'btc', 'Bitcoin', 'BTC',
+                // Extension-specific patterns
+                'injectedProviders', 'providers', 'walletProviders',
+                // Event-based injection
+                'addEventListener', 'dispatchEvent',
+                // Horizon-specific attempts
+                'horizon', 'Horizon', 'HORIZON'
+            ];
+
+            checkPatterns.forEach(pattern => {
+                if (window[pattern]) {
+                    log(`✅ Found: window.${pattern} (${typeof window[pattern]})`, 'success');
+
+                    if (typeof window[pattern] === 'object' && window[pattern] !== null) {
+                        try {
+                            const props = Object.getOwnPropertyNames(window[pattern]);
+                            log(`  📋 Properties: ${props.slice(0, 10).join(', ')}${props.length > 10 ? '...' : ''}`);
+                        } catch (e) {
+                            log(`  ❌ Error accessing properties: ${e.message}`);
+                        }
+                    }
+                }
+            });
+
+            // Check for document events that might indicate wallet injection
+            log('📡 Checking for wallet-related events...');
+
+            // Listen for wallet events
+            const walletEvents = ['wallet-ready', 'horizon-ready', 'bitcoin-ready', 'provider-ready'];
+            walletEvents.forEach(eventType => {
+                document.addEventListener(eventType, (event) => {
+                    log(`🎉 Detected ${eventType} event!`, 'success');
+                    log(`Event details: ${JSON.stringify(event.detail || {})}`);
+                });
+            });
+
+            // Check if wallet might inject after DOM load
+            log('⏰ Setting up delayed checks...');
+
+            setTimeout(() => {
+                log('🔄 Running delayed detection (2s)...');
+                detectWallet();
+            }, 2000);
+
+            setTimeout(() => {
+                log('🔄 Running delayed detection (5s)...');
+                detectWallet();
+            }, 5000);
+
+            // Check for common wallet injection points
+            const injectionPoints = ['ethereum', 'solana', 'bitcoin', 'webln'];
+            injectionPoints.forEach(point => {
+                if (window[point]) {
+                    log(`🔍 Found ${point} injection point`);
+
+                    // Check if it has Horizon-related properties
+                    try {
+                        const obj = window[point];
+                        if (typeof obj === 'object' && obj !== null) {
+                            const props = Object.getOwnPropertyNames(obj);
+                            const horizonProps = props.filter(prop =>
+                                prop.toLowerCase().includes('horizon')
+                            );
+
+                            if (horizonProps.length > 0) {
+                                log(`🎯 Found Horizon properties in window.${point}: ${horizonProps.join(', ')}`, 'success');
+                                horizonAPI = obj;
+                                updateStatus(true, point);
+                                updateAPIStructure(obj);
+                            }
+                        }
+                    } catch (e) {
+                        log(`❌ Error checking ${point}: ${e.message}`);
+                    }
+                }
+            });
+
+            log('💡 If wallet still not detected, try:');
+            log('  1. Refresh the page with wallet already connected');
+            log('  2. Connect to wallet first, then run detection');
+            log('  3. Check browser console for any wallet-related errors');
+        };
+
+        // Analyze HorizonWalletProvider specifically
+        document.getElementById('analyze-horizon').onclick = function() {
+            log('🎯 Deep analysis of HorizonWalletProvider...');
+
+            if (!window.HorizonWalletProvider) {
+                log('❌ HorizonWalletProvider not found!', 'error');
+                return;
+            }
+
+            const provider = window.HorizonWalletProvider;
+            log('🎉 HorizonWalletProvider found!', 'success');
+
+            // Deep object analysis
+            log('📊 Object Analysis:');
+            log(`  - Type: ${typeof provider}`);
+            log(`  - Constructor: ${provider.constructor?.name || 'Unknown'}`);
+            log(`  - String representation: ${provider.toString()}`);
+
+            // Get all properties and methods
+            const allKeys = [];
+            let current = provider;
+            while (current && current !== Object.prototype) {
+                allKeys.push(...Object.getOwnPropertyNames(current));
+                current = Object.getPrototypeOf(current);
+            }
+            const uniqueKeys = [...new Set(allKeys)];
+
+            log(`📋 All available properties/methods (${uniqueKeys.length}):`);
+            uniqueKeys.forEach(key => {
+                try {
+                    const value = provider[key];
+                    const type = typeof value;
+                    if (type === 'function') {
+                        log(`  🔧 ${key}(): function`, 'info');
+                    } else {
+                        log(`  📝 ${key}: ${type} = ${value}`, 'info');
+                    }
+                } catch (e) {
+                    log(`  ❓ ${key}: (access error)`, 'warning');
+                }
+            });
+
+            // Try to call some common methods safely
+            log('🧪 Testing common wallet methods:');
+
+            const testMethods = [
+                'connect', 'getAccounts', 'getAddress', 'getBalance',
+                'getNetwork', 'isConnected', 'getPublicKey'
+            ];
+
+            testMethods.forEach(method => {
+                if (typeof provider[method] === 'function') {
+                    log(`  ✅ ${method}() is available`, 'success');
+                } else {
+                    log(`  ❌ ${method}() not found`, 'warning');
+                }
+            });
+
+            // Check for event handling
+            if (typeof provider.on === 'function' || typeof provider.addEventListener === 'function') {
+                log('📡 Event handling available', 'success');
+            }
+
+            // Store for testing
+            discoveredMethods['HorizonWalletProvider'] = provider;
+
+            log('💡 Use the other buttons to test specific functionality!');
+        };
+
+                // Test HorizonWalletProvider request method specifically
+        document.getElementById('test-request-method').onclick = async function() {
+            log('🔧 Testing HorizonWalletProvider.request() method...');
+
+            if (!window.HorizonWalletProvider) {
+                log('❌ HorizonWalletProvider not found!', 'error');
+                return;
+            }
+
+            const provider = window.HorizonWalletProvider;
+
+            if (typeof provider.request !== 'function') {
+                log('❌ request() method not found!', 'error');
+                return;
+            }
+
+            log('🎯 Found request() method!', 'success');
+
+            // Try to get the function signature
+            try {
+                const funcStr = provider.request.toString();
+                log(`📝 Function signature: ${funcStr}`);
+                log('🎉 DISCOVERY: Horizon uses Custom Events for communication!', 'success');
+            } catch (e) {
+                log('Could not inspect function signature');
+            }
+
+            // Set up event listeners for Horizon Wallet responses
+            log('🎧 Setting up event listeners for Horizon Wallet responses...');
+
+            const responseListener = (event) => {
+                log(`📨 Received custom event: ${event.type}`, 'info');
+
+                // For message events, check event.data instead of event.detail
+                if (event.type === 'message') {
+                    log(`📨 Message event data type: ${typeof event.data}`, 'info');
+                    log(`📨 Message event origin: ${event.origin || 'no origin'}`, 'info');
+                    log(`📨 Message event source: ${event.source ? 'present' : 'null'}`, 'info');
+
+                    if (event.data) {
+                        try {
+                            const dataStr = typeof event.data === 'object'
+                                ? JSON.stringify(event.data, null, 2)
+                                : String(event.data);
+                            log(`📨 Message data: ${dataStr}`, 'success');
+
+                            // Check if this looks like a Horizon response
+                            if (typeof event.data === 'object' && event.data.id) {
+                                log(`🎯 POTENTIAL HORIZON RESPONSE DETECTED!`, 'success');
+
+                                if (event.data.result) {
+                                    log(`✅ SUCCESS RESPONSE: ${JSON.stringify(event.data.result, null, 2)}`, 'success');
+                                }
+
+                                if (event.data.error) {
+                                    log(`❌ ERROR RESPONSE: ${JSON.stringify(event.data.error, null, 2)}`, 'error');
+                                }
+                            }
+                        } catch (e) {
+                            log(`📨 Message data (raw): ${event.data}`, 'info');
+                        }
+                    } else {
+                        log(`📨 Message event with no data`, 'warning');
+                    }
+                } else {
+                    // For other event types, check event.detail
+                    log(`📨 Event detail: ${JSON.stringify(event.detail, null, 2)}`, 'info');
+
+                    if (event.detail && event.detail.result) {
+                        log(`✅ SUCCESS RESPONSE: ${JSON.stringify(event.detail.result, null, 2)}`, 'success');
+                    }
+
+                    if (event.detail && event.detail.error) {
+                        log(`❌ ERROR RESPONSE: ${JSON.stringify(event.detail.error, null, 2)}`, 'error');
+                    }
+                }
+            };
+
+            // Listen for potential Horizon Wallet event names
+            const eventNames = [
+                'horizonWalletResponse',
+                'horizon-wallet-response',
+                'horizon_wallet_response',
+                'horizonResponse',
+                'horizon-response',
+                'horizon_response',
+                'walletResponse',
+                'wallet-response',
+                'wallet_response',
+                'message',
+                'response'
+            ];
+
+            eventNames.forEach(eventName => {
+                document.addEventListener(eventName, responseListener);
+                window.addEventListener(eventName, responseListener);
+            });
+
+            // Also listen for ALL custom events to see what Horizon dispatches
+            const originalDispatch = document.dispatchEvent.bind(document);
+            document.dispatchEvent = function(event) {
+                if (event instanceof CustomEvent && event.type.toLowerCase().includes('horizon')) {
+                    log(`🔍 Horizon Custom Event Dispatched: ${event.type}`, 'info');
+                    log(`🔍 Event detail: ${JSON.stringify(event.detail, null, 2)}`, 'info');
+                }
+                return originalDispatch(event);
+            };
+
+            // Test different request patterns that Bitcoin wallets commonly use
+            const testRequests = [
+                // Standard Bitcoin wallet methods
+                'getAccounts',
+                'connect',
+                'requestAccounts',
+                'getAddress',
+                'getAddresses',
+                'getBalance',
+                'getNetwork',
+                'getPublicKey',
+
+                // Bitcoin-specific methods
+                'signMessage',
+                'signPsbt',
+                'sendBitcoin',
+
+                // Horizon-specific guesses
+                'horizon_getAccounts',
+                'horizon_connect',
+                'btc_getAccounts',
+                'btc_requestAccounts'
+            ];
+
+            log('🧪 Testing various request patterns with event listening...');
+
+            for (let i = 0; i < testRequests.length; i++) {
+                const method = testRequests[i];
+
+                // Add delay between requests to avoid overwhelming the wallet
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                try {
+                    log(`\n🔍 Testing request ${i + 1}/${testRequests.length}: "${method}"`);
+
+                    // Call the request method (this should dispatch a custom event)
+                    provider.request(method, {});
+
+                    log(`📤 Request sent for method: "${method}"`);
+                    log('⏳ Waiting for response event...');
+
+                    // Wait a bit to see if we get a response event
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+
+                } catch (error) {
+                    log(`❌ Error calling request: ${error.message}`, 'error');
+                    if (error.code !== undefined) {
+                        log(`   Code: ${error.code}`);
+                    }
+                }
+            }
+
+            log('\n🏁 Request method testing complete!');
+            log('💡 Check above for any custom events that were captured!');
+
+            // Clean up event listeners after testing
+            setTimeout(() => {
+                eventNames.forEach(eventName => {
+                    document.removeEventListener(eventName, responseListener);
+                    window.removeEventListener(eventName, responseListener);
+                });
+                log('🧹 Event listeners cleaned up');
+            }, 5000);
+        };
+
+        // Simple test buttons for individual methods
+        document.getElementById('test-connect-simple').onclick = async function() {
+            if (!window.HorizonWalletProvider) {
+                log('❌ HorizonWalletProvider not found!', 'error');
+                return;
+            }
+
+            log('🚀 Testing simple connect...');
+
+            try {
+                const result = await window.HorizonWalletProvider.request('connect', {});
+                log('✅ Connect result:', 'success');
+                log(JSON.stringify(result, null, 2), 'success');
+            } catch (error) {
+                log('❌ Connect error:', 'error');
+                log(error.message || String(error), 'error');
+            }
+        };
+
+        document.getElementById('test-accounts-simple').onclick = async function() {
+            if (!window.HorizonWalletProvider) {
+                log('❌ HorizonWalletProvider not found!', 'error');
+                return;
+            }
+
+            log('👤 Testing simple getAccounts...');
+
+            try {
+                const result = await window.HorizonWalletProvider.request('getAccounts', {});
+                log('✅ GetAccounts result:', 'success');
+                log(JSON.stringify(result, null, 2), 'success');
+            } catch (error) {
+                log('❌ GetAccounts error:', 'error');
+                log(error.message || String(error), 'error');
+            }
+        };
+
+        // Test common wallet API patterns
+        document.getElementById('test-common-apis').onclick = async function() {
+            if (!horizonAPI) {
+                log('❌ No Horizon API detected. Run detection first.', 'error');
+                return;
+            }
+
+            log('🧪 Testing common wallet API patterns...');
+
+            const commonMethods = [
+                'requestAccounts', 'getAccounts', 'connect',
+                'getAddress', 'getAddresses', 'getPublicKey',
+                'getBalance', 'getNetwork', 'signMessage',
+                'signPsbt', 'signTransaction', 'sendTransaction'
+            ];
+
+            commonMethods.forEach(method => {
+                if (typeof horizonAPI[method] === 'function') {
+                    log(`✅ Found method: ${method}`, 'success');
+                } else if (horizonAPI[method] !== undefined) {
+                    log(`ℹ️ Found property: ${method} (${typeof horizonAPI[method]})`);
+                }
+            });
+        };
+
+        // Test connection
+        document.getElementById('test-connection').onclick = async function() {
+            log('🔌 Testing wallet connection...');
+
+            // Try HorizonWalletProvider first
+            if (window.HorizonWalletProvider) {
+                log('🎯 Testing HorizonWalletProvider connection...');
+                const provider = window.HorizonWalletProvider;
+
+                try {
+                    if (typeof provider.connect === 'function') {
+                        log('📞 Calling connect()...');
+                        const result = await provider.connect();
+                        log(`✅ Connect result: ${JSON.stringify(result)}`, 'success');
+                    } else if (typeof provider.requestConnection === 'function') {
+                        log('📞 Calling requestConnection()...');
+                        const result = await provider.requestConnection();
+                        log(`✅ RequestConnection result: ${JSON.stringify(result)}`, 'success');
+                    } else if (typeof provider.enable === 'function') {
+                        log('📞 Calling enable()...');
+                        const result = await provider.enable();
+                        log(`✅ Enable result: ${JSON.stringify(result)}`, 'success');
+                    } else if (typeof provider.requestAccounts === 'function') {
+                        log('📞 Calling requestAccounts()...');
+                        const result = await provider.requestAccounts();
+                        log(`✅ RequestAccounts result: ${JSON.stringify(result)}`, 'success');
+                    } else {
+                        log('❓ No standard connection method found', 'warning');
+                        log('Available methods:', Object.getOwnPropertyNames(provider).filter(p => typeof provider[p] === 'function'));
+                    }
+                } catch (error) {
+                    log(`❌ HorizonWalletProvider connection error: ${error.message}`, 'error');
+                    console.error('Full error:', error);
+                }
+            } else {
+                log('❌ HorizonWalletProvider not found!', 'error');
+            }
+
+            const connectionMethods = ['requestAccounts', 'connect', 'enable'];
+
+            for (const method of connectionMethods) {
+                if (typeof horizonAPI[method] === 'function') {
+                    try {
+                        log(`Trying ${method}()...`);
+                        const result = await horizonAPI[method]();
+                        log(`✅ ${method}() succeeded:`, 'success');
+                        log(JSON.stringify(result, null, 2));
+                        break;
+                    } catch (e) {
+                        log(`❌ ${method}() failed: ${e.message}`, 'error');
+                    }
+                }
+            }
+        };
+
+        // Test account methods
+        document.getElementById('test-accounts').onclick = async function() {
+            if (!horizonAPI) {
+                log('❌ No Horizon API detected.', 'error');
+                return;
+            }
+
+            log('👤 Testing account methods...');
+
+            const accountMethods = ['getAccounts', 'getAddress', 'getAddresses'];
+
+            for (const method of accountMethods) {
+                if (typeof horizonAPI[method] === 'function') {
+                    try {
+                        log(`Calling ${method}()...`);
+                        const result = await horizonAPI[method]();
+                        log(`✅ ${method}():`, 'success');
+                        log(JSON.stringify(result, null, 2));
+                    } catch (e) {
+                        log(`❌ ${method}() failed: ${e.message}`, 'error');
+                    }
+                }
+            }
+        };
+
+        // Test balance methods
+        document.getElementById('test-balance').onclick = async function() {
+            if (!horizonAPI) {
+                log('❌ No Horizon API detected.', 'error');
+                return;
+            }
+
+            log('💰 Testing balance methods...');
+
+            const balanceMethods = ['getBalance', 'getBalances'];
+
+            for (const method of balanceMethods) {
+                if (typeof horizonAPI[method] === 'function') {
+                    try {
+                        log(`Calling ${method}()...`);
+                        const result = await horizonAPI[method]();
+                        log(`✅ ${method}():`, 'success');
+                        log(JSON.stringify(result, null, 2));
+                    } catch (e) {
+                        log(`❌ ${method}() failed: ${e.message}`, 'error');
+                    }
+                }
+            }
+        };
+
+        // Test network methods
+        document.getElementById('test-network').onclick = async function() {
+            if (!horizonAPI) {
+                log('❌ No Horizon API detected.', 'error');
+                return;
+            }
+
+            log('🌐 Testing network methods...');
+
+            const networkMethods = ['getNetwork', 'getChain', 'getChainId'];
+
+            for (const method of networkMethods) {
+                if (typeof horizonAPI[method] === 'function') {
+                    try {
+                        log(`Calling ${method}()...`);
+                        const result = await horizonAPI[method]();
+                        log(`✅ ${method}():`, 'success');
+                        log(JSON.stringify(result, null, 2));
+                    } catch (e) {
+                        log(`❌ ${method}() failed: ${e.message}`, 'error');
+                    }
+                }
+            }
+        };
+
+        // Test signing methods
+        document.getElementById('test-signing').onclick = async function() {
+            if (!horizonAPI) {
+                log('❌ No Horizon API detected.', 'error');
+                return;
+            }
+
+            log('✍️ Testing signing methods...');
+
+            // Test message signing
+            if (typeof horizonAPI.signMessage === 'function') {
+                try {
+                    log('Testing signMessage with "Hello Horizon"...');
+                    const result = await horizonAPI.signMessage('Hello Horizon');
+                    log('✅ signMessage succeeded:', 'success');
+                    log(JSON.stringify(result, null, 2));
+                } catch (e) {
+                    log(`❌ signMessage failed: ${e.message}`, 'error');
+                }
+            }
+
+            // Test PSBT signing (with dummy data)
+            const signingMethods = ['signPsbt', 'signTransaction', 'signPSBT'];
+
+            for (const method of signingMethods) {
+                if (typeof horizonAPI[method] === 'function') {
+                    log(`Found signing method: ${method} (not testing with real data)`);
+                }
+            }
+        };
+
+        // Clear output
+        document.getElementById('clear-output').onclick = function() {
+            document.getElementById('output').textContent = '';
+            log('Output cleared. Ready for new tests...');
+        };
+
+        // Run initial detection on page load
+        window.addEventListener('load', () => {
+            setTimeout(detectWallet, 1000); // Give extensions time to load
+        });
+
+        // Also detect when extensions might load later
+        let detectionAttempts = 0;
+        const maxAttempts = 10;
+        const detectionInterval = setInterval(() => {
+            if (detectionAttempts >= maxAttempts) {
+                clearInterval(detectionInterval);
+                return;
+            }
+
+            if (!horizonAPI) {
+                detectWallet();
+                detectionAttempts++;
+            } else {
+                clearInterval(detectionInterval);
+            }
+        }, 2000);
+    </script>
+</body>
+</html>

@@ -1,12 +1,12 @@
 import { Handlers } from "$fresh/server.ts";
 import { CollectionController } from "$server/controller/collectionController.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
+import { ResponseUtil } from "$lib/utils/api/responses/responseUtil.ts";
+import { getPaginationParams } from "$lib/utils/data/pagination/paginationUtils.ts";
 import {
   checkEmptyResult,
   DEFAULT_PAGINATION,
-} from "$server/services/routeValidationService.ts";
-import { RouteType } from "$server/services/cacheService.ts";
+} from "$server/services/validation/routeValidationService.ts";
+import { RouteType } from "$server/services/infrastructure/cacheService.ts";
 
 export const handler: Handlers = {
   async GET(req, ctx) {

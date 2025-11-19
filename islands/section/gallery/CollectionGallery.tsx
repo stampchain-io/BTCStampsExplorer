@@ -1,10 +1,24 @@
 /* ===== COLLECTION GALLERY COMPONENT ===== */
-import { useEffect, useState } from "preact/hooks";
-import { Collection, CollectionGalleryProps } from "$globals";
+import { BREAKPOINTS } from "$constants";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
-import { BREAKPOINTS } from "$lib/utils/constants.ts";
 import { CollectionsBanner } from "$section";
 import { subtitleGrey, titleGreyLD } from "$text";
+import type { Collection } from "$types/stamp.d.ts";
+import { useEffect, useState } from "preact/hooks";
+// Local copy of props to avoid importing server-only types
+export interface CollectionGalleryProps {
+  title?: string;
+  subTitle?: string;
+  collections: Collection[];
+  gridClass?: string;
+  displayCounts?: {
+    desktop?: number;
+    tablet?: number;
+    mobileLg?: number;
+    mobileMd?: number;
+    mobileSm?: number;
+  };
+}
 
 /* ===== STATE ===== */
 export default function CollectionGallery({
@@ -52,6 +66,7 @@ export default function CollectionGallery({
   }, [width, displayCounts, collectionArray.length]);
 
   /* ===== RENDER ===== */
+  const grid = gridClass ?? "grid grid-cols-1 gap-4";
   return (
     <div>
       {title && <h3 class={titleGreyLD}>{title}</h3>}
@@ -63,7 +78,7 @@ export default function CollectionGallery({
           {subTitle}
         </h4>
       )}
-      <div class={gridClass}>
+      <div class={grid}>
         {collectionArray.slice(0, displayCount).map((
           collection: Collection,
           key: number,

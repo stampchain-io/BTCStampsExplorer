@@ -1,5 +1,5 @@
 import { assert, assertEquals } from "@std/assert";
-import { generateRandomNumber } from "$lib/utils/numberUtils.ts";
+import { generateRandomNumber } from "$lib/utils/data/numbers/numberUtils.ts";
 
 Deno.test("numberUtils - generateRandomNumber basic functionality", () => {
   // Test that the number is within range

@@ -1,6 +1,13 @@
 # BITCOIN STAMPS EXPLORER AND API
 
 [![codecov](https://codecov.io/gh/stampchain-io/BTCStampsExplorer/graph/badge.svg?token=4AEWJ1OMM2)](https://codecov.io/gh/stampchain-io/BTCStampsExplorer)
+[![Code Quality](https://github.com/stampchain-io/BTCStampsExplorer/actions/workflows/deploy.yml/badge.svg)](https://github.com/stampchain-io/BTCStampsExplorer/actions/workflows/deploy.yml)
+[![Unit Tests](https://github.com/stampchain-io/BTCStampsExplorer/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/stampchain-io/BTCStampsExplorer/actions/workflows/unit-tests.yml)
+[![Integration Tests](https://github.com/stampchain-io/BTCStampsExplorer/actions/workflows/integration-tests.yml/badge.svg)](https://github.com/stampchain-io/BTCStampsExplorer/actions/workflows/integration-tests.yml)
+[![TypeScript Type Checking](https://github.com/stampchain-io/BTCStampsExplorer/actions/workflows/type-check.yml/badge.svg)](https://github.com/stampchain-io/BTCStampsExplorer/actions/workflows/type-check.yml)
+[![Newman API Tests](https://github.com/stampchain-io/BTCStampsExplorer/actions/workflows/newman-comprehensive-tests.yml/badge.svg)](https://github.com/stampchain-io/BTCStampsExplorer/actions/workflows/newman-comprehensive-tests.yml)
+[![Docker Build Test](https://github.com/stampchain-io/BTCStampsExplorer/actions/workflows/docker-test.yml/badge.svg)](https://github.com/stampchain-io/BTCStampsExplorer/actions/workflows/docker-test.yml)
+[![Actionlint](https://github.com/stampchain-io/BTCStampsExplorer/actions/workflows/actionlint.yml/badge.svg)](https://github.com/stampchain-io/BTCStampsExplorer/actions/workflows/actionlint.yml)
 
 This is the official API and block explorer for
 [Bitcoin Stamps](https://stampchain.io/). It provides a comprehensive interface
@@ -20,7 +27,7 @@ This is a Deno project. For security information including how npm development d
 ## Prerequisites
 
 1. **Install Deno**
-   > ⚠️ **Required Version**: 2.3.3
+   > ⚠️ **Required Version**: 2.4.2
    ```sh
    curl -fsSL https://deno.land/install.sh | sh
    ```
@@ -56,7 +63,7 @@ This is a Deno project. For security information including how npm development d
 ## Development Commands
 
 ```sh
-# Start development server with hot reload and debugging
+# Start development server with hot reload and debugging (auto-loads Chrome if available)
 deno task dev
 
 # Code quality checks (formatting, linting, type checking)
@@ -88,13 +95,13 @@ deno task start
 ### 2. Docker Deployment
 
 ```sh
-docker build -t btc-stamps-explorer:2.3.3 .
-docker run -p 8000:8000 btc-stamps-explorer:2.3.3
+docker build -t btc-stamps-explorer:2.4.2 .
+docker run -p 8000:8000 btc-stamps-explorer:2.4.2
 ```
 
 The container uses:
 - Ubuntu 22.04 base image
-- Deno 2.3.3
+- Deno 2.4.2
 - Production environment
 - Port 8000
 - Required permissions for network, file system, and environment variables

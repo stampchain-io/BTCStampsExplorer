@@ -1,90 +1,141 @@
-import type { Toast as ToastTypeFromProvider } from "./ToastProvider.tsx";
-
-interface ToastComponentProps {
-  id: string;
-  message: string;
-  type: ToastTypeFromProvider["type"];
-  onClose: () => void;
-}
+import { Icon } from "$icon";
+import type { Toast as ToastTypeFromProvider } from "$islands/Toast/ToastProvider.tsx";
+import {
+  notificationBody,
+  notificationContainerError,
+  notificationContainerInfo,
+  notificationContainerSuccess,
+  notificationContainerWarning,
+  notificationHeading,
+} from "$notification";
+import type { ToastComponentProps } from "$types/ui.d.ts";
 
 export const ToastComponent = (
-  { id, message, type, onClose }: ToastComponentProps,
+  {
+    id,
+    message,
+    type,
+    onClose,
+    autoDismiss,
+    duration = 3000,
+    isAnimatingOut: externalIsAnimatingOut,
+  }: ToastComponentProps & { isAnimatingOut?: boolean },
 ) => {
-  const getIcon = (toastType: ToastTypeFromProvider["type"]) => {
+  // Use the external animation state from the provider
+  const shouldAnimateOut = externalIsAnimatingOut ?? false;
+  const getIconName = (toastType: ToastTypeFromProvider["type"]) => {
     switch (toastType) {
       case "error":
-        return (
-          <svg
-            className="w-5 h-5"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
-            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 11.793a1 1 0 1 1-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 0 1-1.414-1.414L8.586 10 6.293 7.707a1 1 0 0 1 1.414-1.414L10 8.586l2.293-2.293a1 1 0 0 1 1.414 1.414L11.414 10l2.293 2.293Z" />
-          </svg>
-        );
+        return "error";
+      case "warning":
+        return "info";
       case "success":
-        return (
-          <svg
-            className="w-5 h-5"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
-            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z" />
-          </svg>
-        );
+        return "success";
       case "info":
       default:
-        return (
-          <svg
-            className="w-5 h-5"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
-            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM10 15a1 1 0 1 1 0-2 1 1 0 0 1 0 2Zm1-4a1 1 0 0 1-2 0V6a1 1 0 0 1 2 0v5Z" />
-          </svg>
-        );
+        return "info";
     }
   };
+
+  const getIconColor = (toastType: ToastTypeFromProvider["type"]) => {
+    switch (toastType) {
+      case "error":
+        return "stroke-color-red";
+      case "warning":
+        return "stroke-color-orange";
+      case "success":
+        return "stroke-color-green";
+      case "info":
+      default:
+        return "stroke-color-grey";
+    }
+  };
+
+  const getContainerStyle = (toastType: ToastTypeFromProvider["type"]) => {
+    switch (toastType) {
+      case "error":
+        return notificationContainerError;
+      case "warning":
+        return notificationContainerWarning;
+      case "success":
+        return notificationContainerSuccess;
+      case "info":
+      default:
+        return notificationContainerInfo;
+    }
+  };
+
+  const getProgressBarColor = (toastType: ToastTypeFromProvider["type"]) => {
+    switch (toastType) {
+      case "error":
+        return "bg-color-red-semidark";
+      case "warning":
+        return "bg-color-orange";
+      case "success":
+        return "bg-color-green-semidark";
+      case "info":
+      default:
+        return "bg-color-grey-semidark";
+    }
+  };
+
+  // Split message into first line and remaining lines
+  const lines = message.split("\n");
+  const firstLine = lines[0];
+  const remainingLines = lines.slice(1);
 
   return (
     <div
       id={`toast-${id}`}
-      class="fixed flex items-center w-full max-w-md p-4 space-x-4 text-gray-500 bg-white divide-x rtl:divide-x-reverse divide-gray-200 rounded-lg shadow top-5 left-5 dark:text-gray-400 dark:divide-gray-700 space-x dark:bg-gray-800 z-50"
+      class={`fixed top-5 inset-x-5 z-notification !w-auto
+        min-[460px]:left-5 min-[460px]:right-auto min-[460px]:max-w-[460px] overflow-hidden ${
+        shouldAnimateOut ? "notification-exit" : "notification-enter"
+      } ${getContainerStyle(type)}`}
       role="alert"
     >
-      <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 rounded-lg">
-        {getIcon(type)}
+      <div class="flex items-start space-x-6">
+        <Icon
+          type="icon"
+          name={getIconName(type)}
+          weight="bold"
+          size="xs"
+          color="custom"
+          className={`${getIconColor(type)} mt-0.5`}
+          ariaLabel={`${type} notification`}
+        />
+
+        <div class="flex-1 ml-6 break-words">
+          <div class={notificationHeading}>{firstLine}</div>
+          {remainingLines.length > 0 && (
+            <div class={`${notificationBody} whitespace-pre-line`}>
+              {remainingLines.join("\n")}
+            </div>
+          )}
+        </div>
+
+        <Icon
+          type="iconButton"
+          name="close"
+          weight="bold"
+          size="xs"
+          color="greyLight"
+          onClick={onClose}
+          className="ml-auto -mt-1.5"
+        />
       </div>
-      <div class="ml-3 text-sm font-normal break-words">{message}</div>
-      <button
-        onClick={onClose}
-        type="button"
-        class="ml-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700"
-        aria-label="Close"
-      >
-        <span class="sr-only">Close</span>
-        <svg
-          class="w-3 h-3"
-          aria-hidden="true"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 14 14"
-        >
-          <path
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+
+      {autoDismiss && (
+        <div class="mt-2 w-full h-0.5 rounded-full bg-color-border">
+          <div
+            class={`h-full rounded-full ${
+              getProgressBarColor(type)
+            } transition-all ease-linear`}
+            style={{
+              animation: `progress ${duration}ms linear forwards`,
+            }}
           />
-        </svg>
-      </button>
+        </div>
+      )}
     </div>
   );
 };

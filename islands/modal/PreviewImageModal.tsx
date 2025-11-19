@@ -1,16 +1,13 @@
 /* ===== PREVIEW IMAGE MODAL COMPONENT ===== */
-import { handleImageError } from "$lib/utils/imageUtils.ts";
+import { ModalBase } from "$components/layout/ModalBase.tsx";
 import { StampTextContent } from "$content";
-import { ModalBase } from "../../components/layout/ModalBase.tsx";
+import { PlaceholderImage } from "$icon";
 import { closeModal } from "$islands/modal/states.ts";
 import { logger } from "$lib/utils/logger.ts";
-import { AUDIO_FILE_IMAGE } from "$lib/utils/constants.ts";
+import { handleImageError } from "$lib/utils/ui/media/imageUtils.ts";
+import type { PreviewImageModalProps } from "$types/ui.d.ts";
 
 /* ===== TYPES ===== */
-interface PreviewImageModalProps {
-  src: string | File;
-  contentType?: "html" | "text" | "image" | "audio";
-}
 
 /* ===== COMPONENT ===== */
 const PreviewImageModal = ({
@@ -49,7 +46,7 @@ const PreviewImageModal = ({
               width="100%"
               height="100%"
               scrolling="no"
-              className="rounded-sm mobileMd:rounded-md w-full h-full"
+              className="rounded-xl mobileMd:rounded-2xl w-full h-full"
               sandbox="allow-scripts allow-same-origin"
               src={imageUrl}
               loading="lazy"
@@ -58,21 +55,15 @@ const PreviewImageModal = ({
           )
           : contentType === "text"
           ? (
-            <div className="w-full h-full rounded-sm mobileMd:rounded-md aspect-square">
+            <div className="w-full h-full rounded-xl mobileMd:rounded-2xl aspect-square">
               <StampTextContent src={imageUrl} />
             </div>
           )
           : contentType === "audio"
-          ? (
-            <img
-              className="rounded-sm mobileMd:rounded-md stamp-image aspect-square"
-              src={AUDIO_FILE_IMAGE}
-              alt="Audio File Preview"
-            />
-          )
+          ? <PlaceholderImage variant="audio" />
           : (
             <img
-              className="rounded-sm mobileMd:rounded-md pixelart stamp-image aspect-square"
+              className="rounded-xl mobileMd:rounded-2xl pixelart stamp-image aspect-square"
               style={{
                 imageRendering: "pixelated",
               }}

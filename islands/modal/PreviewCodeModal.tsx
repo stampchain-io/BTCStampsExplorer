@@ -1,13 +1,11 @@
 /* ===== PREVIEW CODE MODAL COMPONENT ===== */
-import { useEffect, useState } from "preact/hooks";
-import { ModalBase } from "$layout";
 import { closeModal } from "$islands/modal/states.ts";
+import { ModalBase } from "$layout";
 import { logger } from "$lib/utils/logger.ts";
+import type { PreviewCodeModalProps } from "$types/ui.d.ts";
+import { useEffect, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
-interface PreviewCodeModalProps {
-  src: string;
-}
 
 /* ===== COMPONENT ===== */
 export default function PreviewCodeModal({ src }: PreviewCodeModalProps) {
@@ -17,7 +15,7 @@ export default function PreviewCodeModal({ src }: PreviewCodeModalProps) {
   /* ===== EFFECTS ===== */
   // Effect to format the source code
   useEffect(() => {
-    setFormattedSrc(formatHtmlSource(src));
+    setFormattedSrc(formatHtmlSource(src ?? ""));
   }, [src]);
 
   /* ===== HELPER FUNCTIONS ===== */
@@ -88,11 +86,11 @@ export default function PreviewCodeModal({ src }: PreviewCodeModalProps) {
       title=""
       hideHeader
       className="w-[calc(100vw-48px)] h-[calc(100vh-48px)] mobileLg:w-[calc(100vw-96px)] mobileLg:h-[calc(100vh-96px)] max-w-[800px]"
-      contentClassName="h-full bg-[#FAFAFA] rounded-md overflow-auto scrollbar-grey"
+      contentClassName="h-full bg-[#FAFAFA] rounded-xl mobileMd:rounded-2xl overflow-auto scrollbar-background-layer1"
     >
       {/* ===== CODE DISPLAY ===== */}
-      <div className="flex flex-col w-full h-full p-6 mobileMd:p-9">
-        <code className="whitespace-pre-wrap text-xs text-stamp-grey-darkest leading-tight pb-6 mobileMd:pb-9">
+      <div class="flex flex-col w-full h-full p-6 mobileMd:p-9">
+        <code class="whitespace-pre-wrap text-xs text-color-grey-dark leading-tight pb-6 mobileMd:pb-9">
           {formattedSrc}
         </code>
       </div>

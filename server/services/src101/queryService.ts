@@ -1,5 +1,7 @@
+import type {
+  SRC101OwnerParams, SRC101TokenidsParams, SRC101TxParams, SRC101ValidTxParams, SRC101ValidTxTotalCountParams, Src101BalanceParams 
+} from "$types/src101.d.ts";
 import { SRC101Repository } from "$server/database/src101Repository.ts";
-import { SRC101TokenidsParams, SRC101OwnerParams, SRC101TxParams, SRC101ValidTxParams, SRC101ValidTxTotalCountParams, Src101BalanceParams } from "$globals";
 
 export class SRC101QueryService {
   static async getTotalSrc101TXFromSRC101TableCount(
@@ -70,11 +72,11 @@ export class SRC101QueryService {
     }
   }
 
-  static async getDepoyDetails(
+  static async getDeployDetails(
     deploy_hash: string,
   ){
     try{
-      return await SRC101Repository.getDepoyDetails(deploy_hash);
+      return await SRC101Repository.getDeployDetails(deploy_hash);
     } catch (error) {
       console.error("Error getting SRC101 owner:", error);
       throw error;
@@ -133,7 +135,7 @@ export class SRC101QueryService {
   }
 
   static async getTotalSrc101TokenidsCount(
-    params: Partial<SRC101TokenidsParams>,
+    params: SRC101TokenidsParams,
   ): Promise<number> {
     try {
       return await SRC101Repository.getTotalSrc101TokenidsCount(params);
@@ -143,13 +145,24 @@ export class SRC101QueryService {
     }
   }
 
-  static async getSrc101Tokenids( 
+  static async getSrc101Tokenids(
     params: SRC101TokenidsParams,
   ){
     try {
       return await SRC101Repository.getSrc101Tokenids(params);
     } catch (error) {
       console.error("Error getting total SRC101 tokenids count:", error);
+      throw error;
+    }
+  }
+
+  static async getPrimaryDomainForAddress(
+    address: string,
+  ): Promise<string | null> {
+    try {
+      return await SRC101Repository.getPrimaryDomainForAddress(address);
+    } catch (error) {
+      console.error("Error getting primary domain for address:", error);
       throw error;
     }
   }

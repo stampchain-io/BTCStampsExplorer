@@ -1,12 +1,17 @@
 /* ===== HOME PAGE ROUTE ===== */
-import { StampRow } from "$globals";
-import type { Collection } from "$globals";
 import { Handlers, PageProps } from "$fresh/server.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import { StampController } from "$server/controller/stampController.ts";
-import { Src20Controller } from "$server/controller/src20Controller.ts";
-import { gapSectionSlim, Micro5FontLoader } from "$layout";
+import type { CollectionRow } from "$server/types/collection.d.ts";
+import type { SRC20Row } from "$types/src20.d.ts";
+import type { StampRow, StampSaleRow } from "$types/stamp.d.ts";
+
 import { HomeHeader } from "$header";
+import {
+  body,
+  containerBackground,
+  containerGap,
+  Micro5FontLoader,
+} from "$layout";
+import { ResponseUtil } from "$lib/utils/api/responses/responseUtil.ts";
 import {
   CarouselHome,
   GetStampingCta,
@@ -16,6 +21,7 @@ import {
   StampOverviewGallery,
   StampSalesGallery,
 } from "$section";
+import { StampController } from "$server/controller/stampController.ts";
 
 /* ===== TYPES ===== */
 // Define the shape of pageData from StampController.getHomePageData()
@@ -24,7 +30,7 @@ interface StampControllerData {
   stamps_src721: StampRow[];
   stamps_art: StampRow[];
   stamps_posh: StampRow[];
-  collectionData: Collection[];
+  collectionData: CollectionRow[];
 }
 
 interface HomePageData extends StampControllerData {
@@ -43,6 +49,16 @@ interface HomePageData extends StampControllerData {
       totalPages: number;
     };
   };
+  // Performance optimization - single BTC price fetch
+  btcPrice?: number;
+  btcPriceSource?: string;
+  // Recent sales data for SSR optimization
+  recentSalesData?: {
+    data: StampSaleRow[];
+    total: number;
+    page: number;
+    totalPages: number;
+  };
 }
 
 /* ===== SERVER HANDLER ===== */
@@ -54,51 +70,211 @@ export const handler: Handlers<HomePageData> = {
       return ResponseUtil.custom(null, 204);
     }
 
+    console.log(`[HOMEPAGE] Starting homepage request`);
+
     try {
+      /* ===== SINGLE BTC PRICE FETCH ===== */
+      // 🚀 PERFORMANCE: Use singleton BTC price service to eliminate duplicate fetches
+      const { btcPriceSingleton } = await import(
+        "$server/services/price/btcPriceSingleton.ts"
+      );
+      const btcPriceData = await btcPriceSingleton.getPrice();
+      const btcPrice = btcPriceData.price;
+      console.log(
+        `[HOMEPAGE] Singleton BTC price: $${btcPrice} from ${btcPriceData.source}`,
+      );
+
+      // Store BTC price in context for components to use
+      ctx.state.btcPrice = btcPrice;
+      ctx.state.btcPriceSource = btcPriceData.source;
+
       /* ===== DATA FETCHING ===== */
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 2000);
+      const timeout = setTimeout(() => {
+        console.log(`[HOMEPAGE] Request timed out after 15 seconds`);
+        controller.abort();
+      }, 15000); // Increased timeout for ECS
 
-      const [pageData, mintedData, mintingData] = await Promise.all([
-        StampController.getHomePageData(),
-        Src20Controller.fetchFullyMintedByMarketCapV2(5, 1),
-        Src20Controller.fetchTrendingActiveMintingTokensV2(5, 1, 1000),
-      ]);
+      console.log(`[HOMEPAGE] Starting parallel data fetches...`);
+      const startTime = Date.now();
+
+      // ECS-specific: Add individual timeouts and fallbacks for each data source
+      const fetchWithFallback = async (
+        fetchFn: () => Promise<any>,
+        fallbackData: any,
+        name: string,
+      ) => {
+        try {
+          const result = await Promise.race([
+            fetchFn(),
+            new Promise((_, reject) =>
+              setTimeout(() => reject(new Error(`${name} timeout`)), 30000)
+            ),
+          ]);
+          console.log(`[HOMEPAGE] ${name} completed successfully`);
+          return result;
+        } catch (error) {
+          console.warn(`[HOMEPAGE] ${name} failed, using fallback:`, error);
+          return fallbackData;
+        }
+      };
+
+      // ✅ ARCHITECTURE: Use API endpoints for SRC20 data
+      const fetchSRC20FromAPI = async (
+        endpoint: string,
+        baseUrl: string,
+      ): Promise<any> => {
+        try {
+          // Prepare headers for internal API calls
+          const headers: HeadersInit = {
+            "X-API-Version": "2.3", // Use latest API version with market data
+          };
+
+          // Add internal API key for SSR-to-API authentication
+          const internalApiKey = Deno.env.get("INTERNAL_API_KEY");
+          if (internalApiKey) {
+            headers["X-API-Key"] = internalApiKey;
+          }
+
+          const response = await fetch(`${baseUrl}${endpoint}`, {
+            headers,
+          });
+
+          if (!response.ok) {
+            console.error(
+              `[HOMEPAGE] API call failed: ${endpoint} - ${response.status}`,
+            );
+            return { data: [], total: 0, page: 1, totalPages: 0 };
+          }
+
+          const result = await response.json();
+
+          // ✅ FIXED: Handle API response structure properly
+          if (result.data && Array.isArray(result.data)) {
+            // Standard API response with pagination info
+            return {
+              data: result.data,
+              total: result.total || 0,
+              page: result.page || 1,
+              totalPages: result.totalPages || 0,
+            };
+          } else if (Array.isArray(result)) {
+            // Direct array response (for some internal endpoints)
+            return {
+              data: result,
+              total: result.length,
+              page: 1,
+              totalPages: 1,
+            };
+          } else {
+            // Fallback for other response structures
+            return result.data || result ||
+              { data: [], total: 0, page: 1, totalPages: 0 };
+          }
+        } catch (error) {
+          console.error(`[HOMEPAGE] API call error: ${endpoint}`, error);
+          return { data: [], total: 0, page: 1, totalPages: 0 };
+        }
+      };
+
+      // ✅ PRODUCTION FIX: Use request origin instead of hardcoded localhost
+      const url = new URL(req.url);
+      const baseUrl = `${url.protocol}//${url.host}`;
+
+      const [pageData, mintedData, mintingData, recentSalesData] = await Promise
+        .allSettled([
+          fetchWithFallback(
+            () =>
+              StampController.getHomePageData(btcPrice, btcPriceData.source),
+            {
+              carouselStamps: [],
+              stamps_art: [],
+              stamps_src721: [],
+              stamps_posh: [],
+              collectionData: [],
+            },
+            "StampController.getHomePageData",
+          ),
+          fetchWithFallback(
+            () =>
+              fetchSRC20FromAPI(
+                "/api/v2/src20?op=DEPLOY&mintingStatus=minted&sortBy=TRENDING_24H_DESC&limit=5&page=1&includeMarketData=true&includeProgress=true",
+                baseUrl,
+              ),
+            { data: [], total: 0, page: 1, totalPages: 0 },
+            "fetchTopMintedTokens",
+          ),
+          fetchWithFallback(
+            () =>
+              fetchSRC20FromAPI(
+                "/api/v2/src20?op=DEPLOY&mintingStatus=minting&sortBy=TRENDING_MINTING_DESC&limit=5&page=1&includeMarketData=true&includeProgress=true",
+                baseUrl,
+              ),
+            { data: [], total: 0, page: 1, totalPages: 0 },
+            "fetchTrendingActiveMintingTokensV2",
+          ),
+          fetchWithFallback(
+            () =>
+              fetchSRC20FromAPI(
+                "/api/internal/stamp-recent-sales?page=1&limit=8",
+                baseUrl,
+              ),
+            { data: [], total: 0, page: 1, totalPages: 0 },
+            "fetchRecentSalesData",
+          ),
+        ]);
 
       clearTimeout(timeout);
 
-      /* ===== RESPONSE CONFIGURATION ===== */
-      const response = await ctx.render({
-        ...pageData,
-        src20Data: {
-          minted: {
-            data: mintedData.data,
-            total: mintedData.total,
-            page: mintedData.page,
-            totalPages: mintedData.totalPages,
-          },
-          minting: {
-            data: mintingData.data,
-            total: mintingData.total,
-            page: mintingData.page,
-            totalPages: mintingData.totalPages,
-          },
-        },
-      });
-      response.headers.set("Cache-Control", "public, max-age=300"); // 5 min cache
-      response.headers.set("Priority", "high"); // Signal high priority to CDN
-      return response;
-    } catch (error) {
-      /* ===== ERROR HANDLING ===== */
-      console.error("Handler error:", error);
-      // Return minimal data for fast initial render
-      return ctx.render({
+      const duration = Date.now() - startTime;
+      console.log(`[HOMEPAGE] All data fetches completed in ${duration}ms`);
+
+      // Extract results from Promise.allSettled
+      const pageResult = pageData.status === "fulfilled" ? pageData.value : {
         carouselStamps: [],
         stamps_art: [],
         stamps_src721: [],
         stamps_posh: [],
         collectionData: [],
-        error: "Failed to load complete data",
+      };
+      const mintedResult = mintedData.status === "fulfilled"
+        ? mintedData.value
+        : { data: [], total: 0, page: 1, totalPages: 0 };
+      const mintingResult = mintingData.status === "fulfilled"
+        ? mintingData.value
+        : { data: [], total: 0, page: 1, totalPages: 0 };
+      const recentSalesResult = recentSalesData.status === "fulfilled"
+        ? recentSalesData.value
+        : { data: [], total: 0, page: 1, totalPages: 0 };
+
+      /* ===== RESPONSE RENDERING ===== */
+      const response = await ctx.render({
+        ...pageResult,
+        src20Data: {
+          minted: mintedResult as any,
+          minting: mintingResult as any,
+        },
+        recentSalesData: recentSalesResult as any,
+        // 🚀 PERFORMANCE: Pass BTC price to components to avoid redundant fetches
+        btcPrice: btcPrice,
+        btcPriceSource: btcPriceData.source,
+      });
+
+      return response;
+    } catch (error) {
+      console.error("[HOMEPAGE] Critical error:", error);
+      if (error instanceof Error) {
+        console.error("[HOMEPAGE] Error stack:", error.stack);
+      }
+
+      // ECS-specific: Return minimal working page instead of failing completely
+      return await ctx.render({
+        carouselStamps: [],
+        stamps_art: [],
+        stamps_src721: [],
+        stamps_posh: [],
+        collectionData: [],
+        error: "Service temporarily unavailable", // This will show a friendly error message
         src20Data: {
           minted: { data: [], total: 0, page: 1, totalPages: 0 },
           minting: { data: [], total: 0, page: 1, totalPages: 0 },
@@ -118,6 +294,7 @@ export default function Home({ data }: PageProps<HomePageData>) {
     stamps_posh = [],
     collectionData = [],
     src20Data,
+    recentSalesData,
   } = data || {};
 
   /* ===== RENDER ===== */
@@ -127,99 +304,84 @@ export default function Home({ data }: PageProps<HomePageData>) {
       {/* Preload carousel CSS for above-fold content */}
       <link rel="preload" href="/carousel.css" as="style" />
       <link rel="stylesheet" href="/carousel.css" />
+      {/* Homepage animation optimizations */}
+      <link rel="preload" href="/homepage-animations.css" as="style" />
+      <link rel="stylesheet" href="/homepage-animations.css" />
       {/* Load Micro5 font only when needed */}
       <Micro5FontLoader />
 
-      <div>
-        {/* ===== HERO BACKGROUND ===== */}
-        <img
-          src="/img/stamps-collage-purpleOverlay-4000.webp"
-          alt="About Bitcoin Stamps and contact Stampchain"
-          class="
-          absolute
-          top-0
-          left-0
-          w-full
-          h-[450px] mobileMd:h-[500px] mobileLg:h-[600px] tablet:h-[700px] desktop:h-[850px]
-          object-cover
-          pointer-events-none
-          z-[-999]
-          [mask-image:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,0.3),rgba(0,0,0,0.5),rgba(0,0,0,0.3),rgba(0,0,0,0))]
-          [-webkit-mask-image:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,0.3),rgba(0,0,0,0.5),rgba(0,0,0,0.3),rgba(0,0,0,0))]
-        "
-        />
+      {/* ===== MAIN CONTENT ===== */}
+      <div
+        class={`${body} ${containerGap}`}
+      >
+        {/* ===== CRITICAL ABOVE FOLD CONTENT ===== */}
+        <HomeHeader />
 
-        {/* ===== MAIN CONTENT ===== */}
-        <div class="layout-container flex flex-col gap-24 mobileLg:gap-36 mt-0 min-[420px]:mt-3 mobileMd:mt-6 tablet:mt-3">
-          {/* ===== CRITICAL ABOVE FOLD CONTENT ===== */}
-          <HomeHeader />
+        {/* ===== DEFERRED IMPORTANT CONTENT ===== */}
+        <div style="content-visibility:auto;">
+          <CarouselHome carouselStamps={carouselStamps} />
+        </div>
 
-          {/* ===== DEFERRED IMPORTANT CONTENT ===== */}
-          <div style="content-visibility:auto; margin-top:-96px; margin-bottom:-48px;">
-            <CarouselHome carouselStamps={carouselStamps} />
-          </div>
+        {/* ===== NON-CRITICAL CONTENT ===== */}
+        <div style="content-visibility: auto; contain-intrinsic-size: 0 500px;">
+          <StampOverviewGallery
+            stamps_art={stamps_art}
+            stamps_posh={stamps_posh}
+            stamps_src721={stamps_src721}
+            collectionData={collectionData}
+          />
+        </div>
 
-          {/* ===== NON-CRITICAL CONTENT ===== */}
-          <div style="content-visibility: auto; contain-intrinsic-size: 0 500px;">
-            <StampOverviewGallery
-              stamps_art={stamps_art}
-              stamps_posh={stamps_posh}
-              stamps_src721={stamps_src721}
-              collectionData={collectionData}
+        {/* ===== BELOW FOLD CONTENT - LAZY LOAD ===== */}
+        <div style="content-visibility: auto; contain-intrinsic-size: 0 800px;">
+          <div class="flex flex-col">
+            <StampSalesGallery
+              title="RECENT SALES"
+              subTitle="HOT STAMPS"
+              variant="home"
+              initialData={recentSalesData?.data || []}
+              displayCounts={{
+                mobileSm: 3,
+                mobileMd: 4,
+                mobileLg: 5,
+                tablet: 6,
+                desktop: 7,
+              }}
             />
           </div>
-
-          {/* ===== BELOW FOLD CONTENT - LAZY LOAD ===== */}
-          <div style="margin-top: -48px; content-visibility: auto; contain-intrinsic-size: 0 800px;">
+          <div class="my-6 mobileLg:my-9">
             <GetStampingCta />
+          </div>
 
-            <div class="flex flex-col pt-12 mobileLg:pt-24 desktop:pt-36">
-              <StampSalesGallery
-                title="RECENT SALES"
-                subTitle="HOT STAMPS"
-                variant="home"
-                displayCounts={{
-                  mobileSm: 3,
-                  mobileMd: 4,
-                  mobileLg: 5,
-                  tablet: 6,
-                  desktop: 7,
-                }}
+          <div
+            class={`flex flex-col tablet:flex-row ${containerBackground} ${containerGap}`}
+          >
+            <div class="w-full tablet:w-1/2">
+              <SRC20Gallery
+                title="SRC-20 TOKENS"
+                subTitle="TOP TICKERS"
+                viewType="minted"
+                fromPage="home"
+                {...(src20Data?.minted && { serverData: src20Data.minted })}
+                timeframe="24H"
               />
             </div>
-
-            <div
-              class={`flex flex-col tablet:flex-row pt-12 mobileLg:pt-24 desktop:pt-36 ${gapSectionSlim}`}
-            >
-              <div class="w-full tablet:w-1/2">
-                <SRC20Gallery
-                  title="SRC-20 TOKENS"
-                  subTitle="TOP TICKERS"
-                  viewType="minted"
-                  fromPage="home"
-                  serverData={src20Data?.minted}
-                  useClientFetch={false}
-                  timeframe="24H"
-                />
-              </div>
-              <div class="w-full tablet:w-1/2">
-                <SRC20Gallery
-                  title="SRC-20 TOKENS"
-                  subTitle="TRENDING MINTS"
-                  viewType="minting"
-                  fromPage="home"
-                  serverData={src20Data?.minting}
-                  useClientFetch={false}
-                  timeframe="24H"
-                />
-              </div>
+            <div class="w-full tablet:w-1/2">
+              <SRC20Gallery
+                title="SRC-20 TOKENS"
+                subTitle="TRENDING MINTS"
+                viewType="minting"
+                fromPage="home"
+                {...(src20Data?.minting && { serverData: src20Data.minting })}
+                timeframe="24H"
+              />
             </div>
           </div>
+        </div>
 
-          <div class="flex flex-col gap-6 mobileLg:gap-12">
-            <StampchainContactCta />
-            <PartnersBanner />
-          </div>
+        <div class={`flex flex-col ${containerGap}`}>
+          <StampchainContactCta />
+          <PartnersBanner />
         </div>
       </div>
     </>

@@ -1,31 +1,30 @@
 /* ===== SEND TOOL COMPONENT ===== */
-import { JSX } from "preact";
-import { useEffect, useState } from "preact/hooks";
-import { walletContext } from "$client/wallet/wallet.ts";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
-import { FeeCalculatorSimple } from "$components/section/FeeCalculatorSimple.tsx";
-import { SelectField } from "../../form/SelectField.tsx";
-import type { StampRow } from "$globals";
+import { walletContext } from "$client/wallet/wallet.ts";
+import { ProgressiveEstimationIndicator } from "$components/indicators/ProgressiveEstimationIndicator.tsx";
+import { inputField, inputFieldSquare } from "$form";
+import { Icon } from "$icon";
+import { SendToolSkeleton } from "$indicators";
+import { SelectField } from "$islands/form/SelectField.tsx";
 import {
   bodyTool,
   containerBackground,
   containerColForm,
+  containerGap,
   containerRowForm,
   imagePreviewTool,
   loaderSpinGrey,
   rowForm,
 } from "$layout";
-import { titlePurpleLD } from "$text";
-import { Icon } from "$icon";
-import { inputField, inputFieldSquare } from "$form";
-
-/* ===== TYPES ===== */
-interface Props {
-  trxType: string;
-}
+import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
+import { FeeCalculatorBase } from "$section";
+import { labelLg, labelSm, titleGreyLD } from "$text";
+import type { StampRow } from "$types/stamp.d.ts";
+import { JSX } from "preact";
+import { useEffect, useMemo, useState } from "preact/hooks";
 
 /* ===== COMPONENT ===== */
-export function StampSendTool({}: Props) {
+export function StampSendTool() {
   console.log("SENDTOOL: Component rendering - TOP LEVEL");
 
   /* ===== CONTEXT ===== */
@@ -55,6 +54,7 @@ export function StampSendTool({}: Props) {
   const [tosAgreed, setTosAgreed] = useState<boolean>(false);
   const [isImageLoading, setIsImageLoading] = useState(true);
   const [showFallbackIcon, setShowFallbackIcon] = useState(false);
+  const [isLoadingStamps, setIsLoadingStamps] = useState(true); // Add loading state
 
   /* ===== FORM HANDLING ===== */
   const {
@@ -72,13 +72,78 @@ export function StampSendTool({}: Props) {
     initialFee: 1,
   });
 
+  /* ===== 🚀 PROGRESSIVE FEE ESTIMATION INTEGRATION ===== */
+  const {
+    getBestEstimate,
+    isPreFetching,
+    estimateExact, // Phase 3: Exact estimation before sending
+    // Phase-specific results for UI indicators
+    phase1,
+    phase2,
+    phase3,
+    currentPhase,
+    error: feeEstimationError,
+    clearError,
+  } = useTransactionConstructionService({
+    toolType: "stamp",
+    feeRate: isSubmitting ? 0 : formState.fee,
+    walletAddress: wallet?.address || "", // Provide empty string instead of undefined
+    isConnected: !!wallet && !isSubmitting,
+    isSubmitting,
+    // Stamp send specific parameters
+    asset: selectedStamp?.cpid || "",
+    transferQuantity: quantity,
+    recipientAddress: formState.recipientAddress || "",
+  });
+
+  // Get the best available fee estimate
+  const progressiveFeeDetails = getBestEstimate();
+
+  // Local state for exact fee details (updated when Phase 3 completes) - StampingTool pattern
+  const [exactFeeDetails, setExactFeeDetails] = useState<
+    typeof progressiveFeeDetails | null
+  >(null);
+
+  // Reset exactFeeDetails when fee rate changes to allow slider updates - StampingTool pattern
+  useEffect(() => {
+    // Clear exact fee details when fee rate changes so slider updates work
+    setExactFeeDetails(null);
+  }, [formState.fee]);
+
+  // Wrapper function for sending that gets exact fees first - StampingTool pattern
+  const handleSendWithExactFees = async () => {
+    try {
+      // Get exact fees before final submission
+      const exactFees = await estimateExact();
+      if (exactFees) {
+        // Calculate net spend amount (matches wallet display)
+        const netSpendAmount = exactFees.totalValue || 0;
+        setExactFeeDetails({
+          ...exactFees,
+          totalValue: netSpendAmount, // Matches wallet
+        });
+      }
+
+      // Call the original transfer submission
+      await handleTransferSubmit();
+    } catch (error) {
+      console.error("SENDTOOL: Error in exact fee estimation", error);
+      // Still proceed with submission even if exact fees fail
+      await handleTransferSubmit();
+    }
+  };
+
   /* ===== EFFECTS ===== */
   // Fetch stamps effect
   useEffect(() => {
     const fetchStamps = async () => {
       try {
-        if (!wallet?.address) return;
+        if (!wallet?.address) {
+          setIsLoadingStamps(false);
+          return;
+        }
 
+        setIsLoadingStamps(true); // Set loading when starting fetch
         const endpoint = `/api/v2/stamps/balance/${wallet.address}`;
         const response = await fetch(endpoint);
 
@@ -101,15 +166,14 @@ export function StampSendTool({}: Props) {
         if (error instanceof Error) {
           setError(error.message);
         } else {
-          setError(String(error)); // Fallback in case it's not an instance of Error
+          setError(String(error));
         }
+      } finally {
+        setIsLoadingStamps(false); // Clear loading when done
       }
     };
 
-    // Only fetch if we have a wallet address
-    if (wallet?.address) {
-      fetchStamps();
-    }
+    fetchStamps();
   }, [wallet?.address]);
 
   // Set initial stamp effect
@@ -124,6 +188,13 @@ export function StampSendTool({}: Props) {
       }));
     }
   }, [stamps.data]);
+
+  // Progressive fee estimation effect
+  useEffect(() => {
+    // This useEffect is no longer needed as the fee estimation is handled by useTransactionConstructionService
+    // However, we keep it to ensure the formState.fee is updated correctly if the user changes it.
+    // The useTransactionConstructionService will re-trigger this effect if feeRate changes.
+  }, [formState.fee]);
 
   // Reset loading state when selected stamp changes
   useEffect(() => {
@@ -157,11 +228,7 @@ export function StampSendTool({}: Props) {
   }, [formState.recipientAddress, selectedStamp?.stamp, quantity]);
 
   /* ===== EVENT HANDLERS ===== */
-  const handleStampSelect = (e: Event) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    const value = (e.currentTarget as HTMLSelectElement).value;
+  const handleStampSelect = (value: string) => {
     const selectedItem = stamps.data.find(
       (item) => item?.stamp?.toString() === value,
     );
@@ -255,7 +322,7 @@ export function StampSendTool({}: Props) {
             return_psbt: true,
             fee_per_kb: feeRateKB,
             allow_unconfirmed_inputs: true, // Or your preferred setting
-            // Add other necessary options based on XcpManager.composeSend or similar
+            // Add other necessary options based on CounterpartyApiManager.composeSend or similar
           },
         };
 
@@ -348,16 +415,26 @@ export function StampSendTool({}: Props) {
     }
   };
 
+  /* ===== MEMOIZED VALUES ===== */
+  const stampOptions = useMemo(() => {
+    return (stamps.data ?? []).map((stamp) => ({
+      value: stamp.stamp?.toString() ?? "",
+      label: `Stamp ${stamp.stamp}${stamp.ident ? ` - ${stamp.ident}` : ""}`,
+      disabled: false,
+    }));
+  }, [stamps.data]);
+
   /* ===== RENDER HELPERS ===== */
   const renderStampContent = () => {
     if (!selectedStamp) {
       return (
         <Icon
           type="icon"
-          name="uploadImage"
-          weight="normal"
-          size="xxl"
-          color="grey"
+          name="previewImage"
+          weight="extraLight"
+          size="xl"
+          color="custom"
+          className="stroke-color-grey-dark"
         />
       );
     }
@@ -375,7 +452,7 @@ export function StampSendTool({}: Props) {
 
     return (
       <div class="relative w-full h-full">
-        {/* <div class="relative w-full h-full flex items-center justify-center bg-stamp-grey rounded"> */}
+        {/* <div class="relative w-full h-full flex items-center justify-center bg-color-grey rounded"> */}
         {/* Image - always rendered, visibility controlled by class */}
         <img
           key={`stamp-${selectedStamp.tx_hash}`}
@@ -408,10 +485,11 @@ export function StampSendTool({}: Props) {
           <div class="absolute inset-0 flex items-center justify-center w-full h-full">
             <Icon
               type="icon"
-              name="image"
+              name="previewImage"
               weight="normal"
-              size="xxl"
-              color="grey"
+              size="xl"
+              color="custom"
+              className="stroke-color-grey-dark"
             />
           </div>
         )}
@@ -419,23 +497,28 @@ export function StampSendTool({}: Props) {
     );
   };
 
-  // Log props before rendering FeeCalculatorSimple
-  console.log("SENDTOOL: Props for FeeCalculatorSimple:", {
-    isSubmitting,
-    tosAgreed,
-    userAddress: wallet?.address || "",
-    buttonName_prop_to_fee_calc: wallet?.address ? "SEND" : "CONNECT WALLET",
-    formState_fee_for_fee_calc: formState.fee,
-  });
+  /* ===== EARLY RETURN FOR LOADING STATE ===== */
+  if (isLoadingStamps) {
+    return (
+      <div class={`${bodyTool} ${containerGap}`}>
+        <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
+          SEND
+        </h1>
+        <SendToolSkeleton />
+      </div>
+    );
+  }
 
   /* ===== RENDER ===== */
   return (
-    <div class={bodyTool}>
-      <h1 class={`${titlePurpleLD} mobileMd:mx-auto mb-1`}>SEND</h1>
+    <div class={`${bodyTool} ${containerGap}`}>
+      <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
+        SEND
+      </h1>
 
       {/* ===== STAMP SELECTION SECTION ===== */}
       <form
-        class={`${containerBackground} mb-6`}
+        class={`${containerBackground} relative`}
         onSubmit={(e) => {
           e.preventDefault();
           // If we want the form submit to also try, but FeeCalc is primary:
@@ -445,6 +528,7 @@ export function StampSendTool({}: Props) {
         aria-label="Send stamp"
         novalidate
       >
+        {/* Progressive Fee Status Indicator removed - using simplified approach */}
         <div class={`${containerRowForm} mb-5`}>
           <div class={imagePreviewTool}>
             {renderStampContent()}
@@ -452,17 +536,17 @@ export function StampSendTool({}: Props) {
 
           <div class={containerColForm}>
             <SelectField
-              options={stamps.data}
+              options={stampOptions}
               onChange={handleStampSelect}
-              value={selectedStamp?.stamp?.toString() ?? null}
+              value={selectedStamp?.stamp?.toString() ?? ""}
             />
 
-            <div class="flex w-full justify-end items-center gap-5">
+            <div class="flex w-full justify-end items-center -my-[3px] gap-5">
               <div class="flex flex-col justify-start -space-y-0.5">
-                <h5 class="text-xl font-bold text-stamp-grey">
+                <h5 class={`${labelLg} !text-color-grey`}>
                   EDITIONS
                 </h5>
-                <h6 class="text-sm font-medium text-stamp-grey-darker">
+                <h6 class={labelSm}>
                   MAX {maxQuantity}
                 </h6>
               </div>
@@ -501,7 +585,7 @@ export function StampSendTool({}: Props) {
 
       {/* ===== FEE CALCULATOR SECTION ===== */}
       <div class={containerBackground}>
-        <FeeCalculatorSimple
+        <FeeCalculatorBase
           fee={formState.fee}
           handleChangeFee={internalHandleChangeFee}
           type="transfer"
@@ -511,20 +595,50 @@ export function StampSendTool({}: Props) {
             console.log(
               "FEE_CALCULATOR_SUBMIT (SendTool): onSubmit triggered!",
             );
-            handleTransferSubmit();
+            handleSendWithExactFees();
           }}
           buttonName={wallet?.address ? "SEND" : "CONNECT WALLET"}
-          userAddress={wallet?.address || ""}
-          inputType="P2WPKH"
-          outputTypes={["P2WPKH"]}
           tosAgreed={tosAgreed}
           onTosChange={setTosAgreed}
           fromPage="stamp_transfer"
+          bitname=""
           stampTransferDetails={{
             address: formState.recipientAddress || "",
             stamp: selectedStamp?.stamp?.toString() || "",
             editions: quantity || 0,
           }}
+          feeDetails={(exactFeeDetails || progressiveFeeDetails)
+            ? {
+              minerFee: (exactFeeDetails || progressiveFeeDetails)?.minerFee ||
+                0,
+              dustValue: 0, // Send transactions use OP_RETURN encoding, no dust outputs created
+              totalValue:
+                (exactFeeDetails || progressiveFeeDetails)?.totalValue || 0,
+              hasExactFees:
+                (exactFeeDetails || progressiveFeeDetails)?.hasExactFees ||
+                false,
+              estimatedSize: 300, // Default transaction size for stamp sends
+            }
+            : {
+              minerFee: 0,
+              dustValue: 0, // Send transactions use OP_RETURN encoding, no dust outputs created
+              totalValue: 0,
+              hasExactFees: false,
+              estimatedSize: 300,
+            }}
+          progressIndicator={
+            <ProgressiveEstimationIndicator
+              isConnected={!!wallet && !isSubmitting}
+              isSubmitting={isSubmitting}
+              isPreFetching={isPreFetching}
+              currentPhase={currentPhase}
+              phase1={!!phase1}
+              phase2={!!phase2}
+              phase3={!!phase3}
+              feeEstimationError={feeEstimationError}
+              clearError={clearError}
+            />
+          }
         />
       </div>
 

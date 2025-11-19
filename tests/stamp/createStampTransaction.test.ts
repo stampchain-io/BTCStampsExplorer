@@ -1,8 +1,8 @@
-import { assertEquals, assertExists } from "@std/assert";
 import {
-  StampMintService,
+  StampCreationService,
   StampValidationService,
-} from "../../server/services/stamp/index.ts";
+} from "$server/services/stamp/index.ts";
+import { assertEquals, assertExists } from "@std/assert";
 import { Psbt } from "bitcoinjs-lib";
 
 // Configuration for tests
@@ -259,10 +259,13 @@ Deno.test("Stamp Transaction Creation and Validation", async (t) => {
           } catch (error) {
             // If we expect an error, this is okay
             if (testCase.expectedOutputs.errorPattern) {
+              const errorMessage = error instanceof Error
+                ? error.message
+                : String(error);
               assertEquals(
-                testCase.expectedOutputs.errorPattern.test(error.message),
+                testCase.expectedOutputs.errorPattern.test(errorMessage),
                 true,
-                `Error message should match ${testCase.expectedOutputs.errorPattern}: ${error.message}`,
+                `Error message should match ${testCase.expectedOutputs.errorPattern}: ${errorMessage}`,
               );
               // Skip the rest of the test since we expected this error
               return;
@@ -273,7 +276,7 @@ Deno.test("Stamp Transaction Creation and Validation", async (t) => {
         }
 
         // Create test transaction (with mock UTXOs)
-        const result = await StampMintService.createStampIssuance({
+        const result = await StampCreationService.createStampIssuance({
           ...serviceInput,
           // Add mock UTXOs for testing if not doing a dry run
           ...(serviceInput.dryRun ? {} : {
@@ -366,10 +369,13 @@ Deno.test("Stamp Transaction Creation and Validation", async (t) => {
       } catch (error) {
         // If we're expecting an error, check the pattern
         if (testCase.expectedOutputs.errorPattern) {
+          const errorMessage = error instanceof Error
+            ? error.message
+            : String(error);
           assertEquals(
-            testCase.expectedOutputs.errorPattern.test(error.message),
+            testCase.expectedOutputs.errorPattern.test(errorMessage),
             true,
-            `Error message should match ${testCase.expectedOutputs.errorPattern}: ${error.message}`,
+            `Error message should match ${testCase.expectedOutputs.errorPattern}: ${errorMessage}`,
           );
           return;
         }
@@ -386,7 +392,7 @@ Deno.test("Fee normalization for Stamp creation", async () => {
   // Test different fee parameters to ensure they result in consistent values
 
   // Test with satsPerVB
-  const resultVB = await StampMintService.createStampIssuance({
+  const resultVB = await StampCreationService.createStampIssuance({
     sourceWallet: CONFIG.TEST_WALLET_ADDRESS,
     qty: "1",
     locked: true,
@@ -399,7 +405,7 @@ Deno.test("Fee normalization for Stamp creation", async () => {
   });
 
   // Test with satsPerKB (should be converted to 10 sat/vB internally)
-  const resultKB = await StampMintService.createStampIssuance({
+  const resultKB = await StampCreationService.createStampIssuance({
     sourceWallet: CONFIG.TEST_WALLET_ADDRESS,
     qty: "1",
     locked: true,
@@ -440,7 +446,7 @@ Deno.test("Stamp creation error handling", async (t) => {
     const largeFile = "A".repeat(70 * 1024); // 70KB of data
 
     try {
-      await StampMintService.createStampIssuance({
+      await StampCreationService.createStampIssuance({
         sourceWallet: CONFIG.TEST_WALLET_ADDRESS,
         qty: "1",
         locked: true,
@@ -455,17 +461,20 @@ Deno.test("Stamp creation error handling", async (t) => {
       // Should not reach here
       assertEquals(true, false, "Expected an error for oversized file");
     } catch (error) {
+      const errorMessage = error instanceof Error
+        ? error.message
+        : String(error);
       assertEquals(
-        /file size|too large|exceeds/i.test(error.message),
+        /file size|too large|exceeds/i.test(errorMessage),
         true,
-        `Error should mention file size: ${error.message}`,
+        `Error should mention file size: ${errorMessage}`,
       );
     }
   });
 
   await t.step("Invalid source wallet", async () => {
     try {
-      await StampMintService.createStampIssuance({
+      await StampCreationService.createStampIssuance({
         sourceWallet: "invalid-address",
         qty: "1",
         locked: true,
@@ -480,17 +489,20 @@ Deno.test("Stamp creation error handling", async (t) => {
       // Should not reach here
       assertEquals(true, false, "Expected an error for invalid wallet address");
     } catch (error) {
+      const errorMessage = error instanceof Error
+        ? error.message
+        : String(error);
       assertEquals(
-        /invalid|wallet|address/i.test(error.message),
+        /invalid|wallet|address/i.test(errorMessage),
         true,
-        `Error should mention invalid address: ${error.message}`,
+        `Error should mention invalid address: ${errorMessage}`,
       );
     }
   });
 
   await t.step("Invalid fee parameter", async () => {
     try {
-      await StampMintService.createStampIssuance({
+      await StampCreationService.createStampIssuance({
         sourceWallet: CONFIG.TEST_WALLET_ADDRESS,
         qty: "1",
         locked: true,
@@ -505,10 +517,13 @@ Deno.test("Stamp creation error handling", async (t) => {
       // Should not reach here
       assertEquals(true, false, "Expected an error for invalid fee parameter");
     } catch (error) {
+      const errorMessage = error instanceof Error
+        ? error.message
+        : String(error);
       assertEquals(
-        /fee|invalid|negative/i.test(error.message),
+        /fee|invalid|negative/i.test(errorMessage),
         true,
-        `Error should mention invalid fee: ${error.message}`,
+        `Error should mention invalid fee: ${errorMessage}`,
       );
     }
   });

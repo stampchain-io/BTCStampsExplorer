@@ -1,16 +1,12 @@
 /* ===== STAMP TOOLS PAGE ===== */
 /*@baba-71-82*/
 import { Handlers, PageProps } from "$fresh/server.ts";
+import { body, containerGap } from "$layout";
+import { StampSendHowTo } from "$section";
 import { StampSendTool } from "$tool";
-import { StampSendHowTo, StampSendsGallery } from "$section";
-import { body, gapSection } from "$layout";
+import type { ToolStampPageProps } from "$types/ui.d.ts";
 
 /* ===== TYPES ===== */
-interface ToolStampPageProps {
-  selectedTab: string;
-  trxType: "multisig" | "olga";
-  error?: string;
-}
 
 /* ===== SERVER HANDLER ===== */
 export const handler: Handlers = {
@@ -51,7 +47,7 @@ export default function ToolStampPage(
     console.log("Rendering Content for Tab:", selectedTab);
     switch (selectedTab) {
       case "transfer":
-        return <StampSendTool trxType={trxType} />;
+        return <StampSendTool />;
       default:
         return <div>No content available for this tab.</div>;
     }
@@ -67,28 +63,20 @@ export default function ToolStampPage(
     }
   };
 
-  const _renderRightSidebar = () => {
-    console.log("Rendering Right Sidebar for Tab:", selectedTab);
-    switch (selectedTab) {
-      case "transfer":
-        return <StampSendsGallery />;
-      default:
-        return <div>No sidebar content available for this tab.</div>;
-    }
-  };
+  // Note: Right sidebar rendering removed as it's not currently used in the UI
 
   /* ===== RENDER ===== */
   return (
-    <div className={`${body} ${gapSection}`}>
-      <div className={`flex w-full`}>
+    <div class={`${body} ${containerGap}`}>
+      <div class={`flex w-full`}>
         {renderContent()}
       </div>
-      <div className="flex w-full">
+      <div class="flex w-full">
         {renderLeftSidebar()}
       </div>
       {
         /*
-        <div className="flex w-full tablet:w-1/2">
+        <div class="flex w-full tablet:w-1/2">
           {renderRightSidebar()}
         </div>
         */

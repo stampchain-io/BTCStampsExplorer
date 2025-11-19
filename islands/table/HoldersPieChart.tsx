@@ -1,20 +1,26 @@
 /* ===== HOLDERS PIE CHART COMPONENT ===== */
+import type { PieChartProps } from "$types/ui.d.ts";
+import type { HolderRow } from "$types/wallet.d.ts";
 import { Chart } from "fresh_charts/island.tsx";
 
 /* ===== TYPES ===== */
-interface PieChartProps {
-  holders: Array<{
-    address: string | null;
-    amt: number | string;
-    percentage: number | string;
-  }>;
+interface Holder {
+  address: string | null;
+  amt: number;
+  percentage: number;
 }
 
 /* ===== COMPONENT ===== */
-export const HoldersPieChart = ({ holders }: PieChartProps) => {
+export const HoldersPieChart = ({ holders: rawHolders }: PieChartProps) => {
+  // Transform HolderRow[] to Holder[]
+  const holders: Holder[] = (rawHolders ?? []).map((h: HolderRow) => ({
+    address: h.address,
+    amt: h.amt ?? h.quantity ?? 0,
+    percentage: h.percentage ?? 0,
+  }));
   /* ===== EMPTY STATE ===== */
   if (!holders?.length) {
-    return <div class="text-center py-4">No holder data available</div>;
+    return <div class="text-center py-4">NO HOLDER DATA AVAILABLE</div>;
   }
 
   /* ===== HELPER FUNCTIONS ===== */
@@ -58,11 +64,24 @@ export const HoldersPieChart = ({ holders }: PieChartProps) => {
           },
           tooltip: {
             enabled: true,
-            backgroundColor: "#000000BF",
-            titleColor: "#CCCCCC",
-            bodyColor: "#CCCCCC",
-            position: "nearest",
-            yAlign: "bottom",
+            position: "nearest" as const,
+            yAlign: "bottom" as const,
+            backgroundColor: "#0d0a0dbf",
+            borderColor: "#303030",
+            borderWidth: 1,
+            cornerRadius: 12,
+            padding: {
+              top: 12,
+              bottom: 12,
+              left: 16,
+              right: 16,
+            },
+            titleColor: "#fff8f0",
+            bodyColor: "#d8d2ca",
+            usePointStyle: true,
+            boxWidth: 10,
+            boxHeight: 10,
+            boxPadding: 8,
             callbacks: {
               label: (context: any) => {
                 const holder = holders[context.dataIndex];
@@ -78,11 +97,13 @@ export const HoldersPieChart = ({ holders }: PieChartProps) => {
         },
       },
       data: {
-        labels: holders.map((h) => h.address || "Unknown"),
+        labels: holders.map((h: any) => h.address || "Unknown"),
         datasets: [{
-          borderColor: [...Array(holders.length)].fill("#220033"),
+          borderColor: [...Array(holders.length)].fill(
+            "#0d0a0dbf",
+          ),
           label: "Graph Holder",
-          data: holders.map((holder) => Number(holder.amt)),
+          data: holders.map((holder: any) => Number(holder.amt)),
           backgroundColor: generateColors(holders.length),
           hoverOffset: 9,
         }],
@@ -98,6 +119,6 @@ export const HoldersPieChart = ({ holders }: PieChartProps) => {
   } catch (error) {
     /* ===== ERROR STATE ===== */
     console.error("Error rendering chart:", error);
-    return <div class="text-center py-6">Error rendering chart</div>;
+    return <div class="text-center py-6">ERROR RENDERING CHART</div>;
   }
 };

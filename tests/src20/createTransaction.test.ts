@@ -1,7 +1,7 @@
+import { SRC20Service } from "$server/services/src20/index.ts";
 import { assertEquals } from "@std/assert";
-import { SRC20Service } from "../../server/services/src20/index.ts";
-import { decodeSRC20OLGATransaction } from "../../utils/decodeSrc20OlgaTx.ts";
 import { Psbt } from "bitcoinjs-lib";
+import { decodeSRC20OLGATransaction } from "../$utils/decodeSrc20OlgaTx.ts";
 
 declare global {
   let mockTxData: {

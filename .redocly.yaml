@@ -14,6 +14,15 @@ apis:
       no-empty-servers: warn
       operation-operationId-unique: warn
       no-invalid-media-type-examples: warn
+      no-required-schema-properties-undefined:
+        severity: off
+        # Disabled because we use valid oneOf patterns for conditional requirements
+        # e.g., requiring either feeRate OR satsPerVB in SRC20 operations
+      no-ambiguous-paths:
+        severity: off
+        # Disabled because our paths are unambiguous when considering parameter types
+        # e.g., {tx_hash} vs {deploy_hash} are different parameter patterns
+        # and {id} (numeric) vs {address} (string) are different types
     theme:
       openapi:
         hideLogo: true 

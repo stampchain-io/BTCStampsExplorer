@@ -1,94 +1,206 @@
 /* ===== WALLET PROFILE CONTENT COMPONENT ===== */
-import { useEffect, useState } from "preact/hooks";
-import { SortButton } from "$islands/button/SortButton.tsx";
-import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
-import { FilterOld } from "$islands/WIP/FilterOld.tsx";
-import { Setting } from "$islands/datacontrol/Setting.tsx";
-import { Pagination } from "$islands/datacontrol/Pagination.tsx";
-import { SRC20Gallery, StampGallery } from "$section";
-import { WalletContentProps } from "$types/wallet.d.ts";
-import { Dispenser } from "$types/index.d.ts";
-import { formatBTCAmount } from "$lib/utils/formatUtils.ts";
-import { getStampImageSrc } from "$lib/utils/imageUtils.ts";
-import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
-import { StampRow } from "$globals";
-import { label } from "$text";
-import { Icon, LoadingIcon } from "$icon";
+import { PaginationButtons, SortButton } from "$button";
+import { Icon, LoadingIcon, PlaceholderImage } from "$icon";
+import {
+  containerBackground,
+  glassmorphismL2,
+  rowContainerBackground,
+} from "$layout";
+import { tooltipIcon } from "$notification";
+import {
+  label,
+  labelSm,
+  subtitleGrey,
+  titleGreyLD,
+  valueDarkSm,
+  valueSm,
+} from "$text";
+import type { DispenserRow as Dispenser, StampRow } from "$types/stamp.d.ts";
+import type {
+  EnhancedWalletContentProps,
+  SectionHeaderProps,
+} from "$types/ui.d.ts";
+// AjaxStampGallery has been replaced with FreshStampGallery for Fresh.js partial navigation
+import FreshSRC20Gallery from "$islands/section/gallery/FreshSRC20Gallery.tsx";
+import { FreshStampGallery } from "$islands/section/gallery/FreshStampGallery.tsx";
+import {
+  abbreviateAddress,
+  formatBTCAmount,
+} from "$lib/utils/ui/formatting/formatUtils.ts";
+import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
+import {
+  createPaginationHandler,
+  isBrowser,
+  safeNavigate,
+} from "$utils/navigation/freshNavigationUtils.ts";
+import { useEffect, useRef, useState } from "preact/hooks";
 
-/* ===== ITEM HEADER SUBCOMPONENT ===== */
-const ItemHeader = ({
-  title = "STAMP",
-  sortBy = "ASC" as const,
-  isOpenSetting = false,
-  handleOpenSetting = () => {},
-  isOpenFilter = false,
-  handleOpenFilter = () => {},
-  sort = true,
-  filter = true,
-  setting = false,
-  setOpenSettingModal = () => {},
-  onChangeSort = () => {},
-}: {
-  title: string;
-  sortBy: "ASC" | "DESC";
-  sort: boolean;
-  filter: boolean;
-  setting: boolean;
-  isOpenFilter: boolean;
-  isOpenSetting: boolean;
-  handleOpenSetting: (open: boolean) => void;
-  handleOpenFilter: (open: boolean) => void;
-  setOpenSettingModal?: (open: boolean) => void;
-  onChangeSort?: (newSortBy: "ASC" | "DESC") => void;
-}) => {
-  /* ===== RENDER HEADER ===== */
+// ===== ADVANCED SORTING IMPORTS =====
+import SortingErrorBoundary from "$islands/sorting/SortingErrorBoundary.tsx";
+import { WalletSortingProvider } from "$islands/sorting/SortingProviderWithURL.tsx";
+
+// ===== TYPES AND INTERFACES =====
+
+/**
+ * Enhanced wallet content props with feature flag support
+ */
+
+/**
+ * Section-specific sorting configuration for advanced mode
+ */
+interface SectionSortingConfig {
+  section: "stamps" | "src20" | "dispensers";
+  paramName: string;
+  pageParamName: string;
+  anchorName: string;
+  sortOptions: string[]; // Will expand to include advanced options
+}
+
+// ===== SECTION CONFIGURATIONS =====
+
+/**
+ * Configuration for each wallet section with support for advanced sorting
+ */
+const SECTION_CONFIGS: Record<string, SectionSortingConfig> = {
+  stamps: {
+    section: "stamps",
+    paramName: "stampsSortBy",
+    pageParamName: "stamps_page",
+    anchorName: "stamps",
+    sortOptions: [
+      "ASC",
+      "DESC",
+      // Advanced options (only used when enableAdvancedSorting is true)
+      "value_asc", // Sort by BTC value ascending
+      "value_desc", // Sort by BTC value descending
+      "stamp_asc", // Sort by stamp number ascending
+      "stamp_desc", // Sort by stamp number descending
+    ],
+  },
+  src20: {
+    section: "src20",
+    paramName: "src20SortBy",
+    pageParamName: "src20_page",
+    anchorName: "src20",
+    sortOptions: [
+      "ASC",
+      "DESC",
+      // Advanced options
+      "value_asc", // Sort by BTC value ascending
+      "value_desc", // Sort by BTC value descending
+      "quantity_asc", // Sort by quantity ascending
+      "quantity_desc", // Sort by quantity descending
+    ],
+  },
+  dispensers: {
+    section: "dispensers",
+    paramName: "dispensersSortBy",
+    pageParamName: "dispensers_page",
+    anchorName: "closed_listings",
+    sortOptions: [
+      "ASC",
+      "DESC",
+      // Advanced options
+      "value_asc",
+      "value_desc",
+    ],
+  },
+};
+
+// ===== SECTION HEADER COMPONENT =====
+
+/**
+ * Section header with conditional rendering for legacy/advanced sorting
+ */
+function SectionHeader({
+  title,
+  config,
+  sortBy = "DESC", // Provide a default value
+  onSortChange,
+  enableAdvancedSorting = false,
+  showMetrics = false,
+}: SectionHeaderProps) {
+  // Performance metrics placeholder for advanced mode
+  const sortMetrics = enableAdvancedSorting && showMetrics
+    ? { count: 0, avgDuration: 0 } // Will be connected to real metrics
+    : null;
+
   return (
-    <div class="flex flex-row justify-between items-center gap-3 w-full relative">
-      <div class="flex items-end">
-        <p class="text-2xl mobileMd:text-3xl mobileLg:text-4xl font-extralight text-stamp-purple-bright">
+    <div
+      class="flex items-center justify-between mb-2"
+      f-partial={`/${config.paramName}`}
+    >
+      <div class="flex items-center gap-4">
+        <h2 class={titleGreyLD}>
           {title}
-        </p>
+        </h2>
+        {sortMetrics && (
+          <div class="text-xs text-color-grey opacity-75">
+            {sortMetrics.count} sorts • {sortMetrics.avgDuration}ms avg
+          </div>
+        )}
       </div>
-      <div class="flex gap-3 justify-between h-[36px] items-center">
-        {setting && (
-          <Setting
-            initFilter={[]}
-            open={isOpenSetting}
-            handleOpen={handleOpenSetting}
-            filterButtons={["transfer"]}
-            onFilterClick={(filter) => {
-              if (filter === "transfer") {
-                setOpenSettingModal(true);
-              }
-            }}
-          />
-        )}
-        {filter && (
-          <FilterOld
-            initFilter={[]}
-            open={isOpenFilter}
-            handleOpen={handleOpenFilter}
-            filterButtons={["all", "psbt", "dispensers"]}
-            dropdownPosition="bottom"
-          />
-        )}
-        {sort && (
+
+      <div class="flex items-center gap-2">
+        {
+          /* {enableAdvancedSorting
+          ? (
+            // Advanced sorting interface
+            <SortingErrorBoundary
+              context="wallet"
+              maxRetries={2}
+              testId="sorting-interface-boundary"
+              onError={(error: Error) => {
+                console.error("Sorting interface error:", error);
+              }}
+            >
+              <CompleteSortingInterface
+                config={{
+                  defaultSort: sortBy as WalletSortKey,
+                }}
+                options={config.sortOptions.map((option: any) => ({
+                  value: option as WalletSortKey,
+                  label: getSortLabel(option),
+                  direction: option.includes("_desc") ? "desc" : "asc",
+                }))}
+                sortBy={sortBy}
+                sortOrder={sortBy.includes("_desc") ? "desc" : "asc"}
+                onSortChange={(
+                  newSortBy: string,
+                  newSortOrder: "asc" | "desc",
+                ) => {
+                  const sortValue = newSortOrder === "desc"
+                    ? newSortBy + "_desc"
+                    : newSortBy;
+                  onSortChange?.(sortValue);
+                }}
+                variant="buttons"
+                size="sm"
+                showLabel={false}
+              />
+            </SortingErrorBoundary>
+          )
+          : ( */
+        }
+        <div
+          class={`flex relative ${glassmorphismL2} !rounded-full
+             items-start justify-between
+             gap-7 py-1.5 px-5
+             tablet:gap-5 tablet:py-1 tablet:px-4`}
+        >
           <SortButton
-            initSort={sortBy}
-            onChangeSort={onChangeSort}
-            sortParam={title === "STAMPS"
-              ? "stampsSortBy"
-              : title === "TOKENS"
-              ? "src20SortBy"
-              : "dispensersSortBy"}
+            initSort={sortBy as "ASC" | "DESC"}
+            onChangeSort={(newSort: any) => onSortChange?.(newSort)}
+            sortParam={config.paramName}
           />
-        )}
+        </div>
+        {/* )} */}
       </div>
     </div>
   );
-};
+}
 
-/* ===== DISPENSER ITEM SUBCOMPONENT ===== */
+// ===== DISPENSER ITEM SUBCOMPONENT =====
 function DispenserItem({
   dispensers = [],
   pagination,
@@ -104,14 +216,16 @@ function DispenserItem({
   /* ===== EMPTY STATE HANDLING ===== */
   if (!dispensers?.length) {
     return (
-      <div class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-text-purple-3 gradient-text">
-        NO LISTINGS FOUND
+      <div class={rowContainerBackground}>
+        <h6 class={valueDarkSm}>
+          NO LISTINGS FOUND
+        </h6>
       </div>
     );
   }
 
   /* ===== DISPENSER FILTERING ===== */
-  const dispensersWithStamps = dispensers.filter((d) => d.stamp);
+  const dispensersWithStamps = dispensers?.filter((d) => d.stamp) ?? [];
   const openDispensers = dispensersWithStamps.filter((d) =>
     d.give_remaining > 0
   );
@@ -121,10 +235,10 @@ function DispenserItem({
 
   if (!openDispensers.length && !closedDispensers.length) {
     return (
-      <div>
-        <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-text-purple-3 gradient-text">
+      <div class={rowContainerBackground}>
+        <h6 class={valueDarkSm}>
           NO LISTINGS FOUND
-        </h3>
+        </h6>
       </div>
     );
   }
@@ -132,14 +246,11 @@ function DispenserItem({
   /* ===== RENDER DISPENSER ITEM ===== */
   return (
     <div class="relative shadow-md">
-      <div class="hidden mobileLg:flex flex-col gap-6 -mt-6">
+      <div class="hidden mobileLg:flex flex-col">
         {/* Open Dispensers Section */}
         {openDispensers.length > 0 && (
           <div id="open-listings-section">
-            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-text-purple-3 gradient-text mb-6">
-              OPEN LISTINGS
-            </h3>
-            <div class="flex flex-col gap-6">
+            <div class="flex flex-col gap-5">
               {openDispensers.map((dispenser) => (
                 <DispenserRow dispenser={dispenser} view="tablet" />
               ))}
@@ -150,10 +261,7 @@ function DispenserItem({
         {/* Closed Dispensers Section */}
         {closedDispensers.length > 0 && (
           <div id="closed-listings-section">
-            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-text-purple-3 gradient-text mb-6">
-              CLOSED LISTINGS
-            </h3>
-            <div class="flex flex-col gap-6">
+            <div class="flex flex-col gap-5">
               {closedDispensers.map((dispenser) => (
                 <DispenserRow dispenser={dispenser} view="tablet" />
               ))}
@@ -166,10 +274,7 @@ function DispenserItem({
       <div class="flex mobileLg:hidden flex-col gap-3">
         {/* Open Dispensers Section */}
         {openDispensers.length > 0 && (
-          <div class="mb-8" id="open-listings-section">
-            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-text-purple-3 gradient-text mb-6">
-              OPEN LISTINGS
-            </h3>
+          <div class="mb-10 space-y-10" id="open-listings-section">
             <div class="flex flex-col gap-6">
               {openDispensers.map((dispenser) => (
                 <DispenserRow dispenser={dispenser} view="mobile" />
@@ -180,10 +285,7 @@ function DispenserItem({
 
         {/* Closed Dispensers Section */}
         {closedDispensers.length > 0 && (
-          <div id="closed-listings-section">
-            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-text-purple-3 gradient-text mb-6">
-              CLOSED LISTINGS
-            </h3>
+          <div class="space-y-10" id="closed-listings-section">
             <div class="flex flex-col gap-6">
               {closedDispensers.map((dispenser) => (
                 <DispenserRow dispenser={dispenser} view="mobile" />
@@ -196,16 +298,14 @@ function DispenserItem({
       {/* Pagination */}
       {pagination && pagination.totalPages > 1 && (
         <div class="mt-6">
-          <Pagination
+          <PaginationButtons
             page={pagination.page}
             totalPages={pagination.totalPages}
             prefix="dispensers"
-            onPageChange={(page: number) => {
-              const url = new URL(globalThis.location.href);
-              url.searchParams.set("dispensers_page", page.toString());
-              url.searchParams.set("anchor", "closed_listings");
-              globalThis.location.href = url.toString();
-            }}
+            onPageChange={createPaginationHandler(
+              "dispensers_page",
+              "closed_listings",
+            )}
           />
         </div>
       )}
@@ -219,18 +319,23 @@ function DispenserRow(
 ) {
   /* ===== STATE ===== */
   const imageSize = view === "mobile"
-    ? "w-[146px] h-[146px]"
-    : "w-[172px] h-[172px]";
+    ? "w-[72px] h-[72px]"
+    : "w-[78px] h-[78px]";
   const [loading, setLoading] = useState(true);
-  const [src, setSrc] = useState("");
+  const [src, setSrc] = useState<string | undefined>(undefined);
+  const [showCopied, setShowCopied] = useState(false);
+  const [isTooltipVisible, setIsTooltipVisible] = useState(false);
+  const [allowTooltip, setAllowTooltip] = useState(true);
+
+  /* ===== REFS ===== */
+  const copyButtonRef = useRef<HTMLDivElement>(null);
+  const tooltipTimeoutRef = useRef<number | null>(null);
 
   /* ===== IMAGE FETCHING ===== */
-  const fetchStampImage = async () => {
+  const fetchStampImage = () => {
     setLoading(true);
-    const res = await getStampImageSrc(dispenser.stamp as StampRow);
-    if (res) {
-      setSrc(res);
-    } else setSrc(NOT_AVAILABLE_IMAGE);
+    const res = getStampImageSrc(dispenser.stamp as StampRow);
+    setSrc(res);
     setLoading(false);
   };
 
@@ -239,134 +344,200 @@ function DispenserRow(
     fetchStampImage();
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (tooltipTimeoutRef.current) {
+        globalThis.clearTimeout(tooltipTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  /* ===== EVENT HANDLERS ===== */
+  const handleCopyMouseEnter = () => {
+    if (allowTooltip) {
+      if (tooltipTimeoutRef.current) {
+        globalThis.clearTimeout(tooltipTimeoutRef.current);
+      }
+
+      tooltipTimeoutRef.current = globalThis.setTimeout(() => {
+        const buttonRect = copyButtonRef.current?.getBoundingClientRect();
+        if (buttonRect) {
+          setIsTooltipVisible(true);
+        }
+      }, 1500);
+    }
+  };
+
+  const handleCopyMouseLeave = () => {
+    if (tooltipTimeoutRef.current) {
+      globalThis.clearTimeout(tooltipTimeoutRef.current);
+    }
+    setIsTooltipVisible(false);
+    setShowCopied(false);
+    setAllowTooltip(true);
+  };
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(dispenser.origin);
+      setShowCopied(true);
+      setIsTooltipVisible(false);
+      setAllowTooltip(false);
+
+      if (tooltipTimeoutRef.current) {
+        globalThis.clearTimeout(tooltipTimeoutRef.current);
+      }
+
+      tooltipTimeoutRef.current = globalThis.setTimeout(() => {
+        setShowCopied(false);
+      }, 1500);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  };
+
   if (!dispenser.stamp) {
     return null;
   }
 
   /* ===== RENDER DISPENSER ROW ===== */
   return (
-    <div class="flex justify-between dark-gradient rounded-lg hover:border-stamp-primary-light hover:shadow-[0px_0px_20px_#9900EE] group border-2 border-transparent">
-      <div class="flex p-3 mobileLg:p-6 gap-6 uppercase w-full">
+    <div
+      class={`${glassmorphismL2} p-5`}
+    >
+      <div class="flex gap-6 w-full">
         <a
           href={`/stamp/${dispenser.stamp.stamp}`}
           class={`${imageSize} relative flex-shrink-0`}
         >
-          <div class="relative p-[6px] mobileMd:p-3 bg-[#1F002E] rounded-lg aspect-square">
-            <div class="stamp-container absolute inset-0 flex items-center justify-center">
+          <div
+            class={`${glassmorphismL2} !border relative aspect-square`}
+          >
+            <div class="stamp-container absolute inset-0 flex items-center justify-center p-1">
               <div class="relative z-10 w-full h-full">
-                {loading && !src ? <LoadingIcon /> : (
-                  <img
-                    width="100%"
-                    height="100%"
-                    loading="lazy"
-                    class="max-w-none w-full h-full object-contain rounded pixelart stamp-image"
-                    src={src}
-                    alt={`Stamp ${dispenser.stamp.stamp}`}
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = NOT_AVAILABLE_IMAGE;
-                    }}
-                  />
-                )}
+                {loading && !src ? <LoadingIcon /> : src
+                  ? (
+                    <img
+                      width="100%"
+                      height="100%"
+                      loading="lazy"
+                      class="max-w-none w-full h-full object-contain rounded-2xl pixelart stamp-image"
+                      src={src}
+                      alt={`Stamp ${dispenser.stamp.stamp}`}
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = "";
+                        (e.target as HTMLImageElement).alt =
+                          "Content not available";
+                      }}
+                    />
+                  )
+                  : <PlaceholderImage variant="no-image" />}
               </div>
             </div>
           </div>
         </a>
         <div class="flex flex-col w-full">
-          <div class="flex flex-col justify-between w-full mt-[6px]">
-            <div class="relative">
-              <a
-                href={`/stamp/${dispenser.stamp.stamp}`}
-                class="!inline-block text-2xl mobileLg:text-4xl font-black purple-gradient3 group-hover:[-webkit-text-fill-color:#AA00FF]"
-              >
-                {`#${dispenser.stamp.stamp}`}
-              </a>
-            </div>
-          </div>
+          {/* First Row: Stamp Number + Address (left) and GIVE/QUANTITY/PRICE (right) */}
+          <div class="flex justify-between items-start w-full mt-[6px]">
+            {/* Left side: Stamp number and address */}
+            <div class="flex flex-col gap-1">
+              <div class="relative">
+                <a
+                  href={`/stamp/${dispenser.stamp.stamp}`}
+                  class={subtitleGrey}
+                >
+                  {`#${dispenser.stamp.stamp}`}
+                </a>
+              </div>
 
-          <div class="flex justify-between flex-row w-full">
-            <p
-              class={`text-base text-stamp-primary font-light text-ellipsis overflow-hidden ${
-                view === "mobile" ? "tablet:w-full" : ""
-              }`}
-            >
-              <span class="font-bold text-stamp-primary text-base mobileLg:text-xl normal-case">
-                {/* Abbreviate origin address differently depending on screen size */}
-                <span class="mobileMd:hidden">
-                  {abbreviateAddress(dispenser.origin, 4)}
-                </span>
-                <span class="hidden mobileMd:inline mobileLg:hidden">
-                  {abbreviateAddress(dispenser.origin, 7)}
-                </span>
-                <span class="hidden mobileLg:inline tablet:hidden">
-                  {abbreviateAddress(dispenser.origin, 10)}
-                </span>
-                <span class="hidden tablet:inline">{dispenser.origin}</span>
-              </span>
-            </p>
-            <div class="flex flex-row gap-[9px] mobileLg:gap-3">
-              <Icon
-                type="iconButton"
-                name="copy"
-                weight="normal"
-                size="xs"
-                color="grey"
-              />
-              <Icon
-                type="iconButton"
-                name="history"
-                weight="normal"
-                size="xs"
-                color="grey"
-              />
+              <div class="flex flex-row-reverse justify-end gap-4">
+                <div
+                  ref={copyButtonRef}
+                  class="relative peer"
+                  onMouseEnter={handleCopyMouseEnter}
+                  onMouseLeave={handleCopyMouseLeave}
+                >
+                  <Icon
+                    type="iconButton"
+                    name="copy"
+                    weight="normal"
+                    size="smR"
+                    color="greyDark"
+                    className="mb-1"
+                    onClick={copy}
+                  />
+                  <div
+                    class={`${tooltipIcon} ${
+                      isTooltipVisible ? "opacity-100" : "opacity-0"
+                    }`}
+                  >
+                    COPY ADDY
+                  </div>
+                  <div
+                    class={`${tooltipIcon} ${
+                      showCopied ? "opacity-100" : "opacity-0"
+                    }`}
+                  >
+                    ADDY COPIED
+                  </div>
+                </div>
+
+                {/* Full address - hidden on smaller screens */}
+                <h6
+                  class={`${label} text-color-grey hidden tablet:block transition-colors duration-200 peer-hover:text-color-grey-light`}
+                >
+                  {dispenser.origin}
+                </h6>
+
+                {/* Abbreviated address for smaller screens */}
+                <h6
+                  class={`${label} text-color-grey hidden mobileLg:block tablet:hidden transition-colors duration-200 peer-hover:text-color-grey-light`}
+                >
+                  {abbreviateAddress(dispenser.origin, 13)}
+                </h6>
+
+                <h6
+                  class={`${label} text-color-grey hidden mobileMd:block mobileLg:hidden transition-colors duration-200 peer-hover:text-color-grey-light`}
+                >
+                  {abbreviateAddress(dispenser.origin, 9)}
+                </h6>
+
+                <h6
+                  class={`${label} text-color-grey block mobileMd:hidden transition-colors duration-200 peer-hover:text-color-grey-light`}
+                >
+                  {abbreviateAddress(dispenser.origin, 5)}
+                </h6>
+              </div>
             </div>
-          </div>
-          <div class="text-center flex justify-between mt-[6px]">
-            <p class="text-base mobileLg:text-lg text-stamp-grey-darker font-light">
-              GIVE{" "}
-              <span class="font-bold text-stamp-grey-light">
-                {Number(dispenser.give_quantity).toLocaleString()}
-              </span>
-            </p>
-          </div>
-          <div class="flex flex-row justify-between w-full">
-            <p class="text-base mobileLg:text-lg text-stamp-grey-darker font-light">
-              QUANTITY{" "}
-              <span class="font-bold text-stamp-grey-light">
-                {dispenser.give_remaining === 0
-                  ? Number(dispenser.escrow_quantity).toLocaleString()
-                  : `${Number(dispenser.give_remaining).toLocaleString()}/${
-                    Number(dispenser.escrow_quantity).toLocaleString()
-                  }`}
-              </span>
-            </p>
-            <p
-              class={`text-stamp-grey-darker text-lg font-light -mt-1 ${
-                view === "mobile" ? "hidden mobileLg:block" : ""
-              }`}
-            >
-              VALUE
-            </p>
-          </div>
-          <div class="flex flex-row justify-between w-full">
-            <p class="text-base mobileLg:text-lg text-stamp-grey-darker font-light">
-              PRICE{" "}
-              <span class="font-bold text-stamp-grey-light">
-                {formatBTCAmount(Number(dispenser.btcrate), {
-                  includeSymbol: false,
-                })}
-              </span>{" "}
-              <span className="text-stamp-grey-light">BTC</span>
-            </p>
-            <p
-              class={`text-xl mobileMd:text-2xl text-stamp-grey-light font-bold -mt-1 ${
-                view === "mobile" ? "hidden mobileLg:block" : ""
-              }`}
-            >
-              {formatBTCAmount(
-                Number(dispenser.btcrate) * Number(dispenser.escrow_quantity),
-                { includeSymbol: false },
-              )} <span class="text-stamp-grey-light font-light">BTC</span>
-            </p>
+
+            {/* Right side: GIVE, QUANTITY, PRICE, VALUE */}
+            <div class="flex flex-col items-end text-right">
+              <h6 class={labelSm}>
+                GIVE{" "}
+                <span class={valueSm}>
+                  {Number(dispenser.give_quantity).toLocaleString()}
+                </span>
+              </h6>
+              <h6 class={labelSm}>
+                QUANTITY{" "}
+                <span class={valueSm}>
+                  {dispenser.give_remaining === 0
+                    ? Number(dispenser.escrow_quantity).toLocaleString()
+                    : `${Number(dispenser.give_remaining).toLocaleString()}/${
+                      Number(dispenser.escrow_quantity).toLocaleString()
+                    }`}
+                </span>
+              </h6>
+              <h6 class={labelSm}>
+                PRICE{" "}
+                <span class={valueSm}>
+                  {formatBTCAmount(Number(dispenser.btcrate), {
+                    includeSymbol: false,
+                  })}
+                </span>{" "}
+                <span className="text-color-grey-light">BTC</span>
+              </h6>
+            </div>
           </div>
         </div>
       </div>
@@ -374,8 +545,49 @@ function DispenserRow(
   );
 }
 
-/* ===== MAIN WALLET PROFILE COMPONENT ===== */
-export default function WalletProfileContent({
+// ===== MAIN COMPONENT WRAPPER =====
+
+/**
+ * Production-ready wallet profile content with optional advanced sorting
+ */
+export default function WalletProfileContent(
+  props: EnhancedWalletContentProps,
+) {
+  const { enableAdvancedSorting = false } = props;
+
+  // When advanced sorting is enabled, wrap with WalletSortingProvider and error boundary
+  if (enableAdvancedSorting) {
+    return (
+      <SortingErrorBoundary
+        context="wallet"
+        maxRetries={3}
+        testId="wallet-sorting-boundary"
+        onError={(error: Error, details: any) => {
+          console.error("Wallet sorting error:", error);
+          console.debug("Error details:", details);
+          // TODO(#sorting): Report error to monitoring system
+        }}
+      >
+        <WalletSortingProvider
+          defaultSort={props.stampsSortBy || "DESC"}
+          testId="wallet-sorting-provider"
+        >
+          <WalletProfileContentInner {...props} />
+        </WalletSortingProvider>
+      </SortingErrorBoundary>
+    );
+  }
+
+  // Otherwise render directly
+  return <WalletProfileContentInner {...props} />;
+}
+
+// ===== MAIN COMPONENT IMPLEMENTATION =====
+
+/**
+ * Inner component with all the wallet profile logic
+ */
+function WalletProfileContentInner({
   stamps,
   src20,
   dispensers,
@@ -384,35 +596,38 @@ export default function WalletProfileContent({
   stampsSortBy = "DESC",
   src20SortBy = "DESC",
   dispensersSortBy = "DESC",
-}: WalletContentProps) {
-  /* ===== STATE ===== */
-  const [_openSettingModal, setOpenSettingModal] = useState<boolean>(false);
-
-  /* ===== SORT STATE ===== */
-  const [sortStamps, setSortStamps] = useState<"ASC" | "DESC">(stampsSortBy);
-  const [sortTokens, setSortTokens] = useState<"ASC" | "DESC">(src20SortBy);
-  const [sortDispensers, setSortDispensers] = useState<"ASC" | "DESC">(
-    dispensersSortBy,
-  );
-
-  /* ===== TOGGLE STATES ===== */
-  const [openFilter, setOpenFilter] = useState<boolean>(false);
-  const [openSetting, setOpenSetting] = useState<boolean>(false);
+  // Feature flag support
+  enableAdvancedSorting = false, // Default to false for backward compatibility
+  showSortingMetrics = false,
+  sortingConfig = {
+    enableUrlSync: true,
+    enablePersistence: true,
+    enableMetrics: true,
+  },
+}: EnhancedWalletContentProps) {
+  /* ===== STATE MANAGEMENT ===== */
+  const [sortStamps] = useState<string>(stampsSortBy);
+  const [sortTokens] = useState<string>(src20SortBy);
+  const [sortDispensers] = useState<string>(dispensersSortBy);
+  const [_openSetting, _setOpenSetting] = useState(false);
+  const [_openSettingModal, _setOpenSettingModal] = useState(false);
 
   /* ===== COMPUTED VALUES ===== */
   const openDispensersCount =
-    dispensers.data.filter((d) => d.give_remaining > 0).length;
+    dispensers.data.filter((d: any) => d.give_remaining > 0).length;
+  const closedDispensersCount = dispensers.data.length - openDispensersCount;
 
   /* ===== EFFECTS ===== */
   useEffect(() => {
     if (anchor) {
-      const sectionMap = {
+      const sectionMap: Record<string, string> = {
         stamp: "stamps-section",
+        stamps: "stamps-section",
         src20: "src20-section",
         open_listings: "open-listings-section",
         closed_listings: "closed-listings-section",
       };
-      const sectionId = sectionMap[anchor as keyof typeof sectionMap];
+      const sectionId = sectionMap[anchor];
       if (sectionId) {
         const element = document.getElementById(sectionId);
         if (element) {
@@ -420,212 +635,223 @@ export default function WalletProfileContent({
         }
       }
     }
-  }, [anchor, stamps, src20, dispensers]);
+  }, [anchor]);
 
-  useEffect(() => {
-    const currentUrl = globalThis.location.href;
-    const url = new URL(currentUrl);
-    const filterByValue = url.searchParams.get("filterBy") || "";
-    if (filterByValue === "Transfer") {
-      setOpenSettingModal(true);
+  /* ===== HANDLERS ===== */
+  const handleStampSort = (newSort: string) => {
+    // SSR safety check
+    if (!isBrowser()) {
+      return; // Cannot navigate during SSR
     }
-  }, []);
-
-  /* ===== EVENT HANDLERS ===== */
-  const handleOpenSetting = () => {
-    setOpenSetting(!openSetting);
-  };
-
-  const handleOpenFilter = () => {
-    setOpenFilter(!openFilter);
-  };
-
-  /* ===== SORT HANDLERS ===== */
-  const handleChangeSort = (newSort: "ASC" | "DESC") => {
-    setSortStamps(newSort);
     const url = new URL(globalThis.location.href);
-    url.searchParams.set("stampsSortBy", newSort);
-    url.searchParams.delete("stamps_page");
-    url.searchParams.set("anchor", "stamps");
-    globalThis.location.href = url.toString();
+    url.searchParams.set(SECTION_CONFIGS.stamps.paramName, newSort);
+    url.searchParams.delete(SECTION_CONFIGS.stamps.pageParamName);
+    url.searchParams.set("anchor", SECTION_CONFIGS.stamps.anchorName);
+    safeNavigate(url.toString());
   };
 
-  const handleTokenSort = (newSort: "ASC" | "DESC") => {
-    setSortTokens(newSort);
+  const handleTokenSort = (newSort: string) => {
+    // SSR safety check
+    if (!isBrowser()) {
+      return; // Cannot navigate during SSR
+    }
     const url = new URL(globalThis.location.href);
-    url.searchParams.set("src20SortBy", newSort);
-    url.searchParams.delete("src20_page");
-    url.searchParams.set("anchor", "src20");
-    globalThis.location.href = url.toString();
+    url.searchParams.set(SECTION_CONFIGS.src20.paramName, newSort);
+    url.searchParams.delete(SECTION_CONFIGS.src20.pageParamName);
+    url.searchParams.set("anchor", SECTION_CONFIGS.src20.anchorName);
+    safeNavigate(url.toString());
   };
 
-  const handleDispenserSort = (newSort: "ASC" | "DESC") => {
-    setSortDispensers(newSort);
+  const handleDispenserSort = (newSort: string) => {
+    // SSR safety check
+    if (!isBrowser()) {
+      return; // Cannot navigate during SSR
+    }
     const url = new URL(globalThis.location.href);
-    url.searchParams.set("dispensersSortBy", newSort);
-    url.searchParams.delete("dispensers_page");
+    url.searchParams.set(SECTION_CONFIGS.dispensers.paramName, newSort);
+    url.searchParams.delete(SECTION_CONFIGS.dispensers.pageParamName);
     url.searchParams.set(
       "anchor",
       openDispensersCount > 0 ? "open_listings" : "closed_listings",
     );
-    globalThis.location.href = url.toString();
-  };
-
-  /* ===== GALLERY CONFIGURATION ===== */
-  const stampGallery = {
-    title: "",
-    type: "all",
-    stamps: stamps.data,
-    layout: "grid" as const,
-    showDetails: false,
-    gridClass: `
-      grid w-full
-      gap-3
-      mobileMd:gap-6
-      grid-cols-4
-      mobileLg:grid-cols-6
-      tablet:grid-cols-6
-      desktop:grid-cols-8
-      auto-rows-fr
-    `,
-    displayCounts: {
-      mobileSm: 16,
-      mobileLg: 24,
-      tablet: 24,
-      desktop: 32,
-    },
-    pagination: {
-      page: stamps.pagination.page,
-      totalPages: Math.ceil(stamps.pagination.total / stamps.pagination.limit),
-      prefix: "stamps_page",
-      onPageChange: (page: number) => {
-        const url = new URL(globalThis.location.href);
-        url.searchParams.set("stamps_page", page.toString());
-        url.searchParams.set("anchor", "stamps");
-        globalThis.location.href = url.toString();
-      },
-    },
+    safeNavigate(url.toString());
   };
 
   /* ===== RENDER ===== */
   return (
-    <>
+    <div class="flex flex-col gap-6">
       {/* Stamps Section */}
-      <div class="mt-3 mobileLg:mt-6" id="stamps-section">
-        <ItemHeader
+      <div id="stamps-section" class={containerBackground}>
+        <SectionHeader
           title="STAMPS"
-          sort
+          config={SECTION_CONFIGS.stamps}
           sortBy={sortStamps}
-          onChangeSort={handleChangeSort}
-          filter={false}
-          setting={false}
-          isOpenFilter={false}
-          isOpenSetting={openSetting}
-          handleOpenFilter={() => {}}
-          handleOpenSetting={handleOpenSetting}
-          setOpenSettingModal={setOpenSettingModal}
+          onSortChange={handleStampSort}
+          enableAdvancedSorting={enableAdvancedSorting}
+          showMetrics={showSortingMetrics}
         />
-        <div class="mt-3 mobileLg:mt-6">
+
+        <div f-partial="/stamps">
           {stamps.data?.length
-            ? <StampGallery {...stampGallery} />
+            ? (
+              <FreshStampGallery
+                initialData={stamps.data}
+                initialPagination={{
+                  page: stamps.pagination.page,
+                  limit: stamps.pagination.limit,
+                  total: stamps.pagination.total,
+                  totalPages: Math.ceil(
+                    stamps.pagination.total / stamps.pagination.limit,
+                  ),
+                  hasNext: stamps.pagination.page <
+                    Math.ceil(
+                      stamps.pagination.total / stamps.pagination.limit,
+                    ),
+                  hasPrev: stamps.pagination.page > 1,
+                  currentPage: stamps.pagination.page,
+                  pageSize: stamps.pagination.limit,
+                  totalItems: stamps.pagination.total,
+                  hasNextPage: stamps.pagination.page <
+                    Math.ceil(
+                      stamps.pagination.total / stamps.pagination.limit,
+                    ),
+                  hasPreviousPage: stamps.pagination.page > 1,
+                  startIndex: (stamps.pagination.page - 1) *
+                    stamps.pagination.limit,
+                  endIndex: Math.min(
+                    stamps.pagination.page * stamps.pagination.limit,
+                    stamps.pagination.total,
+                  ),
+                }}
+                address={address}
+                initialSort="DESC"
+                showDetails={false}
+                gridClass={`
+                grid w-full
+                gap-3
+                mobileMd:gap-6
+                grid-cols-3
+                mobileSm:grid-cols-4
+                mobileLg:grid-cols-5
+                tablet:grid-cols-6
+                desktop:grid-cols-8
+                `}
+              />
+            )
             : (
-              <p class={`${label} -mt-1.5 mobileLg:-mt-3`}>
-                NO STAMPS IN THE WALLET
-              </p>
+              <div class={rowContainerBackground}>
+                <h6 class={valueDarkSm}>
+                  NO STAMPS IN THE WALLET
+                </h6>
+              </div>
             )}
         </div>
       </div>
 
       {/* SRC20 (TOKENS) Section */}
-      <div class="mt-6 mobileLg:mt-12" id="src20-section">
-        <ItemHeader
+      <div id="src20-section" class={containerBackground}>
+        <SectionHeader
           title="TOKENS"
-          sort
+          config={SECTION_CONFIGS.src20}
           sortBy={sortTokens}
-          onChangeSort={handleTokenSort}
-          filter={false}
-          setting={false}
-          isOpenFilter={false}
-          isOpenSetting={false}
-          handleOpenFilter={() => {}}
-          handleOpenSetting={() => {}}
+          onSortChange={handleTokenSort}
+          enableAdvancedSorting={enableAdvancedSorting}
+          showMetrics={showSortingMetrics}
         />
-        <div class="mt-3 mobileLg:mt-6">
+
+        <div f-partial="/src20">
           {src20.data?.length
             ? (
-              <SRC20Gallery
-                type="all"
-                fromPage="wallet"
+              <FreshSRC20Gallery
                 initialData={src20.data}
-                pagination={{
+                initialPagination={{
                   page: src20.pagination.page,
-                  totalPages: src20.pagination.totalPages,
-                  prefix: "src20",
-                  onPageChange: (page: number) => {
-                    const url = new URL(globalThis.location.href);
-                    url.searchParams.set("src20_page", page.toString());
-                    url.searchParams.set("anchor", "src20");
-                    globalThis.location.href = url.toString();
-                  },
+                  limit: src20.pagination.limit || 50,
+                  total: src20.pagination.total || src20.data.length,
                 }}
                 address={address}
-                sortBy={sortTokens}
+                initialSort={{ key: "stamp", direction: "desc" }}
+                fromPage="wallet"
               />
             )
             : (
-              <p class={`${label} -mt-1.5 mobileLg:-mt-3`}>
-                NO TOKENS IN THE WALLET
-              </p>
+              <div class={rowContainerBackground}>
+                <h6 class={valueDarkSm}>
+                  NO TOKENS IN THE WALLET
+                </h6>
+              </div>
             )}
         </div>
       </div>
 
       {/* Dispensers Section */}
       {dispensers.data.length > 0 && (
-        <div class="mt-3 mobileLg:mt-6" id="listings-section">
-          <ItemHeader
+        <div id="dispensers-section" class={containerBackground}>
+          <SectionHeader
             title="LISTINGS"
-            sort
+            config={SECTION_CONFIGS.dispensers}
             sortBy={sortDispensers}
-            onChangeSort={handleDispenserSort}
-            filter={false}
-            setting={false}
-            isOpenFilter={openFilter}
-            isOpenSetting={false}
-            handleOpenFilter={handleOpenFilter}
-            handleOpenSetting={() => {}}
+            onSortChange={handleDispenserSort}
+            enableAdvancedSorting={enableAdvancedSorting}
+            showMetrics={showSortingMetrics}
           />
-          <div class="mt-3 mobileMd:mt-6">
-            <DispenserItem
-              dispensers={dispensers.data}
-              pagination={{
-                page: dispensers.pagination.page,
-                totalPages: dispensers.pagination.totalPages,
-                prefix: "dispensers",
-                onPageChange: (page: number) => {
-                  const url = new URL(globalThis.location.href);
-                  url.searchParams.set("dispensers_page", page.toString());
-                  url.searchParams.set("anchor", "closed_listings");
-                  globalThis.location.href = url.toString();
-                },
-              }}
-            />
+
+          {/* Open Dispensers */}
+          {openDispensersCount > 0 && (
+            <div id="open-listings-section" class="mb-10">
+              <h3 class={subtitleGrey}>
+                OPEN DISPENSERS - {openDispensersCount}
+              </h3>
+              <DispenserItem
+                dispensers={dispensers.data.filter((d: any) =>
+                  d.give_remaining > 0
+                )}
+              />
+            </div>
+          )}
+
+          {/* Closed Dispensers */}
+          {closedDispensersCount > 0 && (
+            <div id="closed-listings-section">
+              <h3 class={subtitleGrey}>
+                CLOSED DISPENSERS - {closedDispensersCount}
+              </h3>
+              <DispenserItem
+                dispensers={dispensers.data.filter((d: any) =>
+                  d.give_remaining === 0
+                )}
+              />
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Feature Flag Debug Info */}
+      {enableAdvancedSorting && showSortingMetrics && (
+        <div class="mt-8 p-4 bg-color-grey-lightest rounded-2xl">
+          <h3 class="text-sm font-semibold text-color-grey-dark mb-2">
+            Advanced Sorting Status
+          </h3>
+          <div class="text-xs text-color-grey space-y-1">
+            <div>Status: ✅ Enabled (Phase 1 - Infrastructure)</div>
+            <div>URL Sync: {sortingConfig.enableUrlSync ? "✅" : "❌"}</div>
+            <div>
+              Persistence: {sortingConfig.enablePersistence ? "✅" : "❌"}
+            </div>
+            <div>Metrics: {sortingConfig.enableMetrics ? "✅" : "❌"}</div>
+            <div class="mt-2 text-stamp-warning">
+              Note: Advanced sorting UI will be available in Phase 2
+            </div>
           </div>
         </div>
       )}
 
-      {
-        /* Modal for sending stamps
+      {/* Transfer Modal */}
       {_openSettingModal && (
-        <WalletSendStampModal
-          stamps={stamps}
-          fee={0}
-          handleChangeFee={() => {}}
-          toggleModal={handleOpenSettingModal}
-          handleCloseModal={handleCloseSettingModal}
-        />
-      )} */
-      }
-    </>
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          {/* Modal content would go here */}
+        </div>
+      )}
+    </div>
   );
 }

@@ -5,29 +5,16 @@ import {
   walletContext,
 } from "$client/wallet/wallet.ts";
 import { logger } from "$lib/utils/logger.ts";
-import { FeeDetails } from "$lib/types/base.d.ts";
+import {
+  safeInteger,
+  safeNumber,
+} from "$lib/utils/data/numbers/numberUtils.ts";
 import axiod from "axiod";
-import { debounce } from "$lib/utils/debounce.ts";
-
-interface TransactionFormState {
-  fee: number;
-  feeError: string;
-  BTCPrice: number;
-  recipientAddress?: string;
-  addressError?: string;
-  amount?: string;
-  amountError?: string;
-  assetId?: string;
-  estimatedTxFees: FeeDetails | null;
-  apiError: string | null;
-}
-
-interface UseTransactionFormProps {
-  type: "send" | "transfer" | "buy";
-  initialFee?: number;
-  initialAssetId?: string;
-  initialAmount?: string;
-}
+import { debounce } from "$lib/utils/performance/debounce.ts";
+import type {
+  TransactionFormState,
+  UseTransactionFormProps,
+} from "$types/ui.d.ts";
 
 interface DebouncedCallParams {
   sourceAddress: string;
@@ -55,8 +42,10 @@ const calculateEstimatedFeesDebounced = debounce(
             ...prev.estimatedTxFees,
             hasExactFees: false,
             minerFee: 0,
+            estMinerFee: 0, // backward compatibility
             dustValue: 0,
-            totalValue: 0,
+            totalFee: 0,
+            totalValue: 0, // required by FeeDetails
           }
           : null,
       }));
@@ -71,8 +60,8 @@ const calculateEstimatedFeesDebounced = debounce(
         address: params.sourceAddress,
         destination: params.recipientAddress,
         asset: params.assetId,
-        quantity: Number(params.amount),
-        options: { fee_per_kb: params.feeRate * 1000 },
+        quantity: safeNumber(params.amount),
+        options: { fee_per_kb: safeNumber(params.feeRate, 1) * 1000 },
         dryRun: true,
       });
 
@@ -81,11 +70,14 @@ const calculateEstimatedFeesDebounced = debounce(
           ...prev,
           estimatedTxFees: {
             minerFee: response.data.estimatedFee || 0,
+            estMinerFee: response.data.estimatedFee || 0, // backward compatibility
             dustValue: 0,
-            totalValue: response.data.estimatedFee || 0,
+            totalFee: response.data.estimatedFee || 0,
+            totalValue: response.data.estimatedFee || 0, // required by FeeDetails
             hasExactFees: true,
             estimatedSize: response.data.estimatedVsize || 0,
-            effectiveFeeRate: params.feeRate,
+            feeRate: params.feeRate,
+            effectiveFeeRate: params.feeRate, // backward compatibility
             totalVsize: response.data.estimatedVsize || 0,
           },
           apiError: null,
@@ -108,10 +100,13 @@ const calculateEstimatedFeesDebounced = debounce(
         ...prev,
         estimatedTxFees: {
           minerFee: 0,
+          estMinerFee: 0, // backward compatibility
           dustValue: 0,
-          totalValue: 0,
+          totalFee: 0,
+          totalValue: 0, // required by FeeDetails
           hasExactFees: false,
-          effectiveFeeRate: 0,
+          feeRate: 0,
+          effectiveFeeRate: 0, // backward compatibility
           estimatedSize: 0,
           totalVsize: 0,
         },
@@ -178,8 +173,8 @@ export function useTransactionForm(
         lastGoodDataAge: lastGoodDataAge,
       });
 
-      const recommendedFee = Math.round(memoizedFeeData.recommendedFee);
-      const currentBtcPrice = memoizedFeeData.btcPrice;
+      const recommendedFee = safeInteger(memoizedFeeData.recommendedFee);
+      const currentBtcPrice = safeNumber(memoizedFeeData.btcPrice);
 
       // Apply component-level fallbacks if needed
       let finalFee = recommendedFee;

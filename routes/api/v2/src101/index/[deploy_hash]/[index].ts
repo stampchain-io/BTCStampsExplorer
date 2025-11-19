@@ -1,7 +1,7 @@
 import { Handlers } from "$fresh/server.ts";
+import type { AddressHandlerContext } from "$types/base.d.ts";
 import { Src101Controller } from "$server/controller/src101Controller.ts";
-import { AddressHandlerContext } from "$globals";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { ResponseUtil } from "$lib/utils/api/responses/responseUtil.ts";
 
 export const handler: Handlers<AddressHandlerContext> = {
   async GET(req, ctx) {
@@ -12,8 +12,8 @@ export const handler: Handlers<AddressHandlerContext> = {
 
       const queryParams = {
         deploy_hash,
-        tokenid: null,
-        index: index,
+        tokenid: "",
+        index: Number(index),
         limit: Number(params.get("limit")) || 1000,
         page: Number(params.get("page")) || 1,
         sort: params.get("sort") || "ASC",

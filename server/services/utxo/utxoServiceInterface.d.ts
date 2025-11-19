@@ -1,4 +1,4 @@
-import { UTXO } from "$lib/types/base.d.ts";
+import type {UTXO} from "$lib/types/base.d.ts";
 
 /**
  * Options for fetching UTXOs.

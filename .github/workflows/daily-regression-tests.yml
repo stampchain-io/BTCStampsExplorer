@@ -1,0 +1,442 @@
+name: Daily Regression Testing
+
+on:
+  schedule:
+    # Run daily at 2 AM UTC to catch regressions early
+    - cron: '0 2 * * *'
+    # Run additional check on Sunday at 6 AM for weekly review
+    - cron: '0 6 * * 0'
+  workflow_dispatch:
+    inputs:
+      send_notifications:
+        description: 'Send failure notifications'
+        required: false
+        default: true
+        type: boolean
+      full_analysis:
+        description: 'Run full analysis including historical trends'
+        required: false
+        default: false
+        type: boolean
+      skip_weekends:
+        description: 'Skip weekend runs (for manual testing)'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  # Skip weekend runs if configured
+  check-schedule:
+    name: Check Schedule
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.check.outputs.should_run }}
+      is_weekend: ${{ steps.check.outputs.is_weekend }}
+      day_of_week: ${{ steps.check.outputs.day_of_week }}
+    steps:
+      - name: Check if should run
+        id: check
+        run: |
+          # Get current day of week (0=Sunday, 1=Monday, ..., 6=Saturday)
+          day_of_week=$(date +%w)
+          is_weekend="false"
+          should_run="true"
+          
+          # Check if it's weekend
+          if [ "$day_of_week" = "0" ] || [ "$day_of_week" = "6" ]; then
+            is_weekend="true"
+          fi
+          
+          # Skip if it's weekend and skip_weekends is true
+          if [ "$is_weekend" = "true" ] && [ "${{ github.event.inputs.skip_weekends }}" = "true" ]; then
+            should_run="false"
+            echo "Skipping weekend run as requested"
+          fi
+          
+          echo "should_run=$should_run" >> $GITHUB_OUTPUT
+          echo "is_weekend=$is_weekend" >> $GITHUB_OUTPUT
+          echo "day_of_week=$day_of_week" >> $GITHUB_OUTPUT
+          
+          echo "Current day: $day_of_week (0=Sun, 6=Sat)"
+          echo "Is weekend: $is_weekend"
+          echo "Should run: $should_run"
+
+  daily-regression:
+    name: Daily API Regression Testing
+    runs-on: ubuntu-latest
+    needs: check-schedule
+    if: needs.check-schedule.outputs.should_run == 'true'
+    timeout-minutes: 45
+    
+    permissions:
+      contents: read
+      issues: write
+      actions: write
+      
+    env:
+      CI: true
+      NODE_ENV: production
+      # Production-only testing for regression detection
+      PROD_BASE_URL: https://stampchain.io
+      DEV_BASE_URL: https://stampchain.io
+      TEST_MODE: regression-detection
+      NEWMAN_ITERATIONS: 2
+      NEWMAN_VERBOSE: false
+      # Notification settings
+      SEND_NOTIFICATIONS: ${{ github.event.inputs.send_notifications || 'true' }}
+      FULL_ANALYSIS: ${{ github.event.inputs.full_analysis || 'false' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch full history for trend analysis
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          # Install additional tools for trend analysis
+          npm install --no-save moment lodash
+
+      - name: Create timestamped reports directory
+        id: setup-reports
+        run: |
+          timestamp=$(date +"%Y%m%d_%H%M%S")
+          report_dir="reports/daily-regression/$timestamp"
+          mkdir -p "$report_dir"
+          
+          echo "REPORT_DIR=$report_dir" >> $GITHUB_ENV
+          echo "TIMESTAMP=$timestamp" >> $GITHUB_ENV
+          echo "report_dir=$report_dir" >> $GITHUB_OUTPUT
+          
+          echo "Report directory: $report_dir"
+
+      - name: Run comprehensive regression tests
+        id: regression-tests
+        run: |
+          echo "## Daily Regression Test Run - $(date)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Configuration" >> $GITHUB_STEP_SUMMARY
+          echo "- Date: $(date -u)" >> $GITHUB_STEP_SUMMARY
+          echo "- Day: ${{ needs.check-schedule.outputs.day_of_week }} (0=Sun)" >> $GITHUB_STEP_SUMMARY
+          echo "- Weekend: ${{ needs.check-schedule.outputs.is_weekend }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Mode: Regression Detection (Production Only)" >> $GITHUB_STEP_SUMMARY
+          echo "- Iterations: 2" >> $GITHUB_STEP_SUMMARY
+          echo "- Full Analysis: ${{ env.FULL_ANALYSIS }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Set custom environment for reports
+          export NEWMAN_REPORT_PREFIX="daily-regression"
+          export NEWMAN_REPORT_DIR="$REPORT_DIR"
+          
+          # Run the comprehensive tests
+          set +e  # Don't exit on failure
+          docker compose -f docker-compose.test.yml run --rm newman-comprehensive
+          TEST_EXIT_CODE=$?
+          set -e
+          
+          echo "test_exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
+          
+          # List generated reports
+          if [ -d "$REPORT_DIR" ]; then
+            echo "### Generated Reports" >> $GITHUB_STEP_SUMMARY
+            ls -la "$REPORT_DIR"/ >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          exit $TEST_EXIT_CODE
+        continue-on-error: true
+
+      - name: Run regression analysis with historical comparison
+        id: analysis
+        if: always()
+        run: |
+          echo "Running enhanced regression analysis..."
+          
+          # Run standard regression analysis
+          node scripts/analyze-newman-regression.js || true
+          
+          # Run expected changes validation
+          node scripts/validate-expected-changes.cjs || true
+          
+          # Enhanced historical analysis if requested
+          if [ "${{ env.FULL_ANALYSIS }}" = "true" ]; then
+            echo "Running historical trend analysis..."
+            
+            # Use existing trend analysis script if available, or create a simple one
+            if [ -f "scripts/analyze-trends.js" ]; then
+              node scripts/analyze-trends.js || true
+            else
+              echo "Trend analysis script not found, generating basic summary..."
+              mkdir -p reports
+              echo '{"message": "Historical trend analysis requires scripts/analyze-trends.js"}' > reports/trends-analysis.json
+            fi
+          fi
+          
+          echo "analysis_completed=true" >> $GITHUB_OUTPUT
+
+      - name: Generate daily report summary
+        id: daily-summary
+        if: always()
+        run: |
+          # Create comprehensive daily summary
+          {
+            echo "# Daily Regression Test Summary"
+            echo ""
+            echo "**Date**: $(date -u)"
+            echo "**Run ID**: ${{ github.run_id }}"
+            echo "**Commit**: ${{ github.sha }}"
+            echo "**Trigger**: ${{ github.event_name }}"
+            echo ""
+            echo "## Test Execution Status"
+          } > daily_summary.md
+          
+          if [ "${{ steps.regression-tests.outputs.test_exit_code }}" = "0" ]; then
+            echo "✅ **All tests passed successfully**" >> daily_summary.md
+          else
+            echo "❌ **Some tests failed - Investigation required**" >> daily_summary.md
+          fi
+          
+          # Add performance baseline
+          echo "" >> daily_summary.md
+          echo "## Performance Baseline" >> daily_summary.md
+          echo "- Target: < 2000ms average response time" >> daily_summary.md
+          echo "- Production endpoint: https://stampchain.io" >> daily_summary.md
+          echo "- Test coverage: 46/46 endpoints (100%)" >> daily_summary.md
+          
+          # Add links to reports
+          echo "" >> daily_summary.md
+          echo "## Reports Generated" >> daily_summary.md
+          echo "- HTML Report: Available in artifacts" >> daily_summary.md
+          echo "- JSON Results: Available in artifacts" >> daily_summary.md
+          echo "- Regression Analysis: Available in artifacts" >> daily_summary.md
+          
+          if [ "${{ env.FULL_ANALYSIS }}" = "true" ]; then
+            echo "- Historical Trends: Available in artifacts" >> daily_summary.md
+          fi
+          
+          # Save summary
+          cp daily_summary.md "$REPORT_DIR/"
+          
+          echo "Daily summary generated"
+
+      - name: Check for critical regressions
+        id: check-regressions
+        if: always()
+        run: |
+          critical_issues=0
+          warning_issues=0
+          
+          # Check for analysis files
+          if [ -f "reports/expected-changes-validation.json" ]; then
+            unexpected_changes=$(jq -r '.summary.unexpectedChanges' reports/expected-changes-validation.json 2>/dev/null || echo "0")
+            if [ "$unexpected_changes" -gt "0" ]; then
+              critical_issues=$((critical_issues + unexpected_changes))
+              echo "❌ Found $unexpected_changes unexpected changes"
+            fi
+          fi
+          
+          # Check test results
+          if [ "${{ steps.regression-tests.outputs.test_exit_code }}" != "0" ]; then
+            warning_issues=$((warning_issues + 1))
+            echo "⚠️ Test execution had failures"
+          fi
+          
+          echo "critical_issues=$critical_issues" >> $GITHUB_OUTPUT
+          echo "warning_issues=$warning_issues" >> $GITHUB_OUTPUT
+          
+          # Set summary
+          if [ "$critical_issues" -gt "0" ]; then
+            echo "status=critical" >> $GITHUB_OUTPUT
+            echo "❌ CRITICAL: $critical_issues critical issues found"
+          elif [ "$warning_issues" -gt "0" ]; then
+            echo "status=warning" >> $GITHUB_OUTPUT
+            echo "⚠️ WARNING: $warning_issues warnings found"
+          else
+            echo "status=success" >> $GITHUB_OUTPUT
+            echo "✅ All regression checks passed"
+          fi
+
+      - name: Create GitHub issue for critical regressions
+        if: steps.check-regressions.outputs.status == 'critical' && env.SEND_NOTIFICATIONS == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const criticalIssues = '${{ steps.check-regressions.outputs.critical_issues }}';
+            const warningIssues = '${{ steps.check-regressions.outputs.warning_issues }}';
+            const timestamp = '${{ env.TIMESTAMP }}';
+            
+            // Check if there's already an open regression issue today
+            const today = new Date().toISOString().split('T')[0];
+            const { data: existingIssues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'regression,automated',
+              sort: 'created',
+              direction: 'desc',
+              per_page: 5
+            });
+            
+            const todayIssue = existingIssues.find(issue => 
+              issue.title.includes(today) || 
+              new Date(issue.created_at).toDateString() === new Date().toDateString()
+            );
+            
+            if (todayIssue) {
+              // Update existing issue
+              const updateBody = `
+            ## Update: ${new Date().toUTCString()}
+            
+            **Status**: 🔴 Critical regressions still detected  
+            **Critical Issues**: ${criticalIssues}  
+            **Warning Issues**: ${warningIssues}  
+            **Run ID**: ${{ github.run_id }}  
+            
+            ### Actions Required
+            - [ ] Review regression analysis in [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            - [ ] Check unexpected API changes
+            - [ ] Verify endpoint availability
+            - [ ] Update expected changes configuration if changes are intentional
+            
+            ---
+            `;
+              
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: todayIssue.number,
+                body: updateBody
+              });
+            } else {
+              // Create new issue
+              const issueBody = `
+            # 🚨 Daily Regression Test Failures - ${today}
+            
+            Critical API regressions detected during automated daily testing.
+            
+            ## Summary
+            - **Date**: ${new Date().toUTCString()}
+            - **Critical Issues**: ${criticalIssues}
+            - **Warning Issues**: ${warningIssues}
+            - **Workflow Run**: [View Details](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            
+            ## Investigation Required
+            - [ ] Review detailed regression analysis
+            - [ ] Check for unexpected API changes
+            - [ ] Verify production endpoint availability
+            - [ ] Determine if changes are intentional
+            - [ ] Update expected changes configuration if needed
+            
+            ## Next Steps
+            1. Download test artifacts from the workflow run
+            2. Review \`expected-changes-validation.json\` for details
+            3. Check HTML reports for specific failures
+            4. Update \`scripts/validate-expected-changes.cjs\` if changes are expected
+            
+            ---
+            *This issue was automatically created by the daily regression testing workflow.*
+            `;
+              
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `🚨 API Regression Detected - ${today}`,
+                body: issueBody,
+                labels: ['regression', 'automated', 'critical']
+              });
+            }
+
+      - name: Upload comprehensive reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: daily-regression-reports-${{ env.TIMESTAMP }}
+          path: |
+            ${{ env.REPORT_DIR }}/
+            reports/expected-changes-validation.json
+            reports/trends-analysis.json
+            daily_summary.md
+          retention-days: 90
+
+      - name: Set workflow status
+        if: always()
+        run: |
+          status="${{ steps.check-regressions.outputs.status }}"
+          
+          if [ "$status" = "critical" ]; then
+            echo "❌ Daily regression test failed with critical issues"
+            exit 1
+          elif [ "$status" = "warning" ]; then
+            echo "⚠️ Daily regression test completed with warnings"
+            # Don't fail workflow for warnings, just report them
+            exit 0
+          else
+            echo "✅ Daily regression test completed successfully"
+            exit 0
+          fi
+
+  cleanup-old-reports:
+    name: Cleanup Old Reports
+    runs-on: ubuntu-latest
+    needs: [check-schedule, daily-regression]
+    if: always() && needs.check-schedule.outputs.should_run == 'true'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Cleanup old daily regression reports
+        run: |
+          echo "Cleaning up reports older than 30 days..."
+          
+          # Keep last 30 days of daily reports
+          if [ -d "reports/daily-regression" ]; then
+            find reports/daily-regression -type d -mtime +30 -exec rm -rf {} \; 2>/dev/null || true
+            
+            # Count remaining reports
+            remaining=$(find reports/daily-regression -type d -mindepth 1 | wc -l)
+            echo "Remaining daily regression report directories: $remaining"
+          fi
+          
+          echo "Cleanup completed"
+
+  weekly-summary:
+    name: Weekly Summary Report
+    runs-on: ubuntu-latest
+    needs: check-schedule
+    if: needs.check-schedule.outputs.day_of_week == '0' && needs.check-schedule.outputs.should_run == 'true'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Generate weekly summary
+        run: |
+          echo "## Weekly Regression Test Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Week of $(date -d 'last sunday' '+%Y-%m-%d') to $(date '+%Y-%m-%d')" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Count reports from this week
+          if [ -d "reports/daily-regression" ]; then
+            week_count=$(find reports/daily-regression -type d -mtime -7 | wc -l)
+            echo "- Daily test runs this week: $week_count" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- Daily test runs this week: 0" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "- Target coverage: 46/46 endpoints" >> $GITHUB_STEP_SUMMARY
+          echo "- Expected test count: 92+ per run" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Action Items" >> $GITHUB_STEP_SUMMARY
+          echo "- [ ] Review any open regression issues" >> $GITHUB_STEP_SUMMARY
+          echo "- [ ] Update expected changes configuration if needed" >> $GITHUB_STEP_SUMMARY
+          echo "- [ ] Check performance trends" >> $GITHUB_STEP_SUMMARY

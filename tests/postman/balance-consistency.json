@@ -1,0 +1,136 @@
+{
+  "info": {
+    "name": "Balance Consistency Cross-Validation",
+    "description": "Validates that /api/v2/balance/ and /api/v2/src20/balance/ return consistent SRC-20 token data across environments",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "test_address",
+      "value": "bc1qay74nc2djs2g5acqp72eyvlqp3ku7sj97jft8y",
+      "type": "string"
+    },
+    {
+      "key": "test_token",
+      "value": "stamp",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Balance Consistency Check",
+      "item": [
+        {
+          "name": "Get General Balance",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test for successful response",
+                  "pm.test('General balance endpoint responds successfully', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Parse response and find STAMP token",
+                  "const response = pm.response.json();",
+                  "pm.test('Response has valid structure', function () {",
+                  "    pm.expect(response).to.have.property('data');",
+                  "    pm.expect(response.data).to.have.property('src20');",
+                  "    pm.expect(response.data.src20).to.be.an('array');",
+                  "});",
+                  "",
+                  "// Find and store STAMP token balance",
+                  "const stampToken = response.data.src20.find(token => token.tick === pm.variables.get('test_token'));",
+                  "pm.test('STAMP token found in general endpoint', function () {",
+                  "    pm.expect(stampToken).to.not.be.undefined;",
+                  "    pm.expect(stampToken).to.have.property('amt');",
+                  "});",
+                  "",
+                  "if (stampToken) {",
+                  "    pm.globals.set('general_balance', stampToken.amt);",
+                  "    console.log(`General endpoint STAMP balance: ${stampToken.amt}`);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/balance/{{test_address}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "balance", "{{test_address}}"]
+            }
+          }
+        },
+        {
+          "name": "Get SRC20 Specific Balance",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test for successful response",
+                  "pm.test('SRC20 balance endpoint responds successfully', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Parse response",
+                  "const response = pm.response.json();",
+                  "pm.test('SRC20 response has valid structure', function () {",
+                  "    pm.expect(response).to.have.property('data');",
+                  "    pm.expect(response.data).to.have.property('amt');",
+                  "});",
+                  "",
+                  "// Store SRC20 balance",
+                  "const src20Balance = response.data.amt;",
+                  "pm.globals.set('src20_balance', src20Balance);",
+                  "console.log(`SRC20 endpoint STAMP balance: ${src20Balance}`);",
+                  "",
+                  "// CRITICAL TEST: Compare with general endpoint",
+                  "const generalBalance = pm.globals.get('general_balance');",
+                  "pm.test('🔍 BALANCE CONSISTENCY: Both endpoints return identical STAMP amounts', function () {",
+                  "    pm.expect(src20Balance).to.equal(generalBalance, ",
+                  "        `MISMATCH DETECTED! General: ${generalBalance}, SRC20: ${src20Balance}`);",
+                  "});",
+                  "",
+                  "// Additional validation",
+                  "pm.test('Balance is a valid positive number', function () {",
+                  "    const amount = parseFloat(src20Balance);",
+                  "    pm.expect(amount).to.be.a('number');",
+                  "    pm.expect(amount).to.be.above(0);",
+                  "});",
+                  "",
+                  "// Log success",
+                  "if (src20Balance === generalBalance) {",
+                  "    console.log('✅ CONSISTENCY VERIFIED: Both endpoints return identical values');",
+                  "} else {",
+                  "    console.log('❌ DISCREPANCY DETECTED: Endpoints return different values!');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/src20/balance/{{test_address}}/{{test_token}}",
+              "host": ["{{base_url}}"],
+              "path": [
+                "api",
+                "v2",
+                "src20",
+                "balance",
+                "{{test_address}}",
+                "{{test_token}}"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

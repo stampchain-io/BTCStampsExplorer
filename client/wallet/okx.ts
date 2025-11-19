@@ -1,10 +1,16 @@
-import { signal } from "@preact/signals";
-import { walletContext } from "./wallet.ts";
-import { SignPSBTResult, Wallet } from "$types/index.d.ts";
+import {
+  checkWalletAvailability,
+  getGlobalWallets,
+  walletContext,
+} from "$client/wallet/wallet.ts";
+import {
+  handleWalletError,
+  parseConnectionError,
+} from "$client/wallet/walletHelper.ts";
 import { logger } from "$lib/utils/logger.ts";
-import { checkWalletAvailability, getGlobalWallets } from "./wallet.ts";
-import { handleWalletError } from "./walletHelper.ts";
-import type { BaseToast } from "$lib/utils/toastSignal.ts";
+import type { BaseToast } from "$lib/utils/ui/notifications/toastSignal.ts";
+import type { SignPSBTResult, Wallet } from "$types/index.d.ts";
+import { signal } from "@preact/signals";
 
 export const isOKXInstalled = signal<boolean>(false);
 
@@ -19,7 +25,7 @@ export const connectOKX = async (
         context: "connectOKX",
       });
       addToast(
-        "OKX wallet not detected. Please install the OKX extension.",
+        "OKX wallet not detected.\nPlease install the OKX extension.",
         "error",
       );
       return;
@@ -27,20 +33,19 @@ export const connectOKX = async (
     await okx.bitcoin.requestAccounts();
     await handleAccountsChanged();
     logger.info("ui", {
-      message: "Successfully connected to OKX wallet",
+      message: "Successfully connected to OKX wallet.",
       context: "connectOKX",
     });
-    addToast("Successfully connected to OKX wallet", "success");
+    addToast("Successfully connected to OKX wallet.", "success");
   } catch (error: unknown) {
+    const errorMessage = parseConnectionError(error);
     logger.error("ui", {
-      message: "Failed to connect to OKX wallet",
+      message: "Failed to connect to OKX wallet.",
       context: "connectOKX",
-      error: error instanceof Error ? error.message : String(error),
+      error: errorMessage,
     });
     addToast(
-      `Failed to connect to OKX wallet: ${
-        error instanceof Error ? error.message : "Unknown error"
-      }`,
+      `Failed to connect to OKX wallet.\n${errorMessage}`,
       "error",
     );
   }
@@ -89,7 +94,7 @@ const handleAccountsChanged = async () => {
       balanceInfo,
     });
 
-    const _wallet: Wallet = {
+    const wallet: Wallet = {
       address,
       accounts,
       publicKey,
@@ -98,6 +103,7 @@ const handleAccountsChanged = async () => {
         unconfirmed: balanceInfo.unconfirmed,
         total: balanceInfo.total,
       },
+      addressType: "p2wpkh", // Default address type for OKX
       network: "mainnet",
       provider: "okx",
       stampBalance: [],
@@ -106,10 +112,10 @@ const handleAccountsChanged = async () => {
     logger.info("ui", {
       message: "Updated wallet information",
       context: "handleAccountsChanged",
-      wallet: _wallet,
+      wallet: wallet,
     });
 
-    walletContext.updateWallet(_wallet);
+    walletContext.updateWallet(wallet);
   } catch (error: unknown) {
     logger.error("ui", {
       message: "Error fetching account from OKX wallet",

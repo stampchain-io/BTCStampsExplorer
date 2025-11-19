@@ -1,21 +1,21 @@
 /* ===== ARTICLES OVERVIEW COMPONENT ===== */
-import { gapGrid } from "$layout";
-import { ARTICLE_LINKS } from "$components/section/howto/data.ts"; // needs direct import - cannot use "$howto"
 import { Button } from "$button";
-import { headingGreyLDLink, subtitleGrey, text, titleGreyDL } from "$text";
+import { ARTICLE_LINKS } from "$components/section/howto/data.ts"; // needs direct import - cannot use "$howto"
+import { bodyArticle, containerGap } from "$layout";
+import { headingGreyLDLink, subtitleGrey, text, titleGreyLD } from "$text";
 
 /* ===== COMPONENT ===== */
 export function ArticlesOverview() {
   /* ===== COMPONENT RENDER ===== */
   return (
-    <section>
+    <section class={bodyArticle}>
       {/* ===== SECTION TITLE ===== */}
-      <h1 class={titleGreyDL}>
+      <h1 class={titleGreyLD}>
         KEEP READING
       </h1>
 
       {/* ===== CONTENT GRID ===== */}
-      <div class={`flex flex-col tablet:flex-row ${gapGrid}`}>
+      <div class={`flex flex-col tablet:flex-row ${containerGap}`}>
         {/* ===== HOW-TO ARTICLES LIST ===== */}
         <div class="w-full tablet:w-2/3">
           <h2 class={subtitleGrey}>HOW-TO</h2>
@@ -41,8 +41,8 @@ export function ArticlesOverview() {
             stuff you never thought you needed to know.
           </p>
           {/* ===== FAQ BUTTON ===== */}
-          <div class="w-full flex justify-end mt-1">
-            <Button variant="outline" color="grey" size="md" href="/faq">
+          <div class="w-full flex justify-start tablet:justify-end">
+            <Button variant="outline" color="grey" size="mdR" href="/faq">
               FAQ
             </Button>
           </div>

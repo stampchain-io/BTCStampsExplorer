@@ -1,6 +1,4 @@
-import { assert, assertEquals } from "@std/assert";
 import {
-  AUDIO_FILE_IMAGE,
   BIG_LIMIT,
   BLOCK_TABLE,
   BLOCKCHAIN_API_BASE_URL,
@@ -13,11 +11,8 @@ import {
   DEFAULT_LIMIT,
   DEFAULT_PAGE_SIZE,
   DEFAULT_WALLET_CONNECTORS,
-  ERROR_IMAGE,
-  LIBRARY_FILE_IMAGE,
   MAX_XCP_RETRIES,
   MEMPOOL_API_BASE_URL,
-  NOT_AVAILABLE_IMAGE,
   RATE_LIMIT_REQUESTS,
   RATE_LIMIT_WINDOW,
   ROOT_DOMAINS,
@@ -33,7 +28,8 @@ import {
   SUPPORTED_UNICODE_FROM_INDEXER_CODE,
   WALLET_PROVIDERS,
   type WalletProviderKey,
-} from "$lib/utils/constants.ts";
+} from "$constants";
+import { assert, assertEquals } from "@std/assert";
 
 Deno.test("constants - breakpoints", () => {
   assertEquals(BREAKPOINTS.desktop, 1440, "Desktop breakpoint");
@@ -139,30 +135,8 @@ Deno.test("constants - image paths", () => {
   );
   assertEquals(
     STAMPCHAIN_OPENGRAPH_IMAGE,
-    "/img/logo/stampchain-logo-opengraph.jpg",
+    "https://stampchain.io/img/logo/stampchain-logo-opengraph.jpg",
     "Stampchain OpenGraph image",
-  );
-
-  // Placeholder Images
-  assertEquals(
-    AUDIO_FILE_IMAGE,
-    "/img/placeholder/stamp-audio.svg",
-    "Audio file placeholder image",
-  );
-  assertEquals(
-    LIBRARY_FILE_IMAGE,
-    "/img/placeholder/stamp-library.svg",
-    "Library file placeholder image",
-  );
-  assertEquals(
-    NOT_AVAILABLE_IMAGE,
-    "/img/placeholder/stamp-no-image.svg",
-    "Not available placeholder image",
-  );
-  assertEquals(
-    ERROR_IMAGE,
-    "/img/placeholder/stamp-error.svg",
-    "Error placeholder image",
   );
 
   // Verify file extensions
@@ -175,18 +149,11 @@ Deno.test("constants - image paths", () => {
     STAMPCHAIN_OPENGRAPH_IMAGE.endsWith(".jpg"),
     "Stampchain OpenGraph is JPG",
   );
-  assert(AUDIO_FILE_IMAGE.endsWith(".svg"), "Audio placeholder is SVG");
-  assert(LIBRARY_FILE_IMAGE.endsWith(".svg"), "Library placeholder is SVG");
-  assert(
-    NOT_AVAILABLE_IMAGE.endsWith(".svg"),
-    "Not available placeholder is SVG",
-  );
-  assert(ERROR_IMAGE.endsWith(".svg"), "Error placeholder is SVG");
 });
 
 Deno.test("constants - carousel stamp IDs", () => {
   assertEquals(CAROUSEL_STAMP_IDS.length, 5, "Should have 5 carousel stamps");
-  assertEquals(CAROUSEL_STAMP_IDS, [42158, 336082, 57356, 368359, 74607]);
+  assertEquals(CAROUSEL_STAMP_IDS, [1185908, 1121162, 1040705, 932199, 897330]);
 
   // Verify all are positive numbers
   for (const id of CAROUSEL_STAMP_IDS) {
@@ -202,6 +169,7 @@ Deno.test("constants - wallet providers", () => {
     "okx",
     "tapwallet",
     "phantom",
+    "horizon",
   ];
 
   assertEquals(

@@ -1,16 +1,24 @@
 /* ===== HEADER COMPONENT ===== */
-import { useEffect, useRef, useState } from "preact/hooks";
-import { ConnectButton } from "$islands/button/ConnectButton.tsx";
-import { CloseIcon, GearIcon } from "$icon";
-import { HamburgerMenuIcon } from "$components/icon/MenuIcon.tsx"; // Import HamburgerMenuIcon directly to ensure it's available
+import { CloseIcon, Icon } from "$icon";
+import { MenuButton } from "$islands/button/MenuButton.tsx";
+import { SearchButton } from "$islands/button/SearchButton.tsx";
+import { ToolsButton } from "$islands/button/ToolsButton.tsx";
+import { WalletButton } from "$islands/button/WalletButton.tsx";
 import {
-  labelXs,
-  logoPurpleLDLink,
-  navLinkGrey,
-  navLinkGreyLD,
-  navLinkPurple,
-} from "$text";
+  glassmorphism,
+  glassmorphismOverlay,
+  transitionTransform,
+} from "$layout";
+import { useFees } from "$lib/hooks/useFees.ts";
 import { tooltipIcon } from "$notification";
+import {
+  navLinkGreyLD,
+  navLinkGreyLDActive,
+  navLinkPurple,
+  navLinkPurpleActive,
+} from "$text";
+import { createPortal } from "preact/compat";
+import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 
 /* ===== NAVIGATION LINK INTERFACE ===== */
 interface NavLink {
@@ -19,18 +27,9 @@ interface NavLink {
     tablet: string;
   };
   href?: string;
-  subLinks?: NavLink[];
 }
 
 /* ===== TOOLS CONFIGURATION ===== */
-const toolLinks = [
-  { title: "CREATE STAMP", href: "/tool/stamp/create" },
-  { title: "SEND STAMP", href: "/tool/stamp/send" },
-  { title: "DEPLOY TOKEN", href: "/tool/src20/deploy" },
-  { title: "MINT TOKEN", href: "/tool/src20/mint" },
-  { title: "TRANSFER TOKEN", href: "/tool/src20/transfer" },
-  { title: "REGISTER BITNAME", href: "/tool/src101/mint" },
-];
 
 /* ===== DESKTOP NAVIGATION CONFIGURATION ===== */
 const desktopNavLinks: NavLink[] = [
@@ -62,21 +61,6 @@ const desktopNavLinks: NavLink[] = [
     },
     href: "/explorer",
   },
-  {
-    title: {
-      default: "TOOLS",
-      tablet: "TOOLS",
-    },
-    href: "#",
-    subLinks: [
-      { title: "CREATE", href: "/tool/stamp/create" },
-      { title: "SEND", href: "/tool/stamp/send" },
-      { title: "DEPLOY", href: "/tool/src20/deploy" },
-      { title: "MINT", href: "/tool/src20/mint" },
-      { title: "TRANSFER", href: "/tool/src20/transfer" },
-      { title: "REGISTER", href: "/tool/src101/mint" },
-    ],
-  },
 ];
 
 /* ===== MOBILE NAVIGATION CONFIGURATION ===== */
@@ -103,13 +87,76 @@ const mobileNavLinks: NavLink[] = [
 export function Header() {
   const [open, setOpen] = useState(false);
   const [currentPath, setCurrentPath] = useState<string | null>(null);
-  const [toolsOpen, setToolsOpen] = useState(false);
+  const [drawerContent, setDrawerContent] = useState<
+    "menu" | "wallet" | "tools"
+  >("menu");
   // Add tooltip state for close button
   const [isCloseTooltipVisible, setIsCloseTooltipVisible] = useState(false);
   const [allowCloseTooltip, setAllowCloseTooltip] = useState(true);
   const [closeTooltipText, setCloseTooltipText] = useState("CLOSE");
   const closeTooltipTimeoutRef = useRef<number | null>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
+
+  // Centralized data fetching - starts immediately on page load
+  const { fees, loading: feesLoading } = useFees();
+  const [latestBlock, setLatestBlock] = useState(0);
+  const [healthLoading, setHealthLoading] = useState(true);
+
+  // Single atomic dropdown state
+  const [dropdownState, setDropdownState] = useState<{
+    active: "tools" | "wallet" | null;
+    toolsPos: { top: number; left: number } | null;
+    walletPos: { top: number; left: number } | null;
+  }>({
+    active: null,
+    toolsPos: null,
+    walletPos: null,
+  });
+  const toolsButtonRef = useRef<HTMLDivElement>(null);
+  const walletButtonRef = useRef<HTMLDivElement>(null);
+
+  // Hover delay timeout
+  const dropdownTimeoutRef = useRef<number | null>(null);
+
+  // Animation state for dropdowns
+  const [dropdownAnimation, setDropdownAnimation] = useState<{
+    tools: "enter" | "exit" | null;
+    wallet: "enter" | "exit" | null;
+  }>({
+    tools: null,
+    wallet: null,
+  });
+  const animationTimeoutRef = useRef<number | null>(null);
+
+  /* ===== HEALTH DATA FETCHING ===== */
+  useEffect(() => {
+    const fetchHealthData = async () => {
+      try {
+        const response = await fetch("/api/v2/health");
+        if (response.ok) {
+          const healthData = await response.json();
+          const blockHeight = healthData.services?.blockSync?.indexed || 0;
+          setLatestBlock(blockHeight);
+
+          if (blockHeight === 0) {
+            // Set -1 to indicate service is unavailable
+            setLatestBlock(-1);
+          }
+        } else {
+          // API failed, set -1 to indicate service is unavailable
+          setLatestBlock(-1);
+        }
+      } catch (err) {
+        console.error("Health data fetch error:", err);
+        // Set -1 to indicate service is unavailable
+        setLatestBlock(-1);
+      } finally {
+        setHealthLoading(false);
+      }
+    };
+
+    fetchHealthData();
+  }, []);
 
   // Scroll lock
   useEffect(() => {
@@ -205,6 +252,15 @@ export function Header() {
     };
   }, []);
 
+  // Add cleanup effect for animation timeout
+  useEffect(() => {
+    return () => {
+      if (animationTimeoutRef.current) {
+        globalThis.clearTimeout(animationTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const handleCloseMouseEnter = () => {
     if (allowCloseTooltip) {
       setCloseTooltipText("CLOSE");
@@ -231,44 +287,223 @@ export function Header() {
   const closeMenu = () => {
     // Close menu by updating state
     setOpen(false);
-
-    // Close tools section after drawer is closed
-    setTimeout(() => {
-      if (toolsOpen) {
-        setToolsOpen(false);
-      }
-    }, 500); // Wait for drawer close animation to finish
   };
 
-  /* ===== MENU TOGGLE FUNCTION ===== */
-  const toggleMenu = () => {
-    if (open) {
-      closeMenu();
-    } else {
-      setOpen(true);
-      if (toolsOpen) {
-        setToolsOpen(false);
-      }
-    }
+  /* ===== DRAWER CONTROL FUNCTIONS ===== */
+  const openDrawer = (content: "menu" | "wallet" | "tools") => {
+    setDrawerContent(content);
+    setOpen(true);
   };
 
-  /* ===== TOOLS TOGGLE FUNCTION ===== */
-  const toggleTools = () => {
-    if (toolsOpen) {
-      // When closing
-      setTimeout(() => {
-        setToolsOpen(false);
-      }, 250);
-    } else {
-      // When opening
-      setTimeout(() => {
-        setToolsOpen(true);
-      }, 250);
+  /* ===== PORTAL DROPDOWN HANDLERS ===== */
+  const handleToolsMouseEnter = () => {
+    // Clear any existing timeout
+    if (dropdownTimeoutRef.current) {
+      clearTimeout(dropdownTimeoutRef.current);
+      dropdownTimeoutRef.current = null;
     }
+    if (animationTimeoutRef.current) {
+      clearTimeout(animationTimeoutRef.current);
+      animationTimeoutRef.current = null;
+    }
+
+    // Calculate tools position
+    let toolsPos = null;
+    if (toolsButtonRef.current) {
+      const rect = toolsButtonRef.current.getBoundingClientRect();
+      toolsPos = {
+        top: rect.bottom + 12,
+        left: rect.right - 550 + 61,
+      };
+    }
+
+    // Atomic state update
+    const newState = {
+      active: "tools" as const,
+      toolsPos: toolsPos,
+      walletPos: null,
+    };
+    setDropdownState(newState);
+
+    // Trigger enter animation
+    setDropdownAnimation({
+      tools: "enter",
+      wallet: null,
+    });
+  };
+
+  const handleWalletMouseEnter = () => {
+    // Clear any existing timeout
+    if (dropdownTimeoutRef.current) {
+      clearTimeout(dropdownTimeoutRef.current);
+      dropdownTimeoutRef.current = null;
+    }
+    if (animationTimeoutRef.current) {
+      clearTimeout(animationTimeoutRef.current);
+      animationTimeoutRef.current = null;
+    }
+
+    // Calculate wallet position
+    let walletPos = null;
+    if (walletButtonRef.current) {
+      const rect = walletButtonRef.current.getBoundingClientRect();
+      walletPos = {
+        top: rect.bottom + 12,
+        left: rect.right - 150 - 15,
+      };
+    }
+
+    // Atomic state update - all changes happen together
+    const newState = {
+      active: "wallet" as const,
+      toolsPos: null,
+      walletPos: walletPos,
+    };
+    setDropdownState(newState);
+
+    // Trigger enter animation
+    setDropdownAnimation({
+      tools: null,
+      wallet: "enter",
+    });
+  };
+
+  const handleDropdownMouseLeave = () => {
+    // Set timeout to start exit animation
+    dropdownTimeoutRef.current = setTimeout(() => {
+      // Trigger exit animation based on what's currently active
+      if (dropdownState.active === "tools") {
+        setDropdownAnimation((prev) => ({ ...prev, tools: "exit" }));
+      } else if (dropdownState.active === "wallet") {
+        setDropdownAnimation((prev) => ({ ...prev, wallet: "exit" }));
+      }
+
+      // Close dropdown after animation completes (200ms animation duration)
+      animationTimeoutRef.current = setTimeout(() => {
+        setDropdownState({
+          active: null,
+          toolsPos: null,
+          walletPos: null,
+        });
+        setDropdownAnimation({
+          tools: null,
+          wallet: null,
+        });
+      }, 200);
+    }, 300); // 300ms hover delay that works as a bridge between icon button and dropdown
+  };
+
+  // Create a single wallet button instance to prevent state pollution
+  const walletButtonInstance = useMemo(() => {
+    return WalletButton({
+      onOpenDrawer: openDrawer,
+      onCloseDrawer: closeMenu,
+    });
+  }, [openDrawer, closeMenu]);
+
+  // Create centralized data object to pass to ToolsButton
+  const toolsData = useMemo(() => ({
+    btcPrice: fees?.btcPrice || 0,
+    recommendedFee: fees?.recommendedFee || 6,
+    latestBlock,
+    isLoading: feesLoading || healthLoading,
+    // Priority fees from mempool.space
+    lowFee: fees?.hourFee || 0,
+    mediumFee: fees?.halfHourFee || 0,
+    highFee: fees?.fastestFee || 0,
+  }), [fees, latestBlock, feesLoading, healthLoading]);
+
+  /* ===== DRAWER RENDERER ===== */
+  const renderDrawer = (type: "menu" | "wallet" | "tools") => {
+    const isActive = drawerContent === type && open;
+
+    const getContent = () => {
+      switch (type) {
+        case "menu":
+          return MenuButton({ onOpenDrawer: openDrawer }).drawer;
+        case "wallet":
+          return WalletButton({
+            onOpenDrawer: openDrawer,
+            onCloseDrawer: closeMenu,
+          }).drawer;
+        case "tools":
+          return ToolsButton({ onOpenDrawer: openDrawer, data: toolsData })
+            .drawer;
+      }
+    };
+
+    const getTitle = () => {
+      switch (type) {
+        case "menu":
+          return "STAMPCHAIN";
+        case "wallet":
+          return "WALLET";
+        case "tools":
+          return "TOOLS";
+      }
+    };
+
+    return (
+      <div
+        ref={drawerContent === type ? drawerRef : null}
+        class={`flex tablet:hidden flex-col justify-between
+          fixed top-0 right-0 left-auto w-full min-[420px]:w-[340px] h-[100dvh] z-30
+          min-[420px]:rounded-l-3xl min-[420px]:border-l-[1px]
+          min-[420px]:border-l-color-border/75 min-[420px]:shadow-[-12px_0_12px_-6px_rgba(8,7,8,0.75)]
+          ${glassmorphismOverlay} ${transitionTransform} transition-transform will-change-transform
+          overflow-y-auto overflow-x-hidden scrollbar-background-overlay
+          ${isActive ? "translate-x-0" : "translate-x-full"}`}
+        style="transition-timing-function: cubic-bezier(0.46,0.03,0.52,0.96);"
+        id={`navbar-collapse-${type}`}
+      >
+        <div class="flex flex-col h-full">
+          <div class="pt-[29px] mobileLg:pt-[41px] px-9">
+            <div class="flex flex-row justify-between items-center w-full">
+              <div class="relative">
+                <div
+                  class={`${tooltipIcon} ${
+                    isCloseTooltipVisible ? "opacity-100" : "opacity-0"
+                  }`}
+                >
+                  {closeTooltipText}
+                </div>
+                <CloseIcon
+                  size="md"
+                  weight="bold"
+                  color="greyLight"
+                  onClick={() => {
+                    if (open) {
+                      closeMenu();
+                    }
+                  }}
+                  onMouseEnter={handleCloseMouseEnter}
+                  onMouseLeave={handleCloseMouseLeave}
+                  aria-label="Close menu"
+                />
+              </div>
+              <h6
+                class={`font-extrabold text-2xl color-grey-gradientLD tracking-wide select-none inline-block w-fit ${
+                  type === "menu" ? "italic font-black pr-0.5" : ""
+                }`}
+              >
+                {getTitle()}
+              </h6>
+            </div>
+          </div>
+          {getContent()}
+        </div>
+      </div>
+    );
   };
 
   /* ===== NAVIGATION LINKS RENDERER ===== */
   const renderNavLinks = (isMobile = false) => {
+    const isActive = (href?: string) => {
+      if (!href || !currentPath) return false;
+      const hrefPath = href.split("?")[0];
+      return currentPath === hrefPath || currentPath.startsWith(`${hrefPath}/`);
+    };
+
     // Choose which navigation links to use based on mobile/desktop view
     const filteredNavLinks = isMobile ? mobileNavLinks : desktopNavLinks;
 
@@ -283,377 +518,228 @@ export function Header() {
               ? link.title
               : link.title.default}
             // Base styles for nav container with conditional mobile styling
-            className={`relative group ${isMobile ? "" : ""}`}
+            class={`relative group ${isMobile ? "" : "mb-[2px]"}`}
           >
             {/* Main navigation link */}
             <a
-              // Only set href if there are no sublinks (dropdown items)
-              href={link.subLinks ? undefined : link.href}
+              href={link.href}
               // Click handler for navigation
               onClick={() => {
-                if (link.subLinks) return; // Don't navigate if has dropdown
                 if (!link?.href) return; // Don't navigate if no href
-                toggleMenu(); // Close mobile menu if open
+                if (open) {
+                  closeMenu(); // Never open; only close if already open
+                }
                 setCurrentPath(link?.href ? link?.href : null); // Update current path
               }}
               // Complex conditional styling for mobile/desktop
-              className={`inline-block w-full ${
+              class={`inline-block w-full ${
                 isMobile
-                  ? ` ${
-                    // Title of menus
-                    link.subLinks ? navLinkGrey : navLinkGreyLD}`
+                  ? isActive(link.href) ? navLinkGreyLDActive : navLinkGreyLD
+                  : isActive(link.href)
+                  ? navLinkPurpleActive
                   : navLinkPurple
               }`}
             >
-              {/* Hidden tablet version of title */}
-              <span className="tablet:block min-[1180px]:hidden">
-                {typeof link.title === "string"
-                  ? link.title
-                  : link.title.tablet}
-              </span>
-              {/* Visible default version of title */}
-              <span className="hidden min-[1180px]:block">
-                {typeof link.title === "string"
-                  ? link.title
-                  : link.title.default}
-              </span>
-            </a>
-
-            {/* Dropdown menu - only rendered on desktop */}
-            {link.subLinks && (
-              isMobile ? null : (
-                // Check if this is the TOOLS dropdown for special 3-column layout
-                (typeof link.title === "string"
-                    ? link.title
-                    : link.title.default) === "TOOLS"
+              {/* Responsive text label */}
+              {typeof link.title === "string" ? link.title : (
+                isMobile
                   ? (
-                    <div className="hidden group-hover:flex absolute top-full -right-[18px] min-w-[300px] z-10 pt-1 pb-3.5 px-[18px] whitespace-nowrap backdrop-blur-md bg-gradient-to-b from-transparent to-[#000000]/30 rounded-b-lg">
-                      <div className="grid grid-cols-3 gap-4 w-full">
-                        {/* Column 1: Left aligned - Stamp tools */}
-                        <div className="flex flex-col space-y-1 text-left">
-                          <h6
-                            class={labelXs}
-                          >
-                            STAMPS
-                          </h6>
-                          {link.subLinks?.filter((subLink) =>
-                            subLink.href === "/tool/stamp/create" ||
-                            subLink.href === "/tool/stamp/send"
-                          ).map((subLink) => (
-                            <a
-                              key={subLink.href}
-                              href={subLink.href}
-                              onClick={() => {
-                                setCurrentPath(
-                                  subLink?.href ? subLink?.href : null,
-                                );
-                              }}
-                              className={`font-semibold text-xs transition-colors duration-300 ${
-                                currentPath === subLink.href
-                                  ? "text-sm text-stamp-purple-bright hover:text-stamp-purple"
-                                  : "text-sm text-stamp-purple hover:text-stamp-purple-bright"
-                              }`}
-                            >
-                              {subLink.title}
-                            </a>
-                          ))}
-                        </div>
-
-                        {/* Column 2: Center aligned - Token tools */}
-                        <div className="flex flex-col space-y-1 text-center">
-                          <h6
-                            class={labelXs}
-                          >
-                            TOKENS
-                          </h6>
-                          {link.subLinks?.filter((subLink) =>
-                            subLink.href === "/tool/src20/deploy" ||
-                            subLink.href === "/tool/src20/mint" ||
-                            subLink.href === "/tool/src20/transfer"
-                          ).map((subLink) => (
-                            <a
-                              key={subLink.href}
-                              href={subLink.href}
-                              onClick={() => {
-                                setCurrentPath(
-                                  subLink?.href ? subLink?.href : null,
-                                );
-                              }}
-                              className={`font-semibold text-xs transition-colors duration-300 ${
-                                currentPath === subLink.href
-                                  ? "text-sm text-stamp-purple-bright hover:text-stamp-purple"
-                                  : "text-sm text-stamp-purple hover:text-stamp-purple-bright"
-                              }`}
-                            >
-                              {subLink.title}
-                            </a>
-                          ))}
-                        </div>
-
-                        {/* Column 3: Right aligned - Register */}
-                        <div className="flex flex-col space-y-1 text-right">
-                          <h6
-                            class={labelXs}
-                          >
-                            BITNAME
-                          </h6>
-                          {link.subLinks?.filter((subLink) =>
-                            subLink.href === "/tool/src101/mint"
-                          ).map((subLink) => (
-                            <a
-                              key={subLink.href}
-                              href={subLink.href}
-                              onClick={() => {
-                                setCurrentPath(
-                                  subLink?.href ? subLink?.href : null,
-                                );
-                              }}
-                              className={`font-semibold text-xs transition-colors duration-300 ${
-                                currentPath === subLink.href
-                                  ? "text-sm text-stamp-purple-bright hover:text-stamp-purple"
-                                  : "text-sm text-stamp-purple hover:text-stamp-purple-bright"
-                              }`}
-                            >
-                              {subLink.title}
-                            </a>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
+                    // On mobile drawer, always show default label
+                    <span>{link.title.default}</span>
                   )
                   : (
-                    // Default single-column layout for other dropdowns
-                    <div className="hidden group-hover:flex flex-col absolute top-full left-1/2 -translate-x-1/2 min-w-[calc(100%+36px)] z-10 pt-1 pb-3.5 px-[18px] space-y-1 whitespace-nowrap backdrop-blur-md bg-gradient-to-b from-transparent to-[#000000]/30 rounded-b-lg">
-                      {link.subLinks?.map((subLink) => (
-                        <a
-                          key={subLink.href}
-                          href={subLink.href}
-                          onClick={() => {
-                            setCurrentPath(
-                              subLink?.href ? subLink?.href : null,
-                            );
-                          }}
-                          className={`font-semibold text-center text-xs transition-colors duration-300 ${
-                            currentPath === subLink.href
-                              ? "text-sm text-stamp-purple-bright hover:text-stamp-purple"
-                              : "text-sm text-stamp-purple hover:text-stamp-purple-bright"
-                          }`}
-                        >
-                          {subLink.title}
-                        </a>
-                      ))}
-                    </div>
+                    // Show abbreviated label initially and default label at tablet - 1024px
+                    <>
+                      <span class="hidden tablet:inline">
+                        {link.title.default}
+                      </span>
+                      <span class="inline tablet:hidden">
+                        {link.title.tablet}
+                      </span>
+                    </>
                   )
-              )
-            )}
+              )}
+            </a>
           </div>
         ))}
       </>
     );
   };
 
+  /* ===== LOGO ICON ===== */
+  const logoIcon = (
+    <Icon
+      type="iconButton"
+      name="stampchain"
+      size="lg"
+      weight="light"
+      color="purpleLight"
+      className="ml-1.5"
+      href="/home"
+      f-partial="/home"
+      onClick={() => setCurrentPath("home")}
+    />
+  );
+
   /* ===== COMPONENT RENDER ===== */
   return (
-    <header className="tablet:flex justify-between items-center max-w-desktop w-full mx-auto
-     px-gutter-mobile mobileLg:px-gutter-tablet tablet:px-gutter-desktop 
-     pt-6 pb-9 mobileLg:pt-9 mobileLg:pb-14">
-      {/* ===== LOGO AND MOBILE MENU TOGGLE BUTTON ===== */}
-      <div className="flex justify-between items-center w-full ">
-        <a
-          href="/home"
-          f-partial="/home"
-          onClick={() => setCurrentPath("home")}
-          className={`${logoPurpleLDLink} pr-3`}
+    <header class="mobileLg:flex justify-between items-center max-w-desktop w-full mx-auto
+     px-gutter-mobile mobileLg:px-gutter-tablet tablet:px-gutter-desktop
+     pt-6 pb-9 mobileLg:pt-9 tablet:pb-14">
+      {/* ===== MOBILE NAVIGATION ===== */}
+      <div class="mobileLg:hidden flex justify-between items-center w-full relative z-header">
+        {/* Left: Logo Icon */}
+        {logoIcon}
+
+        {/* Right: Search, Tools, Wallet and Menu Buttons */}
+        <div
+          class={`flex items-center gap-7 py-1.5 px-5 ${glassmorphism} !rounded-full`}
         >
-          STAMPCHAIN
-        </a>
-        <div className="tablet:hidden block relative -ml-1">
-          <HamburgerMenuIcon isOpen={open} onClick={toggleMenu} />
+          <SearchButton />
+          {ToolsButton({ onOpenDrawer: openDrawer, data: toolsData }).icon}
+          {WalletButton({
+            onOpenDrawer: openDrawer,
+            onCloseDrawer: closeMenu,
+          }).icon}
+          {MenuButton({ onOpenDrawer: openDrawer }).icon}
         </div>
       </div>
 
-      {/* ===== DESKTOP NAVIGATION ===== */}
-      <div className="hidden tablet:flex justify-between items-center gap-6">
-        {renderNavLinks()}
-        <ConnectButton />
-      </div>
+      {/* ===== TABLET/DESKTOP NAVIGATION ===== */}
+      <div class="hidden mobileLg:flex justify-between items-center w-full relative z-header">
+        {/* Left: Logo Icon */}
+        {logoIcon}
 
-      {/* ===== MOBILE NAVIGATION DRAWER ===== */}
-      <div
-        ref={drawerRef}
-        className={`flex tablet:hidden flex-col justify-between
-           fixed top-0 right-0 left-auto w-full min-[420px]:w-[340px] h-screen z-30
-           bg-gradient-to-b from-[#0e0014]/60 via-[#000000]/80 to-[#000000]/100 backdrop-blur-md
-           shadow-[-12px_0_12px_-6px_rgba(0,0,0,0.5)]
-           transition-transform duration-500 ease-in-out will-change-transform
-           overflow-y-auto overflow-x-hidden scrollbar-black
-           ${open ? "translate-x-0" : "translate-x-full"}`}
-        id="navbar-collapse"
-      >
-        {/* ===== MOBILE MENU LINKS AND CONNECT BUTTON ===== */}
-        <div className="flex flex-col h-full">
-          <div className="flex pt-[30px] px-9">
-            <div className="relative">
-              <div
-                className={`${tooltipIcon} ${
-                  isCloseTooltipVisible ? "opacity-100" : "opacity-0"
-                }`}
-              >
-                {closeTooltipText}
-              </div>
-              <CloseIcon
-                size="sm"
-                weight="bold"
-                color="greyGradient"
-                onClick={() => {
-                  if (open) {
-                    closeMenu();
-                  }
-                }}
-                onMouseEnter={handleCloseMouseEnter}
-                onMouseLeave={handleCloseMouseLeave}
-                aria-label="Close menu"
-              />
+        {/* Right: Navigation Links and Icon Buttons */}
+        <div
+          class={`flex items-center gap-7 tablet:gap-6 py-1.5 tablet:py-1 px-5 tablet:px-4 ${glassmorphism} !rounded-full`}
+        >
+          {/* Navigation Links */}
+          {renderNavLinks()}
+
+          {/* Icon Buttons */}
+          <div class="flex items-center gap-5">
+            <div class="relative group">
+              <SearchButton />
             </div>
-          </div>
-          <div className="flex flex-col flex-1 items-start p-9 gap-5">
-            {renderNavLinks(true)}
-          </div>
-
-          <div className="flex flex-col w-full sticky bottom-0
-          bg-gradient-to-b from-[#000000]/80 to-[#000000]/100
-          shadow-[0_-12px_12px_-6px_rgba(0,0,0,1)]">
-            {/* Tools section with gear icon */}
-            <div className="flex w-full justify-between pt-3 pb-8 px-9">
-              <div className="flex justify-start items-end -ml-1">
-                <GearIcon
-                  size="md"
-                  weight="normal"
-                  color="greyLogicDL"
-                  isOpen={toolsOpen}
-                  onToggle={toggleTools}
-                />
-              </div>
-              <div
-                className={`flex justify-end items-center transition-opacity duration-100
-                  ${toolsOpen ? "opacity-0" : "opacity-100"}`}
-                style={{
-                  transitionDelay: toolsOpen ? "0ms" : "425ms",
-                }}
-              >
-                <ConnectButton />
-              </div>
-            </div>
-
             <div
-              className={`overflow-hidden transition-all duration-500 ease-in-out
-                ${
-                toolsOpen ? "max-h-[260px] opacity-100" : "max-h-0 opacity-0"
-              }`}
+              class="relative group"
+              ref={toolsButtonRef}
+              onMouseEnter={handleToolsMouseEnter}
+              onMouseLeave={handleDropdownMouseLeave}
             >
-              <div className="flex flex-col pl-9 pb-9 gap-3">
-                {toolLinks.map((link) => (
-                  <a
-                    key={link.href}
-                    href={link.href}
-                    onClick={() => {
-                      toggleMenu();
-                      setCurrentPath(link.href);
-                    }}
-                    className={`font-bold transition-colors duration-300 ${
-                      currentPath === link.href
-                        ? "text-base text-stamp-grey-darker hover:text-stamp-grey-light"
-                        : "text-base text-stamp-grey-light hover:!text-stamp-grey-darker"
-                    }`}
-                  >
-                    {link.title}
-                  </a>
-                ))}
-              </div>
+              {ToolsButton({ onOpenDrawer: openDrawer, data: toolsData }).icon}
+            </div>
+            <div
+              class="relative group"
+              ref={walletButtonRef}
+              onMouseEnter={handleWalletMouseEnter}
+              onMouseLeave={handleDropdownMouseLeave}
+            >
+              {WalletButton({
+                onOpenDrawer: openDrawer,
+                onCloseDrawer: closeMenu,
+              }).icon}
             </div>
           </div>
         </div>
       </div>
+
+      {/* ===== MOBILE NAVIGATION DRAWERS ===== */}
+      {renderDrawer("menu")}
+      {renderDrawer("tools")}
+      {renderDrawer("wallet")}
+
+      {/* ===== PORTAL DROPDOWNS ===== */}
+      {(() => {
+        const shouldRenderTools = (dropdownState.active === "tools" ||
+          dropdownAnimation.tools === "exit") &&
+          dropdownState.toolsPos;
+
+        const animationClass = dropdownAnimation.tools === "enter"
+          ? "dropdown-enter"
+          : dropdownAnimation.tools === "exit"
+          ? "dropdown-exit"
+          : "";
+
+        return shouldRenderTools && createPortal(
+          <div
+            class={`hidden tablet:block fixed z-dropdown w-[550px] py-3.5 px-5 whitespace-nowrap ${glassmorphism} ${animationClass}`}
+            style={{
+              top: `${dropdownState.toolsPos!.top}px`,
+              left: `${dropdownState.toolsPos!.left}px`,
+            }}
+            onMouseEnter={() => {
+              // Clear timeout when hovering over dropdown
+              if (dropdownTimeoutRef.current) {
+                clearTimeout(dropdownTimeoutRef.current);
+                dropdownTimeoutRef.current = null;
+              }
+              if (animationTimeoutRef.current) {
+                clearTimeout(animationTimeoutRef.current);
+                animationTimeoutRef.current = null;
+              }
+              // If we were exiting, switch back to enter
+              if (dropdownAnimation.tools === "exit") {
+                setDropdownAnimation((prev) => ({ ...prev, tools: "enter" }));
+              }
+            }}
+            onMouseLeave={handleDropdownMouseLeave}
+          >
+            <div class="grid grid-cols-5 w-full">
+              {ToolsButton({ onOpenDrawer: openDrawer, data: toolsData })
+                .dropdown}
+            </div>
+          </div>,
+          document.body,
+        );
+      })()}
+
+      {(() => {
+        const shouldRenderWallet = (dropdownState.active === "wallet" ||
+          dropdownAnimation.wallet === "exit") &&
+          dropdownState.walletPos &&
+          walletButtonInstance.isConnected;
+
+        const animationClass = dropdownAnimation.wallet === "enter"
+          ? "dropdown-enter"
+          : dropdownAnimation.wallet === "exit"
+          ? "dropdown-exit"
+          : "";
+
+        return shouldRenderWallet && createPortal(
+          <div
+            class={`hidden tablet:block fixed z-dropdown min-w-[150px] py-3.5 px-5 justify-end whitespace-nowrap ${glassmorphism} ${animationClass}`}
+            style={{
+              top: `${dropdownState.walletPos!.top}px`,
+              left: `${dropdownState.walletPos!.left}px`,
+            }}
+            onMouseEnter={() => {
+              // Clear timeout when hovering over dropdown
+              if (dropdownTimeoutRef.current) {
+                clearTimeout(dropdownTimeoutRef.current);
+                dropdownTimeoutRef.current = null;
+              }
+              if (animationTimeoutRef.current) {
+                clearTimeout(animationTimeoutRef.current);
+                animationTimeoutRef.current = null;
+              }
+              // If we were exiting, switch back to enter
+              if (dropdownAnimation.wallet === "exit") {
+                setDropdownAnimation((prev) => ({ ...prev, wallet: "enter" }));
+              }
+            }}
+            onMouseLeave={handleDropdownMouseLeave}
+          >
+            {(() => {
+              return walletButtonInstance.isConnected
+                ? walletButtonInstance.dropdown
+                : null;
+            })()}
+          </div>,
+          document.body,
+        );
+      })()}
     </header>
   );
 }
-
-/* ===== DROPDOWN SUBLINKS FOR MOBILE AND DESKTOP ===== */
-/*
-<div
-// Different dropdown styles for mobile/desktop
-className={`${
-  isMobile
-    ? "hidden group-hover:flex flex-col z-10 w-full pt-3 gap-2 group"
-    : "hidden group-hover:flex flex-col absolute top-full left-1/2 -translate-x-1/2 min-w-[calc(100%+36px)] z-10 pt-1 pb-3.5 px-[18px] space-y-1 whitespace-nowrap backdrop-blur-md bg-gradient-to-b from-transparent to-[#000000]/30 rounded-b-lg"
-}`}
-> */
-/*
-Map through dropdown items
-{link.subLinks?.map((subLink) => (
-  <a
-    key={subLink.href}
-    href={subLink.href}
-    onClick={() => {
-      toggleMenu(); // Close mobile menu
-      setCurrentPath(subLink?.href ? subLink?.href : null); // Update current path
-    }}
-    // Complex conditional styling for active/inactive states
-    className={`font-bold transition-colors duration-300 ${
-      isMobile
-        ? currentPath === subLink.href
-          ? "text-base text-stamp-grey-light hover:text-stamp-grey py-1"
-          : "text-base text-stamp-grey hover:text-stamp-grey-light py-1"
-        : currentPath === subLink.href
-        ? "text-sm text-stamp-purple-bright hover:text-stamp-purple"
-        : "text-sm text-stamp-purple hover:text-stamp-purple-bright"
-    }`}
-  >
-    {subLink.title}
-  </a>
-))}
-</div>
-  */
-
-/* ===== OLD DESKTOP MENUS===== */
-/*
-const desktopNavLinks: NavLink[] = [
-  {
-    title: {
-      default: "ART STAMPS",
-      tablet: "STAMPS",
-    },
-    href: "#",
-    subLinks: [
-      { title: "ALL", href: "/stamp?type=classic" },
-      { title: "COLLECTIONS", href: "/collection" },
-      { title: "STAMPING", href: "/tool/stamp/stamping" },
-      { title: "TRANSFER", href: "/tool/stamp/transfer" },
-    ],
-  },
-  {
-    title: {
-      default: "SRC-20 TOKENS",
-      tablet: "TOKENS",
-    },
-    href: "#",
-    subLinks: [
-      { title: "ALL", href: "/src20" },
-      { title: "TRENDING", href: "/src20?type=trending" },
-      { title: "DEPLOY", href: "/tool/src20/deploy" },
-      { title: "MINT", href: "/tool/src20/mint" },
-      { title: "TRANSFER", href: "/tool/src20/transfer" },
-    ],
-  },
-  {
-    title: {
-      default: "BITNAME DOMAINS",
-      tablet: "BITNAME",
-    },
-    href: "#",
-    subLinks: [
-      { title: "REGISTER", href: "/tool/src101/mint" },
-    ],
-  },
-];
-*/

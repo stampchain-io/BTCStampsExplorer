@@ -1,11 +1,17 @@
-import { signal } from "@preact/signals";
-import { walletContext } from "./wallet.ts";
-import { SignPSBTResult, Wallet } from "$types/index.d.ts";
+import {
+  checkWalletAvailability,
+  getGlobalWallets,
+  walletContext,
+} from "$client/wallet/wallet.ts";
+import {
+  handleWalletError,
+  parseConnectionError,
+} from "$client/wallet/walletHelper.ts";
+import { getBTCBalanceInfo } from "$lib/utils/data/processing/balanceUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
-import { checkWalletAvailability, getGlobalWallets } from "./wallet.ts";
-import { handleWalletError } from "./walletHelper.ts";
-import { getBTCBalanceInfo } from "$lib/utils/balanceUtils.ts";
-import type { BaseToast } from "$lib/utils/toastSignal.ts";
+import type { BaseToast } from "$lib/utils/ui/notifications/toastSignal.ts";
+import type { SignPSBTResult, Wallet } from "$types/index.d.ts";
+import { signal } from "@preact/signals";
 
 interface LeatherAddress {
   symbol: "BTC" | "STX";
@@ -34,7 +40,7 @@ export const connectLeather = async (addToast: AddToastFunction) => {
         message: "Leather wallet not detected",
       });
       addToast(
-        "Leather wallet not detected. Please install the Leather extension.",
+        "Leather wallet not detected.\nPlease install the Leather extension.",
         "error",
       );
       return;
@@ -64,17 +70,16 @@ export const connectLeather = async (addToast: AddToastFunction) => {
     logger.info("ui", {
       message: "Successfully connected to Leather wallet",
     });
-    addToast("Successfully connected to Leather wallet", "success");
+    addToast("Successfully connected to Leather wallet.", "success");
   } catch (error) {
+    const errorMessage = parseConnectionError(error);
     logger.error("ui", {
       message: "Error connecting to Leather wallet",
-      error: error instanceof Error ? error.message : String(error),
+      error: errorMessage,
       details: error,
     });
     addToast(
-      `Failed to connect to Leather wallet: ${
-        error instanceof Error ? error.message : "Unknown error"
-      }`,
+      `Failed to connect to Leather wallet.\n${errorMessage}`,
       "error",
     );
   }
@@ -98,24 +103,24 @@ export const handleConnect = async (addresses: LeatherAddress[]) => {
 
   console.log(`Using BTC address type: ${btcAddress.type}`);
 
-  const _wallet = {} as Wallet;
-  _wallet.address = btcAddress.address;
-  _wallet.accounts = [btcAddress.address];
-  _wallet.publicKey = btcAddress.publicKey;
-  _wallet.addressType = btcAddress.type || "p2wpkh";
+  const wallet = {} as Wallet;
+  wallet.address = btcAddress.address;
+  wallet.accounts = [btcAddress.address];
+  wallet.publicKey = btcAddress.publicKey;
+  wallet.addressType = btcAddress.type || "p2wpkh";
 
   const addressInfo = await getBTCBalanceInfo(btcAddress.address);
 
-  _wallet.btcBalance = {
+  wallet.btcBalance = {
     confirmed: addressInfo?.balance ?? 0,
     unconfirmed: addressInfo?.unconfirmedBalance ?? 0,
     total: (addressInfo?.balance ?? 0) + (addressInfo?.unconfirmedBalance ?? 0),
   };
 
-  _wallet.network = "mainnet";
-  _wallet.provider = "leather";
+  wallet.network = "mainnet";
+  wallet.provider = "leather";
 
-  walletContext.updateWallet(_wallet);
+  walletContext.updateWallet(wallet);
 };
 
 const signMessage = async (message: string) => {

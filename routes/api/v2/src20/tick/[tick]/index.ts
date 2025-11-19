@@ -1,14 +1,16 @@
+import type { PaginatedTickResponseBody } from "$types/api.d.ts";
+// Unused imports removed: BlockHandlerContext, IdentHandlerContext, TickHandlerContext, SRC20TrxRequestParams
 import { Handlers } from "$fresh/server.ts";
-import { PaginatedTickResponseBody } from "$globals";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
+import { isValidSrc20Tick } from "$lib/utils/typeGuards.ts";
+import { getPaginationParams } from "$lib/utils/data/pagination/paginationUtils.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
-import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
-import { BigFloat } from "bigfloat/mod.ts";
 import {
   DEFAULT_PAGINATION,
   validateRequiredParams,
   validateSortParam,
-} from "$server/services/routeValidationService.ts";
+} from "$server/services/validation/routeValidationService.ts";
+import { BigFloat } from "bigfloat/mod.ts";
 
 export const handler: Handlers = {
   async GET(req, ctx) {
@@ -19,6 +21,16 @@ export const handler: Handlers = {
       const paramsValidation = validateRequiredParams({ tick });
       if (!paramsValidation.isValid) {
         return paramsValidation.error!;
+      }
+
+      // Decode the tick parameter first
+      const decodedTick = decodeURIComponent(String(tick));
+
+      // Validate SRC20 tick format
+      if (!isValidSrc20Tick(decodedTick)) {
+        return ApiResponseUtil.badRequest(
+          `Invalid SRC20 tick format: ${decodedTick}. Must be 1-5 characters, alphanumeric and special characters allowed.`,
+        );
       }
 
       const url = new URL(req.url);
@@ -32,6 +44,10 @@ export const handler: Handlers = {
       const { limit, page } = pagination;
       const opParam = url.searchParams.get("op") || undefined;
 
+      // 🚀 NEW V2.3 PARAMETER
+      const includeProgress =
+        url.searchParams.get("includeProgress") === "true";
+
       // Validate sort parameter
       const sortValidation = validateSortParam(url, "sortBy");
       if (!sortValidation.isValid) {
@@ -40,11 +56,13 @@ export const handler: Handlers = {
 
       // Ensure required pagination values
       const params = {
-        tick: decodeURIComponent(String(tick)),
+        tick: decodedTick,
         limit: limit || DEFAULT_PAGINATION.limit,
         page: page || DEFAULT_PAGINATION.page,
-        op: opParam,
-        sortBy: sortValidation.data,
+        ...(opParam && { op: opParam }),
+        ...(sortValidation.data && { sortBy: sortValidation.data }),
+        // 🚀 NEW V2.3 PARAMETER
+        ...(includeProgress && { includeProgress }),
       };
 
       // Fetch data using controller
@@ -62,6 +80,31 @@ export const handler: Handlers = {
         amt: tx.amt ? new BigFloat(tx.amt).toString() : null,
       }));
 
+      // Handle mint_status conversion
+      const formattedMintStatus = mint_status
+        ? {
+          max_supply: mint_status.max_supply?.toString() ?? "0",
+          total_minted: mint_status.total_minted?.toString() ?? "0",
+          total_mints: mint_status.total_mints ?? 0,
+          progress: mint_status.progress ?? "0",
+          decimals: mint_status.decimals ?? 0,
+          limit: mint_status.limit
+            ? (typeof mint_status.limit === "string"
+              ? mint_status.limit
+              : String(mint_status.limit))
+            : "0",
+          tx_hash: mint_status.tx_hash ?? "", // Add required tx_hash field
+        }
+        : {
+          max_supply: "0",
+          total_minted: "0",
+          total_mints: 0,
+          progress: "0",
+          decimals: 0,
+          limit: "0",
+          tx_hash: "", // Add required tx_hash field for default case
+        };
+
       // Construct response body
       const body: PaginatedTickResponseBody = {
         page: page || DEFAULT_PAGINATION.page,
@@ -69,21 +112,14 @@ export const handler: Handlers = {
         total,
         totalPages,
         last_block: lastBlock,
-        mint_status: mint_status
-          ? {
-            ...mint_status,
-            max_supply: mint_status.max_supply?.toString() ?? null,
-            total_minted: mint_status.total_minted?.toString() ?? null,
-            limit: mint_status.limit ?? null,
-          }
-          : null,
+        mint_status: formattedMintStatus,
         data,
       };
 
-      return ResponseUtil.success(body);
+      return ApiResponseUtil.success(body);
     } catch (error) {
       console.error(error);
-      return ResponseUtil.internalError(error, "Error processing request");
+      return ApiResponseUtil.internalError(error, "Error processing request");
     }
   },
 };

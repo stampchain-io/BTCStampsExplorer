@@ -1,11 +1,14 @@
 /* ===== EXPLORER PAGE ===== */
-import { StampPageProps } from "$globals";
-import { Handlers } from "$fresh/server.ts";
-import { StampController } from "$server/controller/stampController.ts";
-import { CollectionService } from "$server/services/collectionService.ts";
-import { STAMP_FILTER_TYPES, STAMP_TYPES, SUBPROTOCOLS } from "$globals";
 import { ExplorerContent } from "$content";
+import { Handlers } from "$fresh/server.ts";
+import { body } from "$layout";
+import type { SUBPROTOCOLS } from "$types/base.d.ts";
+
+import type { StampFilterType, StampType } from "$constants";
 import { ExplorerHeader } from "$header";
+import { StampController } from "$server/controller/stampController.ts";
+import { CollectionService } from "$server/services/core/collectionService.ts";
+import type { StampPageProps } from "$types/api.d.ts";
 
 /* ===== CONSTANTS ===== */
 const MAX_PAGE_SIZE = 120;
@@ -32,20 +35,26 @@ export const handler: Handlers = {
       const filterBy = url.searchParams.get("filterBy")
         ? (url.searchParams.get("filterBy")?.split(",").filter(
           Boolean,
-        ) as STAMP_FILTER_TYPES[])
+        ) as StampFilterType[])
         : [];
-      const selectedTab =
-        (url.searchParams.get("type") || "all") as STAMP_TYPES;
+      const selectedTab = (url.searchParams.get("type") || "all") as StampType;
       const page = parseInt(url.searchParams.get("page") || "1");
       const requestedPageSize = parseInt(url.searchParams.get("limit") || "60");
       const page_size = Math.min(requestedPageSize, MAX_PAGE_SIZE);
-      const recentSales = url.searchParams.get("recentSales") === "true";
+      // Handle both new view parameter and legacy recentSales parameter
+      const viewMode = url.searchParams.get("view") || "all";
+      const recentSales = viewMode === "sales" ||
+        url.searchParams.get("recentSales") === "true";
 
       /* ===== DATA FETCHING ===== */
       let result;
       if (recentSales) {
-        // Handle recent sales view
-        result = await StampController.getRecentSales(page, page_size);
+        // Handle recent sales view with type filtering
+        // Note: SRC-20 excluded from recent sales as they're handled separately in the app
+        const recentSalesType = selectedTab === "src20" ? "all" : selectedTab;
+        result = await StampController.getRecentSales(page, page_size, {
+          type: recentSalesType === "all" ? "all" : recentSalesType,
+        });
       } else {
         // Handle regular stamp listing
         const ident: SUBPROTOCOLS[] = [];
@@ -105,8 +114,8 @@ export function ExplorerPage(props: StampPageProps) {
     stamps,
     page,
     totalPages,
-    filterBy,
-    sortBy,
+    filterBy: _filterBy,
+    sortBy: _sortBy,
     selectedTab,
   } = props.data;
 
@@ -115,12 +124,13 @@ export function ExplorerPage(props: StampPageProps) {
 
   /* ===== RENDER ===== */
   return (
-    <div class="w-full" f-client-nav data-partial="/explorer">
+    <div
+      class={body}
+      f-client-nav
+      data-partial="/explorer"
+    >
       {/* Header Component with Filter Controls */}
-      <ExplorerHeader
-        filterBy={filterBy as STAMP_FILTER_TYPES[]}
-        sortBy={sortBy}
-      />
+      <ExplorerHeader />
 
       {/* Main Content with Pagination */}
       <ExplorerContent
@@ -129,11 +139,7 @@ export function ExplorerPage(props: StampPageProps) {
         pagination={{
           page,
           totalPages,
-          onPageChange: (newPage: number) => {
-            const url = new URL(globalThis.location.href);
-            url.searchParams.set("page", newPage.toString());
-            globalThis.location.href = url.toString();
-          },
+          // Remove onPageChange to let PaginationButtons component use its built-in Fresh navigation
         }}
       />
     </div>

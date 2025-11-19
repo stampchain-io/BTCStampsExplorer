@@ -1,5 +1,5 @@
-import { RATE_LIMIT_REQUESTS, RATE_LIMIT_WINDOW } from "$lib/utils/constants.ts";
-import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import { RATE_LIMIT_REQUESTS, RATE_LIMIT_WINDOW } from "$constants";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { logger } from "$lib/utils/logger.ts";
 
 interface RateLimitEntry {
@@ -29,11 +29,11 @@ export class RateLimitMiddleware {
    * @param window - Time window in milliseconds (default from constants)
    * @returns Response if rate limited, null if allowed
    */
-  static async checkRateLimit(
+  static checkRateLimit(
     req: Request,
     limit: number = RATE_LIMIT_REQUESTS,
     window: number = RATE_LIMIT_WINDOW,
-  ): Promise<Response | null> {
+  ): Response | null {
     // Get client identifier (IP address with fallbacks)
     const clientIP = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
                      req.headers.get("x-real-ip") ||
@@ -153,7 +153,7 @@ export class RateLimitMiddleware {
    * @param req - The incoming request
    * @returns Response if rate limited, null if allowed
    */
-  static async checkFeeRateLimit(req: Request): Promise<Response | null> {
+  static checkFeeRateLimit(req: Request): Response | null {
     // More restrictive limits for fee endpoints (60 requests per minute)
     const FEE_RATE_LIMIT = 60;
     const FEE_RATE_WINDOW = 60 * 1000; // 1 minute

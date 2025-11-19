@@ -1,7 +1,7 @@
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import { XcpManager } from "$server/services/xcpService.ts";
-import { RouteType } from "$server/services/cacheService.ts";
-import { validateRequiredParams } from "$server/services/routeValidationService.ts";
+import { ResponseUtil } from "$lib/utils/api/responses/responseUtil.ts";
+import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
+import { RouteType } from "$server/services/infrastructure/cacheService.ts";
+import { validateRequiredParams } from "$server/services/validation/routeValidationService.ts";
 
 export async function handler(req: Request): Promise<Response> {
   try {
@@ -10,21 +10,24 @@ export async function handler(req: Request): Promise<Response> {
     const utxoOnly = url.searchParams.get("utxoOnly") === "true";
 
     // Validate required parameters
-    const paramsValidation = validateRequiredParams({ address });
+    const paramsValidation = validateRequiredParams({
+      address: address || undefined,
+    });
     if (!paramsValidation.isValid) {
       return paramsValidation.error!;
     }
 
-    const { balances: stampBalance } = await XcpManager.getXcpBalancesByAddress(
-      address,
-      undefined, // cpid
-      utxoOnly,
-      { type: "all" },
-    );
+    const { balances: stampBalance } = await CounterpartyApiManager
+      .getXcpBalancesByAddress(
+        address!,
+        undefined, // cpid
+        utxoOnly,
+        { type: "all" },
+      );
 
     return ResponseUtil.success(
       { stampBalance },
-      { routeType: RouteType.DYNAMIC },
+      { routeType: RouteType.BALANCE },
     );
   } catch (error) {
     return ResponseUtil.internalError(error, "Error retrieving stamps balance");

@@ -1,6 +1,22 @@
 {
   "recommendations": [
     "denoland.vscode-deno",
-    "bradlc.vscode-tailwindcss"
+    "bradlc.vscode-tailwindcss",
+    "ms-vscode.vscode-typescript-next",
+    "esbenp.prettier-vscode",
+    "ms-vscode.vscode-json",
+    "redhat.vscode-yaml",
+    "ms-vscode.hexeditor",
+    "eamodio.gitlens",
+    "ms-vscode.vscode-markdown",
+    "yzhang.markdown-all-in-one",
+    "streetsidesoftware.code-spell-checker",
+    "ms-vscode.test-adapter-converter",
+    "ms-vscode.vscode-github-issue-notebooks"
+  ],
+  "unwantedRecommendations": [
+    "ms-vscode.vscode-typescript",
+    "ms-vscode.vscode-javascript",
+    "hookyqr.beautify",
   ]
 }

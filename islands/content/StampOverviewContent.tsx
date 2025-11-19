@@ -1,20 +1,12 @@
 /* ===== STAMP OVERVIEW CONTENT COMPONENT ===== */
-import { StampRow } from "$globals";
+import { PaginationButtons } from "$button";
 import { StampCard } from "$card";
-import { Pagination } from "$islands/datacontrol/Pagination.tsx";
+import { containerBackground } from "$layout";
+import { valueDark } from "$text";
+import type { StampRow } from "$types/stamp.d.ts";
+import type { StampOverviewContentProps } from "$types/ui.d.ts";
 
 /* ===== TYPES ===== */
-interface StampOverviewContentProps {
-  stamps: StampRow[];
-  isRecentSales?: boolean;
-  fromPage?: string;
-  pagination?: {
-    page: number;
-    totalPages: number;
-    prefix?: string;
-    onPageChange?: (page: number) => void;
-  };
-}
 
 /* ===== COMPONENT ===== */
 export function StampOverviewContent({
@@ -25,37 +17,40 @@ export function StampOverviewContent({
 }: StampOverviewContentProps) {
   /* ===== RENDER ===== */
   return (
-    <div class="w-full pt-3 pb-12 mobileMd:pt-6 mobileMd:pb-[72px]">
+    <div class="w-full pt-3 mobileMd:pt-6">
       {stamps?.length
         ? (
           <div class="grid grid-cols-2 mobileMd:grid-cols-3 mobileLg:grid-cols-4 tablet:grid-cols-5 desktop:grid-cols-6 gap-3 mobileMd:gap-6 w-full auto-rows-fr">
-            {stamps.map((stamp) => (
+            {stamps.map((stamp: StampRow, index: number) => (
               <StampCard
                 key={isRecentSales && stamp.sale_data
-                  ? `${stamp.tx_hash}-${stamp.sale_data.tx_hash}`
+                  ? `${stamp.tx_hash}-${stamp.sale_data.tx_hash}-${stamp.sale_data.block_index}-${index}`
                   : stamp.tx_hash}
                 stamp={stamp}
                 isRecentSale={isRecentSales}
                 showDetails
                 variant="grey"
-                fromPage={fromPage}
+                {...(fromPage && { fromPage })}
               />
             ))}
           </div>
         )
         : (
-          <div class="w-full flex-col flex justify-center items-center">
+          <div
+            class={`${containerBackground} flex-col flex justify-center items-center`}
+          >
             <img src="/img/ic_content.svg" width="160" />
-            <span class="text-stamp-grey">NO STAMPS</span>
+            <h6 class={`py-2 ${valueDark} text-center`}>NO STAMPS</h6>
           </div>
         )}
       {pagination && pagination.totalPages > 1 && (
-        <div class="mt-12 mobileLg:mt-[72px]">
-          <Pagination
+        <div class="mt-7.5 tablet:mt-10">
+          <PaginationButtons
             page={pagination.page}
             totalPages={pagination.totalPages}
-            prefix={pagination.prefix}
-            onPageChange={pagination.onPageChange}
+            {...(pagination.prefix && { prefix: pagination.prefix })}
+            {...(pagination.onPageChange &&
+              { onPageChange: pagination.onPageChange })}
           />
         </div>
       )}

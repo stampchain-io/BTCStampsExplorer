@@ -1,7 +1,8 @@
 /* ===== ERROR 404 PAGE ===== */
-import { Head } from "$fresh/runtime.ts";
-import { subtitleGrey, titleGreyLD } from "$text";
 import { Button } from "$button";
+import { Head } from "$fresh/runtime.ts";
+import { containerBackground } from "$layout";
+import { subtitleGrey, titleGreyLD } from "$text";
 
 /* ===== PAGE COMPONENT ===== */
 export default function Error404Page() {
@@ -12,13 +13,15 @@ export default function Error404Page() {
         <title>404 - Page not found</title>
       </Head>
 
-      <div class="flex flex-col justify-center items-center mx-auto my-auto">
+      <div
+        class={`${containerBackground} mobileMd:max-w-[420px] mobileMd:mx-auto justify-center items-center`}
+      >
         <div class="flex flex-col justify-center items-center">
           <div class={titleGreyLD}>WHOOPS</div>
           <div class={subtitleGrey}>SOMETHING WENT WRONG</div>
         </div>
         <img
-          class="w-[240px] tablet:w-[280px] mt-1 mb-3 pixelart"
+          class="w-[240px] mobileMd:w-[300px] mobileLg:w-[280px] tablet:w-[260px] mt-3 mb-5"
           src="/img/placeholder/broken.png"
           alt="Bitcoin Stamps"
         />
@@ -27,7 +30,7 @@ export default function Error404Page() {
           <Button
             variant="outline"
             color="grey"
-            size="md"
+            size="mdR"
             href="javascript:history.back()"
           >
             GO BACK
@@ -35,7 +38,7 @@ export default function Error404Page() {
           <Button
             variant="flat"
             color="grey"
-            size="md"
+            size="mdR"
             href="/home"
             target="_top"
           >

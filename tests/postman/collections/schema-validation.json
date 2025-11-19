@@ -1,0 +1,191 @@
+{
+  "info": {
+    "name": "BTC Stamps Explorer API - Schema Validation Tests",
+    "description": "Critical schema validation tests that prevent API breaking changes from reaching production",
+    "_postman_id": "schema-validation-tests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "variable": [
+    {
+      "key": "test_address",
+      "value": "bc1qay74nc2djs2g5acqp72eyvlqp3ku7sj97jft8y",
+      "type": "string"
+    },
+    {
+      "key": "test_src20_tick",
+      "value": "STAMP",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Single Object Response Tests",
+      "item": [
+        {
+          "name": "SRC20 Balance by Address/Tick - Schema Validation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// CRITICAL: This test prevents API breaking changes",
+                  "pm.test('Response status is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is valid JSON', function () {",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "const jsonData = pm.response.json();",
+                  "",
+                  "// SCHEMA VALIDATION: Src20BalanceResponseBody",
+                  "pm.test('Response follows Src20BalanceResponseBody schema', function () {",
+                  "    pm.expect(jsonData).to.be.an('object');",
+                  "    pm.expect(jsonData).to.have.property('last_block');",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData.last_block).to.be.a('number');",
+                  "});",
+                  "",
+                  "// CRITICAL: Data must be a single object, NOT an array",
+                  "pm.test('CRITICAL: data is single SRC20Balance object (not array)', function () {",
+                  "    pm.expect(jsonData.data).to.be.an('object', 'REGRESSION: data field returned as array instead of single object - this breaks the schema contract');",
+                  "    pm.expect(Array.isArray(jsonData.data)).to.be.false;",
+                  "});",
+                  "",
+                  "// CRITICAL: Must NOT have pagination fields",
+                  "pm.test('CRITICAL: Response has NO pagination (single object endpoint)', function () {",
+                  "    pm.expect(jsonData).to.not.have.property('page', 'REGRESSION: Single balance endpoint should not have pagination');",
+                  "    pm.expect(jsonData).to.not.have.property('limit', 'REGRESSION: Single balance endpoint should not have pagination');",
+                  "    pm.expect(jsonData).to.not.have.property('total', 'REGRESSION: Single balance endpoint should not have pagination');",
+                  "    pm.expect(jsonData).to.not.have.property('totalPages', 'REGRESSION: Single balance endpoint should not have pagination');",
+                  "});",
+                  "",
+                  "// Validate SRC20Balance object structure if data exists",
+                  "pm.test('SRC20Balance object structure (when data exists)', function () {",
+                  "    if (jsonData.data && typeof jsonData.data === 'object' && Object.keys(jsonData.data).length > 0) {",
+                  "        const balance = jsonData.data;",
+                  "        // Check for typical balance fields (may vary based on data availability)",
+                  "        if (balance.tick) {",
+                  "            pm.expect(balance.tick).to.be.a('string');",
+                  "        }",
+                  "        if (balance.amt) {",
+                  "            pm.expect(balance.amt).to.be.a('string');",
+                  "        }",
+                  "        console.log('✅ Balance data found:', balance);",
+                  "    } else {",
+                  "        console.log('ℹ️  No balance data for this address/tick combination');",
+                  "        pm.test.skip('No balance data to validate');",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v2/src20/balance/{{test_address}}/{{test_src20_tick}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src20",
+                "balance",
+                "{{test_address}}",
+                "{{test_src20_tick}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Paginated Response Tests",
+      "item": [
+        {
+          "name": "SRC20 Balance by Address - Schema Validation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// CRITICAL: This test validates paginated endpoints",
+                  "pm.test('Response status is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is valid JSON', function () {",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "const jsonData = pm.response.json();",
+                  "",
+                  "// SCHEMA VALIDATION: PaginatedSrc20BalanceResponseBody",
+                  "pm.test('Response follows PaginatedSrc20BalanceResponseBody schema', function () {",
+                  "    pm.expect(jsonData).to.be.an('object');",
+                  "    pm.expect(jsonData).to.have.property('last_block');",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData.last_block).to.be.a('number');",
+                  "});",
+                  "",
+                  "// CRITICAL: Data must be an array of objects",
+                  "pm.test('CRITICAL: data is array of SRC20Balance objects', function () {",
+                  "    pm.expect(jsonData.data).to.be.an('array', 'Paginated endpoint must return array');",
+                  "    pm.expect(Array.isArray(jsonData.data)).to.be.true;",
+                  "});",
+                  "",
+                  "// CRITICAL: Must HAVE pagination fields",
+                  "pm.test('CRITICAL: Response HAS pagination (paginated endpoint)', function () {",
+                  "    pm.expect(jsonData).to.have.property('page');",
+                  "    pm.expect(jsonData).to.have.property('limit');",
+                  "    pm.expect(jsonData).to.have.property('total');",
+                  "    pm.expect(jsonData).to.have.property('totalPages');",
+                  "    pm.expect(jsonData.page).to.be.a('number');",
+                  "    pm.expect(jsonData.limit).to.be.a('number');",
+                  "    pm.expect(jsonData.total).to.be.a('number');",
+                  "    pm.expect(jsonData.totalPages).to.be.a('number');",
+                  "    console.log('✅ Pagination fields validated:', {page: jsonData.page, limit: jsonData.limit, total: jsonData.total, totalPages: jsonData.totalPages});",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v2/src20/balance/{{test_address}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src20",
+                "balance",
+                "{{test_address}}"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,21 +1,5 @@
-import { JSX } from "preact";
+import type { InputFieldProps } from "$types/ui.d.ts";
 import { inputField } from "$form";
-interface InputFieldProps {
-  type: string;
-  placeholder?: string;
-  value: string;
-  onChange?: (e: JSX.TargetedEvent<HTMLInputElement, Event>) => void;
-  onInput?: (e: JSX.TargetedEvent<HTMLInputElement, Event>) => void;
-  error?: string;
-  inputMode?: "text" | "numeric";
-  pattern?: string;
-  maxLength?: number;
-  minLength?: number;
-  disabled?: boolean;
-  textAlign?: "left" | "center" | "right";
-  isUppercase?: boolean;
-  class?: string;
-}
 
 export function InputField({
   type,
@@ -28,6 +12,8 @@ export function InputField({
   pattern,
   maxLength,
   minLength,
+  min,
+  step,
   disabled = false,
   textAlign = "left",
   isUppercase = false,
@@ -48,6 +34,8 @@ export function InputField({
         pattern={pattern}
         maxLength={maxLength}
         minLength={minLength}
+        min={min}
+        step={step}
         disabled={disabled}
         style={{ textAlign }}
       />

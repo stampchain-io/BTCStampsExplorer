@@ -1,27 +1,30 @@
 /* ===== STAMP IMAGE COMPONENT ===== */
 /* @baba-update audio icon size (custom) - 780*/
-import { useEffect, useRef, useState } from "preact/hooks";
-import { VNode } from "preact";
-import { StampRow } from "$globals";
-import { getStampImageSrc, handleImageError } from "$lib/utils/imageUtils.ts";
-import {
-  AUDIO_FILE_IMAGE,
-  LIBRARY_FILE_IMAGE,
-  NOT_AVAILABLE_IMAGE,
-} from "$lib/utils/constants.ts";
+
+import { Icon, LoadingIcon, PlaceholderImage } from "$icon";
 import TextContentIsland from "$islands/content/stampDetailContent/StampTextContent.tsx";
 import PreviewCodeModal from "$islands/modal/PreviewCodeModal.tsx";
 import PreviewImageModal from "$islands/modal/PreviewImageModal.tsx";
-import { logger } from "$lib/utils/logger.ts";
-import { tooltipIcon } from "$notification";
 import { openModal } from "$islands/modal/states.ts";
-import { Icon, LoadingIcon } from "$icon";
-import { body, containerDetailImage, gapSectionSlim } from "$layout";
+import {
+  body,
+  containerDetailImage,
+  containerGap,
+  glassmorphism,
+} from "$layout";
+import {
+  getStampImageSrc,
+  handleImageError,
+} from "$lib/utils/ui/media/imageUtils.ts";
+import { tooltipIcon } from "$notification";
+import type { StampRow } from "$types/stamp.d.ts";
+import { VNode } from "preact";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== RIGHT PANEL SUBCOMPONENT ===== */
 function RightPanel(
   { stamp, toggleCodeModal, toggleFullScreenModal, showCodeButton }: {
-    stamp: StampRow;
+    stamp?: StampRow;
     toggleCodeModal: () => void;
     toggleFullScreenModal: () => void;
     showCodeButton: boolean;
@@ -77,6 +80,11 @@ function RightPanel(
       }
     };
   }, []);
+
+  // Early return if stamp is undefined
+  if (!stamp) {
+    return null;
+  }
 
   /* ===== SHARING CONFIGURATION ===== */
   const url = `https://stampchain.io/stamp/${stamp.stamp}`;
@@ -265,8 +273,8 @@ function RightPanel(
 
   /* ===== RENDER ===== */
   return (
-    <div className={`${containerDetailImage} flex justify-between`}>
-      <div className="flex gap-[18px] tablet:gap-3">
+    <div className={`${containerDetailImage} !py-4 px-5 flex justify-between`}>
+      <div className="flex gap-5 tablet:gap-3.5">
         <div
           ref={copyButtonRef}
           class="relative"
@@ -275,10 +283,11 @@ function RightPanel(
         >
           <Icon
             type="iconButton"
-            name="copy"
+            name="copyLink"
             weight="normal"
-            size="mdR"
-            color="grey"
+            size="custom"
+            color="greyLight"
+            className="w-[29px] h-[29px] tablet:w-[25px] tablet:h-[25px]"
             onClick={copyLink}
           />
           <div
@@ -295,29 +304,6 @@ function RightPanel(
           </div>
         </div>
         <div
-          ref={xButtonRef}
-          class="relative"
-          onMouseEnter={handleXMouseEnter}
-          onMouseLeave={handleXMouseLeave}
-        >
-          <Icon
-            type="iconButton"
-            name="twitter"
-            weight="normal"
-            size="mdR"
-            color="grey"
-            onClick={shareToX}
-            ariaLabel="Share on X"
-          />
-          <div
-            class={`${tooltipIcon} ${
-              isXTooltipVisible ? "opacity-100" : "opacity-0"
-            }`}
-          >
-            SHARE ON X
-          </div>
-        </div>
-        <div
           ref={shareButtonRef}
           class="relative"
           onMouseEnter={handleShareMouseEnter}
@@ -328,8 +314,8 @@ function RightPanel(
             name="share"
             weight="normal"
             size="custom"
-            color="grey"
-            className="w-[24px] h-[24px] tablet:w-6 tablet:h-6 mt-[1px]"
+            color="greyLight"
+            className="w-[29px] h-[29px] tablet:w-[25px] tablet:h-[25px]"
             onClick={shareContent}
             ariaLabel="Share content"
           />
@@ -341,8 +327,31 @@ function RightPanel(
             SHARE
           </div>
         </div>
+        <div
+          ref={xButtonRef}
+          class="relative"
+          onMouseEnter={handleXMouseEnter}
+          onMouseLeave={handleXMouseLeave}
+        >
+          <Icon
+            type="iconButton"
+            name="twitterImage"
+            weight="normal"
+            size="mdR"
+            color="greyLight"
+            onClick={shareToX}
+            ariaLabel="Share on X"
+          />
+          <div
+            class={`${tooltipIcon} ${
+              isXTooltipVisible ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            SHARE ON X
+          </div>
+        </div>
       </div>
-      <div className="flex gap-[18px] tablet:gap-3">
+      <div className="flex gap-5 tablet:gap-3.5">
         {showCodeButton && (
           <div
             ref={codeButtonRef}
@@ -355,7 +364,7 @@ function RightPanel(
               name="previewCode"
               weight="normal"
               size="mdR"
-              color="grey"
+              color="greyLight"
               onClick={() => {
                 setIsCodeTooltipVisible(false);
                 toggleCodeModal();
@@ -381,7 +390,7 @@ function RightPanel(
             name="previewImageRaw"
             weight="normal"
             size="mdR"
-            color="grey"
+            color="greyLight"
             onClick={() =>
               globalThis.open(
                 `/s/${stamp.cpid}`,
@@ -412,7 +421,7 @@ function RightPanel(
             name="previewImage"
             weight="normal"
             size="mdR"
-            color="grey"
+            color="greyLight"
             onClick={() => {
               setIsFullscreenTooltipVisible(false);
               toggleFullScreenModal();
@@ -434,17 +443,29 @@ function RightPanel(
 
 /* ===== MAIN STAMP IMAGE COMPONENT ===== */
 export function StampImage(
-  { stamp, className, flag }: {
-    stamp: StampRow;
+  { stamp, className, flag, containerClassName }: {
+    stamp?: StampRow;
     className?: string;
     flag?: boolean;
+    containerClassName?: string;
   },
 ) {
   /* ===== STATE & REFS ===== */
   const [loading, setLoading] = useState<boolean>(true);
   const imgScopeRef = useRef<HTMLDivElement | null>(null);
   const [transform, setTransform] = useState("");
-  const [src, setSrc] = useState("");
+  const [src, setSrc] = useState<string | undefined>(undefined);
+  const [htmlContent, setHtmlContent] = useState<string | null>(null);
+  const [validatedContent, setValidatedContent] = useState<VNode | null>(null);
+  const [isValidating, setIsValidating] = useState<boolean>(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const tooltipTimeoutRef = useRef<number | null>(null);
+  const copyTooltipTimeoutRef = useRef<number | null>(null);
+  const shareTooltipTimeoutRef = useRef<number | null>(null);
+  const codeTooltipTimeoutRef = useRef<number | null>(null);
+  const fullscreenTooltipTimeoutRef = useRef<number | null>(null);
+  const xTooltipTimeoutRef = useRef<number | null>(null);
 
   const updateTransform = () => {
     if (!imgScopeRef.current) return;
@@ -454,68 +475,17 @@ export function StampImage(
     );
   };
 
-  useEffect(() => {
-    // Set initial transform
-    updateTransform();
-
-    // Add event listener to handle window resize
-    globalThis.addEventListener("resize", updateTransform);
-
-    // Cleanup event listener on component unmount
-    return () => {
-      globalThis.removeEventListener("resize", updateTransform);
-    };
-  }, []);
-
-  const toggleFullScreenModal = () => {
-    const modalContent = (
-      <PreviewImageModal
-        src={src}
-        contentType={stamp.stamp_mimetype === "text/html"
-          ? "html"
-          : stamp.stamp_mimetype === "text/plain"
-          ? "text"
-          : stamp.stamp_mimetype?.startsWith("audio/")
-          ? "audio"
-          : "image"}
-      />
-    );
-    openModal(modalContent, "zoomInOut");
-  };
-
-  const fetchStampImage = async () => {
+  const fetchStampImage = () => {
+    if (!stamp) return;
     setLoading(true);
-    const res = await getStampImageSrc(stamp);
-    if (res) {
-      setSrc(res);
-    } else setSrc(NOT_AVAILABLE_IMAGE);
+    const res = getStampImageSrc(stamp);
+    setSrc(res ?? undefined);
     setLoading(false);
   };
 
-  useEffect(() => {
-    fetchStampImage().catch((error) => {
-      console.error("Error fetching stamp image:", error);
-      setLoading(false); // Ensure loading is set to false even on error
-    });
-  }, []);
-
-  const isHtml = stamp.stamp_mimetype === "text/html";
-  const isPlainText = stamp.stamp_mimetype === "text/plain";
-  const isAudio = stamp.stamp_mimetype?.startsWith("audio/");
-  const isLibraryFile = stamp.stamp_mimetype === "text/css" ||
-    stamp.stamp_mimetype === "text/javascript" ||
-    stamp.stamp_mimetype === "application/javascript" ||
-    stamp.stamp_mimetype === "application/gzip";
-
-  const [htmlContent, setHtmlContent] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (isHtml) {
-      fetchHtmlContent();
-    }
-  }, [stamp]);
-
   const fetchHtmlContent = async () => {
+    if (!stamp) return;
+
     try {
       // Use the API endpoint to get raw stamp content instead of the rendered webpage
       const response = await fetch(`/api/v2/stamps/${stamp.stamp}`);
@@ -544,157 +514,105 @@ export function StampImage(
     }
   };
 
-  const [validatedContent, setValidatedContent] = useState<VNode | null>(null);
-  const [isValidating, setIsValidating] = useState<boolean>(false);
+  const validateContent = async () => {
+    if (!stamp || stamp.stamp_mimetype !== "image/svg+xml" || !src) {
+      setIsValidating(false);
+      return;
+    }
 
-  useEffect(() => {
-    const validateContent = async () => {
-      if (stamp.stamp_mimetype === "image/svg+xml" && src) {
-        setIsValidating(true);
+    setIsValidating(true);
 
-        try {
-          // Fetch the SVG content
-          const response = await fetch(src);
-          if (!response.ok) {
-            throw new Error(`Failed to fetch SVG: ${response.status}`);
-          }
+    try {
+      // Fetch the SVG content
+      const response = await fetch(src);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch SVG: ${response.status}`);
+      }
 
-          const svgContent = await response.text();
+      const svgContent = await response.text();
 
-          // Check if SVG has external ordinals.com references
-          if (svgContent.includes("ordinals.com/content/")) {
-            // Rewrite external references to use our proxy
-            let rewrittenSVG = svgContent.replace(
-              /https:\/\/ordinals\.com\/content\/([^"'\s>]+)/g,
-              "/api/proxy/ordinals/$1",
-            );
+      // Check if SVG has external ordinals.com or arweave.net references
+      if (
+        svgContent.includes("ordinals.com/content/") ||
+        svgContent.includes("arweave.net/")
+      ) {
+        // Rewrite external references to use our proxy
+        let rewrittenSVG = svgContent.replace(
+          /https:\/\/ordinals\.com\/content\/([^"'\s>]+)/g,
+          "/api/proxy/ordinals/$1",
+        ).replace(
+          /https:\/\/arweave\.net\/([^"'\s>]+)/g,
+          "/api/proxy/arweave/$1",
+        );
 
-            // Ensure SVG fills container by removing fixed dimensions and adding proper styling
-            if (rewrittenSVG.includes("<svg")) {
-              // Remove width and height attributes
-              rewrittenSVG = rewrittenSVG.replace(
-                /<svg([^>]*)\s+width="([^"]*)"([^>]*)/,
-                "<svg$1$3",
-              ).replace(
-                /<svg([^>]*)\s+height="([^"]*)"([^>]*)/,
-                "<svg$1$3",
-              );
+        // Ensure SVG fills container by removing fixed dimensions and adding proper styling
+        if (rewrittenSVG.includes("<svg")) {
+          // Remove width and height attributes
+          rewrittenSVG = rewrittenSVG.replace(
+            /<svg([^>]*)\s+width="([^"]*)"([^>]*)/,
+            "<svg$1$3",
+          ).replace(
+            /<svg([^>]*)\s+height="([^"]*)"([^>]*)/,
+            "<svg$1$3",
+          );
 
-              // Add viewBox if not present (using the original dimensions)
-              if (!rewrittenSVG.includes("viewBox")) {
-                rewrittenSVG = rewrittenSVG.replace(
-                  /<svg([^>]*)>/,
-                  '<svg$1 viewBox="0 0 460 500">',
-                );
-              }
-
-              // Add responsive styling to fill container properly
-              rewrittenSVG = rewrittenSVG.replace(
-                /<svg([^>]*)>/,
-                '<svg$1 style="max-width: 100%; max-height: 100%; width: auto; height: auto; display: block;">',
-              );
-            }
-
-            setValidatedContent(
-              <div
-                className="max-w-none object-contain rounded pixelart stamp-image h-full w-full flex items-center justify-center"
-                dangerouslySetInnerHTML={{ __html: rewrittenSVG }}
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              />,
-            );
-          } else {
-            // No external references, use original src
-            setValidatedContent(
-              <img
-                width="100%"
-                loading="lazy"
-                className="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
-                src={src}
-                onError={handleImageError}
-                alt={`Stamp No. ${stamp.stamp}`}
-              />,
+          // Add viewBox if not present (using the original dimensions)
+          if (!rewrittenSVG.includes("viewBox")) {
+            rewrittenSVG = rewrittenSVG.replace(
+              /<svg([^>]*)>/,
+              '<svg$1 viewBox="0 0 460 500">',
             );
           }
-        } catch (_error) {
-          // Fallback to original src
-          setValidatedContent(
-            <img
-              width="100%"
-              loading="lazy"
-              className="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
-              src={src}
-              onError={handleImageError}
-              alt={`Stamp No. ${stamp.stamp}`}
-            />,
+
+          // Add responsive styling to fill container properly
+          rewrittenSVG = rewrittenSVG.replace(
+            /<svg([^>]*)>/,
+            '<svg$1 style="max-width: 100%; max-height: 100%; width: auto; height: auto; display: block;">',
           );
         }
 
-        setIsValidating(false);
+        setValidatedContent(
+          <div
+            className="max-w-none object-contain rounded-2xl pixelart stamp-image h-full w-full flex items-center justify-center"
+            dangerouslySetInnerHTML={{ __html: rewrittenSVG }}
+            style={{
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          />,
+        );
       } else {
-        setIsValidating(false);
+        // No external references, use original src
+        setValidatedContent(
+          <img
+            width="100%"
+            loading="lazy"
+            className="max-w-none object-contain rounded-2xl pixelart stamp-image h-full w-full"
+            src={src}
+            onError={handleImageError}
+            alt={`Stamp No. ${stamp.stamp}`}
+          />,
+        );
       }
-    };
-    validateContent();
-  }, [src, stamp.stamp_mimetype]);
-
-  // All tooltip-related refs
-  const tooltipTimeoutRef = useRef<number | null>(null);
-  const copyTooltipTimeoutRef = useRef<number | null>(null);
-  const shareTooltipTimeoutRef = useRef<number | null>(null);
-  const codeTooltipTimeoutRef = useRef<number | null>(null);
-  const fullscreenTooltipTimeoutRef = useRef<number | null>(null);
-
-  // Add cleanup effect for tooltips
-  useEffect(() => {
-    logger.debug("ui", {
-      message: "StampImage mounted",
-      component: "StampImage",
-    });
-
-    return () => {
-      logger.debug("ui", {
-        message: "StampImage unmounting",
-        component: "StampImage",
-      });
-      // Clean up all tooltip timeouts
-      [
-        tooltipTimeoutRef,
-        copyTooltipTimeoutRef,
-        shareTooltipTimeoutRef,
-        codeTooltipTimeoutRef,
-        fullscreenTooltipTimeoutRef,
-        xTooltipTimeoutRef,
-      ].forEach((ref) => {
-        if (ref.current !== null) {
-          globalThis.clearTimeout(ref.current);
-          ref.current = null;
-        }
-      });
-    };
-  }, []);
-
-  const xTooltipTimeoutRef = useRef<number | null>(null);
-
-  // Add to cleanup useEffect
-  useEffect(() => {
-    return () => {
-      if (tooltipTimeoutRef.current) {
-        globalThis.clearTimeout(tooltipTimeoutRef.current);
-      }
-      if (xTooltipTimeoutRef.current) {
-        globalThis.clearTimeout(xTooltipTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  const [isPlaying, setIsPlaying] = useState(false);
-  const audioRef = useRef<HTMLAudioElement>(null);
+    } catch (_error) {
+      // Fallback to original src
+      setValidatedContent(
+        <img
+          width="100%"
+          loading="lazy"
+          className="max-w-none object-contain rounded-2xl pixelart stamp-image h-full w-full"
+          src={src}
+          onError={handleImageError}
+          alt={`Stamp No. ${stamp.stamp}`}
+        />,
+      );
+    } finally {
+      setIsValidating(false);
+    }
+  };
 
   const togglePlayback = () => {
     if (!audioRef.current) return;
@@ -711,11 +629,89 @@ export function StampImage(
     setIsPlaying(false);
   };
 
+  useEffect(() => {
+    // Set initial transform
+    updateTransform();
+
+    // Add event listener to handle window resize
+    globalThis.addEventListener("resize", updateTransform);
+
+    // Cleanup event listener on component unmount
+    return () => {
+      globalThis.removeEventListener("resize", updateTransform);
+    };
+  }, []);
+
+  useEffect(() => {
+    fetchStampImage();
+  }, []);
+
+  useEffect(() => {
+    const isHtml = stamp?.stamp_mimetype === "text/html";
+    if (isHtml) {
+      fetchHtmlContent();
+    }
+  }, [stamp]);
+
+  useEffect(() => {
+    validateContent();
+  }, [stamp, src]);
+
+  useEffect(() => {
+    return () => {
+      const timeoutRefs = [
+        tooltipTimeoutRef,
+        copyTooltipTimeoutRef,
+        shareTooltipTimeoutRef,
+        codeTooltipTimeoutRef,
+        fullscreenTooltipTimeoutRef,
+        xTooltipTimeoutRef,
+      ];
+
+      timeoutRefs.forEach((ref) => {
+        if (ref.current !== null) {
+          globalThis.clearTimeout(ref.current);
+          ref.current = null;
+        }
+      });
+    };
+  }, []);
+
+  // Early return for TypeScript - in practice, stamp is always defined at call sites
+  if (!stamp) return null;
+
+  const toggleFullScreenModal = () => {
+    if (!src) return;
+    const modalContent = (
+      <PreviewImageModal
+        src={src}
+        contentType={stamp.stamp_mimetype === "text/html"
+          ? "html"
+          : stamp.stamp_mimetype === "text/plain"
+          ? "text"
+          : stamp.stamp_mimetype?.startsWith("audio/")
+          ? "audio"
+          : "image"}
+      />
+    );
+    openModal(modalContent, "zoomInOut");
+  };
+
+  const isHtml = stamp.stamp_mimetype === "text/html";
+  const isPlainText = stamp.stamp_mimetype === "text/plain";
+  const isAudio = stamp.stamp_mimetype?.startsWith("audio/");
+  const isLibraryFile = stamp.stamp_mimetype === "text/css" ||
+    stamp.stamp_mimetype === "text/javascript" ||
+    stamp.stamp_mimetype === "application/javascript" ||
+    stamp.stamp_mimetype === "application/gzip";
+
   // Update the toggleCodeModal function to use the new pattern
   const toggleCodeModal = () => {
+    const content = htmlContent || src;
+    if (!content) return;
     const modalContent = (
       <PreviewCodeModal
-        src={htmlContent || src}
+        src={content}
       />
     );
     openModal(modalContent, "zoomInOut");
@@ -726,10 +722,10 @@ export function StampImage(
 
   if (isLoadingOrValidating) {
     return (
-      <div class={`${body} ${gapSectionSlim}`}>
-        <div className={containerDetailImage}>
+      <div class={`${body} ${containerGap}`}>
+        <div className={`${containerDetailImage} ${containerClassName || ""}`}>
           <div className="stamp-container">
-            <LoadingIcon containerClassName="rounded-lg" />
+            <LoadingIcon containerClassName="rounded-2xl" />
           </div>
         </div>
       </div>
@@ -738,38 +734,62 @@ export function StampImage(
 
   return (
     <>
-      {src === NOT_AVAILABLE_IMAGE && (
-        <div className="stamp-container">
-          <img
-            width="100%"
-            loading="lazy"
-            className={`max-w-none object-contain rounded ${className} pixelart stamp-image`}
-            src={src}
-            alt="Not Available"
-          />
+      {!src && (
+        <div className={`${glassmorphism} p-5`}>
+          <PlaceholderImage variant="no-image" />
         </div>
       )}
 
-      {src !== NOT_AVAILABLE_IMAGE && isHtml && (
-        <div className={`${className} ${body} ${gapSectionSlim}`}>
-          <div className={`relative ${flag ? containerDetailImage : ""}`}>
+      {src && isHtml && (
+        <div className={`${className} ${body} ${containerGap}`}>
+          <div
+            className={`relative ${
+              flag ? `${containerDetailImage} ${containerClassName || ""}` : ""
+            }`}
+          >
             <div className="stamp-container">
-              <div className="relative pt-[100%]">
+              <div className="relative pt-[100%] rounded-2xl overflow-hidden">
+                {/* Show placeholder image as background while loading */}
+                <div
+                  className="absolute top-0 left-0 w-full h-full"
+                  style={{ zIndex: 0 }}
+                >
+                  <PlaceholderImage variant="no-image" />
+                </div>
+                {console.log("Rendering iframe with src:", src)}
                 <iframe
                   width="100%"
                   height="100%"
                   scrolling="no"
                   className={`${
                     className || ""
-                  } rounded absolute top-0 left-0 pointer-events-none`}
+                  } rounded-2xl absolute top-0 left-0 w-full h-full bg-transparent`}
                   sandbox="allow-scripts allow-same-origin"
                   src={src || ""}
                   loading="lazy"
-                  style={{ transform: transform || "none" }}
-                  onError={handleImageError}
+                  style={{
+                    transform: transform || "none",
+                    border: "none",
+                    display: "block",
+                    backgroundColor: "transparent",
+                    zIndex: 1,
+                  }}
+                  onLoad={(e) => {
+                    console.log("Iframe loaded successfully:", src);
+                    // Hide the placeholder once iframe loads
+                    const iframe = e.currentTarget as HTMLIFrameElement;
+                    const placeholder = iframe
+                      .previousElementSibling as HTMLElement;
+                    if (placeholder) {
+                      placeholder.style.display = "none";
+                    }
+                  }}
+                  onError={(e) => {
+                    console.error("Iframe load error:", e, src);
+                    handleImageError(e);
+                  }}
                   title="Stamp"
                 />
-                <div className="absolute inset-0 cursor-pointer" />
               </div>
             </div>
           </div>
@@ -784,9 +804,11 @@ export function StampImage(
         </div>
       )}
 
-      {src !== NOT_AVAILABLE_IMAGE && isPlainText && (
-        <div class={`${body} ${gapSectionSlim}`}>
-          <div className={containerDetailImage}>
+      {src && isPlainText && (
+        <div class={`${body} ${containerGap}`}>
+          <div
+            className={`${containerDetailImage} ${containerClassName || ""}`}
+          >
             <div className="stamp-container">
               <div className="relative aspect-square">
                 <TextContentIsland src={src} />
@@ -804,16 +826,13 @@ export function StampImage(
         </div>
       )}
 
-      {src !== NOT_AVAILABLE_IMAGE && isAudio && (
-        <div className={`${className} ${body} ${gapSectionSlim}`}>
-          <div className={containerDetailImage}>
+      {src && isAudio && (
+        <div className={`${className} ${body} ${containerGap}`}>
+          <div
+            className={`${containerDetailImage} ${containerClassName || ""}`}
+          >
             <div className="stamp-container relative group">
-              <img
-                src={AUDIO_FILE_IMAGE}
-                alt="Audio File"
-                className="absolute top-0 left-0 w-full h-full object-contain rounded pixelart stamp-image pointer-events-none select-none"
-                draggable={false}
-              />
+              <PlaceholderImage variant="audio" />
               <div className="absolute inset-0 flex items-center justify-center">
                 <audio
                   ref={audioRef}
@@ -833,8 +852,8 @@ export function StampImage(
                     type="iconButton"
                     weight="bold"
                     size="xxl"
-                    color="custom"
-                    className="p-[25%] relative z-10 fill-stamp-grey group-hover/button:fill-stamp-grey-light transition-all duration-300"
+                    color="grey"
+                    className="p-[25%] relative z-10"
                   />
                 </button>
               </div>
@@ -851,16 +870,13 @@ export function StampImage(
         </div>
       )}
 
-      {src !== NOT_AVAILABLE_IMAGE && isLibraryFile && (
-        <div className={`${className} ${body} ${gapSectionSlim}`}>
-          <div className={containerDetailImage}>
+      {src && isLibraryFile && (
+        <div className={`${className} ${body} ${containerGap}`}>
+          <div
+            className={`${containerDetailImage} ${containerClassName || ""}`}
+          >
             <div className="stamp-container relative group">
-              <img
-                src={LIBRARY_FILE_IMAGE}
-                alt="Library File"
-                className="absolute top-0 left-0 w-full h-full object-contain rounded pixelart stamp-image pointer-events-none select-none"
-                draggable={false}
-              />
+              <PlaceholderImage variant="library" />
             </div>
           </div>
           {flag && (
@@ -874,19 +890,23 @@ export function StampImage(
         </div>
       )}
 
-      {src !== NOT_AVAILABLE_IMAGE && !isHtml && !isPlainText && !isAudio &&
+      {src && !isHtml && !isPlainText && !isAudio &&
         !isLibraryFile && (
           flag
             ? (
-              <div class={`${body} ${gapSectionSlim}`}>
-                <div className={containerDetailImage}>
+              <div class={`${body} ${containerGap}`}>
+                <div
+                  className={`${containerDetailImage} ${
+                    containerClassName || ""
+                  }`}
+                >
                   <div className="stamp-container">
                     <div className="relative z-10 aspect-square flex items-center justify-center">
                       {validatedContent || (
                         <img
                           width="100%"
                           loading="lazy"
-                          className="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
+                          className="max-w-none object-contain rounded-2xl pixelart stamp-image h-full w-full"
                           src={src}
                           onError={handleImageError}
                           alt="Stamp"
@@ -906,14 +926,18 @@ export function StampImage(
               </div>
             )
             : (
-              <div className={containerDetailImage}>
+              <div
+                className={`${containerDetailImage} ${
+                  containerClassName || ""
+                }`}
+              >
                 <div className="stamp-container">
                   <div className="relative z-10 aspect-square flex items-center justify-center">
                     {validatedContent || (
                       <img
                         width="100%"
                         loading="lazy"
-                        className="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
+                        className="max-w-none object-contain rounded-2xl pixelart stamp-image h-full w-full"
                         src={src}
                         onError={handleImageError}
                         alt="Stamp"

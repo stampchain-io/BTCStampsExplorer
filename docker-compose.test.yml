@@ -1,5 +1,32 @@
 services:
   newman:
+    build:
+      context: .
+      dockerfile: Dockerfile.newman
+    working_dir: /app
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - .:/app
+      - ./reports:/app/reports
+    environment:
+      - NODE_ENV=test
+      - DEV_BASE_URL=${DEV_BASE_URL:-http://host.docker.internal:8000}
+      - PROD_BASE_URL=${PROD_BASE_URL:-https://stampchain.io}
+      - NEWMAN_COLLECTION=${NEWMAN_COLLECTION:-tests/postman/collections/comprehensive.json}
+      - NEWMAN_ENVIRONMENT=${NEWMAN_ENVIRONMENT:-tests/postman/environments/comprehensive.json}
+      - NEWMAN_REPORTERS=${NEWMAN_REPORTERS:-cli,html,json}
+      - NEWMAN_ITERATIONS=${NEWMAN_ITERATIONS:-1}
+      - NEWMAN_DELAY_REQUEST=${NEWMAN_DELAY_REQUEST:-0}
+      - NEWMAN_TIMEOUT=${NEWMAN_TIMEOUT:-30000}
+      - NEWMAN_VERBOSE=${NEWMAN_VERBOSE:-false}
+      - NEWMAN_BAIL=${NEWMAN_BAIL:-false}
+      - NEWMAN_FOLDER=${NEWMAN_FOLDER:-}
+      - REPORT_PREFIX=${REPORT_PREFIX:-newman}
+    command: sh scripts/run-newman-with-openapi.sh
+  
+  # Comprehensive collection testing - NEW
+  newman-comprehensive:
     image: node:22-alpine
     working_dir: /app
     extra_hosts:
@@ -9,7 +36,44 @@ services:
       - ./reports:/app/reports
     environment:
       - NODE_ENV=test
-    command: sh scripts/run-newman-enhanced.sh
+      - DEV_BASE_URL=${DEV_BASE_URL:-http://host.docker.internal:8000}
+      - PROD_BASE_URL=${PROD_BASE_URL:-https://stampchain.io}
+      - NEWMAN_COLLECTION=tests/postman/collections/comprehensive.json
+      - NEWMAN_ENVIRONMENT=${NEWMAN_ENVIRONMENT:-tests/postman/environments/comprehensive.json}
+      - NEWMAN_REPORTERS=${NEWMAN_REPORTERS:-cli,html,json}
+      - NEWMAN_ITERATIONS=${NEWMAN_ITERATIONS:-1}
+      - NEWMAN_DELAY_REQUEST=${NEWMAN_DELAY_REQUEST:-0}
+      - NEWMAN_TIMEOUT=${NEWMAN_TIMEOUT:-30000}
+      - NEWMAN_VERBOSE=${NEWMAN_VERBOSE:-false}
+      - NEWMAN_BAIL=${NEWMAN_BAIL:-false}
+      - NEWMAN_FOLDER=${NEWMAN_FOLDER:-}
+      - REPORT_PREFIX=newman-comprehensive
+    command: sh scripts/run-newman-with-openapi.sh
+
+  # Pagination validation testing
+  newman-pagination:
+    image: node:22-alpine
+    working_dir: /app
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - .:/app
+      - ./reports:/app/reports
+    environment:
+      - NODE_ENV=test
+      - BASE_URL=${BASE_URL:-https://stampchain.io}
+      - CURRENT_ENV=${CURRENT_ENV:-prod}
+      - NEWMAN_COLLECTION=tests/postman/collections/pagination-validation.json
+      - NEWMAN_ENVIRONMENT=${NEWMAN_ENVIRONMENT:-tests/postman/environments/comprehensive.json}
+      - NEWMAN_REPORTERS=${NEWMAN_REPORTERS:-cli,html,json}
+      - NEWMAN_ITERATIONS=${NEWMAN_ITERATIONS:-1}
+      - NEWMAN_DELAY_REQUEST=${NEWMAN_DELAY_REQUEST:-0}
+      - NEWMAN_TIMEOUT=${NEWMAN_TIMEOUT:-30000}
+      - NEWMAN_VERBOSE=${NEWMAN_VERBOSE:-false}
+      - NEWMAN_BAIL=${NEWMAN_BAIL:-false}
+      - NEWMAN_FOLDER=${NEWMAN_FOLDER:-}
+      - REPORT_PREFIX=newman-pagination-validation
+    command: sh scripts/run-newman-with-openapi.sh
 
   # Simple collection testing
   newman-simple:
@@ -22,7 +86,7 @@ services:
       - ./reports:/app/reports
     environment:
       - NODE_ENV=test
-    command: sh scripts/run-newman-simple.sh
+    command: sh scripts/run-newman-with-openapi.sh
 
   # Advanced collection testing
   newman-advanced:
@@ -42,7 +106,7 @@ services:
         echo 'NPM version:' && npm --version &&
         
         echo '=== Installing Newman ===' &&
-        npm install -g newman newman-reporter-html &&
+        npm install -g newman newman-reporter-html --no-fund &&
         echo 'Newman version:' && newman --version &&
         
         ping -c 1 host.docker.internal || echo 'host.docker.internal not reachable' &&
@@ -51,8 +115,8 @@ services:
         
         mkdir -p reports/newman-advanced &&
         
-        newman run postman-collection-advanced.json \\
-          --environment postman-environment.json \\
+        newman run tests/postman/collections/comprehensive.json \\
+          --environment tests/postman/environments/comprehensive.json \\
           --reporters cli,html,json \\
           --reporter-html-export reports/newman-advanced/advanced-report.html \\
           --reporter-json-export reports/newman-advanced/advanced-results.json \\
@@ -83,7 +147,7 @@ services:
         echo 'NPM version:' && npm --version &&
         
         echo '=== Installing Newman ===' &&
-        npm install -g newman newman-reporter-html &&
+        npm install -g newman newman-reporter-html --no-fund &&
         echo 'Newman version:' && newman --version &&
         
         ping -c 1 host.docker.internal || echo 'host.docker.internal not reachable' &&
@@ -92,8 +156,8 @@ services:
         
         mkdir -p reports/newman-performance &&
         
-        newman run postman-collection-enhanced.json \\
-          --environment postman-environment.json \\
+        newman run tests/postman/collections/comprehensive.json \\
+          --environment tests/postman/environments/comprehensive.json \\
           --reporters cli,html,json \\
           --reporter-html-export reports/newman-performance/performance-report.html \\
           --reporter-json-export reports/newman-performance/performance-results.json \\
@@ -126,7 +190,7 @@ services:
         echo 'NPM version:' && npm --version &&
         
         echo '=== Installing Newman ===' &&
-        npm install -g newman newman-reporter-html &&
+        npm install -g newman newman-reporter-html --no-fund &&
         echo 'Newman version:' && newman --version &&
         
         ping -c 1 host.docker.internal || echo 'host.docker.internal not reachable' &&
@@ -135,8 +199,8 @@ services:
         
         mkdir -p reports/newman-parallel &&
         
-        newman run postman-collection-enhanced.json \\
-          --environment postman-environment.json \\
+        newman run tests/postman/collections/comprehensive.json \\
+          --environment tests/postman/environments/comprehensive.json \\
           --reporters cli,html,json \\
           --reporter-html-export reports/newman-parallel/parallel-report.html \\
           --reporter-json-export reports/newman-parallel/parallel-results.json \\
@@ -147,4 +211,54 @@ services:
         
         echo 'Parallel test complete. Reports in: reports/newman-parallel/' &&
         ls -la reports/newman-parallel/
-      " 
+      "
+
+  # Request Validation tests - Tests OpenAPI request validation
+  newman-request-validation:
+    image: node:22-alpine
+    working_dir: /app
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - .:/app
+      - ./reports:/app/reports
+    environment:
+      - NODE_ENV=test
+      - DEV_BASE_URL=${DEV_BASE_URL:-http://host.docker.internal:8000}
+      - PROD_BASE_URL=${PROD_BASE_URL:-https://stampchain.io}
+      - NEWMAN_COLLECTION=tests/postman/collections/request-validation.json
+      - NEWMAN_ENVIRONMENT=${NEWMAN_ENVIRONMENT:-tests/postman/environments/comprehensive.json}
+      - NEWMAN_REPORTERS=${NEWMAN_REPORTERS:-cli,html,json}
+      - NEWMAN_ITERATIONS=${NEWMAN_ITERATIONS:-1}
+      - NEWMAN_DELAY_REQUEST=${NEWMAN_DELAY_REQUEST:-0}
+      - NEWMAN_TIMEOUT=${NEWMAN_TIMEOUT:-10000}
+      - NEWMAN_VERBOSE=${NEWMAN_VERBOSE:-false}
+      - NEWMAN_BAIL=${NEWMAN_BAIL:-false}
+      - NEWMAN_FOLDER=${NEWMAN_FOLDER:-}
+      - REPORT_PREFIX=newman-request-validation
+    command: sh scripts/run-newman-with-openapi.sh
+
+  # Data Validation tests - Compares actual data between dev and prod
+  newman-data-validation:
+    image: node:22-alpine
+    working_dir: /app
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - .:/app
+      - ./reports:/app/reports
+    environment:
+      - NODE_ENV=test
+      - DEV_BASE_URL=${DEV_BASE_URL:-http://host.docker.internal:8000}
+      - PROD_BASE_URL=${PROD_BASE_URL:-https://stampchain.io}
+      - NEWMAN_COLLECTION=tests/postman/collections/data-validation.json
+      - NEWMAN_ENVIRONMENT=${NEWMAN_ENVIRONMENT:-tests/postman/environments/comprehensive.json}
+      - NEWMAN_REPORTERS=${NEWMAN_REPORTERS:-cli,html,json}
+      - NEWMAN_ITERATIONS=${NEWMAN_ITERATIONS:-1}
+      - NEWMAN_DELAY_REQUEST=${NEWMAN_DELAY_REQUEST:-0}
+      - NEWMAN_TIMEOUT=${NEWMAN_TIMEOUT:-10000}
+      - NEWMAN_VERBOSE=${NEWMAN_VERBOSE:-false}
+      - NEWMAN_BAIL=${NEWMAN_BAIL:-false}
+      - NEWMAN_FOLDER=${NEWMAN_FOLDER:-}
+      - REPORT_PREFIX=newman-data-validation
+    command: sh scripts/run-newman-with-openapi.sh 

@@ -1,9 +1,10 @@
 import { Handlers } from "$fresh/server.ts";
-import { TX, TXError } from "$globals";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import { SRC101Service } from "$server/services/src101/index.ts";
-import { SRC101InputData } from "$types/index.d.ts";
 import { logger } from "$lib/utils/logger.ts";
+import { ResponseUtil } from "$lib/utils/api/responses/responseUtil.ts";
+import { SRC101Service } from "$server/services/src101/index.ts";
+import type { TX, TXError } from "$types/transaction.d.ts";
+// AddressHandlerContext import removed - not used in this file
+import type { SRC101InputData } from "$types/src101.d.ts";
 
 type TrxType = "multisig" | "olga";
 
@@ -14,26 +15,60 @@ export const handler: Handlers = {
       let response: Response;
 
       const rawBody = await req.text();
-      console.log("SRC-101 request body:", rawBody);
+      // Parse SRC-101 request body
 
-      const body: SRC101InputData & { trxType?: TrxType } = JSON.parse(rawBody);
+      const body: SRC101InputData & { trxType?: TrxType; dryRun?: boolean } =
+        JSON.parse(rawBody);
       const trxType = body.trxType || "multisig";
+      const dryRun = body.dryRun === true;
 
       // Handle backward compatibility for fromAddress
       const effectiveSourceAddress = body.sourceAddress || body.fromAddress ||
         body.changeAddress;
       const effectiveChangeAddress = body.changeAddress || body.sourceAddress ||
-        body.fromAddress;
+        body.fromAddress || "";
       const effectiveRecAddress = body.recAddress;
 
+      // For dryRun, we can use dummy addresses to avoid validation issues
+      const finalSourceAddress = dryRun && !effectiveSourceAddress
+        ? "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4" // Valid P2WPKH dummy address for estimation
+        : effectiveSourceAddress;
+      const finalChangeAddress = dryRun && !effectiveChangeAddress
+        ? "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4" // Valid P2WPKH dummy address for estimation
+        : effectiveChangeAddress;
+
       // Ensure at least one address exists
-      if (!effectiveSourceAddress) {
+      if (!finalSourceAddress) {
         return ResponseUtil.badRequest(
           "Either sourceAddress/fromAddress or changeAddress is required",
         );
       }
 
-      // Validate operation for both transaction types
+      // For dryRun, return fee estimates without creating actual PSBT
+      if (dryRun) {
+        // SRC101 transactions are typically ~300 bytes
+        const estimatedTxSize = 300;
+        const feeRate = Number(body.feeRate) || 1;
+        const estMinerFee = Math.ceil(estimatedTxSize * feeRate);
+        const totalDustValue = 546; // Standard P2WPKH dust limit
+        const totalCost = estMinerFee + totalDustValue;
+
+        return ResponseUtil.success({
+          est_miner_fee: estMinerFee,
+          total_dust_value: totalDustValue,
+          total_cost: totalCost,
+          est_tx_size: estimatedTxSize,
+          feeDetails: {
+            total: estMinerFee,
+            effectiveFeeRate: feeRate,
+            estimatedSize: estimatedTxSize,
+          },
+          is_estimate: true,
+          estimation_method: "dryRun_calculation",
+        });
+      }
+
+      // Validate operation for both transaction types (skip for dryRun as we already returned)
       const validationError = await SRC101Service.UtilityService
         .validateOperation(
           body.op.toLowerCase() as
@@ -43,13 +78,17 @@ export const handler: Handlers = {
             | "setrecord"
             | "renew",
           {
-            ...body,
-            sourceAddress: effectiveSourceAddress,
-            changeAddress: effectiveChangeAddress,
-            recAddress: effectiveRecAddress,
-          },
+            op: body.op,
+            feeRate: body.feeRate,
+            toAddress: body.toAddress,
+            fromAddress: body.fromAddress,
+            root: body.root,
+            sourceAddress: finalSourceAddress,
+            changeAddress: finalChangeAddress,
+            ...(effectiveRecAddress && { recAddress: effectiveRecAddress }),
+          } as SRC101InputData,
         );
-      console.log("validate=====>", validationError);
+      // Validation failed
       if (validationError) {
         return ResponseUtil.badRequest(
           validationError.error || "Validation error",
@@ -57,7 +96,7 @@ export const handler: Handlers = {
       }
 
       if (trxType === "multisig") {
-        if (!effectiveSourceAddress || !effectiveChangeAddress) {
+        if (!finalSourceAddress || !finalChangeAddress) {
           return ResponseUtil.badRequest("Missing required addresses");
         }
 
@@ -70,9 +109,9 @@ export const handler: Handlers = {
             | "renew",
           {
             ...body,
-            sourceAddress: effectiveSourceAddress,
-            recAddress: effectiveRecAddress || effectiveSourceAddress,
-            changeAddress: effectiveChangeAddress,
+            sourceAddress: finalSourceAddress,
+            recAddress: effectiveRecAddress || finalSourceAddress,
+            changeAddress: finalChangeAddress,
           },
         );
         logger.debug("api-src101-create", {
@@ -100,7 +139,7 @@ export const handler: Handlers = {
           response = ResponseUtil.success(result, { forceNoCache: true });
         }
 
-        console.log("response", response);
+        // Return successful response
 
         logger.debug("api-src101-create", {
           message: "Final multisig response",
@@ -110,7 +149,7 @@ export const handler: Handlers = {
       } else {
         return ResponseUtil.badRequest("Not supported yet");
       }
-    } catch (error: unknown) {
+    } catch (error) {
       const errorMessage = error instanceof Error
         ? error.message
         : String(error);

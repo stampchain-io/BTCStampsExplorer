@@ -1,36 +1,32 @@
 /* ===== COLLECTION OVERVIEW PAGE ===== */
-import { STAMP_FILTER_TYPES } from "$globals";
+
+import { PaginationButtons } from "$button";
+import type { StampFilterType } from "$constants";
+import { StampOverviewContent } from "$content";
 import { FreshContext, Handlers, PageProps } from "$fresh/server.ts";
+import { CollectionOverviewHeader } from "$header";
+import { body } from "$layout";
+import { CollectionDetailGallery } from "$section";
 import { CollectionController } from "$server/controller/collectionController.ts";
 import { StampController } from "$server/controller/stampController.ts";
-import { CollectionService } from "$server/services/collectionService.ts";
-import { CollectionRow } from "$server/types/collection.d.ts";
-import { StampOverviewContent } from "$content";
-import { CollectionDetailGallery } from "$section";
-import { CollectionOverviewHeader } from "$header";
-import { Pagination } from "$islands/datacontrol/Pagination.tsx";
+import { CollectionService } from "$server/services/core/collectionService.ts";
+import type { CollectionOverviewPageProps } from "$types/index.d.ts";
 
 /* ===== CONSTANTS ===== */
 const MAX_PAGE_SIZE = 120;
 
 /* ===== TYPES ===== */
-interface CollectionOverviewPageProps {
-  selectedTab: "artist" | "posh" | "recursive";
-  stamps?: any[];
-  collections?: CollectionRow[];
-  page: number;
-  pages: number;
-  _page_size: number;
-  sortBy: string;
-  filterBy: string[];
-  partial?: boolean;
-}
 
 /* ===== SERVER HANDLER ===== */
 export const handler: Handlers<CollectionOverviewPageProps> = {
   async GET(req: Request, ctx: FreshContext) {
     try {
       const overview = ctx.params.overview || "artist";
+
+      // Explicitly reject "detail" to avoid conflict with detail/[id].tsx route
+      if (overview === "detail") {
+        return ctx.renderNotFound();
+      }
 
       // Validate overview parameter first
       if (!["artist", "posh", "recursive"].includes(overview)) {
@@ -45,6 +41,11 @@ export const handler: Handlers<CollectionOverviewPageProps> = {
       const requestedPageSize = parseInt(url.searchParams.get("limit") || "60");
       const page_size = Math.min(requestedPageSize, MAX_PAGE_SIZE);
 
+      // Handle both new view parameter and legacy recentSales parameter
+      const viewMode = url.searchParams.get("view") || "all";
+      const isRecentSales = viewMode === "sales" ||
+        url.searchParams.get("recentSales") === "true";
+
       switch (overview) {
         case "artist": {
           const filterBy = url.searchParams.get("filterBy")?.split(",") || [];
@@ -53,7 +54,6 @@ export const handler: Handlers<CollectionOverviewPageProps> = {
               {
                 limit: page_size,
                 page: page,
-                creator: "",
               },
             );
 
@@ -65,6 +65,7 @@ export const handler: Handlers<CollectionOverviewPageProps> = {
             page_size: collectionsData.limit,
             filterBy,
             sortBy,
+            isRecentSales,
           });
         }
 
@@ -72,7 +73,7 @@ export const handler: Handlers<CollectionOverviewPageProps> = {
           const filterBy = url.searchParams.get("filterBy")
             ? (url.searchParams.get("filterBy")?.split(",").filter(
               Boolean,
-            ) as STAMP_FILTER_TYPES[])
+            ) as StampFilterType[])
             : [];
 
           const poshCollection = await CollectionService.getCollectionByName(
@@ -96,10 +97,11 @@ export const handler: Handlers<CollectionOverviewPageProps> = {
             selectedTab: "posh",
             stamps: Array.isArray(result.data) ? result.data : [],
             page,
-            pages: result.totalPages,
+            pages: (result as any).totalPages,
             page_size,
             filterBy,
             sortBy,
+            isRecentSales,
             partial: url.searchParams.has("_fresh"),
           });
         }
@@ -110,7 +112,7 @@ export const handler: Handlers<CollectionOverviewPageProps> = {
             limit: page_size,
             sortBy: sortBy as "DESC" | "ASC",
             type: "all",
-            filterBy: ["recursive"] as STAMP_FILTER_TYPES[],
+            filterBy: ["recursive"] as StampFilterType[],
             ident: [],
             collectionId: undefined,
           });
@@ -119,10 +121,11 @@ export const handler: Handlers<CollectionOverviewPageProps> = {
             selectedTab: "recursive",
             stamps: Array.isArray(result.data) ? result.data : [],
             page,
-            pages: result.totalPages,
+            pages: (result as any).totalPages,
             page_size,
             filterBy: ["recursive"],
             sortBy,
+            isRecentSales,
             partial: url.searchParams.has("_fresh"),
           });
         }
@@ -152,7 +155,7 @@ export default function CollectionOverviewPage(
     collections,
     page,
     pages,
-    _page_size,
+    isRecentSales = false,
   } = data;
 
   /* ===== HELPERS ===== */
@@ -162,10 +165,11 @@ export default function CollectionOverviewPage(
         return (
           <>
             <CollectionDetailGallery collections={collections || []} />
-            <div class="mt-12 mobileLg:mt-[72px]">
-              <Pagination
-                page={page}
-                totalPages={pages}
+            <div class="mt-7.5 tablet:mt-10">
+              <PaginationButtons
+                page={page ?? 1}
+                totalPages={pages ?? 1}
+                // Remove onPageChange to let PaginationButtons component use its built-in Fresh navigation
                 prefix=""
               />
             </div>
@@ -175,26 +179,34 @@ export default function CollectionOverviewPage(
       case "posh":
       case "recursive":
         return (
-          <div class="w-full flex flex-col items-center" f-client-nav>
-            <div data-partial="/stamp">
+          <div
+            class="w-full flex flex-col items-center"
+            f-client-nav
+            data-partial="/collection"
+          >
+            <div>
               <StampOverviewContent
                 stamps={stamps || []}
-                isRecentSales={false}
+                isRecentSales={isRecentSales}
                 pagination={{
-                  page,
-                  totalPages: pages,
+                  page: page ?? 1,
+                  totalPages: pages ?? 1,
+                  // Remove onPageChange to let PaginationButtons component use its built-in Fresh navigation
                   prefix: "",
                 }}
               />
             </div>
           </div>
         );
+
+      default:
+        return null;
     }
   };
 
   /* ===== COMPONENT ===== */
   return (
-    <div class="flex flex-col">
+    <div class={body}>
       <CollectionOverviewHeader />
       {collectionOverviewContent()}
     </div>

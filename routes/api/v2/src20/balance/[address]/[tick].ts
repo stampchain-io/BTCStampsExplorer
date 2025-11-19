@@ -1,14 +1,9 @@
+import type { AddressTickHandlerContext } from "$types/base.d.ts";
 import { Handlers } from "$fresh/server.ts";
-import { AddressTickHandlerContext } from "$globals";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
-import {
-  checkEmptyResult,
-  DEFAULT_PAGINATION,
-  validateRequiredParams,
-  validateSortParam,
-} from "$server/services/routeValidationService.ts";
+import { RouteType } from "$server/services/infrastructure/cacheService.ts";
+import { validateRequiredParams } from "$server/services/validation/routeValidationService.ts";
 
 export const handler: Handlers<AddressTickHandlerContext> = {
   async GET(req, ctx) {
@@ -23,54 +18,26 @@ export const handler: Handlers<AddressTickHandlerContext> = {
 
       const url = new URL(req.url);
       const params = url.searchParams;
-      const includePagination = params.get("includePagination") === "true";
 
-      // Get pagination parameters if pagination is included
-      let paginationParams: { limit?: number; page?: number } = {};
-      if (includePagination) {
-        const pagination = getPaginationParams(url);
-
-        // Check if pagination validation failed
-        if (pagination instanceof Response) {
-          return pagination;
-        }
-
-        const { limit, page } = pagination;
-        paginationParams = { limit, page };
-      }
-
-      // Validate sort parameter
-      const sortValidation = validateSortParam(url);
-      if (!sortValidation.isValid) {
-        return sortValidation.error!;
-      }
-
+      // This endpoint returns a single balance object, never paginated
       const balanceParams = {
         address,
-        tick: decodeURIComponent(String(tick)),
-        includePagination,
-        limit: paginationParams.limit || DEFAULT_PAGINATION.limit,
-        page: paginationParams.page || DEFAULT_PAGINATION.page,
-        amt: Number(params.get("amt")) || undefined,
-        sortBy: sortValidation.data,
+        tick,
+        includePagination: false, // Single balance endpoint - no pagination
+        amt: Number(params.get("amt")) || 0,
+        includeMarketData: params.get("includeMarketData") === "true", // NEW: API v2.3 enhancement
       };
 
       const result = await Src20Controller.handleSrc20BalanceRequest(
         balanceParams,
       );
 
-      // Check for empty result
-      const emptyCheck = checkEmptyResult(result, "balance data");
-      if (emptyCheck) {
-        return emptyCheck;
-      }
-
-      return ResponseUtil.success(result);
+      return ApiResponseUtil.success(result, { routeType: RouteType.BALANCE });
     } catch (error) {
       console.error("Error in GET handler:", error);
-      return ResponseUtil.internalError(
+      return ApiResponseUtil.internalError(
         error,
-        "Error processing SRC20 balance request",
+        "Error processing balance request",
       );
     }
   },

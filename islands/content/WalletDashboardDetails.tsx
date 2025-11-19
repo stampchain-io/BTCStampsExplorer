@@ -1,25 +1,19 @@
 /* ===== WALLET DASHBOARD DETAILS COMPONENT ===== */
 /* @baba - cleanup button/icon code */
-import { useEffect, useRef, useState } from "preact/hooks";
-import SendBTCModal from "$islands/modal/SendBTCModal.tsx";
-import RecieveAddyModal from "$islands/modal/RecieveAddyModal.tsx";
-import { WalletOverviewInfo } from "$lib/types/index.d.ts";
-import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 import { StatItem, StatTitle } from "$components/section/WalletComponents.tsx";
-import { containerBackground } from "$layout";
-import { titleGreyLD } from "$text";
-import { tooltipIcon } from "$notification";
-import { openModal } from "$islands/modal/states.ts";
 import { Icon } from "$icon";
+import RecieveAddyModal from "$islands/modal/RecieveAddyModal.tsx";
+import SendBTCModal from "$islands/modal/SendBTCModal.tsx";
+import { openModal } from "$islands/modal/states.ts";
+import { containerBackground } from "$layout";
+import type { WalletOverviewInfo } from "$lib/types/index.d.ts";
+import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
+import { tooltipIcon } from "$notification";
+import { titleGreyLD } from "$text";
+import type { WalletDashboardDetailsProps } from "$types/ui.d.ts";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
-interface WalletDashboardDetailsProps {
-  walletData: WalletOverviewInfo;
-  stampsTotal: number;
-  src20Total: number;
-  stampsCreated: number;
-  setShowItem: (type: string) => void;
-}
 
 /* ===== WALLET OVERVIEW SUBCOMPONENT ===== */
 function WalletOverview(
@@ -222,16 +216,16 @@ function WalletOverview(
 
   /* ===== RENDER ===== */
   return (
-    <div className="flex flex-col">
-      <div className="flex justify-between">
-        <div className={`${hideBalance ? "blur-sm" : ""}`}>
-          <h6 class="text-stamp-grey-light font-extralight text-2xl mobileMd:text-3xl mobileLg:text-4xl select-none">
+    <div class="flex flex-col">
+      <div class="flex justify-between">
+        <div class={`${hideBalance ? "blur-sm" : ""}`}>
+          <h6 class="text-color-grey-light font-extralight text-2xl mobileMd:text-3xl mobileLg:text-4xl select-none">
             <span class="font-bold">
               {hideBalance ? "*********" : walletData.balance}
             </span>{" "}
             BTC
           </h6>
-          <h6 class="text-stamp-grey font-extralight text-base mobileMd:text-lg mobileLg:text-xl select-none pt-[3px]">
+          <h6 class="text-color-grey font-extralight text-base mobileMd:text-lg mobileLg:text-xl select-none pt-[3px]">
             <span class="font-medium">
               {hideBalance ? "*****" : walletData.usdValue.toLocaleString()}
             </span>{" "}
@@ -258,7 +252,7 @@ function WalletOverview(
                   name="view"
                   weight="normal"
                   size="mdR"
-                  color="grey"
+                  color="greyLight"
                   ariaLabel="Show Balance"
                 />
                 <div
@@ -277,7 +271,7 @@ function WalletOverview(
                   name="hide"
                   weight="normal"
                   size="mdR"
-                  color="grey"
+                  color="greyLight"
                   ariaLabel="Hide Balance"
                 />
                 <div
@@ -292,7 +286,7 @@ function WalletOverview(
         </button>
       </div>
 
-      <div class="flex items-center pt-3 mobileMd:pt-6 text-base mobileLg:text-lg text-stamp-purple font-medium select-none">
+      <div class="flex items-center pt-3 mobileMd:pt-6 text-base mobileLg:text-lg text-color-purple-semilight font-medium select-none">
         <h6 class="hidden tablet:block">
           {abbreviateAddress(walletData.address, 12)}
         </h6>
@@ -315,7 +309,7 @@ function WalletOverview(
             name="copy"
             weight="normal"
             size="mdR"
-            color="purple"
+            color="greyLight"
             onClick={copy}
           />
           <div
@@ -342,7 +336,7 @@ function WalletOverview(
             name="send"
             weight="normal"
             size="mdR"
-            color="purple"
+            color="greyLight"
             onClick={() => {
               setIsSendTooltipVisible(false);
               onSend();
@@ -367,7 +361,7 @@ function WalletOverview(
             name="receive"
             weight="normal"
             size="mdR"
-            color="purple"
+            color="greyLight"
             onClick={() => {
               setIsReceiveTooltipVisible(false);
               onReceive();
@@ -397,7 +391,7 @@ function WalletOverview(
               name="history"
               weight="normal"
               size="mdR"
-              color="purple"
+              color="greyLight"
             />
           </a>
           <div
@@ -417,9 +411,9 @@ function WalletOverview(
 function DashboardProfile() {
   /* ===== RENDER ===== */
   return (
-    <div className="flex flex-col">
-      <div className="flex">
-        <div className="flex items-center justify-center relative -top-3 -left-3 mobileMd:-top-6 mobileMd:-left-6 w-[58px] h-[58px] mobileLg:w-[76px] mobileLg:h-[76px] bg-stamp-purple rounded-full">
+    <div class="flex flex-col">
+      <div class="flex">
+        <div class="flex items-center justify-center relative -top-3 -left-3 mobileMd:-top-6 mobileMd:-left-6 w-[58px] h-[58px] mobileLg:w-[76px] mobileLg:h-[76px] bg-color-purple-semilight rounded-full">
           <img
             src="/img/banner/kevin.png"
             alt="Avatar"
@@ -434,21 +428,21 @@ function DashboardProfile() {
       </div>
       <div class="flex justify-between">
         <div class="flex flex-col gap-0.5">
-          <h6 class="text-stamp-grey font-light text-base mobileLg:text-lg">
+          <h6 class="text-color-grey font-light text-base mobileLg:text-lg">
             anonymous.btc
           </h6>
-          <h6 class="text-stamp-grey font-light text-base mobileLg:text-lg">
+          <h6 class="text-color-grey font-light text-base mobileLg:text-lg">
             kevin.btc
           </h6>
-          <h6 class="text-stamp-grey font-light text-base mobileLg:text-lg">
+          <h6 class="text-color-grey font-light text-base mobileLg:text-lg">
             pepe.btc
           </h6>
-          <h6 class="text-stamp-grey font-light text-base mobileLg:text-lg">
+          <h6 class="text-color-grey font-light text-base mobileLg:text-lg">
             satoshi.btc
           </h6>
         </div>
         <div class="flex">
-          <h6 class="text-stamp-grey-darker font-medium text-sm mobileLg:text-base">
+          <h6 class="text-color-grey-semidark font-medium text-sm mobileLg:text-base">
             website // X
           </h6>
         </div>
@@ -457,10 +451,10 @@ function DashboardProfile() {
         <div class="flex flex-col gap-1.5 mobileMd:gap-3">
           <Icon
             type="iconButton"
-            name="image"
+            name="website"
             weight="normal"
             size="mdR"
-            color="grey"
+            color="greyLight"
           />
 
           <Icon
@@ -468,7 +462,7 @@ function DashboardProfile() {
             name="collection"
             weight="normal"
             size="mdR"
-            color="grey"
+            color="greyLight"
           />
 
           <Icon
@@ -476,7 +470,7 @@ function DashboardProfile() {
             name="stamp"
             weight="normal"
             size="mdR"
-            color="grey"
+            color="greyLight"
           />
         </div>
       </div>
@@ -513,7 +507,7 @@ function WalletStats(
   return (
     <div class="flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6">
       <div class="flex flex-col w-full">
-        <div className={containerBackground}>
+        <div class={containerBackground}>
           <StampStats
             stampsTotal={stampsTotal}
             stampsCreated={stampsCreated}
@@ -523,7 +517,7 @@ function WalletStats(
         </div>
       </div>
       <div class="flex flex-col w-full">
-        <div className={containerBackground}>
+        <div class={containerBackground}>
           <DispenserStats
             dispensers={{
               open: dispensers?.open ?? 0,
@@ -535,7 +529,7 @@ function WalletStats(
         </div>
       </div>
       <div class="flex flex-col w-full">
-        <div className={containerBackground}>
+        <div class={containerBackground}>
           <TokenStats
             src20Total={src20Total}
             handleType={handleType}
@@ -558,11 +552,11 @@ function StampStats(
 ) {
   /* ===== RENDER ===== */
   return (
-    <div className="flex flex-col gap-1.5 mobileLg:gap-3">
-      <div className="flex pb-1.5 mobileLg:pb-3">
+    <div class="flex flex-col gap-1.5 mobileLg:gap-3">
+      <div class="flex pb-1.5 mobileLg:pb-3">
         <StatTitle label="STAMPS" value={stampsTotal.toString()} />
       </div>
-      <div className="flex justify-between">
+      <div class="flex justify-between">
         <StatItem label="EDITIONS" value="239" />
         <StatItem label="CREATED" value={stampsCreated.toString()} />
         <StatItem
@@ -570,13 +564,13 @@ function StampStats(
           value={
             <>
               {stampValue > 0 ? stampValue.toFixed(8) : "N/A"}{" "}
-              <span className="font-light">BTC</span>
+              <span class="font-light">BTC</span>
             </>
           }
           align="right"
         />
       </div>
-      <div className="flex justify-between">
+      <div class="flex justify-between">
         <StatItem label="COLLECTIONS" value="8" />
         <StatItem
           label="LISTINGS"
@@ -597,11 +591,11 @@ function DispenserStats(
 ) {
   /* ===== RENDER ===== */
   return (
-    <div className="flex flex-col gap-1.5 mobileLg:gap-3">
-      <div className="flex pb-1.5 mobileLg:pb-3">
+    <div class="flex flex-col gap-1.5 mobileLg:gap-3">
+      <div class="flex pb-1.5 mobileLg:pb-3">
         <StatTitle label="LISTINGS" value={dispensers.open.toString()} />
       </div>
-      <div className="flex justify-between">
+      <div class="flex justify-between">
         <StatItem label="ATOMIC" value="N/A" />
         <StatItem
           label="DISPENSERS"
@@ -626,24 +620,24 @@ function TokenStats(
 
   /* ===== RENDER ===== */
   return (
-    <div className="flex flex-col gap-1.5 mobileLg:gap-3">
-      <div className="flex pb-1.5 mobileLg:pb-3">
+    <div class="flex flex-col gap-1.5 mobileLg:gap-3">
+      <div class="flex pb-1.5 mobileLg:pb-3">
         <StatTitle label="TOKENS" value={src20Total?.toString()} />
       </div>
 
-      <div className="flex justify-between">
+      <div class="flex justify-between">
         <StatItem
           label="VALUE"
           value={
             <>
               {totalValue > 0 ? totalValue.toFixed(8) : "N/A"}{" "}
-              <span className="font-light">BTC</span>
+              <span class="font-light">BTC</span>
             </>
           }
         />
         <StatItem label="24H CHANGE" value="+/- 0.00%" align="right" />
       </div>
-      <div className="flex justify-between">
+      <div class="flex justify-between">
         <StatItem
           label="TOP HOLDINGS"
           value={
@@ -702,7 +696,7 @@ export default function WalletDashboardDetails({
         handleChangeFee={setFee}
       />
     );
-    openModal(modalContent, "scaleUpDown");
+    openModal(modalContent, "slideUpDown");
   };
 
   const handleOpenReceiveModal = () => {
@@ -712,7 +706,7 @@ export default function WalletDashboardDetails({
         title="RECEIVE"
       />
     );
-    openModal(modalContent, "scaleUpDown");
+    openModal(modalContent, "slideUpDown");
   };
 
   /* ===== RENDER ===== */
@@ -720,12 +714,12 @@ export default function WalletDashboardDetails({
     <div class="flex flex-col w-full gap-3 mobileMd:gap-6">
       <div class="flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6">
         <div class="flex flex-col w-full mobileLg:w-1/2 tablet:w-2/3">
-          <div className={containerBackground}>
+          <div class={containerBackground}>
             <DashboardProfile />
           </div>
         </div>
         <div class="flex flex-col w-full mobileLg:w-1/2 tablet:w-1/3">
-          <div className={containerBackground}>
+          <div class={containerBackground}>
             <WalletOverview
               walletData={walletData}
               onSend={handleOpenSendModal}
@@ -741,9 +735,11 @@ export default function WalletDashboardDetails({
           stampsTotal={stampsTotal}
           src20Total={src20Total}
           stampsCreated={stampsCreated}
-          dispensers={walletData.dispensers}
-          stampValue={walletData.stampValue}
-          src20Value={walletData.src20Value}
+          {...(walletData.dispensers && { dispensers: walletData.dispensers })}
+          {...(walletData.stampValue !== undefined &&
+            { stampValue: walletData.stampValue })}
+          {...(walletData.src20Value !== undefined &&
+            { src20Value: walletData.src20Value })}
         />
       </div>
     </div>

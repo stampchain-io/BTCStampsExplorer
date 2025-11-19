@@ -1,9 +1,9 @@
-import { StampMintService } from "./stampMintService.ts";
-import { StampValidationService } from "./stampValidationService.ts";
+import { StampCreationService } from "$server/services/stamp/stampCreationService.ts";
+import { StampValidationService } from "$server/services/stamp/stampValidationService.ts";
 
-export { StampMintService, StampValidationService };
+export { StampCreationService, StampValidationService };
 
 export class StampService {
-  static readonly MintService = StampMintService;
+  static readonly MintService = StampCreationService;
   static readonly ValidationService = StampValidationService;
 }

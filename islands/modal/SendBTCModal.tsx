@@ -1,24 +1,28 @@
 /* ===== SEND BTC MODAL COMPONENT ===== */
-import { useEffect, useRef, useState } from "preact/hooks";
-import { walletContext } from "$client/wallet/wallet.ts";
-import { FeeCalculatorSimple } from "$components/section/FeeCalculatorSimple.tsx";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
-import { ModalBase } from "$layout";
+import { walletContext } from "$client/wallet/wallet.ts";
 import { inputField } from "$form";
-import { tooltipIcon } from "$notification";
 import { closeModal } from "$islands/modal/states.ts";
+import { ModalBase } from "$layout";
+import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
 import { logger } from "$lib/utils/logger.ts";
-import { showToast } from "$lib/utils/toastSignal.ts";
+import { mapProgressiveFeeDetails } from "$lib/utils/performance/fees/fee-estimation-utils.ts";
+import { showToast } from "$lib/utils/ui/notifications/toastSignal.ts";
+import { tooltipIcon } from "$notification";
+import { FeeCalculatorBase } from "$section";
+import type { SendBTCModalProps } from "$types/ui.d.ts";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
-interface Props {
-  fee: number;
-  balance: number;
-  handleChangeFee: (fee: number) => void;
-}
 
 /* ===== COMPONENT ===== */
-function SendBTCModal({ fee: initialFee, balance, handleChangeFee }: Props) {
+function SendBTCModal({
+  fee: initialFee,
+  balance,
+  handleChangeFee,
+  onClose: _onClose = () => {},
+  ...baseProps
+}: SendBTCModalProps) {
   /* ===== CONTEXT ===== */
   const { wallet } = walletContext;
 
@@ -47,6 +51,50 @@ function SendBTCModal({ fee: initialFee, balance, handleChangeFee }: Props) {
     type: "send",
     initialFee,
   });
+
+  /* ===== PROGRESSIVE FEE ESTIMATION INTEGRATION ===== */
+  const {
+    getBestEstimate,
+    isEstimating,
+    estimateExact,
+    currentPhase,
+  } = useTransactionConstructionService({
+    toolType: "stamp", // Using "stamp" for basic BTC sends (no data)
+    feeRate: isSubmitting ? 0 : formState.fee,
+    walletAddress: wallet?.address || "",
+    isConnected: !!wallet && !isSubmitting,
+    isSubmitting,
+    // BTC send specific parameters
+    recipientAddress: formState.recipientAddress,
+    amount: formState.amount,
+  });
+
+  // Get the best available fee estimate
+  const progressiveFeeDetails = getBestEstimate();
+
+  // Local state for exact fee details (updated when Phase 3 completes)
+  const [exactFeeDetails, setExactFeeDetails] = useState<
+    typeof progressiveFeeDetails | null
+  >(null);
+
+  // Reset exactFeeDetails when fee rate changes to allow slider updates
+  useEffect(() => {
+    setExactFeeDetails(null);
+  }, [formState.fee]);
+
+  /* ===== FEE DETAILS SYNCHRONIZATION ===== */
+  useEffect(() => {
+    if (progressiveFeeDetails && !isEstimating) {
+      logger.debug("system", {
+        message: "SendBTC progressive fee details update",
+        data: {
+          phase: currentPhase,
+          hasExactFees: progressiveFeeDetails.hasExactFees,
+          minerFee: progressiveFeeDetails.minerFee,
+        },
+      });
+    }
+  }, [progressiveFeeDetails, isEstimating, currentPhase]);
 
   /* ===== EFFECTS ===== */
   useEffect(() => {
@@ -94,7 +142,7 @@ function SendBTCModal({ fee: initialFee, balance, handleChangeFee }: Props) {
 
   useEffect(() => {
     if (formHookError) {
-      showToast(formHookError, "error", false);
+      showToast(formHookError, "error");
       setFormHookError(null);
     }
   }, [formHookError, setFormHookError]);
@@ -135,6 +183,27 @@ function SendBTCModal({ fee: initialFee, balance, handleChangeFee }: Props) {
 
   const handleSendSubmit = async () => {
     await handleSubmit(async () => {
+      // Get exact fee estimation before submitting
+      try {
+        const exactEstimate = await estimateExact();
+        if (exactEstimate) {
+          setExactFeeDetails(exactEstimate);
+          logger.debug("system", {
+            message: "SendBTC exact fee estimation completed",
+            data: {
+              minerFee: exactEstimate.minerFee,
+              hasExactFees: exactEstimate.hasExactFees,
+            },
+          });
+        }
+      } catch (error) {
+        logger.warn("system", {
+          message:
+            "SendBTC exact fee estimation failed, using progressive estimate",
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
+
       const options = {
         return_psbt: true,
         fee_per_kb: formState.fee * 1000,
@@ -185,20 +254,20 @@ function SendBTCModal({ fee: initialFee, balance, handleChangeFee }: Props) {
       if (signResult.signed) {
         if (signResult.txid) {
           showToast(
-            `Transaction sent! TXID: ${signResult.txid.substring(0, 10)}...`,
+            `Transaction sent!\nTXID: ${signResult.txid.substring(0, 10)}`,
             "success",
             false,
           );
           setTimeout(closeModal, 1000);
         } else if (signResult.psbt) {
           try {
-            showToast("Transaction signed. Broadcasting...", "info", true);
+            showToast("Transaction signed.\nBroadcasting...", "info");
             const broadcastTxid = await walletContext.broadcastPSBT(
               signResult.psbt,
             );
             if (broadcastTxid && typeof broadcastTxid === "string") {
               showToast(
-                `Broadcasted! : ${broadcastTxid.substring(0, 10)}...`,
+                `Broadcasted.\n${broadcastTxid.substring(0, 10)}...`,
                 "success",
                 false,
               );
@@ -238,7 +307,7 @@ function SendBTCModal({ fee: initialFee, balance, handleChangeFee }: Props) {
           );
         }
       } else if (signResult.cancelled) {
-        showToast("Transaction signing was cancelled.", "info", true);
+        showToast("Transaction signing was cancelled.", "info");
       } else {
         const signError = signResult.error || "Unknown signing error";
         logger.error("ui", {
@@ -291,8 +360,8 @@ function SendBTCModal({ fee: initialFee, balance, handleChangeFee }: Props) {
     } catch (error) {
       const errorMsg = error instanceof Error
         ? error.message
-        : "Failed to calculate max amount";
-      showToast(errorMsg, "error", false);
+        : "Failed to calculate max amount.";
+      showToast(errorMsg, "error");
     }
   };
 
@@ -344,7 +413,8 @@ function SendBTCModal({ fee: initialFee, balance, handleChangeFee }: Props) {
   return (
     <ModalBase
       onClose={handleCloseModal}
-      title="SEND"
+      {...baseProps}
+      title={baseProps.title || "SEND"}
     >
       {/* ===== AMOUNT INPUT SECTION ===== */}
       <div class="flex flex-col gap-6 -mt-3">
@@ -359,7 +429,7 @@ function SendBTCModal({ fee: initialFee, balance, handleChangeFee }: Props) {
                 value={formState.amount}
                 onInput={handleAmountInput}
                 placeholder="0"
-                class="bg-transparent text-[30px] mobileLg:text-[42px] text-stamp-grey-light placeholder:text-stamp-grey font-black text-right -ms-0 mobileLg:-ms-0 pointer-events-auto no-outline"
+                class="bg-transparent text-[30px] mobileLg:text-[42px] text-color-grey-light placeholder:text-color-grey font-black text-right -ms-0 mobileLg:-ms-0 pointer-events-auto no-outline"
                 style={{
                   width: (() => {
                     const value = formState.amount || "";
@@ -384,14 +454,14 @@ function SendBTCModal({ fee: initialFee, balance, handleChangeFee }: Props) {
                   outlineStyle: "none",
                 }}
               />
-              <span class="text-[30px] mobileLg:text-[42px] text-stamp-grey-light font-extralight">
+              <span class="text-[30px] mobileLg:text-[42px] text-color-grey-light font-extralight">
                 BTC
               </span>
             </div>
           </div>
 
           {/* ===== USD CONVERSION ===== */}
-          <div class="text-sm mobileLg:text-base text-stamp-grey-darker font-light">
+          <div class="text-sm mobileLg:text-base text-color-grey-semidark font-light">
             {formState.amount && formState.BTCPrice
               ? (parseFloat(formState.amount) * formState.BTCPrice)
                 .toLocaleString("en-US", {
@@ -403,7 +473,7 @@ function SendBTCModal({ fee: initialFee, balance, handleChangeFee }: Props) {
 
           {/* ===== MAX BUTTON ===== */}
           <div
-            className="relative text-base mobileLg:text-lg text-stamp-grey font-medium hover:text-stamp-grey-light mt-2 cursor-pointer"
+            className="relative text-base mobileLg:text-lg text-color-grey font-medium hover:text-color-grey-light mt-2 cursor-pointer"
             onClick={handleMaxClick}
             onMouseEnter={handleMaxMouseEnter}
             onMouseLeave={handleMaxMouseLeave}
@@ -433,12 +503,13 @@ function SendBTCModal({ fee: initialFee, balance, handleChangeFee }: Props) {
       </div>
 
       {/* ===== FEE CALCULATOR ===== */}
-      <FeeCalculatorSimple
+      <FeeCalculatorBase
         fee={formState.fee}
-        amount={Number(formState.amount) || 0}
         handleChangeFee={internalHandleChangeFee}
-        type="send"
         BTCPrice={formState.BTCPrice}
+        feeDetails={mapProgressiveFeeDetails(
+          exactFeeDetails || progressiveFeeDetails,
+        )}
         isSubmitting={isSubmitting}
         onSubmit={handleSendSubmit}
         onCancel={handleCloseModal}
@@ -446,10 +517,6 @@ function SendBTCModal({ fee: initialFee, balance, handleChangeFee }: Props) {
         tosAgreed={tosAgreed}
         onTosChange={setTosAgreed}
         className="mt-auto"
-        userAddress={wallet?.address ?? ""}
-        recipientAddress={formState.recipientAddress ?? ""}
-        inputType="P2WPKH"
-        outputTypes={["P2WPKH"]}
       />
     </ModalBase>
   );

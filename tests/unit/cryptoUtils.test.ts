@@ -1,5 +1,5 @@
 import { assertEquals } from "@std/assert";
-import { verifySignature } from "$lib/utils/cryptoUtils.ts";
+import { verifySignature } from "$lib/utils/security/cryptoUtils.ts";
 
 // Save original console.error
 const originalConsoleError = console.error;

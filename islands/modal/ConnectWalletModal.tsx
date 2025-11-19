@@ -1,20 +1,16 @@
 /* ===== CONNECT WALLET MODAL COMPONENT ===== */
-import { ComponentChildren } from "preact";
 import { showConnectWalletModal } from "$client/wallet/wallet.ts";
-import { subtitlePurple } from "$text";
 import { ModalBase } from "$layout";
 import { logger } from "$lib/utils/logger.ts";
+import { subtitleGrey } from "$text";
+import type { ConnectWalletModalProps } from "$types/ui.d.ts";
 
 /* ===== TYPES ===== */
-interface ConnectWalletModalProps {
-  connectors: ComponentChildren;
-  handleClose: () => void;
-}
 
 /* ===== COMPONENT ===== */
 export const ConnectWalletModal = ({
   connectors,
-  handleClose,
+  onClose,
 }: ConnectWalletModalProps) => {
   /* ===== EVENT HANDLERS ===== */
   const handleModalClose = () => {
@@ -32,7 +28,7 @@ export const ConnectWalletModal = ({
     // Then wait for animation to complete before closing
     setTimeout(() => {
       showConnectWalletModal.value = false;
-      handleClose();
+      onClose?.();
     }, 600); // matches --animation-cleanup-delay from modal.css
   };
 
@@ -41,14 +37,14 @@ export const ConnectWalletModal = ({
     <ModalBase
       title="CONNECT"
       onClose={handleModalClose}
-      className="w-[340px] mobileLg:w-[640px]"
+      className="w-[340px] min-[420px]:w-[360px] mobileMd:w-[380px] mobileLg:w-[640px]"
     >
-      <h4 class={`${subtitlePurple} text-center -mt-9 pb-3`}>
+      <h4 class={`${subtitleGrey} text-center -mt-6 pb-3`}>
         YOUR WALLET
       </h4>
 
       {/* ===== WALLET PROVIDERS GRID ===== */}
-      <div class="grid grid-cols-1 mobileLg:grid-cols-2 gap-6 items-center">
+      <div class="grid grid-cols-1 mobileLg:grid-cols-2 gap-5 items-center">
         {connectors}
       </div>
     </ModalBase>

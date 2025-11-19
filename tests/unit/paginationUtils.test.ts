@@ -1,5 +1,8 @@
 import { assertEquals, assertInstanceOf } from "@std/assert";
-import { getPaginationParams, paginate } from "$lib/utils/paginationUtils.ts";
+import {
+  getPaginationParams,
+  paginate,
+} from "$lib/utils/data/pagination/paginationUtils.ts";
 
 Deno.test("paginationUtils - getPaginationParams with default values", () => {
   const url = new URL("https://example.com/api/stamps");
@@ -119,6 +122,56 @@ Deno.test("paginationUtils - getPaginationParams with invalid limit", () => {
   if (!(result instanceof Response)) {
     assertEquals(result.limit, 500, "Should use default limit for empty limit");
     assertEquals(result.page, 1, "Should use default page");
+  }
+});
+
+Deno.test("paginationUtils - getPaginationParams with limit exceeding maximum", () => {
+  // Test limit values that exceed MAX_PAGINATION_LIMIT (1000)
+  const excessiveLimitCases = [
+    {
+      url: "https://example.com/api/stamps?limit=1001",
+      desc: "limit just over max",
+    },
+    {
+      url: "https://example.com/api/stamps?limit=5000",
+      desc: "limit far over max",
+    },
+    {
+      url: "https://example.com/api/stamps?limit=999999",
+      desc: "very high limit",
+    },
+  ];
+
+  for (const testCase of excessiveLimitCases) {
+    const url = new URL(testCase.url);
+    const result = getPaginationParams(url);
+
+    assertInstanceOf(
+      result,
+      Response,
+      `Should return Response for ${testCase.desc}`,
+    );
+    if (result instanceof Response) {
+      assertEquals(
+        result.status,
+        400,
+        `Should return 400 status for ${testCase.desc}`,
+      );
+    }
+  }
+
+  // Test limit at the maximum boundary (should be valid)
+  const maxLimitUrl = new URL("https://example.com/api/stamps?limit=1000");
+  const maxResult = getPaginationParams(maxLimitUrl);
+
+  assertInstanceOf(
+    maxResult,
+    Object,
+    "Should return params object for limit at maximum",
+  );
+  if (!(maxResult instanceof Response)) {
+    assertEquals(maxResult.limit, 1000, "Should accept limit at maximum value");
+    assertEquals(maxResult.page, 1, "Should use default page");
   }
 });
 

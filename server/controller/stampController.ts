@@ -1,45 +1,26 @@
-import { StampService } from "$server/services/stampService.ts";
-import { BIG_LIMIT, CAROUSEL_STAMP_IDS } from "$lib/utils/constants.ts";
-import { HolderRow, SUBPROTOCOLS } from "$globals";
-import { Src20Service } from "$server/services/src20/queryService.ts";
-import { CollectionService } from "$server/services/collectionService.ts";
-import { BlockService } from "$server/services/blockService.ts";
-import { paginate } from "$lib/utils/paginationUtils.ts";
+import type { StampEdition, StampFilesize, StampFiletype, StampFilterType, StampMarketplace, StampRange, StampSuffixFilter } from "$constants";
+import { BIG_LIMIT, CAROUSEL_STAMP_IDS, STAMP_TYPES as STAMP_TYPE_CONSTANTS, type StampType } from "$constants";
+import { filterOptions } from "$lib/utils/data/filtering/filterOptions.ts";
+import { CollectionController } from "$server/controller/collectionController.ts";
+import { BlockService } from "$server/services/core/blockService.ts";
+import { CollectionService } from "$server/services/core/collectionService.ts";
 import { BTCPriceService } from "$server/services/price/btcPriceService.ts";
-import {
-  PaginatedStampBalanceResponseBody,
-  ProcessedHolder,
-  StampRow,
-  STAMP_FILTER_TYPES,
-  STAMP_SUFFIX_FILTERS,
-  STAMP_TYPES,
-  STAMP_FILETYPES,
-  STAMP_EDITIONS,
-  STAMP_MARKET,
-  STAMP_RANGES,
-} from "$globals";
-import { DispenserManager } from "$server/services/xcpService.ts";
-import { filterOptions } from "$lib/utils/filterOptions.ts";
-import { Dispense, Dispenser } from "$types/index.d.ts";
-import { CollectionController } from "./collectionController.ts";
-import { Src20Controller } from "./src20Controller.ts";
-import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
+import { StampService } from "$server/services/stampService.ts";
+import type { CollectionRow } from "$server/types/collection.d.ts";
+import type { SUBPROTOCOLS } from "$types/base.d.ts";
+// import { formatSatoshisToBTC } from "$lib/utils/ui/formatting/formatUtils.ts"; // Fixed: Removed unused import
+import { normalizeHeaders } from "$lib/utils/api/headers/headerUtils.ts";
+import { API_RESPONSE_VERSION, ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
+import { WebResponseUtil } from "$lib/utils/api/responses/webResponseUtil.ts";
 import { logger } from "$lib/utils/logger.ts";
-import { XcpManager } from "$server/services/xcpService.ts";
-import { RouteType } from "$server/services/cacheService.ts";
-import { StampRepository } from "$server/database/stampRepository.ts";
-import { isCpid, getIdentifierType } from "$lib/utils/identifierUtils.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import { detectContentType } from "$lib/utils/imageUtils.ts";
-import { getMimeType } from "$lib/utils/imageUtils.ts";
-import { API_RESPONSE_VERSION } from "$lib/utils/responseUtil.ts";
-import { normalizeHeaders } from "$lib/utils/headerUtils.ts";
-import { WebResponseUtil } from "$lib/utils/webResponseUtil.ts";
-import { decodeBase64 } from "$lib/utils/formatUtils.ts";
-
-interface StampControllerOptions {
-  cacheType: RouteType;
-}
+import { isCpid } from "$lib/utils/typeGuards.ts";
+import { decodeBase64 } from "$lib/utils/ui/formatting/formatUtils.ts";
+import { getMimeTypeFromExtension } from "$lib/utils/ui/media/imageUtils.ts";
+import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
+import { RouteType } from "$server/services/infrastructure/cacheService.ts";
+import type { PaginatedStampBalanceResponseBody } from "$types/api.d.ts";
+import type { StampBalance, StampRow } from "$types/stamp.d.ts";
+import type { HolderRow, ProcessedHolder } from "$types/wallet.d.ts";
 
 export class StampController {
   static async getStamps({
@@ -47,7 +28,7 @@ export class StampController {
     limit = BIG_LIMIT,
     sortBy = "DESC",
     type = "all",
-    filterBy = [] as STAMP_FILTER_TYPES[],
+    filterBy = [] as StampFilterType[],
     ident,
     collectionId,
     identifier,
@@ -57,51 +38,109 @@ export class StampController {
     allColumns = false,
     includeSecondary = true,
     sortColumn = "tx_index",
-    suffixFilters,
-    collectionStampLimit = 12,
+    suffix,
     groupBy,
     groupBySubquery,
     skipTotalCount = false,
     cacheType = RouteType.STAMP_LIST,
     enrichWithAssetInfo = false,
-    isSearchQuery = false,
     url,
-    filetypeFilters,
-    editionFilters,
-    rangeFilters,
+    fileType,
+    editions,
+    range,
     rangeMin,
     rangeMax,
-    marketFilters,
-    marketMin,
-    marketMax,
+    market,
+    dispensers,
+    atomics,
+    listings,
+    listingsMin,
+    listingsMax,
+    sales,
+    salesMin,
+    salesMax,
+    volume,
+    volumeMin,
+    volumeMax,
+    fileSize,
+    fileSizeMin,
+    fileSizeMax,
+    // Market Data Filters (Task 42)
+    minHolderCount,
+    maxHolderCount,
+    minDistributionScore,
+    maxTopHolderPercentage,
+    minFloorPriceBTC,
+    maxFloorPriceBTC,
+    minVolume24h,
+    minPriceChange24h,
+    minDataQualityScore,
+    maxCacheAgeMinutes,
+    priceSource,
+    collectionStampLimit,
+    // Performance optimization - pass pre-fetched BTC price
+    btcPrice,
+    btcPriceSource,
+    includeMarketData = true, // Default to true for backward compatibility
   }: {
     page?: number;
     limit?: number;
     sortBy?: "ASC" | "DESC";
-    /**
-     * If suffix filters and ident are provided, filterBy and type will be ignored
-     */
-    suffixFilters?: string[];
+    suffix?: string[];
     ident?: SUBPROTOCOLS[];
     url?: string;
-    isSearchQuery?: boolean;
     enrichWithAssetInfo?: boolean;
     skipTotalCount?: boolean;
     collectionId?: string | undefined;
-    type?: "all" | "classic" | "cursed" | "posh" | "stamps" | "src20";
-    allColumns?: boolean
+    type?: StampType;
+    allColumns?: boolean;
     identifier?: string | number | (string | number)[];
-    noPagination?: boolean
-    cacheDuration?: number
-    filterBy?: STAMP_FILTER_TYPES[];
-    filetypeFilters?: STAMP_FILETYPES[];
-    editionFilters?: STAMP_EDITIONS[];
-    rangeFilters?: STAMP_RANGES;
+    blockIdentifier?: string | number;
+    noPagination?: boolean;
+    cacheDuration?: number;
+    includeSecondary?: boolean;
+    sortColumn?: string;
+    groupBy?: string;
+    groupBySubquery?: string | boolean;
+    cacheType?: RouteType;
+    filterBy?: StampFilterType[];
+    fileType?: StampFiletype[];
+    editions?: StampEdition[];
+    range?: StampRange;
     rangeMin?: string;
     rangeMax?: string;
-    marketFilters?: STAMP_MARKET[];
-    marketMin?: string;
-    marketMax?: string;
+    market?: Extract<StampMarketplace, "listings" | "sales"> | "";
+    dispensers?: boolean;
+    atomics?: boolean;
+    listings?: Extract<StampMarketplace, "all" | "bargain" | "affordable" | "premium" | "custom"> | "";
+    listingsMin?: string;
+    listingsMax?: string;
+    sales?: Extract<StampMarketplace, "recent" | "premium" | "custom" | "volume"> | "";
+    salesMin?: string;
+    salesMax?: string;
+    volume?: "24h" | "7d" | "30d" | "";
+    volumeMin?: string;
+    volumeMax?: string;
+    fileSize?: StampFilesize | null;
+    fileSizeMin?: string;
+    fileSizeMax?: string;
+    // Market Data Filters (Task 42)
+    minHolderCount?: string;
+    maxHolderCount?: string;
+    minDistributionScore?: string;
+    maxTopHolderPercentage?: string;
+    minFloorPriceBTC?: string;
+    maxFloorPriceBTC?: string;
+    minVolume24h?: string;
+    minPriceChange24h?: string;
+    minDataQualityScore?: string;
+    maxCacheAgeMinutes?: string;
+    priceSource?: string;
+    collectionStampLimit?: number;
+    includeMarketData?: boolean;
+    // Performance optimization - pre-fetched BTC price
+    btcPrice?: number;
+    btcPriceSource?: string;
   } = {}) {
     console.log("stamp controller payload", {
       page,
@@ -112,180 +151,243 @@ export class StampController {
       ident,
       collectionId,
       url,
-      filetypeFilters,
-      editionFilters,
-      rangeFilters,
+      fileType,
+      editions,
+      range,
       rangeMin,
       rangeMax,
-      marketFilters,
-      marketMin,
-      marketMax
+      market,
+      dispensers,
+      atomics,
+      listings,
+      listingsMin,
+      listingsMax,
+      sales,
+      salesMin,
+      salesMax,
+      volume,
+      volumeMin,
+      volumeMax,
+      fileSize,
+      fileSizeMin,
+      fileSizeMax
     });
-    
-    console.log("About to call repository with rangeFilters:", rangeFilters);
-    
-    const filterByArray = typeof filterBy === "string"
-      ? filterBy.split(",").filter(Boolean) as STAMP_FILTER_TYPES[]
-      : filterBy;
+
+    console.log("About to call repository with range:", range);
+
+    const filterByArray: StampFilterType[] = Array.isArray(filterBy)
+      ? filterBy
+      : typeof filterBy === "string" && filterBy
+        ? (filterBy as string).split(",").filter(Boolean) as StampFilterType[]
+        : [];
 
     // Initialize ident based on type
     let finalIdent: SUBPROTOCOLS[] = ident || [];
+
+    // Validate ident parameter if provided
+    const VALID_IDENTS = ["STAMP", "SRC-20", "SRC-721"];
+    if (ident && ident.length > 0) {
+      // Check if all provided idents are valid
+      const invalidIdents = ident.filter(id => !VALID_IDENTS.includes(id));
+      if (invalidIdents.length > 0) {
+        // Return empty results for invalid ident values
+        return {
+          data: [],
+          total: 0,
+          page: page || 1,
+          limit: limit || 50,
+          totalPages: 0,
+          last_block: await BlockService.getLastBlock()
+        };
+      }
+    }
+
     if ((!ident || ident.length === 0) && type) {
-      if (type === "classic") {
+      if (type === STAMP_TYPE_CONSTANTS.CLASSIC) {
         finalIdent = ["STAMP"];
-      } else if (type === "posh") {
+      } else if (type === STAMP_TYPE_CONSTANTS.POSH) {
         finalIdent = [];
-      } else if (type === "stamps") {
+      } else if (type === STAMP_TYPE_CONSTANTS.STAMPS) {
         finalIdent = ["STAMP", "SRC-721"];
-      } else if (type === "src20") {
+      } else if (type === STAMP_TYPE_CONSTANTS.SRC20) {
         finalIdent = ["SRC-20"];
-      } else if (type === "all") {
+      } else if (type === STAMP_TYPE_CONSTANTS.ALL) {
         finalIdent = []; // We'll handle 'all' in the repository
       } else {
         finalIdent = [];
       }
     }
 
-    let filterSuffixFilters: STAMP_SUFFIX_FILTERS[] = [];
+    let filterSuffix: StampSuffixFilter[] = [];
     if (filterByArray.length > 0) {
-      // Extract ident and suffixFilters from filterBy
+      // Extract ident and suffix from filterBy
       const identFromFilter = filterByArray.flatMap((filter) =>
-        filterOptions[filter]?.ident || []
+        filter in filterOptions ? filterOptions[filter as keyof typeof filterOptions]?.ident || [] : []
       );
-      filterSuffixFilters = filterByArray.flatMap((filter) =>
-        filterOptions[filter]?.suffixFilters || []
-      ) as STAMP_SUFFIX_FILTERS[];
+      filterSuffix = filterByArray.flatMap((filter) =>
+        filter in filterOptions ? filterOptions[filter as keyof typeof filterOptions]?.suffixFilters || [] : []
+      ) as StampSuffixFilter[];
 
       // Combine ident from type and filterBy, removing duplicates
       if (identFromFilter.length > 0) {
         finalIdent = Array.from(new Set([...finalIdent, ...identFromFilter]));
       }
 
-      // When filterBy is defined, suffixFilters are limited to those in filterOptions
-      suffixFilters = filterSuffixFilters;
-    } else if (!suffixFilters || suffixFilters.length === 0) {
-      // If suffixFilters are not provided, use all possible suffixes
-      suffixFilters = []; // No suffix filter applied
+      // When filterBy is defined, suffix are limited to those in filterOptions
+      suffix = filterSuffix;
+    } else if (!suffix || suffix.length === 0) {
+      // If suffix are not provided, use all possible suffixes
+      suffix = []; // No suffix filter applied
     }
 
-    // If rangeFilters is undefined but url is provided, check for range parameters
-    if (!rangeFilters && url) {
+    // Handle custom range - StampRange expects string literals, not objects
+    let customRange: StampRange | undefined = range;
+    if (!range && url) {
       try {
         const urlObj = new URL(url);
-        const rangeMin = urlObj.searchParams.get("range[stampRange][min]");
-        const rangeMax = urlObj.searchParams.get("range[stampRange][max]");
-        
-        if (rangeMin || rangeMax) {
-          console.log("Controller detected custom range params:", { rangeMin, rangeMax });
-          rangeFilters = {
-            stampRange: {
-              min: rangeMin || "",
-              max: rangeMax || ""
-            }
-          };
-          console.log("Controller set rangeFilters:", rangeFilters);
+        const rangeMinParam = urlObj.searchParams.get("range[stampRange][min]");
+        const rangeMaxParam = urlObj.searchParams.get("range[stampRange][max]");
+
+        if (rangeMinParam || rangeMaxParam) {
+          console.log("Controller detected custom range params:", { rangeMinParam, rangeMaxParam });
+          customRange = "custom"; // Use the custom literal value
+          console.log("Controller set range:", customRange);
         }
       } catch (error) {
         console.error("Error parsing URL in controller:", error);
       }
     }
 
+    // Use pre-fetched BTC price if provided, otherwise fetch it
+    let btcPriceValue: number;
+    let btcPriceSourceValue: string;
+
+    if (btcPrice !== undefined && btcPriceSource !== undefined) {
+      btcPriceValue = btcPrice;
+      btcPriceSourceValue = btcPriceSource;
+      console.log(`[StampController] Using pre-fetched BTC price: $${btcPriceValue} from ${btcPriceSourceValue}`);
+    } else {
+      const btcPriceData = await BTCPriceService.getPrice();
+      btcPriceValue = btcPriceData.price;
+      btcPriceSourceValue = btcPriceData.source;
+      console.log(`[StampController] Fetched BTC price: $${btcPriceValue} from ${btcPriceSourceValue}`);
+    }
+
+    // Use market data inclusion setting from route handler (version-aware)
+    const useMarketData = includeMarketData;
+
+    // Determine if this is a detail view (single stamp) or list view
+    const isDetailView = identifier && !Array.isArray(identifier);
+
+    // Only include heavy fields like stamp_base64 for detail views
+    const shouldIncludeSecondary = isDetailView ? includeSecondary : false;
+
+    // Convert boolean parameters to proper types for service call
+    const dispensersParam = typeof dispensers === "boolean" ? dispensers : undefined;
+    const atomicsParam = typeof atomics === "boolean" ? atomics : undefined;
+
+    // Convert groupBySubquery to boolean
+    const groupBySubqueryParam = typeof groupBySubquery === "string" ? groupBySubquery === "true" : Boolean(groupBySubquery);
+
+    // Always include market data when available
     const stampResult = await StampService.getStamps({
       page,
       limit,
       sortBy,
       type,
       ident: finalIdent,
-      suffixFilters,
+      suffix: suffix as StampSuffixFilter[],
       allColumns,
-      includeSecondary,
-      collectionId,
-      identifier,
-      blockIdentifier,
-      cacheDuration,
+      includeSecondary: shouldIncludeSecondary,
+      ...(collectionId !== undefined ? { collectionId } : {}),
+      ...(identifier !== undefined ? { identifier } : {}),
+      ...(blockIdentifier !== undefined ? { blockIdentifier } : {}),
+      ...(cacheDuration !== undefined ? { cacheDuration } : {}),
       noPagination,
       sortColumn,
-      collectionStampLimit,
-      groupBy,
-      groupBySubquery,
+      ...(groupBy !== undefined ? { groupBy } : {}),
+      groupBySubquery: groupBySubqueryParam,
       skipTotalCount,
       cacheType,
-      isSearchQuery,
       filterBy: filterByArray,
-      filetypeFilters,
-      editionFilters,
-      rangeFilters,
-      rangeMin,
-      rangeMax,
-      marketFilters,
-      marketMin,
-      marketMax
+      ...(fileType !== undefined ? { fileType } : {}),
+      ...(editions !== undefined ? { editions } : {}),
+      ...(customRange !== undefined ? { range: customRange } : {}),
+      ...(rangeMin !== undefined ? { rangeMin } : {}),
+      ...(rangeMax !== undefined ? { rangeMax } : {}),
+      ...(market !== undefined ? { market } : {}),
+      ...(dispensersParam !== undefined ? { dispensers: dispensersParam } : {}),
+      ...(atomicsParam !== undefined ? { atomics: atomicsParam } : {}),
+      ...(listings !== undefined ? { listings } : {}),
+      ...(listingsMin !== undefined ? { listingsMin } : {}),
+      ...(listingsMax !== undefined ? { listingsMax } : {}),
+      ...(sales !== undefined ? { sales } : {}),
+      ...(salesMin !== undefined ? { salesMin } : {}),
+      ...(salesMax !== undefined ? { salesMax } : {}),
+      ...(volume !== undefined ? { volume } : {}),
+      ...(volumeMin !== undefined ? { volumeMin } : {}),
+      ...(volumeMax !== undefined ? { volumeMax } : {}),
+      ...(fileSize !== undefined ? { fileSize } : {}),
+      ...(fileSizeMin !== undefined ? { fileSizeMin } : {}),
+      ...(fileSizeMax !== undefined ? { fileSizeMax } : {}),
+      // Market Data Filters (Task 42)
+      ...(minHolderCount !== undefined ? { minHolderCount } : {}),
+      ...(maxHolderCount !== undefined ? { maxHolderCount } : {}),
+      ...(minDistributionScore !== undefined ? { minDistributionScore } : {}),
+      ...(maxTopHolderPercentage !== undefined ? { maxTopHolderPercentage } : {}),
+      ...(minFloorPriceBTC !== undefined ? { minFloorPriceBTC } : {}),
+      ...(maxFloorPriceBTC !== undefined ? { maxFloorPriceBTC } : {}),
+      ...(minVolume24h !== undefined ? { minVolume24h } : {}),
+      ...(minPriceChange24h !== undefined ? { minPriceChange24h } : {}),
+      ...(minDataQualityScore !== undefined ? { minDataQualityScore } : {}),
+      ...(maxCacheAgeMinutes !== undefined ? { maxCacheAgeMinutes } : {}),
+      ...(priceSource !== undefined ? { priceSource } : {}),
+      ...(collectionStampLimit !== undefined ? { collectionStampLimit } : {}),
+      includeMarketData: Boolean(useMarketData),
+              btcPriceUSD: btcPriceValue
     });
 
-    // Process stamps with floor prices and asset info if needed
-    const btcPriceData = await BTCPriceService.getPrice();
-    const btcPrice = btcPriceData.price;
-    console.log(`[StampController] BTC price: $${btcPrice} from ${btcPriceData.source}`);
-    const processedStamps = await Promise.all(
-      stampResult.stamps.map(async (stamp) => {
-        if (stamp.ident !== "STAMP" && stamp.ident !== "SRC-721") {
-          return stamp;
-        }
-        
-        // Get all dispensers to check both open and closed
-        const allDispensers = await DispenserManager.getDispensersByCpid(stamp.cpid);
-        const openDispensers = allDispensers.dispensers.filter(d => d.give_remaining > 0);
-        const closedDispensers = allDispensers.dispensers.filter(d => d.give_remaining === 0);
-        
-        let floorPrice: number | "priceless" = "priceless";
-        
-        if (openDispensers.length > 0) {
-          // Use floor price from open dispensers
-          floorPrice = this.calculateFloorPrice(openDispensers);
-        } else if (closedDispensers.length > 0) {
-          // If no open dispensers, use most recent closed dispenser price
-          const sortedClosedDispensers = closedDispensers.sort((a, b) => b.block_index - a.block_index);
-          const recentPrice = Number(formatSatoshisToBTC(sortedClosedDispensers[0].satoshirate, { includeSymbol: false }));
-          floorPrice = recentPrice || "priceless";
-        }
+    // Process stamps - only fetch additional asset info for single stamp detail pages
+    let processedStamps = stampResult.stamps;
+    if (enrichWithAssetInfo && identifier && !Array.isArray(identifier)) {
+      // Only enrich with asset info for detail pages
+      const stamp = stampResult.stamps[0];
+      if (stamp && (stamp.ident === "STAMP" || stamp.ident === "SRC-721")) {
+        const asset = await CounterpartyApiManager.getAssetInfo(stamp.cpid);
+        processedStamps = [this.enrichStampWithAssetData(stamp, asset)];
+      }
+    }
 
-        // If enrichment is requested and it's a single stamp query
-        if (enrichWithAssetInfo && identifier && !Array.isArray(identifier)) {
-          const asset = await XcpManager.getAssetInfo(stamp.cpid);
-          const enrichedStamp = this.enrichStampWithAssetData(stamp, asset);
-          return {
-            ...enrichedStamp,
-            floorPrice,
-            floorPriceUSD: typeof floorPrice === 'number' ? floorPrice * btcPrice : null,
-            marketCapUSD: typeof stamp.marketCap === 'number' ? stamp.marketCap * btcPrice : null,
-          };
-        }
-        
-        return {
-          ...stamp,
-          floorPrice,
-          floorPriceUSD: typeof floorPrice === 'number' ? floorPrice * btcPrice : null,
-          marketCapUSD: typeof stamp.marketCap === 'number' ? stamp.marketCap * btcPrice : null,
-        };
-      })
-    );
+    // Get cache status from the first stamp with market data
+    let cacheStatus = 'unknown';
+    if (useMarketData && processedStamps.length > 0) {
+      const firstStampWithData = processedStamps.find((s: any) => s.cacheStatus);
+      cacheStatus = firstStampWithData?.cacheStatus || 'unknown';
+    }
 
     // Build response based on query type
     const baseResponse = {
-      data: identifier && !Array.isArray(identifier) 
+      data: identifier && !Array.isArray(identifier)
         ? { stamp: processedStamps[0] }  // Single stamp response
         : processedStamps,               // Multiple stamps response
       last_block: stampResult.last_block,
+      metadata: {
+        btcPrice: btcPriceValue,
+        cacheStatus: cacheStatus,
+        source: btcPriceSourceValue
+      }
     };
 
     // Add pagination data for index/collection routes
     if (!identifier || Array.isArray(identifier)) {
+      // Handle both paginated and non-paginated responses
+      const paginatedResult = stampResult as any;
       return {
         ...baseResponse,
-        page: stampResult.page,
-        limit: stampResult.page_size,
-        totalPages: stampResult.pages,
-        total: skipTotalCount ? undefined : stampResult.total,
+        page: paginatedResult.page || page,
+        limit: paginatedResult.page_size || limit,
+        totalPages: paginatedResult.pages || 0,
+        total: skipTotalCount ? undefined : (paginatedResult.total || 0),
       };
     }
 
@@ -293,26 +395,30 @@ export class StampController {
   }
 
   // This becomes a wrapper around getStamps for backward compatibility
-  static async getStampDetailsById(
-    id: string, 
-    stampType: STAMP_TYPES = "all",
+  static getStampDetailsById(
+    id: string,
+    stampType: StampType = "all",
     cacheType: RouteType = RouteType.STAMP_DETAIL,
-    cacheDuration?: number | "never",
+    cacheDuration?: number,
     includeSecondary: boolean = true,
-    isSearchQuery: boolean = false
+    _isSearchQuery: boolean = false
   ) {
-    return this.getStamps({
+    const params: any = {
       identifier: id,
       type: stampType,
       cacheType,
-      cacheDuration,
       allColumns: false,
       noPagination: true,
       skipTotalCount: true,
       enrichWithAssetInfo: true,
       includeSecondary,
-      isSearchQuery
-    });
+    };
+
+    if (cacheDuration !== undefined) {
+      params.cacheDuration = cacheDuration;
+    }
+
+    return this.getStamps(params);
   }
 
   private static enrichStampWithAssetData(stamp: StampRow, asset: any) {
@@ -331,79 +437,47 @@ export class StampController {
       return sum + quantity;
     }, 0);
 
-    // Map holders with percentages
+    // Map holders with percentages - use 'amt' to match UI component expectations
     return holders.map((holder: HolderRow) => {
       const quantity = holder.divisible ? holder.quantity / 100000000 : holder.quantity;
       const percentage = totalQuantity > 0 ? (quantity / totalQuantity) * 100 : 0;
 
       return {
         address: holder.address,
-        amt: quantity,  // Renamed from quantity to amt to match HoldersGraph interface
+        amt: quantity,  // Use 'amt' to match HoldersPieChart and HoldersTableBase expectations
         percentage: Number(percentage.toFixed(2))  // Round to 2 decimal places
       };
     });
   }
 
-  private static calculateFloorPrice(openDispensers: Dispenser[]): number | "priceless" {
-    if (openDispensers.length === 0) return "priceless";
-    
-    const lowestBtcRate = Math.min(
-      ...openDispensers.map(dispenser => 
-        Number(formatSatoshisToBTC(dispenser.satoshirate, { includeSymbol: false }))
-      )
-    );
-    
-    return lowestBtcRate !== Infinity ? lowestBtcRate : "priceless";
-  }
-
-  private static calculateRecentSalePrice(dispensers: Dispenser[]): number | "priceless" {
-    if (dispensers.length === 0) return "priceless";
-
-    // Look at both open and closed dispensers to find the most recent
-    const closedDispensers = dispensers.filter(d => d.give_remaining === 0);
-    const openDispensers = dispensers.filter(d => d.give_remaining > 0);
-
-    // Get most recent from each category
-    const mostRecentClosed = closedDispensers.length > 0 
-      ? closedDispensers.reduce((prev, current) => 
-          (prev.block_index > current.block_index) ? prev : current
-        )
-      : null;
-
-    const mostRecentOpen = openDispensers.length > 0
-      ? openDispensers.reduce((prev, current) => 
-          (prev.block_index > current.block_index) ? prev : current
-        )
-      : null;
-
-    // Compare block indices to find the most recent overall
-    const mostRecent = !mostRecentClosed ? mostRecentOpen :
-                      !mostRecentOpen ? mostRecentClosed :
-                      mostRecentClosed.block_index > mostRecentOpen.block_index 
-                        ? mostRecentClosed 
-                        : mostRecentOpen;
-
-    return mostRecent ? 
-      Number(formatSatoshisToBTC(mostRecent.satoshirate, { includeSymbol: false })) 
-      : "priceless";
-  }
-
-  static async getRecentSales(page?: number, limit?: number) {
+  static async getRecentSales(
+    page?: number,
+    limit?: number,
+    options?: {
+      dayRange?: number;
+      includeFullDetails?: boolean;
+      type?: StampType;
+    }
+  ) {
     try {
-      const { recentSales, total } = await StampService.getRecentSales(
+      const result = await StampService.getRecentSales(
         page,
         limit,
+        options
       );
+
       const lastBlock = await BlockService.getLastBlock();
-      const totalPages = limit ? Math.ceil(total / limit) : 1;
+      const totalPages = limit ? Math.ceil(result.total / limit) : 1;
 
       return {
         page: page || 1,
-        limit: limit || total,
+        limit: limit || result.total,
+        total: result.total,
         totalPages,
-        total,
         last_block: lastBlock,
-        data: recentSales,
+        data: result.recentSales,
+        btcPriceUSD: result.btcPriceUSD,
+        metadata: result.metadata,
       };
     } catch (error) {
       logger.error("stamps", {
@@ -421,19 +495,19 @@ export class StampController {
     sortBy: "ASC" | "DESC" = "DESC"
   ): Promise<PaginatedStampBalanceResponseBody> {
     try {
-      const { balances: xcpBalances, total: xcpTotal } = await XcpManager.getAllXcpBalancesByAddress(
+      const { balances: xcpBalances, total: xcpTotal } = await CounterpartyApiManager.getAllXcpBalancesByAddress(
         address,
         false
       );
-      
+
       console.log(`[StampController] Got ${xcpBalances.length} XCP balances out of ${xcpTotal} total`);
 
       // Get paginated stamps and total count
       const [{ stamps, total }, lastBlock] = await Promise.all([
         StampService.getStampBalancesByAddress(
-          address, 
-          limit, 
-          page, 
+          address,
+          limit,
+          page,
           xcpBalances,
           sortBy
         ),
@@ -442,10 +516,10 @@ export class StampController {
 
       console.log(`[StampController] Got ${stamps.length} stamps for page ${page}, total stamps: ${total}`);
 
+      // v2.3: Stamps already have clean structure, no additional processing needed
       return {
         page,
         limit,
-        total,
         totalPages: Math.ceil(total / limit),
         last_block: lastBlock,
         data: stamps,
@@ -459,7 +533,7 @@ export class StampController {
   static async getMultipleStampCategories(categories: {
     idents: SUBPROTOCOLS[];
     limit: number;
-    type: STAMP_TYPES;
+    type: StampType;
     sortBy?: "ASC" | "DESC";
   }[]) {
     const results = await Promise.all(
@@ -478,7 +552,7 @@ export class StampController {
         return {
           types: category.idents,
           stamps: serviceResult?.stamps ?? [],
-          total: serviceResult?.total ?? 0,
+          total: (serviceResult as any)?.total ?? 0,
         };
       }),
     );
@@ -486,9 +560,14 @@ export class StampController {
     return results;
   }
 
-  static async getHomePageData() {
+  static async getHomePageData(btcPrice?: number, btcPriceSource?: string) {
     try {
+      console.log("[StampController] getHomePageData started");
+      const overallStartTime = Date.now();
+
       // Critical above-the-fold content first
+      console.log("[StampController] Starting parallel fetch of carousel, categories, and collections...");
+      const parallelStartTime = Date.now();
       const [carouselData, mainCategories, collections] = await Promise.all([
         this.getStamps({
           identifier: CAROUSEL_STAMP_IDS,
@@ -496,7 +575,9 @@ export class StampController {
           noPagination: true,
           skipTotalCount: true,
           includeSecondary: false,
-          type: "all"
+          type: "all",
+          ...(btcPrice !== undefined && { btcPrice }),
+          ...(btcPriceSource !== undefined && { btcPriceSource })
         }),
         this.getMultipleStampCategories([
           { idents: ["STAMP", "SRC-721"], limit: 8, type: "stamps", sortBy: "DESC" },
@@ -509,39 +590,71 @@ export class StampController {
           sortBy: "DESC"
         })
       ]);
+      console.log(`[StampController] Parallel fetch completed in ${Date.now() - parallelStartTime}ms`);
 
       // Get posh stamps
+      console.log("[StampController] Starting posh collection fetch...");
+      const poshStartTime = Date.now();
       const poshCollection = await CollectionService.getCollectionByName("posh");
+      console.log(`[StampController] Posh collection lookup took ${Date.now() - poshStartTime}ms`);
+
       let poshStamps = [];
       if (poshCollection) {
+        console.log("[StampController] Fetching posh stamps with collection_id:", poshCollection.collection_id);
+        const poshStampsStartTime = Date.now();
         const poshResult = await this.getStamps({
           collectionId: poshCollection.collection_id,
           page: 1,
           limit: 16,
           sortBy: "DESC",
           skipTotalCount: true,
+          groupBy: 'collection_id',        // Optimize collection query
+          groupBySubquery: true,           // Use window function for better performance
+          collectionStampLimit: 16,        // Limit stamps per collection
+          ...(btcPrice !== undefined && { btcPrice }),
+          ...(btcPriceSource !== undefined && { btcPriceSource })
         });
         poshStamps = poshResult.data;
+        console.log(`[StampController] Posh stamps fetch took ${Date.now() - poshStampsStartTime}ms, got ${poshStamps.length} stamps`);
+      } else {
+        console.log("[StampController] No posh collection found");
       }
-      const collectionData = []
-      await Promise.all(
-        collections?.data.map(async (item) => {
-          const result = await this.getStamps({
-            collectionId: item.collection_id,
-            ident: ["STAMP", "SRC-721", "SRC-20"],
-            sortBy: "DESC"
-          });
-          collectionData.push({ ...item, img: result.data?.[0]?.stamp_url });
-        }),
-      );
+      // Get stamp URLs for collections more efficiently
+      const collectionData = collections?.data ? await (async () => {
+        // Get all collection IDs
+        const collectionIds = collections.data.map((item: CollectionRow) => item.collection_id);
 
-      return {
+        // Fetch first stamp for each collection in a single request if possible
+        const firstStamps = await Promise.all(
+          collectionIds.map(async (collectionId: string) => {
+            const result = await this.getStamps({
+              collectionId,
+              limit: 1,
+              sortBy: "DESC",
+              skipTotalCount: true,
+              // includeMarketData: false // Remove - property doesn't exist in interface
+            });
+            return result.data?.[0];
+          })
+        );
+
+        // Map collection data with images
+        return collections.data.map((item: CollectionRow, index: number) => ({
+          ...item,
+          img: firstStamps[index]?.stamp_url || null
+        }));
+      })() : [];
+
+      const result = {
         carouselStamps: carouselData.data ?? [],
         stamps_src721: mainCategories[1]?.stamps ?? [],
         stamps_art: mainCategories[2]?.stamps ?? [], // Now at index 2
         stamps_posh: poshStamps,
         collectionData: collectionData ?? [],
       };
+
+      console.log(`[StampController] getHomePageData completed in ${Date.now() - overallStartTime}ms`);
+      return result;
 
     } catch (error) {
       logger.error("stamps", {
@@ -552,45 +665,74 @@ export class StampController {
     }
   }
 
-  static async getCollectionPageData(params) {
+  static async getCollectionPageData(params: any) {
     try {
+      console.log("[StampController] getCollectionPageData started");
+      const overallStartTime = Date.now();
       const {sortBy} = params
+
+      // Fetch BTC price once
+      const btcPriceData = await BTCPriceService.getPrice();
+      const btcPrice = btcPriceData.price;
+
+      console.log("[StampController] Starting SRC-721 stamp categories fetch...");
+      const categoriesStartTime = Date.now();
       const [
         stampCategories,
       ] = await Promise.all([
         this.getMultipleStampCategories([
-          { idents: ["SRC-721"], limit: 16, sortBy: sortBy },
+          { idents: ["SRC-721"], limit: 16, type: "stamps", sortBy: sortBy },
         ]),
       ]);
+      console.log(`[StampController] Categories fetch completed in ${Date.now() - categoriesStartTime}ms`);
       // Fetch the "posh" collection to get its collection_id
+      console.log("[StampController] Starting posh collection fetch for collection page...");
+      const poshLookupStartTime = Date.now();
       const poshCollection = await CollectionService.getCollectionByName(
         "posh",
       );
+      console.log(`[StampController] Posh collection lookup took ${Date.now() - poshLookupStartTime}ms`);
+
       let stamps_posh = [];
       if (poshCollection) {
         const poshCollectionId = poshCollection.collection_id;
-        // Fetch stamps from the "posh" collection with limit and sortBy
+        console.log("[StampController] Fetching posh stamps with collection_id:", poshCollectionId);
+        const poshStampsStartTime = Date.now();
+        // Fetch stamps from the "posh" collection with cached market data
         const poshStampsResult = await this.getStamps({
           collectionId: poshCollectionId,
           page: 1,
           limit: 24,
           sortBy: sortBy,
-          skipDispenserLookup: true, // Skip expensive dispenser API calls for collection overview
-          skipPriceCalculation: true, // Skip BTC price fetching for collection overview
+          groupBy: 'collection_id',        // Optimize collection query
+          groupBySubquery: true,           // Use window function for better performance
+          collectionStampLimit: 24,        // Limit stamps per collection
+          // includeMarketData: true, // Use cached market data
+          // btcPriceUSD: btcPrice
         });
         stamps_posh = poshStampsResult.data;
+        console.log(`[StampController] Posh stamps fetch took ${Date.now() - poshStampsStartTime}ms, got ${stamps_posh.length} stamps`);
       } else {
         logger.warn("stamps", {
           message: "Posh collection not found"
         });
+        console.log("[StampController] No posh collection found");
       }
-      return {
+
+      const result = {
         stamps_src721: stampCategories[0].stamps,
         stamps_posh,
+        metadata: {
+          btcPrice: btcPrice,
+          source: btcPriceData.source
+        }
       };
+
+      console.log(`[StampController] getCollectionPageData completed in ${Date.now() - overallStartTime}ms`);
+      return result;
     } catch (error) {
       logger.error("stamps", {
-        message: "Error in getHomePageData",
+        message: "Error in getCollectionPageData",
         error: error instanceof Error ? error.message : String(error)
       });
       throw error;
@@ -612,23 +754,56 @@ export class StampController {
 
   private static async proxyContentRouteToStampsRoute(
     identifier: string,
-    stamp_url: string,
-    baseUrl?: string,
+    _stamp_url: string,
+    _baseUrl?: string,
     contentType: string = 'application/octet-stream'
   ) {
-    const proxyPath = `${baseUrl}/stamps/${identifier}`;
-    
+    // ALWAYS use production CDN for /stamps/ content
+    // These files don't exist locally
+    const cdnBaseUrl = "https://stampchain.io";
+    const proxyPath = `${cdnBaseUrl}/stamps/${identifier}`;
+
     try {
-      const response = await fetch(proxyPath);
-      
-      return new Response(response.body, {
-        headers: normalizeHeaders({
-          ...Object.fromEntries(response.headers),
-          "Content-Type": contentType,
-          "X-API-Version": API_RESPONSE_VERSION,
-          "Vary": "Accept-Encoding, X-API-Version, Origin",
-        }),
+      // Use raw fetch for binary content to avoid consuming the response body
+      const response = await fetch(proxyPath, {
+        method: 'GET',
+        headers: {
+          'Accept': '*/*',
+          'User-Agent': 'BTCStampsExplorer-CDN-Proxy'
+        }
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      // Convert ReadableStream to string for WebResponseUtil
+      // For binary content, we need to handle this properly
+      const isTextContent = contentType.includes('text/') ||
+                           contentType.includes('javascript') ||
+                           contentType.includes('application/json') ||
+                           contentType.includes('xml');
+
+      if (isTextContent) {
+        const textContent = await response.text();
+        return WebResponseUtil.stampResponse(textContent, contentType, {
+          binary: false,
+          headers: {
+            ...Object.fromEntries(response.headers),
+            "Vary": "Accept-Encoding, X-API-Version, Origin",
+          }
+        });
+      } else {
+        // For binary content, just proxy the response directly
+        return new Response(response.body, {
+          headers: normalizeHeaders({
+            ...Object.fromEntries(response.headers),
+            "Content-Type": contentType,
+            "X-API-Version": API_RESPONSE_VERSION,
+            "Vary": "Accept-Encoding, X-API-Version, Origin",
+          }),
+        });
+      }
     } catch (error) {
       logger.error("content", {
         message: "Error fetching from CDN",
@@ -643,7 +818,7 @@ export class StampController {
 
   static async getStampFile(
     identifier: string,
-    routeType: RouteType,
+    _routeType: RouteType,
     baseUrl?: string,
     isFullPath = false
   ) {
@@ -667,10 +842,10 @@ export class StampController {
     }
   }
 
-  private static async handleFullPathStamp(identifier: string, baseUrl?: string) {
+  private static handleFullPathStamp(identifier: string, baseUrl?: string) {
     const [, extension] = identifier.split(".");
-    const contentType = getMimeType(extension);
-    
+    const contentType = getMimeTypeFromExtension(extension || "");
+
     return this.proxyContentRouteToStampsRoute(
       identifier,
       `${baseUrl}/stamps/${identifier}`,
@@ -679,38 +854,82 @@ export class StampController {
     );
   }
 
-  private static async handleStampContent(result: any, identifier: string) {
-    const contentInfo = detectContentType(
-      result.body,
-      undefined,
-      result.headers["Content-Type"] as string | undefined
-    );
+  private static handleStampContent(result: any, identifier: string) {
+    const mimeType = result.headers["Content-Type"] as string || "application/octet-stream";
 
-    const needsDecoding = 
-      contentInfo.mimeType.includes('javascript') || 
-      contentInfo.mimeType.includes('text/') ||
-      contentInfo.mimeType.includes('application/json') ||
-      contentInfo.mimeType.includes('xml');
+    const needsDecoding =
+      mimeType.includes('javascript') ||
+      mimeType.includes('text/') ||
+      mimeType.includes('application/json') ||
+      mimeType.includes('xml');
 
     if (needsDecoding) {
-      return this.handleTextContent(result, contentInfo, identifier);
+      return this.handleTextContent(result, { mimeType, isSvg: mimeType.includes("svg") }, identifier);
     }
 
-    return this.handleBinaryContent(result, contentInfo);
+    return this.handleBinaryContent(result, { mimeType, isSvg: mimeType.includes("svg") });
   }
 
   private static async handleTextContent(result: any, contentInfo: any, identifier: string) {
     try {
-      const decodedContent = await decodeBase64(result.body);
+      let decodedContent = await decodeBase64(result.body);
+
+      // If it's SVG content, rewrite external references to use our proxy
+      if (contentInfo.mimeType.includes('svg') || decodedContent.includes('<svg')) {
+        // Rewrite ordinals.com references to use our proxy
+        decodedContent = decodedContent.replace(
+          /https:\/\/ordinals\.com\/content\/([^"'\s>]+)/g,
+          "/api/proxy/ordinals/$1"
+        );
+
+        // Rewrite arweave.net references to use our proxy
+        decodedContent = decodedContent.replace(
+          /https:\/\/arweave\.net\/([^"'\s>]+)/g,
+          "/api/proxy/arweave/$1"
+        );
+      }
+
+      // Apply Cloudflare Rocket Loader fixes to HTML content (including SVG with HTML structure)
+      if (contentInfo.mimeType.includes('html') || decodedContent.includes('<html') || decodedContent.includes('<script')) {
+        // Step 1: Ensure scripts have correct type and data-cfasync="false"
+        decodedContent = decodedContent.replace(
+          /(<script[^>]*?)>/g,
+          (_match, openingTagInnerContentAndAttributes) => {
+            let tag = openingTagInnerContentAndAttributes;
+            // Correct type if it's mangled by Cloudflare Rocket Loader
+            tag = tag.replace(
+              /type\s*=\s*"[a-f0-9]{24}-text\/javascript"/i,
+              'type="text/javascript"',
+            );
+            // Add data-cfasync="false" if not already present
+            if (!tag.includes('data-cfasync="false"')) {
+              tag += ' data-cfasync="false"';
+            }
+            return tag + ">";
+          },
+        );
+
+        // Step 2: Globally correct any remaining mangled script types
+        // Cloudflare's Rocket Loader might change type="text/javascript"
+        // to type="<hex_value>-text/javascript". This reverts that change.
+        decodedContent = decodedContent.replace(
+          /type\s*=\s*"[a-f0-9]{24}-text\/javascript"/gi,
+          'type="text/javascript"',
+        );
+      }
 
       return WebResponseUtil.stampResponse(decodedContent, contentInfo.mimeType, {
         binary: false,
-        headers: normalizeHeaders({
-          "CF-No-Transform": contentInfo.mimeType.includes('javascript') || 
-                            contentInfo.mimeType.includes('text/html'),
+        headers: {
+          "CF-No-Transform": String(contentInfo.mimeType.includes('javascript') ||
+                            contentInfo.mimeType.includes('text/html')),
           "X-API-Version": API_RESPONSE_VERSION,
+          // Disable Cloudflare optimizations for SVG content with inline JavaScript
+          "CF-Rocket-Loader": "false",
+          "CF-Auto-Minify": "false",
+          "CF-ScrapeShield": "false",
           ...(result.headers || {}),
-        })
+        }
       });
     } catch (error) {
       logger.error("content", {
@@ -718,17 +937,20 @@ export class StampController {
         error: error instanceof Error ? error.message : String(error),
         identifier,
       });
-      return ResponseUtil.internalError(error);
+      return ApiResponseUtil.internalError(error);
     }
   }
 
+  // @ts-ignore - Unused method kept for future reference
   private static handleBinaryContent(result: any, contentInfo: any) {
     return WebResponseUtil.stampResponse(result.body, contentInfo.mimeType, {
       binary: true,
-      headers: normalizeHeaders({
+      headers: Object.fromEntries(normalizeHeaders({
         "X-API-Version": API_RESPONSE_VERSION,
+        // Disable Cloudflare's Rocket Loader for all stamp content
+        "CF-Rocket-Loader": "false",
         ...(result.headers || {}),
-      })
+      }))
     });
   }
 
@@ -753,7 +975,7 @@ export class StampController {
   }
 
   static async getDispensersWithStampsByAddress(
-    address: string, 
+    address: string,
     page: number = 1,
     limit: number = 50,
     options = {}
@@ -767,7 +989,7 @@ export class StampController {
         options
       });
 
-      const dispensersData = await XcpManager.getDispensersByAddress(address, {
+      const dispensersData = await CounterpartyApiManager.getDispensersByAddress(address, {
         verbose: true,
         page,
         limit,
@@ -777,15 +999,15 @@ export class StampController {
       // Add detailed logging for dispenser data
       console.log("[StampController] Dispenser data details:", {
         total: dispensersData.total,
-        dispensersCount: dispensersData.dispensers.length,
+        dispensersCount: dispensersData.dispensers?.length ?? 0,
         page,
         limit,
-        hasDispensers: dispensersData.dispensers.length > 0,
-        firstDispenser: dispensersData.dispensers[0]?.cpid,
-        lastDispenser: dispensersData.dispensers[dispensersData.dispensers.length - 1]?.cpid
+        hasDispensers: (dispensersData.dispensers?.length ?? 0) > 0,
+        firstDispenser: dispensersData.dispensers?.[0]?.cpid,
+        lastDispenser: dispensersData.dispensers?.[Math.max(0, (dispensersData.dispensers?.length ?? 1) - 1)]?.cpid
       });
 
-      if (!dispensersData.dispensers.length) {
+      if (!(dispensersData.dispensers?.length)) {
         return {
           dispensers: [],
           total: 0
@@ -793,7 +1015,7 @@ export class StampController {
       }
 
       // Get unique CPIDs from dispensers
-      const uniqueCpids = [...new Set(dispensersData.dispensers.map(d => d.cpid))];
+      const uniqueCpids = [...new Set(dispensersData.dispensers?.map(d => d.cpid) ?? [])];
 
       // Fetch stamps data for all CPIDs
       const stampsData = await this.getStamps({
@@ -804,21 +1026,21 @@ export class StampController {
 
       // Create a map of stamps by CPID for faster lookup
       const stampsByCpid = new Map(
-        stampsData.data?.map(stamp => [stamp.cpid, stamp]) || []
+        stampsData.data?.map((stamp: any) => [stamp.cpid, stamp]) || []
       );
 
       // Merge stamp data into dispensers
-      const dispensersWithStamps = dispensersData.dispensers.map(dispenser => ({
+      const dispensersWithStamps = dispensersData.dispensers?.map(dispenser => ({
         ...dispenser,
         stamp: stampsByCpid.get(dispenser.cpid) || null
-      }));
+      })) ?? [];
 
       return {
         dispensers: dispensersWithStamps,
         total: dispensersData.total
       };
     } catch (error) {
-      logger.error("getDispensersWithStampsByAddress", {
+      logger.error("stamps", {
         message: "Error fetching dispensers with stamps",
         error: error instanceof Error ? error.message : String(error),
         address
@@ -842,11 +1064,11 @@ export class StampController {
     try {
       // If not a CPID, resolve it
       const cpid = isCpid(id) ? id : await this.resolveToCpid(id);
-      
+
       const { holders, total } = await StampService.getStampHolders(
         cpid,
-        page, 
-        limit, 
+        page,
+        limit,
         { cacheType }
       );
 
@@ -867,8 +1089,8 @@ export class StampController {
   }
 
   static async getStampSends(
-    id: string, 
-    page: number = 1, 
+    id: string,
+    page: number = 1,
     limit: number = 50,
     cacheType: RouteType
   ) {
@@ -892,8 +1114,8 @@ export class StampController {
   }
 
   static async getStampDispensers(
-    id: string, 
-    page: number, 
+    id: string,
+    page: number,
     limit: number,
     cacheType: RouteType
   ) {
@@ -922,7 +1144,7 @@ export class StampController {
   ) {
     try {
       const cpid = await this.resolveToCpid(id);
-      const { dispensers, total } = await StampService.getAllStampDispensers(cpid, { cacheType });
+      const { dispensers, total } = await StampService.getStampDispensers(cpid, 1, 50, { cacheType });
       return {
         data: dispensers,
         total
@@ -937,8 +1159,8 @@ export class StampController {
   }
 
   static async getStampDispenses(
-    id: string, 
-    page: number = 1, 
+    id: string,
+    page: number = 1,
     limit: number = 50,
     cacheType: RouteType
   ) {
@@ -963,8 +1185,8 @@ export class StampController {
 
   static async getStampsCreatedCount(address: string): Promise<number> {
     try {
-      // Use a direct count query instead of getStamps
-      const result = await StampRepository.getStampsCreatedCount(address);
+      // ✅ FIXED: Use service layer instead of calling repository directly
+      const result = await StampService.getStampsCreatedCount(address);
       return result.total || 0;
     } catch (error) {
       logger.error("stamps", {
@@ -977,8 +1199,9 @@ export class StampController {
   }
 
   /**
-   * Calculate total value of stamps in a wallet
+   * Calculate total value of stamps in a wallet using cached market data
    * This is a specialized method for the wallet page that won't affect API endpoints
+   * OPTIMIZED: Uses StampService.getBulkStampMarketData instead of calling repository directly
    */
   static async calculateWalletStampValues(stamps: StampBalance[]): Promise<{
     stampValues: { [cpid: string]: string | number };
@@ -988,76 +1211,40 @@ export class StampController {
       const stampValues: { [cpid: string]: string | number } = {};
       let totalValue = 0;
 
-      // Process stamps in batches to avoid too many concurrent requests
-      const BATCH_SIZE = 10;
-      for (let i = 0; i < stamps.length; i += BATCH_SIZE) {
-        const batch = stamps.slice(i, i + BATCH_SIZE);
-        
-        // Process each stamp in the batch concurrently
-        const batchResults = await Promise.all(
-          batch.map(async (stamp) => {
-            try {
-              // Get all dispensers for the stamp
-              const allDispensersResponse = await DispenserManager.getDispensersByCpid(
-                stamp.cpid,
-                undefined,
-                undefined,
-                undefined,
-                "all"
-              );
-              
-              // Filter open and closed dispensers
-              const openDispensers = allDispensersResponse.dispensers.filter(d => d.give_remaining > 0);
-              const closedDispensers = allDispensersResponse.dispensers.filter(d => d.give_remaining === 0);
-              
-              let unitPrice = 0;
-              if (openDispensers.length > 0) {
-                // Use floor price if there are open dispensers
-                const floorPrice = this.calculateFloorPrice(openDispensers);
-                unitPrice = typeof floorPrice === 'number' ? floorPrice : 0;
-              } else if (closedDispensers.length > 0) {
-                // Use most recent closed dispenser price if no open dispensers
-                // Sort by block_index in descending order to get most recent first
-                const sortedClosedDispensers = closedDispensers.sort((a, b) => b.block_index - a.block_index);
-                unitPrice = sortedClosedDispensers[0].btcrate || 0;
-              }
-
-              // Calculate total value for this stamp based on quantity owned
-              const totalStampValue = unitPrice * stamp.balance;
-              
-              return {
-                cpid: stamp.cpid,
-                value: totalStampValue
-              };
-            } catch (error) {
-              logger.error("calculateWalletStampValues", {
-                message: "Error processing individual stamp",
-                error: error instanceof Error ? error.message : String(error),
-                cpid: stamp.cpid,
-                quantity: stamp.balance
-              });
-              return { cpid: stamp.cpid, value: 0 };
-            }
-          })
-        );
-
-        // Add batch results to totals
-        batchResults.forEach(({ cpid, value }) => {
-          stampValues[cpid] = value;
-          if (typeof value === 'number') {
-            totalValue += value;
-          }
-        });
-
-        // Optional: Add a small delay between batches to prevent rate limiting
-        if (i + BATCH_SIZE < stamps.length) {
-          await new Promise(resolve => setTimeout(resolve, 100));
-        }
+      if (!stamps || stamps.length === 0) {
+        return { stampValues, totalValue };
       }
+
+      // Get all stamp CPIDs
+      const cpids = stamps.map(s => s.cpid);
+
+      // ✅ FIXED: Use service layer instead of calling repository directly
+      const marketDataMap = await StampService.getBulkStampMarketData(cpids);
+
+      // Calculate values using cached market data
+      stamps.forEach((walletStamp: any) => {
+        const marketData = marketDataMap.get(walletStamp.cpid);
+        if (marketData) {
+          let unitPrice = 0;
+
+          // Use the same pricing hierarchy as the API endpoint
+          if (marketData.floorPriceBTC) {
+            unitPrice = marketData.floorPriceBTC;
+          } else if (marketData.recentSalePriceBTC) {
+            unitPrice = marketData.recentSalePriceBTC;
+          }
+
+          const totalStampValue = unitPrice * walletStamp.balance;
+          stampValues[walletStamp.cpid] = totalStampValue;
+          totalValue += totalStampValue;
+        } else {
+          stampValues[walletStamp.cpid] = 0;
+        }
+      });
 
       return { stampValues, totalValue };
     } catch (error) {
-      logger.error("calculateWalletStampValues", {
+      logger.error("stamps", {
         message: "Error calculating wallet stamp values",
         error: error instanceof Error ? error.message : String(error)
       });
@@ -1065,7 +1252,7 @@ export class StampController {
     }
   }
 
-  static async getSpecificStamp(tx_index: string): Promise<{ stamp_url: string, stamp_mimetype: string }> {
-    return await StampService.getSpecificStamp(tx_index);
+  static async getSpecificStamp(identifier: string): Promise<{ stamp: number | undefined, stamp_url: string, stamp_mimetype: string }> {
+    return await StampService.getSpecificStamp(identifier);
   }
 }

@@ -1,5 +1,5 @@
 # Deno base image
-FROM denoland/deno:alpine-2.3.3
+FROM denoland/deno:alpine-2.4.2
 
 # Set environment variables
 ENV HOME=/app \
@@ -13,7 +13,7 @@ ENV HOME=/app \
     REDIS_LOG_LEVEL=DEBUG
 
 # Install additional tools
-RUN apk add --no-cache bash
+RUN apk add --no-cache bash curl
 
 # Create necessary directories
 RUN mkdir -p /app \
@@ -34,22 +34,26 @@ WORKDIR /app
 # Copy files and set permissions
 COPY --chown=deno:deno . .
 
-# Clean any existing caches
+# Clean any existing caches and old build artifacts
 RUN rm -rf node_modules/.deno && \
     rm -rf .npm && \
-    rm -rf .deno
+    rm -rf .deno && \
+    rm -rf _fresh
 
 # Switch to deno user for build steps
 USER deno
 
 # Build steps with all permissions granted and error handling
-# Lock write is used to create lock.json if it doesn't exist
-RUN deno run --allow-all main.ts build --lock-write || (echo "Build failed" && exit 1)
+# Build Fresh assets and ensure they're available
+RUN DENO_ENV=production deno run --allow-all main.ts build || (echo "Build failed" && exit 1)
 
 # Cache dependencies with proper error handling (without lock file)
 RUN DENO_DIR=/app/.deno \
     NPM_CONFIG_CACHE=/app/.npm \
     deno cache --reload main.ts || (echo "Cache failed" && exit 1)
+
+# Ensure _fresh directory is present and has correct permissions
+RUN ls -la /app/_fresh 2>/dev/null || echo "Warning: _fresh directory not found after build"
 
 # Verify the build environment
 RUN echo "Verifying environment and permissions:" && \
@@ -70,5 +74,13 @@ ENV DENO_PERMISSIONS="--allow-net --allow-read --allow-run --allow-write --allow
     REDIS_DEBUG=true \
     REDIS_TIMEOUT=15000 \
     REDIS_MAX_RETRIES=10
+
+# Ensure Fresh static files are available at runtime
+RUN if [ -d "/app/_fresh" ]; then \
+      echo "Fresh build directory found with $(ls -1 /app/_fresh | wc -l) files"; \
+    else \
+      echo "ERROR: Fresh build directory not found!"; \
+      exit 1; \
+    fi
 
 CMD ["sh", "-c", "deno run $DENO_PERMISSIONS main.ts"]

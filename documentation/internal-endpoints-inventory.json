@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json.schemastore.org/json",
+  "generatedAt": "2025-08-08T21:10:00Z",
+  "notes": "Initial inventory for Internal Endpoints Migration & Security (task 32.1). Classification: move|keep|proxy|deprecate.",
+  "endpoints": [
+    { "path": "/api/internal/monitoring", "method": "GET", "file": "routes/api/internal/monitoring.ts", "classification": "move", "authRequired": ["cfAccess","internalSecret","apiKey"], "migrationPhase": "B", "dependencies": ["db","redis"], "contracts": ["cache-control","error-envelope","bigint-serialization"] },
+    { "path": "/api/internal/background-fee-status", "method": "GET", "file": "routes/api/internal/background-fee-status.ts", "classification": "move", "authRequired": ["cfAccess","internalSecret","apiKey"], "migrationPhase": "B", "dependencies": ["redis"], "contracts": ["cache-control","error-envelope"] },
+    { "path": "/api/internal/reset-connection-pool", "method": "POST", "file": "routes/api/internal/reset-connection-pool.ts", "classification": "move", "authRequired": ["internalSecret"], "migrationPhase": "B", "dependencies": ["db"], "contracts": ["error-envelope"] },
+    { "path": "/api/internal/purge-creator-cache", "method": "POST", "file": "routes/api/internal/purge-creator-cache.ts", "classification": "move", "authRequired": ["internalSecret"], "migrationPhase": "B", "dependencies": ["redis"], "contracts": ["error-envelope"] },
+    { "path": "/api/internal/btc-price-status", "method": "GET", "file": "routes/api/internal/btc-price-status.ts", "classification": "move", "authRequired": ["cfAccess","internalSecret","apiKey"], "migrationPhase": "B", "dependencies": ["redis","db"], "contracts": ["cache-control","error-envelope"] },
+    { "path": "/api/internal/stamp-recent-sales", "method": "GET", "file": "routes/api/internal/stamp-recent-sales.ts", "classification": "move", "authRequired": ["cfAccess","internalSecret","apiKey"], "migrationPhase": "B", "dependencies": ["db"], "contracts": ["pagination","cache-control"] },
+    { "path": "/api/internal/utxoquery", "method": "GET", "file": "routes/api/internal/utxoquery.ts", "classification": "keep", "authRequired": ["cfAccess","apiKey"], "migrationPhase": "C", "dependencies": ["quicknode"], "contracts": ["pass-through"] },
+    { "path": "/api/internal/csrfToken", "method": "GET", "file": "routes/api/internal/csrfToken.ts", "classification": "keep", "authRequired": [], "migrationPhase": "C", "dependencies": [], "contracts": ["none"] },
+    { "path": "/api/internal/debug-headers", "method": "GET", "file": "routes/api/internal/debug-headers.ts", "classification": "keep", "authRequired": ["cfAccess","apiKey"], "migrationPhase": "C", "dependencies": [], "contracts": ["echo"] },
+    { "path": "/api/internal/fees", "method": "GET", "file": "routes/api/internal/fees.ts", "classification": "move", "authRequired": ["cfAccess","apiKey"], "migrationPhase": "B", "dependencies": ["external-fee-service"], "contracts": ["cache-control"] },
+    { "path": "/api/internal/creatorName", "method": "POST", "file": "routes/api/internal/creatorName.ts", "classification": "move", "authRequired": ["internalSecret"], "migrationPhase": "B", "dependencies": ["db"], "contracts": ["error-envelope"] },
+    { "path": "/api/internal/src20Background", "method": "POST", "file": "routes/api/internal/src20Background.ts", "classification": "move", "authRequired": ["internalSecret"], "migrationPhase": "B", "dependencies": ["db","redis"], "contracts": ["error-envelope"] },
+    { "path": "/api/internal/test-reset-circuit-breakers", "method": "POST", "file": "routes/api/internal/test-reset-circuit-breakers.ts", "classification": "move", "authRequired": ["internalSecret"], "migrationPhase": "B", "dependencies": [], "contracts": ["error-envelope"] },
+    { "path": "/api/internal/bitcoinNotifications", "method": "POST", "file": "routes/api/internal/bitcoinNotifications.ts", "classification": "move", "authRequired": ["internalSecret"], "migrationPhase": "B", "dependencies": ["db","redis"], "contracts": ["error-envelope"] },
+    { "path": "/api/internal/mara-health", "method": "GET", "file": "routes/api/internal/mara-health.ts", "classification": "move", "authRequired": ["cfAccess","apiKey"], "migrationPhase": "B", "dependencies": ["external"], "contracts": ["cache-control"] },
+    { "path": "/api/internal/mara-fee-rate", "method": "GET", "file": "routes/api/internal/mara-fee-rate.ts", "classification": "move", "authRequired": ["cfAccess","apiKey"], "migrationPhase": "B", "dependencies": ["external"], "contracts": ["cache-control"] },
+    { "path": "/api/internal/mara-submit", "method": "POST", "file": "routes/api/internal/mara-submit.ts", "classification": "move", "authRequired": ["internalSecret"], "migrationPhase": "B", "dependencies": ["external"], "contracts": ["error-envelope"] },
+    { "path": "/api/internal/fee-security", "method": "GET", "file": "routes/api/internal/fee-security.ts", "classification": "move", "authRequired": ["cfAccess","apiKey"], "migrationPhase": "B", "dependencies": ["db","external"], "contracts": ["cache-control"] },
+    { "path": "/api/internal/btcPrice", "method": "GET", "file": "routes/api/internal/btcPrice.ts", "classification": "move", "authRequired": ["cfAccess","apiKey"], "migrationPhase": "B", "dependencies": ["db","redis"], "contracts": ["cache-control"] },
+    { "path": "/api/internal/carousel", "method": "GET", "file": "routes/api/internal/carousel.ts", "classification": "keep", "authRequired": [], "migrationPhase": "C", "dependencies": ["ui-only"], "contracts": ["none"] }
+  ]
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

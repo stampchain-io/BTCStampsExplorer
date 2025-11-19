@@ -1,44 +1,17 @@
 // routes/api/v2/create/send.ts
+import { TX_CONSTANTS } from "$constants";
 import { Handlers } from "$fresh/server.ts";
-import { XcpManager } from "$server/services/xcpService.ts";
-import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
-import { Buffer } from "node:buffer";
-import { networks, Psbt, Transaction } from "bitcoinjs-lib";
-import { logger } from "$lib/utils/logger.ts";
+import type { UTXO as DetailedUTXO } from "$lib/types/index.d.ts";
+import type { ScriptTypeInfo } from "$lib/types/transaction.d.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { hex2bin } from "$lib/utils/binary/baseUtils.ts";
-import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
+import { logger } from "$lib/utils/logger.ts";
 import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts";
+import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
-import type {
-  ScriptTypeInfo,
-  UTXO as DetailedUTXO,
-} from "$lib/types/transaction.d.ts";
-
-interface SendRequestBody {
-  address: string; // Source address for CP, and for fetching UTXO details if needed
-  destination: string;
-  asset: string;
-  quantity: number;
-  satsPerVB: number; // Target fee rate for potential future adjustments, or if CP needs it
-  options?: {
-    service_fee?: number; // Will be handled in a later refinement
-    service_fee_address?: string;
-    memo?: string;
-    memo_is_hex?: boolean;
-    encoding?: string;
-    // Options for XcpManager.createSend
-    fee_per_kb?: number; // XcpManager.createSend might take this for CP API
-    return_psbt?: boolean; // Should be false for this flow
-  };
-  dryRun?: boolean; // Dry run will be complex with this model, deferring full implementation
-}
-
-interface SendResponse {
-  psbtHex?: string;
-  inputsToSign?: { index: number; address: string; sighashTypes?: number[] }[];
-  estimatedFee?: number; // This would be CP's fee initially
-  estimatedVsize?: number;
-}
+import type { SendRequestBody, SendResponse } from "$types/api.d.ts";
+import { networks, Psbt, Transaction } from "bitcoinjs-lib";
+import { Buffer } from "node:buffer";
 
 export const handler: Handlers<SendResponse | { error: string }> = {
   async POST(req) {
@@ -88,7 +61,7 @@ export const handler: Handlers<SendResponse | { error: string }> = {
         });
       }
 
-      // Options for XcpManager.createSend to get the raw transaction
+      // Options for CounterpartyApiManager.createSend to get the raw transaction
       // Counterparty's create_send might require a fee parameter.
       // We pass satsPerVB (converted to fee_per_kb if needed by createSend options) so CP can build its tx.
       // The fee it calculates is implicit in its rawtransaction.
@@ -96,20 +69,20 @@ export const handler: Handlers<SendResponse | { error: string }> = {
         encoding: options.encoding || "opreturn",
         return_psbt: false, // Explicitly ask for raw tx, not PSBT from CP
         verbose: true,
-        // Pass fee info if XcpManager.createSend expects it for the CP API call
-        // Assuming XcpManager.createSend handles conversion if CP API needs fee_per_kb
+        // Pass fee info if CounterpartyApiManager.createSend expects it for the CP API call
+        // Assuming CounterpartyApiManager.createSend handles conversion if CP API needs fee_per_kb
         fee_per_kb: options.fee_per_kb ||
           (satsPerVB
-            ? satsPerVB * TX_CONSTANTS.APPROX_VBYTES_PER_KB / 1000
+            ? satsPerVB * (TX_CONSTANTS as any).APPROX_VBYTES_PER_KB / 1000
             : undefined),
       };
       if (options.memo !== undefined) xcpCreateSendOptions.memo = options.memo;
       if (options.memo_is_hex !== undefined) {
         xcpCreateSendOptions.memo_is_hex = options.memo_is_hex;
       }
-      // Add any other options XcpManager.createSend would pass to Counterparty API
+      // Add any other options CounterpartyApiManager.createSend would pass to Counterparty API
 
-      const cpResponse = await XcpManager.createSend(
+      const cpResponse = await CounterpartyApiManager.createSend(
         address,
         destination,
         asset,
@@ -123,14 +96,14 @@ export const handler: Handlers<SendResponse | { error: string }> = {
       ) {
         await logger.error("api", {
           message:
-            "[API /send] Error or no rawtransaction from XcpManager.createSend",
+            "[API /send] Error or no rawtransaction from CounterpartyApiManager.createSend",
           error: cpResponse.error,
           result: cpResponse.result,
         });
         throw new Error(
           cpResponse.error?.message || cpResponse.error?.description ||
             cpResponse.error ||
-            "Failed to get raw transaction from XcpManager.createSend.",
+            "Failed to get raw transaction from CounterpartyApiManager.createSend.",
         );
       }
 
@@ -162,8 +135,14 @@ export const handler: Handlers<SendResponse | { error: string }> = {
       const inputVout = cpInput.index;
 
       // Fetch full UTXO details for this input
-      const utxoDetails: DetailedUTXO | null = await commonUtxoService
+      const rawUtxoDetails = await commonUtxoService
         .getSpecificUTXO(inputTxid, inputVout);
+      const utxoDetails: DetailedUTXO | null = rawUtxoDetails
+        ? {
+          ...rawUtxoDetails,
+          scriptType: rawUtxoDetails.scriptType as any, // Type cast to handle different ScriptType definitions
+        }
+        : null;
       if (
         !utxoDetails || !utxoDetails.script || utxoDetails.value === undefined
       ) {

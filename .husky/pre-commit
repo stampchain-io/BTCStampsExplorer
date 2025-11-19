@@ -1,14 +1,4 @@
-deno task check:fmt
-if [ $? -ne 0 ]; then
-  echo "Formatting failed. Please run 'deno fmt .' to fix."
-  exit 1
-fi
-
-deno task check:lint
-if [ $? -ne 0 ]; then
-  echo "Linting failed. Please fix lint errors."
-  exit 1
-fi
-
-# All good!
-exit 0
+# Pre-commit Hook - Quick Validation
+# Aligned with CI/CD strategy - catches issues before commit
+# Runs: format check, lint, type check, import validation (report mode)
+deno task validate:quick

@@ -1,21 +1,9 @@
+import type { StampFilterType } from "$constants";
+import type { NavigatorContextType, NavigatorTypes } from "$types/ui.d.ts";
+import { useSSRSafeNavigation } from "$lib/hooks/useSSRSafeNavigation.ts";
+import { IS_BROWSER } from "$fresh/runtime.ts";
 import { createContext } from "preact";
 import { useContext, useEffect, useState } from "preact/hooks";
-import { SRC20_TYPES, STAMP_FILTER_TYPES, STAMP_TYPES } from "$globals";
-
-// Define a union type for both STAMP_TYPES and SRC20_TYPES
-type NavigatorTypes = STAMP_TYPES | SRC20_TYPES;
-
-interface NavigatorContextType {
-  setTypeOption: (page: string, type: NavigatorTypes, reload?: boolean) => void;
-  setSortOption: (sort: string) => void;
-  setFilterOption: (filter: STAMP_FILTER_TYPES) => void;
-  getSort: () => string;
-  getFilter: () => STAMP_FILTER_TYPES[];
-  getType: () => NavigatorTypes;
-  setFilter: (filters: STAMP_FILTER_TYPES[]) => void;
-  setSort: (sort: string) => void;
-  setType: (type: NavigatorTypes) => void;
-}
 
 const NavigatorContext = createContext<NavigatorContextType | undefined>(
   undefined,
@@ -25,66 +13,102 @@ export const NavigatorProvider = (
   { children }: { children: preact.ComponentChildren },
 ) => {
   const [sort, setSort] = useState<string>("DESC");
-  const [filter, setFilter] = useState<STAMP_FILTER_TYPES[]>([]);
+  const [filter, setFilter] = useState<StampFilterType[]>([]);
   const [type, setType] = useState<NavigatorTypes>("all");
 
+  // Use SSR-safe navigation hook
+  const navigation = useSSRSafeNavigation();
+
   useEffect(() => {
-    const url = new URL(self.location.href);
-    setSort(url.searchParams.get("sortBy") || "DESC");
-    setFilter(
-      (url.searchParams.get("filterBy")?.split(",").filter(
-        Boolean,
-      ) as STAMP_FILTER_TYPES[]) || [],
-    );
-    setType((url.searchParams.get("type") as NavigatorTypes) || "all");
-  }, []);
+    // Only initialize from URL on client side
+    if (navigation.isClient) {
+      setSort(navigation.getSearchParam("sortBy") || "DESC");
+      setFilter(
+        (navigation.getSearchParam("filterBy")?.split(",").filter(
+          Boolean,
+        ) as StampFilterType[]) || [],
+      );
+      setType((navigation.getSearchParam("type") as NavigatorTypes) || "all");
+    }
+  }, [navigation.isClient, navigation.searchParams]);
 
   const setTypeOption = (
     _page: string,
     newType: NavigatorTypes,
     reload = false,
   ) => {
-    const url = new URL(self.location.href);
-    url.searchParams.set("type", newType);
-    url.searchParams.set("page", "1");
+    // Guard against SSR usage
+    if (!navigation.isClient) return;
+
     setType(newType);
-    const event = new CustomEvent("fresh-navigate", {
-      detail: { url: url.toString() },
+
+    // Update URL parameters safely
+    navigation.updateSearchParams((params) => {
+      params.set("type", newType);
+      params.set("page", "1");
     });
-    self.dispatchEvent(event);
-    if (reload) {
-      self.location.reload();
+
+    // Dispatch navigation event for Fresh framework
+    if (IS_BROWSER && globalThis.dispatchEvent) {
+      const event = new CustomEvent("fresh-navigate", {
+        detail: { url: navigation.getUrl().toString() },
+      });
+      globalThis.dispatchEvent(event);
+    }
+
+    // Handle reload if requested
+    if (reload && IS_BROWSER && globalThis.location) {
+      globalThis.location.reload();
     }
   };
 
   const setSortOption = (newSort: string) => {
-    const url = new URL(self.location.href);
-    url.searchParams.set("sortBy", newSort);
-    url.searchParams.set("page", "1");
+    // Guard against SSR usage
+    if (!navigation.isClient) return;
+
     setSort(newSort);
-    const event = new CustomEvent("fresh-navigate", {
-      detail: { url: url.toString() },
+
+    // Update URL parameters safely
+    navigation.updateSearchParams((params) => {
+      params.set("sortBy", newSort);
+      params.set("page", "1");
     });
-    self.dispatchEvent(event);
+
+    // Dispatch navigation event for Fresh framework
+    if (IS_BROWSER && globalThis.dispatchEvent) {
+      const event = new CustomEvent("fresh-navigate", {
+        detail: { url: navigation.getUrl().toString() },
+      });
+      globalThis.dispatchEvent(event);
+    }
   };
 
-  const setFilterOption = (newFilter: STAMP_FILTER_TYPES) => {
+  const setFilterOption = (newFilter: StampFilterType) => {
+    // Guard against SSR usage
+    if (!navigation.isClient) return;
+
     const currentFilters = filter.includes(newFilter)
       ? filter.filter((f) => f !== newFilter)
       : [...filter, newFilter];
     setFilter(currentFilters);
 
-    const url = new URL(self.location.href);
-    if (currentFilters.length > 0) {
-      url.searchParams.set("filterBy", currentFilters.join(","));
-    } else {
-      url.searchParams.delete("filterBy");
-    }
-    url.searchParams.set("page", "1");
-    const event = new CustomEvent("fresh-navigate", {
-      detail: { url: url.toString() },
+    // Update URL parameters safely
+    navigation.updateSearchParams((params) => {
+      if (currentFilters.length > 0) {
+        params.set("filterBy", currentFilters.join(","));
+      } else {
+        params.delete("filterBy");
+      }
+      params.set("page", "1");
     });
-    self.dispatchEvent(event);
+
+    // Dispatch navigation event for Fresh framework
+    if (IS_BROWSER && globalThis.dispatchEvent) {
+      const event = new CustomEvent("fresh-navigate", {
+        detail: { url: navigation.getUrl().toString() },
+      });
+      globalThis.dispatchEvent(event);
+    }
   };
 
   const getSort = () => sort;

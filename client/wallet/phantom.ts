@@ -1,12 +1,18 @@
-import { signal } from "@preact/signals";
-import { walletContext } from "./wallet.ts";
-import { SignPSBTResult, Wallet } from "$types/index.d.ts";
-import { checkWalletAvailability, getGlobalWallets } from "./wallet.ts";
-import { handleWalletError } from "./walletHelper.ts";
-import { getBTCBalanceInfo } from "$lib/utils/balanceUtils.ts";
+import {
+  checkWalletAvailability,
+  getGlobalWallets,
+  walletContext,
+} from "$client/wallet/wallet.ts";
+import {
+  handleWalletError,
+  parseConnectionError,
+} from "$client/wallet/walletHelper.ts";
+import { getBTCBalanceInfo } from "$lib/utils/data/processing/balanceUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { broadcastTransaction } from "$lib/utils/minting/broadcast.ts";
-import type { BaseToast } from "$lib/utils/toastSignal.ts";
+import type { BaseToast } from "$lib/utils/ui/notifications/toastSignal.ts";
+import type { SignPSBTResult, Wallet } from "$types/index.d.ts";
+import { signal } from "@preact/signals";
 
 export const isPhantomInstalled = signal<boolean>(false);
 
@@ -16,20 +22,32 @@ export const connectPhantom = async (
   try {
     const provider = getProvider();
     if (!provider) {
+      logger.error("ui", {
+        message: "Phantom wallet not detected",
+        context: "connectPhantom",
+      });
       addToast(
-        "Phantom wallet not detected. Please install the Phantom extension.",
+        "Phantom wallet not detected.\nPlease install the Phantom extension.",
         "error",
       );
       return;
     }
     const accounts = await provider.requestAccounts();
     await handleAccountsChanged(accounts);
-    addToast("Successfully connected to Phantom wallet", "success");
+    logger.info("ui", {
+      message: "Successfully connected to Phantom wallet",
+      context: "connectPhantom",
+    });
+    addToast("Successfully connected to Phantom wallet.", "success");
   } catch (error: unknown) {
+    const errorMessage = parseConnectionError(error);
+    logger.error("ui", {
+      message: "Failed to connect to Phantom wallet",
+      context: "connectPhantom",
+      error: errorMessage,
+    });
     addToast(
-      `Failed to connect to Phantom wallet: ${
-        error instanceof Error ? error.message : "Unknown error"
-      }`,
+      `Failed to connect to Phantom wallet.\n${errorMessage}`,
       "error",
     );
   }
@@ -52,15 +70,15 @@ const handleAccountsChanged = async (accounts: any[]) => {
     return;
   }
 
-  const _wallet = {} as Wallet;
-  _wallet.address = accounts[0]?.address;
-  _wallet.accounts = accounts.map((acc) => acc.address);
-  _wallet.publicKey = accounts[0]?.publicKey;
+  const wallet = {} as Wallet;
+  wallet.address = accounts[0]?.address;
+  wallet.accounts = accounts.map((acc) => acc.address);
+  wallet.publicKey = accounts[0]?.publicKey;
 
-  if (_wallet.address) {
-    const addressInfo = await getBTCBalanceInfo(_wallet.address);
+  if (wallet.address) {
+    const addressInfo = await getBTCBalanceInfo(wallet.address);
 
-    _wallet.btcBalance = {
+    wallet.btcBalance = {
       confirmed: addressInfo?.balance ?? 0,
       unconfirmed: addressInfo?.unconfirmedBalance ?? 0,
       total: (addressInfo?.balance ?? 0) +
@@ -68,10 +86,10 @@ const handleAccountsChanged = async (accounts: any[]) => {
     };
   }
 
-  _wallet.network = "mainnet";
-  _wallet.provider = "phantom";
+  wallet.network = "mainnet";
+  wallet.provider = "phantom";
 
-  walletContext.updateWallet(_wallet);
+  walletContext.updateWallet(wallet);
 };
 
 const signMessage = async (message: string) => {

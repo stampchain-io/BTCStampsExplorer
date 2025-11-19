@@ -1,13 +1,32 @@
 /* ===== COLLECTION DETAIL GALLERY COMPONENT ===== */
 /* @baba - not updated */
-import { useEffect, useState } from "preact/hooks";
-import { Collection, CollectionGalleryProps } from "$globals";
-import { BREAKPOINTS } from "$lib/utils/constants.ts";
-import { ViewAllButton } from "$button";
+import { PaginationButtons, ViewAllButton } from "$button";
 import { CollectionCard } from "$card";
+import { BREAKPOINTS } from "$constants";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
-import { subtitlePurple, titlePurpleLD } from "$text";
-import { Pagination } from "$islands/datacontrol/Pagination.tsx";
+import { subtitleGrey, titleGreyLD } from "$text";
+import type { Collection } from "$types/stamp.d.ts";
+import { useEffect, useState } from "preact/hooks";
+// Local copy of props to avoid importing server-only types
+export interface CollectionGalleryProps {
+  title?: string;
+  subTitle?: string;
+  collections: Collection[];
+  gridClass?: string;
+  displayCounts?: {
+    desktop?: number;
+    tablet?: number;
+    mobileLg?: number;
+    mobileMd?: number;
+    mobileSm?: number;
+  };
+  pagination?: {
+    page: number;
+    totalPages: number;
+    prefix?: string;
+    onPageChange?: (page: number) => void;
+  };
+}
 
 /* ===== STATE ===== */
 export default function CollectionDetailGallery({
@@ -27,6 +46,10 @@ export default function CollectionDetailGallery({
     if (pagination?.onPageChange) {
       pagination.onPageChange(page);
     } else {
+      // SSR-safe browser environment check
+      if (typeof globalThis === "undefined" || !globalThis?.location) {
+        return; // Cannot navigate during SSR
+      }
       const url = new URL(globalThis.location.href);
       url.searchParams.set("page", page.toString());
       globalThis.location.href = url.toString();
@@ -66,18 +89,19 @@ export default function CollectionDetailGallery({
   }, [width, displayCounts, collectionArray.length]);
 
   /* ===== RENDER ===== */
+  const grid = gridClass ?? "grid grid-cols-1 gap-4";
   return (
     <div>
-      {title && <h3 class={titlePurpleLD}>{title}</h3>}
+      {title && <h3 class={titleGreyLD}>{title}</h3>}
       {subTitle && (
         <h4
-          class={subtitlePurple +
-            " mb-3 mobileMd:mb-6 desktop:mb-9"}
+          class={subtitleGrey +
+            " mb-3 mobileMd:mb-6"}
         >
           {subTitle}
         </h4>
       )}
-      <div class={gridClass}>
+      <div class={grid}>
         {collectionArray.slice(0, displayCount).map((
           collection: Collection,
         ) => (
@@ -90,11 +114,11 @@ export default function CollectionDetailGallery({
       <ViewAllButton href="/collection/artist" />
 
       {pagination && pagination.totalPages > 1 && (
-        <div class="mt-12 mobileLg:mt-[72px]">
-          <Pagination
+        <div class="mt-7.5 tablet:mt-10">
+          <PaginationButtons
             page={pagination.page}
             totalPages={pagination.totalPages}
-            prefix={pagination.prefix || ""}
+            {...(pagination.prefix && { prefix: pagination.prefix })}
             onPageChange={handlePageChange}
           />
         </div>

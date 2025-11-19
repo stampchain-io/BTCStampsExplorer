@@ -1,20 +1,10 @@
 /* ===== EXPLORER CONTENT COMPONENT ===== */
-import { StampRow } from "$globals";
+import { PaginationButtons } from "$button";
 import { StampCard } from "$card";
-import { Pagination } from "$islands/datacontrol/Pagination.tsx";
+import type { StampRow } from "$types/stamp.d.ts";
+import type { ExplorerContentProps } from "$types/ui.d.ts";
 
 /* ===== TYPES ===== */
-interface ExplorerContentProps {
-  stamps: StampRow[];
-  isRecentSales?: boolean;
-  fromPage?: string;
-  pagination?: {
-    page: number;
-    totalPages: number;
-    prefix?: string;
-    onPageChange?: (page: number) => void;
-  };
-}
 
 /* ===== COMPONENT ===== */
 export function ExplorerContent({
@@ -25,31 +15,32 @@ export function ExplorerContent({
 }: ExplorerContentProps) {
   /* ===== RENDER ===== */
   return (
-    <div class="w-full pt-3">
+    <div class="w-full pt-3 mobileMd:pt-6">
       {/* ===== STAMPS GRID ===== */}
       <div class="grid grid-cols-2 mobileMd:grid-cols-3 mobileLg:grid-cols-4 tablet:grid-cols-5 desktop:grid-cols-6 gap-6 w-full auto-rows-fr">
-        {stamps.map((stamp) => (
+        {(stamps ?? []).map((stamp: StampRow, index: number) => (
           <StampCard
             key={isRecentSales && stamp.sale_data
-              ? `${stamp.tx_hash}-${stamp.sale_data.tx_hash}`
+              ? `${stamp.tx_hash}-${stamp.sale_data.tx_hash}-${stamp.sale_data.block_index}-${index}`
               : stamp.tx_hash}
             stamp={stamp}
             isRecentSale={isRecentSales}
             showDetails
             variant="grey"
-            fromPage={fromPage}
+            {...(fromPage && { fromPage })}
           />
         ))}
       </div>
 
       {/* ===== PAGINATION ===== */}
       {pagination && pagination.totalPages > 1 && (
-        <div class="mt-12 mobileLg:mt-[72px]">
-          <Pagination
+        <div class="mt-7.5 tablet:mt-10">
+          <PaginationButtons
             page={pagination.page}
             totalPages={pagination.totalPages}
-            prefix={pagination.prefix}
-            onPageChange={pagination.onPageChange}
+            {...(pagination.prefix && { prefix: pagination.prefix })}
+            {...(pagination.onPageChange &&
+              { onPageChange: pagination.onPageChange })}
           />
         </div>
       )}

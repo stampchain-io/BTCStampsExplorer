@@ -1,31 +1,34 @@
 import { Handlers } from "$fresh/server.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { CreatorService } from "$server/services/creator/creatorService.ts";
+import { InternalApiFrontendGuard } from "$server/services/security/internalApiFrontendGuard.ts";
 import { InternalRouteGuard } from "$server/services/security/internalRouteGuard.ts";
 
 export const handler: Handlers = {
   async GET(req) {
     // GET requests need origin check but not CSRF
-    const originError = await InternalRouteGuard.requireTrustedOrigin(req);
+    const originError = await InternalApiFrontendGuard.requireInternalAccess(
+      req,
+    );
     if (originError) return originError;
 
     const url = new URL(req.url);
     const address = url.searchParams.get("address");
 
     if (!address) {
-      return ResponseUtil.badRequest("Address is required");
+      return ApiResponseUtil.badRequest("Address is required");
     }
 
     try {
       const creatorName = await CreatorService.getCreatorNameByAddress(address);
 
       if (!creatorName) {
-        return ResponseUtil.notFound("Creator name not found");
+        return ApiResponseUtil.notFound("Creator name not found");
       }
 
-      return ResponseUtil.success({ creatorName });
+      return ApiResponseUtil.success({ creatorName });
     } catch (error) {
-      return ResponseUtil.internalError(
+      return ApiResponseUtil.internalError(
         error,
         "Error fetching creator name",
       );
@@ -37,7 +40,9 @@ export const handler: Handlers = {
     const csrfError = await InternalRouteGuard.requireCSRF(req);
     if (csrfError) return csrfError;
 
-    const originError = await InternalRouteGuard.requireTrustedOrigin(req);
+    const originError = await InternalApiFrontendGuard.requireInternalAccess(
+      req,
+    );
     if (originError) return originError;
 
     // Check signature for wallet ownership
@@ -49,7 +54,7 @@ export const handler: Handlers = {
         .json();
 
       if (!address || !newName || !signature || !timestamp || !csrfToken) {
-        return ResponseUtil.badRequest("Missing required fields");
+        return ApiResponseUtil.badRequest("Missing required fields");
       }
 
       const result = await CreatorService.updateCreatorName({
@@ -61,15 +66,15 @@ export const handler: Handlers = {
       });
 
       if (!result.success) {
-        return ResponseUtil.badRequest(result.message || "Update failed");
+        return ApiResponseUtil.badRequest(result.message || "Update failed");
       }
 
-      return ResponseUtil.success({
+      return ApiResponseUtil.success({
         success: true,
         creatorName: result.creatorName,
       });
     } catch (error) {
-      return ResponseUtil.internalError(
+      return ApiResponseUtil.internalError(
         error,
         "Error updating creator name",
       );

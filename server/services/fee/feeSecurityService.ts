@@ -25,7 +25,7 @@ export interface SecurityEvent {
     ip?: string;
     userAgent?: string;
     referer?: string;
-  };
+  } | undefined;
 }
 
 export class FeeSecurityService {
@@ -73,8 +73,12 @@ export class FeeSecurityService {
 
       if (feeData.recommendedFee > this.config.maxFeeRate) {
         violations.push(`Fee rate too high: ${feeData.recommendedFee} > ${this.config.maxFeeRate}`);
-        // Always set to high for fee too high
-        riskLevel = "high";
+        // Set to critical if fee is extremely high (more than 2x max)
+        if (feeData.recommendedFee > this.config.maxFeeRate * 2) {
+          riskLevel = "critical";
+        } else {
+          riskLevel = "high";
+        }
       }
     }
 
@@ -136,7 +140,7 @@ export class FeeSecurityService {
           feeData: this.sanitizeFeeData(feeData),
         },
         timestamp: Date.now(),
-        clientInfo,
+        clientInfo: clientInfo || undefined,
       });
     }
 

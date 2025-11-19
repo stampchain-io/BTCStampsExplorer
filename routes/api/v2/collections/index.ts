@@ -1,15 +1,11 @@
 import { Handlers } from "$fresh/server.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
+import { getPaginationParams } from "$lib/utils/data/pagination/paginationUtils.ts";
 import { CollectionController } from "$server/controller/collectionController.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
-import {
-  checkEmptyResult,
-  DEFAULT_PAGINATION,
-} from "$server/services/routeValidationService.ts";
-import { RouteType } from "$server/services/cacheService.ts";
+import { RouteType } from "$server/services/infrastructure/cacheService.ts";
 
 export const handler: Handlers = {
-  async GET(req) {
+  async GET(req, _ctx) {
     try {
       const url = new URL(req.url);
       const pagination = getPaginationParams(url);
@@ -22,20 +18,16 @@ export const handler: Handlers = {
       const { limit, page } = pagination;
 
       const result = await CollectionController.getCollectionDetails({
-        limit: limit || DEFAULT_PAGINATION.limit,
-        page: page || DEFAULT_PAGINATION.page,
+        limit: limit || 50,
+        page: page || 1,
       });
 
-      // Check for empty result
-      const emptyCheck = checkEmptyResult(result, "collection data");
-      if (emptyCheck) {
-        return emptyCheck;
-      }
-
-      return ResponseUtil.success(result, { routeType: RouteType.COLLECTION });
+      return ApiResponseUtil.success(result, {
+        routeType: RouteType.COLLECTION,
+      });
     } catch (error) {
-      console.error("Error in GET handler:", error);
-      return ResponseUtil.internalError(
+      console.error("Error in collections handler:", error);
+      return ApiResponseUtil.internalError(
         error,
         "Error processing collections request",
       );

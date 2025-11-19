@@ -1,15 +1,13 @@
 /* ===== FAQ PAGE ===== */
-import { Head as _Head } from "$fresh/runtime.ts";
-import { body, gapSection } from "$layout";
-import { FaqHeader } from "$header";
 import { FaqAccordion } from "$content";
-import { FAQ_CONTENT } from "$layout";
+import { FaqHeader } from "$header";
+import { body, containerBackground, containerGap, FAQ_CONTENT } from "$layout";
 import { subtitleGrey, text, titleGreyLD } from "$text";
 
 /* ===== PAGE COMPONENT ===== */
 export default function FaqPage() {
   return (
-    <div className={`${body} ${gapSection}`}>
+    <div class={`${body} ${containerGap}`}>
       {/* ===== HEADER SECTION ===== */}
       <FaqHeader />
 
@@ -17,13 +15,13 @@ export default function FaqPage() {
       {FAQ_CONTENT.map((section) => (
         <section
           key={section.title}
-          className="flex flex-col gap-6"
+          class={`${containerBackground} space-y-7`}
         >
           {/* ===== ACCORDION HEADER SECTION ===== */}
           <div>
-            <h3 className={titleGreyLD}>{section.title}</h3>
-            <h4 className={subtitleGrey}>{section.subtitle}</h4>
-            <p className={text}>
+            <h3 class={titleGreyLD}>{section.title}</h3>
+            <h4 class={subtitleGrey}>{section.subtitle}</h4>
+            <p class={text}>
               {section.description.split("\n").map((line, lineIndex, array) => (
                 <span key={lineIndex}>
                   {line}
@@ -34,7 +32,7 @@ export default function FaqPage() {
           </div>
 
           {/* ===== ACCORDION SUBSECTION ===== */}
-          <div className="grid grid-cols-1 tablet:grid-cols-2 gap-3 tablet:gap-9 tablet:gap-y-3">
+          <div class="grid grid-cols-1 tablet:grid-cols-2 gap-3 tablet:gap-9 tablet:gap-y-3">
             {section.items.map((item) => (
               <FaqAccordion key={item.title} item={item} />
             ))}

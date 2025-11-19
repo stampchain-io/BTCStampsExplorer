@@ -3,6 +3,7 @@ export * from "$islands/card/styles.ts";
 
 /* ===== STAMP CARDS ===== */
 export * from "$islands/card/StampCard.tsx";
+export * from "$islands/card/WalletStampCard.tsx";
 
 /* ===== SRC20 TOKEN CARDS ===== */
 export * from "$components/card/SRC20Card.tsx";

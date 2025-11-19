@@ -1,15 +1,17 @@
 import { Handlers } from "$fresh/server.ts";
-import { InternalRouteGuard } from "$server/services/security/internalRouteGuard.ts";
 import { RateLimitMiddleware } from "$server/middleware/rateLimitMiddleware.ts";
-import { FeeService } from "$server/services/fee/feeService.ts";
+import { getProductionFeeService } from "$server/services/fee/feeServiceFactory.ts";
+import { InternalApiFrontendGuard } from "$server/services/security/internalApiFrontendGuard.ts";
 
 export const handler: Handlers = {
   async GET(req) {
-    // CSRF Protection for fee endpoints
-    const csrfError = await InternalRouteGuard.requireCSRF(req);
-    if (csrfError) {
-      console.log("[fees.ts] CSRF validation failed");
-      return csrfError;
+    // Origin validation for read-only endpoint (no CSRF needed)
+    const originError = await InternalApiFrontendGuard.requireInternalAccess(
+      req,
+    );
+    if (originError) {
+      console.log("[fees.ts] Origin validation failed");
+      return originError;
     }
 
     // Rate limiting for fee endpoints
@@ -22,15 +24,15 @@ export const handler: Handlers = {
     const startTime = Date.now();
 
     try {
-      console.log("[fees.ts] Starting Redis-cached fee estimation");
+      console.log("[fees.ts] Starting fee estimation with DI service");
 
-      // Use the new FeeService with Redis caching
-      const baseUrl = new URL(req.url).origin;
-      const feeData = await FeeService.getFeeData(baseUrl);
+      // Use the new DI-based FeeService
+      const feeService = getProductionFeeService();
+      const feeData = await feeService.getFeeData();
 
       const duration = Date.now() - startTime;
       console.log(
-        `[fees.ts] Fee estimation completed in ${duration}ms using ${feeData.source} source (Redis-cached)`,
+        `[fees.ts] Fee estimation completed in ${duration}ms using ${feeData.source} source (DI-based)`,
       );
 
       // Add rate limit headers to response

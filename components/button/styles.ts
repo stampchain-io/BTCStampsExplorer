@@ -1,33 +1,62 @@
 /* ===== BUTTON STYLES MODULE ===== */
+import {
+  glassmorphismL2,
+  glassmorphismL2Hover,
+  shadowL2,
+  transitionColors,
+} from "$layout";
 import { JSX } from "preact";
 
 /* ===== TYPE DEFINITIONS ===== */
+
+// Basic button props interface - exclude conflicting HTML attributes
+export interface ButtonProps
+  extends Omit<JSX.HTMLAttributes<HTMLButtonElement>, "loading" | "size"> {
+  variant?: keyof ButtonVariants["variant"];
+  color?: keyof ButtonVariants["color"];
+  size?: keyof ButtonVariants["size"];
+  disabled?: boolean;
+  loading?: boolean;
+  active?: boolean;
+  fullWidth?: boolean;
+  ariaLabel?: string;
+  "data-type"?: string;
+  "f-partial"?: string;
+}
+
 export interface ButtonVariants {
   base: string;
   variant: Record<
     | "text"
-    | "flat"
     | "outline"
+    | "flat"
     | "flatOutline"
     | "outlineFlat"
-    | "outlineGradient"
-    | "flatOutlineSelector"
-    | "outlineFlatSelector",
+    | "custom",
     string
   >;
   color: Record<
     | "grey"
-    | "greyDark"
-    | "greyGradient"
     | "purple"
-    | "purpleDark"
-    | "purpleGradient"
     | "test"
     | "custom",
     string
   >;
   size: Record<
-    "xs" | "sm" | "md" | "lg" | "xl" | "smR" | "mdR",
+    // when adding new sizes, update the ToggleButton.tsx file too
+    | "xxs"
+    | "xs"
+    | "sm"
+    | "md"
+    | "lg"
+    | "xl"
+    | "xxl"
+    | "xxsR"
+    | "xsR"
+    | "smR"
+    | "mdR"
+    | "lgR"
+    | "custom",
     string
   >;
   textSize: Record<
@@ -39,151 +68,102 @@ export interface ButtonVariants {
     loading: string;
     active: string;
   };
-  spinner: string;
 }
 
-/* ===== BUTTON PROPS INTERFACES ===== */
-interface BaseButtonProps {
-  variant: keyof typeof buttonStyles.variant;
-  color: keyof typeof buttonStyles.color;
-  size: keyof typeof buttonStyles.size;
-  class?: string;
-  children?: JSX.Element | string;
-  disabled?: boolean;
-  role?: JSX.AriaRole;
-  ariaLabel?: string;
-  onClick?: JSX.MouseEventHandler<HTMLButtonElement | HTMLAnchorElement>;
-  onMouseEnter?: JSX.MouseEventHandler<HTMLButtonElement | HTMLAnchorElement>;
-  onMouseLeave?: JSX.MouseEventHandler<HTMLButtonElement | HTMLAnchorElement>;
-  onFocus?: JSX.FocusEventHandler<HTMLButtonElement | HTMLAnchorElement>;
-  onBlur?: JSX.FocusEventHandler<HTMLButtonElement | HTMLAnchorElement>;
-  "data-type"?: string;
-}
+/* ===== BUTTON VARIANT BASE STYLES DEFINITIONS ===== */
+/* ToggleButton.tsx uses custom hover states for the selected state */
+const baseOutline = `
+  bg-color-background bg-opacity-10 hover:bg-opacity-50
+  border border-[var(--color-button-semidark)] rounded-full
+  text-[var(--color-button-semidark)]
+  backdrop-blur-sm opacity-90 hover:opacity-100`;
+const baseFlat = `
+  bg-[linear-gradient(to_bottom_right,var(--color-button-light),var(--color-button-semilight),var(--color-button),var(--color-button-semidark),var(--color-button-dark))]
+  border border-[var(--color-button-dark)] rounded-full
+  text-color-background
+  backdrop-blur-sm opacity-90 hover:opacity-100
+  `;
 
-export interface ButtonElementProps extends BaseButtonProps {
-  href?: undefined;
-  "f-partial"?: undefined;
-  target?: undefined;
-}
-
-export interface AnchorElementProps extends BaseButtonProps {
-  href: string;
-  "f-partial"?: string;
-  target?: "_blank" | "_self" | "_parent" | "_top";
-}
-
-export type ButtonProps = ButtonElementProps | AnchorElementProps;
-
-/* ===== BUTTON STYLE DEFINITIONS ===== */
 export const buttonStyles: ButtonVariants = {
   /* ===== BASE STYLES ===== */
   base: `
     inline-flex items-center justify-center
-    rounded-md border-2 
-    font-bold tracking-wide
-    transition-colors duration-300
+    font-semibold tracking-wide
+    ${transitionColors} cursor-pointer
   `,
 
-  /* ===== VARIANT STYLES ===== */
+  /* ===== VARIANT STYLES  ===== */
+  /* If the outline/flat variants are changed then the SelectorButtons.tsx and ToggleButton.tsx files must be update too */
   variant: {
     text: `
-      bg-transparent
-      !border-0 !p-0 !h-auto
-      !items-start !justify-start
-      font-semibold tracking-wide
-      text-[var(--default-color)] hover:text-[var(--hover-color)]
-    `,
-    flat: `
-      bg-[var(--default-color)] hover:bg-[var(--hover-color)]
-      border-[var(--default-color)] hover:border-[var(--hover-color)]
-      text-black
+      !items-start !justify-start !h-auto !p-0 bg-transparent
+      text-[var(--color-button-dark)] hover:text-[var(--color-button)]
     `,
     outline: `
-      bg-transparent
-      border-[var(--default-color)] hover:border-[var(--hover-color)]
-      text-[var(--default-color)] hover:text-[var(--hover-color)]
+      ${baseOutline} ${shadowL2}
+    `,
+    flat: `
+      ${baseFlat} ${shadowL2}
     `,
     flatOutline: `
-      bg-[var(--default-color)] hover:bg-transparent 
-      border-[var(--default-color)] hover:border-[var(--hover-color)]
-      text-black hover:text-[var(--hover-color)]
+      ${baseFlat} ${shadowL2}
+      !items-center !justify-center
+      hover:!bg-[linear-gradient(to_bottom_right,var(--color-background),var(--color-background),var(--color-background),var(--color-background),var(--color-background))]
+      hover:!border-[var(--color-button-semidark)]
+      hover:!text-[var(--color-button-semidark)] hover:!opacity-90
     `,
     outlineFlat: `
-      bg-transparent hover:bg-[var(--hover-color)] 
-      border-[var(--default-color)] hover:border-[var(--hover-color)]
-      text-[var(--default-color)] hover:text-black
+      ${baseOutline} ${shadowL2}
+      !items-center !justify-center
+      hover:!bg-[linear-gradient(to_bottom_right,var(--color-button-light),var(--color-button-semilight),var(--color-button),var(--color-button-semidark),var(--color-button-dark))]
+      hover:!border-[var(--color-button-dark)]
+      hover:!text-color-background hover:!opacity-90
     `,
-    outlineGradient: `
-      relative !bg-[linear-gradient(to_right,#1a0824,#210925)] !p-[2px] rounded-md !border-0
-      before:absolute before:inset-0 before:rounded-md before:z-[1]
-      before:bg-[conic-gradient(from_var(--angle),var(--color-dark),var(--color-medium),var(--color-light),var(--color-medium),var(--color-dark))]
-      before:[--angle:0deg] before:animate-rotate
-      hover:before:bg-[conic-gradient(from_var(--angle),var(--color-light),var(--color-light),var(--color-light),var(--color-light),var(--color-light))]
-      before:transition-colors before:duration-300
-      [&>*]:relative [&>*]:z-[2] [&>*]:rounded-md [&>*]:bg-[linear-gradient(to_right,#1a0824,#210925)] [&>*]:!border-0
-      [&>*]:inline-flex [&>*]:items-center [&>*]:justify-center [&>*]:w-full [&>*]:h-full [&>*]:px-5
-      [&>*]:font-bold [&>*]:tracking-wider 
-      [&>*]:text-[var(--default-color)] hover:[&>*]:text-[var(--hover-color)]
-      [&>*]:transition-colors [&>*]:duration-100
-    `,
-    flatOutlineSelector: `
-      bg-[var(--hover-color)] border-[var(--hover-color)] text-black
-      hover:bg-[var(--hover-color)] hover:border-[var(--hover-color)] hover:text-black
-    `,
-    outlineFlatSelector: `
-      bg-transparent border-[var(--default-color)] text-[var(--default-color)]
-      hover:bg-[var(--hover-color)] hover:border-[var(--hover-color)] hover:text-black
-    `,
+    custom: `${shadowL2}`,
   },
 
   /* ===== COLOR STYLES ===== */
+  /* Must use CSS variables, since Tailwind CSS definitions are utility classes and won't work */
   color: {
     grey: `
-      [--default-color:#999999]
-      [--hover-color:#CCCCCC]
-    `,
-    greyDark: `
-      [--default-color:#666666]
-      [--hover-color:#999999]
-    `,
-    greyGradient: `
-      [--color-dark:#666666]
-      [--color-medium:#999999]
-      [--color-light:#CCCCCC]
-      [--default-color:var(--color-medium)]
-      [--hover-color:var(--color-light)]
+      [--color-button-dark:var(--color-grey-dark)]
+      [--color-button-semidark:var(--color-grey-semidark)]
+      [--color-button:var(--color-grey)]
+      [--color-button-semilight:var(--color-grey-semilight)]
+      [--color-button-light:var(--color-grey-light)]
     `,
     purple: `
-      [--default-color:#8800CC]
-      [--hover-color:#AA00FF]
-    `,
-    purpleDark: `
-      [--default-color:#660099]
-      [--hover-color:#8800CC]
-    `,
-    purpleGradient: `
-      [--color-dark:#660099]
-      [--color-medium:#8800CC]
-      [--color-light:#AA00FF]
-      [--default-color:var(--color-medium)]
-      [--hover-color:var(--color-light)]
+      [--color-button-dark:var(--color-purple-dark)]
+      [--color-button-semidark:var(--color-purple-semidark)]
+      [--color-button:var(--color-purple)]
+      [--color-button-semilight:var(--color-purple-semilight)]
+      [--color-button-light:var(--color-purple-light)]
     `,
     test: `
-      [--default-color:#00CC00]
-      [--hover-color:#CC0000]
+      [--color-button-dark:var(--color-red-dark)]
+      [--color-button-semidark:var(--color-red-semidark)]
+      [--color-button:var(--color-green)]
+      [--color-button-semilight:var(--color-orange-semilight)]
+      [--color-button-light:var(--color-orange-light)]
     `,
     custom: "",
   },
 
   /* ===== SIZE STYLES ===== */
   size: {
+    xxs: "h-[26px] px-[14px] text-[10px]",
     xs: "h-[30px] px-[14px] text-xs",
     sm: "h-[34px] px-4 text-xs",
     md: "h-[38px] px-4 text-sm",
     lg: "h-[42px] px-4 text-sm",
     xl: "h-[46px] px-5 text-base",
+    xxl: "h-[50px] px-6 text-lg",
+    xxsR: "h-[26px] tablet:h-[22px] px-[14px] text-[10px]",
+    xsR: "h-[30px] tablet:h-[26px] px-[14px] text-xs tablet:text-[10px]",
     smR: "h-[34px] tablet:h-[30px] px-4 text-xs",
     mdR: "h-[38px] tablet:h-[34px] px-4 text-sm tablet:text-xs",
+    lgR: "h-[42px] tablet:h-[38px] px-4 text-sm",
+    custom: "/* Custom size - allows external sizing via className */",
   },
 
   /* ===== TEXT SIZE STYLES - ONLY USED FOR TEXT BUTTONS ===== */
@@ -198,13 +178,20 @@ export const buttonStyles: ButtonVariants = {
   /* ===== STATE STYLES ===== */
   state: {
     disabled: `
-      opacity-50
-      cursor-not-allowed
-      pointer-events-none
+      !opacity-60
+      !cursor-not-allowed
+      relative
+      [&:after]:content-['SOON™']
+      [&:after]:absolute [&:after]:inset-0
+      [&:after]:flex [&:after]:items-center [&:after]:justify-center
+      [&:after]:opacity-0 [&:after]:group-hover:opacity-100
+      [&:after]:transition-opacity [&:after]:ease-in-out [&:after]:duration-200
+      [&:after]:pointer-events-none [&:after]:z-10
+      [&:after]:text-white [&:after]:text-xs [&:after]:font-bold
     `,
     loading: `
+      !opacity-60
       cursor-wait
-      opacity-75
     `,
     active: `
       scale-95
@@ -212,38 +199,35 @@ export const buttonStyles: ButtonVariants = {
       transition-transform
     `,
   },
-
-  /* ===== SPINNER STYLES - @baba - duplicate of loaderSpin in layout/styles.ts ===== */
-  spinner: `
-    animate-spin 
-    rounded-full 
-    h-5 w-5 
-    border-b-[3px] 
-    border-[var(--hover-color)]
-  `,
 };
 
 /* ===== ADDITIONAL STYLES ===== */
-/* ===== TEMPORARY STYLES ===== */
-/* @baba - update feeCalculatorBase buttons */
-export const buttonPurpleOutline =
-  "inline-flex items-center justify-center border-2 border-stamp-purple rounded-md text-sm font-bold tracking-wider text-stamp-purple h-[38px] px-4 hover:border-stamp-purple-highlight hover:text-stamp-purple-highlight transition-colors duration-300";
-export const buttonPurpleFlat =
-  "inline-flex items-center justify-center bg-stamp-purple border-2 border-stamp-purple rounded-md text-sm font-bold tracking-wider text-black h-[38px] px-4 hover:border-stamp-purple-highlight hover:bg-stamp-purple-highlight transition-colors duration-300";
-
 /* ===== TOGGLE SWITCH BUTTON STYLES ===== */
 export const toggleButton =
-  "flex items-center relative w-10 h-5 rounded-full bg-stamp-grey focus:outline-none transition duration-300";
+  `flex items-center relative w-10 h-5 !rounded-full ${glassmorphismL2}
+  ${glassmorphismL2Hover} focus:outline-none transition duration-50`;
 export const toggleKnobBackground =
-  "flex justify-center items-center relative w-5 h-5 bg-stamp-grey rounded-full transition transform duration-500 ";
-export const toggleKnob = "w-[18px] h-[18px] rounded-full";
-export const sliderKnob =
-  `[&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:tablet:w-4 [&::-webkit-slider-thumb]:tablet:h-4 [&::-webkit-slider-thumb]:appearance-none
-   [&::-webkit-slider-thumb]:bg-stamp-purple-dark [&::-webkit-slider-thumb]:hover:bg-stamp-purple [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
-   [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:tablet:w-4 [&::-moz-range-thumb]:tablet:h-4 [&::-moz-range-thumb]:appearance-none
-   [&::-moz-range-thumb]:bg-stamp-purple-dark [&::-moz-range-thumb]:hover:bg-stamp-purple-dark [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer`;
+  "flex justify-center items-center relative w-5 h-5 bg-transparent rounded-full transition ease-in-out transform duration-400";
+export const toggleKnob = "w-[14px] h-[14px] rounded-full";
+/* ===== SLIDER BUTTON STYLES ===== */
 export const sliderBar =
-  `w-full h-1.5 tablet:h-1 rounded-lg bg-stamp-grey appearance-none cursor-pointer`;
+  `w-full h-5 tablet:h-4 !rounded-full ${glassmorphismL2} ${glassmorphismL2Hover} cursor-pointer`;
+export const trackFill = `
+  absolute top-0.5 bottom-0.5 h-[14px] tablet:h-[10px] rounded-full transition-colors duration-200 pointer-events-none
+  `;
+export const sliderKnob = `
+  absolute top-0.5 bottom-0.5 w-full h-[14px] tablet:h-[10px] rounded-full appearance-none bg-transparent pointer-events-none
+  [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:pointer-events-auto
+  [&::-webkit-slider-thumb]:size-[14px] [&::-webkit-slider-thumb]:tablet:size-[10px]
+  [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-color-grey
+  [&::-webkit-slider-thumb]:hover:bg-color-grey-light [&::-webkit-slider-thumb]:cursor-grab
+  [&::-webkit-slider-thumb]:active:cursor-grabbing
+  [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:pointer-events-auto
+  [&::-moz-range-thumb]:size-[14px][&::-moz-range-thumb]:tablet:size-[10px]
+  [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-color-grey
+  [&::-moz-range-thumb]:hover:bg-color-grey-light [&::-moz-range-thumb]:cursor-grab
+  [&::-moz-range-thumb]:active:cursor-grabbing [&::-moz-range-thumb]:border-0
+  `;
 
 /* ===== STYLE COMPOSITION FUNCTION ===== */
 export const button = (
@@ -262,9 +246,9 @@ export const button = (
   if (state?.active) stateClasses.push(buttonStyles.state.active);
 
   return `
-    ${buttonStyles.base} 
-    ${buttonStyles.variant[variant]} 
-    ${buttonStyles.color[color]} 
+    ${buttonStyles.base}
+    ${buttonStyles.variant[variant]}
+    ${buttonStyles.color[color]}
     ${buttonStyles.size[size]}
     ${stateClasses.join(" ")}
   `;

@@ -1,14 +1,16 @@
 import { Handlers } from "$fresh/server.ts";
-import { AddressHandlerContext } from "$globals";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
+import type { AddressHandlerContext } from "$types/api.d.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
+import { getBTCBalanceInfo } from "$lib/utils/data/processing/balanceUtils.ts";
+import { getPaginationParams } from "$lib/utils/data/pagination/paginationUtils.ts";
+import { isValidBitcoinAddress } from "$lib/utils/typeGuards.ts";
+import { Src20Controller } from "$server/controller/src20Controller.ts";
+import { StampController } from "$server/controller/stampController.ts";
+import { RouteType } from "$server/services/infrastructure/cacheService.ts";
 import {
-  checkEmptyResult,
   DEFAULT_PAGINATION,
   validateRequiredParams,
-} from "$server/services/routeValidationService.ts";
-import { RouteType } from "$server/services/cacheService.ts";
-import { getBTCBalanceInfo } from "$lib/utils/balanceUtils.ts";
+} from "$server/services/validation/routeValidationService.ts";
 
 export const handler: Handlers<AddressHandlerContext> = {
   async GET(req: Request, ctx): Promise<Response> {
@@ -19,7 +21,24 @@ export const handler: Handlers<AddressHandlerContext> = {
       const paramsValidation = validateRequiredParams({ address });
       if (!paramsValidation.isValid) {
         return paramsValidation.error ??
-          new Response("Invalid parameters", { status: 400 });
+          ApiResponseUtil.badRequest("Invalid parameters");
+      }
+
+      // Check for XSS attempts
+      const xssPattern = /<script|javascript:|on\w+=/i;
+      if (xssPattern.test(address)) {
+        return ApiResponseUtil.badRequest(
+          "Invalid input detected",
+          { routeType: RouteType.BALANCE },
+        );
+      }
+
+      // Validate Bitcoin address format
+      if (!isValidBitcoinAddress(address)) {
+        return ApiResponseUtil.badRequest(
+          `Invalid Bitcoin address format: ${address}`,
+          { routeType: RouteType.BALANCE },
+        );
       }
 
       // Get pagination params
@@ -33,30 +52,28 @@ export const handler: Handlers<AddressHandlerContext> = {
         page = DEFAULT_PAGINATION.page,
       } = pagination;
 
-      // Use full limit for both endpoints to ensure we get all available data
-      const [stampsRes, src20Res, btcInfo] = await Promise.all([
-        fetch(
-          `${url.origin}/api/v2/stamps/balance/${address}?limit=${limit}&page=${page}`,
-        ),
-        fetch(
-          `${url.origin}/api/v2/src20/balance/${address}?limit=${limit}&page=${page}`,
-        ),
+      // Call controllers directly instead of making HTTP requests to avoid DNS issues
+      const [stamps, src20, btcInfo] = await Promise.all([
+        StampController.getStampBalancesByAddress(address, limit, page),
+        Src20Controller.handleSrc20BalanceRequest({
+          address,
+          limit,
+          page,
+          includePagination: true,
+        }),
         getBTCBalanceInfo(address),
       ]);
 
-      const [stamps, src20] = await Promise.all([
-        stampsRes.json(),
-        src20Res.json(),
-      ]);
-
-      // Check for empty results
+      // Check for empty results - return 404 for valid Bitcoin addresses with no stamps/tokens
       if (!stamps.data?.length && !src20.data?.length) {
-        return checkEmptyResult(null, "balance data") ??
-          new Response("No data found", { status: 404 });
+        return ApiResponseUtil.notFound(
+          `No stamps or SRC-20 tokens found for address: ${address}`,
+        );
       }
 
       // Calculate combined totals
-      const totalItems = (stamps.total || 0) + (src20.total || 0);
+      const totalItems = ((stamps as any).total || 0) +
+        ((src20 as any).total || 0);
       const totalPages = Math.ceil(totalItems / limit);
 
       // Format response to match old schema
@@ -80,7 +97,7 @@ export const handler: Handlers<AddressHandlerContext> = {
       };
 
       // Return with proper caching and informational headers
-      return ResponseUtil.success(response, {
+      return ApiResponseUtil.success(response, {
         routeType: RouteType.BALANCE,
         headers: {
           "X-Preferred-Endpoints":
@@ -91,8 +108,10 @@ export const handler: Handlers<AddressHandlerContext> = {
       });
     } catch (error) {
       console.error("Error in balance/[address] handler:", error);
-      return ResponseUtil.internalError(error) ??
-        new Response("Internal server error", { status: 500 });
+      return ApiResponseUtil.internalError(
+        error instanceof Error ? error : new Error(String(error)),
+        "Failed to fetch balance data",
+      );
     }
   },
 };

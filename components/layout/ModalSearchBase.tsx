@@ -1,10 +1,7 @@
+import { glassmorphism } from "$layout";
 import { logger } from "$lib/utils/logger.ts";
+import type { ModalSearchBaseProps } from "$types/ui.d.ts";
 import { useEffect } from "preact/hooks";
-
-interface ModalSearchBaseProps {
-  children: preact.ComponentChildren;
-  onClose?: () => void;
-}
 
 export function ModalSearchBase({ children, onClose }: ModalSearchBaseProps) {
   console.log("ModalSearchBase rendered"); // Debug log
@@ -49,7 +46,7 @@ export function ModalSearchBase({ children, onClose }: ModalSearchBaseProps) {
       class="w-[90vw] mobileMd:w-[480px] my-16 mobileLg:my-[76px]"
       onClick={(e) => e.stopPropagation()}
     >
-      <div class="relative rounded-md !bg-[#080808] p-[2px] before:absolute before:inset-0 before:rounded-md before:z-[1] before:bg-[conic-gradient(from_var(--angle),#666666,#999999,#CCCCCC,#999999,#666666)] before:[--angle:0deg] before:animate-rotate [&>*]:relative [&>*]:z-[2] [&>*]:rounded-md [&>*]:bg-[#080808]">
+      <div class={`relative ${glassmorphism} !border-color-border`}>
         <div class="relative flex flex-col max-h-[90%] overflow-hidden">
           {children}
         </div>

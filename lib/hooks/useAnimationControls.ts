@@ -1,13 +1,9 @@
-import { useEffect, useState } from "preact/hooks";
 import { IS_BROWSER } from "$fresh/runtime.ts";
+import type { AnimationState } from "$types/ui.d.ts";
 import type { RefObject } from "preact";
+import { useEffect, useState } from "preact/hooks";
 
 // Global animation state
-interface AnimationState {
-  pageVisible: boolean;
-  reducedMotion: boolean;
-  performanceMode: "high" | "medium" | "low";
-}
 
 // Global animation controls
 class AnimationManager {
@@ -15,7 +11,6 @@ class AnimationManager {
   private state: AnimationState = {
     pageVisible: true,
     reducedMotion: false,
-    performanceMode: "high",
   };
   private observers: Set<IntersectionObserver> = new Set();
   private listeners: Set<(state: AnimationState) => void> = new Set();
@@ -31,7 +26,7 @@ class AnimationManager {
     if (IS_BROWSER) {
       this.initializePageVisibility();
       this.initializeReducedMotion();
-      this.initializePerformanceDetection();
+      // performance-based detection removed
     }
   }
 
@@ -64,37 +59,7 @@ class AnimationManager {
     });
   }
 
-  private initializePerformanceDetection() {
-    // Detect performance capabilities
-    const connection = (navigator as any).connection;
-    const memory = (performance as any).memory;
-
-    let performanceMode: "high" | "medium" | "low" = "high";
-
-    // Check network connection
-    if (connection) {
-      if (
-        connection.effectiveType === "2g" ||
-        connection.effectiveType === "slow-2g"
-      ) {
-        performanceMode = "low";
-      } else if (connection.effectiveType === "3g") {
-        performanceMode = "medium";
-      }
-    }
-
-    // Check memory constraints
-    if (memory && memory.jsHeapSizeLimit < 1000000000) { // Less than 1GB
-      performanceMode = "low";
-    }
-
-    // Check hardware concurrency
-    if (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 2) {
-      performanceMode = performanceMode === "high" ? "medium" : "low";
-    }
-
-    this.updateState({ performanceMode });
-  }
+  // performance-based detection removed
 
   private updateState(updates: Partial<AnimationState>) {
     this.state = { ...this.state, ...updates };
@@ -114,13 +79,7 @@ class AnimationManager {
     // Reduced motion
     body.classList.toggle("reduced-motion", this.state.reducedMotion);
 
-    // Performance mode
-    body.classList.remove(
-      "performance-high",
-      "performance-medium",
-      "performance-low",
-    );
-    body.classList.add(`performance-${this.state.performanceMode}`);
+    // Performance mode handling removed
   }
 
   private notifyListeners() {
@@ -141,7 +100,7 @@ class AnimationManager {
   }
 
   public shouldAnimateInViewport(): boolean {
-    return this.shouldAnimate() && this.state.performanceMode !== "low";
+    return this.shouldAnimate();
   }
 
   public createIntersectionObserver(

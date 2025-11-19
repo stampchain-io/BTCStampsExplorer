@@ -2,6 +2,7 @@
 node_modules
 .npm
 .deno
+_fresh/
 npm-debug.log
 .DS_Store
 .git

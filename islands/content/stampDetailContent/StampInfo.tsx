@@ -1,36 +1,39 @@
 /* ===== STAMP INFO COMPONENT ===== */
 /*@baba-750+764+815+icons - refactor to StatItems */
-import { useEffect, useRef, useState } from "preact/hooks";
+import { Button } from "$button";
+import { Icon } from "$icon";
 import BuyStampModal from "$islands/modal/BuyStampModal.tsx";
-import {
-  abbreviateAddress,
-  formatBTCAmount,
-  formatDate,
-} from "$lib/utils/formatUtils.ts";
-import { getSRC101Data, getStampImageSrc } from "$lib/utils/imageUtils.ts";
-import { Src101Detail, StampRow } from "$globals";
-import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
-import { calculateTransactionSize } from "$lib/utils/identifierUtils.ts";
+import { openModal } from "$islands/modal/states.ts";
 import {
   body,
   containerBackground,
   containerColData,
-  gapSectionSlim,
+  containerGap,
 } from "$layout";
+import type { Src101Detail } from "$lib/types/src101.d.ts";
+import type { StampRow } from "$lib/types/stamp.d.ts";
+import { calculateTransactionSize } from "$lib/utils/data/identifiers/identifierUtils.ts";
+import {
+  abbreviateAddress,
+  formatBTCAmount,
+  formatDate,
+} from "$lib/utils/ui/formatting/formatUtils.ts";
+import {
+  getSRC101Data,
+  getStampImageSrc,
+} from "$lib/utils/ui/media/imageUtils.ts";
+import { tooltipIcon } from "$notification";
+import { Dispenser, StampListingsOpenTable } from "$table";
 import {
   headingGreyDLLink,
   labelSm,
   titleGreyLD,
+  value2xl,
   value3xl,
   valueDark,
   valueSm,
 } from "$text";
-import { Button } from "$button";
-import { Dispenser, StampListingsOpenTable } from "$table";
-import { tooltipIcon } from "$notification";
-import { openModal } from "$islands/modal/states.ts";
-import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
-import { Icon } from "$icon";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
 interface StampInfoProps {
@@ -68,7 +71,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     );
 
     // Show modal with animation
-    openModal(modalContent, "scaleUpDown");
+    openModal(modalContent, "slideUpDown");
   };
 
   const createdDate = (() => {
@@ -234,20 +237,24 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     } else if (stamp.stamp_mimetype?.startsWith("image/")) {
       // Handle images
       const src = await getStampImageSrc(stamp);
-      const img = new Image();
-      img.onload = () => {
-        setImageDimensions({
-          width: img.naturalWidth,
-          height: img.naturalHeight,
-          unit: "px",
-        });
-      };
-      img.src = src;
+      if (src) {
+        const img = new Image();
+        img.onload = () => {
+          setImageDimensions({
+            width: img.naturalWidth,
+            height: img.naturalHeight,
+            unit: "px",
+          });
+        };
+        img.src = src;
 
-      fetch(src)
-        .then((response) => response.blob())
-        .then((blob) => setFileSize(blob.size))
-        .catch((error) => console.error("Failed to fetch image size:", error));
+        fetch(src)
+          .then((response) => response.blob())
+          .then((blob) => setFileSize(blob.size))
+          .catch((error) =>
+            console.error("Failed to fetch image size:", error)
+          );
+      }
     } else if (stamp.stamp_mimetype === "text/html") {
       // Handle HTML
       fetch(stamp.stamp_url)
@@ -532,7 +539,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   const fetchSRC101 = async () => {
     try {
       const res = await getSRC101Data(stamp as StampRow);
-      setSrc101(res);
+      setSrc101(res as Src101Detail);
     } catch (error: any) {
       console.log("Fetch SRC101 Error====>", error.message);
       setSrc101({} as Src101Detail);
@@ -550,33 +557,42 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     null,
   );
 
-  // Add btcPrice state with proper initialization
-  const [btcPrice, setBtcPrice] = useState<number | null>(null);
+  // v2.3 API: Use marketData for pricing (preferred) with legacy fallback
+  const stampWithMarketData = stamp as any;
+  const marketData = stampWithMarketData?.marketData;
 
-  // Fetch BTC price when component mounts using centralized Redis-cached endpoint
-  useEffect(() => {
-    const fetchBTCPrice = async () => {
-      try {
-        const price = await fetchBTCPriceInUSD();
-        setBtcPrice(price);
-      } catch (error) {
-        console.error("Error fetching BTC price:", error);
-        setBtcPrice(null);
-      }
-    };
+  // Calculate BTC price from v2.3 marketData or legacy fields
+  const floorPriceBTC = marketData?.floorPriceBTC ??
+    (stamp.floorPrice && stamp.floorPrice !== "priceless"
+      ? stamp.floorPrice
+      : null);
+  const floorPriceUSD = marketData
+    // For v2.3: calculate from marketData if available
+    ? (marketData.floorPriceBTC && marketData.volume24hBTC
+      ? marketData.floorPriceBTC * 117888
+      : null)
+    // Legacy fallback
+    : stamp.floorPriceUSD;
 
-    fetchBTCPrice();
-  }, []);
+  const btcPrice = floorPriceUSD && floorPriceBTC
+    ? floorPriceUSD / floorPriceBTC
+    : null;
 
-  // First, ensure our calculations are correct
+  // Calculate display price: dispenser price > floor price
   const displayPrice = selectedDispenser
     ? parseInt(selectedDispenser.satoshirate.toString(), 10) / 100000000
-    : (typeof stamp.floorPrice === "number" ? stamp.floorPrice : 0);
+    : lowestPriceDispenser
+    ? parseInt(lowestPriceDispenser.satoshirate.toString(), 10) / 100000000
+    : (floorPriceBTC || 0);
 
-  const displayPriceUSD = selectedDispenser && btcPrice
-    ? (parseInt(selectedDispenser.satoshirate.toString(), 10) / 100000000) *
-      btcPrice
-    : stamp.floorPriceUSD;
+  const displayPriceUSD =
+    (selectedDispenser || lowestPriceDispenser) && btcPrice
+      ? (parseInt(
+        (selectedDispenser || lowestPriceDispenser).satoshirate.toString(),
+        10,
+      ) / 100000000) *
+        btcPrice
+      : floorPriceUSD;
 
   // Debug effects for development only
   useEffect(() => {
@@ -706,8 +722,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   /* ===== RENDER ===== */
   return (
     <>
-      <SearchStampModal showButton={false} />
-      <div className={`${body} ${gapSectionSlim}`}>
+      <div className={`${body} ${containerGap}`}>
         <div
           className={containerBackground}
         >
@@ -757,7 +772,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
               </h6>
             )}
 
-            <h5 className="-mt-1.5 font-light text-xl text-stamp-grey block">
+            <h5 className="-mt-1.5 font-light text-xl text-color-grey block">
               {(!isSrc20Stamp() && (isPoshStamp(stamp.cpid) ||
                 (htmlStampTitle && stamp.stamp_mimetype === "text/html"))) && (
                 <>
@@ -773,7 +788,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
             )}
 
             <div className="flex flex-col items-start pt-3">
-              <h6 className={labelSm}>BY</h6>
+              <h6 className={labelSm}>ARTIST</h6>
               <a
                 className={headingGreyDLLink}
                 href={`/wallet/${stamp.creator}`}
@@ -784,11 +799,11 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
             </div>
           </div>
 
-          {(dispensers?.length > 0 || stamp.floorPrice)
+          {(dispensers?.length > 0)
             ? (
               <div className="flex flex-col w-full pt-6 mobileLg:pt-12">
                 <div
-                  className={`flex w-full gap-6 mb-3 items-end ${
+                  className={`flex w-full gap-6 mb-2 items-end ${
                     dispensers?.length >= 2 ? "justify-between" : "justify-end"
                   }`}
                 >
@@ -798,7 +813,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                       name="dispenserListings"
                       weight="normal"
                       size="mdR"
-                      color="grey"
+                      color="greyLight"
                       ariaLabel="Listings"
                       onClick={() => setShowListings(!showListings)}
                       className="pb-0.5"
@@ -813,10 +828,14 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                         })} <span className="font-light">USD</span>
                       </h6>
                     )}
-                    <h6 className={value3xl}>
+                    <h6 className={value2xl}>
                       {formatBTCAmount(
                         typeof displayPrice === "number" ? displayPrice : 0,
-                        { excludeSuffix: true },
+                        {
+                          excludeSuffix: true,
+                          decimals: 8,
+                          stripZeros: true,
+                        },
                       )} <span className="font-extralight">BTC</span>
                     </h6>
                   </div>
@@ -828,19 +847,17 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                       className={`overflow-hidden transition-all duration-500 ease-in-out
                       ${
                         showListings
-                          ? "max-h-[300px] opacity-100"
+                          ? "max-h-[244px] mt-1 mb-3 opacity-100"
                           : "max-h-0 opacity-0"
                       }`}
                     >
-                      <div className="w-full mb-6">
+                      <div className="w-full mb-4">
                         {isLoadingDispensers
                           ? <h6>LOADING</h6>
                           : (
                             <StampListingsOpenTable
                               dispensers={dispensers}
-                              floorPrice={typeof stamp.floorPrice === "number"
-                                ? stamp.floorPrice
-                                : 0}
+                              floorPrice={floorPriceBTC || 0}
                               onSelectDispenser={handleDispenserSelect}
                               selectedDispenser={selectedDispenser}
                             />
@@ -852,9 +869,9 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
 
                 <div className="flex justify-end">
                   <Button
-                    variant="outline"
-                    color="purple"
-                    size="md"
+                    variant="flat"
+                    color="grey"
+                    size="mdR"
                     onClick={() =>
                       toggleModal(selectedDispenser || lowestPriceDispenser)}
                   >
@@ -926,9 +943,8 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                     type="icon"
                     name="divisible"
                     weight="normal"
-                    size="custom"
-                    color="grey"
-                    className="w-[23px] h-[23px]"
+                    size="xs"
+                    color="greyDark"
                     ariaLabel="Divisible"
                   />
                   <div
@@ -951,8 +967,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                     name="keyburned"
                     weight="normal"
                     size="xs"
-                    color="grey"
-                    className="mb-0.5"
+                    color="greyDark"
                     ariaLabel="Keyburned"
                   />
                   <div
@@ -976,7 +991,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                       name="locked"
                       weight="normal"
                       size="xs"
-                      color="grey"
+                      color="greyDark"
                       ariaLabel="Locked"
                     />
                     <div
@@ -999,7 +1014,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                       name="unlocked"
                       weight="normal"
                       size="xs"
-                      color="grey"
+                      color="greyDark"
                       ariaLabel="Unlocked"
                     />
                     <div
@@ -1036,7 +1051,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                 href={`https://www.blockchain.com/explorer/transactions/btc/${stamp.tx_hash}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`${valueSm} hover:text-stamp-grey transition-colors duration-300`}
+                className={`${valueSm} hover:text-color-grey transition-colors duration-300`}
               >
                 {stamp.tx_hash !== null
                   ? abbreviateAddress(stamp.tx_hash, 4)

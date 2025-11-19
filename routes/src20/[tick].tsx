@@ -1,9 +1,11 @@
 /* ===== SRC20 DETAIL PAGE ===== */
 import { Handlers } from "$fresh/server.ts";
-import { Src20Controller } from "$server/controller/src20Controller.ts";
-import { SRC20DetailHeader } from "$header";
-import { DataTableBase, HoldersTable } from "$table";
+import { SRC20DetailHeader } from "$islands/header/index.ts";
 import ChartWidget from "$islands/layout/ChartWidget.tsx";
+import { body, containerGap } from "$layout";
+import { Src20Controller } from "$server/controller/src20Controller.ts";
+import { DetailsTableBase, HoldersTable } from "$table";
+import type { ProcessedHolder } from "$types/wallet.d.ts";
 
 /* ===== SERVER HANDLER ===== */
 export const handler: Handlers = {
@@ -14,38 +16,46 @@ export const handler: Handlers = {
       const decodedTick = decodeURIComponent(rawTick);
       const encodedTick = encodeURIComponent(rawTick);
 
-      // Get the base URL from the request
-      const url = new URL(_req.url);
-      const baseUrl = `${url.protocol}//${url.host}`;
-
-      /* ===== DATA FETCHING ===== */
+      /* ===== SERVER-SIDE DATA FETCHING ===== */
       const [body, transferCount, mintCount, combinedListings] = await Promise
         .all([
           Src20Controller.fetchSrc20TickPageData(decodedTick),
-          fetch(
-            `${baseUrl}/api/v2/src20/tick/${encodedTick}?op=TRANSFER&limit=1`,
-          )
-            .then((r) => r.json()),
-          fetch(`${baseUrl}/api/v2/src20/tick/${encodedTick}?op=MINT&limit=1`)
-            .then((r) => r.json()),
+          // 🚀 SERVER-SIDE: Use controller directly instead of HTTP fetch
+          Src20Controller.getTickData({
+            tick: decodedTick,
+            limit: 1,
+            page: 1,
+            op: "TRANSFER",
+          }).then((result) => ({ total: result.total })),
+          // 🚀 SERVER-SIDE: Use controller directly instead of HTTP fetch
+          Src20Controller.getTickData({
+            tick: decodedTick,
+            limit: 1,
+            page: 1,
+            op: "MINT",
+          }).then((result) => ({ total: result.total })),
+          // 🚀 EXTERNAL API: Keep external call but with better error handling
           fetch(
             `https://api.stampscan.xyz/utxo/combinedListings?tick=${encodedTick}`,
-          ).then((r) => r.json()),
+          ).then((r) => r.ok ? r.json() : []).catch(() => []),
         ]);
 
       if (!body) {
         return ctx.renderNotFound();
       }
       /* @fullman */
-      const highchartsData = combinedListings.map((item, _index) => [
+      const highchartsData = combinedListings.map((
+        item: any,
+        _index: number,
+      ) => [
         new Date(item.date).getTime(),
         item.unit_price_btc * 100000000, // Convert BTC to sats
-      ]).sort((a, b) => a[0] - b[0]);
+      ]).sort((a: any, b: any) => a[0] - b[0]);
 
       /* ===== RESPONSE FORMATTING ===== */
       body.initialCounts = {
-        transfers: transferCount.total || 0,
-        mints: mintCount.total || 0,
+        totalTransfers: transferCount.total || 0,
+        totalMints: mintCount.total || 0,
       };
       body.highcharts = highchartsData || [];
 
@@ -63,12 +73,19 @@ export const handler: Handlers = {
 };
 
 /* ===== TYPES ===== */
-interface SRC20DetailPageProps {
-  data: SRC20DetailPageData | { error: string };
+interface SRC20DetailPageData {
+  deployment: any;
+  holders: ProcessedHolder[];
+  mint_status: any;
+  total_mints: number;
+  total_transfers: number;
+  marketInfo?: any;
+  highcharts?: any[];
+  error?: string;
 }
 
 /* ===== PAGE COMPONENT ===== */
-function SRC20DetailPage(props: SRC20DetailPageProps) {
+function SRC20DetailPage(props: { data: SRC20DetailPageData }) {
   /* ===== ERROR HANDLING ===== */
   if ("error" in props.data) {
     return (
@@ -98,17 +115,30 @@ function SRC20DetailPage(props: SRC20DetailPageProps) {
 
   /* ===== RENDER ===== */
   return (
-    <div class="flex flex-col gap-6">
+    <div class={`${body} ${containerGap}`}>
       <SRC20DetailHeader
         deployment={deployment}
-        mintStatus={mint_status}
-        totalMints={total_mints}
-        totalTransfers={total_transfers}
-        marketInfo={marketInfo}
+        _mintStatus={mint_status}
+        _totalMints={total_mints}
+        _totalTransfers={total_transfers}
+        {...(marketInfo && { marketInfo })}
       />
-      <ChartWidget data={highcharts} />
-      <HoldersTable holders={holders} />
-      <DataTableBase
+      <ChartWidget
+        type="line"
+        data={highcharts || []}
+        fromPage="src20"
+        tick={tick}
+      />
+      <HoldersTable
+        holders={holders.map((h) => ({
+          address: h.address,
+          quantity: h.amt,
+          divisible: false, // SRC20 tokens are not divisible
+          amt: h.amt,
+          percentage: h.percentage,
+        }))}
+      />
+      <DetailsTableBase
         type="src20"
         configs={tableConfigs}
         tick={tick}

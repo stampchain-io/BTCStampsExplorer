@@ -1,18 +1,25 @@
 /* ===== WALLET DASHBOARD CONTENT COMPONENT ===== */
-import { useEffect, useState } from "preact/hooks";
+import type { DispenserRow as Dispenser, StampRow } from "$types/stamp.d.ts";
+
+import { PaginationButtons } from "$button";
+import { Icon, LoadingIcon, PlaceholderImage } from "$icon";
+import { SettingsButton } from "$islands/button/SettingsButton.tsx";
 import { SortButton } from "$islands/button/SortButton.tsx";
-import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
-import { FilterOld } from "$islands/WIP/FilterOld.tsx";
-import { Setting } from "$islands/datacontrol/Setting.tsx";
-import { Pagination } from "$islands/datacontrol/Pagination.tsx";
-import { SRC20Gallery, StampGallery } from "$section";
-import { WalletContentProps } from "$types/wallet.d.ts";
-import { Dispenser } from "$types/index.d.ts";
-import { formatBTCAmount } from "$lib/utils/formatUtils.ts";
-import { getStampImageSrc } from "$lib/utils/imageUtils.ts";
-import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
-import { StampRow } from "$globals";
-import { Icon, LoadingIcon } from "$icon";
+import FreshSRC20Gallery from "$islands/section/gallery/FreshSRC20Gallery.tsx";
+import { FreshStampGallery } from "$islands/section/gallery/FreshStampGallery.tsx";
+import { glassmorphism, shadowGlowPurple } from "$layout";
+import {
+  createPaginationHandler,
+  getCurrentUrl,
+  navigateWithFresh,
+} from "$lib/utils/navigation/freshNavigationUtils.ts";
+import {
+  abbreviateAddress,
+  formatBTCAmount,
+} from "$lib/utils/ui/formatting/formatUtils.ts";
+import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
+import type { WalletContentProps } from "$types/wallet.d.ts";
+import { useEffect, useState } from "preact/hooks";
 
 /* ===== ITEM HEADER SUBCOMPONENT ===== */
 const ItemHeader = ({
@@ -20,10 +27,7 @@ const ItemHeader = ({
   sortBy = "ASC" as const,
   isOpenSetting = false,
   handleOpenSetting = () => {},
-  isOpenFilter = false,
-  handleOpenFilter = () => {},
   sort = true,
-  filter = true,
   setting = false,
   setOpenSettingModal = () => {},
   onChangeSort = () => {},
@@ -32,10 +36,7 @@ const ItemHeader = ({
   sortBy: "ASC" | "DESC";
   isOpenSetting: boolean;
   handleOpenSetting: (open: boolean) => void;
-  isOpenFilter: boolean;
-  handleOpenFilter: (open: boolean) => void;
   sort: boolean;
-  filter: boolean;
   setting: boolean;
   setOpenSettingModal?: (open: boolean) => void;
   onChangeSort?: (newSortBy: "ASC" | "DESC") => void;
@@ -44,31 +45,22 @@ const ItemHeader = ({
   return (
     <div class="flex flex-row justify-between items-center gap-3 w-full relative">
       <div class="flex items-end">
-        <p class="text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-purple-highlight">
+        <p class="text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-extralight text-color-purple-light">
           {title}
         </p>
       </div>
       <div class="flex gap-3 justify-between h-[36px] items-center">
         {setting && (
-          <Setting
+          <SettingsButton
             initFilter={[]}
             open={isOpenSetting}
             handleOpen={handleOpenSetting}
             filterButtons={["transfer"]}
-            onFilterClick={(filter) => {
+            onFilterClick={(filter: string) => {
               if (filter === "transfer") {
                 setOpenSettingModal(true);
               }
             }}
-          />
-        )}
-        {filter && (
-          <FilterOld
-            initFilter={[]}
-            open={isOpenFilter}
-            handleOpen={handleOpenFilter}
-            filterButtons={["all", "psbt", "dispensers"]}
-            dropdownPosition="bottom"
           />
         )}
         {sort && (
@@ -103,14 +95,14 @@ function DispenserItem({
   /* ===== EMPTY STATE HANDLING ===== */
   if (!dispensers?.length) {
     return (
-      <div class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-text-purple-3 gradient-text">
+      <div class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black color-purple-gradientLD">
         NO LISTINGS FOUND
       </div>
     );
   }
 
   /* ===== DISPENSER FILTERING ===== */
-  const dispensersWithStamps = dispensers.filter((d) => d.stamp);
+  const dispensersWithStamps = dispensers?.filter((d) => d.stamp) ?? [];
   const openDispensers = dispensersWithStamps.filter((d) =>
     d.give_remaining > 0
   );
@@ -121,7 +113,7 @@ function DispenserItem({
   if (!openDispensers.length && !closedDispensers.length) {
     return (
       <div>
-        <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-text-purple-3 gradient-text">
+        <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black color-purple-gradientLD">
           NO LISTINGS FOUND
         </h3>
       </div>
@@ -135,7 +127,7 @@ function DispenserItem({
         {/* Open Dispensers Section */}
         {openDispensers.length > 0 && (
           <div id="open-listings-section">
-            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-text-purple-3 gradient-text mb-6">
+            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black color-purple-gradientLD mb-6">
               OPEN LISTINGS
             </h3>
             <div class="flex flex-col gap-6">
@@ -149,7 +141,7 @@ function DispenserItem({
         {/* Closed Dispensers Section */}
         {closedDispensers.length > 0 && (
           <div id="closed-listings-section">
-            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-text-purple-3 gradient-text mb-6">
+            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black color-purple-gradientLD mb-6">
               CLOSED LISTINGS
             </h3>
             <div class="flex flex-col gap-6">
@@ -166,7 +158,7 @@ function DispenserItem({
         {/* Open Dispensers Section */}
         {openDispensers.length > 0 && (
           <div class="mb-8" id="open-listings-section">
-            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-text-purple-3 gradient-text mb-6">
+            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black color-purple-gradientLD mb-6">
               OPEN LISTINGS
             </h3>
             <div class="flex flex-col gap-6">
@@ -180,7 +172,7 @@ function DispenserItem({
         {/* Closed Dispensers Section */}
         {closedDispensers.length > 0 && (
           <div id="closed-listings-section">
-            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-text-purple-3 gradient-text mb-6">
+            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black color-purple-gradientLD mb-6">
               CLOSED LISTINGS
             </h3>
             <div class="flex flex-col gap-6">
@@ -195,16 +187,14 @@ function DispenserItem({
       {/* Pagination */}
       {pagination && pagination.totalPages > 1 && (
         <div class="mt-6">
-          <Pagination
+          <PaginationButtons
             page={pagination.page}
             totalPages={pagination.totalPages}
             prefix="dispensers"
-            onPageChange={(page: number) => {
-              const url = new URL(globalThis.location.href);
-              url.searchParams.set("dispensers_page", page.toString());
-              url.searchParams.set("anchor", "closed_listings");
-              globalThis.location.href = url.toString();
-            }}
+            onPageChange={createPaginationHandler(
+              "dispensers_page",
+              "closed_listings",
+            )}
           />
         </div>
       )}
@@ -221,15 +211,13 @@ function DispenserRow(
     ? "w-[146px] h-[146px]"
     : "w-[172px] h-[172px]";
   const [loading, setLoading] = useState(true);
-  const [src, setSrc] = useState("");
+  const [src, setSrc] = useState<string | undefined>(undefined);
 
   /* ===== IMAGE FETCHING ===== */
-  const fetchStampImage = async () => {
+  const fetchStampImage = () => {
     setLoading(true);
-    const res = await getStampImageSrc(dispenser.stamp as StampRow);
-    if (res) {
-      setSrc(res);
-    } else setSrc(NOT_AVAILABLE_IMAGE);
+    const res = getStampImageSrc(dispenser.stamp as StampRow);
+    setSrc(res);
     setLoading(false);
   };
 
@@ -244,28 +232,34 @@ function DispenserRow(
   }
 
   return (
-    <div class="flex justify-between dark-gradient rounded-lg hover:border-stamp-primary-light hover:shadow-[0px_0px_20px_#9900EE] group border-2 border-transparent">
+    <div
+      class={`flex justify-between ${glassmorphism} rounded-2xl hover:border-color-purple-light ${shadowGlowPurple} border-2 border-transparent`}
+    >
       <div class="flex p-3 mobileLg:p-6 gap-6 uppercase w-full">
         <a
           href={`/stamp/${dispenser.stamp.stamp}`}
           class={`${imageSize} relative flex-shrink-0`}
         >
-          <div class="relative p-[6px] mobileMd:p-3 bg-[#1F002E] rounded-lg aspect-square">
+          <div class="relative p-[6px] mobileMd:p-3 bg-color-background rounded-2xl aspect-square">
             <div class="stamp-container absolute inset-0 flex items-center justify-center">
               <div class="relative z-10 w-full h-full">
-                {loading && !src ? <LoadingIcon /> : (
-                  <img
-                    width="100%"
-                    height="100%"
-                    loading="lazy"
-                    class="max-w-none w-full h-full object-contain rounded pixelart stamp-image"
-                    src={src}
-                    alt={`Stamp ${dispenser.stamp.stamp}`}
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = NOT_AVAILABLE_IMAGE;
-                    }}
-                  />
-                )}
+                {loading && !src ? <LoadingIcon /> : src
+                  ? (
+                    <img
+                      width="100%"
+                      height="100%"
+                      loading="lazy"
+                      class="max-w-none w-full h-full object-contain rounded pixelart stamp-image"
+                      src={src}
+                      alt={`Stamp ${dispenser.stamp.stamp}`}
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = "";
+                        (e.target as HTMLImageElement).alt =
+                          "Content not available";
+                      }}
+                    />
+                  )
+                  : <PlaceholderImage variant="no-image" />}
               </div>
             </div>
           </div>
@@ -275,7 +269,7 @@ function DispenserRow(
             <div class="relative">
               <a
                 href={`/stamp/${dispenser.stamp.stamp}`}
-                class="!inline-block text-2xl mobileLg:text-4xl font-black purple-gradient3 group-hover:[-webkit-text-fill-color:#AA00FF]"
+                class="!inline-block text-2xl mobileLg:text-4xl font-black color-purple-gradientLD group-hover:[-webkit-text-fill-color:var(--color-purple-light)]"
               >
                 {`#${dispenser.stamp.stamp}`}
               </a>
@@ -284,11 +278,11 @@ function DispenserRow(
 
           <div class="flex justify-between flex-row w-full">
             <p
-              class={`text-base text-stamp-primary font-light text-ellipsis overflow-hidden ${
+              class={`text-base text-color-purple-semilight font-light text-ellipsis overflow-hidden ${
                 view === "mobile" ? "tablet:w-full" : ""
               }`}
             >
-              <span class="font-bold text-stamp-primary text-base mobileLg:text-xl normal-case">
+              <span class="font-bold text-color-purple-semilight text-base mobileLg:text-xl normal-case">
                 {/* Abbreviate origin address differently depending on screen size */}
                 <span class="mobileMd:hidden">
                   {abbreviateAddress(dispenser.origin, 4)}
@@ -308,29 +302,29 @@ function DispenserRow(
                 name="copy"
                 weight="normal"
                 size="xs"
-                color="grey"
+                color="greyLight"
               />
               <Icon
                 type="iconButton"
                 name="history"
                 weight="normal"
                 size="xs"
-                color="grey"
+                color="greyLight"
               />
             </div>
           </div>
           <div class="text-center flex justify-between mt-[6px]">
-            <p class="text-base mobileLg:text-lg text-stamp-grey-darker font-light">
+            <p class="text-base mobileLg:text-lg text-color-grey-semidark font-light">
               GIVE{" "}
-              <span class="font-bold text-stamp-grey-light">
+              <span class="font-bold text-color-grey-semilight">
                 {Number(dispenser.give_quantity).toLocaleString()}
               </span>
             </p>
           </div>
           <div class="flex flex-row justify-between w-full">
-            <p class="text-base mobileLg:text-lg text-stamp-grey-darker font-light">
+            <p class="text-base mobileLg:text-lg text-color-grey-semidark font-light">
               QUANTITY{" "}
-              <span class="font-bold text-stamp-grey-light">
+              <span class="font-bold text-color-grey-semilight">
                 {dispenser.give_remaining === 0
                   ? Number(dispenser.escrow_quantity).toLocaleString()
                   : `${Number(dispenser.give_remaining).toLocaleString()}/${
@@ -339,7 +333,7 @@ function DispenserRow(
               </span>
             </p>
             <p
-              class={`text-stamp-grey-darker text-lg font-light -mt-1 ${
+              class={`text-color-grey-semidark text-lg font-light -mt-1 ${
                 view === "mobile" ? "hidden mobileLg:block" : ""
               }`}
             >
@@ -347,24 +341,24 @@ function DispenserRow(
             </p>
           </div>
           <div class="flex flex-row justify-between w-full">
-            <p class="text-base mobileLg:text-lg text-stamp-grey-darker font-light">
+            <p class="text-base mobileLg:text-lg text-color-grey-semidark font-light">
               PRICE{" "}
-              <span class="font-bold text-stamp-grey-light">
+              <span class="font-bold text-color-grey-semilight">
                 {formatBTCAmount(Number(dispenser.btcrate), {
                   includeSymbol: false,
                 })}
               </span>{" "}
-              <span className="text-stamp-grey-light">BTC</span>
+              <span class="text-color-grey-semilight">BTC</span>
             </p>
             <p
-              class={`text-xl mobileMd:text-2xl text-stamp-grey-light font-bold -mt-1 ${
+              class={`text-xl mobileMd:text-2xl text-color-grey-semilight font-bold -mt-1 ${
                 view === "mobile" ? "hidden mobileLg:block" : ""
               }`}
             >
               {formatBTCAmount(
                 Number(dispenser.btcrate) * Number(dispenser.escrow_quantity),
                 { includeSymbol: false },
-              )} <span class="text-stamp-grey-light font-light">BTC</span>
+              )} <span class="text-color-grey-semilight font-light">BTC</span>
             </p>
           </div>
         </div>
@@ -392,12 +386,11 @@ const WalletDashboardContent = ({
   );
 
   /* ===== TOGGLE STATES ===== */
-  const [openFilter, setOpenFilter] = useState<boolean>(false);
   const [openSetting, setOpenSetting] = useState<boolean>(false);
 
   /* ===== COMPUTED VALUES ===== */
   const openDispensersCount =
-    dispensers.data.filter((d) => d.give_remaining > 0).length;
+    dispensers.data?.filter((d: any) => d.give_remaining > 0)?.length ?? 0;
 
   /* ===== EFFECTS ===== */
   useEffect(() => {
@@ -419,7 +412,7 @@ const WalletDashboardContent = ({
   }, [anchor, stamps, src20, dispensers]);
 
   useEffect(() => {
-    const currentUrl = globalThis.location.href;
+    const currentUrl = getCurrentUrl();
     const url = new URL(currentUrl);
     const filterByValue = url.searchParams.get("filterBy") || "";
     if (filterByValue === "Transfer") {
@@ -432,75 +425,38 @@ const WalletDashboardContent = ({
     setOpenSetting(!openSetting);
   };
 
-  const handleOpenFilter = () => {
-    setOpenFilter(!openFilter);
-  };
-
   /* ===== SORT HANDLERS ===== */
   const handleChangeSort = (newSort: "ASC" | "DESC") => {
     setSortStamps(newSort);
-    const url = new URL(globalThis.location.href);
-    url.searchParams.set("stampsSortBy", newSort);
-    url.searchParams.delete("stamps_page");
-    url.searchParams.set("anchor", "stamps");
-    globalThis.location.href = url.toString();
+    navigateWithFresh(
+      {
+        "stampsSortBy": newSort,
+        "stamps_page": "1", // Reset to page 1 when sorting
+      },
+      "stamps",
+    );
   };
 
   const handleTokenSort = (newSort: "ASC" | "DESC") => {
     setSortTokens(newSort);
-    const url = new URL(globalThis.location.href);
-    url.searchParams.set("src20SortBy", newSort);
-    url.searchParams.delete("src20_page");
-    url.searchParams.set("anchor", "src20");
-    globalThis.location.href = url.toString();
+    navigateWithFresh(
+      {
+        "src20SortBy": newSort,
+        "src20_page": "1", // Reset to page 1 when sorting
+      },
+      "src20",
+    );
   };
 
   const handleDispenserSort = (newSort: "ASC" | "DESC") => {
     setSortDispensers(newSort);
-    const url = new URL(globalThis.location.href);
-    url.searchParams.set("dispensersSortBy", newSort);
-    url.searchParams.delete("dispensers_page");
-    url.searchParams.set(
-      "anchor",
+    navigateWithFresh(
+      {
+        "dispensersSortBy": newSort,
+        "dispensers_page": "1", // Reset to page 1 when sorting
+      },
       openDispensersCount > 0 ? "open_listings" : "closed_listings",
     );
-    globalThis.location.href = url.toString();
-  };
-
-  /* ===== GALLERY CONFIGURATION ===== */
-  const stampGallery = {
-    title: "",
-    type: "all",
-    stamps: stamps.data,
-    layout: "grid" as const,
-    showDetails: false,
-    gridClass: `
-      grid w-full
-      gap-3
-      mobileMd:gap-6
-      grid-cols-4
-      mobileLg:grid-cols-6
-      tablet:grid-cols-6
-      desktop:grid-cols-8
-      auto-rows-fr
-    `,
-    displayCounts: {
-      mobileSm: 16,
-      mobileLg: 24,
-      tablet: 24,
-      desktop: 32,
-    },
-    pagination: {
-      page: stamps.pagination.page,
-      totalPages: Math.ceil(stamps.pagination.total / stamps.pagination.limit),
-      prefix: "stamps_page",
-      onPageChange: (page: number) => {
-        const url = new URL(globalThis.location.href);
-        url.searchParams.set("stamps_page", page.toString());
-        url.searchParams.set("anchor", "stamps");
-        globalThis.location.href = url.toString();
-      },
-    },
   };
 
   /* ===== RENDER ===== */
@@ -513,11 +469,8 @@ const WalletDashboardContent = ({
           sort
           sortBy={sortStamps}
           onChangeSort={handleChangeSort}
-          filter={false}
           setting={openSetting}
-          isOpenFilter={false}
           isOpenSetting={openSetting}
-          handleOpenFilter={() => {}}
           handleOpenSetting={handleOpenSetting}
           setOpenSettingModal={(open) => {
             setOpenSetting(open);
@@ -525,7 +478,52 @@ const WalletDashboardContent = ({
         />
         <div class="mt-3 mobileLg:mt-6">
           {stamps.data?.length
-            ? <StampGallery {...stampGallery} />
+            ? (
+              <FreshStampGallery
+                initialData={stamps.data}
+                initialPagination={{
+                  page: stamps.pagination.page,
+                  limit: stamps.pagination.limit || 10,
+                  total: stamps.pagination.total || 0,
+                  totalPages: Math.ceil(
+                    stamps.pagination.total / stamps.pagination.limit,
+                  ),
+                  hasNext: stamps.pagination.page <
+                    Math.ceil(
+                      stamps.pagination.total / stamps.pagination.limit,
+                    ),
+                  hasPrev: stamps.pagination.page > 1,
+                  currentPage: stamps.pagination.page,
+                  pageSize: stamps.pagination.limit || 10,
+                  totalItems: stamps.pagination.total || 0,
+                  hasNextPage: stamps.pagination.page <
+                    Math.ceil(
+                      stamps.pagination.total / stamps.pagination.limit,
+                    ),
+                  hasPreviousPage: stamps.pagination.page > 1,
+                  startIndex: (stamps.pagination.page - 1) *
+                    (stamps.pagination.limit || 10),
+                  endIndex: Math.min(
+                    stamps.pagination.page * (stamps.pagination.limit || 10),
+                    stamps.pagination.total,
+                  ),
+                }}
+                address={address}
+                initialSort={sortStamps}
+                enablePartialNavigation
+                showLoadingSkeleton
+                gridClass={`
+                  grid w-full
+                  gap-3
+                  mobileMd:gap-6
+                  grid-cols-4
+                  mobileLg:grid-cols-6
+                  tablet:grid-cols-6
+                  desktop:grid-cols-8
+                  auto-rows-fr
+                `}
+              />
+            )
             : <p class="text-gray-500">NO AVAILABLE STAMP</p>}
         </div>
       </div>
@@ -537,33 +535,27 @@ const WalletDashboardContent = ({
           sort
           sortBy={sortTokens}
           onChangeSort={handleTokenSort}
-          filter={false}
           setting={false}
-          isOpenFilter={false}
           isOpenSetting={false}
-          handleOpenFilter={() => {}}
           handleOpenSetting={() => {}}
         />
         <div class="mt-3 mobileLg:mt-6">
           {src20.data?.length
             ? (
-              <SRC20Gallery
-                viewType="minted"
-                fromPage="wallet"
+              <FreshSRC20Gallery
                 initialData={src20.data}
-                pagination={{
+                initialPagination={{
                   page: src20.pagination.page,
-                  totalPages: src20.pagination.totalPages,
-                  prefix: "src20",
-                  onPageChange: (page: number) => {
-                    const url = new URL(globalThis.location.href);
-                    url.searchParams.set("src20_page", page.toString());
-                    url.searchParams.set("anchor", "src20");
-                    globalThis.location.href = url.toString();
-                  },
+                  limit: src20.pagination.limit || 10,
+                  total: src20.pagination.total || 0,
                 }}
                 address={address}
-                timeframe="24H"
+                initialSort={{
+                  key: "stamp",
+                  direction: sortTokens === "ASC" ? "asc" : "desc",
+                }}
+                enablePartialNavigation
+                showLoadingSkeleton
               />
             )
             : <p class="text-gray-500">NO AVAILABLE TOKEN</p>}
@@ -571,18 +563,15 @@ const WalletDashboardContent = ({
       </div>
 
       {/* Dispensers Section */}
-      {dispensers.data.length > 0 && (
+      {(dispensers.data?.length ?? 0) > 0 && (
         <div class="mt-48">
           <ItemHeader
             title="LISTINGS"
             sort
             sortBy={sortDispensers}
             onChangeSort={handleDispenserSort}
-            filter={false}
             setting={false}
-            isOpenFilter={openFilter}
             isOpenSetting={false}
-            handleOpenFilter={handleOpenFilter}
             handleOpenSetting={() => {}}
           />
           <div class="mt-3 mobileMd:mt-6">
@@ -592,12 +581,10 @@ const WalletDashboardContent = ({
                 page: dispensers.pagination.page,
                 totalPages: dispensers.pagination.totalPages,
                 prefix: "dispensers",
-                onPageChange: (page: number) => {
-                  const url = new URL(globalThis.location.href);
-                  url.searchParams.set("dispensers_page", page.toString());
-                  url.searchParams.set("anchor", "closed_listings");
-                  globalThis.location.href = url.toString();
-                },
+                onPageChange: createPaginationHandler(
+                  "dispensers_page",
+                  "closed_listings",
+                ),
               }}
             />
           </div>

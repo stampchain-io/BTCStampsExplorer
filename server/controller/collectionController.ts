@@ -1,10 +1,9 @@
-import { CollectionService } from "$server/services/collectionService.ts";
-import {
-  Collection,
-} from "$globals";
-import { CollectionQueryParams, PaginatedCollectionResponseBody } from "$server/types/collection.d.ts";
-import { StampController } from "$server/controller/stampController.ts";
-import { getStampImageSrc } from "$lib/utils/imageUtils.ts";
+
+import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
+import { CollectionService } from "$server/services/core/collectionService.ts";
+import { StampService } from "$server/services/stampService.ts";
+import type {CollectionQueryParams, PaginatedCollectionResponseBody, CollectionRow} from "$server/types/collection.d.ts";
+import type { Collection } from "$types/api.d.ts";
 
 export class CollectionController {
   static async getCollectionDetails(
@@ -18,110 +17,156 @@ export class CollectionController {
     }
   }
 
-  static async getCollectionStamps(
-    params: CollectionQueryParams,
-  ): Promise<PaginatedCollectionResponseBody> {
+  static async getCollectionStamps(options: {
+    limit?: number;
+    page?: number;
+    sortBy?: "ASC" | "DESC";
+    includeMarketData?: boolean;
+  }) {
     try {
-      const { limit = 50, page = 1, creator, sortBy } = params;
+      console.log("[CollectionController] getCollectionStamps started");
+      const overallStartTime = Date.now();
       
-      // Apply minimum stamp count filter at database level
+      const {
+        limit = 50,
+        page = 1,
+        sortBy = "DESC",
+        includeMarketData = true,
+      } = options;
+
+      // Get collections with market data
+      console.log("[CollectionController] Fetching collection details...");
+      const collectionsStartTime = Date.now();
       const collectionsResult = await CollectionService.getCollectionDetails({
         limit,
         page,
-        creator,
         sortBy,
-        minStampCount: 2
+        includeMarketData,
       });
+      console.log(`[CollectionController] Collection details fetched in ${Date.now() - collectionsStartTime}ms, got ${collectionsResult.data?.length || 0} collections`);
 
-      if (!collectionsResult.data || !Array.isArray(collectionsResult.data)) {
-        throw new Error(
-          "Unexpected data structure from CollectionService.getCollectionDetails",
-        );
+      if (!collectionsResult.data) {
+        return {
+          ...collectionsResult,
+          data: [],
+        };
       }
 
-      const collectionIds = collectionsResult.data.map(
-        (collection: Collection) => collection.collection_id,
-      );
+      if (!Array.isArray(collectionsResult.data)) {
+        throw new Error("Invalid data structure from CollectionService: data is not an array");
+      }
 
-      // Create a map to store stamps by collection ID
+      if (collectionsResult.data.length === 0) {
+        return {
+          ...collectionsResult,
+          data: [],
+        };
+      }
+
+      // Get stamps for each collection to build image arrays
       const stampsByCollection = new Map<string, string[]>();
 
-      // Only fetch stamps if we have collections
-      if (collectionIds.length > 0) {
-        // Calculate total limit based on number of collections
-        const totalLimit = collectionIds.length * 12;
+      console.log(`[CollectionController] Starting to fetch stamps for ${collectionsResult.data.length} collections...`);
+      const stampsStartTime = Date.now();
+      
+      // Fetch stamps for all collections in parallel
+      const stampPromises = collectionsResult.data.map(async (collection) => {
+        const collectionId = collection.collection_id;
 
-        console.log('Fetching stamps for collections:', {
-          collectionIds,
-          totalLimit,
-          collectionStampLimit: 12
-        });
+        try {
+          // Get stamps for this collection with a reasonable limit for images
+          const stampResults = await StampService.getStamps({
+            collectionId,
+            limit: 12, // Limit stamps per collection for image gallery
+            sortBy: "DESC",
+            type: "stamps",
+            includeSecondary: false,
+            skipTotalCount: true,
+          });
 
-        const stampResults = await StampController.getStamps({
-          collectionId: collectionIds,
-          noPagination: false,
-          type: "all",
-          sortBy: "ASC",
-          allColumns: false,
-          limit: totalLimit,
-          collectionStampLimit: 12,
-          groupBy: "collection_id",
-          groupBySubquery: true
-        });
+          if (stampResults.stamps && Array.isArray(stampResults.stamps) && stampResults.stamps.length > 0) {
+            const stamps: string[] = [];
 
-        if (!stampResults.data || !Array.isArray(stampResults.data)) {
-          throw new Error(
-            "Unexpected data structure from StampController.getStamps",
-          );
+            for (const stamp of stampResults.stamps) {
+              if (!stamp.tx_hash || !stamp.stamp_mimetype) {
+                continue;
+              }
+
+              // WORKAROUND: Manually set collection_id since database JOIN is not working
+              // This ensures the grouping logic below works correctly
+              stamp.collection_id = collectionId;
+
+              const imageUrl = await getStampImageSrc(stamp);
+              if (imageUrl && stamps.length < 12 && !stamps.includes(imageUrl)) {
+                stamps.push(imageUrl);
+              }
+            }
+
+            if (stamps.length > 0) {
+              stampsByCollection.set(collectionId.toUpperCase(), stamps);
+            }
+          } else if (stampResults.stamps && !Array.isArray(stampResults.stamps)) {
+            // Handle invalid data structure
+            console.error(`Invalid stamp data structure for collection ${collectionId}: stamps is not an array`);
+          }
+        } catch (error) {
+          console.error(`Error fetching stamps for collection ${collectionId}:`, error);
         }
-
-        // Group stamps by collection ID
-        for (const stamp of stampResults.data) {
-          if (!stamp.tx_hash || !stamp.stamp_mimetype) {
-            continue;
-          }
-          
-          const collectionId = stamp.collection_id?.toUpperCase();
-          if (!collectionId) {
-            continue;
-          }
-
-          if (!stampsByCollection.has(collectionId)) {
-            stampsByCollection.set(collectionId, []);
-          }
-
-          const stamps = stampsByCollection.get(collectionId)!;
-          const imageUrl = await getStampImageSrc(stamp);
-          if (stamps.length < 12 && !stamps.includes(imageUrl)) {
-            stamps.push(imageUrl);
-          }
-        }
-      }
+      });
+      
+      // Wait for all stamp fetches to complete
+      await Promise.all(stampPromises);
+      console.log(`[CollectionController] Stamps fetched for all collections in ${Date.now() - stampsStartTime}ms`);
 
       // Map collections with their stamps
       const collections: Collection[] = collectionsResult.data.map(
-        (collection: Collection) => {
-          const collectionId = collection.collection_id.toUpperCase();
+        (collectionRow: CollectionRow) => {
+          const collectionId = collectionRow.collection_id.toUpperCase();
           const stamps = stampsByCollection.get(collectionId) || [];
-          
+
           // Use the second stamp if available, otherwise fall back to the first stamp
           const firstStampImage = stamps[1] || stamps[0] || null;
-          
 
-          
-          return {
-            ...collection,
+          // Convert CollectionRow to Collection format
+          const collection: Collection = {
+            collection_id: collectionRow.collection_id,
+            collection_name: collectionRow.collection_name,
+            collection_description: collectionRow.collection_description,
+            creators: collectionRow.creators,
+            stamp_count: collectionRow.stamp_count,
+            total_editions: collectionRow.total_editions,
+            img: collectionRow.img,
             first_stamp_image: firstStampImage,
             stamp_images: stamps,
+            // Convert marketData from CollectionMarketData to the expected format
+            ...(collectionRow.marketData && {
+              marketData: {
+                minFloorPriceBTC: collectionRow.marketData.minFloorPriceBTC,
+                maxFloorPriceBTC: collectionRow.marketData.maxFloorPriceBTC,
+                avgFloorPriceBTC: collectionRow.marketData.avgFloorPriceBTC,
+                medianFloorPriceBTC: collectionRow.marketData.medianFloorPriceBTC,
+                totalVolume24hBTC: collectionRow.marketData.totalVolume24hBTC,
+                stampsWithPricesCount: collectionRow.marketData.stampsWithPricesCount,
+                minHolderCount: collectionRow.marketData.minHolderCount,
+                maxHolderCount: collectionRow.marketData.maxHolderCount,
+                totalVolumeBTC: collectionRow.marketData.totalVolume24hBTC, // Use 24h volume as total
+                marketCapBTC: null, // Not available in CollectionMarketData
+              }
+            }),
           };
+
+          return collection;
         }
       );
 
-      return {
+      const result = {
         ...collectionsResult,
-        data: collections,
+        data: collections as any,
         // No need to update total - it's already correct from database filtering
       };
+      
+      console.log(`[CollectionController] getCollectionStamps completed in ${Date.now() - overallStartTime}ms`);
+      return result;
     } catch (error) {
       console.error("Error in CollectionController.getCollectionStamps:", error);
       throw error;

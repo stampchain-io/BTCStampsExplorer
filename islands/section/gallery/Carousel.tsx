@@ -1,38 +1,29 @@
 /* ===== CAROUSEL GALLERY COMPONENT ===== */
 /* TODO (@baba)-update styling */
-import { useEffect, useMemo, useState } from "preact/hooks";
-import { IS_BROWSER } from "$fresh/runtime.ts";
-import { StampRow } from "$globals";
-import { ComponentChildren } from "preact";
 import createCarouselSlider from "$client/utils/carousel-slider.ts";
-import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
-import {
-  getStampImageSrc,
-  validateStampContent,
-} from "$lib/utils/imageUtils.ts";
-import { ERROR_IMAGE } from "$lib/utils/constants.ts";
-
-/* ===== TYPES ===== */
-interface CarouselProps {
-  stamps: StampRow[];
-  automatic?: boolean;
-  showNavigation?: boolean;
-  class?: string;
-}
-
-// Cache for validation results to prevent re-validation
-const validationCache = new Map<string, boolean>();
+import { IS_BROWSER } from "$fresh/runtime.ts";
+import { PlaceholderImage } from "$icon";
+import { glassmorphismL2, shadowGlowPurple } from "$layout";
+import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
+import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
+import type { CarouselHomeProps } from "$types/ui.d.ts";
+import { ComponentChildren } from "preact";
+import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 
 /* ===== COMPONENT ===== */
-export default function CarouselGallery(props: CarouselProps) {
+export default function CarouselGallery(props: CarouselHomeProps) {
   /* ===== PROPS EXTRACTION ===== */
-  const { stamps } = props;
+  const { carouselStamps } = props;
+  const stamps = carouselStamps || [];
+
+  /* ===== REFS ===== */
+  const carouselInitialized = useRef(false);
+  const swiperInstance = useRef<any>(null);
 
   /* ===== COMPUTED VALUES ===== */
-  const isMobile = globalThis.innerWidth < 768;
+  const isMobile = IS_BROWSER ? globalThis.innerWidth < 768 : false;
 
   // Memoize duplicatedStamps to prevent infinite re-renders
-  // For Swiper loop mode, we need enough slides: minimum 2x slidesPerView
   const duplicatedStamps = useMemo(() => {
     if (stamps.length === 0) return [];
 
@@ -59,6 +50,9 @@ export default function CarouselGallery(props: CarouselProps) {
   const [validatedContent, setValidatedContent] = useState<
     Record<string, ComponentChildren>
   >({});
+  const [stampSources, setStampSources] = useState<
+    Record<string, string | null>
+  >({});
 
   /* ===== EVENT HANDLERS ===== */
   const handleLoad = () => {
@@ -67,91 +61,107 @@ export default function CarouselGallery(props: CarouselProps) {
 
   /* ===== VALIDATION EFFECT ===== */
   useEffect(() => {
-    const validateStamps = async () => {
+    const validateStamps = () => {
       const validated: Record<string, ComponentChildren> = {};
+      const sources: Record<string, string> = {};
 
-      for (const stamp of duplicatedStamps) {
-        // Skip if already validated
-        if (validatedContent[stamp.tx_hash]) {
-          continue;
-        }
+      // Process stamps in batches to avoid overwhelming the browser
+      const batchSize = 5;
+      for (let i = 0; i < duplicatedStamps.length; i += batchSize) {
+        const batch = duplicatedStamps.slice(i, i + batchSize);
 
-        // Get proper stamp URL using getStampImageSrc
-        const src = await getStampImageSrc(stamp);
-
-        // Handle HTML content
-        if (stamp.stamp_mimetype === "text/html") {
-          validated[stamp.tx_hash] = (
-            <a target="_top" href={`/stamp/${stamp.tx_hash}`}>
-              <iframe
-                width="100%"
-                height="100%"
-                scrolling="no"
-                className="object-contain cursor-pointer desktop:min-w-[408px] tablet:min-w-[269px] mobileLg:min-w-[200px] mobileMd:min-w-[242px] min-w-[150px] rounded aspect-square"
-                sandbox="allow-scripts allow-same-origin"
-                src={src}
-                loading="lazy"
-                onLoad={handleLoad}
-              />
-            </a>
-          );
-          continue;
-        }
-
-        // Handle SVG content with caching
-        if (stamp.stamp_mimetype === "image/svg+xml") {
-          const svgSrc = `/content/${stamp.tx_hash}.svg`;
-
-          // Check cache first
-          let isValid = validationCache.get(svgSrc);
-
-          if (isValid === undefined) {
-            // Only validate if not in cache
-            const validationResult = await validateStampContent(svgSrc);
-            isValid = validationResult.isValid;
-            validationCache.set(svgSrc, isValid);
+        batch.forEach((stamp) => {
+          // Skip if already validated
+          if (validatedContent[stamp.tx_hash]) {
+            return;
           }
 
-          if (!isValid) {
+          // Get proper stamp URL using getStampImageSrc
+          const src = getStampImageSrc(stamp);
+          if (src) {
+            sources[stamp.tx_hash] = src;
+          }
+
+          // If no src, show placeholder
+          if (!src) {
             validated[stamp.tx_hash] = (
               <a target="_top" href={`/stamp/${stamp.tx_hash}`}>
-                <img
-                  src={ERROR_IMAGE}
-                  alt="Invalid SVG"
-                  className="object-contain cursor-pointer desktop:min-w-[408px] tablet:min-w-[269px] mobileLg:min-w-[200px] mobileMd:min-w-[242px] min-w-[150px] rounded"
+                <div class="object-contain cursor-pointer desktop:min-w-[408px] tablet:min-w-[269px] mobileLg:min-w-[200px] mobileMd:min-w-[242px] min-w-[150px] rounded-2xl aspect-square">
+                  <PlaceholderImage variant="no-image" />
+                </div>
+              </a>
+            );
+            return;
+          }
+
+          // Handle HTML content
+          if (stamp.stamp_mimetype === "text/html") {
+            validated[stamp.tx_hash] = (
+              <a target="_top" href={`/stamp/${stamp.tx_hash}`}>
+                <iframe
+                  width="100%"
+                  height="100%"
+                  scrolling="no"
+                  class="object-contain cursor-pointer desktop:min-w-[408px] tablet:min-w-[269px] mobileLg:min-w-[200px] mobileMd:min-w-[242px] min-w-[150px] rounded-2xl aspect-square"
+                  sandbox="allow-scripts allow-same-origin"
+                  src={src}
+                  loading="lazy"
                   onLoad={handleLoad}
                 />
               </a>
             );
+            return;
           }
-        }
-      }
+        });
 
-      // Only update state if we have new validated content
-      if (Object.keys(validated).length > 0) {
-        setValidatedContent((prev) => ({ ...prev, ...validated }));
+        // Update state after each batch
+        if (Object.keys(validated).length > 0) {
+          setValidatedContent((prev) => ({ ...prev, ...validated }));
+        }
+        if (Object.keys(sources).length > 0) {
+          setStampSources((prev) => ({ ...prev, ...sources }));
+        }
       }
     };
 
     validateStamps();
-  }, [duplicatedStamps]); // Now properly memoized
+  }, [duplicatedStamps]);
 
   /* ===== CAROUSEL EFFECT ===== */
   useEffect(() => {
-    if (IS_BROWSER) {
-      const carouselElement = document.querySelector(
-        ".carousel-slider",
-      ) as HTMLElement;
-      const swiper = createCarouselSlider(carouselElement);
-      swiper?.on("slideChange", () => {
-        setActiveSlideIndex(swiper.realIndex);
+    if (IS_BROWSER && !carouselInitialized.current) {
+      // Use requestAnimationFrame to ensure DOM is ready
+      requestAnimationFrame(() => {
+        const carouselElement = document.querySelector(
+          ".carousel-slider",
+        ) as HTMLElement;
+
+        if (carouselElement && !swiperInstance.current) {
+          swiperInstance.current = createCarouselSlider(carouselElement);
+          swiperInstance.current?.on("slideChange", () => {
+            setActiveSlideIndex(swiperInstance.current.realIndex);
+          });
+          carouselInitialized.current = true;
+        }
       });
     }
   }, []);
 
   /* ===== LOADING STATE ===== */
   if (!IS_BROWSER && loading) {
-    return <div>Loading carousel...</div>;
+    return (
+      <div class="carousel-slider-skeleton h-full">
+        <div class="swiper h-full">
+          <div class="swiper-wrapper">
+            {[...Array(5)].map((_, i) => (
+              <div class="swiper-slide" key={`skeleton-${i}`}>
+                <div class="loading-skeleton rounded-3xl h-full min-h-[150px] mobileMd:min-h-[242px] mobileLg:min-h-[200px] tablet:min-h-[269px] desktop:min-h-[408px]" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   }
 
   /* ===== RENDER ===== */
@@ -161,7 +171,7 @@ export default function CarouselGallery(props: CarouselProps) {
         <div class="swiper h-full">
           <div class="swiper-wrapper">
             {duplicatedStamps.map((stamp, index) => {
-              const extension = stamp.stamp_url?.split(".")?.pop() || "";
+              // const extension = stamp.stamp_url?.split(".")?.pop() || "";
               return (
                 <div
                   class="swiper-slide group h-full"
@@ -169,14 +179,18 @@ export default function CarouselGallery(props: CarouselProps) {
                   data-hash={stamp.tx_hash}
                 >
                   <a target="_top" href={`/stamp/${stamp.tx_hash}`}>
-                    <div className="hover-gradient hover:bg-stamp-purple-bright hover:shadow-stamp p-0.5 rounded-md">
-                      <div className="relative min-h-[150px] mobileMd:min-h-[242px] mobileLg:min-h-[200px] tablet:min-h-[269px] desktop:min-h-[408px] p-[6px] mobileMd:p-[12px] desktop:p-[18px] rounded-md bg-stamp-card-bg hover:bg-black">
+                    <div
+                      class={`hover-gradient hover:bg-color-purple-light ${shadowGlowPurple} p-0.5 rounded-3xl`}
+                    >
+                      <div
+                        class={`relative min-h-[150px] mobileMd:min-h-[242px] mobileLg:min-h-[200px] tablet:min-h-[269px] desktop:min-h-[408px] p-[6px] mobileMd:p-[12px] desktop:p-[18px] rounded-3xl ${glassmorphismL2} hover:bg-black`}
+                      >
                         {validatedContent[stamp.tx_hash] || (
                           <img
-                            src={`/content/${stamp.tx_hash}.${extension}`}
+                            src={stampSources[stamp.tx_hash] || stamp.stamp_url}
                             alt={`Stamp #${stamp.stamp}`}
                             loading="lazy"
-                            class="object-contain cursor-pointer desktop:min-w-[408px] tablet:min-w-[269px] mobileLg:min-w-[200px] mobileMd:min-w-[242px] min-w-[150px] rounded pixelart stamp-image"
+                            class="object-contain cursor-pointer desktop:min-w-[408px] tablet:min-w-[269px] mobileLg:min-w-[200px] mobileMd:min-w-[242px] min-w-[150px] rounded-2xl pixelart stamp-image"
                             onLoad={handleLoad}
                           />
                         )}
@@ -184,30 +198,30 @@ export default function CarouselGallery(props: CarouselProps) {
                         {activeSlideIndex - 1 == index && (
                           <div
                             id="hover"
-                            className="flex items-end mobileLg:w-calc-24 w-calc-12 h-[100%] hover-dark-gradient absolute bottom-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                            class="flex items-end mobileLg:w-calc-24 w-calc-12 h-[100%] hover-dark-gradient absolute bottom-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
                           >
-                            <div className="w-full pb-1">
-                              <div className="desktop:hidden flex justify-center items-center w-full">
-                                <h3 className="font-black text-lg gray-gradient1 text-center">
-                                  <span className="font-light text-stamp-grey-light">
+                            <div class="w-full pb-1">
+                              <div class="desktop:hidden flex justify-center items-center w-full">
+                                <h3 class="font-black text-lg color-grey-gradientDL text-center">
+                                  <span class="font-light text-color-grey-light">
                                     #
                                   </span>
                                   {stamp.stamp}
                                 </h3>
                               </div>
-                              <div className="hidden mobileLg:flex justify-between items-end w-full flex-1 px-1 desktop:px-3 pb-1.5 desktop:pb-2">
-                                <h3 className="hidden desktop:block font-black text-2xl gray-gradient1 desktop:text-left">
-                                  <span className="font-light text-stamp-grey-light">
+                              <div class="hidden mobileLg:flex justify-between items-end w-full flex-1 px-1 desktop:px-3 pb-1.5 desktop:pb-2">
+                                <h3 class="hidden desktop:block font-black text-3xl color-grey-gradientDL desktop:text-left">
+                                  <span class="font-light text-color-grey-light">
                                     #
                                   </span>
                                   {stamp.stamp}
                                 </h3>
-                                <h4 className="font-medium text-sm desktop:text-base gray-gradient3 text-left desktop:text-center tracking-normal mb-0.5">
+                                <h4 class="font-medium text-sm desktop:text-base color-grey-gradientLD text-left desktop:text-center tracking-normal mb-0.5">
                                   {stamp.creator_name
                                     ? stamp.creator_name
                                     : abbreviateAddress(stamp.creator, 8)}
                                 </h4>
-                                <h5 className="font-bold text-base desktop:text-lg text-[#BBBBBB] text-right">
+                                <h5 class="font-bold text-base desktop:text-lg text-color-grey text-right">
                                   {stamp.divisible
                                     ? (stamp.supply / 100000000).toFixed(2)
                                     : stamp.supply > 100000
@@ -229,7 +243,7 @@ export default function CarouselGallery(props: CarouselProps) {
         {/* ===== PAGINATION ===== */}
         <div
           class="swiper-pagination"
-          data-slides-length={props.stamps.length}
+          data-slides-length={stamps?.length || 0}
         >
         </div>
       </div>

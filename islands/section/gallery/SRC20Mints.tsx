@@ -1,28 +1,49 @@
 /* ===== SRC20 RECENT MINTS GALLERY COMPONENT ===== */
+import { SRC20CardSmMinting } from "$card";
+import { containerBackground } from "$layout";
+import {
+  notificationBody,
+  notificationContainerError,
+  notificationHeading,
+  notificationTextError,
+} from "$notification";
+import { subtitleGrey, titleGreyDL, titleGreyLD } from "$text";
+import type { SRC20Row } from "$types/src20.d.ts";
 import { useEffect, useState } from "preact/hooks";
-import type { SRC20Row } from "$globals";
-import { SRC20Card, SRC20CardMinting } from "$card";
-import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
 
 /* ===== COMPONENT ===== */
 export default function SRC20MintsGallery() {
   /* ===== STATE ===== */
   const [isLoading, setIsLoading] = useState(true);
   const [transactions, setTransactions] = useState<SRC20Row[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   /* ===== EFFECTS ===== */
   useEffect(() => {
     const fetchTrendingActiveMintingTokens = async () => {
       try {
         const response = await fetch(
-          // Use the consolidated trending endpoint with type=minting
-          "/api/internal/src20/trending?type=minting&limit=5&page=1&transactionCount=1000",
+          "/api/v2/src20?op=DEPLOY&mintingStatus=minting&sortBy=TRENDING_MINTING_DESC&limit=5&page=1&includeMarketData=true&includeProgress=true",
+          {
+            headers: {
+              "X-API-Version": "2.3",
+            },
+          },
         );
-        if (!response.ok) throw new Error("Failed to fetch trending tokens");
+
+        if (!response.ok) {
+          throw new Error(
+            `Failed to fetch trending tokens: ${response.status}`,
+          );
+        }
+
         const data = await response.json();
-        setTransactions(data.data);
+        setTransactions(data.data || []);
+        setError(null);
       } catch (error) {
         console.error("Error fetching trending tokens:", error);
+        setError(error instanceof Error ? error.message : "Unknown error");
+        setTransactions([]);
       } finally {
         setIsLoading(false);
       }
@@ -33,17 +54,19 @@ export default function SRC20MintsGallery() {
 
   /* ===== RENDER ===== */
   return (
-    <div class="flex flex-col w-full items-start tablet:items-end">
+    <div class={`${containerBackground} items-start tablet:items-end`}>
       {/* ===== TITLE SECTION ===== */}
-      <div class="w-full">
-        <h4 class={`${titlePurpleLD} tablet:hidden`}>
+      <div>
+        <h4 class={`${titleGreyLD} tablet:hidden`}>
           TRENDING
         </h4>
-        <h4 class={`hidden tablet:block w-full text-right ${titlePurpleDL}`}>
+        <h4
+          class={`hidden tablet:block w-full tablet:text-right ${titleGreyDL}`}
+        >
           TRENDING
         </h4>
       </div>
-      <h3 class={`w-full text-right ${subtitlePurple}`}>
+      <h3 class={`${subtitleGrey} tablet:text-right mb-2`}>
         {isLoading ? <span class="animate-pulse">POPULAR TOKENS</span> : (
           "POPULAR TOKENS"
         )}
@@ -52,36 +75,42 @@ export default function SRC20MintsGallery() {
       {/* ===== LOADING OR CONTENT ===== */}
       {isLoading
         ? (
-          <div class="w-full flex flex-col gap-6">
-            {[...Array(5)].map((_, index) => (
+          <div class="flex flex-col w-full gap-3 mt-1">
+            {[...Array(6)].map((_, index) => (
               <div
                 key={index}
-                class="loading-skeleton running w-full h-12 rounded"
+                class={`loading-skeleton running w-full rounded-2xl ${
+                  index === 0 ? "h-[34px]" : "h-[54px]"
+                }`}
               />
             ))}
           </div>
         )
+        : error
+        ? (
+          <div class={`mt-3 ${notificationContainerError}`}>
+            <h6 class={`${notificationHeading} ${notificationTextError}`}>
+              ERROR LOADING TRENDING TOKENS
+            </h6>
+            <h6 class={`${notificationBody} ${notificationTextError}`}>
+              {error}
+            </h6>
+          </div>
+        )
+        : transactions.length === 0
+        ? (
+          <div class="text-color-grey-dark text-sm">
+            NO TRENDING TOKENS FOUND
+          </div>
+        )
         : (
-          <div class="w-full flex flex-col gap-6">
-            {transactions.map((src20) => (
-              src20.progress !== "100"
-                ? (
-                  <SRC20CardMinting
-                    key={src20.tick}
-                    src20={src20}
-                    fromPage="stamping/src20"
-                    onImageClick={() => {}}
-                  />
-                )
-                : (
-                  <SRC20Card
-                    key={src20.tick}
-                    src20={src20}
-                    fromPage="stamping/src20"
-                    onImageClick={() => {}}
-                  />
-                )
-            ))}
+          <div class="-mb-3">
+            <SRC20CardSmMinting
+              data={transactions}
+              fromPage="stamping/src20"
+              timeframe="24H"
+              onImageClick={() => {}}
+            />
           </div>
         )}
     </div>

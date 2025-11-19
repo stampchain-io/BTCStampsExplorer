@@ -1,12 +1,8 @@
-import { useEffect, useState } from "preact/hooks";
-import { _SRC20_FILTER_TYPES } from "$globals";
+import { RangeSliderDual, ToggleButton } from "$button";
+import { Radiobutton } from "$islands/filter/FilterComponents.tsx";
 import { SRC20Filters } from "$islands/filter/FilterOptionsSRC20.tsx";
 import { CollapsibleSection } from "$islands/layout/CollapsibleSection.tsx";
-import {
-  Radiobutton,
-  RangeButtons,
-  RangeSlider,
-} from "$islands/filter/FilterComponents.tsx";
+import { useEffect, useState } from "preact/hooks";
 
 // Helper function to check if a section has active filters
 function hasActiveFilters(section: string, filters: SRC20Filters) {
@@ -45,7 +41,6 @@ export const FilterContentSRC20 = ({
   initialFilters: SRC20Filters;
   onFiltersChange: (filters: SRC20Filters) => void;
 }) => {
-  console.log("FilterContentSRC20 - initialFilters:", initialFilters);
   const [filters, setFilters] = useState(initialFilters);
   const [volumePeriod, setVolumePeriod] = useState<PeriodType>(
     initialFilters.market.volumePeriod || "24h",
@@ -56,7 +51,6 @@ export const FilterContentSRC20 = ({
 
   // Add this effect to watch for changes to initialFilters
   useEffect(() => {
-    console.log("FilterContentSRC20 - initialFilters changed:", initialFilters);
     setFilters(initialFilters);
   }, [initialFilters]);
 
@@ -97,8 +91,6 @@ export const FilterContentSRC20 = ({
 
       // For max, if it's Infinity, use a reasonable default
       const maxVal = max === Infinity ? 10000 : max;
-
-      console.log(`Holders range changed: ${minVal} - ${maxVal}`); // Debug log
 
       // Update the filters state with the new values
       setFilters((prevFilters) => {
@@ -182,7 +174,7 @@ export const FilterContentSRC20 = ({
   };
 
   return (
-    <div className="space-y-1.5 tablet:space-y-1">
+    <div class="space-y-1.5 tablet:space-y-1">
       {/* STATUS SECTION - Independent group */}
       <CollapsibleSection
         title="STATUS"
@@ -256,7 +248,7 @@ export const FilterContentSRC20 = ({
             toggle={() => {}}
             variant="collapsibleLabel"
           >
-            <RangeSlider
+            <RangeSliderDual
               variant="holders"
               onChange={handleHoldersRangeChange}
             />
@@ -305,9 +297,11 @@ export const FilterContentSRC20 = ({
             toggle={() => {}}
             variant="collapsibleLabel"
           >
-            <RangeButtons
+            <ToggleButton
+              size="smR"
+              options={["24h", "3d", "7d"]}
               selected={volumePeriod}
-              onChange={(newPeriod: string) => {
+              onChange={(newPeriod: string | string[]) => {
                 const period = newPeriod as PeriodType;
                 setVolumePeriod(period);
 
@@ -324,6 +318,8 @@ export const FilterContentSRC20 = ({
                   return newFilters;
                 });
               }}
+              mode="single"
+              spacing="even"
             />
           </CollapsibleSection>
         )}
@@ -337,9 +333,11 @@ export const FilterContentSRC20 = ({
             toggle={() => {}}
             variant="collapsibleLabel"
           >
-            <RangeButtons
+            <ToggleButton
+              size="smR"
+              options={["24h", "3d", "7d"]}
               selected={priceChangePeriod}
-              onChange={(newPeriod: string) => {
+              onChange={(newPeriod: string | string[]) => {
                 const period = newPeriod as PeriodType;
                 setPriceChangePeriod(period);
 
@@ -356,6 +354,8 @@ export const FilterContentSRC20 = ({
                   return newFilters;
                 });
               }}
+              mode="single"
+              spacing="even"
             />
           </CollapsibleSection>
         )}

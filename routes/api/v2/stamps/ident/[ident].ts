@@ -1,17 +1,18 @@
+import type { SUBPROTOCOLS } from "$types/base.d.ts";
+import type { IdentHandlerContext } from "$types/base.d.ts";
+import type { PaginatedIdResponseBody } from "$types/api.d.ts";
+// Unused imports removed: BlockHandlerContext, TickHandlerContext, PaginatedTickResponseBody, SRC20TrxRequestParams
 import { Handlers } from "$fresh/server.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
+import { getPaginationParams } from "$lib/utils/data/pagination/paginationUtils.ts";
+import { PROTOCOL_IDENTIFIERS } from "$lib/utils/data/protocols/protocol.ts";
 import { StampController } from "$server/controller/stampController.ts";
-import { PROTOCOL_IDENTIFIERS } from "$lib/utils/protocol.ts";
-import { IdentHandlerContext, PaginatedIdResponseBody } from "$globals";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import {
   checkEmptyResult,
   DEFAULT_PAGINATION,
   validateRequiredParams,
   validateSortParam,
-} from "$server/services/routeValidationService.ts";
-import { SUBPROTOCOLS } from "$globals";
-
+} from "$server/services/validation/routeValidationService.ts";
 export const handler: Handlers<IdentHandlerContext> = {
   async GET(req, ctx) {
     const { ident } = ctx.params;
@@ -24,7 +25,7 @@ export const handler: Handlers<IdentHandlerContext> = {
 
     // Validate protocol identifier
     if (!PROTOCOL_IDENTIFIERS.includes(ident.toUpperCase())) {
-      return ResponseUtil.notFound(
+      return ApiResponseUtil.notFound(
         `Error: ident: ${ident} not found, use ${PROTOCOL_IDENTIFIERS}`,
       );
     }
@@ -49,7 +50,8 @@ export const handler: Handlers<IdentHandlerContext> = {
       const result = await StampController.getStamps({
         page: page || DEFAULT_PAGINATION.page,
         limit: limit || DEFAULT_PAGINATION.limit,
-        sortBy: sortValidation.data,
+        ...(sortValidation.data &&
+          { sortBy: sortValidation.data as "ASC" | "DESC" }),
         type: "stamps",
         ident: [ident.toUpperCase() as SUBPROTOCOLS],
       });
@@ -61,19 +63,18 @@ export const handler: Handlers<IdentHandlerContext> = {
       }
 
       const body: PaginatedIdResponseBody = {
-        page: result.page || DEFAULT_PAGINATION.page,
-        limit: result.page_size || DEFAULT_PAGINATION.limit,
-        totalPages: result.pages,
-        total: result.total,
+        page: (result as any).page || DEFAULT_PAGINATION.page,
+        limit: (result as any).page_size || DEFAULT_PAGINATION.limit,
+        totalPages: (result as any).pages,
         last_block: result.last_block,
         ident: ident.toUpperCase() as SUBPROTOCOLS,
-        stamps: result.stamps,
+        data: (result as any).stamps,
       };
 
-      return ResponseUtil.success(body);
+      return ApiResponseUtil.success(body);
     } catch (error) {
       console.error(`Error in stamps/ident handler:`, error);
-      return ResponseUtil.internalError(
+      return ApiResponseUtil.internalError(
         error,
         `Error: stamps with ident: ${ident} not found`,
       );

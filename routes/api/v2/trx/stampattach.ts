@@ -1,31 +1,31 @@
+import { TX_CONSTANTS } from "$constants";
 import { Handlers } from "$fresh/server.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import type {
+  InputTypeForSizeEstimation,
+  OutputTypeForSizeEstimation,
+  ScriptTypeInfo,
+} from "$lib/types/transaction.d.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
+import { hex2bin } from "$lib/utils/data/binary/baseUtils.ts";
+import { logger } from "$lib/utils/logger.ts";
+import { estimateMintingTransactionSize } from "$lib/utils/bitcoin/minting/transactionSizes.ts";
+import { getScriptTypeInfo } from "$lib/utils/bitcoin/scripts/scriptTypeUtils.ts";
+import { serverConfig } from "$server/config/config.ts"; // Import serverConfig
+import { StampController } from "$server/controller/stampController.ts";
 import {
   ComposeAttachOptions,
+  CounterpartyApiManager,
   normalizeFeeRate,
-  XcpManager,
-} from "$server/services/xcpService.ts";
-import { StampController } from "$server/controller/stampController.ts";
-import { serverConfig } from "$server/config/config.ts"; // Import serverConfig
-import { Buffer } from "node:buffer";
+} from "$server/services/counterpartyApiService.ts";
+import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
+import type { UTXO as ServiceUTXO } from "$types/index.d.ts";
 import {
   address as bjsAddress,
   networks,
   Psbt,
   Transaction,
 } from "bitcoinjs-lib";
-import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
-import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts";
-import { estimateTransactionSize } from "$lib/utils/minting/transactionSizes.ts";
-import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
-import { hex2bin } from "$lib/utils/binary/baseUtils.ts";
-import type {
-  InputTypeForSizeEstimation,
-  OutputTypeForSizeEstimation,
-  ScriptTypeInfo,
-} from "$lib/types/transaction.d.ts";
-import { logger } from "$lib/utils/logger.ts";
-import type { UTXO as ServiceUTXO } from "$types/index.d.ts";
+import { Buffer } from "node:buffer";
 
 // Update interface to accept either fee rate type and service fee
 interface StampAttachInput {
@@ -70,21 +70,21 @@ export const handler: Handlers = {
       const normalizedFees = normalizeFeeRate(feeArgs);
 
       if (!normalizedFees || normalizedFees.normalizedSatsPerVB <= 0) {
-        return ResponseUtil.badRequest("Invalid fee rate.");
+        return ApiResponseUtil.badRequest("Invalid fee rate.");
       }
 
       if (inputs_set && !inputs_set.match(/^[a-fA-F0-9]{64}:\d+$/)) {
-        return ResponseUtil.badRequest("Invalid inputs_set format.");
+        return ApiResponseUtil.badRequest("Invalid inputs_set format.");
       }
 
       const cpid = await StampController.resolveToCpid(identifier);
 
       const xcpApiCallOptions: any = {
-        ...options,
+        ...(options || {}),
         return_psbt: false, // Explicitly ask for raw tx from XCP Manager
         verbose: true,
         // Pass a fee_per_kb if CP API needs it for composition, even if we recalculate later.
-        // Using the normalized one, XcpManager.composeAttach expects fee_per_kb.
+        // Using the normalized one, CounterpartyApiManager.composeAttach expects fee_per_kb.
         fee_per_kb: normalizedFees.normalizedSatsPerKB,
       };
       // Remove options that should not be passed directly or are handled differently now
@@ -92,7 +92,7 @@ export const handler: Handlers = {
       delete xcpApiCallOptions.service_fee;
       delete xcpApiCallOptions.service_fee_address;
 
-      const cpResult = await XcpManager.composeAttach(
+      const cpResult = await CounterpartyApiManager.composeAttach(
         address,
         cpid,
         quantity,
@@ -122,7 +122,7 @@ export const handler: Handlers = {
       }[] = [];
       let sumOfUserInputs = BigInt(0);
 
-      const sequence = options.allow_unconfirmed_inputs === false
+      const sequence = options?.allow_unconfirmed_inputs === false
         ? 0xffffffff
         : 0xfffffffd; // RBF if true/undefined
 
@@ -251,10 +251,11 @@ export const handler: Handlers = {
       essentialCpOutputs.forEach((out) => psbt.addOutput(out));
 
       let totalValueToOutputsExcludingChange = cpOutputsTotalValue;
-      const feeService = body.service_fee ?? options.service_fee ??
+      const feeService = body.service_fee ?? options?.service_fee ??
         parseInt(serverConfig.MINTING_SERVICE_FEE_FIXED_SATS, 10);
       const feeServiceAddress = body.service_fee_address ??
-        options.service_fee_address ?? serverConfig.MINTING_SERVICE_FEE_ADDRESS;
+        options?.service_fee_address ??
+        serverConfig.MINTING_SERVICE_FEE_ADDRESS;
       let actualServiceFeeAdded = BigInt(0);
 
       if (feeService > 0 && feeServiceAddress) {
@@ -275,18 +276,20 @@ export const handler: Handlers = {
       const tempPsbtForSize = psbt.clone();
       tempPsbtForSize.addOutput({
         address: address,
-        value: TX_CONSTANTS.DUST_SIZE,
+        value: BigInt(TX_CONSTANTS.DUST_SIZE),
       });
 
       const inputsForSizeEst: InputTypeForSizeEstimation[] = psbt.data.inputs
         .map((input, idx) => {
           let scriptHex = "";
           if (input.witnessUtxo?.script) {
-            scriptHex = input.witnessUtxo.script.toString("hex");
+            scriptHex = input.witnessUtxo.script.toString();
           } else if (input.nonWitnessUtxo) {
             try {
-              scriptHex = Transaction.fromBuffer(input.nonWitnessUtxo)
-                .outs[psbt.txInputs[idx].index].script.toString("hex");
+              scriptHex = Buffer.from(
+                Transaction.fromBuffer(input.nonWitnessUtxo)
+                  .outs[psbt.txInputs[idx].index].script,
+              ).toString("hex");
             } catch (e: any) {
               logger.warn("api", {
                 message:
@@ -309,12 +312,12 @@ export const handler: Handlers = {
       const outputsForSizeEst: OutputTypeForSizeEstimation[] = tempPsbtForSize
         .txOutputs.map((out) => {
           const scriptInfo: ScriptTypeInfo = getScriptTypeInfo(
-            out.script.toString("hex"),
+            Buffer.from(out.script).toString("hex"),
           );
           return { type: scriptInfo.type };
         });
 
-      const estimatedVsize = estimateTransactionSize({
+      const estimatedVsize = estimateMintingTransactionSize({
         inputs: inputsForSizeEst,
         outputs: outputsForSizeEst,
         includeChangeOutput: false,
@@ -352,12 +355,15 @@ export const handler: Handlers = {
           });
           psbt.txOutputs.splice(cpChangeOutputIndex, 1);
           if (psbt.data.globalMap.unsignedTx) {
-            psbt.data.globalMap.unsignedTx.outs.splice(cpChangeOutputIndex, 1);
+            (psbt.data.globalMap.unsignedTx as any).outs.splice(
+              cpChangeOutputIndex,
+              1,
+            );
           }
         } else {
           while (psbt.txOutputs.length > 0) psbt.txOutputs.pop();
           if (psbt.data.globalMap.unsignedTx) {
-            psbt.data.globalMap.unsignedTx.outs = [];
+            (psbt.data.globalMap.unsignedTx as any).outs = [];
           }
           essentialCpOutputs.forEach((out) => psbt.addOutput(out));
           if (feeService > 0 && feeServiceAddress) {
@@ -396,7 +402,7 @@ export const handler: Handlers = {
         );
       }
       const finalPsbtHex = psbt.toHex();
-      return ResponseUtil.success({
+      return ApiResponseUtil.success({
         psbtHex: finalPsbtHex,
         inputsToSign,
         estimatedFee: Number(
@@ -421,9 +427,9 @@ export const handler: Handlers = {
         errorMessage.toLowerCase().includes("insufficient funds") ||
         errorMessage.includes("utxo selection failed")
       ) {
-        return ResponseUtil.badRequest(errorMessage);
+        return ApiResponseUtil.badRequest(errorMessage);
       }
-      return ResponseUtil.internalError(error, errorMessage);
+      return ApiResponseUtil.internalError(error, errorMessage);
     }
   },
 };

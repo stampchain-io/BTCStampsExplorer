@@ -1,15 +1,15 @@
 import { Handlers } from "$fresh/server.ts";
-import { CollectionService } from "$server/services/collectionService.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
+import { CollectionService } from "$server/services/core/collectionService.ts";
 
-export const collectionHandler: Handlers = {
+const collectionHandler: Handlers = {
   async GET(req: Request, _ctx) {
     try {
       const url = new URL(req.url);
       const collectionName = url.searchParams.get("name");
 
       if (!collectionName) {
-        return ResponseUtil.badRequest("Collection name is required", 400);
+        return ApiResponseUtil.badRequest("Collection name is required");
       }
 
       const collection = await CollectionService.getCollectionByName(
@@ -17,12 +17,14 @@ export const collectionHandler: Handlers = {
       );
 
       if (!collection) {
-        return ResponseUtil.notFound("Collection not found");
+        return ApiResponseUtil.notFound("Collection not found");
       }
 
-      return ResponseUtil.success({ data: collection });
+      return ApiResponseUtil.success({ data: collection });
     } catch (error) {
-      return ResponseUtil.internalError(error, "Error fetching collection");
+      return ApiResponseUtil.internalError(error, "Error fetching collection");
     }
   },
 };
+
+export const handler = collectionHandler;

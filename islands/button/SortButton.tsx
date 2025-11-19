@@ -1,29 +1,26 @@
-import { useEffect, useRef, useState } from "preact/hooks";
 import { Icon } from "$components/icon/IconBase.tsx";
+import { useSSRSafeNavigation } from "$lib/hooks/useSSRSafeNavigation.ts";
 import { tooltipIcon } from "$notification";
-
-interface SortProps {
-  searchParams?: URLSearchParams | undefined;
-  initSort?: "ASC" | "DESC" | undefined;
-  sortParam?: string;
-  onChangeSort?: (newSort: "ASC" | "DESC") => void;
-}
+import type { SortProps } from "$types/ui.d.ts";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 export function SortButton(
-  { searchParams, initSort, sortParam = "sortBy", onChangeSort }: SortProps,
+  { searchParams, initSort, sortParam = "sortBy" }: SortProps,
 ) {
+  const { getSearchParam, isClient, getUrl } = useSSRSafeNavigation();
+
   // Initialize sort based on URL parameter or initSort prop
   const sort = (() => {
     // Use initSort prop if provided
     if (initSort) {
       return initSort;
     }
-    // Otherwise use the current URL if available, or fallback to searchParams
-    if (typeof globalThis !== "undefined" && globalThis?.location) {
-      const currentSort = new URL(globalThis.location.href)
-        .searchParams.get(sortParam);
+    // Use SSR-safe navigation for client-side URL parameters
+    if (isClient) {
+      const currentSort = getSearchParam(sortParam);
       return currentSort === "ASC" ? "ASC" : "DESC";
     }
+    // Fallback to server-side searchParams during SSR
     return searchParams?.get(sortParam) === "ASC" ? "ASC" : "DESC";
   })();
 
@@ -32,23 +29,31 @@ export function SortButton(
   const [allowTooltip, setAllowTooltip] = useState(true);
   const tooltipTimeoutRef = useRef<number | null>(null);
 
-  const handleSort = () => {
-    const url = new URL(globalThis.location.href);
-    const currentSort = url.searchParams.get(sortParam) || "DESC";
+  // Helper function to determine the anchor based on sort parameter
+  const getSectionAnchor = (sortParam: string): string => {
+    switch (sortParam) {
+      case "stampsSortBy":
+        return "stamps";
+      case "src20SortBy":
+        return "src20";
+      case "dispensersSortBy":
+        return "dispensers";
+      default:
+        return "stamps";
+    }
+  };
 
-    // Toggle between ASC and DESC
+  // Generate the sort URL for Fresh.js partial navigation
+  const getSortUrl = (): string => {
+    // Get current URL in an SSR-safe way
+    const url = new URL(getUrl());
+    const currentSort = isClient ? getSearchParam(sortParam) || "DESC" : "DESC";
     const newSort = currentSort === "ASC" ? "DESC" : "ASC";
 
-    // Don't update state before page reload
-    setIsTooltipVisible(false);
-    setAllowTooltip(false);
-
-    // Call the onChangeSort callback if provided
-    onChangeSort?.(newSort);
-
-    // Update URL and reload page
     url.searchParams.set(sortParam, newSort);
-    globalThis.location.href = url.toString();
+    url.searchParams.set("anchor", getSectionAnchor(sortParam));
+
+    return url.toString();
   };
 
   // Add tooltip handlers
@@ -81,19 +86,23 @@ export function SortButton(
   }, []);
 
   return (
-    <div className="relative">
-      <Icon
-        type="iconButton"
-        name={sort === "DESC" ? "sortAsc" : "sortDesc"}
-        weight="bold"
-        size="custom"
-        color="purple"
-        className="mt-[4px] tablet:mt-[5px] w-[28px] h-[28px] tablet:w-[25px] tablet:h-[25px] transform transition-all duration-300"
-        ariaLabel={`Sort ${sort === "DESC" ? "ascending" : "descending"}`}
-        onClick={handleSort}
+    <div class="relative">
+      <a
+        href={getSortUrl()}
+        f-partial={getSortUrl()}
+        class="inline-block"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-      />
+      >
+        <Icon
+          type="iconButton"
+          name={sort === "DESC" ? "sortDesc" : "sortAsc"}
+          weight="normal"
+          size="smR"
+          color="grey"
+          ariaLabel={`Sorted ${sort === "DESC" ? "descending" : "ascending"}`}
+        />
+      </a>
       <div
         className={`${tooltipIcon} ${
           isTooltipVisible ? "opacity-100" : "opacity-0"

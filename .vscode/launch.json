@@ -2,9 +2,9 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Deno Fresh: Debug",
-      "request": "launch",
+      "name": "Dev Server",
       "type": "node",
+      "request": "launch",
       "cwd": "${workspaceFolder}",
       "runtimeExecutable": "deno",
       "runtimeArgs": [
@@ -12,16 +12,76 @@
         "dev"
       ],
       "attachSimplePort": 9229,
-      "restart": true,
-      "outputCapture": "std",
-      "postDebugTask": "deno: cleanup-ports",
+      "console": "integratedTerminal",
       "env": {
         "DENO_ENV": "development",
-        "DENO_V8_FLAGS": "--max-old-space-size=8192"
-      },
+        "DEV_BASE_URL": "http://localhost:8000",
+        "SKIP_REDIS_CONNECTION": "true"
+      }
+    },
+    {
+      "name": "Frontend Dev",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "deno",
+      "runtimeArgs": [
+        "task",
+        "dev:frontend"
+      ],
+      "attachSimplePort": 9229,
+      "console": "integratedTerminal",
+      "env": {
+        "DENO_ENV": "development",
+        "DEV_BASE_URL": "http://localhost:8000",
+        "SKIP_REDIS_CONNECTION": "true"
+      }
+    },
+    {
+      "name": "Debug (Breakpoints)",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "deno",
+      "runtimeArgs": [
+        "run",
+        "--inspect-brk",
+        "--allow-all",
+        "--watch=routes/,islands/,components/,lib/,server/",
+        "--watch-exclude=_fresh/,node_modules/,coverage/,tmp/,dist/",
+        "--no-clear-screen",
+        "dev.ts",
+        "--host"
+      ],
+      "attachSimplePort": 9229,
       "console": "internalConsole",
-      "internalConsoleOptions": "openOnSessionStart",
-      "autoAttachChildProcesses": true
+      "env": {
+        "DENO_ENV": "development",
+        "DEV_BASE_URL": "http://localhost:8000",
+        "SKIP_REDIS_CONNECTION": "true"
+      }
+    },
+    {
+      "name": "Attach to Process",
+      "type": "node",
+      "request": "attach",
+      "port": 9229
+    },
+    {
+      "name": "Production Preview",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "deno",
+      "runtimeArgs": [
+        "task",
+        "preview"
+      ],
+      "attachSimplePort": 9229,
+      "console": "integratedTerminal",
+      "env": {
+        "DENO_ENV": "production"
+      }
     }
   ]
 }
