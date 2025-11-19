@@ -320,7 +320,7 @@ export function SRC20TransferTool(
 
       {/* ===== FORM  ===== */}
       <form
-        class={`${containerBackground} ${containerColForm} mb-6 relative z-dropdown`}
+        class={`${containerBackground} ${containerColForm} relative z-dropdown`}
         onSubmit={(e) => {
           e.preventDefault();
           handleSubmit();

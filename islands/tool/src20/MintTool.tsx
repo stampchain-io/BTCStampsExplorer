@@ -436,7 +436,7 @@ export function SRC20MintTool({
       )}
 
       <form
-        class={`${containerBackground} mb-6 relative z-dropdown`}
+        class={`${containerBackground} relative z-dropdown`}
         onSubmit={(e) => {
           e.preventDefault();
           handleMint();
@@ -471,7 +471,7 @@ export function SRC20MintTool({
                   weight="extraLight"
                   size="xl"
                   color="custom"
-                  className="stroke-stamp-grey-darkest"
+                  className="stroke-color-grey-dark"
                 />
               )}
           </div>

@@ -3,7 +3,7 @@
 
 /* ===== BASE STYLES ===== */
 // General styles
-// Horisontal Rule is defined in /styles.css using border color #1b1b1b/80
+// Horisontal Rule is defined in /styles.css using border color
 
 // Transition styles - @baba-refactor codebase to use these instead of hardcoded values
 export const transitionColors = "transition-colors duration-200";
@@ -25,16 +25,16 @@ export const shadowGlowGrey =
 // Glassmorphism styles
 // Overlay layer styles - used for drawer and modal containers
 export const glassmorphismOverlay =
-  `bg-gradient-to-b from-[#080708]/95 via-[#080708]/70 to-[#000000]/90 backdrop-blur-lg`;
+  `bg-gradient-to-b from-color-background/95 via-color-background/70 to-black/90 backdrop-blur-lg`;
 // 1st layer styles
-export const glassmorphism = `border-[1px] border-[#242424]/50 rounded-3xl
-  bg-gradient-to-br from-[#1b191b]/50 via-[#080708]/50 to-[#000000]/50
+export const glassmorphism = `border border-color-border/50 rounded-3xl
+  bg-gradient-to-br from-[#191919]/40 via-color-background/50 to-black/60
   backdrop-blur ${shadow}`;
 // 2nd layer styles - register tool tld dropdown uses same hardcoded values
-export const glassmorphismL2 = `border-[1px] border-[#242424]/75 rounded-2xl
-  bg-[#080708]/30 backdrop-blur-xs ${shadowL2}`;
+export const glassmorphismL2 = `border border-color-border/75 rounded-2xl
+  bg-color-background/30 backdrop-blur-xs ${shadowL2}`;
 export const glassmorphismL2Hover =
-  `hover:bg-[#080708]/60 hover:border-[#242424]`;
+  `hover:bg-color-background/60 hover:border-color-border`;
 
 /* ===== BODY STYLES ===== */
 // Main body styles
@@ -45,11 +45,6 @@ export const bodyTool = `
 export const bodyArticle = `
   ${body} tablet:max-w-[922px] tablet:mx-auto p-5 ${glassmorphism}
 `;
-// Section gaps
-export const gapSection = "gap-12 mobileLg:gap-[72px]"; // Index pages
-export const gapSectionSlim = "gap-6 mobileLg:gap-9"; // Media index page
-// Grid/flex row and column gaps
-export const gapGrid = "gap-6 mobileLg:gap-9 tablet:gap-12"; // - ToS index page
 
 /* ===== CONTAINER STYLES ===== */
 // Base styles
@@ -68,7 +63,7 @@ export const containerCardL2 = `${glassmorphismL2} ${shadowGlowPurple}
 // Table card container styles - check if used
 export const containerCardTable =
   `rounded-3xl ${glassmorphism} ${shadowGlowPurple}
-  hover:border-stamp-purple-bright`;
+  hover:border-color-purple-light`;
 
 // Global styles
 export const containerColData = "flex flex-col -space-y-1"; // Data specific
@@ -82,38 +77,39 @@ export const rowForm = "flex w-full";
 export const rowResponsiveForm =
   "flex flex-col min-[420px]:flex-row w-full gap-5 min-[420px]:[&>*]:flex-1";
 export const rowContainerBackground =
-  `flex items-center justify-center w-full h-[46px] ${glassmorphism}`;
+  `flex items-center justify-center w-full h-[46px] ${glassmorphism}`; // update all tables to use this instead of custom code
 /* ===== COL STYLES ===== */
 
 /* ===== CELL STYLES ===== */
 // Layer 1
 // Stamp and SRC20 Table Row Cards - Stamp/tokencards
 export const cellLeftCard =
-  `p-3 pl-4 rounded-l-3xl border-y-[1px] border-l-[1px] border-r-0 border-[#242424]/50
-  group-hover:bg-black/20 group-hover:border-stamp-purple-bright ${transitionColors} whitespace-nowrap`;
+  `p-3 pl-4 rounded-l-3xl border-y-[1px] border-l-[1px] border-r-0 border-color-border/50
+  group-hover:bg-black/20 group-hover:border-color-purple-light ${transitionColors} whitespace-nowrap`;
 export const cellRightCard =
-  `p-3 pr-4 rounded-r-3xl border-y-[1px] border-r-[1px] border-l-0 border-[#242424]/50
-  group-hover:bg-black/20 group-hover:border-stamp-purple-bright ${transitionColors} whitespace-nowrap`;
-export const cellCenterCard = `p-3 border-y-[1px] border-x-0 border-[#242424]/50
-  group-hover:bg-black/20 group-hover:border-stamp-purple-bright ${transitionColors} whitespace-nowrap`;
+  `p-3 pr-4 rounded-r-3xl border-y-[1px] border-r-[1px] border-l-0 border-color-border/50
+  group-hover:bg-black/20 group-hover:border-color-purple-light ${transitionColors} whitespace-nowrap`;
+export const cellCenterCard =
+  `p-3 border-y-[1px] border-x-0 border-color-border/50
+  group-hover:bg-black/20 group-hover:border-color-purple-light ${transitionColors} whitespace-nowrap`;
 // Layer 2
 // Stamp and SRC20 Table Row Cards - Stamp/tokencards inside of layer 1
 export const cellLeftL2Card =
-  `p-3 pl-4 rounded-l-2xl border-y-[1px] border-l-[1px] border-r-0 border-[#242424]/75
-  group-hover:bg-black/20 group-hover:border-stamp-purple-bright ${transitionColors} whitespace-nowrap`;
+  `p-3 pl-4 rounded-l-2xl border-y-[1px] border-l-[1px] border-r-0 border-color-border/75
+  group-hover:bg-black/20 group-hover:border-color-purple-light ${transitionColors} whitespace-nowrap`;
 export const cellRightL2Card =
-  `p-3 pr-4 rounded-r-2xl border-y-[1px] border-r-[1px] border-l-0 border-[#242424]/75
-  group-hover:bg-black/20 group-hover:border-stamp-purple-bright ${transitionColors} whitespace-nowrap`;
+  `p-3 pr-4 rounded-r-2xl border-y-[1px] border-r-[1px] border-l-0 border-color-border/75
+  group-hover:bg-black/20 group-hover:border-color-purple-light ${transitionColors} whitespace-nowrap`;
 export const cellCenterL2Card =
-  `p-3 border-y-[1px] border-x-0 border-[#242424]/75
-  group-hover:bg-black/20 group-hover:border-stamp-purple-bright ${transitionColors} whitespace-nowrap`;
+  `p-3 border-y-[1px] border-x-0 border-color-border/75
+  group-hover:bg-black/20 group-hover:border-color-purple-light ${transitionColors} whitespace-nowrap`;
 // Stamp and SRC20 Detail pages Table Rows
 export const cellLeftL2Detail =
-  `p-1.5 pl-3 rounded-l-2xl border-y-[1px] border-l-[1px] border-r-0 border-[#242424]/75 group-hover:bg-black/20 group-hover:border-[#232223] ${transitionColors} whitespace-nowrap`;
+  `p-1.5 pl-3 rounded-l-2xl border-y-[1px] border-l-[1px] border-r-0 border-color-border/75 group-hover:bg-black/20 group-hover:border-color-border ${transitionColors} whitespace-nowrap`;
 export const cellRightL2Detail =
-  `p-1.5 pr-3 rounded-r-2xl border-y-[1px] border-r-[1px] border-l-0 border-[#242424]/75 group-hover:bg-black/20 group-hover:border-[#232223] ${transitionColors} whitespace-nowrap`;
+  `p-1.5 pr-3 rounded-r-2xl border-y-[1px] border-r-[1px] border-l-0 border-color-border/75 group-hover:bg-black/20 group-hover:border-color-border ${transitionColors} whitespace-nowrap`;
 export const cellCenterL2Detail =
-  `p-1.5 border-y-[1px] border-x-0 border-[#242424]/75 group-hover:bg-black/20 group-hover:border-[#232223] ${transitionColors} whitespace-nowrap`;
+  `p-1.5 border-y-[1px] border-x-0 border-color-border/75 group-hover:bg-black/20 group-hover:border-color-border ${transitionColors} whitespace-nowrap`;
 
 export const cellStickyLeft =
   `sticky left-0 bg-black/70 tablet:bg-transparent backdrop-blur-xl tablet:backdrop-blur-none z-10`;
@@ -122,11 +118,7 @@ export const cellStickyLeft =
 export const imagePreviewTool =
   `flex items-center justify-center min-w-[100px] h-[100px] ${glassmorphismL2}`;
 export const imageUploadTool =
-  `flex items-center justify-center min-w-[100px] h-[100px] ${glassmorphismL2} hover:bg-stamp-grey-darkest/30 ${transitionColors} cursor-pointer`;
-
-/* ===== MODAL STYLES ===== */
-export const modalBgCenter =
-  "fixed inset-0 z-50 flex items-center justify-center bg-[#000000] bg-opacity-70 backdrop-filter backdrop-blur-md";
+  `flex items-center justify-center min-w-[100px] h-[100px] ${glassmorphismL2} hover:bg-color-grey-dark/30 ${transitionColors} cursor-pointer`;
 
 /* ===== LOADER STYLES ===== */
 // Text loader styles are defined in /text/styles.ts
@@ -134,7 +126,7 @@ export const modalBgCenter =
 // Base loader style
 const loaderSpin = "animate-spin rounded-full border-b-[2px]";
 export const loaderSkeleton =
-  `bg-[#080708]/50 border-[1px] border-[#242424]/50 animate-pulse`;
+  `bg-color-background/50 border border-color-border/50 animate-pulse`;
 // Spinning loader styles
 export const loaderSpinXsGrey = `${loaderSpin} w-3 h-3 border-color-grey`;
 export const loaderSpinSmGrey = `${loaderSpin} w-5 h-5 border-color-grey`;

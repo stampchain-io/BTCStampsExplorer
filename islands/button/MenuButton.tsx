@@ -136,7 +136,7 @@ export function MenuButton({ onOpenDrawer }: MenuButtonProps) {
         name="menu"
         weight="normal"
         size="md"
-        color="purple"
+        color="purpleLight"
         isOpen={false}
         onClick={handleMenuClick}
       />

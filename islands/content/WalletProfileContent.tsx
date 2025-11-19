@@ -5,7 +5,6 @@ import {
   containerBackground,
   glassmorphismL2,
   rowContainerBackground,
-  shadowGlowPurple,
 } from "$layout";
 import { tooltipIcon } from "$notification";
 import {
@@ -404,15 +403,17 @@ function DispenserRow(
   /* ===== RENDER DISPENSER ROW ===== */
   return (
     <div
-      class={`flex justify-between dark-gradient rounded-2xl hover:border-color-purple-light ${shadowGlowPurple} border-2 border-transparent`}
+      class={`${glassmorphismL2} p-5`}
     >
       <div class="flex gap-6 w-full">
         <a
           href={`/stamp/${dispenser.stamp.stamp}`}
           class={`${imageSize} relative flex-shrink-0`}
         >
-          <div class="relative p-[6px] mobileMd:p-3 bg-[#1F002E] rounded-2xl aspect-square">
-            <div class="stamp-container absolute inset-0 flex items-center justify-center">
+          <div
+            class={`${glassmorphismL2} !border relative aspect-square`}
+          >
+            <div class="stamp-container absolute inset-0 flex items-center justify-center p-1">
               <div class="relative z-10 w-full h-full">
                 {loading && !src ? <LoadingIcon /> : src
                   ? (
@@ -827,8 +828,8 @@ function WalletProfileContentInner({
 
       {/* Feature Flag Debug Info */}
       {enableAdvancedSorting && showSortingMetrics && (
-        <div class="mt-8 p-4 bg-stamp-grey-lightest rounded-2xl">
-          <h3 class="text-sm font-semibold text-stamp-grey-darkest mb-2">
+        <div class="mt-8 p-4 bg-color-grey-lightest rounded-2xl">
+          <h3 class="text-sm font-semibold text-color-grey-dark mb-2">
             Advanced Sorting Status
           </h3>
           <div class="text-xs text-color-grey space-y-1">

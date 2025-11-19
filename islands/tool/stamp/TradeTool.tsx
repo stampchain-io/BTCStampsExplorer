@@ -694,10 +694,9 @@ export function StampTradeTool() {
   return (
     <div class={`${bodyTool} ${containerGap}`}>
       {/* ===== SELLER SECTION ===== */}
-      <h1 class={`${titleGreyLD} mobileMd:mx-auto`}>
-        ATTACH TO UTXO
+      <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
+        TRADE
       </h1>
-      <h2 class={`${subtitleGrey} mobileMd:mx-auto`}>SELLER</h2>
 
       {/* ===== CREATE PSBT FORM ===== */}
       <div class={containerBackground}>
@@ -708,7 +707,7 @@ export function StampTradeTool() {
 
         {/* ===== 🎯 INLINE FEE STATUS DISPLAY - CREATE PSBT ===== */}
         {createPsbtFeeDetails && (
-          <div className="mb-4 p-3 bg-stamp-grey-darker/50 rounded-2xl border border-stamp-grey-light/10">
+          <div className="mb-4 p-3 bg-color-grey-semidark/50 rounded-2xl border border-color-grey-light/10">
             <div className="flex items-center gap-2 mb-2">
               <span className="text-sm text-color-grey-light">
                 Estimated Fees:
@@ -822,7 +821,7 @@ export function StampTradeTool() {
 
         {/* ===== 🎯 INLINE FEE STATUS DISPLAY - UTXO ATTACH ===== */}
         {attachFeeDetails && (
-          <div className="mb-4 p-3 bg-stamp-grey-darker/50 rounded-2xl border border-stamp-grey-light/10">
+          <div className="mb-4 p-3 bg-color-grey-semidark/50 rounded-2xl border border-color-grey-light/10">
             <div className="flex items-center gap-2 mb-2">
               <span className="text-sm text-color-grey-light">
                 Estimated Fees:
@@ -1014,14 +1013,14 @@ export function StampTradeTool() {
       {/* ===== BUYER SECTION ===== */}
       {/* ===== COMPLETE SWAP FORM ===== */}
       <div class={containerBackground}>
-        <h2 class={`${subtitleGrey} mobileMd:mx-auto`}>BUYER</h2>
-        <h3 class=" font-bold text-xl text-stamp-purple mb-2">
+        <h2 class={`${subtitleGrey} mx-auto`}>BUYER</h2>
+        <h3 class=" font-bold text-xl text-color-grey-semilight mb-2">
           COMPLETE SWAP
         </h3>
 
         {/* ===== 🎯 INLINE FEE STATUS DISPLAY - COMPLETE SWAP ===== */}
         {swapFeeDetails && (
-          <div className="mb-4 p-3 bg-stamp-grey-darker/50 rounded-2xl border border-stamp-grey-light/10">
+          <div className="mb-4 p-3 bg-color-grey-semidark/50 rounded-2xl border border-color-grey-light/10">
             <div className="flex items-center gap-2 mb-2">
               <span className="text-sm text-color-grey-light">
                 Estimated Fees:

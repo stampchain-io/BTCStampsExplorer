@@ -5,6 +5,7 @@ import {
   notificationContainerError,
   notificationContainerInfo,
   notificationContainerSuccess,
+  notificationContainerWarning,
   notificationHeading,
 } from "$notification";
 import type { ToastComponentProps } from "$types/ui.d.ts";
@@ -39,21 +40,23 @@ export const ToastComponent = (
   const getIconColor = (toastType: ToastTypeFromProvider["type"]) => {
     switch (toastType) {
       case "error":
+        return "stroke-color-red";
       case "warning":
-        return "stroke-[#990000]";
+        return "stroke-color-orange";
       case "success":
-        return "stroke-[#009900]";
+        return "stroke-color-green";
       case "info":
       default:
-        return "stroke-[#999999]";
+        return "stroke-color-grey";
     }
   };
 
   const getContainerStyle = (toastType: ToastTypeFromProvider["type"]) => {
     switch (toastType) {
       case "error":
-      case "warning":
         return notificationContainerError;
+      case "warning":
+        return notificationContainerWarning;
       case "success":
         return notificationContainerSuccess;
       case "info":
@@ -65,13 +68,14 @@ export const ToastComponent = (
   const getProgressBarColor = (toastType: ToastTypeFromProvider["type"]) => {
     switch (toastType) {
       case "error":
+        return "bg-color-red-semidark";
       case "warning":
-        return "bg-[#660000]";
+        return "bg-color-orange";
       case "success":
-        return "bg-[#006600]";
+        return "bg-color-green-semidark";
       case "info":
       default:
-        return "bg-[#666666]";
+        return "bg-color-grey-semidark";
     }
   };
 
@@ -114,14 +118,14 @@ export const ToastComponent = (
           name="close"
           weight="bold"
           size="xs"
-          color="grey"
+          color="greyLight"
           onClick={onClose}
           className="ml-auto -mt-1.5"
         />
       </div>
 
       {autoDismiss && (
-        <div class="mt-2 w-full h-0.5 rounded-full bg-[#1b1b1b]/70">
+        <div class="mt-2 w-full h-0.5 rounded-full bg-color-border">
           <div
             class={`h-full rounded-full ${
               getProgressBarColor(type)

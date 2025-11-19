@@ -449,9 +449,9 @@ export function Header() {
         class={`flex tablet:hidden flex-col justify-between
           fixed top-0 right-0 left-auto w-full min-[420px]:w-[340px] h-[100dvh] z-30
           min-[420px]:rounded-l-3xl min-[420px]:border-l-[1px]
-          min-[420px]:border-l-[#242424]/75 min-[420px]:shadow-[-12px_0_12px_-6px_rgba(8,7,8,0.75)]
+          min-[420px]:border-l-color-border/75 min-[420px]:shadow-[-12px_0_12px_-6px_rgba(8,7,8,0.75)]
           ${glassmorphismOverlay} ${transitionTransform} transition-transform will-change-transform
-          overflow-y-auto overflow-x-hidden scrollbar-black
+          overflow-y-auto overflow-x-hidden scrollbar-background-overlay
           ${isActive ? "translate-x-0" : "translate-x-full"}`}
         style="transition-timing-function: cubic-bezier(0.46,0.03,0.52,0.96);"
         id={`navbar-collapse-${type}`}
@@ -470,7 +470,7 @@ export function Header() {
                 <CloseIcon
                   size="md"
                   weight="bold"
-                  color="grey"
+                  color="greyLight"
                   onClick={() => {
                     if (open) {
                       closeMenu();
@@ -482,7 +482,7 @@ export function Header() {
                 />
               </div>
               <h6
-                class={`font-extrabold text-2xl gray-gradient1 tracking-wide select-none inline-block w-fit ${
+                class={`font-extrabold text-2xl color-grey-gradientLD tracking-wide select-none inline-block w-fit ${
                   type === "menu" ? "italic font-black pr-0.5" : ""
                 }`}
               >
@@ -573,7 +573,7 @@ export function Header() {
       name="stampchain"
       size="lg"
       weight="light"
-      color="purple"
+      color="purpleLight"
       className="ml-1.5"
       href="/home"
       f-partial="/home"

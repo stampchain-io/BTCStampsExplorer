@@ -13,7 +13,7 @@ function mockShowNotification(title: string, text: string, icon: string) {
     confirmButtonText: "O K",
     customClass: {
       confirmButton:
-        "inline-flex items-center justify-center border-2 border-solid border-stamp-purple rounded-2xl text-sm mobileLg:text-base font-extrabold text-stamp-purple tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-purple-highlight hover:text-stamp-purple-highlight transition-colors",
+        "inline-flex items-center justify-center border-2 border-solid border-color-purple-semilight rounded-2xl text-sm mobileLg:text-base font-extrabold text-color-purple-semilight tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-color-purple-light hover:text-color-purple-light transition-colors",
     },
   };
 
@@ -93,12 +93,12 @@ Deno.test("notificationUtils - mockShowNotification button styling", () => {
 
   // Check that button class contains expected styling keywords
   assert(
-    buttonClass.includes("border-stamp-purple"),
-    "Should have stamp-purple border",
+    buttonClass.includes("border-color-purple-semilight"),
+    "Should have color-purple-semilight border",
   );
   assert(
-    buttonClass.includes("text-stamp-purple"),
-    "Should have stamp-purple text",
+    buttonClass.includes("text-color-purple-semilight"),
+    "Should have color-purple-semilight text",
   );
   assert(buttonClass.includes("hover:"), "Should have hover states");
   assert(

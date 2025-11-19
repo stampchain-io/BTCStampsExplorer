@@ -35,7 +35,7 @@ export function SearchButton() {
         name="search"
         weight="normal"
         size="mdR"
-        color="purple"
+        color="purpleLight"
         className="mb-[1px] mobileLg:-ml-1 -mr-0.5 mobileLg:mr-0"
         onClick={openContextualSearch}
         role="button"

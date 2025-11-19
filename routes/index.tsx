@@ -9,7 +9,6 @@ import {
   body,
   containerBackground,
   containerGap,
-  gapSectionSlim,
   Micro5FontLoader,
 } from "$layout";
 import { ResponseUtil } from "$lib/utils/api/responses/responseUtil.ts";
@@ -313,7 +312,7 @@ export default function Home({ data }: PageProps<HomePageData>) {
 
       {/* ===== MAIN CONTENT ===== */}
       <div
-        class={`${body} ${gapSectionSlim}`}
+        class={`${body} ${containerGap}`}
       >
         {/* ===== CRITICAL ABOVE FOLD CONTENT ===== */}
         <HomeHeader />

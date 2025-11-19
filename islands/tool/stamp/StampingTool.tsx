@@ -9,7 +9,7 @@ import { ProgressiveEstimationIndicator } from "$components/indicators/Progressi
 import { MaraStatusLink } from "$components/mara/MaraStatusLink.tsx";
 import { MaraModeWarningModal } from "$components/modals/MaraModeWarningModal.tsx";
 import { MaraServiceUnavailableModal } from "$components/modals/MaraServiceUnavailableModal.tsx";
-import { InputField } from "$form";
+import { InputField, stateDisabled } from "$form";
 import { Icon } from "$icon";
 import { StampingToolSkeleton } from "$indicators";
 import PreviewImageModal from "$islands/modal/PreviewImageModal.tsx";
@@ -43,6 +43,7 @@ import {
   StatusMessages,
   tooltipButton,
   tooltipButtonInCollapsible,
+  tooltipImage,
 } from "$notification";
 import { FeeCalculatorBase } from "$section";
 import { labelLg, subtitleGrey, titleGreyLD } from "$text";
@@ -1697,7 +1698,7 @@ function StampingToolMain({ config }: { config: Config }) {
             {file.name.match(/\.(jpg|jpeg|png|gif|webp|svg|avif)$/i)
               ? (
                 <img
-                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded-2xl bg-conic-pattern bg-[length:4px_4px] bg-stamp-grey/30 [image-rendering:pixelated]`}
+                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded-2xl bg-conic-pattern bg-[length:4px_4px] bg-color-grey/30 [image-rendering:pixelated]`}
                   src={URL.createObjectURL(file)}
                   alt="Preview"
                   onError={(e) => {
@@ -1718,7 +1719,7 @@ function StampingToolMain({ config }: { config: Config }) {
                   loading="lazy"
                   sandbox="allow-scripts allow-same-origin"
                   src={URL.createObjectURL(file)}
-                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded-2xl bg-stamp-grey/30 [image-rendering:pixelated]`}
+                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded-2xl bg-color-grey/30 [image-rendering:pixelated]`}
                   onError={(e) => {
                     console.error("iframe error (detailed):", {
                       error: e,
@@ -1740,14 +1741,14 @@ function StampingToolMain({ config }: { config: Config }) {
                   <PlaceholderImage variant="no-image" />
                 </div>
               )}
-            <div class="flex items-center justify-center absolute inset-0 rounded-2xl hover:bg-[#080708]/60 hover:border-[#242424] opacity-0 hover:opacity-100 transition-opacity">
+            <div class="flex items-center justify-center absolute inset-0 rounded-2xl hover:bg-color-background/60 hover:border-color-border opacity-0 hover:opacity-100 transition-opacity">
               <Icon
                 type="icon"
                 name="uploadImage"
                 weight="extraLight"
                 size="xl"
                 color="custom"
-                className="stroke-stamp-grey-darkest group-hover:stroke-stamp-grey"
+                className="stroke-color-grey-dark group-hover:stroke-color-grey"
               />
             </div>
           </label>
@@ -2191,7 +2192,12 @@ function StampingToolMain({ config }: { config: Config }) {
 
             <div
               ref={previewButtonRef}
-              className={`flex items-center justify-center !w-[46px] !h-10 ${glassmorphismL2} ${glassmorphismL2Hover} cursor-pointer group`} // dunno why, but the width has to be +6px ?!?!
+              className={`flex items-center justify-center !w-[46px] !h-10
+                 ${
+                file
+                  ? `${glassmorphismL2} ${glassmorphismL2Hover} cursor-pointer group`
+                  : `${glassmorphismL2} ${stateDisabled} group`
+              }`}
               onClick={() => {
                 if (!file) return;
                 toggleFullScreenModal();
@@ -2211,7 +2217,7 @@ function StampingToolMain({ config }: { config: Config }) {
                 weight="normal"
                 size="xs"
                 color="greyDark"
-                className="mb-0.5"
+                className={`mb-0.5 ${!file ? "!cursor-not-allowed" : ""}`}
               />
               <div
                 class={`${tooltipButton} ${
@@ -2365,6 +2371,20 @@ function StampingToolMain({ config }: { config: Config }) {
         }}
       >
         PREVIEW STAMP
+      </div>
+
+      {/* Tooltip outside backdrop-blur container to avoid stacking context issues */}
+      <div
+        class={`${tooltipImage} ${
+          isUploadTooltipVisible ? "opacity-100" : "opacity-0"
+        }`}
+        style={{
+          left: `${tooltipPosition.x}px`,
+          top: `${tooltipPosition.y - 6}px`,
+          transform: "translate(-50%, -100%)",
+        }}
+      >
+        UPLOAD FILE
       </div>
     </div>
   );

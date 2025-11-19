@@ -26,7 +26,9 @@ export function SettingsButton({
   return (
     <div
       class={`rounded-full flex flex-col items-center gap-1 h-fit relative z-[10] ${
-        open ? "px-6 py-4 border-2 border-stamp-purple bg-[#0B0B0B]" : ""
+        open
+          ? "px-6 py-4 border-2 border-color-purple-semilight bg-color-background"
+          : ""
       }`}
     >
       {open
@@ -67,7 +69,7 @@ export function SettingsButton({
             name="gear"
             weight="normal"
             size="custom"
-            color="purple"
+            color="purpleLight"
             className="mt-[5px] w-[26px] h-[26px] tablet:w-[24px] tablet:h-[24px] transform transition-all duration-300"
             ariaLabel="Settings"
             onClick={() => handleOpen?.(true)}

@@ -1,12 +1,10 @@
 /* ===== PLACEHOLDER IMAGE ICON COMPONENT ===== */
 import {
   placeholderBasePaths,
-  placeholderTextPaths,
-} from "$components/icon/paths.ts";
-import {
   placeholderPalette,
+  placeholderTextPaths,
   PlaceholderVariant,
-} from "$components/icon/styles.ts";
+} from "$icon";
 import { JSX } from "preact/jsx-runtime";
 
 type Props = {

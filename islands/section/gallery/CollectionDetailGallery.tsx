@@ -96,7 +96,7 @@ export default function CollectionDetailGallery({
       {subTitle && (
         <h4
           class={subtitleGrey +
-            " mb-3 mobileMd:mb-6 desktop:mb-9"}
+            " mb-3 mobileMd:mb-6"}
         >
           {subTitle}
         </h4>

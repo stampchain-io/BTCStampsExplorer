@@ -276,7 +276,7 @@ export function SRC101RegisterTool({
       </h1>
 
       <form
-        class={`${containerBackground} gap-5 mb-6 relative z-dropdown`}
+        class={`${containerBackground} gap-5 relative z-dropdown`}
         onSubmit={(e) => {
           e.preventDefault();
           handleTransferSubmit();
@@ -301,9 +301,9 @@ export function SRC101RegisterTool({
           {/* TLD Dropdown InputField - styled like glassmorphismL2/Hover */}
           <div class="relative w-[64px]" ref={tldDropdownRef}>
             <div
-              class={`h-10 px-4 border-[1px] border-[#242424]/75 rounded-2xl
-                !bg-[#080708]/60 ${glassmorphismL2Hover}
-                font-semibold text-sm text-stamp-grey text-right backdrop-blur-sm hover:text-stamp-grey-light tracking-wider ${transitionAll} !duration-200 focus-visible:!outline-none cursor-pointer flex items-center justify-end ${
+              class={`h-10 px-4 border border-color-border/75 rounded-2xl
+                !bg-color-background/60 ${glassmorphismL2Hover}
+                font-semibold text-sm text-color-grey text-right backdrop-blur-sm hover:text-color-grey-light tracking-wider ${transitionAll} !duration-200 focus-visible:!outline-none cursor-pointer flex items-center justify-end ${
                 openTldDropdown && !isSelectingTld ? "input-open-bottom" : ""
               }`}
               onClick={() => {

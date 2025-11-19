@@ -30,7 +30,7 @@ export const Accordion = (
       >
         {/* Title with Gradient Styling - cant use headingGreyLDLink styling (color-grey-gradientDL-hover) because of the group hover effect */}
         <h2
-          class={`font-bold text-xl tracking-wide gray-gradient1-hover group-hover:[background:none_!important] group-hover:[-webkit-text-fill-color:#CCCCCC_!important] group-hover:[text-fill-color:#CCCCCC_!important] transition-colors duration-200
+          class={`font-bold text-xl tracking-wide color-grey-gradientLD-hover group-hover:[background:none_!important] group-hover:[-webkit-text-fill-color:var(--color-grey-semilight)_!important] group-hover:[text-fill-color:var(--color-grey-semilight)_!important] transition-colors duration-200
             ${
             isOpen
               ? "[background:none_!important] [-webkit-text-fill-color:var(--color-grey-semilight)_!important] [text-fill-color:var(--color-grey-semilight)_!important] "
@@ -44,8 +44,8 @@ export const Accordion = (
         <span
           class={`transition-transform duration-400 ${
             isOpen
-              ? "stroke-stamp-grey-light rotate-45"
-              : "stroke-stamp-grey-darker group-hover:stroke-stamp-grey-light transition-colors duration-400 rotate-0"
+              ? "stroke-color-grey-light rotate-45"
+              : "stroke-color-grey-semidark group-hover:stroke-color-grey-light transition-colors duration-400 rotate-0"
           }`}
         >
           <Icon

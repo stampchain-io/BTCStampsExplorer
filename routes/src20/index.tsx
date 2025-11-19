@@ -252,7 +252,7 @@ export default function SRC20OverviewPage({ data }: any) {
 
   return (
     <div
-      class={body}
+      class={`${body} -mb-3`}
       f-client-nav
       data-partial="/src20"
     >

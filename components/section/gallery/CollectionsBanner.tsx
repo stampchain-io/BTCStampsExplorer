@@ -5,7 +5,7 @@ import { useState } from "preact/hooks";
 
 /* ===== STYLES ===== */
 const containerClassName =
-  `border-2 border-stamp-grey-darker rounded-2xl relative overflow-hidden
+  `border-2 border-color-grey-semidark rounded-2xl relative overflow-hidden
   w-full h-[92px] mobileMd:h-[116px] mobileLg:h-[130px] tablet:h-[148px] desktop:h-[160px]`;
 const imageContentClassName =
   "bg-center bg-no-repeat bg-[length:100%] w-full h-full grayscale transition-all duration-300";

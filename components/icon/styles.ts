@@ -24,7 +24,14 @@ export interface IconVariants {
     | "xlR"
     | "xxlR"
     | "custom";
-  color: "grey" | "greyDark" | "purple" | "purpleDark" | "custom";
+  color:
+    | "greyDark"
+    | "grey"
+    | "greyLight"
+    | "purpleDark"
+    | "purple"
+    | "purpleLight"
+    | "custom";
   className?: string | undefined;
   role?: JSX.AriaRole;
   ariaLabel?: string;
@@ -98,28 +105,38 @@ export const iconStyles = {
   //   - the gradient defs have to be included in the file, since creating a global gradient file for them requires moving them up in the DOM tree (I abandoned this approach)
 
   icon: {
-    /* Removed legacy greyDark with color-grey-semidark - kept stamp-grey-darker */
-    grey:
-      "stroke-stamp-grey fill-none [&_path[class*='fill-stroke']]:fill-stamp-grey",
     greyDark:
-      "stroke-stamp-grey-darker fill-none [&_path[class*='fill-stroke']]:fill-stamp-grey-darker",
-    purple:
-      "stroke-stamp-purple fill-none [&_path[class*='fill-stroke']]:fill-stamp-purple",
+      "stroke-color-grey-semidark fill-none [&_path[class*='fill-stroke']]:fill-color-grey-semidark",
+    grey:
+      "stroke-color-grey fill-none [&_path[class*='fill-stroke']]:fill-color-grey",
+    greyLight:
+      "stroke-color-grey-semilight fill-none [&_path[class*='fill-stroke']]:fill-color-grey-semilight",
+
     purpleDark:
-      "stroke-stamp-purple-darker fill-none [&_path[class*='fill-stroke']]:fill-stamp-purple-darker",
+      "stroke-color-purple-semidark fill-none [&_path[class*='fill-stroke']]:fill-color-purple-semidark",
+    purple:
+      "stroke-color-purple fill-none [&_path[class*='fill-stroke']]:fill-color-purple",
+    purpleLight:
+      "stroke-color-purple-semilight fill-none [&_path[class*='fill-stroke']]:fill-color-purple-semilight",
+
     custom: "fill-none",
   },
 
   iconButton: {
-    /* Removed legacy greyDark with color-grey-semidark - kept stamp-grey-darker */
-    grey:
-      "stroke-stamp-grey hover:stroke-stamp-grey-light group-hover:stroke-stamp-grey-light fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-stamp-grey [&:hover_path[class*='fill-stroke']]:fill-stamp-grey-light [&:group-hover_path[class*='fill-stroke']]:fill-stamp-grey-light",
     greyDark:
-      "stroke-stamp-grey-darker hover:stroke-stamp-grey group-hover:stroke-stamp-grey fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-stamp-grey-darker [&:hover_path[class*='fill-stroke']]:fill-stamp-grey [&:group-hover_path[class*='fill-stroke']]:fill-stamp-grey",
-    purple:
-      "stroke-stamp-purple hover:stroke-stamp-purple-bright group-hover:stroke-stamp-purple-bright fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-stamp-purple [&:hover_path[class*='fill-stroke']]:fill-stamp-purple-bright [&:group-hover_path[class*='fill-stroke']]:fill-stamp-purple-bright",
+      "stroke-color-grey-semidark hover:stroke-color-grey-light group-hover:stroke-color-grey-light fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-color-grey-semidark [&:hover_path[class*='fill-stroke']]:fill-color-grey-light [&:group-hover_path[class*='fill-stroke']]:fill-color-grey-light",
+    grey:
+      "stroke-color-grey hover:stroke-color-grey-light group-hover:stroke-color-grey-light fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-color-grey [&:hover_path[class*='fill-stroke']]:fill-color-grey-light [&:group-hover_path[class*='fill-stroke']]:fill-color-grey-light",
+    greyLight:
+      "stroke-color-grey-semilight hover:stroke-color-grey-light group-hover:stroke-color-grey-light fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-color-grey-semilight [&:hover_path[class*='fill-stroke']]:fill-color-grey-light [&:group-hover_path[class*='fill-stroke']]:fill-color-grey-light",
+
     purpleDark:
-      "stroke-stamp-purple-darker hover:stroke-stamp-purple group-hover:stroke-stamp-purple fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-stamp-purple-darker [&:hover_path[class*='fill-stroke']]:fill-stamp-purple [&:group-hover_path[class*='fill-stroke']]:fill-stamp-purple",
+      "stroke-color-purple-semidark hover:stroke-color-purple-light group-hover:stroke-color-purple-light fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-color-purple-semidark [&:hover_path[class*='fill-stroke']]:fill-color-purple-light [&:group-hover_path[class*='fill-stroke']]:fill-color-purple-light",
+    purple:
+      "stroke-color-purple hover:stroke-color-purple-light group-hover:stroke-color-purple-light fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-color-purple [&:hover_path[class*='fill-stroke']]:fill-color-purple-light [&:group-hover_path[class*='fill-stroke']]:fill-color-purple-light",
+    purpleLight:
+      "stroke-color-purple-semilight hover:stroke-color-purple-light group-hover:stroke-color-purple-light fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-color-purple-semilight [&:hover_path[class*='fill-stroke']]:fill-color-purple-light [&:group-hover_path[class*='fill-stroke']]:fill-color-purple-light",
+
     custom: "fill-none cursor-pointer",
   },
 
@@ -142,6 +159,7 @@ export const iconStyles = {
     lg: "w-8 h-8",
     xl: "w-9 h-9",
     xxl: "w-10 h-10",
+
     xxsR: "w-4 h-4 tablet:w-3 tablet:h-3",
     xsR: "w-5 h-5 tablet:w-4 tablet:h-4",
     smR: "w-6 h-6 tablet:w-5 tablet:h-5",
@@ -179,24 +197,28 @@ export const placeholderColor: Record<
   Palette
 > = {
   grey: {
-    bg: "bg-gradient-to-br from-[#666666]/75 via-[#333333]/75 to-[#000000]",
-    stroke: "stroke-stamp-grey-darker",
-    fill: "fill-stamp-grey-darker",
+    bg:
+      "bg-gradient-to-br from-color-grey-semidark/75 via-color-grey-dark/75 to-black",
+    stroke: "stroke-color-grey-semidark",
+    fill: "fill-color-grey-semidark",
   },
   red: {
-    bg: "bg-gradient-to-br from-[#660000]/75 via-[#330000]/75 to-[#000000]",
-    stroke: "stroke-[#660000]",
-    fill: "fill-[#660000]",
+    bg:
+      "bg-gradient-to-br from-color-red-semidark/75 via-color-red-dark/75 to-black",
+    stroke: "stroke-color-red-semidark",
+    fill: "fill-color-red-semidark",
   },
   green: {
-    bg: "bg-gradient-to-br from-[#006600]/75 via-[#003300]/75 to-[#000000]",
-    stroke: "stroke-[#006600]",
-    fill: "fill-[#006600]",
+    bg:
+      "bg-gradient-to-br from-color-green-semidark/75 via-color-green-dark/75 to-black",
+    stroke: "stroke-color-green-semidark",
+    fill: "fill-color-green-semidark",
   },
   orange: {
-    bg: "bg-gradient-to-br from-[#662900]/75 via-[#331400]/75 to-[#000000]",
-    stroke: "stroke-[#662900]",
-    fill: "fill-[#662900]",
+    bg:
+      "bg-gradient-to-br from-color-orange-semidark/75 via-color-orange-dark/75 to-black",
+    stroke: "stroke-color-orange-semidark",
+    fill: "fill-color-orange-semidark",
   },
 };
 

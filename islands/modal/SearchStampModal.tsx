@@ -264,7 +264,7 @@ function SearchContent({
         onInput={(e) => setSearchTerm((e.target as HTMLInputElement).value)}
         onKeyDown={handleKeyDown}
         autoFocus={autoFocus}
-        class={`relative z-modal h-12 w-full bg-[#080708]/50 pl-7.5 pr-[68px]  font-mediun text-sm text-stamp-grey-light placeholder:bg-[#080708]/50 placeholder:font-light placeholder:!text-stamp-grey no-outline ${
+        class={`relative z-modal h-12 w-full bg-color-background/50 pl-7.5 pr-[68px]  font-mediun text-sm text-color-grey-light placeholder:bg-color-background/50 placeholder:font-light placeholder:!text-color-grey no-outline ${
           searchState.value.error ? "rounded-t-3xl" : "rounded-3xl"
         }`}
       />
@@ -286,7 +286,7 @@ function SearchContent({
         />
       </div>
       {searchState.value.error && (
-        <ul class="bg-[#080708]/50 rounded-b-3xl z-modal overflow-y-auto">
+        <ul class="bg-color-background/50 rounded-b-3xl z-modal overflow-y-auto">
           <li class="flex flex-col items-center justify-end pt-1.5 pb-3 px-7.5">
             <img
               src="/img/placeholder/broken.png"

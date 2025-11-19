@@ -10,7 +10,6 @@ import {
   body,
   containerDetailImage,
   containerGap,
-  gapSectionSlim,
   glassmorphism,
 } from "$layout";
 import {
@@ -287,7 +286,7 @@ function RightPanel(
             name="copyLink"
             weight="normal"
             size="custom"
-            color="grey"
+            color="greyLight"
             className="w-[29px] h-[29px] tablet:w-[25px] tablet:h-[25px]"
             onClick={copyLink}
           />
@@ -315,7 +314,7 @@ function RightPanel(
             name="share"
             weight="normal"
             size="custom"
-            color="grey"
+            color="greyLight"
             className="w-[29px] h-[29px] tablet:w-[25px] tablet:h-[25px]"
             onClick={shareContent}
             ariaLabel="Share content"
@@ -339,7 +338,7 @@ function RightPanel(
             name="twitterImage"
             weight="normal"
             size="mdR"
-            color="grey"
+            color="greyLight"
             onClick={shareToX}
             ariaLabel="Share on X"
           />
@@ -365,7 +364,7 @@ function RightPanel(
               name="previewCode"
               weight="normal"
               size="mdR"
-              color="grey"
+              color="greyLight"
               onClick={() => {
                 setIsCodeTooltipVisible(false);
                 toggleCodeModal();
@@ -391,7 +390,7 @@ function RightPanel(
             name="previewImageRaw"
             weight="normal"
             size="mdR"
-            color="grey"
+            color="greyLight"
             onClick={() =>
               globalThis.open(
                 `/s/${stamp.cpid}`,
@@ -422,7 +421,7 @@ function RightPanel(
             name="previewImage"
             weight="normal"
             size="mdR"
-            color="grey"
+            color="greyLight"
             onClick={() => {
               setIsFullscreenTooltipVisible(false);
               toggleFullScreenModal();
@@ -678,14 +677,8 @@ export function StampImage(
     };
   }, []);
 
-  // Early return if stamp is undefined
-  if (!stamp) {
-    return (
-      <div className="stamp-container bg-gray-200 rounded-2xl p-4 text-center text-gray-500">
-        NO STAMP DATA AVAILABLE
-      </div>
-    );
-  }
+  // Early return for TypeScript - in practice, stamp is always defined at call sites
+  if (!stamp) return null;
 
   const toggleFullScreenModal = () => {
     if (!src) return;
@@ -748,7 +741,7 @@ export function StampImage(
       )}
 
       {src && isHtml && (
-        <div className={`${className} ${body} ${gapSectionSlim}`}>
+        <div className={`${className} ${body} ${containerGap}`}>
           <div
             className={`relative ${
               flag ? `${containerDetailImage} ${containerClassName || ""}` : ""
@@ -812,7 +805,7 @@ export function StampImage(
       )}
 
       {src && isPlainText && (
-        <div class={`${body} ${gapSectionSlim}`}>
+        <div class={`${body} ${containerGap}`}>
           <div
             className={`${containerDetailImage} ${containerClassName || ""}`}
           >
@@ -834,7 +827,7 @@ export function StampImage(
       )}
 
       {src && isAudio && (
-        <div className={`${className} ${body} ${gapSectionSlim}`}>
+        <div className={`${className} ${body} ${containerGap}`}>
           <div
             className={`${containerDetailImage} ${containerClassName || ""}`}
           >
@@ -859,8 +852,8 @@ export function StampImage(
                     type="iconButton"
                     weight="bold"
                     size="xxl"
-                    color="custom"
-                    className="p-[25%] relative z-10 fill-stamp-grey group-hover/button:fill-stamp-grey-light transition-all duration-200"
+                    color="grey"
+                    className="p-[25%] relative z-10"
                   />
                 </button>
               </div>
@@ -878,7 +871,7 @@ export function StampImage(
       )}
 
       {src && isLibraryFile && (
-        <div className={`${className} ${body} ${gapSectionSlim}`}>
+        <div className={`${className} ${body} ${containerGap}`}>
           <div
             className={`${containerDetailImage} ${containerClassName || ""}`}
           >

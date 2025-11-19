@@ -27,26 +27,26 @@ export const logoPurpleLDLink =
 /* ===== NAVIGATION STYLES ===== */
 // Header - Desktop
 export const navLinkPurple =
-  `font-semibold tablet:font-normal text-stamp-purple text-sm tablet:text-[13px] group-hover:text-stamp-purple-bright tracking-wider ${transitionColors} cursor-pointer ${select}`;
+  `font-semibold tablet:font-normal text-color-purple-semilight text-sm tablet:text-[13px] group-hover:text-color-purple-light tracking-wider ${transitionColors} cursor-pointer ${select}`;
 export const navLinkPurpleActive =
-  `${navLinkPurple} !text-stamp-purple-bright hover:!text-stamp-purple`;
+  `${navLinkPurple} !text-color-purple-light hover:!text-color-purple-semilight`;
 export const navSublinkPurple =
-  `font-light text-stamp-purple text-[13px] hover:text-stamp-purple-bright tracking-wider ${transitionColors} cursor-pointer ${select}`; // used in WalletButton.tsx for connected sunmenu links - header uses custom styles
+  `font-light text-color-purple-semilight text-[13px] hover:text-color-purple-light tracking-wider ${transitionColors} cursor-pointer ${select}`; // used in WalletButton and ToolsButton for submenu links
 export const navSublinkPurpleActive =
-  `${navSublinkPurple} !text-stamp-purple-bright hover:!text-stamp-purple`;
+  `${navSublinkPurple} !text-color-purple-light hover:!text-color-purple-semilight`;
 // Header - Mobile/tablet
 export const navLinkGrey =
-  `font-semibold text-sm tablet:text-xs text-stamp-grey hover:text-stamp-grey-light
+  `font-semibold text-sm tablet:text-xs text-color-grey hover:text-color-grey-light
   tracking-wide ${transitionColors} cursor-pointer ${select}`;
 export const navLinkGreyActive =
-  `${navLinkGrey} !text-stamp-grey-light hover:!text-stamp-grey`;
+  `${navLinkGrey} !text-color-grey-light hover:!text-color-grey`;
 export const navLinkGreyLD =
-  `font-light text-xl tablet:text-lg gray-gradient1-hover tracking-wider inline-block w-fit ${transitionColors} cursor-pointer ${select}`;
+  `font-light text-xl tablet:text-lg color-grey-gradientLD-hover tracking-wider inline-block w-fit ${transitionColors} cursor-pointer ${select}`;
 export const navLinkGreyLDActive =
-  `${navLinkGreyLD} text-stamp-grey-light [background:none_!important] [-webkit-text-fill-color:#CCCCCC_!important] [text-fill-color:#CCCCCC_!important] hover:[-webkit-text-fill-color:#999999!important] hover:[text-fill-color:#999999!important]`;
+  `${navLinkGreyLD} text-color-grey-light [background:none_!important] [-webkit-text-fill-color:var(--color-grey-semilight)_!important] [text-fill-color:var(--color-grey-semilight)_!important] hover:[-webkit-text-fill-color:var(--color-grey)!important] hover:[text-fill-color:var(--color-grey)!important]`;
 // Footer - transparent text - ued with the overlayPurple class
 export const navLinkTransparentPurple =
-  `font-light text-[13px] hover:text-stamp-purple-bright tracking-wider ${transitionColors} cursor-pointer ${select}`;
+  `font-light text-[13px] hover:text-color-purple-light tracking-wider ${transitionColors} cursor-pointer ${select}`;
 
 /* ===== TITLE STYLES ===== */
 export const titleGreyLD =
@@ -104,10 +104,10 @@ export const labelXl = `${labelFont} text-xl ${select}`;
 export const labelXsR = `${labelFont} text-xs tablet:text-[10px] ${select}`; // used for the filter file type labels
 export const labelXsPosition =
   `flex justify-end mt-1 tablet:mt-0 -mb-5 tablet:-mb-4`; // used for the filter file type label positioning
-export const labelLightSm = `font-light text-sm text-stamp-grey ${select}`;
+export const labelLightSm = `font-light text-sm text-color-grey ${select}`;
 
 export const labelSmPurple =
-  `font-light text-sm text-stamp-purple-bright tracking-wide mb-0.5 ${select}`;
+  `font-light text-sm text-color-purple-light tracking-wide mb-0.5 ${select}`;
 
 export const labelLogicResponsive = ( // used for the filter labels
   checked: boolean,
@@ -177,9 +177,7 @@ export const valueNeutral = `text-color-grey-semidark`;
 export const tagline =
   `font-regular text-xs bg-gradient-to-r from-color-purple-light via-color-purple-semilight to-color-purple-semidark text-transparent bg-clip-text cursor-default ${select}`; // used in footer
 export const copyright =
-  `font-normal text-xs cursor-default cursor-default ${select}`; // transparent text - combined with the overlayPurple class - used in footer
-export const loaderText =
-  `font-medium text-sm text-stamp-grey uppercase text-center py-3 animated-text-loader ${select}`; // table more rows loader
+  `font-normal text-xs mobileMd:text-sm tablet:text-xs text-color-grey-dark cursor-default ${select}`; // used in the footer for copyright and counterparty version text
 export const toggleSymbol =
   `font-bold text-[10px] text-black cursor-default ${select}`; // used in ToggleSwitchButton.tsx for $/BTC symbols
 

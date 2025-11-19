@@ -125,7 +125,7 @@ export function MaraModeIndicator({
       {/* Tooltip */}
       {showTooltip && (
         <div
-          class="fixed z-50 bg-stamp-grey-darkest/95 backdrop-blur-sm border border-stamp-grey-light/20 rounded-2xl px-4 py-3 shadow-lg max-w-xs text-sm pointer-events-none"
+          class="fixed z-50 bg-color-grey-dark/95 backdrop-blur-sm border border-color-grey-light/20 rounded-2xl px-4 py-3 shadow-lg max-w-xs text-sm pointer-events-none"
           style={{
             left: `${tooltipPosition.x}px`,
             top: `${tooltipPosition.y - 10}px`,
