@@ -6,10 +6,18 @@ import {
   requestValidatorMiddleware,
 } from "$server/middleware/openapiValidator.ts";
 import { transformResponseForVersion } from "$server/middleware/schemaTransformer.ts";
+import { rateLimitMiddleware } from "$server/middleware/rateLimiter.ts";
 
 /**
  * API-specific middleware
  * Handles API versioning, response transformation, and common API concerns
+ *
+ * Middleware execution order (CRITICAL):
+ * 1. Request validation (OpenAPI)
+ * 2. Rate limiting (NEW - protects API from abuse)
+ * 3. API version middleware
+ * 4. Response transformation
+ * 5. Response validation (OpenAPI)
  */
 
 export async function handler(
@@ -50,7 +58,16 @@ export async function handler(
       }
     }
 
-    // Apply API version middleware after request validation
+    // Apply rate limiting after request validation (STEP 2)
+    // Rate limiter handles its own exemptions (health checks, internal APIs, API keys)
+    const rateLimitResponse = await rateLimitMiddleware(req, ctx);
+
+    // If rate limit exceeded, return 429 response immediately
+    if (rateLimitResponse.status === 429) {
+      return rateLimitResponse;
+    }
+
+    // Apply API version middleware after rate limiting (STEP 3)
     const versionResponse = await apiVersionMiddleware(ctx, async () => {
       // Continue to next middleware/handler
       const response = await ctx.next();
