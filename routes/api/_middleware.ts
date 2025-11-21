@@ -58,96 +58,95 @@ export async function handler(
       }
     }
 
-    // Apply rate limiting after request validation (STEP 2)
+    // Apply rate limiting and API version middleware (STEP 2 & 3)
     // Rate limiter handles its own exemptions (health checks, internal APIs, API keys)
-    const rateLimitResponse = await rateLimitMiddleware(req, ctx);
+    // We combine them into a single middleware chain
+    const versionResponse = await rateLimitMiddleware(req, {
+      ...ctx,
+      next: async () => {
+        // Continue to API version middleware
+        return await apiVersionMiddleware(ctx, async () => {
+          // Continue to next middleware/handler
+          const response = await ctx.next();
 
-    // If rate limit exceeded, return 429 response immediately
-    if (rateLimitResponse.status === 429) {
-      return rateLimitResponse;
-    }
-
-    // Apply API version middleware after rate limiting (STEP 3)
-    const versionResponse = await apiVersionMiddleware(ctx, async () => {
-      // Continue to next middleware/handler
-      const response = await ctx.next();
-
-      // Transform response based on API version
-      if (ctx.state.apiVersion && response.ok) {
-        try {
-          const contentType = response.headers.get("content-type");
-
-          // Only transform JSON responses
-          if (contentType?.includes("application/json")) {
-            // Clone the response to avoid consuming the body
-            const clonedResponse = response.clone();
-
-            // Check if response body is readable
-            const reader = clonedResponse.body?.getReader();
-            if (!reader) {
-              console.warn(
-                "Response body is not readable, skipping transformation",
-              );
-              return response;
-            }
-            reader.releaseLock();
-
-            // Parse JSON with error handling
-            let data;
+          // Transform response based on API version
+          if (ctx.state.apiVersion && response.ok) {
             try {
-              data = await clonedResponse.json();
-            } catch (jsonError) {
-              console.warn(
-                "Failed to parse response as JSON, skipping transformation:",
-                jsonError,
-              );
+              const contentType = response.headers.get("content-type");
+
+              // Only transform JSON responses
+              if (contentType?.includes("application/json")) {
+                // Clone the response to avoid consuming the body
+                const clonedResponse = response.clone();
+
+                // Check if response body is readable
+                const reader = clonedResponse.body?.getReader();
+                if (!reader) {
+                  console.warn(
+                    "Response body is not readable, skipping transformation",
+                  );
+                  return response;
+                }
+                reader.releaseLock();
+
+                // Parse JSON with error handling
+                let data;
+                try {
+                  data = await clonedResponse.json();
+                } catch (jsonError) {
+                  console.warn(
+                    "Failed to parse response as JSON, skipping transformation:",
+                    jsonError,
+                  );
+                  return response;
+                }
+
+                const transformed = transformResponseForVersion(
+                  data,
+                  ctx.state.apiVersion as string,
+                );
+
+                // Create new response with transformed data and all headers
+                const newHeaders = new Headers(response.headers);
+
+                // Add version-specific headers
+                newHeaders.set("API-Version", ctx.state.apiVersion as string);
+
+                if (
+                  ctx.state.versionContext &&
+                  typeof ctx.state.versionContext === "object"
+                ) {
+                  const versionContext = ctx.state.versionContext as {
+                    isDeprecated?: boolean;
+                    endOfLife?: string;
+                  };
+                  const { isDeprecated, endOfLife } = versionContext;
+
+                  if (isDeprecated) {
+                    newHeaders.set("Deprecation", "true");
+                    newHeaders.set("Sunset", endOfLife || "");
+                    newHeaders.set(
+                      "Link",
+                      `<https://stampchain.io/docs/api/migration>; rel="deprecation"`,
+                    );
+                  }
+                }
+
+                return ApiResponseUtil.success(transformed, {
+                  status: response.status,
+                  headers: Object.fromEntries(newHeaders),
+                });
+              }
+            } catch (error) {
+              console.error("Error transforming response:", error);
+              // Return original response on error
               return response;
             }
-
-            const transformed = transformResponseForVersion(
-              data,
-              ctx.state.apiVersion as string,
-            );
-
-            // Create new response with transformed data and all headers
-            const newHeaders = new Headers(response.headers);
-
-            // Add version-specific headers
-            newHeaders.set("API-Version", ctx.state.apiVersion as string);
-
-            if (
-              ctx.state.versionContext &&
-              typeof ctx.state.versionContext === "object"
-            ) {
-              const versionContext = ctx.state.versionContext as {
-                isDeprecated?: boolean;
-                endOfLife?: string;
-              };
-              const { isDeprecated, endOfLife } = versionContext;
-
-              if (isDeprecated) {
-                newHeaders.set("Deprecation", "true");
-                newHeaders.set("Sunset", endOfLife || "");
-                newHeaders.set(
-                  "Link",
-                  `<https://stampchain.io/docs/api/migration>; rel="deprecation"`,
-                );
-              }
-            }
-
-            return ApiResponseUtil.success(transformed, {
-              status: response.status,
-              headers: Object.fromEntries(newHeaders),
-            });
           }
-        } catch (error) {
-          console.error("Error transforming response:", error);
-          // Return original response on error
-          return response;
-        }
-      }
 
-      return response;
+          return response;
+        });
+      },
     });
 
     // Apply OpenAPI validation middleware after version transformation
