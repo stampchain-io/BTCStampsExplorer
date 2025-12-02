@@ -1,0 +1,22 @@
+{
+  "session_id": "33cd66a3-fdad-4667-a2d7-041d0d4bb381",
+  "short_id": "33cd66a3",
+  "created_at": "2025-11-21T15:45:14.299106",
+  "last_activity": "2025-11-21T15:45:14.299255",
+  "project_root": "/Users/Shared/repos/StampchainWorkspace/BTCStampsExplorer",
+  "status": "completed",
+  "pid": 15571,
+  "lifecycle": {
+    "created_by": "session_start_hook",
+    "last_heartbeat": "2025-11-21T15:45:14.299264",
+    "heartbeat_count": 1,
+    "cleanup_scheduled": false,
+    "completed_at": "2025-11-21T15:45:37.004699",
+    "completed_gracefully": true
+  },
+  "instructions": {
+    "incoming": "Place .txt files here with prompts/commands for Claude",
+    "processed": "Files moved here after being processed",
+    "format": "filename: YYYY-MM-DD_HH-MM-SS_description.txt"
+  }
+}
