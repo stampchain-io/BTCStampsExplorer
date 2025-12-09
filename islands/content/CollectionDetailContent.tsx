@@ -7,7 +7,7 @@ export const CollectionDetailContent = ({ stamps = [] }: {
   stamps: StampRow[];
 }) => {
   return (
-    <div name="stamps">
+    <div data-name="stamps">
       <div class="grid grid-cols-2 mobileMd:grid-cols-3 tablet:grid-cols-4 desktop:grid-cols-5 gap-6 transition-colors ease-in-out duration-100">
         {stamps.map((stamp: StampRow) => (
           <StampCard

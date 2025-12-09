@@ -161,7 +161,9 @@ export const SelectorButtons = ({
         return (
           <div
             key={option.value}
-            ref={(el) => (optionRefs.current[index] = el)}
+            ref={(el) => {
+              optionRefs.current[index] = el;
+            }}
             class={`
               relative min-w-0 group
               ${
