@@ -211,11 +211,30 @@ export class FetchHttpClient implements HttpClient {
       'ECONNRESET',
       'ENOTFOUND',
       'ECONNREFUSED',
-      'ETIMEDOUT'
+      'ETIMEDOUT',
+      '429',           // Rate limit
+      'rate limit',    // Rate limit text
+      'too many requests', // Common rate limit message
+      '503',           // Service unavailable (often temporary)
+      '502',           // Bad gateway (often temporary)
     ];
 
     const errorMessage = error.message.toLowerCase();
     return retryableErrors.some(retryable => errorMessage.includes(retryable));
+  }
+
+  /**
+   * Check if a status code indicates rate limiting
+   */
+  private isRateLimitStatus(status: number): boolean {
+    return status === 429;
+  }
+
+  /**
+   * Check if a status code is retryable (temporary server errors)
+   */
+  private isRetryableStatus(status: number): boolean {
+    return status === 429 || status === 502 || status === 503 || status === 504;
   }
 
   /**
@@ -308,6 +327,41 @@ export class FetchHttpClient implements HttpClient {
             headers: responseHeaders,
             ok: response.ok,
           };
+
+          // Check for rate limiting or retryable status codes
+          if (this.isRetryableStatus(response.status) && attempt < retries) {
+            // Return controller to pool before retry
+            if (requestController) {
+              this.returnAbortController(requestController);
+            }
+
+            // Calculate backoff delay - use Retry-After header if available
+            let backoffDelay = retryDelay * Math.pow(2, attempt);
+            const retryAfter = response.headers.get("retry-after");
+            if (retryAfter) {
+              const retryAfterSeconds = parseInt(retryAfter, 10);
+              if (!isNaN(retryAfterSeconds)) {
+                backoffDelay = Math.max(backoffDelay, retryAfterSeconds * 1000);
+              }
+            }
+
+            // For rate limits, use longer backoff
+            if (this.isRateLimitStatus(response.status)) {
+              backoffDelay = Math.max(backoffDelay, 5000); // Minimum 5s for rate limits
+              console.warn(`[HttpClient] Rate limited (429), waiting ${backoffDelay}ms before retry ${attempt + 1}/${retries}`, {
+                url,
+                method,
+              });
+            } else {
+              console.warn(`[HttpClient] Retryable status ${response.status}, waiting ${backoffDelay}ms before retry ${attempt + 1}/${retries}`, {
+                url,
+                method,
+              });
+            }
+
+            await this.sleep(backoffDelay);
+            continue; // Retry the request
+          }
 
           // Success - return controller to pool
           if (requestController) {
