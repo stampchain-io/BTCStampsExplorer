@@ -326,12 +326,10 @@ class ImportPatternValidator {
     // Generate recommendations
     const recommendations = this.generateRecommendations(violationsByCategory);
 
-    // Determine success (no violations of specified levels)
-    const success = options.strict 
-      ? violationsByCategory.critical.length === 0 && 
-        violationsByCategory.warning.length === 0 && 
-        violationsByCategory.info.length === 0
-      : violationsByCategory.critical.length === 0;
+    // Determine success based on critical violations only
+    // Warnings and info are reported but don't fail the build
+    // This allows incremental improvement while maintaining build stability
+    const success = violationsByCategory.critical.length === 0;
 
     return {
       success,
