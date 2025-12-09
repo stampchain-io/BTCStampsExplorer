@@ -46,10 +46,10 @@ export function getDatabaseConfig(): DatabaseConfig {
 
   // Production defaults (optimized for co-located database)
   const defaultConfig: DatabaseConfig = {
-    // Connection Pool - increased temporarily to handle connection leak
-    maxConnections: 50,            // Increased from 30 to handle current load
-    minConnections: 15,            // Increased from 10
-    maxWaitingForConnection: 200,  // Increased from 100
+    // Connection Pool - increased to handle parallel SSR data fetching
+    maxConnections: 75,            // Increased from 50 to support concurrent requests
+    minConnections: 20,            // Increased from 15 for faster connection acquisition
+    maxWaitingForConnection: 250,  // Increased from 200 to handle traffic spikes
     connectionTimeout: 15000,      // 15s for local DB
     acquireTimeout: 10000,         // Increased from 5s to 10s wait time
     validationTimeout: 1000,       // 1s validation
