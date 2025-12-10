@@ -11,7 +11,6 @@ import {
   containerGap,
   Micro5FontLoader,
 } from "$layout";
-import { ResponseUtil } from "$lib/utils/api/responses/responseUtil.ts";
 import {
   CarouselHome,
   GetStampingCta,
@@ -22,6 +21,7 @@ import {
   StampSalesGallery,
 } from "$section";
 import { StampController } from "$server/controller/stampController.ts";
+import { SRC20Service } from "$server/services/src20/index.ts";
 
 /* ===== TYPES ===== */
 // Define the shape of pageData from StampController.getHomePageData()
@@ -67,7 +67,8 @@ export const handler: Handlers<HomePageData> = {
     /* ===== REQUEST VALIDATION ===== */
     const headers = Object.fromEntries(req.headers);
     if (headers["sec-fetch-dest"] && headers["sec-fetch-dest"] !== "document") {
-      return ResponseUtil.custom(null, 204);
+      // Fix: 204 No Content responses cannot have a body
+      return new Response(null, { status: 204 });
     }
 
     console.log(`[HOMEPAGE] Starting homepage request`);
@@ -119,70 +120,13 @@ export const handler: Handlers<HomePageData> = {
         }
       };
 
-      // ✅ ARCHITECTURE: Use API endpoints for SRC20 data
-      const fetchSRC20FromAPI = async (
-        endpoint: string,
-        baseUrl: string,
-      ): Promise<any> => {
-        try {
-          // Prepare headers for internal API calls
-          const headers: HeadersInit = {
-            "X-API-Version": "2.3", // Use latest API version with market data
-          };
-
-          // Add internal API key for SSR-to-API authentication
-          const internalApiKey = Deno.env.get("INTERNAL_API_KEY");
-          if (internalApiKey) {
-            headers["X-API-Key"] = internalApiKey;
-          }
-
-          const response = await fetch(`${baseUrl}${endpoint}`, {
-            headers,
-          });
-
-          if (!response.ok) {
-            console.error(
-              `[HOMEPAGE] API call failed: ${endpoint} - ${response.status}`,
-            );
-            return { data: [], total: 0, page: 1, totalPages: 0 };
-          }
-
-          const result = await response.json();
-
-          // ✅ FIXED: Handle API response structure properly
-          if (result.data && Array.isArray(result.data)) {
-            // Standard API response with pagination info
-            return {
-              data: result.data,
-              total: result.total || 0,
-              page: result.page || 1,
-              totalPages: result.totalPages || 0,
-            };
-          } else if (Array.isArray(result)) {
-            // Direct array response (for some internal endpoints)
-            return {
-              data: result,
-              total: result.length,
-              page: 1,
-              totalPages: 1,
-            };
-          } else {
-            // Fallback for other response structures
-            return result.data || result ||
-              { data: [], total: 0, page: 1, totalPages: 0 };
-          }
-        } catch (error) {
-          console.error(`[HOMEPAGE] API call error: ${endpoint}`, error);
-          return { data: [], total: 0, page: 1, totalPages: 0 };
-        }
-      };
-
-      // ✅ PRODUCTION FIX: Use request origin instead of hardcoded localhost
-      const url = new URL(req.url);
-      const baseUrl = `${url.protocol}//${url.host}`;
+      // ✅ ARCHITECTURE: Call services/controllers directly instead of HTTP fetch
+      // This eliminates the internal API self-referencing issue where requests
+      // were timing out due to EC2 IP resolution instead of localhost
 
       const [pageData, mintedData, mintingData, recentSalesData] = await Promise
         .allSettled([
+          // Stamp homepage data (carousels, galleries)
           fetchWithFallback(
             () =>
               StampController.getHomePageData(btcPrice, btcPriceData.source),
@@ -195,30 +139,91 @@ export const handler: Handlers<HomePageData> = {
             },
             "StampController.getHomePageData",
           ),
+          // Top minted SRC20 tokens - call service directly
           fetchWithFallback(
-            () =>
-              fetchSRC20FromAPI(
-                "/api/v2/src20?op=DEPLOY&mintingStatus=minted&sortBy=TRENDING_24H_DESC&limit=5&page=1&includeMarketData=true&includeProgress=true",
-                baseUrl,
-              ),
+            async () => {
+              const result = await SRC20Service.QueryService
+                .fetchEnhancedSrc20Data(
+                  {
+                    op: "DEPLOY",
+                    sortBy: "TRENDING_24H_DESC",
+                    limit: 5,
+                    page: 1,
+                  },
+                  {
+                    onlyFullyMinted: true,
+                    includeMarketData: true,
+                    enrichWithProgress: true,
+                  },
+                );
+              // Type assertion for paginated response
+              const paginatedResult = result as {
+                data: unknown[];
+                page?: number;
+                totalPages?: number;
+                limit?: number;
+              };
+              const dataArray = Array.isArray(paginatedResult.data)
+                ? paginatedResult.data
+                : [];
+              return {
+                data: dataArray,
+                total: dataArray.length,
+                page: paginatedResult.page || 1,
+                totalPages: paginatedResult.totalPages || 1,
+              };
+            },
             { data: [], total: 0, page: 1, totalPages: 0 },
             "fetchTopMintedTokens",
           ),
+          // Trending minting SRC20 tokens - call service directly
           fetchWithFallback(
-            () =>
-              fetchSRC20FromAPI(
-                "/api/v2/src20?op=DEPLOY&mintingStatus=minting&sortBy=TRENDING_MINTING_DESC&limit=5&page=1&includeMarketData=true&includeProgress=true",
-                baseUrl,
-              ),
+            async () => {
+              const result = await SRC20Service.QueryService
+                .fetchEnhancedSrc20Data(
+                  {
+                    op: "DEPLOY",
+                    sortBy: "TRENDING_MINTING_DESC",
+                    limit: 5,
+                    page: 1,
+                  },
+                  {
+                    excludeFullyMinted: true,
+                    includeMarketData: true,
+                    enrichWithProgress: true,
+                  },
+                );
+              // Type assertion for paginated response
+              const paginatedResult = result as {
+                data: unknown[];
+                page?: number;
+                totalPages?: number;
+                limit?: number;
+              };
+              const dataArray = Array.isArray(paginatedResult.data)
+                ? paginatedResult.data
+                : [];
+              return {
+                data: dataArray,
+                total: dataArray.length,
+                page: paginatedResult.page || 1,
+                totalPages: paginatedResult.totalPages || 1,
+              };
+            },
             { data: [], total: 0, page: 1, totalPages: 0 },
             "fetchTrendingActiveMintingTokensV2",
           ),
+          // Recent stamp sales - call controller directly
           fetchWithFallback(
-            () =>
-              fetchSRC20FromAPI(
-                "/api/internal/stamp-recent-sales?page=1&limit=8",
-                baseUrl,
-              ),
+            async () => {
+              const result = await StampController.getRecentSales(1, 8);
+              return {
+                data: result.data || [],
+                total: result.total || 0,
+                page: result.page || 1,
+                totalPages: result.totalPages || 0,
+              };
+            },
             { data: [], total: 0, page: 1, totalPages: 0 },
             "fetchRecentSalesData",
           ),

@@ -170,7 +170,10 @@ function SearchContent({
                 class="w-[84px] pb-3"
               />
               <span class="text-center w-full">
-                {searchState.value.error.split("\n").map((text, index) => (
+                {searchState.value.error.split("\n").map((
+                  text: string,
+                  index: number,
+                ) => (
                   <div
                     key={index}
                     class={`${
