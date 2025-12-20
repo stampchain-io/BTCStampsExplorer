@@ -14,6 +14,7 @@ import {
 import { Handlers } from "$fresh/server.ts";
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { WebResponseUtil } from "$lib/utils/api/responses/webResponseUtil.ts";
+import { applyStampDisplayOverrides } from "$lib/utils/data/stampDisplayOverrides.ts";
 import { getIdentifierType } from "$lib/utils/data/identifiers/identifierUtils.ts";
 import { getPaginationParams } from "$lib/utils/data/pagination/paginationUtils.ts";
 import { StampController } from "$server/controller/stampController.ts";
@@ -424,6 +425,15 @@ export const createStampHandler = (
           const { file_size_bytes: _file_size_bytes, ...v22Stamp } =
             stampData.data.stamp;
           stampData.data.stamp = v22Stamp;
+        }
+
+        // Apply any narrowly-scoped display overrides (e.g., one-off artist name fixes).
+        // NOTE: This keeps `creator` address intact and only affects `creator_name`.
+        if (stampData.data?.stamp) {
+          stampData.data.stamp = applyStampDisplayOverrides(
+            stampData.data.stamp as StampRow,
+            id,
+          );
         }
 
         return ApiResponseUtil.success(

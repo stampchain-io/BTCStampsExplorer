@@ -6,6 +6,7 @@ import { Head } from "$fresh/runtime.ts";
 import { Handlers } from "$fresh/server.ts";
 import { body, containerBackground, containerGap } from "$layout";
 import { logger, LogNamespace } from "$lib/utils/logger.ts";
+import { applyStampDisplayOverrides } from "$lib/utils/data/stampDisplayOverrides.ts";
 import { StampGallery } from "$section";
 import { StampController } from "$server/controller/stampController.ts";
 import { CounterpartyDispenserService } from "$server/services/counterpartyApiService.ts";
@@ -111,7 +112,9 @@ export const handler: Handlers<StampData> = {
       const stamp = stampData.data.stamp;
 
       // Stamp should already have market data from controller
-      const stampWithPrices = stamp;
+      // Apply any narrowly-scoped display overrides (e.g., one-off artist name fixes)
+      // without mutating the underlying on-chain creator address.
+      const stampWithPrices = applyStampDisplayOverrides(stamp, id);
 
       let htmlTitle = null;
       if (
