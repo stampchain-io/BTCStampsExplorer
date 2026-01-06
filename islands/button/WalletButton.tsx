@@ -387,12 +387,12 @@ export const WalletButton = (
               {link.title}
             </a>
           ))}
+        </div>
 
-          {/* Bottom - Counterparty version */}
-          <div class={containerStickyBottom}>
-            <div class={`flex items-end -mb-1.5`}>
-              <CounterpartyVersion />
-            </div>
+        {/* Bottom - Counterparty version */}
+        <div class={containerStickyBottom}>
+          <div class={`flex items-end -mb-1.5`}>
+            <CounterpartyVersion />
           </div>
         </div>
       </div>
