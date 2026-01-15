@@ -908,15 +908,19 @@ class DatabaseManager {
       category = 'src101_balance';
     } else if (queryUpper.includes('STAMP_') && queryUpper.includes('BALANCE')) {
       category = 'stamp_balance';
-    } else if (queryUpper.includes('STAMP_MARKET_DATA') || queryUpper.includes('SRC20_MARKET_DATA')) {
-      category = 'market_data';
     } else if (queryUpper.includes('SRC20_TX') || queryUpper.includes('SRC_20_TX') ||
+               queryUpper.includes('SRC20VALID') ||
                (queryUpper.includes('SRC20') && queryUpper.includes('TRANSACTION'))) {
+      // SRC-20 transaction queries - MUST be checked BEFORE market_data since many
+      // SRC20Valid queries join src20_market_data for enrichment
       category = 'src20_transaction';
+    } else if (queryUpper.includes('STAMP_MARKET_DATA') || queryUpper.includes('SRC20_MARKET_DATA')) {
+      // Pure market data queries (not SRC20Valid transaction lookups)
+      category = 'market_data';
     } else if (queryUpper.includes('FROM SRC20') ||
                (queryUpper.includes('SRC20') && queryUpper.includes('COUNT')) ||
                (queryUpper.includes('SRC20') && queryUpper.includes('TICK'))) {
-      // SRC-20 queries that should be invalidated on new blocks
+      // Generic SRC-20 queries that should be invalidated on new blocks
       category = 'blockchain_data';
     } else if (queryUpper.includes('DISPENSER') || queryUpper.includes('dispensers')) {
       category = 'dispenser';
