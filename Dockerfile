@@ -27,7 +27,9 @@ RUN apk add --no-cache \
     font-freefont \
     mesa-gbm \
     libdrm \
-    && rm -rf /var/cache/apk/*
+    libgcc \
+    && rm -rf /var/cache/apk/* \
+    && cp /usr/lib/libgcc_s.so.1 /usr/local/lib/libgcc_s.so.1
 
 # Create necessary directories
 RUN mkdir -p /app \
