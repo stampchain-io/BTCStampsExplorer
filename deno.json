@@ -157,7 +157,7 @@
     "mysql/": "https://deno.land/x/mysql@v2.12.1/",
     "preact": "https://esm.sh/preact@10.27.2",
     "preact/": "https://esm.sh/preact@10.27.2/",
-    "puppeteer": "https://deno.land/x/puppeteer@16.2.0/mod.ts",
+    "puppeteer": "npm:puppeteer-core@23.11.1",
     "qrcode": "https://esm.sh/qrcode@1.5.1",
     "redis": "https://deno.land/x/redis@v0.40.0/mod.ts",
     "swiper/": "https://esm.sh/swiper@11.1.14/",
