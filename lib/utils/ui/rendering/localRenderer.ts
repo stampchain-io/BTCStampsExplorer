@@ -1,6 +1,7 @@
 /**
- * Local HTML to PNG rendering using Puppeteer with lightweight Chrome
- * No external dependencies - runs entirely on our server
+ * Local HTML to PNG rendering using Puppeteer-core with system Chromium
+ * Uses npm:puppeteer-core for Deno 2.x compatibility (deno.land/x/puppeteer
+ * uses deprecated Deno.run API removed in Deno 2.x)
  */
 
 import puppeteer from "puppeteer";
@@ -30,8 +31,11 @@ export function isLocalRenderingAvailable(): boolean {
       return available;
     }
 
-    // No explicit path set - assume Puppeteer bundled Chrome may be available (dev mode)
-    return true;
+    // No explicit path set - Chrome not available in production
+    console.warn(
+      "[LocalRenderer] PUPPETEER_EXECUTABLE_PATH not set, Chrome rendering unavailable",
+    );
+    return false;
   } catch (error) {
     console.warn("[LocalRenderer] Chrome availability check failed:", error);
     return false;
@@ -49,24 +53,25 @@ export async function renderHtmlLocal(
     width = 1200,
     height = 1200,
     delay = 5000,
-    quality = 90,
   } = options;
 
   console.log(`[LocalRenderer] Rendering ${stampPageUrl} with local Chrome`);
 
   let browser;
   try {
-    // Use PUPPETEER_EXECUTABLE_PATH if set (Docker), otherwise let Puppeteer use its bundled Chrome
-    // Server-side only - Deno APIs not available in browser
-    const executablePath =
-      typeof window === "undefined" && typeof Deno !== "undefined"
-        ? Deno.env.get("PUPPETEER_EXECUTABLE_PATH")
-        : undefined;
+    const executablePath = typeof Deno !== "undefined"
+      ? Deno.env.get("PUPPETEER_EXECUTABLE_PATH")
+      : undefined;
 
-    // Launch browser with minimal flags for headless environment
-    const launchOptions: any = {
-      headless: "new" as any, // Puppeteer types may not be up to date with "new" option
-      dumpio: true, // Pipe Chrome process stderr/stdout for debugging
+    if (!executablePath) {
+      throw new Error(
+        "PUPPETEER_EXECUTABLE_PATH not set - Chrome binary location unknown",
+      );
+    }
+
+    browser = await puppeteer.launch({
+      headless: true,
+      executablePath,
       args: [
         "--no-sandbox",
         "--disable-setuid-sandbox",
@@ -91,23 +96,9 @@ export async function renderHtmlLocal(
         height,
         deviceScaleFactor: 1,
       },
-    };
-
-    // Only add executablePath if it's defined
-    if (executablePath) {
-      launchOptions.executablePath = executablePath;
-    }
-
-    browser = await puppeteer.launch(launchOptions);
+    });
 
     const page = await browser.newPage();
-
-    // Set viewport
-    await page.setViewport({
-      width,
-      height,
-      deviceScaleFactor: 1,
-    });
 
     // Navigate to the stamp page
     await page.goto(stampPageUrl, {
@@ -115,13 +106,12 @@ export async function renderHtmlLocal(
       timeout: 30000,
     });
 
-    // Wait for any dynamic content to load
-    await page.waitForTimeout(delay);
+    // Wait for dynamic content to load
+    await new Promise((resolve) => setTimeout(resolve, delay));
 
     // Take screenshot
     const screenshot = await page.screenshot({
       type: "png",
-      quality,
       fullPage: false,
       clip: {
         x: 0,
@@ -148,15 +138,13 @@ export async function renderHtmlLocal(
     console.error(`[LocalRenderer] Full error stack:`, errorStack);
     console.error(`[LocalRenderer] Error type:`, errorName);
 
-    // Server-side only error logging
-    if (typeof window === "undefined" && typeof Deno !== "undefined") {
+    if (typeof Deno !== "undefined") {
       console.error(
         `[LocalRenderer] Chrome path:`,
         Deno.env.get("PUPPETEER_EXECUTABLE_PATH"),
       );
     }
 
-    // Always throw the original error to see what's really happening
     throw new Error(`Chrome launch failed: ${errorMessage}`);
   } finally {
     if (browser) {
