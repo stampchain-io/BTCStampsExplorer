@@ -95,12 +95,15 @@ export const handler: Handlers = {
 
             // Use integer scaling for pixel-perfect results
             // Ensure minimum scale of 2 for very small images
-            const scale = Math.max(2, Math.floor(targetSize / maxDimension));
-            const scaledWidth = Math.min(sourceImage.width * scale, targetSize);
-            const scaledHeight = Math.min(
-              sourceImage.height * scale,
-              targetSize,
+            // Cap scale so scaled dimensions never exceed targetSize
+            const rawScale = Math.max(2, Math.floor(targetSize / maxDimension));
+            const scale = Math.min(
+              rawScale,
+              Math.floor(targetSize / sourceImage.width),
+              Math.floor(targetSize / sourceImage.height),
             );
+            const scaledWidth = sourceImage.width * scale;
+            const scaledHeight = sourceImage.height * scale;
 
             // Create output image with padding to make it square
             const outputImage = new Image(targetSize, targetSize);
@@ -113,19 +116,19 @@ export const handler: Handlers = {
             const offsetX = Math.floor((targetSize - scaledWidth) / 2);
             const offsetY = Math.floor((targetSize - scaledHeight) / 2);
 
-            // Perform nearest-neighbor upscaling
+            // Perform nearest-neighbor upscaling with bounds checking
             for (let y = 0; y < sourceImage.height; y++) {
               for (let x = 0; x < sourceImage.width; x++) {
                 const pixel = sourceImage.getPixelAt(x + 1, y + 1); // ImageScript uses 1-indexed
 
                 // Draw scaled pixel block
                 for (let dy = 0; dy < scale; dy++) {
+                  const py = offsetY + y * scale + dy + 1; // 1-indexed
+                  if (py < 1 || py > targetSize) continue;
                   for (let dx = 0; dx < scale; dx++) {
-                    outputImage.setPixelAt(
-                      offsetX + x * scale + dx + 1,
-                      offsetY + y * scale + dy + 1,
-                      pixel,
-                    );
+                    const px = offsetX + x * scale + dx + 1; // 1-indexed
+                    if (px < 1 || px > targetSize) continue;
+                    outputImage.setPixelAt(px, py, pixel);
                   }
                 }
               }
