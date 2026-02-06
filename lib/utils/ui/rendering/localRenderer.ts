@@ -87,8 +87,8 @@ export async function renderHtmlLocal(
         "--disable-features=TranslateUI",
         "--disable-software-rasterizer",
         "--memory-pressure-off",
-        "--single-process",
         "--no-zygote",
+        "--js-flags=--max-old-space-size=256",
         `--window-size=${width},${height}`,
       ],
       defaultViewport: {
