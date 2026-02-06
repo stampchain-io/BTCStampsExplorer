@@ -368,11 +368,20 @@ export const handler: Handlers = {
         }
 
         try {
-          // Render the raw stamp HTML content directly, not the full stampchain.io page
-          const stampPageUrl = stamp_url;
+          // Use the /content/ endpoint (same as the website iframe) instead of
+          // raw stamp_url. This fixes two issues:
+          // 1. Some stamp files are served with content-type: binary/octet-stream
+          //    which causes Chrome to download instead of render (net::ERR_ABORTED)
+          // 2. The /content/ handler cleans Cloudflare Rocket Loader script mangling
+          // 3. Relative URLs (e.g., /s/{cpid}) resolve correctly on localhost
+          const urlParts = stamp_url.split("/stamps/");
+          const filename = urlParts.length > 1 ? urlParts[1] : stamp_url;
+          const htmlIdentifier = filename.replace(/\.html?$/i, "");
+          const stampPageUrl =
+            `http://localhost:8000/content/${htmlIdentifier}`;
 
           console.log(
-            `[HTML Preview] Starting render for stamp ${stampNumber} from ${stampPageUrl}`,
+            `[HTML Preview] Starting render for stamp ${stampNumber} via /content/ endpoint`,
           );
 
           // Determine if this is complex content (for extended render time)
@@ -404,9 +413,6 @@ export const handler: Handlers = {
           const errorMessage = htmlError instanceof Error
             ? htmlError.message
             : String(htmlError);
-          const errorStack = htmlError instanceof Error
-            ? htmlError.stack
-            : undefined;
           console.error(
             `[HTML Preview] Rendering failed for stamp ${stampNumber}: ${errorMessage}`,
           );

@@ -26,7 +26,9 @@ export function isLocalRenderingAvailable(): boolean {
       const stat = Deno.statSync(executablePath);
       const available = stat.isFile;
       console.log(
-        `[LocalRenderer] Chrome binary at ${executablePath}: ${available ? "found" : "not found"}`,
+        `[LocalRenderer] Chrome binary at ${executablePath}: ${
+          available ? "found" : "not found"
+        }`,
       );
       return available;
     }
