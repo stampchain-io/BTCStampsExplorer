@@ -13,13 +13,24 @@ export interface LocalRenderOptions {
 }
 
 /**
- * Check if Puppeteer/Chrome is available
+ * Check if Puppeteer/Chrome is available by verifying the binary exists
  */
 export function isLocalRenderingAvailable(): boolean {
   try {
-    // Always return true - Puppeteer will handle browser availability
-    // In Docker: uses PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
-    // In dev: uses Puppeteer's bundled Chrome (auto-downloaded)
+    const executablePath = typeof Deno !== "undefined"
+      ? Deno.env.get("PUPPETEER_EXECUTABLE_PATH")
+      : undefined;
+
+    if (executablePath) {
+      const stat = Deno.statSync(executablePath);
+      const available = stat.isFile;
+      console.log(
+        `[LocalRenderer] Chrome binary at ${executablePath}: ${available ? "found" : "not found"}`,
+      );
+      return available;
+    }
+
+    // No explicit path set - assume Puppeteer bundled Chrome may be available (dev mode)
     return true;
   } catch (error) {
     console.warn("[LocalRenderer] Chrome availability check failed:", error);

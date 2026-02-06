@@ -10,10 +10,21 @@ ENV HOME=/app \
     XDG_CACHE_HOME=/app/.cache \
     XDG_DATA_HOME=/app/.local/share \
     NPM_CONFIG_CACHE=/app/.npm \
-    REDIS_LOG_LEVEL=DEBUG
+    REDIS_LOG_LEVEL=DEBUG \
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser \
+    PUPPETEER_SKIP_DOWNLOAD=true
 
-# Install additional tools
-RUN apk add --no-cache bash curl
+# Install additional tools + Chromium for HTML stamp preview rendering
+RUN apk add --no-cache \
+    bash \
+    curl \
+    chromium \
+    nss \
+    freetype \
+    harfbuzz \
+    font-noto-emoji \
+    font-freefont \
+    && rm -rf /var/cache/apk/*
 
 # Create necessary directories
 RUN mkdir -p /app \
