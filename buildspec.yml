@@ -30,7 +30,15 @@ phases:
     commands:
       - echo "Build started on $(date)"
       # Modify Dockerfile to use our ECR cached base image before building
-      - sed -i "s|FROM denoland/deno:alpine-2.4.2|FROM $ECR_URI/$BASE_REPOSITORY_NAME:alpine-2.4.2|g" Dockerfile || echo "Dockerfile substitution failed, trying original build"
+      # Dynamically match Deno Alpine version in Dockerfile to use ECR-cached base image
+      - DENO_VERSION=$(grep -oP 'FROM denoland/deno:alpine-\K[0-9.]+' Dockerfile | head -1)
+      - |
+        if [ -n "$DENO_VERSION" ]; then
+          echo "Detected Deno version: $DENO_VERSION"
+          sed -i "s|FROM denoland/deno:alpine-${DENO_VERSION}|FROM $ECR_URI/$BASE_REPOSITORY_NAME:alpine-${DENO_VERSION}|g" Dockerfile
+        else
+          echo "Could not detect Deno version from Dockerfile, using Docker Hub directly"
+        fi
       - docker build --platform=linux/amd64 -t $ECR_URI/$ECR_REPOSITORY_NAME:latest .
   post_build:
     commands:

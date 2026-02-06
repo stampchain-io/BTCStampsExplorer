@@ -31,7 +31,7 @@ fi
 # Configuration
 AWS_REGION="us-east-1"
 AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-ECR_REPOSITORY="stamps-app/front-end"
+ECR_REPOSITORY="btc-stamps-explorer"
 IMAGE_TAG="latest"
 CLUSTER_NAME="stamps-app-prod"
 SERVICE_NAME="stamps-app-service"
