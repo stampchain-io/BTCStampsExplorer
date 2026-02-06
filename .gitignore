@@ -200,6 +200,18 @@ _fresh/
 package-lock.json
 .roo/
 
+# Claude Code remote sessions
+.claude-remote/
+
+# Quality gate artifacts (local tooling)
+.quality.json
+.quality-baselines.json
+
+# Build output artifacts
+current-latest-tag.txt
+current-version-tag.txt
+task-def-manual.json
+
 # Added by Task Master AI
 dev-debug.log
 # Dependency directories
