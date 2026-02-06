@@ -23,7 +23,7 @@ echo "======================================================"
 # Configuration
 AWS_REGION="us-east-1"
 AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-ECR_REPOSITORY="stamps-app/front-end"
+ECR_REPOSITORY="btc-stamps-explorer"
 CODEBUILD_PROJECT="stamps-app-build"
 TIMESTAMP=$(date +"%Y%m%d%H%M%S")
 GIT_COMMIT=$(git rev-parse --short HEAD)
