@@ -368,24 +368,11 @@ export const handler: Handlers = {
         }
 
         try {
-          // Create the stamp page URL for rendering
-          const requestUrl = new URL(_req.url);
-          const protocol = requestUrl.hostname === "localhost"
-            ? "http:"
-            : "https:";
-          const stampPageUrl =
-            `${protocol}//${requestUrl.host}/stamp/${stampNumber}`;
+          // Render the raw stamp HTML content directly, not the full stampchain.io page
+          const stampPageUrl = stamp_url;
 
           console.log(
-            `[HTML Preview] Starting render for stamp ${stampNumber}`,
-            {
-              stampPageUrl,
-              stamp: stampNumber,
-              mimetype: stamp_mimetype,
-              dockerPath: Deno.env.get("PUPPETEER_EXECUTABLE_PATH"),
-              isDocker: Deno.env.get("PUPPETEER_EXECUTABLE_PATH") ===
-                "/usr/bin/chromium-browser",
-            },
+            `[HTML Preview] Starting render for stamp ${stampNumber} from ${stampPageUrl}`,
           );
 
           // Determine if this is complex content (for extended render time)
@@ -400,14 +387,7 @@ export const handler: Handlers = {
           );
 
           console.log(
-            `[HTML Preview] Successfully rendered stamp ${stampNumber}`,
-            {
-              stamp: stampNumber,
-              method,
-              bufferSize: pngBuffer.length,
-              isComplex,
-              renderTime: isComplex ? "extended" : "standard",
-            },
+            `[HTML Preview] Successfully rendered stamp ${stampNumber}, size=${pngBuffer.length}`,
           );
 
           return WebResponseUtil.binaryResponse(pngBuffer, "image/png", {
@@ -428,18 +408,7 @@ export const handler: Handlers = {
             ? htmlError.stack
             : undefined;
           console.error(
-            "[HTML Preview] Rendering failed for stamp",
-            stampNumber,
-            {
-              error: errorMessage,
-              stack: errorStack,
-              stamp: stampNumber,
-              mimetype: stamp_mimetype,
-              dockerPath: Deno.env.get("PUPPETEER_EXECUTABLE_PATH"),
-              isDocker: Deno.env.get("PUPPETEER_EXECUTABLE_PATH") ===
-                "/usr/bin/chromium-browser",
-              fallbackUsed: "default-logo",
-            },
+            `[HTML Preview] Rendering failed for stamp ${stampNumber}: ${errorMessage}`,
           );
           return WebResponseUtil.redirect(
             "https://stampchain.io/img/logo/stampchain-logo-opengraph.jpg",
