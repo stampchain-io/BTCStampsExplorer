@@ -66,6 +66,7 @@ export async function renderHtmlLocal(
     // Launch browser with minimal flags for headless environment
     const launchOptions: any = {
       headless: "new" as any, // Puppeteer types may not be up to date with "new" option
+      dumpio: true, // Pipe Chrome process stderr/stdout for debugging
       args: [
         "--no-sandbox",
         "--disable-setuid-sandbox",
@@ -81,6 +82,8 @@ export async function renderHtmlLocal(
         "--disable-features=TranslateUI",
         "--disable-software-rasterizer",
         "--memory-pressure-off",
+        "--single-process",
+        "--no-zygote",
         `--window-size=${width},${height}`,
       ],
       defaultViewport: {

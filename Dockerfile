@@ -22,8 +22,11 @@ RUN apk add --no-cache \
     nss \
     freetype \
     harfbuzz \
+    ca-certificates \
     font-noto-emoji \
     font-freefont \
+    mesa-gbm \
+    libdrm \
     && rm -rf /var/cache/apk/*
 
 # Create necessary directories
