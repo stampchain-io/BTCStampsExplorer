@@ -26,21 +26,9 @@ NC='\033[0m' # No Color
 # Load environment variables from .env file if it exists
 if [ -f .env ]; then
     echo -e "${GREEN}Loading environment variables from .env${NC}"
-    # More robust way to load .env variables
-    while IFS='=' read -r key value || [ -n "$key" ]; do
-        # Skip comments and empty lines
-        [[ $key == \#* ]] && continue
-        [[ -z "$key" ]] && continue
-
-        # Remove any inline comments from the value
-        value=$(echo "$value" | sed 's/[[:space:]]*#.*$//')
-
-        # Clear any carriage returns or other special characters that might be in the value
-        value=$(echo "$value" | tr -d '\r')
-
-        # Export the variable
-        export "$key=$value"
-    done < .env
+    set -a
+    source .env
+    set +a
 fi
 
 # Default values from .env file or fallback to defaults
