@@ -369,7 +369,11 @@ Deno.test("handleImageError - handles HTMLImageElement", () => {
 
   try {
     handleImageError(event as any);
-    assertEquals(mockImg.src, "");
+    // Uses transparent pixel data URI to prevent infinite error loops
+    assertEquals(
+      mockImg.src,
+      "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+    );
     assertEquals(mockImg.alt, "Content not available");
   } catch (error) {
     // Expected in test environment - DOM APIs not available
