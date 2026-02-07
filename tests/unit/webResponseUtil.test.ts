@@ -21,8 +21,8 @@ Deno.test("WebResponseUtil - success creates 200 response", async () => {
   assertEquals(response.status, 200);
   assertEquals(
     response.headers.get("Content-Type"),
-    "text/plain;charset=UTF-8",
-  ); // normalizeHeaders changes this
+    "application/json",
+  ); // normalizeHeaders correctly finds uppercase Content-Type
   assertExists(response.headers.get("X-API-Version"));
 
   const body = await response.json();
