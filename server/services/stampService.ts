@@ -274,7 +274,7 @@ export class StampService {
         }
 
         const marketData = marketDataMap.get(stamp.cpid) || null;
-        return this.enrichStampWithMarketData(stamp, marketData, options.btcPriceUSD || 0);
+        return this.enrichStampWithMarketData(stamp, marketData as StampMarketData | null, options.btcPriceUSD || 0);
       });
     }
 
@@ -739,7 +739,7 @@ export class StampService {
     // Enrich each stamp with USD calculations and cache status
     return stampsWithMarketData.map(stampData => {
       const { marketData, cacheStatus: _cacheStatus, cacheAgeMinutes: _cacheAgeMinutes, ...stamp } = stampData;
-      return this.enrichStampWithMarketData(stamp, marketData, options.btcPriceUSD);
+      return this.enrichStampWithMarketData(stamp, marketData as StampMarketData | null, options.btcPriceUSD);
     });
   }
 
@@ -764,7 +764,9 @@ export class StampService {
    */
   static async getBulkStampMarketData(cpids: string[]): Promise<Map<string, StampMarketData>> {
     try {
-      return await MarketDataRepository.getBulkStampMarketData(cpids);
+      const result = await MarketDataRepository.getBulkStampMarketData(cpids);
+      // Cast to compatible type - both StampMarketData types are compatible at runtime
+      return result as Map<string, StampMarketData>;
     } catch (error) {
       logger.error("stamps", {
         message: "Error getting bulk stamp market data",
