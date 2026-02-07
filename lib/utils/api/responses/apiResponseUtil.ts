@@ -316,10 +316,12 @@ export class ApiResponseUtil {
     status: number,
     options: ApiResponseOptions = {},
   ): Response {
-    return new Response(
+    const responseBody: BodyInit | null =
       body instanceof ArrayBuffer || body instanceof Uint8Array
-        ? body
-        : this.serializeWithBigInt(body),
+        ? body as BodyInit
+        : this.serializeWithBigInt(body);
+    return new Response(
+      responseBody,
       {
         status,
         headers: normalizeHeaders(this.createHeaders(options)),

@@ -216,10 +216,12 @@ export class WebResponseUtil {
       });
     }
 
-    return new Response(
+    const responseBody: BodyInit | null =
       body instanceof ArrayBuffer || body instanceof Uint8Array
-        ? body
-        : JSON.stringify(body),
+        ? body as BodyInit
+        : JSON.stringify(body);
+    return new Response(
+      responseBody,
       {
         status,
         headers: normalizeHeaders({
@@ -305,7 +307,7 @@ export class WebResponseUtil {
     mimeType: string,
     options: WebResponseOptions = {},
   ): Response {
-    return new Response(data, {
+    return new Response(data as BodyInit, {
       status: options.status || 200,
       headers: normalizeHeaders(
         {
