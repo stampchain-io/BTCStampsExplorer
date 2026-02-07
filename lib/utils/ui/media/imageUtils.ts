@@ -107,6 +107,14 @@ export const mimeTypeToSuffix = Object.entries(mimeTypes).reduce(
   {} as { [key: string]: string },
 );
 
+/**
+ * Get the preview PNG URL for a stamp (rendered server-side via Chrome/ImageScript).
+ * Used in grid/listing views where a static preview is preferred over live HTML/SVG.
+ */
+export const getStampPreviewUrl = (stamp: StampRow): string => {
+  return `/api/v2/stamp/${stamp.stamp}/preview`;
+};
+
 export const getStampImageSrc = (stamp: StampRow): string | undefined => {
   const baseUrl = getBaseUrl();
   if (!stamp.stamp_url) {
@@ -219,8 +227,10 @@ export function showFallback(_element: HTMLElement) {
 
 export function handleImageError(e: Event) {
   if (e.currentTarget instanceof HTMLImageElement) {
-    // Set src to empty string to trigger placeholder rendering
-    e.currentTarget.src = "";
+    // Use transparent pixel data URI to prevent infinite error loops
+    // (setting src="" resolves to the page URL, which isn't an image → re-triggers error)
+    e.currentTarget.src =
+      "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
     e.currentTarget.alt = "Content not available";
   } else if (e.currentTarget instanceof HTMLIFrameElement) {
     // Hide the iframe - parent component should handle placeholder
