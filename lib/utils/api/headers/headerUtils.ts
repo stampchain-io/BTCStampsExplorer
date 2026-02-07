@@ -10,9 +10,12 @@ export function normalizeHeaders(
     ? Object.fromEntries(headers)
     : headers;
 
-  // Special handling for content-type
-  if (headerMap["content-type"]) {
-    const [baseType] = headerMap["content-type"].split(",")[0].trim().split(
+  // Special handling for content-type (case-insensitive key lookup)
+  const ctKey = Object.keys(headerMap).find(
+    (k) => k.toLowerCase() === "content-type",
+  );
+  if (ctKey && headerMap[ctKey]) {
+    const [baseType] = headerMap[ctKey].split(",")[0].trim().split(
       ";",
     );
     // Add charset for text-based content
@@ -27,10 +30,13 @@ export function normalizeHeaders(
     }
   }
 
-  // Process vary header separately
+  // Process vary header separately (case-insensitive key lookup)
+  const varyKey = Object.keys(headerMap).find(
+    (k) => k.toLowerCase() === "vary",
+  );
   const varyValues = new Set<string>();
-  if (headerMap["vary"]) {
-    headerMap["vary"].split(",").forEach((v) => varyValues.add(v.trim()));
+  if (varyKey && headerMap[varyKey]) {
+    headerMap[varyKey].split(",").forEach((v) => varyValues.add(v.trim()));
   }
 
   // Add standard vary values

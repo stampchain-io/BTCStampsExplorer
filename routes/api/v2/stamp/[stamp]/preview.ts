@@ -3,11 +3,12 @@
  *
  * Supported formats:
  * - SVG: Converted to PNG using resvg-wasm with proper padding
+ * - SVG with foreignObject: Rendered via Chrome (resvg-wasm can't handle embedded HTML)
  * - PNG/JPEG/GIF/TIFF: Upscaled using ImageScript with pixel-perfect scaling
- * - HTML: Rendered using local Chrome instance
- *
- * Unsupported formats (fallback to original or logo):
- * - WebP, BMP, AVIF: Not supported by ImageScript decoder
+ * - WebP/BMP/AVIF: Rendered via Chrome screenshot (ImageScript can't decode these)
+ * - HTML: Rendered using local Chrome instance with content-aware cropping
+ * - Audio: Stylized waveform visualization generated with ImageScript
+ * - Video: First frame extracted via Chrome <video> element
  *
  * All images are output as 1200x1200 PNG with compression level 9
  *
@@ -100,14 +101,26 @@ async function renderPreview(
   const { stamp_url, stamp_mimetype, stamp: stampNumber } = stampData;
 
   // Raster images (PNG, JPEG, GIF, TIFF) — upscale with ImageScript
+  // WebP/BMP/AVIF fall through to Chrome rendering on ImageScript failure
   if (
     stamp_mimetype?.startsWith("image/") &&
     stamp_mimetype !== "image/svg+xml"
   ) {
-    return await renderRasterPreview(stamp_url, stamp_mimetype, stampNumber);
+    const result = await renderRasterPreview(
+      stamp_url,
+      stamp_mimetype,
+      stampNumber,
+    );
+    if (result) return result;
+    // ImageScript couldn't decode (WebP/BMP/AVIF) — try Chrome
+    return await renderImageWithChrome(
+      stamp_url,
+      stamp_mimetype,
+      stampNumber,
+    );
   }
 
-  // SVG — convert with resvg-wasm
+  // SVG — convert with resvg-wasm (or Chrome for foreignObject SVGs)
   if (stamp_mimetype === "image/svg+xml") {
     return await renderSvgPreview(stamp_url, stamp_mimetype, stampNumber);
   }
@@ -115,6 +128,16 @@ async function renderPreview(
   // HTML — render with local Chrome
   if (stamp_mimetype === "text/html") {
     return await renderHtmlPreview(stamp_url, stamp_mimetype, stampNumber);
+  }
+
+  // Audio — generate waveform visualization
+  if (stamp_mimetype?.startsWith("audio/")) {
+    return await renderAudioPreview(stamp_url, stamp_mimetype, stampNumber);
+  }
+
+  // Video — extract first frame via Chrome
+  if (stamp_mimetype?.startsWith("video/")) {
+    return await renderVideoPreview(stamp_url, stamp_mimetype, stampNumber);
   }
 
   // Unsupported content type
@@ -209,8 +232,6 @@ async function renderSvgPreview(
   stamp_mimetype: string,
   stampNumber: number | undefined,
 ): Promise<CachedPreview | null> {
-  await ensureWasmInitialized();
-
   const svgResponse = await fetch(stamp_url);
   if (!svgResponse.ok) {
     console.error(`Failed to fetch SVG: ${svgResponse.status}`);
@@ -218,6 +239,21 @@ async function renderSvgPreview(
   }
 
   const svgContent = await svgResponse.text();
+
+  // SVGs with <foreignObject> embed HTML content that resvg-wasm cannot render.
+  // Route these to Chrome which handles foreignObject natively.
+  if (svgContent.includes("<foreignObject")) {
+    console.log(
+      `[SVG Preview] Stamp ${stampNumber} uses foreignObject — routing to Chrome`,
+    );
+    return await renderSvgWithChrome(
+      stamp_url,
+      stamp_mimetype,
+      stampNumber,
+    );
+  }
+
+  await ensureWasmInitialized();
 
   const hasAnimations = svgContent.includes("@keyframes") ||
     svgContent.includes("animation:") ||
@@ -304,6 +340,39 @@ async function renderSvgPreview(
   };
 }
 
+/**
+ * Render SVGs containing foreignObject using Chrome.
+ * Chrome handles foreignObject natively, including embedded HTML and images.
+ */
+async function renderSvgWithChrome(
+  stamp_url: string,
+  stamp_mimetype: string,
+  stampNumber: number | undefined,
+): Promise<CachedPreview | null> {
+  if (!isLocalRenderingReady) {
+    console.error(
+      "[SVG Preview] Chrome not available for foreignObject SVG",
+      { stamp: stampNumber },
+    );
+    return null;
+  }
+
+  // Navigate Chrome directly to the SVG URL on the CDN
+  const renderOptions = getOptimalLocalOptions(false);
+  const { buffer: screenshotBuffer, method, contentBounds } =
+    await renderHtmlSmart(stamp_url, renderOptions);
+
+  const result = await centerOnCanvas(screenshotBuffer, {
+    stampNumber,
+    stamp_mimetype,
+    method,
+    contentBounds,
+  });
+  result.meta["X-Rendering-Engine"] = "local-chrome";
+  result.meta["X-ForeignObject"] = "true";
+  return result;
+}
+
 async function renderHtmlPreview(
   stamp_url: string,
   stamp_mimetype: string,
@@ -337,32 +406,267 @@ async function renderHtmlPreview(
     stamp_url?.includes("canvas");
 
   const renderOptions = getOptimalLocalOptions(isComplex);
-  const { buffer: pngBuffer, method } = await renderHtmlSmart(
-    stampPageUrl,
-    renderOptions,
-  );
+  const { buffer: screenshotBuffer, method, contentBounds } =
+    await renderHtmlSmart(stampPageUrl, renderOptions);
+
+  const result = await centerOnCanvas(screenshotBuffer, {
+    stampNumber,
+    stamp_mimetype,
+    method,
+    contentBounds,
+  });
+  result.meta["X-Render-Time"] = isComplex ? "extended" : "standard";
+  result.meta["X-Rendering-Engine"] = "local-chrome";
+  return result;
+}
+
+/**
+ * Render unsupported image formats (WebP, BMP, AVIF) via Chrome screenshot.
+ * Chrome can display these natively even though ImageScript can't decode them.
+ */
+async function renderImageWithChrome(
+  stamp_url: string,
+  stamp_mimetype: string,
+  stampNumber: number | undefined,
+): Promise<CachedPreview | null> {
+  if (!isLocalRenderingReady) {
+    console.log(
+      `[Image Preview] Chrome not available for ${stamp_mimetype} stamp ${stampNumber}`,
+    );
+    return null;
+  }
 
   console.log(
-    `[HTML Preview] Successfully rendered stamp ${stampNumber}, size=${pngBuffer.length}`,
+    `[Image Preview] Rendering ${stamp_mimetype} stamp ${stampNumber} via Chrome`,
   );
+
+  const renderOptions = getOptimalLocalOptions(false);
+  const { buffer: screenshotBuffer, method, contentBounds } =
+    await renderHtmlSmart(stamp_url, renderOptions);
+
+  return centerOnCanvas(screenshotBuffer, {
+    stampNumber,
+    stamp_mimetype,
+    method,
+    contentBounds,
+  });
+}
+
+/**
+ * Generate a stylized audio waveform visualization.
+ * Uses a deterministic pseudo-random pattern seeded from the stamp URL
+ * to create a unique waveform for each audio stamp.
+ */
+async function renderAudioPreview(
+  stamp_url: string,
+  stamp_mimetype: string,
+  stampNumber: number | undefined,
+): Promise<CachedPreview | null> {
+  const targetSize = 1200;
+  const outputImage = new Image(targetSize, targetSize);
+  const bgColor = 0x14001fff; // dark purple background
+  outputImage.fill(bgColor);
+
+  // Generate deterministic seed from stamp URL
+  let seed = 0;
+  for (let i = 0; i < stamp_url.length; i++) {
+    seed = ((seed << 5) - seed + stamp_url.charCodeAt(i)) | 0;
+  }
+  const rng = (n: number) => {
+    seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+    return seed % n;
+  };
+
+  // Draw waveform bars
+  const barCount = 64;
+  const barWidth = Math.floor(targetSize * 0.7 / barCount);
+  const gap = 2;
+  const totalWidth = barCount * (barWidth + gap);
+  const startX = Math.floor((targetSize - totalWidth) / 2);
+  const centerY = Math.floor(targetSize * 0.50);
+  const maxBarHeight = Math.floor(targetSize * 0.30);
+
+  // Waveform color: orange/amber gradient
+  const colors = [0xf59e0bff, 0xf97316ff, 0xef4444ff, 0xec4899ff];
+
+  for (let i = 0; i < barCount; i++) {
+    // Smooth waveform shape with some randomness
+    const t = i / barCount;
+    const envelope = Math.sin(t * Math.PI) * 0.7 + 0.3;
+    const variation = 0.3 + (rng(700) / 1000);
+    const barHeight = Math.floor(maxBarHeight * envelope * variation);
+    const x = startX + i * (barWidth + gap);
+
+    const color = colors[rng(colors.length)];
+
+    // Draw bar (symmetric above and below center)
+    for (let dy = -barHeight; dy <= barHeight; dy++) {
+      const py = centerY + dy;
+      if (py < 1 || py > targetSize) continue;
+      for (let dx = 0; dx < barWidth; dx++) {
+        const px = x + dx;
+        if (px < 1 || px > targetSize) continue;
+        outputImage.setPixelAt(px, py, color);
+      }
+    }
+  }
+
+  // Draw play button circle in center
+  const circleR = 60;
+  const cx = Math.floor(targetSize / 2);
+  const cy = Math.floor(targetSize * 0.50);
+  for (let dy = -circleR; dy <= circleR; dy++) {
+    for (let dx = -circleR; dx <= circleR; dx++) {
+      if (dx * dx + dy * dy <= circleR * circleR) {
+        const px = cx + dx;
+        const py = cy + dy;
+        if (px >= 1 && px <= targetSize && py >= 1 && py <= targetSize) {
+          outputImage.setPixelAt(px, py, 0x14001fcc); // semi-transparent bg
+        }
+      }
+    }
+  }
+  // Draw triangle (play icon) inside circle
+  const triSize = 30;
+  for (let row = -triSize; row <= triSize; row++) {
+    const halfWidth = Math.floor(((row + triSize) / (triSize * 2)) * triSize);
+    for (let col = -5; col < halfWidth; col++) {
+      const px = cx + col + 8;
+      const py = cy + row;
+      if (px >= 1 && px <= targetSize && py >= 1 && py <= targetSize) {
+        outputImage.setPixelAt(px, py, 0xffffffff);
+      }
+    }
+  }
+
+  const pngBuffer = await outputImage.encode(9);
 
   return {
     png: toBase64(pngBuffer),
     meta: {
       "X-Stamp-Number": stampNumber?.toString() || "unknown",
       "X-Original-Type": stamp_mimetype,
-      "X-Conversion-Method": method,
-      "X-Render-Time": isComplex ? "extended" : "standard",
-      "X-Rendering-Engine": "local-chrome",
+      "X-Conversion-Method": "imagescript-waveform",
+      "X-Dimensions": "1200x1200",
+    },
+  };
+}
+
+/**
+ * Extract the first frame of a video using Chrome.
+ * Creates a minimal HTML page with a <video> element, waits for it to load,
+ * and takes a screenshot.
+ */
+async function renderVideoPreview(
+  stamp_url: string,
+  stamp_mimetype: string,
+  stampNumber: number | undefined,
+): Promise<CachedPreview | null> {
+  if (!isLocalRenderingReady) {
+    console.log(
+      `[Video Preview] Chrome not available for video stamp ${stampNumber}`,
+    );
+    return null;
+  }
+
+  console.log(
+    `[Video Preview] Extracting first frame for stamp ${stampNumber}`,
+  );
+
+  // Create a data URL with a minimal HTML page that loads and pauses the video
+  const videoHtml = `<!DOCTYPE html>
+<html><head><style>
+  * { margin: 0; padding: 0; }
+  body { background: #14001f; display: flex; align-items: center; justify-content: center; width: 1200px; height: 1200px; overflow: hidden; }
+  video { max-width: 100%; max-height: 100%; object-fit: contain; }
+</style></head><body>
+<video src="${stamp_url}" muted preload="auto" autoplay></video>
+<script>
+  const v = document.querySelector('video');
+  v.addEventListener('loadeddata', () => { v.pause(); v.currentTime = 0; });
+</script></body></html>`;
+
+  const dataUrl = `data:text/html;base64,${btoa(videoHtml)}`;
+
+  const renderOptions = getOptimalLocalOptions(false);
+  const { buffer: screenshotBuffer, contentBounds } = await renderHtmlSmart(
+    dataUrl,
+    renderOptions,
+  );
+
+  return centerOnCanvas(screenshotBuffer, {
+    stampNumber,
+    stamp_mimetype,
+    method: "local-chrome-video",
+    contentBounds,
+  });
+}
+
+/**
+ * Helper: center a screenshot buffer on a 1200x1200 canvas with dark background.
+ * Shared by HTML, image-via-Chrome, SVG-via-Chrome, and video renderers.
+ */
+async function centerOnCanvas(
+  screenshotBuffer: Uint8Array,
+  opts: {
+    stampNumber?: number | undefined;
+    stamp_mimetype: string;
+    method: string;
+    contentBounds?: { width: number; height: number } | undefined;
+  },
+): Promise<CachedPreview> {
+  const targetSize = 1200;
+  const sourceImage = await Image.decode(screenshotBuffer);
+  const srcW = sourceImage.width;
+  const srcH = sourceImage.height;
+
+  let pngBuffer: Uint8Array;
+
+  if (srcW === targetSize && srcH === targetSize) {
+    pngBuffer = screenshotBuffer;
+  } else {
+    const scale = Math.min(targetSize / srcW, targetSize / srcH);
+    const scaledW = Math.round(srcW * scale);
+    const scaledH = Math.round(srcH * scale);
+
+    const resized = sourceImage.resize(scaledW, scaledH);
+    const outputImage = new Image(targetSize, targetSize);
+    outputImage.fill(0x14001fff);
+
+    const offsetX = Math.floor((targetSize - scaledW) / 2);
+    const offsetY = Math.floor((targetSize - scaledH) / 2);
+    outputImage.composite(resized, offsetX, offsetY);
+
+    pngBuffer = await outputImage.encode(9);
+  }
+
+  return {
+    png: toBase64(pngBuffer),
+    meta: {
+      "X-Stamp-Number": opts.stampNumber?.toString() || "unknown",
+      "X-Original-Type": opts.stamp_mimetype,
+      "X-Conversion-Method": opts.method,
+      "X-Content-Size": opts.contentBounds
+        ? `${opts.contentBounds.width}x${opts.contentBounds.height}`
+        : `${srcW}x${srcH}`,
+      "X-Dimensions": "1200x1200",
     },
   };
 }
 
 export const handler: Handlers = {
-  async GET(_req, ctx) {
+  async GET(req, ctx) {
     try {
       const { stamp } = ctx.params;
       const cacheKey = `preview:${stamp}`;
+      const url = new URL(req.url);
+      const forceRefresh = url.searchParams.get("refresh") === "true";
+
+      // Force refresh: delete existing cache entry before rendering
+      if (forceRefresh) {
+        await dbManager.invalidateCacheByPattern(cacheKey);
+        console.log(`[Preview] Force refresh for ${stamp}, cache cleared`);
+      }
 
       // handleCache returns cached data on hit, or calls renderPreview on miss.
       // We use a wrapper to track whether this was a cache hit or fresh render.

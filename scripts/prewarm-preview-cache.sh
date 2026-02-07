@@ -4,16 +4,22 @@
 # Rendered PNGs are cached in Redis with "never" TTL (immutable blockchain data).
 #
 # Usage:
-#   bash scripts/prewarm-preview-cache.sh [BASE_URL] [DELAY_SECONDS]
+#   bash scripts/prewarm-preview-cache.sh [BASE_URL] [DELAY_SECONDS] [--refresh]
 #
 # Examples:
 #   bash scripts/prewarm-preview-cache.sh https://stampchain.io 3
 #   bash scripts/prewarm-preview-cache.sh http://localhost:8000 0.5
+#   bash scripts/prewarm-preview-cache.sh https://stampchain.io 3 --refresh  # force re-render
 #
 set -euo pipefail
 
 BASE_URL="${1:-http://localhost:8000}"
 DELAY="${2:-3}"
+REFRESH_PARAM=""
+if [ "${3:-}" = "--refresh" ]; then
+  REFRESH_PARAM="?refresh=true"
+  echo "*** REFRESH MODE: forcing re-render of all cached previews ***"
+fi
 PAGE_SIZE=50
 PAGE=1
 TOTAL_OK=0
@@ -60,7 +66,7 @@ except Exception as e:
     [ -z "${STAMP_ID}" ] && continue
 
     HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
-      "${BASE_URL}/api/v2/stamp/${STAMP_ID}/preview")
+      "${BASE_URL}/api/v2/stamp/${STAMP_ID}/preview${REFRESH_PARAM}")
 
     if [ "${HTTP_CODE}" = "200" ]; then
       TOTAL_OK=$((TOTAL_OK + 1))
