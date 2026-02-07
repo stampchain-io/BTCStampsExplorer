@@ -1,7 +1,10 @@
 /**
  * Normalizes response headers to prevent duplicates
  */
-export function normalizeHeaders(headers: Headers | Record<string, string>) {
+export function normalizeHeaders(
+  headers: Headers | Record<string, string>,
+  options?: { immutableBinary?: boolean },
+) {
   const normalized = new Headers();
   const headerMap = headers instanceof Headers
     ? Object.fromEntries(headers)
@@ -32,8 +35,10 @@ export function normalizeHeaders(headers: Headers | Record<string, string>) {
 
   // Add standard vary values
   varyValues.add("Accept-Encoding");
-  varyValues.add("X-API-Version");
-  varyValues.add("Origin");
+  if (!options?.immutableBinary) {
+    varyValues.add("X-API-Version");
+    varyValues.add("Origin");
+  }
 
   // Set normalized vary header
   normalized.set("vary", Array.from(varyValues).join(", "));

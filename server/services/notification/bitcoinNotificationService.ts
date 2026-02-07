@@ -30,6 +30,9 @@ export class BitcoinNotificationService {
   }
 
   private static async handleNewBlock(data: BlockNotification) {
+    // NOTE: preview:* cache keys (rendered stamp PNG previews) are intentionally
+    // excluded from block-based invalidation. Stamp content is immutable blockchain
+    // data — once rendered, a preview never changes regardless of new blocks.
     console.log(`Processing new block notification: ${data.blockHeight}`);
 
     // Block-specific cache invalidation
