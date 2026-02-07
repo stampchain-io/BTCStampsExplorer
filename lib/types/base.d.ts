@@ -163,7 +163,7 @@ export interface BTCBalance {
 
 // Temporary definition for missing XcpBalance type
 export interface XcpBalance {
-  address: string;
+  address: string | null;
   cpid: string;
   quantity: number;
   utxo: string;
