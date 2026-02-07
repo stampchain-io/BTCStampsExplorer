@@ -232,11 +232,14 @@ export async function renderHtmlLocal(
       ? { x: 0, y: 0, width, height }
       : contentBounds;
 
-    // Take screenshot clipped to content bounds
+    // Take screenshot clipped to content bounds.
+    // omitBackground: true makes Chrome's default white background transparent
+    // while preserving any background colors explicitly set by the stamp's HTML/CSS.
     const screenshot = await page.screenshot({
       type: "png",
       fullPage: false,
       clip,
+      omitBackground: true,
     });
 
     console.log(

@@ -173,8 +173,7 @@ async function renderRasterPreview(
     const scaledHeight = sourceImage.height * scale;
 
     const outputImage = new Image(targetSize, targetSize);
-    const bgColor = 0x14001fff; // #14001f with full alpha
-    outputImage.fill(bgColor);
+    outputImage.fill(0x00000000); // transparent background
 
     const offsetX = Math.floor((targetSize - scaledWidth) / 2);
     const offsetY = Math.floor((targetSize - scaledHeight) / 2);
@@ -292,7 +291,7 @@ async function renderSvgPreview(
     targetHeight,
   );
 
-  const paddingColor = conversionOptions.padding?.color || "#14001f";
+  const paddingColor = conversionOptions.padding?.color || "transparent";
 
   const viewBoxMatch = processedSvgContent.match(
     /viewBox=["']([^"']+)["']/,
@@ -620,25 +619,21 @@ async function centerOnCanvas(
   const srcW = sourceImage.width;
   const srcH = sourceImage.height;
 
-  let pngBuffer: Uint8Array;
+  // Always re-encode through ImageScript to ensure consistent PNG output
+  // with transparent background (Chrome screenshots may have white bg pixels)
+  const scale = Math.min(targetSize / srcW, targetSize / srcH);
+  const scaledW = Math.round(srcW * scale);
+  const scaledH = Math.round(srcH * scale);
 
-  if (srcW === targetSize && srcH === targetSize) {
-    pngBuffer = screenshotBuffer;
-  } else {
-    const scale = Math.min(targetSize / srcW, targetSize / srcH);
-    const scaledW = Math.round(srcW * scale);
-    const scaledH = Math.round(srcH * scale);
+  const resized = sourceImage.resize(scaledW, scaledH);
+  const outputImage = new Image(targetSize, targetSize);
+  outputImage.fill(0x00000000); // transparent background
 
-    const resized = sourceImage.resize(scaledW, scaledH);
-    const outputImage = new Image(targetSize, targetSize);
-    outputImage.fill(0x14001fff);
+  const offsetX = Math.floor((targetSize - scaledW) / 2);
+  const offsetY = Math.floor((targetSize - scaledH) / 2);
+  outputImage.composite(resized, offsetX, offsetY);
 
-    const offsetX = Math.floor((targetSize - scaledW) / 2);
-    const offsetY = Math.floor((targetSize - scaledH) / 2);
-    outputImage.composite(resized, offsetX, offsetY);
-
-    pngBuffer = await outputImage.encode(9);
-  }
+  const pngBuffer = await outputImage.encode(9);
 
   return {
     png: toBase64(pngBuffer),
