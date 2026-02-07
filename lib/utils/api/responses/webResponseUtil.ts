@@ -17,6 +17,7 @@ export interface WebResponseOptions {
   forceNoCache?: boolean;
   routeType?: RouteType;
   raw?: boolean;
+  immutableBinary?: boolean;
 }
 
 export interface StampResponseOptions extends WebResponseOptions {
@@ -306,12 +307,15 @@ export class WebResponseUtil {
   ): Response {
     return new Response(data, {
       status: options.status || 200,
-      headers: normalizeHeaders({
-        ...getBinaryContentHeaders(mimeType, options),
-        "Content-Type": mimeType,
-        "X-API-Version": API_RESPONSE_VERSION,
-        ...(options.headers || {}),
-      }),
+      headers: normalizeHeaders(
+        {
+          ...getBinaryContentHeaders(mimeType, options),
+          "Content-Type": mimeType,
+          "X-API-Version": API_RESPONSE_VERSION,
+          ...(options.headers || {}),
+        },
+        options.immutableBinary ? { immutableBinary: true } : {},
+      ),
     });
   }
 
