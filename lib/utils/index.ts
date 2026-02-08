@@ -24,8 +24,6 @@ export * from "./ui/formatting/formatUtils.ts";
 export * from "./ui/rendering/svgUtils.ts";
 export * from "./ui/media/imageUtils.ts";
 export * from "./ui/formatting/emojiUtils.ts";
-export * from "./ui/rendering/htmlRenderer.ts";
-export * from "./ui/rendering/localRenderer.ts";
 export * from "./ui/accessibility/accessibilityUtils.ts";
 export * from "./ui/notifications/toastSignal.ts";
 export * from "./bitcoin/calculations/btcCalculations.ts";

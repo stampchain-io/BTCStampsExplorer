@@ -6,5 +6,3 @@
  */
 
 export * from "./svgUtils.ts";
-export * from "./htmlRenderer.ts";
-export * from "./localRenderer.ts";
