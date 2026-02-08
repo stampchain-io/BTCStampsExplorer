@@ -395,20 +395,27 @@ if [ "$CACHE_DENO_IMAGE" = true ]; then
     fi
 
     # Pull, tag, and push the Deno image
-    echo -e "${GREEN}Pulling Deno image version ${DENO_VERSION} from Docker Hub...${NC}"
-    docker pull --platform=linux/amd64 denoland/deno:alpine-${DENO_VERSION}
+    # Determine architecture - default to arm64 (Graviton), override with --arch=amd64 if needed
+    DOCKER_ARCH="${DOCKER_ARCH:-arm64}"
+    ARCH_SUFFIX=""
+    if [ "$DOCKER_ARCH" = "arm64" ]; then
+        ARCH_SUFFIX="-arm64"
+    fi
+
+    echo -e "${GREEN}Pulling Deno image version ${DENO_VERSION} (${DOCKER_ARCH}) from Docker Hub...${NC}"
+    docker pull --platform=linux/${DOCKER_ARCH} denoland/deno:alpine-${DENO_VERSION}
 
     echo -e "${GREEN}Tagging Deno image for ECR...${NC}"
-    docker tag denoland/deno:alpine-${DENO_VERSION} "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$BASE_REPOSITORY_NAME:alpine-${DENO_VERSION}"
+    docker tag denoland/deno:alpine-${DENO_VERSION} "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$BASE_REPOSITORY_NAME:alpine-${DENO_VERSION}${ARCH_SUFFIX}"
 
     echo -e "${GREEN}Pushing Deno image to ECR...${NC}"
-    docker push "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$BASE_REPOSITORY_NAME:alpine-${DENO_VERSION}"
+    docker push "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$BASE_REPOSITORY_NAME:alpine-${DENO_VERSION}${ARCH_SUFFIX}"
 
-    echo -e "${GREEN}Deno image version ${DENO_VERSION} successfully cached to ECR.${NC}"
+    echo -e "${GREEN}Deno image version ${DENO_VERSION} (${DOCKER_ARCH}) successfully cached to ECR.${NC}"
     echo -e "${GREEN}You can now use this image in your Dockerfile or CodeBuild project by replacing:${NC}"
     echo -e "${YELLOW}FROM denoland/deno:alpine-${DENO_VERSION}${NC}"
     echo -e "${GREEN}with:${NC}"
-    echo -e "${YELLOW}FROM ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${BASE_REPOSITORY_NAME}:alpine-${DENO_VERSION}${NC}"
+    echo -e "${YELLOW}FROM ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${BASE_REPOSITORY_NAME}:alpine-${DENO_VERSION}${ARCH_SUFFIX}${NC}"
 
     exit 0
 fi
@@ -483,10 +490,12 @@ elif [ "$BUILD" = true ]; then
         echo -e "${GREEN}ECR repository '$ECR_REPOSITORY_NAME' found.${NC}"
     fi
 
-    echo -e "${GREEN}Building Docker image locally for AMD64 architecture...${NC}"
+    # Use ARM64 (Graviton) by default, matching CodeBuild buildspec
+    DOCKER_ARCH="${DOCKER_ARCH:-arm64}"
+    echo -e "${GREEN}Building Docker image locally for ${DOCKER_ARCH} architecture...${NC}"
     # Use a local tag without slashes for Docker build
     LOCAL_TAG="stamps_app_frontend"
-    docker build --platform=linux/amd64 -t "$LOCAL_TAG:latest" .
+    docker build --platform=linux/${DOCKER_ARCH} -t "$LOCAL_TAG:latest" .
 
     echo -e "${GREEN}Tagging Docker image...${NC}"
     docker tag "$LOCAL_TAG:latest" "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY_NAME:latest"

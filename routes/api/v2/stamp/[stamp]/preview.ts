@@ -3,12 +3,16 @@
  *
  * Supported formats:
  * - SVG: Converted to PNG using resvg-wasm with proper padding
- * - SVG with foreignObject: Rendered via Chrome (resvg-wasm can't handle embedded HTML)
+ * - SVG with foreignObject: Rendered via CF Worker or local Chrome fallback
  * - PNG/JPEG/GIF/TIFF: Upscaled using ImageScript with pixel-perfect scaling
- * - WebP/BMP/AVIF: Rendered via Chrome screenshot (ImageScript can't decode these)
- * - HTML: Rendered using local Chrome instance with content-aware cropping
+ * - WebP/BMP/AVIF: Rendered via CF Worker or local Chrome fallback
+ * - HTML: Rendered via CF Worker (with cleanHtmlForRendering) or local Chrome fallback
  * - Audio: Stylized waveform visualization generated with ImageScript
- * - Video: First frame extracted via Chrome <video> element
+ * - Video: First frame via CF Worker or local Chrome fallback
+ *
+ * Chrome-dependent paths try Cloudflare Browser Rendering Worker first
+ * (env: CF_PREVIEW_WORKER_URL + CF_PREVIEW_WORKER_SECRET), falling back
+ * to local Puppeteer/Chromium if the Worker is unavailable or unconfigured.
  *
  * All images are output as 1200x1200 PNG with compression level 9
  *
@@ -17,6 +21,7 @@
  */
 import { Handlers } from "$fresh/server.ts";
 import { WebResponseUtil } from "$lib/utils/api/responses/webResponseUtil.ts";
+import { cleanHtmlForRendering } from "$lib/utils/ui/rendering/htmlCleanup.ts";
 import {
   getOptimalLocalOptions,
   isLocalRenderingAvailable,
@@ -46,6 +51,60 @@ async function ensureWasmInitialized() {
 // Check local rendering availability
 const isLocalRenderingReady = isLocalRenderingAvailable();
 console.log("[Preview] Local rendering available:", isLocalRenderingReady);
+
+// Cloudflare Browser Rendering Worker configuration
+const CF_WORKER_URL = Deno.env.get("CF_PREVIEW_WORKER_URL");
+const CF_WORKER_SECRET = Deno.env.get("CF_PREVIEW_WORKER_SECRET");
+const isCfWorkerConfigured = !!(CF_WORKER_URL && CF_WORKER_SECRET);
+console.log("[Preview] CF Worker configured:", isCfWorkerConfigured);
+
+/**
+ * Render content via the Cloudflare Browser Rendering Worker.
+ * Sends either a URL or raw HTML to the Worker, which uses headless Chrome
+ * at Cloudflare's edge to take a PNG screenshot.
+ *
+ * @returns PNG buffer on success, null on failure (caller falls back to local Chrome)
+ */
+async function renderWithCloudflare(params: {
+  url?: string;
+  html?: string;
+  viewport?: { width: number; height: number };
+  delay?: number;
+}): Promise<Uint8Array | null> {
+  if (!isCfWorkerConfigured) return null;
+
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000);
+
+    const response = await fetch(CF_WORKER_URL!, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${CF_WORKER_SECRET}`,
+      },
+      body: JSON.stringify(params),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeout);
+
+    if (!response.ok) {
+      const errorBody = await response.text().catch(() => "");
+      console.error(
+        `[Preview] CF Worker returned ${response.status}: ${errorBody}`,
+      );
+      return null;
+    }
+
+    const buffer = await response.arrayBuffer();
+    return new Uint8Array(buffer);
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error(`[Preview] CF Worker request failed: ${msg}`);
+    return null;
+  }
+}
 
 // Cache control headers for different scenarios
 const CACHE_HEADERS = {
@@ -341,13 +400,34 @@ async function renderSvgPreview(
 
 /**
  * Render SVGs containing foreignObject using Chrome.
- * Chrome handles foreignObject natively, including embedded HTML and images.
+ * Tries Cloudflare Browser Rendering Worker first, falls back to local Chrome.
  */
 async function renderSvgWithChrome(
   stamp_url: string,
   stamp_mimetype: string,
   stampNumber: number | undefined,
 ): Promise<CachedPreview | null> {
+  // Try CF Worker first (URL mode — navigate to SVG on CDN)
+  const cfBuffer = await renderWithCloudflare({
+    url: stamp_url,
+    viewport: { width: 1200, height: 1200 },
+  });
+
+  if (cfBuffer) {
+    console.log(
+      `[SVG Preview] Stamp ${stampNumber} rendered via CF Worker`,
+    );
+    const result = await centerOnCanvas(cfBuffer, {
+      stampNumber,
+      stamp_mimetype,
+      method: "cloudflare-browser",
+    });
+    result.meta["X-Rendering-Engine"] = "cloudflare-worker";
+    result.meta["X-ForeignObject"] = "true";
+    return result;
+  }
+
+  // Fallback to local Chrome
   if (!isLocalRenderingReady) {
     console.error(
       "[SVG Preview] Chrome not available for foreignObject SVG",
@@ -356,7 +436,6 @@ async function renderSvgWithChrome(
     return null;
   }
 
-  // Navigate Chrome directly to the SVG URL on the CDN
   const renderOptions = getOptimalLocalOptions(false);
   const { buffer: screenshotBuffer, method, contentBounds } =
     await renderHtmlSmart(stamp_url, renderOptions);
@@ -377,6 +456,48 @@ async function renderHtmlPreview(
   stamp_mimetype: string,
   stampNumber: number | undefined,
 ): Promise<CachedPreview | null> {
+  const isComplex = stamp_url?.includes("recursive") ||
+    stamp_url?.includes("fractal") ||
+    stamp_url?.includes("canvas");
+  const delay = isComplex ? 8000 : 5000;
+
+  // Try CF Worker first: fetch raw HTML from CDN, clean it, send to Worker
+  if (isCfWorkerConfigured) {
+    try {
+      const htmlResponse = await fetch(stamp_url);
+      if (htmlResponse.ok) {
+        const rawHtml = await htmlResponse.text();
+        const cleanedHtml = cleanHtmlForRendering(rawHtml);
+
+        const cfBuffer = await renderWithCloudflare({
+          html: cleanedHtml,
+          viewport: { width: 1200, height: 1200 },
+          delay,
+        });
+
+        if (cfBuffer) {
+          console.log(
+            `[HTML Preview] Stamp ${stampNumber} rendered via CF Worker`,
+          );
+          const result = await centerOnCanvas(cfBuffer, {
+            stampNumber,
+            stamp_mimetype,
+            method: "cloudflare-browser",
+          });
+          result.meta["X-Render-Time"] = isComplex ? "extended" : "standard";
+          result.meta["X-Rendering-Engine"] = "cloudflare-worker";
+          return result;
+        }
+      }
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      console.error(
+        `[HTML Preview] CF Worker path failed for stamp ${stampNumber}: ${msg}`,
+      );
+    }
+  }
+
+  // Fallback to local Chrome via localhost:8000/content/ endpoint
   if (!isLocalRenderingReady) {
     console.error(
       "[HTML Preview] Chrome rendering not available for HTML content",
@@ -400,10 +521,6 @@ async function renderHtmlPreview(
     `[HTML Preview] Starting render for stamp ${stampNumber} via /content/ endpoint`,
   );
 
-  const isComplex = stamp_url?.includes("recursive") ||
-    stamp_url?.includes("fractal") ||
-    stamp_url?.includes("canvas");
-
   const renderOptions = getOptimalLocalOptions(isComplex);
   const { buffer: screenshotBuffer, method, contentBounds } =
     await renderHtmlSmart(stampPageUrl, renderOptions);
@@ -421,13 +538,34 @@ async function renderHtmlPreview(
 
 /**
  * Render unsupported image formats (WebP, BMP, AVIF) via Chrome screenshot.
- * Chrome can display these natively even though ImageScript can't decode them.
+ * Tries Cloudflare Browser Rendering Worker first, falls back to local Chrome.
  */
 async function renderImageWithChrome(
   stamp_url: string,
   stamp_mimetype: string,
   stampNumber: number | undefined,
 ): Promise<CachedPreview | null> {
+  // Try CF Worker first (URL mode — navigate to image on CDN)
+  const cfBuffer = await renderWithCloudflare({
+    url: stamp_url,
+    viewport: { width: 1200, height: 1200 },
+    delay: 2000,
+  });
+
+  if (cfBuffer) {
+    console.log(
+      `[Image Preview] Stamp ${stampNumber} (${stamp_mimetype}) rendered via CF Worker`,
+    );
+    const result = await centerOnCanvas(cfBuffer, {
+      stampNumber,
+      stamp_mimetype,
+      method: "cloudflare-browser",
+    });
+    result.meta["X-Rendering-Engine"] = "cloudflare-worker";
+    return result;
+  }
+
+  // Fallback to local Chrome
   if (!isLocalRenderingReady) {
     console.log(
       `[Image Preview] Chrome not available for ${stamp_mimetype} stamp ${stampNumber}`,
@@ -436,19 +574,21 @@ async function renderImageWithChrome(
   }
 
   console.log(
-    `[Image Preview] Rendering ${stamp_mimetype} stamp ${stampNumber} via Chrome`,
+    `[Image Preview] Rendering ${stamp_mimetype} stamp ${stampNumber} via local Chrome`,
   );
 
   const renderOptions = getOptimalLocalOptions(false);
   const { buffer: screenshotBuffer, method, contentBounds } =
     await renderHtmlSmart(stamp_url, renderOptions);
 
-  return centerOnCanvas(screenshotBuffer, {
+  const result = await centerOnCanvas(screenshotBuffer, {
     stampNumber,
     stamp_mimetype,
     method,
     contentBounds,
   });
+  result.meta["X-Rendering-Engine"] = "local-chrome";
+  return result;
 }
 
 /**
@@ -553,26 +693,14 @@ async function renderAudioPreview(
 
 /**
  * Extract the first frame of a video using Chrome.
- * Creates a minimal HTML page with a <video> element, waits for it to load,
- * and takes a screenshot.
+ * Tries Cloudflare Browser Rendering Worker first, falls back to local Chrome.
  */
 async function renderVideoPreview(
   stamp_url: string,
   stamp_mimetype: string,
   stampNumber: number | undefined,
 ): Promise<CachedPreview | null> {
-  if (!isLocalRenderingReady) {
-    console.log(
-      `[Video Preview] Chrome not available for video stamp ${stampNumber}`,
-    );
-    return null;
-  }
-
-  console.log(
-    `[Video Preview] Extracting first frame for stamp ${stampNumber}`,
-  );
-
-  // Create a data URL with a minimal HTML page that loads and pauses the video
+  // Create the HTML page that loads and pauses the video at frame 0
   const videoHtml = `<!DOCTYPE html>
 <html><head><style>
   * { margin: 0; padding: 0; }
@@ -585,8 +713,37 @@ async function renderVideoPreview(
   v.addEventListener('loadeddata', () => { v.pause(); v.currentTime = 0; });
 </script></body></html>`;
 
-  const dataUrl = `data:text/html;base64,${btoa(videoHtml)}`;
+  // Try CF Worker first (HTML mode — video element fetches from CDN)
+  const cfBuffer = await renderWithCloudflare({
+    html: videoHtml,
+    viewport: { width: 1200, height: 1200 },
+    delay: 3000,
+  });
 
+  if (cfBuffer) {
+    console.log(
+      `[Video Preview] Stamp ${stampNumber} first frame rendered via CF Worker`,
+    );
+    return centerOnCanvas(cfBuffer, {
+      stampNumber,
+      stamp_mimetype,
+      method: "cloudflare-browser-video",
+    });
+  }
+
+  // Fallback to local Chrome
+  if (!isLocalRenderingReady) {
+    console.log(
+      `[Video Preview] Chrome not available for video stamp ${stampNumber}`,
+    );
+    return null;
+  }
+
+  console.log(
+    `[Video Preview] Extracting first frame for stamp ${stampNumber} via local Chrome`,
+  );
+
+  const dataUrl = `data:text/html;base64,${btoa(videoHtml)}`;
   const renderOptions = getOptimalLocalOptions(false);
   const { buffer: screenshotBuffer, contentBounds } = await renderHtmlSmart(
     dataUrl,

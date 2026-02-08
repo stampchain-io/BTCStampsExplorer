@@ -115,7 +115,8 @@
     "**/*.test.ts",
     "**/*.ci.ts",
     "**/stubs/*",
-    ".taskmaster/**/*"
+    ".taskmaster/**/*",
+    "workers/**/*"
   ],
   "nodeModulesDir": "auto",
   "imports": {
