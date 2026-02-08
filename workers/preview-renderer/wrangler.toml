@@ -1,0 +1,10 @@
+name = "stamp-preview-renderer"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[browser]
+binding = "BROWSER"
+
+[vars]
+# PREVIEW_AUTH_SECRET is set via `wrangler secret put PREVIEW_AUTH_SECRET`
