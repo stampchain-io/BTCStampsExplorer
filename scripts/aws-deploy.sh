@@ -91,17 +91,21 @@ usage() {
     echo -e "  --list-images       List all available images in ECR repository with timestamps"
     echo -e "  --auto-tag-images   Automatically tag all untagged images with date-based tags"
     echo -e "  --select-image      Select a specific image tag to deploy instead of latest"
+    echo -e "  --update-env        Update ECS task definition environment variables from .env"
+    echo -e "  --memory <MB>       Override AWS_MEMORY from .env (e.g., --memory 1024)"
+    echo -e "  --cpu <units>       Override AWS_CPU_UNITS from .env (e.g., --cpu 512)"
     echo -e "  --help              Show this help message"
     echo -e ""
     echo -e "${YELLOW}Common Workflows:${NC}"
-    echo -e "  1. Update task definition:    ./scripts/update-task-def.sh"
-    echo -e "  2. Fix network connectivity:   ${0} --fix-networking"
-    echo -e "  3. Full deployment:            ${0} --build --deploy"
-    echo -e "  4. Cloud-based build/deploy:   ${0} --codebuild --deploy"
-    echo -e "  5. Cache Deno image to ECR:    ${0} --cache-deno-image --deno-version 2.2.8"
-    echo -e "  6. List available images:      ${0} --list-images"
-    echo -e "  7. Auto-tag untagged images:   ${0} --auto-tag-images"
-    echo -e "  8. Deploy specific version:    ${0} --deploy --select-image v20240411.1"
+    echo -e "  1. Full deployment:            ${0} --build --deploy"
+    echo -e "  2. Cloud build + deploy:       ${0} --codebuild --deploy"
+    echo -e "  3. Deploy + update env vars:   ${0} --deploy --update-env"
+    echo -e "  4. Deploy + update memory:     ${0} --deploy --update-env --memory 1024"
+    echo -e "  5. Fix network connectivity:   ${0} --fix-networking"
+    echo -e "  6. Cache Deno image to ECR:    ${0} --cache-deno-image --deno-version 2.5.3"
+    echo -e "  7. List available images:      ${0} --list-images"
+    echo -e "  8. Auto-tag untagged images:   ${0} --auto-tag-images"
+    echo -e "  9. Deploy specific version:    ${0} --deploy --select-image v20240411.1"
     echo -e ""
     echo -e "${YELLOW}Health Check URL:${NC}"
     echo -e "  Use the simple health check to avoid unnecessary dependencies failing the health check:"
@@ -142,8 +146,11 @@ FIX_TASK_DEF=false
 CACHE_DENO_IMAGE=false
 LIST_IMAGES=false
 AUTO_TAG_IMAGES=false
+UPDATE_ENV=false
 SELECT_IMAGE=""
 DENO_VERSION="2.4.2"
+OVERRIDE_MEMORY=""
+OVERRIDE_CPU=""
 
 for arg in "$@"; do
     case $arg in
@@ -200,6 +207,26 @@ for arg in "$@"; do
             DENO_VERSION="$2"
             shift 2
             ;;
+        --update-env)
+            UPDATE_ENV=true
+            shift
+            ;;
+        --memory=*)
+            OVERRIDE_MEMORY="${arg#*=}"
+            shift
+            ;;
+        --memory)
+            OVERRIDE_MEMORY="$2"
+            shift 2
+            ;;
+        --cpu=*)
+            OVERRIDE_CPU="${arg#*=}"
+            shift
+            ;;
+        --cpu)
+            OVERRIDE_CPU="$2"
+            shift 2
+            ;;
         --skip-build)
             # For backward compatibility, deploy without building
             DEPLOY=true
@@ -218,13 +245,72 @@ done
 # If no action specified, show usage
 if [ "$BUILD" = false ] && [ "$CODEBUILD" = false ] && [ "$DEPLOY" = false ] && [ "$FIX_NETWORKING" = false ] &&
    [ "$DIAGNOSE" = false ] && [ "$FIX_TASK_DEF" = false ] && [ "$CACHE_DENO_IMAGE" = false ] &&
-   [ "$LIST_IMAGES" = false ] && [ "$AUTO_TAG_IMAGES" = false ] && [ -z "$SELECT_IMAGE" ]; then
+   [ "$LIST_IMAGES" = false ] && [ "$AUTO_TAG_IMAGES" = false ] && [ "$UPDATE_ENV" = false ] && [ -z "$SELECT_IMAGE" ]; then
     usage
 fi
 
 # ECR login
 echo -e "${GREEN}Logging in to Amazon ECR...${NC}"
 aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com"
+
+# Function to build ECS environment variables JSON from .env file
+# Filters out infrastructure-only variables that shouldn't be in the task definition
+build_env_json() {
+    if [ ! -f .env ]; then
+        echo -e "${RED}Error: .env file not found${NC}" >&2
+        return 1
+    fi
+
+    local ENV_ARRAY="["
+    local FIRST=true
+
+    while IFS='=' read -r key value || [ -n "$key" ]; do
+        # Skip comments and empty lines
+        [[ $key == \#* ]] && continue
+        [[ -z "$key" ]] && continue
+
+        # Clean the key and value
+        key=$(echo "$key" | tr -d ' \t\r')
+        value=$(echo "$value" | sed 's/[[:space:]]*#.*$//' | tr -d '\r')
+
+        # Skip empty values
+        [[ -z "$value" ]] && continue
+
+        # Filter out variables that are NOT app runtime env vars
+        # AWS_* — infrastructure config, not app env
+        [[ $key == AWS_* ]] && continue
+        # PUPPETEER_* — removed, no longer needed
+        [[ $key == PUPPETEER_* ]] && continue
+        # ANTHROPIC_API_KEY — Task Master config, not app
+        [[ $key == ANTHROPIC_API_KEY ]] && continue
+        # CLOUDFLARE_API_KEY/EMAIL/ZONE_ID — deploy-time only credentials
+        [[ $key == CLOUDFLARE_API_KEY ]] && continue
+        [[ $key == CLOUDFLARE_EMAIL ]] && continue
+        [[ $key == CLOUDFLARE_ZONE_ID ]] && continue
+
+        # Add separator if not first item
+        if [ "$FIRST" = true ]; then
+            FIRST=false
+        else
+            ENV_ARRAY="$ENV_ARRAY,"
+        fi
+
+        # Escape double quotes in values for valid JSON
+        value=$(echo "$value" | sed 's/"/\\"/g')
+
+        ENV_ARRAY="$ENV_ARRAY{\"name\":\"$key\",\"value\":\"$value\"}"
+    done < .env
+
+    ENV_ARRAY="$ENV_ARRAY]"
+
+    # Validate JSON
+    if echo "$ENV_ARRAY" | jq '.' > /dev/null 2>&1; then
+        echo "$ENV_ARRAY"
+    else
+        echo -e "${RED}Error: Generated environment variables JSON is invalid${NC}" >&2
+        return 1
+    fi
+}
 
 # Function to list available images in ECR
 list_ecr_images() {
@@ -628,6 +714,40 @@ if [ "$DEPLOY" = true ]; then
     NEW_TASK_DEF=$(echo "$TASK_DEF" | jq --arg IMAGE "$CORRECT_IMAGE" '.taskDefinition |
         del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy) |
         .containerDefinitions[0].image = $IMAGE')
+
+    # Update environment variables from .env if requested
+    if [ "$UPDATE_ENV" = true ]; then
+        echo -e "${GREEN}Building environment variables from .env...${NC}"
+        ENV_JSON=$(build_env_json)
+        if [ $? -ne 0 ]; then
+            echo -e "${RED}Failed to build environment variables. Aborting.${NC}"
+            exit 1
+        fi
+
+        ENV_COUNT=$(echo "$ENV_JSON" | jq 'length')
+        echo -e "${GREEN}Setting ${ENV_COUNT} environment variables in task definition${NC}"
+
+        # Show filtered variables
+        echo -e "${YELLOW}Filtered out: AWS_*, PUPPETEER_*, ANTHROPIC_API_KEY, CLOUDFLARE_API_KEY/EMAIL/ZONE_ID${NC}"
+
+        NEW_TASK_DEF=$(echo "$NEW_TASK_DEF" | jq --argjson env "$ENV_JSON" '.containerDefinitions[0].environment = $env')
+    fi
+
+    # Update memory if overridden or from .env
+    DEPLOY_MEMORY="${OVERRIDE_MEMORY:-${AWS_MEMORY:-2048}}"
+    DEPLOY_CPU="${OVERRIDE_CPU:-${AWS_CPU_UNITS:-512}}"
+
+    CURRENT_MEMORY=$(echo "$NEW_TASK_DEF" | jq -r '.memory // "unknown"')
+    CURRENT_CPU=$(echo "$NEW_TASK_DEF" | jq -r '.cpu // "unknown"')
+
+    if [ "$CURRENT_MEMORY" != "$DEPLOY_MEMORY" ] || [ "$CURRENT_CPU" != "$DEPLOY_CPU" ]; then
+        echo -e "${YELLOW}Memory: ${CURRENT_MEMORY}MB → ${DEPLOY_MEMORY}MB${NC}"
+        echo -e "${YELLOW}CPU: ${CURRENT_CPU} → ${DEPLOY_CPU} units${NC}"
+        NEW_TASK_DEF=$(echo "$NEW_TASK_DEF" | jq --arg mem "$DEPLOY_MEMORY" --arg cpu "$DEPLOY_CPU" '.memory = $mem | .cpu = $cpu')
+    else
+        echo -e "${GREEN}Memory: ${DEPLOY_MEMORY}MB (unchanged)${NC}"
+        echo -e "${GREEN}CPU: ${DEPLOY_CPU} units (unchanged)${NC}"
+    fi
 
     # Register new task definition
     echo -e "${GREEN}Registering new task definition...${NC}"

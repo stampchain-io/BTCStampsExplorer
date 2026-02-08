@@ -3,16 +3,15 @@
  *
  * Supported formats:
  * - SVG: Converted to PNG using resvg-wasm with proper padding
- * - SVG with foreignObject: Rendered via CF Worker or local Chrome fallback
+ * - SVG with foreignObject: Rendered via Cloudflare Browser Rendering Worker
  * - PNG/JPEG/GIF/TIFF: Upscaled using ImageScript with pixel-perfect scaling
- * - WebP/BMP/AVIF: Rendered via CF Worker or local Chrome fallback
- * - HTML: Rendered via CF Worker (with cleanHtmlForRendering) or local Chrome fallback
+ * - WebP/BMP/AVIF: Rendered via Cloudflare Browser Rendering Worker
+ * - HTML: Rendered via CF Worker (with cleanHtmlForRendering)
  * - Audio: Stylized waveform visualization generated with ImageScript
- * - Video: First frame via CF Worker or local Chrome fallback
+ * - Video: First frame via Cloudflare Browser Rendering Worker
  *
- * Chrome-dependent paths try Cloudflare Browser Rendering Worker first
- * (env: CF_PREVIEW_WORKER_URL + CF_PREVIEW_WORKER_SECRET), falling back
- * to local Puppeteer/Chromium if the Worker is unavailable or unconfigured.
+ * Chrome-dependent content is rendered by the Cloudflare Browser Rendering
+ * Worker (env: CF_PREVIEW_WORKER_URL + CF_PREVIEW_WORKER_SECRET).
  *
  * All images are output as 1200x1200 PNG with compression level 9
  *
@@ -22,11 +21,6 @@
 import { Handlers } from "$fresh/server.ts";
 import { WebResponseUtil } from "$lib/utils/api/responses/webResponseUtil.ts";
 import { cleanHtmlForRendering } from "$lib/utils/ui/rendering/htmlCleanup.ts";
-import {
-  getOptimalLocalOptions,
-  isLocalRenderingAvailable,
-  renderHtmlSmart,
-} from "$lib/utils/ui/rendering/localRenderer.ts";
 import {
   calculateSocialMediaDimensions,
   calculateSvgDimensions,
@@ -47,10 +41,6 @@ async function ensureWasmInitialized() {
     wasmInitialized = true;
   }
 }
-
-// Check local rendering availability
-const isLocalRenderingReady = isLocalRenderingAvailable();
-console.log("[Preview] Local rendering available:", isLocalRenderingReady);
 
 // Cloudflare Browser Rendering Worker configuration
 const CF_WORKER_URL = Deno.env.get("CF_PREVIEW_WORKER_URL");
@@ -399,15 +389,13 @@ async function renderSvgPreview(
 }
 
 /**
- * Render SVGs containing foreignObject using Chrome.
- * Tries Cloudflare Browser Rendering Worker first, falls back to local Chrome.
+ * Render SVGs containing foreignObject using Cloudflare Browser Rendering Worker.
  */
 async function renderSvgWithChrome(
   stamp_url: string,
   stamp_mimetype: string,
   stampNumber: number | undefined,
 ): Promise<CachedPreview | null> {
-  // Try CF Worker first (URL mode — navigate to SVG on CDN)
   const cfBuffer = await renderWithCloudflare({
     url: stamp_url,
     viewport: { width: 1200, height: 1200 },
@@ -427,28 +415,11 @@ async function renderSvgWithChrome(
     return result;
   }
 
-  // Fallback to local Chrome
-  if (!isLocalRenderingReady) {
-    console.error(
-      "[SVG Preview] Chrome not available for foreignObject SVG",
-      { stamp: stampNumber },
-    );
-    return null;
-  }
-
-  const renderOptions = getOptimalLocalOptions(false);
-  const { buffer: screenshotBuffer, method, contentBounds } =
-    await renderHtmlSmart(stamp_url, renderOptions);
-
-  const result = await centerOnCanvas(screenshotBuffer, {
-    stampNumber,
-    stamp_mimetype,
-    method,
-    contentBounds,
-  });
-  result.meta["X-Rendering-Engine"] = "local-chrome";
-  result.meta["X-ForeignObject"] = "true";
-  return result;
+  console.error(
+    "[SVG Preview] CF Worker failed for foreignObject SVG",
+    { stamp: stampNumber },
+  );
+  return null;
 }
 
 async function renderHtmlPreview(
@@ -497,55 +468,21 @@ async function renderHtmlPreview(
     }
   }
 
-  // Fallback to local Chrome via localhost:8000/content/ endpoint
-  if (!isLocalRenderingReady) {
-    console.error(
-      "[HTML Preview] Chrome rendering not available for HTML content",
-      {
-        stamp: stampNumber,
-        mimetype: stamp_mimetype,
-        dockerPath: Deno.env.get("PUPPETEER_EXECUTABLE_PATH"),
-        isDocker: Deno.env.get("PUPPETEER_EXECUTABLE_PATH") ===
-          "/usr/bin/chromium-browser",
-      },
-    );
-    return null;
-  }
-
-  const urlParts = stamp_url.split("/stamps/");
-  const filename = urlParts.length > 1 ? urlParts[1] : stamp_url;
-  const htmlIdentifier = filename.replace(/\.html?$/i, "");
-  const stampPageUrl = `http://localhost:8000/content/${htmlIdentifier}`;
-
-  console.log(
-    `[HTML Preview] Starting render for stamp ${stampNumber} via /content/ endpoint`,
+  console.error(
+    "[HTML Preview] CF Worker failed for HTML content",
+    { stamp: stampNumber },
   );
-
-  const renderOptions = getOptimalLocalOptions(isComplex);
-  const { buffer: screenshotBuffer, method, contentBounds } =
-    await renderHtmlSmart(stampPageUrl, renderOptions);
-
-  const result = await centerOnCanvas(screenshotBuffer, {
-    stampNumber,
-    stamp_mimetype,
-    method,
-    contentBounds,
-  });
-  result.meta["X-Render-Time"] = isComplex ? "extended" : "standard";
-  result.meta["X-Rendering-Engine"] = "local-chrome";
-  return result;
+  return null;
 }
 
 /**
- * Render unsupported image formats (WebP, BMP, AVIF) via Chrome screenshot.
- * Tries Cloudflare Browser Rendering Worker first, falls back to local Chrome.
+ * Render unsupported image formats (WebP, BMP, AVIF) via Cloudflare Browser Rendering Worker.
  */
 async function renderImageWithChrome(
   stamp_url: string,
   stamp_mimetype: string,
   stampNumber: number | undefined,
 ): Promise<CachedPreview | null> {
-  // Try CF Worker first (URL mode — navigate to image on CDN)
   const cfBuffer = await renderWithCloudflare({
     url: stamp_url,
     viewport: { width: 1200, height: 1200 },
@@ -565,30 +502,10 @@ async function renderImageWithChrome(
     return result;
   }
 
-  // Fallback to local Chrome
-  if (!isLocalRenderingReady) {
-    console.log(
-      `[Image Preview] Chrome not available for ${stamp_mimetype} stamp ${stampNumber}`,
-    );
-    return null;
-  }
-
   console.log(
-    `[Image Preview] Rendering ${stamp_mimetype} stamp ${stampNumber} via local Chrome`,
+    `[Image Preview] CF Worker failed for ${stamp_mimetype} stamp ${stampNumber}`,
   );
-
-  const renderOptions = getOptimalLocalOptions(false);
-  const { buffer: screenshotBuffer, method, contentBounds } =
-    await renderHtmlSmart(stamp_url, renderOptions);
-
-  const result = await centerOnCanvas(screenshotBuffer, {
-    stampNumber,
-    stamp_mimetype,
-    method,
-    contentBounds,
-  });
-  result.meta["X-Rendering-Engine"] = "local-chrome";
-  return result;
+  return null;
 }
 
 /**
@@ -692,15 +609,13 @@ async function renderAudioPreview(
 }
 
 /**
- * Extract the first frame of a video using Chrome.
- * Tries Cloudflare Browser Rendering Worker first, falls back to local Chrome.
+ * Extract the first frame of a video using Cloudflare Browser Rendering Worker.
  */
 async function renderVideoPreview(
   stamp_url: string,
   stamp_mimetype: string,
   stampNumber: number | undefined,
 ): Promise<CachedPreview | null> {
-  // Create the HTML page that loads and pauses the video at frame 0
   const videoHtml = `<!DOCTYPE html>
 <html><head><style>
   * { margin: 0; padding: 0; }
@@ -713,7 +628,6 @@ async function renderVideoPreview(
   v.addEventListener('loadeddata', () => { v.pause(); v.currentTime = 0; });
 </script></body></html>`;
 
-  // Try CF Worker first (HTML mode — video element fetches from CDN)
   const cfBuffer = await renderWithCloudflare({
     html: videoHtml,
     viewport: { width: 1200, height: 1200 },
@@ -731,31 +645,10 @@ async function renderVideoPreview(
     });
   }
 
-  // Fallback to local Chrome
-  if (!isLocalRenderingReady) {
-    console.log(
-      `[Video Preview] Chrome not available for video stamp ${stampNumber}`,
-    );
-    return null;
-  }
-
   console.log(
-    `[Video Preview] Extracting first frame for stamp ${stampNumber} via local Chrome`,
+    `[Video Preview] CF Worker failed for video stamp ${stampNumber}`,
   );
-
-  const dataUrl = `data:text/html;base64,${btoa(videoHtml)}`;
-  const renderOptions = getOptimalLocalOptions(false);
-  const { buffer: screenshotBuffer, contentBounds } = await renderHtmlSmart(
-    dataUrl,
-    renderOptions,
-  );
-
-  return centerOnCanvas(screenshotBuffer, {
-    stampNumber,
-    stamp_mimetype,
-    method: "local-chrome-video",
-    contentBounds,
-  });
+  return null;
 }
 
 /**

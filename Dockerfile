@@ -10,26 +10,14 @@ ENV HOME=/app \
     XDG_CACHE_HOME=/app/.cache \
     XDG_DATA_HOME=/app/.local/share \
     NPM_CONFIG_CACHE=/app/.npm \
-    REDIS_LOG_LEVEL=DEBUG \
-    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser \
-    PUPPETEER_SKIP_DOWNLOAD=true
+    REDIS_LOG_LEVEL=DEBUG
 
-# Install additional tools + Chromium for HTML stamp preview rendering
+# Install minimal runtime tools (Chromium removed — preview rendering offloaded to CF Worker)
 RUN apk add --no-cache \
     bash \
     curl \
-    chromium \
-    nss \
-    freetype \
-    harfbuzz \
     ca-certificates \
-    font-noto-emoji \
-    font-freefont \
-    mesa-gbm \
-    libdrm \
-    libgcc \
-    && rm -rf /var/cache/apk/* \
-    && cp /usr/lib/libgcc_s.so.1 /usr/local/lib/libgcc_s.so.1
+    && rm -rf /var/cache/apk/*
 
 # Create necessary directories
 RUN mkdir -p /app \
@@ -81,7 +69,7 @@ RUN echo "Verifying environment and permissions:" && \
 EXPOSE 8000
 
 # Runtime environment variables - Enable Redis at runtime
-ENV DENO_PERMISSIONS="--allow-net --allow-read --allow-run --allow-write --allow-env --allow-sys" \
+ENV DENO_PERMISSIONS="--allow-net --allow-read --allow-write --allow-env --allow-sys" \
     SKIP_REDIS=false \
     SKIP_REDIS_CONNECTION=false \
     SKIP_REDIS_TLS=true \
