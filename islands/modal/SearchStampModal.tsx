@@ -1,8 +1,8 @@
 /* @baba - commentary + global styles */
-import { closeModal, openModal, searchState } from "$islands/modal/states.ts";
+import { Icon } from "$icon";
 import { SearchErrorDisplay } from "$islands/modal/SearchErrorDisplay.tsx";
 import { SearchInputField } from "$islands/modal/SearchInputField.tsx";
-import { Icon } from "$icon";
+import { closeModal, openModal, searchState } from "$islands/modal/states.ts";
 import { ModalSearchBase, transitionColors } from "$layout";
 import {
   classifySearchInput,
@@ -33,9 +33,7 @@ export function openStampSearch() {
 
     try {
       const response = await fetch(
-        `/api/v2/stamps/search?q=${
-          encodeURIComponent(currentTerm.trim())
-        }`,
+        `/api/v2/stamps/search?q=${encodeURIComponent(currentTerm.trim())}`,
         {
           headers: {
             "X-API-Version": "2.3",
@@ -195,7 +193,7 @@ function SearchContent({
                           type="icon"
                           name="wallet"
                           weight="normal"
-                          size="xs"
+                          size="md"
                           color="greyLight"
                         />
                       </div>
@@ -212,8 +210,7 @@ function SearchContent({
                   : (
                     <li
                       key={result.stamp}
-                      onClick={() =>
-                        handleResultClick(result.stamp)}
+                      onClick={() => handleResultClick(result.stamp)}
                       class={`flex items-center gap-3 px-7.5 py-2 hover:bg-color-background/60 ${transitionColors} cursor-pointer`}
                     >
                       <img
