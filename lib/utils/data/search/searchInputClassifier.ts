@@ -66,6 +66,21 @@ export function classifySearchInput(
     };
   }
 
+  // Partial Bitcoin address (prefix detection for autosuggest)
+  // - bc1q / bc1p prefix: unambiguous, classify immediately
+  // - 1 or 3 + at least one Base58 letter (pure digits = stamp#)
+  if (
+    /^bc1[qp]/i.test(trimmed) ||
+    (/^[13]/.test(trimmed) && trimmed.length >= 2 &&
+      /[a-km-zA-HJ-NP-Z]/.test(trimmed))
+  ) {
+    return {
+      type: "address",
+      sanitized: trimmed,
+      original: trimmed,
+    };
+  }
+
   // Transaction hash: exactly 64 hex characters
   // Use a local copy to avoid type-predicate narrowing to `never`
   const txCandidate: string = trimmed;
@@ -77,7 +92,7 @@ export function classifySearchInput(
     };
   }
 
-  // Bitcoin address
+  // Bitcoin address (full validation fallback)
   const addrCandidate: string = trimmed;
   if (isValidBitcoinAddress(addrCandidate)) {
     return {

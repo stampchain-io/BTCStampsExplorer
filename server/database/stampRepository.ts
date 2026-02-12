@@ -722,6 +722,7 @@ export class StampRepository {
     fileSizeMax?: string;
     search?: string;
     cpidPrefix?: string;
+    addressPrefix?: string;
     excludeSrc20?: boolean;
   }) {
     // Extract all parameters including both filter types
@@ -771,6 +772,7 @@ export class StampRepository {
       fileSizeMax: _fileSizeMax,
       search,
       cpidPrefix,
+      addressPrefix,
       excludeSrc20 = false,
     } = options;
 
@@ -832,6 +834,12 @@ export class StampRepository {
     if (cpidPrefix) {
       whereConditions.push("st.cpid LIKE ?");
       queryParams.push(`${cpidPrefix}%`);
+    }
+
+    // Address prefix search (creator column only)
+    if (addressPrefix) {
+      whereConditions.push("st.creator LIKE ?");
+      queryParams.push(`${addressPrefix}%`);
     }
 
     // Exclude SRC-20 entries (used by stamp search endpoint)

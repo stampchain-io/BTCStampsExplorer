@@ -52,7 +52,8 @@ export const handler: Handlers = {
         }
 
         case "address":
-          queryOptions.creatorAddress = sanitized;
+          queryOptions.addressPrefix = sanitized;
+          queryOptions.limit = 11;
           queryOptions.sortBy = "DESC";
           break;
 
