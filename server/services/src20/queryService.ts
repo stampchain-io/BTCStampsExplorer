@@ -348,7 +348,7 @@ export class SRC20QueryService {
     }
   }
 
-  static async searchSrc20Data(query: string) {
+  static async searchSrc20Data(query: string, mintableOnly = false) {
     try {
       // Input validation and sanitization
       if (!query || typeof query !== 'string') {
@@ -361,7 +361,10 @@ export class SRC20QueryService {
       }
 
       // Fetch raw data from repository
-      const rawResults = await SRC20Repository.searchValidSrc20TxFromDb(sanitizedQuery);
+      const rawResults = await SRC20Repository.searchValidSrc20TxFromDb(
+        sanitizedQuery,
+        mintableOnly,
+      );
 
       // Early return for empty results
       if (!rawResults || rawResults.length === 0) {

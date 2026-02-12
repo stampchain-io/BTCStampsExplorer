@@ -239,7 +239,9 @@ export function SRC20MintTool({
     const delayDebounceFn = setTimeout(async () => {
       try {
         const response = await fetch(
-          `/api/v2/src20/search?q=${encodeURIComponent(searchTerm.trim())}`,
+          `/api/v2/src20/search?q=${
+            encodeURIComponent(searchTerm.trim())
+          }&mintable_only=true`,
         );
         const data = await response.json();
 

@@ -876,8 +876,15 @@ export class SRC20Repository {
     };
   }
 
-  static async searchValidSrc20TxFromDb(query: string) {
+  static async searchValidSrc20TxFromDb(
+    query: string,
+    mintableOnly = false,
+  ) {
     const sanitizedQuery = query.replace(/[^\w-]/g, "");
+
+    const mintableFilter = mintableOnly
+      ? "AND COALESCE(smd.progress_percentage, 0) < 100"
+      : "";
 
     const sqlQuery = `
     SELECT DISTINCT
@@ -899,8 +906,7 @@ export class SRC20Repository {
         src20.destination LIKE ?)
         AND src20.max IS NOT NULL
         AND src20.op = 'DEPLOY'
-        -- Use progress_percentage from market data instead of manual calculation
-        AND COALESCE(smd.progress_percentage, 0) < 100
+        ${mintableFilter}
     ORDER BY
         CASE
             WHEN src20.tick LIKE ? THEN 0
