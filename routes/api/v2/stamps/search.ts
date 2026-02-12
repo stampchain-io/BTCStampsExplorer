@@ -31,9 +31,19 @@ export const handler: Handlers = {
           queryOptions.identifier = sanitized;
           break;
 
-        case "stamp_number":
-          queryOptions.identifier = parseInt(sanitized);
+        case "stamp_number": {
+          const num = parseInt(sanitized);
+          const prefixStart = num * 10;
+          const prefixEnd = prefixStart + 9;
+          const ids: number[] = [num];
+          for (let i = prefixStart; i <= prefixEnd; i++) {
+            ids.push(i);
+          }
+          queryOptions.identifier = ids;
+          queryOptions.limit = ids.length;
+          queryOptions.sortBy = "ASC";
           break;
+        }
 
         case "address":
           queryOptions.creatorAddress = sanitized;
