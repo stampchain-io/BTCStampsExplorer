@@ -297,7 +297,7 @@ describe("SRC20Repository Sorting Tests", () => {
         offset: 0,
       });
 
-      const executedQueries = mockDb.getQueryHistory();
+      const executedQueries = mockDb.getFullQueryHistory();
       assertEquals(executedQueries.length, 1);
 
       const query = executedQueries[0].query;
@@ -327,7 +327,7 @@ describe("SRC20Repository Sorting Tests", () => {
         offset: 0,
       });
 
-      const executedQueries = mockDb.getQueryHistory();
+      const executedQueries = mockDb.getFullQueryHistory();
       const query = executedQueries[0].query;
 
       // Should include market data JOINs when needed

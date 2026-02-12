@@ -133,10 +133,10 @@ describe("SRC20Repository Unit Tests", () => {
       assertExists(result);
 
       // Verify query was made with unicode escape
-      const queryHistory = mockDb.getQueryHistory();
+      const queryHistory = mockDb.getFullQueryHistory();
       const hasUnicodeQuery = queryHistory.some((h) =>
         h.query.includes("\\U") ||
-        h.params.some((p) => typeof p === "string" && p.includes("\\U"))
+        h.params.some((p: unknown) => typeof p === "string" && (p as string).includes("\\U"))
       );
       assertEquals(hasUnicodeQuery, true);
     });
