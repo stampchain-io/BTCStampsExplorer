@@ -152,6 +152,7 @@ export function SRC20MintTool({
   /* ===== REFS ===== */
   const dropdownRef = useRef<HTMLDivElement>(null);
   const animationTimeoutRef = useRef<number | null>(null);
+  const isInputFocusedRef = useRef<boolean>(false);
 
   /* ===== TOKEN DATA RESET FUNCTION ===== */
   const resetTokenData = () => {
@@ -258,8 +259,10 @@ export function SRC20MintTool({
 
         if (data.data && Array.isArray(data.data)) {
           setSearchResults(data.data);
-          setOpenDrop(true);
-          setDropdownAnimation("enter");
+          if (isInputFocusedRef.current) {
+            setOpenDrop(true);
+            setDropdownAnimation("enter");
+          }
         }
       } catch (error) {
         logger.error("stamps", {
@@ -507,23 +510,21 @@ export function SRC20MintTool({
                 onChange={(value) => {
                   const newValue = value.toUpperCase();
                   if (newValue !== searchTerm) {
-                    if (!isSelecting && !isSwitchingFields) {
-                      setOpenDrop(true);
-                      setDropdownAnimation("enter");
-                    }
                     setIsSelecting(false);
                     setSearchTerm(newValue);
                   }
                 }}
                 onFocus={() => {
+                  isInputFocusedRef.current = true;
                   setIsSelecting(false);
-                  // Re-open dropdown if we have results
+                  // Re-open dropdown if we already have results
                   if (searchResults.length > 0 && !isSwitchingFields) {
                     setOpenDrop(true);
                     setDropdownAnimation("enter");
                   }
                 }}
                 onBlur={() => {
+                  isInputFocusedRef.current = false;
                   setIsSwitchingFields(true);
                   setTimeout(() => {
                     closeDropdownWithAnimation();
