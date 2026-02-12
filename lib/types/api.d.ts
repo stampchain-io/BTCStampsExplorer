@@ -480,6 +480,7 @@ export interface PaginatedSrc20ResponseBody {
 /**
  * Paginated tick response with mint status information
  * Provides detailed information about specific SRC-20 ticks including minting progress
+ * ✨ V2.4 Enhanced: Added optional market_data field for tick-level market information
  */
 export interface PaginatedTickResponseBody {
   last_block: number;
@@ -489,6 +490,7 @@ export interface PaginatedTickResponseBody {
   totalPages: number;
   mint_status: MintStatus;
   data: Src20Detail[];
+  market_data?: SRC20MarketData | null; // ✨ V2.4: Optional market data for the tick
 }
 
 /**

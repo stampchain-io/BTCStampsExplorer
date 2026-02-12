@@ -781,4 +781,120 @@ export class MarketDataRepository {
       )
       .filter((data): data is SRC20MarketData => data !== null);
   }
+
+  /**
+   * Get paginated SRC-20 market data with sorting and filtering
+   * @param options - Pagination and sorting options
+   * @returns Paginated SRC20MarketData with total count
+   */
+  static async getPaginatedSRC20MarketData(options: {
+    limit: number;
+    page: number;
+    sortBy?: string;
+    sortOrder?: "ASC" | "DESC";
+  }): Promise<{
+    data: SRC20MarketData[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  }> {
+    const {
+      limit,
+      page,
+      sortBy = "market_cap_usd",
+      sortOrder = "DESC",
+    } = options;
+
+    // Calculate offset for pagination
+    const offset = (page - 1) * limit;
+
+    // Validate and map sort field to database column
+    const sortFieldMap: Record<string, string> = {
+      market_cap_usd: "CAST(market_cap_usd AS DECIMAL(20,8))",
+      volume_24h_btc: "CAST(volume_24h_btc AS DECIMAL(16,8))",
+      price_change_24h_percent: "CAST(price_change_24h_percent AS DECIMAL(10,2))",
+    };
+
+    const sortColumn = sortFieldMap[sortBy] || sortFieldMap.market_cap_usd;
+
+    // Query to get total count (with filtering)
+    const countQuery = `
+      SELECT COUNT(*) as total
+      FROM src20_market_data
+      WHERE price_btc > 0
+    `;
+
+    // Query to get paginated data
+    const dataQuery = `
+      SELECT
+        tick,
+        price_btc,
+        price_usd,
+        floor_price_btc,
+        market_cap_btc,
+        market_cap_usd,
+        volume_24h_btc,
+        volume_7d_btc,
+        volume_30d_btc,
+        total_volume_btc,
+        holder_count,
+        circulating_supply,
+        price_change_24h_percent,
+        price_change_7d_percent,
+        price_change_30d_percent,
+        primary_exchange,
+        exchange_sources,
+        data_quality_score,
+        last_updated,
+        TIMESTAMPDIFF(MINUTE, last_updated, UTC_TIMESTAMP()) as cache_age_minutes
+      FROM src20_market_data
+      WHERE price_btc > 0
+      ORDER BY ${sortColumn} ${sortOrder}
+      LIMIT ? OFFSET ?
+    `;
+
+    try {
+      // Execute both queries in parallel
+      const [countResult, dataResult] = await Promise.all([
+        this.db.executeQueryWithCache(
+          countQuery,
+          [],
+          DEFAULT_CACHE_DURATION
+        ) as Promise<{ rows?: Array<{ total: number }> }>,
+        this.db.executeQueryWithCache(
+          dataQuery,
+          [limit, offset],
+          DEFAULT_CACHE_DURATION
+        ) as Promise<{ rows?: Array<SRC20MarketDataRow & { cache_age_minutes: number }> }>,
+      ]);
+
+      // Extract total count
+      const total = countResult.rows?.[0]?.total || 0;
+      const totalPages = Math.ceil(total / limit);
+
+      // Parse the data rows
+      const data = (dataResult.rows || [])
+        .map((row) => this.parseSRC20MarketDataRow(row))
+        .filter((marketData): marketData is SRC20MarketData => marketData !== null);
+
+      return {
+        data,
+        total,
+        page,
+        limit,
+        totalPages,
+      };
+    } catch (error) {
+      console.error("Error fetching paginated SRC-20 market data:", error);
+      // Return empty result on error
+      return {
+        data: [],
+        total: 0,
+        page,
+        limit,
+        totalPages: 0,
+      };
+    }
+  }
 }

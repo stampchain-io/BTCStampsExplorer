@@ -1,21 +1,21 @@
 import { MAX_PAGINATION_LIMIT } from "$constants";
 import blockFixturesData from "../fixtures/blockData.json" with {
-    type: "json"
+  type: "json",
 };
 import collectionFixturesData from "../fixtures/collectionData.json" with {
-    type: "json"
+  type: "json",
 };
 import marketDataFixturesData from "../fixtures/marketData.json" with {
-    type: "json"
+  type: "json",
 };
 import src101FixturesData from "../fixtures/src101Data.json" with {
-    type: "json"
+  type: "json",
 };
 import src20FixturesData from "../fixtures/src20Data.json" with {
-    type: "json"
+  type: "json",
 };
 import stampFixturesData from "../fixtures/stampData.json" with {
-    type: "json"
+  type: "json",
 };
 
 interface QueryResult {
@@ -69,15 +69,29 @@ export class MockDatabaseManager {
   }
 
   /**
-   * Set a specific mock response for a query pattern
+   * Set a specific mock response for a query pattern.
+   * Can be called with 2 args (tag-based) or 3 args (query-based).
    */
   setMockResponse(
-    query: string,
-    params: unknown[],
-    response: QueryResult,
+    queryOrTag: string,
+    paramsOrResponse: unknown[] | QueryResult,
+    response?: QueryResult,
   ): void {
-    const key = this.generateMockKey(query, params);
-    this.mockResponses.set(key, response);
+    if (response !== undefined) {
+      // 3-argument form: setMockResponse(query, params, response)
+      const key = this.generateMockKey(
+        queryOrTag,
+        paramsOrResponse as unknown[],
+      );
+      this.mockResponses.set(key, response);
+    } else {
+      // 2-argument form: setMockResponse(tag, response)
+      // Use the tag directly as the key for simple tag-based mocking
+      this._taggedMockResponses.set(
+        queryOrTag,
+        paramsOrResponse as QueryResult,
+      );
+    }
   }
 
   /**
@@ -89,11 +103,20 @@ export class MockDatabaseManager {
   }
 
   private _nextMockResult: QueryResult | null = null;
+  private _taggedMockResponses: Map<string, QueryResult> = new Map();
 
   /**
-   * Get the history of queries that were executed
+   * Get the history of queries that were executed.
+   * Returns an array of query strings for easier testing.
    */
-  getQueryHistory(): Array<{ query: string; params: unknown[] }> {
+  getQueryHistory(): string[] {
+    return this.queryHistory.map((entry) => entry.query);
+  }
+
+  /**
+   * Get the full query history with parameters
+   */
+  getFullQueryHistory(): Array<{ query: string; params: unknown[] }> {
     return [...this.queryHistory];
   }
 
@@ -109,6 +132,7 @@ export class MockDatabaseManager {
    */
   clearMockResponses(): void {
     this.mockResponses.clear();
+    this._taggedMockResponses.clear();
   }
 
   /**
@@ -136,17 +160,28 @@ export class MockDatabaseManager {
   private getMockDataForQuery(query: string, params: unknown[]): QueryResult {
     const normalizedQuery = query.toLowerCase();
 
-    // Check if there's a next mock result waiting
+    // Check if there's a next mock result waiting (highest priority)
     if (this._nextMockResult) {
       const result = this._nextMockResult;
       this._nextMockResult = null; // Clear after use
       return result;
     }
 
-    // Check if there's a specific mock response set first
+    // Check if there's a specific mock response set by query+params (second priority)
     const mockKey = this.generateMockKey(query, params);
     if (this.mockResponses.has(mockKey)) {
       return this.mockResponses.get(mockKey)!;
+    }
+
+    // Check tagged mock responses (tag-based mocking for tests - third priority)
+    // Only use tagged responses if explicitly set, not as a fallback to fixtures
+    if (this._taggedMockResponses.size > 0) {
+      for (const [tag, response] of this._taggedMockResponses.entries()) {
+        // Match if tag is in the query - tagged mocks take precedence over fixtures
+        if (normalizedQuery.includes(tag.toLowerCase())) {
+          return response;
+        }
+      }
     }
 
     // Count queries - Check BEFORE collection queries since count queries may contain "from collections"
@@ -1095,7 +1130,10 @@ export class MockDatabaseManager {
     queryPattern: string | RegExp,
     params?: unknown[],
   ): boolean {
-    return this.queryHistory.some(({ query, params: queryParams }) => {
+    return this.queryHistory.some((entry) => {
+      const query = entry.query;
+      const queryParams = entry.params;
+
       const queryMatches = typeof queryPattern === "string"
         ? query.toLowerCase().includes(queryPattern.toLowerCase())
         : queryPattern.test(query);
@@ -1114,7 +1152,8 @@ export class MockDatabaseManager {
    * Get the number of times a query pattern was called
    */
   getQueryCallCount(queryPattern: string | RegExp): number {
-    return this.queryHistory.filter(({ query }) => {
+    return this.queryHistory.filter((entry) => {
+      const query = entry.query;
       return typeof queryPattern === "string"
         ? query.toLowerCase().includes(queryPattern.toLowerCase())
         : queryPattern.test(query);
