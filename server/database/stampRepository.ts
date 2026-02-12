@@ -723,6 +723,7 @@ export class StampRepository {
     search?: string;
     cpidPrefix?: string;
     addressPrefix?: string;
+    txHashPrefix?: string;
     excludeSrc20?: boolean;
   }) {
     // Extract all parameters including both filter types
@@ -773,6 +774,7 @@ export class StampRepository {
       search,
       cpidPrefix,
       addressPrefix,
+      txHashPrefix,
       excludeSrc20 = false,
     } = options;
 
@@ -840,6 +842,12 @@ export class StampRepository {
     if (addressPrefix) {
       whereConditions.push("st.creator LIKE ?");
       queryParams.push(`${addressPrefix}%`);
+    }
+
+    // Tx hash prefix search (tx_hash column only)
+    if (txHashPrefix) {
+      whereConditions.push("st.tx_hash LIKE ?");
+      queryParams.push(`${txHashPrefix}%`);
     }
 
     // Exclude SRC-20 entries (used by stamp search endpoint)

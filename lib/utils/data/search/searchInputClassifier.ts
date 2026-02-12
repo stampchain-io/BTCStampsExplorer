@@ -92,6 +92,16 @@ export function classifySearchInput(
     };
   }
 
+  // Partial transaction hash: 8+ hex characters (not yet 64)
+  // At 8+ hex chars, very unlikely to be a ticker or other type
+  if (/^[a-fA-F0-9]{8,}$/.test(trimmed) && trimmed.length < 64) {
+    return {
+      type: "tx_hash",
+      sanitized: trimmed.toLowerCase(),
+      original: trimmed,
+    };
+  }
+
   // Bitcoin address (full validation fallback)
   const addrCandidate: string = trimmed;
   if (isValidBitcoinAddress(addrCandidate)) {

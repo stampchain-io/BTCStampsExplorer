@@ -34,7 +34,8 @@ export const handler: Handlers = {
           break;
 
         case "tx_hash":
-          queryOptions.identifier = sanitized;
+          queryOptions.txHashPrefix = sanitized;
+          queryOptions.limit = 11;
           break;
 
         case "stamp_number": {
