@@ -233,22 +233,23 @@ export class CollectionRepository {
 
     // Add market data fields if requested
     // Column names must match collection_market_data table schema
+    // Use MAX() aggregation for GROUP BY compatibility (one market data row per collection)
     if (includeMarketData) {
       query += `,
-        cmd.min_floor_price_btc as minFloorPriceBTC,
-        cmd.max_floor_price_btc as maxFloorPriceBTC,
-        cmd.avg_floor_price_btc as avgFloorPriceBTC,
-        cmd.median_floor_price_btc as medianFloorPriceBTC,
-        cmd.total_volume_24h_btc as totalVolume24hBTC,
-        cmd.stamps_with_prices_count as stampsWithPricesCount,
-        cmd.min_holder_count as minHolderCount,
-        cmd.max_holder_count as maxHolderCount,
-        cmd.avg_holder_count as avgHolderCount,
-        cmd.median_holder_count as medianHolderCount,
-        cmd.total_unique_holders as totalUniqueHolders,
-        cmd.avg_distribution_score as avgDistributionScore,
-        cmd.total_stamps_count as totalStampsCount,
-        cmd.last_updated as marketDataLastUpdated
+        MAX(cmd.min_floor_price_btc) as minFloorPriceBTC,
+        MAX(cmd.max_floor_price_btc) as maxFloorPriceBTC,
+        MAX(cmd.avg_floor_price_btc) as avgFloorPriceBTC,
+        MAX(cmd.median_floor_price_btc) as medianFloorPriceBTC,
+        MAX(cmd.total_volume_24h_btc) as totalVolume24hBTC,
+        MAX(cmd.stamps_with_prices_count) as stampsWithPricesCount,
+        MAX(cmd.min_holder_count) as minHolderCount,
+        MAX(cmd.max_holder_count) as maxHolderCount,
+        MAX(cmd.avg_holder_count) as avgHolderCount,
+        MAX(cmd.median_holder_count) as medianHolderCount,
+        MAX(cmd.total_unique_holders) as totalUniqueHolders,
+        MAX(cmd.avg_distribution_score) as avgDistributionScore,
+        MAX(cmd.total_stamps_count) as totalStampsCount,
+        MAX(cmd.last_updated) as marketDataLastUpdated
       `;
     }
 
@@ -446,22 +447,23 @@ export class CollectionRepository {
     `;
 
     // Add market data fields if requested
+    // Use MAX() aggregation for GROUP BY compatibility (one market data row per collection)
     if (includeMarketData) {
       query += `,
-        cmd.min_floor_price_btc as minFloorPriceBTC,
-        cmd.max_floor_price_btc as maxFloorPriceBTC,
-        cmd.avg_floor_price_btc as avgFloorPriceBTC,
-        cmd.median_floor_price_btc as medianFloorPriceBTC,
-        cmd.total_volume_24h_btc as totalVolume24hBTC,
-        cmd.stamps_with_prices_count as stampsWithPricesCount,
-        cmd.min_holder_count as minHolderCount,
-        cmd.max_holder_count as maxHolderCount,
-        cmd.avg_holder_count as avgHolderCount,
-        cmd.median_holder_count as medianHolderCount,
-        cmd.total_unique_holders as totalUniqueHolders,
-        cmd.avg_distribution_score as avgDistributionScore,
-        cmd.total_stamps_count as totalStampsCount,
-        cmd.last_updated as marketDataLastUpdated
+        MAX(cmd.min_floor_price_btc) as minFloorPriceBTC,
+        MAX(cmd.max_floor_price_btc) as maxFloorPriceBTC,
+        MAX(cmd.avg_floor_price_btc) as avgFloorPriceBTC,
+        MAX(cmd.median_floor_price_btc) as medianFloorPriceBTC,
+        MAX(cmd.total_volume_24h_btc) as totalVolume24hBTC,
+        MAX(cmd.stamps_with_prices_count) as stampsWithPricesCount,
+        MAX(cmd.min_holder_count) as minHolderCount,
+        MAX(cmd.max_holder_count) as maxHolderCount,
+        MAX(cmd.avg_holder_count) as avgHolderCount,
+        MAX(cmd.median_holder_count) as medianHolderCount,
+        MAX(cmd.total_unique_holders) as totalUniqueHolders,
+        MAX(cmd.avg_distribution_score) as avgDistributionScore,
+        MAX(cmd.total_stamps_count) as totalStampsCount,
+        MAX(cmd.last_updated) as marketDataLastUpdated
       `;
     }
 
@@ -474,7 +476,6 @@ export class CollectionRepository {
     `;
 
     // Join market data table if requested
-    // Option C (Hybrid): Use pre-computed collection_market_data table for performance
     if (includeMarketData) {
       // collection_market_data.collection_id stores hex string, collections.collection_id is BINARY(16)
       query += `
