@@ -350,13 +350,28 @@ export function SRC20MintTool({
         setError("Token not deployed");
         resetTokenData();
       } else {
+        logger.debug("stamps", {
+          message: "Token data received",
+          data: {
+            tick,
+            hasMintStatus: !!data.mintStatus,
+            hasStampUrl: !!data.mintStatus?.stamp_url,
+            stampUrl: data.mintStatus?.stamp_url,
+            txHash: data.mintStatus?.tx_hash,
+          },
+        });
+
         setMintStatus(data.mintStatus);
         setHolders(data.holders || 0);
+
         // Use centralized image URL logic
-        const imageUrl = getSRC20ImageSrc({
-          ...data.mintStatus,
-          deploy_tx: data.mintStatus.tx_hash,
-        } as any);
+        const imageUrl = getSRC20ImageSrc(data.mintStatus as any);
+
+        logger.debug("stamps", {
+          message: "Image URL generated",
+          data: { imageUrl, stampUrl: data.mintStatus?.stamp_url },
+        });
+
         setSelectedTokenImage(imageUrl);
 
         setFormState((prevState) => ({

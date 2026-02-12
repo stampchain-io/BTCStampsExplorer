@@ -598,11 +598,14 @@ export class SRC20Repository {
         dep.lim,
         dep.tx_hash,
         dep.tick,
+        dep.stamp_hash,
         COALESCE(stats.total_minted, 0) as total_minted,
         COALESCE(stats.holders_count, 0) as holders_count,
-        (SELECT COUNT(*) FROM ${SRC20_TABLE} WHERE tick = dep.tick AND op = 'MINT') AS total_mints
+        (SELECT COUNT(*) FROM ${SRC20_TABLE} WHERE tick = dep.tick AND op = 'MINT') AS total_mints,
+        stamps.stamp_url
       FROM ${SRC20_TABLE} AS dep
       LEFT JOIN src20_token_stats stats ON stats.tick = dep.tick
+      LEFT JOIN stamps ON stamps.tx_hash = dep.tx_hash
       WHERE
         dep.tick = ? AND
         dep.op = 'DEPLOY'
@@ -637,6 +640,8 @@ export class SRC20Repository {
       holders: row["holders_count"],
       tx_hash: row["tx_hash"],
       tick: row["tick"],
+      stamp_hash: row["stamp_hash"],
+      stamp_url: row["stamp_url"],
     });
   }
 
