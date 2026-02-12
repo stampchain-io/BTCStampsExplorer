@@ -2,6 +2,7 @@
 import { closeModal, openModal, searchState } from "$islands/modal/states.ts";
 import { SearchErrorDisplay } from "$islands/modal/SearchErrorDisplay.tsx";
 import { SearchInputField } from "$islands/modal/SearchInputField.tsx";
+import { Icon } from "$icon";
 import { ModalSearchBase, transitionColors } from "$layout";
 import {
   classifySearchInput,
@@ -190,24 +191,17 @@ function SearchContent({
                       class={`flex items-center gap-3 px-7.5 py-2 hover:bg-color-background/60 ${transitionColors} cursor-pointer`}
                     >
                       <div class="w-10 h-10 rounded bg-color-background/30 flex items-center justify-center">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          class="w-5 h-5 text-stamp-grey-light"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          stroke-width="1.5"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="M21 12a2.25 2.25 0 0 0-2.25-2.25H15a3 3 0 1 1 0-6h.75A2.25 2.25 0 0 1 18 6v0M3 6v12a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3V6a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3Z"
-                          />
-                        </svg>
+                        <Icon
+                          type="icon"
+                          name="wallet"
+                          weight="normal"
+                          size="xs"
+                          color="greyLight"
+                        />
                       </div>
                       <div class="flex flex-col flex-1 min-w-0">
                         <span class="text-sm font-medium text-stamp-grey-light">
-                          View wallet
+                          VIEW WALLET
                         </span>
                         <span class="text-xs text-stamp-grey truncate">
                           {result.address}
