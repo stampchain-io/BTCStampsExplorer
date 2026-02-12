@@ -20,7 +20,9 @@ const skipInCI = Deno.env.get("CI") === "true" && !Deno.env.get("TEST_DB_HOST");
 // Test server base URL
 const BASE_URL = Deno.env.get("TEST_SERVER_URL") || "http://localhost:8000";
 
-describe("Collection Detail Endpoint - /api/v2/collections/[id]", { skip: skipInCI }, () => {
+describe("Collection Detail Endpoint - /api/v2/collections/[id]", {
+  skip: skipInCI,
+}, () => {
   let testCollectionId: string | null = null;
 
   beforeAll(async () => {
@@ -48,7 +50,9 @@ describe("Collection Detail Endpoint - /api/v2/collections/[id]", { skip: skipIn
   describe("GET /api/v2/collections/[id]", () => {
     it("should return 404 for invalid collection UUID", async () => {
       const invalidId = "00000000000000000000000000000000";
-      const response = await fetch(`${BASE_URL}/api/v2/collections/${invalidId}`);
+      const response = await fetch(
+        `${BASE_URL}/api/v2/collections/${invalidId}`,
+      );
 
       assertEquals(response.status, 404);
 
@@ -63,7 +67,9 @@ describe("Collection Detail Endpoint - /api/v2/collections/[id]", { skip: skipIn
         return;
       }
 
-      const response = await fetch(`${BASE_URL}/api/v2/collections/${testCollectionId}`);
+      const response = await fetch(
+        `${BASE_URL}/api/v2/collections/${testCollectionId}`,
+      );
 
       assertEquals(response.status, 200);
 
@@ -89,7 +95,9 @@ describe("Collection Detail Endpoint - /api/v2/collections/[id]", { skip: skipIn
         return;
       }
 
-      const response = await fetch(`${BASE_URL}/api/v2/collections/${testCollectionId}`);
+      const response = await fetch(
+        `${BASE_URL}/api/v2/collections/${testCollectionId}`,
+      );
 
       assertEquals(response.status, 200);
 
@@ -111,7 +119,7 @@ describe("Collection Detail Endpoint - /api/v2/collections/[id]", { skip: skipIn
       const limit = 10;
       const page = 1;
       const response = await fetch(
-        `${BASE_URL}/api/v2/collections/${testCollectionId}?limit=${limit}&page=${page}`
+        `${BASE_URL}/api/v2/collections/${testCollectionId}?limit=${limit}&page=${page}`,
       );
 
       assertEquals(response.status, 200);
@@ -132,7 +140,9 @@ describe("Collection Detail Endpoint - /api/v2/collections/[id]", { skip: skipIn
         return;
       }
 
-      const response = await fetch(`${BASE_URL}/api/v2/collections/${testCollectionId}`);
+      const response = await fetch(
+        `${BASE_URL}/api/v2/collections/${testCollectionId}`,
+      );
 
       assertEquals(response.status, 200);
 
@@ -145,12 +155,17 @@ describe("Collection Detail Endpoint - /api/v2/collections/[id]", { skip: skipIn
         const marketData = collection.marketData;
 
         // These fields should exist when market data is present
-        assertExists(marketData.minFloorPriceBTC !== undefined);
-        assertExists(marketData.maxFloorPriceBTC !== undefined);
-        assertExists(marketData.avgFloorPriceBTC !== undefined);
-        assertExists(marketData.medianFloorPriceBTC !== undefined);
-        assertExists(marketData.totalVolume24hBTC !== undefined);
-        assertExists(marketData.stampsWithPricesCount !== undefined);
+        assertExists(marketData.floorPriceBTC !== undefined);
+        assertExists(marketData.avgPriceBTC !== undefined);
+        assertExists(marketData.totalValueBTC !== undefined);
+        assertExists(marketData.volume24hBTC !== undefined);
+        assertExists(marketData.volume7dBTC !== undefined);
+        assertExists(marketData.volume30dBTC !== undefined);
+        assertExists(marketData.totalVolumeBTC !== undefined);
+        assertExists(marketData.totalStamps !== undefined);
+        assertExists(marketData.uniqueHolders !== undefined);
+        assertExists(marketData.listedStamps !== undefined);
+        assertExists(marketData.soldStamps24h !== undefined);
       }
     });
 
@@ -162,7 +177,9 @@ describe("Collection Detail Endpoint - /api/v2/collections/[id]", { skip: skipIn
 
       // Test with lowercase UUID
       const lowercaseId = testCollectionId.toLowerCase();
-      const response = await fetch(`${BASE_URL}/api/v2/collections/${lowercaseId}`);
+      const response = await fetch(
+        `${BASE_URL}/api/v2/collections/${lowercaseId}`,
+      );
 
       assertEquals(response.status, 200);
 
@@ -173,7 +190,9 @@ describe("Collection Detail Endpoint - /api/v2/collections/[id]", { skip: skipIn
 
     it("should reject malformed UUIDs", async () => {
       const malformedId = "not-a-valid-uuid";
-      const response = await fetch(`${BASE_URL}/api/v2/collections/${malformedId}`);
+      const response = await fetch(
+        `${BASE_URL}/api/v2/collections/${malformedId}`,
+      );
 
       // Should return 400 Bad Request or 404 Not Found
       assertEquals(response.status >= 400 && response.status < 500, true);
@@ -186,11 +205,15 @@ describe("Collection Detail Endpoint - /api/v2/collections/[id]", { skip: skipIn
       }
 
       // Make first request
-      const response1 = await fetch(`${BASE_URL}/api/v2/collections/${testCollectionId}`);
+      const response1 = await fetch(
+        `${BASE_URL}/api/v2/collections/${testCollectionId}`,
+      );
       assertEquals(response1.status, 200);
 
       // Make second request - should be cached
-      const response2 = await fetch(`${BASE_URL}/api/v2/collections/${testCollectionId}`);
+      const response2 = await fetch(
+        `${BASE_URL}/api/v2/collections/${testCollectionId}`,
+      );
       assertEquals(response2.status, 200);
 
       const data1 = await response1.json();

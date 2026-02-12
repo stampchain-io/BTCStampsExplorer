@@ -68,20 +68,19 @@ describe("Collection Market Data Integration Tests", () => {
           stamp_count: 3,
           total_editions: 100,
           // Market data fields from collection_market_data table
-          minFloorPriceBTC: "0.00001000",
-          maxFloorPriceBTC: "0.00005000",
-          avgFloorPriceBTC: "0.00003000",
-          medianFloorPriceBTC: null,
-          totalVolume24hBTC: "0.00050000",
-          stampsWithPricesCount: 2,
-          minHolderCount: 5,
-          maxHolderCount: 20,
-          avgHolderCount: "12.50",
-          medianHolderCount: null,
-          totalUniqueHolders: 15,
-          avgDistributionScore: "7.5",
-          totalStampsCount: 3,
-          marketDataLastUpdated: new Date("2025-02-11T12:00:00Z"),
+          floor_price_btc: "0.00001000",
+          avg_price_btc: "0.00003000",
+          total_value_btc: "0.00300000",
+          volume_24h_btc: "0.00050000",
+          volume_7d_btc: "0.00100000",
+          volume_30d_btc: "0.00300000",
+          total_volume_btc: "0.01000000",
+          total_stamps: 3,
+          unique_holders: 15,
+          listed_stamps: 2,
+          sold_stamps_24h: 1,
+          last_updated: new Date("2025-02-11T12:00:00Z"),
+          created_at: new Date("2024-01-01T00:00:00Z"),
         }],
       };
 
@@ -106,19 +105,17 @@ describe("Collection Market Data Integration Tests", () => {
 
       // Verify market data is included
       assertExists(collection.marketData);
-      assertEquals(collection.marketData.minFloorPriceBTC, 0.00001000);
-      assertEquals(collection.marketData.maxFloorPriceBTC, 0.00005000);
-      assertEquals(collection.marketData.avgFloorPriceBTC, 0.00003000);
-      assertEquals(collection.marketData.medianFloorPriceBTC, null);
-      assertEquals(collection.marketData.totalVolume24hBTC, 0.00050000);
-      assertEquals(collection.marketData.stampsWithPricesCount, 2);
-      assertEquals(collection.marketData.minHolderCount, 5);
-      assertEquals(collection.marketData.maxHolderCount, 20);
-      assertEquals(collection.marketData.avgHolderCount, 12.50);
-      assertEquals(collection.marketData.medianHolderCount, null);
-      assertEquals(collection.marketData.totalUniqueHolders, 15);
-      assertEquals(collection.marketData.avgDistributionScore, 7.5);
-      assertEquals(collection.marketData.totalStampsCount, 3);
+      assertEquals(collection.marketData.floorPriceBTC, 0.00001000);
+      assertEquals(collection.marketData.avgPriceBTC, 0.00003000);
+      assertEquals(collection.marketData.totalValueBTC, 0.003);
+      assertEquals(collection.marketData.volume24hBTC, 0.00050000);
+      assertEquals(collection.marketData.volume7dBTC, 0.001);
+      assertEquals(collection.marketData.volume30dBTC, 0.003);
+      assertEquals(collection.marketData.totalVolumeBTC, 0.01);
+      assertEquals(collection.marketData.totalStamps, 3);
+      assertEquals(collection.marketData.uniqueHolders, 15);
+      assertEquals(collection.marketData.listedStamps, 2);
+      assertEquals(collection.marketData.soldStamps24h, 1);
       assertExists(collection.marketData.lastUpdated);
     });
 
@@ -138,21 +135,20 @@ describe("Collection Market Data Integration Tests", () => {
           stamp_count: 1,
           total_editions: 10,
           // NULL values (no market data available)
-          minFloorPriceBTC: null,
-          maxFloorPriceBTC: null,
-          avgFloorPriceBTC: null,
-          medianFloorPriceBTC: null,
+          floor_price_btc: null,
+          avg_price_btc: null,
+          total_value_btc: null,
           // 0 values (zero volume, valid data)
-          totalVolume24hBTC: "0",
-          stampsWithPricesCount: 0,
-          minHolderCount: 0,
-          maxHolderCount: 0,
-          avgHolderCount: "0",
-          medianHolderCount: null,
-          totalUniqueHolders: 0,
-          avgDistributionScore: "0",
-          totalStampsCount: 1,
-          marketDataLastUpdated: new Date("2025-02-11T12:00:00Z"),
+          volume_24h_btc: "0",
+          volume_7d_btc: "0",
+          volume_30d_btc: "0",
+          total_volume_btc: "0",
+          total_stamps: 1,
+          unique_holders: 0,
+          listed_stamps: 0,
+          sold_stamps_24h: 0,
+          last_updated: new Date("2025-02-11T12:00:00Z"),
+          created_at: new Date("2024-01-01T00:00:00Z"),
         }],
       };
 
@@ -169,13 +165,17 @@ describe("Collection Market Data Integration Tests", () => {
       const collection = result.rows[0] as CollectionWithOptionalMarketData;
 
       // Verify NULL values are preserved as null (no data)
-      assertEquals(collection.marketData?.minFloorPriceBTC, null);
-      assertEquals(collection.marketData?.maxFloorPriceBTC, null);
-      assertEquals(collection.marketData?.avgFloorPriceBTC, null);
+      assertEquals(collection.marketData?.floorPriceBTC, null);
+      assertEquals(collection.marketData?.avgPriceBTC, null);
+      assertEquals(collection.marketData?.totalValueBTC, null);
 
       // Verify 0 values are preserved as 0 (zero volume)
-      assertEquals(collection.marketData?.totalVolume24hBTC, 0);
-      assertEquals(collection.marketData?.stampsWithPricesCount, 0);
+      assertEquals(collection.marketData?.volume24hBTC, 0);
+      assertEquals(collection.marketData?.volume7dBTC, 0);
+      assertEquals(collection.marketData?.volume30dBTC, 0);
+      assertEquals(collection.marketData?.totalVolumeBTC, 0);
+      assertEquals(collection.marketData?.listedStamps, 0);
+      assertEquals(collection.marketData?.soldStamps24h, 0);
     });
 
     it("should handle collections without market data", async () => {
@@ -194,20 +194,19 @@ describe("Collection Market Data Integration Tests", () => {
           stamp_count: 1,
           total_editions: 10,
           // All market data fields are NULL (no entry in collection_market_data)
-          minFloorPriceBTC: null,
-          maxFloorPriceBTC: null,
-          avgFloorPriceBTC: null,
-          medianFloorPriceBTC: null,
-          totalVolume24hBTC: null,
-          stampsWithPricesCount: null,
-          minHolderCount: null,
-          maxHolderCount: null,
-          avgHolderCount: null,
-          medianHolderCount: null,
-          totalUniqueHolders: null,
-          avgDistributionScore: null,
-          totalStampsCount: null,
-          marketDataLastUpdated: null,
+          floor_price_btc: null,
+          avg_price_btc: null,
+          total_value_btc: null,
+          volume_24h_btc: null,
+          volume_7d_btc: null,
+          volume_30d_btc: null,
+          total_volume_btc: null,
+          total_stamps: null,
+          unique_holders: null,
+          listed_stamps: null,
+          sold_stamps_24h: null,
+          last_updated: null,
+          created_at: null,
         }],
       };
 
@@ -291,7 +290,7 @@ describe("Collection Market Data Integration Tests", () => {
       const queries = mockDb.getQueryHistory();
       const hasMarketDataJoin = queries.some((q) =>
         q.includes("collection_market_data") ||
-        q.includes("cmd.min_floor_price_btc")
+        q.includes("cmd.floor_price_btc")
       );
 
       assertEquals(
@@ -393,20 +392,19 @@ describe("Collection Market Data Integration Tests", () => {
           stamp_count: 1,
           total_editions: 1,
           // All CollectionMarketDataRow fields with proper types
-          minFloorPriceBTC: "0.00001234", // DECIMAL as string
-          maxFloorPriceBTC: "0.00009876",
-          avgFloorPriceBTC: "0.00005555",
-          medianFloorPriceBTC: null,
-          totalVolume24hBTC: "0.00123456",
-          stampsWithPricesCount: 1, // INT
-          minHolderCount: 1,
-          maxHolderCount: 10,
-          avgHolderCount: "5.5", // DECIMAL as string
-          medianHolderCount: null,
-          totalUniqueHolders: 8,
-          avgDistributionScore: "6.75",
-          totalStampsCount: 1,
-          marketDataLastUpdated: new Date("2025-02-11T12:00:00Z"),
+          floor_price_btc: "0.00001234", // DECIMAL as string
+          avg_price_btc: "0.00005555",
+          total_value_btc: "0.00100000",
+          volume_24h_btc: "0.00123456",
+          volume_7d_btc: "0.00200000",
+          volume_30d_btc: "0.00500000",
+          total_volume_btc: "0.01000000",
+          total_stamps: 1, // INT
+          unique_holders: 8,
+          listed_stamps: 1,
+          sold_stamps_24h: 1,
+          last_updated: new Date("2025-02-11T12:00:00Z"),
+          created_at: new Date("2024-01-01T00:00:00Z"),
         }],
       };
 
@@ -423,24 +421,23 @@ describe("Collection Market Data Integration Tests", () => {
       const collection = result.rows[0] as CollectionWithOptionalMarketData;
 
       // Verify DECIMAL fields are parsed to numbers
-      assertEquals(typeof collection.marketData?.minFloorPriceBTC, "number");
-      assertEquals(typeof collection.marketData?.avgFloorPriceBTC, "number");
-      assertEquals(typeof collection.marketData?.avgHolderCount, "number");
-      assertEquals(
-        typeof collection.marketData?.avgDistributionScore,
-        "number",
-      );
+      assertEquals(typeof collection.marketData?.floorPriceBTC, "number");
+      assertEquals(typeof collection.marketData?.avgPriceBTC, "number");
+      assertEquals(typeof collection.marketData?.totalValueBTC, "number");
+      assertEquals(typeof collection.marketData?.volume24hBTC, "number");
+      assertEquals(typeof collection.marketData?.volume7dBTC, "number");
+      assertEquals(typeof collection.marketData?.volume30dBTC, "number");
+      assertEquals(typeof collection.marketData?.totalVolumeBTC, "number");
 
       // Verify INT fields remain integers
-      assertEquals(
-        typeof collection.marketData?.stampsWithPricesCount,
-        "number",
-      );
-      assertEquals(typeof collection.marketData?.totalUniqueHolders, "number");
+      assertEquals(typeof collection.marketData?.totalStamps, "number");
+      assertEquals(typeof collection.marketData?.uniqueHolders, "number");
+      assertEquals(typeof collection.marketData?.listedStamps, "number");
+      assertEquals(typeof collection.marketData?.soldStamps24h, "number");
 
       // Verify precision is preserved
-      assertEquals(collection.marketData?.minFloorPriceBTC, 0.00001234);
-      assertEquals(collection.marketData?.avgHolderCount, 5.5);
+      assertEquals(collection.marketData?.floorPriceBTC, 0.00001234);
+      assertEquals(collection.marketData?.avgPriceBTC, 0.00005555);
     });
   });
 });

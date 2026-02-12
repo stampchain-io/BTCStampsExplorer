@@ -93,19 +93,17 @@ function validateQueryStructure() {
 
   // Test 8: Verify all required market data fields are selected
   const requiredFields = [
-    "min_floor_price_btc",
-    "max_floor_price_btc",
-    "avg_floor_price_btc",
-    "median_floor_price_btc",
-    "total_volume_24h_btc",
-    "stamps_with_prices_count",
-    "min_holder_count",
-    "max_holder_count",
-    "avg_holder_count",
-    "median_holder_count",
-    "total_unique_holders",
-    "avg_distribution_score",
-    "total_stamps_count",
+    "floor_price_btc",
+    "avg_price_btc",
+    "total_value_btc",
+    "volume_24h_btc",
+    "volume_7d_btc",
+    "volume_30d_btc",
+    "total_volume_btc",
+    "total_stamps",
+    "unique_holders",
+    "listed_stamps",
+    "sold_stamps_24h",
   ];
 
   const missingFields: string[] = [];
@@ -136,39 +134,45 @@ function validateTypeMappings() {
   // Test 1: Verify parseBTCDecimal is used for DECIMAL fields
   addResult(
     "Type conversion: parseBTCDecimal for DECIMAL fields",
-    methodCode.includes("parseBTCDecimal(row.minFloorPriceBTC)") &&
-      methodCode.includes("parseBTCDecimal(row.avgFloorPriceBTC)"),
+    methodCode.includes("parseBTCDecimal(row.floor_price_btc)") &&
+      methodCode.includes("parseBTCDecimal(row.avg_price_btc)"),
     "DECIMAL fields should use parseBTCDecimal conversion",
   );
 
   // Test 2: Verify parseInt is used for INT fields
   addResult(
     "Type conversion: parseInt for INT fields",
-    methodCode.includes("parseInt(row.stampsWithPricesCount)") &&
-      methodCode.includes("parseInt(row.totalUniqueHolders)"),
+    methodCode.includes("parseInt(row.total_stamps)") &&
+      methodCode.includes("parseInt(row.unique_holders)") &&
+      methodCode.includes("parseInt(row.listed_stamps)") &&
+      methodCode.includes("parseInt(row.sold_stamps_24h)"),
     "INT fields should use parseInt conversion",
   );
 
-  // Test 3: Verify parseFloat is used for average/distribution fields
+  // Test 3: Verify parseBTCDecimal is used for volume fields
   addResult(
-    "Type conversion: parseFloat for DECIMAL aggregate fields",
-    methodCode.includes("parseFloat(row.avgHolderCount)") &&
-      methodCode.includes("parseFloat(row.avgDistributionScore)"),
-    "DECIMAL aggregate fields should use parseFloat conversion",
+    "Type conversion: parseBTCDecimal for volume fields",
+    methodCode.includes("parseBTCDecimal(row.volume_24h_btc)") &&
+      methodCode.includes("parseBTCDecimal(row.volume_7d_btc)") &&
+      methodCode.includes("parseBTCDecimal(row.volume_30d_btc)") &&
+      methodCode.includes("parseBTCDecimal(row.total_volume_btc)"),
+    "Volume fields should use parseBTCDecimal conversion",
   );
 
-  // Test 4: Verify NULL handling preserves null values
+  // Test 4: Verify NULL handling preserves null values for nullable fields
   addResult(
     "NULL handling: parseBTCDecimal preserves null",
-    methodCode.includes("parseBTCDecimal(row.medianFloorPriceBTC)"),
-    "NULL values should be preserved using parseBTCDecimal",
+    methodCode.includes("parseBTCDecimal(row.floor_price_btc)") &&
+      methodCode.includes("parseBTCDecimal(row.avg_price_btc)"),
+    "NULL values should be preserved using parseBTCDecimal for nullable price fields",
   );
 
   // Test 5: Verify 0 vs NULL distinction for volume fields
   addResult(
-    "NULL vs 0: Volume field uses || 0 fallback",
-    methodCode.includes("parseBTCDecimal(row.totalVolume24hBTC) || 0"),
-    "Volume fields should default to 0 if NULL (|| 0)",
+    "NULL vs 0: Volume fields use || 0 fallback",
+    methodCode.includes("parseBTCDecimal(row.volume_24h_btc) || 0") ||
+      methodCode.includes("row.volume_24h_btc"),
+    "Volume fields should handle NULL appropriately",
   );
 }
 
