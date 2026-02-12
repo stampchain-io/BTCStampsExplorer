@@ -17,9 +17,11 @@ export function useAutoFocus(
 ): void {
   useEffect(() => {
     if (autoFocus) {
-      setTimeout(() => {
+      // Small delay to ensure the modal animation has rendered
+      // the input as visible and focusable
+      requestAnimationFrame(() => {
         inputRef.current?.focus();
-      }, 0);
+      });
     }
   }, [autoFocus]);
 }
