@@ -226,39 +226,17 @@ export function SRC20MintTool({
 
   /* ===== TOKEN SEARCH EFFECT ===== */
   useEffect(() => {
-    logger.debug("stamps", {
-      message: "Search effect triggered",
-      data: { searchTerm, isSelecting, isSwitchingFields },
-    });
-
     if (isSelecting || isSwitchingFields) {
-      logger.debug("stamps", {
-        message: "Search effect: early return",
-        data: { isSelecting, isSwitchingFields },
-      });
       return;
     }
 
     if (!searchTerm.trim()) {
-      logger.debug("stamps", {
-        message: "Search effect: empty search term, clearing results",
-      });
       setSearchResults([]);
       closeDropdownWithAnimation();
       return;
     }
 
-    logger.debug("stamps", {
-      message: "Search effect: scheduling search",
-      data: { searchTerm },
-    });
-
     const delayDebounceFn = setTimeout(async () => {
-      logger.debug("stamps", {
-        message: "Search: executing fetch",
-        data: { searchTerm },
-      });
-
       try {
         const response = await fetch(
           `/api/v2/src20/search?q=${
@@ -266,16 +244,10 @@ export function SRC20MintTool({
           }&mintable_only=true`,
         );
 
-        logger.debug("stamps", {
-          message: "Search: fetch complete",
-          data: { status: response.status, ok: response.ok },
-        });
-
         if (!response.ok) {
           logger.error("stamps", {
             message: "Search API error",
-            status: response.status,
-            searchTerm,
+            data: { status: response.status, searchTerm },
           });
           setSearchResults([]);
           closeDropdownWithAnimation();
@@ -284,36 +256,10 @@ export function SRC20MintTool({
 
         const data = await response.json();
 
-        logger.debug("stamps", {
-          message: "Search: parsed JSON",
-          data: {
-            hasData: !!data.data,
-            isArray: Array.isArray(data.data),
-            length: data.data?.length,
-            isSelecting,
-            isSwitchingFields,
-          },
-        });
-
         if (data.data && Array.isArray(data.data)) {
           setSearchResults(data.data);
-          logger.debug("stamps", {
-            message: "Search: results set, opening dropdown",
-            data: {
-              count: data.data.length,
-            },
-          });
-
-          // Always set dropdown open when we have results
-          // The render condition will check current state to determine visibility
           setOpenDrop(true);
           setDropdownAnimation("enter");
-        } else {
-          logger.debug("stamps", {
-            message: "Search returned no results or unexpected format",
-            searchTerm,
-            dataStructure: typeof data,
-          });
         }
       } catch (error) {
         logger.error("stamps", {
@@ -343,65 +289,18 @@ export function SRC20MintTool({
       setIsImageLoading(true);
       setError(null);
 
-      logger.debug("stamps", {
-        message: "Fetching mint data for tick",
-        data: { tick, url: `/api/v2/src20/tick/${tick}/mintData` },
-      });
-
       const response = await axiod.get(`/api/v2/src20/tick/${tick}/mintData`);
       const data = response.data;
 
-      logger.debug("stamps", {
-        message: "Raw API response received",
-        data: {
-          tick,
-          hasData: !!data,
-          dataKeys: data ? Object.keys(data) : [],
-          hasMintStatus: !!data?.mintStatus,
-          hasHolders: data?.holders !== undefined,
-          rawData: data,
-        },
-      });
-
       if (!data || data.error || !data.mintStatus) {
-        logger.error("stamps", {
-          message: "Invalid mint data response",
-          data: {
-            tick,
-            hasData: !!data,
-            hasError: !!data?.error,
-            hasMintStatus: !!data?.mintStatus,
-            fullData: data,
-          },
-        });
         setError("Token not deployed");
         resetTokenData();
       } else {
-        logger.debug("stamps", {
-          message: "Token data received",
-          data: {
-            tick,
-            hasMintStatus: !!data.mintStatus,
-            hasStampUrl: !!data.mintStatus?.stamp_url,
-            stampUrl: data.mintStatus?.stamp_url,
-            txHash: data.mintStatus?.tx_hash,
-            limit: data.mintStatus?.limit,
-            maxSupply: data.mintStatus?.max_supply,
-            progress: data.mintStatus?.progress,
-          },
-        });
-
         setMintStatus(data.mintStatus);
         setHolders(data.holders || 0);
 
         // Use centralized image URL logic
         const imageUrl = getSRC20ImageSrc(data.mintStatus as any);
-
-        logger.debug("stamps", {
-          message: "Image URL generated",
-          data: { imageUrl, stampUrl: data.mintStatus?.stamp_url },
-        });
-
         setSelectedTokenImage(imageUrl);
 
         setFormState((prevState) => ({
@@ -412,22 +311,10 @@ export function SRC20MintTool({
       }
     } catch (err) {
       logger.error("stamps", {
-        message: "Error fetching token data - FULL ERROR DETAILS",
+        message: "Error fetching token data",
         data: {
           tick,
-          errorType: err?.constructor?.name,
-          errorMessage: err instanceof Error ? err.message : String(err),
-          errorStack: err instanceof Error ? err.stack : undefined,
-          fullError: err,
-          // If it's an axios error, get more details
-          axiosError: (err as any)?.response
-            ? {
-              status: (err as any).response.status,
-              statusText: (err as any).response.statusText,
-              data: (err as any).response.data,
-              headers: (err as any).response.headers,
-            }
-            : undefined,
+          error: err instanceof Error ? err.message : String(err),
         },
       });
       const errorMessage = extractSRC20ErrorMessage(err, "mint");

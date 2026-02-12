@@ -599,7 +599,6 @@ export class SRC20Repository {
         dep.lim,
         dep.tx_hash,
         dep.tick,
-        dep.stamp_hash,
         COALESCE(stats.total_minted, 0) as total_minted,
         COALESCE(stats.holders_count, 0) as holders_count,
         (SELECT COUNT(*) FROM ${SRC20_TABLE} WHERE tick = dep.tick AND op = 'MINT') AS total_mints,
@@ -641,7 +640,6 @@ export class SRC20Repository {
       holders: row["holders_count"],
       tx_hash: row["tx_hash"],
       tick: row["tick"],
-      stamp_hash: row["stamp_hash"],
       stamp_url: row["stamp_url"],
     });
   }
