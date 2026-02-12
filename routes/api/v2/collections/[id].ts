@@ -2,13 +2,15 @@ import { Handlers } from "$fresh/server.ts";
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { getPaginationParams } from "$lib/utils/data/pagination/paginationUtils.ts";
 import { CollectionController } from "$server/controller/collectionController.ts";
+import { CollectionService } from "$server/services/core/collectionService.ts";
 import { RouteType } from "$server/services/infrastructure/cacheService.ts";
 
 /**
  * Collection Detail Endpoint
  * Route: /api/v2/collections/[id]
  *
- * Returns detailed information for a specific collection by ID, including:
+ * Accepts either a collection name (e.g., "KEVIN") or a hex UUID (32 hex chars).
+ * Returns detailed information including:
  * - Basic collection information (name, description, creators)
  * - Stamps array (paginated)
  * - Market data from collection_market_data table
@@ -17,28 +19,31 @@ import { RouteType } from "$server/services/infrastructure/cacheService.ts";
  * - limit: Number of stamps to return per page (default: 50)
  * - page: Page number for pagination (default: 1)
  * - includeMarketData: Whether to include market data (default: true)
- *
- * Note: Collection ID must be a valid UUID (32 hex characters).
- * The UUID is converted to BINARY(16) using UNHEX() for database queries.
  */
 export const handler: Handlers = {
   async GET(req, ctx) {
     try {
       const { id } = ctx.params;
 
-      // Validate collection ID format (should be 32 hex characters)
       if (!id) {
-        return ApiResponseUtil.badRequest("Collection ID is required");
+        return ApiResponseUtil.badRequest("Collection ID or name is required");
       }
 
-      // Remove hyphens if UUID format with hyphens (e.g., "550e8400-e29b-41d4-a716-446655440000")
+      // Determine if input is a hex UUID or a collection name
       const cleanedId = id.replace(/-/g, "");
+      const isHexId = /^[0-9a-fA-F]{32}$/.test(cleanedId);
 
-      // Validate hex format and length
-      if (!/^[0-9a-fA-F]{32}$/.test(cleanedId)) {
-        return ApiResponseUtil.badRequest(
-          "Invalid collection ID format. Expected 32 hexadecimal characters.",
-        );
+      let collectionId: string;
+
+      if (isHexId) {
+        collectionId = cleanedId;
+      } else {
+        // Look up collection by name to get its hex UUID
+        const byName = await CollectionService.getCollectionByName(id);
+        if (!byName) {
+          return ApiResponseUtil.notFound("Collection not found");
+        }
+        collectionId = byName.collection_id;
       }
 
       const url = new URL(req.url);
@@ -57,9 +62,9 @@ export const handler: Handlers = {
         ? true
         : includeMarketDataParam === "true";
 
-      // Fetch collection by ID
+      // Fetch collection by ID (with market data, stamps, etc.)
       const collection = await CollectionController.getCollectionById(
-        cleanedId,
+        collectionId,
         {
           includeMarketData,
           stampLimit: limit || 50,
@@ -76,7 +81,7 @@ export const handler: Handlers = {
         routeType: RouteType.COLLECTION,
       });
     } catch (error) {
-      console.error("Error in collection by-id handler:", error);
+      console.error("Error in collection handler:", error);
       return ApiResponseUtil.internalError(
         error,
         "Error processing collection request",
