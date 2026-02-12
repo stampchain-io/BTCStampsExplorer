@@ -452,7 +452,7 @@ export class MarketDataRepository {
   static async getCollectionMarketData(collectionId: string): Promise<CollectionMarketData | null> {
     const query = `
       SELECT
-        collection_id,
+        HEX(collection_id) as collection_id,
         min_floor_price_btc,
         max_floor_price_btc,
         avg_floor_price_btc,
@@ -469,7 +469,7 @@ export class MarketDataRepository {
         last_updated,
         TIMESTAMPDIFF(MINUTE, last_updated, UTC_TIMESTAMP()) as cache_age_minutes
       FROM collection_market_data
-      WHERE collection_id = ?
+      WHERE collection_id = UNHEX(?)
       LIMIT 1
     `;
 
