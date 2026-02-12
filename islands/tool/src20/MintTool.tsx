@@ -226,23 +226,50 @@ export function SRC20MintTool({
 
   /* ===== TOKEN SEARCH EFFECT ===== */
   useEffect(() => {
+    logger.debug("stamps", {
+      message: "Search effect triggered",
+      data: { searchTerm, isSelecting, isSwitchingFields },
+    });
+
     if (isSelecting || isSwitchingFields) {
+      logger.debug("stamps", {
+        message: "Search effect: early return",
+        data: { isSelecting, isSwitchingFields },
+      });
       return;
     }
 
     if (!searchTerm.trim()) {
+      logger.debug("stamps", {
+        message: "Search effect: empty search term, clearing results",
+      });
       setSearchResults([]);
       closeDropdownWithAnimation();
       return;
     }
 
+    logger.debug("stamps", {
+      message: "Search effect: scheduling search",
+      data: { searchTerm },
+    });
+
     const delayDebounceFn = setTimeout(async () => {
+      logger.debug("stamps", {
+        message: "Search: executing fetch",
+        data: { searchTerm },
+      });
+
       try {
         const response = await fetch(
           `/api/v2/src20/search?q=${
             encodeURIComponent(searchTerm.trim())
           }&mintable_only=true`,
         );
+
+        logger.debug("stamps", {
+          message: "Search: fetch complete",
+          data: { status: response.status, ok: response.ok },
+        });
 
         if (!response.ok) {
           logger.error("stamps", {
@@ -257,12 +284,30 @@ export function SRC20MintTool({
 
         const data = await response.json();
 
+        logger.debug("stamps", {
+          message: "Search: parsed JSON",
+          data: {
+            hasData: !!data.data,
+            isArray: Array.isArray(data.data),
+            length: data.data?.length,
+            isSelecting,
+            isSwitchingFields,
+          },
+        });
+
         if (data.data && Array.isArray(data.data)) {
           setSearchResults(data.data);
-          if (!isSelecting && !isSwitchingFields) {
-            setOpenDrop(true);
-            setDropdownAnimation("enter");
-          }
+          logger.debug("stamps", {
+            message: "Search: results set, opening dropdown",
+            data: {
+              count: data.data.length,
+            },
+          });
+
+          // Always set dropdown open when we have results
+          // The render condition will check current state to determine visibility
+          setOpenDrop(true);
+          setDropdownAnimation("enter");
         } else {
           logger.debug("stamps", {
             message: "Search returned no results or unexpected format",
@@ -526,13 +571,12 @@ export function SRC20MintTool({
                   }
                 }}
                 onFocus={() => {
-                  if (
-                    !searchTerm.trim() && !isSwitchingFields && !isSelecting
-                  ) {
+                  setIsSelecting(false);
+                  // Re-open dropdown if we have results
+                  if (searchResults.length > 0 && !isSwitchingFields) {
                     setOpenDrop(true);
                     setDropdownAnimation("enter");
                   }
-                  setIsSelecting(false);
                 }}
                 onBlur={() => {
                   setIsSwitchingFields(true);
