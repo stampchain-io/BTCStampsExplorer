@@ -679,7 +679,7 @@ paths:
                   stamps:
                     type: array
                     items:
-                      $ref: "#/components/schemas/Stamp"
+                      $ref: "#/components/schemas/StampRow"
                     description: Paginated array of stamps in the collection
                   marketData:
                     $ref: "#/components/schemas/CollectionMarketData"
