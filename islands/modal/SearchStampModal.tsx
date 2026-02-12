@@ -75,10 +75,18 @@ export function openStampSearch() {
         return;
       }
 
+      // For address searches, prepend a wallet link row
+      const { type: inputType } = classifySearchInput(
+        currentTerm.trim(),
+      );
+      const addressRow = inputType === "address"
+        ? [{ _addressLink: true, address: currentTerm.trim() }]
+        : [];
+
       searchState.value = {
         ...searchState.value,
         error: "",
-        results: data.data,
+        results: [...addressRow, ...data.data],
       };
     } catch (err) {
       console.error("Stamp Search Error:", err);
@@ -181,14 +189,27 @@ function SearchContent({
                         )}
                       class={`flex items-center gap-3 px-7.5 py-2 hover:bg-color-background/60 ${transitionColors} cursor-pointer`}
                     >
-                      <div class="w-10 h-10 rounded bg-color-background/30 flex items-center justify-center text-lg">
-                        👤
+                      <div class="w-10 h-10 rounded bg-color-background/30 flex items-center justify-center">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="w-5 h-5 text-stamp-grey-light"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          stroke-width="1.5"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M21 12a2.25 2.25 0 0 0-2.25-2.25H15a3 3 0 1 1 0-6h.75A2.25 2.25 0 0 1 18 6v0M3 6v12a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3V6a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3Z"
+                          />
+                        </svg>
                       </div>
-                      <div class="flex flex-col flex-1">
-                        <span class="text-sm font-medium text-color-grey-light">
+                      <div class="flex flex-col flex-1 min-w-0">
+                        <span class="text-sm font-medium text-stamp-grey-light">
                           View wallet
                         </span>
-                        <span class="text-xs text-color-grey truncate">
+                        <span class="text-xs text-stamp-grey truncate">
                           {result.address}
                         </span>
                       </div>
