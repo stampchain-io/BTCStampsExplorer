@@ -54,7 +54,7 @@ export interface CollectionWithOptionalMarketData extends CollectionRow {
     avg: number | null;
   } | null;
   totalVolume24h?: number | null;
-  totalUniqueHolders?: number | null;
+  uniqueHolders?: number | null;
 
   // Stamp image fields for gallery display
   first_stamp_image?: string;

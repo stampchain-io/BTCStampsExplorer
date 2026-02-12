@@ -138,20 +138,9 @@ export class CollectionController {
             img: collectionRow.img,
             first_stamp_image: firstStampImage,
             stamp_images: stamps,
-            // Convert marketData from CollectionMarketData to the expected format
+            // Pass through market data from collection_market_data table
             ...(collectionRow.marketData && {
-              marketData: {
-                minFloorPriceBTC: collectionRow.marketData.minFloorPriceBTC,
-                maxFloorPriceBTC: collectionRow.marketData.maxFloorPriceBTC,
-                avgFloorPriceBTC: collectionRow.marketData.avgFloorPriceBTC,
-                medianFloorPriceBTC: collectionRow.marketData.medianFloorPriceBTC,
-                totalVolume24hBTC: collectionRow.marketData.totalVolume24hBTC,
-                stampsWithPricesCount: collectionRow.marketData.stampsWithPricesCount,
-                minHolderCount: collectionRow.marketData.minHolderCount,
-                maxHolderCount: collectionRow.marketData.maxHolderCount,
-                totalVolumeBTC: collectionRow.marketData.totalVolume24hBTC, // Use 24h volume as total
-                marketCapBTC: null, // Not available in CollectionMarketData
-              }
+              marketData: collectionRow.marketData,
             }),
           };
 

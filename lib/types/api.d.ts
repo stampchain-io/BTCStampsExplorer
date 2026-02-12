@@ -1366,18 +1366,20 @@ export interface Collection {
   first_stamp_image?: string | null;
   stamp_images?: string[] | null;
   img: string;
-  // Market data fields
+  // Market data from collection_market_data table
   marketData?: {
-    minFloorPriceBTC: number | null;
-    maxFloorPriceBTC: number | null;
-    avgFloorPriceBTC: number | null;
-    medianFloorPriceBTC: number | null;
-    totalVolume24hBTC: number;
-    stampsWithPricesCount: number;
-    minHolderCount: number;
-    maxHolderCount: number;
+    floorPriceBTC: number | null;
+    avgPriceBTC: number | null;
+    totalValueBTC: number;
+    volume24hBTC: number;
+    volume7dBTC: number;
+    volume30dBTC: number;
     totalVolumeBTC: number;
-    marketCapBTC: number | null;
+    totalStamps: number;
+    uniqueHolders: number;
+    listedStamps: number;
+    soldStamps24h: number;
+    lastUpdated: Date | null;
   };
 }
 

@@ -167,24 +167,25 @@ export interface SRC20MarketDataRow {
 
 /**
  * Database row interface for collection_market_data table
- * All DECIMAL columns are represented as strings to preserve precision
+ * Actual columns: collection_id (BINARY(16)), floor_price_btc, avg_price_btc,
+ * total_value_btc, volume_24h_btc, volume_7d_btc, volume_30d_btc, total_volume_btc,
+ * total_stamps, unique_holders, listed_stamps, sold_stamps_24h, last_updated, created_at
  */
 export interface CollectionMarketDataRow {
   collection_id: string;
-  min_floor_price_btc: string | null;
-  max_floor_price_btc: string | null;
-  avg_floor_price_btc: string | null;
-  median_floor_price_btc: string | null;
-  total_volume_24h_btc: string;
-  stamps_with_prices_count: number;
-  min_holder_count: number;
-  max_holder_count: number;
-  avg_holder_count: string;
-  median_holder_count: number;
-  total_unique_holders: number;
-  avg_distribution_score: string;
-  total_stamps_count: number;
+  floor_price_btc: string | null;
+  avg_price_btc: string | null;
+  total_value_btc: string | null;
+  volume_24h_btc: string;
+  volume_7d_btc: string;
+  volume_30d_btc: string;
+  total_volume_btc: string;
+  total_stamps: number;
+  unique_holders: number;
+  listed_stamps: number;
+  sold_stamps_24h: number;
   last_updated: Date;
+  created_at: Date;
 }
 
 /**
@@ -251,19 +252,17 @@ export interface SRC20MarketData {
 
 export interface CollectionMarketData {
   collectionId: string;
-  minFloorPriceBTC: number | null;
-  maxFloorPriceBTC: number | null;
-  avgFloorPriceBTC: number | null;
-  medianFloorPriceBTC: number | null;
-  totalVolume24hBTC: number;
-  stampsWithPricesCount: number;
-  minHolderCount: number;
-  maxHolderCount: number;
-  avgHolderCount: number;
-  medianHolderCount: number;
-  totalUniqueHolders: number;
-  avgDistributionScore: number;
-  totalStampsCount: number;
+  floorPriceBTC: number | null;
+  avgPriceBTC: number | null;
+  totalValueBTC: number;
+  volume24hBTC: number;
+  volume7dBTC: number;
+  volume30dBTC: number;
+  totalVolumeBTC: number;
+  totalStamps: number;
+  uniqueHolders: number;
+  listedStamps: number;
+  soldStamps24h: number;
   lastUpdated: Date;
 }
 
