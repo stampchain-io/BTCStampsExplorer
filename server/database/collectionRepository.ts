@@ -232,6 +232,7 @@ export class CollectionRepository {
     `;
 
     // Add market data fields if requested
+    // Column names must match collection_market_data table schema
     if (includeMarketData) {
       query += `,
         cmd.min_floor_price_btc as minFloorPriceBTC,
@@ -239,16 +240,14 @@ export class CollectionRepository {
         cmd.avg_floor_price_btc as avgFloorPriceBTC,
         cmd.median_floor_price_btc as medianFloorPriceBTC,
         cmd.total_volume_24h_btc as totalVolume24hBTC,
-        cmd.total_volume_7d_btc as totalVolume7dBTC,
-        cmd.total_volume_30d_btc as totalVolume30dBTC,
         cmd.stamps_with_prices_count as stampsWithPricesCount,
         cmd.min_holder_count as minHolderCount,
         cmd.max_holder_count as maxHolderCount,
         cmd.avg_holder_count as avgHolderCount,
         cmd.median_holder_count as medianHolderCount,
         cmd.total_unique_holders as totalUniqueHolders,
-        cmd.total_listed_stamps as totalListedStamps,
-        cmd.total_sold_stamps_24h as totalSoldStamps24h,
+        cmd.avg_distribution_score as avgDistributionScore,
+        cmd.total_stamps_count as totalStampsCount,
         cmd.last_updated as marketDataLastUpdated
       `;
     }
@@ -332,16 +331,14 @@ export class CollectionRepository {
         avgFloorPriceBTC: parseBTCDecimal(row.avgFloorPriceBTC),
         medianFloorPriceBTC: parseBTCDecimal(row.medianFloorPriceBTC),
         totalVolume24hBTC: parseBTCDecimal(row.totalVolume24hBTC) ?? 0,
-        totalVolume7dBTC: parseBTCDecimal(row.totalVolume7dBTC) ?? 0,
-        totalVolume30dBTC: parseBTCDecimal(row.totalVolume30dBTC) ?? 0,
         stampsWithPricesCount: parseIntOrNull(row.stampsWithPricesCount) ?? 0,
         minHolderCount: parseIntOrNull(row.minHolderCount) ?? 0,
         maxHolderCount: parseIntOrNull(row.maxHolderCount) ?? 0,
         avgHolderCount: parseFloatOrNull(row.avgHolderCount) ?? 0,
         medianHolderCount: parseIntOrNull(row.medianHolderCount),
         totalUniqueHolders: parseIntOrNull(row.totalUniqueHolders) ?? 0,
-        totalListedStamps: parseIntOrNull(row.totalListedStamps) ?? 0,
-        totalSoldStamps24h: parseIntOrNull(row.totalSoldStamps24h) ?? 0,
+        avgDistributionScore: parseFloatOrNull(row.avgDistributionScore) ?? 0,
+        totalStampsCount: parseIntOrNull(row.totalStampsCount) ?? 0,
         lastUpdated: row.marketDataLastUpdated
           ? new Date(row.marketDataLastUpdated)
           : null,
