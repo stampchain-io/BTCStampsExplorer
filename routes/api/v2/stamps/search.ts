@@ -27,7 +27,7 @@ export const handler: Handlers = {
 
       switch (type) {
         case "cpid":
-          queryOptions.search = sanitized;
+          queryOptions.cpidPrefix = sanitized;
           queryOptions.limit = 11;
           queryOptions.sortBy = "ASC";
           break;

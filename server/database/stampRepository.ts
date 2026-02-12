@@ -721,6 +721,7 @@ export class StampRepository {
     fileSizeMin?: string;
     fileSizeMax?: string;
     search?: string;
+    cpidPrefix?: string;
   }) {
     // Extract all parameters including both filter types
     const {
@@ -768,6 +769,7 @@ export class StampRepository {
       fileSizeMin: _fileSizeMin,
       fileSizeMax: _fileSizeMax,
       search,
+      cpidPrefix,
     } = options;
 
     // Combine both filter types for processing
@@ -822,6 +824,12 @@ export class StampRepository {
         whereConditions,
         queryParams,
       );
+    }
+
+    // CPID prefix search (cpid column only)
+    if (cpidPrefix) {
+      whereConditions.push("st.cpid LIKE ?");
+      queryParams.push(`${cpidPrefix}%`);
     }
 
     // Use either the object or direct parameters
