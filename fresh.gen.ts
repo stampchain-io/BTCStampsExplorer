@@ -38,6 +38,7 @@ import * as $api_v2_balance_address_ from "./routes/api/v2/balance/[address].ts"
 import * as $api_v2_balance_getStampsBalance from "./routes/api/v2/balance/getStampsBalance.ts";
 import * as $api_v2_block_block_index_ from "./routes/api/v2/block/[block_index].ts";
 import * as $api_v2_block_block_count_number_ from "./routes/api/v2/block/block_count/[...number].ts";
+import * as $api_v2_collections_id_ from "./routes/api/v2/collections/[id].ts";
 import * as $api_v2_collections_by_name_name_ from "./routes/api/v2/collections/by-name/[name].ts";
 import * as $api_v2_collections_creator_creator_ from "./routes/api/v2/collections/creator/[creator].ts";
 import * as $api_v2_collections_index from "./routes/api/v2/collections/index.ts";
@@ -75,6 +76,8 @@ import * as $api_v2_src20_block_block_index_tick_ from "./routes/api/v2/src20/bl
 import * as $api_v2_src20_block_block_index_index from "./routes/api/v2/src20/block/[block_index]/index.ts";
 import * as $api_v2_src20_create from "./routes/api/v2/src20/create.ts";
 import * as $api_v2_src20_index from "./routes/api/v2/src20/index.ts";
+import * as $api_v2_src20_market_tick_index from "./routes/api/v2/src20/market/[tick]/index.ts";
+import * as $api_v2_src20_market_index from "./routes/api/v2/src20/market/index.ts";
 import * as $api_v2_src20_multisig_operation_ from "./routes/api/v2/src20/multisig/[operation].ts";
 import * as $api_v2_src20_search from "./routes/api/v2/src20/search.ts";
 import * as $api_v2_src20_tick_tick_deploy from "./routes/api/v2/src20/tick/[tick]/deploy.ts";
@@ -352,6 +355,7 @@ const manifest = {
     "./routes/api/v2/block/[block_index].ts": $api_v2_block_block_index_,
     "./routes/api/v2/block/block_count/[...number].ts":
       $api_v2_block_block_count_number_,
+    "./routes/api/v2/collections/[id].ts": $api_v2_collections_id_,
     "./routes/api/v2/collections/by-name/[name].ts":
       $api_v2_collections_by_name_name_,
     "./routes/api/v2/collections/creator/[creator].ts":
@@ -404,6 +408,9 @@ const manifest = {
       $api_v2_src20_block_block_index_index,
     "./routes/api/v2/src20/create.ts": $api_v2_src20_create,
     "./routes/api/v2/src20/index.ts": $api_v2_src20_index,
+    "./routes/api/v2/src20/market/[tick]/index.ts":
+      $api_v2_src20_market_tick_index,
+    "./routes/api/v2/src20/market/index.ts": $api_v2_src20_market_index,
     "./routes/api/v2/src20/multisig/[operation].ts":
       $api_v2_src20_multisig_operation_,
     "./routes/api/v2/src20/search.ts": $api_v2_src20_search,
