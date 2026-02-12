@@ -343,10 +343,37 @@ export function SRC20MintTool({
       setIsImageLoading(true);
       setError(null);
 
+      logger.debug("stamps", {
+        message: "Fetching mint data for tick",
+        data: { tick, url: `/api/v2/src20/tick/${tick}/mintData` },
+      });
+
       const response = await axiod.get(`/api/v2/src20/tick/${tick}/mintData`);
       const data = response.data;
 
+      logger.debug("stamps", {
+        message: "Raw API response received",
+        data: {
+          tick,
+          hasData: !!data,
+          dataKeys: data ? Object.keys(data) : [],
+          hasMintStatus: !!data?.mintStatus,
+          hasHolders: data?.holders !== undefined,
+          rawData: data,
+        },
+      });
+
       if (!data || data.error || !data.mintStatus) {
+        logger.error("stamps", {
+          message: "Invalid mint data response",
+          data: {
+            tick,
+            hasData: !!data,
+            hasError: !!data?.error,
+            hasMintStatus: !!data?.mintStatus,
+            fullData: data,
+          },
+        });
         setError("Token not deployed");
         resetTokenData();
       } else {
@@ -358,6 +385,9 @@ export function SRC20MintTool({
             hasStampUrl: !!data.mintStatus?.stamp_url,
             stampUrl: data.mintStatus?.stamp_url,
             txHash: data.mintStatus?.tx_hash,
+            limit: data.mintStatus?.limit,
+            maxSupply: data.mintStatus?.max_supply,
+            progress: data.mintStatus?.progress,
           },
         });
 
@@ -382,9 +412,23 @@ export function SRC20MintTool({
       }
     } catch (err) {
       logger.error("stamps", {
-        message: "Error fetching token data",
-        error: err,
-        tick,
+        message: "Error fetching token data - FULL ERROR DETAILS",
+        data: {
+          tick,
+          errorType: err?.constructor?.name,
+          errorMessage: err instanceof Error ? err.message : String(err),
+          errorStack: err instanceof Error ? err.stack : undefined,
+          fullError: err,
+          // If it's an axios error, get more details
+          axiosError: (err as any)?.response
+            ? {
+              status: (err as any).response.status,
+              statusText: (err as any).response.statusText,
+              data: (err as any).response.data,
+              headers: (err as any).response.headers,
+            }
+            : undefined,
+        },
       });
       const errorMessage = extractSRC20ErrorMessage(err, "mint");
       setError(errorMessage);

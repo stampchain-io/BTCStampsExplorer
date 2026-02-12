@@ -4,7 +4,8 @@ import {
     BLOCKCHAIN_SYNC_CACHE_DURATION,
     IMMUTABLE_CACHE_DURATION,
     SRC20_BALANCE_TABLE,
-    SRC20_TABLE
+    SRC20_TABLE,
+    STAMP_TABLE
 } from "$constants";
 import type {SRC20BalanceRequestParams} from "$lib/types/src20.d.ts";
 import { emojiToUnicodeEscape, unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
@@ -602,10 +603,10 @@ export class SRC20Repository {
         COALESCE(stats.total_minted, 0) as total_minted,
         COALESCE(stats.holders_count, 0) as holders_count,
         (SELECT COUNT(*) FROM ${SRC20_TABLE} WHERE tick = dep.tick AND op = 'MINT') AS total_mints,
-        stamps.stamp_url
+        st.stamp_url
       FROM ${SRC20_TABLE} AS dep
       LEFT JOIN src20_token_stats stats ON stats.tick = dep.tick
-      LEFT JOIN stamps ON stamps.tx_hash = dep.tx_hash
+      LEFT JOIN ${STAMP_TABLE} st ON st.tx_hash = dep.tx_hash
       WHERE
         dep.tick = ? AND
         dep.op = 'DEPLOY'
