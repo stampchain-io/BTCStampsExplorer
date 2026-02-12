@@ -270,25 +270,12 @@ export class CollectionRepository {
 
     // Fetch market data separately - collection_market_data.collection_id is BINARY(16),
     // so we use UNHEX() to convert the hex string parameter for matching.
+    // Use SELECT * since the actual column names may differ from the TypeScript types.
     let marketData = null;
     if (includeMarketData) {
       try {
         const marketQuery = `
-          SELECT
-            min_floor_price_btc,
-            max_floor_price_btc,
-            avg_floor_price_btc,
-            median_floor_price_btc,
-            total_volume_24h_btc,
-            stamps_with_prices_count,
-            min_holder_count,
-            max_holder_count,
-            avg_holder_count,
-            median_holder_count,
-            total_unique_holders,
-            avg_distribution_score,
-            total_stamps_count,
-            last_updated
+          SELECT *
           FROM collection_market_data
           WHERE collection_id = UNHEX(?)
           LIMIT 1
@@ -302,25 +289,26 @@ export class CollectionRepository {
 
         if (marketResult.rows && marketResult.rows.length > 0) {
           const md = marketResult.rows[0];
+          console.log("[CollectionMarketData] Columns for", collectionId, ":", Object.keys(md).join(", "));
           marketData = {
-            minFloorPriceBTC: parseBTCDecimal(md.min_floor_price_btc),
-            maxFloorPriceBTC: parseBTCDecimal(md.max_floor_price_btc),
-            avgFloorPriceBTC: parseBTCDecimal(md.avg_floor_price_btc),
-            medianFloorPriceBTC: parseBTCDecimal(md.median_floor_price_btc),
-            totalVolume24hBTC: parseBTCDecimal(md.total_volume_24h_btc) ?? 0,
-            stampsWithPricesCount: parseIntOrNull(md.stamps_with_prices_count) ?? 0,
-            minHolderCount: parseIntOrNull(md.min_holder_count) ?? 0,
-            maxHolderCount: parseIntOrNull(md.max_holder_count) ?? 0,
-            avgHolderCount: parseFloatOrNull(md.avg_holder_count) ?? 0,
-            medianHolderCount: parseIntOrNull(md.median_holder_count),
-            totalUniqueHolders: parseIntOrNull(md.total_unique_holders) ?? 0,
-            avgDistributionScore: parseFloatOrNull(md.avg_distribution_score) ?? 0,
-            totalStampsCount: parseIntOrNull(md.total_stamps_count) ?? 0,
+            minFloorPriceBTC: parseBTCDecimal(md.min_floor_price_btc ?? md.floor_price_btc),
+            maxFloorPriceBTC: parseBTCDecimal(md.max_floor_price_btc ?? md.floor_price_btc),
+            avgFloorPriceBTC: parseBTCDecimal(md.avg_floor_price_btc ?? md.floor_price_btc),
+            medianFloorPriceBTC: parseBTCDecimal(md.median_floor_price_btc ?? md.floor_price_btc),
+            totalVolume24hBTC: parseBTCDecimal(md.total_volume_24h_btc ?? md.volume_24h_btc) ?? 0,
+            stampsWithPricesCount: parseIntOrNull(md.stamps_with_prices_count ?? md.stamp_count) ?? 0,
+            minHolderCount: parseIntOrNull(md.min_holder_count ?? md.holder_count) ?? 0,
+            maxHolderCount: parseIntOrNull(md.max_holder_count ?? md.holder_count) ?? 0,
+            avgHolderCount: parseFloatOrNull(md.avg_holder_count ?? md.holder_count) ?? 0,
+            medianHolderCount: parseIntOrNull(md.median_holder_count ?? md.holder_count),
+            totalUniqueHolders: parseIntOrNull(md.total_unique_holders ?? md.unique_holders) ?? 0,
+            avgDistributionScore: parseFloatOrNull(md.avg_distribution_score ?? md.distribution_score) ?? 0,
+            totalStampsCount: parseIntOrNull(md.total_stamps_count ?? md.stamp_count) ?? 0,
             lastUpdated: md.last_updated ? new Date(md.last_updated) : null,
           };
         }
-      } catch (_error) {
-        // Market data table may not exist - gracefully return null
+      } catch (error) {
+        console.error("Error fetching market data for collection:", collectionId, error);
       }
     }
 
@@ -452,28 +440,14 @@ export class CollectionRepository {
     // Build a map of market data keyed by collection_id (hex string)
     // collection_market_data.collection_id is BINARY(16), so use UNHEX() for matching
     // and HEX() in SELECT to get hex strings for the map key.
+    // Use SELECT *, HEX(collection_id) since the actual column names may differ from types.
     let marketDataMap: Map<string, any> | null = null;
     if (includeMarketData && result.rows && result.rows.length > 0) {
       try {
         const collectionIds = result.rows.map((r: any) => r.collection_id);
         const placeholders = collectionIds.map(() => "UNHEX(?)").join(",");
         const marketQuery = `
-          SELECT
-            HEX(collection_id) as collection_id,
-            min_floor_price_btc,
-            max_floor_price_btc,
-            avg_floor_price_btc,
-            median_floor_price_btc,
-            total_volume_24h_btc,
-            stamps_with_prices_count,
-            min_holder_count,
-            max_holder_count,
-            avg_holder_count,
-            median_holder_count,
-            total_unique_holders,
-            avg_distribution_score,
-            total_stamps_count,
-            last_updated
+          SELECT *, HEX(collection_id) as collection_id_hex
           FROM collection_market_data
           WHERE collection_id IN (${placeholders})
         `;
@@ -487,26 +461,27 @@ export class CollectionRepository {
         if (marketResult.rows && marketResult.rows.length > 0) {
           marketDataMap = new Map();
           for (const md of marketResult.rows) {
-            marketDataMap.set(md.collection_id, {
-              minFloorPriceBTC: parseBTCDecimal(md.min_floor_price_btc),
-              maxFloorPriceBTC: parseBTCDecimal(md.max_floor_price_btc),
-              avgFloorPriceBTC: parseBTCDecimal(md.avg_floor_price_btc),
-              medianFloorPriceBTC: parseBTCDecimal(md.median_floor_price_btc),
-              totalVolume24hBTC: parseBTCDecimal(md.total_volume_24h_btc) ?? 0,
-              stampsWithPricesCount: parseIntOrNull(md.stamps_with_prices_count) ?? 0,
-              minHolderCount: parseIntOrNull(md.min_holder_count) ?? 0,
-              maxHolderCount: parseIntOrNull(md.max_holder_count) ?? 0,
-              avgHolderCount: parseFloatOrNull(md.avg_holder_count) ?? 0,
-              medianHolderCount: parseIntOrNull(md.median_holder_count),
-              totalUniqueHolders: parseIntOrNull(md.total_unique_holders) ?? 0,
-              avgDistributionScore: parseFloatOrNull(md.avg_distribution_score) ?? 0,
-              totalStampsCount: parseIntOrNull(md.total_stamps_count) ?? 0,
+            const hexId = md.collection_id_hex;
+            marketDataMap.set(hexId, {
+              minFloorPriceBTC: parseBTCDecimal(md.min_floor_price_btc ?? md.floor_price_btc),
+              maxFloorPriceBTC: parseBTCDecimal(md.max_floor_price_btc ?? md.floor_price_btc),
+              avgFloorPriceBTC: parseBTCDecimal(md.avg_floor_price_btc ?? md.floor_price_btc),
+              medianFloorPriceBTC: parseBTCDecimal(md.median_floor_price_btc ?? md.floor_price_btc),
+              totalVolume24hBTC: parseBTCDecimal(md.total_volume_24h_btc ?? md.volume_24h_btc) ?? 0,
+              stampsWithPricesCount: parseIntOrNull(md.stamps_with_prices_count ?? md.stamp_count) ?? 0,
+              minHolderCount: parseIntOrNull(md.min_holder_count ?? md.holder_count) ?? 0,
+              maxHolderCount: parseIntOrNull(md.max_holder_count ?? md.holder_count) ?? 0,
+              avgHolderCount: parseFloatOrNull(md.avg_holder_count ?? md.holder_count) ?? 0,
+              medianHolderCount: parseIntOrNull(md.median_holder_count ?? md.holder_count),
+              totalUniqueHolders: parseIntOrNull(md.total_unique_holders ?? md.unique_holders) ?? 0,
+              avgDistributionScore: parseFloatOrNull(md.avg_distribution_score ?? md.distribution_score) ?? 0,
+              totalStampsCount: parseIntOrNull(md.total_stamps_count ?? md.stamp_count) ?? 0,
               lastUpdated: md.last_updated ? new Date(md.last_updated) : null,
             });
           }
         }
-      } catch (_error) {
-        // Market data table may not exist - gracefully continue without it
+      } catch (error) {
+        console.error("Error fetching batch market data:", error);
       }
     }
 

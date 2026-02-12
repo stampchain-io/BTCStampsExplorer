@@ -3,7 +3,6 @@ import type { StampFilters, StampRow } from "$types/stamp.d.ts";
 import type {
     CacheStatus,
     CollectionMarketData,
-    CollectionMarketDataRow,
     SRC20MarketData,
     SRC20MarketDataRow,
     StampHolderCache,
@@ -450,23 +449,11 @@ export class MarketDataRepository {
    * @returns CollectionMarketData or null if not found
    */
   static async getCollectionMarketData(collectionId: string): Promise<CollectionMarketData | null> {
+    // Use SELECT * since actual column names may differ from TypeScript types.
+    // Add HEX(collection_id) and cache_age_minutes as computed columns.
     const query = `
-      SELECT
-        HEX(collection_id) as collection_id,
-        min_floor_price_btc,
-        max_floor_price_btc,
-        avg_floor_price_btc,
-        median_floor_price_btc,
-        total_volume_24h_btc,
-        stamps_with_prices_count,
-        min_holder_count,
-        max_holder_count,
-        avg_holder_count,
-        median_holder_count,
-        total_unique_holders,
-        avg_distribution_score,
-        total_stamps_count,
-        last_updated,
+      SELECT *,
+        HEX(collection_id) as collection_id_hex,
         TIMESTAMPDIFF(MINUTE, last_updated, UTC_TIMESTAMP()) as cache_age_minutes
       FROM collection_market_data
       WHERE collection_id = UNHEX(?)
@@ -478,15 +465,16 @@ export class MarketDataRepository {
         query,
         [collectionId],
         DEFAULT_CACHE_DURATION
-      ) as { rows?: Array<CollectionMarketDataRow & { cache_age_minutes: number }> };
+      ) as { rows?: Array<any> };
 
       if (!result.rows || result.rows.length === 0) {
         return null;
       }
 
       const row = result.rows[0];
+      console.log("[CollectionMarketData] Actual columns:", Object.keys(row).join(", "));
 
-      // Parse the row data into the application format
+      // Parse with fallbacks for both possible column naming conventions
       return this.parseCollectionMarketDataRow(row);
     } catch (error) {
       console.error(`Error fetching market data for collection ${collectionId}:`, error);
@@ -706,23 +694,23 @@ export class MarketDataRepository {
    * @param row - Database row
    * @returns Parsed CollectionMarketData
    */
-  private static parseCollectionMarketDataRow(row: CollectionMarketDataRow & { cache_age_minutes?: number }): CollectionMarketData | null {
+  private static parseCollectionMarketDataRow(row: any): CollectionMarketData | null {
     try {
       return {
-        collectionId: row.collection_id,
-        minFloorPriceBTC: parseBTCDecimal(row.min_floor_price_btc),
-        maxFloorPriceBTC: parseBTCDecimal(row.max_floor_price_btc),
-        avgFloorPriceBTC: parseBTCDecimal(row.avg_floor_price_btc),
-        medianFloorPriceBTC: parseBTCDecimal(row.median_floor_price_btc),
-        totalVolume24hBTC: parseBTCDecimal(row.total_volume_24h_btc) || 0,
-        stampsWithPricesCount: row.stamps_with_prices_count || 0,
-        minHolderCount: row.min_holder_count || 0,
-        maxHolderCount: row.max_holder_count || 0,
-        avgHolderCount: parseFloat(row.avg_holder_count) || 0,
-        medianHolderCount: row.median_holder_count || 0,
-        totalUniqueHolders: row.total_unique_holders || 0,
-        avgDistributionScore: parseFloat(row.avg_distribution_score) || 0,
-        totalStampsCount: row.total_stamps_count || 0,
+        collectionId: row.collection_id_hex ?? row.collection_id,
+        minFloorPriceBTC: parseBTCDecimal(row.min_floor_price_btc ?? row.floor_price_btc),
+        maxFloorPriceBTC: parseBTCDecimal(row.max_floor_price_btc ?? row.floor_price_btc),
+        avgFloorPriceBTC: parseBTCDecimal(row.avg_floor_price_btc ?? row.floor_price_btc),
+        medianFloorPriceBTC: parseBTCDecimal(row.median_floor_price_btc ?? row.floor_price_btc),
+        totalVolume24hBTC: parseBTCDecimal(row.total_volume_24h_btc ?? row.volume_24h_btc) || 0,
+        stampsWithPricesCount: row.stamps_with_prices_count ?? row.stamp_count ?? 0,
+        minHolderCount: row.min_holder_count ?? row.holder_count ?? 0,
+        maxHolderCount: row.max_holder_count ?? row.holder_count ?? 0,
+        avgHolderCount: parseFloat(row.avg_holder_count ?? row.holder_count) || 0,
+        medianHolderCount: row.median_holder_count ?? row.holder_count ?? 0,
+        totalUniqueHolders: row.total_unique_holders ?? row.unique_holders ?? 0,
+        avgDistributionScore: parseFloat(row.avg_distribution_score ?? row.distribution_score) || 0,
+        totalStampsCount: row.total_stamps_count ?? row.stamp_count ?? 0,
         lastUpdated: new Date(row.last_updated),
       };
     } catch (error) {
