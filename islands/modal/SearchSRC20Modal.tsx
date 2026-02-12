@@ -3,7 +3,10 @@ import { closeModal, openModal, searchState } from "$islands/modal/states.ts";
 import { SearchErrorDisplay } from "$islands/modal/SearchErrorDisplay.tsx";
 import { SearchInputField } from "$islands/modal/SearchInputField.tsx";
 import { ModalSearchBase, transitionColors } from "$layout";
-import { generateSearchErrorMessage } from "$lib/utils/data/search/searchInputClassifier.ts";
+import {
+  classifySearchInput,
+  generateSearchErrorMessage,
+} from "$lib/utils/data/search/searchInputClassifier.ts";
 import {
   navigateSSRSafe,
   useAutoFocus,
@@ -44,6 +47,24 @@ export function openSRC20Search() {
       if (
         !response.ok || !data.data || data.data.length === 0
       ) {
+        // For addresses with no results, show a link to
+        // the wallet page instead of an error
+        const { type } = classifySearchInput(
+          currentTerm.trim(),
+        );
+        if (type === "address") {
+          searchState.value = {
+            ...searchState.value,
+            error: "",
+            results: [
+              {
+                _addressLink: true,
+                address: currentTerm.trim(),
+              },
+            ],
+          };
+          return;
+        }
         searchState.value = {
           ...searchState.value,
           error: generateSearchErrorMessage(
@@ -90,9 +111,7 @@ export function openSRC20Search() {
           searchState.value = { ...searchState.value, term };
         }}
         error={searchState.value.error}
-        results={(searchState.value.results || []) as Array<{
-          tick: string;
-        }>}
+        results={searchState.value.results || []}
         inputRef={inputRef}
         onSearch={handleSearch}
         setError={(error) => {
@@ -105,10 +124,6 @@ export function openSRC20Search() {
   openModal(modalContent, "slideDownUp");
 }
 
-interface SRC20SearchResult {
-  tick: string;
-}
-
 function SearchContent({
   setSearchTerm,
   inputRef,
@@ -118,7 +133,8 @@ function SearchContent({
   searchTerm: string;
   setSearchTerm: (term: string) => void;
   error: string;
-  results: SRC20SearchResult[];
+  // deno-lint-ignore no-explicit-any
+  results: any[];
   inputRef: preact.RefObject<HTMLInputElement>;
   onSearch: () => void;
   setError: (error: string) => void;
@@ -132,9 +148,8 @@ function SearchContent({
     navigateSSRSafe(`/src20/${tick}`);
   };
 
-  // Typed cast for signal results
-  const results = (searchState.value.results || []) as
-    SRC20SearchResult[];
+  // deno-lint-ignore no-explicit-any
+  const rawResults = (searchState.value.results || []) as any[];
   const error = searchState.value.error;
 
   return (
@@ -146,25 +161,44 @@ function SearchContent({
         placeholder="TOKEN, ADDY OR TX HASH"
         inputRef={inputRef}
         autoFocus={autoFocus}
-        hasResults={results.length > 0}
+        hasResults={rawResults.length > 0}
         hasError={!!error}
       />
 
       {error
         ? <SearchErrorDisplay error={error} />
-        : results.length > 0
+        : rawResults.length > 0
         ? (
           <ul class="max-h-[266px] bg-color-background/50 rounded-b-3xl z-modal overflow-y-auto scrollbar-background-overlay [&::-webkit-scrollbar]:!rounded-[2px] [&::-webkit-scrollbar]:!w-[4px]">
-            {results.map(
-              (result) => (
-                <li
-                  key={result.tick}
-                  onClick={() => handleResultClick(result.tick)}
-                  class={`${textSm} px-7.5 py-[9px] hover:bg-color-background/60 ${transitionColors} cursor-pointer`}
-                >
-                  {result.tick}
-                </li>
-              ),
+            {rawResults.map(
+              (result) =>
+                result._addressLink
+                  ? (
+                    <li
+                      key="address-link"
+                      onClick={() =>
+                        navigateSSRSafe(
+                          `/wallet/${result.address}`,
+                        )}
+                      class={`${textSm} px-7.5 py-[9px] hover:bg-color-background/60 ${transitionColors} cursor-pointer`}
+                    >
+                      View SRC-20 holdings for{" "}
+                      <span class="text-color-grey-light">
+                        {result.address.slice(0, 8)}...
+                        {result.address.slice(-6)}
+                      </span>
+                    </li>
+                  )
+                  : (
+                    <li
+                      key={result.tick}
+                      onClick={() =>
+                        handleResultClick(result.tick)}
+                      class={`${textSm} px-7.5 py-[9px] hover:bg-color-background/60 ${transitionColors} cursor-pointer`}
+                    >
+                      {result.tick}
+                    </li>
+                  ),
             )}
           </ul>
         )

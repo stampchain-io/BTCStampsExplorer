@@ -20,16 +20,9 @@ export const handler: Handlers = {
       // deno-lint-ignore no-explicit-any
       const queryOptions: Record<string, any> = {
         limit: 10,
-        noPagination: true,
+        page: 1,
         skipTotalCount: true,
-        selectColumns: [
-          "stamp",
-          "cpid",
-          "stamp_url",
-          "stamp_mimetype",
-          "creator",
-          "tx_hash",
-        ],
+        cacheDuration: 60,
       };
 
       switch (type) {
@@ -55,21 +48,28 @@ export const handler: Handlers = {
           break;
       }
 
-      const results = await StampService.getStamps(queryOptions);
+      // deno-lint-ignore no-explicit-any
+      let results: any;
+      try {
+        results = await StampService.getStamps(queryOptions);
+      } catch (_err) {
+        // Service throws "NO STAMPS FOUND" when result is null
+        return ApiResponseUtil.success({ data: [] });
+      }
+
+      // StampService.getStamps returns { stamps: [...], last_block }
+      const stamps = results?.stamps || [];
 
       // Format for dropdown display
       // deno-lint-ignore no-explicit-any
-      const formattedResults = ((results as any)?.data || []).map(
-        // deno-lint-ignore no-explicit-any
-        (stamp: any) => ({
-          stamp: stamp.stamp,
-          cpid: stamp.cpid,
-          preview: stamp.stamp_url,
-          mimetype: stamp.stamp_mimetype,
-          creator: stamp.creator,
-          tx_hash: stamp.tx_hash,
-        }),
-      );
+      const formattedResults = stamps.map((stamp: any) => ({
+        stamp: stamp.stamp,
+        cpid: stamp.cpid,
+        preview: stamp.stamp_url,
+        mimetype: stamp.stamp_mimetype,
+        creator: stamp.creator,
+        tx_hash: stamp.tx_hash,
+      }));
 
       return ApiResponseUtil.success({ data: formattedResults });
     } catch (error) {

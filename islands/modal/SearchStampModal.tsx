@@ -3,7 +3,10 @@ import { closeModal, openModal, searchState } from "$islands/modal/states.ts";
 import { SearchErrorDisplay } from "$islands/modal/SearchErrorDisplay.tsx";
 import { SearchInputField } from "$islands/modal/SearchInputField.tsx";
 import { ModalSearchBase, transitionColors } from "$layout";
-import { generateSearchErrorMessage } from "$lib/utils/data/search/searchInputClassifier.ts";
+import {
+  classifySearchInput,
+  generateSearchErrorMessage,
+} from "$lib/utils/data/search/searchInputClassifier.ts";
 import {
   navigateSSRSafe,
   useAutoFocus,
@@ -43,6 +46,24 @@ export function openStampSearch() {
       if (
         !response.ok || !data.data || data.data.length === 0
       ) {
+        // For addresses with no results, show a link to
+        // the wallet page instead of an error
+        const { type } = classifySearchInput(
+          currentTerm.trim(),
+        );
+        if (type === "address") {
+          searchState.value = {
+            ...searchState.value,
+            error: "",
+            results: [
+              {
+                _addressLink: true,
+                address: currentTerm.trim(),
+              },
+            ],
+          };
+          return;
+        }
         searchState.value = {
           ...searchState.value,
           error: generateSearchErrorMessage(
@@ -89,13 +110,7 @@ export function openStampSearch() {
           searchState.value = { ...searchState.value, term };
         }}
         error={searchState.value.error}
-        results={(searchState.value.results || []) as Array<{
-          stamp: number;
-          cpid: string;
-          preview: string;
-          mimetype: string;
-          creator: string;
-        }>}
+        results={searchState.value.results || []}
         inputRef={inputRef}
         onSearch={handleSearch}
         setError={(error) => {
@@ -108,14 +123,6 @@ export function openStampSearch() {
   openModal(modalContent, "slideDownUp");
 }
 
-interface StampSearchResult {
-  stamp: number;
-  cpid: string;
-  preview: string;
-  mimetype: string;
-  creator: string;
-}
-
 function SearchContent({
   setSearchTerm,
   inputRef,
@@ -125,7 +132,8 @@ function SearchContent({
   searchTerm: string;
   setSearchTerm: (term: string) => void;
   error: string;
-  results: StampSearchResult[];
+  // deno-lint-ignore no-explicit-any
+  results: any[];
   inputRef: preact.RefObject<HTMLInputElement>;
   onSearch: () => void;
   setError: (error: string) => void;
@@ -139,9 +147,8 @@ function SearchContent({
     navigateSSRSafe(`/stamp/${stamp}`);
   };
 
-  // Typed cast for signal results
-  const results = (searchState.value.results || []) as
-    StampSearchResult[];
+  // deno-lint-ignore no-explicit-any
+  const rawResults = (searchState.value.results || []) as any[];
   const error = searchState.value.error;
 
   return (
@@ -153,37 +160,62 @@ function SearchContent({
         placeholder="STAMP #, CPID, ADDY OR TX HASH"
         inputRef={inputRef}
         autoFocus={autoFocus}
-        hasResults={results.length > 0}
+        hasResults={rawResults.length > 0}
         hasError={!!error}
       />
 
       {error
         ? <SearchErrorDisplay error={error} />
-        : results.length > 0
+        : rawResults.length > 0
         ? (
           <ul class="max-h-[266px] bg-color-background/50 rounded-b-3xl z-modal overflow-y-auto scrollbar-background-overlay [&::-webkit-scrollbar]:!rounded-[2px] [&::-webkit-scrollbar]:!w-[4px]">
-            {results.map(
-              (result) => (
-                <li
-                  key={result.stamp}
-                  onClick={() => handleResultClick(result.stamp)}
-                  class={`flex items-center gap-3 px-7.5 py-2 hover:bg-color-background/60 ${transitionColors} cursor-pointer`}
-                >
-                  <img
-                    src={result.preview}
-                    alt={`Stamp ${result.stamp}`}
-                    class="w-10 h-10 rounded object-cover"
-                  />
-                  <div class="flex flex-col flex-1">
-                    <span class="text-sm font-medium text-color-grey-light">
-                      #{result.stamp} - {result.cpid}
-                    </span>
-                    <span class="text-xs text-color-grey truncate">
-                      {result.creator}
-                    </span>
-                  </div>
-                </li>
-              ),
+            {rawResults.map(
+              (result) =>
+                result._addressLink
+                  ? (
+                    <li
+                      key="address-link"
+                      onClick={() =>
+                        navigateSSRSafe(
+                          `/wallet/${result.address}`,
+                        )}
+                      class={`flex items-center gap-3 px-7.5 py-2 hover:bg-color-background/60 ${transitionColors} cursor-pointer`}
+                    >
+                      <div class="w-10 h-10 rounded bg-color-background/30 flex items-center justify-center text-lg">
+                        👤
+                      </div>
+                      <div class="flex flex-col flex-1">
+                        <span class="text-sm font-medium text-color-grey-light">
+                          View wallet
+                        </span>
+                        <span class="text-xs text-color-grey truncate">
+                          {result.address}
+                        </span>
+                      </div>
+                    </li>
+                  )
+                  : (
+                    <li
+                      key={result.stamp}
+                      onClick={() =>
+                        handleResultClick(result.stamp)}
+                      class={`flex items-center gap-3 px-7.5 py-2 hover:bg-color-background/60 ${transitionColors} cursor-pointer`}
+                    >
+                      <img
+                        src={result.preview}
+                        alt={`Stamp ${result.stamp}`}
+                        class="w-10 h-10 rounded object-cover"
+                      />
+                      <div class="flex flex-col flex-1">
+                        <span class="text-sm font-medium text-color-grey-light">
+                          #{result.stamp} - {result.cpid}
+                        </span>
+                        <span class="text-xs text-color-grey truncate">
+                          {result.creator}
+                        </span>
+                      </div>
+                    </li>
+                  ),
             )}
           </ul>
         )
