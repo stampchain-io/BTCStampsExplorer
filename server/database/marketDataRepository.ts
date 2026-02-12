@@ -449,11 +449,24 @@ export class MarketDataRepository {
    * @returns CollectionMarketData or null if not found
    */
   static async getCollectionMarketData(collectionId: string): Promise<CollectionMarketData | null> {
-    // Use SELECT * since actual column names may differ from TypeScript types.
-    // Add HEX(collection_id) and cache_age_minutes as computed columns.
+    // Actual table columns: collection_id (BINARY(16)), floor_price_btc, avg_price_btc,
+    // total_value_btc, volume_24h_btc, volume_7d_btc, volume_30d_btc, total_volume_btc,
+    // total_stamps, unique_holders, listed_stamps, sold_stamps_24h, last_updated, created_at
     const query = `
-      SELECT *,
+      SELECT
         HEX(collection_id) as collection_id_hex,
+        floor_price_btc,
+        avg_price_btc,
+        total_value_btc,
+        volume_24h_btc,
+        volume_7d_btc,
+        volume_30d_btc,
+        total_volume_btc,
+        total_stamps,
+        unique_holders,
+        listed_stamps,
+        sold_stamps_24h,
+        last_updated,
         TIMESTAMPDIFF(MINUTE, last_updated, UTC_TIMESTAMP()) as cache_age_minutes
       FROM collection_market_data
       WHERE collection_id = UNHEX(?)
@@ -471,11 +484,7 @@ export class MarketDataRepository {
         return null;
       }
 
-      const row = result.rows[0];
-      console.log("[CollectionMarketData] Actual columns:", Object.keys(row).join(", "));
-
-      // Parse with fallbacks for both possible column naming conventions
-      return this.parseCollectionMarketDataRow(row);
+      return this.parseCollectionMarketDataRow(result.rows[0]);
     } catch (error) {
       console.error(`Error fetching market data for collection ${collectionId}:`, error);
       return null;
@@ -696,21 +705,20 @@ export class MarketDataRepository {
    */
   private static parseCollectionMarketDataRow(row: any): CollectionMarketData | null {
     try {
+      const floorPrice = parseBTCDecimal(row.floor_price_btc);
       return {
         collectionId: row.collection_id_hex ?? row.collection_id,
-        minFloorPriceBTC: parseBTCDecimal(row.min_floor_price_btc ?? row.floor_price_btc),
-        maxFloorPriceBTC: parseBTCDecimal(row.max_floor_price_btc ?? row.floor_price_btc),
-        avgFloorPriceBTC: parseBTCDecimal(row.avg_floor_price_btc ?? row.floor_price_btc),
-        medianFloorPriceBTC: parseBTCDecimal(row.median_floor_price_btc ?? row.floor_price_btc),
-        totalVolume24hBTC: parseBTCDecimal(row.total_volume_24h_btc ?? row.volume_24h_btc) || 0,
-        stampsWithPricesCount: row.stamps_with_prices_count ?? row.stamp_count ?? 0,
-        minHolderCount: row.min_holder_count ?? row.holder_count ?? 0,
-        maxHolderCount: row.max_holder_count ?? row.holder_count ?? 0,
-        avgHolderCount: parseFloat(row.avg_holder_count ?? row.holder_count) || 0,
-        medianHolderCount: row.median_holder_count ?? row.holder_count ?? 0,
-        totalUniqueHolders: row.total_unique_holders ?? row.unique_holders ?? 0,
-        avgDistributionScore: parseFloat(row.avg_distribution_score ?? row.distribution_score) || 0,
-        totalStampsCount: row.total_stamps_count ?? row.stamp_count ?? 0,
+        floorPriceBTC: floorPrice,
+        avgPriceBTC: parseBTCDecimal(row.avg_price_btc),
+        totalValueBTC: parseBTCDecimal(row.total_value_btc) || 0,
+        volume24hBTC: parseBTCDecimal(row.volume_24h_btc) || 0,
+        volume7dBTC: parseBTCDecimal(row.volume_7d_btc) || 0,
+        volume30dBTC: parseBTCDecimal(row.volume_30d_btc) || 0,
+        totalVolumeBTC: parseBTCDecimal(row.total_volume_btc) || 0,
+        totalStamps: row.total_stamps ?? 0,
+        uniqueHolders: row.unique_holders ?? 0,
+        listedStamps: row.listed_stamps ?? 0,
+        soldStamps24h: row.sold_stamps_24h ?? 0,
         lastUpdated: new Date(row.last_updated),
       };
     } catch (error) {

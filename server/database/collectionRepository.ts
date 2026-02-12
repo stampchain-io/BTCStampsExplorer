@@ -16,13 +16,6 @@ function parseIntOrNull(value: any): number | null {
   return isNaN(parsed) ? null : parsed;
 }
 
-// Local utility function for float parsing that preserves null
-function parseFloatOrNull(value: any): number | null {
-  if (value === null || value === undefined) return null;
-  const parsed = parseFloat(value);
-  return isNaN(parsed) ? null : parsed;
-}
-
 export class CollectionRepository {
   // Dependency injection support
   private static db: typeof dbManager = dbManager;
@@ -270,12 +263,26 @@ export class CollectionRepository {
 
     // Fetch market data separately - collection_market_data.collection_id is BINARY(16),
     // so we use UNHEX() to convert the hex string parameter for matching.
-    // Use SELECT * since the actual column names may differ from the TypeScript types.
+    // Actual table columns: collection_id, floor_price_btc, avg_price_btc, total_value_btc,
+    // volume_24h_btc, volume_7d_btc, volume_30d_btc, total_volume_btc, total_stamps,
+    // unique_holders, listed_stamps, sold_stamps_24h, last_updated, created_at
     let marketData = null;
     if (includeMarketData) {
       try {
         const marketQuery = `
-          SELECT *
+          SELECT
+            floor_price_btc,
+            avg_price_btc,
+            total_value_btc,
+            volume_24h_btc,
+            volume_7d_btc,
+            volume_30d_btc,
+            total_volume_btc,
+            total_stamps,
+            unique_holders,
+            listed_stamps,
+            sold_stamps_24h,
+            last_updated
           FROM collection_market_data
           WHERE collection_id = UNHEX(?)
           LIMIT 1
@@ -289,21 +296,19 @@ export class CollectionRepository {
 
         if (marketResult.rows && marketResult.rows.length > 0) {
           const md = marketResult.rows[0];
-          console.log("[CollectionMarketData] Columns for", collectionId, ":", Object.keys(md).join(", "));
+          const floorPrice = parseBTCDecimal(md.floor_price_btc);
           marketData = {
-            minFloorPriceBTC: parseBTCDecimal(md.min_floor_price_btc ?? md.floor_price_btc),
-            maxFloorPriceBTC: parseBTCDecimal(md.max_floor_price_btc ?? md.floor_price_btc),
-            avgFloorPriceBTC: parseBTCDecimal(md.avg_floor_price_btc ?? md.floor_price_btc),
-            medianFloorPriceBTC: parseBTCDecimal(md.median_floor_price_btc ?? md.floor_price_btc),
-            totalVolume24hBTC: parseBTCDecimal(md.total_volume_24h_btc ?? md.volume_24h_btc) ?? 0,
-            stampsWithPricesCount: parseIntOrNull(md.stamps_with_prices_count ?? md.stamp_count) ?? 0,
-            minHolderCount: parseIntOrNull(md.min_holder_count ?? md.holder_count) ?? 0,
-            maxHolderCount: parseIntOrNull(md.max_holder_count ?? md.holder_count) ?? 0,
-            avgHolderCount: parseFloatOrNull(md.avg_holder_count ?? md.holder_count) ?? 0,
-            medianHolderCount: parseIntOrNull(md.median_holder_count ?? md.holder_count),
-            totalUniqueHolders: parseIntOrNull(md.total_unique_holders ?? md.unique_holders) ?? 0,
-            avgDistributionScore: parseFloatOrNull(md.avg_distribution_score ?? md.distribution_score) ?? 0,
-            totalStampsCount: parseIntOrNull(md.total_stamps_count ?? md.stamp_count) ?? 0,
+            floorPriceBTC: floorPrice,
+            avgPriceBTC: parseBTCDecimal(md.avg_price_btc),
+            totalValueBTC: parseBTCDecimal(md.total_value_btc) ?? 0,
+            volume24hBTC: parseBTCDecimal(md.volume_24h_btc) ?? 0,
+            volume7dBTC: parseBTCDecimal(md.volume_7d_btc) ?? 0,
+            volume30dBTC: parseBTCDecimal(md.volume_30d_btc) ?? 0,
+            totalVolumeBTC: parseBTCDecimal(md.total_volume_btc) ?? 0,
+            totalStamps: parseIntOrNull(md.total_stamps) ?? 0,
+            uniqueHolders: parseIntOrNull(md.unique_holders) ?? 0,
+            listedStamps: parseIntOrNull(md.listed_stamps) ?? 0,
+            soldStamps24h: parseIntOrNull(md.sold_stamps_24h) ?? 0,
             lastUpdated: md.last_updated ? new Date(md.last_updated) : null,
           };
         }
@@ -440,14 +445,26 @@ export class CollectionRepository {
     // Build a map of market data keyed by collection_id (hex string)
     // collection_market_data.collection_id is BINARY(16), so use UNHEX() for matching
     // and HEX() in SELECT to get hex strings for the map key.
-    // Use SELECT *, HEX(collection_id) since the actual column names may differ from types.
     let marketDataMap: Map<string, any> | null = null;
     if (includeMarketData && result.rows && result.rows.length > 0) {
       try {
         const collectionIds = result.rows.map((r: any) => r.collection_id);
         const placeholders = collectionIds.map(() => "UNHEX(?)").join(",");
         const marketQuery = `
-          SELECT *, HEX(collection_id) as collection_id_hex
+          SELECT
+            HEX(collection_id) as collection_id_hex,
+            floor_price_btc,
+            avg_price_btc,
+            total_value_btc,
+            volume_24h_btc,
+            volume_7d_btc,
+            volume_30d_btc,
+            total_volume_btc,
+            total_stamps,
+            unique_holders,
+            listed_stamps,
+            sold_stamps_24h,
+            last_updated
           FROM collection_market_data
           WHERE collection_id IN (${placeholders})
         `;
@@ -462,20 +479,19 @@ export class CollectionRepository {
           marketDataMap = new Map();
           for (const md of marketResult.rows) {
             const hexId = md.collection_id_hex;
+            const floorPrice = parseBTCDecimal(md.floor_price_btc);
             marketDataMap.set(hexId, {
-              minFloorPriceBTC: parseBTCDecimal(md.min_floor_price_btc ?? md.floor_price_btc),
-              maxFloorPriceBTC: parseBTCDecimal(md.max_floor_price_btc ?? md.floor_price_btc),
-              avgFloorPriceBTC: parseBTCDecimal(md.avg_floor_price_btc ?? md.floor_price_btc),
-              medianFloorPriceBTC: parseBTCDecimal(md.median_floor_price_btc ?? md.floor_price_btc),
-              totalVolume24hBTC: parseBTCDecimal(md.total_volume_24h_btc ?? md.volume_24h_btc) ?? 0,
-              stampsWithPricesCount: parseIntOrNull(md.stamps_with_prices_count ?? md.stamp_count) ?? 0,
-              minHolderCount: parseIntOrNull(md.min_holder_count ?? md.holder_count) ?? 0,
-              maxHolderCount: parseIntOrNull(md.max_holder_count ?? md.holder_count) ?? 0,
-              avgHolderCount: parseFloatOrNull(md.avg_holder_count ?? md.holder_count) ?? 0,
-              medianHolderCount: parseIntOrNull(md.median_holder_count ?? md.holder_count),
-              totalUniqueHolders: parseIntOrNull(md.total_unique_holders ?? md.unique_holders) ?? 0,
-              avgDistributionScore: parseFloatOrNull(md.avg_distribution_score ?? md.distribution_score) ?? 0,
-              totalStampsCount: parseIntOrNull(md.total_stamps_count ?? md.stamp_count) ?? 0,
+              floorPriceBTC: floorPrice,
+              avgPriceBTC: parseBTCDecimal(md.avg_price_btc),
+              totalValueBTC: parseBTCDecimal(md.total_value_btc) ?? 0,
+              volume24hBTC: parseBTCDecimal(md.volume_24h_btc) ?? 0,
+              volume7dBTC: parseBTCDecimal(md.volume_7d_btc) ?? 0,
+              volume30dBTC: parseBTCDecimal(md.volume_30d_btc) ?? 0,
+              totalVolumeBTC: parseBTCDecimal(md.total_volume_btc) ?? 0,
+              totalStamps: parseIntOrNull(md.total_stamps) ?? 0,
+              uniqueHolders: parseIntOrNull(md.unique_holders) ?? 0,
+              listedStamps: parseIntOrNull(md.listed_stamps) ?? 0,
+              soldStamps24h: parseIntOrNull(md.sold_stamps_24h) ?? 0,
               lastUpdated: md.last_updated ? new Date(md.last_updated) : null,
             });
           }

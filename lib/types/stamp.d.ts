@@ -1395,22 +1395,21 @@ export interface StampMarketData {
 
 /**
  * CollectionMarketData - Migrated from marketData.d.ts
+ * Matches actual collection_market_data table columns
  */
 export interface CollectionMarketData {
   collectionId: string;
-  minFloorPriceBTC: number | null;
-  maxFloorPriceBTC: number | null;
-  avgFloorPriceBTC: number | null;
-  medianFloorPriceBTC: number | null;
-  totalVolume24hBTC: number;
-  stampsWithPricesCount: number;
-  minHolderCount: number;
-  maxHolderCount: number;
-  avgHolderCount: number;
-  medianHolderCount: number;
-  totalUniqueHolders: number;
-  avgDistributionScore: number;
-  totalStampsCount: number;
+  floorPriceBTC: number | null;
+  avgPriceBTC: number | null;
+  totalValueBTC: number;
+  volume24hBTC: number;
+  volume7dBTC: number;
+  volume30dBTC: number;
+  totalVolumeBTC: number;
+  totalStamps: number;
+  uniqueHolders: number;
+  listedStamps: number;
+  soldStamps24h: number;
   lastUpdated: Date;
 }
 
