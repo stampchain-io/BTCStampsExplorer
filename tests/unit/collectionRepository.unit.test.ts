@@ -156,8 +156,8 @@ describe("CollectionRepository Unit Tests", () => {
       assertExists(page2.rows);
 
       // Verify offset was applied (mock should handle this)
-      const query1 = mockDb.getQueryHistory()[0];
-      const query2 = mockDb.getQueryHistory()[1];
+      const query1 = mockDb.getFullQueryHistory()[0];
+      const query2 = mockDb.getFullQueryHistory()[1];
 
       assertEquals(
         query1.params.includes(0),
@@ -231,7 +231,7 @@ describe("CollectionRepository Unit Tests", () => {
         .getTotalCollectionsByCreatorFromDb();
 
       // Debug: Check query history
-      const queryHistory = mockDb.getQueryHistory();
+      const queryHistory = mockDb.getFullQueryHistory();
       if (queryHistory.length > 0) {
         console.log("Query for count:", queryHistory[0].query);
         console.log("Query params:", queryHistory[0].params);
@@ -280,7 +280,7 @@ describe("CollectionRepository Unit Tests", () => {
       );
 
       // Debug: log the query history to see what was called
-      const queryHistory = mockDb.getQueryHistory();
+      const queryHistory = mockDb.getFullQueryHistory();
       if (queryHistory.length > 0) {
         console.log("Query called:", queryHistory[0].query);
         console.log("Query params:", queryHistory[0].params);

@@ -49,7 +49,7 @@ Deno.test("BlockRepository Unit Tests with DI", async (t) => {
     assertExists(block.messages_hash);
 
     // Verify correct query was called
-    const queryHistory = mockDb.getQueryHistory();
+    const queryHistory = mockDb.getFullQueryHistory();
     assertEquals(queryHistory.length, 1);
     assertEquals(queryHistory[0].query.includes("WHERE block_index = ?"), true);
     assertEquals(queryHistory[0].params, [blockIndex]);
@@ -73,7 +73,7 @@ Deno.test("BlockRepository Unit Tests with DI", async (t) => {
     assertEquals(block.block_index, 820000);
 
     // Verify correct query was called
-    const queryHistory = mockDb.getQueryHistory();
+    const queryHistory = mockDb.getFullQueryHistory();
     assertEquals(queryHistory.length, 1);
     assertEquals(queryHistory[0].query.includes("WHERE block_hash = ?"), true);
     assertEquals(queryHistory[0].params, [blockHash]);
@@ -110,7 +110,7 @@ Deno.test("BlockRepository Unit Tests with DI", async (t) => {
       assertEquals(result.rows[0].last_block, 820000); // Highest block in fixtures
 
       // Verify correct query was called
-      const queryHistory = mockDb.getQueryHistory();
+      const queryHistory = mockDb.getFullQueryHistory();
       assertEquals(queryHistory.length, 1);
       assertEquals(queryHistory[0].query.includes("MAX(block_index)"), true);
       assertEquals(queryHistory[0].params, []);
@@ -141,7 +141,7 @@ Deno.test("BlockRepository Unit Tests with DI", async (t) => {
       assertEquals(typeof result[0].tx_count, "number");
 
       // Verify two queries were called (blocks and stamp counts)
-      const queryHistory = mockDb.getQueryHistory();
+      const queryHistory = mockDb.getFullQueryHistory();
       assertEquals(queryHistory.length, 2);
       assertEquals(
         queryHistory[0].query.includes("ORDER BY block_index DESC"),
@@ -193,7 +193,7 @@ Deno.test("BlockRepository Unit Tests with DI", async (t) => {
       assertEquals(result[0].sends, 0);
 
       // Verify two queries were called
-      const queryHistory = mockDb.getQueryHistory();
+      const queryHistory = mockDb.getFullQueryHistory();
       assertEquals(queryHistory.length, 2);
       assertEquals(
         queryHistory[0].query.includes("WHERE block_index >= ? - 2"),
@@ -223,7 +223,7 @@ Deno.test("BlockRepository Unit Tests with DI", async (t) => {
     assertEquals(result.length, 5);
 
     // Verify _getBlockIndexByHash was called first
-    const queryHistory = mockDb.getQueryHistory();
+    const queryHistory = mockDb.getFullQueryHistory();
     assertEquals(queryHistory.length, 3); // _getBlockIndexByHash + 2 related queries
     assertEquals(queryHistory[0].query.includes("SELECT block_index"), true);
     assertEquals(queryHistory[0].query.includes("WHERE block_hash = ?"), true);
@@ -244,7 +244,7 @@ Deno.test("BlockRepository Unit Tests with DI", async (t) => {
       assertEquals(result, 819999);
 
       // Verify correct query was called
-      const queryHistory = mockDb.getQueryHistory();
+      const queryHistory = mockDb.getFullQueryHistory();
       assertEquals(queryHistory.length, 1);
       assertEquals(queryHistory[0].query.includes("SELECT block_index"), true);
       assertEquals(
