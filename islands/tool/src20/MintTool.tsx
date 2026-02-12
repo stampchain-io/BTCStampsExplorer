@@ -558,9 +558,8 @@ export function SRC20MintTool({
                 type="text"
                 placeholder="Token"
                 value={searchTerm}
-                onChange={(e) => {
-                  const newValue = (e.target as HTMLInputElement).value
-                    .toUpperCase();
+                onChange={(value) => {
+                  const newValue = value.toUpperCase();
                   if (newValue !== searchTerm) {
                     if (!isSelecting && !isSwitchingFields) {
                       setOpenDrop(true);

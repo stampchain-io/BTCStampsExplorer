@@ -301,17 +301,20 @@ export class FetchHttpClient implements HttpClient {
           const response = await fetch(url, fetchConfig);
 
           // Parse response data
+          // Read as text first to avoid "Body already consumed" error
+          const textData = await response.text();
           let data: T;
           const contentType = response.headers.get("content-type");
           if (contentType?.includes("application/json")) {
             try {
-              data = await response.json();
+              data = JSON.parse(textData);
             } catch (_jsonError) {
-              // If JSON parsing fails, treat as text
-              data = await response.text() as T;
+              // If JSON parsing fails, return as text
+              console.error("Failed to parse JSON response:", _jsonError);
+              data = textData as T;
             }
           } else {
-            data = await response.text() as T;
+            data = textData as T;
           }
 
           // Convert headers to plain object
