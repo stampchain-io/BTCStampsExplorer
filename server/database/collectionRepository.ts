@@ -268,9 +268,8 @@ export class CollectionRepository {
 
     const stamps = stampsResult.rows.map((r) => r.stamp);
 
-    // Fetch market data separately using the same approach as marketDataRepository.ts
-    // The collection_market_data table stores collection_id as a hex string (VARCHAR),
-    // not BINARY(16), so we query it directly with the hex string - no JOIN needed.
+    // Fetch market data separately - collection_market_data.collection_id is BINARY(16),
+    // so we use UNHEX() to convert the hex string parameter for matching.
     let marketData = null;
     if (includeMarketData) {
       try {
@@ -291,7 +290,7 @@ export class CollectionRepository {
             total_stamps_count,
             last_updated
           FROM collection_market_data
-          WHERE collection_id = ?
+          WHERE collection_id = UNHEX(?)
           LIMIT 1
         `;
 
@@ -451,16 +450,16 @@ export class CollectionRepository {
     };
 
     // Build a map of market data keyed by collection_id (hex string)
-    // The collection_market_data table stores collection_id as VARCHAR hex strings,
-    // so we query it directly - no JOIN needed.
+    // collection_market_data.collection_id is BINARY(16), so use UNHEX() for matching
+    // and HEX() in SELECT to get hex strings for the map key.
     let marketDataMap: Map<string, any> | null = null;
     if (includeMarketData && result.rows && result.rows.length > 0) {
       try {
         const collectionIds = result.rows.map((r: any) => r.collection_id);
-        const placeholders = collectionIds.map(() => "?").join(",");
+        const placeholders = collectionIds.map(() => "UNHEX(?)").join(",");
         const marketQuery = `
           SELECT
-            collection_id,
+            HEX(collection_id) as collection_id,
             min_floor_price_btc,
             max_floor_price_btc,
             avg_floor_price_btc,
