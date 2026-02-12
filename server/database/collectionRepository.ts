@@ -273,11 +273,28 @@ export class CollectionRepository {
       GROUP BY c.collection_id, c.collection_name, c.collection_description
     `;
 
-    const result = await this.db.executeQueryWithCache(
-      query,
-      [collectionId],
-      60 * 5, // Cache for 5 minutes
-    ) as { rows: any[] };
+    let result: { rows: any[] };
+
+    try {
+      result = await this.db.executeQueryWithCache(
+        query,
+        [collectionId],
+        60 * 5, // Cache for 5 minutes
+      ) as { rows: any[] };
+    } catch (error) {
+      // If market data table doesn't exist yet, retry without it
+      if (includeMarketData) {
+        console.warn(
+          "collection_market_data table query failed, retrying without market data:",
+          error instanceof Error ? error.message : error,
+        );
+        return await this.getCollectionById(collectionId, {
+          ...options,
+          includeMarketData: false,
+        });
+      }
+      throw error;
+    }
 
     if (result.rows.length === 0) {
       return null;
@@ -398,7 +415,10 @@ export class CollectionRepository {
       minStampCount?: number;
       includeMarketData?: boolean;
     },
-  ) {
+  ): Promise<{
+    rows: import("../../server/types/collection.d.ts").CollectionRow[];
+    [key: string]: any;
+  }> {
     const {
       limit = SMALL_LIMIT,
       page = 1,
@@ -490,14 +510,31 @@ export class CollectionRepository {
 
     queryParams.push(limit, offset);
 
-    const result = await this.db.executeQueryWithCache(
-      query,
-      queryParams,
-      60 * 5, // 5 minutes cache in seconds
-    ) as {
+    let result: {
       rows: import("../../server/types/collection.d.ts").CollectionRow[];
       [key: string]: any;
     };
+
+    try {
+      result = await this.db.executeQueryWithCache(
+        query,
+        queryParams,
+        60 * 5, // 5 minutes cache in seconds
+      ) as typeof result;
+    } catch (error) {
+      // If market data table doesn't exist yet, retry without it
+      if (includeMarketData) {
+        console.warn(
+          "collection_market_data table query failed, retrying without market data:",
+          error instanceof Error ? error.message : error,
+        );
+        return await this.getCollectionDetailsWithMarketData({
+          ...options,
+          includeMarketData: false,
+        });
+      }
+      throw error;
+    }
 
     // Transform the results to include market data in the expected format
     if (includeMarketData && (result as any).rows) {
