@@ -283,6 +283,9 @@ export function SRC20MintTool({
   /* ===== TOKEN SELECTION HANDLER ===== */
   const handleResultClick = async (tick: string) => {
     closeDropdownWithAnimation();
+    // Blur the input so it loses focus after selection
+    isInputFocusedRef.current = false;
+    (document.activeElement as HTMLElement)?.blur();
     setIsSelecting(true);
     setIsSwitchingFields(true);
     setSearchResults([]);
