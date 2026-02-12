@@ -241,12 +241,30 @@ export function estimateTransactionSizeForType(
       ];
       break;
     }
-    case "src20":
-    case "src101": {
-      // Estimate data chunks needed (capped at reasonable amount)
-      const dataChunks = Math.min(Math.ceil((fileSize || 100) / 32), 5);
+    case "src20": {
+      // SRC-20 uses 62-byte chunks for multisig data encoding
+      const src20Chunks = Math.max(
+        1,
+        Math.ceil((fileSize || 100) / 62),
+      );
       outputs = [
-        ...Array(dataChunks).fill({ type: "P2WSH" }),
+        { type: "P2WPKH" }, // recipient
+        ...Array(src20Chunks).fill({ type: "P2WSH" }), // multisig data outputs
+        { type: "P2WPKH" }, // change
+      ];
+      break;
+    }
+    case "src101": {
+      // SRC-101 uses 62-byte chunks for 3-of-3 bare multisig data encoding
+      // Payload includes 2-byte length prefix + 6-byte "stamp:" prefix + data
+      const src101DataSize = (fileSize || 200) + 8; // data + prefixes
+      const src101Chunks = Math.max(
+        1,
+        Math.ceil(src101DataSize / 62),
+      );
+      outputs = [
+        { type: "P2WPKH" }, // recipient
+        ...Array(src101Chunks).fill({ type: "P2WSH" }), // multisig data outputs
         { type: "P2WPKH" }, // change
       ];
       break;
