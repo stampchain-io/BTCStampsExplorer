@@ -296,7 +296,16 @@ export class MockDatabaseManager {
         normalizedQuery.includes("st.ident != 'src-20'")
       ) {
         stamps = stamps.filter((s) => s.stamp >= 0 && s.ident !== "SRC-20");
-      } // Cursed stamps filter: (st.stamp < 0)
+      } // Cursed stamps filter: excludes posh (cpid NOT LIKE 'A%' AND ident != 'SRC-20')
+      else if (
+        normalizedQuery.includes("st.stamp < 0") &&
+        normalizedQuery.includes("not")
+      ) {
+        stamps = stamps.filter((s) =>
+          s.stamp < 0 &&
+          !(s.cpid && !s.cpid.startsWith("A") && s.ident !== "SRC-20")
+        );
+      } // Posh stamps filter: (st.stamp < 0 AND cpid NOT LIKE 'A%')
       else if (normalizedQuery.includes("st.stamp < 0")) {
         stamps = stamps.filter((s) => s.stamp < 0);
       } // Filter by CPID if present

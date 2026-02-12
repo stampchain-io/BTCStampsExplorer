@@ -144,7 +144,8 @@ export class StampRepository {
     let stampCondition = "";
     if (type !== "all") {
       if (type === "cursed") {
-        stampCondition = "st.stamp < 0";
+        stampCondition =
+          "st.stamp < 0 AND NOT (st.cpid NOT LIKE 'A%' AND st.ident != 'SRC-20')";
       } else if (type === "stamps" && !identifier) {
         if (!isSearchQuery)
           stampCondition = "st.stamp >= 0 AND st.ident != 'SRC-20'";
@@ -1375,7 +1376,8 @@ export class StampRepository {
     let typeCondition = "";
     if (type !== STAMP_TYPE_CONSTANTS.ALL) {
       if (type === STAMP_TYPE_CONSTANTS.CURSED) {
-        typeCondition = "AND s.stamp < 0";
+        typeCondition =
+          "AND s.stamp < 0 AND NOT (s.cpid NOT LIKE 'A%' AND s.ident != 'SRC-20')";
       } else if (type === STAMP_TYPE_CONSTANTS.CLASSIC) {
         typeCondition = "AND s.stamp >= 0 AND s.cpid LIKE 'A%' AND s.ident != 'SRC-20'";
       } else if (type === STAMP_TYPE_CONSTANTS.STAMPS) {
