@@ -1,6 +1,6 @@
 #!/bin/bash
 # deploy-local.sh - Local Docker build and deployment to AWS ECR/ECS
-# Works on both macOS ARM and Linux ARM64 (cross-compiles to linux/amd64 for ECS)
+# Builds linux/arm64 images for Graviton-based ECS Fargate
 # Usage: ./scripts/deploy-local.sh [--yes] [--skip-monitor] [test_mode=true]
 
 set -e
@@ -109,9 +109,9 @@ if [ "$AUTO_YES" = false ] && [ "$TEST_MODE" = false ]; then
   fi
 fi
 
-# Setup buildx for cross-platform builds
-# Both macOS ARM and Linux ARM64 need to cross-compile to linux/amd64 for ECS Fargate
-echo -e "${YELLOW}Setting up Docker buildx for cross-platform builds...${NC}"
+# Setup buildx for builds
+# ECS Fargate runs on Graviton (ARM64) - build natively on ARM64 hosts
+echo -e "${YELLOW}Setting up Docker buildx...${NC}"
 BUILDER_NAME="stamps-builder"
 if ! docker buildx ls 2>/dev/null | grep -q "${BUILDER_NAME}"; then
   if [ "$TEST_MODE" = true ]; then
@@ -136,19 +136,19 @@ else
     docker login --username AWS --password-stdin ${ECR_REGISTRY}
 fi
 
-# Build for linux/amd64 (ECS Fargate requires x86_64)
-echo -e "${YELLOW}Building Docker image for linux/amd64...${NC}"
+# Build for linux/arm64 (ECS Fargate runs on Graviton ARM64)
+echo -e "${YELLOW}Building Docker image for linux/arm64...${NC}"
 echo -e "${BLUE}Using buildx with registry layer caching...${NC}"
 echo -e "${BLUE}This may take 3-8 minutes on first build...${NC}"
 
 if [ "$TEST_MODE" = true ]; then
   echo -e "  TEST MODE: Would build with:"
-  echo -e "    Platform: linux/amd64"
+  echo -e "    Platform: linux/arm64"
   echo -e "    Tags: ${ECR_REPOSITORY}:${IMAGE_TAG}, ${ECR_REPOSITORY}:${VERSION_TAG}"
   echo -e "    Cache: registry-based"
 else
   docker buildx build \
-    --platform linux/amd64 \
+    --platform linux/arm64 \
     --tag ${ECR_REPOSITORY}:${IMAGE_TAG} \
     --tag ${ECR_REPOSITORY}:${VERSION_TAG} \
     --cache-from type=registry,ref=${ECR_REPOSITORY}:buildcache \
