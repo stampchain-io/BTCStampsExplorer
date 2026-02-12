@@ -263,9 +263,9 @@ export class CollectionRepository {
 
     // Join market data table if requested
     if (includeMarketData) {
-      // collection_market_data.collection_id stores hex string, collections.collection_id is BINARY(16)
+      // Use HEX() on both sides to guarantee matching regardless of column type
       query += `
-      LEFT JOIN collection_market_data cmd ON cmd.collection_id = HEX(c.collection_id)
+      LEFT JOIN collection_market_data cmd ON HEX(cmd.collection_id) = HEX(c.collection_id)
       `;
     }
 
@@ -477,9 +477,9 @@ export class CollectionRepository {
 
     // Join market data table if requested
     if (includeMarketData) {
-      // collection_market_data.collection_id stores hex string, collections.collection_id is BINARY(16)
+      // Use HEX() on both sides to guarantee matching regardless of column type
       query += `
-      LEFT JOIN collection_market_data cmd ON cmd.collection_id = HEX(c.collection_id)
+      LEFT JOIN collection_market_data cmd ON HEX(cmd.collection_id) = HEX(c.collection_id)
       `;
     }
 
