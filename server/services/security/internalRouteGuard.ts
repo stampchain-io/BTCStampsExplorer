@@ -7,9 +7,7 @@ export class InternalRouteGuard {
   // For routes that require CSRF
   static async requireCSRF(req: Request) {
     // Skip CSRF check in development environment for easier testing
-    const isDevelopment = Deno.env.get("DENO_ENV") === "development";
-    
-    if (isDevelopment) {
+    if (serverConfig.IS_DEVELOPMENT) {
       logger.debug("stamps", {
         message: "Development environment - CSRF check skipped",
         headers: Object.fromEntries(req.headers.entries()),
@@ -80,8 +78,7 @@ export class InternalRouteGuard {
   // For webhook routes
   static requireAPIKey(req: Request) {
     const apiKey = req.headers.get("X-API-Key");
-    // Use INTERNAL_API_KEY from environment instead of serverConfig.API_KEY
-    const configApiKey = Deno.env.get("INTERNAL_API_KEY");
+    const configApiKey = serverConfig.INTERNAL_API_KEY;
 
     // Check if API key is not configured
     if (!configApiKey || configApiKey.trim() === '') {
@@ -147,7 +144,7 @@ export class InternalRouteGuard {
     console.log(`[${requestId}] Checking trusted origin...`);
 
     // Skip origin check in development
-    if (Deno.env.get("DENO_ENV") === "development") {
+    if (serverConfig.IS_DEVELOPMENT) {
       console.log(`[${requestId}] Development environment - skipping origin check`);
       return null;
     }

@@ -4,8 +4,8 @@ import * as bitcoin from "bitcoinjs-lib";
 // Conditionally import tiny-secp256k1
 let ecc: any = null;
 const isBuildMode = Deno.args.includes("build");
-const isDevelopment = Deno.env.get("DENO_ENV") === "development";
-const useStubs = Deno.env.get("USE_CRYPTO_STUBS") === "true";
+const isDevelopment = serverConfig.IS_DEVELOPMENT;
+const useStubs = serverConfig.USE_CRYPTO_STUBS;
 
 if (isBuildMode) {
   // In build mode, always use stub implementation

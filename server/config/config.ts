@@ -23,6 +23,23 @@ type ServerConfig = {
   readonly MARA_SERVICE_FEE_SATS?: string;
   readonly MARA_SERVICE_FEE_ADDRESS?: string;
   readonly ENABLE_MARA_INTEGRATION?: string;
+  // Environment detection
+  readonly DENO_ENV: string;
+  readonly IS_DEVELOPMENT: boolean;
+  readonly IS_PRODUCTION: boolean;
+  // Security
+  readonly INTERNAL_API_KEY?: string;
+  readonly INTERNAL_API_SECRET?: string;
+  readonly CF_ACCESS_CLIENT_ID?: string;
+  readonly CF_ACCESS_CLIENT_SECRET?: string;
+  // Development & debugging
+  readonly DEV_BASE_URL: string;
+  readonly DEBUG_SQL: boolean;
+  readonly USE_CRYPTO_STUBS: boolean;
+  // Middleware
+  readonly PUBLIC_API_KEY?: string;
+  readonly RATE_LIMIT_DEBUG: boolean;
+  readonly OPENAPI_VALIDATION_DISABLED: boolean;
   [key: string]: string | boolean | undefined;
 };
 
@@ -82,6 +99,49 @@ const serverConfig: ServerConfig = {
   },
   get ENABLE_MARA_INTEGRATION() {
     return Deno.env.get("ENABLE_MARA_INTEGRATION") || "0";
+  },
+  // Environment detection
+  get DENO_ENV() {
+    return Deno.env.get("DENO_ENV") || "development";
+  },
+  get IS_DEVELOPMENT() {
+    return Deno.env.get("DENO_ENV") === "development";
+  },
+  get IS_PRODUCTION() {
+    return Deno.env.get("DENO_ENV") === "production";
+  },
+  // Security
+  get INTERNAL_API_KEY() {
+    return Deno.env.get("INTERNAL_API_KEY") || "";
+  },
+  get INTERNAL_API_SECRET() {
+    return Deno.env.get("INTERNAL_API_SECRET") || "";
+  },
+  get CF_ACCESS_CLIENT_ID() {
+    return Deno.env.get("CF_ACCESS_CLIENT_ID") || "";
+  },
+  get CF_ACCESS_CLIENT_SECRET() {
+    return Deno.env.get("CF_ACCESS_CLIENT_SECRET") || "";
+  },
+  // Development & debugging
+  get DEV_BASE_URL() {
+    return Deno.env.get("DEV_BASE_URL") || "https://stampchain.io";
+  },
+  get DEBUG_SQL() {
+    return Deno.env.get("DEBUG_SQL") === "true";
+  },
+  get USE_CRYPTO_STUBS() {
+    return Deno.env.get("USE_CRYPTO_STUBS") === "true";
+  },
+  // Middleware
+  get PUBLIC_API_KEY() {
+    return Deno.env.get("PUBLIC_API_KEY") || "";
+  },
+  get RATE_LIMIT_DEBUG() {
+    return Deno.env.get("RATE_LIMIT_DEBUG") === "true";
+  },
+  get OPENAPI_VALIDATION_DISABLED() {
+    return Deno.env.get("OPENAPI_VALIDATION_DISABLED") === "true";
   },
 };
 

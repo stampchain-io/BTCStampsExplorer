@@ -1,5 +1,6 @@
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { logger } from "$lib/utils/logger.ts";
+import { serverConfig } from "$server/config/config.ts";
 
 /**
  * Security guard for internal API endpoints that need to be accessible from our frontend
@@ -12,7 +13,7 @@ export class InternalApiFrontendGuard {
    */
   static requireInternalAccess(req: Request) {
     // Skip in development
-    if (Deno.env.get("DENO_ENV") === "development") {
+    if (serverConfig.IS_DEVELOPMENT) {
       return null;
     }
 
@@ -20,10 +21,10 @@ export class InternalApiFrontendGuard {
     const origin = req.headers.get("Origin");
     const referer = req.headers.get("Referer");
     const host = req.headers.get("Host");
-    
+
     // Check for API key first (for server-to-server calls)
     const apiKey = req.headers.get("X-API-Key");
-    const expectedApiKey = Deno.env.get("INTERNAL_API_KEY");
+    const expectedApiKey = serverConfig.INTERNAL_API_KEY;
     
     if (apiKey && expectedApiKey && apiKey === expectedApiKey) {
       return null; // Valid API key

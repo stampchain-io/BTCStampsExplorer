@@ -17,6 +17,7 @@ import { SRC20Repository } from "$server/database/src20Repository.ts";
 import { BlockService } from "$server/services/core/blockService.ts";
 import { Big } from "big";
 import { SRC20UtilityService } from "$server/services/src20/utilityService.ts";
+import { serverConfig } from "$server/config/config.ts";
 
 // Define missing types
 interface PerformanceMetrics {
@@ -1050,9 +1051,8 @@ export class SRC20QueryService {
         // 🚀 V2.3 CLEAN STRUCTURE: Create nested objects and remove root duplicates
         enriched.forEach((row: any) => {
           // Get base URL (same logic as used in other parts of the app)
-          const env = Deno.env.get("DENO_ENV");
-          const baseUrl = env === "development"
-            ? (Deno.env.get("DEV_BASE_URL") || "https://stampchain.io")
+          const baseUrl = serverConfig.IS_DEVELOPMENT
+            ? serverConfig.DEV_BASE_URL
             : "https://stampchain.io";
 
           // ✅ STAMP_URL: Use transaction hash for the actual stamp content
