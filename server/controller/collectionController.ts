@@ -2,7 +2,7 @@
 import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
 import { CollectionService } from "$server/services/core/collectionService.ts";
 import { StampService } from "$server/services/stampService.ts";
-import type {CollectionQueryParams, PaginatedCollectionResponseBody, CollectionRow} from "$server/types/collection.d.ts";
+import type {CollectionQueryParams, PaginatedCollectionResponseBody, CollectionRow, CollectionWithCreators} from "$server/types/collection.d.ts";
 import type { Collection } from "$types/api.d.ts";
 
 export class CollectionController {
@@ -180,6 +180,22 @@ export class CollectionController {
       return await CollectionService.getCollectionNames(params);
     } catch (error) {
       console.error("Error in CollectionController.getCollectionNames:", error);
+      throw error;
+    }
+  }
+
+  static async getCollectionById(
+    collectionId: string,
+    options: {
+      includeMarketData?: boolean;
+      stampLimit?: number;
+      stampPage?: number;
+    } = {},
+  ): Promise<CollectionWithCreators | null> {
+    try {
+      return await CollectionService.getCollectionById(collectionId, options);
+    } catch (error) {
+      console.error("Error in CollectionController.getCollectionById:", error);
       throw error;
     }
   }

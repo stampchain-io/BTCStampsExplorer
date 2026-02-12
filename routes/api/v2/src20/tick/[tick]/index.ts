@@ -11,6 +11,7 @@ import {
   validateSortParam,
 } from "$server/services/validation/routeValidationService.ts";
 import { BigFloat } from "bigfloat/mod.ts";
+import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
 
 export const handler: Handlers = {
   async GET(req, ctx) {
@@ -105,6 +106,11 @@ export const handler: Handlers = {
           tx_hash: "", // Add required tx_hash field for default case
         };
 
+      // Fetch market data for the tick
+      const market_data = await MarketDataRepository.getSRC20MarketData(
+        decodedTick,
+      );
+
       // Construct response body
       const body: PaginatedTickResponseBody = {
         page: page || DEFAULT_PAGINATION.page,
@@ -114,6 +120,7 @@ export const handler: Handlers = {
         last_block: lastBlock,
         mint_status: formattedMintStatus,
         data,
+        market_data, // Add market data field (null if not found)
       };
 
       return ApiResponseUtil.success(body);
