@@ -226,7 +226,7 @@ export function SRC20MintTool({
 
   /* ===== TOKEN SEARCH EFFECT ===== */
   useEffect(() => {
-    if (isSelecting || tick || isSwitchingFields) {
+    if (isSelecting || isSwitchingFields) {
       return;
     }
 
@@ -243,6 +243,18 @@ export function SRC20MintTool({
             encodeURIComponent(searchTerm.trim())
           }&mintable_only=true`,
         );
+
+        if (!response.ok) {
+          logger.error("stamps", {
+            message: "Search API error",
+            status: response.status,
+            searchTerm,
+          });
+          setSearchResults([]);
+          closeDropdownWithAnimation();
+          return;
+        }
+
         const data = await response.json();
 
         if (data.data && Array.isArray(data.data)) {
@@ -251,6 +263,12 @@ export function SRC20MintTool({
             setOpenDrop(true);
             setDropdownAnimation("enter");
           }
+        } else {
+          logger.debug("stamps", {
+            message: "Search returned no results or unexpected format",
+            searchTerm,
+            dataStructure: typeof data,
+          });
         }
       } catch (error) {
         logger.error("stamps", {
@@ -266,7 +284,7 @@ export function SRC20MintTool({
     return () => {
       clearTimeout(delayDebounceFn);
     };
-  }, [searchTerm, isSelecting, tick, isSwitchingFields]);
+  }, [searchTerm, isSelecting, isSwitchingFields]);
 
   /* ===== TOKEN SELECTION HANDLER ===== */
   const handleResultClick = async (tick: string) => {
@@ -313,6 +331,8 @@ export function SRC20MintTool({
       resetTokenData();
     } finally {
       setIsImageLoading(false);
+      setIsSelecting(false);
+      setIsSwitchingFields(false);
     }
   };
 
