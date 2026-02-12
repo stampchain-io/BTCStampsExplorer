@@ -3,10 +3,8 @@ import { closeModal, openModal, searchState } from "$islands/modal/states.ts";
 import { SearchErrorDisplay } from "$islands/modal/SearchErrorDisplay.tsx";
 import { SearchInputField } from "$islands/modal/SearchInputField.tsx";
 import { ModalSearchBase, transitionColors } from "$layout";
-import {
-  classifySearchInput,
-  generateSearchErrorMessage,
-} from "$lib/utils/data/search/searchInputClassifier.ts";
+import { generateSearchErrorMessage } from "$lib/utils/data/search/searchInputClassifier.ts";
+import { isValidBitcoinAddress } from "$lib/utils/typeGuards.ts";
 import {
   navigateSSRSafe,
   scheduleFocus,
@@ -46,12 +44,9 @@ export function openSRC20Search() {
       if (
         !response.ok || !data.data || data.data.length === 0
       ) {
-        // For addresses with no results, show a link to
-        // the wallet page instead of an error
-        const { type } = classifySearchInput(
-          currentTerm.trim(),
-        );
-        if (type === "address") {
+        // For valid addresses with no results, show a
+        // link to the wallet page instead of an error
+        if (isValidBitcoinAddress(currentTerm.trim())) {
           searchState.value = {
             ...searchState.value,
             error: "",
