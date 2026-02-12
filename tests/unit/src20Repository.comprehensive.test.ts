@@ -739,11 +739,13 @@ Deno.test("SRC20Repository - Search Functionality", async (t) => {
     SRC20Repository.setDatabase(mock.db as any);
 
     try {
+      // Input sanitization happens in the service layer (searchInputClassifier)
+      // The repository wraps with % wildcards but does not strip special chars
       await SRC20Repository.searchValidSrc20TxFromDb("test@#$%^&*()");
 
       const [query, params] = [mock.calls[0].query, mock.calls[0].params];
-      // Should remove special characters except - and _
-      assertEquals(params[0], "%test%");
+      // Repository wraps input with wildcards; sanitization is upstream
+      assertEquals(params[0], "%test@#$%^&*()%");
     } finally {
       SRC20Repository.setDatabase(originalDb);
     }

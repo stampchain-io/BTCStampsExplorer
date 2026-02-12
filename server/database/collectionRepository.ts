@@ -514,7 +514,9 @@ export class CollectionRepository {
       total_editions: typeof row.total_editions === "string"
         ? parseInt(row.total_editions)
         : row.total_editions,
-      marketData: marketDataMap?.get(row.collection_id) ?? null,
+      ...(includeMarketData
+        ? { marketData: marketDataMap?.get(row.collection_id) ?? null }
+        : {}),
     }));
 
     return result;

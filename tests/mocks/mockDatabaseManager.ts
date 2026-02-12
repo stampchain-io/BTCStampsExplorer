@@ -229,6 +229,11 @@ export class MockDatabaseManager {
       return this.getSrc20MarketData(normalizedQuery, params);
     }
 
+    // Collection market data queries (separate table from collections)
+    if (normalizedQuery.includes("from collection_market_data")) {
+      return this.getCollectionMarketData(normalizedQuery, params);
+    }
+
     // SRC-20 queries
     if (
       normalizedQuery.includes("from src20valid") ||
@@ -383,6 +388,49 @@ export class MockDatabaseManager {
     }
 
     return { rows: marketData };
+  }
+
+  /**
+   * Get collection market data from fixtures
+   * Returns market data keyed by collection_id_hex for the two-query pattern
+   * used by getCollectionDetailsWithMarketData
+   */
+  private getCollectionMarketData(
+    _query: string,
+    params: unknown[],
+  ): QueryResult {
+    const collectionFixtures = collectionFixturesData as any;
+    const collections = collectionFixtures.collections || [];
+
+    // params are collection IDs passed to UNHEX(?) placeholders
+    const rows = params
+      .filter((p): p is string => typeof p === "string")
+      .map((collectionId) => {
+        const collection = collections.find(
+          (c: any) => c.collection_id === collectionId,
+        );
+        if (collection) {
+          return {
+            collection_id_hex: collectionId,
+            floor_price_btc: "0.001",
+            avg_price_btc: "0.005",
+            total_value_btc: "0.05",
+            volume_24h_btc: "0.5",
+            volume_7d_btc: "1.2",
+            volume_30d_btc: "3.5",
+            total_volume_btc: "10.0",
+            total_stamps: 3,
+            unique_holders: 50,
+            listed_stamps: 3,
+            sold_stamps_24h: 1,
+            last_updated: "2024-01-01T00:00:00Z",
+          };
+        }
+        return null;
+      })
+      .filter(Boolean);
+
+    return { rows };
   }
 
   /**
