@@ -393,12 +393,14 @@ describe("Transaction Size Estimator", () => {
       assert(Number.isInteger(result));
     });
 
-    it("should cap data chunks for SRC20/SRC101", () => {
-      const result = estimateTransactionSizeForType("src20", 10000);
+    it("should scale data chunks proportionally for SRC20/SRC101", () => {
+      const small = estimateTransactionSizeForType("src20", 100);
+      const large = estimateTransactionSizeForType("src20", 1000);
 
-      // Should cap at 5 chunks regardless of file size
-      assert(result < 1000); // Should not be enormous
-      assert(Number.isInteger(result));
+      // Larger data should produce larger estimates (62-byte chunk scaling)
+      assert(large > small);
+      assert(Number.isInteger(small));
+      assert(Number.isInteger(large));
     });
 
     it("should estimate send transaction size", () => {
