@@ -476,7 +476,7 @@ export function SRC20MintTool({
               ? (
                 <img
                   src={selectedTokenImage}
-                  class="w-full h-full"
+                  class="w-full h-full rounded-2xl object-cover"
                   alt=""
                   loading="lazy"
                   onLoad={() => setIsImageLoading(false)}
