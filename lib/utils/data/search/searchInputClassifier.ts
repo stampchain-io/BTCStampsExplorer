@@ -48,8 +48,8 @@ export function classifySearchInput(
     return { type: "unknown", sanitized: "", original: input };
   }
 
-  // CPID: starts with 'A' or 'a' followed by 5+ digits
-  if (/^[Aa]\d{5,}$/.test(trimmed)) {
+  // CPID: starts with 'A' or 'a' followed by 1+ digits
+  if (/^[Aa]\d+$/.test(trimmed)) {
     return {
       type: "cpid",
       sanitized: trimmed.toUpperCase(),

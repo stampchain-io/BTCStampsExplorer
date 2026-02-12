@@ -27,6 +27,11 @@ export const handler: Handlers = {
 
       switch (type) {
         case "cpid":
+          queryOptions.search = sanitized;
+          queryOptions.limit = 11;
+          queryOptions.sortBy = "ASC";
+          break;
+
         case "tx_hash":
           queryOptions.identifier = sanitized;
           break;
