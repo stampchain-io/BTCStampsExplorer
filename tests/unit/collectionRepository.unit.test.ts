@@ -362,20 +362,19 @@ describe("CollectionRepository Unit Tests", () => {
             creators: "bc1qexamplecreator", // Database stores as string
             creator_names: "Example Creator",
             stamp_numbers: "4258,4262,4265", // Database stores as string
-            minFloorPriceBTC: "0.001",
-            maxFloorPriceBTC: "0.01",
-            avgFloorPriceBTC: "0.005",
-            medianFloorPriceBTC: null,
-            totalVolume24hBTC: "0.5",
-            stampsWithPricesCount: "3",
-            minHolderCount: "5",
-            maxHolderCount: "20",
-            avgHolderCount: "12.5",
-            medianHolderCount: null,
-            totalUniqueHolders: "50",
-            avgDistributionScore: "0.75",
-            totalStampsCount: "3",
-            marketDataLastUpdated: "2024-01-01T00:00:00Z",
+            floor_price_btc: "0.001",
+            avg_price_btc: "0.005",
+            total_value_btc: "0.05",
+            volume_24h_btc: "0.5",
+            volume_7d_btc: "1.2",
+            volume_30d_btc: "3.5",
+            total_volume_btc: "10.0",
+            total_stamps: 3,
+            unique_holders: 50,
+            listed_stamps: 3,
+            sold_stamps_24h: 1,
+            last_updated: "2024-01-01T00:00:00Z",
+            created_at: "2023-01-01T00:00:00Z",
           }],
         },
       );
@@ -393,15 +392,31 @@ describe("CollectionRepository Unit Tests", () => {
       if (result.rows.length > 0) {
         const firstCollection = result.rows[0];
         assertExists(firstCollection.marketData);
-        assertExists(firstCollection.marketData.minFloorPriceBTC);
-        assertExists(firstCollection.marketData.maxFloorPriceBTC);
-        assertExists(firstCollection.marketData.avgFloorPriceBTC);
+        assertExists(firstCollection.marketData.floorPriceBTC);
+        assertExists(firstCollection.marketData.avgPriceBTC);
+        assertExists(firstCollection.marketData.totalValueBTC);
         assertEquals(
-          typeof firstCollection.marketData.totalVolume24hBTC,
+          typeof firstCollection.marketData.volume24hBTC,
           "number",
         );
         assertEquals(
-          typeof firstCollection.marketData.stampsWithPricesCount,
+          typeof firstCollection.marketData.volume7dBTC,
+          "number",
+        );
+        assertEquals(
+          typeof firstCollection.marketData.volume30dBTC,
+          "number",
+        );
+        assertEquals(
+          typeof firstCollection.marketData.totalVolumeBTC,
+          "number",
+        );
+        assertEquals(
+          typeof firstCollection.marketData.listedStamps,
+          "number",
+        );
+        assertEquals(
+          typeof firstCollection.marketData.soldStamps24h,
           "number",
         );
       }

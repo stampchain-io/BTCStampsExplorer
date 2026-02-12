@@ -784,7 +784,8 @@ export class MockDatabaseManager {
 
       // Check if this is a market data query
       const includesMarketData =
-        normalizedQuery.includes("cmd.min_floor_price_btc") ||
+        normalizedQuery.includes("cmd.floor_price_btc") ||
+        normalizedQuery.includes("collection_market_data") ||
         normalizedQuery.includes("stamp_market_data");
 
       // Transform collection data with creators and stamps
@@ -813,20 +814,19 @@ export class MockDatabaseManager {
         if (includesMarketData) {
           return {
             ...baseData,
-            minFloorPriceBTC: "0.001",
-            maxFloorPriceBTC: "0.01",
-            avgFloorPriceBTC: "0.005",
-            medianFloorPriceBTC: null,
-            totalVolume24hBTC: "0.5",
-            stampsWithPricesCount: stamps.length.toString(),
-            minHolderCount: "5",
-            maxHolderCount: "20",
-            avgHolderCount: "12.5",
-            medianHolderCount: null,
-            totalUniqueHolders: "50",
-            avgDistributionScore: "0.75",
-            totalStampsCount: stamps.length.toString(),
-            marketDataLastUpdated: "2024-01-01T00:00:00Z",
+            floor_price_btc: "0.001",
+            avg_price_btc: "0.005",
+            total_value_btc: "0.05",
+            volume_24h_btc: "0.5",
+            volume_7d_btc: "1.2",
+            volume_30d_btc: "3.5",
+            total_volume_btc: "10.0",
+            total_stamps: stamps.length,
+            unique_holders: 50,
+            listed_stamps: 3,
+            sold_stamps_24h: 1,
+            last_updated: "2024-01-01T00:00:00Z",
+            created_at: "2023-01-01T00:00:00Z",
           };
         }
 

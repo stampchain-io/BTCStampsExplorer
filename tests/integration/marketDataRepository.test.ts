@@ -256,10 +256,25 @@ describe("MarketDataRepository Integration Tests", () => {
         if (marketData) {
           assertExists(marketData.collectionId);
           assertEquals(marketData.collectionId, collectionId);
-          assertEquals(typeof marketData.minFloorPriceBTC, "number");
-          assertEquals(typeof marketData.maxFloorPriceBTC, "number");
-          assertEquals(typeof marketData.avgFloorPriceBTC, "number");
-          assertEquals(typeof marketData.totalStampsCount, "number");
+          // Check nullable fields
+          if (marketData.floorPriceBTC !== null) {
+            assertEquals(typeof marketData.floorPriceBTC, "number");
+          }
+          if (marketData.avgPriceBTC !== null) {
+            assertEquals(typeof marketData.avgPriceBTC, "number");
+          }
+          if (marketData.totalValueBTC !== null) {
+            assertEquals(typeof marketData.totalValueBTC, "number");
+          }
+          // Check non-nullable fields
+          assertEquals(typeof marketData.volume24hBTC, "number");
+          assertEquals(typeof marketData.volume7dBTC, "number");
+          assertEquals(typeof marketData.volume30dBTC, "number");
+          assertEquals(typeof marketData.totalVolumeBTC, "number");
+          assertEquals(typeof marketData.totalStamps, "number");
+          assertEquals(typeof marketData.uniqueHolders, "number");
+          assertEquals(typeof marketData.listedStamps, "number");
+          assertEquals(typeof marketData.soldStamps24h, "number");
         }
       }
     });
