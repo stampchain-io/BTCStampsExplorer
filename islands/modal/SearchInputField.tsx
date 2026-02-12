@@ -40,6 +40,7 @@ export function SearchInputField({
     <>
       <input
         ref={inputRef}
+        data-search-input
         type="text"
         placeholder={placeholder}
         value={value}

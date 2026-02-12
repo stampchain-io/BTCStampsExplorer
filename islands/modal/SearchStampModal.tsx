@@ -10,6 +10,7 @@ import {
 } from "$lib/utils/data/search/searchInputClassifier.ts";
 import {
   navigateSSRSafe,
+  scheduleFocus,
   useAutoFocus,
   useDebouncedSearch,
 } from "$lib/utils/ui/search/searchHooks.ts";
@@ -128,6 +129,7 @@ export function openStampSearch() {
     </ModalSearchBase>
   );
   openModal(modalContent, "slideDownUp");
+  scheduleFocus();
 }
 
 function SearchContent({

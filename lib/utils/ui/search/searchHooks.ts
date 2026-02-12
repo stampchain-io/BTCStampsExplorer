@@ -10,6 +10,9 @@ import type { RefObject } from "preact";
 
 /**
  * Auto-focus an input element after mount.
+ * Works on both fresh mounts and component reuse
+ * (e.g. when modal reopens before the close animation
+ * finishes).
  */
 export function useAutoFocus(
   inputRef: RefObject<HTMLInputElement>,
@@ -17,13 +20,34 @@ export function useAutoFocus(
 ): void {
   useEffect(() => {
     if (autoFocus) {
-      // Small delay to ensure the modal animation has rendered
-      // the input as visible and focusable
       requestAnimationFrame(() => {
         inputRef.current?.focus();
       });
     }
   }, [autoFocus]);
+}
+
+/**
+ * Schedule focus on the search input after the modal
+ * renders.  Queries the DOM directly via a data attribute
+ * so it works regardless of ref wiring or component
+ * mount/reuse lifecycle.
+ */
+export function scheduleFocus(): void {
+  let attempts = 0;
+  const tryFocus = () => {
+    const el = document.querySelector<HTMLInputElement>(
+      "[data-search-input]",
+    );
+    if (el) {
+      el.focus();
+      return;
+    }
+    if (++attempts < 10) {
+      requestAnimationFrame(tryFocus);
+    }
+  };
+  requestAnimationFrame(tryFocus);
 }
 
 /**
