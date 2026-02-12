@@ -782,18 +782,53 @@ describe(
         assertEquals(result[0].formatted, true);
       });
 
-      it("should sanitize query input", async () => {
-        let capturedQuery: string;
-        SRC20Repository.searchValidSrc20TxFromDb = (query) => {
+      it("should classify and sanitize query input", async () => {
+        let capturedQuery: string | undefined;
+        SRC20Repository.searchValidSrc20TxFromDb = (
+          query: string,
+          _searchType: string,
+        ) => {
           capturedQuery = query;
           return Promise.resolve([]);
         };
 
+        // Long XSS input becomes "unknown" → service returns []
+        // without calling repository (early return for unknown)
         await SRC20QueryService.searchSrc20Data(
           "TEST<script>alert('xss')</script>",
         );
+        assertEquals(capturedQuery, undefined);
 
-        assertEquals(capturedQuery, "TESTscriptalertxssscript");
+        // Ticker with special chars → sanitized and passed
+        await SRC20QueryService.searchSrc20Data("TE$T");
+        assertEquals(capturedQuery, "TET");
+      });
+
+      it("should pass search type to repository", async () => {
+        let capturedType: string;
+        SRC20Repository.searchValidSrc20TxFromDb = (
+          _query: string,
+          searchType: string,
+        ) => {
+          capturedType = searchType;
+          return Promise.resolve([]);
+        };
+
+        // Ticker input
+        await SRC20QueryService.searchSrc20Data("TEST");
+        assertEquals(capturedType!, "ticker");
+
+        // Address input
+        await SRC20QueryService.searchSrc20Data(
+          "bc1q7mlw0y0qe9dadg24q2225ded0myuxkw2wm8pzj",
+        );
+        assertEquals(capturedType!, "address");
+
+        // Tx hash input
+        await SRC20QueryService.searchSrc20Data(
+          "24832ae47e475303801fc47cbf08094f5d0f8eb6f255efa05ee2d93c422a52f4",
+        );
+        assertEquals(capturedType!, "tx_hash");
       });
 
       it("should return empty array for invalid input types", async () => {

@@ -96,6 +96,7 @@ import * as $api_v2_stamps_block from "./routes/api/v2/stamps/block.ts";
 import * as $api_v2_stamps_block_block_index_ from "./routes/api/v2/stamps/block/[block_index].ts";
 import * as $api_v2_stamps_ident_ident_ from "./routes/api/v2/stamps/ident/[ident].ts";
 import * as $api_v2_stamps_index from "./routes/api/v2/stamps/index.ts";
+import * as $api_v2_stamps_search from "./routes/api/v2/stamps/search.ts";
 import * as $api_v2_trx_complete_psbt from "./routes/api/v2/trx/complete_psbt.ts";
 import * as $api_v2_trx_create_psbt from "./routes/api/v2/trx/create_psbt.ts";
 import * as $api_v2_trx_stampattach from "./routes/api/v2/trx/stampattach.ts";
@@ -243,6 +244,8 @@ import * as $modal_FilterSRC20Modal from "./islands/modal/FilterSRC20Modal.tsx";
 import * as $modal_PreviewCodeModal from "./islands/modal/PreviewCodeModal.tsx";
 import * as $modal_PreviewImageModal from "./islands/modal/PreviewImageModal.tsx";
 import * as $modal_RecieveAddyModal from "./islands/modal/RecieveAddyModal.tsx";
+import * as $modal_SearchErrorDisplay from "./islands/modal/SearchErrorDisplay.tsx";
+import * as $modal_SearchInputField from "./islands/modal/SearchInputField.tsx";
 import * as $modal_SearchSRC20Modal from "./islands/modal/SearchSRC20Modal.tsx";
 import * as $modal_SearchStampModal from "./islands/modal/SearchStampModal.tsx";
 import * as $modal_SendBTCModal from "./islands/modal/SendBTCModal.tsx";
@@ -434,6 +437,7 @@ const manifest = {
       $api_v2_stamps_block_block_index_,
     "./routes/api/v2/stamps/ident/[ident].ts": $api_v2_stamps_ident_ident_,
     "./routes/api/v2/stamps/index.ts": $api_v2_stamps_index,
+    "./routes/api/v2/stamps/search.ts": $api_v2_stamps_search,
     "./routes/api/v2/trx/complete_psbt.ts": $api_v2_trx_complete_psbt,
     "./routes/api/v2/trx/create_psbt.ts": $api_v2_trx_create_psbt,
     "./routes/api/v2/trx/stampattach.ts": $api_v2_trx_stampattach,
@@ -601,6 +605,8 @@ const manifest = {
     "./islands/modal/PreviewCodeModal.tsx": $modal_PreviewCodeModal,
     "./islands/modal/PreviewImageModal.tsx": $modal_PreviewImageModal,
     "./islands/modal/RecieveAddyModal.tsx": $modal_RecieveAddyModal,
+    "./islands/modal/SearchErrorDisplay.tsx": $modal_SearchErrorDisplay,
+    "./islands/modal/SearchInputField.tsx": $modal_SearchInputField,
     "./islands/modal/SearchSRC20Modal.tsx": $modal_SearchSRC20Modal,
     "./islands/modal/SearchStampModal.tsx": $modal_SearchStampModal,
     "./islands/modal/SendBTCModal.tsx": $modal_SendBTCModal,
