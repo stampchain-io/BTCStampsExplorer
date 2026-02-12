@@ -10,10 +10,7 @@
  *
  * @module searchInputClassifier
  */
-import {
-  isValidBitcoinAddress,
-  isTxHash,
-} from "$lib/utils/typeGuards.ts";
+import { isTxHash, isValidBitcoinAddress } from "$lib/utils/typeGuards.ts";
 
 export type SearchInputType =
   | "ticker" // SRC-20 only

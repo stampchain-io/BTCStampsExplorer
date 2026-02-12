@@ -44,14 +44,11 @@ export function SearchInputField({
         type="text"
         placeholder={placeholder}
         value={value}
-        onInput={(e) =>
-          onChange((e.target as HTMLInputElement).value)}
+        onInput={(e) => onChange((e.target as HTMLInputElement).value)}
         onKeyDown={handleKeyDown}
         autoFocus={autoFocus}
         class={`relative z-modal h-12 w-full bg-color-background/50 pl-7.5 pr-[68px] font-medium text-sm text-color-grey-light placeholder:bg-color-background/50 placeholder:font-light placeholder:!text-color-grey no-outline ${
-          hasError || hasResults
-            ? "rounded-t-3xl"
-            : "rounded-3xl"
+          hasError || hasResults ? "rounded-t-3xl" : "rounded-3xl"
         }`}
       />
       <div
@@ -65,9 +62,7 @@ export function SearchInputField({
           size="xs"
           color="custom"
           className={`w-5 h-5 ${
-            hasError
-              ? "stroke-color-grey-light"
-              : "stroke-color-grey"
+            hasError ? "stroke-color-grey-light" : "stroke-color-grey"
           }`}
         />
       </div>

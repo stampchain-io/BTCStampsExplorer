@@ -34,9 +34,7 @@ export function openSRC20Search() {
 
     try {
       const response = await fetch(
-        `/api/v2/src20/search?q=${
-          encodeURIComponent(currentTerm.trim())
-        }`,
+        `/api/v2/src20/search?q=${encodeURIComponent(currentTerm.trim())}`,
         {
           headers: {
             "X-API-Version": "2.3",
@@ -194,8 +192,7 @@ function SearchContent({
                   : (
                     <li
                       key={result.tick}
-                      onClick={() =>
-                        handleResultClick(result.tick)}
+                      onClick={() => handleResultClick(result.tick)}
                       class={`${textSm} px-7.5 py-[9px] hover:bg-color-background/60 ${transitionColors} cursor-pointer`}
                     >
                       {result.tick}
