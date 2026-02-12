@@ -84,7 +84,27 @@ describe("Collection Market Data Integration Tests", () => {
         }],
       };
 
+      // Mock first query (core collection data)
       mockDb.mockQueryResult(mockResponse.rows);
+
+      // Mock second query (collection_market_data lookup)
+      mockDb.setMockResponse("collection_market_data", {
+        rows: [{
+          collection_id_hex: "A1B2C3D4E5F6789012345678",
+          floor_price_btc: "0.00001000",
+          avg_price_btc: "0.00003000",
+          total_value_btc: "0.00300000",
+          volume_24h_btc: "0.00050000",
+          volume_7d_btc: "0.00100000",
+          volume_30d_btc: "0.00300000",
+          total_volume_btc: "0.01000000",
+          total_stamps: 3,
+          unique_holders: 15,
+          listed_stamps: 2,
+          sold_stamps_24h: 1,
+          last_updated: new Date("2025-02-11T12:00:00Z"),
+        }],
+      });
 
       const result = await CollectionRepository
         .getCollectionDetailsWithMarketData({
@@ -152,7 +172,27 @@ describe("Collection Market Data Integration Tests", () => {
         }],
       };
 
+      // Mock first query (core collection data)
       mockDb.mockQueryResult(mockResponse.rows);
+
+      // Mock second query (collection_market_data with NULL/0 values)
+      mockDb.setMockResponse("collection_market_data", {
+        rows: [{
+          collection_id_hex: "NULLTEST123456789012345678",
+          floor_price_btc: null,
+          avg_price_btc: null,
+          total_value_btc: null,
+          volume_24h_btc: "0",
+          volume_7d_btc: "0",
+          volume_30d_btc: "0",
+          total_volume_btc: "0",
+          total_stamps: 1,
+          unique_holders: 0,
+          listed_stamps: 0,
+          sold_stamps_24h: 0,
+          last_updated: new Date("2025-02-11T12:00:00Z"),
+        }],
+      });
 
       const result = await CollectionRepository
         .getCollectionDetailsWithMarketData({
@@ -164,10 +204,11 @@ describe("Collection Market Data Integration Tests", () => {
       assertExists(result);
       const collection = result.rows[0] as CollectionWithOptionalMarketData;
 
-      // Verify NULL values are preserved as null (no data)
+      // Verify NULL values: floorPriceBTC/avgPriceBTC preserve null (no fallback)
+      // totalValueBTC uses ?? 0 fallback, so null → 0
       assertEquals(collection.marketData?.floorPriceBTC, null);
       assertEquals(collection.marketData?.avgPriceBTC, null);
-      assertEquals(collection.marketData?.totalValueBTC, null);
+      assertEquals(collection.marketData?.totalValueBTC, 0);
 
       // Verify 0 values are preserved as 0 (zero volume)
       assertEquals(collection.marketData?.volume24hBTC, 0);
@@ -408,7 +449,27 @@ describe("Collection Market Data Integration Tests", () => {
         }],
       };
 
+      // Mock first query (core collection data)
       mockDb.mockQueryResult(mockResponse.rows);
+
+      // Mock second query (collection_market_data with typed fields)
+      mockDb.setMockResponse("collection_market_data", {
+        rows: [{
+          collection_id_hex: "TYPETEST123456789012345678",
+          floor_price_btc: "0.00001234",
+          avg_price_btc: "0.00005555",
+          total_value_btc: "0.00100000",
+          volume_24h_btc: "0.00123456",
+          volume_7d_btc: "0.00200000",
+          volume_30d_btc: "0.00500000",
+          total_volume_btc: "0.01000000",
+          total_stamps: 1,
+          unique_holders: 8,
+          listed_stamps: 1,
+          sold_stamps_24h: 1,
+          last_updated: new Date("2025-02-11T12:00:00Z"),
+        }],
+      });
 
       const result = await CollectionRepository
         .getCollectionDetailsWithMarketData({

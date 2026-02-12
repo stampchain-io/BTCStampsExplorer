@@ -3165,11 +3165,16 @@ export interface GlobalModalState {
 
 /**
  * SearchState - Migrated from states.ts
+ *
+ * `results` is intentionally generic so it can hold SRC-20 token
+ * rows ({ tick: string; ... }) as well as stamp rows
+ * ({ stamp: number; cpid: string; ... }).
  */
 export interface SearchState {
   term: string;
   error: string;
-  results?: Array<{ tick: string }>;
+  // deno-lint-ignore no-explicit-any
+  results?: Array<Record<string, any>>;
 }
 
 /**

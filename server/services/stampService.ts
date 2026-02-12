@@ -165,6 +165,7 @@ export class StampService {
     maxCacheAgeMinutes?: string;
     priceSource?: string;
     collectionStampLimit?: number;
+    search?: string;
   }) {
     // Extract range parameters from URL if not already set
     let range = options.range;

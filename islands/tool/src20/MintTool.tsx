@@ -152,6 +152,7 @@ export function SRC20MintTool({
   /* ===== REFS ===== */
   const dropdownRef = useRef<HTMLDivElement>(null);
   const animationTimeoutRef = useRef<number | null>(null);
+  const isInputFocusedRef = useRef<boolean>(false);
 
   /* ===== TOKEN DATA RESET FUNCTION ===== */
   const resetTokenData = () => {
@@ -226,7 +227,7 @@ export function SRC20MintTool({
 
   /* ===== TOKEN SEARCH EFFECT ===== */
   useEffect(() => {
-    if (isSelecting || tick || isSwitchingFields) {
+    if (isSelecting || isSwitchingFields) {
       return;
     }
 
@@ -243,11 +244,22 @@ export function SRC20MintTool({
             encodeURIComponent(searchTerm.trim())
           }&mintable_only=true`,
         );
+
+        if (!response.ok) {
+          logger.error("stamps", {
+            message: "Search API error",
+            data: { status: response.status, searchTerm },
+          });
+          setSearchResults([]);
+          closeDropdownWithAnimation();
+          return;
+        }
+
         const data = await response.json();
 
         if (data.data && Array.isArray(data.data)) {
           setSearchResults(data.data);
-          if (!isSelecting && !isSwitchingFields) {
+          if (isInputFocusedRef.current) {
             setOpenDrop(true);
             setDropdownAnimation("enter");
           }
@@ -266,11 +278,14 @@ export function SRC20MintTool({
     return () => {
       clearTimeout(delayDebounceFn);
     };
-  }, [searchTerm, isSelecting, tick, isSwitchingFields]);
+  }, [searchTerm, isSelecting, isSwitchingFields]);
 
   /* ===== TOKEN SELECTION HANDLER ===== */
   const handleResultClick = async (tick: string) => {
     closeDropdownWithAnimation();
+    // Blur the input so it loses focus after selection
+    isInputFocusedRef.current = false;
+    (document.activeElement as HTMLElement)?.blur();
     setIsSelecting(true);
     setIsSwitchingFields(true);
     setSearchResults([]);
@@ -289,11 +304,9 @@ export function SRC20MintTool({
       } else {
         setMintStatus(data.mintStatus);
         setHolders(data.holders || 0);
+
         // Use centralized image URL logic
-        const imageUrl = getSRC20ImageSrc({
-          ...data.mintStatus,
-          deploy_tx: data.mintStatus.tx_hash,
-        } as any);
+        const imageUrl = getSRC20ImageSrc(data.mintStatus as any);
         setSelectedTokenImage(imageUrl);
 
         setFormState((prevState) => ({
@@ -305,14 +318,18 @@ export function SRC20MintTool({
     } catch (err) {
       logger.error("stamps", {
         message: "Error fetching token data",
-        error: err,
-        tick,
+        data: {
+          tick,
+          error: err instanceof Error ? err.message : String(err),
+        },
       });
       const errorMessage = extractSRC20ErrorMessage(err, "mint");
       setError(errorMessage);
       resetTokenData();
     } finally {
       setIsImageLoading(false);
+      setIsSelecting(false);
+      setIsSwitchingFields(false);
     }
   };
 
@@ -459,7 +476,7 @@ export function SRC20MintTool({
               ? (
                 <img
                   src={selectedTokenImage}
-                  class="w-full h-full"
+                  class="w-full h-full rounded-2xl object-cover"
                   alt=""
                   loading="lazy"
                   onLoad={() => setIsImageLoading(false)}
@@ -493,28 +510,24 @@ export function SRC20MintTool({
                 type="text"
                 placeholder="Token"
                 value={searchTerm}
-                onChange={(e) => {
-                  const newValue = (e.target as HTMLInputElement).value
-                    .toUpperCase();
+                onChange={(value) => {
+                  const newValue = value.toUpperCase();
                   if (newValue !== searchTerm) {
-                    if (!isSelecting && !isSwitchingFields) {
-                      setOpenDrop(true);
-                      setDropdownAnimation("enter");
-                    }
                     setIsSelecting(false);
                     setSearchTerm(newValue);
                   }
                 }}
                 onFocus={() => {
-                  if (
-                    !searchTerm.trim() && !isSwitchingFields && !isSelecting
-                  ) {
+                  isInputFocusedRef.current = true;
+                  setIsSelecting(false);
+                  // Re-open dropdown if we already have results
+                  if (searchResults.length > 0 && !isSwitchingFields) {
                     setOpenDrop(true);
                     setDropdownAnimation("enter");
                   }
-                  setIsSelecting(false);
                 }}
                 onBlur={() => {
+                  isInputFocusedRef.current = false;
                   setIsSwitchingFields(true);
                   setTimeout(() => {
                     closeDropdownWithAnimation();

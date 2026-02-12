@@ -719,6 +719,7 @@ export class StampRepository {
     fileSize?: StampFilesize | null;
     fileSizeMin?: string;
     fileSizeMax?: string;
+    search?: string;
   }) {
     // Extract all parameters including both filter types
     const {
@@ -765,6 +766,7 @@ export class StampRepository {
       fileSize: _fileSize,
       fileSizeMin: _fileSizeMin,
       fileSizeMax: _fileSizeMax,
+      search,
     } = options;
 
     // Combine both filter types for processing
@@ -810,6 +812,15 @@ export class StampRepository {
     if (creatorAddress) {
       whereConditions.push("st.creator = ?");
       queryParams.push(creatorAddress);
+    }
+
+    // Free-text search across cpid, creator, tx_hash
+    if (search) {
+      this.buildSearchConditions(
+        search,
+        whereConditions,
+        queryParams,
+      );
     }
 
     // Use either the object or direct parameters

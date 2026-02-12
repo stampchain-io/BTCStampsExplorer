@@ -4,7 +4,8 @@ import {
     BLOCKCHAIN_SYNC_CACHE_DURATION,
     IMMUTABLE_CACHE_DURATION,
     SRC20_BALANCE_TABLE,
-    SRC20_TABLE
+    SRC20_TABLE,
+    STAMP_TABLE
 } from "$constants";
 import type {SRC20BalanceRequestParams} from "$lib/types/src20.d.ts";
 import { emojiToUnicodeEscape, unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
@@ -600,9 +601,11 @@ export class SRC20Repository {
         dep.tick,
         COALESCE(stats.total_minted, 0) as total_minted,
         COALESCE(stats.holders_count, 0) as holders_count,
-        (SELECT COUNT(*) FROM ${SRC20_TABLE} WHERE tick = dep.tick AND op = 'MINT') AS total_mints
+        (SELECT COUNT(*) FROM ${SRC20_TABLE} WHERE tick = dep.tick AND op = 'MINT') AS total_mints,
+        st.stamp_url
       FROM ${SRC20_TABLE} AS dep
       LEFT JOIN src20_token_stats stats ON stats.tick = dep.tick
+      LEFT JOIN ${STAMP_TABLE} st ON st.tx_hash = dep.tx_hash
       WHERE
         dep.tick = ? AND
         dep.op = 'DEPLOY'
@@ -637,6 +640,7 @@ export class SRC20Repository {
       holders: row["holders_count"],
       tx_hash: row["tx_hash"],
       tick: row["tick"],
+      stamp_url: row["stamp_url"],
     });
   }
 
@@ -878,13 +882,43 @@ export class SRC20Repository {
 
   static async searchValidSrc20TxFromDb(
     query: string,
+    searchType:
+      | "ticker"
+      | "address"
+      | "tx_hash"
+      | "cpid"
+      | "stamp_number"
+      | "unknown" = "ticker",
     mintableOnly = false,
   ) {
-    const sanitizedQuery = query.replace(/[^\w-]/g, "");
+    // Input already sanitized by service layer via searchInputClassifier
+    if (!query || query.length === 0) {
+      return [];
+    }
 
     const mintableFilter = mintableOnly
       ? "AND COALESCE(smd.progress_percentage, 0) < 100"
       : "";
+
+    // Build WHERE clause based on search type
+    let whereClause: string;
+    switch (searchType) {
+      case "tx_hash":
+        whereClause = "src20.tx_hash LIKE ?";
+        break;
+      case "address":
+        whereClause =
+          "(src20.creator LIKE ? OR src20.destination LIKE ?)";
+        break;
+      case "ticker":
+      default:
+        // For ticker (or unknown), search all fields
+        whereClause = `(src20.tick LIKE ? OR
+        src20.tx_hash LIKE ? OR
+        src20.creator LIKE ? OR
+        src20.destination LIKE ?)`;
+        break;
+    }
 
     const sqlQuery = `
     SELECT DISTINCT
@@ -892,7 +926,6 @@ export class SRC20Repository {
         src20.max AS max_supply,
         src20.lim AS lim,
         src20.deci AS decimals,
-        -- 🚀 USE src20_market_data AS SOURCE OF TRUTH
         COALESCE(smd.total_mints, 0) AS total_mints,
         COALESCE(smd.total_minted, 0) AS total_minted,
         COALESCE(smd.progress_percentage, 0) AS progress,
@@ -900,10 +933,7 @@ export class SRC20Repository {
     FROM ${SRC20_TABLE} src20
     LEFT JOIN src20_market_data smd ON smd.tick = src20.tick
     WHERE
-        (src20.tick LIKE ? OR
-        src20.tx_hash LIKE ? OR
-        src20.creator LIKE ? OR
-        src20.destination LIKE ?)
+        ${whereClause}
         AND src20.max IS NOT NULL
         AND src20.op = 'DEPLOY'
         ${mintableFilter}
@@ -916,30 +946,59 @@ export class SRC20Repository {
     LIMIT 10;
     `;
 
-    const searchParam = `%${sanitizedQuery}%`;
-    const startSearchParam = `${sanitizedQuery}%`;
-    const queryParams = [searchParam, searchParam, searchParam, searchParam, startSearchParam];
+    // Build query params based on search type
+    const searchParam = `%${query}%`;
+    const startSearchParam = `${query}%`;
+
+    let queryParams: string[];
+    switch (searchType) {
+      case "tx_hash":
+        // WHERE (1) + ORDER BY (1)
+        queryParams = [searchParam, startSearchParam];
+        break;
+      case "address":
+        // WHERE (2) + ORDER BY (1)
+        queryParams = [
+          searchParam,
+          searchParam,
+          startSearchParam,
+        ];
+        break;
+      case "ticker":
+      default:
+        // WHERE (4) + ORDER BY (1)
+        queryParams = [
+          searchParam,
+          searchParam,
+          searchParam,
+          searchParam,
+          startSearchParam,
+        ];
+        break;
+    }
 
     try {
       const result = await this.db.executeQueryWithCache(
         sqlQuery,
         queryParams,
-        BLOCKCHAIN_SYNC_CACHE_DURATION
+        BLOCKCHAIN_SYNC_CACHE_DURATION,
       );
 
-      return this.convertResponseToEmoji((result as any).rows.map((row: any) => {
-        // No manual calculations - just use the data from src20_market_data
-        return {
-          tick: row.tick,
-          progress: parseFloat(row.progress || "0"),
-          total_minted: row.total_minted,
-          max_supply: row.max_supply,
-          holders: row.holders,
-          total_mints: row.total_mints
-        };
-      }).filter(Boolean)); // Remove null entries
+      return this.convertResponseToEmoji(
+        // deno-lint-ignore no-explicit-any
+        (result as any).rows.map((row: any) => {
+          return {
+            tick: row.tick,
+            progress: parseFloat(row.progress || "0"),
+            total_minted: row.total_minted,
+            max_supply: row.max_supply,
+            holders: row.holders,
+            total_mints: row.total_mints,
+          };
+        }).filter(Boolean),
+      );
     } catch (error) {
-      console.error("Error executing query:", error);
+      console.error("Error executing SRC20 search query:", error);
       return [];
     }
   }

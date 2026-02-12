@@ -11,6 +11,7 @@ import type {
 import type {SRC20BalanceRequestParams} from "$lib/types/src20.d.ts";
 import { stripTrailingZeros } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { paginate } from "$lib/utils/data/pagination/paginationUtils.ts";
+import { classifySearchInput } from "$lib/utils/data/search/searchInputClassifier.ts";
 import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
 import { SRC20Repository } from "$server/database/src20Repository.ts";
 import { BlockService } from "$server/services/core/blockService.ts";
@@ -350,19 +351,22 @@ export class SRC20QueryService {
 
   static async searchSrc20Data(query: string, mintableOnly = false) {
     try {
-      // Input validation and sanitization
-      if (!query || typeof query !== 'string') {
+      // Input validation
+      if (!query || typeof query !== "string") {
         return [];
       }
 
-      const sanitizedQuery = query.trim().replace(/[^\w-]/g, "");
-      if (!sanitizedQuery) {
+      // Classify input and apply type-appropriate sanitization
+      const { type, sanitized } = classifySearchInput(query);
+
+      if (!sanitized || type === "unknown") {
         return [];
       }
 
-      // Fetch raw data from repository
+      // Fetch raw data from repository with type-aware search
       const rawResults = await SRC20Repository.searchValidSrc20TxFromDb(
-        sanitizedQuery,
+        sanitized,
+        type,
         mintableOnly,
       );
 
@@ -378,7 +382,7 @@ export class SRC20QueryService {
       return Array.isArray(mappedData) ? mappedData : [mappedData];
     } catch (error: any) {
       console.error("Error in searchSrc20Data:", error);
-      // Return empty array on error rather than throwing to prevent API failures
+      // Return empty array on error rather than throwing
       return [];
     }
   }
