@@ -214,7 +214,8 @@ export class CollectionRepository {
 
     const stampOffset = (stampPage - 1) * stampLimit;
 
-    let query = `
+    // Core collection query (no market data JOIN - fetched separately)
+    const query = `
       SELECT
         HEX(c.collection_id) as collection_id,
         c.collection_name,
@@ -229,73 +230,20 @@ export class CollectionRepository {
             ELSE st.supply
           END
         ) as total_editions
-    `;
-
-    // Add market data fields if requested
-    // Column names must match collection_market_data table schema
-    // Use MAX() aggregation for GROUP BY compatibility (one market data row per collection)
-    if (includeMarketData) {
-      query += `,
-        MAX(cmd.min_floor_price_btc) as minFloorPriceBTC,
-        MAX(cmd.max_floor_price_btc) as maxFloorPriceBTC,
-        MAX(cmd.avg_floor_price_btc) as avgFloorPriceBTC,
-        MAX(cmd.median_floor_price_btc) as medianFloorPriceBTC,
-        MAX(cmd.total_volume_24h_btc) as totalVolume24hBTC,
-        MAX(cmd.stamps_with_prices_count) as stampsWithPricesCount,
-        MAX(cmd.min_holder_count) as minHolderCount,
-        MAX(cmd.max_holder_count) as maxHolderCount,
-        MAX(cmd.avg_holder_count) as avgHolderCount,
-        MAX(cmd.median_holder_count) as medianHolderCount,
-        MAX(cmd.total_unique_holders) as totalUniqueHolders,
-        MAX(cmd.avg_distribution_score) as avgDistributionScore,
-        MAX(cmd.total_stamps_count) as totalStampsCount,
-        MAX(cmd.last_updated) as marketDataLastUpdated
-      `;
-    }
-
-    query += `
       FROM collections c
       LEFT JOIN collection_creators cc ON c.collection_id = cc.collection_id
       LEFT JOIN creator cr ON cc.creator_address = cr.address
       LEFT JOIN collection_stamps cs ON c.collection_id = cs.collection_id
       LEFT JOIN ${STAMP_TABLE} st ON cs.stamp = st.stamp
-    `;
-
-    // Join market data table if requested
-    if (includeMarketData) {
-      // Use HEX() on both sides to guarantee matching regardless of column type
-      query += `
-      LEFT JOIN collection_market_data cmd ON HEX(cmd.collection_id) = HEX(c.collection_id)
-      `;
-    }
-
-    query += `
       WHERE c.collection_id = UNHEX(?)
       GROUP BY c.collection_id, c.collection_name, c.collection_description
     `;
 
-    let result: { rows: any[] };
-
-    try {
-      result = await this.db.executeQueryWithCache(
-        query,
-        [collectionId],
-        60 * 5, // Cache for 5 minutes
-      ) as { rows: any[] };
-    } catch (error) {
-      // If market data table doesn't exist yet, retry without it
-      if (includeMarketData) {
-        console.warn(
-          "collection_market_data table query failed, retrying without market data:",
-          error instanceof Error ? error.message : error,
-        );
-        return await this.getCollectionById(collectionId, {
-          ...options,
-          includeMarketData: false,
-        });
-      }
-      throw error;
-    }
+    const result = await this.db.executeQueryWithCache(
+      query,
+      [collectionId],
+      60 * 5, // Cache for 5 minutes
+    ) as { rows: any[] };
 
     if (result.rows.length === 0) {
       return null;
@@ -320,31 +268,62 @@ export class CollectionRepository {
 
     const stamps = stampsResult.rows.map((r) => r.stamp);
 
-    // Check if market data exists
-    const hasMarketData = includeMarketData &&
-      row.marketDataLastUpdated !== undefined &&
-      row.marketDataLastUpdated !== null;
+    // Fetch market data separately using the same approach as marketDataRepository.ts
+    // The collection_market_data table stores collection_id as a hex string (VARCHAR),
+    // not BINARY(16), so we query it directly with the hex string - no JOIN needed.
+    let marketData = null;
+    if (includeMarketData) {
+      try {
+        const marketQuery = `
+          SELECT
+            min_floor_price_btc,
+            max_floor_price_btc,
+            avg_floor_price_btc,
+            median_floor_price_btc,
+            total_volume_24h_btc,
+            stamps_with_prices_count,
+            min_holder_count,
+            max_holder_count,
+            avg_holder_count,
+            median_holder_count,
+            total_unique_holders,
+            avg_distribution_score,
+            total_stamps_count,
+            last_updated
+          FROM collection_market_data
+          WHERE collection_id = ?
+          LIMIT 1
+        `;
 
-    const marketData = hasMarketData
-      ? {
-        minFloorPriceBTC: parseBTCDecimal(row.minFloorPriceBTC),
-        maxFloorPriceBTC: parseBTCDecimal(row.maxFloorPriceBTC),
-        avgFloorPriceBTC: parseBTCDecimal(row.avgFloorPriceBTC),
-        medianFloorPriceBTC: parseBTCDecimal(row.medianFloorPriceBTC),
-        totalVolume24hBTC: parseBTCDecimal(row.totalVolume24hBTC) ?? 0,
-        stampsWithPricesCount: parseIntOrNull(row.stampsWithPricesCount) ?? 0,
-        minHolderCount: parseIntOrNull(row.minHolderCount) ?? 0,
-        maxHolderCount: parseIntOrNull(row.maxHolderCount) ?? 0,
-        avgHolderCount: parseFloatOrNull(row.avgHolderCount) ?? 0,
-        medianHolderCount: parseIntOrNull(row.medianHolderCount),
-        totalUniqueHolders: parseIntOrNull(row.totalUniqueHolders) ?? 0,
-        avgDistributionScore: parseFloatOrNull(row.avgDistributionScore) ?? 0,
-        totalStampsCount: parseIntOrNull(row.totalStampsCount) ?? 0,
-        lastUpdated: row.marketDataLastUpdated
-          ? new Date(row.marketDataLastUpdated)
-          : null,
+        const marketResult = await this.db.executeQueryWithCache(
+          marketQuery,
+          [collectionId],
+          60 * 5, // Cache for 5 minutes
+        ) as { rows: any[] };
+
+        if (marketResult.rows && marketResult.rows.length > 0) {
+          const md = marketResult.rows[0];
+          marketData = {
+            minFloorPriceBTC: parseBTCDecimal(md.min_floor_price_btc),
+            maxFloorPriceBTC: parseBTCDecimal(md.max_floor_price_btc),
+            avgFloorPriceBTC: parseBTCDecimal(md.avg_floor_price_btc),
+            medianFloorPriceBTC: parseBTCDecimal(md.median_floor_price_btc),
+            totalVolume24hBTC: parseBTCDecimal(md.total_volume_24h_btc) ?? 0,
+            stampsWithPricesCount: parseIntOrNull(md.stamps_with_prices_count) ?? 0,
+            minHolderCount: parseIntOrNull(md.min_holder_count) ?? 0,
+            maxHolderCount: parseIntOrNull(md.max_holder_count) ?? 0,
+            avgHolderCount: parseFloatOrNull(md.avg_holder_count) ?? 0,
+            medianHolderCount: parseIntOrNull(md.median_holder_count),
+            totalUniqueHolders: parseIntOrNull(md.total_unique_holders) ?? 0,
+            avgDistributionScore: parseFloatOrNull(md.avg_distribution_score) ?? 0,
+            totalStampsCount: parseIntOrNull(md.total_stamps_count) ?? 0,
+            lastUpdated: md.last_updated ? new Date(md.last_updated) : null,
+          };
+        }
+      } catch (_error) {
+        // Market data table may not exist - gracefully return null
       }
-      : null;
+    }
 
     return {
       collection_id: row.collection_id,
@@ -428,7 +407,8 @@ export class CollectionRepository {
     } = options;
     const offset = (page - 1) * limit;
 
-    let query = `
+    // Core collection query (no market data JOIN - fetched separately)
+    const query = `
       SELECT
         HEX(c.collection_id) as collection_id,
         c.collection_name,
@@ -444,172 +424,108 @@ export class CollectionRepository {
             ELSE st.supply
           END
         ) as total_editions
-    `;
-
-    // Add market data fields if requested
-    // Use MAX() aggregation for GROUP BY compatibility (one market data row per collection)
-    if (includeMarketData) {
-      query += `,
-        MAX(cmd.min_floor_price_btc) as minFloorPriceBTC,
-        MAX(cmd.max_floor_price_btc) as maxFloorPriceBTC,
-        MAX(cmd.avg_floor_price_btc) as avgFloorPriceBTC,
-        MAX(cmd.median_floor_price_btc) as medianFloorPriceBTC,
-        MAX(cmd.total_volume_24h_btc) as totalVolume24hBTC,
-        MAX(cmd.stamps_with_prices_count) as stampsWithPricesCount,
-        MAX(cmd.min_holder_count) as minHolderCount,
-        MAX(cmd.max_holder_count) as maxHolderCount,
-        MAX(cmd.avg_holder_count) as avgHolderCount,
-        MAX(cmd.median_holder_count) as medianHolderCount,
-        MAX(cmd.total_unique_holders) as totalUniqueHolders,
-        MAX(cmd.avg_distribution_score) as avgDistributionScore,
-        MAX(cmd.total_stamps_count) as totalStampsCount,
-        MAX(cmd.last_updated) as marketDataLastUpdated
-      `;
-    }
-
-    query += `
       FROM collections c
       LEFT JOIN collection_creators cc ON c.collection_id = cc.collection_id
       LEFT JOIN creator cr ON cc.creator_address = cr.address
       LEFT JOIN collection_stamps cs ON c.collection_id = cs.collection_id
       LEFT JOIN ${STAMP_TABLE} st ON cs.stamp = st.stamp
-    `;
-
-    // Join market data table if requested
-    if (includeMarketData) {
-      // Use HEX() on both sides to guarantee matching regardless of column type
-      query += `
-      LEFT JOIN collection_market_data cmd ON HEX(cmd.collection_id) = HEX(c.collection_id)
-      `;
-    }
-
-    const queryParams: any[] = [];
-
-    if (creator) {
-      query += ` WHERE cc.creator_address = ?`;
-      queryParams.push(creator);
-    }
-
-    query += `
+      ${creator ? "WHERE cc.creator_address = ?" : ""}
       GROUP BY c.collection_id, c.collection_name, c.collection_description
-    `;
-
-    // Add HAVING clause for minimum stamp count filter
-    if (minStampCount !== undefined && minStampCount > 0) {
-      query += ` HAVING COUNT(DISTINCT cs.stamp) >= ?`;
-      queryParams.push(minStampCount);
-    }
-
-    query += `
+      ${minStampCount !== undefined && minStampCount > 0 ? "HAVING COUNT(DISTINCT cs.stamp) >= ?" : ""}
       ORDER BY c.collection_name ${sortBy}
       LIMIT ? OFFSET ?
     `;
 
+    const queryParams: any[] = [];
+    if (creator) queryParams.push(creator);
+    if (minStampCount !== undefined && minStampCount > 0) queryParams.push(minStampCount);
     queryParams.push(limit, offset);
 
-    let result: {
+    const result = await this.db.executeQueryWithCache(
+      query,
+      queryParams,
+      60 * 5, // 5 minutes cache in seconds
+    ) as {
       rows: import("../../server/types/collection.d.ts").CollectionRow[];
       [key: string]: any;
     };
 
-    try {
-      result = await this.db.executeQueryWithCache(
-        query,
-        queryParams,
-        60 * 5, // 5 minutes cache in seconds
-      ) as typeof result;
-    } catch (error) {
-      // If market data table doesn't exist yet, retry without it
-      if (includeMarketData) {
-        console.warn(
-          "collection_market_data table query failed, retrying without market data:",
-          error instanceof Error ? error.message : error,
-        );
-        return await this.getCollectionDetailsWithMarketData({
-          ...options,
-          includeMarketData: false,
-        });
-      }
-      throw error;
-    }
+    // Build a map of market data keyed by collection_id (hex string)
+    // The collection_market_data table stores collection_id as VARCHAR hex strings,
+    // so we query it directly - no JOIN needed.
+    let marketDataMap: Map<string, any> | null = null;
+    if (includeMarketData && result.rows && result.rows.length > 0) {
+      try {
+        const collectionIds = result.rows.map((r: any) => r.collection_id);
+        const placeholders = collectionIds.map(() => "?").join(",");
+        const marketQuery = `
+          SELECT
+            collection_id,
+            min_floor_price_btc,
+            max_floor_price_btc,
+            avg_floor_price_btc,
+            median_floor_price_btc,
+            total_volume_24h_btc,
+            stamps_with_prices_count,
+            min_holder_count,
+            max_holder_count,
+            avg_holder_count,
+            median_holder_count,
+            total_unique_holders,
+            avg_distribution_score,
+            total_stamps_count,
+            last_updated
+          FROM collection_market_data
+          WHERE collection_id IN (${placeholders})
+        `;
 
-    // Transform the results to include market data in the expected format
-    if (includeMarketData && (result as any).rows) {
-      (result as any).rows = (result as any).rows.map((row: any) => {
-        // Check if market data exists (use last_updated as indicator)
-        // If last_updated is null/undefined, this collection has no market data row
-        const hasMarketData = row.marketDataLastUpdated !== undefined &&
-          row.marketDataLastUpdated !== null;
-        const marketData = hasMarketData
-          ? {
-            minFloorPriceBTC: parseBTCDecimal(row.minFloorPriceBTC),
-            maxFloorPriceBTC: parseBTCDecimal(row.maxFloorPriceBTC),
-            avgFloorPriceBTC: parseBTCDecimal(row.avgFloorPriceBTC),
-            medianFloorPriceBTC: parseBTCDecimal(row.medianFloorPriceBTC),
-            totalVolume24hBTC: parseBTCDecimal(row.totalVolume24hBTC) ?? 0,
-            stampsWithPricesCount: parseIntOrNull(row.stampsWithPricesCount) ??
-              0,
-            minHolderCount: parseIntOrNull(row.minHolderCount) ?? 0,
-            maxHolderCount: parseIntOrNull(row.maxHolderCount) ?? 0,
-            avgHolderCount: parseFloatOrNull(row.avgHolderCount) ?? 0,
-            medianHolderCount: parseIntOrNull(row.medianHolderCount),
-            totalUniqueHolders: parseIntOrNull(row.totalUniqueHolders) ?? 0,
-            avgDistributionScore: parseFloatOrNull(row.avgDistributionScore) ??
-              0,
-            totalStampsCount: parseIntOrNull(row.totalStampsCount) ?? 0,
-            lastUpdated: row.marketDataLastUpdated
-              ? new Date(row.marketDataLastUpdated)
-              : null,
+        const marketResult = await this.db.executeQueryWithCache(
+          marketQuery,
+          collectionIds,
+          60 * 5,
+        ) as { rows: any[] };
+
+        if (marketResult.rows && marketResult.rows.length > 0) {
+          marketDataMap = new Map();
+          for (const md of marketResult.rows) {
+            marketDataMap.set(md.collection_id, {
+              minFloorPriceBTC: parseBTCDecimal(md.min_floor_price_btc),
+              maxFloorPriceBTC: parseBTCDecimal(md.max_floor_price_btc),
+              avgFloorPriceBTC: parseBTCDecimal(md.avg_floor_price_btc),
+              medianFloorPriceBTC: parseBTCDecimal(md.median_floor_price_btc),
+              totalVolume24hBTC: parseBTCDecimal(md.total_volume_24h_btc) ?? 0,
+              stampsWithPricesCount: parseIntOrNull(md.stamps_with_prices_count) ?? 0,
+              minHolderCount: parseIntOrNull(md.min_holder_count) ?? 0,
+              maxHolderCount: parseIntOrNull(md.max_holder_count) ?? 0,
+              avgHolderCount: parseFloatOrNull(md.avg_holder_count) ?? 0,
+              medianHolderCount: parseIntOrNull(md.median_holder_count),
+              totalUniqueHolders: parseIntOrNull(md.total_unique_holders) ?? 0,
+              avgDistributionScore: parseFloatOrNull(md.avg_distribution_score) ?? 0,
+              totalStampsCount: parseIntOrNull(md.total_stamps_count) ?? 0,
+              lastUpdated: md.last_updated ? new Date(md.last_updated) : null,
+            });
           }
-          : null;
-
-        // Clean up the row object
-        delete row.minFloorPriceBTC;
-        delete row.maxFloorPriceBTC;
-        delete row.avgFloorPriceBTC;
-        delete row.medianFloorPriceBTC;
-        delete row.totalVolume24hBTC;
-        delete row.stampsWithPricesCount;
-        delete row.minHolderCount;
-        delete row.maxHolderCount;
-        delete row.avgHolderCount;
-        delete row.medianHolderCount;
-        delete row.totalUniqueHolders;
-        delete row.avgDistributionScore;
-        delete row.totalStampsCount;
-        delete row.marketDataLastUpdated;
-
-        return {
-          ...row,
-          creators: row.creators ? row.creators.split(",") : [],
-          stamps: row.stamp_numbers
-            ? row.stamp_numbers.split(",").map(Number)
-            : [],
-          stamp_count: typeof row.stamp_count === "string"
-            ? parseInt(row.stamp_count)
-            : row.stamp_count,
-          total_editions: typeof row.total_editions === "string"
-            ? parseInt(row.total_editions)
-            : row.total_editions,
-          marketData,
-        };
-      });
-    } else {
-      // Even without market data, transform creators and stamps into arrays
-      (result as any).rows = (result as any).rows.map((row: any) => ({
-        ...row,
-        creators: row.creators ? row.creators.split(",") : [],
-        stamps: row.stamp_numbers
-          ? row.stamp_numbers.split(",").map(Number)
-          : [],
-        stamp_count: typeof row.stamp_count === "string"
-          ? parseInt(row.stamp_count)
-          : row.stamp_count,
-        total_editions: typeof row.total_editions === "string"
-          ? parseInt(row.total_editions)
-          : row.total_editions,
-      }));
+        }
+      } catch (_error) {
+        // Market data table may not exist - gracefully continue without it
+      }
     }
+
+    // Transform rows with market data attached
+    (result as any).rows = (result as any).rows.map((row: any) => ({
+      ...row,
+      creators: row.creators ? row.creators.split(",") : [],
+      stamps: row.stamp_numbers
+        ? row.stamp_numbers.split(",").map(Number)
+        : [],
+      stamp_count: typeof row.stamp_count === "string"
+        ? parseInt(row.stamp_count)
+        : row.stamp_count,
+      total_editions: typeof row.total_editions === "string"
+        ? parseInt(row.total_editions)
+        : row.total_editions,
+      marketData: marketDataMap?.get(row.collection_id) ?? null,
+    }));
 
     return result;
   }
