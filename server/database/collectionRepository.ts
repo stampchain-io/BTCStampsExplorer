@@ -262,9 +262,9 @@ export class CollectionRepository {
 
     // Join market data table if requested
     if (includeMarketData) {
-      // collection_market_data.collection_id is BINARY(16), same as collections.collection_id
+      // collection_market_data.collection_id stores hex string, collections.collection_id is BINARY(16)
       query += `
-      LEFT JOIN collection_market_data cmd ON cmd.collection_id = c.collection_id
+      LEFT JOIN collection_market_data cmd ON cmd.collection_id = HEX(c.collection_id)
       `;
     }
 
@@ -476,10 +476,9 @@ export class CollectionRepository {
     // Join market data table if requested
     // Option C (Hybrid): Use pre-computed collection_market_data table for performance
     if (includeMarketData) {
-      // Join with collection_market_data table
-      // Both collection_market_data.collection_id and collections.collection_id are BINARY(16)
+      // collection_market_data.collection_id stores hex string, collections.collection_id is BINARY(16)
       query += `
-      LEFT JOIN collection_market_data cmd ON cmd.collection_id = c.collection_id
+      LEFT JOIN collection_market_data cmd ON cmd.collection_id = HEX(c.collection_id)
       `;
     }
 
