@@ -349,6 +349,24 @@ export function formatPercentage(
 }
 
 /**
+ * Formats file size in bytes to human-readable string
+ * @param bytes The file size in bytes
+ * @param forceBytes If true, always display in bytes (for text/plain)
+ * @returns Formatted string (e.g., "7.2 KB", "512 B")
+ */
+export function formatFileSize(
+  bytes: number,
+  forceBytes: boolean = false,
+): string {
+  if (forceBytes || bytes < 1024) {
+    return `${bytes} B`;
+  }
+
+  const kb = bytes / 1024;
+  return `${kb.toFixed(1)} KB`;
+}
+
+/**
  * Formats market cap
  * @param marketCap The market cap in BTC
  * @returns Formatted market cap string

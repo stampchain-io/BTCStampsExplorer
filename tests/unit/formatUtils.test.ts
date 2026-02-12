@@ -1,4 +1,3 @@
-import { assertEquals } from "@std/assert";
 import {
   abbreviateAddress,
   categorizeInput,
@@ -7,6 +6,7 @@ import {
   formatBTC,
   formatBTCAmount,
   formatDate,
+  formatFileSize,
   formatMarketCap,
   formatNumber,
   formatNumberWithCommas,
@@ -18,6 +18,7 @@ import {
   isIntOr32ByteHex,
   stripTrailingZeros,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
+import { assertEquals } from "@std/assert";
 
 Deno.test("formatUtils - abbreviateAddress", () => {
   assertEquals(abbreviateAddress(""), "");
@@ -265,4 +266,22 @@ Deno.test("formatUtils - formatMarketCap", () => {
   // Null/undefined
   assertEquals(formatMarketCap(null), "N/A");
   assertEquals(formatMarketCap(undefined), "N/A");
+});
+
+Deno.test("formatUtils - formatFileSize", () => {
+  // Bytes
+  assertEquals(formatFileSize(0), "0 B");
+  assertEquals(formatFileSize(512), "512 B");
+  assertEquals(formatFileSize(1023), "1023 B");
+
+  // Kilobytes
+  assertEquals(formatFileSize(1024), "1.0 KB");
+  assertEquals(formatFileSize(7168), "7.0 KB");
+  assertEquals(formatFileSize(7372.8), "7.2 KB");
+  assertEquals(formatFileSize(65536), "64.0 KB");
+
+  // Force bytes mode (for text/plain)
+  assertEquals(formatFileSize(512, true), "512 B");
+  assertEquals(formatFileSize(1024, true), "1024 B");
+  assertEquals(formatFileSize(7168, true), "7168 B");
 });

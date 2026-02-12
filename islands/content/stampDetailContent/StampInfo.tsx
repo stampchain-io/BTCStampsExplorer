@@ -12,11 +12,11 @@ import {
 } from "$layout";
 import type { Src101Detail } from "$lib/types/src101.d.ts";
 import type { StampRow } from "$lib/types/stamp.d.ts";
-import { calculateTransactionSize } from "$lib/utils/data/identifiers/identifierUtils.ts";
 import {
   abbreviateAddress,
   formatBTCAmount,
   formatDate,
+  formatFileSize,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import {
   getSRC101Data,
@@ -103,7 +103,6 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   const [imageDimensions, setImageDimensions] = useState<DimensionsType | null>(
     null,
   );
-  const [fileSize, setFileSize] = useState<number | null>(null);
 
   const fileExtension = stamp.stamp_url?.split(".")?.pop()?.toUpperCase() ||
     "UNKNOWN";
@@ -227,13 +226,9 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   /* ===== HELPER FUNCTIONS ===== */
   const handleContent = async () => {
     if (isSrc20Stamp()) {
-      // Calculate size of JSON data for SRC-20 stamps
-      const jsonData = stamp.stamp_base64;
-      const blob = new Blob([jsonData], { type: "application/json" });
-      setFileSize(blob.size);
+      // SRC-20 stamps - no file size computation needed
     } else if (isSrc101Stamp()) {
-      const res = await calculateTransactionSize(stamp.tx_hash);
-      setFileSize(res);
+      // SRC-101 stamps - no file size computation needed
     } else if (stamp.stamp_mimetype?.startsWith("image/")) {
       // Handle images
       const src = await getStampImageSrc(stamp);
@@ -247,22 +242,12 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
           });
         };
         img.src = src;
-
-        fetch(src)
-          .then((response) => response.blob())
-          .then((blob) => setFileSize(blob.size))
-          .catch((error) =>
-            console.error("Failed to fetch image size:", error)
-          );
       }
     } else if (stamp.stamp_mimetype === "text/html") {
       // Handle HTML
       fetch(stamp.stamp_url)
         .then((response) => response.text())
         .then((html) => {
-          const blob = new Blob([html], { type: "text/html" });
-          setFileSize(blob.size);
-
           const parser = new DOMParser();
           const doc = parser.parseFromString(html, "text/html");
 
@@ -325,77 +310,18 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
       fileExtension === "MP4" ||
       fileExtension === "MPEG"
     ) {
-      // Handle MPEG files
-      fetch(stamp.stamp_url)
-        .then((response) => {
-          const contentLength = response.headers.get("content-length");
-          if (contentLength) {
-            setFileSize(parseInt(contentLength, 10));
-            return;
-          }
-          return response.blob();
-        })
-        .then((blob) => {
-          if (blob instanceof Blob) {
-            setFileSize(blob.size);
-          }
-        })
-        .catch((error) => {
-          console.error("Failed to fetch MPEG size:", error);
-          setFileSize(0);
-        });
+      // Handle MPEG files - no file size computation needed
     } else if (stamp.stamp_mimetype === "text/plain") {
-      // Handle plain text files
-      fetch(stamp.stamp_url)
-        .then((response) => response.text())
-        .then((text) => {
-          const blob = new Blob([text], { type: "text/plain" });
-          setFileSize(blob.size);
-        })
-        .catch((error) => console.error("Failed to fetch text size:", error));
+      // Handle plain text files - no file size computation needed
     } else if (
       stamp.stamp_mimetype === "text/javascript" ||
       stamp.stamp_mimetype === "application/javascript"
     ) {
-      // Handle JS stamps
-      fetch(stamp.stamp_url)
-        .then((response) => response.text())
-        .then((js) => {
-          const blob = new Blob([js], { type: stamp.stamp_mimetype });
-          setFileSize(blob.size);
-        })
-        .catch((error) => console.error("Failed to fetch JS size:", error));
+      // Handle JS stamps - no file size computation needed
     } else if (stamp.stamp_mimetype === "application/gzip") {
-      // Handle GZIP stamps
-      fetch(stamp.stamp_url)
-        .then((response) => response.text())
-        .then((content) => {
-          const blob = new Blob([content], { type: "application/gzip" });
-          setFileSize(blob.size);
-        })
-        .catch((error) => console.error("Failed to fetch GZIP size:", error));
+      // Handle GZIP stamps - no file size computation needed
     } else if (fileExtension === "BMN") {
-      // Handle BMN files
-      fetch(stamp.stamp_url)
-        .then((response) => {
-          const contentLength = response.headers.get("content-length");
-          if (contentLength) {
-            setFileSize(parseInt(contentLength, 10));
-            return;
-          }
-          return response.text();
-        })
-        .then((content) => {
-          if (typeof content === "string") {
-            const encoder = new TextEncoder();
-            const bytes = encoder.encode(content);
-            setFileSize(bytes.length);
-          }
-        })
-        .catch((error) => {
-          console.error("Failed to fetch BMN size:", error);
-          setFileSize(0);
-        });
+      // Handle BMN files - no file size computation needed
     } else if (!stamp?.stamp_mimetype && fileExtension !== "BMN") {
       console.log("Missing stamp_mimetype and not BMN:", {
         stamp_mimetype: stamp?.stamp_mimetype,
@@ -410,16 +336,6 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   }, [stamp.stamp_mimetype, stamp.stamp_url, fileExtension]);
 
   /* ===== UTILITY FUNCTIONS ===== */
-  // Format file size
-  const formatFileSize = (size: number) => {
-    if (stamp.stamp_mimetype === "text/plain") {
-      return `${size} B`;
-    }
-
-    if (size < 1024) return size + " B";
-    return (size / 1024).toFixed(1) + " KB";
-  };
-
   // Format dimensions display
   const getDimensionsDisplay = (dims: DimensionsType | null) => {
     if (stamp.stamp_mimetype === "text/plain") {
@@ -1033,7 +949,12 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
             <div className={`${containerColData} flex-1 items-start`}>
               <h6 className={labelSm}>SIZE</h6>
               <h6 className={valueSm}>
-                {fileSize !== null ? formatFileSize(fileSize) : "N/A"}
+                {stamp.file_size_bytes !== null
+                  ? formatFileSize(
+                    stamp.file_size_bytes,
+                    stamp.stamp_mimetype === "text/plain",
+                  )
+                  : "N/A"}
               </h6>
             </div>
             <div className={`${containerColData} flex-1 items-center`}>
