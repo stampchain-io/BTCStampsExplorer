@@ -2422,6 +2422,40 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
+  /api/v2/stamps/search:
+    get:
+      operationId: searchStamps
+      tags:
+        - Stamps
+      summary: Search stamps by query string
+      description: |
+        Search for stamps by CPID, stamp number, transaction hash, creator address, or ticker.
+        The input is automatically classified and routed to the appropriate query type.
+        Returns a simplified result set suitable for search/autocomplete interfaces.
+      parameters:
+        - name: q
+          in: query
+          required: true
+          description: |
+            Search query string. Automatically classified as one of:
+            - **cpid**: Matches CPID pattern (e.g., "A1234567890")
+            - **stamp_number**: Numeric input interpreted as stamp number
+            - **tx_hash**: 64-character hex string matching transaction hash
+            - **address**: Bitcoin address (1/3/bc1 prefix)
+            - **ticker**: Falls through to generic LIKE search on cpid, creator, and tx_hash
+          schema:
+            type: string
+          example: "KEVIN"
+      responses:
+        "200":
+          description: Successful response with matching stamps
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StampSearchResponseBody"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
   /api/v2/src20/create:
     post:
       operationId: createSrc20Token
@@ -2884,6 +2918,36 @@ components:
           type: number
           nullable: true
           description: "Market capitalization in USD (supply * floorPrice * BTC/USD rate)"
+    StampSearchResult:
+      type: object
+      properties:
+        stamp:
+          type: number
+          nullable: true
+          description: "Stamp number"
+        cpid:
+          type: string
+          description: "Counterparty asset ID"
+        preview:
+          type: string
+          description: "URL to stamp preview image"
+        mimetype:
+          type: string
+          description: "MIME type of the stamp content"
+        creator:
+          type: string
+          description: "Creator Bitcoin address"
+        tx_hash:
+          type: string
+          description: "Transaction hash"
+    StampSearchResponseBody:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/StampSearchResult"
+          description: "Array of matching stamps (max 10 results)"
     StampRowSummary:
       type: object
       properties:
