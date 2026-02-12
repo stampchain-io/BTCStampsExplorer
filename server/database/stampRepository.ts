@@ -18,6 +18,7 @@ import { filterOptions } from "$lib/utils/data/filtering/filterOptions.ts";
 import { getIdentifierType } from "$lib/utils/data/identifiers/identifierUtils.ts";
 import { logger, LogNamespace } from "$lib/utils/logger.ts";
 import { isCpid, isStampHash, isStampNumber, isTxHash } from "$lib/utils/typeGuards.ts";
+import { serverConfig } from "$server/config/config.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
 import { summarize_issuances } from "$server/database/index.ts";
 import type { SUBPROTOCOLS } from "$types/base.d.ts";
@@ -1054,7 +1055,7 @@ export class StampRepository {
     }
 
     // Near the end of the getStamps method, right before executing the query
-    if (Deno.env.get("DEBUG_SQL") === "true" || Deno.env.get("DENO_ENV") === "development") {
+    if (serverConfig.DEBUG_SQL || serverConfig.IS_DEVELOPMENT) {
       logger.debug("sql", { message: `[SQL DEBUG] Final SQL query: ${query}` });
       logger.debug("sql", { message: `[SQL DEBUG] With parameters: ${queryParams}` });
     }
@@ -1468,7 +1469,7 @@ export class StampRepository {
       if (stamps.length > 0) {
         // 🔧 PRODUCTION: Remove verbose debug logging
         // Only log in development environment
-        if (Deno.env.get("DENO_ENV") === "development") {
+        if (serverConfig.IS_DEVELOPMENT) {
           console.log(`[RECENT SALES] Using stamp_sales_history: ${stamps.length} stamps found`);
         }
 

@@ -7,6 +7,7 @@ import {
     SRC20_TABLE,
     STAMP_TABLE
 } from "$constants";
+import { serverConfig } from "$server/config/config.ts";
 import type {SRC20BalanceRequestParams} from "$lib/types/src20.d.ts";
 import { emojiToUnicodeEscape, unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { bigFloatToString } from "$lib/utils/ui/formatting/formatUtils.ts";
@@ -825,9 +826,8 @@ export class SRC20Repository {
     const row = (result as any).rows[0];
 
     // ✅ ENHANCED IMAGE FIELDS: Add stamp_url and deploy_img for SRC-20 detail pages
-    const env = Deno.env.get("DENO_ENV");
-    const baseUrl = env === "development"
-      ? (Deno.env.get("DEV_BASE_URL") || "https://stampchain.io")
+    const baseUrl = serverConfig.IS_DEVELOPMENT
+      ? serverConfig.DEV_BASE_URL
       : "https://stampchain.io";
 
     const deployment = this.convertSingleResponseToEmoji({

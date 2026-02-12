@@ -10,6 +10,7 @@
 
 import { FreshContext } from "$fresh/server.ts";
 import { getRedisConnection } from "$server/cache/redisClient.ts";
+import { serverConfig } from "$server/config/config.ts";
 
 interface RateLimitConfig {
   /** Time window in milliseconds */
@@ -137,7 +138,7 @@ export async function rateLimitMiddleware(
 
   // Check for API key bypass
   const apiKey = req.headers.get("X-API-Key");
-  const validApiKey = Deno.env.get("PUBLIC_API_KEY");
+  const validApiKey = serverConfig.PUBLIC_API_KEY;
 
   if (apiKey && validApiKey && apiKey === validApiKey) {
     console.log("[RATE LIMITER] API key bypass granted");
@@ -237,7 +238,7 @@ export async function rateLimitMiddleware(
     const remaining = config.max - current;
 
     // Log rate limit status (debug mode)
-    const rateLimitDebug = Deno.env.get("RATE_LIMIT_DEBUG") === "true";
+    const rateLimitDebug = serverConfig.RATE_LIMIT_DEBUG;
     if (rateLimitDebug) {
       console.log(`[RATE LIMITER] IP ${clientIp} ${pathname}: ${current}/${config.max} (${remaining} remaining)`);
     }
