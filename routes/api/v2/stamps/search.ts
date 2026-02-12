@@ -23,6 +23,7 @@ export const handler: Handlers = {
         page: 1,
         skipTotalCount: true,
         cacheDuration: 60,
+        excludeSrc20: true,
       };
 
       switch (type) {

@@ -722,6 +722,7 @@ export class StampRepository {
     fileSizeMax?: string;
     search?: string;
     cpidPrefix?: string;
+    excludeSrc20?: boolean;
   }) {
     // Extract all parameters including both filter types
     const {
@@ -770,6 +771,7 @@ export class StampRepository {
       fileSizeMax: _fileSizeMax,
       search,
       cpidPrefix,
+      excludeSrc20 = false,
     } = options;
 
     // Combine both filter types for processing
@@ -830,6 +832,11 @@ export class StampRepository {
     if (cpidPrefix) {
       whereConditions.push("st.cpid LIKE ?");
       queryParams.push(`${cpidPrefix}%`);
+    }
+
+    // Exclude SRC-20 entries (used by stamp search endpoint)
+    if (excludeSrc20) {
+      whereConditions.push("st.ident != 'SRC-20'");
     }
 
     // Use either the object or direct parameters
