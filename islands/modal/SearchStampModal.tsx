@@ -5,8 +5,8 @@ import { SearchInputField } from "$islands/modal/SearchInputField.tsx";
 import { closeModal, openModal, searchState } from "$islands/modal/states.ts";
 import { ModalSearchBase, transitionColors } from "$layout";
 import { generateSearchErrorMessage } from "$lib/utils/data/search/searchInputClassifier.ts";
-import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { isValidBitcoinAddress } from "$lib/utils/typeGuards.ts";
+import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
 import {
   navigateSSRSafe,
   scheduleFocus,
@@ -205,7 +205,9 @@ function SearchContent({
                           VIEW WALLET
                         </span>
                         <span class="text-xs text-stamp-grey truncate">
-                          {abbreviateAddress(result.address, 8)}
+                          {result.address?.startsWith("bc1p")
+                            ? abbreviateAddress(result.address, 14)
+                            : result.address}
                         </span>
                       </div>
                     </li>
@@ -226,7 +228,9 @@ function SearchContent({
                           #{result.stamp} - {result.cpid}
                         </span>
                         <span class="text-xs text-color-grey truncate">
-                          {abbreviateAddress(result.creator, 8)}
+                          {result.creator?.startsWith("bc1p")
+                            ? abbreviateAddress(result.creator, 14)
+                            : result.creator}
                         </span>
                       </div>
                     </li>

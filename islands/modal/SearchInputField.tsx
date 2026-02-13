@@ -6,7 +6,7 @@
  * Used by both SearchStampModal and SearchSRC20Modal.
  */
 import { Icon } from "$icon";
-import { loaderSpinSmGrey } from "$layout";
+import { loaderSpinXsGrey } from "$layout";
 import type { RefObject } from "preact";
 
 interface SearchInputFieldProps {
@@ -58,7 +58,7 @@ export function SearchInputField({
         class="absolute z-[3] right-6 top-[11px] cursor-pointer"
         onClick={onSearch}
       >
-        {isLoading ? <div class={loaderSpinSmGrey} /> : (
+        {isLoading ? <div class={`${loaderSpinXsGrey} mt-1 mr-1`} /> : (
           <Icon
             type="icon"
             name="search"
