@@ -30,34 +30,6 @@ if (typeof process !== "undefined" && process.emitWarning) {
   };
 }
 
-// Try to establish the resolver as early as possible.
-// The error happens before the original main.ts logs, so this might not catch it either,
-// but it's an attempt to hook in earlier.
-const earlyOriginalResolve = import.meta.resolve;
-import.meta.resolve = function (specifier: string): string {
-  // BROWSER GUARD: Only access Deno when available (server-side)
-  const isBuildMode =
-    (typeof Deno !== "undefined" && Deno.args?.includes("build")) || false;
-  console.log(
-    `[EARLY RESOLVER ENTRY] Specifier: "${specifier}", BuildMode: ${isBuildMode}, Timestamp: ${Date.now()}`,
-  );
-
-  if (
-    specifier === "tiny-secp256k1" ||
-    specifier === "secp256k1" ||
-    specifier.endsWith("secp256k1.node") ||
-    specifier.includes("secp256k1.node") // More aggressive check
-  ) {
-    console.log(
-      `[EARLY RESOLVER ACTION] Crypto redirect for "${specifier}" to JS/WASM.`,
-    );
-    return earlyOriginalResolve("npm:tiny-secp256k1/lib/esm/index.js");
-  }
-  // No other rules, just default, to minimize interference if this runs super early.
-  console.log(`[EARLY RESOLVER ACTION] Default resolve for "${specifier}"`);
-  return earlyOriginalResolve(specifier);
-};
-
 import config from "$/fresh.config.ts";
 import manifest from "$/fresh.gen.ts";
 import "$/globals.d.ts";
@@ -81,65 +53,6 @@ if (DENO_ROLE !== "web") {
   );
   BackgroundFeeService = feeModule.BackgroundFeeService;
 }
-
-// Set DENO_BUILD_MODE globally, to be accessible within the resolver
-(globalThis as any).DENO_BUILD_MODE = Deno.args.includes("build");
-
-if ((globalThis as any).DENO_BUILD_MODE) {
-  console.log(
-    "[BUILD] Running in build mode. Applying specific import resolutions if applicable.",
-  );
-} else {
-  (globalThis as any).DENO_BUILD_MODE = false; // Ensure it's explicitly false otherwise
-  // console.log("[RUNTIME] Running in runtime mode.");
-}
-
-// Re-assign to ensure our more detailed resolver (if the early one was too simple or overwritten)
-const laterOriginalResolve = import.meta.resolve; // This might now point to our early resolver
-import.meta.resolve = function (specifier: string): string {
-  const isBuildMode = (globalThis as any).DENO_BUILD_MODE;
-  console.log(
-    `[LATER RESOLVER ENTRY] Specifier: "${specifier}", BuildMode: ${isBuildMode}, Timestamp: ${Date.now()}`,
-  );
-
-  if (
-    specifier === "tiny-secp256k1" ||
-    specifier === "secp256k1" ||
-    specifier.endsWith("secp256k1.node") ||
-    specifier.includes("secp256k1.node") // More aggressive check
-  ) {
-    console.log(
-      `[LATER RESOLVER ACTION] Crypto redirect for "${specifier}" to JS/WASM.`,
-    );
-    return laterOriginalResolve("npm:tiny-secp256k1/lib/esm/index.js");
-  }
-
-  if (isBuildMode) {
-    if (
-      specifier === "$lib/utils/minting/broadcast.ts" ||
-      specifier === "./broadcast.ts" ||
-      specifier.endsWith("/broadcast.ts")
-    ) {
-      console.log(
-        `[LATER RESOLVER ACTION] Build stub for broadcast: "${specifier}"`,
-      );
-      return laterOriginalResolve(
-        specifier.replace(/broadcast\\.ts$/, "broadcast.build.ts"),
-      );
-    }
-
-    if (specifier === "bitcoinjs-lib") {
-      console.log(
-        `[LATER RESOLVER ACTION] Build stub for bitcoinjs-lib: "${specifier}"`,
-      );
-      return laterOriginalResolve(
-        "$server/services/stubs/bitcoinjs-lib.build.ts",
-      );
-    }
-  }
-  console.log(`[LATER RESOLVER ACTION] Default resolve for "${specifier}"`);
-  return laterOriginalResolve(specifier);
-};
 
 if (import.meta.main) {
   if (!Deno.args.includes("build") && DENO_ROLE !== "web") {
@@ -168,7 +81,7 @@ if (import.meta.main) {
     }
   }
 
-  if ((globalThis as any).DENO_BUILD_MODE) {
+  if (Deno.args.includes("build")) {
     console.log(`[MAIN] Entering build block at ${Date.now()}`);
     await build(import.meta.url, "./main.ts", config);
     console.log(`[MAIN] Exiting build block at ${Date.now()}`);
