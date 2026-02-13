@@ -58,18 +58,20 @@ export function SearchInputField({
         class="absolute z-[3] right-6 top-[11px] cursor-pointer"
         onClick={onSearch}
       >
-        {isLoading ? <div class={`${loaderSpinXsGrey} mt-1 mr-1`} /> : (
-          <Icon
-            type="icon"
-            name="search"
-            weight="bold"
-            size="xs"
-            color="custom"
-            className={`w-5 h-5 ${
-              hasError ? "stroke-color-grey-light" : "stroke-color-grey"
-            }`}
-          />
-        )}
+        {isLoading
+          ? <div class={`${loaderSpinXsGrey} mt-[7px] mr-[3px]`} />
+          : (
+            <Icon
+              type="icon"
+              name="search"
+              weight="bold"
+              size="xs"
+              color="custom"
+              className={`w-5 h-5 ${
+                hasError ? "stroke-color-grey-light" : "stroke-color-grey"
+              }`}
+            />
+          )}
       </div>
     </>
   );

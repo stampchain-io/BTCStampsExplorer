@@ -206,7 +206,7 @@ function SearchContent({
                         </span>
                         <span class="text-xs text-stamp-grey truncate">
                           {result.address?.startsWith("bc1p")
-                            ? abbreviateAddress(result.address, 14)
+                            ? abbreviateAddress(result.address, 20)
                             : result.address}
                         </span>
                       </div>
@@ -229,7 +229,7 @@ function SearchContent({
                         </span>
                         <span class="text-xs text-color-grey truncate">
                           {result.creator?.startsWith("bc1p")
-                            ? abbreviateAddress(result.creator, 14)
+                            ? abbreviateAddress(result.creator, 20)
                             : result.creator}
                         </span>
                       </div>
