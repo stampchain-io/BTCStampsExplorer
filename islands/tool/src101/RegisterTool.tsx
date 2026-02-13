@@ -244,9 +244,11 @@ export function SRC101RegisterTool({
   const checkAvailability = async (): Promise<boolean> => {
     setCheckStatus(false);
     try {
+      // Encode only the domain name without TLD to match DB storage format
+      // The mint operation stores btoa(toAddress), not btoa(toAddress + root)
       const url =
         `/api/v2/src101/77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed/${
-          btoa((formState.toAddress + formState.root)?.toLowerCase())
+          btoa(formState.toAddress?.toLowerCase())
         }`;
       const res = await fetch(url);
       const jsonData = await res.json();
@@ -422,24 +424,6 @@ export function SRC101RegisterTool({
             />
           }
         />
-
-        {/* ===== 🚨 FEE ESTIMATION ERROR HANDLING ===== */}
-        {feeEstimationError && (
-          <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-2xl">
-            <div className="flex items-center justify-between">
-              <span className="text-red-700 text-sm">
-                Fee estimation error: {feeEstimationError}
-              </span>
-              <button
-                type="button"
-                onClick={clearError}
-                className="text-red-500 hover:text-red-700 text-sm font-medium"
-              >
-                Clear
-              </button>
-            </div>
-          </div>
-        )}
 
         <StatusMessages
           submissionMessage={submissionMessage}

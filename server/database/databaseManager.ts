@@ -3,6 +3,7 @@ import "$/server/config/env.ts";
 import { getDatabaseConfig, logDatabaseConfig, validateDatabaseConfig, type DatabaseConfig as DBPoolConfig } from "$/server/config/database.config.ts";
 import { bigIntReviver, bigIntSerializer } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { crypto } from "@std/crypto";
+import { serverConfig } from "$server/config/config.ts";
 import {
     ConsoleHandler,
     FileHandler,
@@ -700,9 +701,9 @@ class DatabaseManager {
 
   private async connectToRedis(): Promise<void> {
     // Safely obtain and parse environment variables with defaults
-    const REDIS_CONNECTION_TIMEOUT = parseInt(Deno.env.get("REDIS_TIMEOUT") || "15000");
+    const REDIS_CONNECTION_TIMEOUT = parseInt(serverConfig.REDIS_TIMEOUT);
     // Note: REDIS_DEBUG not used in this function - only used in cache operations
-    const SKIP_REDIS_TLS = Deno.env.get("SKIP_REDIS_TLS") === "true"; // Only skip if explicitly set to true
+    const SKIP_REDIS_TLS = serverConfig.SKIP_REDIS_TLS; // Only skip if explicitly set to true
     // Note: REDIS_MAX_RETRIES not used in this function - class uses this.#MAX_RETRIES from DB_MAX_RETRIES
 
     // Early console log to ensure we can see Redis connection attempts in logs
@@ -908,15 +909,19 @@ class DatabaseManager {
       category = 'src101_balance';
     } else if (queryUpper.includes('STAMP_') && queryUpper.includes('BALANCE')) {
       category = 'stamp_balance';
-    } else if (queryUpper.includes('STAMP_MARKET_DATA') || queryUpper.includes('SRC20_MARKET_DATA')) {
-      category = 'market_data';
     } else if (queryUpper.includes('SRC20_TX') || queryUpper.includes('SRC_20_TX') ||
+               queryUpper.includes('SRC20VALID') ||
                (queryUpper.includes('SRC20') && queryUpper.includes('TRANSACTION'))) {
+      // SRC-20 transaction queries - MUST be checked BEFORE market_data since many
+      // SRC20Valid queries join src20_market_data for enrichment
       category = 'src20_transaction';
+    } else if (queryUpper.includes('STAMP_MARKET_DATA') || queryUpper.includes('SRC20_MARKET_DATA')) {
+      // Pure market data queries (not SRC20Valid transaction lookups)
+      category = 'market_data';
     } else if (queryUpper.includes('FROM SRC20') ||
                (queryUpper.includes('SRC20') && queryUpper.includes('COUNT')) ||
                (queryUpper.includes('SRC20') && queryUpper.includes('TICK'))) {
-      // SRC-20 queries that should be invalidated on new blocks
+      // Generic SRC-20 queries that should be invalidated on new blocks
       category = 'blockchain_data';
     } else if (queryUpper.includes('DISPENSER') || queryUpper.includes('dispensers')) {
       category = 'dispenser';
@@ -984,7 +989,7 @@ class DatabaseManager {
       }
     }
 
-    const REDIS_DEBUG = Deno.env.get("REDIS_DEBUG") === "true";
+    const REDIS_DEBUG = serverConfig.REDIS_DEBUG;
 
     if (!this.#redisAvailable) {
       if (this.#redisAvailableAtStartup) {
@@ -1037,7 +1042,7 @@ class DatabaseManager {
   }
 
   private async getCachedData(key: string): Promise<unknown | null> {
-    const REDIS_DEBUG = Deno.env.get("REDIS_DEBUG") === "true";
+    const REDIS_DEBUG = serverConfig.REDIS_DEBUG;
 
     if (this.#redisClient) {
       try {
@@ -1096,7 +1101,7 @@ class DatabaseManager {
     data: unknown,
     expiry: number | "never",
   ): Promise<void> {
-    const REDIS_DEBUG = Deno.env.get("REDIS_DEBUG") === "true";
+    const REDIS_DEBUG = serverConfig.REDIS_DEBUG;
 
     // Only use in-memory cache as fallback when Redis is unavailable
     if (!this.#redisAvailable || !this.#redisClient) {

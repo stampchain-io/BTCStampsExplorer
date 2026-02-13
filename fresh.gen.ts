@@ -38,6 +38,7 @@ import * as $api_v2_balance_address_ from "./routes/api/v2/balance/[address].ts"
 import * as $api_v2_balance_getStampsBalance from "./routes/api/v2/balance/getStampsBalance.ts";
 import * as $api_v2_block_block_index_ from "./routes/api/v2/block/[block_index].ts";
 import * as $api_v2_block_block_count_number_ from "./routes/api/v2/block/block_count/[...number].ts";
+import * as $api_v2_collections_id_ from "./routes/api/v2/collections/[id].ts";
 import * as $api_v2_collections_by_name_name_ from "./routes/api/v2/collections/by-name/[name].ts";
 import * as $api_v2_collections_creator_creator_ from "./routes/api/v2/collections/creator/[creator].ts";
 import * as $api_v2_collections_index from "./routes/api/v2/collections/index.ts";
@@ -75,6 +76,8 @@ import * as $api_v2_src20_block_block_index_tick_ from "./routes/api/v2/src20/bl
 import * as $api_v2_src20_block_block_index_index from "./routes/api/v2/src20/block/[block_index]/index.ts";
 import * as $api_v2_src20_create from "./routes/api/v2/src20/create.ts";
 import * as $api_v2_src20_index from "./routes/api/v2/src20/index.ts";
+import * as $api_v2_src20_market_tick_index from "./routes/api/v2/src20/market/[tick]/index.ts";
+import * as $api_v2_src20_market_index from "./routes/api/v2/src20/market/index.ts";
 import * as $api_v2_src20_multisig_operation_ from "./routes/api/v2/src20/multisig/[operation].ts";
 import * as $api_v2_src20_search from "./routes/api/v2/src20/search.ts";
 import * as $api_v2_src20_tick_tick_deploy from "./routes/api/v2/src20/tick/[tick]/deploy.ts";
@@ -93,6 +96,7 @@ import * as $api_v2_stamps_block from "./routes/api/v2/stamps/block.ts";
 import * as $api_v2_stamps_block_block_index_ from "./routes/api/v2/stamps/block/[block_index].ts";
 import * as $api_v2_stamps_ident_ident_ from "./routes/api/v2/stamps/ident/[ident].ts";
 import * as $api_v2_stamps_index from "./routes/api/v2/stamps/index.ts";
+import * as $api_v2_stamps_search from "./routes/api/v2/stamps/search.ts";
 import * as $api_v2_trx_complete_psbt from "./routes/api/v2/trx/complete_psbt.ts";
 import * as $api_v2_trx_create_psbt from "./routes/api/v2/trx/create_psbt.ts";
 import * as $api_v2_trx_stampattach from "./routes/api/v2/trx/stampattach.ts";
@@ -240,6 +244,8 @@ import * as $modal_FilterSRC20Modal from "./islands/modal/FilterSRC20Modal.tsx";
 import * as $modal_PreviewCodeModal from "./islands/modal/PreviewCodeModal.tsx";
 import * as $modal_PreviewImageModal from "./islands/modal/PreviewImageModal.tsx";
 import * as $modal_RecieveAddyModal from "./islands/modal/RecieveAddyModal.tsx";
+import * as $modal_SearchErrorDisplay from "./islands/modal/SearchErrorDisplay.tsx";
+import * as $modal_SearchInputField from "./islands/modal/SearchInputField.tsx";
 import * as $modal_SearchSRC20Modal from "./islands/modal/SearchSRC20Modal.tsx";
 import * as $modal_SearchStampModal from "./islands/modal/SearchStampModal.tsx";
 import * as $modal_SendBTCModal from "./islands/modal/SendBTCModal.tsx";
@@ -352,6 +358,7 @@ const manifest = {
     "./routes/api/v2/block/[block_index].ts": $api_v2_block_block_index_,
     "./routes/api/v2/block/block_count/[...number].ts":
       $api_v2_block_block_count_number_,
+    "./routes/api/v2/collections/[id].ts": $api_v2_collections_id_,
     "./routes/api/v2/collections/by-name/[name].ts":
       $api_v2_collections_by_name_name_,
     "./routes/api/v2/collections/creator/[creator].ts":
@@ -404,6 +411,9 @@ const manifest = {
       $api_v2_src20_block_block_index_index,
     "./routes/api/v2/src20/create.ts": $api_v2_src20_create,
     "./routes/api/v2/src20/index.ts": $api_v2_src20_index,
+    "./routes/api/v2/src20/market/[tick]/index.ts":
+      $api_v2_src20_market_tick_index,
+    "./routes/api/v2/src20/market/index.ts": $api_v2_src20_market_index,
     "./routes/api/v2/src20/multisig/[operation].ts":
       $api_v2_src20_multisig_operation_,
     "./routes/api/v2/src20/search.ts": $api_v2_src20_search,
@@ -427,6 +437,7 @@ const manifest = {
       $api_v2_stamps_block_block_index_,
     "./routes/api/v2/stamps/ident/[ident].ts": $api_v2_stamps_ident_ident_,
     "./routes/api/v2/stamps/index.ts": $api_v2_stamps_index,
+    "./routes/api/v2/stamps/search.ts": $api_v2_stamps_search,
     "./routes/api/v2/trx/complete_psbt.ts": $api_v2_trx_complete_psbt,
     "./routes/api/v2/trx/create_psbt.ts": $api_v2_trx_create_psbt,
     "./routes/api/v2/trx/stampattach.ts": $api_v2_trx_stampattach,
@@ -594,6 +605,8 @@ const manifest = {
     "./islands/modal/PreviewCodeModal.tsx": $modal_PreviewCodeModal,
     "./islands/modal/PreviewImageModal.tsx": $modal_PreviewImageModal,
     "./islands/modal/RecieveAddyModal.tsx": $modal_RecieveAddyModal,
+    "./islands/modal/SearchErrorDisplay.tsx": $modal_SearchErrorDisplay,
+    "./islands/modal/SearchInputField.tsx": $modal_SearchInputField,
     "./islands/modal/SearchSRC20Modal.tsx": $modal_SearchSRC20Modal,
     "./islands/modal/SearchStampModal.tsx": $modal_SearchStampModal,
     "./islands/modal/SendBTCModal.tsx": $modal_SendBTCModal,

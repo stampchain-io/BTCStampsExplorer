@@ -17,6 +17,7 @@ export interface WebResponseOptions {
   forceNoCache?: boolean;
   routeType?: RouteType;
   raw?: boolean;
+  immutableBinary?: boolean;
 }
 
 export interface StampResponseOptions extends WebResponseOptions {
@@ -215,10 +216,12 @@ export class WebResponseUtil {
       });
     }
 
-    return new Response(
+    const responseBody: BodyInit | null =
       body instanceof ArrayBuffer || body instanceof Uint8Array
-        ? body
-        : JSON.stringify(body),
+        ? body as BodyInit
+        : JSON.stringify(body);
+    return new Response(
+      responseBody,
       {
         status,
         headers: normalizeHeaders({
@@ -304,14 +307,17 @@ export class WebResponseUtil {
     mimeType: string,
     options: WebResponseOptions = {},
   ): Response {
-    return new Response(data, {
+    return new Response(data as BodyInit, {
       status: options.status || 200,
-      headers: normalizeHeaders({
-        ...getBinaryContentHeaders(mimeType, options),
-        "Content-Type": mimeType,
-        "X-API-Version": API_RESPONSE_VERSION,
-        ...(options.headers || {}),
-      }),
+      headers: normalizeHeaders(
+        {
+          ...getBinaryContentHeaders(mimeType, options),
+          "Content-Type": mimeType,
+          "X-API-Version": API_RESPONSE_VERSION,
+          ...(options.headers || {}),
+        },
+        options.immutableBinary ? { immutableBinary: true } : {},
+      ),
     });
   }
 

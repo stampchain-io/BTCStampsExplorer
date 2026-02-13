@@ -4,6 +4,7 @@ import {
   getCacheConfig,
   RouteType,
 } from "$server/services/infrastructure/cacheService.ts";
+import { serverConfig } from "$server/config/config.ts";
 
 // Import types for internal use and re-export for server code
 import type { ApiErrorResponse, APIResponse } from "$lib/types/api.ts";
@@ -261,7 +262,7 @@ export class ApiResponseUtil {
     // Check if we're in development mode (server-side only)
     const isDevelopment = typeof window === "undefined" &&
       typeof Deno !== "undefined" &&
-      Deno.env.get("DENO_ENV") === "development";
+      serverConfig.IS_DEVELOPMENT;
 
     return new Response(
       JSON.stringify(
@@ -316,10 +317,12 @@ export class ApiResponseUtil {
     status: number,
     options: ApiResponseOptions = {},
   ): Response {
-    return new Response(
+    const responseBody: BodyInit | null =
       body instanceof ArrayBuffer || body instanceof Uint8Array
-        ? body
-        : this.serializeWithBigInt(body),
+        ? body as BodyInit
+        : this.serializeWithBigInt(body);
+    return new Response(
+      responseBody,
       {
         status,
         headers: normalizeHeaders(this.createHeaders(options)),

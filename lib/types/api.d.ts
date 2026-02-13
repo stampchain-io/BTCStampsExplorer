@@ -480,6 +480,7 @@ export interface PaginatedSrc20ResponseBody {
 /**
  * Paginated tick response with mint status information
  * Provides detailed information about specific SRC-20 ticks including minting progress
+ * ✨ V2.4 Enhanced: Added optional market_data field for tick-level market information
  */
 export interface PaginatedTickResponseBody {
   last_block: number;
@@ -489,6 +490,7 @@ export interface PaginatedTickResponseBody {
   totalPages: number;
   mint_status: MintStatus;
   data: Src20Detail[];
+  market_data?: SRC20MarketData | null; // ✨ V2.4: Optional market data for the tick
 }
 
 /**
@@ -1364,18 +1366,20 @@ export interface Collection {
   first_stamp_image?: string | null;
   stamp_images?: string[] | null;
   img: string;
-  // Market data fields
+  // Market data from collection_market_data table
   marketData?: {
-    minFloorPriceBTC: number | null;
-    maxFloorPriceBTC: number | null;
-    avgFloorPriceBTC: number | null;
-    medianFloorPriceBTC: number | null;
-    totalVolume24hBTC: number;
-    stampsWithPricesCount: number;
-    minHolderCount: number;
-    maxHolderCount: number;
+    floorPriceBTC: number | null;
+    avgPriceBTC: number | null;
+    totalValueBTC: number;
+    volume24hBTC: number;
+    volume7dBTC: number;
+    volume30dBTC: number;
     totalVolumeBTC: number;
-    marketCapBTC: number | null;
+    totalStamps: number;
+    uniqueHolders: number;
+    listedStamps: number;
+    soldStamps24h: number;
+    lastUpdated: Date | null;
   };
 }
 

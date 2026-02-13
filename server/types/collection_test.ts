@@ -61,19 +61,17 @@ Deno.test("CollectionWithOptionalMarketData - market data structure", () => {
     img: "https://example.com/image.png",
     marketData: {
       collectionId: "collection_123",
-      minFloorPriceBTC: 0.01,
-      maxFloorPriceBTC: 0.05,
-      avgFloorPriceBTC: 0.03,
-      medianFloorPriceBTC: 0.04,
-      totalVolume24hBTC: 1.5,
-      stampsWithPricesCount: 5,
-      minHolderCount: 2,
-      maxHolderCount: 10,
-      avgHolderCount: 5,
-      medianHolderCount: 4,
-      totalUniqueHolders: 25,
-      avgDistributionScore: 0.6,
-      totalStampsCount: 10,
+      floorPriceBTC: 0.01,
+      avgPriceBTC: 0.03,
+      totalValueBTC: 0.5,
+      volume24hBTC: 1.5,
+      volume7dBTC: 5.0,
+      volume30dBTC: 15.0,
+      totalVolumeBTC: 25.0,
+      totalStamps: 10,
+      uniqueHolders: 25,
+      listedStamps: 5,
+      soldStamps24h: 2,
       lastUpdated: new Date(),
     },
     cacheStatus: "fresh",
@@ -85,7 +83,7 @@ Deno.test("CollectionWithOptionalMarketData - market data structure", () => {
   };
 
   assertExists(collection.marketData);
-  assertEquals(collection.marketData.totalVolume24hBTC, 1.5);
+  assertEquals(collection.marketData.volume24hBTC, 1.5);
   assertEquals(collection.cacheStatus, "fresh");
 });
 

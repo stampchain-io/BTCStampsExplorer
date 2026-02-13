@@ -1,4 +1,5 @@
 import { IS_BROWSER } from "$fresh/runtime.ts";
+import { safeNavigate } from "$utils/navigation/freshNavigationUtils.ts";
 import { useEffect, useState } from "preact/hooks";
 
 /**
@@ -85,10 +86,22 @@ export function useSSRSafeNavigation(fallbackUrl = "/") {
     // Convenience methods
     getSearchParam: (key: string) => searchParams.get(key),
     setSearchParam: (key: string, value: string) => {
-      updateSearchParams((params) => params.set(key, value));
+      if (!IS_BROWSER || !globalThis.location) return;
+
+      const url = new URL(globalThis.location.href);
+      url.searchParams.set(key, value);
+
+      // Use safeNavigate to trigger Fresh partial navigation or full reload
+      safeNavigate(url.toString());
     },
     deleteSearchParam: (key: string) => {
-      updateSearchParams((params) => params.delete(key));
+      if (!IS_BROWSER || !globalThis.location) return;
+
+      const url = new URL(globalThis.location.href);
+      url.searchParams.delete(key);
+
+      // Use safeNavigate to trigger Fresh partial navigation or full reload
+      safeNavigate(url.toString());
     },
   };
 }

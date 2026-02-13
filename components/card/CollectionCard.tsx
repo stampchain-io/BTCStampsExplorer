@@ -7,7 +7,7 @@ import {
   formatVolume,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { labelSm, valueSm } from "$text";
-import type { CollectionWithOptionalMarketData } from "$types/";
+import type { CollectionWithOptionalMarketData } from "$types/index.d.ts";
 
 /* ===== HELPERS ===== */
 function abbreviateCollectionName(name: string): string {
@@ -109,8 +109,8 @@ export function CollectionCard(
             <h5 class={`${labelSm} -mt-0.5 hidden mobileLg:block`}>
               VOLUME{" "}
               <span class={valueSm}>
-                {collection.marketData?.totalVolume24hBTC
-                  ? formatVolume(collection.marketData.totalVolume24hBTC)
+                {collection.marketData?.volume24hBTC
+                  ? formatVolume(collection.marketData.volume24hBTC)
                   : "N/A"}
               </span>{"  "}
               <span class="text-color-grey-light">BTC</span>
@@ -121,8 +121,8 @@ export function CollectionCard(
               <span class="min-[400px]:hidden">PRICE</span>
               <span class="hidden min-[400px]:inline">FLOOR PRICE</span>{" "}
               <span class={valueSm}>
-                {collection.marketData?.minFloorPriceBTC
-                  ? formatBTC(collection.marketData.minFloorPriceBTC)
+                {collection.marketData?.floorPriceBTC
+                  ? formatBTC(collection.marketData.floorPriceBTC)
                   : "N/A"}
               </span>{" "}
               <span class="text-color-grey-light">BTC</span>
@@ -131,10 +131,10 @@ export function CollectionCard(
               <span class="min-[400px]:hidden">MCAP</span>
               <span class="hidden min-[400px]:inline">MARKETCAP</span>{" "}
               <span class={valueSm}>
-                {collection.marketData?.minFloorPriceBTC &&
+                {collection.marketData?.floorPriceBTC &&
                     collection.total_editions
                   ? formatMarketCap(
-                    collection.marketData.minFloorPriceBTC *
+                    collection.marketData.floorPriceBTC *
                       collection.total_editions,
                   )
                   : "N/A"}

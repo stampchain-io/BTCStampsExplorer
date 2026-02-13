@@ -9,7 +9,6 @@
 
 import type { FeeDetails } from "$types/base.d.ts";
 import type { ProgressiveFeeEstimationResult as FeeEstimationResult } from "$types/fee-estimation.ts";
-import type { ProgressiveFeeEstimationResult as UIProgressiveResult } from "../../../../hooks/useProgressiveFeeEstimation.ts";
 import type { ProgressiveFeeEstimationProps } from "$types/ui.d.ts";
 
 /**
@@ -17,30 +16,15 @@ import type { ProgressiveFeeEstimationProps } from "$types/ui.d.ts";
  */
 function convertToUIProgressiveResult(
   result: FeeEstimationResult | null,
-): UIProgressiveResult | null {
+): FeeEstimationResult | null {
   if (!result) return null;
 
+  // Return the result as-is since both types are compatible
+  // FeeEstimationResult from fee-estimation.ts has all required fields
   return {
-    feeDetails: {
-      minerFee: result.minerFee || 0,
-      dustValue: result.dustValue || 0,
-      totalValue: result.totalValue || 0,
-      hasExactFees: result.hasExactFees || false,
-      estimatedSize: result.estimatedSize || 300,
-      serviceFee: result.serviceFee ?? null,
-      itemPrice: result.itemPrice ?? null,
-      effectiveFeeRate: result.effectiveFeeRate ?? null,
-    },
-    isEstimating: false,
-    estimationError: null,
-    refresh: () => {},
-    estimationCount: 0,
-    lastEstimationTime: result.timestamp || null,
-    cacheStatus: result.cacheHit ? "fresh" : "empty",
-    feeDetailsVersion: 1,
-    isPreFetching: false,
-    preFetchedFees: null,
-  };
+    ...result,
+    phase: result.phase || "instant",
+  } as FeeEstimationResult;
 }
 
 /**

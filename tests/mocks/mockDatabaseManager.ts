@@ -1,21 +1,21 @@
 import { MAX_PAGINATION_LIMIT } from "$constants";
 import blockFixturesData from "../fixtures/blockData.json" with {
-    type: "json"
+  type: "json",
 };
 import collectionFixturesData from "../fixtures/collectionData.json" with {
-    type: "json"
+  type: "json",
 };
 import marketDataFixturesData from "../fixtures/marketData.json" with {
-    type: "json"
+  type: "json",
 };
 import src101FixturesData from "../fixtures/src101Data.json" with {
-    type: "json"
+  type: "json",
 };
 import src20FixturesData from "../fixtures/src20Data.json" with {
-    type: "json"
+  type: "json",
 };
 import stampFixturesData from "../fixtures/stampData.json" with {
-    type: "json"
+  type: "json",
 };
 
 interface QueryResult {
@@ -69,15 +69,29 @@ export class MockDatabaseManager {
   }
 
   /**
-   * Set a specific mock response for a query pattern
+   * Set a specific mock response for a query pattern.
+   * Can be called with 2 args (tag-based) or 3 args (query-based).
    */
   setMockResponse(
-    query: string,
-    params: unknown[],
-    response: QueryResult,
+    queryOrTag: string,
+    paramsOrResponse: unknown[] | QueryResult,
+    response?: QueryResult,
   ): void {
-    const key = this.generateMockKey(query, params);
-    this.mockResponses.set(key, response);
+    if (response !== undefined) {
+      // 3-argument form: setMockResponse(query, params, response)
+      const key = this.generateMockKey(
+        queryOrTag,
+        paramsOrResponse as unknown[],
+      );
+      this.mockResponses.set(key, response);
+    } else {
+      // 2-argument form: setMockResponse(tag, response)
+      // Use the tag directly as the key for simple tag-based mocking
+      this._taggedMockResponses.set(
+        queryOrTag,
+        paramsOrResponse as QueryResult,
+      );
+    }
   }
 
   /**
@@ -89,11 +103,20 @@ export class MockDatabaseManager {
   }
 
   private _nextMockResult: QueryResult | null = null;
+  private _taggedMockResponses: Map<string, QueryResult> = new Map();
 
   /**
-   * Get the history of queries that were executed
+   * Get the history of queries that were executed.
+   * Returns an array of query strings for easier testing.
    */
-  getQueryHistory(): Array<{ query: string; params: unknown[] }> {
+  getQueryHistory(): string[] {
+    return this.queryHistory.map((entry) => entry.query);
+  }
+
+  /**
+   * Get the full query history with parameters
+   */
+  getFullQueryHistory(): Array<{ query: string; params: unknown[] }> {
     return [...this.queryHistory];
   }
 
@@ -109,6 +132,7 @@ export class MockDatabaseManager {
    */
   clearMockResponses(): void {
     this.mockResponses.clear();
+    this._taggedMockResponses.clear();
   }
 
   /**
@@ -136,17 +160,28 @@ export class MockDatabaseManager {
   private getMockDataForQuery(query: string, params: unknown[]): QueryResult {
     const normalizedQuery = query.toLowerCase();
 
-    // Check if there's a next mock result waiting
+    // Check if there's a next mock result waiting (highest priority)
     if (this._nextMockResult) {
       const result = this._nextMockResult;
       this._nextMockResult = null; // Clear after use
       return result;
     }
 
-    // Check if there's a specific mock response set first
+    // Check if there's a specific mock response set by query+params (second priority)
     const mockKey = this.generateMockKey(query, params);
     if (this.mockResponses.has(mockKey)) {
       return this.mockResponses.get(mockKey)!;
+    }
+
+    // Check tagged mock responses (tag-based mocking for tests - third priority)
+    // Only use tagged responses if explicitly set, not as a fallback to fixtures
+    if (this._taggedMockResponses.size > 0) {
+      for (const [tag, response] of this._taggedMockResponses.entries()) {
+        // Match if tag is in the query - tagged mocks take precedence over fixtures
+        if (normalizedQuery.includes(tag.toLowerCase())) {
+          return response;
+        }
+      }
     }
 
     // Count queries - Check BEFORE collection queries since count queries may contain "from collections"
@@ -192,6 +227,11 @@ export class MockDatabaseManager {
 
     if (normalizedQuery.includes("from src20_market_data")) {
       return this.getSrc20MarketData(normalizedQuery, params);
+    }
+
+    // Collection market data queries (separate table from collections)
+    if (normalizedQuery.includes("from collection_market_data")) {
+      return this.getCollectionMarketData(normalizedQuery, params);
     }
 
     // SRC-20 queries
@@ -261,7 +301,16 @@ export class MockDatabaseManager {
         normalizedQuery.includes("st.ident != 'src-20'")
       ) {
         stamps = stamps.filter((s) => s.stamp >= 0 && s.ident !== "SRC-20");
-      } // Cursed stamps filter: (st.stamp < 0)
+      } // Cursed stamps filter: excludes posh (cpid NOT LIKE 'A%' AND ident != 'SRC-20')
+      else if (
+        normalizedQuery.includes("st.stamp < 0") &&
+        normalizedQuery.includes("not")
+      ) {
+        stamps = stamps.filter((s) =>
+          s.stamp < 0 &&
+          !(s.cpid && !s.cpid.startsWith("A") && s.ident !== "SRC-20")
+        );
+      } // Posh stamps filter: (st.stamp < 0 AND cpid NOT LIKE 'A%')
       else if (normalizedQuery.includes("st.stamp < 0")) {
         stamps = stamps.filter((s) => s.stamp < 0);
       } // Filter by CPID if present
@@ -339,6 +388,49 @@ export class MockDatabaseManager {
     }
 
     return { rows: marketData };
+  }
+
+  /**
+   * Get collection market data from fixtures
+   * Returns market data keyed by collection_id_hex for the two-query pattern
+   * used by getCollectionDetailsWithMarketData
+   */
+  private getCollectionMarketData(
+    _query: string,
+    params: unknown[],
+  ): QueryResult {
+    const collectionFixtures = collectionFixturesData as any;
+    const collections = collectionFixtures.collections || [];
+
+    // params are collection IDs passed to UNHEX(?) placeholders
+    const rows = params
+      .filter((p): p is string => typeof p === "string")
+      .map((collectionId) => {
+        const collection = collections.find(
+          (c: any) => c.collection_id === collectionId,
+        );
+        if (collection) {
+          return {
+            collection_id_hex: collectionId,
+            floor_price_btc: "0.001",
+            avg_price_btc: "0.005",
+            total_value_btc: "0.05",
+            volume_24h_btc: "0.5",
+            volume_7d_btc: "1.2",
+            volume_30d_btc: "3.5",
+            total_volume_btc: "10.0",
+            total_stamps: 3,
+            unique_holders: 50,
+            listed_stamps: 3,
+            sold_stamps_24h: 1,
+            last_updated: "2024-01-01T00:00:00Z",
+          };
+        }
+        return null;
+      })
+      .filter(Boolean);
+
+    return { rows };
   }
 
   /**
@@ -740,7 +832,8 @@ export class MockDatabaseManager {
 
       // Check if this is a market data query
       const includesMarketData =
-        normalizedQuery.includes("cmd.min_floor_price_btc") ||
+        normalizedQuery.includes("cmd.floor_price_btc") ||
+        normalizedQuery.includes("collection_market_data") ||
         normalizedQuery.includes("stamp_market_data");
 
       // Transform collection data with creators and stamps
@@ -769,20 +862,19 @@ export class MockDatabaseManager {
         if (includesMarketData) {
           return {
             ...baseData,
-            minFloorPriceBTC: "0.001",
-            maxFloorPriceBTC: "0.01",
-            avgFloorPriceBTC: "0.005",
-            medianFloorPriceBTC: null,
-            totalVolume24hBTC: "0.5",
-            stampsWithPricesCount: stamps.length.toString(),
-            minHolderCount: "5",
-            maxHolderCount: "20",
-            avgHolderCount: "12.5",
-            medianHolderCount: null,
-            totalUniqueHolders: "50",
-            avgDistributionScore: "0.75",
-            totalStampsCount: stamps.length.toString(),
-            marketDataLastUpdated: "2024-01-01T00:00:00Z",
+            floor_price_btc: "0.001",
+            avg_price_btc: "0.005",
+            total_value_btc: "0.05",
+            volume_24h_btc: "0.5",
+            volume_7d_btc: "1.2",
+            volume_30d_btc: "3.5",
+            total_volume_btc: "10.0",
+            total_stamps: stamps.length,
+            unique_holders: 50,
+            listed_stamps: 3,
+            sold_stamps_24h: 1,
+            last_updated: "2024-01-01T00:00:00Z",
+            created_at: "2023-01-01T00:00:00Z",
           };
         }
 
@@ -1095,7 +1187,10 @@ export class MockDatabaseManager {
     queryPattern: string | RegExp,
     params?: unknown[],
   ): boolean {
-    return this.queryHistory.some(({ query, params: queryParams }) => {
+    return this.queryHistory.some((entry) => {
+      const query = entry.query;
+      const queryParams = entry.params;
+
       const queryMatches = typeof queryPattern === "string"
         ? query.toLowerCase().includes(queryPattern.toLowerCase())
         : queryPattern.test(query);
@@ -1114,7 +1209,8 @@ export class MockDatabaseManager {
    * Get the number of times a query pattern was called
    */
   getQueryCallCount(queryPattern: string | RegExp): number {
-    return this.queryHistory.filter(({ query }) => {
+    return this.queryHistory.filter((entry) => {
+      const query = entry.query;
       return typeof queryPattern === "string"
         ? query.toLowerCase().includes(queryPattern.toLowerCase())
         : queryPattern.test(query);

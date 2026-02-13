@@ -129,6 +129,118 @@
           }
         }
       ]
+    },
+    {
+      "name": "Preview - Image Stamp",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v2/stamp/37687/preview",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v2", "stamp", "37687", "preview"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Preview returns 200 with PNG', function () {",
+              "    pm.response.to.have.status(200);",
+              "    pm.expect(pm.response.headers.get('Content-Type')).to.include('image/png');",
+              "});",
+              "",
+              "pm.test('Preview has non-empty body', function () {",
+              "    pm.expect(pm.response.size().body).to.be.above(0);",
+              "});",
+              "",
+              "pm.test('Preview has caching headers', function () {",
+              "    const cacheControl = pm.response.headers.get('Cache-Control');",
+              "    pm.expect(cacheControl).to.exist;",
+              "    pm.expect(cacheControl).to.include('public');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Preview - HTML Stamp",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v2/stamp/1054189/preview",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v2", "stamp", "1054189", "preview"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// HTML stamps may 302 to fallback if Chrome unavailable",
+              "pm.test('Preview HTML stamp responds with 200 or 302', function () {",
+              "    pm.expect([200, 302]).to.include(pm.response.code);",
+              "});",
+              "",
+              "if (pm.response.code === 200) {",
+              "    pm.test('Preview HTML stamp returns PNG', function () {",
+              "        pm.expect(pm.response.headers.get('Content-Type')).to.include('image/png');",
+              "    });",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "OG Tags - Stamp Detail Page",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "text/html"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/stamp/37687",
+          "host": ["{{baseUrl}}"],
+          "path": ["stamp", "37687"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Stamp detail page returns 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const body = pm.response.text();",
+              "",
+              "pm.test('Has og:image pointing to preview endpoint', function () {",
+              "    pm.expect(body).to.match(/og:image[^>]*content=\"[^\"]*\\/api\\/v2\\/stamp\\/37687\\/preview\"/);",
+              "});",
+              "",
+              "pm.test('Has twitter:card summary_large_image', function () {",
+              "    pm.expect(body).to.match(/twitter:card[^>]*content=\"summary_large_image\"/);",
+              "});",
+              "",
+              "pm.test('Has twitter:image meta tag', function () {",
+              "    pm.expect(body).to.match(/twitter:image[^>]*content=\"[^\"]*\\/api\\/v2\\/stamp\\/37687\\/preview\"/);",
+              "});"
+            ]
+          }
+        }
+      ]
     }
   ],
   "event": [
@@ -138,7 +250,7 @@
         "type": "text/javascript",
         "exec": [
           "// Simple smoke tests - no complex setup needed",
-          "console.log('🚀 Running smoke tests...');"
+          "console.log('Running smoke tests...');"
         ]
       }
     },

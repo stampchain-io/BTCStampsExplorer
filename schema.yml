@@ -621,6 +621,92 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
+  /api/v2/collections/{id}:
+    get:
+      operationId: getCollectionById
+      tags:
+        - Collections
+      summary: Get collection details by ID
+      description: |
+        Returns detailed information for a specific collection by its UUID identifier.
+        Includes collection metadata, paginated stamps array, and aggregated market data
+        from the collection_market_data table.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{32}$'
+          description: Collection UUID (32 hex characters, with or without hyphens)
+          example: "550e8400e29b41d4a716446655440000"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Page"
+        - in: query
+          name: includeMarketData
+          schema:
+            type: boolean
+            default: true
+          description: Whether to include market data in the response
+      responses:
+        "200":
+          description: Successful response with collection details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  collection_id:
+                    type: string
+                    description: Collection UUID
+                  collection_name:
+                    type: string
+                    description: Collection name
+                  collection_description:
+                    type: string
+                    description: Collection description
+                  creators:
+                    type: array
+                    items:
+                      type: string
+                    description: Array of creator addresses
+                  stamp_count:
+                    type: integer
+                    description: Number of stamps in collection
+                  total_editions:
+                    type: number
+                    description: Total editions across all stamps
+                  stamps:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/StampRow"
+                    description: Paginated array of stamps in the collection
+                  marketData:
+                    $ref: "#/components/schemas/CollectionMarketData"
+                    nullable: true
+                    description: Aggregated market data from collection_market_data table
+                  pagination:
+                    type: object
+                    properties:
+                      page:
+                        type: integer
+                      limit:
+                        type: integer
+                      totalPages:
+                        type: integer
+                      total:
+                        type: integer
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          description: Collection not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponseBody"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
   /api/v2/cursed:
     get:
       operationId: getCursedStamps
@@ -1262,6 +1348,101 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "404":
           $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/v2/src20/market:
+    get:
+      operationId: getSrc20MarketData
+      tags:
+        - SRC-20
+      summary: Get paginated SRC-20 market data
+      description: |
+        Returns paginated SRC-20 market data from the src20_market_data cache table.
+        All data includes USD values calculated from BTC prices and current BTC/USD rate.
+        Market data is refreshed periodically from exchange sources.
+      parameters:
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Page"
+        - in: query
+          name: sort
+          schema:
+            type: string
+            enum: [market_cap_usd, volume_24h_btc, price_change_24h_percent]
+            default: market_cap_usd
+          description: Field to sort by
+        - in: query
+          name: order
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+          description: Sort order (ascending or descending)
+      responses:
+        "200":
+          description: Successful response with paginated market data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/SRC20MarketDataRow"
+                  total:
+                    type: integer
+                    description: Total number of tokens with market data
+                  page:
+                    type: integer
+                    description: Current page number
+                  limit:
+                    type: integer
+                    description: Items per page
+                  totalPages:
+                    type: integer
+                    description: Total number of pages
+                  last_block:
+                    type: integer
+                    description: Last indexed block height
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/v2/src20/market/{tick}:
+    get:
+      operationId: getSrc20MarketDataByTick
+      tags:
+        - SRC-20
+      summary: Get market data for a specific SRC-20 token
+      description: |
+        Returns market data for a specific SRC-20 token from the src20_market_data cache table.
+        Uses case-insensitive tick matching. Returns complete market data including USD values.
+        USD values are calculated from BTC prices using current BTC/USD rate.
+      parameters:
+        - in: path
+          name: tick
+          required: true
+          schema:
+            type: string
+          description: SRC-20 token tick symbol (case-insensitive)
+          example: "KEVIN"
+      responses:
+        "200":
+          description: Successful response with market data for the token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SRC20MarketDataRow"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          description: Market data not found for the specified token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponseBody"
         "500":
           $ref: "#/components/responses/InternalServerError"
 
@@ -2241,6 +2422,40 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
+  /api/v2/stamps/search:
+    get:
+      operationId: searchStamps
+      tags:
+        - Stamps
+      summary: Search stamps by query string
+      description: |
+        Search for stamps by CPID, stamp number, transaction hash, creator address, or ticker.
+        The input is automatically classified and routed to the appropriate query type.
+        Returns a simplified result set suitable for search/autocomplete interfaces.
+      parameters:
+        - name: q
+          in: query
+          required: true
+          description: |
+            Search query string. Automatically classified as one of:
+            - **cpid**: Matches CPID pattern (e.g., "A1234567890")
+            - **stamp_number**: Numeric input interpreted as stamp number
+            - **tx_hash**: 64-character hex string matching transaction hash
+            - **address**: Bitcoin address (1/3/bc1 prefix)
+            - **ticker**: Falls through to generic LIKE search on cpid, creator, and tx_hash
+          schema:
+            type: string
+          example: "KEVIN"
+      responses:
+        "200":
+          description: Successful response with matching stamps
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StampSearchResponseBody"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
   /api/v2/src20/create:
     post:
       operationId: createSrc20Token
@@ -2703,6 +2918,36 @@ components:
           type: number
           nullable: true
           description: "Market capitalization in USD (supply * floorPrice * BTC/USD rate)"
+    StampSearchResult:
+      type: object
+      properties:
+        stamp:
+          type: number
+          nullable: true
+          description: "Stamp number"
+        cpid:
+          type: string
+          description: "Counterparty asset ID"
+        preview:
+          type: string
+          description: "URL to stamp preview image"
+        mimetype:
+          type: string
+          description: "MIME type of the stamp content"
+        creator:
+          type: string
+          description: "Creator Bitcoin address"
+        tx_hash:
+          type: string
+          description: "Transaction hash"
+    StampSearchResponseBody:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/StampSearchResult"
+          description: "Array of matching stamps (max 10 results)"
     StampRowSummary:
       type: object
       properties:
@@ -2903,18 +3148,28 @@ components:
         market_data:
           type: object
           nullable: true
-          description: "Market data information (v2.3+, DEPLOY operations only). Contains pricing, volume, and holder statistics."
+          description: "Market data information (v2.3+, DEPLOY operations only). Contains pricing, volume, and holder statistics. USD values populated from src20_market_data table."
           properties:
             market_cap_btc:
               type: string
               nullable: true
               description: "Market capitalization in BTC"
               example: "8807.40000000"
+            market_cap_usd:
+              type: string
+              nullable: true
+              description: "Market capitalization in USD (calculated from BTC price)"
+              example: "528444.00"
             price_btc:
               type: string
               nullable: true
               description: "Current price in BTC"
               example: "0.00041900"
+            price_usd:
+              type: string
+              nullable: true
+              description: "Current price in USD (calculated from BTC price)"
+              example: "25.14"
             price_source_type:
               type: string
               nullable: true
@@ -3690,23 +3945,46 @@ components:
       properties:
         collection_id:
           type: string
+          description: Unique collection identifier (UUID)
         collection_name:
           type: string
+          description: Display name of the collection
         collection_description:
           type: string
+          description: Description of the collection
         creators:
           type: array
           items:
             type: string
+          description: Array of creator addresses
         stamp_count:
           type: integer
+          description: Number of stamps in the collection
         total_editions:
           type: number
+          description: Total number of editions across all stamps
+        img:
+          type: string
+          nullable: true
+          description: Collection image URL
+        first_stamp_image:
+          type: string
+          nullable: true
+          description: URL of the first stamp image in the collection
+        stamp_images:
+          type: array
+          items:
+            type: string
+          description: Array of stamp image URLs
         stamps:
           type: array
           items:
             type: integer
-            description: Array of stamp numbers in this collection
+          description: Array of stamp numbers in this collection
+        marketData:
+          $ref: "#/components/schemas/CollectionMarketData"
+          nullable: true
+          description: Aggregated market data for the collection from collection_market_data table
 
     ErrorResponseBody:
       type: object
@@ -3983,9 +4261,124 @@ components:
           type: number
 
     # Market Data Cache Schemas
+    StampMarketDataRow:
+      type: object
+      description: Database row format for stamp market data from stamp_market_data table (snake_case, string decimals)
+      required:
+        - cpid
+        - holder_count
+        - unique_holder_count
+        - data_quality_score
+        - confidence_level
+        - last_updated
+      properties:
+        cpid:
+          type: string
+          description: Counterparty ID of the stamp
+        floor_price_btc:
+          type: string
+          nullable: true
+          description: Floor price in BTC (DECIMAL stored as string for precision)
+        recent_sale_price_btc:
+          type: string
+          nullable: true
+          description: Most recent sale price in BTC (DECIMAL stored as string)
+        open_dispensers_count:
+          type: integer
+          description: Number of open dispensers
+        closed_dispensers_count:
+          type: integer
+          description: Number of closed dispensers
+        total_dispensers_count:
+          type: integer
+          description: Total number of dispensers
+        holder_count:
+          type: integer
+          description: Number of addresses holding this stamp
+        unique_holder_count:
+          type: integer
+          description: Number of unique holders (excluding duplicates)
+        top_holder_percentage:
+          type: string
+          description: Percentage held by the top holder (DECIMAL stored as string)
+        holder_distribution_score:
+          type: string
+          description: Distribution score from 0-100 (DECIMAL stored as string)
+        volume_24h_btc:
+          type: string
+          description: 24-hour trading volume in BTC (DECIMAL stored as string)
+        volume_7d_btc:
+          type: string
+          description: 7-day trading volume in BTC (DECIMAL stored as string)
+        volume_30d_btc:
+          type: string
+          description: 30-day trading volume in BTC (DECIMAL stored as string)
+        total_volume_btc:
+          type: string
+          description: All-time trading volume in BTC (DECIMAL stored as string)
+        price_source:
+          type: string
+          nullable: true
+          description: Source of the price data
+        volume_sources:
+          type: string
+          nullable: true
+          description: JSON string of volume breakdown by source
+        data_quality_score:
+          type: string
+          description: Data quality score from 0-10 (DECIMAL stored as string)
+        confidence_level:
+          type: string
+          description: Confidence level from 0-10 (DECIMAL stored as string)
+        last_updated:
+          type: string
+          format: date-time
+          description: Last update timestamp
+        last_price_update:
+          type: string
+          format: date-time
+          nullable: true
+          description: Last price update timestamp
+        update_frequency_minutes:
+          type: integer
+          description: Update frequency in minutes
+        last_sale_tx_hash:
+          type: string
+          nullable: true
+          description: Transaction hash of most recent sale
+        last_sale_buyer_address:
+          type: string
+          nullable: true
+          description: Buyer's address from most recent sale
+        last_sale_dispenser_address:
+          type: string
+          nullable: true
+          description: Dispenser address used in most recent sale
+        last_sale_btc_amount:
+          type: string
+          nullable: true
+          description: Amount in BTC from most recent sale (BIGINT stored as string in satoshis, converted to BTC via / 1e8)
+        last_sale_dispenser_tx_hash:
+          type: string
+          nullable: true
+          description: Transaction hash that created the dispenser
+        last_sale_block_index:
+          type: integer
+          nullable: true
+          description: Block number of most recent sale
+        activity_level:
+          type: string
+          nullable: true
+          enum: [HOT, WARM, COOL, DORMANT, COLD]
+          description: Activity level based on trading frequency
+        last_activity_time:
+          type: integer
+          nullable: true
+          description: Unix timestamp of last activity
+
     StampMarketData:
       type: object
-      description: Market data for individual stamps from the cache
+      description: Market data for individual stamps from the cache (parsed with proper types)
       properties:
         cpid:
           type: string
@@ -4072,7 +4465,7 @@ components:
         lastSaleBtcAmount:
           type: number
           nullable: true
-          description: Amount in BTC from most recent sale
+          description: Amount in BTC from most recent sale (converted from satoshis via BIGINT / 1e8)
         lastSaleDispenserTxHash:
           type: string
           nullable: true
@@ -4146,6 +4539,83 @@ components:
           format: date-time
           description: Last update timestamp
 
+    SRC20MarketDataRow:
+      type: object
+      description: Database row format for SRC-20 market data from src20_market_data table (snake_case, string decimals)
+      required:
+        - tick
+        - market_cap_btc
+        - market_cap_usd
+        - volume_24h_btc
+        - holder_count
+        - circulating_supply
+        - data_quality_score
+        - last_updated
+      properties:
+        tick:
+          type: string
+          description: Token ticker symbol
+        price_btc:
+          type: string
+          nullable: true
+          description: Current price in BTC (DECIMAL stored as string for precision)
+        price_usd:
+          type: string
+          nullable: true
+          description: Current price in USD (DECIMAL stored as string for precision)
+        floor_price_btc:
+          type: string
+          nullable: true
+          description: Floor price in BTC (DECIMAL stored as string for precision)
+        market_cap_btc:
+          type: string
+          description: Market capitalization in BTC (DECIMAL stored as string)
+        market_cap_usd:
+          type: string
+          description: Market capitalization in USD (DECIMAL stored as string)
+        volume_24h_btc:
+          type: string
+          description: 24-hour trading volume in BTC (DECIMAL stored as string)
+        volume_7d_btc:
+          type: string
+          description: 7-day trading volume in BTC (DECIMAL stored as string)
+        volume_30d_btc:
+          type: string
+          description: 30-day trading volume in BTC (DECIMAL stored as string)
+        total_volume_btc:
+          type: string
+          description: All-time trading volume in BTC (DECIMAL stored as string)
+        holder_count:
+          type: integer
+          description: Number of token holders
+        circulating_supply:
+          type: string
+          description: Circulating supply (DECIMAL stored as string for precision)
+        price_change_24h_percent:
+          type: string
+          description: 24-hour price change percentage (DECIMAL stored as string)
+        price_change_7d_percent:
+          type: string
+          description: 7-day price change percentage (DECIMAL stored as string)
+        price_change_30d_percent:
+          type: string
+          description: 30-day price change percentage (DECIMAL stored as string)
+        primary_exchange:
+          type: string
+          nullable: true
+          description: Primary exchange for trading
+        exchange_sources:
+          type: string
+          nullable: true
+          description: JSON string array of exchange sources
+        data_quality_score:
+          type: string
+          description: Data quality score from 0-10 (DECIMAL stored as string)
+        last_updated:
+          type: string
+          format: date-time
+          description: Last update timestamp
+
     SRC20MarketDataEnhanced:
       type: object
       description: Enhanced market data for SRC-20 tokens in v2.3 API responses with consistent snake_case naming
@@ -4207,56 +4677,103 @@ components:
                   type: number
                   description: 24h volume from OpenStamp
 
+    CollectionMarketDataRow:
+      type: object
+      description: Database row format for collection market data from collection_market_data table (snake_case, string decimals)
+      required:
+        - collection_id
+        - last_updated
+      properties:
+        collection_id:
+          type: string
+          description: Collection UUID identifier (BINARY(16))
+        floor_price_btc:
+          type: string
+          nullable: true
+          description: Floor price in BTC (DECIMAL stored as string)
+        avg_price_btc:
+          type: string
+          nullable: true
+          description: Average price in BTC (DECIMAL stored as string)
+        total_value_btc:
+          type: string
+          nullable: true
+          description: Total value in BTC (DECIMAL stored as string)
+        volume_24h_btc:
+          type: string
+          description: 24-hour volume in BTC (DECIMAL stored as string)
+        volume_7d_btc:
+          type: string
+          description: 7-day volume in BTC (DECIMAL stored as string)
+        volume_30d_btc:
+          type: string
+          description: 30-day volume in BTC (DECIMAL stored as string)
+        total_volume_btc:
+          type: string
+          description: Total volume in BTC (DECIMAL stored as string)
+        total_stamps:
+          type: integer
+          description: Total number of stamps in collection
+        unique_holders:
+          type: integer
+          description: Total unique holders across collection
+        listed_stamps:
+          type: integer
+          description: Number of stamps currently listed
+        sold_stamps_24h:
+          type: integer
+          description: Number of stamps sold in last 24 hours
+        last_updated:
+          type: string
+          format: date-time
+          description: Last update timestamp
+        created_at:
+          type: string
+          format: date-time
+          description: Row creation timestamp
+
     CollectionMarketData:
       type: object
-      description: Aggregated market data for collections
+      description: Aggregated market data for collections (parsed with proper types)
       properties:
         collectionId:
           type: string
           description: Collection identifier
-        minFloorPriceBTC:
+        floorPriceBTC:
           type: number
           nullable: true
-          description: Minimum floor price in the collection
-        maxFloorPriceBTC:
+          description: Floor price in BTC
+        avgPriceBTC:
           type: number
           nullable: true
-          description: Maximum floor price in the collection
-        avgFloorPriceBTC:
+          description: Average price in BTC
+        totalValueBTC:
           type: number
-          nullable: true
-          description: Average floor price in the collection
-        medianFloorPriceBTC:
+          description: Total value in BTC
+        volume24hBTC:
           type: number
-          nullable: true
-          description: Median floor price in the collection
-        totalVolume24hBTC:
+          description: 24-hour trading volume in BTC
+        volume7dBTC:
           type: number
-          description: Total 24-hour volume for the collection
-        stampsWithPricesCount:
-          type: integer
-          description: Number of stamps with price data
-        minHolderCount:
-          type: integer
-          description: Minimum holder count in the collection
-        maxHolderCount:
-          type: integer
-          description: Maximum holder count in the collection
-        avgHolderCount:
+          description: 7-day trading volume in BTC
+        volume30dBTC:
           type: number
-          description: Average holder count
-        medianHolderCount:
-          type: integer
-          description: Median holder count
-        totalUniqueHolders:
-          type: integer
-          description: Total unique holders across collection
-        avgDistributionScore:
+          description: 30-day trading volume in BTC
+        totalVolumeBTC:
           type: number
-          description: Average distribution score
-        totalStampsCount:
+          description: Total trading volume in BTC
+        totalStamps:
           type: integer
           description: Total number of stamps in collection
+        uniqueHolders:
+          type: integer
+          description: Total unique holders across collection
+        listedStamps:
+          type: integer
+          description: Number of stamps currently listed
+        soldStamps24h:
+          type: integer
+          description: Number of stamps sold in last 24 hours
         lastUpdated:
           type: string
           format: date-time

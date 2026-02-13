@@ -240,7 +240,8 @@ export default function StampDetailPage(props: StampDetailPageProps) {
   };
 
   // Ensure HTTPS for production preview URLs
-  const baseUrl = new URL(props.url || "").origin.replace(/^http:/, "https:");
+  const baseUrl = new URL(String(props.url || "https://stampchain.io")).origin
+    .replace(/^http:/, "https:");
   const metaInfo = getMetaImageInfo(stamp, baseUrl);
   const metaDescription = stamp
     ? stamp.name || "Unprunable UTXO Art"
@@ -309,7 +310,11 @@ export default function StampDetailPage(props: StampDetailPageProps) {
         {/* Primary og:image - stamp preview (should override app-level meta tag) */}
         <meta property="og:image" content={metaInfo.url} key="og:image" />
         <meta property="og:type" content="website" key="og-type" />
-        <meta property="og:url" content={props.url} key="og-url" />
+        <meta
+          property="og:url"
+          content={String(props.url || "").replace(/^http:/, "https:")}
+          key="og-url"
+        />
         <meta property="og:locale" content="en_US" key="og-locale" />
         <meta
           name="twitter:card"

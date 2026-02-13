@@ -1,15 +1,21 @@
 /**
  * Normalizes response headers to prevent duplicates
  */
-export function normalizeHeaders(headers: Headers | Record<string, string>) {
+export function normalizeHeaders(
+  headers: Headers | Record<string, string>,
+  options?: { immutableBinary?: boolean },
+) {
   const normalized = new Headers();
   const headerMap = headers instanceof Headers
     ? Object.fromEntries(headers)
     : headers;
 
-  // Special handling for content-type
-  if (headerMap["content-type"]) {
-    const [baseType] = headerMap["content-type"].split(",")[0].trim().split(
+  // Special handling for content-type (case-insensitive key lookup)
+  const ctKey = Object.keys(headerMap).find(
+    (k) => k.toLowerCase() === "content-type",
+  );
+  if (ctKey && headerMap[ctKey]) {
+    const [baseType] = headerMap[ctKey].split(",")[0].trim().split(
       ";",
     );
     // Add charset for text-based content
@@ -24,16 +30,21 @@ export function normalizeHeaders(headers: Headers | Record<string, string>) {
     }
   }
 
-  // Process vary header separately
+  // Process vary header separately (case-insensitive key lookup)
+  const varyKey = Object.keys(headerMap).find(
+    (k) => k.toLowerCase() === "vary",
+  );
   const varyValues = new Set<string>();
-  if (headerMap["vary"]) {
-    headerMap["vary"].split(",").forEach((v) => varyValues.add(v.trim()));
+  if (varyKey && headerMap[varyKey]) {
+    headerMap[varyKey].split(",").forEach((v) => varyValues.add(v.trim()));
   }
 
   // Add standard vary values
   varyValues.add("Accept-Encoding");
-  varyValues.add("X-API-Version");
-  varyValues.add("Origin");
+  if (!options?.immutableBinary) {
+    varyValues.add("X-API-Version");
+    varyValues.add("Origin");
+  }
 
   // Set normalized vary header
   normalized.set("vary", Array.from(varyValues).join(", "));

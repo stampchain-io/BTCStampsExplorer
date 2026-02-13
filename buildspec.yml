@@ -30,8 +30,27 @@ phases:
     commands:
       - echo "Build started on $(date)"
       # Modify Dockerfile to use our ECR cached base image before building
-      - sed -i "s|FROM denoland/deno:alpine-2.4.2|FROM $ECR_URI/$BASE_REPOSITORY_NAME:alpine-2.4.2|g" Dockerfile || echo "Dockerfile substitution failed, trying original build"
-      - docker build --platform=linux/amd64 -t $ECR_URI/$ECR_REPOSITORY_NAME:latest .
+      # Try ECR-cached base image, fall back to Docker Hub if not available
+      - DENO_VERSION=$(grep -oP 'FROM denoland/deno:alpine-\K[0-9.]+' Dockerfile | head -1)
+      - |
+        if [ -n "$DENO_VERSION" ]; then
+          echo "Detected Deno version: $DENO_VERSION"
+          BASE_TAG="alpine-${DENO_VERSION}-arm64"
+          # Check if cached base image exists in ECR
+          if aws ecr describe-images --repository-name $BASE_REPOSITORY_NAME --image-ids imageTag=${BASE_TAG} >/dev/null 2>&1; then
+            echo "Found cached base image ${BASE_TAG} in ECR, using it"
+            sed -i "s|FROM denoland/deno:alpine-${DENO_VERSION}|FROM $ECR_URI/$BASE_REPOSITORY_NAME:${BASE_TAG}|g" Dockerfile
+          else
+            echo "Cached base image ${BASE_TAG} not in ECR, pulling from Docker Hub"
+            echo "Caching base image for future builds..."
+            docker pull --platform=linux/arm64 denoland/deno:alpine-${DENO_VERSION} || true
+            docker tag denoland/deno:alpine-${DENO_VERSION} $ECR_URI/$BASE_REPOSITORY_NAME:${BASE_TAG} || true
+            docker push $ECR_URI/$BASE_REPOSITORY_NAME:${BASE_TAG} || true
+          fi
+        else
+          echo "Could not detect Deno version from Dockerfile, using Docker Hub directly"
+        fi
+      - docker build --platform=linux/arm64 -t $ECR_URI/$ECR_REPOSITORY_NAME:latest .
   post_build:
     commands:
       - echo "Build completed on $(date)"

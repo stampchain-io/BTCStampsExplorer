@@ -33,7 +33,7 @@ Deno.test("SRC101Repository - getSrc101Price", async (t) => {
     assertEquals(result[5], "100000");
 
     // Verify correct query was called
-    const history = mockDb.getQueryHistory();
+    const history = mockDb.getFullQueryHistory();
     assertEquals(history.length, 1);
     assertEquals(history[0].params, [deployHash]);
 
@@ -91,7 +91,7 @@ Deno.test("SRC101Repository - getTotalSrc101TXFromSRC101TableCount", async (t) =
 
     assertEquals(result, 3);
 
-    const history = mockDb.getQueryHistory();
+    const history = mockDb.getFullQueryHistory();
     const lastQuery = history[history.length - 1].query.toLowerCase();
     assertEquals(lastQuery.includes("status is null"), true);
 
@@ -265,7 +265,7 @@ Deno.test("SRC101Repository - getSrc101Balance", async (t) => {
     assertEquals(result.length > 0, true);
 
     // Verify query includes ORDER BY with DESC
-    const history = mockDb.getQueryHistory();
+    const history = mockDb.getFullQueryHistory();
     const lastQuery = history[history.length - 1].query;
     assertEquals(lastQuery.includes("ORDER BY last_update DESC"), true);
 

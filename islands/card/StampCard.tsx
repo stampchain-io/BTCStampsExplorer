@@ -14,7 +14,10 @@ import {
   formatSupplyValue,
   stripTrailingZeros,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
-import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
+import {
+  getStampImageSrc,
+  getStampPreviewUrl,
+} from "$lib/utils/ui/media/imageUtils.ts";
 import type { StampRow } from "$types/stamp.d.ts";
 import { VNode } from "preact";
 import { useEffect, useRef, useState } from "preact/hooks";
@@ -50,6 +53,7 @@ export function StampCard({
   const [loading, setLoading] = useState<boolean>(true);
   const [src, setSrc] = useState<string | undefined>(undefined);
   const [validatedContent, setValidatedContent] = useState<VNode | null>(null);
+  const [isValidating, setIsValidating] = useState<boolean>(false);
 
   // Audio-related state (always declared to avoid conditional hooks)
   const [isPlaying, setIsPlaying] = useState(false);
@@ -64,8 +68,10 @@ export function StampCard({
   /* ===== HANDLERS ===== */
   const handleImageError = (e: Event) => {
     if (e.currentTarget instanceof HTMLImageElement) {
-      // Set src to empty string to trigger placeholder image rendering
-      e.currentTarget.src = "";
+      // Use transparent pixel data URI to prevent infinite error loops
+      // (setting src="" resolves to the page URL, which isn't an image → re-triggers error)
+      e.currentTarget.src =
+        "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
       e.currentTarget.alt = "Content not available";
     }
   };
@@ -96,6 +102,7 @@ export function StampCard({
   useEffect(() => {
     const validateContent = async () => {
       if (stamp.stamp_mimetype === "image/svg+xml" && src) {
+        setIsValidating(true);
         try {
           // Fetch the SVG content
           const response = await fetch(src);
@@ -105,52 +112,22 @@ export function StampCard({
 
           const svgContent = await response.text();
 
-          // Check if SVG has external ordinals.com or arweave.net references
+          // Check if SVG has external ordinals.com or arweave.net references (recursive SVG)
           if (
             svgContent.includes("ordinals.com/content/") ||
             svgContent.includes("arweave.net/")
           ) {
-            // Rewrite external references to use our proxy
-            let rewrittenSVG = svgContent.replace(
-              /https:\/\/ordinals\.com\/content\/([^"'\s>]+)/g,
-              "/api/proxy/ordinals/$1",
-            ).replace(
-              /https:\/\/arweave\.net\/([^"'\s>]+)/g,
-              "/api/proxy/arweave/$1",
-            );
-
-            // Ensure SVG fills container by removing fixed dimensions and adding proper styling
-            if (rewrittenSVG.includes("<svg")) {
-              // Remove width and height attributes
-              rewrittenSVG = rewrittenSVG.replace(
-                /<svg([^>]*)\s+width="([^"]*)"([^>]*)/,
-                "<svg$1$3",
-              ).replace(
-                /<svg([^>]*)\s+height="([^"]*)"([^>]*)/,
-                "<svg$1$3",
-              );
-
-              // Add viewBox if not present (using the original dimensions)
-              if (!rewrittenSVG.includes("viewBox")) {
-                rewrittenSVG = rewrittenSVG.replace(
-                  /<svg([^>]*)>/,
-                  '<svg$1 viewBox="0 0 460 500">',
-                );
-              }
-
-              // Add responsive styling to fill container properly
-              rewrittenSVG = rewrittenSVG.replace(
-                /<svg([^>]*)>/,
-                '<svg$1 style="max-width: 100%; max-height: 100%; width: auto; height: auto; display: block;">',
-              );
-            }
-
+            // Use cached preview PNG for recursive SVGs in grid view
             setValidatedContent(
               <div class="stamp-container">
-                <div class="relative z-10 aspect-square flex items-center justify-center">
-                  <div
+                <div class="relative z-10 aspect-square">
+                  <img
+                    src={getStampPreviewUrl(stamp as StampRow)}
+                    loading="lazy"
+                    alt={`Stamp No. ${stamp.stamp}`}
                     class="max-w-none object-contain rounded-2xl pixelart stamp-image h-full w-full"
-                    dangerouslySetInnerHTML={{ __html: rewrittenSVG }}
+                    onLoad={() => setLoading(false)}
+                    onError={handleImageError}
                   />
                 </div>
               </div>,
@@ -165,6 +142,7 @@ export function StampCard({
                     loading="lazy"
                     alt={`Stamp No. ${stamp.stamp}`}
                     class="max-w-none object-contain rounded-2xl pixelart stamp-image h-full w-full"
+                    onLoad={() => setLoading(false)}
                     onError={handleImageError}
                   />
                 </div>
@@ -180,6 +158,9 @@ export function StampCard({
               </div>
             </div>,
           );
+          setLoading(false);
+        } finally {
+          setIsValidating(false);
         }
       }
     };
@@ -254,32 +235,19 @@ export function StampCard({
       return <StampTextContent src={src} />;
     }
 
-    // Handle HTML content
+    // Handle HTML content - show cached preview PNG in grid view
     if (stamp.stamp_mimetype === "text/html") {
       return (
-        <div class="relative w-full h-full">
-          <div class="relative pt-[100%]">
-            <iframe
-              width="100%"
-              height="100%"
-              scrolling="no"
+        <div class="stamp-container">
+          <div class="relative z-10 aspect-square">
+            <img
+              src={getStampPreviewUrl(stamp as StampRow)}
               loading="lazy"
-              sandbox="allow-scripts allow-same-origin"
-              src={src}
-              class="absolute top-0 left-0 w-full h-full rounded-2xl object-contain pointer-events-none"
-              onError={(e) => {
-                console.error("iframe error (detailed):", {
-                  error: e,
-                  target: e.target,
-                  src: (e.target as HTMLIFrameElement).src,
-                  contentWindow: (e.target as HTMLIFrameElement).contentWindow
-                    ? "present"
-                    : "missing",
-                });
-                handleImageError(e);
-              }}
+              alt={`Stamp No. ${stamp.stamp}`}
+              class="max-w-none object-contain rounded-2xl pixelart stamp-image h-full w-full"
+              onLoad={() => setLoading(false)}
+              onError={handleImageError}
             />
-            <div class="absolute inset-0 cursor-pointer" />
           </div>
         </div>
       );
@@ -297,6 +265,15 @@ export function StampCard({
     }
 
     if (stamp.stamp_mimetype === "image/svg+xml") {
+      // Show spinner while SVG content is being validated (prevents
+      // "no-image" placeholder flash during async validation)
+      if (isValidating) {
+        return (
+          <div class="stamp-container">
+            <LoadingIcon />
+          </div>
+        );
+      }
       return validatedContent || (
         <div class="stamp-container">
           <div class="relative z-10 aspect-square">
@@ -315,6 +292,7 @@ export function StampCard({
             loading="lazy"
             alt={`Stamp No. ${stamp.stamp}`}
             class="max-w-none object-contain rounded-2xl pixelart stamp-image h-full w-full"
+            onLoad={() => setLoading(false)}
             onError={handleImageError}
           />
         </div>

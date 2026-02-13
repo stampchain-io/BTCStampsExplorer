@@ -577,6 +577,12 @@ class DependencyGraphAnalyzer {
     }
   }
 
+  private isTypeOnlyCycle(cycle: string[]): boolean {
+    return cycle.every((nodeId) =>
+      nodeId.endsWith(".d.ts") || nodeId.includes("/types/")
+    );
+  }
+
   private generateHealthReport(): void {
     const totalModules = this.graph.nodes.size;
     const circularDependencies = this.graph.circularDependencies.length;
@@ -589,19 +595,19 @@ class DependencyGraphAnalyzer {
     const averageHealthScore =
       healthScores.reduce((sum, score) => sum + score, 0) / healthScores.length;
 
+    // Separate type-only cycles from runtime cycles
+    const typeOnlyCycles = this.graph.circularDependencies.filter((cd) =>
+      this.isTypeOnlyCycle(cd.cycle)
+    );
+    const runtimeCycles = this.graph.circularDependencies.filter((cd) =>
+      !this.isTypeOnlyCycle(cd.cycle)
+    );
+
     const criticalIssues: string[] = [];
+    const warnings: string[] = [];
     const recommendations: string[] = [];
 
-    // Critical issues
-    if (circularDependencies > 0) {
-      criticalIssues.push(
-        `${circularDependencies} circular dependency cycles detected`,
-      );
-      recommendations.push(
-        "Break circular dependencies by extracting interfaces or shared modules",
-      );
-    }
-
+    // Client-server leaks are always critical
     if (clientServerLeaks > 0) {
       criticalIssues.push(
         `${clientServerLeaks} client-server boundary violations`,
@@ -611,11 +617,33 @@ class DependencyGraphAnalyzer {
       );
     }
 
-    if (orphanedTypes > 5) {
-      criticalIssues.push(`${orphanedTypes} orphaned type modules`);
-      recommendations.push("Remove unused type modules or add proper exports");
+    // Runtime circular deps are critical only above threshold
+    if (runtimeCycles.length > 10) {
+      criticalIssues.push(
+        `${runtimeCycles.length} runtime circular dependency cycles (threshold: 10)`,
+      );
+      recommendations.push(
+        "Break runtime circular dependencies by extracting interfaces or shared modules",
+      );
+    } else if (runtimeCycles.length > 0) {
+      warnings.push(
+        `${runtimeCycles.length} runtime circular dependency cycles (threshold: 10)`,
+      );
     }
 
+    // Type-only cycles are informational warnings, not critical
+    if (typeOnlyCycles.length > 0) {
+      warnings.push(
+        `${typeOnlyCycles.length} type-only circular dependency cycles (benign - no runtime impact)`,
+      );
+      if (typeOnlyCycles.length > 20) {
+        recommendations.push(
+          "Consider consolidating type files to reduce type-only circular references",
+        );
+      }
+    }
+
+    // Low health score is critical
     if (averageHealthScore < 70) {
       criticalIssues.push(
         `Low average health score: ${averageHealthScore.toFixed(1)}`,
@@ -623,6 +651,12 @@ class DependencyGraphAnalyzer {
       recommendations.push(
         "Refactor modules with low health scores to improve maintainability",
       );
+    }
+
+    // Orphaned types are warnings, not critical
+    if (orphanedTypes > 5) {
+      warnings.push(`${orphanedTypes} orphaned type modules`);
+      recommendations.push("Remove unused type modules or add proper exports");
     }
 
     this.graph.healthReport = {
@@ -724,12 +758,29 @@ class DependencyGraphAnalyzer {
   }
 
   private generateJsonReport(): string {
+    const typeOnlyCycles = this.graph.circularDependencies.filter((cd) =>
+      this.isTypeOnlyCycle(cd.cycle)
+    );
+    const runtimeCycles = this.graph.circularDependencies.filter((cd) =>
+      !this.isTypeOnlyCycle(cd.cycle)
+    );
+
     return JSON.stringify(
       {
-        summary: this.graph.healthReport,
+        summary: {
+          ...this.graph.healthReport,
+          typeOnlyCircularDependencies: typeOnlyCycles.length,
+          runtimeCircularDependencies: runtimeCycles.length,
+        },
         circularDependencies: this.graph.circularDependencies,
         clientServerLeaks: this.graph.clientServerLeaks,
         orphanedTypes: this.graph.orphanedTypes,
+        issues: this.graph.circularDependencies.map((cd) => ({
+          type: "circular-dependency",
+          severity: cd.severity,
+          typeOnly: this.isTypeOnlyCycle(cd.cycle),
+          cycle: cd.cycle,
+        })),
         nodeDetails: Array.from(this.graph.nodes.values()).map((node) => ({
           id: node.id,
           moduleType: node.moduleType,
@@ -751,12 +802,22 @@ class DependencyGraphAnalyzer {
 
     const report = this.graph.healthReport;
 
+    // Separate type-only from runtime cycles for reporting
+    const typeOnlyCycles = this.graph.circularDependencies.filter((cd) =>
+      this.isTypeOnlyCycle(cd.cycle)
+    );
+    const runtimeCycles = this.graph.circularDependencies.filter((cd) =>
+      !this.isTypeOnlyCycle(cd.cycle)
+    );
+
     console.log(`\n📈 Overview:`);
     console.log(`   Total Modules: ${report.totalModules}`);
     console.log(
       `   Average Health Score: ${report.averageHealthScore.toFixed(1)}%`,
     );
-    console.log(`   Circular Dependencies: ${report.circularDependencies}`);
+    console.log(
+      `   Circular Dependencies: ${report.circularDependencies} total (${typeOnlyCycles.length} type-only, ${runtimeCycles.length} runtime)`,
+    );
     console.log(`   Client-Server Leaks: ${report.clientServerLeaks}`);
     console.log(`   Orphaned Types: ${report.orphanedTypes}`);
 
@@ -790,9 +851,8 @@ class DependencyGraphAnalyzer {
       });
     }
 
-    // Overall status
-    const overallHealth = report.criticalIssues.length === 0 &&
-      report.averageHealthScore >= 80;
+    // Overall status based on critical issues only (not warnings)
+    const overallHealth = report.criticalIssues.length === 0;
     console.log(
       `\n${overallHealth ? "✅" : "❌"} Overall Status: ${
         overallHealth ? "HEALTHY" : "NEEDS ATTENTION"

@@ -7,8 +7,12 @@ export const handler: Handlers = {
     try {
       const url = new URL(req.url);
       const query = url.searchParams.get("q") || "";
+      const mintableOnly = url.searchParams.get("mintable_only") === "true";
 
-      const results = await SRC20Service.QueryService.searchSrc20Data(query);
+      const results = await SRC20Service.QueryService.searchSrc20Data(
+        query,
+        mintableOnly,
+      );
 
       return ApiResponseUtil.success({ data: results });
     } catch (error) {

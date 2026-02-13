@@ -1,4 +1,5 @@
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
+import { serverConfig } from "$server/config/config.ts";
 
 /**
  * CloudFlare-aware security guard for internal endpoints
@@ -11,14 +12,14 @@ export class CloudflareInternalGuard {
    */
   static requireInternalAccess(req: Request) {
     // Skip in development
-    if (Deno.env.get("DENO_ENV") === "development") {
+    if (serverConfig.IS_DEVELOPMENT) {
       return null;
     }
 
     // Method 1: Check for internal secret header (configure CloudFlare to add this)
     const internalSecret = req.headers.get("X-Internal-Secret");
-    const expectedSecret = Deno.env.get("INTERNAL_API_SECRET");
-    
+    const expectedSecret = serverConfig.INTERNAL_API_SECRET;
+
     if (expectedSecret && internalSecret === expectedSecret) {
       return null; // Access granted
     }
@@ -26,8 +27,8 @@ export class CloudflareInternalGuard {
     // Method 2: Check CloudFlare Access Service Token (if using CloudFlare Access)
     const cfAccessToken = req.headers.get("CF-Access-Client-Id");
     const cfAccessSecret = req.headers.get("CF-Access-Client-Secret");
-    const expectedCfId = Deno.env.get("CF_ACCESS_CLIENT_ID");
-    const expectedCfSecret = Deno.env.get("CF_ACCESS_CLIENT_SECRET");
+    const expectedCfId = serverConfig.CF_ACCESS_CLIENT_ID;
+    const expectedCfSecret = serverConfig.CF_ACCESS_CLIENT_SECRET;
     
     if (expectedCfId && expectedCfSecret && 
         cfAccessToken === expectedCfId && 
@@ -46,7 +47,7 @@ export class CloudflareInternalGuard {
 
     // Method 4: Simple API key check as fallback
     const apiKey = req.headers.get("X-API-Key");
-    const expectedApiKey = Deno.env.get("INTERNAL_API_KEY");
+    const expectedApiKey = serverConfig.INTERNAL_API_KEY;
     
     if (expectedApiKey && apiKey === expectedApiKey) {
       return null; // Access granted

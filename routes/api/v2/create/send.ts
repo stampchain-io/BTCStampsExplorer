@@ -10,12 +10,14 @@ import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts";
 import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
 import type { SendRequestBody, SendResponse } from "$types/api.d.ts";
-import { networks, Psbt, Transaction } from "bitcoinjs-lib";
 import { Buffer } from "node:buffer";
 
 export const handler: Handlers<SendResponse | { error: string }> = {
   async POST(req) {
     try {
+      // Dynamic import of bitcoinjs-lib to exclude from build-time static analysis
+      const { networks, Psbt, Transaction } = await import("bitcoinjs-lib");
+
       const body: SendRequestBody = await req.json();
       const commonUtxoService = new CommonUTXOService();
 

@@ -238,13 +238,25 @@ describe("CollectionRepository Integration Tests", { skip: skipInCI }, () => {
         // Market data might be null if no data exists
         if (firstCollection.marketData) {
           assertExists(
-            firstCollection.marketData.minFloorPriceBTC !== undefined,
+            firstCollection.marketData.floorPriceBTC !== undefined,
           );
           assertExists(
-            firstCollection.marketData.maxFloorPriceBTC !== undefined,
+            firstCollection.marketData.avgPriceBTC !== undefined,
           );
           assertExists(
-            firstCollection.marketData.avgFloorPriceBTC !== undefined,
+            firstCollection.marketData.totalValueBTC !== undefined,
+          );
+          assertExists(
+            firstCollection.marketData.volume24hBTC !== undefined,
+          );
+          assertExists(
+            firstCollection.marketData.volume7dBTC !== undefined,
+          );
+          assertExists(
+            firstCollection.marketData.volume30dBTC !== undefined,
+          );
+          assertExists(
+            firstCollection.marketData.totalVolumeBTC !== undefined,
           );
         }
       }

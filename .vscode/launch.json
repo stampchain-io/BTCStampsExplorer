@@ -6,7 +6,7 @@
       "type": "node",
       "request": "launch",
       "cwd": "${workspaceFolder}",
-      "runtimeExecutable": "deno",
+      "runtimeExecutable": "${env:HOME}/.deno/bin/deno",
       "runtimeArgs": [
         "task",
         "dev"
@@ -24,7 +24,7 @@
       "type": "node",
       "request": "launch",
       "cwd": "${workspaceFolder}",
-      "runtimeExecutable": "deno",
+      "runtimeExecutable": "${env:HOME}/.deno/bin/deno",
       "runtimeArgs": [
         "task",
         "dev:frontend"
@@ -42,7 +42,7 @@
       "type": "node",
       "request": "launch",
       "cwd": "${workspaceFolder}",
-      "runtimeExecutable": "deno",
+      "runtimeExecutable": "${env:HOME}/.deno/bin/deno",
       "runtimeArgs": [
         "run",
         "--inspect-brk",
@@ -72,7 +72,7 @@
       "type": "node",
       "request": "launch",
       "cwd": "${workspaceFolder}",
-      "runtimeExecutable": "deno",
+      "runtimeExecutable": "${env:HOME}/.deno/bin/deno",
       "runtimeArgs": [
         "task",
         "preview"

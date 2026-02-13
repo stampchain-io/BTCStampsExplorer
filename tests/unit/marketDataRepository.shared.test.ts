@@ -301,15 +301,23 @@ describe("MarketDataRepository Unit Tests (with shared helper)", () => {
         assertExists(result.collectionId);
         assertEquals(result.collectionId, mockData.collection_id);
         // Check for nullable fields properly
-        if (result.minFloorPriceBTC !== null) {
-          assertEquals(typeof result.minFloorPriceBTC, "number");
+        if (result.floorPriceBTC !== null) {
+          assertEquals(typeof result.floorPriceBTC, "number");
         }
-        if (result.maxFloorPriceBTC !== null) {
-          assertEquals(typeof result.maxFloorPriceBTC, "number");
+        if (result.avgPriceBTC !== null) {
+          assertEquals(typeof result.avgPriceBTC, "number");
         }
-        if (result.avgFloorPriceBTC !== null) {
-          assertEquals(typeof result.avgFloorPriceBTC, "number");
+        if (result.totalValueBTC !== null) {
+          assertEquals(typeof result.totalValueBTC, "number");
         }
+        assertEquals(typeof result.volume24hBTC, "number");
+        assertEquals(typeof result.volume7dBTC, "number");
+        assertEquals(typeof result.volume30dBTC, "number");
+        assertEquals(typeof result.totalVolumeBTC, "number");
+        assertEquals(typeof result.totalStamps, "number");
+        assertEquals(typeof result.uniqueHolders, "number");
+        assertEquals(typeof result.listedStamps, "number");
+        assertEquals(typeof result.soldStamps24h, "number");
       }
     });
 

@@ -6,6 +6,7 @@
 
 // Import ValidationErrorCode for use within this file
 import { ValidationErrorCode } from "$constants";
+import { serverConfig } from "$server/config/config.ts";
 
 // Re-export all type definitions
 export * from "./errors.d.ts";
@@ -1152,7 +1153,7 @@ export function createErrorReporter({
         try {
           if (
             typeof Deno !== "undefined" &&
-            Deno.env.get("DENO_ENV") === "development"
+            serverConfig.IS_DEVELOPMENT
           ) {
             console.error("React Error:", {
               error: appError,

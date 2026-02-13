@@ -20,6 +20,7 @@ Deno.env.set("DENO_ENV", "test");
 
 // Import dependencies that need database
 import { SRC20Repository } from "$server/database/src20Repository.ts";
+import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
 import { BlockService } from "$server/services/core/blockService.ts";
 import { SRC20MarketService } from "$server/services/src20/marketService.ts";
 import { SRC20UtilityService } from "$server/services/src20/utilityService.ts";
@@ -48,6 +49,8 @@ const originalGetLastBlock = BlockService.getLastBlock;
 const originalFormatSRC20Row = SRC20UtilityService.formatSRC20Row;
 const originalFetchMarketListingSummary =
   SRC20MarketService.fetchMarketListingSummary;
+const originalGetAllSRC20MarketData =
+  MarketDataRepository.getAllSRC20MarketData;
 
 // Add a test-level database connection handler
 let dbConnections: any[] = [];
@@ -99,6 +102,8 @@ describe(
       SRC20UtilityService.formatSRC20Row = originalFormatSRC20Row;
       SRC20MarketService.fetchMarketListingSummary =
         originalFetchMarketListingSummary;
+      MarketDataRepository.getAllSRC20MarketData =
+        originalGetAllSRC20MarketData;
     });
 
     describe("getTotalCountValidSrc20Tx", () => {
@@ -777,18 +782,53 @@ describe(
         assertEquals(result[0].formatted, true);
       });
 
-      it("should sanitize query input", async () => {
-        let capturedQuery: string;
-        SRC20Repository.searchValidSrc20TxFromDb = (query) => {
+      it("should classify and sanitize query input", async () => {
+        let capturedQuery: string | undefined;
+        SRC20Repository.searchValidSrc20TxFromDb = (
+          query: string,
+          _searchType: string,
+        ) => {
           capturedQuery = query;
           return Promise.resolve([]);
         };
 
+        // Long XSS input becomes "unknown" → service returns []
+        // without calling repository (early return for unknown)
         await SRC20QueryService.searchSrc20Data(
           "TEST<script>alert('xss')</script>",
         );
+        assertEquals(capturedQuery, undefined);
 
-        assertEquals(capturedQuery, "TESTscriptalertxssscript");
+        // Ticker with special chars → sanitized and passed
+        await SRC20QueryService.searchSrc20Data("TE$T");
+        assertEquals(capturedQuery, "TET");
+      });
+
+      it("should pass search type to repository", async () => {
+        let capturedType: string;
+        SRC20Repository.searchValidSrc20TxFromDb = (
+          _query: string,
+          searchType: string,
+        ) => {
+          capturedType = searchType;
+          return Promise.resolve([]);
+        };
+
+        // Ticker input
+        await SRC20QueryService.searchSrc20Data("TEST");
+        assertEquals(capturedType!, "ticker");
+
+        // Address input
+        await SRC20QueryService.searchSrc20Data(
+          "bc1q7mlw0y0qe9dadg24q2225ded0myuxkw2wm8pzj",
+        );
+        assertEquals(capturedType!, "address");
+
+        // Tx hash input
+        await SRC20QueryService.searchSrc20Data(
+          "24832ae47e475303801fc47cbf08094f5d0f8eb6f255efa05ee2d93c422a52f4",
+        );
+        assertEquals(capturedType!, "tx_hash");
       });
 
       it("should return empty array for invalid input types", async () => {
@@ -859,7 +899,8 @@ describe(
           tick: row.tick,
           block_time: "2024-02-08T18:02:36.000Z",
         });
-        SRC20MarketService.fetchMarketListingSummary = () =>
+        // Mock DB query instead of external API calls
+        MarketDataRepository.getAllSRC20MarketData = () =>
           Promise.resolve([]);
       });
 
@@ -932,20 +973,31 @@ describe(
         SRC20Repository.getTotalCountValidSrc20TxFromDb = () =>
           Promise.resolve({ rows: [{ total: 1 }] });
 
-        const mockMarketData = [{
+        // Mock DB market data instead of external API response
+        const mockDbMarketData = [{
           tick: "TEST",
-          floor_price: 100,
-          volume_24h: 500,
-          holder_count: 50,
-          floor_unit_price: 100,
-          mcap: 5000000,
-          volume24: 500,
-          tx_hash: "test_hash",
-          market_data: {},
+          priceBTC: 0.001,
+          priceUSD: 100,
+          floorPriceBTC: 0.001,
+          marketCapBTC: 5000000,
+          marketCapUSD: 500000000,
+          volume24hBTC: 500,
+          volume7dBTC: 3500,
+          volume30dBTC: 15000,
+          totalVolumeBTC: 50000,
+          holderCount: 50,
+          circulatingSupply: "5000000000",
+          priceChange24hPercent: 5.5,
+          priceChange7dPercent: 10.0,
+          priceChange30dPercent: 25.0,
+          primaryExchange: "BitMart",
+          exchangeSources: ["BitMart", "OKX"],
+          dataQualityScore: 95,
+          lastUpdated: new Date(),
         }];
 
-        SRC20MarketService.fetchMarketListingSummary = () =>
-          Promise.resolve(mockMarketData as any);
+        MarketDataRepository.getAllSRC20MarketData = () =>
+          Promise.resolve(mockDbMarketData as any);
 
         const result = await SRC20QueryService.fetchEnhancedSrc20Data(
           {},
@@ -1147,9 +1199,9 @@ describe(
             tick: row.tick,
           });
 
-          // Mock market service to fail
-          SRC20MarketService.fetchMarketListingSummary = () =>
-            Promise.reject(new Error("Market data error"));
+          // Mock DB query to fail
+          MarketDataRepository.getAllSRC20MarketData = () =>
+            Promise.reject(new Error("Database query error"));
 
           // Should not throw error, should return original data
           const result = await SRC20QueryService.fetchEnhancedSrc20Data(

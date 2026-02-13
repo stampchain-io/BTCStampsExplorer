@@ -1,5 +1,6 @@
 import { logger } from "$lib/utils/monitoring/logging/logger.ts";
 import { LOG_NAMESPACES } from "$lib/constants/loggingConstants.ts";
+import { serverConfig } from "$server/config/config.ts";
 import type { Context } from "$types/ui.d.ts";
 import { parse as parseYaml } from "@std/yaml";
 import Ajv from "npm:ajv@8.17.1";
@@ -44,7 +45,7 @@ class OpenAPIValidator {
     
     // Always enable validation - this adds robustness to our API
     // Can be disabled in specific environments if needed (e.g., performance testing)
-    this.enabled = Deno.env.get("OPENAPI_VALIDATION_DISABLED") !== "true";
+    this.enabled = !serverConfig.OPENAPI_VALIDATION_DISABLED;
   }
 
   /**
@@ -396,7 +397,7 @@ export async function openapiValidatorMiddleware(ctx: Context, next: Next) {
         });
 
         // In development, add validation errors to response headers
-        if (Deno.env.get("DENO_ENV") === "development") {
+        if (serverConfig.IS_DEVELOPMENT) {
           ctx.response.headers.set(
             "X-Schema-Validation-Error",
             JSON.stringify(validation.errors)

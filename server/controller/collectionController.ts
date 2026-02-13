@@ -2,7 +2,7 @@
 import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
 import { CollectionService } from "$server/services/core/collectionService.ts";
 import { StampService } from "$server/services/stampService.ts";
-import type {CollectionQueryParams, PaginatedCollectionResponseBody, CollectionRow} from "$server/types/collection.d.ts";
+import type {CollectionQueryParams, PaginatedCollectionResponseBody, CollectionRow, CollectionWithCreators} from "$server/types/collection.d.ts";
 import type { Collection } from "$types/api.d.ts";
 
 export class CollectionController {
@@ -138,20 +138,9 @@ export class CollectionController {
             img: collectionRow.img,
             first_stamp_image: firstStampImage,
             stamp_images: stamps,
-            // Convert marketData from CollectionMarketData to the expected format
+            // Pass through market data from collection_market_data table
             ...(collectionRow.marketData && {
-              marketData: {
-                minFloorPriceBTC: collectionRow.marketData.minFloorPriceBTC,
-                maxFloorPriceBTC: collectionRow.marketData.maxFloorPriceBTC,
-                avgFloorPriceBTC: collectionRow.marketData.avgFloorPriceBTC,
-                medianFloorPriceBTC: collectionRow.marketData.medianFloorPriceBTC,
-                totalVolume24hBTC: collectionRow.marketData.totalVolume24hBTC,
-                stampsWithPricesCount: collectionRow.marketData.stampsWithPricesCount,
-                minHolderCount: collectionRow.marketData.minHolderCount,
-                maxHolderCount: collectionRow.marketData.maxHolderCount,
-                totalVolumeBTC: collectionRow.marketData.totalVolume24hBTC, // Use 24h volume as total
-                marketCapBTC: null, // Not available in CollectionMarketData
-              }
+              marketData: collectionRow.marketData,
             }),
           };
 
@@ -180,6 +169,22 @@ export class CollectionController {
       return await CollectionService.getCollectionNames(params);
     } catch (error) {
       console.error("Error in CollectionController.getCollectionNames:", error);
+      throw error;
+    }
+  }
+
+  static async getCollectionById(
+    collectionId: string,
+    options: {
+      includeMarketData?: boolean;
+      stampLimit?: number;
+      stampPage?: number;
+    } = {},
+  ): Promise<CollectionWithCreators | null> {
+    try {
+      return await CollectionService.getCollectionById(collectionId, options);
+    } catch (error) {
+      console.error("Error in CollectionController.getCollectionById:", error);
       throw error;
     }
   }

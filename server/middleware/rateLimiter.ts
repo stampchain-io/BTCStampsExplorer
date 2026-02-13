@@ -10,6 +10,7 @@
 
 import { FreshContext } from "$fresh/server.ts";
 import { getRedisConnection } from "$server/cache/redisClient.ts";
+import { serverConfig } from "$server/config/config.ts";
 
 interface RateLimitConfig {
   /** Time window in milliseconds */
@@ -25,28 +26,34 @@ interface RateLimitConfig {
 /**
  * Rate limit configurations by endpoint pattern
  * More specific patterns checked first
+ *
+ * Configuration based on research recommendations:
+ * - SRC-20: 120 req/min (2/sec) - Known performance bottleneck
+ * - Stamps: 180 req/min (3/sec) - Database-intensive queries
+ * - Blocks: 240 req/min (4/sec) - Lighter queries
+ * - General: 300 req/min (5/sec) - Standard API protection
  */
 const rateLimitConfigs: Record<string, RateLimitConfig> = {
   // Tier 3: SRC-20 endpoints (strictest - known pain point)
   "/api/v2/src20": {
     windowMs: 60000, // 1 minute
-    max: 60, // 60 requests = 1 req/sec
-    message: "SRC-20 API rate limit exceeded. Limit: 60 requests per minute.",
-    blockDuration: 600, // 10 minute block
+    max: 120, // 120 requests = 2 req/sec (updated from 60)
+    message: "SRC-20 API rate limit exceeded. Limit: 120 requests per minute.",
+    blockDuration: 300, // 5 minute block (updated from 10 minutes)
   },
 
   // Tier 2: Expensive endpoints (database-intensive)
   "/api/v2/stamps": {
     windowMs: 60000,
-    max: 120, // 120 requests = 2 req/sec
-    message: "Stamps API rate limit exceeded. Limit: 120 requests per minute.",
+    max: 180, // 180 requests = 3 req/sec (updated from 120)
+    message: "Stamps API rate limit exceeded. Limit: 180 requests per minute.",
     blockDuration: 300, // 5 minute block
   },
   "/api/v2/blocks": {
     windowMs: 60000,
-    max: 120,
-    message: "Blocks API rate limit exceeded. Limit: 120 requests per minute.",
-    blockDuration: 300,
+    max: 240, // 240 requests = 4 req/sec (updated from 120)
+    message: "Blocks API rate limit exceeded. Limit: 240 requests per minute.",
+    blockDuration: 180, // 3 minute block (updated from 5 minutes)
   },
 
   // Tier 1: General API protection (default for all other endpoints)
@@ -131,7 +138,7 @@ export async function rateLimitMiddleware(
 
   // Check for API key bypass
   const apiKey = req.headers.get("X-API-Key");
-  const validApiKey = Deno.env.get("PUBLIC_API_KEY");
+  const validApiKey = serverConfig.PUBLIC_API_KEY;
 
   if (apiKey && validApiKey && apiKey === validApiKey) {
     console.log("[RATE LIMITER] API key bypass granted");
@@ -231,7 +238,7 @@ export async function rateLimitMiddleware(
     const remaining = config.max - current;
 
     // Log rate limit status (debug mode)
-    const rateLimitDebug = Deno.env.get("RATE_LIMIT_DEBUG") === "true";
+    const rateLimitDebug = serverConfig.RATE_LIMIT_DEBUG;
     if (rateLimitDebug) {
       console.log(`[RATE LIMITER] IP ${clientIp} ${pathname}: ${current}/${config.max} (${remaining} remaining)`);
     }

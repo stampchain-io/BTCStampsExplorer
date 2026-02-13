@@ -368,7 +368,7 @@ describe("StampRepository Unit Tests", () => {
       assertEquals(success, true);
 
       // Verify the query was called
-      const queryHistory = mockDb.getQueryHistory();
+      const queryHistory = mockDb.getFullQueryHistory();
       const updateQuery = queryHistory.find((q) =>
         q.query.toLowerCase().includes("insert") ||
         q.query.toLowerCase().includes("update")

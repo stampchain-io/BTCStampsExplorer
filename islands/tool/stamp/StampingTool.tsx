@@ -2291,9 +2291,7 @@ function StampingToolMain({ config }: { config: Config }) {
 
       <StatusMessages
         submissionMessage={submissionMessage}
-        apiError={apiError || maraError || (feeEstimationError
-          ? `Fee estimation error: ${feeEstimationError}`
-          : "")}
+        apiError={apiError || maraError || ""}
         transactionHex={debugTransactionHex}
         {...(debugTransactionHex
           ? {

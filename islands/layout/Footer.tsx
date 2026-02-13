@@ -169,7 +169,7 @@ export function Footer() {
           </div>
           <div class="hidden tablet:flex w-full  mt-3 mb-1">
             <h6 class={`${copyright}`}>
-              <span class="italic">STAMPCHAIN</span> &copy; 2025
+              <span class="italic">STAMPCHAIN</span> &copy; 2026
             </h6>
           </div>
         </div>
@@ -276,7 +276,7 @@ export function Footer() {
                 <h6
                   class={`${copyright} hidden mobileMd:inline tablet:hidden`}
                 >
-                  <span class="italic">STAMPCHAIN</span> &copy; 2025
+                  <span class="italic">STAMPCHAIN</span> &copy; 2026
                 </h6>
               </div>
             </div>
@@ -285,7 +285,7 @@ export function Footer() {
           {/* ===== COPYRIGHT SECTION - BASE/MOBILESM ===== */}
           <div class="flex flex-row mobileMd:hidden w-full justify-center  mt-3">
             <h6 class={`${copyright}`}>
-              <span class="italic">STAMPCHAIN</span> &copy; 2025
+              <span class="italic">STAMPCHAIN</span> &copy; 2026
             </h6>
           </div>
           <div class="hidden tablet:flex mt-[18px] justify-end">

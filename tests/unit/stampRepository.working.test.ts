@@ -58,8 +58,8 @@ Deno.test("StampRepository Unit Tests", async (t) => {
 
     // Check if either query contains stampstablev4 (case insensitive)
     const hasStampTable = queryHistory.some((h) =>
-      h.query.toLowerCase().includes("stampstablev4") ||
-      h.query.toLowerCase().includes("stamptablev4")
+      h.toLowerCase().includes("stampstablev4") ||
+      h.toLowerCase().includes("stamptablev4")
     );
     assertEquals(hasStampTable, true);
 
@@ -180,7 +180,7 @@ Deno.test("StampRepository Unit Tests", async (t) => {
     const queryHistory = mockDb.getQueryHistory();
 
     const countQuery = queryHistory.find((h) =>
-      h.query.toLowerCase().includes("count(*)")
+      h.toLowerCase().includes("count(*)")
     );
     assertExists(countQuery);
 
@@ -209,7 +209,7 @@ Deno.test("StampRepository Unit Tests", async (t) => {
       // Verify the query was called
       const queryHistory = mockDb.getQueryHistory();
       const countQuery = queryHistory.find((h) =>
-        h.query.toLowerCase().includes("count(*)")
+        h.toLowerCase().includes("count(*)")
       );
       assertExists(countQuery);
 

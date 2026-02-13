@@ -27,10 +27,10 @@ export const handler: Handlers = {
         );
       }
 
-      // Validate tokenid format (should be numeric or alphanumeric)
-      if (!/^[a-zA-Z0-9-]+$/.test(tokenid)) {
+      // Validate tokenid format (base64 encoded: alphanumeric + /+=)
+      if (!/^[a-zA-Z0-9+/=-]+$/.test(tokenid)) {
         return ResponseUtil.badRequest(
-          `Invalid token ID format: ${tokenid}. Must be alphanumeric.`,
+          `Invalid token ID format: ${tokenid}. Must be valid base64.`,
         );
       }
 
@@ -50,12 +50,18 @@ export const handler: Handlers = {
         return sortValidation.error!;
       }
 
+      // Support optional expire filter: ?expire=0 (active only), ?expire=1 (expired only)
+      // No expire param returns all records (needed for availability checks)
+      const expireParam = url.searchParams.get("expire");
+      const expire = expireParam !== null ? Number(expireParam) : undefined;
+
       const queryParams = {
         deploy_hash,
         tokenid,
         limit: limit || DEFAULT_PAGINATION.limit,
         page: page || DEFAULT_PAGINATION.page,
         ...(sortValidation.data && { sort: sortValidation.data }),
+        ...(expire !== undefined && { expire }),
       };
 
       const result = await Src101Controller.handleSrc101OwnerRequest(
