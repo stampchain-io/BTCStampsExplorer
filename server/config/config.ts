@@ -57,7 +57,9 @@ type ServerConfig = {
 };
 
 const serverConfig: ServerConfig = {
-  APP_ROOT: Deno.cwd(),
+  get APP_ROOT() {
+    return Deno.cwd();
+  },
   MINTING_SERVICE_FEE_ENABLED: "0",
   MINTING_SERVICE_FEE_FIXED_SATS: "0",
 
