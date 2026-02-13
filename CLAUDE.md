@@ -412,9 +412,10 @@ curl http://localhost:8000/api/health
 
 **Bitcoin Stamps Specific**:
 - Transaction validation requires proper secp256k1 handling
-- Block height consensus critical for data integrity  
+- Block height consensus critical for data integrity
 - SRC-20 token balance calculations must be precise
 - Image protocol data requires special base64 handling
+- `client/bitcoinInit.ts` is orphaned (no imports) - not in client build graph, no crypto bundle bloat
 
 ### Troubleshooting Commands
 

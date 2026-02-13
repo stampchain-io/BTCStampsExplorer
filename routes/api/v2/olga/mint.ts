@@ -12,7 +12,6 @@ import {
   CounterpartyApiManager,
   normalizeFeeRate,
 } from "$server/services/counterpartyApiService.ts";
-import * as bitcoin from "bitcoinjs-lib"; // Keep for Psbt.fromHex
 import type {
   CreateStampIssuanceParams,
   NormalizedMintResponse,
@@ -22,6 +21,8 @@ import type {
 
 export const handler: Handlers<NormalizedMintResponse | { error: string }> = {
   async POST(req: Request, _ctx: FreshContext) {
+    // Dynamic import of bitcoinjs-lib to exclude from build-time static analysis
+    const bitcoin = await import("bitcoinjs-lib");
     let body: RawRequestBody;
     try {
       body = await req.json();
