@@ -188,43 +188,49 @@ jobs:
           exit ${TEST_EXIT_CODE:-0}
         continue-on-error: true
 
+      - name: Fix Docker file permissions
+        if: always()
+        run: |
+          # Docker containers run as root and change file ownership
+          # This prevents EACCES errors in subsequent steps
+          sudo chown -R $(id -u):$(id -g) . || true
+
       - name: Analyze Regression Results
         id: regression-analysis
         if: always()
         run: |
           echo "Running regression analysis..."
-          
-          # Install dependencies for analysis script
-          npm install
-          
-          # Run the analysis
+
+          # Run the analysis (uses only Node.js built-in modules, no npm install needed)
           node scripts/analyze-newman-regression.js || ANALYSIS_EXIT_CODE=$?
-          
-                      # Check if analysis report was created
-            if [ -f reports/newman-comprehensive/*-analysis.json ]; then
-              echo "✅ Regression analysis completed"
-              
-              # Extract summary for GitHub
-              LATEST_ANALYSIS=$(ls -t reports/newman-comprehensive/*-analysis.json | head -1)
-              if [ -f "$LATEST_ANALYSIS" ]; then
-                {
-                  echo ""
-                  echo "### Regression Analysis Summary"
-                  echo ""
-                  
-                  # Parse JSON and add to summary
-                  node -e "
-                    const fs = require('fs');
-                    const analysis = JSON.parse(fs.readFileSync('$LATEST_ANALYSIS', 'utf8'));
-                    console.log('- Breaking Changes: ' + analysis.summary.breaking);
-                    console.log('- Non-Breaking Changes: ' + analysis.summary.nonBreaking);
-                    console.log('- Performance Issues: ' + analysis.summary.performanceIssues);
-                    console.log('- Performance Improvements: ' + analysis.summary.performanceImprovements);
-                  "
-                } >> "$GITHUB_STEP_SUMMARY"
-              fi
+
+          # Check if analysis report was created
+          if ls reports/newman-comprehensive/*-analysis.json 1>/dev/null 2>&1; then
+            echo "✅ Regression analysis completed"
+
+            # Extract summary for GitHub
+            LATEST_ANALYSIS=$(ls -t reports/newman-comprehensive/*-analysis.json | head -1)
+            if [ -f "$LATEST_ANALYSIS" ]; then
+              {
+                echo ""
+                echo "### Regression Analysis Summary"
+                echo ""
+
+                # Parse JSON and add to summary
+                node -e "
+                  const fs = require('fs');
+                  const analysis = JSON.parse(fs.readFileSync('$LATEST_ANALYSIS', 'utf8'));
+                  console.log('- Breaking Changes: ' + analysis.summary.breaking);
+                  console.log('- Non-Breaking Changes: ' + analysis.summary.nonBreaking);
+                  console.log('- Performance Issues: ' + analysis.summary.performanceIssues);
+                  console.log('- Performance Improvements: ' + analysis.summary.performanceImprovements);
+                "
+              } >> "$GITHUB_STEP_SUMMARY"
             fi
-          
+          else
+            echo "⚠️ No analysis reports found — Newman may not have generated output files"
+          fi
+
           exit ${ANALYSIS_EXIT_CODE:-0}
         continue-on-error: true
 
@@ -352,18 +358,24 @@ jobs:
       - name: Check for critical issues
         if: always()
         run: |
-          # Fail the workflow if there were breaking changes
-          if [ "${{ steps.regression-analysis.outcome }}" == "failure" ]; then
-            echo "❌ Breaking changes detected in API responses"
-            exit 1
-          fi
-          
-          # Also fail if Newman tests failed
+          FAILED=false
+
+          # Check if Newman tests failed
           if [ "${{ steps.newman-test.outcome }}" == "failure" ]; then
             echo "❌ Newman API tests failed"
+            FAILED=true
+          fi
+
+          # Check if regression analysis found breaking changes
+          if [ "${{ steps.regression-analysis.outcome }}" == "failure" ]; then
+            echo "❌ Regression analysis failed (check logs for breaking changes or infrastructure errors)"
+            FAILED=true
+          fi
+
+          if [ "$FAILED" = true ]; then
             exit 1
           fi
-          
+
           echo "✅ All checks passed"
 
   pagination-validation:
