@@ -1,16 +1,16 @@
 
 import {
-    BALANCE_CACHE_DURATION,
-    BLOCKCHAIN_SYNC_CACHE_DURATION,
-    IMMUTABLE_CACHE_DURATION,
-    SRC20_BALANCE_TABLE,
-    SRC20_TABLE,
-    STAMP_TABLE
+  BALANCE_CACHE_DURATION,
+  BLOCKCHAIN_SYNC_CACHE_DURATION,
+  IMMUTABLE_CACHE_DURATION,
+  SRC20_BALANCE_TABLE,
+  SRC20_TABLE,
+  STAMP_TABLE
 } from "$constants";
-import { serverConfig } from "$server/config/config.ts";
-import type {SRC20BalanceRequestParams} from "$lib/types/src20.d.ts";
+import type { SRC20BalanceRequestParams } from "$lib/types/src20.d.ts";
 import { emojiToUnicodeEscape, unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { bigFloatToString } from "$lib/utils/ui/formatting/formatUtils.ts";
+import { serverConfig } from "$server/config/config.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
 import type { SRC20SnapshotRequestParams, SRC20TrxRequestParams } from "$types/src20.d.ts";
 import { BigFloat } from "bigfloat/mod.ts";
@@ -923,6 +923,7 @@ export class SRC20Repository {
     const sqlQuery = `
     SELECT DISTINCT
         src20.tick,
+        src20.tx_hash,
         src20.max AS max_supply,
         src20.lim AS lim,
         src20.deci AS decimals,
@@ -953,14 +954,14 @@ export class SRC20Repository {
     let queryParams: string[];
     switch (searchType) {
       case "tx_hash":
-        // WHERE (1) + ORDER BY (1)
-        queryParams = [searchParam, startSearchParam];
+        // WHERE (1 prefix) + ORDER BY (1)
+        queryParams = [startSearchParam, startSearchParam];
         break;
       case "address":
-        // WHERE (2) + ORDER BY (1)
+        // WHERE (2 prefix) + ORDER BY (1)
         queryParams = [
-          searchParam,
-          searchParam,
+          startSearchParam,
+          startSearchParam,
           startSearchParam,
         ];
         break;

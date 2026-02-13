@@ -1,4 +1,5 @@
 /*@baba-styles is not config properly*/
+import { Icon } from "$icon";
 import { closeModal, openModal, searchState } from "$islands/modal/states.ts";
 import { SearchErrorDisplay } from "$islands/modal/SearchErrorDisplay.tsx";
 import { SearchInputField } from "$islands/modal/SearchInputField.tsx";
@@ -11,7 +12,6 @@ import {
   useAutoFocus,
   useDebouncedSearch,
 } from "$lib/utils/ui/search/searchHooks.ts";
-import { textSm } from "$text";
 
 export function openSRC20Search() {
   const inputRef = {
@@ -70,10 +70,15 @@ export function openSRC20Search() {
         return;
       }
 
+      // For valid address searches, prepend a wallet link row
+      const addressRow = isValidBitcoinAddress(currentTerm.trim())
+        ? [{ _addressLink: true, address: currentTerm.trim() }]
+        : [];
+
       searchState.value = {
         ...searchState.value,
         error: "",
-        results: data.data,
+        results: [...addressRow, ...data.data],
       };
     } catch (err) {
       console.error("SRC20 Search Error:", err);
@@ -175,22 +180,49 @@ function SearchContent({
                         navigateSSRSafe(
                           `/wallet/${result.address}`,
                         )}
-                      class={`${textSm} px-7.5 py-[9px] hover:bg-color-background/60 ${transitionColors} cursor-pointer`}
+                      class={`flex items-center gap-3 px-7.5 py-2 hover:bg-color-background/60 ${transitionColors} cursor-pointer`}
                     >
-                      View SRC-20 holdings for{" "}
-                      <span class="text-color-grey-light">
-                        {result.address.slice(0, 8)}...
-                        {result.address.slice(-6)}
-                      </span>
+                      <div class="w-10 h-10 rounded bg-color-background/30 flex items-center justify-center">
+                        <Icon
+                          type="icon"
+                          name="wallet"
+                          weight="normal"
+                          size="md"
+                          color="greyLight"
+                        />
+                      </div>
+                      <div class="flex flex-col flex-1 min-w-0">
+                        <span class="text-sm font-medium text-stamp-grey-light">
+                          VIEW WALLET
+                        </span>
+                        <span class="text-xs text-stamp-grey truncate">
+                          {result.address}
+                        </span>
+                      </div>
                     </li>
                   )
                   : (
                     <li
                       key={result.tick}
                       onClick={() => handleResultClick(result.tick)}
-                      class={`${textSm} px-7.5 py-[9px] hover:bg-color-background/60 ${transitionColors} cursor-pointer`}
+                      class={`flex items-center gap-3 px-7.5 py-2 hover:bg-color-background/60 ${transitionColors} cursor-pointer`}
                     >
-                      {result.tick}
+                      <img
+                        src={result.tx_hash
+                          ? `/stamps/${result.tx_hash}.svg`
+                          : "/img/placeholder/broken.png"}
+                        alt={result.tick}
+                        class="w-10 h-10 rounded object-cover"
+                      />
+                      <div class="flex flex-col flex-1">
+                        <span class="text-sm font-medium text-color-grey-light">
+                          {result.tick}
+                        </span>
+                        <span class="text-xs text-color-grey">
+                          {result.progress ? `${result.progress}% minted` : ""}
+                          {result.holders ? ` · ${result.holders} holders` : ""}
+                        </span>
+                      </div>
                     </li>
                   ),
             )}
