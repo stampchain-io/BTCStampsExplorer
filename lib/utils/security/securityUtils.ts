@@ -1,4 +1,5 @@
 import { create, Header, Payload, verify } from "djwt/mod.ts";
+import { serverConfig } from "$server/config/config.ts";
 
 let SECRET_KEY: string | undefined;
 
@@ -9,7 +10,7 @@ function getSecretKey(): string {
   }
 
   const key = typeof Deno !== "undefined"
-    ? Deno.env.get("CSRF_SECRET_KEY")
+    ? serverConfig.CSRF_SECRET_KEY
     : undefined;
   if (!key) {
     throw new Error("CSRF_SECRET_KEY is not set in the server configuration");

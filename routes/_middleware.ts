@@ -1,5 +1,6 @@
 import { FreshContext } from "$fresh/server.ts";
 import { WebResponseUtil } from "$utils/api/responses/webResponseUtil.ts";
+import { serverConfig } from "$server/config/config.ts";
 
 // Route configuration constants
 const ROUTE_CONFIG = {
@@ -38,11 +39,9 @@ interface ResponseHeaders {
 }
 
 function getBaseUrl(req: Request): string {
-  const env = Deno.env.get("DENO_ENV");
-
   // Development mode
-  if (env === "development") {
-    return Deno.env.get("DEV_BASE_URL") || "https://stampchain.io";
+  if (serverConfig.IS_DEVELOPMENT) {
+    return serverConfig.DEV_BASE_URL;
   }
 
   // Production mode - ECS-aware base URL detection
@@ -58,9 +57,8 @@ function getBaseUrl(req: Request): string {
   }
 
   // Fallback to explicit production URL if available
-  const prodUrl = Deno.env.get("PROD_BASE_URL");
-  if (prodUrl) {
-    return prodUrl;
+  if (serverConfig.PROD_BASE_URL) {
+    return serverConfig.PROD_BASE_URL;
   }
 
   // Final fallback to request origin

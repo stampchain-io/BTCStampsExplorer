@@ -7,13 +7,14 @@
 
 import { createDatabaseCircuitBreaker, type CircuitBreaker } from "$/server/utils/circuitBreaker.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
+import { serverConfig } from "$server/config/config.ts";
 
 class CircuitBreakerDatabaseManager {
   private circuitBreaker: CircuitBreaker;
   private isDevelopment: boolean;
 
   constructor() {
-    this.isDevelopment = Deno.env.get("DENO_ENV") === "development";
+    this.isDevelopment = serverConfig.IS_DEVELOPMENT;
     this.circuitBreaker = createDatabaseCircuitBreaker('DatabaseOperations', this.isDevelopment);
   }
 

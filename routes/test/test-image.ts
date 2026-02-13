@@ -45,7 +45,7 @@ export const handler: Handlers = {
       "827374352ddea0191a7e597753aae1a7bec66318f94e9d8587ed9fa6f8cffe61";
 
     // Get the DENO_ENV value
-    const denoEnv = Deno.env.get("DENO_ENV") || "unknown";
+    const denoEnv = serverConfig.DENO_ENV;
 
     // Log the environment
     logger.debug("system", {

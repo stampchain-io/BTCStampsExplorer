@@ -5,6 +5,7 @@
  */
 
 import puppeteer from "puppeteer";
+import { serverConfig } from "$server/config/config.ts";
 
 export interface LocalRenderOptions {
   width?: number;
@@ -33,7 +34,7 @@ export interface RenderResult {
 export function isLocalRenderingAvailable(): boolean {
   try {
     const executablePath = typeof Deno !== "undefined"
-      ? Deno.env.get("PUPPETEER_EXECUTABLE_PATH")
+      ? serverConfig.PUPPETEER_EXECUTABLE_PATH
       : undefined;
 
     if (executablePath) {
@@ -167,7 +168,7 @@ export async function renderHtmlLocal(
   let browser;
   try {
     const executablePath = typeof Deno !== "undefined"
-      ? Deno.env.get("PUPPETEER_EXECUTABLE_PATH")
+      ? serverConfig.PUPPETEER_EXECUTABLE_PATH
       : undefined;
 
     if (!executablePath) {
@@ -267,7 +268,7 @@ export async function renderHtmlLocal(
     if (typeof Deno !== "undefined") {
       console.error(
         `[LocalRenderer] Chrome path:`,
-        Deno.env.get("PUPPETEER_EXECUTABLE_PATH"),
+        serverConfig.PUPPETEER_EXECUTABLE_PATH,
       );
     }
 

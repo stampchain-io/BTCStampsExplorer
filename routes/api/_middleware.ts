@@ -7,6 +7,7 @@ import {
 } from "$server/middleware/openapiValidator.ts";
 import { transformResponseForVersion } from "$server/middleware/schemaTransformer.ts";
 import { rateLimitMiddleware } from "$server/middleware/rateLimiter.ts";
+import { serverConfig } from "$server/config/config.ts";
 
 /**
  * API-specific middleware
@@ -29,7 +30,7 @@ export async function handler(
     ctx.state.request = req;
 
     // Apply request validation first (if enabled)
-    if (Deno.env.get("OPENAPI_VALIDATION_DISABLED") !== "true") {
+    if (!serverConfig.OPENAPI_VALIDATION_DISABLED) {
       // Create a context wrapper for the request validator
       const requestValidationContext = {
         request: req,
@@ -152,7 +153,7 @@ export async function handler(
     // Apply OpenAPI validation middleware after version transformation
     // This ensures we validate the final response structure
     // Validation is always on unless explicitly disabled
-    if (Deno.env.get("OPENAPI_VALIDATION_DISABLED") !== "true") {
+    if (!serverConfig.OPENAPI_VALIDATION_DISABLED) {
       // Create a context wrapper for the OpenAPI validator
       const validationContext = {
         request: req,

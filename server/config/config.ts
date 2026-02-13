@@ -34,12 +34,25 @@ type ServerConfig = {
   readonly CF_ACCESS_CLIENT_SECRET?: string;
   // Development & debugging
   readonly DEV_BASE_URL: string;
+  readonly PROD_BASE_URL: string | undefined;
   readonly DEBUG_SQL: boolean;
   readonly USE_CRYPTO_STUBS: boolean;
   // Middleware
   readonly PUBLIC_API_KEY?: string;
   readonly RATE_LIMIT_DEBUG: boolean;
   readonly OPENAPI_VALIDATION_DISABLED: boolean;
+  // Database & Caching
+  readonly REDIS_TIMEOUT: string;
+  readonly SKIP_REDIS_TLS: boolean;
+  readonly REDIS_DEBUG: boolean;
+  // Worker & Cloudflare
+  readonly CONNECTION_POOL_RESET_TOKEN?: string;
+  readonly CF_PREVIEW_WORKER_URL?: string;
+  readonly CF_PREVIEW_WORKER_SECRET?: string;
+  // Rendering
+  readonly PUPPETEER_EXECUTABLE_PATH?: string;
+  // Server Role
+  readonly DENO_ROLE?: string;
   [key: string]: string | boolean | undefined;
 };
 
@@ -127,6 +140,9 @@ const serverConfig: ServerConfig = {
   get DEV_BASE_URL() {
     return Deno.env.get("DEV_BASE_URL") || "https://stampchain.io";
   },
+  get PROD_BASE_URL() {
+    return Deno.env.get("PROD_BASE_URL") || "";
+  },
   get DEBUG_SQL() {
     return Deno.env.get("DEBUG_SQL") === "true";
   },
@@ -142,6 +158,34 @@ const serverConfig: ServerConfig = {
   },
   get OPENAPI_VALIDATION_DISABLED() {
     return Deno.env.get("OPENAPI_VALIDATION_DISABLED") === "true";
+  },
+  // Database & Caching
+  get REDIS_TIMEOUT() {
+    return Deno.env.get("REDIS_TIMEOUT") || "15000";
+  },
+  get SKIP_REDIS_TLS() {
+    return Deno.env.get("SKIP_REDIS_TLS") === "true";
+  },
+  get REDIS_DEBUG() {
+    return Deno.env.get("REDIS_DEBUG") === "true";
+  },
+  // Worker & Cloudflare
+  get CONNECTION_POOL_RESET_TOKEN() {
+    return Deno.env.get("CONNECTION_POOL_RESET_TOKEN") || "";
+  },
+  get CF_PREVIEW_WORKER_URL() {
+    return Deno.env.get("CF_PREVIEW_WORKER_URL") || "";
+  },
+  get CF_PREVIEW_WORKER_SECRET() {
+    return Deno.env.get("CF_PREVIEW_WORKER_SECRET") || "";
+  },
+  // Rendering
+  get PUPPETEER_EXECUTABLE_PATH() {
+    return Deno.env.get("PUPPETEER_EXECUTABLE_PATH") || "";
+  },
+  // Server Role
+  get DENO_ROLE() {
+    return Deno.env.get("DENO_ROLE") || "";
   },
 };
 

@@ -8,6 +8,7 @@ import { WebResponseUtil } from "$lib/utils/api/responses/webResponseUtil.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { RouteType } from "$server/services/infrastructure/cacheService.ts";
 import type { State } from "$types/ui.d.ts";
+import { serverConfig } from "$server/config/config.ts";
 // import { getBaseUrl } from "$lib/utils/ui/media/imageUtils.ts";
 // import { getMimeType } from "$lib/utils/ui/media/imageUtils.ts";
 
@@ -22,7 +23,7 @@ export async function handleContentRequest(
     identifier,
     path: ctx.url.pathname,
     baseUrl: ctx.state.baseUrl,
-    env: Deno.env.get("DENO_ENV"),
+    env: serverConfig.DENO_ENV,
   });
 
   const isFullPath = identifier.includes(".") || ctx.url.pathname.includes(".");
