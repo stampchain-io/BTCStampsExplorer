@@ -63,7 +63,8 @@ import manifest from "$/fresh.gen.ts";
 import "$/globals.d.ts";
 import build from "$fresh/dev.ts";
 import { start } from "$fresh/server.ts";
-const DENO_ROLE = Deno.env.get("DENO_ROLE");
+import { serverConfig } from "$server/config/config.ts";
+const DENO_ROLE = serverConfig.DENO_ROLE;
 // Lazy import DB and background services only when not running in pure web mode
 let dbManager:
   | typeof import("$server/database/databaseManager.ts").dbManager
@@ -174,7 +175,7 @@ if (import.meta.main) {
     Deno.exit(0);
   } else {
     console.log(`[MAIN] Entering runtime block at ${Date.now()}`);
-    if (Deno.env.get("DENO_ENV") !== "development") {}
+    if (!serverConfig.IS_DEVELOPMENT) {}
     await start(manifest, config);
     console.log(`[MAIN] Server started at ${Date.now()}`);
   }

@@ -1,6 +1,7 @@
 import { Handlers } from "$fresh/server.ts";
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { InternalRouteGuard } from "$server/services/security/internalRouteGuard.ts";
+import { serverConfig } from "$server/config/config.ts";
 
 export const handler: Handlers = {
   GET(req) {
@@ -9,7 +10,7 @@ export const handler: Handlers = {
     if (accessError) return accessError;
 
     // Only available in development
-    if (Deno.env.get("DENO_ENV") !== "development") {
+    if (!serverConfig.IS_DEVELOPMENT) {
       return ApiResponseUtil.badRequest(
         "Debug endpoint only available in development",
       );

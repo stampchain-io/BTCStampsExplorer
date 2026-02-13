@@ -19,6 +19,7 @@ import {
   isStampTransactionOptions,
 } from "$lib/utils/api/adapters/toolEndpointAdapters.ts";
 import { logger } from "$lib/utils/logger.ts";
+import { serverConfig } from "$server/config/config.ts";
 
 /**
  * Cache entry for tool endpoint responses
@@ -57,14 +58,12 @@ export class ToolEndpointFeeEstimator {
     this.config = {
       cacheTTL: config.cacheTTL ?? 30_000, // 30 seconds default
       requestTimeout: config.requestTimeout ??
-        ((typeof Deno !== "undefined" &&
-            Deno?.env?.get("DENO_ENV") !== "production")
+        ((typeof Deno !== "undefined" && !serverConfig.IS_PRODUCTION)
           ? 20_000
           : 10_000), // longer in dev
       maxCacheSize: config.maxCacheSize ?? 100,
       enableLogging: config.enableLogging ??
-        (typeof Deno !== "undefined" &&
-          Deno.env.get("DENO_ENV") === "development"),
+        (typeof Deno !== "undefined" && serverConfig.IS_DEVELOPMENT),
     };
   }
 

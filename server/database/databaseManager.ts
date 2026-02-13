@@ -3,6 +3,7 @@ import "$/server/config/env.ts";
 import { getDatabaseConfig, logDatabaseConfig, validateDatabaseConfig, type DatabaseConfig as DBPoolConfig } from "$/server/config/database.config.ts";
 import { bigIntReviver, bigIntSerializer } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { crypto } from "@std/crypto";
+import { serverConfig } from "$server/config/config.ts";
 import {
     ConsoleHandler,
     FileHandler,
@@ -700,9 +701,9 @@ class DatabaseManager {
 
   private async connectToRedis(): Promise<void> {
     // Safely obtain and parse environment variables with defaults
-    const REDIS_CONNECTION_TIMEOUT = parseInt(Deno.env.get("REDIS_TIMEOUT") || "15000");
+    const REDIS_CONNECTION_TIMEOUT = parseInt(serverConfig.REDIS_TIMEOUT);
     // Note: REDIS_DEBUG not used in this function - only used in cache operations
-    const SKIP_REDIS_TLS = Deno.env.get("SKIP_REDIS_TLS") === "true"; // Only skip if explicitly set to true
+    const SKIP_REDIS_TLS = serverConfig.SKIP_REDIS_TLS; // Only skip if explicitly set to true
     // Note: REDIS_MAX_RETRIES not used in this function - class uses this.#MAX_RETRIES from DB_MAX_RETRIES
 
     // Early console log to ensure we can see Redis connection attempts in logs
@@ -988,7 +989,7 @@ class DatabaseManager {
       }
     }
 
-    const REDIS_DEBUG = Deno.env.get("REDIS_DEBUG") === "true";
+    const REDIS_DEBUG = serverConfig.REDIS_DEBUG;
 
     if (!this.#redisAvailable) {
       if (this.#redisAvailableAtStartup) {
@@ -1041,7 +1042,7 @@ class DatabaseManager {
   }
 
   private async getCachedData(key: string): Promise<unknown | null> {
-    const REDIS_DEBUG = Deno.env.get("REDIS_DEBUG") === "true";
+    const REDIS_DEBUG = serverConfig.REDIS_DEBUG;
 
     if (this.#redisClient) {
       try {
@@ -1100,7 +1101,7 @@ class DatabaseManager {
     data: unknown,
     expiry: number | "never",
   ): Promise<void> {
-    const REDIS_DEBUG = Deno.env.get("REDIS_DEBUG") === "true";
+    const REDIS_DEBUG = serverConfig.REDIS_DEBUG;
 
     // Only use in-memory cache as fallback when Redis is unavailable
     if (!this.#redisAvailable || !this.#redisClient) {

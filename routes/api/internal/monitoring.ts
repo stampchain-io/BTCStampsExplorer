@@ -7,6 +7,7 @@ import { objectPoolManager } from "$server/services/memory/objectPool.ts";
 import { memoryMonitor } from "$server/services/monitoring/memoryMonitorService.ts";
 import process from "node:process";
 import { InternalRouteGuard } from "$server/services/security/internalRouteGuard.ts";
+import { serverConfig } from "$server/config/config.ts";
 
 export async function handler(req: Request): Promise<Response> {
   // Security check for internal endpoints
@@ -60,7 +61,7 @@ function handleHealthAction(): Promise<Response> {
       memory: process.memoryUsage(),
       pid: process.pid,
       node_version: process.version,
-      environment: Deno.env.get("DENO_ENV") || "development",
+      environment: serverConfig.DENO_ENV,
     };
 
     return Promise.resolve(ApiResponseUtil.success(health));

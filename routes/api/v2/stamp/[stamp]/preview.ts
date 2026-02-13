@@ -42,9 +42,11 @@ async function ensureWasmInitialized() {
   }
 }
 
+import { serverConfig } from "$server/config/config.ts";
+
 // Cloudflare Browser Rendering Worker configuration
-const CF_WORKER_URL = Deno.env.get("CF_PREVIEW_WORKER_URL");
-const CF_WORKER_SECRET = Deno.env.get("CF_PREVIEW_WORKER_SECRET");
+const CF_WORKER_URL = serverConfig.CF_PREVIEW_WORKER_URL;
+const CF_WORKER_SECRET = serverConfig.CF_PREVIEW_WORKER_SECRET;
 const isCfWorkerConfigured = !!(CF_WORKER_URL && CF_WORKER_SECRET);
 console.log("[Preview] CF Worker configured:", isCfWorkerConfigured);
 
