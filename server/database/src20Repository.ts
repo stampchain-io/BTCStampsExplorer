@@ -896,6 +896,15 @@ export class SRC20Repository {
       return [];
     }
 
+    // Address search: query balance table (tokens held by address)
+    if (searchType === "address") {
+      return this.searchSrc20ByHolder(query);
+    }
+
+    const baseUrl = serverConfig.IS_DEVELOPMENT
+      ? serverConfig.DEV_BASE_URL
+      : "https://stampchain.io";
+
     const mintableFilter = mintableOnly
       ? "AND COALESCE(smd.progress_percentage, 0) < 100"
       : "";
@@ -905,10 +914,6 @@ export class SRC20Repository {
     switch (searchType) {
       case "tx_hash":
         whereClause = "src20.tx_hash LIKE ?";
-        break;
-      case "address":
-        whereClause =
-          "(src20.creator LIKE ? OR src20.destination LIKE ?)";
         break;
       case "ticker":
       default:
@@ -957,14 +962,6 @@ export class SRC20Repository {
         // WHERE (1 prefix) + ORDER BY (1)
         queryParams = [startSearchParam, startSearchParam];
         break;
-      case "address":
-        // WHERE (2 prefix) + ORDER BY (1)
-        queryParams = [
-          startSearchParam,
-          startSearchParam,
-          startSearchParam,
-        ];
-        break;
       case "ticker":
       default:
         // WHERE (4) + ORDER BY (1)
@@ -990,6 +987,10 @@ export class SRC20Repository {
         (result as any).rows.map((row: any) => {
           return {
             tick: row.tick,
+            tx_hash: row.tx_hash,
+            deploy_img: row.tx_hash
+              ? `${baseUrl}/stamps/${row.tx_hash}.svg`
+              : null,
             progress: parseFloat(row.progress || "0"),
             total_minted: row.total_minted,
             max_supply: row.max_supply,
@@ -1000,6 +1001,64 @@ export class SRC20Repository {
       );
     } catch (error) {
       console.error("Error executing SRC20 search query:", error);
+      return [];
+    }
+  }
+
+  /**
+   * Search for SRC-20 tokens held by an address (from balance table).
+   * Returns tokens the address owns, not tokens the address deployed.
+   */
+  private static async searchSrc20ByHolder(addressQuery: string) {
+    const startSearchParam = `${addressQuery}%`;
+    const baseUrl = serverConfig.IS_DEVELOPMENT
+      ? serverConfig.DEV_BASE_URL
+      : "https://stampchain.io";
+
+    const sqlQuery = `
+    SELECT DISTINCT
+        bal.tick,
+        deploy.tx_hash,
+        deploy.max AS max_supply,
+        COALESCE(smd.total_mints, 0) AS total_mints,
+        COALESCE(smd.total_minted, 0) AS total_minted,
+        COALESCE(smd.progress_percentage, 0) AS progress,
+        COALESCE(smd.holder_count, 0) AS holders
+    FROM ${SRC20_BALANCE_TABLE} bal
+    JOIN ${SRC20_TABLE} deploy
+        ON deploy.tick = bal.tick AND deploy.op = 'DEPLOY'
+    LEFT JOIN src20_market_data smd ON smd.tick = bal.tick
+    WHERE
+        bal.address LIKE ?
+        AND bal.amt > 0
+    ORDER BY CAST(bal.amt AS DECIMAL(38,18)) DESC
+    LIMIT 10;
+    `;
+
+    try {
+      const result = await this.db.executeQueryWithCache(
+        sqlQuery,
+        [startSearchParam],
+        BLOCKCHAIN_SYNC_CACHE_DURATION,
+      );
+
+      return this.convertResponseToEmoji(
+        // deno-lint-ignore no-explicit-any
+        (result as any).rows.map((row: any) => {
+          return {
+            tick: row.tick,
+            tx_hash: row.tx_hash,
+            deploy_img: row.tx_hash ? `${baseUrl}/stamps/${row.tx_hash}.svg` : null,
+            progress: parseFloat(row.progress || "0"),
+            total_minted: row.total_minted,
+            max_supply: row.max_supply,
+            holders: row.holders,
+            total_mints: row.total_mints,
+          };
+        }).filter(Boolean),
+      );
+    } catch (error) {
+      console.error("Error executing SRC20 holder search:", error);
       return [];
     }
   }

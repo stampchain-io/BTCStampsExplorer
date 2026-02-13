@@ -1,8 +1,8 @@
 /*@baba-styles is not config properly*/
 import { Icon } from "$icon";
-import { closeModal, openModal, searchState } from "$islands/modal/states.ts";
 import { SearchErrorDisplay } from "$islands/modal/SearchErrorDisplay.tsx";
 import { SearchInputField } from "$islands/modal/SearchInputField.tsx";
+import { closeModal, openModal, searchState } from "$islands/modal/states.ts";
 import { ModalSearchBase, transitionColors } from "$layout";
 import { generateSearchErrorMessage } from "$lib/utils/data/search/searchInputClassifier.ts";
 import { isValidBitcoinAddress } from "$lib/utils/typeGuards.ts";
@@ -208,9 +208,8 @@ function SearchContent({
                       class={`flex items-center gap-3 px-7.5 py-2 hover:bg-color-background/60 ${transitionColors} cursor-pointer`}
                     >
                       <img
-                        src={result.tx_hash
-                          ? `/stamps/${result.tx_hash}.svg`
-                          : "/img/placeholder/broken.png"}
+                        src={result.deploy_img ||
+                          "/img/placeholder/broken.png"}
                         alt={result.tick}
                         class="w-10 h-10 rounded object-cover"
                       />

@@ -167,11 +167,11 @@ export function generateSearchErrorMessage(
     switch (type) {
       case "tx_hash":
         header = "NO TOKEN FOUND";
-        detail = "No token deploy found for this transaction";
+        detail = "No token found for this transaction";
         break;
       case "address":
         header = "NO TOKENS FOUND";
-        detail = "No token deploy found for this address";
+        detail = "No tokens found for this address";
         break;
       case "ticker":
         header = "NO TOKEN FOUND";
