@@ -143,7 +143,9 @@ function SearchContent({
 }) {
   // Shared hooks
   useAutoFocus(inputRef, autoFocus);
-  useDebouncedSearch(searchState.value.term, onSearch);
+  useDebouncedSearch(searchState.value.term, onSearch, 300, () => {
+    searchState.value = { ...searchState.value, error: "", results: [] };
+  });
 
   const handleResultClick = (tick: string) => {
     navigateSSRSafe(`/src20/${tick}`);
@@ -181,7 +183,7 @@ function SearchContent({
                         navigateSSRSafe(
                           `/wallet/${result.address}`,
                         )}
-                      class={`flex items-center gap-3 px-7.5 py-2 hover:bg-color-background/60 ${transitionColors} cursor-pointer`}
+                      class={`flex items-center gap-5 px-7.5 py-1.5 hover:bg-color-background/60 ${transitionColors} cursor-pointer`}
                     >
                       <div class="w-10 h-10 rounded bg-color-background/30 flex items-center justify-center">
                         <Icon
@@ -206,7 +208,7 @@ function SearchContent({
                     <li
                       key={result.tick}
                       onClick={() => handleResultClick(result.tick)}
-                      class={`flex items-center gap-3 px-7.5 py-2 hover:bg-color-background/60 ${transitionColors} cursor-pointer`}
+                      class={`flex items-center gap-5 px-7.5 py-1.5 hover:bg-color-background/60 ${transitionColors} cursor-pointer`}
                     >
                       <img
                         src={result.tx_hash

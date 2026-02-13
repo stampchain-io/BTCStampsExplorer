@@ -58,9 +58,13 @@ export function useDebouncedSearch(
   searchTerm: string,
   onSearch: () => void,
   delay = 300,
+  onClear?: () => void,
 ): void {
   useEffect(() => {
-    if (!searchTerm.trim()) return;
+    if (!searchTerm.trim()) {
+      onClear?.();
+      return;
+    }
 
     const timer = setTimeout(() => {
       onSearch();

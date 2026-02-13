@@ -40,14 +40,12 @@ export const handler: Handlers = {
 
         case "stamp_number": {
           const num = parseInt(sanitized);
-          const prefixStart = num * 10;
-          const prefixEnd = prefixStart + 9;
-          const ids: number[] = [num];
-          for (let i = prefixStart; i <= prefixEnd; i++) {
-            ids.push(i);
-          }
-          queryOptions.identifier = ids;
-          queryOptions.limit = ids.length;
+          queryOptions.stampNumberPrefix = {
+            exact: num,
+            rangeStart: num * 10,
+            rangeEnd: num * 10 + 9,
+          };
+          queryOptions.limit = 11;
           queryOptions.sortBy = "ASC";
           break;
         }
