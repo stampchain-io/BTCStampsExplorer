@@ -53,6 +53,7 @@ export function StampCard({
   const [loading, setLoading] = useState<boolean>(true);
   const [src, setSrc] = useState<string | undefined>(undefined);
   const [validatedContent, setValidatedContent] = useState<VNode | null>(null);
+  const [isValidating, setIsValidating] = useState<boolean>(false);
 
   // Audio-related state (always declared to avoid conditional hooks)
   const [isPlaying, setIsPlaying] = useState(false);
@@ -88,9 +89,7 @@ export function StampCard({
     setLoading(true);
     const res = getStampImageSrc(stamp as StampRow);
     setSrc(res);
-    // Don't setLoading(false) here — wait for the browser to confirm
-    // the image loaded (via onLoad) or SVG validation to complete.
-    // This prevents the "no-image" placeholder flash.
+    setLoading(false);
   };
 
   /* ===== EFFECTS ===== */
@@ -99,23 +98,11 @@ export function StampCard({
     fetchStampImage();
   }, []);
 
-  // For non-SVG content types that don't need async validation,
-  // clear loading once src is resolved (audio, text, library, html
-  // all render immediately without an <img> load cycle).
-  useEffect(() => {
-    if (!src || stamp.stamp_mimetype === "image/svg+xml") return;
-    const mimetype = stamp.stamp_mimetype || "";
-    const needsImgLoad = mimetype.startsWith("image/") ||
-      mimetype === "text/html";
-    if (!needsImgLoad) {
-      setLoading(false);
-    }
-  }, [src, stamp.stamp_mimetype]);
-
   // Validate SVG content when source changes
   useEffect(() => {
     const validateContent = async () => {
       if (stamp.stamp_mimetype === "image/svg+xml" && src) {
+        setIsValidating(true);
         try {
           // Fetch the SVG content
           const response = await fetch(src);
@@ -172,6 +159,8 @@ export function StampCard({
             </div>,
           );
           setLoading(false);
+        } finally {
+          setIsValidating(false);
         }
       }
     };
@@ -182,7 +171,7 @@ export function StampCard({
 
   /* ===== RENDER HELPERS ===== */
   const renderContent = () => {
-    if (loading) {
+    if (loading && !src) {
       return (
         <div class="stamp-container">
           <LoadingIcon />
@@ -276,6 +265,15 @@ export function StampCard({
     }
 
     if (stamp.stamp_mimetype === "image/svg+xml") {
+      // Show spinner while SVG content is being validated (prevents
+      // "no-image" placeholder flash during async validation)
+      if (isValidating) {
+        return (
+          <div class="stamp-container">
+            <LoadingIcon />
+          </div>
+        );
+      }
       return validatedContent || (
         <div class="stamp-container">
           <div class="relative z-10 aspect-square">
