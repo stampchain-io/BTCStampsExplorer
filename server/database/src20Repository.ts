@@ -1,16 +1,16 @@
 
 import {
-    BALANCE_CACHE_DURATION,
-    BLOCKCHAIN_SYNC_CACHE_DURATION,
-    IMMUTABLE_CACHE_DURATION,
-    SRC20_BALANCE_TABLE,
-    SRC20_TABLE,
-    STAMP_TABLE
+  BALANCE_CACHE_DURATION,
+  BLOCKCHAIN_SYNC_CACHE_DURATION,
+  IMMUTABLE_CACHE_DURATION,
+  SRC20_BALANCE_TABLE,
+  SRC20_TABLE,
+  STAMP_TABLE
 } from "$constants";
-import { serverConfig } from "$server/config/config.ts";
-import type {SRC20BalanceRequestParams} from "$lib/types/src20.d.ts";
+import type { SRC20BalanceRequestParams } from "$lib/types/src20.d.ts";
 import { emojiToUnicodeEscape, unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { bigFloatToString } from "$lib/utils/ui/formatting/formatUtils.ts";
+import { serverConfig } from "$server/config/config.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
 import type { SRC20SnapshotRequestParams, SRC20TrxRequestParams } from "$types/src20.d.ts";
 import { BigFloat } from "bigfloat/mod.ts";
@@ -896,6 +896,11 @@ export class SRC20Repository {
       return [];
     }
 
+    // Address search: query balance table (tokens held by address)
+    if (searchType === "address") {
+      return this.searchSrc20ByHolder(query);
+    }
+
     const mintableFilter = mintableOnly
       ? "AND COALESCE(smd.progress_percentage, 0) < 100"
       : "";
@@ -905,10 +910,6 @@ export class SRC20Repository {
     switch (searchType) {
       case "tx_hash":
         whereClause = "src20.tx_hash LIKE ?";
-        break;
-      case "address":
-        whereClause =
-          "(src20.creator LIKE ? OR src20.destination LIKE ?)";
         break;
       case "ticker":
       default:
@@ -923,6 +924,7 @@ export class SRC20Repository {
     const sqlQuery = `
     SELECT DISTINCT
         src20.tick,
+        src20.tx_hash,
         src20.max AS max_supply,
         src20.lim AS lim,
         src20.deci AS decimals,
@@ -953,16 +955,8 @@ export class SRC20Repository {
     let queryParams: string[];
     switch (searchType) {
       case "tx_hash":
-        // WHERE (1) + ORDER BY (1)
-        queryParams = [searchParam, startSearchParam];
-        break;
-      case "address":
-        // WHERE (2) + ORDER BY (1)
-        queryParams = [
-          searchParam,
-          searchParam,
-          startSearchParam,
-        ];
+        // WHERE (1 prefix) + ORDER BY (1)
+        queryParams = [startSearchParam, startSearchParam];
         break;
       case "ticker":
       default:
@@ -989,6 +983,7 @@ export class SRC20Repository {
         (result as any).rows.map((row: any) => {
           return {
             tick: row.tick,
+            tx_hash: row.tx_hash,
             progress: parseFloat(row.progress || "0"),
             total_minted: row.total_minted,
             max_supply: row.max_supply,
@@ -999,6 +994,60 @@ export class SRC20Repository {
       );
     } catch (error) {
       console.error("Error executing SRC20 search query:", error);
+      return [];
+    }
+  }
+
+  /**
+   * Search for SRC-20 tokens held by an address (from balance table).
+   * Returns tokens the address owns, not tokens the address deployed.
+   */
+  private static async searchSrc20ByHolder(addressQuery: string) {
+    const startSearchParam = `${addressQuery}%`;
+
+    const sqlQuery = `
+    SELECT DISTINCT
+        bal.tick,
+        deploy.tx_hash,
+        deploy.max AS max_supply,
+        COALESCE(smd.total_mints, 0) AS total_mints,
+        COALESCE(smd.total_minted, 0) AS total_minted,
+        COALESCE(smd.progress_percentage, 0) AS progress,
+        COALESCE(smd.holder_count, 0) AS holders
+    FROM ${SRC20_BALANCE_TABLE} bal
+    JOIN ${SRC20_TABLE} deploy
+        ON deploy.tick = bal.tick AND deploy.op = 'DEPLOY'
+    LEFT JOIN src20_market_data smd ON smd.tick = bal.tick
+    WHERE
+        bal.address LIKE ?
+        AND bal.amt > 0
+    ORDER BY CAST(bal.amt AS DECIMAL(38,18)) DESC
+    LIMIT 10;
+    `;
+
+    try {
+      const result = await this.db.executeQueryWithCache(
+        sqlQuery,
+        [startSearchParam],
+        BLOCKCHAIN_SYNC_CACHE_DURATION,
+      );
+
+      return this.convertResponseToEmoji(
+        // deno-lint-ignore no-explicit-any
+        (result as any).rows.map((row: any) => {
+          return {
+            tick: row.tick,
+            tx_hash: row.tx_hash,
+            progress: parseFloat(row.progress || "0"),
+            total_minted: row.total_minted,
+            max_supply: row.max_supply,
+            holders: row.holders,
+            total_mints: row.total_mints,
+          };
+        }).filter(Boolean),
+      );
+    } catch (error) {
+      console.error("Error executing SRC20 holder search:", error);
       return [];
     }
   }

@@ -23,20 +23,36 @@ export const handler: Handlers = {
         page: 1,
         skipTotalCount: true,
         cacheDuration: 60,
+        excludeSrc20: true,
       };
 
       switch (type) {
         case "cpid":
-        case "tx_hash":
-          queryOptions.identifier = sanitized;
+          queryOptions.cpidPrefix = sanitized;
+          queryOptions.limit = 11;
+          queryOptions.sortBy = "ASC";
           break;
 
-        case "stamp_number":
-          queryOptions.identifier = parseInt(sanitized);
+        case "tx_hash":
+          queryOptions.txHashPrefix = sanitized;
+          queryOptions.limit = 11;
           break;
+
+        case "stamp_number": {
+          const num = parseInt(sanitized);
+          queryOptions.stampNumberPrefix = {
+            exact: num,
+            rangeStart: num * 10,
+            rangeEnd: num * 10 + 9,
+          };
+          queryOptions.limit = 11;
+          queryOptions.sortBy = "ASC";
+          break;
+        }
 
         case "address":
-          queryOptions.creatorAddress = sanitized;
+          queryOptions.addressPrefix = sanitized;
+          queryOptions.limit = 11;
           queryOptions.sortBy = "DESC";
           break;
 

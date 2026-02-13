@@ -4,10 +4,9 @@ import { SearchErrorDisplay } from "$islands/modal/SearchErrorDisplay.tsx";
 import { SearchInputField } from "$islands/modal/SearchInputField.tsx";
 import { closeModal, openModal, searchState } from "$islands/modal/states.ts";
 import { ModalSearchBase, transitionColors } from "$layout";
-import {
-  classifySearchInput,
-  generateSearchErrorMessage,
-} from "$lib/utils/data/search/searchInputClassifier.ts";
+import { generateSearchErrorMessage } from "$lib/utils/data/search/searchInputClassifier.ts";
+import { isValidBitcoinAddress } from "$lib/utils/typeGuards.ts";
+import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
 import {
   navigateSSRSafe,
   scheduleFocus,
@@ -32,6 +31,7 @@ export function openStampSearch() {
       return;
     }
 
+    searchState.value = { ...searchState.value, isLoading: true };
     try {
       const response = await fetch(
         `/api/v2/stamps/search?q=${encodeURIComponent(currentTerm.trim())}`,
@@ -46,14 +46,12 @@ export function openStampSearch() {
       if (
         !response.ok || !data.data || data.data.length === 0
       ) {
-        // For addresses with no results, show a link to
-        // the wallet page instead of an error
-        const { type } = classifySearchInput(
-          currentTerm.trim(),
-        );
-        if (type === "address") {
+        // For valid addresses with no results, show a
+        // link to the wallet page instead of an error
+        if (isValidBitcoinAddress(currentTerm.trim())) {
           searchState.value = {
             ...searchState.value,
+            isLoading: false,
             error: "",
             results: [
               {
@@ -66,6 +64,7 @@ export function openStampSearch() {
         }
         searchState.value = {
           ...searchState.value,
+          isLoading: false,
           error: generateSearchErrorMessage(
             currentTerm.trim(),
             "stamp",
@@ -75,16 +74,14 @@ export function openStampSearch() {
         return;
       }
 
-      // For address searches, prepend a wallet link row
-      const { type: inputType } = classifySearchInput(
-        currentTerm.trim(),
-      );
-      const addressRow = inputType === "address"
+      // For valid address searches, prepend a wallet link row
+      const addressRow = isValidBitcoinAddress(currentTerm.trim())
         ? [{ _addressLink: true, address: currentTerm.trim() }]
         : [];
 
       searchState.value = {
         ...searchState.value,
+        isLoading: false,
         error: "",
         results: [...addressRow, ...data.data],
       };
@@ -92,6 +89,7 @@ export function openStampSearch() {
       console.error("Stamp Search Error:", err);
       searchState.value = {
         ...searchState.value,
+        isLoading: false,
         error: "AN ERROR OCCURRED\nPlease try again later",
         results: [],
       };
@@ -99,7 +97,7 @@ export function openStampSearch() {
   };
 
   // Open modal
-  searchState.value = { term: "", error: "", results: [] };
+  searchState.value = { term: "", error: "", isLoading: false, results: [] };
   const modalContent = (
     <ModalSearchBase
       title="Search Stamps"
@@ -150,7 +148,9 @@ function SearchContent({
 }) {
   // Shared hooks
   useAutoFocus(inputRef, autoFocus);
-  useDebouncedSearch(searchState.value.term, onSearch);
+  useDebouncedSearch(searchState.value.term, onSearch, 300, () => {
+    searchState.value = { ...searchState.value, error: "", results: [] };
+  });
 
   const handleResultClick = (stamp: number | string) => {
     navigateSSRSafe(`/stamp/${stamp}`);
@@ -171,6 +171,7 @@ function SearchContent({
         autoFocus={autoFocus}
         hasResults={rawResults.length > 0}
         hasError={!!error}
+        isLoading={searchState.value.isLoading}
       />
 
       {error
@@ -188,7 +189,7 @@ function SearchContent({
                         navigateSSRSafe(
                           `/wallet/${result.address}`,
                         )}
-                      class={`flex items-center gap-3 px-7.5 py-2 hover:bg-color-background/60 ${transitionColors} cursor-pointer`}
+                      class={`flex items-center gap-5 px-7.5 py-1.5 hover:bg-color-background/60 ${transitionColors} cursor-pointer`}
                     >
                       <div class="w-10 h-10 rounded bg-color-background/30 flex items-center justify-center">
                         <Icon
@@ -204,7 +205,9 @@ function SearchContent({
                           VIEW WALLET
                         </span>
                         <span class="text-xs text-stamp-grey truncate">
-                          {result.address}
+                          {result.address?.startsWith("bc1p")
+                            ? abbreviateAddress(result.address, 20)
+                            : result.address}
                         </span>
                       </div>
                     </li>
@@ -213,7 +216,7 @@ function SearchContent({
                     <li
                       key={result.stamp}
                       onClick={() => handleResultClick(result.stamp)}
-                      class={`flex items-center gap-3 px-7.5 py-2 hover:bg-color-background/60 ${transitionColors} cursor-pointer`}
+                      class={`flex items-center gap-5 px-7.5 py-1.5 hover:bg-color-background/60 ${transitionColors} cursor-pointer`}
                     >
                       <img
                         src={result.preview}
@@ -225,7 +228,9 @@ function SearchContent({
                           #{result.stamp} - {result.cpid}
                         </span>
                         <span class="text-xs text-color-grey truncate">
-                          {result.creator}
+                          {result.creator?.startsWith("bc1p")
+                            ? abbreviateAddress(result.creator, 20)
+                            : result.creator}
                         </span>
                       </div>
                     </li>

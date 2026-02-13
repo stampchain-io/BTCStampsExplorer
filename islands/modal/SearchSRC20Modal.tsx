@@ -1,19 +1,19 @@
 /*@baba-styles is not config properly*/
-import { closeModal, openModal, searchState } from "$islands/modal/states.ts";
+import { Icon } from "$icon";
 import { SearchErrorDisplay } from "$islands/modal/SearchErrorDisplay.tsx";
 import { SearchInputField } from "$islands/modal/SearchInputField.tsx";
+import { closeModal, openModal, searchState } from "$islands/modal/states.ts";
 import { ModalSearchBase, transitionColors } from "$layout";
-import {
-  classifySearchInput,
-  generateSearchErrorMessage,
-} from "$lib/utils/data/search/searchInputClassifier.ts";
+import { generateSearchErrorMessage } from "$lib/utils/data/search/searchInputClassifier.ts";
+import { isValidBitcoinAddress } from "$lib/utils/typeGuards.ts";
+import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
+import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
 import {
   navigateSSRSafe,
   scheduleFocus,
   useAutoFocus,
   useDebouncedSearch,
 } from "$lib/utils/ui/search/searchHooks.ts";
-import { textSm } from "$text";
 
 export function openSRC20Search() {
   const inputRef = {
@@ -32,6 +32,7 @@ export function openSRC20Search() {
       return;
     }
 
+    searchState.value = { ...searchState.value, isLoading: true };
     try {
       const response = await fetch(
         `/api/v2/src20/search?q=${encodeURIComponent(currentTerm.trim())}`,
@@ -46,14 +47,12 @@ export function openSRC20Search() {
       if (
         !response.ok || !data.data || data.data.length === 0
       ) {
-        // For addresses with no results, show a link to
-        // the wallet page instead of an error
-        const { type } = classifySearchInput(
-          currentTerm.trim(),
-        );
-        if (type === "address") {
+        // For valid addresses with no results, show a
+        // link to the wallet page instead of an error
+        if (isValidBitcoinAddress(currentTerm.trim())) {
           searchState.value = {
             ...searchState.value,
+            isLoading: false,
             error: "",
             results: [
               {
@@ -66,6 +65,7 @@ export function openSRC20Search() {
         }
         searchState.value = {
           ...searchState.value,
+          isLoading: false,
           error: generateSearchErrorMessage(
             currentTerm.trim(),
             "src20",
@@ -75,15 +75,22 @@ export function openSRC20Search() {
         return;
       }
 
+      // For valid address searches, prepend a wallet link row
+      const addressRow = isValidBitcoinAddress(currentTerm.trim())
+        ? [{ _addressLink: true, address: currentTerm.trim() }]
+        : [];
+
       searchState.value = {
         ...searchState.value,
+        isLoading: false,
         error: "",
-        results: data.data,
+        results: [...addressRow, ...data.data],
       };
     } catch (err) {
       console.error("SRC20 Search Error:", err);
       searchState.value = {
         ...searchState.value,
+        isLoading: false,
         error: "AN ERROR OCCURRED\nPlease try again later",
         results: [],
       };
@@ -91,7 +98,7 @@ export function openSRC20Search() {
   };
 
   // Open modal
-  searchState.value = { term: "", error: "", results: [] };
+  searchState.value = { term: "", error: "", isLoading: false, results: [] };
   const modalContent = (
     <ModalSearchBase
       title="Search SRC-20 Tokens"
@@ -142,7 +149,9 @@ function SearchContent({
 }) {
   // Shared hooks
   useAutoFocus(inputRef, autoFocus);
-  useDebouncedSearch(searchState.value.term, onSearch);
+  useDebouncedSearch(searchState.value.term, onSearch, 300, () => {
+    searchState.value = { ...searchState.value, error: "", results: [] };
+  });
 
   const handleResultClick = (tick: string) => {
     navigateSSRSafe(`/src20/${tick}`);
@@ -163,6 +172,7 @@ function SearchContent({
         autoFocus={autoFocus}
         hasResults={rawResults.length > 0}
         hasError={!!error}
+        isLoading={searchState.value.isLoading}
       />
 
       {error
@@ -180,22 +190,51 @@ function SearchContent({
                         navigateSSRSafe(
                           `/wallet/${result.address}`,
                         )}
-                      class={`${textSm} px-7.5 py-[9px] hover:bg-color-background/60 ${transitionColors} cursor-pointer`}
+                      class={`flex items-center gap-5 px-7.5 py-1.5 hover:bg-color-background/60 ${transitionColors} cursor-pointer`}
                     >
-                      View SRC-20 holdings for{" "}
-                      <span class="text-color-grey-light">
-                        {result.address.slice(0, 8)}...
-                        {result.address.slice(-6)}
-                      </span>
+                      <div class="w-10 h-10 rounded bg-color-background/30 flex items-center justify-center">
+                        <Icon
+                          type="icon"
+                          name="wallet"
+                          weight="normal"
+                          size="md"
+                          color="greyLight"
+                        />
+                      </div>
+                      <div class="flex flex-col flex-1 min-w-0">
+                        <span class="text-sm font-medium text-stamp-grey-light">
+                          VIEW WALLET
+                        </span>
+                        <span class="text-xs text-stamp-grey truncate">
+                          {result.address?.startsWith("bc1p")
+                            ? abbreviateAddress(result.address, 20)
+                            : result.address}
+                        </span>
+                      </div>
                     </li>
                   )
                   : (
                     <li
                       key={result.tick}
                       onClick={() => handleResultClick(result.tick)}
-                      class={`${textSm} px-7.5 py-[9px] hover:bg-color-background/60 ${transitionColors} cursor-pointer`}
+                      class={`flex items-center gap-5 px-7.5 py-1.5 hover:bg-color-background/60 ${transitionColors} cursor-pointer`}
                     >
-                      {result.tick}
+                      <img
+                        src={result.tx_hash
+                          ? constructStampUrl(result.tx_hash)
+                          : "/img/placeholder/broken.png"}
+                        alt={result.tick}
+                        class="w-10 h-10 rounded object-cover"
+                      />
+                      <div class="flex flex-col flex-1">
+                        <span class="text-sm font-medium text-color-grey-light uppercase">
+                          {result.tick}
+                        </span>
+                        <span class="text-xs text-color-grey uppercase">
+                          {result.progress ? `${result.progress}% Minted` : ""}
+                          {result.holders ? ` · ${result.holders} Holders` : ""}
+                        </span>
+                      </div>
                     </li>
                   ),
             )}

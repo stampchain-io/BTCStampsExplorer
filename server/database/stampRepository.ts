@@ -721,6 +721,11 @@ export class StampRepository {
     fileSizeMin?: string;
     fileSizeMax?: string;
     search?: string;
+    cpidPrefix?: string;
+    addressPrefix?: string;
+    txHashPrefix?: string;
+    stampNumberPrefix?: { exact: number; rangeStart: number; rangeEnd: number };
+    excludeSrc20?: boolean;
   }) {
     // Extract all parameters including both filter types
     const {
@@ -768,6 +773,11 @@ export class StampRepository {
       fileSizeMin: _fileSizeMin,
       fileSizeMax: _fileSizeMax,
       search,
+      cpidPrefix,
+      addressPrefix,
+      txHashPrefix,
+      stampNumberPrefix,
+      excludeSrc20 = false,
     } = options;
 
     // Combine both filter types for processing
@@ -822,6 +832,41 @@ export class StampRepository {
         whereConditions,
         queryParams,
       );
+    }
+
+    // CPID prefix search (cpid column only)
+    if (cpidPrefix) {
+      whereConditions.push("st.cpid LIKE ?");
+      queryParams.push(`${cpidPrefix}%`);
+    }
+
+    // Stamp number prefix search (exact match OR range of next magnitude)
+    if (stampNumberPrefix) {
+      whereConditions.push(
+        "(st.stamp = ? OR (st.stamp >= ? AND st.stamp <= ?))",
+      );
+      queryParams.push(
+        stampNumberPrefix.exact,
+        stampNumberPrefix.rangeStart,
+        stampNumberPrefix.rangeEnd,
+      );
+    }
+
+    // Address prefix search (creator column only)
+    if (addressPrefix) {
+      whereConditions.push("st.creator LIKE ?");
+      queryParams.push(`${addressPrefix}%`);
+    }
+
+    // Tx hash prefix search (tx_hash column only)
+    if (txHashPrefix) {
+      whereConditions.push("st.tx_hash LIKE ?");
+      queryParams.push(`${txHashPrefix}%`);
+    }
+
+    // Exclude SRC-20 entries (used by stamp search endpoint)
+    if (excludeSrc20) {
+      whereConditions.push("st.ident != 'SRC-20'");
     }
 
     // Use either the object or direct parameters

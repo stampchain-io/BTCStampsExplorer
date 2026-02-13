@@ -48,7 +48,7 @@ export function classifySearchInput(
     return { type: "unknown", sanitized: "", original: input };
   }
 
-  // CPID: starts with 'A' or 'a' followed by 5+ digits
+  // CPID: starts with 'A' or 'a', followed by 5+ digits (real numeric asset IDs)
   if (/^[Aa]\d{5,}$/.test(trimmed)) {
     return {
       type: "cpid",
@@ -66,6 +66,21 @@ export function classifySearchInput(
     };
   }
 
+  // Partial Bitcoin address (prefix detection for autosuggest)
+  // - bc1q / bc1p prefix: unambiguous, classify immediately
+  // - 1 or 3 + at least one Base58 letter (pure digits = stamp#)
+  if (
+    /^bc1[qp]/i.test(trimmed) ||
+    (/^[13]/.test(trimmed) && trimmed.length >= 2 &&
+      /[a-km-zA-HJ-NP-Z]/.test(trimmed))
+  ) {
+    return {
+      type: "address",
+      sanitized: trimmed,
+      original: trimmed,
+    };
+  }
+
   // Transaction hash: exactly 64 hex characters
   // Use a local copy to avoid type-predicate narrowing to `never`
   const txCandidate: string = trimmed;
@@ -77,7 +92,17 @@ export function classifySearchInput(
     };
   }
 
-  // Bitcoin address
+  // Partial transaction hash: 8+ hex characters (not yet 64)
+  // At 8+ hex chars, very unlikely to be a ticker or other type
+  if (/^[a-fA-F0-9]{8,}$/.test(trimmed) && trimmed.length < 64) {
+    return {
+      type: "tx_hash",
+      sanitized: trimmed.toLowerCase(),
+      original: trimmed,
+    };
+  }
+
+  // Bitcoin address (full validation fallback)
   const addrCandidate: string = trimmed;
   if (isValidBitcoinAddress(addrCandidate)) {
     return {
