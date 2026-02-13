@@ -315,40 +315,51 @@ jobs:
       - name: Verify deployment (circuit breaker check)
         if: needs.pre-check.outputs.dry_run != 'true'
         run: |
-          # Check that the new task definition is the PRIMARY deployment
-          ROLLOUT_STATE=$(aws ecs describe-services \
-            --cluster "${{ env.ECS_CLUSTER }}" \
-            --services "${{ env.ECS_SERVICE }}" \
-            --query 'services[0].deployments[?status==`PRIMARY`].rolloutState | [0]' \
-            --output text)
+          # Poll rollout state — it may lag behind services-stable
+          echo "Waiting for deployment rollout to complete..."
+          MAX_ATTEMPTS=20
+          ATTEMPT=0
 
-          RUNNING=$(aws ecs describe-services \
-            --cluster "${{ env.ECS_CLUSTER }}" \
-            --services "${{ env.ECS_SERVICE }}" \
-            --query 'services[0].runningCount' \
-            --output text)
+          while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
+            ATTEMPT=$((ATTEMPT + 1))
 
-          DESIRED=$(aws ecs describe-services \
-            --cluster "${{ env.ECS_CLUSTER }}" \
-            --services "${{ env.ECS_SERVICE }}" \
-            --query 'services[0].desiredCount' \
-            --output text)
+            ROLLOUT_STATE=$(aws ecs describe-services \
+              --cluster "${{ env.ECS_CLUSTER }}" \
+              --services "${{ env.ECS_SERVICE }}" \
+              --query 'services[0].deployments[?status==`PRIMARY`].rolloutState | [0]' \
+              --output text)
 
-          echo "Rollout state: ${ROLLOUT_STATE}"
-          echo "Running: ${RUNNING}/${DESIRED}"
+            RUNNING=$(aws ecs describe-services \
+              --cluster "${{ env.ECS_CLUSTER }}" \
+              --services "${{ env.ECS_SERVICE }}" \
+              --query 'services[0].runningCount' \
+              --output text)
 
-          if [ "$ROLLOUT_STATE" != "COMPLETED" ]; then
-            echo "::error::Deployment rollout state is ${ROLLOUT_STATE} (expected COMPLETED)"
-            echo "Circuit breaker may have triggered a rollback"
-            exit 1
-          fi
+            DESIRED=$(aws ecs describe-services \
+              --cluster "${{ env.ECS_CLUSTER }}" \
+              --services "${{ env.ECS_SERVICE }}" \
+              --query 'services[0].desiredCount' \
+              --output text)
 
-          if [ "$RUNNING" -lt "$DESIRED" ]; then
-            echo "::error::Not all tasks running (${RUNNING}/${DESIRED})"
-            exit 1
-          fi
+            echo "[${ATTEMPT}/${MAX_ATTEMPTS}] Rollout: ${ROLLOUT_STATE} | Running: ${RUNNING}/${DESIRED}"
 
-          echo "Deployment verified successfully"
+            if [ "$ROLLOUT_STATE" = "COMPLETED" ]; then
+              if [ "$RUNNING" -ge "$DESIRED" ]; then
+                echo "Deployment verified successfully"
+                exit 0
+              fi
+            fi
+
+            if [ "$ROLLOUT_STATE" = "FAILED" ]; then
+              echo "::error::Deployment rollout FAILED — circuit breaker triggered rollback"
+              exit 1
+            fi
+
+            sleep 15
+          done
+
+          echo "::error::Deployment rollout did not complete within $((MAX_ATTEMPTS * 15))s (state: ${ROLLOUT_STATE})"
+          exit 1
 
       - name: Dry run summary
         if: needs.pre-check.outputs.dry_run == 'true'
