@@ -258,24 +258,6 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
           }
         />
 
-        {/* ===== 🚨 FEE ESTIMATION ERROR HANDLING ===== */}
-        {feeEstimationError && (
-          <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-2xl">
-            <div className="flex items-center justify-between">
-              <span className="text-red-700 text-sm">
-                Fee estimation error: {feeEstimationError}
-              </span>
-              <button
-                type="button"
-                onClick={clearError}
-                className="text-red-500 hover:text-red-700 text-sm font-medium"
-              >
-                Clear
-              </button>
-            </div>
-          </div>
-        )}
-
         {/* ===== STATUS MESSAGES ===== */}
         <StatusMessages
           submissionMessage={submissionMessage}

@@ -597,20 +597,6 @@ export function SRC20DeployTool(
           }
         />
 
-        {/* Error Display */}
-        {feeEstimationError && (
-          <div className="mt-2 text-red-500 text-sm">
-            Fee estimation error: {feeEstimationError}
-            <button
-              type="button"
-              onClick={clearError}
-              className="ml-2 text-red-400 hover:text-red-300"
-            >
-              ✕
-            </button>
-          </div>
-        )}
-
         <StatusMessages
           submissionMessage={submissionMessage}
           apiError={apiError}
