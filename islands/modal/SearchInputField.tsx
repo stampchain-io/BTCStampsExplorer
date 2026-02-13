@@ -18,7 +18,7 @@ interface SearchInputFieldProps {
   autoFocus?: boolean;
   hasResults: boolean;
   hasError: boolean;
-  isLoading?: boolean;
+  isLoading?: boolean | undefined;
 }
 
 export function SearchInputField({
