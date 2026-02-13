@@ -235,10 +235,14 @@ export function useTransactionConstructionService(options: EstimationOptions) {
         }
       } catch (error) {
         if (!isCancelled) {
-          dispatch({
-            type: "ESTIMATION_ERROR",
-            error: error instanceof Error ? error.message : String(error),
-          });
+          const errorMsg = error instanceof Error
+            ? error.message
+            : String(error);
+          // Don't surface wallet-connection errors — missing wallet is an
+          // expected state on tool pages, not an error worth displaying.
+          if (!/wallet.*connect|connect.*required/i.test(errorMsg)) {
+            dispatch({ type: "ESTIMATION_ERROR", error: errorMsg });
+          }
         }
       }
     };
@@ -326,7 +330,11 @@ export function useTransactionConstructionService(options: EstimationOptions) {
         const errorMessage = error instanceof Error
           ? error.message
           : String(error);
-        dispatch({ type: "ESTIMATION_ERROR", error: errorMessage });
+        // Don't surface wallet-connection errors — missing wallet is an
+        // expected state on tool pages, not an error worth displaying.
+        if (!/wallet.*connect|connect.*required/i.test(errorMessage)) {
+          dispatch({ type: "ESTIMATION_ERROR", error: errorMessage });
+        }
         throw error;
       }
     },
