@@ -27,10 +27,10 @@ export const handler: Handlers = {
         );
       }
 
-      // Validate tokenid format (should be numeric or alphanumeric)
-      if (!/^[a-zA-Z0-9-]+$/.test(tokenid)) {
+      // Validate tokenid format (base64 encoded: alphanumeric + /+=)
+      if (!/^[a-zA-Z0-9+/=-]+$/.test(tokenid)) {
         return ResponseUtil.badRequest(
-          `Invalid token ID format: ${tokenid}. Must be alphanumeric.`,
+          `Invalid token ID format: ${tokenid}. Must be valid base64.`,
         );
       }
 
