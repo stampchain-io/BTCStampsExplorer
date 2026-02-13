@@ -68,8 +68,10 @@ const WalletStampCardComponent = (
   /* ===== HANDLERS ===== */
   const handleImageError = (e: Event) => {
     if (e.currentTarget instanceof HTMLImageElement) {
-      // Set src to empty string to trigger placeholder rendering
-      e.currentTarget.src = "";
+      // Use transparent pixel data URI to prevent infinite error loops
+      // (setting src="" resolves to the page URL, which isn't an image → re-triggers error)
+      e.currentTarget.src =
+        "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
       e.currentTarget.alt = "Content not available";
     }
   };
@@ -88,7 +90,9 @@ const WalletStampCardComponent = (
     // Use centralized image URL logic
     const imageSrc = getStampImageSrc(stamp);
     setSrc(imageSrc);
-    setLoading(false);
+    // Don't setLoading(false) here — wait for the browser to confirm
+    // the image loaded (via onLoad) or SVG validation to complete.
+    // This prevents the "no-image" placeholder flash.
   };
 
   /* ===== EFFECTS ===== */
@@ -96,6 +100,18 @@ const WalletStampCardComponent = (
   useEffect(() => {
     fetchStampImage();
   }, []);
+
+  // For non-SVG content types that don't need an <img> load cycle,
+  // clear loading once src is resolved (audio, text, library, html/iframe
+  // all render immediately without waiting for browser image download).
+  useEffect(() => {
+    if (!src || stamp.stamp_mimetype === "image/svg+xml") return;
+    const mimetype = stamp.stamp_mimetype || "";
+    const needsImgLoad = mimetype.startsWith("image/");
+    if (!needsImgLoad) {
+      setLoading(false);
+    }
+  }, [src, stamp.stamp_mimetype]);
 
   // Validate SVG content when source changes
   useEffect(() => {
@@ -160,6 +176,7 @@ const WalletStampCardComponent = (
                 </div>
               </div>,
             );
+            setLoading(false);
           } else {
             // No external references, use original src
             setValidatedContent(
@@ -170,6 +187,7 @@ const WalletStampCardComponent = (
                     loading="lazy"
                     alt={`Stamp No. ${stamp.stamp}`}
                     class="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
+                    onLoad={() => setLoading(false)}
                     onError={handleImageError}
                   />
                 </div>
@@ -185,6 +203,7 @@ const WalletStampCardComponent = (
               </div>
             </div>,
           );
+          setLoading(false);
         }
       }
     };
@@ -195,7 +214,7 @@ const WalletStampCardComponent = (
 
   /* ===== RENDER HELPERS ===== */
   const renderContent = () => {
-    if (loading && !src) {
+    if (loading) {
       return (
         <div class="stamp-container">
           <LoadingIcon />
@@ -320,6 +339,7 @@ const WalletStampCardComponent = (
             loading="lazy"
             alt={`Stamp No. ${stamp.stamp}`}
             class="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
+            onLoad={() => setLoading(false)}
             onError={handleImageError}
           />
         </div>

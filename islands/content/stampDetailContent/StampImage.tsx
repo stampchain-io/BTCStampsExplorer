@@ -473,7 +473,9 @@ export function StampImage(
     setLoading(true);
     const res = getStampImageSrc(stamp);
     setSrc(res ?? undefined);
-    setLoading(false);
+    // Don't setLoading(false) here — wait for the browser to confirm
+    // the image loaded (via onLoad) or SVG validation to complete.
+    // This prevents the "no-image" placeholder flash.
   };
 
   const fetchHtmlContent = async () => {
@@ -577,6 +579,7 @@ export function StampImage(
             }}
           />,
         );
+        setLoading(false);
       } else {
         // No external references, use original src
         setValidatedContent(
@@ -585,6 +588,7 @@ export function StampImage(
             loading="lazy"
             className="max-w-none object-contain rounded-2xl pixelart stamp-image h-full w-full"
             src={src}
+            onLoad={() => setLoading(false)}
             onError={handleImageError}
             alt={`Stamp No. ${stamp.stamp}`}
           />,
@@ -598,6 +602,7 @@ export function StampImage(
           loading="lazy"
           className="max-w-none object-contain rounded-2xl pixelart stamp-image h-full w-full"
           src={src}
+          onLoad={() => setLoading(false)}
           onError={handleImageError}
           alt={`Stamp No. ${stamp.stamp}`}
         />,
@@ -625,6 +630,18 @@ export function StampImage(
   useEffect(() => {
     fetchStampImage();
   }, []);
+
+  // For non-SVG content types that don't need an <img> load cycle,
+  // clear loading once src is resolved (audio, text, library, html/iframe
+  // all render immediately without waiting for browser image download).
+  useEffect(() => {
+    if (!src || stamp?.stamp_mimetype === "image/svg+xml") return;
+    const mimetype = stamp?.stamp_mimetype || "";
+    const needsImgLoad = mimetype.startsWith("image/");
+    if (!needsImgLoad) {
+      setLoading(false);
+    }
+  }, [src, stamp?.stamp_mimetype]);
 
   useEffect(() => {
     const isHtml = stamp?.stamp_mimetype === "text/html";
@@ -918,6 +935,7 @@ export function StampImage(
                           loading="lazy"
                           className="max-w-none object-contain rounded-2xl pixelart stamp-image h-full w-full"
                           src={src}
+                          onLoad={() => setLoading(false)}
                           onError={handleImageError}
                           alt="Stamp"
                         />
@@ -949,6 +967,7 @@ export function StampImage(
                         loading="lazy"
                         className="max-w-none object-contain rounded-2xl pixelart stamp-image h-full w-full"
                         src={src}
+                        onLoad={() => setLoading(false)}
                         onError={handleImageError}
                         alt="Stamp"
                       />

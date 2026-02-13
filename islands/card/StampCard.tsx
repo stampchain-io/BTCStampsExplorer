@@ -88,7 +88,9 @@ export function StampCard({
     setLoading(true);
     const res = getStampImageSrc(stamp as StampRow);
     setSrc(res);
-    setLoading(false);
+    // Don't setLoading(false) here — wait for the browser to confirm
+    // the image loaded (via onLoad) or SVG validation to complete.
+    // This prevents the "no-image" placeholder flash.
   };
 
   /* ===== EFFECTS ===== */
@@ -96,6 +98,19 @@ export function StampCard({
   useEffect(() => {
     fetchStampImage();
   }, []);
+
+  // For non-SVG content types that don't need async validation,
+  // clear loading once src is resolved (audio, text, library, html
+  // all render immediately without an <img> load cycle).
+  useEffect(() => {
+    if (!src || stamp.stamp_mimetype === "image/svg+xml") return;
+    const mimetype = stamp.stamp_mimetype || "";
+    const needsImgLoad = mimetype.startsWith("image/") ||
+      mimetype === "text/html";
+    if (!needsImgLoad) {
+      setLoading(false);
+    }
+  }, [src, stamp.stamp_mimetype]);
 
   // Validate SVG content when source changes
   useEffect(() => {
@@ -124,6 +139,7 @@ export function StampCard({
                     loading="lazy"
                     alt={`Stamp No. ${stamp.stamp}`}
                     class="max-w-none object-contain rounded-2xl pixelart stamp-image h-full w-full"
+                    onLoad={() => setLoading(false)}
                     onError={handleImageError}
                   />
                 </div>
@@ -139,6 +155,7 @@ export function StampCard({
                     loading="lazy"
                     alt={`Stamp No. ${stamp.stamp}`}
                     class="max-w-none object-contain rounded-2xl pixelart stamp-image h-full w-full"
+                    onLoad={() => setLoading(false)}
                     onError={handleImageError}
                   />
                 </div>
@@ -154,6 +171,7 @@ export function StampCard({
               </div>
             </div>,
           );
+          setLoading(false);
         }
       }
     };
@@ -164,7 +182,7 @@ export function StampCard({
 
   /* ===== RENDER HELPERS ===== */
   const renderContent = () => {
-    if (loading && !src) {
+    if (loading) {
       return (
         <div class="stamp-container">
           <LoadingIcon />
@@ -238,6 +256,7 @@ export function StampCard({
               loading="lazy"
               alt={`Stamp No. ${stamp.stamp}`}
               class="max-w-none object-contain rounded-2xl pixelart stamp-image h-full w-full"
+              onLoad={() => setLoading(false)}
               onError={handleImageError}
             />
           </div>
@@ -275,6 +294,7 @@ export function StampCard({
             loading="lazy"
             alt={`Stamp No. ${stamp.stamp}`}
             class="max-w-none object-contain rounded-2xl pixelart stamp-image h-full w-full"
+            onLoad={() => setLoading(false)}
             onError={handleImageError}
           />
         </div>
