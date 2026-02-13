@@ -1,0 +1,41 @@
+# Dependabot configuration - targets dev branch
+# PRs flow: dependabot -> dev (CI validation) -> main (production deploy)
+version: 2
+updates:
+  # GitHub Actions - keep workflows up to date
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    target-branch: "dev"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "ci"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+
+  # npm dependencies (Newman, test tooling)
+  - package-ecosystem: "npm"
+    directory: "/"
+    target-branch: "dev"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
+    commit-message:
+      prefix: "deps"
+    open-pull-requests-limit: 5
+    groups:
+      newman-testing:
+        patterns:
+          - "newman*"
+      minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
