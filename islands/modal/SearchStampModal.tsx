@@ -5,6 +5,7 @@ import { SearchInputField } from "$islands/modal/SearchInputField.tsx";
 import { closeModal, openModal, searchState } from "$islands/modal/states.ts";
 import { ModalSearchBase, transitionColors } from "$layout";
 import { generateSearchErrorMessage } from "$lib/utils/data/search/searchInputClassifier.ts";
+import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { isValidBitcoinAddress } from "$lib/utils/typeGuards.ts";
 import {
   navigateSSRSafe,
@@ -30,6 +31,7 @@ export function openStampSearch() {
       return;
     }
 
+    searchState.value = { ...searchState.value, isLoading: true };
     try {
       const response = await fetch(
         `/api/v2/stamps/search?q=${encodeURIComponent(currentTerm.trim())}`,
@@ -49,6 +51,7 @@ export function openStampSearch() {
         if (isValidBitcoinAddress(currentTerm.trim())) {
           searchState.value = {
             ...searchState.value,
+            isLoading: false,
             error: "",
             results: [
               {
@@ -61,6 +64,7 @@ export function openStampSearch() {
         }
         searchState.value = {
           ...searchState.value,
+          isLoading: false,
           error: generateSearchErrorMessage(
             currentTerm.trim(),
             "stamp",
@@ -77,6 +81,7 @@ export function openStampSearch() {
 
       searchState.value = {
         ...searchState.value,
+        isLoading: false,
         error: "",
         results: [...addressRow, ...data.data],
       };
@@ -84,6 +89,7 @@ export function openStampSearch() {
       console.error("Stamp Search Error:", err);
       searchState.value = {
         ...searchState.value,
+        isLoading: false,
         error: "AN ERROR OCCURRED\nPlease try again later",
         results: [],
       };
@@ -91,7 +97,7 @@ export function openStampSearch() {
   };
 
   // Open modal
-  searchState.value = { term: "", error: "", results: [] };
+  searchState.value = { term: "", error: "", isLoading: false, results: [] };
   const modalContent = (
     <ModalSearchBase
       title="Search Stamps"
@@ -165,6 +171,7 @@ function SearchContent({
         autoFocus={autoFocus}
         hasResults={rawResults.length > 0}
         hasError={!!error}
+        isLoading={searchState.value.isLoading}
       />
 
       {error
@@ -198,7 +205,7 @@ function SearchContent({
                           VIEW WALLET
                         </span>
                         <span class="text-xs text-stamp-grey truncate">
-                          {result.address}
+                          {abbreviateAddress(result.address, 8)}
                         </span>
                       </div>
                     </li>
@@ -219,7 +226,7 @@ function SearchContent({
                           #{result.stamp} - {result.cpid}
                         </span>
                         <span class="text-xs text-color-grey truncate">
-                          {result.creator}
+                          {abbreviateAddress(result.creator, 8)}
                         </span>
                       </div>
                     </li>

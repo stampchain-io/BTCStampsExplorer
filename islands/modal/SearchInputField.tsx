@@ -6,6 +6,7 @@
  * Used by both SearchStampModal and SearchSRC20Modal.
  */
 import { Icon } from "$icon";
+import { loaderSpinSmGrey } from "$layout";
 import type { RefObject } from "preact";
 
 interface SearchInputFieldProps {
@@ -17,6 +18,7 @@ interface SearchInputFieldProps {
   autoFocus?: boolean;
   hasResults: boolean;
   hasError: boolean;
+  isLoading?: boolean;
 }
 
 export function SearchInputField({
@@ -28,6 +30,7 @@ export function SearchInputField({
   autoFocus = false,
   hasResults,
   hasError,
+  isLoading = false,
 }: SearchInputFieldProps) {
   const handleKeyDown = (e: KeyboardEvent) => {
     if (e.key === "Enter") {
@@ -55,16 +58,18 @@ export function SearchInputField({
         class="absolute z-[3] right-6 top-[11px] cursor-pointer"
         onClick={onSearch}
       >
-        <Icon
-          type="icon"
-          name="search"
-          weight="bold"
-          size="xs"
-          color="custom"
-          className={`w-5 h-5 ${
-            hasError ? "stroke-color-grey-light" : "stroke-color-grey"
-          }`}
-        />
+        {isLoading ? <div class={loaderSpinSmGrey} /> : (
+          <Icon
+            type="icon"
+            name="search"
+            weight="bold"
+            size="xs"
+            color="custom"
+            className={`w-5 h-5 ${
+              hasError ? "stroke-color-grey-light" : "stroke-color-grey"
+            }`}
+          />
+        )}
       </div>
     </>
   );

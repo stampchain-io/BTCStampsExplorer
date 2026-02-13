@@ -5,6 +5,7 @@ import { SearchInputField } from "$islands/modal/SearchInputField.tsx";
 import { closeModal, openModal, searchState } from "$islands/modal/states.ts";
 import { ModalSearchBase, transitionColors } from "$layout";
 import { generateSearchErrorMessage } from "$lib/utils/data/search/searchInputClassifier.ts";
+import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { isValidBitcoinAddress } from "$lib/utils/typeGuards.ts";
 import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
 import {
@@ -31,6 +32,7 @@ export function openSRC20Search() {
       return;
     }
 
+    searchState.value = { ...searchState.value, isLoading: true };
     try {
       const response = await fetch(
         `/api/v2/src20/search?q=${encodeURIComponent(currentTerm.trim())}`,
@@ -50,6 +52,7 @@ export function openSRC20Search() {
         if (isValidBitcoinAddress(currentTerm.trim())) {
           searchState.value = {
             ...searchState.value,
+            isLoading: false,
             error: "",
             results: [
               {
@@ -62,6 +65,7 @@ export function openSRC20Search() {
         }
         searchState.value = {
           ...searchState.value,
+          isLoading: false,
           error: generateSearchErrorMessage(
             currentTerm.trim(),
             "src20",
@@ -78,6 +82,7 @@ export function openSRC20Search() {
 
       searchState.value = {
         ...searchState.value,
+        isLoading: false,
         error: "",
         results: [...addressRow, ...data.data],
       };
@@ -85,6 +90,7 @@ export function openSRC20Search() {
       console.error("SRC20 Search Error:", err);
       searchState.value = {
         ...searchState.value,
+        isLoading: false,
         error: "AN ERROR OCCURRED\nPlease try again later",
         results: [],
       };
@@ -92,7 +98,7 @@ export function openSRC20Search() {
   };
 
   // Open modal
-  searchState.value = { term: "", error: "", results: [] };
+  searchState.value = { term: "", error: "", isLoading: false, results: [] };
   const modalContent = (
     <ModalSearchBase
       title="Search SRC-20 Tokens"
@@ -166,6 +172,7 @@ function SearchContent({
         autoFocus={autoFocus}
         hasResults={rawResults.length > 0}
         hasError={!!error}
+        isLoading={searchState.value.isLoading}
       />
 
       {error
@@ -199,7 +206,7 @@ function SearchContent({
                           VIEW WALLET
                         </span>
                         <span class="text-xs text-stamp-grey truncate">
-                          {result.address}
+                          {abbreviateAddress(result.address, 8)}
                         </span>
                       </div>
                     </li>

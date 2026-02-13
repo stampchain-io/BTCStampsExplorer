@@ -3173,6 +3173,7 @@ export interface GlobalModalState {
 export interface SearchState {
   term: string;
   error: string;
+  isLoading?: boolean;
   // deno-lint-ignore no-explicit-any
   results?: Array<Record<string, any>>;
 }
