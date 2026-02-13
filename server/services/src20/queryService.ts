@@ -11,11 +11,13 @@ import type {
 import type {SRC20BalanceRequestParams} from "$lib/types/src20.d.ts";
 import { stripTrailingZeros } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { paginate } from "$lib/utils/data/pagination/paginationUtils.ts";
+import { classifySearchInput } from "$lib/utils/data/search/searchInputClassifier.ts";
 import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
 import { SRC20Repository } from "$server/database/src20Repository.ts";
 import { BlockService } from "$server/services/core/blockService.ts";
 import { Big } from "big";
 import { SRC20UtilityService } from "$server/services/src20/utilityService.ts";
+import { serverConfig } from "$server/config/config.ts";
 
 // Define missing types
 interface PerformanceMetrics {
@@ -348,20 +350,26 @@ export class SRC20QueryService {
     }
   }
 
-  static async searchSrc20Data(query: string) {
+  static async searchSrc20Data(query: string, mintableOnly = false) {
     try {
-      // Input validation and sanitization
-      if (!query || typeof query !== 'string') {
+      // Input validation
+      if (!query || typeof query !== "string") {
         return [];
       }
 
-      const sanitizedQuery = query.trim().replace(/[^\w-]/g, "");
-      if (!sanitizedQuery) {
+      // Classify input and apply type-appropriate sanitization
+      const { type, sanitized } = classifySearchInput(query);
+
+      if (!sanitized || type === "unknown") {
         return [];
       }
 
-      // Fetch raw data from repository
-      const rawResults = await SRC20Repository.searchValidSrc20TxFromDb(sanitizedQuery);
+      // Fetch raw data from repository with type-aware search
+      const rawResults = await SRC20Repository.searchValidSrc20TxFromDb(
+        sanitized,
+        type,
+        mintableOnly,
+      );
 
       // Early return for empty results
       if (!rawResults || rawResults.length === 0) {
@@ -375,7 +383,7 @@ export class SRC20QueryService {
       return Array.isArray(mappedData) ? mappedData : [mappedData];
     } catch (error: any) {
       console.error("Error in searchSrc20Data:", error);
-      // Return empty array on error rather than throwing to prevent API failures
+      // Return empty array on error rather than throwing
       return [];
     }
   }
@@ -1043,9 +1051,8 @@ export class SRC20QueryService {
         // 🚀 V2.3 CLEAN STRUCTURE: Create nested objects and remove root duplicates
         enriched.forEach((row: any) => {
           // Get base URL (same logic as used in other parts of the app)
-          const env = Deno.env.get("DENO_ENV");
-          const baseUrl = env === "development"
-            ? (Deno.env.get("DEV_BASE_URL") || "https://stampchain.io")
+          const baseUrl = serverConfig.IS_DEVELOPMENT
+            ? serverConfig.DEV_BASE_URL
             : "https://stampchain.io";
 
           // ✅ STAMP_URL: Use transaction hash for the actual stamp content

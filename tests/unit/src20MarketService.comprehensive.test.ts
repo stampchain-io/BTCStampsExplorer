@@ -1,536 +1,302 @@
 /**
- * Comprehensive branch coverage tests for SRC20MarketService
- * Target: Improve from 3.1% to >80% branch coverage
+ * Comprehensive tests for SRC20MarketService
+ * Tests DB-sourced implementation (no external API calls)
  */
 
 import { SRC20MarketService } from "$server/services/src20/marketService.ts";
-import { assertEquals } from "@std/assert";
-import { FetchHttpClient } from "$server/interfaces/httpClient.ts";
+import { assertEquals, assertExists } from "@std/assert";
+import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
 
-// Mock fetch globally for testing
-const originalFetch = globalThis.fetch;
-// Track active fetch promises and timers
-let activeFetches: Promise<Response>[] = [];
-let activeTimers: number[] = [];
+// Set environment to skip Redis and database connections before importing
+(globalThis as any).SKIP_REDIS_CONNECTION = true;
+(globalThis as any).SKIP_DB_CONNECTION = true;
+Deno.env.set("SKIP_REDIS_CONNECTION", "true");
+Deno.env.set("SKIP_DB_CONNECTION", "true");
+Deno.env.set("DENO_ENV", "test");
 
-// Override setTimeout to track timers
-const originalSetTimeout = globalThis.setTimeout;
-const originalClearTimeout = globalThis.clearTimeout;
+// Store original method for restoration
+const originalGetAllSRC20MarketData = MarketDataRepository.getAllSRC20MarketData;
 
-function trackTimers() {
-  globalThis.setTimeout = ((fn: any, delay: number, ...args: any[]) => {
-    const id = originalSetTimeout(fn, delay, ...args);
-    activeTimers.push(id);
-    return id;
-  }) as any;
-
-  globalThis.clearTimeout = ((id: number) => {
-    originalClearTimeout(id);
-    const index = activeTimers.indexOf(id);
-    if (index >= 0) {
-      activeTimers.splice(index, 1);
-    }
-  }) as any;
-}
-
-function restoreTimers() {
-  // Clear all active timers
-  activeTimers.forEach((id) => originalClearTimeout(id));
-  activeTimers = [];
-
-  // Restore original functions
-  globalThis.setTimeout = originalSetTimeout;
-  globalThis.clearTimeout = originalClearTimeout;
-}
-
-function mockFetch(
-  responses: { url: string; response: Response | (() => Promise<Response>) }[],
-) {
-  activeFetches = []; // Clear any previous fetches
-  globalThis.fetch = async (url: string | URL) => {
-    const urlStr = url.toString();
-    const match = responses.find((r) => urlStr.includes(r.url));
-    if (!match) {
-      throw new Error(`No mock response found for URL: ${urlStr}`);
-    }
-    const fetchPromise = typeof match.response === "function"
-      ? match.response()
-      : Promise.resolve(match.response);
-
-    activeFetches.push(fetchPromise);
-    return await fetchPromise;
+// Helper to create mock SRC20MarketData objects
+function createMockMarketData(tick: string, overrides: any = {}) {
+  return {
+    tick,
+    priceBTC: 0.001,
+    priceUSD: 100,
+    floorPriceBTC: 0.001,
+    marketCapBTC: 21000,
+    marketCapUSD: 2100000,
+    volume24hBTC: 5.5,
+    volume7dBTC: 35.0,
+    volume30dBTC: 150.0,
+    totalVolumeBTC: 500.0,
+    holderCount: 1000,
+    circulatingSupply: "21000000",
+    priceChange24hPercent: 5.5,
+    priceChange7dPercent: 10.0,
+    priceChange30dPercent: 25.0,
+    primaryExchange: "BitMart",
+    exchangeSources: ["BitMart", "OKX"],
+    dataQualityScore: 95,
+    lastUpdated: new Date(),
+    ...overrides,
   };
 }
 
-function restoreFetch() {
-  globalThis.fetch = originalFetch;
-}
-
-// Helper to create mock responses
-function createMockResponse(data: any, status = 200): Response {
-  return new Response(JSON.stringify(data), {
-    status,
-    statusText: status === 200 ? "OK" : "Error",
-  });
-}
-
-function createMockErrorResponse(
-  status = 500,
-  statusText = "Internal Server Error",
-): Response {
-  return new Response("Server Error", {
-    status,
-    statusText,
-  });
-}
-
-Deno.test("SRC20MarketService - Comprehensive Branch Coverage", async (t) => {
-  // Track timers from the start
-  trackTimers();
-
-  // Ensure cleanup after all tests
-  let cleanupNeeded = false;
-
-  const cleanup = async () => {
-    if (cleanupNeeded) {
-      // Wait for all active fetches to complete
-      if (activeFetches.length > 0) {
-        await Promise.allSettled(activeFetches);
-        activeFetches = [];
-      }
-      restoreFetch();
-      cleanupNeeded = false;
-    }
+Deno.test("SRC20MarketService - DB-Sourced Implementation Tests", async (t) => {
+  const cleanup = () => {
+    // Restore original method
+    MarketDataRepository.getAllSRC20MarketData = originalGetAllSRC20MarketData;
   };
 
   try {
-    await t.step("Success path - both APIs return valid data", async () => {
-      cleanupNeeded = true;
-      const stampScanData = [
-        {
-          tick: "PEPE",
-          floor_unit_price: 0.001,
-          volume_24h_btc: 5.5, // Fix: Use the field name the service expects
-          holder_count: 1000,
-          stamp_url: "https://example.com/stamp.jpg",
-          tx_hash: "abc123def456",
-        },
+    await t.step("Success path - DB returns valid market data", async () => {
+      const mockData = [
+        createMockMarketData("PEPE", {
+          floorPriceBTC: 0.001,
+          marketCapBTC: 21000000,
+          volume24hBTC: 5.5,
+          volume7dBTC: 35.0,
+          holderCount: 1000,
+          priceChange24hPercent: 5.5,
+        }),
       ];
 
-      const openStampData = {
-        data: [
-          {
-            name: "PEPE",
-            price: "100000", // 0.001 BTC in sats
-            totalSupply: 21000000,
-            change24: "+5.5%",
-          },
-        ],
-      };
-
-      mockFetch([
-        { url: "stampscan.xyz", response: createMockResponse(stampScanData) },
-        { url: "openstamp.io", response: createMockResponse(openStampData) },
-      ]);
+      MarketDataRepository.getAllSRC20MarketData = () => Promise.resolve(mockData);
 
       const result = await SRC20MarketService.fetchMarketListingSummary();
+
       assertEquals(result.length, 1);
       assertEquals(result[0].tick, "PEPE");
       assertEquals(result[0].floor_price_btc, 0.001);
+      assertEquals(result[0].market_cap_btc, 21000000);
+      assertEquals(result[0].volume_24h_btc, 5.5);
+      assertEquals(result[0].holder_count, 1000);
 
-      await cleanup();
+      // Verify backward compatibility fields
+      assertEquals(result[0].floor_unit_price, 0.001);
+      assertEquals(result[0].mcap, 21000000);
+      assertEquals(result[0].volume24, 5.5);
+
+      cleanup();
     });
 
-    await t.step("StampScan API error handling", async () => {
-      cleanupNeeded = true;
-      const openStampData = {
-        data: [{ name: "TEST", price: "50000", totalSupply: 1000000 }],
-      };
-
-      mockFetch([
-        { url: "stampscan.xyz", response: createMockErrorResponse() },
-        { url: "openstamp.io", response: createMockResponse(openStampData) },
-      ]);
+    await t.step("DB returns empty array - no market data", async () => {
+      MarketDataRepository.getAllSRC20MarketData = () => Promise.resolve([]);
 
       const result = await SRC20MarketService.fetchMarketListingSummary();
-      assertEquals(result.length, 1);
-      assertEquals(result[0].tick, "TEST");
 
-      await cleanup();
-    });
-
-    await t.step("OpenStamp API error handling", async () => {
-      cleanupNeeded = true;
-      const stampScanData = [
-        { tick: "ERROR_TEST", floor_unit_price: 0.002, volume_24h_btc: 1.0 },
-      ];
-
-      mockFetch([
-        { url: "stampscan.xyz", response: createMockResponse(stampScanData) },
-        { url: "openstamp.io", response: createMockErrorResponse(403) },
-      ]);
-
-      const result = await SRC20MarketService.fetchMarketListingSummary();
-      assertEquals(result.length, 1);
-      assertEquals(result[0].tick, "ERROR_TEST");
-
-      await cleanup();
-    });
-
-    await t.step("Both APIs fail gracefully", async () => {
-      cleanupNeeded = true;
-      mockFetch([
-        { url: "stampscan.xyz", response: createMockErrorResponse() },
-        { url: "openstamp.io", response: createMockErrorResponse() },
-      ]);
-
-      const result = await SRC20MarketService.fetchMarketListingSummary();
       assertEquals(result.length, 0);
+      assertEquals(Array.isArray(result), true);
 
-      await cleanup();
+      cleanup();
     });
 
-    await t.step("Missing tick field handling", async () => {
-      cleanupNeeded = true;
-      const stampScanData = [
-        { floor_unit_price: 0.001, volume_24h_btc: 5.5 }, // Missing tick
+    await t.step("DB returns multiple tokens - correct mapping", async () => {
+      const mockData = [
+        createMockMarketData("TOKEN1", {
+          floorPriceBTC: 0.002,
+          marketCapBTC: 42000000,
+          volume24hBTC: 10.0,
+          volume7dBTC: 70.0,
+          holderCount: 2000,
+          priceChange24hPercent: 10.5,
+        }),
+        createMockMarketData("TOKEN2", {
+          floorPriceBTC: 0.003,
+          marketCapBTC: 63000000,
+          volume24hBTC: 15.0,
+          volume7dBTC: 105.0,
+          holderCount: 3000,
+          priceChange24hPercent: -5.2,
+        }),
       ];
 
-      mockFetch([
-        { url: "stampscan.xyz", response: createMockResponse(stampScanData) },
-        { url: "openstamp.io", response: createMockResponse({ data: [] }) },
-      ]);
+      MarketDataRepository.getAllSRC20MarketData = () => Promise.resolve(mockData);
 
       const result = await SRC20MarketService.fetchMarketListingSummary();
-      // ✅ UPDATED: Service now creates entries with random keys for missing ticks
-      assertEquals(result.length, 1);
-      // Verify the item has a fallback key that starts with "MISSING_TICK_"
-      assertEquals(result[0].tick.startsWith("MISSING_TICK_"), true);
 
-      await cleanup();
+      assertEquals(result.length, 2);
+      assertEquals(result[0].tick, "TOKEN1");
+      assertEquals(result[1].tick, "TOKEN2");
+
+      // Verify both v2.3 and legacy fields for both tokens
+      assertEquals(result[0].floor_price_btc, 0.002);
+      assertEquals(result[0].floor_unit_price, 0.002);
+      assertEquals(result[1].floor_price_btc, 0.003);
+      assertEquals(result[1].floor_unit_price, 0.003);
+
+      cleanup();
     });
 
-    await t.step("Missing name field handling", async () => {
-      cleanupNeeded = true;
-      const openStampData = {
-        data: [{ price: "100000", totalSupply: 1000 }], // Missing name
-      };
+    await t.step("NULL floor price handling - returns null not 0", async () => {
+      const mockData = [
+        createMockMarketData("NULLPRICE", {
+          floorPriceBTC: null,
+          marketCapBTC: 0,
+          volume24hBTC: 0,
+        }),
+      ];
 
-      mockFetch([
-        { url: "stampscan.xyz", response: createMockResponse([]) },
-        { url: "openstamp.io", response: createMockResponse(openStampData) },
-      ]);
-
-      const result = await SRC20MarketService.fetchMarketListingSummary();
-      // ✅ UPDATED: Service now creates entries with random keys for missing names
-      assertEquals(result.length, 1);
-      // Verify the item has a fallback key that starts with "MISSING_NAME_"
-      assertEquals(result[0].tick.startsWith("MISSING_NAME_"), true);
-
-      await cleanup();
-    });
-
-    await t.step("Infinity price handling", async () => {
-      cleanupNeeded = true;
-      const openStampData = {
-        data: [
-          {
-            name: "INFINITY",
-            price: "Infinity",
-            totalSupply: 1000,
-            change24: "+0%",
-          },
-        ],
-      };
-
-      mockFetch([
-        { url: "stampscan.xyz", response: createMockResponse([]) },
-        { url: "openstamp.io", response: createMockResponse(openStampData) },
-      ]);
+      MarketDataRepository.getAllSRC20MarketData = () => Promise.resolve(mockData);
 
       const result = await SRC20MarketService.fetchMarketListingSummary();
+
       assertEquals(result.length, 1);
-      // ✅ UPDATED: Service returns null for floor_price_btc when price is Infinity
       assertEquals(result[0].floor_price_btc, null);
+      assertEquals(result[0].floor_unit_price, null);
+      assertEquals(result[0].market_cap_btc, 0);
+      assertEquals(result[0].mcap, 0);
 
-      await cleanup();
+      cleanup();
     });
 
-    await t.step("Market cap calculation edge cases", async () => {
-      cleanupNeeded = true;
-      const openStampData = {
-        data: [
-          {
-            name: "EDGE",
-            price: "0", // Zero price
-            totalSupply: 1000000,
-            change24: "+0%",
-          },
-        ],
-      };
+    await t.step("Zero values preserved - not converted to null", async () => {
+      const mockData = [
+        createMockMarketData("ZERO", {
+          floorPriceBTC: 0,
+          marketCapBTC: 0,
+          volume24hBTC: 0,
+          volume7dBTC: 0,
+          holderCount: 0,
+        }),
+      ];
 
-      mockFetch([
-        { url: "stampscan.xyz", response: createMockResponse([]) },
-        { url: "openstamp.io", response: createMockResponse(openStampData) },
-      ]);
+      MarketDataRepository.getAllSRC20MarketData = () => Promise.resolve(mockData);
 
       const result = await SRC20MarketService.fetchMarketListingSummary();
+
       assertEquals(result.length, 1);
-      // ✅ UPDATED: Service correctly converts "0" price to 0 (not null)
       assertEquals(result[0].floor_price_btc, 0);
       assertEquals(result[0].market_cap_btc, 0);
+      assertEquals(result[0].volume_24h_btc, 0);
+      assertEquals(result[0].holder_count, 0);
 
-      await cleanup();
+      cleanup();
     });
 
-    await t.step("Change24 parsing - valid percentage", async () => {
-      cleanupNeeded = true;
-      const openStampData = {
-        data: [
-          {
-            name: "CHANGE",
-            price: "50000",
-            totalSupply: 1000,
-            change_24h: "+15.5%",
-          },
-        ],
-      };
-
-      mockFetch([
-        { url: "stampscan.xyz", response: createMockResponse([]) },
-        { url: "openstamp.io", response: createMockResponse(openStampData) },
-      ]);
-
-      const result = await SRC20MarketService.fetchMarketListingSummary();
-      assertEquals(result.length, 1);
-      // ✅ UPDATED: Service correctly parses change_24h field and maps to change_24h
-      assertEquals(result[0].change_24h, 15.5);
-
-      await cleanup();
-    });
-
-    await t.step("Change24 parsing - invalid format", async () => {
-      cleanupNeeded = true;
-      const openStampData = {
-        data: [
-          {
-            name: "INVALID",
-            price: "50000",
-            totalSupply: 1000,
-            change_24h: "not-a-number%",
-          },
-        ],
-      };
-
-      mockFetch([
-        { url: "stampscan.xyz", response: createMockResponse([]) },
-        { url: "openstamp.io", response: createMockResponse(openStampData) },
-      ]);
-
-      const result = await SRC20MarketService.fetchMarketListingSummary();
-      assertEquals(result.length, 1);
-      // ✅ UPDATED: Service returns undefined for invalid change_24h format
-      assertEquals(result[0].change_24h, undefined);
-
-      await cleanup();
-    });
-
-    await t.step("StampScan JSON parsing error", async () => {
-      cleanupNeeded = true;
-      mockFetch([
-        {
-          url: "stampscan.xyz",
-          response: new Response("invalid json", { status: 200 }),
-        },
-        { url: "openstamp.io", response: createMockResponse({ data: [] }) },
-      ]);
-
-      const result = await SRC20MarketService.fetchMarketListingSummary();
-      assertEquals(result.length, 0);
-
-      await cleanup();
-    });
-
-    await t.step("StampScan nested data structure", async () => {
-      cleanupNeeded = true;
-      const stampScanData = {
-        data: [
-          {
-            tick: "NESTED",
-            floor_unit_price: 0.003,
-            volume_24h_btc: 2.5,
-            holder_count: 500,
-          },
-        ],
-      };
-
-      mockFetch([
-        { url: "stampscan.xyz", response: createMockResponse(stampScanData) },
-        { url: "openstamp.io", response: createMockResponse({ data: [] }) },
-      ]);
-
-      const result = await SRC20MarketService.fetchMarketListingSummary();
-      assertEquals(result.length, 1);
-      assertEquals(result[0].tick, "NESTED");
-
-      await cleanup();
-    });
-
-    await t.step("OpenStamp response as root array", async () => {
-      cleanupNeeded = true;
-      const openStampData = [
-        { name: "ROOT", price: "75000", totalSupply: 2000000 },
+    await t.step("Change percentage field mapping", async () => {
+      const mockData = [
+        createMockMarketData("CHANGE", {
+          priceChange24hPercent: 15.5,
+          priceChange7dPercent: 25.0,
+        }),
       ];
 
-      mockFetch([
-        { url: "stampscan.xyz", response: createMockResponse([]) },
-        { url: "openstamp.io", response: createMockResponse(openStampData) },
-      ]);
+      MarketDataRepository.getAllSRC20MarketData = () => Promise.resolve(mockData);
 
       const result = await SRC20MarketService.fetchMarketListingSummary();
+
       assertEquals(result.length, 1);
-      assertEquals(result[0].tick, "ROOT");
+      assertEquals(result[0].change_24h_percent, 15.5);
+      assertEquals(result[0].change_24h, 15.5); // Legacy field
+      assertEquals(result[0].change24, 15.5); // Legacy field
 
-      await cleanup();
+      cleanup();
     });
 
-    await t.step("OpenStamp unexpected data format", async () => {
-      cleanupNeeded = true;
-      const openStampData = {
-        result: "some other structure",
-        items: [],
-      };
-
-      mockFetch([
-        { url: "stampscan.xyz", response: createMockResponse([]) },
-        { url: "openstamp.io", response: createMockResponse(openStampData) },
-      ]);
-
-      const result = await SRC20MarketService.fetchMarketListingSummary();
-      assertEquals(result.length, 0);
-
-      await cleanup();
-    });
-
-    await t.step("OpenStamp network error handling", async () => {
-      cleanupNeeded = true;
-      mockFetch([
-        { url: "stampscan.xyz", response: createMockResponse([]) },
-        {
-          url: "openstamp.io",
-          response: createMockErrorResponse(500, "Error"),
-        },
-      ]);
-
-      const result = await SRC20MarketService.fetchMarketListingSummary();
-      assertEquals(result.length, 0);
-
-      await cleanup();
-    });
-
-    await t.step(
-      "Price calculation with missing OpenStamp price field",
-      async () => {
-        cleanupNeeded = true;
-        const openStampData = {
-          data: [{ name: "NOPRICE", totalSupply: 1000 }], // Missing price
-        };
-
-        mockFetch([
-          { url: "stampscan.xyz", response: createMockResponse([]) },
-          { url: "openstamp.io", response: createMockResponse(openStampData) },
-        ]);
-
-        const result = await SRC20MarketService.fetchMarketListingSummary();
-        assertEquals(result.length, 1);
-        // ✅ UPDATED: Service returns null when no valid price is available
-        assertEquals(result[0].floor_price_btc, null);
-
-        await cleanup();
-      },
-    );
-
-    await t.step("Metadata preference - StampScan over OpenStamp", async () => {
-      cleanupNeeded = true;
-      const stampScanData = [
-        {
-          tick: "PREFER",
-          floor_unit_price: 0.001,
-          volume_24h_btc: 5.5,
-          holder_count: 1500, // StampScan value
-          stamp_url: "https://stampscan.com/image.jpg",
-          tx_hash: "stampscan123",
-        },
+    await t.step("Volume 7d field mapping", async () => {
+      const mockData = [
+        createMockMarketData("VOLUME7D", {
+          volume7dBTC: 100.5,
+        }),
       ];
 
-      const openStampData = {
-        data: [
-          {
-            name: "PREFER",
-            price: "100000",
-            totalSupply: 1000000,
-            change24: "+10%",
-            // Different metadata that should be ignored
-          },
-        ],
-      };
-
-      mockFetch([
-        { url: "stampscan.xyz", response: createMockResponse(stampScanData) },
-        { url: "openstamp.io", response: createMockResponse(openStampData) },
-      ]);
+      MarketDataRepository.getAllSRC20MarketData = () => Promise.resolve(mockData);
 
       const result = await SRC20MarketService.fetchMarketListingSummary();
-      assertEquals(result.length, 1);
-      assertEquals(result[0].holder_count, 1500); // Should prefer StampScan
-      assertEquals(result[0].stamp_url, "https://stampscan.com/image.jpg");
 
-      await cleanup();
+      assertEquals(result.length, 1);
+      assertEquals(result[0].volume_7d_btc, 100.5);
+      assertEquals(result[0].sum_7d, 100.5); // Legacy field
+
+      cleanup();
     });
 
-    await t.step(
-      "Fallback to OpenStamp metadata when StampScan missing",
-      async () => {
-        cleanupNeeded = true;
-        const stampScanData = [
-          {
-            tick: "FALLBACK",
-            floor_unit_price: 0.002,
-            volume_24h_btc: 3.0,
-            // Missing holder_count and other metadata
-          },
-        ];
+    await t.step("All standardized fields present in output", async () => {
+      const mockData = [
+        createMockMarketData("COMPLETE", {
+          floorPriceBTC: 0.005,
+          marketCapBTC: 105000000,
+          volume24hBTC: 25.5,
+          priceChange24hPercent: 8.2,
+        }),
+      ];
 
-        const openStampData = {
-          data: [
-            {
-              name: "FALLBACK",
-              price: "200000",
-              totalSupply: 500000,
-              change_24h: "-2.5%",
-              holdersCount: 250, // ✅ UPDATED: Service looks for holdersCount field
-            },
-          ],
-        };
+      MarketDataRepository.getAllSRC20MarketData = () => Promise.resolve(mockData);
 
-        mockFetch([
-          { url: "stampscan.xyz", response: createMockResponse(stampScanData) },
-          { url: "openstamp.io", response: createMockResponse(openStampData) },
-        ]);
+      const result = await SRC20MarketService.fetchMarketListingSummary();
 
-        const result = await SRC20MarketService.fetchMarketListingSummary();
-        assertEquals(result.length, 1);
-        assertEquals(result[0].holder_count, 250); // Fallback to OpenStamp
-        assertEquals(result[0].stamp_url, null);
-        assertEquals(result[0].tx_hash, "");
+      assertEquals(result.length, 1);
 
-        await cleanup();
-      },
-    );
+      // v2.3 standardized fields
+      assertExists(result[0].floor_price_btc);
+      assertExists(result[0].market_cap_btc);
+      assertExists(result[0].volume_24h_btc);
+      assertExists(result[0].change_24h_percent);
+
+      // Legacy backward compatibility fields
+      assertExists(result[0].floor_unit_price);
+      assertExists(result[0].mcap);
+      assertExists(result[0].volume24);
+      assertExists(result[0].change24);
+
+      cleanup();
+    });
+
+    await t.step("Repository error handling - returns empty array", async () => {
+      MarketDataRepository.getAllSRC20MarketData = () =>
+        Promise.reject(new Error("Database error"));
+
+      const result = await SRC20MarketService.fetchMarketListingSummary();
+
+      assertEquals(result.length, 0);
+      assertEquals(Array.isArray(result), true);
+
+      cleanup();
+    });
+
+    await t.step("Undefined priceChange24hPercent - returns undefined", async () => {
+      const mockData = [
+        createMockMarketData("NOCHANGE", {
+          priceChange24hPercent: undefined,
+        }),
+      ];
+
+      MarketDataRepository.getAllSRC20MarketData = () => Promise.resolve(mockData);
+
+      const result = await SRC20MarketService.fetchMarketListingSummary();
+
+      assertEquals(result.length, 1);
+      assertEquals(result[0].change_24h_percent, undefined);
+      assertEquals(result[0].change24, undefined);
+
+      cleanup();
+    });
+
+    await t.step("Metadata fields not included in MarketListingAggregated", async () => {
+      const mockData = [
+        createMockMarketData("META", {
+          floorPriceBTC: 0.001,
+          marketCapBTC: 21000000,
+        }),
+      ];
+
+      MarketDataRepository.getAllSRC20MarketData = () => Promise.resolve(mockData);
+
+      const result = await SRC20MarketService.fetchMarketListingSummary();
+
+      assertEquals(result.length, 1);
+
+      // MarketListingAggregated includes stamp_url and tx_hash
+      // DB source doesn't have these fields, should default appropriately
+      assertExists(result[0].tick);
+      assertExists(result[0].holder_count);
+
+      cleanup();
+    });
   } finally {
     // Final cleanup in case any step failed
-    await cleanup();
-    // Restore timer functions and clear all timers
-    restoreTimers();
+    cleanup();
   }
 });

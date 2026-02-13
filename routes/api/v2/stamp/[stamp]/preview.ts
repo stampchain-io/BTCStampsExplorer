@@ -3,28 +3,31 @@
  *
  * Supported formats:
  * - SVG: Converted to PNG using resvg-wasm with proper padding
+ * - SVG with foreignObject: Rendered via Cloudflare Browser Rendering Worker
  * - PNG/JPEG/GIF/TIFF: Upscaled using ImageScript with pixel-perfect scaling
- * - HTML: Rendered using local Chrome instance
+ * - WebP/BMP/AVIF: Rendered via Cloudflare Browser Rendering Worker
+ * - HTML: Rendered via CF Worker (with cleanHtmlForRendering)
+ * - Audio: Stylized waveform visualization generated with ImageScript
+ * - Video: First frame via Cloudflare Browser Rendering Worker
  *
- * Unsupported formats (fallback to original or logo):
- * - WebP, BMP, AVIF: Not supported by ImageScript decoder
+ * Chrome-dependent content is rendered by the Cloudflare Browser Rendering
+ * Worker (env: CF_PREVIEW_WORKER_URL + CF_PREVIEW_WORKER_SECRET).
  *
  * All images are output as 1200x1200 PNG with compression level 9
+ *
+ * Caching: Rendered PNGs are cached in Redis as base64. Stamps are immutable
+ * blockchain data so cache entries never expire ("never" TTL).
  */
 import { Handlers } from "$fresh/server.ts";
-import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { WebResponseUtil } from "$lib/utils/api/responses/webResponseUtil.ts";
-import {
-  getOptimalLocalOptions,
-  isLocalRenderingAvailable,
-  renderHtmlSmart,
-} from "$lib/utils/ui/rendering/localRenderer.ts";
+import { cleanHtmlForRendering } from "$lib/utils/ui/rendering/htmlCleanup.ts";
 import {
   calculateSocialMediaDimensions,
   calculateSvgDimensions,
   getOptimalConversionOptions,
 } from "$lib/utils/ui/rendering/svgUtils.ts";
 import { StampController } from "$server/controller/stampController.ts";
+import { dbManager } from "$server/database/databaseManager.ts";
 import { Image } from "https://deno.land/x/imagescript@1.3.0/mod.ts";
 import { initWasm, Resvg } from "npm:@resvg/resvg-wasm@2.6.0";
 
@@ -39,9 +42,61 @@ async function ensureWasmInitialized() {
   }
 }
 
-// Check local rendering availability
-const isLocalRenderingReady = isLocalRenderingAvailable();
-console.log("[Preview] Local rendering available:", isLocalRenderingReady);
+import { serverConfig } from "$server/config/config.ts";
+
+// Cloudflare Browser Rendering Worker configuration
+const CF_WORKER_URL = serverConfig.CF_PREVIEW_WORKER_URL;
+const CF_WORKER_SECRET = serverConfig.CF_PREVIEW_WORKER_SECRET;
+const isCfWorkerConfigured = !!(CF_WORKER_URL && CF_WORKER_SECRET);
+console.log("[Preview] CF Worker configured:", isCfWorkerConfigured);
+
+/**
+ * Render content via the Cloudflare Browser Rendering Worker.
+ * Sends either a URL or raw HTML to the Worker, which uses headless Chrome
+ * at Cloudflare's edge to take a PNG screenshot.
+ *
+ * @returns PNG buffer on success, null on failure (caller falls back to local Chrome)
+ */
+async function renderWithCloudflare(params: {
+  url?: string;
+  html?: string;
+  viewport?: { width: number; height: number };
+  delay?: number;
+}): Promise<Uint8Array | null> {
+  if (!isCfWorkerConfigured) return null;
+
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000);
+
+    const response = await fetch(CF_WORKER_URL!, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${CF_WORKER_SECRET}`,
+      },
+      body: JSON.stringify(params),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeout);
+
+    if (!response.ok) {
+      const errorBody = await response.text().catch(() => "");
+      console.error(
+        `[Preview] CF Worker returned ${response.status}: ${errorBody}`,
+      );
+      return null;
+    }
+
+    const buffer = await response.arrayBuffer();
+    return new Uint8Array(buffer);
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error(`[Preview] CF Worker request failed: ${msg}`);
+    return null;
+  }
+}
 
 // Cache control headers for different scenarios
 const CACHE_HEADERS = {
@@ -53,225 +108,251 @@ const CACHE_HEADERS = {
   error: { "Cache-Control": "no-cache, no-store" },
 };
 
-export const handler: Handlers = {
-  async GET(_req, ctx) {
-    try {
-      const { stamp } = ctx.params;
-      // Get stamp details
-      const stampData = await StampController.getSpecificStamp(stamp);
-      if (!stampData?.stamp_url) {
-        return ApiResponseUtil.notFound("Stamp not found");
-      }
+const FALLBACK_LOGO =
+  "https://stampchain.io/img/logo/stampchain-logo-opengraph.jpg";
 
-      const { stamp_url, stamp_mimetype, stamp: stampNumber } = stampData;
+/** Cached preview stored in Redis: base64 PNG + metadata headers */
+interface CachedPreview {
+  png: string;
+  meta: Record<string, string>;
+}
 
-      // For non-SVG images, we need to fetch and process them for social media dimensions
-      // ImageScript supports: PNG, JPEG, GIF, TIFF
-      // Not supported: WebP, BMP, AVIF (will fallback to logo)
-      if (
-        stamp_mimetype?.startsWith("image/") &&
-        stamp_mimetype !== "image/svg+xml"
-      ) {
-        try {
-          // Fetch the original image
-          const imageResponse = await fetch(stamp_url);
-          if (!imageResponse.ok) {
-            throw new Error(`Failed to fetch image: ${imageResponse.status}`);
+/** Encode Uint8Array to base64 string */
+function toBase64(data: Uint8Array): string {
+  let binary = "";
+  for (let i = 0; i < data.length; i++) {
+    binary += String.fromCharCode(data[i]);
+  }
+  return btoa(binary);
+}
+
+/** Decode base64 string to Uint8Array */
+function fromBase64(b64: string): Uint8Array {
+  const binary = atob(b64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes;
+}
+
+/**
+ * Render a stamp preview PNG. Returns CachedPreview on success, null on failure.
+ * Null results are NOT cached permanently — they get stored as JSON "null" (5 bytes)
+ * and treated as cache miss on next read, so failed renders are retried.
+ */
+async function renderPreview(
+  stampIdentifier: string,
+): Promise<CachedPreview | null> {
+  const stampData = await StampController.getSpecificStamp(stampIdentifier);
+  if (!stampData?.stamp_url) {
+    return null;
+  }
+
+  const { stamp_url, stamp_mimetype, stamp: stampNumber } = stampData;
+
+  // Raster images (PNG, JPEG, GIF, TIFF) — upscale with ImageScript
+  // WebP/BMP/AVIF fall through to Chrome rendering on ImageScript failure
+  if (
+    stamp_mimetype?.startsWith("image/") &&
+    stamp_mimetype !== "image/svg+xml"
+  ) {
+    const result = await renderRasterPreview(
+      stamp_url,
+      stamp_mimetype,
+      stampNumber,
+    );
+    if (result) return result;
+    // ImageScript couldn't decode (WebP/BMP/AVIF) — try Chrome
+    return await renderImageWithChrome(
+      stamp_url,
+      stamp_mimetype,
+      stampNumber,
+    );
+  }
+
+  // SVG — convert with resvg-wasm (or Chrome for foreignObject SVGs)
+  if (stamp_mimetype === "image/svg+xml") {
+    return await renderSvgPreview(stamp_url, stamp_mimetype, stampNumber);
+  }
+
+  // HTML — render with local Chrome
+  if (stamp_mimetype === "text/html") {
+    return await renderHtmlPreview(stamp_url, stamp_mimetype, stampNumber);
+  }
+
+  // Audio — generate waveform visualization
+  if (stamp_mimetype?.startsWith("audio/")) {
+    return await renderAudioPreview(stamp_url, stamp_mimetype, stampNumber);
+  }
+
+  // Video — extract first frame via Chrome
+  if (stamp_mimetype?.startsWith("video/")) {
+    return await renderVideoPreview(stamp_url, stamp_mimetype, stampNumber);
+  }
+
+  // Unsupported content type
+  return null;
+}
+
+async function renderRasterPreview(
+  stamp_url: string,
+  stamp_mimetype: string,
+  stampNumber: number | undefined,
+): Promise<CachedPreview | null> {
+  const imageResponse = await fetch(stamp_url);
+  if (!imageResponse.ok) {
+    console.error(`Failed to fetch image: ${imageResponse.status}`);
+    return null;
+  }
+
+  const imageBuffer = await imageResponse.arrayBuffer();
+
+  try {
+    const sourceImage = await Image.decode(new Uint8Array(imageBuffer));
+
+    const maxDimension = Math.max(sourceImage.width, sourceImage.height);
+    const targetSize = 1200;
+
+    const rawScale = Math.max(2, Math.floor(targetSize / maxDimension));
+    const scale = Math.min(
+      rawScale,
+      Math.floor(targetSize / sourceImage.width),
+      Math.floor(targetSize / sourceImage.height),
+    );
+    const scaledWidth = sourceImage.width * scale;
+    const scaledHeight = sourceImage.height * scale;
+
+    const outputImage = new Image(targetSize, targetSize);
+    outputImage.fill(0x00000000); // transparent background
+
+    const offsetX = Math.floor((targetSize - scaledWidth) / 2);
+    const offsetY = Math.floor((targetSize - scaledHeight) / 2);
+
+    for (let y = 0; y < sourceImage.height; y++) {
+      for (let x = 0; x < sourceImage.width; x++) {
+        const pixel = sourceImage.getPixelAt(x + 1, y + 1);
+        for (let dy = 0; dy < scale; dy++) {
+          const py = offsetY + y * scale + dy + 1;
+          if (py < 1 || py > targetSize) continue;
+          for (let dx = 0; dx < scale; dx++) {
+            const px = offsetX + x * scale + dx + 1;
+            if (px < 1 || px > targetSize) continue;
+            outputImage.setPixelAt(px, py, pixel);
           }
-
-          // For pixel art stamps, we need to upscale them
-          const imageBuffer = await imageResponse.arrayBuffer();
-
-          try {
-            // Decode the image
-            const sourceImage = await Image.decode(new Uint8Array(imageBuffer));
-
-            // Calculate scale factor to fit in 1200x1200 while preserving aspect ratio
-            const maxDimension = Math.max(
-              sourceImage.width,
-              sourceImage.height,
-            );
-            const targetSize = 1200;
-
-            // Use integer scaling for pixel-perfect results
-            // Ensure minimum scale of 2 for very small images
-            const scale = Math.max(2, Math.floor(targetSize / maxDimension));
-            const scaledWidth = Math.min(sourceImage.width * scale, targetSize);
-            const scaledHeight = Math.min(
-              sourceImage.height * scale,
-              targetSize,
-            );
-
-            // Create output image with padding to make it square
-            const outputImage = new Image(targetSize, targetSize);
-
-            // Fill background with dark purple
-            const bgColor = 0x14001fff; // #14001f with full alpha
-            outputImage.fill(bgColor);
-
-            // Calculate position to center the scaled image
-            const offsetX = Math.floor((targetSize - scaledWidth) / 2);
-            const offsetY = Math.floor((targetSize - scaledHeight) / 2);
-
-            // Perform nearest-neighbor upscaling
-            for (let y = 0; y < sourceImage.height; y++) {
-              for (let x = 0; x < sourceImage.width; x++) {
-                const pixel = sourceImage.getPixelAt(x + 1, y + 1); // ImageScript uses 1-indexed
-
-                // Draw scaled pixel block
-                for (let dy = 0; dy < scale; dy++) {
-                  for (let dx = 0; dx < scale; dx++) {
-                    outputImage.setPixelAt(
-                      offsetX + x * scale + dx + 1,
-                      offsetY + y * scale + dy + 1,
-                      pixel,
-                    );
-                  }
-                }
-              }
-            }
-
-            // Encode as PNG with maximum compression (level 9)
-            const pngBuffer = await outputImage.encode(9);
-
-            return WebResponseUtil.binaryResponse(pngBuffer, "image/png", {
-              headers: {
-                "X-Stamp-Number": stampNumber?.toString() || "unknown",
-                "X-Original-Type": stamp_mimetype,
-                "X-Conversion-Method": "imagescript-upscale",
-                "X-Original-Size": `${sourceImage.width}x${sourceImage.height}`,
-                "X-Scale-Factor": scale.toString(),
-                "X-Dimensions": "1200x1200",
-                ...CACHE_HEADERS.success,
-              },
-            });
-          } catch (upscaleError: unknown) {
-            console.error("Image upscaling error:", upscaleError);
-            // Check if it's an unsupported format
-            const errorMessage = upscaleError instanceof Error
-              ? upscaleError.message
-              : String(upscaleError);
-            const isUnsupportedFormat =
-              errorMessage.includes("Unknown file signature") ||
-              errorMessage.includes("Invalid") ||
-              stamp_mimetype === "image/webp" ||
-              stamp_mimetype === "image/bmp" ||
-              stamp_mimetype === "image/avif";
-
-            if (isUnsupportedFormat) {
-              console.log(`Unsupported image format: ${stamp_mimetype}`);
-            }
-
-            // Fallback to redirect for unsupported formats
-            return WebResponseUtil.redirect(stamp_url, 302, {
-              headers: {
-                ...CACHE_HEADERS.redirect,
-                "X-Error": `upscale-failed: ${errorMessage}`,
-                "X-Unsupported-Format": isUnsupportedFormat
-                  ? stamp_mimetype
-                  : "false",
-              },
-            });
-          }
-        } catch (error: unknown) {
-          console.error("Image fetch error:", error);
-          const errorMessage = error instanceof Error
-            ? error.message
-            : String(error);
-          return WebResponseUtil.redirect(
-            "https://stampchain.io/img/logo/stampchain-logo-opengraph.jpg",
-            302,
-            {
-              headers: {
-                "X-Error": `image-fetch-failed: ${errorMessage}`,
-                "X-Fallback": "default-logo",
-                ...CACHE_HEADERS.error,
-              },
-            },
-          );
         }
       }
+    }
 
-      // For SVGs, convert to PNG using resvg-wasm
-      if (stamp_mimetype === "image/svg+xml") {
-        try {
-          // Ensure WASM is initialized
-          await ensureWasmInitialized();
+    const pngBuffer = await outputImage.encode(9);
 
-          // Fetch the SVG content
-          const svgResponse = await fetch(stamp_url);
-          if (!svgResponse.ok) {
-            throw new Error(`Failed to fetch SVG: ${svgResponse.status}`);
-          }
+    return {
+      png: toBase64(pngBuffer),
+      meta: {
+        "X-Stamp-Number": stampNumber?.toString() || "unknown",
+        "X-Original-Type": stamp_mimetype,
+        "X-Conversion-Method": "imagescript-upscale",
+        "X-Original-Size": `${sourceImage.width}x${sourceImage.height}`,
+        "X-Scale-Factor": scale.toString(),
+        "X-Dimensions": "1200x1200",
+      },
+    };
+  } catch (upscaleError: unknown) {
+    console.error("Image upscaling error:", upscaleError);
+    const errorMessage = upscaleError instanceof Error
+      ? upscaleError.message
+      : String(upscaleError);
+    const isUnsupportedFormat =
+      errorMessage.includes("Unknown file signature") ||
+      errorMessage.includes("Invalid") ||
+      stamp_mimetype === "image/webp" ||
+      stamp_mimetype === "image/bmp" ||
+      stamp_mimetype === "image/avif";
 
-          const svgContent = await svgResponse.text();
+    if (isUnsupportedFormat) {
+      console.log(`Unsupported image format: ${stamp_mimetype}`);
+    }
 
-          // Check if SVG contains animations or complex CSS
-          const hasAnimations = svgContent.includes("@keyframes") ||
-            svgContent.includes("animation:") ||
-            svgContent.includes("animation-");
+    return null;
+  }
+}
 
-          let processedSvgContent = svgContent;
+async function renderSvgPreview(
+  stamp_url: string,
+  stamp_mimetype: string,
+  stampNumber: number | undefined,
+): Promise<CachedPreview | null> {
+  const svgResponse = await fetch(stamp_url);
+  if (!svgResponse.ok) {
+    console.error(`Failed to fetch SVG: ${svgResponse.status}`);
+    return null;
+  }
 
-          if (hasAnimations) {
-            console.log(
-              `SVG contains animations that resvg-wasm cannot handle: ${stampNumber}`,
-            );
+  const svgContent = await svgResponse.text();
 
-            // Try to strip out style tags to get a static version
-            // This is a simple approach - remove entire style tag
-            processedSvgContent = processedSvgContent.replace(
-              /<style[^>]*>[\s\S]*?<\/style>/gi,
-              "",
-            );
+  // SVGs with <foreignObject> embed HTML content that resvg-wasm cannot render.
+  // Route these to Chrome which handles foreignObject natively.
+  if (svgContent.includes("<foreignObject")) {
+    console.log(
+      `[SVG Preview] Stamp ${stampNumber} uses foreignObject — routing to Chrome`,
+    );
+    return await renderSvgWithChrome(
+      stamp_url,
+      stamp_mimetype,
+      stampNumber,
+    );
+  }
 
-            // Also remove any inline animation styles
-            processedSvgContent = processedSvgContent.replace(
-              /animation[^;]*;?/gi,
-              "",
-            );
-            processedSvgContent = processedSvgContent.replace(
-              /animation-[^;]*;?/gi,
-              "",
-            );
-          }
+  await ensureWasmInitialized();
 
-          // Get optimal conversion options based on processed SVG content
-          const conversionOptions = getOptimalConversionOptions(
-            processedSvgContent,
-          );
+  const hasAnimations = svgContent.includes("@keyframes") ||
+    svgContent.includes("animation:") ||
+    svgContent.includes("animation-");
 
-          // Convert SVG to PNG using resvg with optimal settings
-          // For social media, we need to handle the aspect ratio properly
-          const originalDimensions = calculateSvgDimensions(
-            processedSvgContent,
-          );
+  let processedSvgContent = svgContent;
 
-          // Use target dimensions from conversion options (1200x1200 for square, 1200x630 for wide)
-          const targetWidth = conversionOptions.width || 1200;
-          const targetHeight = conversionOptions.height || 1200;
+  if (hasAnimations) {
+    console.log(
+      `SVG contains animations that resvg-wasm cannot handle: ${stampNumber}`,
+    );
+    processedSvgContent = processedSvgContent.replace(
+      /<style[^>]*>[\s\S]*?<\/style>/gi,
+      "",
+    );
+    processedSvgContent = processedSvgContent.replace(
+      /animation[^;]*;?/gi,
+      "",
+    );
+    processedSvgContent = processedSvgContent.replace(
+      /animation-[^;]*;?/gi,
+      "",
+    );
+  }
 
-          const socialDimensions = calculateSocialMediaDimensions(
-            originalDimensions.width,
-            originalDimensions.height,
-            targetWidth,
-            targetHeight,
-          );
+  const conversionOptions = getOptimalConversionOptions(processedSvgContent);
+  const originalDimensions = calculateSvgDimensions(processedSvgContent);
 
-          // Create a wrapper SVG with proper dimensions and padding
-          const paddingColor = conversionOptions.padding?.color || "#14001f";
+  const targetWidth = conversionOptions.width || 1200;
+  const targetHeight = conversionOptions.height || 1200;
 
-          // Extract viewBox from processed SVG if present
-          const viewBoxMatch = processedSvgContent.match(
-            /viewBox=["']([^"']+)["']/,
-          );
-          const viewBox = viewBoxMatch
-            ? viewBoxMatch[1]
-            : `0 0 ${originalDimensions.width} ${originalDimensions.height}`;
+  const socialDimensions = calculateSocialMediaDimensions(
+    originalDimensions.width,
+    originalDimensions.height,
+    targetWidth,
+    targetHeight,
+  );
 
-          // Create wrapper SVG that includes padding
-          const wrappedSvg =
-            `<svg width="${targetWidth}" height="${targetHeight}" viewBox="0 0 ${targetWidth} ${targetHeight}" xmlns="http://www.w3.org/2000/svg">
+  const paddingColor = conversionOptions.padding?.color || "transparent";
+
+  const viewBoxMatch = processedSvgContent.match(
+    /viewBox=["']([^"']+)["']/,
+  );
+  const viewBox = viewBoxMatch
+    ? viewBoxMatch[1]
+    : `0 0 ${originalDimensions.width} ${originalDimensions.height}`;
+
+  const wrappedSvg =
+    `<svg width="${targetWidth}" height="${targetHeight}" viewBox="0 0 ${targetWidth} ${targetHeight}" xmlns="http://www.w3.org/2000/svg">
             <rect width="${targetWidth}" height="${targetHeight}" fill="${paddingColor}"/>
             <svg x="${socialDimensions.x}" y="${socialDimensions.y}"
                  width="${socialDimensions.imageWidth}" height="${socialDimensions.imageHeight}"
@@ -280,202 +361,401 @@ export const handler: Handlers = {
             </svg>
           </svg>`;
 
-          // Render the wrapped SVG with padding
-          const resvgOptions: any = {
-            fitTo: {
-              mode: "width",
-              value: targetWidth,
-            },
-            background: paddingColor,
-          };
+  const resvgOptions: any = {
+    fitTo: {
+      mode: "width",
+      value: targetWidth,
+    },
+    background: paddingColor,
+  };
 
-          // Only add font if it's defined
-          if (conversionOptions.font) {
-            resvgOptions.font = conversionOptions.font;
-          }
+  if (conversionOptions.font) {
+    resvgOptions.font = conversionOptions.font;
+  }
 
-          const resvg = new Resvg(wrappedSvg, resvgOptions);
+  const resvg = new Resvg(wrappedSvg, resvgOptions);
+  const pngData = resvg.render();
+  const pngBuffer = pngData.asPng();
 
-          const pngData = resvg.render();
-          const pngBuffer = pngData.asPng();
+  return {
+    png: toBase64(pngBuffer),
+    meta: {
+      "X-Stamp-Number": stampNumber?.toString() || "unknown",
+      "X-Original-Type": stamp_mimetype,
+      "X-Conversion-Method": "resvg-wasm",
+      "X-Background": conversionOptions.background || "transparent",
+      "X-Dimensions": `${pngData.width}x${pngData.height}`,
+      "X-Animations-Stripped": hasAnimations ? "true" : "false",
+    },
+  };
+}
 
-          // Return the PNG directly with proper caching headers
-          return WebResponseUtil.binaryResponse(pngBuffer, "image/png", {
-            headers: {
-              "X-Stamp-Number": stampNumber?.toString() || "unknown",
-              "X-Original-Type": stamp_mimetype,
-              "X-Conversion-Method": "resvg-wasm",
-              "X-Background": conversionOptions.background || "transparent",
-              "X-Dimensions": `${pngData.width}x${pngData.height}`,
-              "X-Animations-Stripped": hasAnimations ? "true" : "false",
-              ...CACHE_HEADERS.success,
-            },
-          });
-        } catch (conversionError: unknown) {
-          const errorMessage = conversionError instanceof Error
-            ? conversionError.message
-            : String(conversionError);
-          console.error(
-            "SVG to PNG conversion error:",
-            errorMessage,
-          );
-          console.error("Full SVG conversion error:", conversionError);
+/**
+ * Render SVGs containing foreignObject using Cloudflare Browser Rendering Worker.
+ */
+async function renderSvgWithChrome(
+  stamp_url: string,
+  stamp_mimetype: string,
+  stampNumber: number | undefined,
+): Promise<CachedPreview | null> {
+  const cfBuffer = await renderWithCloudflare({
+    url: stamp_url,
+    viewport: { width: 1200, height: 1200 },
+  });
 
-          // For SVG conversion errors, only fallback to placeholder
-          // Don't attempt HTML rendering as that requires Chrome and is unreliable for SVGs
-          return WebResponseUtil.redirect(
-            "https://stampchain.io/img/logo/stampchain-logo-opengraph.jpg",
-            302,
-            {
-              headers: {
-                "X-Conversion-Method": "svg-conversion-failed",
-                "X-Error": `resvg-wasm-failed: ${errorMessage}`,
-                "X-Fallback": "default-logo",
-                ...CACHE_HEADERS.error,
-              },
-            },
-          );
-        }
-      }
+  if (cfBuffer) {
+    console.log(
+      `[SVG Preview] Stamp ${stampNumber} rendered via CF Worker`,
+    );
+    const result = await centerOnCanvas(cfBuffer, {
+      stampNumber,
+      stamp_mimetype,
+      method: "cloudflare-browser",
+    });
+    result.meta["X-Rendering-Engine"] = "cloudflare-worker";
+    result.meta["X-ForeignObject"] = "true";
+    return result;
+  }
 
-      // For HTML content, use local Chrome rendering
-      if (stamp_mimetype === "text/html") {
-        if (!isLocalRenderingReady) {
-          console.error(
-            "[HTML Preview] Chrome rendering not available for HTML content",
-            {
-              stamp: stampNumber,
-              mimetype: stamp_mimetype,
-              dockerPath: Deno.env.get("PUPPETEER_EXECUTABLE_PATH"),
-              isDocker: Deno.env.get("PUPPETEER_EXECUTABLE_PATH") ===
-                "/usr/bin/chromium-browser",
-            },
-          );
-          return WebResponseUtil.redirect(
-            "https://stampchain.io/img/logo/stampchain-logo-opengraph.jpg",
-            302,
-            {
-              headers: {
-                "X-Error": "no-local-rendering",
-                "X-Fallback": "default-logo",
-                ...CACHE_HEADERS.error,
-              },
-            },
-          );
-        }
+  console.error(
+    "[SVG Preview] CF Worker failed for foreignObject SVG",
+    { stamp: stampNumber },
+  );
+  return null;
+}
 
-        try {
-          // Create the stamp page URL for rendering
-          const requestUrl = new URL(_req.url);
-          const protocol = requestUrl.hostname === "localhost"
-            ? "http:"
-            : "https:";
-          const stampPageUrl =
-            `${protocol}//${requestUrl.host}/stamp/${stampNumber}`;
+async function renderHtmlPreview(
+  stamp_url: string,
+  stamp_mimetype: string,
+  stampNumber: number | undefined,
+): Promise<CachedPreview | null> {
+  const isComplex = stamp_url?.includes("recursive") ||
+    stamp_url?.includes("fractal") ||
+    stamp_url?.includes("canvas");
+  const delay = isComplex ? 8000 : 5000;
 
+  // Try CF Worker first: fetch raw HTML from CDN, clean it, send to Worker
+  if (isCfWorkerConfigured) {
+    try {
+      const htmlResponse = await fetch(stamp_url);
+      if (htmlResponse.ok) {
+        const rawHtml = await htmlResponse.text();
+        const cleanedHtml = cleanHtmlForRendering(rawHtml);
+
+        const cfBuffer = await renderWithCloudflare({
+          html: cleanedHtml,
+          viewport: { width: 1200, height: 1200 },
+          delay,
+        });
+
+        if (cfBuffer) {
           console.log(
-            `[HTML Preview] Starting render for stamp ${stampNumber}`,
-            {
-              stampPageUrl,
-              stamp: stampNumber,
-              mimetype: stamp_mimetype,
-              dockerPath: Deno.env.get("PUPPETEER_EXECUTABLE_PATH"),
-              isDocker: Deno.env.get("PUPPETEER_EXECUTABLE_PATH") ===
-                "/usr/bin/chromium-browser",
-            },
+            `[HTML Preview] Stamp ${stampNumber} rendered via CF Worker`,
           );
-
-          // Determine if this is complex content (for extended render time)
-          const isComplex = stamp_url?.includes("recursive") ||
-            stamp_url?.includes("fractal") ||
-            stamp_url?.includes("canvas");
-
-          const renderOptions = getOptimalLocalOptions(isComplex);
-          const { buffer: pngBuffer, method } = await renderHtmlSmart(
-            stampPageUrl,
-            renderOptions,
-          );
-
-          console.log(
-            `[HTML Preview] Successfully rendered stamp ${stampNumber}`,
-            {
-              stamp: stampNumber,
-              method,
-              bufferSize: pngBuffer.length,
-              isComplex,
-              renderTime: isComplex ? "extended" : "standard",
-            },
-          );
-
-          return WebResponseUtil.binaryResponse(pngBuffer, "image/png", {
-            headers: {
-              "X-Stamp-Number": stampNumber?.toString() || "unknown",
-              "X-Original-Type": stamp_mimetype,
-              "X-Conversion-Method": method,
-              "X-Render-Time": isComplex ? "extended" : "standard",
-              "X-Rendering-Engine": "local-chrome",
-              ...CACHE_HEADERS.success,
-            },
-          });
-        } catch (htmlError: unknown) {
-          const errorMessage = htmlError instanceof Error
-            ? htmlError.message
-            : String(htmlError);
-          const errorStack = htmlError instanceof Error
-            ? htmlError.stack
-            : undefined;
-          console.error(
-            "[HTML Preview] Rendering failed for stamp",
+          const result = await centerOnCanvas(cfBuffer, {
             stampNumber,
-            {
-              error: errorMessage,
-              stack: errorStack,
-              stamp: stampNumber,
-              mimetype: stamp_mimetype,
-              dockerPath: Deno.env.get("PUPPETEER_EXECUTABLE_PATH"),
-              isDocker: Deno.env.get("PUPPETEER_EXECUTABLE_PATH") ===
-                "/usr/bin/chromium-browser",
-              fallbackUsed: "default-logo",
-            },
-          );
-          return WebResponseUtil.redirect(
-            "https://stampchain.io/img/logo/stampchain-logo-opengraph.jpg",
-            302,
-            {
-              headers: {
-                "X-Error": "html-render-failed",
-                "X-Rendering-Engine": "local-chrome",
-                "X-Fallback": "default-logo",
-                ...CACHE_HEADERS.error,
-              },
-            },
-          );
+            stamp_mimetype,
+            method: "cloudflare-browser",
+          });
+          result.meta["X-Render-Time"] = isComplex ? "extended" : "standard";
+          result.meta["X-Rendering-Engine"] = "cloudflare-worker";
+          return result;
         }
       }
-
-      // For other content types, fallback to default logo
-      return WebResponseUtil.redirect(
-        "https://stampchain.io/img/logo/stampchain-logo-opengraph.jpg",
-        302,
-        {
-          headers: {
-            "X-Fallback": "unsupported-content-type",
-            ...CACHE_HEADERS.error,
-          },
-        },
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      console.error(
+        `[HTML Preview] CF Worker path failed for stamp ${stampNumber}: ${msg}`,
       );
+    }
+  }
+
+  console.error(
+    "[HTML Preview] CF Worker failed for HTML content",
+    { stamp: stampNumber },
+  );
+  return null;
+}
+
+/**
+ * Render unsupported image formats (WebP, BMP, AVIF) via Cloudflare Browser Rendering Worker.
+ */
+async function renderImageWithChrome(
+  stamp_url: string,
+  stamp_mimetype: string,
+  stampNumber: number | undefined,
+): Promise<CachedPreview | null> {
+  const cfBuffer = await renderWithCloudflare({
+    url: stamp_url,
+    viewport: { width: 1200, height: 1200 },
+    delay: 2000,
+  });
+
+  if (cfBuffer) {
+    console.log(
+      `[Image Preview] Stamp ${stampNumber} (${stamp_mimetype}) rendered via CF Worker`,
+    );
+    const result = await centerOnCanvas(cfBuffer, {
+      stampNumber,
+      stamp_mimetype,
+      method: "cloudflare-browser",
+    });
+    result.meta["X-Rendering-Engine"] = "cloudflare-worker";
+    return result;
+  }
+
+  console.log(
+    `[Image Preview] CF Worker failed for ${stamp_mimetype} stamp ${stampNumber}`,
+  );
+  return null;
+}
+
+/**
+ * Generate a stylized audio waveform visualization.
+ * Uses a deterministic pseudo-random pattern seeded from the stamp URL
+ * to create a unique waveform for each audio stamp.
+ */
+async function renderAudioPreview(
+  stamp_url: string,
+  stamp_mimetype: string,
+  stampNumber: number | undefined,
+): Promise<CachedPreview | null> {
+  const targetSize = 1200;
+  const outputImage = new Image(targetSize, targetSize);
+  const bgColor = 0x14001fff; // dark purple background
+  outputImage.fill(bgColor);
+
+  // Generate deterministic seed from stamp URL
+  let seed = 0;
+  for (let i = 0; i < stamp_url.length; i++) {
+    seed = ((seed << 5) - seed + stamp_url.charCodeAt(i)) | 0;
+  }
+  const rng = (n: number) => {
+    seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+    return seed % n;
+  };
+
+  // Draw waveform bars
+  const barCount = 64;
+  const barWidth = Math.floor(targetSize * 0.7 / barCount);
+  const gap = 2;
+  const totalWidth = barCount * (barWidth + gap);
+  const startX = Math.floor((targetSize - totalWidth) / 2);
+  const centerY = Math.floor(targetSize * 0.50);
+  const maxBarHeight = Math.floor(targetSize * 0.30);
+
+  // Waveform color: orange/amber gradient
+  const colors = [0xf59e0bff, 0xf97316ff, 0xef4444ff, 0xec4899ff];
+
+  for (let i = 0; i < barCount; i++) {
+    // Smooth waveform shape with some randomness
+    const t = i / barCount;
+    const envelope = Math.sin(t * Math.PI) * 0.7 + 0.3;
+    const variation = 0.3 + (rng(700) / 1000);
+    const barHeight = Math.floor(maxBarHeight * envelope * variation);
+    const x = startX + i * (barWidth + gap);
+
+    const color = colors[rng(colors.length)];
+
+    // Draw bar (symmetric above and below center)
+    for (let dy = -barHeight; dy <= barHeight; dy++) {
+      const py = centerY + dy;
+      if (py < 1 || py > targetSize) continue;
+      for (let dx = 0; dx < barWidth; dx++) {
+        const px = x + dx;
+        if (px < 1 || px > targetSize) continue;
+        outputImage.setPixelAt(px, py, color);
+      }
+    }
+  }
+
+  // Draw play button circle in center
+  const circleR = 60;
+  const cx = Math.floor(targetSize / 2);
+  const cy = Math.floor(targetSize * 0.50);
+  for (let dy = -circleR; dy <= circleR; dy++) {
+    for (let dx = -circleR; dx <= circleR; dx++) {
+      if (dx * dx + dy * dy <= circleR * circleR) {
+        const px = cx + dx;
+        const py = cy + dy;
+        if (px >= 1 && px <= targetSize && py >= 1 && py <= targetSize) {
+          outputImage.setPixelAt(px, py, 0x14001fcc); // semi-transparent bg
+        }
+      }
+    }
+  }
+  // Draw triangle (play icon) inside circle
+  const triSize = 30;
+  for (let row = -triSize; row <= triSize; row++) {
+    const halfWidth = Math.floor(((row + triSize) / (triSize * 2)) * triSize);
+    for (let col = -5; col < halfWidth; col++) {
+      const px = cx + col + 8;
+      const py = cy + row;
+      if (px >= 1 && px <= targetSize && py >= 1 && py <= targetSize) {
+        outputImage.setPixelAt(px, py, 0xffffffff);
+      }
+    }
+  }
+
+  const pngBuffer = await outputImage.encode(9);
+
+  return {
+    png: toBase64(pngBuffer),
+    meta: {
+      "X-Stamp-Number": stampNumber?.toString() || "unknown",
+      "X-Original-Type": stamp_mimetype,
+      "X-Conversion-Method": "imagescript-waveform",
+      "X-Dimensions": "1200x1200",
+    },
+  };
+}
+
+/**
+ * Extract the first frame of a video using Cloudflare Browser Rendering Worker.
+ */
+async function renderVideoPreview(
+  stamp_url: string,
+  stamp_mimetype: string,
+  stampNumber: number | undefined,
+): Promise<CachedPreview | null> {
+  const videoHtml = `<!DOCTYPE html>
+<html><head><style>
+  * { margin: 0; padding: 0; }
+  body { background: #14001f; display: flex; align-items: center; justify-content: center; width: 1200px; height: 1200px; overflow: hidden; }
+  video { max-width: 100%; max-height: 100%; object-fit: contain; }
+</style></head><body>
+<video src="${stamp_url}" muted preload="auto" autoplay></video>
+<script>
+  const v = document.querySelector('video');
+  v.addEventListener('loadeddata', () => { v.pause(); v.currentTime = 0; });
+</script></body></html>`;
+
+  const cfBuffer = await renderWithCloudflare({
+    html: videoHtml,
+    viewport: { width: 1200, height: 1200 },
+    delay: 3000,
+  });
+
+  if (cfBuffer) {
+    console.log(
+      `[Video Preview] Stamp ${stampNumber} first frame rendered via CF Worker`,
+    );
+    return centerOnCanvas(cfBuffer, {
+      stampNumber,
+      stamp_mimetype,
+      method: "cloudflare-browser-video",
+    });
+  }
+
+  console.log(
+    `[Video Preview] CF Worker failed for video stamp ${stampNumber}`,
+  );
+  return null;
+}
+
+/**
+ * Helper: center a screenshot buffer on a 1200x1200 canvas with dark background.
+ * Shared by HTML, image-via-Chrome, SVG-via-Chrome, and video renderers.
+ */
+async function centerOnCanvas(
+  screenshotBuffer: Uint8Array,
+  opts: {
+    stampNumber?: number | undefined;
+    stamp_mimetype: string;
+    method: string;
+    contentBounds?: { width: number; height: number } | undefined;
+  },
+): Promise<CachedPreview> {
+  const targetSize = 1200;
+  const sourceImage = await Image.decode(screenshotBuffer);
+  const srcW = sourceImage.width;
+  const srcH = sourceImage.height;
+
+  // Always re-encode through ImageScript to ensure consistent PNG output
+  // with transparent background (Chrome screenshots may have white bg pixels)
+  const scale = Math.min(targetSize / srcW, targetSize / srcH);
+  const scaledW = Math.round(srcW * scale);
+  const scaledH = Math.round(srcH * scale);
+
+  const resized = sourceImage.resize(scaledW, scaledH);
+  const outputImage = new Image(targetSize, targetSize);
+  outputImage.fill(0x00000000); // transparent background
+
+  const offsetX = Math.floor((targetSize - scaledW) / 2);
+  const offsetY = Math.floor((targetSize - scaledH) / 2);
+  outputImage.composite(resized, offsetX, offsetY);
+
+  const pngBuffer = await outputImage.encode(9);
+
+  return {
+    png: toBase64(pngBuffer),
+    meta: {
+      "X-Stamp-Number": opts.stampNumber?.toString() || "unknown",
+      "X-Original-Type": opts.stamp_mimetype,
+      "X-Conversion-Method": opts.method,
+      "X-Content-Size": opts.contentBounds
+        ? `${opts.contentBounds.width}x${opts.contentBounds.height}`
+        : `${srcW}x${srcH}`,
+      "X-Dimensions": "1200x1200",
+    },
+  };
+}
+
+export const handler: Handlers = {
+  async GET(req, ctx) {
+    try {
+      const { stamp } = ctx.params;
+      const cacheKey = `preview:${stamp}`;
+      const url = new URL(req.url);
+      const forceRefresh = url.searchParams.get("refresh") === "true";
+
+      // Force refresh: delete existing cache entry before rendering
+      if (forceRefresh) {
+        await dbManager.invalidateCacheByPattern(cacheKey);
+        console.log(`[Preview] Force refresh for ${stamp}, cache cleared`);
+      }
+
+      // handleCache returns cached data on hit, or calls renderPreview on miss.
+      // We use a wrapper to track whether this was a cache hit or fresh render.
+      let wasRendered = false;
+      const cached = await dbManager.handleCache<CachedPreview | null>(
+        cacheKey,
+        async () => {
+          wasRendered = true;
+          return await renderPreview(stamp);
+        },
+        "never",
+      );
+
+      if (cached?.png) {
+        const pngBytes = fromBase64(cached.png);
+        return WebResponseUtil.binaryResponse(pngBytes, "image/png", {
+          immutableBinary: true,
+          headers: {
+            ...cached.meta,
+            "X-Cache": wasRendered ? "rendered" : "redis-hit",
+            ...CACHE_HEADERS.success,
+          },
+        });
+      }
+
+      // null result — stamp not found, unsupported format, or render failure
+      // Return fallback redirect (not cached permanently — null in Redis
+      // is treated as cache miss on next read so render is retried)
+      return WebResponseUtil.redirect(FALLBACK_LOGO, 302, {
+        headers: {
+          "X-Fallback": "render-failed-or-unsupported",
+          ...CACHE_HEADERS.redirect,
+        },
+      });
     } catch (error) {
       console.error("Preview generation error:", error);
-      return WebResponseUtil.redirect(
-        "https://stampchain.io/img/logo/stampchain-logo-opengraph.jpg",
-        302,
-        {
-          headers: {
-            "X-Fallback": "general-error",
-            ...CACHE_HEADERS.error,
-          },
+      return WebResponseUtil.redirect(FALLBACK_LOGO, 302, {
+        headers: {
+          "X-Fallback": "general-error",
+          ...CACHE_HEADERS.error,
         },
-      );
+      });
     }
   },
 };

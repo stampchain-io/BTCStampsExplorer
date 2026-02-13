@@ -3,6 +3,7 @@ import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { InternalRouteGuard } from "$server/services/security/internalRouteGuard.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
+import { serverConfig } from "$server/config/config.ts";
 
 /**
  * Emergency endpoint to reset the database connection pool
@@ -25,7 +26,7 @@ export const handler: Handlers = {
 
       // Additional security: require a secret token
       const token = req.headers.get("x-reset-token");
-      const expectedToken = Deno.env.get("CONNECTION_POOL_RESET_TOKEN");
+      const expectedToken = serverConfig.CONNECTION_POOL_RESET_TOKEN;
 
       if (!expectedToken || token !== expectedToken) {
         return ApiResponseUtil.forbidden("Invalid reset token");

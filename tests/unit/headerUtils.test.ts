@@ -120,7 +120,7 @@ Deno.test("headerUtils - normalizeHeaders handles empty headers", () => {
   assert(varyHeader.includes("Origin"), "Should include Origin");
 });
 
-Deno.test("headerUtils - normalizeHeaders case sensitivity limitation", () => {
+Deno.test("headerUtils - normalizeHeaders handles case-insensitive keys", () => {
   const headers = {
     "Content-Type": "text/html",
     "VARY": "Accept",
@@ -129,19 +129,18 @@ Deno.test("headerUtils - normalizeHeaders case sensitivity limitation", () => {
 
   const normalized = normalizeHeaders(headers);
 
-  // The function only processes lowercase "content-type" and "vary" in the input
-  // Uppercase versions are not specially processed
+  // Case-insensitive lookup finds uppercase Content-Type and normalizes it
   assertEquals(
     normalized.get("content-type"),
-    null,
-    "Content-Type (uppercase) is not processed",
+    "text/html; charset=utf-8",
+    "Content-Type (uppercase) is found and normalized with charset",
   );
 
-  // VARY is processed as a regular header, then the function adds default values
+  // VARY (uppercase) is found via case-insensitive lookup and merged with defaults
   const varyHeader = normalized.get("vary") || "";
   assert(
     varyHeader.includes("Accept"),
-    "VARY (uppercase) is set as regular header",
+    "VARY (uppercase) value is preserved",
   );
   assert(
     varyHeader.includes("Accept-Encoding"),

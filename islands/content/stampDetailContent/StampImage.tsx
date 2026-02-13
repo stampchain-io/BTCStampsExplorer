@@ -452,8 +452,6 @@ export function StampImage(
 ) {
   /* ===== STATE & REFS ===== */
   const [loading, setLoading] = useState<boolean>(true);
-  const imgScopeRef = useRef<HTMLDivElement | null>(null);
-  const [transform, setTransform] = useState("");
   const [src, setSrc] = useState<string | undefined>(undefined);
   const [htmlContent, setHtmlContent] = useState<string | null>(null);
   const [validatedContent, setValidatedContent] = useState<VNode | null>(null);
@@ -467,13 +465,8 @@ export function StampImage(
   const fullscreenTooltipTimeoutRef = useRef<number | null>(null);
   const xTooltipTimeoutRef = useRef<number | null>(null);
 
-  const updateTransform = () => {
-    if (!imgScopeRef.current) return;
-    const width = imgScopeRef.current.clientWidth;
-    setTransform(
-      `scale(${(width + 50) / 648}))`,
-    );
-  };
+  // No transform needed: the iframe is w-full h-full inside a square container,
+  // so it fills the available space naturally without CSS transform.
 
   const fetchStampImage = () => {
     if (!stamp) return;
@@ -584,6 +577,7 @@ export function StampImage(
             }}
           />,
         );
+        setLoading(false);
       } else {
         // No external references, use original src
         setValidatedContent(
@@ -592,6 +586,7 @@ export function StampImage(
             loading="lazy"
             className="max-w-none object-contain rounded-2xl pixelart stamp-image h-full w-full"
             src={src}
+            onLoad={() => setLoading(false)}
             onError={handleImageError}
             alt={`Stamp No. ${stamp.stamp}`}
           />,
@@ -605,6 +600,7 @@ export function StampImage(
           loading="lazy"
           className="max-w-none object-contain rounded-2xl pixelart stamp-image h-full w-full"
           src={src}
+          onLoad={() => setLoading(false)}
           onError={handleImageError}
           alt={`Stamp No. ${stamp.stamp}`}
         />,
@@ -628,19 +624,6 @@ export function StampImage(
   const handleAudioEnded = () => {
     setIsPlaying(false);
   };
-
-  useEffect(() => {
-    // Set initial transform
-    updateTransform();
-
-    // Add event listener to handle window resize
-    globalThis.addEventListener("resize", updateTransform);
-
-    // Cleanup event listener on component unmount
-    return () => {
-      globalThis.removeEventListener("resize", updateTransform);
-    };
-  }, []);
 
   useEffect(() => {
     fetchStampImage();
@@ -756,36 +739,66 @@ export function StampImage(
                 >
                   <PlaceholderImage variant="no-image" />
                 </div>
-                {console.log("Rendering iframe with src:", src)}
                 <iframe
                   width="100%"
                   height="100%"
                   scrolling="no"
                   className={`${
                     className || ""
-                  } rounded-2xl absolute top-0 left-0 w-full h-full bg-transparent`}
+                  } rounded-2xl absolute top-0 left-0 bg-transparent`}
                   sandbox="allow-scripts allow-same-origin"
                   src={src || ""}
                   loading="lazy"
                   style={{
-                    transform: transform || "none",
                     border: "none",
                     display: "block",
                     backgroundColor: "transparent",
                     zIndex: 1,
+                    transformOrigin: "top left",
                   }}
                   onLoad={(e) => {
-                    console.log("Iframe loaded successfully:", src);
-                    // Hide the placeholder once iframe loads
                     const iframe = e.currentTarget as HTMLIFrameElement;
+                    // Hide the placeholder once iframe loads
                     const placeholder = iframe
                       .previousElementSibling as HTMLElement;
                     if (placeholder) {
                       placeholder.style.display = "none";
                     }
+                    // Auto-scale: measure content, then scale iframe to fit
+                    // the square container without clipping
+                    try {
+                      const doc = iframe.contentDocument;
+                      if (!doc) return;
+                      const cw = Math.max(
+                        doc.body?.scrollWidth || 0,
+                        doc.documentElement?.scrollWidth || 0,
+                      );
+                      const ch = Math.max(
+                        doc.body?.scrollHeight || 0,
+                        doc.documentElement?.scrollHeight || 0,
+                      );
+                      if (cw > 0 && ch > 0) {
+                        const container = iframe.parentElement;
+                        if (!container) return;
+                        const boxW = container.clientWidth;
+                        const boxH = container.clientHeight;
+                        const scale = Math.min(boxW / cw, boxH / ch);
+                        if (scale < 0.99) {
+                          // Content is larger than container — scale down
+                          iframe.style.width = `${cw}px`;
+                          iframe.style.height = `${ch}px`;
+                          iframe.style.transform = `scale(${scale})`;
+                        } else {
+                          // Content fits — fill container normally
+                          iframe.style.width = "100%";
+                          iframe.style.height = "100%";
+                        }
+                      }
+                    } catch {
+                      // Cross-origin or sandboxed — leave as-is
+                    }
                   }}
                   onError={(e) => {
-                    console.error("Iframe load error:", e, src);
                     handleImageError(e);
                   }}
                   title="Stamp"
@@ -908,6 +921,7 @@ export function StampImage(
                           loading="lazy"
                           className="max-w-none object-contain rounded-2xl pixelart stamp-image h-full w-full"
                           src={src}
+                          onLoad={() => setLoading(false)}
                           onError={handleImageError}
                           alt="Stamp"
                         />
@@ -939,6 +953,7 @@ export function StampImage(
                         loading="lazy"
                         className="max-w-none object-contain rounded-2xl pixelart stamp-image h-full w-full"
                         src={src}
+                        onLoad={() => setLoading(false)}
                         onError={handleImageError}
                         alt="Stamp"
                       />

@@ -1,12 +1,24 @@
 /*@baba-styles is not config properly*/
 import { Icon } from "$icon";
+import { SearchErrorDisplay } from "$islands/modal/SearchErrorDisplay.tsx";
+import { SearchInputField } from "$islands/modal/SearchInputField.tsx";
 import { closeModal, openModal, searchState } from "$islands/modal/states.ts";
 import { ModalSearchBase, transitionColors } from "$layout";
-import { textSm } from "$text";
-import { useEffect } from "preact/hooks";
+import { generateSearchErrorMessage } from "$lib/utils/data/search/searchInputClassifier.ts";
+import { isValidBitcoinAddress } from "$lib/utils/typeGuards.ts";
+import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
+import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
+import {
+  navigateSSRSafe,
+  scheduleFocus,
+  useAutoFocus,
+  useDebouncedSearch,
+} from "$lib/utils/ui/search/searchHooks.ts";
 
 export function openSRC20Search() {
-  const inputRef = { current: null } as preact.RefObject<HTMLInputElement>;
+  const inputRef = {
+    current: null,
+  } as preact.RefObject<HTMLInputElement>;
 
   const handleSearch = async () => {
     const currentTerm = searchState.value.term;
@@ -20,6 +32,7 @@ export function openSRC20Search() {
       return;
     }
 
+    searchState.value = { ...searchState.value, isLoading: true };
     try {
       const response = await fetch(
         `/api/v2/src20/search?q=${encodeURIComponent(currentTerm.trim())}`,
@@ -31,25 +44,53 @@ export function openSRC20Search() {
       );
       const data = await response.json();
 
-      if (!response.ok || !data.data || data.data.length === 0) {
+      if (
+        !response.ok || !data.data || data.data.length === 0
+      ) {
+        // For valid addresses with no results, show a
+        // link to the wallet page instead of an error
+        if (isValidBitcoinAddress(currentTerm.trim())) {
+          searchState.value = {
+            ...searchState.value,
+            isLoading: false,
+            error: "",
+            results: [
+              {
+                _addressLink: true,
+                address: currentTerm.trim(),
+              },
+            ],
+          };
+          return;
+        }
         searchState.value = {
           ...searchState.value,
-          error:
-            `NO TOKEN FOUND\n${currentTerm.trim()}\nThe token ticker isn't recognized`,
+          isLoading: false,
+          error: generateSearchErrorMessage(
+            currentTerm.trim(),
+            "src20",
+          ),
           results: [],
         };
         return;
       }
 
+      // For valid address searches, prepend a wallet link row
+      const addressRow = isValidBitcoinAddress(currentTerm.trim())
+        ? [{ _addressLink: true, address: currentTerm.trim() }]
+        : [];
+
       searchState.value = {
         ...searchState.value,
+        isLoading: false,
         error: "",
-        results: data.data,
+        results: [...addressRow, ...data.data],
       };
     } catch (err) {
-      console.error("SRC20 Search Error======>", err);
+      console.error("SRC20 Search Error:", err);
       searchState.value = {
         ...searchState.value,
+        isLoading: false,
         error: "AN ERROR OCCURRED\nPlease try again later",
         results: [],
       };
@@ -57,12 +98,16 @@ export function openSRC20Search() {
   };
 
   // Open modal
-  searchState.value = { term: "", error: "", results: [] };
+  searchState.value = { term: "", error: "", isLoading: false, results: [] };
   const modalContent = (
     <ModalSearchBase
       title="Search SRC-20 Tokens"
       onClose={() => {
-        searchState.value = { term: "", error: "", results: [] };
+        searchState.value = {
+          term: "",
+          error: "",
+          results: [],
+        };
         closeModal();
       }}
     >
@@ -83,6 +128,7 @@ export function openSRC20Search() {
     </ModalSearchBase>
   );
   openModal(modalContent, "slideDownUp");
+  scheduleFocus();
 }
 
 function SearchContent({
@@ -94,113 +140,104 @@ function SearchContent({
   searchTerm: string;
   setSearchTerm: (term: string) => void;
   error: string;
-  results: Array<{ tick: string }>;
+  // deno-lint-ignore no-explicit-any
+  results: any[];
   inputRef: preact.RefObject<HTMLInputElement>;
   onSearch: () => void;
   setError: (error: string) => void;
   autoFocus?: boolean;
 }) {
-  // Auto-focus effect
-  useEffect(() => {
-    if (autoFocus) {
-      setTimeout(() => {
-        inputRef.current?.focus();
-      }, 0);
-    }
-  }, [autoFocus]);
-
-  // Debounced search effect
-  useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      onSearch();
-    }, 300);
-
-    return () => clearTimeout(delayDebounceFn);
-  }, [searchState.value.term]);
+  // Shared hooks
+  useAutoFocus(inputRef, autoFocus);
+  useDebouncedSearch(searchState.value.term, onSearch, 300, () => {
+    searchState.value = { ...searchState.value, error: "", results: [] };
+  });
 
   const handleResultClick = (tick: string) => {
-    // SSR-safe browser environment check
-    if (typeof globalThis === "undefined" || !globalThis?.location) {
-      return; // Cannot navigate during SSR
-    }
-    globalThis.location.href = `/src20/${tick}`;
+    navigateSSRSafe(`/src20/${tick}`);
   };
+
+  // deno-lint-ignore no-explicit-any
+  const rawResults = (searchState.value.results || []) as any[];
+  const error = searchState.value.error;
 
   return (
     <>
-      <input
-        ref={inputRef}
-        type="text"
-        placeholder="TOKEN, ADDY OR TX HASH"
+      <SearchInputField
         value={searchState.value.term}
-        onInput={(e) => {
-          const newTerm = (e.target as HTMLInputElement).value;
-          setSearchTerm(newTerm);
-        }}
+        onChange={setSearchTerm}
+        onSearch={onSearch}
+        placeholder="TOKEN, ADDY OR TX HASH"
+        inputRef={inputRef}
         autoFocus={autoFocus}
-        class={`relative z-modal h-12 w-full bg-color-background/50 pl-7.5 pr-[68px] font-medium text-sm text-color-grey-light placeholder:bg-color-background/50 placeholder:font-light placeholder:!text-color-grey no-outline ${
-          searchState.value.error ||
-            (searchState.value.results?.length ?? 0) > 0
-            ? "rounded-t-3xl"
-            : "rounded-3xl"
-        }`}
+        hasResults={rawResults.length > 0}
+        hasError={!!error}
+        isLoading={searchState.value.isLoading}
       />
-      <div class="absolute z-[3] right-6 top-[11px] cursor-pointer">
-        <Icon
-          type="icon"
-          name="search"
-          weight="bold"
-          size="xs"
-          color="custom"
-          className={`w-5 h-5 ${
-            searchState.value.error
-              ? "stroke-color-grey-light"
-              : "stroke-color-grey"
-          }`}
-        />
-      </div>
 
-      {searchState.value.error
-        ? (
-          <ul class="bg-color-background/50 rounded-b-3xl z-modal overflow-y-auto">
-            <li class="flex flex-col items-center justify-end pt-1.5 pb-3 px-7.5">
-              <img
-                src="/img/placeholder/broken.png"
-                alt="No results"
-                class="w-[84px] pb-3"
-              />
-              <span class="text-center w-full">
-                {searchState.value.error.split("\n").map((text, index) => (
-                  <div
-                    key={index}
-                    class={`${
-                      index === 0
-                        ? "font-light text-base text-color-grey-light"
-                        : index ===
-                            searchState.value.error.split("\n").length - 1
-                        ? textSm
-                        : "font-medium text-sm text-color-grey pt-0.5 pb-1"
-                    } break-all overflow-hidden`}
-                  >
-                    {text}
-                  </div>
-                ))}
-              </span>
-            </li>
-          </ul>
-        )
-        : searchState.value.results && searchState.value.results.length > 0
+      {error
+        ? <SearchErrorDisplay error={error} />
+        : rawResults.length > 0
         ? (
           <ul class="max-h-[266px] bg-color-background/50 rounded-b-3xl z-modal overflow-y-auto scrollbar-background-overlay [&::-webkit-scrollbar]:!rounded-[2px] [&::-webkit-scrollbar]:!w-[4px]">
-            {searchState.value.results.map((result: { tick: string }) => (
-              <li
-                key={result.tick}
-                onClick={() => handleResultClick(result.tick)}
-                class={`${textSm} px-7.5 py-[9px] hover:bg-color-background/60 ${transitionColors} cursor-pointer`}
-              >
-                {result.tick}
-              </li>
-            ))}
+            {rawResults.map(
+              (result) =>
+                result._addressLink
+                  ? (
+                    <li
+                      key="address-link"
+                      onClick={() =>
+                        navigateSSRSafe(
+                          `/wallet/${result.address}`,
+                        )}
+                      class={`flex items-center gap-5 px-7.5 py-1.5 hover:bg-color-background/60 ${transitionColors} cursor-pointer`}
+                    >
+                      <div class="w-10 h-10 rounded bg-color-background/30 flex items-center justify-center">
+                        <Icon
+                          type="icon"
+                          name="wallet"
+                          weight="normal"
+                          size="md"
+                          color="greyLight"
+                        />
+                      </div>
+                      <div class="flex flex-col flex-1 min-w-0">
+                        <span class="text-sm font-medium text-stamp-grey-light">
+                          VIEW WALLET
+                        </span>
+                        <span class="text-xs text-stamp-grey truncate">
+                          {result.address?.startsWith("bc1p")
+                            ? abbreviateAddress(result.address, 20)
+                            : result.address}
+                        </span>
+                      </div>
+                    </li>
+                  )
+                  : (
+                    <li
+                      key={result.tick}
+                      onClick={() => handleResultClick(result.tick)}
+                      class={`flex items-center gap-5 px-7.5 py-1.5 hover:bg-color-background/60 ${transitionColors} cursor-pointer`}
+                    >
+                      <img
+                        src={result.tx_hash
+                          ? constructStampUrl(result.tx_hash)
+                          : "/img/placeholder/broken.png"}
+                        alt={result.tick}
+                        class="w-10 h-10 rounded object-cover"
+                      />
+                      <div class="flex flex-col flex-1">
+                        <span class="text-sm font-medium text-color-grey-light uppercase">
+                          {result.tick}
+                        </span>
+                        <span class="text-xs text-color-grey uppercase">
+                          {result.progress ? `${result.progress}% Minted` : ""}
+                          {result.holders ? ` · ${result.holders} Holders` : ""}
+                        </span>
+                      </div>
+                    </li>
+                  ),
+            )}
           </ul>
         )
         : null}

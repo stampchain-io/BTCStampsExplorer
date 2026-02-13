@@ -51,28 +51,36 @@ export const useFees = (): UseFeeResult => {
     const unsubscribe = subscribeFees();
 
     // Subscribe to signal changes with optimized updates
-    const signalUnsubscribe = feeSignal.subscribe((feeState) => {
-      // Only update fees if the data has actually changed
-      const dataChanged =
-        JSON.stringify(feeState.data) !== JSON.stringify(prevDataRef.current);
-      if (dataChanged) {
-        console.log("[useFees] Fee data changed, updating state");
-        prevDataRef.current = feeState.data;
-        setFees(feeState.data);
-      }
+    const signalUnsubscribe = feeSignal.subscribe(
+      (
+        feeState: {
+          data: FeeData | null;
+          loading: boolean;
+          error: string | null;
+        },
+      ) => {
+        // Only update fees if the data has actually changed
+        const dataChanged =
+          JSON.stringify(feeState.data) !== JSON.stringify(prevDataRef.current);
+        if (dataChanged) {
+          console.log("[useFees] Fee data changed, updating state");
+          prevDataRef.current = feeState.data;
+          setFees(feeState.data);
+        }
 
-      // Only update loading if it actually changed
-      if (feeState.loading !== prevLoadingRef.current) {
-        prevLoadingRef.current = feeState.loading;
-        setLoading(feeState.loading);
-      }
+        // Only update loading if it actually changed
+        if (feeState.loading !== prevLoadingRef.current) {
+          prevLoadingRef.current = feeState.loading;
+          setLoading(feeState.loading);
+        }
 
-      // Only update error if it actually changed
-      if (feeState.error !== prevErrorRef.current) {
-        prevErrorRef.current = feeState.error;
-        setError(feeState.error);
-      }
-    });
+        // Only update error if it actually changed
+        if (feeState.error !== prevErrorRef.current) {
+          prevErrorRef.current = feeState.error;
+          setError(feeState.error);
+        }
+      },
+    );
 
     // Cleanup subscriptions
     return () => {

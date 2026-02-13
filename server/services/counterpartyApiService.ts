@@ -64,6 +64,69 @@ export function normalizeFeeRate(params: {
   }
 }
 
+/**
+ * Configuration for stale-if-error behavior
+ * When XCP API fails, we can serve stale cached data for a longer period
+ */
+const STALE_IF_ERROR_TTL = 60 * 60; // 1 hour - serve stale data if all nodes fail
+
+/**
+ * In-memory stale cache for XCP API responses
+ * This provides a fallback when Redis cache expires and API is unavailable
+ */
+const staleXcpCache = new Map<string, { data: any; timestamp: number; maxStaleAge: number }>();
+const MAX_STALE_ENTRIES = 1000;
+
+/**
+ * Clean old entries from stale cache
+ */
+function cleanStaleCache(): void {
+  const now = Date.now();
+  for (const [key, entry] of staleXcpCache.entries()) {
+    // Remove entries older than their max stale age
+    if (now - entry.timestamp > entry.maxStaleAge * 1000) {
+      staleXcpCache.delete(key);
+    }
+  }
+  // If still over limit, remove oldest entries
+  if (staleXcpCache.size > MAX_STALE_ENTRIES) {
+    const entries = Array.from(staleXcpCache.entries())
+      .sort((a, b) => a[1].timestamp - b[1].timestamp);
+    const toRemove = entries.slice(0, staleXcpCache.size - MAX_STALE_ENTRIES);
+    for (const [key] of toRemove) {
+      staleXcpCache.delete(key);
+    }
+  }
+}
+
+/**
+ * Store data in stale cache for fallback
+ */
+function setStaleCache<T>(key: string, data: T, maxStaleAge: number = STALE_IF_ERROR_TTL): void {
+  cleanStaleCache();
+  staleXcpCache.set(key, {
+    data,
+    timestamp: Date.now(),
+    maxStaleAge,
+  });
+}
+
+/**
+ * Get stale data from cache if within max stale age
+ */
+function getStaleCache<T>(key: string): T | null {
+  const entry = staleXcpCache.get(key);
+  if (!entry) return null;
+
+  const age = (Date.now() - entry.timestamp) / 1000;
+  if (age > entry.maxStaleAge) {
+    staleXcpCache.delete(key);
+    return null;
+  }
+
+  return entry.data as T;
+}
+
 export async function fetchXcpV2WithCache<T>(
   endpoint: string,
   queryParams: URLSearchParams,
@@ -84,6 +147,9 @@ export async function fetchXcpV2WithCache<T>(
     cacheKey,
     async () => {
       let errorMessage = null;
+      let lastStatusCode: number | null = null;
+      let isRateLimited = false;
+
       for (const node of XCP_V2_NODES) {
         const url = `${node.url}${endpoint}?${queryParams.toString()}`;
         await logger.debug("api", {
@@ -96,6 +162,7 @@ export async function fetchXcpV2WithCache<T>(
 
         try {
           const response = await httpClient.get(url);
+          lastStatusCode = response.status;
 
           await logger.debug("api", {
             message: "XCP node response received",
@@ -104,6 +171,19 @@ export async function fetchXcpV2WithCache<T>(
             ok: response.ok,
             url
           });
+
+          // Check for rate limiting
+          if (response.status === 429) {
+            isRateLimited = true;
+            await logger.warn("api", {
+              message: "XCP node rate limited (429)",
+              node: node.name,
+              url,
+              retryAfter: response.headers?.["retry-after"],
+            });
+            errorMessage = "Rate limited (429)";
+            continue; // Try the next node
+          }
 
           if (!response.ok) {
             const errorBody = typeof response.data === 'string' ? response.data : JSON.stringify(response.data);
@@ -124,33 +204,60 @@ export async function fetchXcpV2WithCache<T>(
             node: node.name,
             url
           });
+
+          // Store successful response in stale cache for fallback
+          setStaleCache(cacheKey, data, STALE_IF_ERROR_TTL);
+
           return data;
         } catch (error) {
+          const errorMsg = error instanceof Error ? error.message : String(error);
+
+          // Check if error message indicates rate limiting
+          if (errorMsg.includes('429') || errorMsg.toLowerCase().includes('rate limit')) {
+            isRateLimited = true;
+          }
+
           await logger.error("api", {
             message: "XCP node fetch error",
             node: node.name,
-            error: error instanceof Error ? error.message : String(error),
+            error: errorMsg,
             url,
             stack: error instanceof Error ? error.stack : undefined
           });
-          errorMessage = error instanceof Error ? error.message : String(error)
+          errorMessage = errorMsg;
           // Continue to the next node
         }
       }
 
-      // If all nodes fail, return a minimal data structure
+      // All nodes failed - try to use stale cached data
+      const staleData = getStaleCache<T>(cacheKey);
+      if (staleData) {
+        await logger.warn("api", {
+          message: "All XCP nodes failed, using stale cached data",
+          endpoint,
+          queryParams: queryParams.toString(),
+          error: errorMessage,
+          isRateLimited,
+        });
+        return staleData;
+      }
+
+      // No stale data available, return minimal structure
       await logger.warn("api", {
-        message: "All XCP nodes failed, returning minimal data structure",
+        message: "All XCP nodes failed, no stale data available, returning minimal data structure",
         endpoint,
         queryParams: queryParams.toString(),
-        error: errorMessage
+        error: errorMessage,
+        isRateLimited,
+        lastStatusCode,
       });
 
       return {
         result: [],
         next_cursor: null,
         result_count: 0,
-        error: errorMessage
+        error: errorMessage,
+        fromStaleCache: false,
       } as T;
     },
     cacheTimeout,

@@ -2,7 +2,7 @@ import { CollectionRepository } from "$server/database/collectionRepository.ts";
 import { BlockController } from "$server/controller/blockController.ts";
 import type {CollectionQueryParams, PaginatedCollectionResponseBody} from "$server/types/collection.d.ts";
 import { paginate } from "$lib/utils/data/pagination/paginationUtils.ts";
-import type { CollectionRow } from "$server/types/collection.d.ts";
+import type { CollectionRow, CollectionWithCreators } from "$server/types/collection.d.ts";
 
 export class CollectionService {
   static async getCollectionDetails(
@@ -49,6 +49,17 @@ export class CollectionService {
     collectionName: string,
   ): Promise<CollectionRow | null> {
     return await CollectionRepository.getCollectionByName(collectionName);
+  }
+
+  static async getCollectionById(
+    collectionId: string,
+    options: {
+      includeMarketData?: boolean;
+      stampLimit?: number;
+      stampPage?: number;
+    } = {},
+  ): Promise<CollectionWithCreators | null> {
+    return await CollectionRepository.getCollectionById(collectionId, options);
   }
 
   static async getCollectionNames(

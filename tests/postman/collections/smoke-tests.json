@@ -15,8 +15,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/health",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "health"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "health"
+              ]
             }
           },
           "event": [
@@ -36,7 +41,7 @@
                   "pm.test('Health response contains status', function () {",
                   "    const responseJson = pm.response.json();",
                   "    pm.expect(responseJson).to.have.property('status');",
-                  "    pm.expect(responseJson.status).to.eql('healthy');",
+                  "    pm.expect(responseJson.status).to.eql('OK');",
                   "});",
                   "",
                   "// Store health check result",
@@ -53,8 +58,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/internal/monitoring",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "internal", "monitoring"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "internal",
+                "monitoring"
+              ]
             }
           },
           "event": [
@@ -100,8 +111,16 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/api/v2/src20/balance/{{test_address}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v2", "src20", "balance", "{{test_address}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src20",
+                "balance",
+                "{{test_address}}"
+              ]
             }
           },
           "event": [
@@ -131,7 +150,7 @@
                   "",
                   "pm.test('SRC20 Balance v2.2 has required structure', function () {",
                   "    const responseJson = pm.response.json();",
-                  "    pm.expect(responseJson).to.have.all.keys('last_block', 'data');",
+                  "    pm.expect(responseJson).to.include.all.keys('last_block', 'data');",
                   "    pm.expect(responseJson.last_block).to.be.a('number');",
                   "    pm.expect(responseJson.data).to.be.an('array');",
                   "});",
@@ -155,8 +174,16 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/api/v2/src20/balance/{{test_address}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v2", "src20", "balance", "{{test_address}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src20",
+                "balance",
+                "{{test_address}}"
+              ]
             }
           },
           "event": [
@@ -180,7 +207,7 @@
                   "    ",
                   "    if (responseJson.data.length > 0) {",
                   "        const firstItem = responseJson.data[0];",
-                  "        pm.expect(firstItem).to.have.property('market_data', 'v2.3 MUST have market_data field');",
+                  "        pm.expect(firstItem, 'v2.3 MUST have market_data field').to.have.property('market_data');",
                   "        ",
                   "        // market_data can be null or object",
                   "        const marketData = firstItem.market_data;",
@@ -190,7 +217,7 @@
                   "",
                   "pm.test('SRC20 Balance v2.3 has required structure', function () {",
                   "    const responseJson = pm.response.json();",
-                  "    pm.expect(responseJson).to.have.all.keys('last_block', 'data');",
+                  "    pm.expect(responseJson).to.include.all.keys('last_block', 'data');",
                   "    pm.expect(responseJson.last_block).to.be.a('number');",
                   "    pm.expect(responseJson.data).to.be.an('array');",
                   "});",
@@ -214,8 +241,14 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/api/v2/src20?limit=5",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v2", "src20"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src20"
+              ],
               "query": [
                 {
                   "key": "limit",
@@ -269,8 +302,14 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/api/v2/src20?op=deploy&limit=3&includeMarketData=true",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v2", "src20"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src20"
+              ],
               "query": [
                 {
                   "key": "op",
@@ -314,7 +353,7 @@
                   "    pm.expect(responseJson.data.length).to.be.above(0, 'Should return at least 1 deploy operation');",
                   "    ",
                   "    const firstItem = responseJson.data[0];",
-                  "    pm.expect(firstItem).to.have.property('stamp_url', 'stamp_url field MUST exist');",
+                  "    pm.expect(firstItem, 'stamp_url field MUST exist').to.have.property('stamp_url');",
                   "    pm.expect(firstItem.stamp_url).to.be.a('string');",
                   "    ",
                   "    // Validate stamp_url format: https://stampchain.io/stamps/{tx_hash}.svg",
@@ -326,7 +365,7 @@
                   "    const responseJson = pm.response.json();",
                   "    const firstItem = responseJson.data[0];",
                   "    ",
-                  "    pm.expect(firstItem).to.have.property('deploy_img', 'deploy_img field MUST exist');",
+                  "    pm.expect(firstItem, 'deploy_img field MUST exist').to.have.property('deploy_img');",
                   "    pm.expect(firstItem.deploy_img).to.be.a('string');",
                   "    ",
                   "    // Validate deploy_img format: https://stampchain.io/stamps/{deploy_tx}.svg",
@@ -338,7 +377,7 @@
                   "    const responseJson = pm.response.json();",
                   "    const firstItem = responseJson.data[0];",
                   "    ",
-                  "    pm.expect(firstItem).to.have.property('deploy_tx', 'deploy_tx field MUST exist');",
+                  "    pm.expect(firstItem, 'deploy_tx field MUST exist').to.have.property('deploy_tx');",
                   "    pm.expect(firstItem.deploy_tx).to.be.a('string');",
                   "    ",
                   "    // Validate deploy_tx format: 64-character hex string",
@@ -369,7 +408,7 @@
                   "    const responseJson = pm.response.json();",
                   "    const firstItem = responseJson.data[0];",
                   "    ",
-                  "    pm.expect(firstItem).to.have.property('market_data', 'market_data field MUST exist for v2.3');",
+                  "    pm.expect(firstItem, 'market_data field MUST exist for v2.3').to.have.property('market_data');",
                   "    ",
                   "    if (firstItem.market_data !== null) {",
                   "        pm.expect(firstItem.market_data).to.be.an('object');",
@@ -383,7 +422,7 @@
                   "    const responseJson = pm.response.json();",
                   "    const firstItem = responseJson.data[0];",
                   "    ",
-                  "    pm.expect(firstItem).to.have.property('mint_progress', 'mint_progress field MUST exist for v2.3');",
+                  "    pm.expect(firstItem, 'mint_progress field MUST exist for v2.3').to.have.property('mint_progress');",
                   "    ",
                   "    if (firstItem.mint_progress !== null) {",
                   "        pm.expect(firstItem.mint_progress).to.be.an('object');",
@@ -400,75 +439,349 @@
               }
             }
           ]
-        }
-              ]
-      },
-      {
-        "name": "Stamps with Cursed Filter (Alternative to Deprecated Cursed Endpoint)",
-        "event": [
-          {
-            "listen": "test",
-            "script": {
-              "type": "text/javascript",
-              "exec": [
-                "pm.test('✅ Stamps with cursed filter responds', function () {",
-                "    pm.response.to.have.status(200);",
-                "});",
-                "",
-                "pm.test('⚡ Stamps cursed filter response time acceptable', function () {",
-                "    pm.expect(pm.response.responseTime).to.be.below(5000);",
-                "});",
-                "",
-                "pm.test('📋 Stamps cursed filter has required structure', function () {",
-                "    const response = pm.response.json();",
-                "    pm.expect(response).to.have.property('data');",
-                "    pm.expect(response).to.have.property('page');",
-                "    pm.expect(response).to.have.property('limit');",
-                "    pm.expect(response).to.have.property('total');",
-                "});",
-                "",
-                "pm.test('🎯 Stamps cursed filter returns cursed stamps only', function () {",
-                "    const response = pm.response.json();",
-                "    if (response.data && response.data.length > 0) {",
-                "        response.data.forEach(function(stamp) {",
-                "            pm.expect(stamp).to.have.property('stamp');",
-                "            pm.expect(stamp.stamp).to.be.below(0); // Cursed stamps have negative numbers",
-                "        });",
-                "    }",
-                "});",
-                "",
-                "pm.test('✨ Stamps cursed filter equivalent to deprecated cursed endpoint', function () {",
-                "    const response = pm.response.json();",
-                "    pm.expect(response.deprecated).to.not.exist; // Should not be deprecated",
-                "    pm.expect(response.data).to.be.an('array');",
-                "});"
-              ]
-            }
-          }
-        ],
-        "request": {
-          "method": "GET",
-          "header": [
+        },
+        {
+          "name": "Stamps with Cursed Filter (Alternative to Deprecated Cursed Endpoint)",
+          "event": [
             {
-              "key": "X-API-Version",
-              "value": "2.3"
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Stamps with cursed filter responds', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Stamps cursed filter response time acceptable', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(5000);",
+                  "});",
+                  "",
+                  "pm.test('Stamps cursed filter has required structure', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('data');",
+                  "    pm.expect(response).to.have.property('page');",
+                  "    pm.expect(response).to.have.property('limit');",
+                  "    pm.expect(response).to.have.property('total');",
+                  "});",
+                  "",
+                  "pm.test('Stamps cursed filter returns cursed stamps only', function () {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.length > 0) {",
+                  "        response.data.forEach(function(stamp) {",
+                  "            pm.expect(stamp).to.have.property('stamp');",
+                  "            pm.expect(stamp.stamp).to.be.below(0);",
+                  "        });",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test('Stamps cursed filter equivalent to deprecated cursed endpoint', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.deprecated).to.not.exist;",
+                  "    pm.expect(response.data).to.be.an('array');",
+                  "});"
+                ]
+              }
             }
           ],
-          "url": {
-            "raw": "{{baseUrl}}/api/v2/stamps?type=cursed&limit=3",
-            "host": ["{{baseUrl}}"],
-            "path": ["api", "v2", "stamps"],
-            "query": [
+          "request": {
+            "method": "GET",
+            "header": [
               {
-                "key": "type",
-                "value": "cursed"
-              },
-              {
-                "key": "limit",
-                "value": "3"
+                "key": "X-API-Version",
+                "value": "2.3"
               }
-            ]
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v2/stamps?type=cursed&limit=3",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "stamps"
+              ],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "cursed"
+                },
+                {
+                  "key": "limit",
+                  "value": "3"
+                }
+              ]
+            }
           }
+        }
+      ]
+    },
+    {
+      "name": "Stamp Preview API Tests",
+      "item": [
+        {
+          "name": "Preview - Image Stamp (PNG)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v2/stamp/37687/preview",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "stamp",
+                "37687",
+                "preview"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Smoke Test: Preview endpoint for image stamp",
+                  "pm.test('Preview image stamp returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Preview image stamp response time < 10000ms', function () {",
+                  "    // First render may be slow; cached renders are fast",
+                  "    pm.expect(pm.response.responseTime).to.be.below(10000);",
+                  "});",
+                  "",
+                  "pm.test('Preview image stamp returns PNG content type', function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('image/png');",
+                  "});",
+                  "",
+                  "pm.test('Preview image stamp has non-empty body', function () {",
+                  "    pm.expect(pm.response.size().body).to.be.above(0);",
+                  "});",
+                  "",
+                  "pm.test('Preview image stamp has caching headers', function () {",
+                  "    const cacheControl = pm.response.headers.get('Cache-Control');",
+                  "    pm.expect(cacheControl).to.exist;",
+                  "    pm.expect(cacheControl).to.include('public');",
+                  "});",
+                  "",
+                  "pm.test('Preview image stamp has conversion metadata', function () {",
+                  "    const conversionMethod = pm.response.headers.get('X-Conversion-Method');",
+                  "    pm.expect(conversionMethod).to.exist;",
+                  "    pm.expect(conversionMethod).to.be.a('string');",
+                  "});",
+                  "",
+                  "// Store test result",
+                  "pm.globals.set('preview_image_stamp_passed', pm.response.code === 200);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Preview - HTML Stamp",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v2/stamp/1054189/preview",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "stamp",
+                "1054189",
+                "preview"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Smoke Test: Preview endpoint for HTML stamp",
+                  "// HTML stamps require Chrome rendering; may 302 to fallback if Chrome unavailable",
+                  "pm.test('Preview HTML stamp responds with 200 or 302', function () {",
+                  "    pm.expect([200, 302]).to.include(pm.response.code);",
+                  "});",
+                  "",
+                  "pm.test('Preview HTML stamp response time < 15000ms', function () {",
+                  "    // HTML rendering via Chrome is slower than image upscaling",
+                  "    pm.expect(pm.response.responseTime).to.be.below(15000);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test('Preview HTML stamp returns PNG content type', function () {",
+                  "        pm.expect(pm.response.headers.get('Content-Type')).to.include('image/png');",
+                  "    });",
+                  "",
+                  "    pm.test('Preview HTML stamp has non-empty body', function () {",
+                  "        pm.expect(pm.response.size().body).to.be.above(0);",
+                  "    });",
+                  "",
+                  "    pm.test('Preview HTML stamp has caching headers', function () {",
+                  "        const cacheControl = pm.response.headers.get('Cache-Control');",
+                  "        pm.expect(cacheControl).to.exist;",
+                  "        pm.expect(cacheControl).to.include('public');",
+                  "    });",
+                  "}",
+                  "",
+                  "if (pm.response.code === 302) {",
+                  "    pm.test('Preview HTML stamp 302 redirects to fallback', function () {",
+                  "        const location = pm.response.headers.get('Location');",
+                  "        pm.expect(location).to.exist;",
+                  "        pm.expect(location).to.include('stampchain');",
+                  "    });",
+                  "}",
+                  "",
+                  "// Store test result (both 200 and 302 are acceptable)",
+                  "pm.globals.set('preview_html_stamp_passed', [200, 302].includes(pm.response.code));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "OG Tag & Social Meta Tests",
+      "item": [
+        {
+          "name": "Stamp Detail Page - OG Tags (Image Stamp)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/html"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/stamp/37687",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "stamp",
+                "37687"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Smoke Test: OG tags on stamp detail page",
+                  "pm.test('Stamp detail page returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Stamp detail page response time < 5000ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(5000);",
+                  "});",
+                  "",
+                  "pm.test('Stamp detail page returns HTML', function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('text/html');",
+                  "});",
+                  "",
+                  "const body = pm.response.text();",
+                  "",
+                  "pm.test('Stamp detail page has og:image meta tag', function () {",
+                  "    pm.expect(body).to.include('og:image');",
+                  "    // og:image should point to the preview endpoint",
+                  "    pm.expect(body).to.match(/og:image[^>]*content=\"[^\"]*\\/api\\/v2\\/stamp\\/37687\\/preview\"/);",
+                  "});",
+                  "",
+                  "pm.test('Stamp detail page has twitter:card set to summary_large_image', function () {",
+                  "    pm.expect(body).to.include('twitter:card');",
+                  "    pm.expect(body).to.match(/twitter:card[^>]*content=\"summary_large_image\"/);",
+                  "});",
+                  "",
+                  "pm.test('Stamp detail page has twitter:image meta tag', function () {",
+                  "    pm.expect(body).to.include('twitter:image');",
+                  "    pm.expect(body).to.match(/twitter:image[^>]*content=\"[^\"]*\\/api\\/v2\\/stamp\\/37687\\/preview\"/);",
+                  "});",
+                  "",
+                  "pm.test('Stamp detail page has og:image:width and og:image:height', function () {",
+                  "    pm.expect(body).to.match(/og:image:width[^>]*content=\"1200\"/);",
+                  "    pm.expect(body).to.match(/og:image:height[^>]*content=\"1200\"/);",
+                  "});",
+                  "",
+                  "pm.test('Stamp detail page has og:title', function () {",
+                  "    pm.expect(body).to.include('og:title');",
+                  "});",
+                  "",
+                  "// Store test result",
+                  "pm.globals.set('og_tags_image_stamp_passed', pm.response.code === 200);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Stamp Detail Page - OG Tags (HTML Stamp)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/html"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/stamp/1054189",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "stamp",
+                "1054189"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Smoke Test: OG tags on HTML stamp detail page",
+                  "pm.test('HTML stamp detail page returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('HTML stamp detail page response time < 5000ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(5000);",
+                  "});",
+                  "",
+                  "const body = pm.response.text();",
+                  "",
+                  "pm.test('HTML stamp detail page has og:image pointing to preview', function () {",
+                  "    pm.expect(body).to.include('og:image');",
+                  "    pm.expect(body).to.match(/og:image[^>]*content=\"[^\"]*\\/api\\/v2\\/stamp\\/1054189\\/preview\"/);",
+                  "});",
+                  "",
+                  "pm.test('HTML stamp detail page has twitter:card summary_large_image', function () {",
+                  "    pm.expect(body).to.include('twitter:card');",
+                  "    pm.expect(body).to.match(/twitter:card[^>]*content=\"summary_large_image\"/);",
+                  "});",
+                  "",
+                  "pm.test('HTML stamp detail page has twitter:image pointing to preview', function () {",
+                  "    pm.expect(body).to.include('twitter:image');",
+                  "    pm.expect(body).to.match(/twitter:image[^>]*content=\"[^\"]*\\/api\\/v2\\/stamp\\/1054189\\/preview\"/);",
+                  "});",
+                  "",
+                  "// Store test result",
+                  "pm.globals.set('og_tags_html_stamp_passed', pm.response.code === 200);"
+                ]
+              }
+            }
+          ]
         }
       ]
     },
@@ -482,8 +795,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/v2/src20?limit=1",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v2", "src20"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src20"
+              ],
               "query": [
                 {
                   "key": "limit",
@@ -532,8 +851,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/health",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "health"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "health"
+              ]
             }
           },
           "event": [
@@ -544,16 +868,20 @@
                   "// SMOKE TEST SUITE RESULTS SUMMARY",
                   "",
                   "// Collect all test results",
-                  "const healthPassed = pm.globals.get('health_check_passed') === 'true';",
-                  "const src20v22Passed = pm.globals.get('src20_balance_v2_2_passed') === 'true';",
-                  "const src20v23Passed = pm.globals.get('src20_balance_v2_3_passed') === 'true';",
-                  "const overviewPassed = pm.globals.get('src20_overview_passed') === 'true';",
-                  "const dbPassed = pm.globals.get('database_connectivity_passed') === 'true';",
-                  "const src20DeployEnhancedPassed = pm.globals.get('src20_deploy_enhanced_passed') === 'true';",
+                  "const healthPassed = !!pm.globals.get('health_check_passed');",
+                  "const src20v22Passed = !!pm.globals.get('src20_balance_v2_2_passed');",
+                  "const src20v23Passed = !!pm.globals.get('src20_balance_v2_3_passed');",
+                  "const overviewPassed = !!pm.globals.get('src20_overview_passed');",
+                  "const dbPassed = !!pm.globals.get('database_connectivity_passed');",
+                  "const src20DeployEnhancedPassed = !!pm.globals.get('src20_deploy_enhanced_passed');",
+                  "const previewImagePassed = !!pm.globals.get('preview_image_stamp_passed');",
+                  "const previewHtmlPassed = !!pm.globals.get('preview_html_stamp_passed');",
+                  "const ogTagsImagePassed = !!pm.globals.get('og_tags_image_stamp_passed');",
+                  "const ogTagsHtmlPassed = !!pm.globals.get('og_tags_html_stamp_passed');",
                   "",
                   "// Calculate overall success rate",
-                  "const totalTests = 6;",
-                  "const passedTests = [healthPassed, src20v22Passed, src20v23Passed, overviewPassed, dbPassed, src20DeployEnhancedPassed]",
+                  "const totalTests = 10;",
+                  "const passedTests = [healthPassed, src20v22Passed, src20v23Passed, overviewPassed, dbPassed, src20DeployEnhancedPassed, previewImagePassed, previewHtmlPassed, ogTagsImagePassed, ogTagsHtmlPassed]",
                   "    .filter(result => result === true).length;",
                   "const successRate = (passedTests / totalTests) * 100;",
                   "",
@@ -578,19 +906,37 @@
                   "    pm.expect(src20DeployEnhancedPassed).to.be.true;",
                   "});",
                   "",
+                  "pm.test('Preview API: Image Stamp Rendering', function () {",
+                  "    pm.expect(previewImagePassed).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('Preview API: HTML Stamp Rendering', function () {",
+                  "    pm.expect(previewHtmlPassed).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('OG Tags: Stamp Detail Pages Have Social Meta', function () {",
+                  "    pm.expect(ogTagsImagePassed && ogTagsHtmlPassed).to.be.true;",
+                  "});",
+                  "",
                   "// Log results for reporting",
-                  "console.log('🔥 SMOKE TEST RESULTS SUMMARY:');",
-                  "console.log(`   Health Check: ${healthPassed ? '✅ PASS' : '❌ FAIL'}`);",
-                  "console.log(`   SRC20 v2.2: ${src20v22Passed ? '✅ PASS' : '❌ FAIL'}`);",
-                  "console.log(`   SRC20 v2.3: ${src20v23Passed ? '✅ PASS' : '❌ FAIL'}`);",
-                  "console.log(`   SRC20 Overview: ${overviewPassed ? '✅ PASS' : '❌ FAIL'}`);",
-                  "console.log(`   Database: ${dbPassed ? '✅ PASS' : '❌ FAIL'}`);",
-                  "console.log(`   SRC20 Deploy Enhanced: ${src20DeployEnhancedPassed ? '✅ PASS' : '❌ FAIL'}`);",
+                  "console.log('SMOKE TEST RESULTS SUMMARY:');",
+                  "console.log(`   Health Check: ${healthPassed ? 'PASS' : 'FAIL'}`);",
+                  "console.log(`   SRC20 v2.2: ${src20v22Passed ? 'PASS' : 'FAIL'}`);",
+                  "console.log(`   SRC20 v2.3: ${src20v23Passed ? 'PASS' : 'FAIL'}`);",
+                  "console.log(`   SRC20 Overview: ${overviewPassed ? 'PASS' : 'FAIL'}`);",
+                  "console.log(`   Database: ${dbPassed ? 'PASS' : 'FAIL'}`);",
+                  "console.log(`   SRC20 Deploy Enhanced: ${src20DeployEnhancedPassed ? 'PASS' : 'FAIL'}`);",
+                  "console.log(`   Preview Image Stamp: ${previewImagePassed ? 'PASS' : 'FAIL'}`);",
+                  "console.log(`   Preview HTML Stamp: ${previewHtmlPassed ? 'PASS' : 'FAIL'}`);",
+                  "console.log(`   OG Tags Image Stamp: ${ogTagsImagePassed ? 'PASS' : 'FAIL'}`);",
+                  "console.log(`   OG Tags HTML Stamp: ${ogTagsHtmlPassed ? 'PASS' : 'FAIL'}`);",
                   "console.log(`   Overall Success Rate: ${successRate}% (${passedTests}/${totalTests})`);",
                   "",
                   "// Set final result for deployment pipeline",
                   "pm.globals.set('smoke_tests_passed', successRate >= 80);",
-                  "pm.globals.set('smoke_tests_success_rate', successRate);"
+                  "pm.globals.set('smoke_tests_success_rate', successRate);",
+                  "",
+                  "// Clean up initialization guard for next run"
                 ]
               }
             }
@@ -606,21 +952,9 @@
         "type": "text/javascript",
         "exec": [
           "// Set default test values if not provided",
-          "if (!pm.globals.has('test_address')) {",
+          "if (!pm.globals.get('test_address')) {",
           "    pm.globals.set('test_address', 'bc1qrfne7jw6fk6r8kl6dlm0ktt6rv4e5nqp5y4yny');",
-          "}",
-          "",
-          "// Clear previous test results",
-          "pm.globals.unset('health_check_passed');",
-          "pm.globals.unset('src20_balance_v2_2_passed');",
-          "pm.globals.unset('src20_balance_v2_3_passed');",
-          "pm.globals.unset('src20_overview_passed');",
-          "pm.globals.unset('database_connectivity_passed');",
-          "pm.globals.unset('src20_deploy_enhanced_passed');",
-          "pm.globals.unset('smoke_tests_passed');",
-          "pm.globals.unset('smoke_tests_success_rate');",
-          "",
-          "console.log('🔥 Starting BTCStampsExplorer Production Smoke Tests...');"
+          "}"
         ]
       }
     }

@@ -86,6 +86,8 @@ export type {
   StampClassification,
   // Stamp filters and props
   StampFilters,
+  // Stamp market data types
+  StampMarketData,
   // Stamp metadata and validation
   StampMetadata,
   StampParsingResult,

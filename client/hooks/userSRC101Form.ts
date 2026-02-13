@@ -80,15 +80,21 @@ export function useSRC101Form(
 
     try {
       // Phase 1: Immediate client-side fee estimation
-      // SRC101 transactions typically have ~300 bytes
-      // 1. Main output (dust to recipient ~546 sats)
-      // 2. OP_RETURN output (0 sats for data)
-      // 3. Change output (variable, back to sender)
-
-      // Simple fee estimation: ~300 bytes for SRC101 transaction
-      const estimatedTxSize = 300;
+      // SRC-101 encodes data in 3-of-3 bare multisig outputs (62 bytes per chunk)
+      // Estimate JSON payload size based on operation type
+      const estimatedDataSize = action === "deploy"
+        ? 400
+        : action === "mint"
+        ? 350
+        : 200;
+      const payloadLength = 2 + 6 + estimatedDataSize; // length prefix + "stamp:" + data
+      const numChunks = Math.ceil(payloadLength / 62);
+      // Base ~142 vbytes (1 input + recipient + change + overhead)
+      // + 114 vbytes per multisig output, with 5% safety margin
+      const estimatedTxSize = Math.ceil((142 + numChunks * 114) * 1.05);
       const immediateEstimate = Math.ceil(estimatedTxSize * formData.fee);
-      const dustValue = 546; // Standard SRC101 dust amount
+      // Dust: recipient (789 sats) + N multisig outputs (809 sats each)
+      const dustValue = 789 + (numChunks * 809);
       const totalEstimate = immediateEstimate + dustValue;
 
       // Set immediate estimates with hasExactFees: false

@@ -355,108 +355,112 @@ const FilterDrawer = (
       style="transition-timing-function: cubic-bezier(0.46,0.03,0.52,0.96);"
       aria-labelledby="drawer-form-label"
     >
-      {/* Scrollable content area */}
-      <div class="h-full overflow-y-auto scrollbar-background-overlay pt-[29px] mobileLg:pt-[41px] tablet:pt-[40px]">
-        <div class="px-9 tablet:px-6">
-          <div class="relative w-full">
-            {/* Mobile CloseIcon - shows by default, hidden on tablet+ */}
-            <div class="flex flex-row tablet:hidden justify-between items-center w-full">
-              <h6 class="font-extrabold text-2xl color-grey-gradientLD tracking-wide select-none inline-block w-fit">
-                FILTERS
-              </h6>
-              <div class="relative">
-                <Tooltip
-                  visible={isCloseTooltipVisible}
-                  text={closeTooltipText}
-                />
-                <CloseIcon
-                  size="md"
-                  weight="bold"
-                  color="greyLight"
-                  onClick={handleCloseDrawer}
-                  onMouseEnter={handleCloseMouseEnter}
-                  onMouseLeave={handleCloseMouseLeave}
-                  aria-label="Close"
-                />
+      {/* Content container with flex column to separate scrollable area from sticky buttons */}
+      <div class="h-full pt-[29px] mobileLg:pt-[41px] tablet:pt-[40px] flex flex-col">
+        {/* Scrollable content area - overflow only on this section */}
+        <div class="flex-1 overflow-y-auto scrollbar-background-overlay">
+          <div class="px-9 tablet:px-6">
+            <div class="relative w-full">
+              {/* Mobile CloseIcon - shows by default, hidden on tablet+ */}
+              <div class="flex flex-row tablet:hidden justify-between items-center w-full">
+                <h6 class="font-extrabold text-2xl color-grey-gradientLD tracking-wide select-none inline-block w-fit">
+                  FILTERS
+                </h6>
+                <div class="relative">
+                  <Tooltip
+                    visible={isCloseTooltipVisible}
+                    text={closeTooltipText}
+                  />
+                  <CloseIcon
+                    size="md"
+                    weight="bold"
+                    color="greyLight"
+                    onClick={handleCloseDrawer}
+                    onMouseEnter={handleCloseMouseEnter}
+                    onMouseLeave={handleCloseMouseLeave}
+                    aria-label="Close"
+                  />
+                </div>
+              </div>
+              {/* Tablet+ Icon - hidden on mobile, shows on tablet+ */}
+              <div class="hidden tablet:flex flex-row justify-between items-center w-full">
+                <div class="relative">
+                  <Tooltip
+                    visible={isCloseTooltipVisible}
+                    text={closeTooltipText}
+                  />
+                  <Icon
+                    type="iconButton"
+                    name="close"
+                    weight="bold"
+                    size="xs"
+                    color="greyLight"
+                    onClick={handleCloseDrawer}
+                    onMouseEnter={handleCloseMouseEnter}
+                    onMouseLeave={handleCloseMouseLeave}
+                    aria-label="Close menu"
+                  />
+                </div>
+                <h6 class="font-normal text-lg color-grey-gradientLD mt-[2px] select-none inline-block w-fit">
+                  FILTERS
+                </h6>
               </div>
             </div>
-            {/* Tablet+ Icon - hidden on mobile, shows on tablet+ */}
-            <div class="hidden tablet:flex flex-row justify-between items-center w-full">
-              <div class="relative">
-                <Tooltip
-                  visible={isCloseTooltipVisible}
-                  text={closeTooltipText}
-                />
-                <Icon
-                  type="iconButton"
-                  name="close"
-                  weight="bold"
-                  size="xs"
-                  color="greyLight"
-                  onClick={handleCloseDrawer}
-                  onMouseEnter={handleCloseMouseEnter}
-                  onMouseLeave={handleCloseMouseLeave}
-                  aria-label="Close menu"
-                />
-              </div>
-              <h6 class="font-normal text-lg color-grey-gradientLD mt-[2px] select-none inline-block w-fit">
-                FILTERS
-              </h6>
-            </div>
+          </div>
+
+          {/* Filter content based on type */}
+          <div class="flex flex-col pt-6 pb-[120px] px-9 tablet:pt-5 tablet:pb-[100px] tablet:px-6">
+            {type === "stamp" && (
+              <FilterContentStamp
+                initialFilters={currentFilters as StampFilters}
+                onFiltersChange={(filters) => {
+                  setCurrentFilters(filters);
+                }}
+              />
+            )}
+            {type === "src20" && (
+              <FilterContentSRC20
+                initialFilters={currentFilters as SRC20Filters}
+                onFiltersChange={(filters) => {
+                  setCurrentFilters(filters);
+                }}
+              />
+            )}
+            {/* Add more filter content components for other types as needed */}
           </div>
         </div>
 
-        {/* Filter content based on type */}
-        <div class="flex flex-col pt-6 pb-[120px] px-9 tablet:pt-5 tablet:pb-[100px] tablet:px-6">
-          {type === "stamp" && (
-            <FilterContentStamp
-              initialFilters={currentFilters as StampFilters}
-              onFiltersChange={(filters) => {
-                setCurrentFilters(filters);
-              }}
-            />
-          )}
-          {type === "src20" && (
-            <FilterContentSRC20
-              initialFilters={currentFilters as SRC20Filters}
-              onFiltersChange={(filters) => {
-                setCurrentFilters(filters);
-              }}
-            />
-          )}
-          {/* Add more filter content components for other types as needed */}
+        {/* Sticky buttons - now outside overflow container */}
+        <div
+          class={`flex justify-between ${containerStickyBottom} !mt-0 w-full px-9 tablet:px-6 gap-6 bg-transparent`}
+        >
+          <Button
+            variant="outline"
+            color="grey"
+            size="mdR"
+            onClick={() => {
+              isClearingRef.current = true;
+              // Always clear to empty default filters (full reset)
+              const clearedFilters = { ...emptyFilters };
+              setCurrentFilters(clearedFilters);
+              setTimeout(() => {
+                isClearingRef.current = false;
+              }, 100);
+            }}
+            class="w-full"
+          >
+            CLEAR
+          </Button>
+          <Button
+            variant="flat"
+            color="grey"
+            size="mdR"
+            onClick={handleApplyFilters}
+            class="w-full"
+          >
+            APPLY
+          </Button>
         </div>
-      </div>
-      {/* Sticky buttons */}
-      <div
-        class={`flex justify-between ${containerStickyBottom}!mt-0 w-full px-9 tablet:px-6 gap-6 bg-transparent`}
-      >
-        <Button
-          variant="outline"
-          color="grey"
-          size="mdR"
-          onClick={() => {
-            isClearingRef.current = true;
-            // Always clear to empty default filters (full reset)
-            const clearedFilters = { ...emptyFilters };
-            setCurrentFilters(clearedFilters);
-            setTimeout(() => {
-              isClearingRef.current = false;
-            }, 100);
-          }}
-          class="w-full !backdrop-blur-xl"
-        >
-          CLEAR
-        </Button>
-        <Button
-          variant="flat"
-          color="grey"
-          size="mdR"
-          onClick={handleApplyFilters}
-          class="w-full"
-        >
-          APPLY
-        </Button>
       </div>
     </div>
   );

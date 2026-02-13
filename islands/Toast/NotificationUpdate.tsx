@@ -47,11 +47,20 @@ const TYPE = "info" as const;
 const AUTO_DISMISS = false;
 
 /**
+ * Feature flag to enable/disable the notification
+ * Set to false to prevent notification from showing
+ */
+const SHOW_NOTIFICATION = false;
+
+/**
  * Displays a one-time notification for major app updates
  * All configuration is self-contained in this file
  */
 export function NotificationUpdate() {
   useEffect(() => {
+    // Feature flag check - disable notification
+    if (!SHOW_NOTIFICATION) return;
+
     // Only run on client side
     if (typeof window === "undefined") return;
 

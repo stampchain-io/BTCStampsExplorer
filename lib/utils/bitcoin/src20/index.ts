@@ -5,4 +5,4 @@
  * to provide clean import paths and enable tree-shaking.
  */
 
-export * from "./errorHandling.ts";
+export * from "./errorHandling.tsx";

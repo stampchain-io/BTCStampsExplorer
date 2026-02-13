@@ -1,0 +1,504 @@
+name: Production Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      deploy_mode:
+        description: "Deployment mode"
+        required: true
+        default: "codebuild"
+        type: choice
+        options:
+          - codebuild
+          - deploy-only
+      skip_validation:
+        description: "Skip post-deploy validation"
+        required: false
+        default: false
+        type: boolean
+      dry_run:
+        description: "Dry run (log actions without executing)"
+        required: false
+        default: false
+        type: boolean
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPO: btc-stamps-explorer
+  ECS_CLUSTER: stamps-app-prod
+  ECS_SERVICE: stamps-app-service
+  TASK_FAMILY: stamps-app-task
+  CONTAINER_NAME: stamps-app-service
+  CODEBUILD_PROJECT: stamps-app-build
+  CODEBUILD_SOURCE_BUCKET: stamps-app-codebuild-source
+  PROD_URL: https://stampchain.io
+
+jobs:
+  # Gate: ensure production-validation passed on this commit
+  pre-check:
+    name: Pre-Deploy Checks
+    runs-on: ubuntu-latest
+    outputs:
+      deploy_mode: ${{ steps.config.outputs.mode }}
+      dry_run: ${{ steps.config.outputs.dry_run }}
+      git_sha_short: ${{ steps.config.outputs.git_sha_short }}
+      version_tag: ${{ steps.config.outputs.version_tag }}
+
+    steps:
+      - name: Determine configuration
+        id: config
+        run: |
+          MODE="${{ github.event.inputs.deploy_mode || 'codebuild' }}"
+          DRY_RUN="${{ github.event.inputs.dry_run || 'false' }}"
+          SHA_SHORT="${GITHUB_SHA::8}"
+          VERSION="prod-$(date +%Y%m%d-%H%M%S)-g${SHA_SHORT}"
+
+          echo "mode=${MODE}" >> $GITHUB_OUTPUT
+          echo "dry_run=${DRY_RUN}" >> $GITHUB_OUTPUT
+          echo "git_sha_short=${SHA_SHORT}" >> $GITHUB_OUTPUT
+          echo "version_tag=${VERSION}" >> $GITHUB_OUTPUT
+
+          echo "## Deploy Configuration" >> $GITHUB_STEP_SUMMARY
+          echo "| Setting | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Mode | ${MODE} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Commit | ${SHA_SHORT} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Version | ${VERSION} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Dry Run | ${DRY_RUN} |" >> $GITHUB_STEP_SUMMARY
+
+  build:
+    name: Build via CodeBuild
+    runs-on: ubuntu-latest
+    needs: pre-check
+    if: needs.pre-check.outputs.deploy_mode == 'codebuild'
+    timeout-minutes: 20
+
+    permissions:
+      id-token: write
+      contents: read
+
+    outputs:
+      build_id: ${{ steps.codebuild.outputs.build_id }}
+      image_uri: ${{ steps.image.outputs.uri }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOYMENT_ROLE_ARN }}
+          role-session-name: gh-build-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Verify CodeBuild project exists
+        run: |
+          aws codebuild batch-get-projects \
+            --names "${{ env.CODEBUILD_PROJECT }}" \
+            --query 'projects[0].name' \
+            --output text
+
+      - name: Upload source to S3 for CodeBuild
+        if: needs.pre-check.outputs.dry_run != 'true'
+        run: |
+          # CodeBuild source is S3-based — zip and upload current commit
+          git archive --format=zip HEAD -o /tmp/source.zip
+          aws s3 cp /tmp/source.zip \
+            "s3://${{ env.CODEBUILD_SOURCE_BUCKET }}/source.zip"
+          echo "Source uploaded to S3"
+
+      - name: Start CodeBuild
+        if: needs.pre-check.outputs.dry_run != 'true'
+        id: codebuild
+        run: |
+          BUILD_ID=$(aws codebuild start-build \
+            --project-name "${{ env.CODEBUILD_PROJECT }}" \
+            --environment-variables-override "[
+              {\"name\":\"AWS_ACCOUNT_ID\",\"value\":\"947253282047\"},
+              {\"name\":\"AWS_DEFAULT_REGION\",\"value\":\"${{ env.AWS_REGION }}\"},
+              {\"name\":\"ECR_REPOSITORY_NAME\",\"value\":\"${{ env.ECR_REPO }}\"},
+              {\"name\":\"VERSION_TAG\",\"value\":\"${{ needs.pre-check.outputs.version_tag }}\"}
+            ]" \
+            --query 'build.id' \
+            --output text)
+
+          echo "build_id=${BUILD_ID}" >> $GITHUB_OUTPUT
+          echo "Started CodeBuild: ${BUILD_ID}"
+
+      - name: Wait for CodeBuild completion
+        if: needs.pre-check.outputs.dry_run != 'true'
+        run: |
+          BUILD_ID="${{ steps.codebuild.outputs.build_id }}"
+          echo "Waiting for build ${BUILD_ID}..."
+
+          while true; do
+            STATUS=$(aws codebuild batch-get-builds \
+              --ids "${BUILD_ID}" \
+              --query 'builds[0].buildStatus' \
+              --output text)
+
+            PHASE=$(aws codebuild batch-get-builds \
+              --ids "${BUILD_ID}" \
+              --query 'builds[0].currentPhase' \
+              --output text)
+
+            echo "Status: ${STATUS} | Phase: ${PHASE}"
+
+            case "$STATUS" in
+              SUCCEEDED)
+                echo "Build succeeded"
+                break
+                ;;
+              FAILED|FAULT|STOPPED|TIMED_OUT)
+                echo "::error::CodeBuild failed with status: ${STATUS}"
+                # Get build logs URL
+                LOG_URL=$(aws codebuild batch-get-builds \
+                  --ids "${BUILD_ID}" \
+                  --query 'builds[0].logs.deepLink' \
+                  --output text)
+                echo "Build logs: ${LOG_URL}"
+                exit 1
+                ;;
+              IN_PROGRESS)
+                sleep 30
+                ;;
+            esac
+          done
+
+      - name: Verify ECR image
+        if: needs.pre-check.outputs.dry_run != 'true'
+        id: image
+        run: |
+          # Verify the image was pushed
+          ACCOUNT_ID="947253282047"
+          IMAGE_URI="${ACCOUNT_ID}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPO }}:latest"
+
+          # Retry up to 3 times (ECR propagation delay)
+          for i in 1 2 3; do
+            if aws ecr describe-images \
+              --repository-name "${{ env.ECR_REPO }}" \
+              --image-ids imageTag=latest \
+              --query 'imageDetails[0].imagePushedAt' \
+              --output text 2>/dev/null; then
+              echo "Image verified in ECR"
+              echo "uri=${IMAGE_URI}" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+            echo "Retry ${i}/3 - waiting for image..."
+            sleep 10
+          done
+
+          echo "::error::Image not found in ECR after build"
+          exit 1
+
+      - name: Dry run summary
+        if: needs.pre-check.outputs.dry_run == 'true'
+        run: |
+          echo "## Dry Run - Build Phase" >> $GITHUB_STEP_SUMMARY
+          echo "Would trigger CodeBuild project: ${{ env.CODEBUILD_PROJECT }}" >> $GITHUB_STEP_SUMMARY
+          echo "Would push to ECR: ${{ env.ECR_REPO }}:latest" >> $GITHUB_STEP_SUMMARY
+
+  deploy:
+    name: Deploy to ECS
+    runs-on: ubuntu-latest
+    needs: [pre-check, build]
+    if: always() && (needs.build.result == 'success' || needs.pre-check.outputs.deploy_mode == 'deploy-only')
+    timeout-minutes: 15
+
+    permissions:
+      id-token: write
+      contents: read
+
+    outputs:
+      task_def_arn: ${{ steps.register.outputs.arn }}
+      previous_task_def: ${{ steps.snapshot.outputs.previous_arn }}
+
+    steps:
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOYMENT_ROLE_ARN }}
+          role-session-name: gh-deploy-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Snapshot current state for rollback
+        id: snapshot
+        run: |
+          # Capture current task definition for rollback
+          CURRENT_ARN=$(aws ecs describe-services \
+            --cluster "${{ env.ECS_CLUSTER }}" \
+            --services "${{ env.ECS_SERVICE }}" \
+            --query 'services[0].taskDefinition' \
+            --output text)
+
+          echo "previous_arn=${CURRENT_ARN}" >> $GITHUB_OUTPUT
+          echo "Current task definition: ${CURRENT_ARN}"
+
+          # Verify service is healthy before deploying
+          STATUS=$(aws ecs describe-services \
+            --cluster "${{ env.ECS_CLUSTER }}" \
+            --services "${{ env.ECS_SERVICE }}" \
+            --query 'services[0].status' \
+            --output text)
+
+          if [ "$STATUS" != "ACTIVE" ]; then
+            echo "::error::ECS service not ACTIVE (status: ${STATUS})"
+            exit 1
+          fi
+
+      - name: Register new task definition
+        if: needs.pre-check.outputs.dry_run != 'true'
+        id: register
+        run: |
+          ACCOUNT_ID="947253282047"
+          IMAGE_URI="${ACCOUNT_ID}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPO }}:latest"
+
+          # Get current task definition and update only the image
+          aws ecs describe-task-definition \
+            --task-definition "${{ env.TASK_FAMILY }}" \
+            --query 'taskDefinition' > /tmp/current-task-def.json
+
+          # Create new task def: swap image, remove metadata fields
+          python3 -c "
+          import json, sys
+
+          with open('/tmp/current-task-def.json') as f:
+              td = json.load(f)
+
+          # Update container image
+          for container in td.get('containerDefinitions', []):
+              if container.get('name') == '${{ env.CONTAINER_NAME }}':
+                  container['image'] = '${IMAGE_URI}'
+
+          # Remove metadata fields that can't be in registration request
+          for key in ['taskDefinitionArn', 'revision', 'status', 'requiresAttributes',
+                      'compatibilities', 'registeredAt', 'registeredBy']:
+              td.pop(key, None)
+
+          with open('/tmp/new-task-def.json', 'w') as f:
+              json.dump(td, f, indent=2)
+          "
+
+          # Register new revision
+          TASK_DEF_ARN=$(aws ecs register-task-definition \
+            --cli-input-json file:///tmp/new-task-def.json \
+            --query 'taskDefinition.taskDefinitionArn' \
+            --output text)
+
+          REVISION=$(echo "$TASK_DEF_ARN" | awk -F: '{print $NF}')
+          echo "arn=${TASK_DEF_ARN}" >> $GITHUB_OUTPUT
+          echo "Registered task definition: ${{ env.TASK_FAMILY }}:${REVISION}"
+
+      - name: Update ECS service
+        if: needs.pre-check.outputs.dry_run != 'true'
+        run: |
+          aws ecs update-service \
+            --cluster "${{ env.ECS_CLUSTER }}" \
+            --service "${{ env.ECS_SERVICE }}" \
+            --task-definition "${{ steps.register.outputs.arn }}" \
+            --force-new-deployment \
+            --query 'service.deployments[0].{status:status,desired:desiredCount,running:runningCount}' \
+            --output table
+
+      - name: Wait for deployment stability
+        if: needs.pre-check.outputs.dry_run != 'true'
+        run: |
+          echo "Waiting for ECS service to stabilize (timeout: 10 min)..."
+          aws ecs wait services-stable \
+            --cluster "${{ env.ECS_CLUSTER }}" \
+            --services "${{ env.ECS_SERVICE }}"
+          echo "Service stabilized"
+
+      - name: Verify deployment (circuit breaker check)
+        if: needs.pre-check.outputs.dry_run != 'true'
+        run: |
+          # Check that the new task definition is the PRIMARY deployment
+          ROLLOUT_STATE=$(aws ecs describe-services \
+            --cluster "${{ env.ECS_CLUSTER }}" \
+            --services "${{ env.ECS_SERVICE }}" \
+            --query 'services[0].deployments[?status==`PRIMARY`].rolloutState | [0]' \
+            --output text)
+
+          RUNNING=$(aws ecs describe-services \
+            --cluster "${{ env.ECS_CLUSTER }}" \
+            --services "${{ env.ECS_SERVICE }}" \
+            --query 'services[0].runningCount' \
+            --output text)
+
+          DESIRED=$(aws ecs describe-services \
+            --cluster "${{ env.ECS_CLUSTER }}" \
+            --services "${{ env.ECS_SERVICE }}" \
+            --query 'services[0].desiredCount' \
+            --output text)
+
+          echo "Rollout state: ${ROLLOUT_STATE}"
+          echo "Running: ${RUNNING}/${DESIRED}"
+
+          if [ "$ROLLOUT_STATE" != "COMPLETED" ]; then
+            echo "::error::Deployment rollout state is ${ROLLOUT_STATE} (expected COMPLETED)"
+            echo "Circuit breaker may have triggered a rollback"
+            exit 1
+          fi
+
+          if [ "$RUNNING" -lt "$DESIRED" ]; then
+            echo "::error::Not all tasks running (${RUNNING}/${DESIRED})"
+            exit 1
+          fi
+
+          echo "Deployment verified successfully"
+
+      - name: Dry run summary
+        if: needs.pre-check.outputs.dry_run == 'true'
+        run: |
+          echo "## Dry Run - Deploy Phase" >> $GITHUB_STEP_SUMMARY
+          echo "Would register new task definition for ${{ env.TASK_FAMILY }}" >> $GITHUB_STEP_SUMMARY
+          echo "Would update service ${{ env.ECS_SERVICE }} in cluster ${{ env.ECS_CLUSTER }}" >> $GITHUB_STEP_SUMMARY
+          echo "Previous task def: ${{ steps.snapshot.outputs.previous_arn }}" >> $GITHUB_STEP_SUMMARY
+
+  validate:
+    name: Post-Deploy Validation
+    runs-on: ubuntu-latest
+    needs: [pre-check, deploy]
+    if: always() && needs.deploy.result == 'success' && needs.pre-check.outputs.dry_run != 'true'
+    timeout-minutes: 5
+
+    steps:
+      - name: Wait for new tasks to start serving
+        run: sleep 15
+
+      - name: Health check
+        id: health
+        run: |
+          STATUS=$(curl -s -o /tmp/health.json -w "%{http_code}" \
+            --max-time 15 \
+            "${{ env.PROD_URL }}/api/v2/health" || echo "000")
+
+          echo "Health endpoint returned: ${STATUS}"
+
+          if [ "$STATUS" = "200" ]; then
+            echo "Health check PASSED"
+            cat /tmp/health.json
+          else
+            echo "::warning::Health check returned ${STATUS} (may still be starting)"
+          fi
+
+      - name: API smoke test
+        run: |
+          # Test key endpoints
+          ENDPOINTS=(
+            "/api/v2/health"
+            "/api/v2/stamps?limit=1"
+            "/api/v2/src20?limit=1"
+          )
+
+          PASS=0
+          FAIL=0
+
+          for endpoint in "${ENDPOINTS[@]}"; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+              --max-time 10 \
+              "${{ env.PROD_URL }}${endpoint}" || echo "000")
+
+            if [ "$STATUS" = "200" ]; then
+              echo "PASS: ${endpoint} (${STATUS})"
+              PASS=$((PASS + 1))
+            else
+              echo "WARN: ${endpoint} (${STATUS})"
+              FAIL=$((FAIL + 1))
+            fi
+          done
+
+          echo "Smoke test: ${PASS} passed, ${FAIL} warnings"
+
+          if [ "$FAIL" -gt 1 ]; then
+            echo "::error::Multiple API endpoints failing"
+            exit 1
+          fi
+
+      - name: Create deployment summary
+        if: always()
+        run: |
+          echo "## Production Deployment Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Commit | ${{ needs.pre-check.outputs.git_sha_short }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Version | ${{ needs.pre-check.outputs.version_tag }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Cluster | ${{ env.ECS_CLUSTER }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Service | ${{ env.ECS_SERVICE }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Health | ${{ env.PROD_URL }}/api/v2/health |" >> $GITHUB_STEP_SUMMARY
+
+  rollback:
+    name: Rollback on Failure
+    runs-on: ubuntu-latest
+    needs: [pre-check, deploy, validate]
+    if: failure() && needs.deploy.outputs.previous_task_def != '' && needs.pre-check.outputs.dry_run != 'true'
+    timeout-minutes: 10
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOYMENT_ROLE_ARN }}
+          role-session-name: gh-rollback-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Rollback to previous task definition
+        run: |
+          PREVIOUS_ARN="${{ needs.deploy.outputs.previous_task_def }}"
+          echo "::warning::Rolling back to ${PREVIOUS_ARN}"
+
+          aws ecs update-service \
+            --cluster "${{ env.ECS_CLUSTER }}" \
+            --service "${{ env.ECS_SERVICE }}" \
+            --task-definition "${PREVIOUS_ARN}" \
+            --force-new-deployment \
+            --query 'service.deployments[0].{status:status,desired:desiredCount}' \
+            --output table
+
+          echo "Waiting for rollback to stabilize..."
+          aws ecs wait services-stable \
+            --cluster "${{ env.ECS_CLUSTER }}" \
+            --services "${{ env.ECS_SERVICE }}"
+
+          echo "Rollback completed"
+
+      - name: Rollback summary
+        run: |
+          echo "## ROLLBACK EXECUTED" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Deployment failed and was rolled back to:" >> $GITHUB_STEP_SUMMARY
+          echo "\`${{ needs.deploy.outputs.previous_task_def }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Action required:** Investigate the failure before re-deploying." >> $GITHUB_STEP_SUMMARY
+
+  notify:
+    name: Deployment Notification
+    runs-on: ubuntu-latest
+    needs: [pre-check, build, deploy, validate]
+    if: always() && needs.pre-check.outputs.dry_run != 'true'
+
+    steps:
+      - name: Deployment result
+        run: |
+          BUILD_RESULT="${{ needs.build.result }}"
+          DEPLOY_RESULT="${{ needs.deploy.result }}"
+          VALIDATE_RESULT="${{ needs.validate.result }}"
+
+          if [ "$DEPLOY_RESULT" = "success" ] && [ "$VALIDATE_RESULT" = "success" ]; then
+            echo "## Deployment Successful" >> $GITHUB_STEP_SUMMARY
+            echo "Commit \`${{ needs.pre-check.outputs.git_sha_short }}\` deployed to production." >> $GITHUB_STEP_SUMMARY
+          elif [ "$DEPLOY_RESULT" = "success" ] && [ "$VALIDATE_RESULT" = "failure" ]; then
+            echo "## Deployment Succeeded but Validation Failed" >> $GITHUB_STEP_SUMMARY
+            echo "Automatic rollback should have been triggered." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "## Deployment Failed" >> $GITHUB_STEP_SUMMARY
+            echo "Build: ${BUILD_RESULT} | Deploy: ${DEPLOY_RESULT} | Validate: ${VALIDATE_RESULT}" >> $GITHUB_STEP_SUMMARY
+          fi

@@ -107,11 +107,11 @@ export const CollectionDetailHeader = (
             MARKETCAP
           </h5>
           <h6 class={value3xl}>
-            {collection.marketData?.minFloorPriceBTC !== null &&
-                collection.marketData?.minFloorPriceBTC !== undefined &&
+            {collection.marketData?.floorPriceBTC !== null &&
+                collection.marketData?.floorPriceBTC !== undefined &&
                 collection.total_editions
               ? formatMarketCap(
-                collection.marketData.minFloorPriceBTC *
+                collection.marketData.floorPriceBTC *
                   collection.total_editions,
               )
               : "N/A"} <span class="font-light">BTC</span>
@@ -123,9 +123,9 @@ export const CollectionDetailHeader = (
               HOLDERS
             </h5>
             <h6 class={valueSm}>
-              {collection.marketData?.totalUniqueHolders
+              {collection.marketData?.uniqueHolders
                 ? formatNumberWithCommas(
-                  collection.marketData.totalUniqueHolders,
+                  collection.marketData.uniqueHolders,
                 )
                 : "N/A"}
             </h6>
@@ -151,9 +151,9 @@ export const CollectionDetailHeader = (
               FLOOR PRICE
             </h5>
             <h6 class={valueSm}>
-              {collection.marketData?.minFloorPriceBTC !== null &&
-                  collection.marketData?.minFloorPriceBTC !== undefined
-                ? `${formatBTC(collection.marketData.minFloorPriceBTC)} BTC`
+              {collection.marketData?.floorPriceBTC !== null &&
+                  collection.marketData?.floorPriceBTC !== undefined
+                ? `${formatBTC(collection.marketData.floorPriceBTC)} BTC`
                 : "N/A BTC"}
             </h6>
           </div>
@@ -162,8 +162,8 @@ export const CollectionDetailHeader = (
               24H VOLUME
             </h5>
             <h6 class={valueSm}>
-              {collection.marketData?.totalVolume24hBTC !== undefined
-                ? `${formatVolume(collection.marketData.totalVolume24hBTC)} BTC`
+              {collection.marketData?.volume24hBTC !== undefined
+                ? `${formatVolume(collection.marketData.volume24hBTC)} BTC`
                 : "N/A BTC"}
             </h6>
           </div>
@@ -172,9 +172,9 @@ export const CollectionDetailHeader = (
               AVG PRICE
             </h5>
             <h6 class={valueSm}>
-              {collection.marketData?.avgFloorPriceBTC !== null &&
-                  collection.marketData?.avgFloorPriceBTC !== undefined
-                ? `${formatBTC(collection.marketData.avgFloorPriceBTC)} BTC`
+              {collection.marketData?.avgPriceBTC !== null &&
+                  collection.marketData?.avgPriceBTC !== undefined
+                ? `${formatBTC(collection.marketData.avgPriceBTC)} BTC`
                 : "N/A BTC"}
             </h6>
           </div>

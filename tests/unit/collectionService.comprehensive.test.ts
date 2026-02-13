@@ -35,7 +35,7 @@ const mockCollectionRowWithMarketData = {
     avg: 1000000,
   },
   totalVolume24h: 5000000,
-  totalUniqueHolders: 25,
+  uniqueHolders: 25,
 };
 
 const mockCollectionsResult = {

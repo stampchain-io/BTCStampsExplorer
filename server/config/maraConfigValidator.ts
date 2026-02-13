@@ -11,6 +11,7 @@ import {
     createMaraConfigFromEnv,
     DEFAULT_MARA_CONFIG
 } from "$server/config/maraConfig.ts";
+import { serverConfig } from "$server/config/config.ts";
 
 /**
  * Result of MARA configuration validation
@@ -94,7 +95,7 @@ export function validateMaraConfigOnStartup(): MaraConfigValidationResult {
     }
 
     // 4. Check for development/production consistency
-    const isProduction = Deno.env.get('DENO_ENV') === 'production';
+    const isProduction = serverConfig.IS_PRODUCTION;
     const isDefaultAddress = config.serviceFeeAddress === DEFAULT_MARA_CONFIG.serviceFeeAddress;
 
     if (!isProduction && !isDefaultAddress) {
@@ -111,7 +112,7 @@ export function validateMaraConfigOnStartup(): MaraConfigValidationResult {
       serviceFeeAmount: config.serviceFeeAmount,
       serviceFeeAddress: config.serviceFeeAddress,
       enabled: config.enabled,
-      environment: Deno.env.get('DENO_ENV') || 'development',
+      environment: serverConfig.DENO_ENV,
     });
 
     result.config = config;

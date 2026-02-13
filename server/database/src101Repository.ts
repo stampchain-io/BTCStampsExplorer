@@ -667,11 +667,15 @@ export class SRC101Repository {
       queryParams.push(params.index);
     }
 
-    if (params.expire && params.expire == 1) {
-      whereClauses.push(`expire_timestamp < ?`);
-      queryParams.push(new Date().getTime() / 1000);
-    } else {
-      whereClauses.push(`expire_timestamp > ?`);
+    // Only filter by expiry when explicitly requested:
+    // expire=1: expired records only, expire=0: non-expired only
+    // No expire param: return all records (needed for availability checks)
+    if (params.expire !== undefined && params.expire !== null) {
+      if (params.expire == 1) {
+        whereClauses.push(`expire_timestamp < ?`);
+      } else {
+        whereClauses.push(`expire_timestamp > ?`);
+      }
       queryParams.push(new Date().getTime() / 1000);
     }
 
@@ -715,11 +719,15 @@ export class SRC101Repository {
       queryParams.push(params.index);
     }
 
-    if (params.expire && params.expire == 1) {
-      whereClauses.push(`? > expire_timestamp`);
-      queryParams.push(new Date().getTime() / 1000);
-    } else {
-      whereClauses.push(`? < expire_timestamp`);
+    // Only filter by expiry when explicitly requested:
+    // expire=1: expired records only, expire=0: non-expired only
+    // No expire param: return all records (needed for availability checks)
+    if (params.expire !== undefined && params.expire !== null) {
+      if (params.expire == 1) {
+        whereClauses.push(`? > expire_timestamp`);
+      } else {
+        whereClauses.push(`? < expire_timestamp`);
+      }
       queryParams.push(new Date().getTime() / 1000);
     }
 

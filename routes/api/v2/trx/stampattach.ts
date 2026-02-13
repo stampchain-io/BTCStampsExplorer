@@ -19,12 +19,6 @@ import {
 } from "$server/services/counterpartyApiService.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
 import type { UTXO as ServiceUTXO } from "$types/index.d.ts";
-import {
-  address as bjsAddress,
-  networks,
-  Psbt,
-  Transaction,
-} from "bitcoinjs-lib";
 import { Buffer } from "node:buffer";
 
 // Update interface to accept either fee rate type and service fee
@@ -50,6 +44,14 @@ export const handler: Handlers = {
   async POST(req: Request) {
     const commonUtxoService = new CommonUTXOService();
     try {
+      // Dynamic import of bitcoinjs-lib to exclude from build-time static analysis
+      const {
+        address: bjsAddress,
+        networks,
+        Psbt,
+        Transaction,
+      } = await import("bitcoinjs-lib");
+
       const body: StampAttachInput = await req.json();
       logger.info("api", {
         message: "Received stamp attach input",

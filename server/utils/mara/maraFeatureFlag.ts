@@ -6,6 +6,7 @@
 
 import { logger } from "$lib/utils/logger.ts";
 import { isMaraIntegrationEnabled, getValidatedMaraConfig } from "$/server/config/maraConfigValidator.ts";
+import { serverConfig } from "$server/config/config.ts";
 
 /**
  * Check if MARA integration is currently enabled
@@ -87,12 +88,12 @@ export async function withMaraEnabled<T>(
 export function logMaraFeatureStatus(): void {
   const enabled = isMaraEnabled();
   const config = getMaraConfigIfEnabled();
-  
+
   logger.info("mara", {
     message: "MARA feature flag status",
     enabled,
     hasValidConfig: config !== null,
-    environment: Deno.env.get("DENO_ENV") || "development",
+    environment: serverConfig.DENO_ENV,
   });
 
   if (enabled && config) {
@@ -141,13 +142,13 @@ export function getMaraServiceFeeConfig(): { amount: number; address: string } |
  * @param enabled Whether to enable or disable MARA
  */
 export function setMaraEnabledForTesting(enabled: boolean): void {
-  if (Deno.env.get("DENO_ENV") === "production") {
+  if (serverConfig.IS_PRODUCTION) {
     throw new Error("Cannot modify MARA feature flag in production");
   }
 
-  const currentValue = Deno.env.get("ENABLE_MARA_INTEGRATION");
+  const currentValue = serverConfig.ENABLE_MARA_INTEGRATION;
   const newValue = enabled ? "1" : "0";
-  
+
   logger.warn("mara", {
     message: "Modifying MARA feature flag for testing",
     previousValue: currentValue,

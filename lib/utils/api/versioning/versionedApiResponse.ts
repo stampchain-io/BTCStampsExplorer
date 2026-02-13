@@ -3,7 +3,7 @@ import { transformResponseForVersion } from "$server/middleware/schemaTransforme
 import {
   ApiResponseOptions,
   ApiResponseUtil,
-} from "$lib/utils/api/versioning/apiResponseUtil.ts";
+} from "../responses/apiResponseUtil.ts";
 
 /**
  * Versioned API Response Utility

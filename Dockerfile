@@ -1,5 +1,5 @@
-# Deno base image
-FROM denoland/deno:alpine-2.4.2
+# Deno base image - Updated for CVE-2025-61786 security fix
+FROM denoland/deno:alpine-2.5.3
 
 # Set environment variables
 ENV HOME=/app \
@@ -12,8 +12,12 @@ ENV HOME=/app \
     NPM_CONFIG_CACHE=/app/.npm \
     REDIS_LOG_LEVEL=DEBUG
 
-# Install additional tools
-RUN apk add --no-cache bash curl
+# Install minimal runtime tools (Chromium removed — preview rendering offloaded to CF Worker)
+RUN apk add --no-cache \
+    bash \
+    curl \
+    ca-certificates \
+    && rm -rf /var/cache/apk/*
 
 # Create necessary directories
 RUN mkdir -p /app \
@@ -65,7 +69,7 @@ RUN echo "Verifying environment and permissions:" && \
 EXPOSE 8000
 
 # Runtime environment variables - Enable Redis at runtime
-ENV DENO_PERMISSIONS="--allow-net --allow-read --allow-run --allow-write --allow-env --allow-sys" \
+ENV DENO_PERMISSIONS="--allow-net --allow-read --allow-write --allow-env --allow-sys" \
     SKIP_REDIS=false \
     SKIP_REDIS_CONNECTION=false \
     SKIP_REDIS_TLS=true \

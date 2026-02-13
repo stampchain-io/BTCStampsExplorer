@@ -46,11 +46,50 @@ export const handler: Handlers = {
 
       // For dryRun, return fee estimates without creating actual PSBT
       if (dryRun) {
-        // SRC101 transactions are typically ~300 bytes
-        const estimatedTxSize = 300;
+        // Estimate transfer data size from request body fields
+        // The actual operation constructs a JSON object with op, p, and operation-specific fields
+        const operationFields: Record<string, unknown> = {
+          op: body.op?.toUpperCase() || "MINT",
+          p: "SRC-101",
+        };
+        // Include operation-specific fields (mirrors src101Operations.ts)
+        for (const [key, value] of Object.entries(body)) {
+          if (
+            ![
+              "sourceAddress",
+              "fromAddress",
+              "changeAddress",
+              "feeRate",
+              "trxType",
+              "dryRun",
+              "toAddress",
+              "recAddress",
+              "network",
+              "enableRBF",
+            ].includes(key) && value !== undefined
+          ) {
+            operationFields[key] = value;
+          }
+        }
+        const estimatedJsonSize = JSON.stringify(operationFields).length;
+
+        // SRC-101 payload: 2 (length prefix) + 6 ("stamp:" prefix) + JSON data
+        const payloadLength = 2 + 6 + estimatedJsonSize;
+        // Data is padded to multiple of 62 bytes, then split into chunks
+        // Each chunk becomes a 3-of-3 bare multisig output
+        const numChunks = Math.ceil(payloadLength / 62);
+
+        // Transaction structure:
+        // - Base: ~142 vbytes (1 P2WPKH input + recipient output + change output + overhead)
+        // - Each 3-of-3 multisig output: ~114 vbytes (8 amount + 1 varint + 105 script)
+        const estimatedTxSize = Math.ceil(
+          (142 + numChunks * 114) * 1.05,
+        ); // 5% safety margin
+
         const feeRate = Number(body.feeRate) || 1;
         const estMinerFee = Math.ceil(estimatedTxSize * feeRate);
-        const totalDustValue = 546; // Standard P2WPKH dust limit
+        // Dust: recipient (789 sats) + N multisig outputs (809 sats each)
+        const totalDustValue = 789 + (numChunks * 809);
         const totalCost = estMinerFee + totalDustValue;
 
         return ResponseUtil.success({
@@ -62,6 +101,7 @@ export const handler: Handlers = {
             total: estMinerFee,
             effectiveFeeRate: feeRate,
             estimatedSize: estimatedTxSize,
+            numChunks: numChunks,
           },
           is_estimate: true,
           estimation_method: "dryRun_calculation",

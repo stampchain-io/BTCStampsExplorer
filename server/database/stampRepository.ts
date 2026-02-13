@@ -18,6 +18,7 @@ import { filterOptions } from "$lib/utils/data/filtering/filterOptions.ts";
 import { getIdentifierType } from "$lib/utils/data/identifiers/identifierUtils.ts";
 import { logger, LogNamespace } from "$lib/utils/logger.ts";
 import { isCpid, isStampHash, isStampNumber, isTxHash } from "$lib/utils/typeGuards.ts";
+import { serverConfig } from "$server/config/config.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
 import { summarize_issuances } from "$server/database/index.ts";
 import type { SUBPROTOCOLS } from "$types/base.d.ts";
@@ -144,7 +145,8 @@ export class StampRepository {
     let stampCondition = "";
     if (type !== "all") {
       if (type === "cursed") {
-        stampCondition = "st.stamp < 0";
+        stampCondition =
+          "st.stamp < 0 AND NOT (st.cpid NOT LIKE 'A%' AND st.ident != 'SRC-20')";
       } else if (type === "stamps" && !identifier) {
         if (!isSearchQuery)
           stampCondition = "st.stamp >= 0 AND st.ident != 'SRC-20'";
@@ -718,6 +720,12 @@ export class StampRepository {
     fileSize?: StampFilesize | null;
     fileSizeMin?: string;
     fileSizeMax?: string;
+    search?: string;
+    cpidPrefix?: string;
+    addressPrefix?: string;
+    txHashPrefix?: string;
+    stampNumberPrefix?: { exact: number; rangeStart: number; rangeEnd: number };
+    excludeSrc20?: boolean;
   }) {
     // Extract all parameters including both filter types
     const {
@@ -764,6 +772,12 @@ export class StampRepository {
       fileSize: _fileSize,
       fileSizeMin: _fileSizeMin,
       fileSizeMax: _fileSizeMax,
+      search,
+      cpidPrefix,
+      addressPrefix,
+      txHashPrefix,
+      stampNumberPrefix,
+      excludeSrc20 = false,
     } = options;
 
     // Combine both filter types for processing
@@ -809,6 +823,50 @@ export class StampRepository {
     if (creatorAddress) {
       whereConditions.push("st.creator = ?");
       queryParams.push(creatorAddress);
+    }
+
+    // Free-text search across cpid, creator, tx_hash
+    if (search) {
+      this.buildSearchConditions(
+        search,
+        whereConditions,
+        queryParams,
+      );
+    }
+
+    // CPID prefix search (cpid column only)
+    if (cpidPrefix) {
+      whereConditions.push("st.cpid LIKE ?");
+      queryParams.push(`${cpidPrefix}%`);
+    }
+
+    // Stamp number prefix search (exact match OR range of next magnitude)
+    if (stampNumberPrefix) {
+      whereConditions.push(
+        "(st.stamp = ? OR (st.stamp >= ? AND st.stamp <= ?))",
+      );
+      queryParams.push(
+        stampNumberPrefix.exact,
+        stampNumberPrefix.rangeStart,
+        stampNumberPrefix.rangeEnd,
+      );
+    }
+
+    // Address prefix search (creator column only)
+    if (addressPrefix) {
+      whereConditions.push("st.creator LIKE ?");
+      queryParams.push(`${addressPrefix}%`);
+    }
+
+    // Tx hash prefix search (tx_hash column only)
+    if (txHashPrefix) {
+      whereConditions.push("st.tx_hash LIKE ?");
+      queryParams.push(`${txHashPrefix}%`);
+    }
+
+    // Exclude SRC-20 entries (used by stamp search endpoint)
+    if (excludeSrc20) {
+      whereConditions.push("st.ident != 'SRC-20'");
     }
 
     // Use either the object or direct parameters
@@ -1042,7 +1100,7 @@ export class StampRepository {
     }
 
     // Near the end of the getStamps method, right before executing the query
-    if (Deno.env.get("DEBUG_SQL") === "true" || Deno.env.get("DENO_ENV") === "development") {
+    if (serverConfig.DEBUG_SQL || serverConfig.IS_DEVELOPMENT) {
       logger.debug("sql", { message: `[SQL DEBUG] Final SQL query: ${query}` });
       logger.debug("sql", { message: `[SQL DEBUG] With parameters: ${queryParams}` });
     }
@@ -1375,7 +1433,8 @@ export class StampRepository {
     let typeCondition = "";
     if (type !== STAMP_TYPE_CONSTANTS.ALL) {
       if (type === STAMP_TYPE_CONSTANTS.CURSED) {
-        typeCondition = "AND s.stamp < 0";
+        typeCondition =
+          "AND s.stamp < 0 AND NOT (s.cpid NOT LIKE 'A%' AND s.ident != 'SRC-20')";
       } else if (type === STAMP_TYPE_CONSTANTS.CLASSIC) {
         typeCondition = "AND s.stamp >= 0 AND s.cpid LIKE 'A%' AND s.ident != 'SRC-20'";
       } else if (type === STAMP_TYPE_CONSTANTS.STAMPS) {
@@ -1455,7 +1514,7 @@ export class StampRepository {
       if (stamps.length > 0) {
         // 🔧 PRODUCTION: Remove verbose debug logging
         // Only log in development environment
-        if (Deno.env.get("DENO_ENV") === "development") {
+        if (serverConfig.IS_DEVELOPMENT) {
           console.log(`[RECENT SALES] Using stamp_sales_history: ${stamps.length} stamps found`);
         }
 

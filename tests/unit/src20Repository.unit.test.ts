@@ -133,10 +133,10 @@ describe("SRC20Repository Unit Tests", () => {
       assertExists(result);
 
       // Verify query was made with unicode escape
-      const queryHistory = mockDb.getQueryHistory();
+      const queryHistory = mockDb.getFullQueryHistory();
       const hasUnicodeQuery = queryHistory.some((h) =>
         h.query.includes("\\U") ||
-        h.params.some((p) => typeof p === "string" && p.includes("\\U"))
+        h.params.some((p: unknown) => typeof p === "string" && (p as string).includes("\\U"))
       );
       assertEquals(hasUnicodeQuery, true);
     });
@@ -227,9 +227,11 @@ describe("SRC20Repository Unit Tests", () => {
         dep.tick,
         COALESCE(stats.total_minted, 0) as total_minted,
         COALESCE(stats.holders_count, 0) as holders_count,
-        (SELECT COUNT(*) FROM SRC20Valid WHERE tick = dep.tick AND op = 'MINT') AS total_mints
+        (SELECT COUNT(*) FROM SRC20Valid WHERE tick = dep.tick AND op = 'MINT') AS total_mints,
+        st.stamp_url
       FROM SRC20Valid AS dep
       LEFT JOIN src20_token_stats stats ON stats.tick = dep.tick
+      LEFT JOIN StampTableV4 st ON st.tx_hash = dep.tx_hash
       WHERE
         dep.tick = ? AND
         dep.op = 'DEPLOY'
@@ -258,9 +260,11 @@ describe("SRC20Repository Unit Tests", () => {
         dep.tick,
         COALESCE(stats.total_minted, 0) as total_minted,
         COALESCE(stats.holders_count, 0) as holders_count,
-        (SELECT COUNT(*) FROM SRC20Valid WHERE tick = dep.tick AND op = 'MINT') AS total_mints
+        (SELECT COUNT(*) FROM SRC20Valid WHERE tick = dep.tick AND op = 'MINT') AS total_mints,
+        st.stamp_url
       FROM SRC20Valid AS dep
       LEFT JOIN src20_token_stats stats ON stats.tick = dep.tick
+      LEFT JOIN StampTableV4 st ON st.tx_hash = dep.tx_hash
       WHERE
         dep.tick = ? AND
         dep.op = 'DEPLOY'
@@ -278,6 +282,7 @@ describe("SRC20Repository Unit Tests", () => {
             total_minted: "500000",
             holders_count: 100,
             total_mints: 50,
+            stamp_url: "https://stampchain.io/stamps/test.png",
           }],
         },
       );

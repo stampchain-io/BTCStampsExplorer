@@ -1,0 +1,15 @@
+{
+  "name": "stamp-preview-renderer",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail"
+  },
+  "devDependencies": {
+    "@cloudflare/puppeteer": "^0.0.15",
+    "@cloudflare/workers-types": "^4.20250124.0",
+    "wrangler": "^4.0.0"
+  }
+}

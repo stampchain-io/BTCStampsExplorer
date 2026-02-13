@@ -23,7 +23,8 @@ const MAX_PAGE_SIZE = 120;
 export const handler: Handlers = {
   async GET(req: Request, ctx) {
     const url = new URL(req.url);
-    const baseUrl = `${url.protocol}//${url.host}`;
+    // ✅ REMOVED: baseUrl was causing internal API self-referencing via EC2 IP
+    // Now using direct controller/service calls instead of HTTP fetch
 
     try {
       /* ===== URL PARAMS ===== */
@@ -65,47 +66,27 @@ export const handler: Handlers = {
       let recentSalesData: StampSaleRow[] = [];
 
       if (recentSales) {
-        // ✅ FIX: Use API endpoint (proper architectural separation)
+        // ✅ FIX: Use direct controller call instead of HTTP fetch
+        // This eliminates the internal API self-referencing issue where requests
+        // were timing out due to EC2 IP resolution instead of localhost
         try {
-          const recentSalesParams = new URLSearchParams({
-            page: page.toString(),
-            limit: page_size.toString(),
-            sortBy: "DESC", // Recent sales should always be DESC (newest first)
-            dayRange: "30", // Use 30-day range like homepage
-            fullDetails: "true", // Enable enhanced transaction information
-            type: typeFilter, // Add stamp type filtering
-          });
-
-          // Use fetch with proper headers for internal API access
-          const response = await fetch(
-            `${baseUrl}/api/internal/stamp-recent-sales?${recentSalesParams}`,
+          const result = await StampController.getRecentSales(
+            page,
+            page_size,
             {
-              headers: {
-                "X-API-Version": "2.3",
-                "User-Agent": "Mozilla/5.0 (compatible; StampChain/2.0)",
-                "Accept": "application/json",
-                "Origin": baseUrl,
-                "Referer": `${baseUrl}/stamp`,
-                "Host": new URL(baseUrl).host,
-              },
+              dayRange: 30, // Use 30-day range like homepage
+              includeFullDetails: true, // Enable enhanced transaction information
+              type: typeFilter as any, // Add stamp type filtering
             },
           );
 
-          if (!response.ok) {
-            console.error(
-              "[Recent Sales API Error]",
-              response.status,
-              await response.text(),
-            );
-            throw new Error(
-              `Recent sales API failed: ${response.status}`,
-            );
-          }
-
-          // Extract data (handle API wrapper format)
-          const result = await response.json();
           const salesResult = result.data || [];
-          recentSalesData = Array.isArray(salesResult) ? salesResult : [];
+          // Cast the result via unknown - data will be transformed to proper format later
+          recentSalesData = (Array.isArray(salesResult)
+            ? salesResult.filter((item) =>
+              item !== null
+            )
+            : []) as unknown as StampSaleRow[];
 
           // Debug: Check received data for stamp_url issues
           recentSalesData.forEach((sale: any, index: number) => {
@@ -170,7 +151,7 @@ export const handler: Handlers = {
             pagination: {
               total: result.total || 0,
               page: result.page || page,
-              totalPages: result.total_pages ||
+              totalPages: result.totalPages ||
                 Math.ceil((result.total || 0) / page_size),
             },
           };

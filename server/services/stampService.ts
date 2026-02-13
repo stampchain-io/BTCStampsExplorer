@@ -18,7 +18,7 @@ import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
 import { CreatorService } from "$server/services/creator/creatorService.ts";
 import { getCacheConfig, RouteType } from "$server/services/infrastructure/cacheService.ts";
 import { BTCPriceService } from "$server/services/price/btcPriceService.ts";
-import type { StampMarketData, XcpBalance } from "$types/";
+import type { StampMarketData, XcpBalance } from "$types/index.d.ts";
 
 interface StampServiceOptions {
   cacheType: RouteType;
@@ -165,6 +165,12 @@ export class StampService {
     maxCacheAgeMinutes?: string;
     priceSource?: string;
     collectionStampLimit?: number;
+    search?: string;
+    stampNumberPrefix?: {
+      exact: number;
+      rangeStart: number;
+      rangeEnd: number;
+    };
   }) {
     // Extract range parameters from URL if not already set
     let range = options.range;
@@ -274,7 +280,7 @@ export class StampService {
         }
 
         const marketData = marketDataMap.get(stamp.cpid) || null;
-        return this.enrichStampWithMarketData(stamp, marketData, options.btcPriceUSD || 0);
+        return this.enrichStampWithMarketData(stamp, marketData as StampMarketData | null, options.btcPriceUSD || 0);
       });
     }
 
@@ -739,7 +745,7 @@ export class StampService {
     // Enrich each stamp with USD calculations and cache status
     return stampsWithMarketData.map(stampData => {
       const { marketData, cacheStatus: _cacheStatus, cacheAgeMinutes: _cacheAgeMinutes, ...stamp } = stampData;
-      return this.enrichStampWithMarketData(stamp, marketData, options.btcPriceUSD);
+      return this.enrichStampWithMarketData(stamp, marketData as StampMarketData | null, options.btcPriceUSD);
     });
   }
 
@@ -764,7 +770,9 @@ export class StampService {
    */
   static async getBulkStampMarketData(cpids: string[]): Promise<Map<string, StampMarketData>> {
     try {
-      return await MarketDataRepository.getBulkStampMarketData(cpids);
+      const result = await MarketDataRepository.getBulkStampMarketData(cpids);
+      // Cast to compatible type - both StampMarketData types are compatible at runtime
+      return result as Map<string, StampMarketData>;
     } catch (error) {
       logger.error("stamps", {
         message: "Error getting bulk stamp market data",

@@ -3,7 +3,6 @@ import type { StampFilters, StampRow } from "$types/stamp.d.ts";
 import type {
     CacheStatus,
     CollectionMarketData,
-    CollectionMarketDataRow,
     SRC20MarketData,
     SRC20MarketDataRow,
     StampHolderCache,
@@ -450,26 +449,27 @@ export class MarketDataRepository {
    * @returns CollectionMarketData or null if not found
    */
   static async getCollectionMarketData(collectionId: string): Promise<CollectionMarketData | null> {
+    // Actual table columns: collection_id (BINARY(16)), floor_price_btc, avg_price_btc,
+    // total_value_btc, volume_24h_btc, volume_7d_btc, volume_30d_btc, total_volume_btc,
+    // total_stamps, unique_holders, listed_stamps, sold_stamps_24h, last_updated, created_at
     const query = `
       SELECT
-        collection_id,
-        min_floor_price_btc,
-        max_floor_price_btc,
-        avg_floor_price_btc,
-        median_floor_price_btc,
-        total_volume_24h_btc,
-        stamps_with_prices_count,
-        min_holder_count,
-        max_holder_count,
-        avg_holder_count,
-        median_holder_count,
-        total_unique_holders,
-        avg_distribution_score,
-        total_stamps_count,
+        HEX(collection_id) as collection_id_hex,
+        floor_price_btc,
+        avg_price_btc,
+        total_value_btc,
+        volume_24h_btc,
+        volume_7d_btc,
+        volume_30d_btc,
+        total_volume_btc,
+        total_stamps,
+        unique_holders,
+        listed_stamps,
+        sold_stamps_24h,
         last_updated,
         TIMESTAMPDIFF(MINUTE, last_updated, UTC_TIMESTAMP()) as cache_age_minutes
       FROM collection_market_data
-      WHERE collection_id = ?
+      WHERE collection_id = UNHEX(?)
       LIMIT 1
     `;
 
@@ -478,16 +478,13 @@ export class MarketDataRepository {
         query,
         [collectionId],
         DEFAULT_CACHE_DURATION
-      ) as { rows?: Array<CollectionMarketDataRow & { cache_age_minutes: number }> };
+      ) as { rows?: Array<any> };
 
       if (!result.rows || result.rows.length === 0) {
         return null;
       }
 
-      const row = result.rows[0];
-
-      // Parse the row data into the application format
-      return this.parseCollectionMarketDataRow(row);
+      return this.parseCollectionMarketDataRow(result.rows[0]);
     } catch (error) {
       console.error(`Error fetching market data for collection ${collectionId}:`, error);
       return null;
@@ -706,23 +703,22 @@ export class MarketDataRepository {
    * @param row - Database row
    * @returns Parsed CollectionMarketData
    */
-  private static parseCollectionMarketDataRow(row: CollectionMarketDataRow & { cache_age_minutes?: number }): CollectionMarketData | null {
+  private static parseCollectionMarketDataRow(row: any): CollectionMarketData | null {
     try {
+      const floorPrice = parseBTCDecimal(row.floor_price_btc);
       return {
-        collectionId: row.collection_id,
-        minFloorPriceBTC: parseBTCDecimal(row.min_floor_price_btc),
-        maxFloorPriceBTC: parseBTCDecimal(row.max_floor_price_btc),
-        avgFloorPriceBTC: parseBTCDecimal(row.avg_floor_price_btc),
-        medianFloorPriceBTC: parseBTCDecimal(row.median_floor_price_btc),
-        totalVolume24hBTC: parseBTCDecimal(row.total_volume_24h_btc) || 0,
-        stampsWithPricesCount: row.stamps_with_prices_count || 0,
-        minHolderCount: row.min_holder_count || 0,
-        maxHolderCount: row.max_holder_count || 0,
-        avgHolderCount: parseFloat(row.avg_holder_count) || 0,
-        medianHolderCount: row.median_holder_count || 0,
-        totalUniqueHolders: row.total_unique_holders || 0,
-        avgDistributionScore: parseFloat(row.avg_distribution_score) || 0,
-        totalStampsCount: row.total_stamps_count || 0,
+        collectionId: row.collection_id_hex ?? row.collection_id,
+        floorPriceBTC: floorPrice,
+        avgPriceBTC: parseBTCDecimal(row.avg_price_btc),
+        totalValueBTC: parseBTCDecimal(row.total_value_btc) || 0,
+        volume24hBTC: parseBTCDecimal(row.volume_24h_btc) || 0,
+        volume7dBTC: parseBTCDecimal(row.volume_7d_btc) || 0,
+        volume30dBTC: parseBTCDecimal(row.volume_30d_btc) || 0,
+        totalVolumeBTC: parseBTCDecimal(row.total_volume_btc) || 0,
+        totalStamps: row.total_stamps ?? 0,
+        uniqueHolders: row.unique_holders ?? 0,
+        listedStamps: row.listed_stamps ?? 0,
+        soldStamps24h: row.sold_stamps_24h ?? 0,
         lastUpdated: new Date(row.last_updated),
       };
     } catch (error) {
@@ -780,5 +776,121 @@ export class MarketDataRepository {
         this.parseSRC20MarketDataRow(row)
       )
       .filter((data): data is SRC20MarketData => data !== null);
+  }
+
+  /**
+   * Get paginated SRC-20 market data with sorting and filtering
+   * @param options - Pagination and sorting options
+   * @returns Paginated SRC20MarketData with total count
+   */
+  static async getPaginatedSRC20MarketData(options: {
+    limit: number;
+    page: number;
+    sortBy?: string;
+    sortOrder?: "ASC" | "DESC";
+  }): Promise<{
+    data: SRC20MarketData[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  }> {
+    const {
+      limit,
+      page,
+      sortBy = "market_cap_usd",
+      sortOrder = "DESC",
+    } = options;
+
+    // Calculate offset for pagination
+    const offset = (page - 1) * limit;
+
+    // Validate and map sort field to database column
+    const sortFieldMap: Record<string, string> = {
+      market_cap_usd: "CAST(market_cap_usd AS DECIMAL(20,8))",
+      volume_24h_btc: "CAST(volume_24h_btc AS DECIMAL(16,8))",
+      price_change_24h_percent: "CAST(price_change_24h_percent AS DECIMAL(10,2))",
+    };
+
+    const sortColumn = sortFieldMap[sortBy] || sortFieldMap.market_cap_usd;
+
+    // Query to get total count (with filtering)
+    const countQuery = `
+      SELECT COUNT(*) as total
+      FROM src20_market_data
+      WHERE price_btc > 0
+    `;
+
+    // Query to get paginated data
+    const dataQuery = `
+      SELECT
+        tick,
+        price_btc,
+        price_usd,
+        floor_price_btc,
+        market_cap_btc,
+        market_cap_usd,
+        volume_24h_btc,
+        volume_7d_btc,
+        volume_30d_btc,
+        total_volume_btc,
+        holder_count,
+        circulating_supply,
+        price_change_24h_percent,
+        price_change_7d_percent,
+        price_change_30d_percent,
+        primary_exchange,
+        exchange_sources,
+        data_quality_score,
+        last_updated,
+        TIMESTAMPDIFF(MINUTE, last_updated, UTC_TIMESTAMP()) as cache_age_minutes
+      FROM src20_market_data
+      WHERE price_btc > 0
+      ORDER BY ${sortColumn} ${sortOrder}
+      LIMIT ? OFFSET ?
+    `;
+
+    try {
+      // Execute both queries in parallel
+      const [countResult, dataResult] = await Promise.all([
+        this.db.executeQueryWithCache(
+          countQuery,
+          [],
+          DEFAULT_CACHE_DURATION
+        ) as Promise<{ rows?: Array<{ total: number }> }>,
+        this.db.executeQueryWithCache(
+          dataQuery,
+          [limit, offset],
+          DEFAULT_CACHE_DURATION
+        ) as Promise<{ rows?: Array<SRC20MarketDataRow & { cache_age_minutes: number }> }>,
+      ]);
+
+      // Extract total count
+      const total = countResult.rows?.[0]?.total || 0;
+      const totalPages = Math.ceil(total / limit);
+
+      // Parse the data rows
+      const data = (dataResult.rows || [])
+        .map((row) => this.parseSRC20MarketDataRow(row))
+        .filter((marketData): marketData is SRC20MarketData => marketData !== null);
+
+      return {
+        data,
+        total,
+        page,
+        limit,
+        totalPages,
+      };
+    } catch (error) {
+      console.error("Error fetching paginated SRC-20 market data:", error);
+      // Return empty result on error
+      return {
+        data: [],
+        total: 0,
+        page,
+        limit,
+        totalPages: 0,
+      };
+    }
   }
 }
