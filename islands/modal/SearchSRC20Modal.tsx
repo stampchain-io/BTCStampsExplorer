@@ -6,6 +6,7 @@ import { closeModal, openModal, searchState } from "$islands/modal/states.ts";
 import { ModalSearchBase, transitionColors } from "$layout";
 import { generateSearchErrorMessage } from "$lib/utils/data/search/searchInputClassifier.ts";
 import { isValidBitcoinAddress } from "$lib/utils/typeGuards.ts";
+import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
 import {
   navigateSSRSafe,
   scheduleFocus,
@@ -208,18 +209,19 @@ function SearchContent({
                       class={`flex items-center gap-3 px-7.5 py-2 hover:bg-color-background/60 ${transitionColors} cursor-pointer`}
                     >
                       <img
-                        src={result.deploy_img ||
-                          "/img/placeholder/broken.png"}
+                        src={result.tx_hash
+                          ? constructStampUrl(result.tx_hash)
+                          : "/img/placeholder/broken.png"}
                         alt={result.tick}
                         class="w-10 h-10 rounded object-cover"
                       />
                       <div class="flex flex-col flex-1">
-                        <span class="text-sm font-medium text-color-grey-light">
+                        <span class="text-sm font-medium text-color-grey-light uppercase">
                           {result.tick}
                         </span>
-                        <span class="text-xs text-color-grey">
-                          {result.progress ? `${result.progress}% minted` : ""}
-                          {result.holders ? ` · ${result.holders} holders` : ""}
+                        <span class="text-xs text-color-grey uppercase">
+                          {result.progress ? `${result.progress}% Minted` : ""}
+                          {result.holders ? ` · ${result.holders} Holders` : ""}
                         </span>
                       </div>
                     </li>

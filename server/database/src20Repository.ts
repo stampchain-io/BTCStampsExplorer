@@ -901,10 +901,6 @@ export class SRC20Repository {
       return this.searchSrc20ByHolder(query);
     }
 
-    const baseUrl = serverConfig.IS_DEVELOPMENT
-      ? serverConfig.DEV_BASE_URL
-      : "https://stampchain.io";
-
     const mintableFilter = mintableOnly
       ? "AND COALESCE(smd.progress_percentage, 0) < 100"
       : "";
@@ -988,9 +984,6 @@ export class SRC20Repository {
           return {
             tick: row.tick,
             tx_hash: row.tx_hash,
-            deploy_img: row.tx_hash
-              ? `${baseUrl}/stamps/${row.tx_hash}.svg`
-              : null,
             progress: parseFloat(row.progress || "0"),
             total_minted: row.total_minted,
             max_supply: row.max_supply,
@@ -1011,9 +1004,6 @@ export class SRC20Repository {
    */
   private static async searchSrc20ByHolder(addressQuery: string) {
     const startSearchParam = `${addressQuery}%`;
-    const baseUrl = serverConfig.IS_DEVELOPMENT
-      ? serverConfig.DEV_BASE_URL
-      : "https://stampchain.io";
 
     const sqlQuery = `
     SELECT DISTINCT
@@ -1048,7 +1038,6 @@ export class SRC20Repository {
           return {
             tick: row.tick,
             tx_hash: row.tx_hash,
-            deploy_img: row.tx_hash ? `${baseUrl}/stamps/${row.tx_hash}.svg` : null,
             progress: parseFloat(row.progress || "0"),
             total_minted: row.total_minted,
             max_supply: row.max_supply,
