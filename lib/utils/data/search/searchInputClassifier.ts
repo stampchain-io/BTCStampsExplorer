@@ -48,8 +48,8 @@ export function classifySearchInput(
     return { type: "unknown", sanitized: "", original: input };
   }
 
-  // CPID: starts with 'A' or 'a', optionally followed by digits
-  if (/^[Aa]\d*$/.test(trimmed)) {
+  // CPID: starts with 'A' or 'a', followed by 5+ digits (real numeric asset IDs)
+  if (/^[Aa]\d{5,}$/.test(trimmed)) {
     return {
       type: "cpid",
       sanitized: trimmed.toUpperCase(),
@@ -167,11 +167,11 @@ export function generateSearchErrorMessage(
     switch (type) {
       case "tx_hash":
         header = "NO TOKEN FOUND";
-        detail = "No token found for this transaction";
+        detail = "No token deploy found for this transaction";
         break;
       case "address":
         header = "NO TOKENS FOUND";
-        detail = "No tokens found for this address";
+        detail = "No token deploy found for this address";
         break;
       case "ticker":
         header = "NO TOKEN FOUND";
