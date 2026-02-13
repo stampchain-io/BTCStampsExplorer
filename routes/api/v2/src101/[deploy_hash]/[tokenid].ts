@@ -50,12 +50,18 @@ export const handler: Handlers = {
         return sortValidation.error!;
       }
 
+      // Support optional expire filter: ?expire=0 (active only), ?expire=1 (expired only)
+      // No expire param returns all records (needed for availability checks)
+      const expireParam = url.searchParams.get("expire");
+      const expire = expireParam !== null ? Number(expireParam) : undefined;
+
       const queryParams = {
         deploy_hash,
         tokenid,
         limit: limit || DEFAULT_PAGINATION.limit,
         page: page || DEFAULT_PAGINATION.page,
         ...(sortValidation.data && { sort: sortValidation.data }),
+        ...(expire !== undefined && { expire }),
       };
 
       const result = await Src101Controller.handleSrc101OwnerRequest(
