@@ -70,7 +70,9 @@ if [ "$USE_OPENAPI_VALIDATOR" = "true" ] && [ -f "./static/swagger/openapi.yml" 
   [ -n "$NEWMAN_TIMEOUT" ] && [ "$NEWMAN_TIMEOUT" -gt 0 ] && NEWMAN_CMD="$NEWMAN_CMD --timeout $NEWMAN_TIMEOUT"
   [ "$NEWMAN_BAIL" = "true" ] && NEWMAN_CMD="$NEWMAN_CMD --bail"
   [ "$NEWMAN_VERBOSE" = "true" ] && NEWMAN_CMD="$NEWMAN_CMD --verbose"
-  
+  [ -n "$DEV_BASE_URL" ] && NEWMAN_CMD="$NEWMAN_CMD --env-var 'dev_base_url=$DEV_BASE_URL'"
+  [ -n "$PROD_BASE_URL" ] && NEWMAN_CMD="$NEWMAN_CMD --env-var 'prod_base_url=$PROD_BASE_URL'"
+
   eval $NEWMAN_CMD
   NEWMAN_EXIT_CODE=$?
 
@@ -87,6 +89,8 @@ else
   [ -n "$NEWMAN_TIMEOUT" ] && [ "$NEWMAN_TIMEOUT" -gt 0 ] && NEWMAN_CMD="$NEWMAN_CMD --timeout $NEWMAN_TIMEOUT"
   [ "$NEWMAN_BAIL" = "true" ] && NEWMAN_CMD="$NEWMAN_CMD --bail"
   [ "$NEWMAN_VERBOSE" = "true" ] && NEWMAN_CMD="$NEWMAN_CMD --verbose"
+  [ -n "$DEV_BASE_URL" ] && NEWMAN_CMD="$NEWMAN_CMD --env-var 'dev_base_url=$DEV_BASE_URL'"
+  [ -n "$PROD_BASE_URL" ] && NEWMAN_CMD="$NEWMAN_CMD --env-var 'prod_base_url=$PROD_BASE_URL'"
 
   eval $NEWMAN_CMD
   NEWMAN_EXIT_CODE=$?
