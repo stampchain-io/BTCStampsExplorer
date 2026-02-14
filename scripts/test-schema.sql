@@ -181,6 +181,7 @@ CREATE TABLE src20_market_data (
     price_source_type VARCHAR(50),
     change_24h DECIMAL(10,2) DEFAULT 0,
     change_7d DECIMAL(10,2) DEFAULT 0,
+    update_frequency_minutes INT DEFAULT 5,
     PRIMARY KEY (tick),
     INDEX idx_market_cap (market_cap_btc),
     INDEX idx_volume_24h (volume_24h_btc),
