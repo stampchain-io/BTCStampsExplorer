@@ -56,7 +56,7 @@ jobs:
       - name: Cache Deno dependencies
         run: |
           echo "Pre-caching Deno dependencies to speed up server startup..."
-          deno cache --node-modules-dir deps.ts main.ts
+          deno cache --node-modules-dir main.ts
           echo "Dependencies cached successfully"
 
       - name: Start development server
