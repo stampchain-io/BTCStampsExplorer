@@ -122,7 +122,7 @@
         "exec": [
           "// Common test validations",
           "pm.test('Response status is valid', () => {",
-          "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 400, 404, 410, 500]);",
+          "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 400, 404, 410]);",
           "});",
           "",
           "pm.test('Response time is acceptable', () => {",
@@ -7612,6 +7612,19 @@
         },
         {
           "name": "Test Error Endpoint - Dev",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Error endpoint returns expected status', function() {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 500]);",
+                  "});"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
@@ -7635,6 +7648,19 @@
         },
         {
           "name": "Test Error Endpoint - Prod",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Error endpoint returns expected status', function() {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 500]);",
+                  "});"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
