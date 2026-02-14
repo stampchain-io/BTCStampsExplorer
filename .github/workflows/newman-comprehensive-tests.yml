@@ -673,6 +673,8 @@ jobs:
           mkdir -p reports/newman-local-dev
 
           # Run Newman tests pointing to localhost with test data from seed
+          # Exclude schema-generated "src101" (uses {{baseUrl}} and <integer> placeholders)
+          # Exclude "POST Endpoints" (requires Bitcoin infrastructure for tx building)
           newman run tests/postman/collections/comprehensive.json \
             --env-var dev_base_url=http://localhost:8000 \
             --env-var prod_base_url=http://localhost:8000 \
@@ -688,6 +690,16 @@ jobs:
             --env-var test_index=1942 \
             --env-var test_tick=stamp \
             --env-var test_timeout=10000 \
+            --folder "Balance Endpoints" \
+            --folder "Block Endpoints" \
+            --folder "Collections Endpoints" \
+            --folder "Comparison Report" \
+            --folder "Cursed Stamps Endpoints" \
+            --folder "Error Scenarios" \
+            --folder "SRC-20 Endpoints" \
+            --folder "Stamps Endpoints" \
+            --folder "SRC-101 Endpoints" \
+            --folder "System Endpoints" \
             --reporters cli,html,json \
             --reporter-html-export reports/newman-local-dev/newman-report.html \
             --reporter-json-export reports/newman-local-dev/newman-report.json \
