@@ -22,7 +22,7 @@ on:
   workflow_dispatch:
 
 env:
-  DENO_VERSION: "2.4.x"
+  DENO_VERSION: "2.6.9"
   NODE_VERSION: "18"
 
 jobs:

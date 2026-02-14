@@ -10,7 +10,7 @@ avoid duplication and keeps this guide concise.
 
 ## 1. Project Overview
 - **Framework**: Fresh (v1.7.3)
-- **Deno version**: 2.4.2
+- **Deno version**: 2.6.9
 - **Purpose**: Serve a Bitcoin Stamps block explorer and API
   supporting SRC‑20, SRC‑721, and SRC‑101 standards.
 

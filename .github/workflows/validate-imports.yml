@@ -51,7 +51,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version: v2.4.x
+          deno-version: v2.6.9
 
       - name: Cache Deno Dependencies
         uses: actions/cache@v4
@@ -300,7 +300,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version: v2.4.x
+          deno-version: v2.6.9
 
       - name: Run Compliance Check
         run: |

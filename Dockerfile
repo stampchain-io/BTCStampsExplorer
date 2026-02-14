@@ -1,5 +1,5 @@
 # Deno base image - Updated for CVE-2025-61786 security fix
-FROM denoland/deno:alpine-2.5.3
+FROM denoland/deno:alpine-2.6.9
 
 # Set environment variables
 ENV HOME=/app \
