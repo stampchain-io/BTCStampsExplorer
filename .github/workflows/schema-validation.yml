@@ -38,15 +38,15 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Deno
-        uses: denoland/setup-deno@v1
+        uses: denoland/setup-deno@v2
         with:
           deno-version: ${{ env.DENO_VERSION }}
 
       - name: Setup Node.js (for Newman)
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
 
@@ -128,7 +128,7 @@ jobs:
 
       - name: Upload Schema Validation Results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: schema-validation-results
           path: reports/schema-validation-results.json
@@ -136,7 +136,7 @@ jobs:
 
       - name: Comment PR with Schema Validation Results
         if: github.event_name == 'pull_request' && always()
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const fs = require('fs');

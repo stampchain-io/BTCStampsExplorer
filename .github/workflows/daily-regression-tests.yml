@@ -88,12 +88,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0  # Fetch full history for trend analysis
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '20'
           cache: 'npm'
@@ -265,7 +265,7 @@ jobs:
 
       - name: Create GitHub issue for critical regressions
         if: steps.check-regressions.outputs.status == 'critical' && env.SEND_NOTIFICATIONS == 'true'
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -356,7 +356,7 @@ jobs:
 
       - name: Upload comprehensive reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: daily-regression-reports-${{ env.TIMESTAMP }}
           path: |
@@ -391,7 +391,7 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Cleanup old daily regression reports
         run: |
@@ -416,7 +416,7 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Generate weekly summary
         run: |
