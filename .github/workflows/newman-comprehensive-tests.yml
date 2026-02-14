@@ -691,7 +691,7 @@ jobs:
             --reporters cli,html,json \
             --reporter-html-export reports/newman-local-dev/newman-report.html \
             --reporter-json-export reports/newman-local-dev/newman-report.json \
-            --bail || NEWMAN_EXIT_CODE=$?
+            || NEWMAN_EXIT_CODE=$?
 
           echo "Newman tests completed"
 
