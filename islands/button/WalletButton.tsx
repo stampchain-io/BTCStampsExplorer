@@ -229,81 +229,79 @@ export const WalletButton = (
       </div>
     ),
     // The wallet dropdown content
-    dropdown: (
-      isConnected && address
-        ? (
-          <div class="flex flex-col gap-1.5 text-right whitespace-nowrap">
-            <div class="flex flex-row-reverse justify-end items-center gap-3">
-              <div
-                ref={copyButtonRef}
-                class="relative peer"
-                onMouseEnter={handleCopyMouseEnter}
-                onMouseLeave={handleCopyMouseLeave}
-              >
-                <Icon
-                  type="iconButton"
-                  name="copy"
-                  weight="normal"
-                  size="xxs"
-                  color="greyDark"
-                  className="mb-0.5"
-                  onClick={copy}
-                />
-                <div
-                  class={`${tooltipIcon} ${
-                    isTooltipVisible ? "opacity-100" : "opacity-0"
-                  }`}
-                >
-                  COPY ADDY
-                </div>
-                <div
-                  class={`${tooltipIcon} ${
-                    showCopied ? "opacity-100" : "opacity-0"
-                  }`}
-                >
-                  ADDY COPIED
-                </div>
-              </div>
-              <h6
-                class={`${valueDarkXs} transition-colors duration-200 peer-hover:text-color-grey-light`}
-              >
-                {abbreviateAddress(address, 7)}
-              </h6>
-            </div>
-            <div class="flex items-center gap-3 mb-0.5">
+    dropdown: isConnected && address
+      ? (
+        <div class="flex flex-col gap-1.5 text-right whitespace-nowrap">
+          <div class="flex flex-row-reverse justify-end items-center gap-3">
+            <div
+              ref={copyButtonRef}
+              class="relative peer"
+              onMouseEnter={handleCopyMouseEnter}
+              onMouseLeave={handleCopyMouseLeave}
+            >
               <Icon
-                type="icon"
-                name="bitcoins"
+                type="iconButton"
+                name="copy"
                 weight="normal"
-                size="xs"
+                size="xxs"
                 color="greyDark"
+                className="mb-0.5"
+                onClick={copy}
               />
-              <h6 class={valueSm}>
-                {formatSatoshisToBTC(btcBalance.total, {
-                  includeSymbol: false,
-                  stripZeros: true,
-                })} <span class={labelSm}>BTC</span>
-              </h6>
+              <div
+                class={`${tooltipIcon} ${
+                  isTooltipVisible ? "opacity-100" : "opacity-0"
+                }`}
+              >
+                COPY ADDY
+              </div>
+              <div
+                class={`${tooltipIcon} ${
+                  showCopied ? "opacity-100" : "opacity-0"
+                }`}
+              >
+                ADDY COPIED
+              </div>
             </div>
-            <hr class="!mt-2 !mb-2" />
-            <a
-              href={`/wallet/${address}`}
-              class={isActive(`/wallet/${address}`)
-                ? `${navSublinkPurpleActive}`
-                : `${navSublinkPurple}`}
+            <h6
+              class={`${valueDarkXs} transition-colors duration-200 peer-hover:text-color-grey-light`}
             >
-              DASHBOARD
-            </a>
-            <a
-              onClick={() => walletSignOut()}
-              class={`${navSublinkPurple}`}
-            >
-              DISCONNECT
-            </a>
+              {abbreviateAddress(address, 7)}
+            </h6>
           </div>
-        )
-        : null
-    ),
+          <div class="flex items-center gap-3 mb-0.5">
+            <Icon
+              type="icon"
+              name="bitcoins"
+              weight="normal"
+              size="xs"
+              color="greyDark"
+            />
+            <h6 class={valueSm}>
+              {formatSatoshisToBTC(btcBalance.total, {
+                includeSymbol: false,
+                stripZeros: true,
+              })} <span class={labelSm}>BTC</span>
+            </h6>
+          </div>
+          <hr class="!mt-2 !mb-2" />
+          <a
+            href={`/wallet/${address}`}
+            class={isActive(`/wallet/${address}`)
+              ? `${navSublinkPurpleActive}`
+              : `${navSublinkPurple}`}
+          >
+            DASHBOARD
+          </a>
+          <a
+            onClick={() => walletSignOut()}
+            class={`${navSublinkPurple}`}
+          >
+            DISCONNECT
+          </a>
+        </div>
+      )
+      : null,
     // The wallet drawer content
     drawer: (
       <div class="flex flex-col h-full px-9 tablet:px-6">
