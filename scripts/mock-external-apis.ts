@@ -329,40 +329,99 @@ function handleCounterpartyApi(
   // Get asset dispensers: /assets/{cpid}/dispensers
   const assetDispensersMatch = path.match(/^\/assets\/([^/]+)\/dispensers/);
   if (assetDispensersMatch) {
+    const cpid = assetDispensersMatch[1];
     return jsonResponse({
-      result: [],
+      result: [
+        {
+          tx_index: 100001,
+          tx_hash:
+            "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
+          block_index: 820000,
+          source: "bc1qkqqre5xuqk60xtt93j297zgg7t6x0ul7gwjmv4",
+          asset: cpid,
+          give_quantity: 1,
+          escrow_quantity: 10,
+          satoshirate: 10000,
+          status: 0,
+          give_remaining: 9,
+          oracle_address: null,
+          last_status_tx_hash: null,
+          origin: "bc1qkqqre5xuqk60xtt93j297zgg7t6x0ul7gwjmv4",
+        },
+      ],
       next_cursor: null,
-      result_count: 0,
+      result_count: 1,
     });
   }
 
   // Get asset dispenses: /assets/{cpid}/dispenses
   const assetDispensesMatch = path.match(/^\/assets\/([^/]+)\/dispenses/);
   if (assetDispensesMatch) {
+    const cpid = assetDispensesMatch[1];
     return jsonResponse({
-      result: [],
+      result: [
+        {
+          tx_index: 100002,
+          tx_hash:
+            "b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3",
+          block_index: 820001,
+          source: "bc1qulr65fnl9dgdt8re6g7yuzvjtxn43lydqeu6lh",
+          destination:
+            "bc1qkqqre5xuqk60xtt93j297zgg7t6x0ul7gwjmv4",
+          asset: cpid,
+          dispense_quantity: 1,
+          dispenser_tx_hash:
+            "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
+        },
+      ],
       next_cursor: null,
-      result_count: 0,
+      result_count: 1,
     });
   }
 
   // Get asset holders (balances): /assets/{cpid}/balances
   const assetBalancesMatch = path.match(/^\/assets\/([^/]+)\/balances/);
   if (assetBalancesMatch) {
+    const cpid = assetBalancesMatch[1];
     return jsonResponse({
-      result: [],
+      result: [
+        {
+          address: "bc1qkqqre5xuqk60xtt93j297zgg7t6x0ul7gwjmv4",
+          asset: cpid,
+          quantity: 1,
+        },
+        {
+          address: "bc1qulr65fnl9dgdt8re6g7yuzvjtxn43lydqeu6lh",
+          asset: cpid,
+          quantity: 1,
+        },
+      ],
       next_cursor: null,
-      result_count: 0,
+      result_count: 2,
     });
   }
 
   // Get asset sends: /assets/{cpid}/sends
   const assetSendsMatch = path.match(/^\/assets\/([^/]+)\/sends/);
   if (assetSendsMatch) {
+    const cpid = assetSendsMatch[1];
     return jsonResponse({
-      result: [],
+      result: [
+        {
+          tx_index: 100003,
+          tx_hash:
+            "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4",
+          block_index: 820002,
+          source: "bc1qkqqre5xuqk60xtt93j297zgg7t6x0ul7gwjmv4",
+          destination:
+            "bc1qulr65fnl9dgdt8re6g7yuzvjtxn43lydqeu6lh",
+          asset: cpid,
+          quantity: 1,
+          status: "valid",
+        },
+      ],
       next_cursor: null,
-      result_count: 0,
+      result_count: 1,
     });
   }
 

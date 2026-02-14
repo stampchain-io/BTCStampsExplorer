@@ -782,6 +782,7 @@ jobs:
             --env-var test_cpid=A888354448084788958 \
             --env-var test_address=bc1qkqqre5xuqk60xtt93j297zgg7t6x0ul7gwjmv4 \
             --env-var test_tx_hash=e94be2793462692ca8fea3a54dd90ff4b18735196a2bc426382c11959533c8ca \
+            --env-var test_src20_tx_hash=f353823cdc63ee24fe2167ca14d3bb9b6a54dd063b53382c0cd42f05d7262808 \
             --env-var test_src20_tick=stamp \
             --env-var test_cursed_id=-1832 \
             --env-var test_deploy_hash=77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed \
