@@ -532,6 +532,10 @@ jobs:
       QUICKNODE_API_KEY: test-quicknode-key
       ANTHROPIC_API_KEY: test-anthropic-key
       PERPLEXITY_API_KEY: test-perplexity-key
+      # Mock external APIs for POST endpoint testing (Counterparty, mempool.space, Blockstream)
+      XCP_API_URL: http://localhost:18443/v2
+      MEMPOOL_API_URL: http://localhost:18443/mempool/api
+      BLOCKSTREAM_API_URL: http://localhost:18443/blockstream/api
 
     steps:
       - name: Checkout code
@@ -601,7 +605,8 @@ jobs:
         run: |
           echo "Verifying test data..."
           mysql -h 127.0.0.1 -P 3306 -u root -ptest btcstamps_test -e "SHOW TABLES;"
-          mysql -h 127.0.0.1 -P 3306 -u root -ptest btcstamps_test -e "SELECT COUNT(*) AS stamp_count FROM stamps;"
+          mysql -h 127.0.0.1 -P 3306 -u root -ptest btcstamps_test -e "SELECT COUNT(*) AS stamp_count FROM StampTableV4;"
+          mysql -h 127.0.0.1 -P 3306 -u root -ptest btcstamps_test -e "SELECT COUNT(*) AS block_count FROM blocks;"
           echo "✅ Test data verified"
 
       - name: Cache Deno dependencies for dev server
@@ -609,16 +614,39 @@ jobs:
           echo "Caching Deno dependencies..."
           deno cache --no-check main.ts dev.ts
 
+      - name: Start mock external API server
+        run: |
+          echo "Starting mock external API server for POST endpoint testing..."
+          nohup deno run --allow-net --allow-env scripts/mock-external-apis.ts > mock-api-server.log 2>&1 &
+          echo $! > mock-api-server.pid
+          echo "Mock server started with PID: $(cat mock-api-server.pid)"
+
+          # Wait for mock server to be ready
+          timeout 15 bash -c 'until curl -f -s http://localhost:18443/health > /dev/null 2>&1; do
+            echo "Mock server not ready yet, waiting..."
+            sleep 1
+          done' || {
+            echo "❌ Mock API server failed to start"
+            cat mock-api-server.log || echo "No logs available"
+            exit 1
+          }
+          echo "✅ Mock external API server is ready"
+
       - name: Start dev server
         run: |
           echo "Starting Deno dev server in background..."
           # Start dev server without watch mode for CI
+          # XCP_API_URL, MEMPOOL_API_URL, BLOCKSTREAM_API_URL from job env
+          # point to mock server for POST endpoint testing
           DENO_ENV=development \
           DB_HOST=127.0.0.1 \
           DB_USER=root \
           DB_PASSWORD=test \
           DB_NAME=btcstamps_test \
           REDIS_URL=redis://127.0.0.1:6379 \
+          XCP_API_URL=http://localhost:18443/v2 \
+          MEMPOOL_API_URL=http://localhost:18443/mempool/api \
+          BLOCKSTREAM_API_URL=http://localhost:18443/blockstream/api \
           nohup deno run -A dev.ts > dev-server.log 2>&1 &
 
           echo "Dev server started with PID: $!"
@@ -672,9 +700,7 @@ jobs:
           echo "Running Newman tests against local dev server..."
           mkdir -p reports/newman-local-dev
 
-          # Run Newman tests pointing to localhost with test data from seed
-          # Exclude schema-generated "src101" (uses {{baseUrl}} and <integer> placeholders)
-          # Exclude "POST Endpoints" (requires Bitcoin infrastructure for tx building)
+          # Run Newman tests pointing to localhost with comprehensive seed data
           newman run tests/postman/collections/comprehensive.json \
             --env-var dev_base_url=http://localhost:8000 \
             --env-var prod_base_url=http://localhost:8000 \
@@ -690,16 +716,6 @@ jobs:
             --env-var test_index=1942 \
             --env-var test_tick=stamp \
             --env-var test_timeout=10000 \
-            --folder "Balance Endpoints" \
-            --folder "Block Endpoints" \
-            --folder "Collections Endpoints" \
-            --folder "Comparison Report" \
-            --folder "Cursed Stamps Endpoints" \
-            --folder "Error Scenarios" \
-            --folder "SRC-20 Endpoints" \
-            --folder "Stamps Endpoints" \
-            --folder "SRC-101 Endpoints" \
-            --folder "System Endpoints" \
             --reporters cli,html,json \
             --reporter-html-export reports/newman-local-dev/newman-report.html \
             --reporter-json-export reports/newman-local-dev/newman-report.json \
@@ -741,13 +757,18 @@ jobs:
           echo "=== Dev Server Logs ==="
           cat dev-server.log || echo "No logs available"
 
-      - name: Stop dev server
+      - name: Stop dev server and mock API server
         if: always()
         run: |
           if [ -f dev-server.pid ]; then
             echo "Stopping dev server..."
             kill $(cat dev-server.pid) || true
             rm dev-server.pid
+          fi
+          if [ -f mock-api-server.pid ]; then
+            echo "Stopping mock API server..."
+            kill $(cat mock-api-server.pid) || true
+            rm mock-api-server.pid
           fi
 
       - name: Upload test reports

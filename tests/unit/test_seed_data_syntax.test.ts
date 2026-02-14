@@ -107,17 +107,31 @@ describe("Test Seed Data SQL Syntax Validation", () => {
       "blocks",
       "StampTableV4",
       "creator",
+      "transactions",
       "SRC20Valid",
       "balances",
       "src20_token_stats",
+      "src20_metadata",
+      "src20_market_data",
+      "SRC101Valid",
+      "SRC101",
+      "src101price",
+      "recipients",
+      "owners",
       "collections",
+      "collection_creators",
+      "collection_stamps",
+      "collection_market_data",
+      "stamp_market_data",
+      "stamp_holder_cache",
+      "stamp_sales_history",
     ];
 
     for (const table of requiredTables) {
       it(`should have INSERT/REPLACE statements for ${table} table`, async () => {
         if (!seedSQL) seedSQL = await loadSeedFile();
 
-        const pattern = new RegExp(`(INSERT|REPLACE)\\s+INTO\\s+${table}\\b`, "i");
+        const pattern = new RegExp(`(INSERT|REPLACE)\\s+INTO\\s+\`?${table}\`?\\b`, "i");
         assertMatch(
           seedSQL,
           pattern,
@@ -128,68 +142,75 @@ describe("Test Seed Data SQL Syntax Validation", () => {
   });
 
   describe("BINARY(16) Collection ID Handling", () => {
-    it("should use UNHEX() for collection_id insertions", async () => {
+    it("should use X'hex' or UNHEX() for collection_id insertions", async () => {
       if (!seedSQL) seedSQL = await loadSeedFile();
 
-      // Check if collections table uses UNHEX for collection_id
-      const collectionsPattern = /INSERT|REPLACE.*INTO\s+collections[\s\S]*?VALUES/i;
-      const collectionsInsert = seedSQL.match(collectionsPattern);
+      // Check if collections table has binary-formatted collection_id values
+      const hasCollections = /(INSERT|REPLACE)\s+INTO\s+`?collections`?/i.test(seedSQL);
 
-      if (collectionsInsert) {
+      if (hasCollections) {
         assertMatch(
           seedSQL,
-          /UNHEX\(['"]/i,
-          "Should use UNHEX() function for BINARY(16) collection_id values"
+          /X'[0-9A-Fa-f]+'|UNHEX\(['"]/i,
+          "Should use X'hex' or UNHEX() for BINARY(16) collection_id values"
         );
       }
     });
 
-    it("should use UNHEX() in collection_creators table", async () => {
+    it("should use binary format in collection_creators table", async () => {
       if (!seedSQL) seedSQL = await loadSeedFile();
 
-      const creatorsPattern = /INSERT|REPLACE.*INTO\s+collection_creators/i;
-      const hasCreators = creatorsPattern.test(seedSQL);
+      const hasCreators = /(INSERT|REPLACE)\s+INTO\s+`?collection_creators`?/i.test(seedSQL);
 
       if (hasCreators) {
         assertMatch(
           seedSQL,
-          /collection_creators[\s\S]*?UNHEX/i,
-          "collection_creators should use UNHEX() for collection_id"
+          /collection_creators[\s\S]*?(X'[0-9A-Fa-f]+'|UNHEX)/i,
+          "collection_creators should use X'hex' or UNHEX() for collection_id"
         );
       }
     });
 
-    it("should use UNHEX() in collection_stamps table", async () => {
+    it("should use binary format in collection_stamps table", async () => {
       if (!seedSQL) seedSQL = await loadSeedFile();
 
-      const stampsPattern = /INSERT|REPLACE.*INTO\s+collection_stamps/i;
-      const hasStamps = stampsPattern.test(seedSQL);
+      const hasStamps = /(INSERT|REPLACE)\s+INTO\s+`?collection_stamps`?/i.test(seedSQL);
 
       if (hasStamps) {
         assertMatch(
           seedSQL,
-          /collection_stamps[\s\S]*?UNHEX/i,
-          "collection_stamps should use UNHEX() for collection_id"
+          /collection_stamps[\s\S]*?(X'[0-9A-Fa-f]+'|UNHEX)/i,
+          "collection_stamps should use X'hex' or UNHEX() for collection_id"
         );
       }
     });
 
-    it("should have properly formatted hex strings for UNHEX()", async () => {
+    it("should have properly formatted hex strings for BINARY(16)", async () => {
       if (!seedSQL) seedSQL = await loadSeedFile();
 
-      // Find all UNHEX() calls
-      const unhexCalls = seedSQL.match(/UNHEX\(['"]([0-9A-Fa-f]+)['"]\)/g);
-
-      if (unhexCalls) {
-        for (const call of unhexCalls) {
-          const hexMatch = call.match(/UNHEX\(['"]([0-9A-Fa-f]+)['"]\)/);
-          if (hexMatch) {
-            const hexValue = hexMatch[1];
-            assertEquals(
-              hexValue.length,
-              32,
-              `UNHEX() hex string should be 32 characters (16 bytes), got ${hexValue.length} in: ${call}`
-            );
+      // Find X'hex' literals only in collection-related table inserts
+      const collectionTables = ["collections", "collection_creators", "collection_stamps", "collection_market_data"];
+      for (const table of collectionTables) {
+        const tablePattern = new RegExp(
+          `REPLACE\\s+INTO\\s+\`?${table}\`?[\\s\\S]*?;`,
+          "gi"
+        );
+        const tableInserts = seedSQL.match(tablePattern);
+        if (tableInserts) {
+          for (const insert of tableInserts) {
+            const hexLiterals = insert.match(/X'([0-9A-Fa-f]+)'/g);
+            if (hexLiterals) {
+              for (const literal of hexLiterals) {
+                const hexMatch = literal.match(/X'([0-9A-Fa-f]+)'/);
+                if (hexMatch) {
+                  assertEquals(
+                    hexMatch[1].length,
+                    32,
+                    `${table}: X'hex' collection_id should be 32 chars (16 bytes), got ${hexMatch[1].length}`
+                  );
+                }
+              }
+            }
           }
         }
       }
@@ -338,7 +359,7 @@ describe("Test Seed Data SQL Syntax Validation", () => {
       if (!seedSQL) seedSQL = await loadSeedFile();
 
       const tableOrder: string[] = [];
-      const tablePattern = /(INSERT|REPLACE)\s+INTO\s+(\w+)/gi;
+      const tablePattern = /(INSERT|REPLACE)\s+INTO\s+`?(\w+)`?/gi;
       const matches = seedSQL.matchAll(tablePattern);
 
       for (const match of matches) {
