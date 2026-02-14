@@ -259,7 +259,7 @@ CREATE TABLE src101_all (
     destination_nvalue BIGINT,
     block_time INT NOT NULL,
     tx_index INT NOT NULL,
-    status VARCHAR(100),
+    status VARCHAR(255),
     PRIMARY KEY (tx_hash),
     INDEX idx_block_index (block_index),
     INDEX idx_tick (tick),
