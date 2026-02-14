@@ -210,7 +210,18 @@ export class MockDatabaseManager {
       return this.getCollectionData(normalizedQuery, params);
     }
 
-    // Stamp queries (non-count)
+    // Stamp queries with market data JOIN - check BEFORE simple stamp queries
+    if (
+      (normalizedQuery.includes("from stamps") ||
+        normalizedQuery.includes("stampstablev4")) &&
+      (normalizedQuery.includes("join stamp_market_data") ||
+        normalizedQuery.includes("left join stamp_market_data") ||
+        normalizedQuery.includes("smd.floor_price_btc"))
+    ) {
+      return this.getStampsWithMarketDataJoin(normalizedQuery, params);
+    }
+
+    // Stamp queries (non-count, non-join)
     if (
       normalizedQuery.includes("from stamps") ||
       normalizedQuery.includes("from stampstablev4") ||
@@ -332,17 +343,176 @@ export class MockDatabaseManager {
       }
     }
 
-    // Apply limit if present
+    // Apply ORDER BY if present
+    if (normalizedQuery.includes("order by")) {
+      const orderByMatch = query.match(/order\s+by\s+(\w+\.)?(\w+)\s+(asc|desc)/i);
+      if (orderByMatch) {
+        const sortField = orderByMatch[2];
+        const sortOrder = orderByMatch[3].toLowerCase();
+
+        stamps.sort((a: any, b: any) => {
+          const aVal = a[sortField];
+          const bVal = b[sortField];
+
+          // Handle numeric comparisons
+          if (typeof aVal === "number" && typeof bVal === "number") {
+            return sortOrder === "desc" ? bVal - aVal : aVal - bVal;
+          }
+
+          // Handle string comparisons
+          if (typeof aVal === "string" && typeof bVal === "string") {
+            return sortOrder === "desc"
+              ? bVal.localeCompare(aVal)
+              : aVal.localeCompare(bVal);
+          }
+
+          // Handle null/undefined
+          if (aVal == null && bVal == null) return 0;
+          if (aVal == null) return 1;
+          if (bVal == null) return -1;
+
+          return 0;
+        });
+      }
+    }
+
+    // Apply limit and offset for pagination
     if (normalizedQuery.includes("limit")) {
       const limitMatch = query.match(/limit\s+(\d+|\?)/i);
       if (limitMatch) {
-        const limitIndex = params.length - 2; // Usually second to last param
-        const limit = params[limitIndex] as number || MAX_PAGINATION_LIMIT;
-        stamps = stamps.slice(0, limit);
+        let limit = MAX_PAGINATION_LIMIT;
+        let offset = 0;
+
+        // Find limit parameter (usually second to last or last param)
+        if (normalizedQuery.includes("offset")) {
+          // Both LIMIT and OFFSET present
+          limit = params[params.length - 2] as number || MAX_PAGINATION_LIMIT;
+          offset = params[params.length - 1] as number || 0;
+        } else {
+          // Only LIMIT present
+          limit = params[params.length - 1] as number || MAX_PAGINATION_LIMIT;
+        }
+
+        stamps = stamps.slice(offset, offset + limit);
       }
     }
 
     return { rows: stamps };
+  }
+
+  /**
+   * Get stamps with market data JOIN (for queries like getStampsWithMarketData)
+   */
+  private getStampsWithMarketDataJoin(
+    query: string,
+    params: unknown[],
+  ): QueryResult {
+    const normalizedQuery = query.toLowerCase();
+    const stampFixtures = stampFixturesData as any;
+    const marketDataFixtures = marketDataFixturesData as any;
+
+    // Get all stamps from fixtures
+    let stamps = [
+      ...stampFixtures.regularStamps,
+      ...stampFixtures.cursedStamps,
+      ...stampFixtures.src20Stamps,
+      ...stampFixtures.stampsWithMarketData,
+    ];
+
+    // Apply collection filter if present (JOIN with collection_stamps)
+    if (
+      normalizedQuery.includes("join collection_stamps") &&
+      normalizedQuery.includes("collection_id = unhex(?)")
+    ) {
+      const collectionId = params[0] as string;
+      const collectionFixtures = collectionFixturesData as any;
+      const collectionStamps = collectionFixtures.collectionStamps || [];
+
+      // Filter stamps that belong to this collection
+      const stampNumbers = collectionStamps
+        .filter((cs: any) => cs.collection_id === collectionId)
+        .map((cs: any) => cs.stamp);
+
+      stamps = stamps.filter((s) => stampNumbers.includes(s.stamp));
+    }
+
+    // Join with market data
+    const stampMarketData = marketDataFixtures.stampMarketData || [];
+    const results = stamps.map((stamp: any) => {
+      // Find matching market data by CPID
+      const marketData = stampMarketData.find((md: any) => md.cpid === stamp.cpid);
+
+      // Combine stamp data with market data (LEFT JOIN, so market data is optional)
+      return {
+        ...stamp,
+        // Market data fields (null if no match)
+        floor_price_btc: marketData?.floor_price_btc || null,
+        recent_sale_price_btc: marketData?.recent_sale_price_btc || null,
+        open_dispensers_count: marketData?.open_dispensers_count || 0,
+        closed_dispensers_count: marketData?.closed_dispensers_count || 0,
+        total_dispensers_count: marketData?.total_dispensers_count || 0,
+        holder_count: marketData?.holder_count || 0,
+        unique_holder_count: marketData?.unique_holder_count || 0,
+        top_holder_percentage: marketData?.top_holder_percentage || null,
+        holder_distribution_score: marketData?.holder_distribution_score || null,
+        volume_24h_btc: marketData?.volume_24h_btc || null,
+        volume_7d_btc: marketData?.volume_7d_btc || null,
+        volume_30d_btc: marketData?.volume_30d_btc || null,
+        total_volume_btc: marketData?.total_volume_btc || null,
+        price_source: marketData?.price_source || null,
+        volume_sources: marketData?.volume_sources || null,
+        data_quality_score: marketData?.data_quality_score || null,
+        confidence_level: marketData?.confidence_level || null,
+        market_data_last_updated: marketData?.last_updated || null,
+        last_price_update: marketData?.last_price_update || null,
+        update_frequency_minutes: marketData?.update_frequency_minutes || null,
+        cache_age_minutes: marketData ? 5 : null, // Mock cache age
+      };
+    });
+
+    // Apply ORDER BY if present
+    let sortedResults = [...results];
+    if (normalizedQuery.includes("order by")) {
+      const orderByMatch = query.match(/order\s+by\s+st\.(\w+)\s+(asc|desc)/i);
+      if (orderByMatch) {
+        const sortField = orderByMatch[1];
+        const sortOrder = orderByMatch[2].toLowerCase();
+
+        sortedResults.sort((a: any, b: any) => {
+          const aVal = a[sortField];
+          const bVal = b[sortField];
+
+          if (typeof aVal === "number" && typeof bVal === "number") {
+            return sortOrder === "desc" ? bVal - aVal : aVal - bVal;
+          }
+
+          if (aVal == null && bVal == null) return 0;
+          if (aVal == null) return 1;
+          if (bVal == null) return -1;
+
+          return 0;
+        });
+      }
+    }
+
+    // Apply LIMIT and OFFSET for pagination
+    let paginatedResults = sortedResults;
+    if (normalizedQuery.includes("limit")) {
+      let limit = 20; // default
+      let offset = 0;
+
+      // Find limit and offset in params (usually last two params)
+      if (normalizedQuery.includes("offset")) {
+        limit = params[params.length - 2] as number || 20;
+        offset = params[params.length - 1] as number || 0;
+      } else {
+        limit = params[params.length - 1] as number || 20;
+      }
+
+      paginatedResults = sortedResults.slice(offset, offset + limit);
+    }
+
+    return { rows: paginatedResults };
   }
 
   /**
@@ -375,16 +545,82 @@ export class MockDatabaseManager {
    * Get SRC-20 market data from fixtures
    */
   private getSrc20MarketData(query: string, params: unknown[]): QueryResult {
+    const normalizedQuery = query.toLowerCase();
     const marketDataFixtures = marketDataFixturesData as any;
     let marketData = [...marketDataFixtures.src20MarketData];
 
-    // Filter by tick if present
-    if (query.includes("where") && query.includes("tick")) {
+    // Filter by tick if present (single tick)
+    if (normalizedQuery.includes("where") && normalizedQuery.includes("tick =")) {
       const tickIndex = params.findIndex((p) => typeof p === "string");
       if (tickIndex >= 0) {
         const tick = params[tickIndex];
         marketData = marketData.filter((m) => m.tick === tick);
       }
+    }
+
+    // Filter by tick IN clause (batch queries)
+    if (normalizedQuery.includes("tick in")) {
+      // All params are ticks for IN clause
+      const ticks = params.filter((p) => typeof p === "string");
+      marketData = marketData.filter((m) => ticks.includes(m.tick));
+    }
+
+    // Filter by price > 0 (common in paginated queries)
+    if (normalizedQuery.includes("price_btc > 0")) {
+      marketData = marketData.filter((m) =>
+        m.price_btc && parseFloat(m.price_btc) > 0
+      );
+    }
+
+    // Apply ORDER BY if present
+    if (normalizedQuery.includes("order by")) {
+      // Check for CAST expressions in ORDER BY
+      const castMatch = query.match(
+        /order\s+by\s+cast\((\w+)\s+as\s+decimal\([^)]+\)\)\s+(asc|desc)/i,
+      );
+      const simpleMatch = query.match(/order\s+by\s+(\w+)\s+(asc|desc)/i);
+
+      const orderMatch = castMatch || simpleMatch;
+      if (orderMatch) {
+        const sortField = orderMatch[1];
+        const sortOrder = orderMatch[2].toLowerCase();
+
+        marketData.sort((a: any, b: any) => {
+          const aVal = parseFloat(a[sortField]) || 0;
+          const bVal = parseFloat(b[sortField]) || 0;
+          return sortOrder === "desc" ? bVal - aVal : aVal - bVal;
+        });
+      }
+    }
+
+    // Apply LIMIT and OFFSET for pagination
+    if (normalizedQuery.includes("limit")) {
+      let limit = 20;
+      let offset = 0;
+
+      // Try to extract LIMIT and OFFSET from the query string first
+      const limitMatch = query.match(/limit\s+(\d+)/i);
+      const offsetMatch = query.match(/offset\s+(\d+)/i);
+
+      if (limitMatch) {
+        limit = parseInt(limitMatch[1]);
+      } else if (normalizedQuery.includes("offset")) {
+        // Both LIMIT and OFFSET present as params (last two params)
+        const limitParam = params[params.length - 2];
+        const offsetParam = params[params.length - 1];
+        if (typeof limitParam === "number") limit = limitParam;
+        if (typeof offsetParam === "number") offset = offsetParam;
+      } else {
+        // Only LIMIT present as param (last param)
+        const limitParam = params[params.length - 1];
+        if (typeof limitParam === "number") limit = limitParam;
+      }
+
+      if (offsetMatch) {
+        offset = parseInt(offsetMatch[1]);
+      }
+
+      marketData = marketData.slice(offset, offset + limit);
     }
 
     return { rows: marketData };
@@ -620,14 +856,45 @@ export class MockDatabaseManager {
         }
       }
 
-      // Apply limit if present
+      // Apply limit and offset for pagination
       if (normalizedQuery.includes("limit")) {
         const limitIndex = params.findIndex((p) =>
-          typeof p === "number" && p > 0
+          typeof p === "number" && p > 0 && p < 10000
         );
         if (limitIndex >= 0) {
           const limit = params[limitIndex] as number;
-          filteredOwners = filteredOwners.slice(0, limit);
+          let offset = 0;
+
+          // Check for OFFSET after LIMIT
+          if (normalizedQuery.includes("offset")) {
+            const offsetIndex = params.findIndex((p, idx) =>
+              idx > limitIndex && typeof p === "number" && p >= 0
+            );
+            if (offsetIndex >= 0) {
+              offset = params[offsetIndex] as number;
+            }
+          }
+
+          filteredOwners = filteredOwners.slice(offset, offset + limit);
+        }
+      }
+
+      // Apply ORDER BY if present
+      if (normalizedQuery.includes("order by")) {
+        // For SRC101 owners, typically ordered by quantity or timestamp
+        if (normalizedQuery.includes("quantity")) {
+          const isDesc = normalizedQuery.includes("desc");
+          filteredOwners.sort((a: any, b: any) => {
+            const diff = (a.quantity || 0) - (b.quantity || 0);
+            return isDesc ? -diff : diff;
+          });
+        } else if (normalizedQuery.includes("block_time")) {
+          const isDesc = normalizedQuery.includes("desc");
+          filteredOwners.sort((a: any, b: any) => {
+            const timeA = new Date(a.block_time || 0).getTime();
+            const timeB = new Date(b.block_time || 0).getTime();
+            return isDesc ? timeB - timeA : timeA - timeB;
+          });
         }
       }
 

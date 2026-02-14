@@ -1,39 +1,42 @@
-name: Newman Comprehensive Tests (Production Validation)
+name: Newman Comprehensive Tests (Production Validation + Local Dev)
 
-# This workflow validates production API endpoints on a schedule
-# It does NOT run on code changes because Newman tests don't add value in CI without a dev server
-# For local development: Use 'deno task check:api:comprehensive' to compare localhost vs production
+# This workflow includes:
+# 1. Production validation (scheduled) - validates live stampchain.io endpoints
+# 2. Local dev testing (push/PR) - runs Newman tests against local dev server with MySQL+Redis
 
 on:
-  # Remove push/PR triggers - Newman tests don't add value in CI without dev server
-  # push:
-  #   branches: [main, dev]
-  #   paths:
-  #     - 'tests/postman/collections/comprehensive.json'
-  #     - 'tests/postman/collections/pagination-validation.json'
-  #     - 'tests/postman/environments/comprehensive.json'
-  #     - 'tests/postman/data/pagination-tests.json'
-  #     - 'scripts/run-newman-comprehensive.sh'
-  #     - 'scripts/run-newman-pagination-validation.sh'
-  #     - 'scripts/analyze-newman-regression.js'
-  #     - 'server/**'
-  #     - 'routes/**'
-  #     - 'lib/**'
-  #     - '.github/workflows/newman-comprehensive-tests.yml'
-  # pull_request:
-  #   branches: [main, dev]
-  #   paths:
-  #     - 'tests/postman/collections/comprehensive.json'
-  #     - 'tests/postman/collections/pagination-validation.json'
-  #     - 'tests/postman/environments/comprehensive.json'
-  #     - 'tests/postman/data/pagination-tests.json'
-  #     - 'scripts/run-newman-comprehensive.sh'
-  #     - 'scripts/run-newman-pagination-validation.sh'
-  #     - 'scripts/analyze-newman-regression.js'
-  #     - 'server/**'
-  #     - 'routes/**'
-  #     - 'lib/**'
-  #     - '.github/workflows/newman-comprehensive-tests.yml'
+  push:
+    branches: [main, dev]
+    paths:
+      - 'tests/postman/collections/comprehensive.json'
+      - 'tests/postman/collections/pagination-validation.json'
+      - 'tests/postman/environments/comprehensive.json'
+      - 'tests/postman/data/pagination-tests.json'
+      - 'scripts/run-newman-comprehensive.sh'
+      - 'scripts/run-newman-pagination-validation.sh'
+      - 'scripts/analyze-newman-regression.js'
+      - 'scripts/test-schema.sql'
+      - 'scripts/test-seed-data.sql'
+      - 'server/**'
+      - 'routes/**'
+      - 'lib/**'
+      - '.github/workflows/newman-comprehensive-tests.yml'
+  pull_request:
+    branches: [main, dev]
+    paths:
+      - 'tests/postman/collections/comprehensive.json'
+      - 'tests/postman/collections/pagination-validation.json'
+      - 'tests/postman/environments/comprehensive.json'
+      - 'tests/postman/data/pagination-tests.json'
+      - 'scripts/run-newman-comprehensive.sh'
+      - 'scripts/run-newman-pagination-validation.sh'
+      - 'scripts/analyze-newman-regression.js'
+      - 'scripts/test-schema.sql'
+      - 'scripts/test-seed-data.sql'
+      - 'server/**'
+      - 'routes/**'
+      - 'lib/**'
+      - '.github/workflows/newman-comprehensive-tests.yml'
   workflow_dispatch:
     inputs:
       test_folder:
@@ -476,3 +479,385 @@ jobs:
             echo "✅ Performance benchmarks passed"
           fi
           echo "✅ Benchmark run complete"
+
+  newman-local-dev:
+    name: Newman Tests - Local Dev Server
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    if: github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
+
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: test
+          MYSQL_DATABASE: btcstamps_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      CI: true
+      DENO_ENV: development
+      # Database configuration
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: test
+      DB_NAME: btcstamps_test
+      # Redis configuration
+      REDIS_URL: redis://127.0.0.1:6379
+      ELASTICACHE_ENDPOINT: 127.0.0.1:6379
+      SKIP_REDIS_CONNECTION: false
+      # Mock API keys for testing
+      QUICKNODE_API_KEY: test-quicknode-key
+      ANTHROPIC_API_KEY: test-anthropic-key
+      PERPLEXITY_API_KEY: test-perplexity-key
+      # Mock external APIs for POST endpoint testing (Counterparty, mempool.space, Blockstream)
+      XCP_API_URL: http://localhost:18443/v2
+      MEMPOOL_API_URL: http://localhost:18443/mempool/api
+      BLOCKSTREAM_API_URL: http://localhost:18443/blockstream/api
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.4.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache Deno dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.deno
+            ~/.cache/deno
+          key: ${{ runner.os }}-deno-newman-${{ hashFiles('**/deno.json', '**/import_map.json') }}
+          restore-keys: |
+            ${{ runner.os }}-deno-newman-
+            ${{ runner.os }}-deno-
+
+      - name: Cache npm dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-newman-${{ hashFiles('**/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-newman-
+            ${{ runner.os }}-npm-
+
+      - name: Wait for MySQL
+        run: |
+          echo "Waiting for MySQL to be ready..."
+          timeout 60 bash -c 'until mysqladmin ping -h 127.0.0.1 -P 3306 -u root -ptest --silent; do
+            echo "MySQL not ready yet, waiting..."
+            sleep 2
+          done'
+          echo "✅ MySQL is ready"
+
+      - name: Wait for Redis
+        run: |
+          echo "Waiting for Redis to be ready..."
+          timeout 30 bash -c 'until nc -z 127.0.0.1 6379; do
+            echo "Redis not ready yet, waiting..."
+            sleep 1
+          done'
+          echo "✅ Redis is ready"
+
+      - name: Load test schema
+        run: |
+          echo "Loading test schema..."
+          mysql -h 127.0.0.1 -P 3306 -u root -ptest btcstamps_test < scripts/test-schema.sql
+          echo "✅ Test schema loaded"
+
+      - name: Load test seed data
+        run: |
+          echo "Loading test seed data..."
+          mysql -h 127.0.0.1 -P 3306 -u root -ptest btcstamps_test < scripts/test-seed-data.sql
+          echo "✅ Test seed data loaded"
+
+      - name: Verify test data
+        run: |
+          echo "Verifying test data..."
+          mysql -h 127.0.0.1 -P 3306 -u root -ptest btcstamps_test -e "SHOW TABLES;"
+          mysql -h 127.0.0.1 -P 3306 -u root -ptest btcstamps_test -e "SELECT COUNT(*) AS stamp_count FROM StampTableV4;"
+          mysql -h 127.0.0.1 -P 3306 -u root -ptest btcstamps_test -e "SELECT COUNT(*) AS block_count FROM blocks;"
+          echo "✅ Test data verified"
+
+      - name: Cache Deno dependencies for dev server
+        run: |
+          echo "Caching Deno dependencies..."
+          deno cache --no-check main.ts dev.ts
+
+      - name: Start mock external API server
+        run: |
+          echo "Starting mock external API server for POST endpoint testing..."
+          nohup deno run --allow-net --allow-env scripts/mock-external-apis.ts > mock-api-server.log 2>&1 &
+          echo $! > mock-api-server.pid
+          echo "Mock server started with PID: $(cat mock-api-server.pid)"
+
+          # Wait for mock server to be ready
+          timeout 15 bash -c 'until curl -f -s http://localhost:18443/health > /dev/null 2>&1; do
+            echo "Mock server not ready yet, waiting..."
+            sleep 1
+          done' || {
+            echo "❌ Mock API server failed to start"
+            cat mock-api-server.log || echo "No logs available"
+            exit 1
+          }
+          echo "✅ Mock external API server is ready"
+
+      - name: Start dev server
+        run: |
+          echo "Starting Deno dev server in background..."
+          # Start dev server without watch mode for CI
+          # XCP_API_URL, MEMPOOL_API_URL, BLOCKSTREAM_API_URL from job env
+          # point to mock server for POST endpoint testing
+          DENO_ENV=development \
+          DB_HOST=127.0.0.1 \
+          DB_USER=root \
+          DB_PASSWORD=test \
+          DB_NAME=btcstamps_test \
+          REDIS_URL=redis://127.0.0.1:6379 \
+          XCP_API_URL=http://localhost:18443/v2 \
+          MEMPOOL_API_URL=http://localhost:18443/mempool/api \
+          BLOCKSTREAM_API_URL=http://localhost:18443/blockstream/api \
+          nohup deno run -A dev.ts > dev-server.log 2>&1 &
+
+          echo "Dev server started with PID: $!"
+          echo $! > dev-server.pid
+
+          echo "Waiting for dev server to be ready (max 60s)..."
+          timeout 60 bash -c 'until curl -f -s http://localhost:8000/api/v2/health > /dev/null 2>&1; do
+            echo "Dev server not ready yet, waiting..."
+            sleep 2
+          done' || {
+            echo "❌ Dev server failed to start within 60 seconds"
+            echo "=== Dev Server Logs ==="
+            cat dev-server.log || echo "No logs available"
+            exit 1
+          }
+
+          echo "✅ Dev server is ready at http://localhost:8000"
+
+      - name: Verify dev server health
+        run: |
+          echo "Checking dev server health endpoint..."
+          curl -f http://localhost:8000/api/v2/health || {
+            echo "❌ Health check failed"
+            exit 1
+          }
+          echo "✅ Health check passed"
+
+      - name: Install Newman
+        run: |
+          echo "Installing Newman and reporters..."
+          npm install -g newman newman-reporter-html newman-reporter-json
+
+      - name: Verify test collection exists
+        run: |
+          echo "Verifying test collection and environment files..."
+          if [ ! -f "tests/postman/collections/comprehensive.json" ]; then
+            echo "❌ Error: tests/postman/collections/comprehensive.json not found"
+            exit 1
+          fi
+
+          if [ ! -f "tests/postman/environments/comprehensive.json" ]; then
+            echo "⚠️ Warning: tests/postman/environments/comprehensive.json not found"
+            echo "Tests will run with dev_base_url as environment variable"
+          fi
+
+          echo "✅ Test files verified"
+
+      - name: Run Newman tests against localhost
+        id: newman-local
+        run: |
+          echo "Running Newman tests against local dev server..."
+          mkdir -p reports/newman-local-dev
+
+          # Run Newman tests pointing to localhost with comprehensive seed data
+          newman run tests/postman/collections/comprehensive.json \
+            --env-var dev_base_url=http://localhost:8000 \
+            --env-var prod_base_url=http://localhost:8000 \
+            --env-var test_block=820000 \
+            --env-var test_stamp_id=1384305 \
+            --env-var test_cpid=A888354448084788958 \
+            --env-var test_address=bc1qkqqre5xuqk60xtt93j297zgg7t6x0ul7gwjmv4 \
+            --env-var test_tx_hash=e94be2793462692ca8fea3a54dd90ff4b18735196a2bc426382c11959533c8ca \
+            --env-var test_src20_tick=stamp \
+            --env-var test_cursed_id=-1832 \
+            --env-var test_deploy_hash=77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed \
+            --env-var test_tokenid=U0FUT1NISU5BS0FNT1RP \
+            --env-var test_index=1942 \
+            --env-var test_tick=stamp \
+            --env-var test_timeout=10000 \
+            --reporters cli,html,json \
+            --reporter-html-export reports/newman-local-dev/newman-report.html \
+            --reporter-json-export reports/newman-local-dev/newman-report.json \
+            || NEWMAN_EXIT_CODE=$?
+
+          echo "Newman tests completed"
+
+          # Create summary
+          {
+            echo "## Newman Local Dev Test Results"
+            echo ""
+            echo "### Configuration"
+            echo "- Base URL: http://localhost:8000"
+            echo "- Collection: tests/postman/collections/comprehensive.json"
+            echo "- Environment: Local dev server with MySQL + Redis"
+            echo ""
+
+            if [ -f "reports/newman-local-dev/newman-report.json" ]; then
+              echo "### Results Summary"
+              node -e "
+                const fs = require('fs');
+                const report = JSON.parse(fs.readFileSync('reports/newman-local-dev/newman-report.json', 'utf8'));
+                const stats = report.run.stats;
+                console.log('- Total Requests: ' + stats.requests.total);
+                console.log('- Passed Assertions: ' + stats.assertions.passed);
+                console.log('- Failed Assertions: ' + stats.assertions.failed);
+                console.log('- Total Assertions: ' + stats.assertions.total);
+                console.log('- Average Response Time: ' + Math.round(report.run.timings.responseAverage) + 'ms');
+              "
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          exit ${NEWMAN_EXIT_CODE:-0}
+        continue-on-error: false
+
+      - name: Capture dev server logs on failure
+        if: failure()
+        run: |
+          echo "=== Dev Server Logs ==="
+          cat dev-server.log || echo "No logs available"
+
+      - name: Stop dev server and mock API server
+        if: always()
+        run: |
+          if [ -f dev-server.pid ]; then
+            echo "Stopping dev server..."
+            kill $(cat dev-server.pid) || true
+            rm dev-server.pid
+          fi
+          if [ -f mock-api-server.pid ]; then
+            echo "Stopping mock API server..."
+            kill $(cat mock-api-server.pid) || true
+            rm mock-api-server.pid
+          fi
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: newman-local-dev-reports-${{ github.run_number }}
+          path: reports/newman-local-dev/
+          retention-days: 30
+
+      - name: Upload dev server logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dev-server-logs-${{ github.run_number }}
+          path: dev-server.log
+          retention-days: 7
+
+      - name: Create PR comment with results
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            let comment = '## 🧪 Newman Local Dev Test Results\n\n';
+            comment += '✅ **Local Dev Server**: Tests run against localhost:8000 with MySQL + Redis\n\n';
+
+            const testStatus = '${{ steps.newman-local.outcome }}';
+
+            if (testStatus === 'success') {
+              comment += '### ✅ All Local Dev Tests Passed\n\n';
+
+              try {
+                const report = JSON.parse(fs.readFileSync('reports/newman-local-dev/newman-report.json', 'utf8'));
+                const stats = report.run.stats;
+
+                comment += `- **Total Requests**: ${stats.requests.total}\n`;
+                comment += `- **Passed Assertions**: ${stats.assertions.passed}\n`;
+                comment += `- **Failed Assertions**: ${stats.assertions.failed}\n`;
+                comment += `- **Total Assertions**: ${stats.assertions.total}\n`;
+                comment += `- **Average Response Time**: ${Math.round(report.run.timings.responseAverage)}ms\n`;
+              } catch (e) {
+                comment += 'Could not parse test results.\n';
+              }
+            } else {
+              comment += '### ❌ Local Dev Tests Failed\n\n';
+              comment += 'Some tests did not pass against the local dev server. Please check the detailed report.\n\n';
+            }
+
+            comment += '\n### 📎 Resources\n\n';
+            comment += '- [Test Reports Artifact](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n';
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.find(comment =>
+              comment.user.type === 'Bot' &&
+              comment.body.includes('Newman Local Dev Test Results')
+            );
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: comment
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: comment
+              });
+            }
+
+      - name: Summarize results
+        if: always()
+        run: |
+          echo "=== Newman Local Dev Test Summary ==="
+
+          if [ "${{ steps.newman-local.outcome }}" == "success" ]; then
+            echo "✅ Newman tests passed against local dev server"
+          else
+            echo "❌ Newman tests failed against local dev server"
+          fi
+
+          echo "✅ Local dev test run complete"

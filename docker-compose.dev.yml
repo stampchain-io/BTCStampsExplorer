@@ -1,0 +1,133 @@
+services:
+  # MySQL 8.0 database service
+  mysql:
+    image: mysql:8.0
+    container_name: btcstamps-mysql-dev
+    environment:
+      MYSQL_ROOT_PASSWORD: btcstamps_dev_root
+      MYSQL_DATABASE: btcstamps_test
+      MYSQL_USER: btcstamps_dev
+      MYSQL_PASSWORD: btcstamps_dev_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      # Auto-load schema and seed data on startup
+      - ./scripts:/docker-entrypoint-initdb.d/:ro
+      # Persist database data
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pbtcstamps_dev_root"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - btcstamps-network
+    restart: unless-stopped
+
+  # Redis 7 cache service
+  redis:
+    image: redis:7-alpine
+    container_name: btcstamps-redis-dev
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    networks:
+      - btcstamps-network
+    restart: unless-stopped
+
+  # Deno application service
+  deno-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: btcstamps-deno-dev
+    environment:
+      # Deno environment
+      DENO_ENV: development
+
+      # Database configuration - connect to mysql service
+      DB_HOST: mysql
+      DB_USER: btcstamps_dev
+      DB_PASSWORD: btcstamps_dev_pass
+      DB_NAME: btcstamps_test
+      DB_PORT: 3306
+      DB_MAX_RETRIES: 5
+
+      # Redis configuration - connect to redis service
+      CACHE: "true"
+      ELASTICACHE_ENDPOINT: redis
+      ELASITCACHE_PORT: 6379
+      FORCE_REDIS_CONNECTION: "false"
+      SKIP_REDIS: "false"
+      SKIP_REDIS_CONNECTION: "false"
+      SKIP_REDIS_TLS: "true"
+      REDIS_DEBUG: "true"
+      REDIS_TIMEOUT: 15000
+      REDIS_MAX_RETRIES: 10
+      REDIS_LOG_LEVEL: DEBUG
+
+      # API Configuration
+      API_BASE_URL: http://localhost:8000
+
+      # Content Configuration
+      IMAGES_SRC_PATH: https://stampchain.io/stamps
+
+      # Security Configuration (development defaults)
+      CSRF_SECRET_KEY: dev_csrf_secret_key_change_in_production
+      INTERNAL_API_SECRET: dev_internal_secret
+      INTERNAL_API_KEY: dev_internal_key
+      APP_DOMAIN: localhost
+      ALLOWED_DOMAINS: localhost,127.0.0.1
+
+      # MARA Integration (disabled in dev)
+      ENABLE_MARA_INTEGRATION: 0
+      MARA_API_BASE_URL: https://slipstream.mara.com/rest-api
+      MARA_API_TIMEOUT: 30000
+      MARA_SERVICE_FEE_SATS: 42000
+
+      # Minting Service Configuration (disabled in dev)
+      MINTING_SERVICE_FEE_ENABLED: 0
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount source code for live reload during development
+      - .:/app:cached
+      # Preserve Deno cache and node_modules
+      - deno_cache:/app/.deno
+      - npm_cache:/app/.npm
+      - node_modules:/app/node_modules
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - btcstamps-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v2/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+networks:
+  btcstamps-network:
+    driver: bridge
+    name: btcstamps-dev-network
+
+volumes:
+  mysql_data:
+    name: btcstamps-mysql-dev-data
+  deno_cache:
+    name: btcstamps-deno-cache-dev
+  npm_cache:
+    name: btcstamps-npm-cache-dev
+  node_modules:
+    name: btcstamps-node-modules-dev
