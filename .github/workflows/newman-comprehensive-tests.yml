@@ -358,6 +358,73 @@ jobs:
               });
             }
 
+      - name: Create regression issue (scheduled runs only)
+        if: github.event_name == 'schedule' && steps.newman-test.outcome == 'failure'
+        uses: actions/github-script@v8
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const today = new Date().toISOString().split('T')[0];
+
+            // Check for existing open regression issue to avoid duplicates
+            const { data: existingIssues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'api-regression',
+              state: 'open',
+            });
+
+            if (existingIssues.length > 0) {
+              // Add comment to existing issue instead of creating a new one
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existingIssues[0].number,
+                body: `### Regression still present (${today})\n\nScheduled Newman tests failed again.\n\n**Run**: ${runUrl}\n**Artifacts**: Check the run for detailed reports.`,
+              });
+              console.log(`Updated existing regression issue #${existingIssues[0].number}`);
+              return;
+            }
+
+            // Build issue body with analysis details if available
+            let analysisDetails = '';
+            try {
+              const analysisFiles = fs.readdirSync('reports/newman-comprehensive/')
+                .filter(f => f.endsWith('-analysis.json'))
+                .sort((a, b) => b.localeCompare(a));
+
+              if (analysisFiles.length > 0) {
+                const analysis = JSON.parse(
+                  fs.readFileSync(`reports/newman-comprehensive/${analysisFiles[0]}`, 'utf8')
+                );
+                const summary = analysis.summary;
+                analysisDetails = `\n### Regression Analysis\n- Breaking Changes: ${summary.breaking}\n- Non-Breaking Changes: ${summary.nonBreaking}\n- Performance Issues: ${summary.performanceIssues}\n`;
+
+                if (analysis.regressions?.breaking?.length > 0) {
+                  analysisDetails += '\n### Breaking Changes\n';
+                  analysis.regressions.breaking.slice(0, 10).forEach(bc => {
+                    analysisDetails += `- **${bc.request}**: ${bc.assertion}\n  - Error: \`${bc.error}\`\n`;
+                  });
+                  if (analysis.regressions.breaking.length > 10) {
+                    analysisDetails += `\n... and ${analysis.regressions.breaking.length - 10} more\n`;
+                  }
+                }
+              }
+            } catch (e) {
+              console.log('Could not parse analysis report:', e.message);
+            }
+
+            // Create new regression issue
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `API Regression Detected - ${today}`,
+              body: `## Scheduled Newman Test Failure\n\nThe daily scheduled Newman API tests detected failures against production (stampchain.io).\n\n**Run**: ${runUrl}\n**Date**: ${today}\n**Trigger**: Scheduled (daily 2 AM UTC)\n${analysisDetails}\n### Next Steps\n1. Check the [workflow run](${runUrl}) for detailed test results\n2. Download the Newman report artifact for full failure details\n3. Investigate and fix the regression\n4. Close this issue when resolved\n\n---\n*Auto-created by scheduled API regression monitoring*`,
+              labels: ['api-regression', 'bug', 'automated'],
+            });
+
       - name: Summarize results
         if: always()
         run: |
@@ -378,9 +445,14 @@ jobs:
             echo "✅ Regression analysis completed"
           fi
 
-          # This workflow is informational (scheduled monitoring only)
-          # Results are in step summary and uploaded artifacts
           echo "✅ Monitoring run complete"
+
+      - name: Fail on scheduled regression
+        if: github.event_name == 'schedule' && steps.newman-test.outcome == 'failure'
+        run: |
+          echo "❌ Scheduled production validation detected API regressions"
+          echo "   A GitHub issue has been created with details."
+          exit 1
 
   pagination-validation:
     name: Pagination & Data Validation Tests
