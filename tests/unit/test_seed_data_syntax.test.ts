@@ -105,10 +105,10 @@ describe("Test Seed Data SQL Syntax Validation", () => {
   describe("Required Tables Coverage", () => {
     const requiredTables = [
       "blocks",
-      "stamps",
+      "StampTableV4",
       "creator",
-      "src20",
-      "src20_balance",
+      "SRC20Valid",
+      "balances",
       "src20_token_stats",
       "collections",
     ];

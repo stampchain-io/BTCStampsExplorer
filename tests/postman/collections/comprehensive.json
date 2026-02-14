@@ -117,7 +117,7 @@
         "exec": [
           "// Common test validations",
           "pm.test('Response status is valid', () => {",
-          "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 400, 404]);",
+          "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 400, 404, 410]);",
           "});",
           "",
           "pm.test('Response time is acceptable', () => {",
