@@ -130,6 +130,7 @@
   ],
   "nodeModulesDir": "auto",
   "imports": {
+    "web-vitals": "https://esm.sh/web-vitals@4.2.4",
     "stream": "node:stream",
     "stream/promises": "node:stream/promises",
     "stream/consumers": "node:stream/consumers",

@@ -61,14 +61,25 @@ export default function CarouselGallery(props: CarouselHomeProps) {
 
   /* ===== VALIDATION EFFECT ===== */
   useEffect(() => {
+    // Defer stamp validation to idle periods to reduce main thread blocking
+    // This improves TBT (Total Blocking Time) by spreading validation work across idle callbacks
     const validateStamps = () => {
       const validated: Record<string, ComponentChildren> = {};
       const sources: Record<string, string> = {};
 
       // Process stamps in batches to avoid overwhelming the browser
       const batchSize = 5;
-      for (let i = 0; i < duplicatedStamps.length; i += batchSize) {
-        const batch = duplicatedStamps.slice(i, i + batchSize);
+      let currentBatch = 0;
+      const totalBatches = Math.ceil(duplicatedStamps.length / batchSize);
+
+      // Process one batch per idle callback
+      const processBatch = () => {
+        if (currentBatch >= totalBatches) {
+          return; // All batches processed
+        }
+
+        const startIdx = currentBatch * batchSize;
+        const batch = duplicatedStamps.slice(startIdx, startIdx + batchSize);
 
         batch.forEach((stamp) => {
           // Skip if already validated
@@ -121,7 +132,21 @@ export default function CarouselGallery(props: CarouselHomeProps) {
         if (Object.keys(sources).length > 0) {
           setStampSources((prev) => ({ ...prev, ...sources }));
         }
-      }
+
+        currentBatch++;
+
+        // Schedule next batch during idle time
+        if (currentBatch < totalBatches) {
+          const idleCallback = (globalThis as any).requestIdleCallback ||
+            ((cb: () => void) => setTimeout(cb, 16)); // Fallback to ~60fps timing
+          idleCallback(processBatch);
+        }
+      };
+
+      // Start processing first batch during idle time
+      const idleCallback = (globalThis as any).requestIdleCallback ||
+        ((cb: () => void) => setTimeout(cb, 16));
+      idleCallback(processBatch);
     };
 
     validateStamps();

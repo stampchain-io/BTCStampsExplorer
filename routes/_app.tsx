@@ -11,6 +11,7 @@ import ModalProvider from "$islands/layout/ModalProvider.tsx";
 import PageVisibilityManager from "$islands/layout/PageVisibilityManager.tsx";
 import { NotificationUpdate } from "$islands/Toast/NotificationUpdate.tsx";
 import { ToastProvider } from "$islands/Toast/ToastProvider.tsx";
+import WebVitalsReporter from "$islands/WebVitalsReporter.tsx";
 import { Footer, NavigatorProvider } from "$layout";
 
 /* ===== ROOT COMPONENT ===== */
@@ -49,12 +50,72 @@ export default function App({ Component, state, url }: PageProps<unknown>) {
           href="https://cdn.jsdelivr.net"
           crossOrigin="anonymous"
         />
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js">
-        </script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js">
-        </script>
-        <script src="/background-topology.js">
-        </script>
+
+        {/* ===== LAZY SCRIPT LOADING COORDINATOR ===== */}
+        {/* Inline script to track loading and dispatch event when ready */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                // Track script loading state
+                window.__vantaScripts = { three: false, p5: false, vanta: false };
+
+                // Dispatch event when all scripts are ready
+                window.checkVantaReady = function() {
+                  if (window.__vantaScripts.three && window.__vantaScripts.p5 && window.__vantaScripts.vanta) {
+                    window.dispatchEvent(new CustomEvent('vanta-scripts-ready', {
+                      detail: { three: true, p5: true, vanta: true }
+                    }));
+                  }
+                };
+              })();
+            `,
+          }}
+        />
+
+        {/* Load scripts with onload handlers embedded in src URLs via wrapper scripts */}
+        <script
+          async
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                var s = document.createElement('script');
+                s.async = true;
+                s.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+                s.onload = function() { window.__vantaScripts.three = true; window.checkVantaReady(); };
+                document.head.appendChild(s);
+              })();
+            `,
+          }}
+        />
+        <script
+          async
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                var s = document.createElement('script');
+                s.async = true;
+                s.src = 'https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js';
+                s.onload = function() { window.__vantaScripts.p5 = true; window.checkVantaReady(); };
+                document.head.appendChild(s);
+              })();
+            `,
+          }}
+        />
+        <script
+          async
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                var s = document.createElement('script');
+                s.async = true;
+                s.src = '/background-topology.js';
+                s.onload = function() { window.__vantaScripts.vanta = true; window.checkVantaReady(); };
+                document.head.appendChild(s);
+              })();
+            `,
+          }}
+        />
 
         {/* ===== CRITICAL CSS ===== */}
         <link rel="preload" href="/styles.css" as="style" />
@@ -263,6 +324,7 @@ export default function App({ Component, state, url }: PageProps<unknown>) {
         {/* ===== PERFORMANCE OPTIMIZATION ===== */}
         <PageVisibilityManager />
         <AnimationControlsManager />
+        <WebVitalsReporter />
       </body>
     </html>
   );

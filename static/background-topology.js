@@ -295,9 +295,9 @@
                             (function () {
                                 // === PARTICLE COUNT ===
                                 // Controls number of flowing particles in the topology
-                                // Mobile: 750 particles, Tablet/Desktop: 1500 particles
+                                // Mobile: 750 particles, Tablet/Desktop: 600 particles
                                 const isMobile = "undefined" != typeof navigator && (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768);
-                                c = isMobile ? 750 : 1500;
+                                c = isMobile ? 750 : 600;
                                 const colorPalette = e.options.colorPalette || ["#bb00ff", "#000000", "#c219ff", "#000000", "#c933ff", "#000000", "#cf4dff", "#000000", "#d666ff"];
                                 for (let e = 0; e < c; e++) {
                                     let s = t.random(t.width + 200),
@@ -362,7 +362,7 @@
                                 // === FLOW FIELD EVOLUTION SPEED ===
                                 // Controls how fast the underlying flow field changes over time
                                 // Default: c += 0.002
-                                (c += 0.1);
+                                (c += 0.01);
                         });
                 });
             }
@@ -400,12 +400,12 @@
  * === PARTICLE SYSTEM ===
  * Particle count: Dynamic based on device
  *   Mobile/Tablet: 750 particles
- *   Desktop: 1500 particles
+ *   Desktop: 600 particles
  *   Detection: user agent check + window width < 768px
  *
  * === ANIMATION BEHAVIOR ===
- * Particle speed: mult(4.7) - controls particle movement speed through topology
- * Flow field strength: mult(2.5) - controls particle response to flow field
+ * Particle speed: mult(5.9) - controls particle movement speed through topology
+ * Flow field strength: mult(9.9) - controls particle response to flow field
  * Line thickness: strokeWeight(1)
  * Line opacity: 0.05 - transparency of connecting lines between particles
  * Flow animation speed: c += 0.01 - speed of underlying flow field evolution

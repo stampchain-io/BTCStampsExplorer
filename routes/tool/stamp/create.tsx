@@ -5,7 +5,7 @@ import { Handlers, PageProps } from "$fresh/server.ts";
 import { body, containerBackground, containerGap } from "$layout";
 import { StampGallery, StampingHowto } from "$section";
 import { StampController } from "$server/controller/stampController.ts";
-import { StampingTool } from "$tool";
+import { StampingToolLazy } from "$islands/tool/stamp/StampingToolLazy.tsx";
 import type { StampRow } from "$types/stamp.d.ts";
 
 /* ===== TYPES ===== */
@@ -69,7 +69,7 @@ export default function ToolStampingPage({ data }: PageProps<StampPageData>) {
   return (
     <div class={`${body} ${containerGap}`}>
       <div class={`flex w-full`}>
-        <StampingTool />
+        <StampingToolLazy />
       </div>
       <div
         class={`flex flex-col tablet:flex-row justify-between ${containerGap}`}
