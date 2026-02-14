@@ -704,6 +704,7 @@ jobs:
           newman run tests/postman/collections/comprehensive.json \
             --env-var dev_base_url=http://localhost:8000 \
             --env-var prod_base_url=http://localhost:8000 \
+            --env-var baseUrl=http://localhost:8000 \
             --env-var test_block=820000 \
             --env-var test_stamp_id=1384305 \
             --env-var test_cpid=A888354448084788958 \

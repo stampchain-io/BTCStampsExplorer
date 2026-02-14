@@ -45,7 +45,12 @@ export const handler: Handlers = {
       const { limit, page } = pagination;
 
       // Parse additional query parameters for enhanced functionality
-      const dayRange = parseInt(url.searchParams.get("dayRange") || "30");
+      const parsedDayRange = parseInt(
+        url.searchParams.get("dayRange") || "30",
+      );
+      const dayRange = isNaN(parsedDayRange) || parsedDayRange <= 0
+        ? 30
+        : parsedDayRange;
       const includeFullDetails = url.searchParams.get("fullDetails") === "true";
       const type = url.searchParams.get("type") as
         | "all"
@@ -122,6 +127,12 @@ export const handler: Handlers = {
               dispenser_tx_hash: sale.dispenser_tx_hash,
               dispense_quantity: sale.dispense_quantity,
             },
+
+            // Top-level sale detail fields (expected by comprehensive tests)
+            dispenser_address: sale.dispenser_address,
+            time_ago: sale.time_ago,
+            btc_amount_satoshis: sale.btc_amount_satoshis,
+            transaction_hash: sale.tx_hash,
 
             // Newman test compatibility fields - use snake_case
             last_sale_price: sale.btc_amount, // Map to btc_amount for Newman tests
