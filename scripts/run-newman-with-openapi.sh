@@ -72,6 +72,7 @@ if [ "$USE_OPENAPI_VALIDATOR" = "true" ] && [ -f "./static/swagger/openapi.yml" 
   [ "$NEWMAN_VERBOSE" = "true" ] && NEWMAN_CMD="$NEWMAN_CMD --verbose"
   [ -n "$DEV_BASE_URL" ] && NEWMAN_CMD="$NEWMAN_CMD --env-var 'dev_base_url=$DEV_BASE_URL'"
   [ -n "$PROD_BASE_URL" ] && NEWMAN_CMD="$NEWMAN_CMD --env-var 'prod_base_url=$PROD_BASE_URL'"
+  [ -n "$DEV_BASE_URL" ] && NEWMAN_CMD="$NEWMAN_CMD --env-var 'baseUrl=$DEV_BASE_URL' --env-var 'base_url=$DEV_BASE_URL'"
 
   eval $NEWMAN_CMD
   NEWMAN_EXIT_CODE=$?
@@ -91,6 +92,7 @@ else
   [ "$NEWMAN_VERBOSE" = "true" ] && NEWMAN_CMD="$NEWMAN_CMD --verbose"
   [ -n "$DEV_BASE_URL" ] && NEWMAN_CMD="$NEWMAN_CMD --env-var 'dev_base_url=$DEV_BASE_URL'"
   [ -n "$PROD_BASE_URL" ] && NEWMAN_CMD="$NEWMAN_CMD --env-var 'prod_base_url=$PROD_BASE_URL'"
+  [ -n "$DEV_BASE_URL" ] && NEWMAN_CMD="$NEWMAN_CMD --env-var 'baseUrl=$DEV_BASE_URL' --env-var 'base_url=$DEV_BASE_URL'"
 
   eval $NEWMAN_CMD
   NEWMAN_EXIT_CODE=$?
