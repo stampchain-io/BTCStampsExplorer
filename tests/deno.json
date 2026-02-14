@@ -127,6 +127,7 @@
     "mysql/": "https://deno.land/x/mysql@v2.12.1/",
     "preact": "https://esm.sh/preact@10.22.0",
     "preact/": "https://esm.sh/preact@10.22.0/",
+    "preact-render-to-string": "https://esm.sh/preact-render-to-string@6.5.11?external=preact",
     "puppeteer": "https://deno.land/x/puppeteer@16.2.0/mod.ts",
     "qrcode": "https://esm.sh/qrcode@1.5.1",
     "redis": "https://deno.land/x/redis@v0.32.4/mod.ts",

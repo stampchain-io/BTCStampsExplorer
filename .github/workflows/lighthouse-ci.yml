@@ -1,0 +1,181 @@
+name: Lighthouse CI
+
+on:
+  push:
+    branches: [main, dev]
+    paths:
+      - 'client/**'
+      - 'routes/**'
+      - 'islands/**'
+      - 'components/**'
+      - 'static/**'
+      - 'lighthouserc.js'
+      - 'docker-compose.dev.yml'
+      - '.github/workflows/lighthouse-ci.yml'
+  pull_request:
+    branches: [main, dev]
+    paths:
+      - 'client/**'
+      - 'routes/**'
+      - 'islands/**'
+      - 'components/**'
+      - 'static/**'
+      - 'lighthouserc.js'
+      - 'docker-compose.dev.yml'
+      - '.github/workflows/lighthouse-ci.yml'
+  workflow_dispatch:
+    # Allow manual triggering for testing
+
+jobs:
+  lighthouse-ci:
+    name: Lighthouse CI Performance Testing
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Start dev server with docker-compose
+        run: |
+          echo "Starting development server with docker-compose.dev.yml..."
+          docker-compose -f docker-compose.dev.yml up -d
+
+          echo "Waiting for services to be healthy..."
+          timeout 180 bash -c 'until docker-compose -f docker-compose.dev.yml ps | grep -q "healthy"; do
+            echo "Services not ready yet, waiting..."
+            docker-compose -f docker-compose.dev.yml ps
+            sleep 5
+          done'
+
+          echo "Waiting for Deno app to be ready on port 8000..."
+          timeout 120 bash -c 'until curl -f http://localhost:8000/api/v2/health > /dev/null 2>&1; do
+            echo "Deno app not ready yet, waiting..."
+            sleep 3
+          done'
+
+          echo "✅ Dev server is ready!"
+          docker-compose -f docker-compose.dev.yml ps
+
+      - name: Verify server is responding
+        run: |
+          echo "Testing server endpoints..."
+          curl -f http://localhost:8000/api/v2/health || exit 1
+          echo "✅ Server is responding correctly"
+
+      - name: Run Lighthouse CI - Desktop
+        run: |
+          echo "Running Lighthouse CI with desktop preset..."
+          npx @lhci/cli@0.14.x autorun --config=lighthouserc.js
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+      - name: Run Lighthouse CI - Mobile
+        run: |
+          echo "Running Lighthouse CI with mobile preset..."
+          # Create temporary mobile config
+          cat > lighthouserc.mobile.js << 'EOF'
+          export default {
+            ci: {
+              collect: {
+                url: [
+                  'http://localhost:8000/',
+                  'http://localhost:8000/stamp/1',
+                  'http://localhost:8000/src20',
+                ],
+                numberOfRuns: 3,
+                settings: {
+                  preset: 'mobile',
+                  chromeFlags: '--no-sandbox --disable-dev-shm-usage',
+                  skipAudits: [
+                    'uses-http2',
+                    'uses-long-cache-ttl',
+                  ],
+                },
+              },
+              assert: {
+                preset: 'lighthouse:recommended',
+                assertions: {
+                  // Slightly relaxed mobile budgets
+                  'total-blocking-time': ['error', { maxNumericValue: 600 }],
+                  'first-contentful-paint': ['error', { maxNumericValue: 2500 }],
+                  'largest-contentful-paint': ['error', { maxNumericValue: 3000 }],
+                  'speed-index': ['error', { maxNumericValue: 4000 }],
+                  'cumulative-layout-shift': ['error', { maxNumericValue: 0.1 }],
+                  'interactive': ['warn', { maxNumericValue: 4000 }],
+                  'max-potential-fid': ['warn', { maxNumericValue: 150 }],
+                  'categories:performance': ['warn', { minScore: 0.85 }],
+                  'categories:accessibility': ['warn', { minScore: 0.8 }],
+                  'categories:best-practices': ['warn', { minScore: 0.85 }],
+                  'categories:seo': ['warn', { minScore: 0.8 }],
+                },
+              },
+              upload: {
+                target: 'temporary-public-storage',
+              },
+            },
+          };
+          EOF
+
+          npx @lhci/cli@0.14.x autorun --config=lighthouserc.mobile.js
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+      - name: Upload Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports
+          path: .lighthouseci/
+          retention-days: 30
+
+      - name: Display Lighthouse results
+        if: always()
+        run: |
+          echo "## Lighthouse CI Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Performance Budgets" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Budget (Desktop) | Budget (Mobile) |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|------------------|-----------------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Total Blocking Time | < 500ms | < 600ms |" >> $GITHUB_STEP_SUMMARY
+          echo "| First Contentful Paint | < 2000ms | < 2500ms |" >> $GITHUB_STEP_SUMMARY
+          echo "| Largest Contentful Paint | < 2500ms | < 3000ms |" >> $GITHUB_STEP_SUMMARY
+          echo "| Speed Index | < 3500ms | < 4000ms |" >> $GITHUB_STEP_SUMMARY
+          echo "| Cumulative Layout Shift | < 0.1 | < 0.1 |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📊 Full reports available in workflow artifacts" >> $GITHUB_STEP_SUMMARY
+
+      - name: Show container logs on failure
+        if: failure()
+        run: |
+          echo "=== Docker Compose Status ==="
+          docker-compose -f docker-compose.dev.yml ps
+          echo ""
+          echo "=== MySQL Logs ==="
+          docker-compose -f docker-compose.dev.yml logs mysql | tail -100
+          echo ""
+          echo "=== Redis Logs ==="
+          docker-compose -f docker-compose.dev.yml logs redis | tail -100
+          echo ""
+          echo "=== Deno App Logs ==="
+          docker-compose -f docker-compose.dev.yml logs deno-app | tail -200
+
+      - name: Cleanup
+        if: always()
+        run: |
+          echo "Stopping docker-compose services..."
+          docker-compose -f docker-compose.dev.yml down -v
+          echo "✅ Cleanup complete"
