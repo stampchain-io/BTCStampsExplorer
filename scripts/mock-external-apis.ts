@@ -266,6 +266,25 @@ function handleCounterpartyApi(
     });
   }
 
+  // Compose issuance: /addresses/{address}/compose/issuance - SUCCESS path
+  const issuanceMatch = path.match(
+    /^\/addresses\/([^/]+)\/compose\/issuance$/,
+  );
+  if (issuanceMatch) {
+    return jsonResponse({
+      result: {
+        rawtransaction: COUNTERPARTY_RAW_TX,
+        params: {
+          source: issuanceMatch[1],
+          asset: "A12345678901234567",
+          quantity: 1,
+          divisible: false,
+          description: "Mock issuance for CI testing",
+        },
+      },
+    });
+  }
+
   // Get balances: /addresses/{address}/balances
   const balancesMatch = path.match(/^\/addresses\/([^/]+)\/balances/);
   if (balancesMatch) {

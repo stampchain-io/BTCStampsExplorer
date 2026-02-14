@@ -391,18 +391,8 @@ export const handler: Handlers = {
           `Insufficient funds after all calculations for attach. Deficit: ${-finalUserChangeValue}`,
         );
       }
-      try {
-        psbt.finalizeAllInputs();
-      } catch (finalizeError: any) {
-        logger.error("api", {
-          message: "Error finalizing inputs for stampattach PSBT",
-          error: finalizeError.message,
-          psbtInputs: psbt.data.inputs,
-        });
-        throw new Error(
-          `Failed to finalize PSBT inputs: ${finalizeError.message}`,
-        );
-      }
+      // Return unsigned PSBT for the wallet to sign (do NOT finalize —
+      // finalizeAllInputs() requires signatures which the wallet provides)
       const finalPsbtHex = psbt.toHex();
       return ApiResponseUtil.success({
         psbtHex: finalPsbtHex,
