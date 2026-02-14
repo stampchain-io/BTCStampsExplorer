@@ -1,0 +1,8 @@
+# GitGuardian configuration
+# https://docs.gitguardian.com/ggshield-docs/reference/gitguardian-yaml
+
+paths-ignore:
+  # Docker Compose dev environment uses intentional test-only credentials
+  - docker-compose.dev.yml
+  # CI workflow test environment variables (mock API keys)
+  - .github/workflows/newman-comprehensive-tests.yml

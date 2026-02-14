@@ -90,17 +90,22 @@ export const DEFAULT_MARA_CONFIG: MaraConfig = {
 
 /**
  * Counterparty API node endpoints with metadata
+ * In CI/test environments, override with XCP_API_URL env var to point to mock server
  */
-export const XCP_V2_NODES = [
-  {
-    name: "counterparty.io",
-    url: "https://api.counterparty.io:4000/v2",
-  },
-  {
-    name: "dev.counterparty.io",
-    url: "https://api.counterparty.io:4000/v2",
-  },
-] as const;
+const _xcpApiUrl = typeof Deno !== "undefined"
+  ? Deno.env.get("XCP_API_URL")
+  : undefined;
+export const XCP_V2_NODES: ReadonlyArray<{ name: string; url: string }> =
+  _xcpApiUrl ? [{ name: "mock", url: _xcpApiUrl }] : [
+    {
+      name: "counterparty.io",
+      url: "https://api.counterparty.io:4000/v2",
+    },
+    {
+      name: "dev.counterparty.io",
+      url: "https://api.counterparty.io:4000/v2",
+    },
+  ];
 
 /**
  * Circuit breaker fallback data for trending tokens

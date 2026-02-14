@@ -77,7 +77,7 @@ Create `.claude/commands/btc-dev-server.md`:
 Start BTCStampsExplorer development server with proper setup.
 
 Steps:
-1. Check Deno version with `deno --version` (must be 2.4.2+)
+1. Check Deno version with `deno --version` (must be 2.6.9+)
 2. Validate environment with `deno task check:ports` 
 3. Start development server: `deno task dev`
 4. Verify server is running on http://localhost:8000
@@ -262,27 +262,198 @@ interface ApiResponse<T> {
 
 #### Testing Infrastructure
 
-**Newman API Testing**:
+**Overview**: BTCStampsExplorer has comprehensive testing at three levels:
+1. **Unit Tests**: Fast, isolated tests using MockDatabaseManager (154+ tests, 50+ with mocks)
+2. **Integration Tests**: Database connectivity and service integration tests
+3. **API Tests**: Newman/Postman tests covering all 46 API endpoints
+
+**Quick Reference**:
 ```bash
-# Test collections in tests/postman/collections/
+# Unit testing (fast, no database required)
+deno task test:unit              # 154+ tests, 50+ use MockDatabaseManager
+deno task test:unit:coverage     # With coverage reports
+
+# Local development environment (MySQL + Redis + Deno app)
+deno task test:dev:start         # Start docker-compose.dev.yml services
+deno task test:dev:stop          # Stop dev services
+deno task test:dev:logs          # View logs
+deno task test:dev:restart       # Restart all services
+
+# Integration testing (requires MySQL + Redis)
+deno task test:integration       # Database integration tests
+deno task test:integration:ci    # CI-safe version with fallbacks
+
+# Newman API testing (requires running dev server)
+deno task test:ci:newman-local   # Run Newman against localhost:8000
 npm run test:api:smoke           # 3 endpoints, health checks
 npm run test:api:comprehensive   # 46 endpoints, full coverage
 npm run test:api:performance     # Load testing
-npm run test:api:regression      # Dev vs prod validation
 ```
 
-**Unit and Integration Tests**:
+**MockDatabaseManager Usage Patterns**:
+
+The `tests/mocks/mockDatabaseManager.ts` provides a fixture-based mock for unit testing repository classes without a real database:
+
+```typescript
+// Example: Testing StampRepository with mock database
+import { MockDatabaseManager } from "../mocks/mockDatabaseManager.ts";
+
+const mockDb = new MockDatabaseManager();
+const repository = new StampRepository(mockDb as unknown as DatabaseManager);
+
+// MockDatabaseManager returns fixture data from tests/fixtures/
+const stamp = await repository.getStampById("1");
+// Returns data from tests/fixtures/stampData.json
+```
+
+**When to use MockDatabaseManager**:
+- Unit tests for repository classes (StampRepository, MarketDataRepository, SRC20Repository)
+- Tests that need predictable, repeatable data
+- Fast test execution without database overhead
+- CI/CD environments where database setup is complex
+
+**When NOT to use MockDatabaseManager**:
+- Integration tests verifying actual database connectivity
+- Tests requiring complex SQL queries or joins
+- Performance testing of database operations
+- Tests verifying database transaction behavior
+
+**Local Development Testing Environment**:
+
+The `docker-compose.dev.yml` provides a complete local testing environment:
+
+```yaml
+# Services included:
+# - MySQL 8.0 (port 3306)
+# - Redis 7 (port 6379)
+# - Deno application (port 8000)
+```
+
+**Setup and Usage**:
 ```bash
-# Deno testing framework
-deno task test:unit              # Unit tests in tests/unit/
-deno task test:unit:coverage     # With coverage reports
-deno task test:integration       # Database integration tests
+# 1. Start all services
+deno task test:dev:start
+
+# 2. Wait for services to be healthy (30-60 seconds)
+# Check logs: deno task test:dev:logs
+
+# 3. Verify health
+curl http://localhost:8000/api/v2/health
+
+# 4. Run Newman tests against local dev
+deno task test:ci:newman-local
+
+# 5. Stop services when done
+deno task test:dev:stop
+```
+
+**CI Testing Approach**:
+
+GitHub Actions runs three test jobs on every push/PR:
+
+1. **Unit Tests** (`.github/workflows/unit-tests.yml`):
+   - Runs `deno task test:unit:coverage`
+   - Uses MockDatabaseManager and fixtures
+   - No external services required
+   - Uploads coverage to Codecov
+
+2. **Integration Tests** (`.github/workflows/integration-tests.yml`):
+   - Starts MySQL + Redis services
+   - Runs `deno task test:integration:ci`
+   - Tests DatabaseManager connectivity
+   - Validates fallback behavior
+
+3. **Newman Local Dev Tests** (`.github/workflows/newman-comprehensive-tests.yml`):
+   - Starts MySQL + Redis services
+   - Loads test schema (`scripts/test-schema.sql`)
+   - Seeds test data (`scripts/test-seed-data.sql`)
+   - Starts local Deno dev server
+   - Runs Newman tests against localhost:8000
+   - Tests all 46 endpoints with real data
+
+**Test Data Management**:
+
+Test fixtures are located in `tests/fixtures/`:
+- `stampData.json` - Sample stamp records
+- `marketData.json` - Market data samples
+- `src20Data.json` - SRC-20 token data
+- `collectionData.json` - Collection metadata
+
+Database test data:
+- `scripts/test-schema.sql` - Database schema for testing
+- `scripts/test-seed-data.sql` - Seed data for Newman tests
+
+**Updating Fixtures**:
+When schema changes, update fixtures to maintain test coverage:
+
+```bash
+# 1. Update schema
+vim scripts/test-schema.sql
+
+# 2. Update seed data if needed
+vim scripts/test-seed-data.sql
+
+# 3. Update JSON fixtures
+vim tests/fixtures/stampData.json
+
+# 4. Verify MockDatabaseManager still works
+deno task test:unit
+
+# 5. Verify integration tests pass
+deno task test:integration
+```
+
+**Adding New Query Pattern Support to MockDatabaseManager**:
+
+```typescript
+// In tests/mocks/mockDatabaseManager.ts
+
+// 1. Add new query pattern matcher
+if (query.includes("SELECT * FROM new_table")) {
+  return this.fixtures.newTableData || [];
+}
+
+// 2. Add fixture data to constructor
+this.fixtures = {
+  stamps: stampFixtures,
+  newTableData: newTableFixtures, // Add new fixture
+  // ...
+};
+
+// 3. Create fixture file
+// tests/fixtures/newTableData.json
+```
+
+**Writing Tests with Mocks**:
+
+```typescript
+// Good: Uses MockDatabaseManager for predictable data
+Deno.test("StampRepository.getStampById returns correct stamp", async () => {
+  const mockDb = new MockDatabaseManager();
+  const repo = new StampRepository(mockDb as unknown as DatabaseManager);
+
+  const stamp = await repo.getStampById("1");
+
+  assertEquals(stamp?.stamp_id, "1");
+  assertEquals(stamp?.creator, "test_creator");
+});
+
+// Bad: Uses real database in unit test (slow, fragile)
+Deno.test("StampRepository.getStampById returns correct stamp", async () => {
+  const db = await DatabaseManager.getInstance(); // DON'T DO THIS in unit tests
+  const repo = new StampRepository(db);
+
+  const stamp = await repo.getStampById("1"); // Requires database connection
+  // ...
+});
 ```
 
 **Test Environment Requirements**:
-- Tests run with `DENO_ENV=test` and `SKIP_REDIS_CONNECTION=true`
-- Docker Compose provides isolated Newman test environment
-- CI/CD runs full test matrix including cross-browser validation
+- Unit tests: `DENO_ENV=test` and `SKIP_REDIS_CONNECTION=true`
+- Integration tests: `DENO_ENV=test` with MySQL + Redis services
+- Newman tests: Local dev server running with test database
+
+**For complete testing guide, see [TESTING.md](mdc:TESTING.md)**
 
 #### Security and Production Considerations
 

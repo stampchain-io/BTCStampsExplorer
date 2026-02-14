@@ -151,6 +151,8 @@ temp-data/
 migration-data/
 sample-data/
 *.sql
+!scripts/test-schema.sql
+!scripts/test-seed-data.sql
 *.dump
 *.backup
 *.bak
@@ -221,9 +223,7 @@ dev-debug.log
 
 .cursor/mcp.json
 .cursor/
-.taskmaster/config.json
-.taskmaster/*
-.taskmaster/state.json
+.taskmaster/
 mcp.json
 docs/delegation/
 docs/delegation/archive/
@@ -238,7 +238,6 @@ emergency_fix.sh
 emergency_cleanup.sh
 
 # Task Master AI - Local configuration files (should not be committed)
-.taskmaster/docs/prd.txt
 .windsurf/mcp.json
 .roo/mcp.json
 .vscode/mcp.json
