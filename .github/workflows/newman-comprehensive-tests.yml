@@ -544,7 +544,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
-          deno-version: v2.4.2
+          deno-version: v2.6.9
 
       - name: Setup Node.js
         uses: actions/setup-node@v4

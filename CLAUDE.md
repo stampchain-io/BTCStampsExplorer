@@ -77,7 +77,7 @@ Create `.claude/commands/btc-dev-server.md`:
 Start BTCStampsExplorer development server with proper setup.
 
 Steps:
-1. Check Deno version with `deno --version` (must be 2.4.2+)
+1. Check Deno version with `deno --version` (must be 2.6.9+)
 2. Validate environment with `deno task check:ports` 
 3. Start development server: `deno task dev`
 4. Verify server is running on http://localhost:8000
