@@ -74,6 +74,11 @@ CREATE TABLE stamps (
     is_valid_base64 TINYINT(1) DEFAULT 1,
     block_hash VARCHAR(64),
     destination VARCHAR(255),
+    has_active_dispenser TINYINT(1) DEFAULT 0,
+    has_recent_sale TINYINT(1) DEFAULT 0,
+    market_price DECIMAL(20,8) DEFAULT NULL,
+    has_active_atomic TINYINT(1) DEFAULT 0,
+    unbound_quantity BIGINT UNSIGNED DEFAULT 0,
     PRIMARY KEY (stamp),
     UNIQUE KEY idx_tx_hash (tx_hash),
     UNIQUE KEY idx_cpid (cpid),
@@ -82,7 +87,8 @@ CREATE TABLE stamps (
     INDEX idx_stamp_hash (stamp_hash),
     INDEX idx_ident (ident),
     INDEX idx_block_time (block_time),
-    INDEX idx_file_size (file_size_bytes)
+    INDEX idx_file_size (file_size_bytes),
+    INDEX idx_market_price (market_price)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Creator table: Creator name mappings

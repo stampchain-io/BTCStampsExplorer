@@ -201,26 +201,23 @@ REPLACE INTO src20_market_data (tick, price_btc, price_usd, floor_price_btc, mar
 -- COLLECTION DATA (from production)
 -- ============================================================
 
--- Collections (5)
+-- Collections (9 total: 5 named + 4 referenced by creators/stamps)
 REPLACE INTO collections (collection_id, collection_name, collection_description) VALUES
 (UNHEX('015F0478516E4273DD90FE59C766DD98'), 'KEVIN', NULL),
 (UNHEX('01FB16E3BD5B32AC00892FCAF9023BFD'), 'stampedninja', NULL),
 (UNHEX('021C0CAD6986A081440A8AACEE166BB1'), 'INFINITY SEED', 'Unleash a universe of visual splendor with INFINITY SEED, where each stroke and hue is a response to your input. In this interactive art series, your chosen seed--a number or a phrase--blooms into a digital tapestry of algorithmic beauty. Every creation is '),
 (UNHEX('029CA44721915C4D1D216430D65D457D'), 'the_pixel_karens', NULL),
-(UNHEX('03B298DB2DE2F73787F81699D87CE224'), 'homerstamps', NULL);
+(UNHEX('03B298DB2DE2F73787F81699D87CE224'), 'homerstamps', NULL),
+(UNHEX('AA597956804B075E90AA85154246242F'), 'collection_aa59', NULL),
+(UNHEX('6890362FD311C1B924D853B733870B0F'), 'collection_6890', NULL),
+(UNHEX('A07E00311EAAED9DF424D1E22A548683'), 'collection_a07e', NULL),
+(UNHEX('6AB89B2AA163F332DF16BBCBDB4AF13A'), 'collection_6ab8', NULL);
 
 -- Collection creators (3)
 REPLACE INTO collection_creators (collection_id, creator_address) VALUES
 (UNHEX('AA597956804B075E90AA85154246242F'), '1BxLHAUWAhN2LHWgvB9nJZRi93jjK2w2rx'),
 (UNHEX('6890362FD311C1B924D853B733870B0F'), '1WweVUK8kLmSNt6yKKqwVxch3Z7Lw5HAY'),
 (UNHEX('A07E00311EAAED9DF424D1E22A548683'), '1WweVUK8kLmSNt6yKKqwVxch3Z7Lw5HAY');
-
--- Need to add the collections referenced by collection_creators that are not already present
-REPLACE INTO collections (collection_id, collection_name, collection_description) VALUES
-(UNHEX('AA597956804B075E90AA85154246242F'), 'collection_aa59', NULL),
-(UNHEX('6890362FD311C1B924D853B733870B0F'), 'collection_6890', NULL),
-(UNHEX('A07E00311EAAED9DF424D1E22A548683'), 'collection_a07e', NULL),
-(UNHEX('6AB89B2AA163F332DF16BBCBDB4AF13A'), 'collection_6ab8', NULL);
 
 -- Collection stamps (10 records from production)
 REPLACE INTO collection_stamps (collection_id, stamp) VALUES
