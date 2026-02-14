@@ -672,10 +672,21 @@ jobs:
           echo "Running Newman tests against local dev server..."
           mkdir -p reports/newman-local-dev
 
-          # Run Newman tests pointing to localhost
+          # Run Newman tests pointing to localhost with test data from seed
           newman run tests/postman/collections/comprehensive.json \
             --env-var dev_base_url=http://localhost:8000 \
             --env-var prod_base_url=http://localhost:8000 \
+            --env-var test_block=820000 \
+            --env-var test_stamp_id=1384305 \
+            --env-var test_cpid=A888354448084788958 \
+            --env-var test_address=bc1qkqqre5xuqk60xtt93j297zgg7t6x0ul7gwjmv4 \
+            --env-var test_tx_hash=e94be2793462692ca8fea3a54dd90ff4b18735196a2bc426382c11959533c8ca \
+            --env-var test_src20_tick=stamp \
+            --env-var test_cursed_id=-1832 \
+            --env-var test_deploy_hash=77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed \
+            --env-var test_tokenid=U0FUT1NISU5BS0FNT1RP \
+            --env-var test_index=1942 \
+            --env-var test_tick=stamp \
             --reporters cli,html,json \
             --reporter-html-export reports/newman-local-dev/newman-report.html \
             --reporter-json-export reports/newman-local-dev/newman-report.json \
