@@ -83,7 +83,8 @@ export const handler: Handlers = {
       | "MARKET_CAP"
       | "VOLUME"
       | "PRICE"
-      | "CHANGE";
+      | "CHANGE"
+      | "TOKEN";
     const sortDirection = (url.searchParams.get("sortDirection") || "desc") as
       | "asc"
       | "desc";
@@ -150,6 +151,9 @@ export const handler: Handlers = {
                 break;
             }
           }
+          break;
+        case "TOKEN":
+          apiSortBy = sortDirection === "desc" ? "TICK_DESC" : "TICK_ASC";
           break;
         case "DEPLOY":
           apiSortBy = sortDirection === "desc" ? "DEPLOY_DESC" : "DEPLOY_ASC";
