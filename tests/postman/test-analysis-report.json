@@ -1,0 +1,735 @@
+{
+  "summary": {
+    "totalRequests": 128,
+    "requestsWithTests": 121,
+    "exactAssertions": 113,
+    "rangeAssertions": 4,
+    "unknownPattern": 4
+  },
+  "exactTests": [
+    {
+      "name": "Get Address Balance - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/balance/{{test_address}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get Address Balance - Prod",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/v2/balance/{{test_address}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get Stamps Balance - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/stamps/balance/{{test_address}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get Stamps Balance - Prod",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/v2/stamps/balance/{{test_address}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get Block Info - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/block/{{test_block}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get Block Info - Prod",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/v2/block/{{test_block}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get Block Count - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/block/block_count/{{test_number}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get Block Count - Prod",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/v2/block/block_count/{{test_number}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get Collections - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/collections",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get Collections - Prod",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/v2/collections",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get Collections by Creator - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/collections/creator/{{test_address}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get Collections by Creator - Prod",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/v2/collections/creator/{{test_address}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get Cursed List - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/cursed?limit=5",
+      "pattern": "pm.response.to.have.status(410)"
+    },
+    {
+      "name": "Get Cursed List - Prod",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/v2/cursed?limit=5",
+      "pattern": "pm.response.to.have.status(410)"
+    },
+    {
+      "name": "Get Cursed by ID - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/cursed/{{test_cursed_id}}",
+      "pattern": "pm.response.to.have.status(410)"
+    },
+    {
+      "name": "Get Cursed by ID - Prod",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/v2/cursed/{{test_cursed_id}}",
+      "pattern": "pm.response.to.have.status(410)"
+    },
+    {
+      "name": "Get Cursed by Block - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/cursed/block/{{test_block}}",
+      "pattern": "pm.response.to.have.status(410)"
+    },
+    {
+      "name": "Get Cursed by Block - Prod",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/v2/cursed/block/{{test_block}}",
+      "pattern": "pm.response.to.have.status(410)"
+    },
+    {
+      "name": "Invalid Stamp ID - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/stamps/999999999",
+      "pattern": "pm.response.to.have.status(404)"
+    },
+    {
+      "name": "Invalid Address - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/balance/invalid_address",
+      "pattern": "pm.response.to.have.status(400)"
+    },
+    {
+      "name": "Negative Limit - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/stamps?limit=-1",
+      "pattern": "pm.response.to.have.status(400)"
+    },
+    {
+      "name": "Invalid SRC20 Tick Length - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/src20/tick/{{test_src20_tick_invalid}}",
+      "pattern": "pm.response.to.have.status(400)"
+    },
+    {
+      "name": "Invalid SRC20 Tick Length - Prod",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/v2/src20/tick/{{test_src20_tick_invalid}}",
+      "pattern": "pm.response.to.have.status(400)"
+    },
+    {
+      "name": "List SRC20 - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/src20?limit=5",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "List SRC20 - Prod",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/v2/src20?limit=5",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get SRC20 Ticks - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/src20/tick",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get SRC20 Ticks - Prod",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/v2/src20/tick",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get SRC20 by Tick - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/src20/tick/{{test_src20_tick}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get SRC20 by Tick - Prod",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/v2/src20/tick/{{test_src20_tick}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get SRC20 Deploy Info - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/src20/tick/{{test_src20_tick}}/deploy",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get SRC20 Deploy Info - Prod",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/v2/src20/tick/{{test_src20_tick}}/deploy",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get SRC20 Balance - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/src20/balance/{{test_address}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get SRC20 Balance - Prod",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/v2/src20/balance/{{test_address}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get SRC20 Balance by Tick - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/src20/balance/{{test_address}}/{{test_src20_tick}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get SRC20 Balance by Tick - Prod",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/v2/src20/balance/{{test_address}}/{{test_src20_tick}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get SRC20 by Block - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/src20/block/{{test_block}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get SRC20 by Block - Prod",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/v2/src20/block/{{test_block}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get SRC20 TX - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/src20/tx/{{test_tx_hash}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get SRC20 TX - Prod",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/v2/src20/tx/{{test_tx_hash}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get paginated valid SRC-101 transactions",
+      "method": "GET",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get paginated SRC-101 transactions",
+      "method": "GET",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get SRC-101 transaction by hash",
+      "method": "GET",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get SRC-101 deployment details",
+      "method": "GET",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get SRC-101 from owners table",
+      "method": "GET",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get total supply for SRC-101 token",
+      "method": "GET",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get tokenid of SRC-101 by address_btc",
+      "method": "GET",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get SRC-101 token information",
+      "method": "GET",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get SRC-101 balances by address",
+      "method": "GET",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get SRC-101 token by index",
+      "method": "GET",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "List Stamps - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/stamps?limit=5&page=1",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "List Stamps - Prod",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/v2/stamps?limit=5&page=1",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get Stamp by ID - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/stamps/{{test_stamp_id}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get Stamp by ID - Prod",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/v2/stamps/{{test_stamp_id}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get Stamp Dispensers - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/stamps/{{test_stamp_id}}/dispensers",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get Stamp Dispensers - Prod",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/v2/stamps/{{test_stamp_id}}/dispensers",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get Stamp Dispenses - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/stamps/{{test_stamp_id}}/dispenses",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get Stamp Dispenses - Prod",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/v2/stamps/{{test_stamp_id}}/dispenses",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get Stamp Holders - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/stamps/{{test_stamp_id}}/holders",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get Stamp Holders - Prod",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/v2/stamps/{{test_stamp_id}}/holders",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get Stamp Sends - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/stamps/{{test_stamp_id}}/sends",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get Stamp Sends - Prod",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/v2/stamps/{{test_stamp_id}}/sends",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get Stamps by Block - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/stamps/block/{{test_block}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get Stamps by Block - Prod",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/v2/stamps/block/{{test_block}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get Stamps by Ident - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/stamps/ident/{{test_ident}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get Stamps by Ident - Prod",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/v2/stamps/ident/{{test_ident}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get Recent Sales - Dev (Default)",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/internal/stamp-recent-sales",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get Recent Sales - Prod (Default)",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/internal/stamp-recent-sales",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get Recent Sales - Dev (Custom day_range)",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/internal/stamp-recent-sales?dayRange=7",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get Recent Sales - Dev (full_details=true)",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/internal/stamp-recent-sales?fullDetails=true",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get Recent Sales - Dev (Pagination)",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/internal/stamp-recent-sales?page=1&limit=10",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get Recent Sales - Dev (Boundary day_range)",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/internal/stamp-recent-sales?dayRange=1",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get Recent Sales - Dev (Large day_range)",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/internal/stamp-recent-sales?dayRange=365",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get Recent Sales - Dev (Combined Parameters)",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/internal/stamp-recent-sales?dayRange=14&fullDetails=true&page=1&limit=5",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get Recent Sales - Dev (Error: Invalid day_range)",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/internal/stamp-recent-sales?dayRange=invalid",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get Recent Sales - Dev (Error: Negative day_range)",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/internal/stamp-recent-sales?dayRange=-5",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get Recent Sales - Dev (Performance Test)",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/internal/stamp-recent-sales?limit=50",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get Recent Sales - Prod (Performance Test)",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/internal/stamp-recent-sales?limit=50",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Health Check - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/health",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Health Check - Prod",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/v2/health",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Version - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/version",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Version - Prod",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/v2/version",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get SRC20 Balance Snapshot - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/src20/balance/snapshot/{{test_tick}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get SRC20 Balance Snapshot - Prod",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/v2/src20/balance/snapshot/{{test_tick}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get SRC20 Block Tick - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/src20/block/{{test_block}}/{{test_tick}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get SRC20 Block Tick - Prod",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/v2/src20/block/{{test_block}}/{{test_tick}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get SRC-101 Transaction - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/src101/tx/{{test_tx_hash}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get SRC-101 Transaction - Prod",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/v2/src101/tx/{{test_tx_hash}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get SRC-101 Deploy Details - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/src101/{{test_deploy_hash}}/deploy",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get SRC-101 Deploy Details - Prod",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/v2/src101/{{test_deploy_hash}}/deploy",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get SRC-101 from Owners - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/src101/{{test_deploy_hash}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get SRC-101 from Owners - Prod",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/v2/src101/{{test_deploy_hash}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get SRC-101 Total Supply - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/src101/{{test_deploy_hash}}/total",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get SRC-101 Total Supply - Prod",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/v2/src101/{{test_deploy_hash}}/total",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get SRC-101 by Address - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/src101/{{test_deploy_hash}}/address/{{test_address}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get SRC-101 by Address - Prod",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/v2/src101/{{test_deploy_hash}}/address/{{test_address}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get SRC-101 Balance - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/src101/balance/{{test_address}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get SRC-101 Balance - Prod",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/v2/src101/balance/{{test_address}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get SRC-101 Token Info - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/src101/{{test_deploy_hash}}/{{test_tokenid}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get SRC-101 Token Info - Prod",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/v2/src101/{{test_deploy_hash}}/{{test_tokenid}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get SRC-101 by Index - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/src101/index/{{test_deploy_hash}}/{{test_index}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get SRC-101 by Index - Prod",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/v2/src101/index/{{test_deploy_hash}}/{{test_index}}",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Create SRC20 Token - Dev",
+      "method": "POST",
+      "url": "{{dev_base_url}}/api/v2/src20/create",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Create SRC20 Token - Prod",
+      "method": "POST",
+      "url": "{{prod_base_url}}/api/v2/src20/create",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Attach Stamp - Dev",
+      "method": "POST",
+      "url": "{{dev_base_url}}/api/v2/trx/stampattach",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Attach Stamp - Prod",
+      "method": "POST",
+      "url": "{{prod_base_url}}/api/v2/trx/stampattach",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Mint Stamp - Dev",
+      "method": "POST",
+      "url": "{{dev_base_url}}/api/v2/olga/mint",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Mint Stamp - Prod",
+      "method": "POST",
+      "url": "{{prod_base_url}}/api/v2/olga/mint",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Detach Stamp - No Assets (Dev)",
+      "method": "POST",
+      "url": "{{dev_base_url}}/api/v2/trx/stampdetach",
+      "pattern": "pm.response.to.have.status(400)"
+    },
+    {
+      "name": "Detach Stamp - Insufficient Funds (Dev)",
+      "method": "POST",
+      "url": "{{dev_base_url}}/api/v2/trx/stampdetach",
+      "pattern": "pm.response.to.have.status(400)"
+    },
+    {
+      "name": "Detach Stamp - No Assets (Prod)",
+      "method": "POST",
+      "url": "{{prod_base_url}}/api/v2/trx/stampdetach",
+      "pattern": "pm.response.to.have.status(400)"
+    },
+    {
+      "name": "Detach Stamp - Insufficient Funds (Prod)",
+      "method": "POST",
+      "url": "{{prod_base_url}}/api/v2/trx/stampdetach",
+      "pattern": "pm.response.to.have.status(400)"
+    },
+    {
+      "name": "Get API Documentation - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/docs",
+      "pattern": "pm.response.to.have.status(200)"
+    },
+    {
+      "name": "Get API Documentation - Prod",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/v2/docs",
+      "pattern": "pm.response.to.have.status(200)"
+    }
+  ],
+  "rangeTests": [
+    {
+      "name": "Get SRC20 TX with Null Tick - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/src20/tx/{{test_tx_hash}}?tick=null",
+      "pattern": "pm.expect(pm.response.code).to.be.oneof([200, 404])",
+      "scriptPreview": "pm.test('Handles valid hash with null tick parameter', () => {\n  // 200 = data found, 404 = no matching tx in test DB (acceptable)\n  pm.expect(pm.response.code).to.be.oneOf([200, 404]);\n  const jsonDa..."
+    },
+    {
+      "name": "Get SRC20 TX with Null Tick - Prod",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/v2/src20/tx/{{test_tx_hash}}?tick=null",
+      "pattern": "pm.expect(pm.response.code).to.be.oneof([200, 404])",
+      "scriptPreview": "pm.test('Handles valid hash with null tick parameter', () => {\n  pm.expect(pm.response.code).to.be.oneOf([200, 404]);\n  const jsonData = pm.response.json();\n  if (pm.response.code === 200) {\n    pm.ex..."
+    },
+    {
+      "name": "Test Error Endpoint - Dev",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/error",
+      "pattern": "pm.expect(pm.response.code).to.be.oneof([400, 500])",
+      "scriptPreview": "pm.test('Error endpoint returns expected status', function() {\n    pm.expect(pm.response.code).to.be.oneOf([400, 500]);\n});..."
+    },
+    {
+      "name": "Test Error Endpoint - Prod",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/v2/error",
+      "pattern": "pm.expect(pm.response.code).to.be.oneof([400, 500])",
+      "scriptPreview": "pm.test('Error endpoint returns expected status', function() {\n    pm.expect(pm.response.code).to.be.oneOf([400, 500]);\n});..."
+    }
+  ],
+  "unknownTests": [
+    {
+      "name": "Generate Final Report",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/v2/health",
+      "scriptPreview": "// Generate comparison report with deep field comparison\nconst results = JSON.parse(pm.collectionVariables.get('comparison_results') || '[]');\n\n// Helper function to deep compare objects\nfunction deep..."
+    },
+    {
+      "name": "Get Recent Sales - Dev vs Prod Comparison",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/internal/stamp-recent-sales?dayRange=7&fullDetails=true&limit=10",
+      "scriptPreview": "// Store dev response for comparison\npm.test('Store dev response', function () {\n    const devResponse = pm.response.json();\n    pm.collectionVariables.set('dev_recent_sales_response', JSON.stringify(..."
+    },
+    {
+      "name": "Get Recent Sales - Prod vs Dev Comparison",
+      "method": "GET",
+      "url": "{{prod_base_url}}/api/internal/stamp-recent-sales?dayRange=7&fullDetails=true&limit=10",
+      "scriptPreview": "// Compare prod response with dev response\npm.test('Prod response validation', function () {\n    const jsonData = pm.response.json();\n    pm.expect(jsonData).to.have.property('data');\n    pm.expect(js..."
+    },
+    {
+      "name": "Get Recent Sales - Dev (Schema Validation)",
+      "method": "GET",
+      "url": "{{dev_base_url}}/api/internal/stamp-recent-sales?fullDetails=true&limit=5",
+      "scriptPreview": "pm.test('Schema validation: Top-level structure', function () {\n    const jsonData = pm.response.json();\n    const requiredTopLevel = ['data', 'page', 'limit', 'total', 'total_pages', 'last_block', 'b..."
+    }
+  ]
+}

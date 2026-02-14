@@ -1,0 +1,390 @@
+# Data Content Validation Examples
+
+Quick reference for data content validation patterns used in the comprehensive Postman collection.
+
+## Table of Contents
+
+1. [Stamps Validation](#stamps-validation)
+2. [SRC-20 Validation](#src-20-validation)
+3. [Pagination Validation](#pagination-validation)
+4. [Health Validation](#health-validation)
+5. [Collections Validation](#collections-validation)
+6. [Block Validation](#block-validation)
+7. [Balance Validation](#balance-validation)
+
+---
+
+## Stamps Validation
+
+**Applied to**: `/api/v2/stamps/*`, `/api/v2/cursed/*`
+
+```javascript
+// Data content validation for stamps
+pm.test("Stamp data values are valid", function() {
+  const json = pm.response.json();
+  if (json.data && Array.isArray(json.data) && json.data.length > 0) {
+    const stamp = json.data[0];
+
+    // Validate stamp number is positive or negative (cursed)
+    if (stamp.stamp !== undefined && stamp.stamp !== null) {
+      pm.expect(stamp.stamp).to.be.a('number');
+      pm.expect(stamp.stamp).to.satisfy(n => n > 0 || n < 0, 'stamp should be positive or negative (cursed)');
+    }
+
+    // Validate tx_hash is 64-char hex
+    if (stamp.tx_hash !== undefined && stamp.tx_hash !== null) {
+      pm.expect(stamp.tx_hash).to.be.a('string');
+      pm.expect(stamp.tx_hash).to.match(/^[a-f0-9]{64}$/i, 'tx_hash should be 64-char hex');
+    }
+
+    // Validate cpid pattern (if present)
+    if (stamp.cpid !== undefined && stamp.cpid !== null) {
+      pm.expect(stamp.cpid).to.be.a('string');
+      pm.expect(stamp.cpid).to.match(/^[A-Z0-9]+$/, 'cpid should be alphanumeric uppercase');
+    }
+
+    // Validate block_index is positive
+    if (stamp.block_index !== undefined && stamp.block_index !== null) {
+      pm.expect(stamp.block_index).to.be.a('number');
+      pm.expect(stamp.block_index).to.be.above(0, 'block_index should be positive');
+    }
+
+    // Validate stamp_url if present
+    if (stamp.stamp_url !== undefined && stamp.stamp_url !== null) {
+      pm.expect(stamp.stamp_url).to.be.a('string');
+      if (stamp.stamp_url.length > 0) {
+        pm.expect(stamp.stamp_url).to.match(/^(https?:\/\/|data:|ipfs:|ar:\/\/)/, 'stamp_url should be valid URL or data URI');
+      }
+    }
+  }
+});
+```
+
+**Fields Validated**:
+- ✅ `stamp` - Positive or negative number (blessed/cursed)
+- ✅ `tx_hash` - 64-character hexadecimal
+- ✅ `cpid` - Alphanumeric uppercase pattern
+- ✅ `block_index` - Positive integer
+- ✅ `stamp_url` - Valid URL format
+
+---
+
+## SRC-20 Validation
+
+**Applied to**: `/api/v2/src20/*`
+
+```javascript
+// Data content validation for SRC-20 tokens
+pm.test("SRC-20 data values are valid", function() {
+  const json = pm.response.json();
+  if (json.data && Array.isArray(json.data) && json.data.length > 0) {
+    const token = json.data[0];
+
+    // Validate tick is non-empty string
+    if (token.tick !== undefined && token.tick !== null) {
+      pm.expect(token.tick).to.be.a('string');
+      pm.expect(token.tick.length).to.be.above(0, 'tick should not be empty');
+      pm.expect(token.tick.length).to.be.at.most(5, 'tick should be max 5 characters');
+    }
+
+    // Validate max supply is positive
+    if (token.max !== undefined && token.max !== null) {
+      pm.expect(token.max).to.be.a('string');
+      pm.expect(parseFloat(token.max)).to.be.above(0, 'max should be positive');
+    }
+
+    // Validate limit per mint
+    if (token.lim !== undefined && token.lim !== null) {
+      pm.expect(token.lim).to.be.a('string');
+      pm.expect(parseFloat(token.lim)).to.be.above(0, 'lim should be positive');
+    }
+
+    // Validate progress_percentage is 0-100
+    if (token.progress_percentage !== undefined && token.progress_percentage !== null) {
+      pm.expect(token.progress_percentage).to.be.a('number');
+      pm.expect(token.progress_percentage).to.be.at.least(0, 'progress should be >= 0');
+      pm.expect(token.progress_percentage).to.be.at.most(100, 'progress should be <= 100');
+    }
+
+    // Validate tx_hash
+    if (token.tx_hash !== undefined && token.tx_hash !== null) {
+      pm.expect(token.tx_hash).to.be.a('string');
+      pm.expect(token.tx_hash).to.match(/^[a-f0-9]{64}$/i, 'tx_hash should be 64-char hex');
+    }
+  }
+});
+```
+
+**Fields Validated**:
+- ✅ `tick` - Non-empty string, max 5 characters
+- ✅ `max` - Positive number (max supply)
+- ✅ `lim` - Positive number (limit per mint)
+- ✅ `progress_percentage` - 0-100 range
+- ✅ `tx_hash` - 64-character hexadecimal
+
+---
+
+## Pagination Validation
+
+**Applied to**: All paginated list endpoints
+
+```javascript
+// Data content validation for pagination
+pm.test("Pagination values are valid", function() {
+  const json = pm.response.json();
+
+  // Validate pagination metadata
+  if (json.pagination !== undefined && json.pagination !== null) {
+    const p = json.pagination;
+
+    // Page should be >= 1
+    if (p.page !== undefined && p.page !== null) {
+      pm.expect(p.page).to.be.a('number');
+      pm.expect(p.page).to.be.at.least(1, 'page should be >= 1');
+    }
+
+    // Limit should be positive and <= 1000
+    if (p.limit !== undefined && p.limit !== null) {
+      pm.expect(p.limit).to.be.a('number');
+      pm.expect(p.limit).to.be.above(0, 'limit should be positive');
+      pm.expect(p.limit).to.be.at.most(1000, 'limit should be <= 1000');
+    }
+
+    // Total should be non-negative
+    if (p.total !== undefined && p.total !== null) {
+      pm.expect(p.total).to.be.a('number');
+      pm.expect(p.total).to.be.at.least(0, 'total should be >= 0');
+    }
+  }
+
+  // Validate data array length doesn't exceed limit
+  if (json.data && Array.isArray(json.data) && json.pagination?.limit) {
+    pm.expect(json.data.length).to.be.at.most(json.pagination.limit, 'data.length should not exceed limit');
+  }
+});
+```
+
+**Fields Validated**:
+- ✅ `pagination.page` - >= 1
+- ✅ `pagination.limit` - > 0 and <= 1000
+- ✅ `pagination.total` - >= 0
+- ✅ `data.length` - <= pagination.limit
+
+---
+
+## Health Validation
+
+**Applied to**: `/api/v2/health`
+
+```javascript
+// Data content validation for health endpoint
+pm.test("Health data values are valid", function() {
+  const json = pm.response.json();
+
+  // Validate status is OK or ERROR
+  if (json.status !== undefined && json.status !== null) {
+    pm.expect(json.status).to.be.a('string');
+    pm.expect(['OK', 'ERROR', 'DEGRADED']).to.include(json.status, 'status should be OK, ERROR, or DEGRADED');
+  }
+
+  // Validate services are boolean
+  if (json.services !== undefined && json.services !== null) {
+    pm.expect(json.services).to.be.an('object');
+    Object.entries(json.services).forEach(([key, value]) => {
+      pm.expect(value).to.be.a('boolean', `service ${key} should be boolean`);
+    });
+  }
+});
+```
+
+**Fields Validated**:
+- ✅ `status` - One of: 'OK', 'ERROR', 'DEGRADED'
+- ✅ `services.*` - All boolean values
+
+---
+
+## Collections Validation
+
+**Applied to**: `/api/v2/collections/*`
+
+```javascript
+// Data content validation for collections
+pm.test("Collection data values are valid", function() {
+  const json = pm.response.json();
+  if (json.data && Array.isArray(json.data) && json.data.length > 0) {
+    const collection = json.data[0];
+
+    // Validate id is UUID format
+    if (collection.id !== undefined && collection.id !== null) {
+      pm.expect(collection.id).to.be.a('string');
+      pm.expect(collection.id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i, 'id should be UUID');
+    }
+
+    // Validate name is non-empty
+    if (collection.name !== undefined && collection.name !== null) {
+      pm.expect(collection.name).to.be.a('string');
+      pm.expect(collection.name.length).to.be.above(0, 'name should not be empty');
+    }
+
+    // Validate creator if present
+    if (collection.creator !== undefined && collection.creator !== null) {
+      pm.expect(collection.creator).to.be.a('string');
+      pm.expect(collection.creator.length).to.be.above(0, 'creator should not be empty');
+    }
+  }
+});
+```
+
+**Fields Validated**:
+- ✅ `id` - Valid UUID format
+- ✅ `name` - Non-empty string
+- ✅ `creator` - Non-empty string (if present)
+
+---
+
+## Block Validation
+
+**Applied to**: `/api/v2/block/*`
+
+```javascript
+// Data content validation for block data
+pm.test("Block data values are valid", function() {
+  const json = pm.response.json();
+
+  const blockData = json.data || json;
+
+  // Validate block_index is positive
+  if (blockData.block_index !== undefined && blockData.block_index !== null) {
+    pm.expect(blockData.block_index).to.be.a('number');
+    pm.expect(blockData.block_index).to.be.above(0, 'block_index should be positive');
+  }
+
+  // Validate block_hash is 64-char hex
+  if (blockData.block_hash !== undefined && blockData.block_hash !== null) {
+    pm.expect(blockData.block_hash).to.be.a('string');
+    pm.expect(blockData.block_hash).to.match(/^[a-f0-9]{64}$/i, 'block_hash should be 64-char hex');
+  }
+
+  // Validate block_time is valid timestamp
+  if (blockData.block_time !== undefined && blockData.block_time !== null) {
+    pm.expect(blockData.block_time).to.be.a('number');
+    pm.expect(blockData.block_time).to.be.above(0, 'block_time should be positive timestamp');
+    pm.expect(blockData.block_time).to.be.below(Date.now() / 1000 + 7200, 'block_time should not be too far in future');
+  }
+});
+```
+
+**Fields Validated**:
+- ✅ `block_index` - Positive integer
+- ✅ `block_hash` - 64-character hexadecimal
+- ✅ `block_time` - Valid Unix timestamp (not future)
+
+---
+
+## Balance Validation
+
+**Applied to**: `/api/v2/balance/*`
+
+```javascript
+// Data content validation for balance data
+pm.test("Balance data values are valid", function() {
+  const json = pm.response.json();
+  if (json.data && Array.isArray(json.data) && json.data.length > 0) {
+    const balance = json.data[0];
+
+    // Validate address format
+    if (balance.address !== undefined && balance.address !== null) {
+      pm.expect(balance.address).to.be.a('string');
+      pm.expect(balance.address).to.match(/^(bc1|tb1|[13])[a-zA-HJ-NP-Z0-9]{25,62}$/, 'address should be valid Bitcoin address');
+    }
+
+    // Validate balance is non-negative
+    if (balance.balance !== undefined && balance.balance !== null) {
+      const bal = typeof balance.balance === 'string' ? parseFloat(balance.balance) : balance.balance;
+      pm.expect(bal).to.be.at.least(0, 'balance should be non-negative');
+    }
+  }
+});
+```
+
+**Fields Validated**:
+- ✅ `address` - Valid Bitcoin address (bc1, tb1, or legacy)
+- ✅ `balance` - Non-negative number
+
+---
+
+## Pattern Summary
+
+### Common Patterns Used
+
+#### 1. Conditional Validation (Nullable Fields)
+```javascript
+if (field !== undefined && field !== null) {
+  // Validation logic
+}
+```
+
+#### 2. Array Element Validation
+```javascript
+if (json.data && Array.isArray(json.data) && json.data.length > 0) {
+  const item = json.data[0];
+  // Validate item
+}
+```
+
+#### 3. Type Checking
+```javascript
+pm.expect(value).to.be.a('string');
+pm.expect(value).to.be.a('number');
+pm.expect(value).to.be.a('boolean');
+```
+
+#### 4. Regex Pattern Matching
+```javascript
+pm.expect(value).to.match(/^[a-f0-9]{64}$/i, 'error message');
+```
+
+#### 5. Range Validation
+```javascript
+pm.expect(value).to.be.at.least(0);
+pm.expect(value).to.be.at.most(100);
+pm.expect(value).to.be.above(0);
+pm.expect(value).to.be.below(1000);
+```
+
+#### 6. Custom Validators
+```javascript
+pm.expect(value).to.satisfy(n => n > 0 || n < 0, 'message');
+```
+
+#### 7. Enum Validation
+```javascript
+pm.expect(['OK', 'ERROR', 'DEGRADED']).to.include(value);
+```
+
+---
+
+## Validation Statistics
+
+- **Total Validation Types**: 7
+- **Total Requests with Validation**: 101/128 (78.9%)
+- **Total Field Validations**: 25+ unique field types
+
+## Adding New Validations
+
+To add validation to a new endpoint:
+
+1. Identify the endpoint type
+2. Choose appropriate validation patterns from above
+3. Add conditional checks for nullable fields
+4. Include descriptive error messages
+5. Test with real API responses
+
+Example:
+```javascript
+pm.test("Custom data values are valid", function() {
+  const json = pm.response.json();
+
+  // Add your validations here following the patterns above
+});
+```

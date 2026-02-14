@@ -1,0 +1,67 @@
+{
+  "requestsAnalyzed": 11,
+  "requestsUpdated": 7,
+  "requestsPreserved": 4,
+  "changes": [
+    {
+      "name": "Get Cursed List - Dev",
+      "before": "// Cursed endpoints are deprecated and return HTTP 410 (Gone)\npm.test('Response status is valid (including deprecated 410)', () => {\n    pm.expect(pm....",
+      "after": "// Cursed endpoints are deprecated and return HTTP 410 (Gone)\npm.test('Cursed endpoint returns 410 Gone', () => {\n    pm.response.to.have.status(410);...",
+      "reason": "Cursed endpoints are deprecated and always return 410 Gone"
+    },
+    {
+      "name": "Get Cursed List - Prod",
+      "before": "// Cursed endpoints are deprecated and return HTTP 410 (Gone)\npm.test('Response status is valid (including deprecated 410)', () => {\n    pm.expect(pm....",
+      "after": "// Cursed endpoints are deprecated and return HTTP 410 (Gone)\npm.test('Cursed endpoint returns 410 Gone', () => {\n    pm.response.to.have.status(410);...",
+      "reason": "Cursed endpoints are deprecated and always return 410 Gone"
+    },
+    {
+      "name": "Get Cursed by ID - Dev",
+      "before": "// Cursed endpoints are deprecated and return HTTP 410 (Gone)\npm.test('Response status is valid (including deprecated 410)', () => {\n    pm.expect(pm....",
+      "after": "// Cursed endpoints are deprecated and return HTTP 410 (Gone)\npm.test('Cursed endpoint returns 410 Gone', () => {\n    pm.response.to.have.status(410);...",
+      "reason": "Cursed endpoints are deprecated and always return 410 Gone"
+    },
+    {
+      "name": "Get Cursed by ID - Prod",
+      "before": "// Cursed endpoints are deprecated and return HTTP 410 (Gone)\npm.test('Response status is valid (including deprecated 410)', () => {\n    pm.expect(pm....",
+      "after": "// Cursed endpoints are deprecated and return HTTP 410 (Gone)\npm.test('Cursed endpoint returns 410 Gone', () => {\n    pm.response.to.have.status(410);...",
+      "reason": "Cursed endpoints are deprecated and always return 410 Gone"
+    },
+    {
+      "name": "Get Cursed by Block - Dev",
+      "before": "// Cursed endpoints are deprecated and return HTTP 410 (Gone)\npm.test('Response status is valid (including deprecated 410)', () => {\n    pm.expect(pm....",
+      "after": "// Cursed endpoints are deprecated and return HTTP 410 (Gone)\npm.test('Cursed endpoint returns 410 Gone', () => {\n    pm.response.to.have.status(410);...",
+      "reason": "Cursed endpoints are deprecated and always return 410 Gone"
+    },
+    {
+      "name": "Get Cursed by Block - Prod",
+      "before": "// Cursed endpoints are deprecated and return HTTP 410 (Gone)\npm.test('Response status is valid (including deprecated 410)', () => {\n    pm.expect(pm....",
+      "after": "// Cursed endpoints are deprecated and return HTTP 410 (Gone)\npm.test('Cursed endpoint returns 410 Gone', () => {\n    pm.response.to.have.status(410);...",
+      "reason": "Cursed endpoints are deprecated and always return 410 Gone"
+    },
+    {
+      "name": "Negative Limit - Dev",
+      "before": "pm.test('Handles negative limit gracefully', () => {\n    pm.response.to.have.status(400);\n});...",
+      "after": "pm.test('Handles negative limit gracefully', () => {\n    pm.response.to.have.status(400);\n});...",
+      "reason": "Negative limit is invalid input - should consistently return 400 Bad Request"
+    }
+  ],
+  "preserved": [
+    {
+      "name": "Get SRC20 TX with Null Tick - Dev",
+      "reason": "Test data may not guarantee tx exists - 404 is legitimate if tx not found"
+    },
+    {
+      "name": "Get SRC20 TX with Null Tick - Prod",
+      "reason": "Production data may not have the tx - 404 is legitimate if tx not found"
+    },
+    {
+      "name": "Test Error Endpoint - Dev",
+      "reason": "Error endpoint may intentionally return different error codes for testing"
+    },
+    {
+      "name": "Test Error Endpoint - Prod",
+      "reason": "Error endpoint may intentionally return different error codes for testing"
+    }
+  ]
+}
