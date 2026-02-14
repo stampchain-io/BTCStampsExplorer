@@ -4,11 +4,12 @@ import {
   detectScriptType,
   getScriptTypeInfo,
 } from "$lib/utils/bitcoin/scripts/scriptTypeUtils.ts";
-
-const BLOCKCYPHER_API_BASE_URL = "https://api.blockcypher.com";
-const BLOCKCHAIN_API_BASE_URL = "https://blockchain.info";
-const MEMPOOL_API_BASE_URL = "https://mempool.space/api";
-const BLOCKSTREAM_API_BASE_URL = "https://blockstream.info/api";
+import {
+  BLOCKCHAIN_API_BASE_URL,
+  BLOCKCYPHER_API_BASE_URL,
+  BLOCKSTREAM_API_BASE_URL,
+  MEMPOOL_API_BASE_URL,
+} from "$constants";
 
 async function fetchFromBlockstream(tx: string) {
   const response = await fetch(`${BLOCKSTREAM_API_BASE_URL}/tx/${tx}`);
