@@ -288,10 +288,25 @@ function handleCounterpartyApi(
   // Get balances: /addresses/{address}/balances
   const balancesMatch = path.match(/^\/addresses\/([^/]+)\/balances/);
   if (balancesMatch) {
+    // Return sufficient XCP balance (0.5 XCP = 50000000 base units) for POSH stamps
+    // Plus some BTC for testing
     return jsonResponse({
-      result: [],
+      result: [
+        {
+          cpid: "XCP",
+          asset: "XCP",
+          quantity: 100000000, // 1.0 XCP (sufficient for POSH stamp)
+          address: balancesMatch[1],
+        },
+        {
+          cpid: "BTC",
+          asset: "BTC",
+          quantity: 100000000, // 1.0 BTC
+          address: balancesMatch[1],
+        },
+      ],
       next_cursor: null,
-      result_count: 0,
+      result_count: 2,
     });
   }
 
@@ -308,6 +323,46 @@ function handleCounterpartyApi(
         supply: 1,
         owner: "bc1qkqqre5xuqk60xtt93j297zgg7t6x0ul7gwjmv4",
       },
+    });
+  }
+
+  // Get asset dispensers: /assets/{cpid}/dispensers
+  const assetDispensersMatch = path.match(/^\/assets\/([^/]+)\/dispensers/);
+  if (assetDispensersMatch) {
+    return jsonResponse({
+      result: [],
+      next_cursor: null,
+      result_count: 0,
+    });
+  }
+
+  // Get asset dispenses: /assets/{cpid}/dispenses
+  const assetDispensesMatch = path.match(/^\/assets\/([^/]+)\/dispenses/);
+  if (assetDispensesMatch) {
+    return jsonResponse({
+      result: [],
+      next_cursor: null,
+      result_count: 0,
+    });
+  }
+
+  // Get asset holders (balances): /assets/{cpid}/balances
+  const assetBalancesMatch = path.match(/^\/assets\/([^/]+)\/balances/);
+  if (assetBalancesMatch) {
+    return jsonResponse({
+      result: [],
+      next_cursor: null,
+      result_count: 0,
+    });
+  }
+
+  // Get asset sends: /assets/{cpid}/sends
+  const assetSendsMatch = path.match(/^\/assets\/([^/]+)\/sends/);
+  if (assetSendsMatch) {
+    return jsonResponse({
+      result: [],
+      next_cursor: null,
+      result_count: 0,
     });
   }
 
@@ -334,6 +389,29 @@ function handleBitcoinApi(path: string): Response {
     const txid = txHexMatch[1];
     const address = txAddressMap.get(txid);
     return textResponse(getMockRawTxHex(address));
+  }
+
+  // Address balance: /address/{address}
+  const addressMatch = path.match(/^\/address\/([^/]+)$/);
+  if (addressMatch) {
+    const address = addressMatch[1];
+    return jsonResponse({
+      address,
+      chain_stats: {
+        funded_txo_count: 1,
+        funded_txo_sum: 10000000,
+        spent_txo_count: 0,
+        spent_txo_sum: 0,
+        tx_count: 1,
+      },
+      mempool_stats: {
+        funded_txo_count: 0,
+        funded_txo_sum: 0,
+        spent_txo_count: 0,
+        spent_txo_sum: 0,
+        tx_count: 0,
+      },
+    });
   }
 
   // Address UTXOs: /address/{address}/utxo
@@ -363,6 +441,11 @@ function handleBitcoinApi(path: string): Response {
       economyFee: 5,
       minimumFee: 1,
     });
+  }
+
+  // Block tip height: /v1/blocks/tip/height
+  if (path === "/v1/blocks/tip/height") {
+    return textResponse("880000"); // Mock current block height
   }
 
   return jsonResponse({ error: "Not found" }, 404);
