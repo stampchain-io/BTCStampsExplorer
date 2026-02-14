@@ -1,7 +1,8 @@
 -- BTCStampsExplorer Test Database Schema
 -- MySQL 8.0 compatible DDL for testing
--- Derived from repository query patterns in server/database/
+-- Aligned with production indexer schema (btc_stamps/indexer/table_schema.sql)
 -- Created: 2026-02-13
+-- Updated: 2026-02-13 - Table names synchronized with production
 
 -- ============================================================
 -- Drop existing tables (idempotent execution)
@@ -14,18 +15,18 @@ DROP TABLE IF EXISTS collection_market_data;
 DROP TABLE IF EXISTS collection_stamps;
 DROP TABLE IF EXISTS collection_creators;
 DROP TABLE IF EXISTS collections;
-DROP TABLE IF EXISTS src101_owners;
-DROP TABLE IF EXISTS src101_recipients;
-DROP TABLE IF EXISTS src101_price;
-DROP TABLE IF EXISTS src101_all;
-DROP TABLE IF EXISTS src101;
+DROP TABLE IF EXISTS owners;
+DROP TABLE IF EXISTS recipients;
+DROP TABLE IF EXISTS src101price;
+DROP TABLE IF EXISTS SRC101;
+DROP TABLE IF EXISTS SRC101Valid;
 DROP TABLE IF EXISTS src20_market_data;
-DROP TABLE IF EXISTS src20_balance;
+DROP TABLE IF EXISTS balances;
 DROP TABLE IF EXISTS src20_token_stats;
-DROP TABLE IF EXISTS src20;
+DROP TABLE IF EXISTS SRC20Valid;
 DROP TABLE IF EXISTS transactions;
 DROP TABLE IF EXISTS creator;
-DROP TABLE IF EXISTS stamps;
+DROP TABLE IF EXISTS StampTableV4;
 DROP TABLE IF EXISTS blocks;
 
 -- ============================================================
@@ -46,8 +47,8 @@ CREATE TABLE blocks (
     INDEX idx_block_time (block_time)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Stamps table: Main stamp data
-CREATE TABLE stamps (
+-- StampTableV4 table: Main stamp data (production name)
+CREATE TABLE StampTableV4 (
     stamp INT NOT NULL,
     block_index INT NOT NULL,
     cpid VARCHAR(255) NOT NULL,
@@ -113,13 +114,15 @@ CREATE TABLE transactions (
 -- SRC-20 Tables
 -- ============================================================
 
--- SRC-20 table: SRC-20 token operations
-CREATE TABLE src20 (
+-- SRC20Valid table: SRC-20 valid token operations (production name)
+CREATE TABLE SRC20Valid (
+    id VARCHAR(255) NOT NULL,
     tx_hash VARCHAR(64) NOT NULL,
     block_index INT NOT NULL,
     p VARCHAR(50),
     op VARCHAR(50),
     tick VARCHAR(255),
+    tick_hash VARCHAR(64),
     creator VARCHAR(255),
     amt VARCHAR(255),
     deci VARCHAR(50),
@@ -128,25 +131,31 @@ CREATE TABLE src20 (
     destination VARCHAR(255),
     block_time INT NOT NULL,
     tx_index INT NOT NULL,
-    PRIMARY KEY (tx_hash, tx_index),
+    status VARCHAR(255),
+    PRIMARY KEY (id),
     INDEX idx_block_index (block_index),
     INDEX idx_tick (tick),
+    INDEX idx_tick_hash (tick_hash),
     INDEX idx_op (op),
     INDEX idx_creator (creator),
     INDEX idx_destination (destination),
     INDEX idx_tick_op (tick, op)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- SRC-20 balance table: Token balances per address
-CREATE TABLE src20_balance (
+-- balances table: Token balances per address (production name)
+CREATE TABLE balances (
+    id VARCHAR(255) NOT NULL,
     address VARCHAR(255) NOT NULL,
     p VARCHAR(50),
     tick VARCHAR(255) NOT NULL,
+    tick_hash VARCHAR(64),
     amt VARCHAR(255) NOT NULL DEFAULT '0',
     block_time INT,
     last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (address, tick),
+    PRIMARY KEY (id),
+    INDEX idx_address_tick (address, tick),
     INDEX idx_tick (tick),
+    INDEX idx_tick_hash (tick_hash),
     INDEX idx_amt (amt(50)),
     INDEX idx_last_update (last_update)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -199,8 +208,9 @@ CREATE TABLE src20_market_data (
 -- SRC-101 Tables
 -- ============================================================
 
--- SRC-101 table: Valid SRC-101 operations
-CREATE TABLE src101 (
+-- SRC101Valid table: Valid SRC-101 operations (production name)
+CREATE TABLE SRC101Valid (
+    id VARCHAR(255) NOT NULL,
     tx_hash VARCHAR(64) NOT NULL,
     block_index INT NOT NULL,
     p VARCHAR(50),
@@ -227,7 +237,8 @@ CREATE TABLE src101 (
     destination VARCHAR(255),
     block_time INT NOT NULL,
     tx_index INT NOT NULL,
-    PRIMARY KEY (tx_hash),
+    status VARCHAR(255),
+    PRIMARY KEY (id),
     INDEX idx_block_index (block_index),
     INDEX idx_tick (tick),
     INDEX idx_op (op),
@@ -235,8 +246,9 @@ CREATE TABLE src101 (
     INDEX idx_creator (creator)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- SRC-101 all table: All SRC-101 operations (including invalid)
-CREATE TABLE src101_all (
+-- SRC101 table: All SRC-101 operations (including invalid) (production name)
+CREATE TABLE SRC101 (
+    id VARCHAR(255) NOT NULL,
     tx_hash VARCHAR(64) NOT NULL,
     block_index INT NOT NULL,
     p VARCHAR(50),
@@ -267,7 +279,7 @@ CREATE TABLE src101_all (
     block_time INT NOT NULL,
     tx_index INT NOT NULL,
     status VARCHAR(255),
-    PRIMARY KEY (tx_hash),
+    PRIMARY KEY (id),
     INDEX idx_block_index (block_index),
     INDEX idx_tick (tick),
     INDEX idx_op (op),
@@ -275,25 +287,28 @@ CREATE TABLE src101_all (
     INDEX idx_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- SRC-101 price table: Pricing tiers
-CREATE TABLE src101_price (
+-- src101price table: Pricing tiers (production name)
+CREATE TABLE src101price (
+    id VARCHAR(255) NOT NULL,
     deploy_hash VARCHAR(64) NOT NULL,
     len INT NOT NULL,
     price DECIMAL(20,8) NOT NULL,
-    PRIMARY KEY (deploy_hash, len)
+    PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- SRC-101 recipients table: Whitelist addresses
-CREATE TABLE src101_recipients (
+-- recipients table: Whitelist addresses (production name)
+CREATE TABLE recipients (
+    id VARCHAR(255) NOT NULL,
     deploy_hash VARCHAR(64) NOT NULL,
     address VARCHAR(255) NOT NULL,
-    PRIMARY KEY (deploy_hash, address),
+    PRIMARY KEY (id),
+    INDEX idx_deploy_hash (deploy_hash),
     INDEX idx_address (address)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- SRC-101 owners table: Token ownership
-CREATE TABLE src101_owners (
-    id INT AUTO_INCREMENT,
+-- owners table: Token ownership (production name)
+CREATE TABLE owners (
+    id VARCHAR(255) NOT NULL,
     `index` INT,
     deploy_hash VARCHAR(64) NOT NULL,
     p VARCHAR(50),
@@ -444,6 +459,15 @@ CREATE TABLE stamp_sales_history (
     INDEX idx_buyer (buyer_address),
     INDEX idx_seller (seller_address)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================================
+-- Compatibility Views
+-- ============================================================
+-- These views provide backward compatibility for explorer queries
+-- that may still reference old table names
+
+CREATE OR REPLACE VIEW stamps AS SELECT * FROM StampTableV4;
+CREATE OR REPLACE VIEW src20 AS SELECT * FROM SRC20Valid;
 
 -- ============================================================
 -- Schema creation complete
