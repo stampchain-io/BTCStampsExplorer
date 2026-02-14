@@ -16,6 +16,18 @@ import { renderToString } from "preact-render-to-string";
 import { StampingToolLazy } from "../../../islands/tool/stamp/StampingToolLazy.tsx";
 import { TradeToolLazy } from "../../../islands/tool/stamp/TradeToolLazy.tsx";
 
+/* ===== PATH HELPERS ===== */
+// Resolve paths relative to this test file so they work regardless of CWD
+const resolve = (rel: string) =>
+  new URL(rel, import.meta.url).pathname;
+
+const STAMPING_TOOL_LAZY = resolve(
+  "../../../islands/tool/stamp/StampingToolLazy.tsx",
+);
+const TRADE_TOOL_LAZY = resolve(
+  "../../../islands/tool/stamp/TradeToolLazy.tsx",
+);
+
 /* ===== TESTS ===== */
 
 Deno.test({
@@ -48,9 +60,7 @@ Deno.test({
   fn: () => {
     // Verify the component source uses requestIdleCallback
     // This is a static analysis test that verifies the pattern exists
-    const componentSource = Deno.readTextFileSync(
-      "islands/tool/stamp/StampingToolLazy.tsx",
-    );
+    const componentSource = Deno.readTextFileSync(STAMPING_TOOL_LAZY);
 
     // Must use requestIdleCallback for deferred loading
     assertEquals(
@@ -85,9 +95,7 @@ Deno.test({
 Deno.test({
   name: "TradeToolLazy - uses requestIdleCallback pattern",
   fn: () => {
-    const componentSource = Deno.readTextFileSync(
-      "islands/tool/stamp/TradeToolLazy.tsx",
-    );
+    const componentSource = Deno.readTextFileSync(TRADE_TOOL_LAZY);
 
     assertEquals(
       componentSource.includes("requestIdleCallback"),
@@ -118,9 +126,7 @@ Deno.test({
 Deno.test({
   name: "StampingToolLazy - cleanup cancels idle callback",
   fn: () => {
-    const componentSource = Deno.readTextFileSync(
-      "islands/tool/stamp/StampingToolLazy.tsx",
-    );
+    const componentSource = Deno.readTextFileSync(STAMPING_TOOL_LAZY);
 
     // Must handle cleanup (cancelIdleCallback or clearTimeout)
     assertEquals(
@@ -135,9 +141,7 @@ Deno.test({
 Deno.test({
   name: "TradeToolLazy - cleanup cancels idle callback",
   fn: () => {
-    const componentSource = Deno.readTextFileSync(
-      "islands/tool/stamp/TradeToolLazy.tsx",
-    );
+    const componentSource = Deno.readTextFileSync(TRADE_TOOL_LAZY);
 
     assertEquals(
       componentSource.includes("cancelIdleCallback") ||

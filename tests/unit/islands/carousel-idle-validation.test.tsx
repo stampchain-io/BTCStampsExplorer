@@ -12,6 +12,13 @@ import { renderToString } from "preact-render-to-string";
 import CarouselGallery from "../../../islands/section/gallery/Carousel.tsx";
 import type { StampRow } from "../../../lib/types/stamp.d.ts";
 
+/* ===== PATH HELPERS ===== */
+// Resolve paths relative to this test file so they work regardless of CWD
+const CAROUSEL_SRC = new URL(
+  "../../../islands/section/gallery/Carousel.tsx",
+  import.meta.url,
+).pathname;
+
 /* ===== TEST FIXTURES ===== */
 
 const mockStamps: StampRow[] = [
@@ -52,9 +59,7 @@ Deno.test({
   name: "Carousel - uses requestIdleCallback for validation batching",
   fn: () => {
     // Verify the component source uses requestIdleCallback for batched validation
-    const componentSource = Deno.readTextFileSync(
-      "islands/section/gallery/Carousel.tsx",
-    );
+    const componentSource = Deno.readTextFileSync(CAROUSEL_SRC);
 
     // Must use requestIdleCallback for deferred validation
     assertEquals(
@@ -75,9 +80,7 @@ Deno.test({
 Deno.test({
   name: "Carousel - processes stamps in batches of 5",
   fn: () => {
-    const componentSource = Deno.readTextFileSync(
-      "islands/section/gallery/Carousel.tsx",
-    );
+    const componentSource = Deno.readTextFileSync(CAROUSEL_SRC);
 
     // Must define a batch size for processing
     assertEquals(
@@ -106,9 +109,7 @@ Deno.test({
   name:
     "Carousel - falls back to setTimeout when requestIdleCallback unavailable",
   fn: () => {
-    const componentSource = Deno.readTextFileSync(
-      "islands/section/gallery/Carousel.tsx",
-    );
+    const componentSource = Deno.readTextFileSync(CAROUSEL_SRC);
 
     // Must use setTimeout as fallback when requestIdleCallback is not available
     assertEquals(
@@ -148,9 +149,7 @@ Deno.test({
 Deno.test({
   name: "Carousel - validates stamp content using getStampImageSrc",
   fn: () => {
-    const componentSource = Deno.readTextFileSync(
-      "islands/section/gallery/Carousel.tsx",
-    );
+    const componentSource = Deno.readTextFileSync(CAROUSEL_SRC);
 
     // Must use getStampImageSrc for proper URL resolution
     assertEquals(
