@@ -85,6 +85,11 @@
       "key": "test_tick",
       "value": "STAMP",
       "type": "string"
+    },
+    {
+      "key": "test_timeout",
+      "value": "10000",
+      "type": "string"
     }
   ],
   "event": [

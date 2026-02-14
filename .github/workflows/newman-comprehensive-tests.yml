@@ -687,6 +687,7 @@ jobs:
             --env-var test_tokenid=U0FUT1NISU5BS0FNT1RP \
             --env-var test_index=1942 \
             --env-var test_tick=stamp \
+            --env-var test_timeout=10000 \
             --reporters cli,html,json \
             --reporter-html-export reports/newman-local-dev/newman-report.html \
             --reporter-json-export reports/newman-local-dev/newman-report.json \
