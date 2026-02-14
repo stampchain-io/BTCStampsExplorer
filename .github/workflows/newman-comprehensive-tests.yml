@@ -612,14 +612,14 @@ jobs:
       - name: Start dev server
         run: |
           echo "Starting Deno dev server in background..."
-          # Start dev server without watch mode to avoid excess output
+          # Start dev server without watch mode for CI
           DENO_ENV=development \
           DB_HOST=127.0.0.1 \
           DB_USER=root \
           DB_PASSWORD=test \
           DB_NAME=btcstamps_test \
           REDIS_URL=redis://127.0.0.1:6379 \
-          nohup deno run -A --no-clear-screen dev.ts > dev-server.log 2>&1 &
+          nohup deno run -A dev.ts > dev-server.log 2>&1 &
 
           echo "Dev server started with PID: $!"
           echo $! > dev-server.pid
