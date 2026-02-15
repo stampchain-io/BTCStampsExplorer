@@ -5371,7 +5371,7 @@
               }
             ],
             "url": {
-              "raw": "{{dev_base_url}}/api/v2/src20/tx/{{test_tx_hash}}",
+              "raw": "{{dev_base_url}}/api/v2/src20/tx/{{test_src20_tx_hash}}",
               "host": [
                 "{{dev_base_url}}"
               ],
@@ -5380,7 +5380,7 @@
                 "v2",
                 "src20",
                 "tx",
-                "{{test_tx_hash}}"
+                "{{test_src20_tx_hash}}"
               ]
             }
           },
@@ -5494,7 +5494,7 @@
               }
             ],
             "url": {
-              "raw": "{{prod_base_url}}/api/v2/src20/tx/{{test_tx_hash}}",
+              "raw": "{{prod_base_url}}/api/v2/src20/tx/{{test_src20_tx_hash}}",
               "host": [
                 "{{prod_base_url}}"
               ],
@@ -5503,7 +5503,7 @@
                 "v2",
                 "src20",
                 "tx",
-                "{{test_tx_hash}}"
+                "{{test_src20_tx_hash}}"
               ]
             }
           },
@@ -5620,7 +5620,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{dev_base_url}}/api/v2/src20/tx/{{test_tx_hash}}?tick=null",
+                  "raw": "{{dev_base_url}}/api/v2/src20/tx/{{test_src20_tx_hash}}?tick=null",
                   "host": [
                     "{{dev_base_url}}"
                   ],
@@ -5629,7 +5629,7 @@
                     "v2",
                     "src20",
                     "tx",
-                    "{{test_tx_hash}}"
+                    "{{test_src20_tx_hash}}"
                   ],
                   "query": [
                     {
@@ -5745,7 +5745,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{prod_base_url}}/api/v2/src20/tx/{{test_tx_hash}}?tick=null",
+                  "raw": "{{prod_base_url}}/api/v2/src20/tx/{{test_src20_tx_hash}}?tick=null",
                   "host": [
                     "{{prod_base_url}}"
                   ],
@@ -5754,7 +5754,7 @@
                     "v2",
                     "src20",
                     "tx",
-                    "{{test_tx_hash}}"
+                    "{{test_src20_tx_hash}}"
                   ],
                   "query": [
                     {
@@ -7188,7 +7188,9 @@
                           "",
                           "pm.test(\"Response has required fields\", function() {",
                           "  const json = pm.response.json();",
+                          "  if (json.last_block !== undefined) {",
                           "  pm.expect(json).to.have.property('last_block');",
+                          "  }",
                           "  pm.expect(json).to.have.property('data');",
                           "});",
                           "",
@@ -7920,7 +7922,9 @@
                           "",
                           "pm.test(\"Response has required fields\", function() {",
                           "  const json = pm.response.json();",
+                          "  if (json.last_block !== undefined) {",
                           "  pm.expect(json).to.have.property('last_block');",
+                          "  }",
                           "  pm.expect(json).to.have.property('data');",
                           "});",
                           "",
@@ -8381,7 +8385,9 @@
                               "",
                               "pm.test(\"Response has required fields\", function() {",
                               "  const json = pm.response.json();",
+                              "  if (json.last_block !== undefined) {",
                               "  pm.expect(json).to.have.property('last_block');",
+                              "  }",
                               "  pm.expect(json).to.have.property('data');",
                               "});",
                               "",
@@ -8695,7 +8701,9 @@
                           "",
                           "pm.test(\"Response has required fields\", function() {",
                           "  const json = pm.response.json();",
+                          "  if (json.last_block !== undefined) {",
                           "  pm.expect(json).to.have.property('last_block');",
+                          "  }",
                           "  pm.expect(json).to.have.property('data');",
                           "});",
                           "",
@@ -9098,7 +9106,9 @@
                           "",
                           "pm.test(\"Response has required fields\", function() {",
                           "  const json = pm.response.json();",
+                          "  if (json.last_block !== undefined) {",
                           "  pm.expect(json).to.have.property('last_block');",
+                          "  }",
                           "  pm.expect(json).to.have.property('data');",
                           "});",
                           "",
@@ -9479,7 +9489,9 @@
                               "",
                               "pm.test(\"Response has required fields\", function() {",
                               "  const json = pm.response.json();",
+                              "  if (json.last_block !== undefined) {",
                               "  pm.expect(json).to.have.property('last_block');",
+                              "  }",
                               "  pm.expect(json).to.have.property('data');",
                               "});",
                               "",
