@@ -935,3 +935,196 @@ jobs:
           fi
 
           echo "✅ Local dev test run complete"
+
+  schema-contract-tests:
+    name: Schema Contract Tests (20 High-Traffic Endpoints)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+
+      - name: Verify schema contract test collection exists
+        run: |
+          echo "Verifying schema-contract-tests.json exists..."
+          if [ ! -f "tests/postman/collections/schema-contract-tests.json" ]; then
+            echo "❌ Error: schema-contract-tests.json not found"
+            exit 1
+          fi
+          echo "✅ Schema contract test collection found"
+
+      - name: Run schema contract tests against production
+        id: schema-contract-test
+        run: |
+          echo "## Schema Contract Tests" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Test Configuration" >> $GITHUB_STEP_SUMMARY
+          echo "- Collection: schema-contract-tests.json" >> $GITHUB_STEP_SUMMARY
+          echo "- Endpoints: 20 high-traffic GET endpoints" >> $GITHUB_STEP_SUMMARY
+          echo "- Target: Production (https://stampchain.io)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Run schema contract tests against production
+          DEV_BASE_URL=https://stampchain.io \
+          PROD_BASE_URL=https://stampchain.io \
+          NEWMAN_COLLECTION=tests/postman/collections/schema-contract-tests.json \
+          NEWMAN_REPORTERS=cli,json \
+          docker compose -f docker-compose.test.yml run --rm newman
+        continue-on-error: false
+
+      - name: Fix Docker file permissions
+        if: always()
+        run: sudo chown -R $(id -u):$(id -g) . || true
+
+      - name: Parse test results
+        if: always()
+        id: parse-results
+        run: |
+          echo "Parsing Newman JSON results..."
+
+          # Find the most recent newman JSON report
+          LATEST_REPORT=$(find reports/newman -name "*.json" -type f -printf '%T+ %p\n' | sort -r | head -n 1 | cut -d' ' -f2-)
+
+          if [ -z "$LATEST_REPORT" ]; then
+            echo "⚠️ No JSON report found"
+            echo "total_tests=0" >> $GITHUB_OUTPUT
+            echo "passed_tests=0" >> $GITHUB_OUTPUT
+            echo "failed_tests=0" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          echo "Found report: $LATEST_REPORT"
+
+          # Extract test counts using jq
+          TOTAL=$(jq -r '.run.stats.tests.total // 0' "$LATEST_REPORT")
+          PASSED=$(jq -r '.run.stats.tests.passed // 0' "$LATEST_REPORT")
+          FAILED=$(jq -r '.run.stats.tests.failed // 0' "$LATEST_REPORT")
+
+          echo "total_tests=$TOTAL" >> $GITHUB_OUTPUT
+          echo "passed_tests=$PASSED" >> $GITHUB_OUTPUT
+          echo "failed_tests=$FAILED" >> $GITHUB_OUTPUT
+
+          echo "Total tests: $TOTAL"
+          echo "Passed: $PASSED"
+          echo "Failed: $FAILED"
+
+      - name: Upload test results artifact
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: schema-contract-test-results-${{ github.run_number }}
+          path: reports/newman/
+          retention-days: 30
+
+      - name: Comment on PR with results
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const total = '${{ steps.parse-results.outputs.total_tests }}';
+            const passed = '${{ steps.parse-results.outputs.passed_tests }}';
+            const failed = '${{ steps.parse-results.outputs.failed_tests }}';
+
+            const status = failed === '0' ? '✅' : '❌';
+            const comment = `## ${status} Schema Contract Test Results
+
+            **Collection:** schema-contract-tests.json
+            **Endpoints Tested:** 20 high-traffic GET endpoints
+            **Target:** Production (https://stampchain.io)
+
+            ### Results
+            - **Total Tests:** ${total}
+            - **Passed:** ${passed}
+            - **Failed:** ${failed}
+
+            ${failed !== '0' ? '⚠️ **Breaking schema changes detected!** Review failing tests before merging.' : '✅ All schema contract tests passed - no breaking changes detected.'}
+
+            <details>
+            <summary>Endpoints Covered</summary>
+
+            1. GET /api/v2/stamps - Paginated stamps list
+            2. GET /api/v2/stamps/{id} - Single stamp detail
+            3. GET /api/v2/stamps/balance/{address} - Stamp balances
+            4. GET /api/v2/stamps/block/{block_index} - Stamps by block
+            5. GET /api/v2/stamps/search - Stamp search
+            6. GET /api/v2/stamps/ident/{ident} - Stamps by ident
+            7. GET /api/v2/src20 - Paginated SRC-20 transactions
+            8. GET /api/v2/src20/balance/{address} - SRC-20 balances
+            9. GET /api/v2/src20/balance/{address}/{tick} - Single SRC-20 balance
+            10. GET /api/v2/src20/tick/{tick} - Tick data
+            11. GET /api/v2/src20/tick/{tick}/deploy - Tick deployment info
+            12. GET /api/v2/src20/tx/{tx_hash} - SRC-20 transaction detail
+            13. GET /api/v2/src20/block/{block_index} - SRC-20 by block
+            14. GET /api/v2/block/{block_index} - Block info
+            15. GET /api/v2/balance/{address} - Combined balance
+            16. GET /api/v2/collections - Collections list
+            17. GET /api/v2/collections/{id} - Collection detail
+            18. GET /api/v2/src101 - SRC-101 tokens
+            19. GET /api/v2/src101/balance/{address} - SRC-101 balances
+            20. GET /api/v2/src101/tx - SRC-101 transactions
+            </details>
+
+            [View detailed results artifact](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            `;
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.find(comment =>
+              comment.user.type === 'Bot' &&
+              comment.body.includes('Schema Contract Test Results')
+            );
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: comment
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: comment
+              });
+            }
+
+      - name: Summarize results
+        if: always()
+        run: |
+          echo "=== Schema Contract Test Summary ==="
+
+          TOTAL="${{ steps.parse-results.outputs.total_tests }}"
+          PASSED="${{ steps.parse-results.outputs.passed_tests }}"
+          FAILED="${{ steps.parse-results.outputs.failed_tests }}"
+
+          echo "Total tests: $TOTAL"
+          echo "Passed: $PASSED"
+          echo "Failed: $FAILED"
+
+          if [ "$FAILED" == "0" ] && [ "$TOTAL" != "0" ]; then
+            echo "✅ All schema contract tests passed"
+          elif [ "$TOTAL" == "0" ]; then
+            echo "⚠️ No test results found"
+          else
+            echo "❌ $FAILED schema contract tests failed"
+          fi
+
+          echo "✅ Schema contract test run complete"
