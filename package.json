@@ -40,6 +40,7 @@
     "test:api:daily:analyze": "npm run test:api:daily:regression && npm run test:api:report:regression && npm run test:api:validate:expected",
     "test:api:trends:analyze": "node -e \"console.log('Trends analysis would run here - see daily-regression-tests.yml for implementation')\"",
     "test:api:version:detect": "node scripts/detect-api-version-changes.cjs",
+    "test:api:schema-contract": "NEWMAN_COLLECTION=tests/postman/collections/schema-contract-tests.json docker-compose -f docker-compose.test.yml run --rm newman",
     "prepare": "husky"
   },
   "dependencies": {
