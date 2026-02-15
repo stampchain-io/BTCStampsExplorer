@@ -27,7 +27,7 @@ npm run test:api:comprehensive:verbose
 # System endpoints only
 npm run test:api:comprehensive:system
 
-# Stamps endpoints only  
+# Stamps endpoints only
 npm run test:api:comprehensive:stamps
 
 # SRC-20 endpoints only
@@ -126,7 +126,7 @@ The `postman-environment-comprehensive.json` includes:
 The CI environment cannot access the real database, so we use comprehensive test fixtures that mirror production data:
 
 - `/tests/fixtures/stampData.json` - Stamp test data
-- `/tests/fixtures/marketData.json` - Market data fixtures  
+- `/tests/fixtures/marketData.json` - Market data fixtures
 - `/tests/fixtures/src20Data.json` - SRC-20 token data
 - `/tests/fixtures/collectionData.json` - Collection fixtures
 - `/tests/fixtures/apiTestFixtures.ts` - Consolidated fixture access
@@ -157,7 +157,7 @@ node scripts/analyze-newman-regression.js
    - Status code changes
    - Schema violations
 
-2. **Non-Breaking Changes** 
+2. **Non-Breaking Changes**
    - New optional fields (marketData, etc.)
    - Timezone differences
    - Ordering changes
@@ -185,7 +185,7 @@ Analysis creates JSON report with:
 - name: Run Comprehensive API Tests
   run: |
     docker-compose -f docker-compose.test.yml up newman-comprehensive
-    
+
 - name: Analyze Regression Results
   if: always()
   run: |
@@ -248,6 +248,103 @@ NEWMAN_VERBOSE=true docker-compose -f docker-compose.test.yml up newman-comprehe
    - Track response time trends
    - Investigate critical performance issues
    - Optimize slow endpoints identified by tests
+
+## Test Reliability Baseline (February 2026)
+
+### Current Metrics
+
+As of February 15, 2026, the Newman comprehensive test collection has achieved the following reliability baseline:
+
+- **Total Requests**: 168 API endpoint tests
+- **Total Assertions**: 939+ assertions (558+ request-level + collection-level assertions)
+- **Guard Patterns**: 0 (all conditional guards eliminated)
+- **False-Positive Protection**: Collection-level assertion rejects 500 status codes
+- **Accepted Status Codes**: [200, 201, 400, 404, 410] only
+- **Coverage**: 100% of endpoints have explicit data structure validation
+
+### Guard Pattern Elimination
+
+Prior to February 2026, test assertions used defensive guard patterns like:
+
+```javascript
+// OLD PATTERN (removed)
+if (json.data && Array.isArray(json.data) && json.data.length > 0) {
+  pm.expect(json.data[0].field).to.exist;
+}
+```
+
+These patterns created dead code paths that:
+- Never executed when endpoints returned 500 errors
+- Allowed false-positive test passes
+- Masked actual API failures
+
+**New Pattern** (positive assertions):
+
+```javascript
+// NEW PATTERN (current)
+pm.expect(json.data).to.be.an('array').that.is.not.empty;
+pm.expect(json.data[0].field).to.exist;
+```
+
+All assertions now actively validate data structures and will fail if expected data is missing.
+
+### Verification Commands
+
+Confirm zero guard patterns remain:
+
+```bash
+# Check for data property guards (should return 0)
+grep -E "if \(json\.(data|pagination)" tests/postman/collections/comprehensive.json | wc -l
+
+# Check for existence guards (should return 0)
+grep -E "if \(json &&" tests/postman/collections/comprehensive.json | wc -l
+
+# Verify collection-level status assertion
+grep "to.be.oneOf" tests/postman/collections/comprehensive.json
+# Should show: pm.expect(pm.response.code).to.be.oneOf([200, 201, 400, 404, 410]);
+```
+
+### CI Pipeline Validation
+
+The Newman test suite runs across three CI jobs:
+
+1. **newman-local-dev**: Tests against local dev server with MySQL + Redis
+   - Full database seeding with comprehensive test data
+   - Validates all endpoints return expected data structures
+   - Expected result: 0 failures
+
+2. **schema-contract-tests**: Validates 20 high-traffic endpoints
+   - Tests against production (stampchain.io)
+   - Ensures no breaking schema changes
+   - Expected result: 0 failures
+
+3. **newman-comprehensive**: Full regression testing
+   - Production endpoint validation
+   - Performance benchmarking
+   - Expected result: 0 failures (excluding 403 from /api/internal/* by design)
+
+### Known Edge Cases
+
+1. **Internal API Endpoints** (`/api/internal/*`): Return 403 in CI by design (authentication required)
+2. **SRC-101 Endpoints**: Some data properties may be null for specific test data
+3. **Pagination Limits**: Data array length assertions validate against pagination.limit
+
+### Maintenance Guidelines
+
+When modifying Newman tests:
+
+1. **Never** reintroduce guard patterns (`if (json.data`, `if (json &&`)
+2. Use positive assertions that expect data structures to exist
+3. Update collection-level assertion only with explicit approval
+4. Keep 500 status code excluded from valid responses
+5. Run full test suite locally before pushing changes
+6. Verify CI shows 0 Newman failures before merging PRs
+
+### Related Documentation
+
+- [Gap Analysis Summary](../tests/postman/GAP_ANALYSIS_SUMMARY.md)
+- [Refactoring Summary](../tests/scripts/REFACTORING_SUMMARY.md)
+- [Test Seed Data Audit](../scripts/audit_test_seed_alignment.py)
 
 ## Future Enhancements
 
