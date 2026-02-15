@@ -1,0 +1,1676 @@
+{
+  "audit_metadata": {
+    "generated_at": "2026-02-15",
+    "collection_file": "comprehensive.json",
+    "seed_data_file": "test-seed-data.sql",
+    "total_requests_analyzed": 128
+  },
+  "executive_summary": {
+    "overall_alignment": "88.3% of requests have matching seed data",
+    "requests_with_gaps": 4,
+    "missing_variables": [
+      "test_ident",
+      "test_number"
+    ],
+    "special_attention_needed": [
+      "16 requests accept both 200 and 400 status codes",
+      "28 requests use pagination/filtering"
+    ]
+  },
+  "summary": {
+    "total_requests": 128,
+    "matched": 113,
+    "missing": 4,
+    "no_variables": 11,
+    "match_percentage": 88.3,
+    "src101_200_400_tests": 16,
+    "requests_with_pagination": 28,
+    "method_breakdown": {
+      "GET": 117,
+      "POST": 11
+    },
+    "folder_breakdown": {
+      "Balance Endpoints": 4,
+      "Block Endpoints": 4,
+      "Collections Endpoints": 4,
+      "Comparison Report": 1,
+      "Cursed Stamps Endpoints": 6,
+      "Error Scenarios": 5,
+      "SRC-20 Endpoints": 16,
+      "SRC-20 Endpoints/SRC20 TX Edge Cases": 2,
+      "src101": 1,
+      "src101/tx": 1,
+      "src101/tx/{tx_hash}": 1,
+      "src101/{deploy_hash}/deploy": 1,
+      "src101/{deploy_hash}": 1,
+      "src101/{deploy_hash}/total": 1,
+      "src101/{deploy_hash}/address/{address_btc}": 1,
+      "src101/{deploy_hash}/{tokenid}": 1,
+      "src101/balance/{address}": 1,
+      "src101/index/{deploy_hash}/{index}": 1,
+      "src101/create": 1,
+      "Stamps Endpoints": 37,
+      "System Endpoints": 12,
+      "SRC-101 Endpoints": 16,
+      "POST Endpoints": 10
+    },
+    "missing_variables": [
+      "test_ident",
+      "test_number"
+    ],
+    "requests_by_status_code": {
+      "200": 84,
+      "200/400": 16,
+      "unknown": 17
+    }
+  },
+  "details": [
+    {
+      "request_name": "Get Address Balance - Dev",
+      "folder": "Balance Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/balance/{{test_address}}",
+      "variables": "dev_base_url, test_address",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get Address Balance - Prod",
+      "folder": "Balance Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/v2/balance/{{test_address}}",
+      "variables": "prod_base_url, test_address",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get Stamps Balance - Dev",
+      "folder": "Balance Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/stamps/balance/{{test_address}}",
+      "variables": "dev_base_url, test_address",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get Stamps Balance - Prod",
+      "folder": "Balance Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/v2/stamps/balance/{{test_address}}",
+      "variables": "prod_base_url, test_address",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get Block Info - Dev",
+      "folder": "Block Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/block/{{test_block}}",
+      "variables": "dev_base_url, test_block",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get Block Info - Prod",
+      "folder": "Block Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/v2/block/{{test_block}}",
+      "variables": "prod_base_url, test_block",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get Block Count - Dev",
+      "folder": "Block Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/block/block_count/{{test_number}}",
+      "variables": "dev_base_url, test_number",
+      "expected_status": "200",
+      "seed_status": "MISSING",
+      "notes": [
+        "Missing seed data for: test_number"
+      ]
+    },
+    {
+      "request_name": "Get Block Count - Prod",
+      "folder": "Block Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/v2/block/block_count/{{test_number}}",
+      "variables": "prod_base_url, test_number",
+      "expected_status": "200",
+      "seed_status": "MISSING",
+      "notes": [
+        "Missing seed data for: test_number"
+      ]
+    },
+    {
+      "request_name": "Get Collections - Dev",
+      "folder": "Collections Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/collections",
+      "variables": "dev_base_url",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get Collections - Prod",
+      "folder": "Collections Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/v2/collections",
+      "variables": "prod_base_url",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get Collections by Creator - Dev",
+      "folder": "Collections Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/collections/creator/{{test_address}}",
+      "variables": "dev_base_url, test_address",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get Collections by Creator - Prod",
+      "folder": "Collections Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/v2/collections/creator/{{test_address}}",
+      "variables": "prod_base_url, test_address",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Generate Final Report",
+      "folder": "Comparison Report",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/health",
+      "variables": "dev_base_url",
+      "expected_status": "unknown",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get Cursed List - Dev",
+      "folder": "Cursed Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/cursed",
+      "variables": "dev_base_url",
+      "expected_status": "unknown",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "Uses pagination/filtering parameters"
+      ]
+    },
+    {
+      "request_name": "Get Cursed List - Prod",
+      "folder": "Cursed Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/v2/cursed",
+      "variables": "prod_base_url",
+      "expected_status": "unknown",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "Uses pagination/filtering parameters"
+      ]
+    },
+    {
+      "request_name": "Get Cursed by ID - Dev",
+      "folder": "Cursed Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/cursed/{{test_cursed_id}}",
+      "variables": "dev_base_url, test_cursed_id",
+      "expected_status": "unknown",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get Cursed by ID - Prod",
+      "folder": "Cursed Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/v2/cursed/{{test_cursed_id}}",
+      "variables": "prod_base_url, test_cursed_id",
+      "expected_status": "unknown",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get Cursed by Block - Dev",
+      "folder": "Cursed Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/cursed/block/{{test_block}}",
+      "variables": "dev_base_url, test_block",
+      "expected_status": "unknown",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get Cursed by Block - Prod",
+      "folder": "Cursed Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/v2/cursed/block/{{test_block}}",
+      "variables": "prod_base_url, test_block",
+      "expected_status": "unknown",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Invalid Stamp ID - Dev",
+      "folder": "Error Scenarios",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/stamps/999999999",
+      "variables": "dev_base_url",
+      "expected_status": "404",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Invalid Address - Dev",
+      "folder": "Error Scenarios",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/balance/invalid_address",
+      "variables": "dev_base_url",
+      "expected_status": "400",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Negative Limit - Dev",
+      "folder": "Error Scenarios",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/stamps",
+      "variables": "dev_base_url",
+      "expected_status": "400",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "Uses pagination/filtering parameters"
+      ]
+    },
+    {
+      "request_name": "Invalid SRC20 Tick Length - Dev",
+      "folder": "Error Scenarios",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/src20/tick/{{test_src20_tick_invalid}}",
+      "variables": "dev_base_url, test_src20_tick_invalid",
+      "expected_status": "400",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Invalid SRC20 Tick Length - Prod",
+      "folder": "Error Scenarios",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/v2/src20/tick/{{test_src20_tick_invalid}}",
+      "variables": "prod_base_url, test_src20_tick_invalid",
+      "expected_status": "400",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "List SRC20 - Dev",
+      "folder": "SRC-20 Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/src20",
+      "variables": "dev_base_url",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "Uses pagination/filtering parameters"
+      ]
+    },
+    {
+      "request_name": "List SRC20 - Prod",
+      "folder": "SRC-20 Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/v2/src20",
+      "variables": "prod_base_url",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "Uses pagination/filtering parameters"
+      ]
+    },
+    {
+      "request_name": "Get SRC20 Ticks - Dev",
+      "folder": "SRC-20 Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/src20/tick",
+      "variables": "dev_base_url",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get SRC20 Ticks - Prod",
+      "folder": "SRC-20 Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/v2/src20/tick",
+      "variables": "prod_base_url",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get SRC20 by Tick - Dev",
+      "folder": "SRC-20 Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/src20/tick/{{test_src20_tick}}",
+      "variables": "dev_base_url, test_src20_tick",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get SRC20 by Tick - Prod",
+      "folder": "SRC-20 Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/v2/src20/tick/{{test_src20_tick}}",
+      "variables": "prod_base_url, test_src20_tick",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get SRC20 Deploy Info - Dev",
+      "folder": "SRC-20 Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/src20/tick/{{test_src20_tick}}/deploy",
+      "variables": "dev_base_url, test_src20_tick",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get SRC20 Deploy Info - Prod",
+      "folder": "SRC-20 Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/v2/src20/tick/{{test_src20_tick}}/deploy",
+      "variables": "prod_base_url, test_src20_tick",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get SRC20 Balance - Dev",
+      "folder": "SRC-20 Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/src20/balance/{{test_address}}",
+      "variables": "dev_base_url, test_address",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get SRC20 Balance - Prod",
+      "folder": "SRC-20 Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/v2/src20/balance/{{test_address}}",
+      "variables": "prod_base_url, test_address",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get SRC20 Balance by Tick - Dev",
+      "folder": "SRC-20 Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/src20/balance/{{test_address}}/{{test_src20_tick}}",
+      "variables": "dev_base_url, test_address, test_src20_tick",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get SRC20 Balance by Tick - Prod",
+      "folder": "SRC-20 Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/v2/src20/balance/{{test_address}}/{{test_src20_tick}}",
+      "variables": "prod_base_url, test_address, test_src20_tick",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get SRC20 by Block - Dev",
+      "folder": "SRC-20 Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/src20/block/{{test_block}}",
+      "variables": "dev_base_url, test_block",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get SRC20 by Block - Prod",
+      "folder": "SRC-20 Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/v2/src20/block/{{test_block}}",
+      "variables": "prod_base_url, test_block",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get SRC20 TX - Dev",
+      "folder": "SRC-20 Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/src20/tx/{{test_src20_tx_hash}}",
+      "variables": "dev_base_url, test_src20_tx_hash",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get SRC20 TX - Prod",
+      "folder": "SRC-20 Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/v2/src20/tx/{{test_src20_tx_hash}}",
+      "variables": "prod_base_url, test_src20_tx_hash",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get SRC20 TX with Null Tick - Dev",
+      "folder": "SRC-20 Endpoints/SRC20 TX Edge Cases",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/src20/tx/{{test_src20_tx_hash}}",
+      "variables": "dev_base_url, test_src20_tx_hash",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "Uses pagination/filtering parameters"
+      ]
+    },
+    {
+      "request_name": "Get SRC20 TX with Null Tick - Prod",
+      "folder": "SRC-20 Endpoints/SRC20 TX Edge Cases",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/v2/src20/tx/{{test_src20_tx_hash}}",
+      "variables": "prod_base_url, test_src20_tx_hash",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "Uses pagination/filtering parameters"
+      ]
+    },
+    {
+      "request_name": "Get paginated valid SRC-101 transactions",
+      "folder": "src101",
+      "method": "GET",
+      "endpoint": "",
+      "variables": "",
+      "expected_status": "200/400",
+      "seed_status": "NO_VARS",
+      "notes": [
+        "No variables used in this request",
+        "\u26a0\ufe0f  Accepts both 200 and 400 status codes",
+        "SRC-101 endpoint"
+      ]
+    },
+    {
+      "request_name": "Get paginated SRC-101 transactions",
+      "folder": "src101/tx",
+      "method": "GET",
+      "endpoint": "",
+      "variables": "",
+      "expected_status": "200/400",
+      "seed_status": "NO_VARS",
+      "notes": [
+        "No variables used in this request",
+        "\u26a0\ufe0f  Accepts both 200 and 400 status codes",
+        "SRC-101 endpoint"
+      ]
+    },
+    {
+      "request_name": "Get SRC-101 transaction by hash",
+      "folder": "src101/tx/{tx_hash}",
+      "method": "GET",
+      "endpoint": "",
+      "variables": "",
+      "expected_status": "200/400",
+      "seed_status": "NO_VARS",
+      "notes": [
+        "No variables used in this request",
+        "\u26a0\ufe0f  Accepts both 200 and 400 status codes",
+        "SRC-101 endpoint"
+      ]
+    },
+    {
+      "request_name": "Get SRC-101 deployment details",
+      "folder": "src101/{deploy_hash}/deploy",
+      "method": "GET",
+      "endpoint": "",
+      "variables": "",
+      "expected_status": "200/400",
+      "seed_status": "NO_VARS",
+      "notes": [
+        "No variables used in this request",
+        "\u26a0\ufe0f  Accepts both 200 and 400 status codes",
+        "SRC-101 endpoint"
+      ]
+    },
+    {
+      "request_name": "Get SRC-101 from owners table",
+      "folder": "src101/{deploy_hash}",
+      "method": "GET",
+      "endpoint": "",
+      "variables": "",
+      "expected_status": "200/400",
+      "seed_status": "NO_VARS",
+      "notes": [
+        "No variables used in this request",
+        "\u26a0\ufe0f  Accepts both 200 and 400 status codes",
+        "SRC-101 endpoint"
+      ]
+    },
+    {
+      "request_name": "Get total supply for SRC-101 token",
+      "folder": "src101/{deploy_hash}/total",
+      "method": "GET",
+      "endpoint": "",
+      "variables": "",
+      "expected_status": "200/400",
+      "seed_status": "NO_VARS",
+      "notes": [
+        "No variables used in this request",
+        "\u26a0\ufe0f  Accepts both 200 and 400 status codes",
+        "SRC-101 endpoint"
+      ]
+    },
+    {
+      "request_name": "Get tokenid of SRC-101 by address_btc",
+      "folder": "src101/{deploy_hash}/address/{address_btc}",
+      "method": "GET",
+      "endpoint": "",
+      "variables": "",
+      "expected_status": "200/400",
+      "seed_status": "NO_VARS",
+      "notes": [
+        "No variables used in this request",
+        "\u26a0\ufe0f  Accepts both 200 and 400 status codes",
+        "SRC-101 endpoint"
+      ]
+    },
+    {
+      "request_name": "Get SRC-101 token information",
+      "folder": "src101/{deploy_hash}/{tokenid}",
+      "method": "GET",
+      "endpoint": "",
+      "variables": "",
+      "expected_status": "200/400",
+      "seed_status": "NO_VARS",
+      "notes": [
+        "No variables used in this request",
+        "\u26a0\ufe0f  Accepts both 200 and 400 status codes",
+        "SRC-101 endpoint"
+      ]
+    },
+    {
+      "request_name": "Get SRC-101 balances by address",
+      "folder": "src101/balance/{address}",
+      "method": "GET",
+      "endpoint": "",
+      "variables": "",
+      "expected_status": "200/400",
+      "seed_status": "NO_VARS",
+      "notes": [
+        "No variables used in this request",
+        "\u26a0\ufe0f  Accepts both 200 and 400 status codes",
+        "SRC-101 endpoint"
+      ]
+    },
+    {
+      "request_name": "Get SRC-101 token by index",
+      "folder": "src101/index/{deploy_hash}/{index}",
+      "method": "GET",
+      "endpoint": "",
+      "variables": "",
+      "expected_status": "200/400",
+      "seed_status": "NO_VARS",
+      "notes": [
+        "No variables used in this request",
+        "\u26a0\ufe0f  Accepts both 200 and 400 status codes",
+        "SRC-101 endpoint"
+      ]
+    },
+    {
+      "request_name": "Deploy, Mint, Transfer SRC-101, SetRecord, Renew",
+      "folder": "src101/create",
+      "method": "POST",
+      "endpoint": "",
+      "variables": "",
+      "expected_status": "unknown",
+      "seed_status": "NO_VARS",
+      "notes": [
+        "No variables used in this request",
+        "SRC-101 endpoint"
+      ]
+    },
+    {
+      "request_name": "List Stamps - Dev",
+      "folder": "Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/stamps",
+      "variables": "dev_base_url",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "Uses pagination/filtering parameters"
+      ]
+    },
+    {
+      "request_name": "List Stamps - Prod",
+      "folder": "Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/v2/stamps",
+      "variables": "prod_base_url",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "Uses pagination/filtering parameters"
+      ]
+    },
+    {
+      "request_name": "Get Stamp by ID - Dev",
+      "folder": "Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/stamps/{{test_stamp_id}}",
+      "variables": "dev_base_url, test_stamp_id",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get Stamp by ID - Prod",
+      "folder": "Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/v2/stamps/{{test_stamp_id}}",
+      "variables": "prod_base_url, test_stamp_id",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get Stamp Dispensers - Dev",
+      "folder": "Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/stamps/{{test_stamp_id}}/dispensers",
+      "variables": "dev_base_url, test_stamp_id",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get Stamp Dispensers - Prod",
+      "folder": "Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/v2/stamps/{{test_stamp_id}}/dispensers",
+      "variables": "prod_base_url, test_stamp_id",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get Stamp Dispenses - Dev",
+      "folder": "Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/stamps/{{test_stamp_id}}/dispenses",
+      "variables": "dev_base_url, test_stamp_id",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get Stamp Dispenses - Prod",
+      "folder": "Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/v2/stamps/{{test_stamp_id}}/dispenses",
+      "variables": "prod_base_url, test_stamp_id",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get Stamp Holders - Dev",
+      "folder": "Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/stamps/{{test_stamp_id}}/holders",
+      "variables": "dev_base_url, test_stamp_id",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get Stamp Holders - Prod",
+      "folder": "Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/v2/stamps/{{test_stamp_id}}/holders",
+      "variables": "prod_base_url, test_stamp_id",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get Stamp Sends - Dev",
+      "folder": "Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/stamps/{{test_stamp_id}}/sends",
+      "variables": "dev_base_url, test_stamp_id",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get Stamp Sends - Prod",
+      "folder": "Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/v2/stamps/{{test_stamp_id}}/sends",
+      "variables": "prod_base_url, test_stamp_id",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get Stamps by Block - Dev",
+      "folder": "Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/stamps/block/{{test_block}}",
+      "variables": "dev_base_url, test_block",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get Stamps by Block - Prod",
+      "folder": "Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/v2/stamps/block/{{test_block}}",
+      "variables": "prod_base_url, test_block",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get Stamps by Ident - Dev",
+      "folder": "Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/stamps/ident/{{test_ident}}",
+      "variables": "dev_base_url, test_ident",
+      "expected_status": "200",
+      "seed_status": "MISSING",
+      "notes": [
+        "Missing seed data for: test_ident"
+      ]
+    },
+    {
+      "request_name": "Get Stamps by Ident - Prod",
+      "folder": "Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/v2/stamps/ident/{{test_ident}}",
+      "variables": "prod_base_url, test_ident",
+      "expected_status": "200",
+      "seed_status": "MISSING",
+      "notes": [
+        "Missing seed data for: test_ident"
+      ]
+    },
+    {
+      "request_name": "Get Recent Sales - Dev (Default)",
+      "folder": "Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/internal/stamp-recent-sales",
+      "variables": "dev_base_url",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get Recent Sales - Prod (Default)",
+      "folder": "Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/internal/stamp-recent-sales",
+      "variables": "prod_base_url",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get Recent Sales - Dev (Custom day_range)",
+      "folder": "Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/internal/stamp-recent-sales",
+      "variables": "dev_base_url",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "Uses pagination/filtering parameters"
+      ]
+    },
+    {
+      "request_name": "Get Recent Sales - Prod (Custom day_range)",
+      "folder": "Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/internal/stamp-recent-sales",
+      "variables": "prod_base_url",
+      "expected_status": "unknown",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "Uses pagination/filtering parameters"
+      ]
+    },
+    {
+      "request_name": "Get Recent Sales - Dev (full_details=true)",
+      "folder": "Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/internal/stamp-recent-sales",
+      "variables": "dev_base_url",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "Uses pagination/filtering parameters"
+      ]
+    },
+    {
+      "request_name": "Get Recent Sales - Prod (full_details=true)",
+      "folder": "Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/internal/stamp-recent-sales",
+      "variables": "prod_base_url",
+      "expected_status": "unknown",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "Uses pagination/filtering parameters"
+      ]
+    },
+    {
+      "request_name": "Get Recent Sales - Dev (Pagination)",
+      "folder": "Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/internal/stamp-recent-sales",
+      "variables": "dev_base_url",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "Uses pagination/filtering parameters"
+      ]
+    },
+    {
+      "request_name": "Get Recent Sales - Prod (Pagination)",
+      "folder": "Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/internal/stamp-recent-sales",
+      "variables": "prod_base_url",
+      "expected_status": "unknown",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "Uses pagination/filtering parameters"
+      ]
+    },
+    {
+      "request_name": "Get Recent Sales - Dev (Boundary day_range)",
+      "folder": "Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/internal/stamp-recent-sales",
+      "variables": "dev_base_url",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "Uses pagination/filtering parameters"
+      ]
+    },
+    {
+      "request_name": "Get Recent Sales - Prod (Boundary day_range)",
+      "folder": "Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/internal/stamp-recent-sales",
+      "variables": "prod_base_url",
+      "expected_status": "unknown",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "Uses pagination/filtering parameters"
+      ]
+    },
+    {
+      "request_name": "Get Recent Sales - Dev (Large day_range)",
+      "folder": "Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/internal/stamp-recent-sales",
+      "variables": "dev_base_url",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "Uses pagination/filtering parameters"
+      ]
+    },
+    {
+      "request_name": "Get Recent Sales - Prod (Large day_range)",
+      "folder": "Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/internal/stamp-recent-sales",
+      "variables": "prod_base_url",
+      "expected_status": "unknown",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "Uses pagination/filtering parameters"
+      ]
+    },
+    {
+      "request_name": "Get Recent Sales - Dev (Combined Parameters)",
+      "folder": "Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/internal/stamp-recent-sales",
+      "variables": "dev_base_url",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "Uses pagination/filtering parameters"
+      ]
+    },
+    {
+      "request_name": "Get Recent Sales - Prod (Combined Parameters)",
+      "folder": "Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/internal/stamp-recent-sales",
+      "variables": "prod_base_url",
+      "expected_status": "unknown",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "Uses pagination/filtering parameters"
+      ]
+    },
+    {
+      "request_name": "Get Recent Sales - Dev (Error: Invalid day_range)",
+      "folder": "Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/internal/stamp-recent-sales",
+      "variables": "dev_base_url",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "Uses pagination/filtering parameters"
+      ]
+    },
+    {
+      "request_name": "Get Recent Sales - Dev (Error: Negative day_range)",
+      "folder": "Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/internal/stamp-recent-sales",
+      "variables": "dev_base_url",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "Uses pagination/filtering parameters"
+      ]
+    },
+    {
+      "request_name": "Get Recent Sales - Dev (Performance Test)",
+      "folder": "Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/internal/stamp-recent-sales",
+      "variables": "dev_base_url",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "Uses pagination/filtering parameters"
+      ]
+    },
+    {
+      "request_name": "Get Recent Sales - Prod (Performance Test)",
+      "folder": "Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/internal/stamp-recent-sales",
+      "variables": "prod_base_url",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "Uses pagination/filtering parameters"
+      ]
+    },
+    {
+      "request_name": "Get Recent Sales - Dev vs Prod Comparison",
+      "folder": "Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/internal/stamp-recent-sales",
+      "variables": "dev_base_url",
+      "expected_status": "unknown",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "Uses pagination/filtering parameters"
+      ]
+    },
+    {
+      "request_name": "Get Recent Sales - Prod vs Dev Comparison",
+      "folder": "Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/internal/stamp-recent-sales",
+      "variables": "prod_base_url",
+      "expected_status": "unknown",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "Uses pagination/filtering parameters"
+      ]
+    },
+    {
+      "request_name": "Get Recent Sales - Dev (Schema Validation)",
+      "folder": "Stamps Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/internal/stamp-recent-sales",
+      "variables": "dev_base_url",
+      "expected_status": "unknown",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "Uses pagination/filtering parameters"
+      ]
+    },
+    {
+      "request_name": "Health Check - Dev",
+      "folder": "System Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/health",
+      "variables": "dev_base_url",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Health Check - Prod",
+      "folder": "System Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/v2/health",
+      "variables": "prod_base_url",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Version - Dev",
+      "folder": "System Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/version",
+      "variables": "dev_base_url",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Version - Prod",
+      "folder": "System Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/v2/version",
+      "variables": "prod_base_url",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get SRC20 Balance Snapshot - Dev",
+      "folder": "System Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/src20/balance/snapshot/{{test_tick}}",
+      "variables": "dev_base_url, test_tick",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get SRC20 Balance Snapshot - Prod",
+      "folder": "System Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/v2/src20/balance/snapshot/{{test_tick}}",
+      "variables": "prod_base_url, test_tick",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get SRC20 Block Tick - Dev",
+      "folder": "System Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/src20/block/{{test_block}}/{{test_tick}}",
+      "variables": "dev_base_url, test_block, test_tick",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get SRC20 Block Tick - Prod",
+      "folder": "System Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/v2/src20/block/{{test_block}}/{{test_tick}}",
+      "variables": "prod_base_url, test_block, test_tick",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get SRC-101 Transaction - Dev",
+      "folder": "SRC-101 Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/src101/tx/{{test_tx_hash}}",
+      "variables": "dev_base_url, test_tx_hash",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "SRC-101 endpoint"
+      ]
+    },
+    {
+      "request_name": "Get SRC-101 Transaction - Prod",
+      "folder": "SRC-101 Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/v2/src101/tx/{{test_tx_hash}}",
+      "variables": "prod_base_url, test_tx_hash",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "SRC-101 endpoint"
+      ]
+    },
+    {
+      "request_name": "Get SRC-101 Deploy Details - Dev",
+      "folder": "SRC-101 Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/src101/{{test_deploy_hash}}/deploy",
+      "variables": "dev_base_url, test_deploy_hash",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "SRC-101 endpoint"
+      ]
+    },
+    {
+      "request_name": "Get SRC-101 Deploy Details - Prod",
+      "folder": "SRC-101 Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/v2/src101/{{test_deploy_hash}}/deploy",
+      "variables": "prod_base_url, test_deploy_hash",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "SRC-101 endpoint"
+      ]
+    },
+    {
+      "request_name": "Get SRC-101 from Owners - Dev",
+      "folder": "SRC-101 Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/src101/{{test_deploy_hash}}",
+      "variables": "dev_base_url, test_deploy_hash",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "SRC-101 endpoint"
+      ]
+    },
+    {
+      "request_name": "Get SRC-101 from Owners - Prod",
+      "folder": "SRC-101 Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/v2/src101/{{test_deploy_hash}}",
+      "variables": "prod_base_url, test_deploy_hash",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "SRC-101 endpoint"
+      ]
+    },
+    {
+      "request_name": "Get SRC-101 Total Supply - Dev",
+      "folder": "SRC-101 Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/src101/{{test_deploy_hash}}/total",
+      "variables": "dev_base_url, test_deploy_hash",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "SRC-101 endpoint"
+      ]
+    },
+    {
+      "request_name": "Get SRC-101 Total Supply - Prod",
+      "folder": "SRC-101 Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/v2/src101/{{test_deploy_hash}}/total",
+      "variables": "prod_base_url, test_deploy_hash",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "SRC-101 endpoint"
+      ]
+    },
+    {
+      "request_name": "Get SRC-101 by Address - Dev",
+      "folder": "SRC-101 Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/src101/{{test_deploy_hash}}/address/{{test_address}}",
+      "variables": "dev_base_url, test_address, test_deploy_hash",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "SRC-101 endpoint"
+      ]
+    },
+    {
+      "request_name": "Get SRC-101 by Address - Prod",
+      "folder": "SRC-101 Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/v2/src101/{{test_deploy_hash}}/address/{{test_address}}",
+      "variables": "prod_base_url, test_address, test_deploy_hash",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "SRC-101 endpoint"
+      ]
+    },
+    {
+      "request_name": "Get SRC-101 Balance - Dev",
+      "folder": "SRC-101 Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/src101/balance/{{test_address}}",
+      "variables": "dev_base_url, test_address",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "SRC-101 endpoint"
+      ]
+    },
+    {
+      "request_name": "Get SRC-101 Balance - Prod",
+      "folder": "SRC-101 Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/v2/src101/balance/{{test_address}}",
+      "variables": "prod_base_url, test_address",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "SRC-101 endpoint"
+      ]
+    },
+    {
+      "request_name": "Get SRC-101 Token Info - Dev",
+      "folder": "SRC-101 Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/src101/{{test_deploy_hash}}/{{test_tokenid}}",
+      "variables": "dev_base_url, test_deploy_hash, test_tokenid",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "SRC-101 endpoint"
+      ]
+    },
+    {
+      "request_name": "Get SRC-101 Token Info - Prod",
+      "folder": "SRC-101 Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/v2/src101/{{test_deploy_hash}}/{{test_tokenid}}",
+      "variables": "prod_base_url, test_deploy_hash, test_tokenid",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "SRC-101 endpoint"
+      ]
+    },
+    {
+      "request_name": "Get SRC-101 by Index - Dev",
+      "folder": "SRC-101 Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/src101/index/{{test_deploy_hash}}/{{test_index}}",
+      "variables": "dev_base_url, test_deploy_hash, test_index",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "SRC-101 endpoint"
+      ]
+    },
+    {
+      "request_name": "Get SRC-101 by Index - Prod",
+      "folder": "SRC-101 Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/v2/src101/index/{{test_deploy_hash}}/{{test_index}}",
+      "variables": "prod_base_url, test_deploy_hash, test_index",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "SRC-101 endpoint"
+      ]
+    },
+    {
+      "request_name": "Create SRC20 Token - Dev",
+      "folder": "POST Endpoints",
+      "method": "POST",
+      "endpoint": "{{dev_base_url}}/api/v2/src20/create",
+      "variables": "dev_base_url, test_address",
+      "expected_status": "200/400",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "\u26a0\ufe0f  Accepts both 200 and 400 status codes"
+      ]
+    },
+    {
+      "request_name": "Create SRC20 Token - Prod",
+      "folder": "POST Endpoints",
+      "method": "POST",
+      "endpoint": "{{prod_base_url}}/api/v2/src20/create",
+      "variables": "prod_base_url, test_address",
+      "expected_status": "200/400",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "\u26a0\ufe0f  Accepts both 200 and 400 status codes"
+      ]
+    },
+    {
+      "request_name": "Attach Stamp - Dev",
+      "folder": "POST Endpoints",
+      "method": "POST",
+      "endpoint": "{{dev_base_url}}/api/v2/trx/stampattach",
+      "variables": "dev_base_url, test_address, test_stamp_id",
+      "expected_status": "200/400",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "\u26a0\ufe0f  Accepts both 200 and 400 status codes"
+      ]
+    },
+    {
+      "request_name": "Attach Stamp - Prod",
+      "folder": "POST Endpoints",
+      "method": "POST",
+      "endpoint": "{{prod_base_url}}/api/v2/trx/stampattach",
+      "variables": "prod_base_url, test_address, test_stamp_id",
+      "expected_status": "200/400",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "\u26a0\ufe0f  Accepts both 200 and 400 status codes"
+      ]
+    },
+    {
+      "request_name": "Mint Stamp - Dev",
+      "folder": "POST Endpoints",
+      "method": "POST",
+      "endpoint": "{{dev_base_url}}/api/v2/olga/mint",
+      "variables": "dev_base_url, test_address",
+      "expected_status": "200/400",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "\u26a0\ufe0f  Accepts both 200 and 400 status codes"
+      ]
+    },
+    {
+      "request_name": "Mint Stamp - Prod",
+      "folder": "POST Endpoints",
+      "method": "POST",
+      "endpoint": "{{prod_base_url}}/api/v2/olga/mint",
+      "variables": "prod_base_url, test_address",
+      "expected_status": "200/400",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data",
+        "\u26a0\ufe0f  Accepts both 200 and 400 status codes"
+      ]
+    },
+    {
+      "request_name": "Detach Stamp - No Assets (Dev)",
+      "folder": "POST Endpoints",
+      "method": "POST",
+      "endpoint": "{{dev_base_url}}/api/v2/trx/stampdetach",
+      "variables": "dev_base_url",
+      "expected_status": "400",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Detach Stamp - Insufficient Funds (Dev)",
+      "folder": "POST Endpoints",
+      "method": "POST",
+      "endpoint": "{{dev_base_url}}/api/v2/trx/stampdetach",
+      "variables": "dev_base_url",
+      "expected_status": "400",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Detach Stamp - No Assets (Prod)",
+      "folder": "POST Endpoints",
+      "method": "POST",
+      "endpoint": "{{prod_base_url}}/api/v2/trx/stampdetach",
+      "variables": "prod_base_url",
+      "expected_status": "400",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Detach Stamp - Insufficient Funds (Prod)",
+      "folder": "POST Endpoints",
+      "method": "POST",
+      "endpoint": "{{prod_base_url}}/api/v2/trx/stampdetach",
+      "variables": "prod_base_url",
+      "expected_status": "400",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get API Documentation - Dev",
+      "folder": "System Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/docs",
+      "variables": "dev_base_url",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Get API Documentation - Prod",
+      "folder": "System Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/v2/docs",
+      "variables": "prod_base_url",
+      "expected_status": "200",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Test Error Endpoint - Dev",
+      "folder": "System Endpoints",
+      "method": "GET",
+      "endpoint": "{{dev_base_url}}/api/v2/error",
+      "variables": "dev_base_url",
+      "expected_status": "400",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    },
+    {
+      "request_name": "Test Error Endpoint - Prod",
+      "folder": "System Endpoints",
+      "method": "GET",
+      "endpoint": "{{prod_base_url}}/api/v2/error",
+      "variables": "prod_base_url",
+      "expected_status": "400",
+      "seed_status": "MATCHED",
+      "notes": [
+        "All variables have matching seed data"
+      ]
+    }
+  ]
+}

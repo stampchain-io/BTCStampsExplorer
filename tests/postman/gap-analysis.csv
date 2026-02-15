@@ -1,0 +1,129 @@
+request_name,folder,method,endpoint,variables,expected_status,seed_status,notes
+Get Address Balance - Dev,Balance Endpoints,GET,{{dev_base_url}}/api/v2/balance/{{test_address}},"dev_base_url, test_address",200,MATCHED,All variables have matching seed data
+Get Address Balance - Prod,Balance Endpoints,GET,{{prod_base_url}}/api/v2/balance/{{test_address}},"prod_base_url, test_address",200,MATCHED,All variables have matching seed data
+Get Stamps Balance - Dev,Balance Endpoints,GET,{{dev_base_url}}/api/v2/stamps/balance/{{test_address}},"dev_base_url, test_address",200,MATCHED,All variables have matching seed data
+Get Stamps Balance - Prod,Balance Endpoints,GET,{{prod_base_url}}/api/v2/stamps/balance/{{test_address}},"prod_base_url, test_address",200,MATCHED,All variables have matching seed data
+Get Block Info - Dev,Block Endpoints,GET,{{dev_base_url}}/api/v2/block/{{test_block}},"dev_base_url, test_block",200,MATCHED,All variables have matching seed data
+Get Block Info - Prod,Block Endpoints,GET,{{prod_base_url}}/api/v2/block/{{test_block}},"prod_base_url, test_block",200,MATCHED,All variables have matching seed data
+Get Block Count - Dev,Block Endpoints,GET,{{dev_base_url}}/api/v2/block/block_count/{{test_number}},"dev_base_url, test_number",200,MISSING,Missing seed data for: test_number
+Get Block Count - Prod,Block Endpoints,GET,{{prod_base_url}}/api/v2/block/block_count/{{test_number}},"prod_base_url, test_number",200,MISSING,Missing seed data for: test_number
+Get Collections - Dev,Collections Endpoints,GET,{{dev_base_url}}/api/v2/collections,dev_base_url,200,MATCHED,All variables have matching seed data
+Get Collections - Prod,Collections Endpoints,GET,{{prod_base_url}}/api/v2/collections,prod_base_url,200,MATCHED,All variables have matching seed data
+Get Collections by Creator - Dev,Collections Endpoints,GET,{{dev_base_url}}/api/v2/collections/creator/{{test_address}},"dev_base_url, test_address",200,MATCHED,All variables have matching seed data
+Get Collections by Creator - Prod,Collections Endpoints,GET,{{prod_base_url}}/api/v2/collections/creator/{{test_address}},"prod_base_url, test_address",200,MATCHED,All variables have matching seed data
+Generate Final Report,Comparison Report,GET,{{dev_base_url}}/api/v2/health,dev_base_url,unknown,MATCHED,All variables have matching seed data
+Get Cursed List - Dev,Cursed Stamps Endpoints,GET,{{dev_base_url}}/api/v2/cursed,dev_base_url,unknown,MATCHED,All variables have matching seed data | Uses pagination/filtering parameters
+Get Cursed List - Prod,Cursed Stamps Endpoints,GET,{{prod_base_url}}/api/v2/cursed,prod_base_url,unknown,MATCHED,All variables have matching seed data | Uses pagination/filtering parameters
+Get Cursed by ID - Dev,Cursed Stamps Endpoints,GET,{{dev_base_url}}/api/v2/cursed/{{test_cursed_id}},"dev_base_url, test_cursed_id",unknown,MATCHED,All variables have matching seed data
+Get Cursed by ID - Prod,Cursed Stamps Endpoints,GET,{{prod_base_url}}/api/v2/cursed/{{test_cursed_id}},"prod_base_url, test_cursed_id",unknown,MATCHED,All variables have matching seed data
+Get Cursed by Block - Dev,Cursed Stamps Endpoints,GET,{{dev_base_url}}/api/v2/cursed/block/{{test_block}},"dev_base_url, test_block",unknown,MATCHED,All variables have matching seed data
+Get Cursed by Block - Prod,Cursed Stamps Endpoints,GET,{{prod_base_url}}/api/v2/cursed/block/{{test_block}},"prod_base_url, test_block",unknown,MATCHED,All variables have matching seed data
+Invalid Stamp ID - Dev,Error Scenarios,GET,{{dev_base_url}}/api/v2/stamps/999999999,dev_base_url,404,MATCHED,All variables have matching seed data
+Invalid Address - Dev,Error Scenarios,GET,{{dev_base_url}}/api/v2/balance/invalid_address,dev_base_url,400,MATCHED,All variables have matching seed data
+Negative Limit - Dev,Error Scenarios,GET,{{dev_base_url}}/api/v2/stamps,dev_base_url,400,MATCHED,All variables have matching seed data | Uses pagination/filtering parameters
+Invalid SRC20 Tick Length - Dev,Error Scenarios,GET,{{dev_base_url}}/api/v2/src20/tick/{{test_src20_tick_invalid}},"dev_base_url, test_src20_tick_invalid",400,MATCHED,All variables have matching seed data
+Invalid SRC20 Tick Length - Prod,Error Scenarios,GET,{{prod_base_url}}/api/v2/src20/tick/{{test_src20_tick_invalid}},"prod_base_url, test_src20_tick_invalid",400,MATCHED,All variables have matching seed data
+List SRC20 - Dev,SRC-20 Endpoints,GET,{{dev_base_url}}/api/v2/src20,dev_base_url,200,MATCHED,All variables have matching seed data | Uses pagination/filtering parameters
+List SRC20 - Prod,SRC-20 Endpoints,GET,{{prod_base_url}}/api/v2/src20,prod_base_url,200,MATCHED,All variables have matching seed data | Uses pagination/filtering parameters
+Get SRC20 Ticks - Dev,SRC-20 Endpoints,GET,{{dev_base_url}}/api/v2/src20/tick,dev_base_url,200,MATCHED,All variables have matching seed data
+Get SRC20 Ticks - Prod,SRC-20 Endpoints,GET,{{prod_base_url}}/api/v2/src20/tick,prod_base_url,200,MATCHED,All variables have matching seed data
+Get SRC20 by Tick - Dev,SRC-20 Endpoints,GET,{{dev_base_url}}/api/v2/src20/tick/{{test_src20_tick}},"dev_base_url, test_src20_tick",200,MATCHED,All variables have matching seed data
+Get SRC20 by Tick - Prod,SRC-20 Endpoints,GET,{{prod_base_url}}/api/v2/src20/tick/{{test_src20_tick}},"prod_base_url, test_src20_tick",200,MATCHED,All variables have matching seed data
+Get SRC20 Deploy Info - Dev,SRC-20 Endpoints,GET,{{dev_base_url}}/api/v2/src20/tick/{{test_src20_tick}}/deploy,"dev_base_url, test_src20_tick",200,MATCHED,All variables have matching seed data
+Get SRC20 Deploy Info - Prod,SRC-20 Endpoints,GET,{{prod_base_url}}/api/v2/src20/tick/{{test_src20_tick}}/deploy,"prod_base_url, test_src20_tick",200,MATCHED,All variables have matching seed data
+Get SRC20 Balance - Dev,SRC-20 Endpoints,GET,{{dev_base_url}}/api/v2/src20/balance/{{test_address}},"dev_base_url, test_address",200,MATCHED,All variables have matching seed data
+Get SRC20 Balance - Prod,SRC-20 Endpoints,GET,{{prod_base_url}}/api/v2/src20/balance/{{test_address}},"prod_base_url, test_address",200,MATCHED,All variables have matching seed data
+Get SRC20 Balance by Tick - Dev,SRC-20 Endpoints,GET,{{dev_base_url}}/api/v2/src20/balance/{{test_address}}/{{test_src20_tick}},"dev_base_url, test_address, test_src20_tick",200,MATCHED,All variables have matching seed data
+Get SRC20 Balance by Tick - Prod,SRC-20 Endpoints,GET,{{prod_base_url}}/api/v2/src20/balance/{{test_address}}/{{test_src20_tick}},"prod_base_url, test_address, test_src20_tick",200,MATCHED,All variables have matching seed data
+Get SRC20 by Block - Dev,SRC-20 Endpoints,GET,{{dev_base_url}}/api/v2/src20/block/{{test_block}},"dev_base_url, test_block",200,MATCHED,All variables have matching seed data
+Get SRC20 by Block - Prod,SRC-20 Endpoints,GET,{{prod_base_url}}/api/v2/src20/block/{{test_block}},"prod_base_url, test_block",200,MATCHED,All variables have matching seed data
+Get SRC20 TX - Dev,SRC-20 Endpoints,GET,{{dev_base_url}}/api/v2/src20/tx/{{test_src20_tx_hash}},"dev_base_url, test_src20_tx_hash",200,MATCHED,All variables have matching seed data
+Get SRC20 TX - Prod,SRC-20 Endpoints,GET,{{prod_base_url}}/api/v2/src20/tx/{{test_src20_tx_hash}},"prod_base_url, test_src20_tx_hash",200,MATCHED,All variables have matching seed data
+Get SRC20 TX with Null Tick - Dev,SRC-20 Endpoints/SRC20 TX Edge Cases,GET,{{dev_base_url}}/api/v2/src20/tx/{{test_src20_tx_hash}},"dev_base_url, test_src20_tx_hash",200,MATCHED,All variables have matching seed data | Uses pagination/filtering parameters
+Get SRC20 TX with Null Tick - Prod,SRC-20 Endpoints/SRC20 TX Edge Cases,GET,{{prod_base_url}}/api/v2/src20/tx/{{test_src20_tx_hash}},"prod_base_url, test_src20_tx_hash",200,MATCHED,All variables have matching seed data | Uses pagination/filtering parameters
+Get paginated valid SRC-101 transactions,src101,GET,,,200/400,NO_VARS,No variables used in this request | ⚠️  Accepts both 200 and 400 status codes | SRC-101 endpoint
+Get paginated SRC-101 transactions,src101/tx,GET,,,200/400,NO_VARS,No variables used in this request | ⚠️  Accepts both 200 and 400 status codes | SRC-101 endpoint
+Get SRC-101 transaction by hash,src101/tx/{tx_hash},GET,,,200/400,NO_VARS,No variables used in this request | ⚠️  Accepts both 200 and 400 status codes | SRC-101 endpoint
+Get SRC-101 deployment details,src101/{deploy_hash}/deploy,GET,,,200/400,NO_VARS,No variables used in this request | ⚠️  Accepts both 200 and 400 status codes | SRC-101 endpoint
+Get SRC-101 from owners table,src101/{deploy_hash},GET,,,200/400,NO_VARS,No variables used in this request | ⚠️  Accepts both 200 and 400 status codes | SRC-101 endpoint
+Get total supply for SRC-101 token,src101/{deploy_hash}/total,GET,,,200/400,NO_VARS,No variables used in this request | ⚠️  Accepts both 200 and 400 status codes | SRC-101 endpoint
+Get tokenid of SRC-101 by address_btc,src101/{deploy_hash}/address/{address_btc},GET,,,200/400,NO_VARS,No variables used in this request | ⚠️  Accepts both 200 and 400 status codes | SRC-101 endpoint
+Get SRC-101 token information,src101/{deploy_hash}/{tokenid},GET,,,200/400,NO_VARS,No variables used in this request | ⚠️  Accepts both 200 and 400 status codes | SRC-101 endpoint
+Get SRC-101 balances by address,src101/balance/{address},GET,,,200/400,NO_VARS,No variables used in this request | ⚠️  Accepts both 200 and 400 status codes | SRC-101 endpoint
+Get SRC-101 token by index,src101/index/{deploy_hash}/{index},GET,,,200/400,NO_VARS,No variables used in this request | ⚠️  Accepts both 200 and 400 status codes | SRC-101 endpoint
+"Deploy, Mint, Transfer SRC-101, SetRecord, Renew",src101/create,POST,,,unknown,NO_VARS,No variables used in this request | SRC-101 endpoint
+List Stamps - Dev,Stamps Endpoints,GET,{{dev_base_url}}/api/v2/stamps,dev_base_url,200,MATCHED,All variables have matching seed data | Uses pagination/filtering parameters
+List Stamps - Prod,Stamps Endpoints,GET,{{prod_base_url}}/api/v2/stamps,prod_base_url,200,MATCHED,All variables have matching seed data | Uses pagination/filtering parameters
+Get Stamp by ID - Dev,Stamps Endpoints,GET,{{dev_base_url}}/api/v2/stamps/{{test_stamp_id}},"dev_base_url, test_stamp_id",200,MATCHED,All variables have matching seed data
+Get Stamp by ID - Prod,Stamps Endpoints,GET,{{prod_base_url}}/api/v2/stamps/{{test_stamp_id}},"prod_base_url, test_stamp_id",200,MATCHED,All variables have matching seed data
+Get Stamp Dispensers - Dev,Stamps Endpoints,GET,{{dev_base_url}}/api/v2/stamps/{{test_stamp_id}}/dispensers,"dev_base_url, test_stamp_id",200,MATCHED,All variables have matching seed data
+Get Stamp Dispensers - Prod,Stamps Endpoints,GET,{{prod_base_url}}/api/v2/stamps/{{test_stamp_id}}/dispensers,"prod_base_url, test_stamp_id",200,MATCHED,All variables have matching seed data
+Get Stamp Dispenses - Dev,Stamps Endpoints,GET,{{dev_base_url}}/api/v2/stamps/{{test_stamp_id}}/dispenses,"dev_base_url, test_stamp_id",200,MATCHED,All variables have matching seed data
+Get Stamp Dispenses - Prod,Stamps Endpoints,GET,{{prod_base_url}}/api/v2/stamps/{{test_stamp_id}}/dispenses,"prod_base_url, test_stamp_id",200,MATCHED,All variables have matching seed data
+Get Stamp Holders - Dev,Stamps Endpoints,GET,{{dev_base_url}}/api/v2/stamps/{{test_stamp_id}}/holders,"dev_base_url, test_stamp_id",200,MATCHED,All variables have matching seed data
+Get Stamp Holders - Prod,Stamps Endpoints,GET,{{prod_base_url}}/api/v2/stamps/{{test_stamp_id}}/holders,"prod_base_url, test_stamp_id",200,MATCHED,All variables have matching seed data
+Get Stamp Sends - Dev,Stamps Endpoints,GET,{{dev_base_url}}/api/v2/stamps/{{test_stamp_id}}/sends,"dev_base_url, test_stamp_id",200,MATCHED,All variables have matching seed data
+Get Stamp Sends - Prod,Stamps Endpoints,GET,{{prod_base_url}}/api/v2/stamps/{{test_stamp_id}}/sends,"prod_base_url, test_stamp_id",200,MATCHED,All variables have matching seed data
+Get Stamps by Block - Dev,Stamps Endpoints,GET,{{dev_base_url}}/api/v2/stamps/block/{{test_block}},"dev_base_url, test_block",200,MATCHED,All variables have matching seed data
+Get Stamps by Block - Prod,Stamps Endpoints,GET,{{prod_base_url}}/api/v2/stamps/block/{{test_block}},"prod_base_url, test_block",200,MATCHED,All variables have matching seed data
+Get Stamps by Ident - Dev,Stamps Endpoints,GET,{{dev_base_url}}/api/v2/stamps/ident/{{test_ident}},"dev_base_url, test_ident",200,MISSING,Missing seed data for: test_ident
+Get Stamps by Ident - Prod,Stamps Endpoints,GET,{{prod_base_url}}/api/v2/stamps/ident/{{test_ident}},"prod_base_url, test_ident",200,MISSING,Missing seed data for: test_ident
+Get Recent Sales - Dev (Default),Stamps Endpoints,GET,{{dev_base_url}}/api/internal/stamp-recent-sales,dev_base_url,200,MATCHED,All variables have matching seed data
+Get Recent Sales - Prod (Default),Stamps Endpoints,GET,{{prod_base_url}}/api/internal/stamp-recent-sales,prod_base_url,200,MATCHED,All variables have matching seed data
+Get Recent Sales - Dev (Custom day_range),Stamps Endpoints,GET,{{dev_base_url}}/api/internal/stamp-recent-sales,dev_base_url,200,MATCHED,All variables have matching seed data | Uses pagination/filtering parameters
+Get Recent Sales - Prod (Custom day_range),Stamps Endpoints,GET,{{prod_base_url}}/api/internal/stamp-recent-sales,prod_base_url,unknown,MATCHED,All variables have matching seed data | Uses pagination/filtering parameters
+Get Recent Sales - Dev (full_details=true),Stamps Endpoints,GET,{{dev_base_url}}/api/internal/stamp-recent-sales,dev_base_url,200,MATCHED,All variables have matching seed data | Uses pagination/filtering parameters
+Get Recent Sales - Prod (full_details=true),Stamps Endpoints,GET,{{prod_base_url}}/api/internal/stamp-recent-sales,prod_base_url,unknown,MATCHED,All variables have matching seed data | Uses pagination/filtering parameters
+Get Recent Sales - Dev (Pagination),Stamps Endpoints,GET,{{dev_base_url}}/api/internal/stamp-recent-sales,dev_base_url,200,MATCHED,All variables have matching seed data | Uses pagination/filtering parameters
+Get Recent Sales - Prod (Pagination),Stamps Endpoints,GET,{{prod_base_url}}/api/internal/stamp-recent-sales,prod_base_url,unknown,MATCHED,All variables have matching seed data | Uses pagination/filtering parameters
+Get Recent Sales - Dev (Boundary day_range),Stamps Endpoints,GET,{{dev_base_url}}/api/internal/stamp-recent-sales,dev_base_url,200,MATCHED,All variables have matching seed data | Uses pagination/filtering parameters
+Get Recent Sales - Prod (Boundary day_range),Stamps Endpoints,GET,{{prod_base_url}}/api/internal/stamp-recent-sales,prod_base_url,unknown,MATCHED,All variables have matching seed data | Uses pagination/filtering parameters
+Get Recent Sales - Dev (Large day_range),Stamps Endpoints,GET,{{dev_base_url}}/api/internal/stamp-recent-sales,dev_base_url,200,MATCHED,All variables have matching seed data | Uses pagination/filtering parameters
+Get Recent Sales - Prod (Large day_range),Stamps Endpoints,GET,{{prod_base_url}}/api/internal/stamp-recent-sales,prod_base_url,unknown,MATCHED,All variables have matching seed data | Uses pagination/filtering parameters
+Get Recent Sales - Dev (Combined Parameters),Stamps Endpoints,GET,{{dev_base_url}}/api/internal/stamp-recent-sales,dev_base_url,200,MATCHED,All variables have matching seed data | Uses pagination/filtering parameters
+Get Recent Sales - Prod (Combined Parameters),Stamps Endpoints,GET,{{prod_base_url}}/api/internal/stamp-recent-sales,prod_base_url,unknown,MATCHED,All variables have matching seed data | Uses pagination/filtering parameters
+Get Recent Sales - Dev (Error: Invalid day_range),Stamps Endpoints,GET,{{dev_base_url}}/api/internal/stamp-recent-sales,dev_base_url,200,MATCHED,All variables have matching seed data | Uses pagination/filtering parameters
+Get Recent Sales - Dev (Error: Negative day_range),Stamps Endpoints,GET,{{dev_base_url}}/api/internal/stamp-recent-sales,dev_base_url,200,MATCHED,All variables have matching seed data | Uses pagination/filtering parameters
+Get Recent Sales - Dev (Performance Test),Stamps Endpoints,GET,{{dev_base_url}}/api/internal/stamp-recent-sales,dev_base_url,200,MATCHED,All variables have matching seed data | Uses pagination/filtering parameters
+Get Recent Sales - Prod (Performance Test),Stamps Endpoints,GET,{{prod_base_url}}/api/internal/stamp-recent-sales,prod_base_url,200,MATCHED,All variables have matching seed data | Uses pagination/filtering parameters
+Get Recent Sales - Dev vs Prod Comparison,Stamps Endpoints,GET,{{dev_base_url}}/api/internal/stamp-recent-sales,dev_base_url,unknown,MATCHED,All variables have matching seed data | Uses pagination/filtering parameters
+Get Recent Sales - Prod vs Dev Comparison,Stamps Endpoints,GET,{{prod_base_url}}/api/internal/stamp-recent-sales,prod_base_url,unknown,MATCHED,All variables have matching seed data | Uses pagination/filtering parameters
+Get Recent Sales - Dev (Schema Validation),Stamps Endpoints,GET,{{dev_base_url}}/api/internal/stamp-recent-sales,dev_base_url,unknown,MATCHED,All variables have matching seed data | Uses pagination/filtering parameters
+Health Check - Dev,System Endpoints,GET,{{dev_base_url}}/api/v2/health,dev_base_url,200,MATCHED,All variables have matching seed data
+Health Check - Prod,System Endpoints,GET,{{prod_base_url}}/api/v2/health,prod_base_url,200,MATCHED,All variables have matching seed data
+Version - Dev,System Endpoints,GET,{{dev_base_url}}/api/v2/version,dev_base_url,200,MATCHED,All variables have matching seed data
+Version - Prod,System Endpoints,GET,{{prod_base_url}}/api/v2/version,prod_base_url,200,MATCHED,All variables have matching seed data
+Get SRC20 Balance Snapshot - Dev,System Endpoints,GET,{{dev_base_url}}/api/v2/src20/balance/snapshot/{{test_tick}},"dev_base_url, test_tick",200,MATCHED,All variables have matching seed data
+Get SRC20 Balance Snapshot - Prod,System Endpoints,GET,{{prod_base_url}}/api/v2/src20/balance/snapshot/{{test_tick}},"prod_base_url, test_tick",200,MATCHED,All variables have matching seed data
+Get SRC20 Block Tick - Dev,System Endpoints,GET,{{dev_base_url}}/api/v2/src20/block/{{test_block}}/{{test_tick}},"dev_base_url, test_block, test_tick",200,MATCHED,All variables have matching seed data
+Get SRC20 Block Tick - Prod,System Endpoints,GET,{{prod_base_url}}/api/v2/src20/block/{{test_block}}/{{test_tick}},"prod_base_url, test_block, test_tick",200,MATCHED,All variables have matching seed data
+Get SRC-101 Transaction - Dev,SRC-101 Endpoints,GET,{{dev_base_url}}/api/v2/src101/tx/{{test_tx_hash}},"dev_base_url, test_tx_hash",200,MATCHED,All variables have matching seed data | SRC-101 endpoint
+Get SRC-101 Transaction - Prod,SRC-101 Endpoints,GET,{{prod_base_url}}/api/v2/src101/tx/{{test_tx_hash}},"prod_base_url, test_tx_hash",200,MATCHED,All variables have matching seed data | SRC-101 endpoint
+Get SRC-101 Deploy Details - Dev,SRC-101 Endpoints,GET,{{dev_base_url}}/api/v2/src101/{{test_deploy_hash}}/deploy,"dev_base_url, test_deploy_hash",200,MATCHED,All variables have matching seed data | SRC-101 endpoint
+Get SRC-101 Deploy Details - Prod,SRC-101 Endpoints,GET,{{prod_base_url}}/api/v2/src101/{{test_deploy_hash}}/deploy,"prod_base_url, test_deploy_hash",200,MATCHED,All variables have matching seed data | SRC-101 endpoint
+Get SRC-101 from Owners - Dev,SRC-101 Endpoints,GET,{{dev_base_url}}/api/v2/src101/{{test_deploy_hash}},"dev_base_url, test_deploy_hash",200,MATCHED,All variables have matching seed data | SRC-101 endpoint
+Get SRC-101 from Owners - Prod,SRC-101 Endpoints,GET,{{prod_base_url}}/api/v2/src101/{{test_deploy_hash}},"prod_base_url, test_deploy_hash",200,MATCHED,All variables have matching seed data | SRC-101 endpoint
+Get SRC-101 Total Supply - Dev,SRC-101 Endpoints,GET,{{dev_base_url}}/api/v2/src101/{{test_deploy_hash}}/total,"dev_base_url, test_deploy_hash",200,MATCHED,All variables have matching seed data | SRC-101 endpoint
+Get SRC-101 Total Supply - Prod,SRC-101 Endpoints,GET,{{prod_base_url}}/api/v2/src101/{{test_deploy_hash}}/total,"prod_base_url, test_deploy_hash",200,MATCHED,All variables have matching seed data | SRC-101 endpoint
+Get SRC-101 by Address - Dev,SRC-101 Endpoints,GET,{{dev_base_url}}/api/v2/src101/{{test_deploy_hash}}/address/{{test_address}},"dev_base_url, test_address, test_deploy_hash",200,MATCHED,All variables have matching seed data | SRC-101 endpoint
+Get SRC-101 by Address - Prod,SRC-101 Endpoints,GET,{{prod_base_url}}/api/v2/src101/{{test_deploy_hash}}/address/{{test_address}},"prod_base_url, test_address, test_deploy_hash",200,MATCHED,All variables have matching seed data | SRC-101 endpoint
+Get SRC-101 Balance - Dev,SRC-101 Endpoints,GET,{{dev_base_url}}/api/v2/src101/balance/{{test_address}},"dev_base_url, test_address",200,MATCHED,All variables have matching seed data | SRC-101 endpoint
+Get SRC-101 Balance - Prod,SRC-101 Endpoints,GET,{{prod_base_url}}/api/v2/src101/balance/{{test_address}},"prod_base_url, test_address",200,MATCHED,All variables have matching seed data | SRC-101 endpoint
+Get SRC-101 Token Info - Dev,SRC-101 Endpoints,GET,{{dev_base_url}}/api/v2/src101/{{test_deploy_hash}}/{{test_tokenid}},"dev_base_url, test_deploy_hash, test_tokenid",200,MATCHED,All variables have matching seed data | SRC-101 endpoint
+Get SRC-101 Token Info - Prod,SRC-101 Endpoints,GET,{{prod_base_url}}/api/v2/src101/{{test_deploy_hash}}/{{test_tokenid}},"prod_base_url, test_deploy_hash, test_tokenid",200,MATCHED,All variables have matching seed data | SRC-101 endpoint
+Get SRC-101 by Index - Dev,SRC-101 Endpoints,GET,{{dev_base_url}}/api/v2/src101/index/{{test_deploy_hash}}/{{test_index}},"dev_base_url, test_deploy_hash, test_index",200,MATCHED,All variables have matching seed data | SRC-101 endpoint
+Get SRC-101 by Index - Prod,SRC-101 Endpoints,GET,{{prod_base_url}}/api/v2/src101/index/{{test_deploy_hash}}/{{test_index}},"prod_base_url, test_deploy_hash, test_index",200,MATCHED,All variables have matching seed data | SRC-101 endpoint
+Create SRC20 Token - Dev,POST Endpoints,POST,{{dev_base_url}}/api/v2/src20/create,"dev_base_url, test_address",200/400,MATCHED,All variables have matching seed data | ⚠️  Accepts both 200 and 400 status codes
+Create SRC20 Token - Prod,POST Endpoints,POST,{{prod_base_url}}/api/v2/src20/create,"prod_base_url, test_address",200/400,MATCHED,All variables have matching seed data | ⚠️  Accepts both 200 and 400 status codes
+Attach Stamp - Dev,POST Endpoints,POST,{{dev_base_url}}/api/v2/trx/stampattach,"dev_base_url, test_address, test_stamp_id",200/400,MATCHED,All variables have matching seed data | ⚠️  Accepts both 200 and 400 status codes
+Attach Stamp - Prod,POST Endpoints,POST,{{prod_base_url}}/api/v2/trx/stampattach,"prod_base_url, test_address, test_stamp_id",200/400,MATCHED,All variables have matching seed data | ⚠️  Accepts both 200 and 400 status codes
+Mint Stamp - Dev,POST Endpoints,POST,{{dev_base_url}}/api/v2/olga/mint,"dev_base_url, test_address",200/400,MATCHED,All variables have matching seed data | ⚠️  Accepts both 200 and 400 status codes
+Mint Stamp - Prod,POST Endpoints,POST,{{prod_base_url}}/api/v2/olga/mint,"prod_base_url, test_address",200/400,MATCHED,All variables have matching seed data | ⚠️  Accepts both 200 and 400 status codes
+Detach Stamp - No Assets (Dev),POST Endpoints,POST,{{dev_base_url}}/api/v2/trx/stampdetach,dev_base_url,400,MATCHED,All variables have matching seed data
+Detach Stamp - Insufficient Funds (Dev),POST Endpoints,POST,{{dev_base_url}}/api/v2/trx/stampdetach,dev_base_url,400,MATCHED,All variables have matching seed data
+Detach Stamp - No Assets (Prod),POST Endpoints,POST,{{prod_base_url}}/api/v2/trx/stampdetach,prod_base_url,400,MATCHED,All variables have matching seed data
+Detach Stamp - Insufficient Funds (Prod),POST Endpoints,POST,{{prod_base_url}}/api/v2/trx/stampdetach,prod_base_url,400,MATCHED,All variables have matching seed data
+Get API Documentation - Dev,System Endpoints,GET,{{dev_base_url}}/api/v2/docs,dev_base_url,200,MATCHED,All variables have matching seed data
+Get API Documentation - Prod,System Endpoints,GET,{{prod_base_url}}/api/v2/docs,prod_base_url,200,MATCHED,All variables have matching seed data
+Test Error Endpoint - Dev,System Endpoints,GET,{{dev_base_url}}/api/v2/error,dev_base_url,400,MATCHED,All variables have matching seed data
+Test Error Endpoint - Prod,System Endpoints,GET,{{prod_base_url}}/api/v2/error,prod_base_url,400,MATCHED,All variables have matching seed data
