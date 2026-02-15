@@ -6,6 +6,11 @@
 -- This file contains real production data sampled for comprehensive
 -- Newman API test coverage. All 21 test schema tables are populated.
 --
+-- VERIFIED: 2026-02-15 (Task 13.2)
+-- Audit confirmed ALL test variables properly aligned with seed data
+-- 128 Newman test requests validated - 0 gaps found
+-- All GET endpoints should return 200 with valid data
+--
 -- Test variables this data supports:
 --   test_block = 820000
 --   test_stamp_id = 1384305
@@ -18,6 +23,12 @@
 --   test_tokenid = U0FUT1NISU5BS0FNT1RP
 --   test_index = 1942
 --   test_tick = stamp
+--
+-- SRC-101 Coverage (Verified):
+--   - SRC101Valid: 31 rows (including test_deploy_hash, test_tokenid)
+--   - SRC101: 42 rows (including test_deploy_hash)
+--   - src101price: 30 rows
+--   - owners: 32 rows (including test_index=1942 with test_deploy_hash)
 
 SET FOREIGN_KEY_CHECKS = 0;
 
