@@ -1,0 +1,1142 @@
+{
+  "info": {
+    "name": "BTC Stamps Explorer API - Schema Contract Tests",
+    "description": "Contract tests for 20 high-traffic GET endpoints validating response schemas to catch breaking API changes in CI.\n\nEndpoints Covered:\n1. GET /api/v2/stamps - Paginated stamps list\n2. GET /api/v2/stamps/{id} - Single stamp detail (nested data.stamp)\n3. GET /api/v2/stamps/balance/{address} - Stamp balances by address\n4. GET /api/v2/stamps/block/{block_index} - Stamps by block\n5. GET /api/v2/stamps/search - Stamp search\n6. GET /api/v2/stamps/ident/{ident} - Stamps by ident\n7. GET /api/v2/src20 - Paginated SRC-20 transactions\n8. GET /api/v2/src20/balance/{address} - SRC-20 balances by address\n9. GET /api/v2/src20/balance/{address}/{tick} - Single SRC-20 balance (nested data object)\n10. GET /api/v2/src20/tick/{tick} - Tick data\n11. GET /api/v2/src20/tick/{tick}/deploy - Tick deployment info (nested data object)\n12. GET /api/v2/src20/tx/{tx_hash} - SRC-20 transaction detail (nested data object)\n13. GET /api/v2/src20/block/{block_index} - SRC-20 by block\n14. GET /api/v2/block/{block_index} - Block info (nested data.block_info)\n15. GET /api/v2/balance/{address} - Combined balance\n16. GET /api/v2/collections - Collections list\n17. GET /api/v2/collections/{id} - Collection detail\n18. GET /api/v2/src101 - SRC-101 tokens\n19. GET /api/v2/src101/balance/{address} - SRC-101 balances\n20. GET /api/v2/src101/tx - SRC-101 transactions\n\nEach test validates:\n- Required top-level fields (data, page, limit, totalPages for paginated)\n- First item required properties (for list endpoints when data non-empty)\n- Field types match OpenAPI schema\n- Breaking changes detection",
+    "_postman_id": "schema-contract-tests-v1",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "variable": [
+    {
+      "key": "test_stamp_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "test_address",
+      "value": "bc1qay74nc2djs2g5acqp72eyvlqp3ku7sj97jft8y",
+      "type": "string"
+    },
+    {
+      "key": "test_src20_tick",
+      "value": "STAMP",
+      "type": "string"
+    },
+    {
+      "key": "test_block",
+      "value": "779652",
+      "type": "string"
+    },
+    {
+      "key": "test_tx_hash",
+      "value": "f353823cdc63ee24fe2167ca14d3bb9b6a54dd063b53382c0cd42f05d7262808",
+      "type": "string"
+    },
+    {
+      "key": "test_collection_id",
+      "value": "00000000-0000-0000-0000-000000000001",
+      "type": "string"
+    },
+    {
+      "key": "test_deploy_hash",
+      "value": "77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Paginated List Endpoints",
+      "description": "Tests for endpoints returning paginated lists with data arrays",
+      "item": [
+        {
+          "name": "GET /api/v2/stamps - Schema Contract",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Response is valid JSON', () => pm.response.to.be.json);",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "// CONTRACT: Paginated response must have pagination fields",
+                  "pm.test('CONTRACT: Has required pagination fields', () => {",
+                  "    pm.expect(response).to.have.property('data');",
+                  "    pm.expect(response).to.have.property('page');",
+                  "    pm.expect(response).to.have.property('limit');",
+                  "    pm.expect(response).to.have.property('totalPages');",
+                  "    pm.expect(response).to.have.property('total');",
+                  "});",
+                  "",
+                  "// CONTRACT: Pagination fields must be numbers",
+                  "pm.test('CONTRACT: Pagination fields are numbers', () => {",
+                  "    pm.expect(response.page).to.be.a('number');",
+                  "    pm.expect(response.limit).to.be.a('number');",
+                  "    pm.expect(response.totalPages).to.be.a('number');",
+                  "    pm.expect(response.total).to.be.a('number');",
+                  "});",
+                  "",
+                  "// CONTRACT: Data must be array",
+                  "pm.test('CONTRACT: data is array', () => {",
+                  "    pm.expect(response.data).to.be.an('array');",
+                  "});",
+                  "",
+                  "// CONTRACT: last_block must be number",
+                  "pm.test('CONTRACT: last_block is number', () => {",
+                  "    pm.expect(response).to.have.property('last_block');",
+                  "    pm.expect(response.last_block).to.be.a('number');",
+                  "});",
+                  "",
+                  "// CONTRACT: First item required fields (when data non-empty)",
+                  "pm.test('CONTRACT: First item has required stamp fields', () => {",
+                  "    if (response.data.length > 0) {",
+                  "        const stamp = response.data[0];",
+                  "        pm.expect(stamp).to.have.property('stamp');",
+                  "        pm.expect(stamp).to.have.property('tx_hash');",
+                  "        pm.expect(stamp.stamp).to.be.a('number');",
+                  "        pm.expect(stamp.tx_hash).to.be.a('string');",
+                  "    } else {",
+                  "        pm.test.skip();",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/stamps?limit=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "stamps"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /api/v2/stamps/balance/{address} - Schema Contract",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test('CONTRACT: Has required pagination fields', () => {",
+                  "    pm.expect(response).to.have.property('data');",
+                  "    pm.expect(response).to.have.property('page');",
+                  "    pm.expect(response).to.have.property('limit');",
+                  "    pm.expect(response).to.have.property('totalPages');",
+                  "});",
+                  "",
+                  "pm.test('CONTRACT: data is array', () => {",
+                  "    pm.expect(response.data).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('CONTRACT: last_block is number', () => {",
+                  "    pm.expect(response.last_block).to.be.a('number');",
+                  "});",
+                  "",
+                  "pm.test('CONTRACT: First balance has required fields', () => {",
+                  "    if (response.data.length > 0) {",
+                  "        const balance = response.data[0];",
+                  "        pm.expect(balance).to.have.property('cpid');",
+                  "        pm.expect(balance).to.have.property('stamp');",
+                  "        pm.expect(balance.cpid).to.be.a('string');",
+                  "        pm.expect(balance.stamp).to.be.a('number');",
+                  "    } else {",
+                  "        pm.test.skip();",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/stamps/balance/{{test_address}}?limit=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "stamps",
+                "balance",
+                "{{test_address}}"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /api/v2/stamps/block/{block_index} - Schema Contract",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test('CONTRACT: Has data array', () => {",
+                  "    pm.expect(response).to.have.property('data');",
+                  "    pm.expect(response.data).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('CONTRACT: Has block_info', () => {",
+                  "    pm.expect(response).to.have.property('block_info');",
+                  "    pm.expect(response.block_info).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test('CONTRACT: last_block is number', () => {",
+                  "    pm.expect(response.last_block).to.be.a('number');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/stamps/block/{{test_block}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "stamps",
+                "block",
+                "{{test_block}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /api/v2/stamps/search - Schema Contract",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test('CONTRACT: Has data array', () => {",
+                  "    pm.expect(response).to.have.property('data');",
+                  "    pm.expect(response.data).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/stamps/search?query=STAMP&limit=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "stamps",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "query",
+                  "value": "STAMP"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /api/v2/stamps/ident/{ident} - Schema Contract",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test('CONTRACT: Has page, limit, last_block', () => {",
+                  "    pm.expect(response).to.have.property('page');",
+                  "    pm.expect(response).to.have.property('limit');",
+                  "    pm.expect(response).to.have.property('last_block');",
+                  "});",
+                  "",
+                  "pm.test('CONTRACT: Has ident field', () => {",
+                  "    pm.expect(response).to.have.property('ident');",
+                  "    pm.expect(response.ident).to.be.a('string');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/stamps/ident/STAMP?limit=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "stamps",
+                "ident",
+                "STAMP"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /api/v2/src20 - Schema Contract",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test('CONTRACT: Has required pagination fields', () => {",
+                  "    pm.expect(response).to.have.property('data');",
+                  "    pm.expect(response).to.have.property('page');",
+                  "    pm.expect(response).to.have.property('limit');",
+                  "    pm.expect(response).to.have.property('totalPages');",
+                  "});",
+                  "",
+                  "pm.test('CONTRACT: data is array', () => {",
+                  "    pm.expect(response.data).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('CONTRACT: last_block is number', () => {",
+                  "    pm.expect(response.last_block).to.be.a('number');",
+                  "});",
+                  "",
+                  "pm.test('CONTRACT: First SRC20 tx has required fields', () => {",
+                  "    if (response.data.length > 0) {",
+                  "        const tx = response.data[0];",
+                  "        pm.expect(tx).to.have.property('tx_hash');",
+                  "        pm.expect(tx).to.have.property('tick');",
+                  "        pm.expect(tx.tx_hash).to.be.a('string');",
+                  "        pm.expect(tx.tick).to.be.a('string');",
+                  "    } else {",
+                  "        pm.test.skip();",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/src20?limit=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src20"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /api/v2/src20/balance/{address} - Schema Contract",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test('CONTRACT: Has data array', () => {",
+                  "    pm.expect(response).to.have.property('data');",
+                  "    pm.expect(response.data).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('CONTRACT: last_block is number', () => {",
+                  "    pm.expect(response.last_block).to.be.a('number');",
+                  "});",
+                  "",
+                  "pm.test('CONTRACT: First balance has required fields', () => {",
+                  "    if (response.data.length > 0) {",
+                  "        const balance = response.data[0];",
+                  "        pm.expect(balance).to.have.property('tick');",
+                  "        pm.expect(balance).to.have.property('amt');",
+                  "        pm.expect(balance.tick).to.be.a('string');",
+                  "        pm.expect(balance.amt).to.be.a('string');",
+                  "    } else {",
+                  "        pm.test.skip();",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/src20/balance/{{test_address}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src20",
+                "balance",
+                "{{test_address}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /api/v2/src20/tick/{tick} - Schema Contract",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test('CONTRACT: Has required pagination fields', () => {",
+                  "    pm.expect(response).to.have.property('data');",
+                  "    pm.expect(response).to.have.property('page');",
+                  "    pm.expect(response).to.have.property('limit');",
+                  "    pm.expect(response).to.have.property('totalPages');",
+                  "});",
+                  "",
+                  "pm.test('CONTRACT: data is array', () => {",
+                  "    pm.expect(response.data).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('CONTRACT: Has mint_status', () => {",
+                  "    pm.expect(response).to.have.property('mint_status');",
+                  "    pm.expect(response.mint_status).to.be.an('object');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/src20/tick/{{test_src20_tick}}?limit=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src20",
+                "tick",
+                "{{test_src20_tick}}"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /api/v2/src20/block/{block_index} - Schema Contract",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test('CONTRACT: Has required pagination fields', () => {",
+                  "    pm.expect(response).to.have.property('data');",
+                  "    pm.expect(response).to.have.property('page');",
+                  "    pm.expect(response).to.have.property('limit');",
+                  "    pm.expect(response).to.have.property('totalPages');",
+                  "});",
+                  "",
+                  "pm.test('CONTRACT: data is array', () => {",
+                  "    pm.expect(response.data).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('CONTRACT: last_block is number', () => {",
+                  "    pm.expect(response.last_block).to.be.a('number');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/src20/block/{{test_block}}?limit=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src20",
+                "block",
+                "{{test_block}}"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /api/v2/collections - Schema Contract",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test('CONTRACT: Has required pagination fields', () => {",
+                  "    pm.expect(response).to.have.property('data');",
+                  "    pm.expect(response).to.have.property('page');",
+                  "    pm.expect(response).to.have.property('limit');",
+                  "    pm.expect(response).to.have.property('totalPages');",
+                  "    pm.expect(response).to.have.property('total');",
+                  "});",
+                  "",
+                  "pm.test('CONTRACT: data is array', () => {",
+                  "    pm.expect(response.data).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('CONTRACT: last_block is number', () => {",
+                  "    pm.expect(response.last_block).to.be.a('number');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/collections?limit=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "collections"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /api/v2/src101 - Schema Contract",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test('CONTRACT: Has required pagination fields', () => {",
+                  "    pm.expect(response).to.have.property('data');",
+                  "    pm.expect(response).to.have.property('page');",
+                  "    pm.expect(response).to.have.property('limit');",
+                  "    pm.expect(response).to.have.property('totalPages');",
+                  "});",
+                  "",
+                  "pm.test('CONTRACT: data is array', () => {",
+                  "    pm.expect(response.data).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('CONTRACT: last_block is number', () => {",
+                  "    pm.expect(response.last_block).to.be.a('number');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/src101?limit=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src101"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /api/v2/src101/balance/{address} - Schema Contract",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test('CONTRACT: Has data array', () => {",
+                  "    pm.expect(response).to.have.property('data');",
+                  "    pm.expect(response.data).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('CONTRACT: last_block is number', () => {",
+                  "    pm.expect(response.last_block).to.be.a('number');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/src101/balance/{{test_address}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src101",
+                "balance",
+                "{{test_address}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /api/v2/src101/tx - Schema Contract",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test('CONTRACT: Has required pagination fields', () => {",
+                  "    pm.expect(response).to.have.property('data');",
+                  "    pm.expect(response).to.have.property('page');",
+                  "    pm.expect(response).to.have.property('limit');",
+                  "    pm.expect(response).to.have.property('totalPages');",
+                  "});",
+                  "",
+                  "pm.test('CONTRACT: data is array', () => {",
+                  "    pm.expect(response.data).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('CONTRACT: last_block is number', () => {",
+                  "    pm.expect(response.last_block).to.be.a('number');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/src101/tx?limit=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src101",
+                "tx"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Single Object Endpoints",
+      "description": "Tests for endpoints returning single objects (not paginated)",
+      "item": [
+        {
+          "name": "GET /api/v2/stamps/{id} - Schema Contract",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test('CONTRACT: Has data object (not array)', () => {",
+                  "    pm.expect(response).to.have.property('data');",
+                  "    pm.expect(response.data).to.be.an('object');",
+                  "    pm.expect(Array.isArray(response.data)).to.be.false;",
+                  "});",
+                  "",
+                  "pm.test('CONTRACT: NO pagination fields', () => {",
+                  "    pm.expect(response).to.not.have.property('page');",
+                  "    pm.expect(response).to.not.have.property('limit');",
+                  "    pm.expect(response).to.not.have.property('totalPages');",
+                  "});",
+                  "",
+                  "pm.test('CONTRACT: Nested stamp has required fields', () => {",
+                  "    pm.expect(response.data).to.have.property('stamp');",
+                  "    const stamp = response.data.stamp;",
+                  "    pm.expect(stamp).to.have.property('stamp');",
+                  "    pm.expect(stamp).to.have.property('tx_hash');",
+                  "    pm.expect(stamp.stamp).to.be.a('number');",
+                  "    pm.expect(stamp.tx_hash).to.be.a('string');",
+                  "});",
+                  "",
+                  "pm.test('CONTRACT: last_block is number', () => {",
+                  "    pm.expect(response.last_block).to.be.a('number');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/stamps/{{test_stamp_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "stamps",
+                "{{test_stamp_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /api/v2/src20/balance/{address}/{tick} - Schema Contract",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test('CONTRACT: Has data object (not array)', () => {",
+                  "    pm.expect(response).to.have.property('data');",
+                  "    pm.expect(response.data).to.be.an('object');",
+                  "    pm.expect(Array.isArray(response.data)).to.be.false;",
+                  "});",
+                  "",
+                  "pm.test('CONTRACT: NO pagination fields', () => {",
+                  "    pm.expect(response).to.not.have.property('page');",
+                  "    pm.expect(response).to.not.have.property('limit');",
+                  "    pm.expect(response).to.not.have.property('totalPages');",
+                  "});",
+                  "",
+                  "pm.test('CONTRACT: Balance has required fields', () => {",
+                  "    pm.expect(response.data).to.have.property('tick');",
+                  "    pm.expect(response.data).to.have.property('amt');",
+                  "    pm.expect(response.data).to.have.property('address');",
+                  "});",
+                  "",
+                  "pm.test('CONTRACT: last_block is number', () => {",
+                  "    pm.expect(response.last_block).to.be.a('number');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/src20/balance/{{test_address}}/{{test_src20_tick}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src20",
+                "balance",
+                "{{test_address}}",
+                "{{test_src20_tick}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /api/v2/src20/tick/{tick}/deploy - Schema Contract",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test('CONTRACT: Has data object', () => {",
+                  "    pm.expect(response).to.have.property('data');",
+                  "    pm.expect(response.data).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test('CONTRACT: Deploy has required fields', () => {",
+                  "    pm.expect(response.data).to.have.property('tick');",
+                  "    pm.expect(response.data).to.have.property('max');",
+                  "    pm.expect(response.data).to.have.property('lim');",
+                  "    pm.expect(response.data.tick).to.be.a('string');",
+                  "    pm.expect(response.data.max).to.be.a('string');",
+                  "    pm.expect(response.data.lim).to.be.a('string');",
+                  "});",
+                  "",
+                  "pm.test('CONTRACT: last_block is number', () => {",
+                  "    pm.expect(response.last_block).to.be.a('number');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/src20/tick/{{test_src20_tick}}/deploy",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src20",
+                "tick",
+                "{{test_src20_tick}}",
+                "deploy"
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /api/v2/src20/tx/{tx_hash} - Schema Contract",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test('CONTRACT: Has data object', () => {",
+                  "    pm.expect(response).to.have.property('data');",
+                  "    pm.expect(response.data).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test('CONTRACT: Transaction has required fields', () => {",
+                  "    pm.expect(response.data).to.have.property('tx_hash');",
+                  "    pm.expect(response.data).to.have.property('tick');",
+                  "    pm.expect(response.data.tx_hash).to.be.a('string');",
+                  "    pm.expect(response.data.tick).to.be.a('string');",
+                  "});",
+                  "",
+                  "pm.test('CONTRACT: last_block is number', () => {",
+                  "    pm.expect(response.last_block).to.be.a('number');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/src20/tx/{{test_tx_hash}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src20",
+                "tx",
+                "{{test_tx_hash}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /api/v2/block/{block_index} - Schema Contract",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test('CONTRACT: Has data object', () => {",
+                  "    pm.expect(response).to.have.property('data');",
+                  "    pm.expect(response.data).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test('CONTRACT: Has last_block in nested data', () => {",
+                  "    pm.expect(response.data).to.have.property('last_block');",
+                  "    pm.expect(response.data.last_block).to.be.a('number');",
+                  "});",
+                  "",
+                  "pm.test('CONTRACT: Block has required fields', () => {",
+                  "    pm.expect(response.data).to.have.property('block_info');",
+                  "    pm.expect(response.data.block_info).to.have.property('block_index');",
+                  "    pm.expect(response.data.block_info.block_index).to.be.a('number');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/block/{{test_block}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "block",
+                "{{test_block}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /api/v2/balance/{address} - Schema Contract",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test('CONTRACT: Has required pagination fields', () => {",
+                  "    pm.expect(response).to.have.property('data');",
+                  "    pm.expect(response).to.have.property('page');",
+                  "    pm.expect(response).to.have.property('limit');",
+                  "    pm.expect(response).to.have.property('totalPages');",
+                  "});",
+                  "",
+                  "pm.test('CONTRACT: data is object with stamps and src20', () => {",
+                  "    pm.expect(response.data).to.be.an('object');",
+                  "    pm.expect(response.data).to.have.property('stamps');",
+                  "    pm.expect(response.data).to.have.property('src20');",
+                  "    pm.expect(response.data.stamps).to.be.an('array');",
+                  "    pm.expect(response.data.src20).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('CONTRACT: Has btc info', () => {",
+                  "    pm.expect(response).to.have.property('btc');",
+                  "    pm.expect(response.btc).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test('CONTRACT: last_block is number', () => {",
+                  "    pm.expect(response.last_block).to.be.a('number');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/balance/{{test_address}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "balance",
+                "{{test_address}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /api/v2/collections/{id} - Schema Contract",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200 or 404', () => {",
+                  "    pm.expect([200, 404]).to.include(pm.response.code);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    ",
+                  "    pm.test('CONTRACT: Has data object', () => {",
+                  "        pm.expect(response).to.have.property('data');",
+                  "        pm.expect(response.data).to.be.an('object');",
+                  "    });",
+                  "    ",
+                  "    pm.test('CONTRACT: Collection has required fields', () => {",
+                  "        pm.expect(response.data).to.have.property('id');",
+                  "        pm.expect(response.data).to.have.property('name');",
+                  "        pm.expect(response.data.id).to.be.a('string');",
+                  "        pm.expect(response.data.name).to.be.a('string');",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/collections/{{test_collection_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "collections",
+                "{{test_collection_id}}"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

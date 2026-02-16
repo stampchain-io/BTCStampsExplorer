@@ -358,6 +358,73 @@ jobs:
               });
             }
 
+      - name: Create regression issue (scheduled runs only)
+        if: github.event_name == 'schedule' && steps.newman-test.outcome == 'failure'
+        uses: actions/github-script@v8
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const today = new Date().toISOString().split('T')[0];
+
+            // Check for existing open regression issue to avoid duplicates
+            const { data: existingIssues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'api-regression',
+              state: 'open',
+            });
+
+            if (existingIssues.length > 0) {
+              // Add comment to existing issue instead of creating a new one
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existingIssues[0].number,
+                body: `### Regression still present (${today})\n\nScheduled Newman tests failed again.\n\n**Run**: ${runUrl}\n**Artifacts**: Check the run for detailed reports.`,
+              });
+              console.log(`Updated existing regression issue #${existingIssues[0].number}`);
+              return;
+            }
+
+            // Build issue body with analysis details if available
+            let analysisDetails = '';
+            try {
+              const analysisFiles = fs.readdirSync('reports/newman-comprehensive/')
+                .filter(f => f.endsWith('-analysis.json'))
+                .sort((a, b) => b.localeCompare(a));
+
+              if (analysisFiles.length > 0) {
+                const analysis = JSON.parse(
+                  fs.readFileSync(`reports/newman-comprehensive/${analysisFiles[0]}`, 'utf8')
+                );
+                const summary = analysis.summary;
+                analysisDetails = `\n### Regression Analysis\n- Breaking Changes: ${summary.breaking}\n- Non-Breaking Changes: ${summary.nonBreaking}\n- Performance Issues: ${summary.performanceIssues}\n`;
+
+                if (analysis.regressions?.breaking?.length > 0) {
+                  analysisDetails += '\n### Breaking Changes\n';
+                  analysis.regressions.breaking.slice(0, 10).forEach(bc => {
+                    analysisDetails += `- **${bc.request}**: ${bc.assertion}\n  - Error: \`${bc.error}\`\n`;
+                  });
+                  if (analysis.regressions.breaking.length > 10) {
+                    analysisDetails += `\n... and ${analysis.regressions.breaking.length - 10} more\n`;
+                  }
+                }
+              }
+            } catch (e) {
+              console.log('Could not parse analysis report:', e.message);
+            }
+
+            // Create new regression issue
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `API Regression Detected - ${today}`,
+              body: `## Scheduled Newman Test Failure\n\nThe daily scheduled Newman API tests detected failures against production (stampchain.io).\n\n**Run**: ${runUrl}\n**Date**: ${today}\n**Trigger**: Scheduled (daily 2 AM UTC)\n${analysisDetails}\n### Next Steps\n1. Check the [workflow run](${runUrl}) for detailed test results\n2. Download the Newman report artifact for full failure details\n3. Investigate and fix the regression\n4. Close this issue when resolved\n\n---\n*Auto-created by scheduled API regression monitoring*`,
+              labels: ['api-regression', 'bug', 'automated'],
+            });
+
       - name: Summarize results
         if: always()
         run: |
@@ -378,9 +445,14 @@ jobs:
             echo "✅ Regression analysis completed"
           fi
 
-          # This workflow is informational (scheduled monitoring only)
-          # Results are in step summary and uploaded artifacts
           echo "✅ Monitoring run complete"
+
+      - name: Fail on scheduled regression
+        if: github.event_name == 'schedule' && steps.newman-test.outcome == 'failure'
+        run: |
+          echo "❌ Scheduled production validation detected API regressions"
+          echo "   A GitHub issue has been created with details."
+          exit 1
 
   pagination-validation:
     name: Pagination & Data Validation Tests
@@ -710,6 +782,7 @@ jobs:
             --env-var test_cpid=A888354448084788958 \
             --env-var test_address=bc1qkqqre5xuqk60xtt93j297zgg7t6x0ul7gwjmv4 \
             --env-var test_tx_hash=e94be2793462692ca8fea3a54dd90ff4b18735196a2bc426382c11959533c8ca \
+            --env-var test_src20_tx_hash=f353823cdc63ee24fe2167ca14d3bb9b6a54dd063b53382c0cd42f05d7262808 \
             --env-var test_src20_tick=stamp \
             --env-var test_cursed_id=-1832 \
             --env-var test_deploy_hash=77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed \
@@ -862,3 +935,196 @@ jobs:
           fi
 
           echo "✅ Local dev test run complete"
+
+  schema-contract-tests:
+    name: Schema Contract Tests (20 High-Traffic Endpoints)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+
+      - name: Verify schema contract test collection exists
+        run: |
+          echo "Verifying schema-contract-tests.json exists..."
+          if [ ! -f "tests/postman/collections/schema-contract-tests.json" ]; then
+            echo "❌ Error: schema-contract-tests.json not found"
+            exit 1
+          fi
+          echo "✅ Schema contract test collection found"
+
+      - name: Run schema contract tests against production
+        id: schema-contract-test
+        run: |
+          echo "## Schema Contract Tests" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Test Configuration" >> $GITHUB_STEP_SUMMARY
+          echo "- Collection: schema-contract-tests.json" >> $GITHUB_STEP_SUMMARY
+          echo "- Endpoints: 20 high-traffic GET endpoints" >> $GITHUB_STEP_SUMMARY
+          echo "- Target: Production (https://stampchain.io)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Run schema contract tests against production
+          DEV_BASE_URL=https://stampchain.io \
+          PROD_BASE_URL=https://stampchain.io \
+          NEWMAN_COLLECTION=tests/postman/collections/schema-contract-tests.json \
+          NEWMAN_REPORTERS=cli,json \
+          docker compose -f docker-compose.test.yml run --rm newman
+        continue-on-error: false
+
+      - name: Fix Docker file permissions
+        if: always()
+        run: sudo chown -R $(id -u):$(id -g) . || true
+
+      - name: Parse test results
+        if: always()
+        id: parse-results
+        run: |
+          echo "Parsing Newman JSON results..."
+
+          # Find the most recent newman JSON report
+          LATEST_REPORT=$(find reports/newman -name "*.json" -type f -printf '%T+ %p\n' | sort -r | head -n 1 | cut -d' ' -f2-)
+
+          if [ -z "$LATEST_REPORT" ]; then
+            echo "⚠️ No JSON report found"
+            echo "total_tests=0" >> $GITHUB_OUTPUT
+            echo "passed_tests=0" >> $GITHUB_OUTPUT
+            echo "failed_tests=0" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          echo "Found report: $LATEST_REPORT"
+
+          # Extract test counts using jq
+          TOTAL=$(jq -r '.run.stats.tests.total // 0' "$LATEST_REPORT")
+          PASSED=$(jq -r '.run.stats.tests.passed // 0' "$LATEST_REPORT")
+          FAILED=$(jq -r '.run.stats.tests.failed // 0' "$LATEST_REPORT")
+
+          echo "total_tests=$TOTAL" >> $GITHUB_OUTPUT
+          echo "passed_tests=$PASSED" >> $GITHUB_OUTPUT
+          echo "failed_tests=$FAILED" >> $GITHUB_OUTPUT
+
+          echo "Total tests: $TOTAL"
+          echo "Passed: $PASSED"
+          echo "Failed: $FAILED"
+
+      - name: Upload test results artifact
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: schema-contract-test-results-${{ github.run_number }}
+          path: reports/newman/
+          retention-days: 30
+
+      - name: Comment on PR with results
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const total = '${{ steps.parse-results.outputs.total_tests }}';
+            const passed = '${{ steps.parse-results.outputs.passed_tests }}';
+            const failed = '${{ steps.parse-results.outputs.failed_tests }}';
+
+            const status = failed === '0' ? '✅' : '❌';
+            const comment = `## ${status} Schema Contract Test Results
+
+            **Collection:** schema-contract-tests.json
+            **Endpoints Tested:** 20 high-traffic GET endpoints
+            **Target:** Production (https://stampchain.io)
+
+            ### Results
+            - **Total Tests:** ${total}
+            - **Passed:** ${passed}
+            - **Failed:** ${failed}
+
+            ${failed !== '0' ? '⚠️ **Breaking schema changes detected!** Review failing tests before merging.' : '✅ All schema contract tests passed - no breaking changes detected.'}
+
+            <details>
+            <summary>Endpoints Covered</summary>
+
+            1. GET /api/v2/stamps - Paginated stamps list
+            2. GET /api/v2/stamps/{id} - Single stamp detail
+            3. GET /api/v2/stamps/balance/{address} - Stamp balances
+            4. GET /api/v2/stamps/block/{block_index} - Stamps by block
+            5. GET /api/v2/stamps/search - Stamp search
+            6. GET /api/v2/stamps/ident/{ident} - Stamps by ident
+            7. GET /api/v2/src20 - Paginated SRC-20 transactions
+            8. GET /api/v2/src20/balance/{address} - SRC-20 balances
+            9. GET /api/v2/src20/balance/{address}/{tick} - Single SRC-20 balance
+            10. GET /api/v2/src20/tick/{tick} - Tick data
+            11. GET /api/v2/src20/tick/{tick}/deploy - Tick deployment info
+            12. GET /api/v2/src20/tx/{tx_hash} - SRC-20 transaction detail
+            13. GET /api/v2/src20/block/{block_index} - SRC-20 by block
+            14. GET /api/v2/block/{block_index} - Block info
+            15. GET /api/v2/balance/{address} - Combined balance
+            16. GET /api/v2/collections - Collections list
+            17. GET /api/v2/collections/{id} - Collection detail
+            18. GET /api/v2/src101 - SRC-101 tokens
+            19. GET /api/v2/src101/balance/{address} - SRC-101 balances
+            20. GET /api/v2/src101/tx - SRC-101 transactions
+            </details>
+
+            [View detailed results artifact](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            `;
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.find(comment =>
+              comment.user.type === 'Bot' &&
+              comment.body.includes('Schema Contract Test Results')
+            );
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: comment
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: comment
+              });
+            }
+
+      - name: Summarize results
+        if: always()
+        run: |
+          echo "=== Schema Contract Test Summary ==="
+
+          TOTAL="${{ steps.parse-results.outputs.total_tests }}"
+          PASSED="${{ steps.parse-results.outputs.passed_tests }}"
+          FAILED="${{ steps.parse-results.outputs.failed_tests }}"
+
+          echo "Total tests: $TOTAL"
+          echo "Passed: $PASSED"
+          echo "Failed: $FAILED"
+
+          if [ "$FAILED" == "0" ] && [ "$TOTAL" != "0" ]; then
+            echo "✅ All schema contract tests passed"
+          elif [ "$TOTAL" == "0" ]; then
+            echo "⚠️ No test results found"
+          else
+            echo "❌ $FAILED schema contract tests failed"
+          fi
+
+          echo "✅ Schema contract test run complete"
