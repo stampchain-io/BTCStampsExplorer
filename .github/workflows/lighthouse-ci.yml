@@ -9,7 +9,7 @@ on:
       - 'islands/**'
       - 'components/**'
       - 'static/**'
-      - 'lighthouserc.js'
+      - 'lighthouserc.cjs'
       - '.github/workflows/lighthouse-ci.yml'
   pull_request:
     branches: [main, dev]
@@ -19,7 +19,7 @@ on:
       - 'islands/**'
       - 'components/**'
       - 'static/**'
-      - 'lighthouserc.js'
+      - 'lighthouserc.cjs'
       - '.github/workflows/lighthouse-ci.yml'
   workflow_dispatch:
     # Allow manual triggering for testing
@@ -179,18 +179,18 @@ jobs:
       - name: Run Lighthouse CI - Collect
         run: |
           echo "Collecting Lighthouse metrics (desktop preset, 3 runs per URL)..."
-          lhci collect --config=lighthouserc.js
+          lhci collect --config=lighthouserc.cjs
 
       - name: Run Lighthouse CI - Assert
         run: |
           echo "Asserting performance budgets..."
-          lhci assert --config=lighthouserc.js
+          lhci assert --config=lighthouserc.cjs
 
       - name: Run Lighthouse CI - Upload
         if: always()
         run: |
           echo "Uploading Lighthouse reports..."
-          lhci upload --config=lighthouserc.js || true
+          lhci upload --config=lighthouserc.cjs || true
 
       - name: Upload Lighthouse reports
         if: always()
