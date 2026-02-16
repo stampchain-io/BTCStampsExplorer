@@ -176,12 +176,21 @@ jobs:
           echo ""
           echo "✅ Server is responding correctly"
 
-      - name: Run Lighthouse CI - Desktop
+      - name: Run Lighthouse CI - Collect
         run: |
-          echo "Running Lighthouse CI with desktop preset..."
-          lhci autorun --config=lighthouserc.js
-        env:
-          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+          echo "Collecting Lighthouse metrics (desktop preset, 3 runs per URL)..."
+          lhci collect --config=lighthouserc.js
+
+      - name: Run Lighthouse CI - Assert
+        run: |
+          echo "Asserting performance budgets..."
+          lhci assert --config=lighthouserc.js
+
+      - name: Run Lighthouse CI - Upload
+        if: always()
+        run: |
+          echo "Uploading Lighthouse reports..."
+          lhci upload --config=lighthouserc.js || true
 
       - name: Upload Lighthouse reports
         if: always()
