@@ -40,7 +40,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
@@ -48,15 +47,15 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Start dev server with docker-compose
+      - name: Start dev server with docker compose
         run: |
           echo "Starting development server with docker-compose.dev.yml..."
-          docker-compose -f docker-compose.dev.yml up -d
+          docker compose -f docker-compose.dev.yml up -d
 
           echo "Waiting for services to be healthy..."
-          timeout 180 bash -c 'until docker-compose -f docker-compose.dev.yml ps | grep -q "healthy"; do
+          timeout 180 bash -c 'until docker compose -f docker-compose.dev.yml ps | grep -q "healthy"; do
             echo "Services not ready yet, waiting..."
-            docker-compose -f docker-compose.dev.yml ps
+            docker compose -f docker-compose.dev.yml ps
             sleep 5
           done'
 
@@ -67,7 +66,7 @@ jobs:
           done'
 
           echo "✅ Dev server is ready!"
-          docker-compose -f docker-compose.dev.yml ps
+          docker compose -f docker-compose.dev.yml ps
 
       - name: Verify server is responding
         run: |
@@ -162,20 +161,20 @@ jobs:
         if: failure()
         run: |
           echo "=== Docker Compose Status ==="
-          docker-compose -f docker-compose.dev.yml ps
+          docker compose -f docker-compose.dev.yml ps
           echo ""
           echo "=== MySQL Logs ==="
-          docker-compose -f docker-compose.dev.yml logs mysql | tail -100
+          docker compose -f docker-compose.dev.yml logs mysql | tail -100
           echo ""
           echo "=== Redis Logs ==="
-          docker-compose -f docker-compose.dev.yml logs redis | tail -100
+          docker compose -f docker-compose.dev.yml logs redis | tail -100
           echo ""
           echo "=== Deno App Logs ==="
-          docker-compose -f docker-compose.dev.yml logs deno-app | tail -200
+          docker compose -f docker-compose.dev.yml logs deno-app | tail -200
 
       - name: Cleanup
         if: always()
         run: |
-          echo "Stopping docker-compose services..."
-          docker-compose -f docker-compose.dev.yml down -v
+          echo "Stopping docker compose services..."
+          docker compose -f docker-compose.dev.yml down -v
           echo "✅ Cleanup complete"
