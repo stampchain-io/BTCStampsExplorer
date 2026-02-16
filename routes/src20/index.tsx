@@ -81,10 +81,7 @@ export const handler: Handlers = {
       | "HOLDERS"
       | "PROGRESS"
       | "MARKET_CAP"
-      | "VOLUME"
-      | "PRICE"
-      | "CHANGE"
-      | "TOKEN";
+      | "VOLUME";
     const sortDirection = (url.searchParams.get("sortDirection") || "desc") as
       | "asc"
       | "desc";
@@ -152,9 +149,6 @@ export const handler: Handlers = {
             }
           }
           break;
-        case "TOKEN":
-          apiSortBy = sortDirection === "desc" ? "TICK_DESC" : "TICK_ASC";
-          break;
         case "DEPLOY":
           apiSortBy = sortDirection === "desc" ? "DEPLOY_DESC" : "DEPLOY_ASC";
           break;
@@ -170,28 +164,6 @@ export const handler: Handlers = {
           apiSortBy = sortDirection === "desc"
             ? "MARKET_CAP_DESC"
             : "MARKET_CAP_ASC";
-          break;
-        case "PRICE":
-          apiSortBy = sortDirection === "desc" ? "PRICE_DESC" : "PRICE_ASC";
-          break;
-        case "CHANGE":
-          switch (timeframe) {
-            case "24H":
-              apiSortBy = sortDirection === "desc"
-                ? "CHANGE_24H_DESC"
-                : "CHANGE_24H_ASC";
-              break;
-            case "7D":
-              apiSortBy = sortDirection === "desc"
-                ? "CHANGE_7D_DESC"
-                : "CHANGE_7D_ASC";
-              break;
-            case "30D":
-              apiSortBy = sortDirection === "desc"
-                ? "CHANGE_30D_DESC"
-                : "CHANGE_30D_ASC";
-              break;
-          }
           break;
         case "VOLUME":
           // Volume sorting with timeframe support

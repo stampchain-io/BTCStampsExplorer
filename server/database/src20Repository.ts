@@ -285,22 +285,16 @@ export class SRC20Repository {
         finalOrderBy = `smd.volume_30d_btc ASC`;
         needsMarketData = true;
       } else if (normalizedSortBy === "CHANGE_24H_DESC") {
-        finalOrderBy = `smd.price_change_24h_percent DESC`;
+        finalOrderBy = `smd.change_24h DESC`;
         needsMarketData = true;
       } else if (normalizedSortBy === "CHANGE_24H_ASC") {
-        finalOrderBy = `smd.price_change_24h_percent ASC`;
+        finalOrderBy = `smd.change_24h ASC`;
         needsMarketData = true;
       } else if (normalizedSortBy === "CHANGE_7D_DESC") {
-        finalOrderBy = `smd.price_change_7d_percent DESC`;
+        finalOrderBy = `smd.change_7d DESC`;
         needsMarketData = true;
       } else if (normalizedSortBy === "CHANGE_7D_ASC") {
-        finalOrderBy = `smd.price_change_7d_percent ASC`;
-        needsMarketData = true;
-      } else if (normalizedSortBy === "CHANGE_30D_DESC") {
-        finalOrderBy = `smd.price_change_30d_percent DESC`;
-        needsMarketData = true;
-      } else if (normalizedSortBy === "CHANGE_30D_ASC") {
-        finalOrderBy = `smd.price_change_30d_percent ASC`;
+        finalOrderBy = `smd.change_7d ASC`;
         needsMarketData = true;
 
       // TOKEN METRICS sorting (no additional JOINs needed)
