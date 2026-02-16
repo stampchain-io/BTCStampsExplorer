@@ -1,5 +1,5 @@
 /**
- * Common Object Pools for BTCStampsExplorer
+ * Common Object Pools for stampchain.io
  * Pre-configured pools for frequently used data structures
  */
 

@@ -769,7 +769,7 @@ export class StampController {
         method: 'GET',
         headers: {
           'Accept': '*/*',
-          'User-Agent': 'BTCStampsExplorer-CDN-Proxy'
+          'User-Agent': 'stampchain.io-CDN-Proxy'
         }
       });
 

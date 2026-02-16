@@ -1,6 +1,6 @@
 /**
  * @fileoverview useSortingURL - Custom hook for URL synchronization with sorting state
- * @description Provides URL parameter synchronization following BTCStampsExplorer patterns
+ * @description Provides URL parameter synchronization following stampchain.io patterns
  * with support for Fresh.js navigation and browser history management
  */
 
@@ -50,7 +50,7 @@ export interface UseSortingURLReturn {
 
 /**
  * Custom hook for URL synchronization with sorting state
- * Follows BTCStampsExplorer patterns for URL parameter handling
+ * Follows stampchain.io patterns for URL parameter handling
  */
 export function useSortingURL(config: URLSyncConfig): UseSortingURLReturn {
   const {

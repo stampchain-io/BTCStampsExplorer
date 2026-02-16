@@ -5,7 +5,7 @@
  * both API versioning and performance optimization.
  *
  * @version 1.0.0
- * @author BTCStampsExplorer Team
+ * @author stampchain.io Team
  */
 
 import type { SRC20Row } from "$types/src20.d.ts";

@@ -492,7 +492,7 @@ export default function App({ Component }: PageProps) {
 
 ## Future Enhancements
 
-As outlined in [Issue #860](https://github.com/stampchain-io/BTCStampsExplorer/issues/860):
+As outlined in [Issue #860](https://github.com/stampchain-io/stampchain.io/issues/860):
 
 ### Planned Improvements
 
