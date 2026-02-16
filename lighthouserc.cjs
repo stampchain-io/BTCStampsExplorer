@@ -9,16 +9,25 @@
  * - LCP (Largest Contentful Paint): < 2500ms - Largest element visible
  * - Speed Index: < 3500ms - How quickly content is visually displayed
  * - CLS (Cumulative Layout Shift): < 0.1 - Visual stability
+ *
+ * Test data IDs must match scripts/test-seed-data.sql:
+ * - test_stamp_id = 1384305
+ * - test_block = 820000
+ * - test_src20_tick = stamp
+ * - test_address = bc1qkqqre5xuqk60xtt93j297zgg7t6x0ul7gwjmv4
  */
 
 module.exports = {
   ci: {
     collect: {
-      // Run against local dev server started by docker-compose.dev.yml
+      // Run against local dev server - IDs must match test-seed-data.sql
       url: [
         "http://localhost:8000/",
-        "http://localhost:8000/stamp/1",
+        "http://localhost:8000/stamp/1384305",
         "http://localhost:8000/src20",
+        "http://localhost:8000/src20/stamp",
+        "http://localhost:8000/block/820000",
+        "http://localhost:8000/wallet/bc1qkqqre5xuqk60xtt93j297zgg7t6x0ul7gwjmv4",
       ],
       // Number of runs per URL for more stable results
       numberOfRuns: 3,
@@ -60,8 +69,10 @@ module.exports = {
     upload: {
       // Upload to temporary public storage
       target: "temporary-public-storage",
-      // Keep reports for 30 days
-      // githubAppToken: process.env.LHCI_GITHUB_APP_TOKEN, // Optional: for GitHub status checks
+      // GitHub App token for PR status checks
+      // Install app: https://github.com/apps/lighthouse-ci
+      // Add token as LHCI_GITHUB_APP_TOKEN secret in GitHub Actions
+      githubAppToken: process.env.LHCI_GITHUB_APP_TOKEN,
     },
   },
 };
