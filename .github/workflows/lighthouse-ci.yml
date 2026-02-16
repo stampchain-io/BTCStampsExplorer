@@ -132,6 +132,23 @@ jobs:
           echo "Caching Deno dependencies..."
           deno cache --no-check main.ts dev.ts
 
+      - name: Start mock external API server
+        run: |
+          echo "Starting mock external API server..."
+          nohup deno run --allow-net --allow-env scripts/mock-external-apis.ts > mock-api-server.log 2>&1 &
+          echo $! > mock-api-server.pid
+          echo "Mock server started with PID: $(cat mock-api-server.pid)"
+
+          timeout 15 bash -c 'until curl -f -s http://localhost:18443/health > /dev/null 2>&1; do
+            echo "Mock server not ready yet, waiting..."
+            sleep 1
+          done' || {
+            echo "❌ Mock API server failed to start"
+            cat mock-api-server.log || echo "No logs available"
+            exit 1
+          }
+          echo "✅ Mock external API server is ready"
+
       - name: Start dev server
         run: |
           echo "Starting Deno dev server in background..."
@@ -203,4 +220,8 @@ jobs:
           if [ -f dev-server.pid ]; then
             kill "$(cat dev-server.pid)" 2>/dev/null || true
             echo "✅ Dev server stopped"
+          fi
+          if [ -f mock-api-server.pid ]; then
+            kill "$(cat mock-api-server.pid)" 2>/dev/null || true
+            echo "✅ Mock API server stopped"
           fi
