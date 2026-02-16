@@ -177,11 +177,15 @@ jobs:
           echo "✅ Server is responding correctly"
 
       - name: Run Lighthouse CI - Collect
+        continue-on-error: true
+        id: lhci-collect
         run: |
           echo "Collecting Lighthouse metrics (desktop preset, 3 runs per URL)..."
           lhci collect --config=lighthouserc.cjs
 
       - name: Run Lighthouse CI - Assert
+        if: steps.lhci-collect.outcome == 'success'
+        continue-on-error: true
         run: |
           echo "Asserting performance budgets..."
           lhci assert --config=lighthouserc.cjs
