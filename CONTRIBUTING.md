@@ -1,6 +1,6 @@
-# Contributing to BTCStampsExplorer
+# Contributing to stampchain.io
 
-Thank you for your interest in contributing to BTCStampsExplorer! This guide will help you understand our development workflow, coding standards, and quality requirements.
+Thank you for your interest in contributing to stampchain.io! This guide will help you understand our development workflow, coding standards, and quality requirements.
 
 ## Quick Start
 
@@ -27,7 +27,7 @@ Install hooks with:
 
 ### Import Pattern Standards
 
-BTCStampsExplorer enforces strict import patterns to maintain code quality and architectural consistency.
+stampchain.io enforces strict import patterns to maintain code quality and architectural consistency.
 
 #### ✅ Preferred Patterns (Use These)
 
@@ -240,7 +240,7 @@ If hooks prevent commits:
 
 ### Domain Separation
 
-BTCStampsExplorer follows domain-specific architecture:
+stampchain.io follows domain-specific architecture:
 
 - **Types**: Domain-specific type definitions in `lib/types/`
 - **Services**: Business logic separated by domain (stamps, SRC20, etc.)
@@ -296,7 +296,7 @@ deno task monitor:local
 
 ### Version Management
 
-BTCStampsExplorer uses semantic versioning:
+stampchain.io uses semantic versioning:
 
 - **Major**: Breaking API changes
 - **Minor**: New features, backward compatible
@@ -320,4 +320,4 @@ Each deployment must pass:
 
 ---
 
-Thank you for contributing to BTCStampsExplorer! Your adherence to these guidelines helps maintain code quality and ensures a smooth development experience for everyone.
+Thank you for contributing to stampchain.io! Your adherence to these guidelines helps maintain code quality and ensures a smooth development experience for everyone.

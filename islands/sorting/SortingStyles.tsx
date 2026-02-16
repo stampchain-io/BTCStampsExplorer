@@ -1,5 +1,5 @@
 /**
- * @fileoverview SortingStyles - Styled sorting components matching BTCStampsExplorer design system
+ * @fileoverview SortingStyles - Styled sorting components matching stampchain.io design system
  * @description Provides pre-styled sorting components that align with the existing design patterns,
  * using the established color palette, typography, and spacing conventions
  */
@@ -44,7 +44,7 @@ function mapButtonSizeToSortingSize(size: ButtonSize): "sm" | "md" | "lg" {
  */
 
 /**
- * StyledSortingDropdown - Dropdown with BTCStampsExplorer styling
+ * StyledSortingDropdown - Dropdown with stampchain.io styling
  */
 function StyledSortingDropdown({
   options,
@@ -94,7 +94,7 @@ function StyledSortingDropdown({
  */
 
 /**
- * StyledSortingButtons - Button group with BTCStampsExplorer styling
+ * StyledSortingButtons - Button group with stampchain.io styling
  */
 function StyledSortingButtons({
   options,
@@ -187,7 +187,7 @@ function StyledSortingButtons({
  */
 
 /**
- * StyledSortingLabel - Label with BTCStampsExplorer styling
+ * StyledSortingLabel - Label with stampchain.io styling
  */
 function StyledSortingLabel({
   className = "",
@@ -237,7 +237,7 @@ function StyledSortingLabel({
  */
 
 /**
- * StyledSortingError - Error display with BTCStampsExplorer styling
+ * StyledSortingError - Error display with stampchain.io styling
  */
 function StyledSortingError({
   className = "",

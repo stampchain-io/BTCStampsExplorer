@@ -1,5 +1,5 @@
 /**
- * Rate Limiting Middleware for BTCStampsExplorer
+ * Rate Limiting Middleware for stampchain.io
  *
  * Implements preventive rate limiting to protect against API abuse
  * Uses Redis for distributed rate limit tracking

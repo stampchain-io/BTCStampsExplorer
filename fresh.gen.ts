@@ -158,6 +158,7 @@ import * as $wallet_address_ from "./routes/wallet/[address].tsx";
 import * as $Toast_NotificationUpdate from "./islands/Toast/NotificationUpdate.tsx";
 import * as $Toast_ToastComponent from "./islands/Toast/ToastComponent.tsx";
 import * as $Toast_ToastProvider from "./islands/Toast/ToastProvider.tsx";
+import * as $WebVitalsReporter from "./islands/WebVitalsReporter.tsx";
 import * as $badge_ActivityBadge from "./islands/badge/ActivityBadge.tsx";
 import * as $badge_index from "./islands/badge/index.ts";
 import * as $button_FilterButton from "./islands/button/FilterButton.tsx";
@@ -309,7 +310,9 @@ import * as $tool_src20_MintTool from "./islands/tool/src20/MintTool.tsx";
 import * as $tool_src20_TransferTool from "./islands/tool/src20/TransferTool.tsx";
 import * as $tool_stamp_SendTool from "./islands/tool/stamp/SendTool.tsx";
 import * as $tool_stamp_StampingTool from "./islands/tool/stamp/StampingTool.tsx";
+import * as $tool_stamp_StampingToolLazy from "./islands/tool/stamp/StampingToolLazy.tsx";
 import * as $tool_stamp_TradeTool from "./islands/tool/stamp/TradeTool.tsx";
+import * as $tool_stamp_TradeToolLazy from "./islands/tool/stamp/TradeToolLazy.tsx";
 import type { Manifest } from "$fresh/server.ts";
 
 const manifest = {
@@ -504,6 +507,7 @@ const manifest = {
     "./islands/Toast/NotificationUpdate.tsx": $Toast_NotificationUpdate,
     "./islands/Toast/ToastComponent.tsx": $Toast_ToastComponent,
     "./islands/Toast/ToastProvider.tsx": $Toast_ToastProvider,
+    "./islands/WebVitalsReporter.tsx": $WebVitalsReporter,
     "./islands/badge/ActivityBadge.tsx": $badge_ActivityBadge,
     "./islands/badge/index.ts": $badge_index,
     "./islands/button/FilterButton.tsx": $button_FilterButton,
@@ -689,7 +693,9 @@ const manifest = {
     "./islands/tool/src20/TransferTool.tsx": $tool_src20_TransferTool,
     "./islands/tool/stamp/SendTool.tsx": $tool_stamp_SendTool,
     "./islands/tool/stamp/StampingTool.tsx": $tool_stamp_StampingTool,
+    "./islands/tool/stamp/StampingToolLazy.tsx": $tool_stamp_StampingToolLazy,
     "./islands/tool/stamp/TradeTool.tsx": $tool_stamp_TradeTool,
+    "./islands/tool/stamp/TradeToolLazy.tsx": $tool_stamp_TradeToolLazy,
   },
   baseUrl: import.meta.url,
 } satisfies Manifest;

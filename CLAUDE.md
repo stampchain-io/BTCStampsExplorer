@@ -1,8 +1,8 @@
-# BTCStampsExplorer - Claude Code 2025 Instructions
+# stampchain.io - Claude Code 2025 Instructions
 
 ## Project Overview
 
-BTCStampsExplorer is the **official Bitcoin Stamps block explorer and API** powering [stampchain.io](https://stampchain.io). This is a production-grade Deno Fresh application serving the Bitcoin Stamps ecosystem with:
+stampchain.io is the **official Bitcoin Stamps block explorer and API**. This is a production-grade Deno Fresh application serving the Bitcoin Stamps ecosystem with:
 
 - **Fresh Framework**: Server-side rendering + islands architecture for optimal performance
 - **API Server**: OpenAPI/Swagger documented endpoints serving Bitcoin Stamps data
@@ -61,7 +61,7 @@ Adapted for Deno Fresh development:
 
 ### Extended Thinking Triggers
 
-For BTCStampsExplorer's complex blockchain data processing:
+For stampchain.io's complex blockchain data processing:
 
 - **"think"**: Basic reasoning for simple route or component changes
 - **"think hard"**: Deep analysis for database queries, caching strategies, or API design
@@ -70,11 +70,11 @@ For BTCStampsExplorer's complex blockchain data processing:
 
 ### Custom Slash Commands
 
-**BTCStampsExplorer-specific commands** (use with `/command-name`):
+**stampchain.io-specific commands** (use with `/command-name`):
 
 Create `.claude/commands/btc-dev-server.md`:
 ```markdown
-Start BTCStampsExplorer development server with proper setup.
+Start stampchain.io development server with proper setup.
 
 Steps:
 1. Check Deno version with `deno --version` (must be 2.6.9+)
@@ -86,7 +86,7 @@ Steps:
 
 Create `.claude/commands/btc-test-api.md`:
 ```markdown
-Run comprehensive API tests for BTCStampsExplorer: $ARGUMENTS
+Run comprehensive API tests for stampchain.io: $ARGUMENTS
 
 Steps:
 1. Validate OpenAPI schema: `deno task test:api:schema`
@@ -98,7 +98,7 @@ Steps:
 
 Create `.claude/commands/btc-validate-build.md`:
 ```markdown
-Validate BTCStampsExplorer build and deployment readiness.
+Validate stampchain.io build and deployment readiness.
 
 Steps:
 1. Run full quality checks: `deno task check:all`
@@ -145,7 +145,7 @@ Configure in `.claude/settings.json`:
     ],
     "SessionStart": [
       {
-        "command": "echo \"🚀 BTCStampsExplorer Development Session Started\"",
+        "command": "echo \"🚀 stampchain.io Development Session Started\"",
         "description": "Session startup message"
       },
       {
@@ -196,7 +196,7 @@ deno task test:unit:coverage  # Unit tests with coverage
 deno task deploy:pre-flight   # Production readiness check
 ```
 
-### BTCStampsExplorer Specific Guidelines
+### stampchain.io Specific Guidelines
 
 #### Fresh Framework Architecture
 
@@ -262,7 +262,7 @@ interface ApiResponse<T> {
 
 #### Testing Infrastructure
 
-**Overview**: BTCStampsExplorer has comprehensive testing at three levels:
+**Overview**: stampchain.io has comprehensive testing at three levels:
 1. **Unit Tests**: Fast, isolated tests using MockDatabaseManager (154+ tests, 50+ with mocks)
 2. **Integration Tests**: Database connectivity and service integration tests
 3. **API Tests**: Newman/Postman tests covering all 46 API endpoints
@@ -624,7 +624,7 @@ deno task deploy:rollback --check
 
 ### MCP Integration
 
-BTCStampsExplorer can integrate with MCP servers for enhanced development workflow:
+stampchain.io can integrate with MCP servers for enhanced development workflow:
 
 ```json
 {
@@ -680,7 +680,7 @@ Configure safe tool usage in `.claude/settings.json`:
 
 ## Critical Production Notes
 
-**Data Integrity**: BTCStampsExplorer serves financial data for Bitcoin Stamps ecosystem. All changes must preserve data accuracy and system security.
+**Data Integrity**: stampchain.io serves financial data for Bitcoin Stamps ecosystem. All changes must preserve data accuracy and system security.
 
 **High Availability**: The application serves [stampchain.io](https://stampchain.io) with uptime requirements. Test thoroughly before deployment.
 
@@ -690,6 +690,6 @@ Configure safe tool usage in `.claude/settings.json`:
 
 ---
 
-**Remember**: BTCStampsExplorer is critical infrastructure for the Bitcoin Stamps ecosystem. Every change should prioritize data integrity, security, and community needs while maintaining the high technical standards expected of financial software.
+**Remember**: stampchain.io is critical infrastructure for the Bitcoin Stamps ecosystem. Every change should prioritize data integrity, security, and community needs while maintaining the high technical standards expected of financial software.
 
 *Building the future of Bitcoin Stamps, one commit at a time* 🧡
