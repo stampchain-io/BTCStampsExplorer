@@ -1,5 +1,5 @@
 {
-  "name": "btcstampsexplorer",
+  "name": "stampchain.io",
   "description": "This is the API for https://stampchain.io/ and the open source block explorer for Bitcoin Stamps.",
   "version": "1.0.0",
   "type": "module",

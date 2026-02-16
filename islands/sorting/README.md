@@ -1,6 +1,6 @@
 # 🚀 World-Class Sorting Infrastructure
 
-A comprehensive, reusable sorting system for BTCStampsExplorer built with Fresh.js best practices.
+A comprehensive, reusable sorting system for stampchain.io built with Fresh.js best practices.
 
 ## 📋 Overview
 
@@ -243,4 +243,4 @@ See [INTEGRATION_GUIDE.md](./INTEGRATION_GUIDE.md) for detailed migration instru
 
 ## 📄 License
 
-Part of BTCStampsExplorer - see project license.
+Part of stampchain.io - see project license.

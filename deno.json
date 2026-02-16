@@ -67,6 +67,7 @@
     "validate:dependencies:json": "deno run --allow-all scripts/validation/dependency-graph-analyzer.ts --format=json",
     "validate:client-server": "deno run --allow-all scripts/validation/dependency-graph-analyzer.ts --check-client-server",
     "test:cross-module": "deno task test:integration",
+    "audit:coverage": "deno run --allow-read --allow-write scripts/audit-endpoint-coverage.ts",
     "prewarm:preview": "bash scripts/prewarm-preview-cache.sh http://localhost:8000 0.5",
     "prewarm:preview:prod": "bash scripts/prewarm-preview-cache.sh https://stampchain.io 3",
     "prewarm:preview:refresh": "bash scripts/prewarm-preview-cache.sh https://stampchain.io 3 --refresh"

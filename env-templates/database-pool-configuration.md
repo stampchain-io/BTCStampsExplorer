@@ -1,6 +1,6 @@
 # Database Connection Pool Configuration
 
-This document describes the new environment-aware database connection pool configuration options available in BTCStampsExplorer.
+This document describes the new environment-aware database connection pool configuration options available in stampchain.io.
 
 ## Overview
 

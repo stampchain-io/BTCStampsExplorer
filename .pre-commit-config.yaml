@@ -1,4 +1,4 @@
-# BTCStampsExplorer Pre-commit Configuration
+# stampchain.io Pre-commit Configuration
 # 
 # This configuration enforces code quality standards before commits,
 # including import pattern validation, formatting, and type checking.

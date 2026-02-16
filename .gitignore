@@ -215,6 +215,7 @@ current-version-tag.txt
 task-def-manual.json
 
 # Added by Task Master AI
+.taskmasterconfig
 dev-debug.log
 # Dependency directories
 # Environment variables
