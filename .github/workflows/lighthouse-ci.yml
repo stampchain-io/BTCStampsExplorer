@@ -71,6 +71,7 @@ jobs:
       XCP_API_URL: http://localhost:18443/v2
       MEMPOOL_API_URL: http://localhost:18443/mempool/api
       BLOCKSTREAM_API_URL: http://localhost:18443/blockstream/api
+      LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
 
     steps:
       - name: Checkout code
@@ -177,7 +178,6 @@ jobs:
           echo "✅ Server is responding correctly"
 
       - name: Run Lighthouse CI - Collect
-        continue-on-error: true
         id: lhci-collect
         run: |
           echo "Collecting Lighthouse metrics (desktop preset, 3 runs per URL)..."
@@ -185,7 +185,6 @@ jobs:
 
       - name: Run Lighthouse CI - Assert
         if: steps.lhci-collect.outcome == 'success'
-        continue-on-error: true
         run: |
           echo "Asserting performance budgets..."
           lhci assert --config=lighthouserc.cjs
@@ -218,6 +217,17 @@ jobs:
           echo "| Largest Contentful Paint | < 2500ms |" >> $GITHUB_STEP_SUMMARY
           echo "| Speed Index | < 3500ms |" >> $GITHUB_STEP_SUMMARY
           echo "| Cumulative Layout Shift | < 0.1 |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Pages Tested (6 URLs, 3 runs each)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Page | URL |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|-----|" >> $GITHUB_STEP_SUMMARY
+          echo "| Homepage | / |" >> $GITHUB_STEP_SUMMARY
+          echo "| Stamp Detail | /stamp/1384305 |" >> $GITHUB_STEP_SUMMARY
+          echo "| SRC-20 List | /src20 |" >> $GITHUB_STEP_SUMMARY
+          echo "| SRC-20 Detail | /src20/stamp |" >> $GITHUB_STEP_SUMMARY
+          echo "| Block Detail | /block/820000 |" >> $GITHUB_STEP_SUMMARY
+          echo "| Wallet | /wallet/bc1q...gwjmv4 |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "📊 Full reports available in workflow artifacts" >> $GITHUB_STEP_SUMMARY
 
