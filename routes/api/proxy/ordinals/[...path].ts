@@ -18,7 +18,7 @@ export const handler = async (
     // Fetch from ordinals.com with User-Agent for monitoring
     const response = await fetch(ordinalsUrl, {
       headers: {
-        "User-Agent": "BTCStampsExplorer-Ordinals-Proxy",
+        "User-Agent": "stampchain.io-Ordinals-Proxy",
       },
       redirect: "follow", // Follow redirects automatically
     });

@@ -18,7 +18,7 @@ export const handler = async (
     // Fetch from arweave.net with User-Agent for monitoring
     const response = await fetch(arweaveUrl, {
       headers: {
-        "User-Agent": "BTCStampsExplorer-Arweave-Proxy",
+        "User-Agent": "stampchain.io-Arweave-Proxy",
       },
       redirect: "follow", // Follow redirects automatically
     });
