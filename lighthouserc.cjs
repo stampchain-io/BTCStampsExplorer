@@ -11,7 +11,7 @@
  * - CLS (Cumulative Layout Shift): < 0.1 - Visual stability
  */
 
-export default {
+module.exports = {
   ci: {
     collect: {
       // Run against local dev server started by docker-compose.dev.yml
