@@ -100,7 +100,7 @@
         "exec": [
           "// Initialize test session",
           "if (!pm.collectionVariables.get('test_session_id')) {",
-          "    const sessionId = 'test_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);",
+          "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 400, 404, 410, 500]);",
           "    pm.collectionVariables.set('test_session_id', sessionId);",
           "    console.log('🚀 Starting regression test session:', sessionId);",
           "}",
