@@ -59,7 +59,7 @@
     "deploy:dry-run": "./scripts/deploy.sh --dry-run",
     "deploy:benchmark": "deno run --allow-all scripts/deployment/performance-benchmarking.ts",
     "deploy:rollback": "deno run --allow-all scripts/deployment/automated-rollback.ts ${ROLLBACK_MODE:---check}",
-    "deploy:rollback:test": "deno run --allow-all scripts/deployment/automated-rollback.ts --test",
+    "deploy:rollback:test": "deno run --allow-all scripts/deployment/automated-rollback.ts --test-staging",
     "deploy:rollback:check": "deno run --allow-all scripts/deployment/automated-rollback.ts --check",
     "deploy:regression": "deno run --allow-all scripts/deployment/regression-detection.ts ${REGRESSION_MODE:-}",
     "validate:dependencies": "deno run --allow-all scripts/validation/dependency-graph-analyzer.ts",
