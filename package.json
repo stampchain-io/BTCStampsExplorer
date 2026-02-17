@@ -49,7 +49,7 @@
     "tiny-secp256k1": "^2.2.3"
   },
   "devDependencies": {
-    "@lhci/cli": "^0.14.0",
+    "@lhci/cli": "^0.15.1",
     "husky": "^9.1.7"
   },
   "main": "swagger.js",
