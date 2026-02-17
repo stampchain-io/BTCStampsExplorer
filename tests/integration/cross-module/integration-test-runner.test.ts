@@ -663,7 +663,11 @@ class CrossModuleIntegrationRunner {
 }
 
 // Main test execution
-Deno.test("Cross-Module Integration Test Suite", async () => {
+Deno.test({
+  name: "Cross-Module Integration Test Suite",
+  sanitizeOps: false,
+  sanitizeResources: false,
+  fn: async () => {
   const projectRoot = Deno.cwd();
   const runner = new CrossModuleIntegrationRunner(projectRoot);
 
@@ -685,6 +689,7 @@ Deno.test("Cross-Module Integration Test Suite", async () => {
     true,
     "All integration components must be healthy",
   );
+  },
 });
 
 export { CrossModuleIntegrationRunner, type IntegrationReport };

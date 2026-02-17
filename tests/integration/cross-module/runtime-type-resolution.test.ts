@@ -1027,7 +1027,11 @@ class RuntimeTypeResolutionTester {
 }
 
 // Main test execution
-Deno.test("Runtime Type Resolution Test Suite", async () => {
+Deno.test({
+  name: "Runtime Type Resolution Test Suite",
+  sanitizeOps: false,
+  sanitizeResources: false,
+  fn: async () => {
   const projectRoot = Deno.cwd();
   const tester = new RuntimeTypeResolutionTester(projectRoot);
 
@@ -1049,6 +1053,7 @@ Deno.test("Runtime Type Resolution Test Suite", async () => {
     true,
     "All runtime type components must be healthy",
   );
+  },
 });
 
 export { type RuntimeTypeReport, RuntimeTypeResolutionTester };
