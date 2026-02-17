@@ -246,6 +246,10 @@ jobs:
       ELASTICACHE_ENDPOINT: 127.0.0.1:6379
       SKIP_REDIS_CONNECTION: false
       QUICKNODE_API_KEY: test-quicknode-key
+      # Mock external APIs for POST endpoint testing
+      XCP_API_URL: http://localhost:18443/v2
+      MEMPOOL_API_URL: http://localhost:18443/mempool/api
+      BLOCKSTREAM_API_URL: http://localhost:18443/blockstream/api
 
     steps:
       - name: Checkout code
@@ -261,6 +265,15 @@ jobs:
           mysql -h 127.0.0.1 -P 3306 -u root -ptest btcstamps_test < scripts/test-schema.sql
           mysql -h 127.0.0.1 -P 3306 -u root -ptest btcstamps_test < scripts/test-seed-data.sql
           echo "✅ Test data loaded"
+
+      - name: Start mock external API server
+        run: |
+          nohup deno run --allow-net --allow-env scripts/mock-external-apis.ts > mock-api-server.log 2>&1 &
+          echo $! > mock-api-server.pid
+          timeout 15 bash -c 'until curl -f -s http://localhost:18443/health > /dev/null 2>&1; do
+            sleep 1
+          done' || { cat mock-api-server.log; exit 1; }
+          echo "✅ Mock API server ready at http://localhost:18443"
 
       - name: Cache and start dev server
         run: |
