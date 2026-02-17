@@ -1,4 +1,4 @@
-import { type BlockStampType } from "$constants";
+import { type BlockStampType, IMMUTABLE_CACHE_DURATION } from "$constants";
 import { BlockRepository, StampRepository } from "$server/database/index.ts";
 import type { BlockInfoResponseBody, StampBlockResponseBody } from "$types/api.d.ts";
 
@@ -19,7 +19,7 @@ export class BlockService {
         blockIdentifier,
         sortBy: "ASC",
         noPagination: true,
-        cacheDuration: "never",
+        cacheDuration: IMMUTABLE_CACHE_DURATION,
       }),
     ]);
 

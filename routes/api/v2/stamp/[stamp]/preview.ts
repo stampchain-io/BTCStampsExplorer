@@ -16,7 +16,7 @@
  * All images are output as 1200x1200 PNG with compression level 9
  *
  * Caching: Rendered PNGs are cached in Redis as base64. Stamps are immutable
- * blockchain data so cache entries never expire ("never" TTL).
+ * blockchain data so cache entries use a 7-day TTL (604800s) to allow LRU eviction.
  */
 import { Handlers } from "$fresh/server.ts";
 import { WebResponseUtil } from "$lib/utils/api/responses/webResponseUtil.ts";
@@ -724,7 +724,7 @@ export const handler: Handlers = {
           wasRendered = true;
           return await renderPreview(stamp);
         },
-        "never",
+        604800,
       );
 
       if (cached?.png) {

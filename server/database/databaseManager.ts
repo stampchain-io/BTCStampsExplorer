@@ -2,6 +2,7 @@ import "$/server/config/env.ts";
 
 import { getDatabaseConfig, logDatabaseConfig, validateDatabaseConfig, type DatabaseConfig as DBPoolConfig } from "$/server/config/database.config.ts";
 import { bigIntReviver, bigIntSerializer } from "$lib/utils/ui/formatting/formatUtils.ts";
+import { DEFAULT_CACHE_DURATION } from "$lib/constants/database.ts";
 import { crypto } from "@std/crypto";
 import { serverConfig } from "$server/config/config.ts";
 import {
@@ -23,6 +24,7 @@ if (typeof Deno !== "undefined" && Deno.args?.includes("build")) {
     set: () => Promise.resolve("OK"),
     get: () => Promise.resolve(null),
     keys: () => Promise.resolve([]),
+    scan: () => Promise.resolve(["0", []]),
     del: () => Promise.resolve(0)
   });
 } else if (typeof Deno !== "undefined") {
@@ -41,6 +43,7 @@ if (typeof Deno !== "undefined" && Deno.args?.includes("build")) {
       set: () => Promise.resolve("OK"),
       get: () => Promise.resolve(null),
       keys: () => Promise.resolve([]),
+      scan: () => Promise.resolve(["0", []]),
       del: () => Promise.resolve(0)
     });
     }
@@ -51,6 +54,7 @@ if (typeof Deno !== "undefined" && Deno.args?.includes("build")) {
     set: () => Promise.resolve("OK"),
     get: () => Promise.resolve(null),
     keys: () => Promise.resolve([]),
+    scan: () => Promise.resolve(["0", []]),
     del: () => Promise.resolve(0)
   });
 }
@@ -1109,6 +1113,7 @@ class DatabaseManager {
       if (REDIS_DEBUG) {
         console.log(`[IN-MEMORY CACHE SET] Using fallback for key: ${key.substring(0, 10)}... (Redis unavailable)`);
       }
+      return;
     }
 
     if (this.#redisClient) {
@@ -1286,13 +1291,32 @@ class DatabaseManager {
       }
     }
 
-    // Also try original pattern matching for backwards compatibility
+    // Also try original pattern matching for backwards compatibility.
+    // Uses SCAN cursor iteration instead of blocking KEYS command (BUG 5 fix).
     if (this.#redisClient) {
       try {
-        const keys = await this.#redisClient.keys(pattern);
-        if (keys.length > 0) {
-          await this.#redisClient.del(...keys);
-          console.log(`Cache invalidated ${keys.length} keys for pattern: ${pattern}`);
+        // SCAN is O(1) per call and non-blocking, unlike KEYS which is O(N).
+        let cursor = 0;
+        const allKeys: string[] = [];
+        do {
+          const [nextCursor, keys] = await this.#redisClient.scan(cursor, {
+            match: pattern,
+            count: 100,
+          });
+          cursor = Number(nextCursor);
+          allKeys.push(...keys);
+        } while (cursor !== 0);
+
+        if (allKeys.length > 0) {
+          // Delete in batches of 100 to avoid oversized DEL commands.
+          const BATCH_SIZE = 100;
+          for (let i = 0; i < allKeys.length; i += BATCH_SIZE) {
+            const batch = allKeys.slice(i, i + BATCH_SIZE);
+            await this.#redisClient.del(...batch);
+          }
+          console.log(
+            `Cache invalidated ${allKeys.length} keys for pattern: ${pattern}`,
+          );
         }
       } catch (error) {
         console.error("Failed to invalidate Redis cache by pattern:", error);
@@ -1416,11 +1440,19 @@ class DatabaseManager {
             parsed.total = finalData.length;
           }
 
-          // Preserve TTL
+          // Preserve TTL with a single atomic set() to eliminate the race window
+          // where a key has no TTL between set() and expire().
           const ttl = await this.#redisClient.ttl(cacheKey);
-          await this.#redisClient.set(cacheKey, JSON.stringify(parsed));
-          if (ttl > 0) {
-            await this.#redisClient.expire(cacheKey, ttl);
+          if (ttl === -2) {
+            // Key no longer exists (expired between our get() and now); skip update
+            continue;
+          } else if (ttl > 0) {
+            // Key has a positive TTL — preserve it atomically
+            await this.#redisClient.set(cacheKey, JSON.stringify(parsed), { ex: ttl });
+          } else {
+            // ttl === -1: key exists but has no expiry — apply DEFAULT_CACHE_DURATION
+            // to prevent permanent keys from accumulating
+            await this.#redisClient.set(cacheKey, JSON.stringify(parsed), { ex: DEFAULT_CACHE_DURATION });
           }
 
           console.log(`[CACHE APPEND] Successfully updated cache key: ${cacheKey.substring(0, 20)}...`);
