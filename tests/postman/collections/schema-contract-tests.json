@@ -41,6 +41,11 @@
       "key": "test_deploy_hash",
       "value": "77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed",
       "type": "string"
+    },
+    {
+      "key": "test_src20_address",
+      "value": "bc1qndwhntf80jv90kkkgvs67vp48hhpxeetrk9f5m",
+      "type": "string"
     }
   ],
   "item": [
@@ -422,17 +427,14 @@
                   "    pm.expect(response.last_block).to.be.a('number');",
                   "});",
                   "",
-                  "pm.test('DEBUG: data type=' + typeof response.data + ' isArray=' + Array.isArray(response.data) + ' length=' + (response.data ? response.data.length : 'null') + ' keys=' + Object.keys(response).join(','), () => {});",
-                  "",
-                  "if (Array.isArray(response.data) && response.data.length > 0) {",
-                  "    pm.test('CONTRACT: First balance has required fields', () => {",
-                  "        const balance = response.data[0];",
-                  "        pm.expect(balance).to.have.property('tick');",
-                  "        pm.expect(balance).to.have.property('amt');",
-                  "        pm.expect(balance.tick).to.be.a('string');",
-                  "        pm.expect(balance.amt).to.be.a('string');",
-                  "    });",
-                  "}"
+                  "pm.test('CONTRACT: First balance has required fields', () => {",
+                  "    pm.expect(response.data.length).to.be.greaterThan(0, 'Seed data should have SRC-20 balances for test_src20_address');",
+                  "    const balance = response.data[0];",
+                  "    pm.expect(balance).to.have.property('tick');",
+                  "    pm.expect(balance).to.have.property('amt');",
+                  "    pm.expect(balance.tick).to.be.a('string');",
+                  "    pm.expect(balance.amt).to.be.a('string');",
+                  "});"
                 ]
               }
             }
@@ -441,7 +443,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/v2/src20/balance/{{test_address}}",
+              "raw": "{{base_url}}/api/v2/src20/balance/{{test_src20_address}}",
               "host": [
                 "{{base_url}}"
               ],
@@ -450,7 +452,7 @@
                 "v2",
                 "src20",
                 "balance",
-                "{{test_address}}"
+                "{{test_src20_address}}"
               ]
             }
           }
@@ -849,22 +851,13 @@
                   "    pm.expect(response).to.not.have.property('totalPages');",
                   "});",
                   "",
-                  "pm.test('DEBUG: data type=' + typeof response.data + ' isArray=' + Array.isArray(response.data) + ' keys=' + Object.keys(response).join(','), () => {});",
-                  "",
-                  "if (response.data && !Array.isArray(response.data)) {",
-                  "    pm.test('CONTRACT: Balance has required fields', () => {",
-                  "        pm.expect(response.data).to.have.property('tick');",
-                  "        pm.expect(response.data).to.have.property('amt');",
-                  "        pm.expect(response.data).to.have.property('address');",
-                  "    });",
-                  "} else if (Array.isArray(response.data) && response.data.length > 0) {",
-                  "    pm.test('CONTRACT: Balance has required fields', () => {",
-                  "        const balance = response.data[0];",
-                  "        pm.expect(balance).to.have.property('tick');",
-                  "        pm.expect(balance).to.have.property('amt');",
-                  "        pm.expect(balance).to.have.property('address');",
-                  "    });",
-                  "}",
+                  "pm.test('CONTRACT: Balance has required fields', () => {",
+                  "    const balanceData = Array.isArray(response.data) ? response.data[0] : response.data;",
+                  "    pm.expect(balanceData).to.not.be.null;",
+                  "    pm.expect(balanceData).to.have.property('tick');",
+                  "    pm.expect(balanceData).to.have.property('amt');",
+                  "    pm.expect(balanceData).to.have.property('address');",
+                  "});",
                   "",
                   "pm.test('CONTRACT: last_block is number', () => {",
                   "    pm.expect(response.last_block).to.be.a('number');",
@@ -877,7 +870,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/v2/src20/balance/{{test_address}}/{{test_src20_tick}}",
+              "raw": "{{base_url}}/api/v2/src20/balance/{{test_src20_address}}/{{test_src20_tick}}",
               "host": [
                 "{{base_url}}"
               ],
@@ -886,7 +879,7 @@
                 "v2",
                 "src20",
                 "balance",
-                "{{test_address}}",
+                "{{test_src20_address}}",
                 "{{test_src20_tick}}"
               ]
             }
