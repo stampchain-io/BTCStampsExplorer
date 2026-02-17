@@ -268,6 +268,8 @@ class AutomatedRollbackManager {
   }
 
   private initializeHealthChecks(): void {
+    const isCI = Deno.env.get("CI") === "true";
+
     this.healthChecks = [
       {
         name: "api_health",
@@ -285,18 +287,26 @@ class AutomatedRollbackManager {
       },
       {
         name: "redis_connection",
-        endpoint: "/api/health/redis",
+        endpoint: "/api/v2/health",
         timeout: 3000,
         expected: 200,
         critical: false
       },
-      {
+      // In CI: validate fixture data is accessible via read endpoints
+      // In production: validate stamp creation POST endpoint
+      ...(isCI ? [{
+        name: "stamp_data_access",
+        endpoint: "/api/v2/src20?limit=1",
+        timeout: 10000,
+        expected: 200,
+        critical: true
+      }] : [{
         name: "stamp_creation",
         endpoint: "/api/v2/create/send",
         timeout: 15000,
         expected: /success|pending/,
         critical: true
-      },
+      }]),
       {
         name: "memory_usage",
         command: "ps aux | grep deno | grep -v grep | awk '{sum+=$6} END {print sum}'",
