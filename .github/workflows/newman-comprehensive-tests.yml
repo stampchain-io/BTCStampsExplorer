@@ -825,6 +825,49 @@ jobs:
           exit ${NEWMAN_EXIT_CODE:-0}
         continue-on-error: false
 
+      - name: Run schema contract tests against localhost
+        id: schema-contract-local
+        run: |
+          echo "Running schema contract tests against local dev server..."
+
+          newman run tests/postman/collections/schema-contract-tests.json \
+            --env-var base_url=http://localhost:8000 \
+            --env-var test_block=820000 \
+            --env-var test_stamp_id=1384305 \
+            --env-var test_address=bc1qkqqre5xuqk60xtt93j297zgg7t6x0ul7gwjmv4 \
+            --env-var test_tx_hash=f353823cdc63ee24fe2167ca14d3bb9b6a54dd063b53382c0cd42f05d7262808 \
+            --env-var test_src20_tick=stamp \
+            --env-var test_collection_id=2531AF5D3A023148764800FAA6CC883F \
+            --env-var test_deploy_hash=77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed \
+            --reporters cli,json \
+            --reporter-json-export reports/newman-local-dev/schema-contract-report.json \
+            || SCHEMA_EXIT_CODE=$?
+
+          # Add schema contract results to summary
+          {
+            echo ""
+            echo "## Schema Contract Test Results (Local Dev)"
+            echo ""
+            echo "- Collection: schema-contract-tests.json (20 endpoints)"
+            echo "- Target: Local dev server (http://localhost:8000)"
+            echo ""
+
+            if [ -f "reports/newman-local-dev/schema-contract-report.json" ]; then
+              node -e "
+                const fs = require('fs');
+                const report = JSON.parse(fs.readFileSync('reports/newman-local-dev/schema-contract-report.json', 'utf8'));
+                const stats = report.run.stats;
+                console.log('- Total Requests: ' + stats.requests.total);
+                console.log('- Passed Assertions: ' + stats.assertions.passed);
+                console.log('- Failed Assertions: ' + stats.assertions.failed);
+                console.log('- Total Assertions: ' + stats.assertions.total);
+              "
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          exit ${SCHEMA_EXIT_CODE:-0}
+        continue-on-error: false
+
       - name: Capture dev server logs on failure
         if: failure()
         run: |
@@ -929,18 +972,26 @@ jobs:
           echo "=== Newman Local Dev Test Summary ==="
 
           if [ "${{ steps.newman-local.outcome }}" == "success" ]; then
-            echo "✅ Newman tests passed against local dev server"
+            echo "✅ Comprehensive Newman tests passed against local dev server"
           else
-            echo "❌ Newman tests failed against local dev server"
+            echo "❌ Comprehensive Newman tests failed against local dev server"
+          fi
+
+          if [ "${{ steps.schema-contract-local.outcome }}" == "success" ]; then
+            echo "✅ Schema contract tests passed against local dev server"
+          else
+            echo "❌ Schema contract tests failed against local dev server"
           fi
 
           echo "✅ Local dev test run complete"
 
   schema-contract-tests:
-    name: Schema Contract Tests (20 High-Traffic Endpoints)
+    name: Schema Contract Tests - Production Monitor
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    if: github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+    # Production monitoring only — schema contracts are validated against local dev
+    # in the newman-local-dev job. This job monitors production for regressions.
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
 
     permissions:
       contents: read
@@ -982,7 +1033,7 @@ jobs:
           NEWMAN_COLLECTION=tests/postman/collections/schema-contract-tests.json \
           NEWMAN_REPORTERS=cli,json \
           docker compose -f docker-compose.test.yml run --rm newman
-        continue-on-error: true  # Production tests may timeout — non-blocking
+        continue-on-error: true  # Production monitoring — non-blocking
 
       - name: Fix Docker file permissions
         if: always()
