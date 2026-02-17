@@ -210,6 +210,43 @@ jobs:
     timeout-minutes: 25
     if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
 
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: test
+          MYSQL_DATABASE: btcstamps_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      CI: true
+      DENO_ENV: development
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: test
+      DB_NAME: btcstamps_test
+      REDIS_URL: redis://127.0.0.1:6379
+      ELASTICACHE_ENDPOINT: 127.0.0.1:6379
+      SKIP_REDIS_CONNECTION: false
+      QUICKNODE_API_KEY: test-quicknode-key
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -218,6 +255,22 @@ jobs:
         uses: denoland/setup-deno@v2
         with:
           deno-version: ${{ env.DENO_VERSION }}
+
+      - name: Load test schema and seed data
+        run: |
+          mysql -h 127.0.0.1 -P 3306 -u root -ptest btcstamps_test < scripts/test-schema.sql
+          mysql -h 127.0.0.1 -P 3306 -u root -ptest btcstamps_test < scripts/test-seed-data.sql
+          echo "✅ Test data loaded"
+
+      - name: Cache and start dev server
+        run: |
+          deno cache --no-check main.ts dev.ts
+          nohup deno run -A dev.ts > dev-server.log 2>&1 &
+          echo $! > dev-server.pid
+          timeout 60 bash -c 'until curl -f -s http://localhost:8000/api/v2/health > /dev/null 2>&1; do
+            sleep 2
+          done' || { cat dev-server.log; exit 1; }
+          echo "✅ Dev server ready at http://localhost:8000"
 
       - name: Test rollback procedures in staging
         run: deno task deploy:rollback:test
@@ -228,6 +281,7 @@ jobs:
           BASE_URL: http://localhost:8000
 
       - name: Upload rollback test results
+        if: always()
         uses: actions/upload-artifact@v6
         with:
           name: rollback-test-results

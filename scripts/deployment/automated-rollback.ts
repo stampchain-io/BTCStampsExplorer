@@ -85,7 +85,7 @@ class AutomatedRollbackManager {
 
   async checkDeploymentHealth(): Promise<boolean> {
     console.log("🔍 Checking Deployment Health");
-    console.log("=" * 50);
+    console.log("=".repeat(50));
 
     try {
       const activeSlot = this.getActiveSlot();
@@ -146,7 +146,7 @@ class AutomatedRollbackManager {
     }
 
     console.log("🔄 Starting Automated Rollback");
-    console.log("=" * 50);
+    console.log("=".repeat(50));
 
     this.rollbackInProgress = true;
 
@@ -206,7 +206,7 @@ class AutomatedRollbackManager {
 
   async testStagingRollback(): Promise<boolean> {
     console.log("🧪 Testing Rollback Procedures in Staging");
-    console.log("=" * 50);
+    console.log("=".repeat(50));
 
     try {
       // Simulate deployment failure scenarios
