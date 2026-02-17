@@ -232,7 +232,12 @@ function checkSSRProtection(lines: string[], currentIndex: number): boolean {
     // Check for browser environment checks
     if (line.includes('typeof globalThis === "undefined"') ||
         line.includes('typeof globalThis === \'undefined\'') ||
+        line.includes('typeof globalThis.location !== "undefined"') ||
+        line.includes('typeof globalThis.location !== \'undefined\'') ||
+        line.includes('typeof globalThis.location === "undefined"') ||
+        line.includes('typeof globalThis.location === \'undefined\'') ||
         line.includes('!globalThis?.location') ||
+        line.includes('globalThis.location?.') ||
         line.includes('typeof window === "undefined"') ||
         line.includes('typeof window === \'undefined\'')) {
       return true;
