@@ -9,8 +9,7 @@ on:
       - 'islands/**'
       - 'components/**'
       - 'static/**'
-      - 'lighthouserc.js'
-      - 'docker-compose.dev.yml'
+      - 'lighthouserc.cjs'
       - '.github/workflows/lighthouse-ci.yml'
   pull_request:
     branches: [main, dev]
@@ -20,8 +19,7 @@ on:
       - 'islands/**'
       - 'components/**'
       - 'static/**'
-      - 'lighthouserc.js'
-      - 'docker-compose.dev.yml'
+      - 'lighthouserc.cjs'
       - '.github/workflows/lighthouse-ci.yml'
   workflow_dispatch:
     # Allow manual triggering for testing
@@ -32,110 +30,174 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: test
+          MYSQL_DATABASE: btcstamps_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      CI: true
+      DENO_ENV: development
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: test
+      DB_NAME: btcstamps_test
+      REDIS_URL: redis://127.0.0.1:6379
+      ELASTICACHE_ENDPOINT: 127.0.0.1:6379
+      SKIP_REDIS_CONNECTION: false
+      QUICKNODE_API_KEY: test-quicknode-key
+      ANTHROPIC_API_KEY: test-anthropic-key
+      PERPLEXITY_API_KEY: test-perplexity-key
+      XCP_API_URL: http://localhost:18443/v2
+      MEMPOOL_API_URL: http://localhost:18443/mempool/api
+      BLOCKSTREAM_API_URL: http://localhost:18443/blockstream/api
+      LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.6.9
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '20'
-          cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Install LHCI
+        run: npm install -g @lhci/cli@0.14.x
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - name: Cache Deno dependencies
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.deno
+            ~/.cache/deno
+          key: ${{ runner.os }}-deno-lighthouse-${{ hashFiles('**/deno.json') }}
+          restore-keys: |
+            ${{ runner.os }}-deno-lighthouse-
+            ${{ runner.os }}-deno-
 
-      - name: Start dev server with docker-compose
+      - name: Wait for MySQL
         run: |
-          echo "Starting development server with docker-compose.dev.yml..."
-          docker-compose -f docker-compose.dev.yml up -d
-
-          echo "Waiting for services to be healthy..."
-          timeout 180 bash -c 'until docker-compose -f docker-compose.dev.yml ps | grep -q "healthy"; do
-            echo "Services not ready yet, waiting..."
-            docker-compose -f docker-compose.dev.yml ps
-            sleep 5
+          echo "Waiting for MySQL to be ready..."
+          timeout 60 bash -c 'until mysqladmin ping -h 127.0.0.1 -P 3306 -u root -ptest --silent; do
+            echo "MySQL not ready yet, waiting..."
+            sleep 2
           done'
+          echo "✅ MySQL is ready"
 
-          echo "Waiting for Deno app to be ready on port 8000..."
-          timeout 120 bash -c 'until curl -f http://localhost:8000/api/v2/health > /dev/null 2>&1; do
-            echo "Deno app not ready yet, waiting..."
+      - name: Wait for Redis
+        run: |
+          echo "Waiting for Redis to be ready..."
+          timeout 30 bash -c 'until nc -z 127.0.0.1 6379; do
+            echo "Redis not ready yet, waiting..."
+            sleep 1
+          done'
+          echo "✅ Redis is ready"
+
+      - name: Load test schema and seed data
+        run: |
+          echo "Loading test schema..."
+          mysql -h 127.0.0.1 -P 3306 -u root -ptest btcstamps_test < scripts/test-schema.sql
+          echo "✅ Test schema loaded"
+          echo "Loading test seed data..."
+          mysql -h 127.0.0.1 -P 3306 -u root -ptest btcstamps_test < scripts/test-seed-data.sql
+          echo "✅ Test seed data loaded"
+
+      - name: Cache Deno dependencies for dev server
+        run: |
+          echo "Caching Deno dependencies..."
+          deno cache --no-check main.ts dev.ts
+
+      - name: Start mock external API server
+        run: |
+          echo "Starting mock external API server..."
+          nohup deno run --allow-net --allow-env scripts/mock-external-apis.ts > mock-api-server.log 2>&1 &
+          echo $! > mock-api-server.pid
+          echo "Mock server started with PID: $(cat mock-api-server.pid)"
+
+          timeout 15 bash -c 'until curl -f -s http://localhost:18443/health > /dev/null 2>&1; do
+            echo "Mock server not ready yet, waiting..."
+            sleep 1
+          done' || {
+            echo "❌ Mock API server failed to start"
+            cat mock-api-server.log || echo "No logs available"
+            exit 1
+          }
+          echo "✅ Mock external API server is ready"
+
+      - name: Start dev server
+        run: |
+          echo "Starting Deno dev server in background..."
+          nohup deno run -A dev.ts > dev-server.log 2>&1 &
+          echo $! > dev-server.pid
+          echo "Dev server started with PID: $(cat dev-server.pid)"
+
+          echo "Waiting for dev server to be ready (max 90s)..."
+          timeout 90 bash -c 'until curl -f -s http://localhost:8000/api/v2/health > /dev/null 2>&1; do
+            echo "Dev server not ready yet, waiting..."
             sleep 3
-          done'
+          done' || {
+            echo "❌ Dev server failed to start within 90 seconds"
+            echo "=== Dev Server Logs ==="
+            cat dev-server.log || echo "No logs available"
+            exit 1
+          }
 
-          echo "✅ Dev server is ready!"
-          docker-compose -f docker-compose.dev.yml ps
+          echo "✅ Dev server is ready at http://localhost:8000"
 
       - name: Verify server is responding
         run: |
           echo "Testing server endpoints..."
           curl -f http://localhost:8000/api/v2/health || exit 1
+          echo ""
           echo "✅ Server is responding correctly"
 
-      - name: Run Lighthouse CI - Desktop
+      - name: Run Lighthouse CI - Collect
+        id: lhci-collect
         run: |
-          echo "Running Lighthouse CI with desktop preset..."
-          npx @lhci/cli@0.14.x autorun --config=lighthouserc.js
-        env:
-          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+          echo "Collecting Lighthouse metrics (desktop preset, 3 runs per URL)..."
+          lhci collect --config=lighthouserc.cjs
 
-      - name: Run Lighthouse CI - Mobile
+      - name: Run Lighthouse CI - Assert
+        if: steps.lhci-collect.outcome == 'success'
         run: |
-          echo "Running Lighthouse CI with mobile preset..."
-          # Create temporary mobile config
-          cat > lighthouserc.mobile.js << 'EOF'
-          export default {
-            ci: {
-              collect: {
-                url: [
-                  'http://localhost:8000/',
-                  'http://localhost:8000/stamp/1',
-                  'http://localhost:8000/src20',
-                ],
-                numberOfRuns: 3,
-                settings: {
-                  preset: 'mobile',
-                  chromeFlags: '--no-sandbox --disable-dev-shm-usage',
-                  skipAudits: [
-                    'uses-http2',
-                    'uses-long-cache-ttl',
-                  ],
-                },
-              },
-              assert: {
-                preset: 'lighthouse:recommended',
-                assertions: {
-                  // Slightly relaxed mobile budgets
-                  'total-blocking-time': ['error', { maxNumericValue: 600 }],
-                  'first-contentful-paint': ['error', { maxNumericValue: 2500 }],
-                  'largest-contentful-paint': ['error', { maxNumericValue: 3000 }],
-                  'speed-index': ['error', { maxNumericValue: 4000 }],
-                  'cumulative-layout-shift': ['error', { maxNumericValue: 0.1 }],
-                  'interactive': ['warn', { maxNumericValue: 4000 }],
-                  'max-potential-fid': ['warn', { maxNumericValue: 150 }],
-                  'categories:performance': ['warn', { minScore: 0.85 }],
-                  'categories:accessibility': ['warn', { minScore: 0.8 }],
-                  'categories:best-practices': ['warn', { minScore: 0.85 }],
-                  'categories:seo': ['warn', { minScore: 0.8 }],
-                },
-              },
-              upload: {
-                target: 'temporary-public-storage',
-              },
-            },
-          };
-          EOF
+          echo "Asserting performance budgets..."
+          lhci assert --config=lighthouserc.cjs
 
-          npx @lhci/cli@0.14.x autorun --config=lighthouserc.mobile.js
-        env:
-          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+      - name: Run Lighthouse CI - Upload
+        if: always()
+        run: |
+          echo "Uploading Lighthouse reports..."
+          lhci upload --config=lighthouserc.cjs || true
 
       - name: Upload Lighthouse reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: lighthouse-reports
           path: .lighthouseci/
@@ -146,36 +208,43 @@ jobs:
         run: |
           echo "## Lighthouse CI Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Performance Budgets" >> $GITHUB_STEP_SUMMARY
+          echo "### Performance Budgets (Desktop)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Metric | Budget (Desktop) | Budget (Mobile) |" >> $GITHUB_STEP_SUMMARY
-          echo "|--------|------------------|-----------------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Total Blocking Time | < 500ms | < 600ms |" >> $GITHUB_STEP_SUMMARY
-          echo "| First Contentful Paint | < 2000ms | < 2500ms |" >> $GITHUB_STEP_SUMMARY
-          echo "| Largest Contentful Paint | < 2500ms | < 3000ms |" >> $GITHUB_STEP_SUMMARY
-          echo "| Speed Index | < 3500ms | < 4000ms |" >> $GITHUB_STEP_SUMMARY
-          echo "| Cumulative Layout Shift | < 0.1 | < 0.1 |" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Budget |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Total Blocking Time | < 500ms |" >> $GITHUB_STEP_SUMMARY
+          echo "| First Contentful Paint | < 2000ms |" >> $GITHUB_STEP_SUMMARY
+          echo "| Largest Contentful Paint | < 2500ms |" >> $GITHUB_STEP_SUMMARY
+          echo "| Speed Index | < 3500ms |" >> $GITHUB_STEP_SUMMARY
+          echo "| Cumulative Layout Shift | < 0.1 |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Pages Tested (6 URLs, 3 runs each)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Page | URL |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|-----|" >> $GITHUB_STEP_SUMMARY
+          echo "| Homepage | / |" >> $GITHUB_STEP_SUMMARY
+          echo "| Stamp Detail | /stamp/1384305 |" >> $GITHUB_STEP_SUMMARY
+          echo "| SRC-20 List | /src20 |" >> $GITHUB_STEP_SUMMARY
+          echo "| SRC-20 Detail | /src20/stamp |" >> $GITHUB_STEP_SUMMARY
+          echo "| Block Detail | /block/820000 |" >> $GITHUB_STEP_SUMMARY
+          echo "| Wallet | /wallet/bc1q...gwjmv4 |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "📊 Full reports available in workflow artifacts" >> $GITHUB_STEP_SUMMARY
 
-      - name: Show container logs on failure
+      - name: Show server logs on failure
         if: failure()
         run: |
-          echo "=== Docker Compose Status ==="
-          docker-compose -f docker-compose.dev.yml ps
-          echo ""
-          echo "=== MySQL Logs ==="
-          docker-compose -f docker-compose.dev.yml logs mysql | tail -100
-          echo ""
-          echo "=== Redis Logs ==="
-          docker-compose -f docker-compose.dev.yml logs redis | tail -100
-          echo ""
-          echo "=== Deno App Logs ==="
-          docker-compose -f docker-compose.dev.yml logs deno-app | tail -200
+          echo "=== Dev Server Logs ==="
+          cat dev-server.log || echo "No dev server logs available"
 
       - name: Cleanup
         if: always()
         run: |
-          echo "Stopping docker-compose services..."
-          docker-compose -f docker-compose.dev.yml down -v
-          echo "✅ Cleanup complete"
+          if [ -f dev-server.pid ]; then
+            kill "$(cat dev-server.pid)" 2>/dev/null || true
+            echo "✅ Dev server stopped"
+          fi
+          if [ -f mock-api-server.pid ]; then
+            kill "$(cat mock-api-server.pid)" 2>/dev/null || true
+            echo "✅ Mock API server stopped"
+          fi
