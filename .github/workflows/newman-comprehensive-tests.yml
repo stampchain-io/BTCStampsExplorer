@@ -10,6 +10,7 @@ on:
     paths:
       - 'tests/postman/collections/comprehensive.json'
       - 'tests/postman/collections/pagination-validation.json'
+      - 'tests/postman/collections/schema-contract-tests.json'
       - 'tests/postman/environments/comprehensive.json'
       - 'tests/postman/data/pagination-tests.json'
       - 'scripts/run-newman-comprehensive.sh'
@@ -26,6 +27,7 @@ on:
     paths:
       - 'tests/postman/collections/comprehensive.json'
       - 'tests/postman/collections/pagination-validation.json'
+      - 'tests/postman/collections/schema-contract-tests.json'
       - 'tests/postman/environments/comprehensive.json'
       - 'tests/postman/data/pagination-tests.json'
       - 'scripts/run-newman-comprehensive.sh'
