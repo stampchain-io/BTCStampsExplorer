@@ -292,15 +292,21 @@ class AutomatedRollbackManager {
         expected: 200,
         critical: false
       },
-      // stamp_creation requires real Bitcoin infrastructure (POST with tx data)
-      // Skip in CI where only test DB is available
-      ...(!isCI ? [{
+      // In CI: validate fixture data is accessible via read endpoints
+      // In production: validate stamp creation POST endpoint
+      ...(isCI ? [{
+        name: "stamp_data_access",
+        endpoint: "/api/v2/src20?limit=1",
+        timeout: 10000,
+        expected: 200,
+        critical: true
+      }] : [{
         name: "stamp_creation",
         endpoint: "/api/v2/create/send",
         timeout: 15000,
         expected: /success|pending/,
         critical: true
-      }] : []),
+      }]),
       {
         name: "memory_usage",
         command: "ps aux | grep deno | grep -v grep | awk '{sum+=$6} END {print sum}'",
