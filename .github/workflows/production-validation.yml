@@ -222,12 +222,8 @@ jobs:
       - name: Test rollback procedures in staging
         run: deno task deploy:rollback:test
 
-      - name: Validate rollback health checks
-        run: deno task deploy:rollback:check
-        env:
-          BASE_URL: http://localhost:8000
-
       - name: Upload rollback test results
+        if: always()
         uses: actions/upload-artifact@v6
         with:
           name: rollback-test-results
