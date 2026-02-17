@@ -1,6 +1,6 @@
 // deno-lint-ignore-file no-explicit-any
 
-import { STAMP_TABLE } from "$constants";
+import { IMMUTABLE_CACHE_DURATION, STAMP_TABLE } from "$constants";
 import { dbManager } from "$server/database/databaseManager.ts";
 
 const BLOCK_FIELDS =
@@ -35,7 +35,7 @@ export class BlockRepository {
       WHERE ${field} = ?;
       `,
       [queryValue],
-      "never",
+      IMMUTABLE_CACHE_DURATION,
     );
   }
   /**
@@ -66,7 +66,7 @@ export class BlockRepository {
         LIMIT ?;
         `,
         [num],
-        "never", // Blocks are immutable once confirmed - cache forever
+        IMMUTABLE_CACHE_DURATION, // Blocks are immutable once confirmed - cache forever
       ) || { rows: [] };
 
       const blocks = (result as any).rows;
@@ -130,7 +130,7 @@ export class BlockRepository {
       ORDER BY block_index DESC;
       `,
         [block_index, block_index],
-        "never", // Blocks are immutable once confirmed - cache forever
+        IMMUTABLE_CACHE_DURATION, // Blocks are immutable once confirmed - cache forever
       ),
       this.db.executeQueryWithCache(
         `
@@ -141,7 +141,7 @@ export class BlockRepository {
       GROUP BY block_index;
       `,
         [block_index, block_index],
-        "never",
+        IMMUTABLE_CACHE_DURATION,
       ),
     ]);
 
@@ -173,7 +173,7 @@ export class BlockRepository {
       LIMIT 1;
       `,
       [block_hash],
-      "never",
+      IMMUTABLE_CACHE_DURATION,
     );
     return (result as number[])[0];
   }
