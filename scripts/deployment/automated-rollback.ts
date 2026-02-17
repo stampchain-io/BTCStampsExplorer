@@ -2,11 +2,11 @@
 
 /**
  * Automated Rollback Procedures with Health Check Validation
- * 
+ *
  * Implements blue-green deployment patterns with comprehensive health checks.
  * Provides automated rollback decision matrix based on error rates, performance
  * degradation, and user impact metrics with database migration rollback capabilities.
- * 
+ *
  * Usage:
  *   deno run --allow-all scripts/deployment/automated-rollback.ts --check
  *   deno run --allow-all scripts/deployment/automated-rollback.ts --rollback
@@ -19,6 +19,8 @@ import { exists } from "@std/fs";
 interface HealthCheck {
   name: string;
   endpoint?: string;
+  method?: string;
+  body?: string;
   command?: string;
   timeout: number;
   expected: string | number | RegExp;
@@ -93,12 +95,15 @@ class AutomatedRollbackManager {
 
       // Run health checks
       const healthResults = await this.runHealthChecks();
-      
+
       // Collect metrics
       const metrics = await this.collectMetrics();
-      
+
       // Update slot health score
-      activeSlot.healthScore = this.calculateHealthScore(healthResults, metrics);
+      activeSlot.healthScore = this.calculateHealthScore(
+        healthResults,
+        metrics,
+      );
       activeSlot.lastHealthCheck = new Date().toISOString();
       activeSlot.metrics = metrics;
 
@@ -110,31 +115,32 @@ class AutomatedRollbackManager {
         console.log(`   Reasons: ${rollbackDecision.reason.join(", ")}`);
         console.log(`   User Impact: ${rollbackDecision.userImpact}`);
         console.log(`   Confidence: ${rollbackDecision.confidence}%`);
-        
+
         if (rollbackDecision.userImpact === "critical") {
           await this.executeEmergencyRollback();
         } else {
           await this.executeGracefulRollback();
         }
-        
+
         return false;
       }
 
       console.log(`\n✅ Deployment Health: ${activeSlot.healthScore}%`);
       console.log(`   Error Rate: ${metrics.errorRate.toFixed(2)}%`);
       console.log(`   Response Time: ${metrics.responseTime.toFixed(0)}ms`);
-      console.log(`   Memory Usage: ${(metrics.memoryUsage / 1024 / 1024).toFixed(0)}MB`);
+      console.log(
+        `   Memory Usage: ${(metrics.memoryUsage / 1024 / 1024).toFixed(0)}MB`,
+      );
 
       return true;
-
     } catch (error) {
       console.error("💥 Health check failed:", error.message);
-      
+
       // Emergency rollback on health check failure
       if (!this.rollbackInProgress) {
         await this.executeEmergencyRollback();
       }
-      
+
       return false;
     }
   }
@@ -154,7 +160,9 @@ class AutomatedRollbackManager {
       const activeSlot = this.getActiveSlot();
       const inactiveSlot = this.getInactiveSlot();
 
-      console.log(`📍 Rolling back from ${activeSlot.name} to ${inactiveSlot.name}`);
+      console.log(
+        `📍 Rolling back from ${activeSlot.name} to ${inactiveSlot.name}`,
+      );
 
       // Pre-rollback validation
       const canRollback = await this.validateRollbackReadiness(inactiveSlot);
@@ -174,30 +182,29 @@ class AutomatedRollbackManager {
       if (rollbackSuccess) {
         console.log(`\n✅ Rollback completed successfully`);
         console.log(`   Active slot: ${this.currentSlot}`);
-        
+
         // Mark failed slot as inactive
         activeSlot.status = "failed";
-        
+
         // Send notifications
         await this.sendRollbackNotification("success", {
           from: activeSlot.name,
           to: inactiveSlot.name,
-          reason: "Automated rollback completed"
+          reason: "Automated rollback completed",
         });
-        
+
         return true;
       } else {
         throw new Error("Rollback health verification failed");
       }
-
     } catch (error) {
       console.error("💥 Rollback failed:", error.message);
-      
+
       await this.sendRollbackNotification("failed", {
         error: error.message,
-        requiresManualIntervention: true
+        requiresManualIntervention: true,
       });
-      
+
       return false;
     } finally {
       this.rollbackInProgress = false;
@@ -212,16 +219,29 @@ class AutomatedRollbackManager {
       // Simulate deployment failure scenarios
       const testScenarios = [
         { name: "High Error Rate", errorRate: 25, expectedRollback: true },
-        { name: "Performance Degradation", responseTime: 5000, expectedRollback: true },
-        { name: "Memory Leak", memoryUsage: 2048 * 1024 * 1024, expectedRollback: true },
-        { name: "Normal Operation", errorRate: 1, responseTime: 200, expectedRollback: false }
+        {
+          name: "Performance Degradation",
+          responseTime: 5000,
+          expectedRollback: true,
+        },
+        {
+          name: "Memory Leak",
+          memoryUsage: 2048 * 1024 * 1024,
+          expectedRollback: true,
+        },
+        {
+          name: "Normal Operation",
+          errorRate: 1,
+          responseTime: 200,
+          expectedRollback: false,
+        },
       ];
 
       let passedTests = 0;
 
       for (const scenario of testScenarios) {
         console.log(`\n🔬 Testing scenario: ${scenario.name}`);
-        
+
         // Simulate metrics
         const simulatedMetrics: DeploymentMetrics = {
           errorRate: scenario.errorRate || 1,
@@ -229,16 +249,20 @@ class AutomatedRollbackManager {
           throughput: 100,
           memoryUsage: scenario.memoryUsage || 512 * 1024 * 1024,
           cpuUsage: 50,
-          activeConnections: 100
+          activeConnections: 100,
         };
 
         const decision = await this.evaluateRollbackTriggers(simulatedMetrics);
-        
+
         if (decision.shouldRollback === scenario.expectedRollback) {
-          console.log(`   ✅ Test passed - rollback decision: ${decision.shouldRollback}`);
+          console.log(
+            `   ✅ Test passed - rollback decision: ${decision.shouldRollback}`,
+          );
           passedTests++;
         } else {
-          console.log(`   ❌ Test failed - expected: ${scenario.expectedRollback}, got: ${decision.shouldRollback}`);
+          console.log(
+            `   ❌ Test failed - expected: ${scenario.expectedRollback}, got: ${decision.shouldRollback}`,
+          );
         }
       }
 
@@ -257,10 +281,11 @@ class AutomatedRollbackManager {
 
       console.log(`\n📊 Rollback Tests Summary:`);
       console.log(`   Passed: ${passedTests}/${totalTests}`);
-      console.log(`   Success Rate: ${(passedTests / totalTests * 100).toFixed(1)}%`);
+      console.log(
+        `   Success Rate: ${(passedTests / totalTests * 100).toFixed(1)}%`,
+      );
 
       return success;
-
     } catch (error) {
       console.error("💥 Staging rollback test failed:", error.message);
       return false;
@@ -274,36 +299,47 @@ class AutomatedRollbackManager {
         endpoint: "/api/health",
         timeout: 5000,
         expected: 200,
-        critical: true
+        critical: true,
       },
       {
         name: "database_connection",
         endpoint: "/api/v2/stamps?limit=1",
         timeout: 10000,
         expected: 200,
-        critical: true
+        critical: true,
       },
       {
         name: "redis_connection",
-        endpoint: "/api/health/redis",
+        endpoint: "/api/v2/health",
         timeout: 3000,
         expected: 200,
-        critical: false
+        critical: false,
       },
+      // Stamp creation POST endpoint - uses mock API server in CI,
+      // real Counterparty/Bitcoin APIs in production
       {
         name: "stamp_creation",
         endpoint: "/api/v2/create/send",
+        method: "POST",
+        body: JSON.stringify({
+          address: "bc1qkqqre5xuqk60xtt93j297zgg7t6x0ul7gwjmv4",
+          destination: "bc1qzxszplp8v7w0jc89dlrqyct9staqlhwxzy7lkq",
+          asset: "XCP",
+          quantity: 1,
+          satsPerVB: 12,
+        }),
         timeout: 15000,
-        expected: /success|pending/,
-        critical: true
+        expected: 200,
+        critical: true,
       },
       {
         name: "memory_usage",
-        command: "ps aux | grep deno | grep -v grep | awk '{sum+=$6} END {print sum}'",
+        command:
+          "ps aux | grep deno | grep -v grep | awk '{sum+=$6} END {print sum}'",
         timeout: 5000,
         expected: 2048 * 1024, // 2GB limit in KB
-        critical: false
-      }
+        critical: false,
+      },
     ];
   }
 
@@ -315,7 +351,7 @@ class AutomatedRollbackManager {
         threshold: 5, // 5% error rate
         timeWindow: 300, // 5 minutes
         severity: "critical",
-        enabled: true
+        enabled: true,
       },
       {
         name: "performance_degradation",
@@ -323,7 +359,7 @@ class AutomatedRollbackManager {
         threshold: 3000, // 3 seconds
         timeWindow: 600, // 10 minutes
         severity: "major",
-        enabled: true
+        enabled: true,
       },
       {
         name: "memory_leak",
@@ -331,7 +367,7 @@ class AutomatedRollbackManager {
         threshold: 1536 * 1024 * 1024, // 1.5GB
         timeWindow: 1800, // 30 minutes
         severity: "major",
-        enabled: true
+        enabled: true,
       },
       {
         name: "connection_failure",
@@ -339,7 +375,7 @@ class AutomatedRollbackManager {
         threshold: 10, // Minimum active connections
         timeWindow: 60, // 1 minute
         severity: "critical",
-        enabled: true
+        enabled: true,
       },
       {
         name: "health_check_failure",
@@ -347,8 +383,8 @@ class AutomatedRollbackManager {
         threshold: 70, // 70% health score
         timeWindow: 180, // 3 minutes
         severity: "critical",
-        enabled: true
-      }
+        enabled: true,
+      },
     ];
   }
 
@@ -366,8 +402,8 @@ class AutomatedRollbackManager {
           throughput: 100,
           memoryUsage: 512 * 1024 * 1024,
           cpuUsage: 30,
-          activeConnections: 50
-        }
+          activeConnections: 50,
+        },
       },
       {
         name: "green",
@@ -381,9 +417,9 @@ class AutomatedRollbackManager {
           throughput: 80,
           memoryUsage: 480 * 1024 * 1024,
           cpuUsage: 25,
-          activeConnections: 0
-        }
-      }
+          activeConnections: 0,
+        },
+      },
     ];
   }
 
@@ -401,11 +437,19 @@ class AutomatedRollbackManager {
           // HTTP endpoint check
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), check.timeout);
-          
-          const response = await fetch(`${baseUrl}${check.endpoint}`, {
-            signal: controller.signal
-          });
-          
+
+          const fetchOptions: RequestInit = { signal: controller.signal };
+          if (check.method) fetchOptions.method = check.method;
+          if (check.body) {
+            fetchOptions.body = check.body;
+            fetchOptions.headers = { "Content-Type": "application/json" };
+          }
+
+          const response = await fetch(
+            `${baseUrl}${check.endpoint}`,
+            fetchOptions,
+          );
+
           clearTimeout(timeoutId);
 
           if (typeof check.expected === "number") {
@@ -414,21 +458,20 @@ class AutomatedRollbackManager {
             const text = await response.text();
             passed = check.expected.test(text);
           }
-
         } else if (check.command) {
           // Command execution check
           const cmd = new Deno.Command("sh", {
             args: ["-c", check.command],
             stdout: "piped",
-            stderr: "piped"
+            stderr: "piped",
           });
 
           const result = await cmd.output();
-          
+
           if (result.code === 0) {
             const output = new TextDecoder().decode(result.stdout).trim();
             const value = parseFloat(output) || 0;
-            
+
             if (typeof check.expected === "number") {
               passed = value <= check.expected;
             }
@@ -436,8 +479,11 @@ class AutomatedRollbackManager {
         }
 
         results.set(check.name, passed);
-        console.log(`   ${passed ? "✅" : "❌"} ${check.name}${check.critical ? " [CRITICAL]" : ""}`);
-
+        console.log(
+          `   ${passed ? "✅" : "❌"} ${check.name}${
+            check.critical ? " [CRITICAL]" : ""
+          }`,
+        );
       } catch (error) {
         results.set(check.name, false);
         console.log(`   ❌ ${check.name} - Error: ${error.message}`);
@@ -450,14 +496,14 @@ class AutomatedRollbackManager {
   private async collectMetrics(): Promise<DeploymentMetrics> {
     // In a real implementation, this would collect actual metrics
     // For now, we'll simulate metrics collection
-    
+
     const baseMetrics = {
       errorRate: Math.random() * 2, // 0-2% error rate
       responseTime: 150 + Math.random() * 100, // 150-250ms
       throughput: 80 + Math.random() * 40, // 80-120 requests/sec
       memoryUsage: (400 + Math.random() * 200) * 1024 * 1024, // 400-600MB
       cpuUsage: 20 + Math.random() * 30, // 20-50% CPU
-      activeConnections: 40 + Math.floor(Math.random() * 60) // 40-100 connections
+      activeConnections: 40 + Math.floor(Math.random() * 60), // 40-100 connections
     };
 
     // Store metrics history for trend analysis
@@ -466,7 +512,7 @@ class AutomatedRollbackManager {
         this.metricsHistory[key] = [];
       }
       this.metricsHistory[key].push(value);
-      
+
       // Keep only last 100 data points
       if (this.metricsHistory[key].length > 100) {
         this.metricsHistory[key] = this.metricsHistory[key].slice(-100);
@@ -476,13 +522,16 @@ class AutomatedRollbackManager {
     return baseMetrics;
   }
 
-  private calculateHealthScore(healthResults: Map<string, boolean>, metrics: DeploymentMetrics): number {
+  private calculateHealthScore(
+    healthResults: Map<string, boolean>,
+    metrics: DeploymentMetrics,
+  ): number {
     let score = 100;
 
     // Deduct points for failed health checks
     for (const [checkName, passed] of healthResults) {
       if (!passed) {
-        const check = this.healthChecks.find(c => c.name === checkName);
+        const check = this.healthChecks.find((c) => c.name === checkName);
         if (check?.critical) {
           score -= 30; // Critical checks are worth more
         } else {
@@ -500,7 +549,9 @@ class AutomatedRollbackManager {
     return Math.max(0, score);
   }
 
-  private async evaluateRollbackTriggers(metrics: DeploymentMetrics): Promise<RollbackDecision> {
+  private async evaluateRollbackTriggers(
+    metrics: DeploymentMetrics,
+  ): Promise<RollbackDecision> {
     const triggeredTriggers: RollbackTrigger[] = [];
     const reasons: string[] = [];
 
@@ -512,28 +563,54 @@ class AutomatedRollbackManager {
       switch (trigger.name) {
         case "high_error_rate":
           triggered = metrics.errorRate > trigger.threshold;
-          if (triggered) reasons.push(`Error rate ${metrics.errorRate.toFixed(1)}% exceeds ${trigger.threshold}%`);
+          if (triggered) {
+            reasons.push(
+              `Error rate ${
+                metrics.errorRate.toFixed(1)
+              }% exceeds ${trigger.threshold}%`,
+            );
+          }
           break;
 
         case "performance_degradation":
           triggered = metrics.responseTime > trigger.threshold;
-          if (triggered) reasons.push(`Response time ${metrics.responseTime.toFixed(0)}ms exceeds ${trigger.threshold}ms`);
+          if (triggered) {
+            reasons.push(
+              `Response time ${
+                metrics.responseTime.toFixed(0)
+              }ms exceeds ${trigger.threshold}ms`,
+            );
+          }
           break;
 
         case "memory_leak":
           triggered = metrics.memoryUsage > trigger.threshold;
-          if (triggered) reasons.push(`Memory usage ${(metrics.memoryUsage / 1024 / 1024).toFixed(0)}MB exceeds threshold`);
+          if (triggered) {
+            reasons.push(
+              `Memory usage ${
+                (metrics.memoryUsage / 1024 / 1024).toFixed(0)
+              }MB exceeds threshold`,
+            );
+          }
           break;
 
         case "connection_failure":
           triggered = metrics.activeConnections < trigger.threshold;
-          if (triggered) reasons.push(`Active connections ${metrics.activeConnections} below minimum ${trigger.threshold}`);
+          if (triggered) {
+            reasons.push(
+              `Active connections ${metrics.activeConnections} below minimum ${trigger.threshold}`,
+            );
+          }
           break;
 
         case "health_check_failure":
           const activeSlot = this.getActiveSlot();
           triggered = activeSlot.healthScore < trigger.threshold;
-          if (triggered) reasons.push(`Health score ${activeSlot.healthScore}% below ${trigger.threshold}%`);
+          if (triggered) {
+            reasons.push(
+              `Health score ${activeSlot.healthScore}% below ${trigger.threshold}%`,
+            );
+          }
           break;
       }
 
@@ -542,8 +619,12 @@ class AutomatedRollbackManager {
       }
     }
 
-    const criticalTriggers = triggeredTriggers.filter(t => t.severity === "critical");
-    const majorTriggers = triggeredTriggers.filter(t => t.severity === "major");
+    const criticalTriggers = triggeredTriggers.filter((t) =>
+      t.severity === "critical"
+    );
+    const majorTriggers = triggeredTriggers.filter((t) =>
+      t.severity === "major"
+    );
 
     let shouldRollback = false;
     let userImpact: "low" | "medium" | "high" | "critical" = "low";
@@ -569,16 +650,24 @@ class AutomatedRollbackManager {
       triggeredBy: triggeredTriggers,
       confidence,
       userImpact,
-      estimatedDowntime: shouldRollback ? (userImpact === "critical" ? 30 : 120) : 0
+      estimatedDowntime: shouldRollback
+        ? (userImpact === "critical" ? 30 : 120)
+        : 0,
     };
   }
 
-  private async validateRollbackReadiness(inactiveSlot: DeploymentSlot): Promise<boolean> {
-    console.log(`\n🔍 Validating rollback readiness for ${inactiveSlot.name} slot...`);
+  private async validateRollbackReadiness(
+    inactiveSlot: DeploymentSlot,
+  ): Promise<boolean> {
+    console.log(
+      `\n🔍 Validating rollback readiness for ${inactiveSlot.name} slot...`,
+    );
 
     // Check if inactive slot is healthy
     if (inactiveSlot.healthScore < 80) {
-      console.log(`   ❌ Inactive slot health score too low: ${inactiveSlot.healthScore}%`);
+      console.log(
+        `   ❌ Inactive slot health score too low: ${inactiveSlot.healthScore}%`,
+      );
       return false;
     }
 
@@ -599,25 +688,32 @@ class AutomatedRollbackManager {
     try {
       // Get current migration version
       const currentVersion = await this.getCurrentDatabaseVersion();
-      
+
       // Get rollback target version
       const targetVersion = await this.getRollbackTargetVersion();
-      
+
       if (currentVersion === targetVersion) {
-        console.log(`   ✅ No database rollback needed (already at ${targetVersion})`);
+        console.log(
+          `   ✅ No database rollback needed (already at ${targetVersion})`,
+        );
         return;
       }
 
       // Execute rollback migrations
-      const migrations = await this.getPendingRollbackMigrations(currentVersion, targetVersion);
-      
+      const migrations = await this.getPendingRollbackMigrations(
+        currentVersion,
+        targetVersion,
+      );
+
       for (const migration of migrations) {
         if (!migration.canRollback) {
-          throw new Error(`Migration ${migration.version} cannot be rolled back`);
+          throw new Error(
+            `Migration ${migration.version} cannot be rolled back`,
+          );
         }
 
         console.log(`   🔄 Rolling back migration: ${migration.version}`);
-        
+
         if (migration.rollbackSql) {
           // Execute rollback SQL (simulated)
           console.log(`   ✅ Rollback completed for ${migration.version}`);
@@ -626,9 +722,8 @@ class AutomatedRollbackManager {
 
       // Verify data integrity
       await this.verifyDataIntegrity();
-      
-      console.log(`   ✅ Database rollback completed successfully`);
 
+      console.log(`   ✅ Database rollback completed successfully`);
     } catch (error) {
       console.error(`   ❌ Database rollback failed: ${error.message}`);
       throw error;
@@ -636,14 +731,18 @@ class AutomatedRollbackManager {
   }
 
   private async switchTrafficSlot(): Promise<void> {
-    console.log(`\n🔀 Switching traffic from ${this.currentSlot} to ${this.currentSlot === "blue" ? "green" : "blue"}...`);
+    console.log(
+      `\n🔀 Switching traffic from ${this.currentSlot} to ${
+        this.currentSlot === "blue" ? "green" : "blue"
+      }...`,
+    );
 
     // In a real implementation, this would update load balancer configuration
     // For simulation, we just switch the current slot indicator
     this.currentSlot = this.currentSlot === "blue" ? "green" : "blue";
-    
+
     // Update slot statuses
-    this.deploymentSlots.forEach(slot => {
+    this.deploymentSlots.forEach((slot) => {
       if (slot.name === this.currentSlot) {
         slot.status = "active";
       } else {
@@ -658,18 +757,22 @@ class AutomatedRollbackManager {
     console.log(`\n🔍 Verifying rollback health...`);
 
     // Wait for services to stabilize
-    await new Promise(resolve => setTimeout(resolve, 10000));
+    await new Promise((resolve) => setTimeout(resolve, 10000));
 
     // Run health checks on the new active slot
     const healthResults = await this.runHealthChecks();
     const failedCriticalChecks = Array.from(healthResults.entries())
       .filter(([checkName, passed]) => {
-        const check = this.healthChecks.find(c => c.name === checkName);
+        const check = this.healthChecks.find((c) => c.name === checkName);
         return !passed && check?.critical;
       });
 
     if (failedCriticalChecks.length > 0) {
-      console.log(`   ❌ Critical health checks failed: ${failedCriticalChecks.map(([name]) => name).join(", ")}`);
+      console.log(
+        `   ❌ Critical health checks failed: ${
+          failedCriticalChecks.map(([name]) => name).join(", ")
+        }`,
+      );
       return false;
     }
 
@@ -685,7 +788,7 @@ class AutomatedRollbackManager {
   private async executeGracefulRollback(): Promise<void> {
     console.log("🔄 EXECUTING GRACEFUL ROLLBACK");
     // Allow current requests to complete before rolling back
-    await new Promise(resolve => setTimeout(resolve, 30000)); // 30 second grace period
+    await new Promise((resolve) => setTimeout(resolve, 30000)); // 30 second grace period
     await this.executeRollback();
   }
 
@@ -693,39 +796,44 @@ class AutomatedRollbackManager {
     try {
       // Simulate database rollback test
       console.log(`   🔄 Simulating database rollback...`);
-      
+
       // In a real implementation, this would:
       // 1. Create a test migration
       // 2. Apply it
       // 3. Roll it back
       // 4. Verify data integrity
-      
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       return true;
     } catch (error) {
-      console.error(`   ❌ Database rollback simulation failed: ${error.message}`);
+      console.error(
+        `   ❌ Database rollback simulation failed: ${error.message}`,
+      );
       return false;
     }
   }
 
-  private async sendRollbackNotification(status: "success" | "failed", details: any): Promise<void> {
+  private async sendRollbackNotification(
+    status: "success" | "failed",
+    details: any,
+  ): Promise<void> {
     // In a real implementation, this would send notifications via:
     // - Slack/Teams webhook
     // - Email alerts
     // - PagerDuty/incident management system
     // - CloudWatch/monitoring system
-    
+
     console.log(`\n📧 Rollback notification sent: ${status.toUpperCase()}`);
     console.log(`   Details: ${JSON.stringify(details, null, 2)}`);
   }
 
   private getActiveSlot(): DeploymentSlot {
-    return this.deploymentSlots.find(slot => slot.name === this.currentSlot)!;
+    return this.deploymentSlots.find((slot) => slot.name === this.currentSlot)!;
   }
 
   private getInactiveSlot(): DeploymentSlot {
-    return this.deploymentSlots.find(slot => slot.name !== this.currentSlot)!;
+    return this.deploymentSlots.find((slot) => slot.name !== this.currentSlot)!;
   }
 
   private async getCurrentDatabaseVersion(): Promise<string> {
@@ -738,7 +846,10 @@ class AutomatedRollbackManager {
     return "2024.01.10";
   }
 
-  private async getPendingRollbackMigrations(current: string, target: string): Promise<DatabaseMigration[]> {
+  private async getPendingRollbackMigrations(
+    current: string,
+    target: string,
+  ): Promise<DatabaseMigration[]> {
     // Simulate getting migrations that need to be rolled back
     return [
       {
@@ -746,15 +857,15 @@ class AutomatedRollbackManager {
         timestamp: "2024-01-15T10:00:00Z",
         rollbackSql: "DROP TABLE new_feature_table;",
         canRollback: true,
-        dataIntegrityCheck: "SELECT COUNT(*) FROM core_tables"
-      }
+        dataIntegrityCheck: "SELECT COUNT(*) FROM core_tables",
+      },
     ];
   }
 
   private async verifyDataIntegrity(): Promise<void> {
     // Simulate data integrity verification
     console.log(`   🔍 Verifying data integrity...`);
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
     console.log(`   ✅ Data integrity verified`);
   }
 }
@@ -788,11 +899,14 @@ if (import.meta.main) {
     }
 
     Deno.exit(success ? 0 : 1);
-
   } catch (error) {
     console.error("💥 Rollback operation failed:", error.message);
     Deno.exit(1);
   }
 }
 
-export { AutomatedRollbackManager, type RollbackDecision, type DeploymentMetrics };
+export {
+  AutomatedRollbackManager,
+  type DeploymentMetrics,
+  type RollbackDecision,
+};
