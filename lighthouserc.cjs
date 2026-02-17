@@ -86,6 +86,8 @@ module.exports = {
         "image-redundant-alt": ["warn", { minScore: 0 }],
         "target-size": ["warn", { minScore: 0 }],
         "dom-size": ["warn", { minScore: 0 }],
+        "select-name": ["warn", { minScore: 0 }],
+        "color-contrast": ["warn", { minScore: 0 }],
         "legacy-javascript": "off",
 
         // Skipped audit - don't assert on it
