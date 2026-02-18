@@ -49,6 +49,12 @@ type ServerConfig = {
   readonly CONNECTION_POOL_RESET_TOKEN?: string;
   readonly CF_PREVIEW_WORKER_URL?: string;
   readonly CF_PREVIEW_WORKER_SECRET?: string;
+  // S3 & CloudFront (stamp preview storage)
+  readonly AWS_S3_BUCKETNAME: string;
+  readonly AWS_S3_IMAGE_DIR: string;
+  readonly CLOUDFRONT_PREVIEW_DOMAIN: string;
+  readonly PREVIEW_STORAGE: "s3" | "redis";
+  readonly AWS_REGION: string;
   // Rendering
   readonly PUPPETEER_EXECUTABLE_PATH?: string;
   // Server Role
@@ -180,6 +186,22 @@ const serverConfig: ServerConfig = {
   },
   get CF_PREVIEW_WORKER_SECRET() {
     return Deno.env.get("CF_PREVIEW_WORKER_SECRET") || "";
+  },
+  // S3 & CloudFront (stamp preview storage)
+  get AWS_S3_BUCKETNAME() {
+    return Deno.env.get("AWS_S3_BUCKETNAME") ?? "";
+  },
+  get AWS_S3_IMAGE_DIR() {
+    return Deno.env.get("AWS_S3_IMAGE_DIR") ?? "stamps/";
+  },
+  get CLOUDFRONT_PREVIEW_DOMAIN() {
+    return Deno.env.get("CLOUDFRONT_PREVIEW_DOMAIN") ?? "stampchain.io";
+  },
+  get PREVIEW_STORAGE(): "s3" | "redis" {
+    return (Deno.env.get("PREVIEW_STORAGE") ?? "redis") as "s3" | "redis";
+  },
+  get AWS_REGION() {
+    return Deno.env.get("AWS_REGION") ?? "us-east-1";
   },
   // Rendering
   get PUPPETEER_EXECUTABLE_PATH() {

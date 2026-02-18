@@ -8,5 +8,10 @@
   {"name": "DENO_ENV", "value": "production"},
   {"name": "SKIP_REDIS_CONNECTION", "value": "false"},
   {"name": "ELASTICACHE_ENDPOINT", "value": "memory"},
-  {"name": "SKIP_REDIS", "value": "false"}
+  {"name": "SKIP_REDIS", "value": "false"},
+  {"name": "AWS_S3_BUCKETNAME", "value": "{existing-bucket-name}"},
+  {"name": "AWS_S3_IMAGE_DIR", "value": "stamps/"},
+  {"name": "CLOUDFRONT_PREVIEW_DOMAIN", "value": "stampchain.io"},
+  {"name": "PREVIEW_STORAGE", "value": "s3"},
+  {"name": "AWS_REGION", "value": "us-east-1"}
 ]
