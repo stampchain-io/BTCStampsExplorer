@@ -34,7 +34,7 @@ describe("Test Seed Data SQL Syntax Validation", () => {
 
       assertMatch(
         seedSQL,
-        /--.*BTCStampsExplorer.*Test.*Seed.*Data/i,
+        /--.*stampchain\.io.*Test.*Seed.*Data/i,
         "Should have descriptive header comment"
       );
     });

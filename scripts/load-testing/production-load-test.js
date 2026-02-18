@@ -5,7 +5,7 @@ import http from "k6/http";
 import { Counter, Rate, Trend } from "k6/metrics";
 
 // =============================================================================
-// BTCStampsExplorer - Production Load Testing Suite
+// stampchain.io - Production Load Testing Suite
 // =============================================================================
 // Comprehensive load testing for production readiness validation
 // Tests both v2.2 and v2.3 API versions under various load conditions
@@ -122,7 +122,7 @@ export let options = {
 
 // Test setup
 export function setup() {
-  console.log("🚀 Starting BTCStampsExplorer Load Testing Suite...");
+  console.log("🚀 Starting stampchain.io Load Testing Suite...");
   console.log(`   Base URL: ${BASE_URL}`);
   console.log(`   Test Address: ${TEST_ADDRESS}`);
 
@@ -358,7 +358,7 @@ export function handleSummary(data) {
 
 function generateCustomSummary(data) {
   const summary = [
-    "\n🚀 BTCStampsExplorer Load Test Results Summary\n",
+    "\n🚀 stampchain.io Load Test Results Summary\n",
     "================================================\n",
   ];
 
