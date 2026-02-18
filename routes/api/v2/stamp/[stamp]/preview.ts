@@ -15,8 +15,11 @@
  *
  * All images are output as 1200x1200 PNG with compression level 9
  *
- * Caching: Rendered PNGs are cached in Redis as base64. Stamps are immutable
- * blockchain data so cache entries use a 7-day TTL (604800s) to allow LRU eviction.
+ * Caching:
+ *   PREVIEW_STORAGE=redis (default): PNGs cached in Redis as base64 with 7-day TTL.
+ *   PREVIEW_STORAGE=s3: PNGs stored in S3 as raw binary, served via CloudFront redirect.
+ *     S3 path: {IMAGE_DIR}/previews/{identifier}.png
+ *     CloudFront delivers with immutable Cache-Control.
  */
 import { Handlers } from "$fresh/server.ts";
 import { WebResponseUtil } from "$lib/utils/api/responses/webResponseUtil.ts";
@@ -43,6 +46,14 @@ async function ensureWasmInitialized() {
 }
 
 import { serverConfig } from "$server/config/config.ts";
+import {
+  getPreviewUrl,
+  previewExists,
+  uploadPreview,
+} from "$server/services/aws/previewStorageService.ts";
+
+const useS3Storage = serverConfig.PREVIEW_STORAGE === "s3";
+console.log("[Preview] Storage mode:", useS3Storage ? "s3" : "redis");
 
 // Cloudflare Browser Rendering Worker configuration
 const CF_WORKER_URL = serverConfig.CF_PREVIEW_WORKER_URL;
@@ -701,53 +712,104 @@ async function centerOnCanvas(
   };
 }
 
+/**
+ * S3 storage path: check S3 → redirect to CloudFront. On miss → render →
+ * upload raw PNG to S3 → redirect. No Redis involvement.
+ */
+async function handleS3Preview(
+  stamp: string,
+  forceRefresh: boolean,
+): Promise<Response> {
+  // Check if preview already exists in S3 (skip on force refresh)
+  if (!forceRefresh && await previewExists(stamp)) {
+    return WebResponseUtil.redirect(getPreviewUrl(stamp), 302, {
+      headers: {
+        "X-Cache": "s3-hit",
+        ...CACHE_HEADERS.redirect,
+      },
+    });
+  }
+
+  // Render the preview
+  const rendered = await renderPreview(stamp);
+  if (!rendered?.png) {
+    return WebResponseUtil.redirect(FALLBACK_LOGO, 302, {
+      headers: {
+        "X-Fallback": "render-failed-or-unsupported",
+        ...CACHE_HEADERS.redirect,
+      },
+    });
+  }
+
+  // Upload raw binary PNG to S3 (decode from base64)
+  const pngBytes = fromBase64(rendered.png);
+  await uploadPreview(stamp, pngBytes, rendered.meta);
+
+  // Redirect to CloudFront URL — CF handles Cache-Control from S3 object metadata
+  return WebResponseUtil.redirect(getPreviewUrl(stamp), 302, {
+    headers: {
+      "X-Cache": "s3-uploaded",
+      ...CACHE_HEADERS.redirect,
+    },
+  });
+}
+
+/**
+ * Redis storage path: original behavior — cache base64 PNG in Redis,
+ * serve binary response directly.
+ */
+async function handleRedisPreview(
+  stamp: string,
+  forceRefresh: boolean,
+): Promise<Response> {
+  const cacheKey = `preview:${stamp}`;
+
+  if (forceRefresh) {
+    await dbManager.invalidateCacheByPattern(cacheKey);
+    console.log(`[Preview] Force refresh for ${stamp}, cache cleared`);
+  }
+
+  let wasRendered = false;
+  const cached = await dbManager.handleCache<CachedPreview | null>(
+    cacheKey,
+    async () => {
+      wasRendered = true;
+      return await renderPreview(stamp);
+    },
+    604800,
+  );
+
+  if (cached?.png) {
+    const pngBytes = fromBase64(cached.png);
+    return WebResponseUtil.binaryResponse(pngBytes, "image/png", {
+      immutableBinary: true,
+      headers: {
+        ...cached.meta,
+        "X-Cache": wasRendered ? "rendered" : "redis-hit",
+        ...CACHE_HEADERS.success,
+      },
+    });
+  }
+
+  return WebResponseUtil.redirect(FALLBACK_LOGO, 302, {
+    headers: {
+      "X-Fallback": "render-failed-or-unsupported",
+      ...CACHE_HEADERS.redirect,
+    },
+  });
+}
+
 export const handler: Handlers = {
   async GET(req, ctx) {
     try {
       const { stamp } = ctx.params;
-      const cacheKey = `preview:${stamp}`;
       const url = new URL(req.url);
       const forceRefresh = url.searchParams.get("refresh") === "true";
 
-      // Force refresh: delete existing cache entry before rendering
-      if (forceRefresh) {
-        await dbManager.invalidateCacheByPattern(cacheKey);
-        console.log(`[Preview] Force refresh for ${stamp}, cache cleared`);
+      if (useS3Storage) {
+        return await handleS3Preview(stamp, forceRefresh);
       }
-
-      // handleCache returns cached data on hit, or calls renderPreview on miss.
-      // We use a wrapper to track whether this was a cache hit or fresh render.
-      let wasRendered = false;
-      const cached = await dbManager.handleCache<CachedPreview | null>(
-        cacheKey,
-        async () => {
-          wasRendered = true;
-          return await renderPreview(stamp);
-        },
-        604800,
-      );
-
-      if (cached?.png) {
-        const pngBytes = fromBase64(cached.png);
-        return WebResponseUtil.binaryResponse(pngBytes, "image/png", {
-          immutableBinary: true,
-          headers: {
-            ...cached.meta,
-            "X-Cache": wasRendered ? "rendered" : "redis-hit",
-            ...CACHE_HEADERS.success,
-          },
-        });
-      }
-
-      // null result — stamp not found, unsupported format, or render failure
-      // Return fallback redirect (not cached permanently — null in Redis
-      // is treated as cache miss on next read so render is retried)
-      return WebResponseUtil.redirect(FALLBACK_LOGO, 302, {
-        headers: {
-          "X-Fallback": "render-failed-or-unsupported",
-          ...CACHE_HEADERS.redirect,
-        },
-      });
+      return await handleRedisPreview(stamp, forceRefresh);
     } catch (error) {
       console.error("Preview generation error:", error);
       return WebResponseUtil.redirect(FALLBACK_LOGO, 302, {
