@@ -1,4 +1,4 @@
-// Horizon Wallet Integration for BTCStampsExplorer
+// Horizon Wallet Integration for stampchain.io
 // Based on API discovery from testing - supports 6 methods:
 // getAddresses, signPsbt, signMessage, fairmint, dispense, openOrder
 

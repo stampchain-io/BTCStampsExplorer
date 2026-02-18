@@ -1,7 +1,7 @@
 #!/usr/bin/env -S deno run --allow-run --allow-write
 
 /**
- * Comprehensive TypeScript error analysis for BTCStampsExplorer
+ * Comprehensive TypeScript error analysis for stampchain.io
  * Generates detailed reports on type errors across the project
  */
 
@@ -91,7 +91,7 @@ function parseTypeErrors(output: string): AnalysisResult {
         } else {
           // Error without file path - try to extract from import statements
           const importMatch = currentErrorBlock.join(" ").match(
-            /import\("file:\/\/.*\/BTCStampsExplorer\/(.+?)"\)/,
+            /import\("file:\/\/.*\/App\/(.+?)"\)/,
           );
           if (importMatch) {
             currentFileName = importMatch[1];
@@ -150,7 +150,7 @@ function parseTypeErrors(output: string): AnalysisResult {
       if (line.trim().startsWith("at file://")) {
         // Extract the file path
         const fileMatch = line.match(
-          /at file:\/\/.*\/BTCStampsExplorer\/(.+?):/,
+          /at file:\/\/.*\/App\/(.+?):/,
         );
         if (fileMatch) {
           currentFileName = fileMatch[1];
@@ -169,7 +169,7 @@ function parseTypeErrors(output: string): AnalysisResult {
     } else {
       // Try to extract from import statements for final block
       const importMatch = currentErrorBlock.join(" ").match(
-        /import\("file:\/\/.*\/BTCStampsExplorer\/(.+?)"\)/,
+        /import\("file:\/\/.*\/App\/(.+?)"\)/,
       );
       if (importMatch) {
         currentFileName = importMatch[1];

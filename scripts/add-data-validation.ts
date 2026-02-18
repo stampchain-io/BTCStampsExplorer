@@ -432,7 +432,7 @@ function processItems(items: PostmanItem[]): number {
  */
 async function main() {
   const collectionPath =
-    "/home/StampchainWorkspace/BTCStampsExplorer/tests/postman/collections/comprehensive.json";
+    "./tests/postman/collections/comprehensive.json";
 
   console.log("Reading Postman collection...");
   const collectionText = await Deno.readTextFile(collectionPath);

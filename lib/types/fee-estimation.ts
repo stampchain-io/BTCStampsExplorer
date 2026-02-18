@@ -6,7 +6,7 @@
  * - Phase 2: Smart UTXO-based estimates with caching
  * - Phase 3: Exact transaction construction
  *
- * @author BTCStampsExplorer Team
+ * @author stampchain.io
  * @version 1.0.0
  */
 

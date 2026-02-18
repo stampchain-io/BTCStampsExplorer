@@ -4,7 +4,7 @@
  * Type Testing Pipeline
  * 
  * Automated type testing pipeline with regression detection, coverage reporting,
- * and CI/CD integration for the BTCStampsExplorer Deno Fresh 2.4 project.
+ * and CI/CD integration for the stampchain.io Deno Fresh project.
  * 
  * Usage:
  *   deno task type:test:regression  # Run regression tests

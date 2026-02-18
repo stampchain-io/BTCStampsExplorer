@@ -4,7 +4,7 @@
  * This module contains all type definitions related to the SRC-20 token protocol
  * including operation types, token metadata, balance tracking, and validation helpers.
  *
- * @author BTCStampsExplorer Team
+ * @author stampchain.io
  * @version 1.0.0
  * @created 2025-01-31
  *

@@ -156,7 +156,7 @@ async function testEndpoint(test: EndpointTest): Promise<{
     const response = await fetch(test.url, {
       method: test.method,
       headers: {
-        'User-Agent': 'BTCStampsExplorer-Diagnostic/1.0',
+        'User-Agent': 'stampchain.io-Diagnostic/1.0',
         ...test.headers
       },
       signal: controller.signal
@@ -215,7 +215,7 @@ async function testEndpoint(test: EndpointTest): Promise<{
 
 async function runDiagnostics(): Promise<void> {
   const target = isLocal ? '🔧 LOCAL DEV SERVER' : '🌐 PRODUCTION';
-  console.log(colorize(`\n🔬 BTCStampsExplorer Diagnostics - ${target}`, 'bold'));
+  console.log(colorize(`\n🔬 stampchain.io Diagnostics - ${target}`, 'bold'));
   console.log(colorize(`Target: ${BASE_URL}`, 'dim'));
   console.log(colorize(`Time: ${new Date().toISOString()}`, 'dim'));
   console.log('─'.repeat(80));

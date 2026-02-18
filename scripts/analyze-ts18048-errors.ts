@@ -195,7 +195,7 @@ function printReport(summary: ErrorSummary) {
     // Show sample errors from this category
     const samples = errors.slice(0, 3);
     for (const error of samples) {
-      const relativePath = error.file.replace(/.*\/BTCStampsExplorer\//, "");
+      const relativePath = error.file.replace(/.*\/App\//, "");
       console.log(`  ${relativePath}:${error.line}:${error.column}`);
       console.log(`    Property: ${error.objectType}.${error.property}`);
     }
@@ -211,7 +211,7 @@ function printReport(summary: ErrorSummary) {
     .slice(0, 10);
   
   for (const [file, errors] of sortedFiles) {
-    const relativePath = file.replace(/.*\/BTCStampsExplorer\//, "");
+    const relativePath = file.replace(/.*\/App\//, "");
     console.log(`\n${relativePath}: ${errors.length} errors`);
     
     // Group errors by property in this file
@@ -244,7 +244,7 @@ function printReport(summary: ErrorSummary) {
   
   for (let i = 0; i < summary.priorityFiles.length; i++) {
     const file = summary.priorityFiles[i];
-    const relativePath = file.replace(/.*\/BTCStampsExplorer\//, "");
+    const relativePath = file.replace(/.*\/App\//, "");
     const errors = summary.byFile.get(file)!;
     console.log(`${i + 1}. ${relativePath} (${errors.length} errors)`);
   }
@@ -274,7 +274,7 @@ async function saveDetailedReport(errors: TS18048Error[], summary: ErrorSummary)
     },
     errors: errors.map(error => ({
       ...error,
-      relativePath: error.file.replace(/.*\/BTCStampsExplorer\//, ""),
+      relativePath: error.file.replace(/.*\/App\//, ""),
     })),
   };
   
