@@ -1,4 +1,4 @@
--- BTCStampsExplorer Test Database Schema
+-- stampchain.io Test Database Schema
 -- Directly derived from btc_stamps/indexer/table_schema.sql (production)
 -- Only includes tables needed for API endpoint testing
 -- Updated: 2026-02-13 - Aligned 1:1 with production indexer schema
