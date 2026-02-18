@@ -1,6 +1,6 @@
 // Core Task Verification Infrastructure
 // Purpose: Comprehensive validation system for task completion
-// Part of Task 40: Verification System for BTCStampsExplorer
+// Part of Task 40: Verification System for stampchain.io
 
 import { join } from "@std/path";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";

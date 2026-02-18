@@ -1,7 +1,7 @@
 /**
  * Rate Limiting Configuration
  *
- * Centralized rate limit settings for BTCStampsExplorer API
+ * Centralized rate limit settings for stampchain.io API
  *
  * Created: November 2025
  */

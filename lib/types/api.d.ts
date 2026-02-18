@@ -1746,7 +1746,7 @@ export declare function isBlockchainError(
 // ============================================================================
 
 /**
- * Complete endpoint registry for BTCStampsExplorer API
+ * Complete endpoint registry for stampchain.io API
  * Total: 74 endpoints (49 public v2, 23 internal, 2 proxy)
  */
 export interface EndpointRegistry {

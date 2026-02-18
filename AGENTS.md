@@ -1,7 +1,7 @@
-# BTCStampsExplorer Agent Guidelines
+# stampchain.io Agent Guidelines
 
 This document summarizes standards, development practices, and style
-conventions for working on the BTCStampsExplorer code base. The
+conventions for working on the stampchain.io code base. The
 repository hosts a Deno Fresh web application and REST API. Follow
 these guidelines for consistent code quality and project maintenance.
 Detailed rules for linting, formatting, workflow commands, and more

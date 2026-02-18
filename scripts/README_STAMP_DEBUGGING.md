@@ -1,6 +1,6 @@
 # Stamp Minting Debug Scripts
 
-These scripts are essential for debugging and testing the stamp minting functionality in BTCStampsExplorer.
+These scripts are essential for debugging and testing the stamp minting functionality in stampchain.io.
 
 ## Essential Debug Scripts
 

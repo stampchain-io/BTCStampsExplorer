@@ -1,6 +1,6 @@
 # 🚀 World-Class Sorting Infrastructure Integration Guide
 
-This guide shows how to integrate the new world-class sorting infrastructure with existing BTCStampsExplorer components while maintaining backward compatibility.
+This guide shows how to integrate the new world-class sorting infrastructure with existing stampchain.io components while maintaining backward compatibility.
 
 ## 📋 Table of Contents
 

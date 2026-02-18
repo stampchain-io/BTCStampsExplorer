@@ -143,7 +143,7 @@ Deno.test("MaraSlipstreamService - Configuration", async (t) => {
 // TODO: Skip ES module stubbing tests due to architectural limitations
 // These tests attempt to stub FetchHttpClient prototype methods, which is not supported
 // in Deno's testing environment. Will need refactoring to dependency injection pattern.
-// Issue: https://github.com/BTCStampsExplorer/issues/es-module-stubbing
+// Issue: https://github.com/stampchain-io/stampchain.io/issues/es-module-stubbing
 Deno.test.ignore("MaraSlipstreamService - Fee Rate Fetching", async (t) => {
   await t.step("should fetch fee rate successfully", async () => {
     setupMockProviders();

@@ -1,13 +1,13 @@
 /**
- * BTCStampsExplorer Type Definitions - Public API
+ * stampchain.io Type Definitions - Public API
  *
  * This file provides the main entry point for all client-side type definitions
- * used throughout the BTCStampsExplorer application. Types are organized by
+ * used throughout the stampchain.io application. Types are organized by
  * functional domains and exported using TypeScript 5.3+ patterns.
  *
  * @fileoverview Public API exports for client-side type definitions
  * @version 2.0.0
- * @author BTCStampsExplorer Team
+ * @author stampchain.io
  *
  * Usage:
  * ```typescript

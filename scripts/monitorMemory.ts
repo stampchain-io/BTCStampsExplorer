@@ -3,7 +3,7 @@
 /**
  * Memory & System Monitoring Script
  *
- * This script provides comprehensive monitoring of BTCStampsExplorer's
+ * This script provides comprehensive monitoring of stampchain.io's
  * memory usage, object pools, ECS status, and business metrics.
  *
  * Usage:
@@ -133,7 +133,7 @@ function colorize(text: string, color: keyof typeof colors): string {
 
 function printHelp() {
   console.log(`
-${colorize('BTCStampsExplorer Memory & System Monitoring', 'bold')}
+${colorize('stampchain.io Memory & System Monitoring', 'bold')}
 
 ${colorize('Usage:', 'cyan')}
   deno run --allow-net --allow-env scripts/monitorMemory.ts [options]
@@ -177,7 +177,7 @@ async function fetchEndpoint(action: string): Promise<any> {
       signal: controller.signal,
       headers: {
         'Accept': 'application/json',
-        'User-Agent': 'BTCStampsExplorer-Monitor/1.0'
+        'User-Agent': 'stampchain.io-Monitor/1.0'
       }
     });
 
@@ -336,7 +336,7 @@ function formatHealthData(data: HealthData): void {
 }
 
 async function runMonitoring(): Promise<void> {
-  console.log(colorize(`\n🔍 BTCStampsExplorer System Monitor`, 'bold'));
+  console.log(colorize(`\n🔍 stampchain.io System Monitor`, 'bold'));
   console.log(colorize(`Target: ${config.baseUrl}`, 'dim'));
   console.log(colorize(`Time: ${new Date().toISOString()}`, 'dim'));
 

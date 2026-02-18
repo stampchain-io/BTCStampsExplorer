@@ -10,7 +10,7 @@
  * - Actionable suggestions for common errors
  * - Correlation ID tracking for debugging
  *
- * @author BTCStampsExplorer Team
+ * @author stampchain.io
  * @version 1.0.0
  */
 

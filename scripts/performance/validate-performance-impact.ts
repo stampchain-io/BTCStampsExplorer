@@ -267,7 +267,7 @@ class PerformanceImpactValidator {
     return `# Performance Impact Validation Report - Task 28.5
 
 **Generated**: ${timestamp}
-**Project**: BTCStampsExplorer (Deno Fresh 2.4)
+**Project**: stampchain.io (Deno Fresh)
 **Task**: Validate Performance Impact of Standardized Patterns
 
 ## Executive Summary
