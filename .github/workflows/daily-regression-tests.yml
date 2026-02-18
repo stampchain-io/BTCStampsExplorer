@@ -153,6 +153,12 @@ jobs:
           exit $TEST_EXIT_CODE
         continue-on-error: true
 
+      - name: Fix Docker file permissions
+        if: always()
+        run: |
+          # Docker containers run as root and change file ownership
+          sudo chown -R $(id -u):$(id -g) . || true
+
       - name: Run regression analysis with historical comparison
         id: analysis
         if: always()
@@ -221,9 +227,13 @@ jobs:
             echo "- Historical Trends: Available in artifacts" >> daily_summary.md
           fi
           
-          # Save summary
-          cp daily_summary.md "$REPORT_DIR/"
-          
+          # Save summary to report directory (guard against empty REPORT_DIR)
+          if [ -n "$REPORT_DIR" ] && [ -d "$REPORT_DIR" ]; then
+            cp daily_summary.md "$REPORT_DIR/"
+          else
+            echo "⚠️ REPORT_DIR not set or missing, skipping copy"
+          fi
+
           echo "Daily summary generated"
 
       - name: Check for critical regressions
@@ -358,12 +368,13 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v6
         with:
-          name: daily-regression-reports-${{ env.TIMESTAMP }}
+          name: daily-regression-reports-${{ env.TIMESTAMP || 'unknown' }}
           path: |
-            ${{ env.REPORT_DIR }}/
+            reports/daily-regression/
             reports/expected-changes-validation.json
             reports/trends-analysis.json
             daily_summary.md
+          if-no-files-found: warn
           retention-days: 90
 
       - name: Set workflow status

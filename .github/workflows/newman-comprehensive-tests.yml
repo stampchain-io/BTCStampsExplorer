@@ -452,8 +452,33 @@ jobs:
       - name: Fail on scheduled regression
         if: github.event_name == 'schedule' && steps.newman-test.outcome == 'failure'
         run: |
-          echo "❌ Scheduled production validation detected API regressions"
-          echo "   A GitHub issue has been created with details."
+          # Check actual Newman assertion failures from JSON report instead of
+          # relying on Docker container exit code (which can fail for infra reasons
+          # even when all assertions pass).
+          LATEST_REPORT=$(ls -t reports/newman-comprehensive/*.json 2>/dev/null | head -1)
+          if [ -n "$LATEST_REPORT" ]; then
+            ASSERTION_FAILURES=$(node -e "
+              const fs = require('fs');
+              try {
+                const r = JSON.parse(fs.readFileSync('$LATEST_REPORT', 'utf8'));
+                const failed = r.run?.stats?.assertions?.failed ?? 0;
+                console.log(failed);
+              } catch(e) { console.log('-1'); }
+            " 2>/dev/null || echo "-1")
+
+            if [ "$ASSERTION_FAILURES" = "0" ]; then
+              echo "✅ Newman assertions all passed (Docker exit was non-zero but no assertion failures)"
+              echo "   Skipping failure — Docker/infra issue, not an API regression."
+              exit 0
+            elif [ "$ASSERTION_FAILURES" = "-1" ]; then
+              echo "⚠️ Could not parse Newman report — treating as failure"
+            else
+              echo "❌ Scheduled production validation: $ASSERTION_FAILURES assertion failure(s)"
+              echo "   A GitHub issue has been created with details."
+            fi
+          else
+            echo "⚠️ No Newman JSON report found — treating as failure"
+          fi
           exit 1
 
   pagination-validation:
