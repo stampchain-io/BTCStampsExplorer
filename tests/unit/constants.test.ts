@@ -170,6 +170,7 @@ Deno.test("constants - wallet providers", () => {
     "tapwallet",
     "phantom",
     "horizon",
+    "xverse",
   ];
 
   assertEquals(

@@ -5,6 +5,7 @@ import { okxProvider } from "$client/wallet/okx.ts";
 import { phantomProvider } from "$client/wallet/phantom.ts";
 import { tapWalletProvider } from "$client/wallet/tapwallet.ts";
 import { unisatProvider } from "$client/wallet/unisat.ts";
+import { xverseProvider } from "$client/wallet/xverse.ts";
 import { WALLET_PROVIDERS } from "$constants";
 import { closeForegroundModal, closeModal } from "$islands/modal/states.ts";
 import { containerCardL2 } from "$layout";
@@ -32,6 +33,7 @@ const walletConnectors: Record<
   tapwallet: tapWalletProvider.connectTapWallet,
   phantom: phantomProvider.connectPhantom,
   horizon: horizonProvider.connectHorizon,
+  xverse: xverseProvider.connectXverse,
 } as const;
 
 /* ===== MODAL COMPONENT ===== */
