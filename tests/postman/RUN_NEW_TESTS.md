@@ -14,7 +14,7 @@ This guide explains how to run the newly added test scripts for the 6 Recent Sal
 ### Run All Tests
 
 ```bash
-cd /home/StampchainWorkspace/BTCStampsExplorer
+cd /home/StampchainWorkspace/stampchain.io
 
 # Using the comprehensive test script
 ./scripts/run-newman-comprehensive.sh
