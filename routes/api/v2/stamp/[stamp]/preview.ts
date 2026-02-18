@@ -811,7 +811,14 @@ export const handler: Handlers = {
       }
       return await handleRedisPreview(stamp, forceRefresh);
     } catch (error) {
-      console.error("Preview generation error:", error);
+      const errName = error instanceof Error ? error.name : "unknown";
+      const errMsg = error instanceof Error ? error.message : String(error);
+      console.error(
+        "Preview generation error:",
+        errName,
+        errMsg,
+        error instanceof Error ? error.stack : "",
+      );
       return WebResponseUtil.redirect(FALLBACK_LOGO, 302, {
         headers: {
           "X-Fallback": "general-error",

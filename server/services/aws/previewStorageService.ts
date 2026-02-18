@@ -18,7 +18,15 @@ let _s3Client: S3Client | null = null;
 
 function getS3Client(): S3Client {
   if (!_s3Client) {
-    _s3Client = new S3Client({ region: serverConfig.AWS_REGION });
+    _s3Client = new S3Client({
+      region: serverConfig.AWS_REGION,
+      // Deno npm compat: force the SDK to use the default credential provider
+      // chain which reads AWS_CONTAINER_CREDENTIALS_RELATIVE_URI in ECS Fargate.
+      // Explicitly passing undefined lets the SDK auto-detect.
+    });
+    console.log(
+      `[S3] Client initialized: region=${serverConfig.AWS_REGION}, bucket=${serverConfig.AWS_S3_BUCKETNAME}`,
+    );
   }
   return _s3Client;
 }
@@ -60,6 +68,11 @@ export async function previewExists(identifier: string): Promise<boolean> {
     ) {
       return false;
     }
+    console.error("[S3] previewExists error:", {
+      name: err instanceof Error ? err.name : "unknown",
+      message: err instanceof Error ? err.message : String(err),
+      code: (err as any)?.$metadata?.httpStatusCode,
+    });
     throw err;
   }
 }
