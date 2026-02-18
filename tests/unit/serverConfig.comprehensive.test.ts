@@ -342,7 +342,7 @@ Deno.test("ServerConfig - MARA Configuration", async (t) => {
 // TODO: Skip getMaraConfig Function tests due to ES module stubbing limitations
 // These tests attempt to stub createMaraConfigFromEnv which is an ES module export
 // Deno's testing framework doesn't support stubbing ES module exports reliably
-// Issue: https://github.com/BTCStampsExplorer/issues/es-module-stubbing
+// Issue: https://github.com/stampchain-io/stampchain.io/issues/es-module-stubbing
 Deno.test.ignore("ServerConfig - getMaraConfig Function", async (t) => {
   await t.step("should return MARA config when enabled", () => {
     const mockMaraConfig = {
