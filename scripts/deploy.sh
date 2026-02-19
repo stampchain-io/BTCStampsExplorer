@@ -542,7 +542,7 @@ TASKDEF
 }
 
 # ---------------------------------------------------------------------------
-# Monitor ECS deployment (10 min timeout, poll every 30s)
+# Monitor ECS deployment (20 min timeout, poll every 30s)
 # ---------------------------------------------------------------------------
 monitor_deployment() {
   if [ "$SKIP_MONITOR" = true ]; then
@@ -551,12 +551,12 @@ monitor_deployment() {
     return 0
   fi
   if [ "$DRY_RUN" = true ]; then
-    echo -e "${YELLOW}[dry-run] Would monitor deployment for 10 minutes${NC}"
+    echo -e "${YELLOW}[dry-run] Would monitor deployment for 20 minutes${NC}"
     return 0
   fi
 
-  echo -e "${BLUE}--- Monitoring deployment (timeout: 10 min) ---${NC}"
-  local timeout=600
+  echo -e "${BLUE}--- Monitoring deployment (timeout: 20 min) ---${NC}"
+  local timeout=1200
   local start_time
   start_time=$(date +%s)
   local cutoff=$((start_time + timeout))
@@ -590,7 +590,7 @@ monitor_deployment() {
     sleep 30
   done
 
-  echo -e "${YELLOW}Deployment still in progress after ${timeout}s timeout.${NC}"
+  echo -e "${YELLOW}Deployment still in progress after $((timeout / 60)) min timeout.${NC}"
   echo "Monitor at: https://console.aws.amazon.com/ecs/home?region=${AWS_REGION}#/clusters/${ECS_CLUSTER}/services/${ECS_SERVICE}"
   return 2
 }
