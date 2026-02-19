@@ -45,10 +45,6 @@ export const handler: Handlers = {
     );
     if (originError) return originError;
 
-    // Check signature for wallet ownership
-    const signatureError = await InternalRouteGuard.requireSignature(req);
-    if (signatureError) return signatureError;
-
     try {
       const { address, newName, signature, timestamp, csrfToken } = await req
         .json();
