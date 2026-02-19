@@ -1,15 +1,7 @@
 name: Import Pattern Validation
 
-# Trigger on pull requests and pushes to main branch
+# Trigger on pull requests to main/dev branches
 on:
-  push:
-    branches: [main, dev]
-    paths:
-      - "**/*.ts"
-      - "**/*.tsx"
-      - "deno.json"
-      - ".github/workflows/validate-imports.yml"
-      - "scripts/validate-import-patterns.ts"
   pull_request:
     branches: [main, dev]
     paths:

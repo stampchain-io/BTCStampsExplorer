@@ -1,16 +1,6 @@
 name: Lighthouse CI
 
 on:
-  push:
-    branches: [main, dev]
-    paths:
-      - 'client/**'
-      - 'routes/**'
-      - 'islands/**'
-      - 'components/**'
-      - 'static/**'
-      - 'lighthouserc.cjs'
-      - '.github/workflows/lighthouse-ci.yml'
   pull_request:
     branches: [main, dev]
     paths:

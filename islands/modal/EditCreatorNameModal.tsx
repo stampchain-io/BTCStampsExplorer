@@ -130,7 +130,20 @@ function EditCreatorNameModal({
 
       let signature: string;
       try {
-        signature = await walletContext.signMessage(message);
+        const rawSignature = await walletContext.signMessage(message);
+        console.log(
+          "[EditCreatorName] signMessage returned:",
+          typeof rawSignature,
+          rawSignature
+            ? `(${String(rawSignature).length} chars)`
+            : rawSignature,
+        );
+        if (!rawSignature || typeof rawSignature !== "string") {
+          throw new Error(
+            `Wallet returned invalid signature (got ${typeof rawSignature})`,
+          );
+        }
+        signature = rawSignature;
       } catch (err) {
         const errMsg = err instanceof Error ? err.message : String(err);
         // User cancellation — don't show an error toast

@@ -2,26 +2,9 @@ name: Newman Comprehensive Tests (Production Validation + Local Dev)
 
 # This workflow includes:
 # 1. Production validation (scheduled) - validates live stampchain.io endpoints
-# 2. Local dev testing (push/PR) - runs Newman tests against local dev server with MySQL+Redis
+# 2. Local dev testing (PR) - runs Newman tests against local dev server with MySQL+Redis
 
 on:
-  push:
-    branches: [main, dev]
-    paths:
-      - 'tests/postman/collections/comprehensive.json'
-      - 'tests/postman/collections/pagination-validation.json'
-      - 'tests/postman/collections/schema-contract-tests.json'
-      - 'tests/postman/environments/comprehensive.json'
-      - 'tests/postman/data/pagination-tests.json'
-      - 'scripts/run-newman-comprehensive.sh'
-      - 'scripts/run-newman-pagination-validation.sh'
-      - 'scripts/analyze-newman-regression.js'
-      - 'scripts/test-schema.sql'
-      - 'scripts/test-seed-data.sql'
-      - 'server/**'
-      - 'routes/**'
-      - 'lib/**'
-      - '.github/workflows/newman-comprehensive-tests.yml'
   pull_request:
     branches: [main, dev]
     paths:
