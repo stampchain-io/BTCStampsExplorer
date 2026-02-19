@@ -31,6 +31,7 @@ interface WalletProviders {
   tapwallet?: any;
   phantom?: any;
   HorizonWalletProvider?: any;
+  XverseProviders?: { BitcoinProvider?: any };
 }
 
 // Initialize wallet state
@@ -251,6 +252,8 @@ export function checkWalletAvailability(provider: string): boolean {
       return !!wallets.phantom?.bitcoin?.isPhantom;
     case "horizon":
       return !!wallets.HorizonWalletProvider;
+    case "xverse":
+      return !!wallets.XverseProviders?.BitcoinProvider;
     default:
       return false;
   }
