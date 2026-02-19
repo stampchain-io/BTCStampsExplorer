@@ -74,6 +74,16 @@ export type { AncestorInfo } from "$types/base.d.ts";
 export interface Wallet {
   accounts: string[];
   address: string;
+  /**
+   * Secondary ordinals/inscriptions address (P2TR, bc1p...) for wallets that
+   * expose separate payment and ordinals accounts (e.g. Xverse).
+   *
+   * - wallet.address     = payment (P2WPKH) — used for BTC transfers and stamps
+   * - wallet.ordinalsAddress = ordinals (P2TR) — used for inscriptions/ordinals
+   *
+   * Undefined for wallets that only expose a single address (Unisat, OKX, etc.).
+   */
+  ordinalsAddress?: string;
   btcBalance: {
     confirmed: number;
     unconfirmed: number;
@@ -621,26 +631,37 @@ export interface UnisatWalletAPI extends BaseWalletProvider {
 }
 
 /**
- * Xverse Wallet API interface
+ * Xverse address purpose types (sats-connect v2 AddressPurpose)
+ */
+export type XverseAddressPurpose = "payment" | "ordinals" | "stacks";
+
+/**
+ * Xverse Wallet API interface (sats-connect v2 compatible)
  */
 export interface XverseWalletAPI extends BaseWalletProvider {
   name: "xverse";
   request(method: string, params?: any): Promise<any>;
-  getAddresses(): Promise<{
+  getAddresses(params?: {
+    purposes?: XverseAddressPurpose[];
+    message?: string;
+  }): Promise<{
     addresses: Array<{
       address: string;
-      type: "p2wpkh" | "p2tr" | "p2sh";
       publicKey: string;
+      purpose: XverseAddressPurpose;
+      addressType: "p2wpkh" | "p2tr" | "p2sh" | "p2pkh";
     }>;
   }>;
   signMessage(params: {
     address: string;
     message: string;
-  }): Promise<string>;
+    protocol?: "ECDSA" | "BIP322";
+  }): Promise<string | { signature: string; messageSignature: string }>;
   signPsbt(params: {
     hex: string;
+    allowedSignHash?: number;
     broadcast?: boolean;
-    inputsToSign?: Array<{
+    inputsToSign: Array<{
       address: string;
       signingIndexes: number[];
       sigHash?: number;
@@ -651,7 +672,7 @@ export interface XverseWalletAPI extends BaseWalletProvider {
       address: string;
       amountSats: number;
     }>;
-  }): Promise<string>;
+  }): Promise<{ txId: string }>;
   getCapabilities(): Promise<{
     addresses: boolean;
     signMessage: boolean;
