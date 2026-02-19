@@ -36,7 +36,10 @@ export const handler: Handlers = {
   },
 
   async POST(req) {
-    // Check CSRF and origin
+    // Clone request before any guards to preserve body stream
+    const reqClone = req.clone();
+
+    // Check CSRF (reads from headers only) and origin
     const csrfError = await InternalRouteGuard.requireCSRF(req);
     if (csrfError) return csrfError;
 
@@ -46,11 +49,24 @@ export const handler: Handlers = {
     if (originError) return originError;
 
     try {
-      const { address, newName, signature, timestamp, csrfToken } = await req
-        .json();
+      const body = await reqClone.json();
+      const { address, newName, signature, timestamp, csrfToken } = body;
 
       if (!address || !newName || !signature || !timestamp || !csrfToken) {
-        return ApiResponseUtil.badRequest("Missing required fields");
+        const missing = [
+          !address && "address",
+          !newName && "newName",
+          !signature && "signature",
+          !timestamp && "timestamp",
+          !csrfToken && "csrfToken",
+        ].filter(Boolean);
+        console.error(
+          `[CreatorName] Missing fields: ${missing.join(", ")}. ` +
+            `Body keys: ${Object.keys(body).join(", ") || "(empty)"}`,
+        );
+        return ApiResponseUtil.badRequest(
+          `Missing required fields: ${missing.join(", ")}`,
+        );
       }
 
       // Validate creator name early (before crypto operations)
@@ -78,6 +94,7 @@ export const handler: Handlers = {
         creatorName: result.creatorName,
       });
     } catch (error) {
+      console.error("[CreatorName] Error processing request:", error);
       return ApiResponseUtil.internalError(
         error,
         "Error updating creator name",
