@@ -1,15 +1,6 @@
 name: TypeScript Type Checking
 
 on:
-  push:
-    branches: [main, dev]
-    paths:
-      - "**/*.ts"
-      - "**/*.tsx"
-      - "deno.json"
-      - "globals.d.ts"
-      - "lib/types/**"
-      - ".github/workflows/type-check.yml"
   pull_request:
     branches: [main, dev]
     paths:
@@ -19,6 +10,7 @@ on:
       - "globals.d.ts"
       - "lib/types/**"
       - ".github/workflows/type-check.yml"
+  workflow_dispatch:
 
 jobs:
   type-check:

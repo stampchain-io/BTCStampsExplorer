@@ -8,15 +8,6 @@ on:
       - 'server/services/**'
       - 'static/swagger/**'
       - '.redocly.yaml'
-  push:
-    branches:
-      - main
-      - dev
-    paths:
-      - 'routes/api/**'
-      - 'server/services/**'
-      - 'static/swagger/**'
-      - '.redocly.yaml'
 
 jobs:
   validate-schema:
