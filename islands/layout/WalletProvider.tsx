@@ -6,6 +6,7 @@ import { phantomProvider } from "$client/wallet/phantom.ts";
 import { tapWalletProvider } from "$client/wallet/tapwallet.ts";
 import { unisatProvider } from "$client/wallet/unisat.ts";
 import { xverseProvider } from "$client/wallet/xverse.ts";
+import { checkWalletAvailability } from "$client/wallet/wallet.ts";
 import { WALLET_PROVIDERS } from "$constants";
 import { closeForegroundModal, closeModal } from "$islands/modal/states.ts";
 import { containerCardL2 } from "$layout";
@@ -55,6 +56,24 @@ export function WalletProvider(
         walletConnectors[providerKey as WalletProviderKey];
       if (!connectFunction) {
         throw new Error(`Unsupported wallet provider: ${providerKey}`);
+      }
+
+      // Check if wallet extension is installed before attempting connection
+      if (!checkWalletAvailability(providerKey)) {
+        const installUrl = providerInfo.installUrl;
+        if (installUrl) {
+          showToast(
+            `${providerInfo.name} wallet not detected.\nOpening install page...`,
+            "info",
+          );
+          globalThis.open(installUrl, "_blank", "noopener,noreferrer");
+        } else {
+          showToast(
+            `${providerInfo.name} wallet not detected.\nPlease install the ${providerInfo.name} extension.`,
+            "error",
+          );
+        }
+        return;
       }
 
       await connectFunction((message: string, type: BaseToast["type"]) => {

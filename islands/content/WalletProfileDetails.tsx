@@ -12,6 +12,9 @@ import { tooltipIcon } from "$notification";
 import { label, subtitleGrey, titleGreyLD, valueSm } from "$text";
 import type { WalletProfileDetailsProps } from "$types/ui.d.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
+import EditCreatorNameModal from "$islands/modal/EditCreatorNameModal.tsx";
+import { openModal } from "$islands/modal/states.ts";
+import { walletContext } from "$client/wallet/wallet.ts";
 
 /* ===== TYPES ===== */
 
@@ -21,6 +24,12 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
   const [showCopied, setShowCopied] = useState(false);
   const [isTooltipVisible, setIsTooltipVisible] = useState(false);
   const [allowTooltip, setAllowTooltip] = useState(true);
+  const [displayName, setDisplayName] = useState(
+    walletData.creatorName || walletData.address,
+  );
+
+  /* ===== WALLET CONTEXT ===== */
+  const { wallet } = walletContext;
 
   /* ===== REFS ===== */
   const copyButtonRef = useRef<HTMLDivElement>(null);
@@ -79,6 +88,22 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
     }
   };
 
+  const handleEditClick = () => {
+    openModal(
+      <EditCreatorNameModal
+        currentName={walletData.creatorName || ""}
+        onSuccess={(newName) => {
+          setDisplayName(newName);
+          // Force a page refresh to update the server-rendered data
+          globalThis.setTimeout(() => {
+            globalThis.location.reload();
+          }, 1500);
+        }}
+      />,
+      "slideUpDown",
+    );
+  };
+
   /* ===== COMPUTED VALUES ===== */
   const bitNames = Array.isArray(walletData.src101?.names)
     ? walletData.src101.names.filter((name): name is string =>
@@ -91,13 +116,31 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
     walletData.creatorName !== `${name}.btc`
   );
 
+  // Check if the connected wallet owns this profile
+  const isOwner = wallet?.address &&
+    wallet.address.toLowerCase() === walletData.address.toLowerCase();
+
   /* ===== RENDER ===== */
   return (
     <div class="flex flex-col w-full">
       <h1 class={titleGreyLD}>WALLET</h1>
-      <h2 class={`${subtitleGrey} tracking-wider`}>
-        {walletData.creatorName || "ANONYMOUS"}
-      </h2>
+      <div class="flex items-center gap-2">
+        <h2 class={`${subtitleGrey} tracking-wider`}>
+          {displayName}
+        </h2>
+        {isOwner && (
+          <Icon
+            type="icon"
+            name="edit"
+            weight="normal"
+            size="smR"
+            color="greyDark"
+            className="cursor-pointer hover:stroke-color-grey-light transition-colors duration-200"
+            onClick={handleEditClick}
+            ariaLabel="Edit creator name"
+          />
+        )}
+      </div>
       <div class="flex flex-row-reverse justify-end gap-4">
         <div
           ref={copyButtonRef}

@@ -57,6 +57,14 @@ export const handler: Handlers = {
         return ApiResponseUtil.badRequest("Missing required fields");
       }
 
+      // Validate creator name early (before crypto operations)
+      const validation = CreatorService.validateCreatorName(newName);
+      if (!validation.valid) {
+        return ApiResponseUtil.badRequest(
+          validation.message || "Invalid creator name",
+        );
+      }
+
       const result = await CreatorService.updateCreatorName({
         address,
         newName,

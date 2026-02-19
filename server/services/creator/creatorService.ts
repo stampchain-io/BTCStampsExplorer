@@ -4,7 +4,43 @@ import { SecurityService } from "$server/services/security/securityService.ts";
 import { SRC101Service } from "$server/services/src101/index.ts";
 import { StampService } from "$server/services/stampService.ts";
 
+const CREATOR_NAME_MAX_LENGTH = 25;
+const CREATOR_NAME_MIN_LENGTH = 1;
+const CREATOR_NAME_PATTERN = /^[a-zA-Z0-9 .\-_']+$/;
+
 export class CreatorService {
+  static validateCreatorName(
+    name: string,
+  ): { valid: boolean; sanitized?: string; message?: string } {
+    if (typeof name !== "string") {
+      return { valid: false, message: "Creator name must be a string" };
+    }
+
+    const trimmed = name.trim();
+
+    if (trimmed.length < CREATOR_NAME_MIN_LENGTH) {
+      return { valid: false, message: "Creator name cannot be empty" };
+    }
+
+    if (trimmed.length > CREATOR_NAME_MAX_LENGTH) {
+      return {
+        valid: false,
+        message:
+          `Creator name must be ${CREATOR_NAME_MAX_LENGTH} characters or fewer (got ${trimmed.length})`,
+      };
+    }
+
+    if (!CREATOR_NAME_PATTERN.test(trimmed)) {
+      return {
+        valid: false,
+        message:
+          "Creator name can only contain letters, numbers, spaces, periods, hyphens, underscores, and apostrophes",
+      };
+    }
+
+    return { valid: true, sanitized: trimmed };
+  }
+
   static async getCreatorNameByAddress(address: string): Promise<string | null> {
     try {
       // 1. First check the creators table
@@ -88,13 +124,20 @@ export class CreatorService {
     csrfToken: string;
   }): Promise<{ success: boolean; creatorName?: string; message?: string }> {
     try {
+      // Validate name before any crypto operations (fail fast)
+      const validation = CreatorService.validateCreatorName(params.newName);
+      if (!validation.valid) {
+        return { success: false, message: validation.message ?? "Invalid creator name" };
+      }
+      const sanitizedName = validation.sanitized!;
+
       // Verify CSRF token first
       const isValidCSRF = await SecurityService.validateCSRFToken(params.csrfToken);
       if (!isValidCSRF) {
         return { success: false, message: "Invalid CSRF token" };
       }
 
-      // Verify signature
+      // Verify signature (uses original newName since that's what was signed)
       const message = `Update creator name to ${params.newName} at ${params.timestamp}`;
       const isValidSignature = verifySignature(message, params.signature, params.address);
       if (!isValidSignature) {
@@ -107,13 +150,13 @@ export class CreatorService {
         return { success: false, message: "Signature expired" };
       }
 
-      // Update the name
-      const updated = await StampController.updateCreatorName(params.address, params.newName);
+      // Update with sanitized (trimmed) name
+      const updated = await StampController.updateCreatorName(params.address, sanitizedName);
       if (!updated) {
         return { success: false, message: "Failed to update creator name" };
       }
 
-      return { success: true, creatorName: params.newName };
+      return { success: true, creatorName: sanitizedName };
     } catch (error) {
       console.error("Error in CreatorService.updateCreatorName:", error);
       return { success: false, message: "Failed to update creator name" };
