@@ -220,7 +220,7 @@ function SearchContent({
                       <img
                         src={result.preview}
                         alt={`Stamp ${result.stamp}`}
-                        class="w-10 h-10 rounded object-cover"
+                        class="w-10 h-10 rounded object-contain pixelart"
                       />
                       <div class="flex flex-col flex-1">
                         <span class="text-sm font-medium text-color-grey-light">
