@@ -1,7 +1,6 @@
 /*@baba-styles is not config properly*/
+import { SearchErrorDisplay, SearchInputField } from "$form";
 import { Icon } from "$icon";
-import { SearchErrorDisplay } from "$islands/modal/SearchErrorDisplay.tsx";
-import { SearchInputField } from "$islands/modal/SearchInputField.tsx";
 import { closeModal, openModal, searchState } from "$islands/modal/states.ts";
 import { ModalSearchBase, transitionColors } from "$layout";
 import { generateSearchErrorMessage } from "$lib/utils/data/search/searchInputClassifier.ts";
