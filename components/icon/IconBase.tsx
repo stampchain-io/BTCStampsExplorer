@@ -100,6 +100,8 @@ export function Icon(props: IconVariants) {
       hide: "eyeSlash",
       collection: "images",
       copy: "copy",
+      edit: "pencil",
+      pencil: "pencil",
 
       // Bitcoin Specific Icons
       bitcoin: "bitcoin",
