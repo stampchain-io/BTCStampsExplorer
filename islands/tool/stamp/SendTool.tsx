@@ -3,7 +3,7 @@ import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { ProgressiveEstimationIndicator } from "$components/indicators/ProgressiveEstimationIndicator.tsx";
 import { inputField, inputFieldDropdown, inputFieldSquare } from "$form";
-import { Icon } from "$icon";
+import { Icon, PlaceholderImage } from "$icon";
 import { SendToolSkeleton } from "$indicators";
 import {
   bodyTool,
@@ -16,6 +16,11 @@ import {
   rowForm,
 } from "$layout";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
+import {
+  getStampImageSrc,
+  handleImageError,
+  processSVG,
+} from "$lib/utils/ui/media/imageUtils.ts";
 import { FeeCalculatorBase } from "$section";
 import { labelLg, labelSm, titleGreyLD } from "$text";
 import type { StampRow } from "$types/stamp.d.ts";
@@ -52,8 +57,10 @@ export function StampSendTool() {
   });
   const [tosAgreed, setTosAgreed] = useState<boolean>(false);
   const [isImageLoading, setIsImageLoading] = useState(true);
-  const [showFallbackIcon, setShowFallbackIcon] = useState(false);
   const [isLoadingStamps, setIsLoadingStamps] = useState(true);
+  const [validatedSVGNode, setValidatedSVGNode] = useState<
+    JSX.Element | null
+  >(null);
 
   /* ===== DROPDOWN STATE ===== */
   const [openDrop, setOpenDrop] = useState(false);
@@ -225,24 +232,48 @@ export function StampSendTool() {
   }, [stamps.data]);
 
   useEffect(() => {
-    console.log(
-      "[SendTool] Effect triggered by selectedStamp?.tx_hash change. New tx_hash:",
-      selectedStamp?.tx_hash,
-    );
     if (selectedStamp) {
-      console.log(
-        "[SendTool] Effect: selectedStamp is present. Setting isImageLoading=true, showFallbackIcon=false.",
-      );
       setIsImageLoading(true);
-      setShowFallbackIcon(false);
       setMaxQuantity(selectedStamp.unbound_quantity);
     } else {
-      console.log(
-        "[SendTool] Effect: selectedStamp is null/undefined. Setting loader/fallback for empty state.",
-      );
       setIsImageLoading(false);
-      setShowFallbackIcon(true);
     }
+  }, [selectedStamp?.tx_hash]);
+
+  /* ===== SVG VALIDATION EFFECT ===== */
+  useEffect(() => {
+    if (selectedStamp?.stamp_mimetype !== "image/svg+xml") {
+      setValidatedSVGNode(null);
+      return;
+    }
+    const src = getStampImageSrc(selectedStamp);
+    if (!src) {
+      setValidatedSVGNode(<PlaceholderImage variant="no-image" />);
+      setIsImageLoading(false);
+      return;
+    }
+    (async () => {
+      try {
+        const response = await fetch(src);
+        if (!response.ok) throw new Error(`Fetch failed: ${response.status}`);
+        const svgContent = await response.text();
+        const processed = processSVG(svgContent);
+        if (processed) {
+          setValidatedSVGNode(
+            <div
+              class="w-full h-full flex items-center justify-center"
+              dangerouslySetInnerHTML={{ __html: processed }}
+            />,
+          );
+        } else {
+          setValidatedSVGNode(<PlaceholderImage variant="error" />);
+        }
+      } catch {
+        setValidatedSVGNode(<PlaceholderImage variant="error" />);
+      } finally {
+        setIsImageLoading(false);
+      }
+    })();
   }, [selectedStamp?.tx_hash]);
 
   useEffect(() => {
@@ -269,7 +300,6 @@ export function StampSendTool() {
       );
 
       setIsImageLoading(true);
-      setShowFallbackIcon(false);
       setSelectedStamp({ ...selectedItem });
 
       setFormState((prev) => ({
@@ -440,6 +470,11 @@ export function StampSendTool() {
   };
 
   /* ===== RENDER HELPERS ===== */
+  const isLibraryFile = selectedStamp?.stamp_mimetype === "text/css" ||
+    selectedStamp?.stamp_mimetype === "text/javascript" ||
+    selectedStamp?.stamp_mimetype === "application/javascript" ||
+    selectedStamp?.stamp_mimetype === "application/gzip";
+
   const renderStampContent = () => {
     if (!selectedStamp) {
       return (
@@ -454,11 +489,13 @@ export function StampSendTool() {
       );
     }
 
+    const src = getStampImageSrc(selectedStamp);
+
     if (selectedStamp.stamp_mimetype === "text/html") {
       return (
         <div class="relative aspect-square w-full">
           <iframe
-            src={`/s/${selectedStamp.tx_hash}`}
+            src={src}
             width="100%"
             height="100%"
             sandbox="allow-scripts allow-same-origin"
@@ -469,41 +506,46 @@ export function StampSendTool() {
       );
     }
 
+    if (selectedStamp.stamp_mimetype === "image/svg+xml") {
+      return validatedSVGNode || (
+        <div class="relative w-full h-full flex items-center justify-center">
+          <div class={loaderSpinGrey} />
+        </div>
+      );
+    }
+
+    if (selectedStamp.stamp_mimetype === "text/plain") {
+      return <PlaceholderImage variant="no-image" />;
+    }
+
+    if (selectedStamp.stamp_mimetype?.startsWith("audio/")) {
+      return <PlaceholderImage variant="audio" />;
+    }
+
+    if (isLibraryFile) {
+      return <PlaceholderImage variant="library" />;
+    }
+
+    if (!src) {
+      return <PlaceholderImage variant="no-image" />;
+    }
+
     return (
       <div class="relative w-full h-full">
         <img
           key={`stamp-${selectedStamp.tx_hash}`}
-          src={`/s/${selectedStamp.tx_hash}`}
+          src={src}
           alt={`Stamp #${selectedStamp.stamp}`}
           class={`w-full h-full object-contain pixelart transition-opacity duration-300 ${
-            (isImageLoading || showFallbackIcon) ? "opacity-0" : "opacity-100"
+            isImageLoading ? "opacity-0" : "opacity-100"
           }`}
-          onLoad={() => {
-            setIsImageLoading(false);
-            setShowFallbackIcon(false);
-          }}
-          onError={() => {
-            setIsImageLoading(false);
-            setShowFallbackIcon(true);
-          }}
+          onLoad={() => setIsImageLoading(false)}
+          onError={handleImageError}
         />
 
         {isImageLoading && (
           <div class="absolute inset-0 flex items-center justify-center">
             <div class={loaderSpinGrey} />
-          </div>
-        )}
-
-        {!isImageLoading && showFallbackIcon && (
-          <div class="absolute inset-0 flex items-center justify-center w-full h-full">
-            <Icon
-              type="icon"
-              name="previewImage"
-              weight="normal"
-              size="xl"
-              color="custom"
-              className="stroke-color-grey-dark"
-            />
           </div>
         )}
       </div>
@@ -603,6 +645,7 @@ export function StampSendTool() {
                         src={`/api/v2/stamp/${stamp.stamp}/preview`}
                         alt=""
                         class="w-7 h-7 rounded object-contain pixelart flex-shrink-0"
+                        onError={handleImageError}
                       />
                       <div class="flex items-center justify-between flex-1 min-w-0">
                         <span class="text-sm font-medium text-color-grey-light">
