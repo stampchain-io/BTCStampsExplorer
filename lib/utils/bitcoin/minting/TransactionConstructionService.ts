@@ -6,7 +6,7 @@
  * Phase 2: Smart tool endpoint estimates with dryRun=true (NEW: Direct tool integration)
  * Phase 3: Exact transaction construction (on user action only)
  *
- * @author BTCStampsExplorer Team
+ * @author stampchain.io
  * @version 2.0.0 - Now with direct tool endpoint integration
  */
 

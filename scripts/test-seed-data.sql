@@ -1,4 +1,4 @@
--- BTCStampsExplorer Test Seed Data
+-- stampchain.io Test Seed Data
 -- Auto-generated from production database
 -- Generated: 2026-02-13 21:57:30
 -- Source: btc_stamps production database

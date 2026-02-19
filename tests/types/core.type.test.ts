@@ -655,7 +655,7 @@ Deno.test("Core Types - Dependency Analysis", async () => {
   ];
 
   const analysis = await analyzeDependencies(
-    ".//Documents/BTCStampsExplorer",
+    ".//Development/Websites/Stampchain/App",
     typeFiles,
   );
 

@@ -108,7 +108,7 @@ pm.test("Data values are valid", function() {
 ## Files Location
 
 ```
-BTCStampsExplorer/
+stampchain.io/
 ├── scripts/
 │   ├── add-data-validation.ts          # TypeScript version
 │   ├── add-data-validation.mjs         # Node.js version

@@ -48,8 +48,8 @@ This is a Deno project. For security information including how npm development d
 
 1. **Clone the repository:**
    ```sh
-   git clone https://github.com/stampchain-io/bitcoin-stamps-explorer.git
-   cd bitcoin-stamps-explorer
+   git clone https://github.com/stampchain-io/stampchain.io.git
+   cd stampchain.io
    ```
 
 2. **Environment Setup**

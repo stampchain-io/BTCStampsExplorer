@@ -3,7 +3,7 @@
 /**
  * TS18048 Null Safety Error Analysis Tool
  * 
- * Specifically analyzes "X is possibly 'undefined'" errors across the BTCStampsExplorer codebase
+ * Specifically analyzes "X is possibly 'undefined'" errors across the stampchain.io codebase
  */
 
 interface NullSafetyError {

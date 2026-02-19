@@ -1,6 +1,6 @@
 {
   "info": {
-    "name": "BTCStampsExplorer - Production Smoke Tests",
+    "name": "stampchain.io - Production Smoke Tests",
     "description": "Comprehensive smoke test suite for production readiness validation",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },

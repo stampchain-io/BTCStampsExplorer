@@ -45,7 +45,7 @@ class JSXPreactAgentMonitor {
         if (match) {
           const [, file, lineStr, columnStr, message] = match;
           const error: TS2345Error = {
-            file: file.replace(/^.*\/BTCStampsExplorer\//, ''),
+            file: file.replace(/^.*\/App\//, ''),
             line: parseInt(lineStr),
             column: parseInt(columnStr),
             message: message.trim(),
