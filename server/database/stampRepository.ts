@@ -726,6 +726,7 @@ export class StampRepository {
     txHashPrefix?: string;
     stampNumberPrefix?: string;
     excludeSrc20?: boolean;
+    excludeSrc101?: boolean;
   }) {
     // Extract all parameters including both filter types
     const {
@@ -778,6 +779,7 @@ export class StampRepository {
       txHashPrefix,
       stampNumberPrefix,
       excludeSrc20 = false,
+      excludeSrc101 = false,
     } = options;
 
     // Combine both filter types for processing
@@ -861,6 +863,11 @@ export class StampRepository {
     // Exclude SRC-20 entries (used by stamp search endpoint)
     if (excludeSrc20) {
       whereConditions.push("st.ident != 'SRC-20'");
+    }
+
+    // Exclude SRC-101 entries (used by stamp search endpoint)
+    if (excludeSrc101) {
+      whereConditions.push("st.ident != 'SRC-101'");
     }
 
     // Use either the object or direct parameters

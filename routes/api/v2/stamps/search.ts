@@ -24,6 +24,7 @@ export const handler: Handlers = {
         skipTotalCount: true,
         cacheDuration: 60,
         excludeSrc20: true,
+        excludeSrc101: true,
       };
 
       switch (type) {
