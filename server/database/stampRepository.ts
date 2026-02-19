@@ -724,7 +724,7 @@ export class StampRepository {
     cpidPrefix?: string;
     addressPrefix?: string;
     txHashPrefix?: string;
-    stampNumberPrefix?: { exact: number; rangeStart: number; rangeEnd: number };
+    stampNumberPrefix?: string;
     excludeSrc20?: boolean;
   }) {
     // Extract all parameters including both filter types
@@ -840,16 +840,10 @@ export class StampRepository {
       queryParams.push(`${cpidPrefix}%`);
     }
 
-    // Stamp number prefix search (exact match OR range of next magnitude)
+    // Stamp number prefix search (string prefix match on stamp column)
     if (stampNumberPrefix) {
-      whereConditions.push(
-        "(st.stamp = ? OR (st.stamp >= ? AND st.stamp <= ?))",
-      );
-      queryParams.push(
-        stampNumberPrefix.exact,
-        stampNumberPrefix.rangeStart,
-        stampNumberPrefix.rangeEnd,
-      );
+      whereConditions.push("CAST(st.stamp AS CHAR) LIKE ?");
+      queryParams.push(`${stampNumberPrefix}%`);
     }
 
     // Address prefix search (creator column only)
