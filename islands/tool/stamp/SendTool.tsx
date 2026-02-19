@@ -220,18 +220,6 @@ export function StampSendTool() {
   }, [wallet?.address]);
 
   useEffect(() => {
-    if (stamps.data.length > 0 && !selectedStamp) {
-      const firstStamp = stamps.data[0];
-      setSelectedStamp(firstStamp);
-      setFormState((prev) => ({
-        ...prev,
-        stampId: firstStamp.stamp,
-        cpid: firstStamp.cpid,
-      }));
-    }
-  }, [stamps.data]);
-
-  useEffect(() => {
     if (selectedStamp) {
       setIsImageLoading(true);
       setMaxQuantity(selectedStamp.unbound_quantity);
@@ -595,7 +583,11 @@ export function StampSendTool() {
             >
               {/* Trigger */}
               <div
-                class={`${inputField} flex items-center gap-3 cursor-pointer select-none`}
+                class={`${inputField} flex items-center gap-3 select-none ${
+                  !wallet?.address || stamps.data.length === 0
+                    ? "cursor-default"
+                    : "cursor-pointer"
+                }`}
                 onClick={() => {
                   if (openDrop) {
                     closeDropdownWithAnimation();
@@ -607,15 +599,25 @@ export function StampSendTool() {
               >
                 {selectedStamp
                   ? (
-                    <>
-                      <span class="font-medium text-color-grey-light">
-                        #{selectedStamp.stamp}
-                      </span>
-                    </>
+                    <span class="font-medium text-color-grey-light">
+                      #{selectedStamp.stamp}
+                    </span>
+                  )
+                  : !wallet?.address
+                  ? (
+                    <span class="font-light text-color-grey-semidark uppercase">
+                      Connect your wallet
+                    </span>
+                  )
+                  : stamps.data.length === 0
+                  ? (
+                    <span class="font-light text-color-grey-semidark uppercase">
+                      No stamps in wallet
+                    </span>
                   )
                   : (
                     <span class="font-light text-color-grey-semidark uppercase">
-                      No stamps in wallet
+                      Select stamp
                     </span>
                   )}
               </div>
