@@ -131,14 +131,20 @@ const signMessage = async (message: string) => {
 
   console.log("Leather wallet signing message:", message);
   try {
-    const { signature } = await leatherProvider.request(
+    const response = await leatherProvider.request(
       "signMessage",
       {
         message,
         paymentType: "p2wpkh",
       },
-    );
+    ) as { result?: { signature?: string }; signature?: string };
+    // Leather wraps responses in {result: ...} (same as signPsbt)
+    const signature = response?.result?.signature ?? response?.signature;
     console.log("Leather wallet signature result:", signature);
+    if (!signature) {
+      console.error("Leather signMessage response:", JSON.stringify(response));
+      throw new Error("Leather wallet returned empty signature");
+    }
     return signature;
   } catch (error) {
     console.error("Error signing message with Leather wallet:", error);

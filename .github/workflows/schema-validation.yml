@@ -1,15 +1,6 @@
 name: API Schema Validation
 
 on:
-  push:
-    branches: [main, dev]
-    paths:
-      - 'routes/api/**'
-      - 'server/**'
-      - 'lib/types/**'
-      - 'schema.yml'
-      - 'tests/postman/collections/schema-validation.json'
-      - '.github/workflows/schema-validation.yml'
   pull_request:
     branches: [main, dev]
     paths:
