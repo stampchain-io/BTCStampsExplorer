@@ -38,6 +38,10 @@ import { useSSRSafeNavigation } from "$lib/hooks/useSSRSafeNavigation.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { validateWalletAddressForMinting } from "$lib/utils/scriptTypeUtils.ts";
 import { handleImageError } from "$lib/utils/ui/media/imageUtils.ts";
+import {
+  createRecursiveHtmlPreviewUrl,
+  revokePreviewUrl,
+} from "$lib/utils/ui/media/recursivePreview.ts";
 import { showToast } from "$lib/utils/ui/notifications/toastSignal.ts";
 import {
   StatusMessages,
@@ -279,6 +283,7 @@ function StampingToolMain({ config }: { config: Config }) {
   }, [fees, loading, feeSource]);
 
   const [file, setFile] = useState<File | null>(null);
+  const [htmlPreviewUrl, setHtmlPreviewUrl] = useState<string | null>(null);
   const [fee, setFee] = useState<number>(1); // Initialize with a lower default fee (1 sat/vB)
   const [issuance, setIssuance] = useState("1");
   const [BTCPrice, setBTCPrice] = useState<number>(60000);
@@ -964,6 +969,8 @@ function StampingToolMain({ config }: { config: Config }) {
       setFileError("No file selected");
       setFile(null);
       setFileSize(undefined);
+      revokePreviewUrl(htmlPreviewUrl);
+      setHtmlPreviewUrl(null);
       return;
     }
 
@@ -973,12 +980,30 @@ function StampingToolMain({ config }: { config: Config }) {
       setFileError(validation.error || "Invalid file");
       setFile(null);
       setFileSize(undefined);
+      revokePreviewUrl(htmlPreviewUrl);
+      setHtmlPreviewUrl(null);
       return;
     }
 
     setFileError("");
     setFile(selectedFile);
     setFileSize(selectedFile.size);
+
+    // Build a preview blob with <base> injection for recursive HTML stamps
+    revokePreviewUrl(htmlPreviewUrl);
+    if (selectedFile.name.match(/\.html$/i)) {
+      createRecursiveHtmlPreviewUrl(selectedFile).then((url) => {
+        setHtmlPreviewUrl(url);
+      }).catch((err) => {
+        logger.error("stamps", {
+          message: "Failed to create recursive HTML preview",
+          error: err.message,
+        });
+        setHtmlPreviewUrl(null);
+      });
+    } else {
+      setHtmlPreviewUrl(null);
+    }
 
     // Set warning message if file is not an image
     if (validation.warning) {
@@ -1668,6 +1693,7 @@ function StampingToolMain({ config }: { config: Config }) {
       if (uploadTooltipTimeoutRef.current) {
         globalThis.clearTimeout(uploadTooltipTimeoutRef.current);
       }
+      revokePreviewUrl(htmlPreviewUrl);
     };
   }, []);
 
@@ -1710,7 +1736,7 @@ function StampingToolMain({ config }: { config: Config }) {
                   }}
                 />
               )
-              : file.name.match(/\.(html)$/i)
+              : file.name.match(/\.(html)$/i) && htmlPreviewUrl
               ? (
                 <iframe
                   width="100%"
@@ -1718,7 +1744,7 @@ function StampingToolMain({ config }: { config: Config }) {
                   scrolling="no"
                   loading="lazy"
                   sandbox="allow-scripts allow-same-origin"
-                  src={URL.createObjectURL(file)}
+                  src={htmlPreviewUrl}
                   class={`${PREVIEW_SIZE_CLASSES} object-contain rounded-2xl bg-color-grey/30 [image-rendering:pixelated]`}
                   onError={(e) => {
                     console.error("iframe error (detailed):", {
@@ -1971,18 +1997,20 @@ function StampingToolMain({ config }: { config: Config }) {
   }, [isFullScreenModalOpen]);
 
   /* ===== MODAL MANAGEMENT ===== */
-  // Handle preview modal
+  // Handle preview modal — pass pre-built preview URL for HTML stamps
+  // so recursive /s/ references resolve correctly in fullscreen too
   useEffect(() => {
     if (isFullScreenModalOpen && file) {
+      const isHtml = file.type?.startsWith("text/html");
       openModal(
         <PreviewImageModal
-          src={file}
-          contentType={file?.type?.startsWith("text/html") ? "html" : "image"}
+          src={isHtml && htmlPreviewUrl ? htmlPreviewUrl : file}
+          contentType={isHtml ? "html" : "image"}
         />,
         "zoomInOut",
       );
     }
-  }, [isFullScreenModalOpen, file]);
+  }, [isFullScreenModalOpen, file, htmlPreviewUrl]);
 
   // Sync local state with global modal state for preview modal
   useEffect(() => {
