@@ -686,7 +686,9 @@ export function StampImage(
   const isLibraryFile = stamp.stamp_mimetype === "text/css" ||
     stamp.stamp_mimetype === "text/javascript" ||
     stamp.stamp_mimetype === "application/javascript" ||
-    stamp.stamp_mimetype === "application/gzip";
+    stamp.stamp_mimetype === "application/gzip" ||
+    stamp.stamp_mimetype === "application/json" ||
+    stamp.stamp_mimetype === "text/json";
 
   // Update the toggleCodeModal function to use the new pattern
   const toggleCodeModal = () => {

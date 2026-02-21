@@ -59,11 +59,13 @@ export function StampCard({
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  // Library file detection
+  // Library file detection (CSS, JS, GZIP, JSON)
   const isLibraryFile = stamp.stamp_mimetype === "text/css" ||
     stamp.stamp_mimetype === "text/javascript" ||
     stamp.stamp_mimetype === "application/javascript" ||
-    stamp.stamp_mimetype === "application/gzip";
+    stamp.stamp_mimetype === "application/gzip" ||
+    stamp.stamp_mimetype === "application/json" ||
+    stamp.stamp_mimetype === "text/json";
 
   /* ===== HANDLERS ===== */
   const handleImageError = (e: Event) => {
