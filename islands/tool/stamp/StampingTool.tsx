@@ -124,6 +124,7 @@ function isValidForMinting(params: ValidationParams) {
   if (issuanceError) return false;
   if (addressError) return false;
   if (isPoshStamp && (!stampName || stampNameError)) return false;
+  if (!isPoshStamp && stampNameError) return false;
 
   return true;
 }
@@ -408,6 +409,7 @@ function StampingToolMain({ config }: { config: Config }) {
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   const [isUploadTooltipVisible, setIsUploadTooltipVisible] = useState(false);
   const uploadTooltipTimeoutRef = useRef<number | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Modal state
   const [isFullScreenModalOpen, setIsFullScreenModalOpen] = useState(false);
@@ -923,18 +925,23 @@ function StampingToolMain({ config }: { config: Config }) {
   const handleShowAdvancedOptions = () => {
     setAllowAdvancedTooltip(false);
     setIsAdvancedTooltipVisible(false);
+
+    // When collapsing, reset POSH/CPID state so the form is never
+    // silently blocked by a hidden required field.
+    if (showAdvancedOptions) {
+      setIsPoshStamp(false);
+      setStampName("");
+      setStampNameError("");
+    }
+
     setShowAdvancedOptions(!showAdvancedOptions);
   };
 
   const handleIsPoshStamp = () => {
     setAllowPoshTooltip(false);
     setIsPoshTooltipVisible(false);
-
-    if (!isPoshStamp) {
-      setStampName(""); // Clear the input when switching to POSH
-    } else {
-      setStampName(""); // Clear the input when switching to CUSTOM CPID
-    }
+    setStampName("");
+    setStampNameError("");
     setIsPoshStamp(!isPoshStamp);
   };
 
@@ -959,6 +966,27 @@ function StampingToolMain({ config }: { config: Config }) {
       };
       reader.onerror = () => reject(new Error("Failed to read file"));
     });
+  };
+
+  /* ===== FORM RESET ===== */
+  const resetForm = () => {
+    revokePreviewUrl(htmlPreviewUrl);
+    setHtmlPreviewUrl(null);
+    setFile(null);
+    setFileSize(undefined);
+    setFileError("");
+    setIssuance("1");
+    setIssuanceError("");
+    setStampName("");
+    setStampNameError("");
+    setIsPoshStamp(false);
+    setIsLocked(true);
+    setApiError("");
+    setSubmissionMessage(null);
+    setExactFeeDetails(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   const handleImage = (e: Event) => {
@@ -1256,6 +1284,7 @@ function StampingToolMain({ config }: { config: Config }) {
               false,
             );
             setApiError("");
+            resetForm();
             setIsSubmitting(false);
             return;
           }
@@ -1298,6 +1327,7 @@ function StampingToolMain({ config }: { config: Config }) {
           console.log("=== END TRANSACTION HEX ===");
 
           await submitToMara(result.psbt);
+          resetForm();
           setIsSubmitting(false);
         } catch (maraError) {
           logger.error("stamps", {
@@ -1348,6 +1378,7 @@ function StampingToolMain({ config }: { config: Config }) {
                   false,
                 );
                 setApiError("");
+                resetForm();
                 setIsSubmitting(false);
                 return;
               }
@@ -1374,6 +1405,7 @@ function StampingToolMain({ config }: { config: Config }) {
                     false,
                   );
                   setApiError("");
+                  resetForm();
                   setIsSubmitting(false);
                   return;
                 }
@@ -1427,6 +1459,7 @@ function StampingToolMain({ config }: { config: Config }) {
             </>,
           );
           setApiError("");
+          resetForm();
           setIsSubmitting(false);
         } else {
           logger.debug("stamps", {
@@ -1724,6 +1757,7 @@ function StampingToolMain({ config }: { config: Config }) {
         id="upload"
         type="file"
         class="hidden"
+        ref={fileInputRef}
         onChange={handleImage}
       />
       {file !== null
