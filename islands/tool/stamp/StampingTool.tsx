@@ -1702,7 +1702,7 @@ function StampingToolMain({ config }: { config: Config }) {
     <div
       id="image-preview"
       class={`relative items-center content-center mx-auto ${PREVIEW_SIZE_CLASSES} text-center group ${glassmorphismL2}
-      ${glassmorphismL2Hover} ${transitionColors} cursor-pointer `}
+      ${glassmorphismL2Hover} ${transitionColors} cursor-pointer overflow-hidden`}
       onMouseMove={handleMouseMove}
       onMouseEnter={handleUploadMouseEnter}
       onMouseLeave={handleUploadMouseLeave}
