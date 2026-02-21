@@ -2301,6 +2301,7 @@ function StampingToolMain({ config }: { config: Config }) {
           onTosChange={setTosAgreed}
           disabled={isConnected ? !isFormValid : false}
           bitname=""
+          {...(stampName ? { cpid: stampName } : {})}
           progressIndicator={
             <ProgressiveEstimationIndicator
               isConnected={!!wallet && !isSubmitting}

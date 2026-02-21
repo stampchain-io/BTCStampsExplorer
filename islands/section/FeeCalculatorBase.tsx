@@ -63,6 +63,7 @@ export function FeeCalculatorBase({
   maraFeeRate = null,
   isLoadingMaraFee = false,
   progressIndicator,
+  cpid,
 }: ExtendedBaseFeeCalculatorProps) {
   const { fees } = useFees();
   const [visible, setVisible] = useState(false);
@@ -333,6 +334,14 @@ export function FeeCalculatorBase({
               {fileType
                 ? fileType.toUpperCase()
                 : <span class="animate-pulse">***</span>}
+            </h6>
+          )}
+
+          {/* CPID - Only show for stamp type */}
+          {type === "stamp" && (
+            <h6 class={textXs}>
+              <span class={labelXs}>CPID</span>&nbsp;&nbsp;
+              {cpid ? cpid : <span class="animate-pulse">AUTO</span>}
             </h6>
           )}
 
