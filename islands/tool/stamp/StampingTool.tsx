@@ -1411,9 +1411,20 @@ function StampingToolMain({ config }: { config: Config }) {
             data: { txid: result.txid },
           });
           showToast(
-            `Broadcasted.\n${result.txid.substring(0, 10)}`,
+            "Transaction broadcasted successfully.",
             "success",
             false,
+            <>
+              Transaction hash:{" "}
+              <a
+                href={`https://mempool.space/tx/${result.txid}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="underline hover:opacity-80"
+              >
+                {result.txid.substring(0, 12)}...
+              </a>
+            </>,
           );
           setApiError("");
           setIsSubmitting(false);
@@ -1422,9 +1433,9 @@ function StampingToolMain({ config }: { config: Config }) {
             message: "Transaction signed successfully, but txid not returned",
           });
           showToast(
-            "Transaction signed and broadcasted successfully.\nPlease check your wallet or a block explorer for confirmation.",
-            "success",
-            false,
+            "Transaction broadcasted successfully, but no transaction hash was returned.\nPlease check your wallet history for confirmation.",
+            "warning",
+            true,
           );
           setApiError("");
           setIsSubmitting(false);
