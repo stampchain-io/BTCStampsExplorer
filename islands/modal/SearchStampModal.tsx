@@ -1,19 +1,18 @@
 /* @baba - commentary + global styles */
+import { SearchErrorDisplay, SearchInputField } from "$form";
 import { Icon, PlaceholderImage } from "$icon";
-import { SearchErrorDisplay } from "$islands/modal/SearchErrorDisplay.tsx";
-import { SearchInputField } from "$islands/modal/SearchInputField.tsx";
 import { closeModal, openModal, searchState } from "$islands/modal/states.ts";
 import { ModalSearchBase, transitionColors } from "$layout";
 import { generateSearchErrorMessage } from "$lib/utils/data/search/searchInputClassifier.ts";
 import { isValidBitcoinAddress } from "$lib/utils/typeGuards.ts";
 import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
-import { handleImageError } from "$lib/utils/ui/media/imageUtils.ts";
 import {
   navigateSSRSafe,
   scheduleFocus,
   useAutoFocus,
   useDebouncedSearch,
 } from "$lib/utils/ui/search/searchHooks.ts";
+import { useState } from "preact/hooks";
 
 export function openStampSearch() {
   const inputRef = {
@@ -131,6 +130,29 @@ export function openStampSearch() {
   scheduleFocus();
 }
 
+function StampResultImage(
+  { src, alt }: { src?: string; alt: string },
+) {
+  const [error, setError] = useState(false);
+
+  if (!src || error) {
+    return (
+      <div class="w-10 h-10 flex-shrink-0">
+        <PlaceholderImage variant="no-image" className="!rounded" />
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      alt={alt}
+      class="w-10 h-10 flex-shrink-0 rounded object-contain pixelart"
+      onError={() => setError(true)}
+    />
+  );
+}
+
 function SearchContent({
   setSearchTerm,
   inputRef,
@@ -219,46 +241,10 @@ function SearchContent({
                       onClick={() => handleResultClick(result.stamp)}
                       class={`flex items-center gap-5 px-7.5 py-1.5 hover:bg-color-background/60 ${transitionColors} cursor-pointer`}
                     >
-                      {result.preview &&
-                          result.mimetype?.startsWith("image/")
-                        ? (
-                          <img
-                            src={result.preview}
-                            alt={`Stamp ${result.stamp}`}
-                            class="w-10 h-10 rounded object-cover flex-shrink-0"
-                            onError={handleImageError}
-                          />
-                        )
-                        : result.mimetype === "text/plain"
-                        ? (
-                          <div class="w-10 h-10 rounded flex-shrink-0 bg-[#ff7700] flex items-center justify-center">
-                            <span class="text-[9px] font-bold text-black tracking-widest leading-none">
-                              TXT
-                            </span>
-                          </div>
-                        )
-                        : !result.mimetype ||
-                            result.mimetype === "UNKNOWN" ||
-                            result.mimetype === "application/octet-stream"
-                        ? (
-                          <div class="w-10 h-10 flex-shrink-0">
-                            <PlaceholderImage
-                              variant="error"
-                              className="!rounded"
-                            />
-                          </div>
-                        )
-                        : (
-                          <div class="w-10 h-10 rounded bg-stamp-grey/20 flex items-center justify-center flex-shrink-0">
-                            <Icon
-                              type="icon"
-                              name="stamp"
-                              weight="normal"
-                              size="sm"
-                              color="grey"
-                            />
-                          </div>
-                        )}
+                      <StampResultImage
+                        src={result.preview}
+                        alt={`Stamp ${result.stamp}`}
+                      />
                       <div class="flex flex-col flex-1">
                         <span class="text-sm font-medium text-color-grey-light">
                           #{result.stamp} - {result.cpid}

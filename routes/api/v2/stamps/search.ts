@@ -24,6 +24,7 @@ export const handler: Handlers = {
         skipTotalCount: true,
         cacheDuration: 60,
         excludeSrc20: true,
+        excludeSrc101: true,
       };
 
       switch (type) {
@@ -31,7 +32,6 @@ export const handler: Handlers = {
           queryOptions.cpidPrefix = sanitized;
           queryOptions.limit = 11;
           queryOptions.sortBy = "ASC";
-          queryOptions.sortColumn = "stamp";
           break;
 
         case "tx_hash":
@@ -39,20 +39,11 @@ export const handler: Handlers = {
           queryOptions.limit = 11;
           break;
 
-        case "stamp_number": {
-          const num = parseInt(sanitized);
-          queryOptions.stampNumberPrefix = {
-            exact: num,
-            rangeStart: num * 10,
-            rangeEnd: num * 10 + 9,
-          };
+        case "stamp_number":
+          queryOptions.stampNumberPrefix = sanitized;
           queryOptions.limit = 11;
-          queryOptions.sortColumn = "stamp";
-          // Negative stamps: DESC puts -1 before -2 before -10 (closest to 0 first)
-          // Positive stamps: ASC puts 1 before 10 before 19 (natural order)
-          queryOptions.sortBy = num < 0 ? "DESC" : "ASC";
+          queryOptions.sortBy = "ASC";
           break;
-        }
 
         case "address":
           queryOptions.addressPrefix = sanitized;

@@ -211,6 +211,8 @@ import * as $filter_FilterOptionsStamp from "./islands/filter/FilterOptionsStamp
 import * as $form_Checkbox from "./islands/form/Checkbox.tsx";
 import * as $form_InputField from "./islands/form/InputField.tsx";
 import * as $form_SRC20InputField from "./islands/form/SRC20InputField.tsx";
+import * as $form_SearchErrorDisplay from "./islands/form/SearchErrorDisplay.tsx";
+import * as $form_SearchInputField from "./islands/form/SearchInputField.tsx";
 import * as $form_SelectDate from "./islands/form/SelectDate.tsx";
 import * as $form_SelectField from "./islands/form/SelectField.tsx";
 import * as $header_AboutHeader from "./islands/header/AboutHeader.tsx";
@@ -246,8 +248,6 @@ import * as $modal_FilterSRC20Modal from "./islands/modal/FilterSRC20Modal.tsx";
 import * as $modal_PreviewCodeModal from "./islands/modal/PreviewCodeModal.tsx";
 import * as $modal_PreviewImageModal from "./islands/modal/PreviewImageModal.tsx";
 import * as $modal_RecieveAddyModal from "./islands/modal/RecieveAddyModal.tsx";
-import * as $modal_SearchErrorDisplay from "./islands/modal/SearchErrorDisplay.tsx";
-import * as $modal_SearchInputField from "./islands/modal/SearchInputField.tsx";
 import * as $modal_SearchSRC20Modal from "./islands/modal/SearchSRC20Modal.tsx";
 import * as $modal_SearchStampModal from "./islands/modal/SearchStampModal.tsx";
 import * as $modal_SendBTCModal from "./islands/modal/SendBTCModal.tsx";
@@ -573,6 +573,8 @@ const manifest = {
     "./islands/form/Checkbox.tsx": $form_Checkbox,
     "./islands/form/InputField.tsx": $form_InputField,
     "./islands/form/SRC20InputField.tsx": $form_SRC20InputField,
+    "./islands/form/SearchErrorDisplay.tsx": $form_SearchErrorDisplay,
+    "./islands/form/SearchInputField.tsx": $form_SearchInputField,
     "./islands/form/SelectDate.tsx": $form_SelectDate,
     "./islands/form/SelectField.tsx": $form_SelectField,
     "./islands/header/AboutHeader.tsx": $header_AboutHeader,
@@ -611,8 +613,6 @@ const manifest = {
     "./islands/modal/PreviewCodeModal.tsx": $modal_PreviewCodeModal,
     "./islands/modal/PreviewImageModal.tsx": $modal_PreviewImageModal,
     "./islands/modal/RecieveAddyModal.tsx": $modal_RecieveAddyModal,
-    "./islands/modal/SearchErrorDisplay.tsx": $modal_SearchErrorDisplay,
-    "./islands/modal/SearchInputField.tsx": $modal_SearchInputField,
     "./islands/modal/SearchSRC20Modal.tsx": $modal_SearchSRC20Modal,
     "./islands/modal/SearchStampModal.tsx": $modal_SearchStampModal,
     "./islands/modal/SendBTCModal.tsx": $modal_SendBTCModal,
