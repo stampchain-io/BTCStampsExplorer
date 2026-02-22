@@ -331,6 +331,22 @@ const WalletStampCardComponent = (
       );
     }
 
+    // Unrenderable content: no image URL, unknown/missing type, or raw binary
+    if (
+      !src ||
+      !stamp.stamp_mimetype ||
+      stamp.stamp_mimetype === "UNKNOWN" ||
+      stamp.stamp_mimetype === "application/octet-stream"
+    ) {
+      return (
+        <div class="stamp-container relative">
+          <div class="relative z-10 aspect-square">
+            <PlaceholderImage variant="error" />
+          </div>
+        </div>
+      );
+    }
+
     // Regular images
     return (
       <div class="stamp-container">
