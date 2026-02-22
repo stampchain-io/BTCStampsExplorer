@@ -1103,7 +1103,7 @@ function StampingToolMain({ config }: { config: Config }) {
       try {
         // Parse the number after 'A'
         const num = BigInt(numStr);
-        const min = BigInt(Math.pow(26, 12)) + BigInt(1); // 26^12 + 1
+        const min = BigInt(26) ** BigInt(12) + BigInt(1); // 26^12 + 1
         const max = BigInt("18446744073709551615"); // 2^64 - 1
 
         if (num >= min && num <= max) {
