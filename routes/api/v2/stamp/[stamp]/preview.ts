@@ -1198,7 +1198,7 @@ async function handleRedisPreview(
 // Handler-level timeout: prevent the request from hanging indefinitely
 // when rendering takes too long (e.g. complex recursive stamps).
 const HANDLER_TIMEOUT_MS = 55000; // 55s — must beat ALB 60s idle timeout
-const GIF_HANDLER_TIMEOUT_MS = 120000; // 120s — GIF is opt-in, expected slow
+const GIF_HANDLER_TIMEOUT_MS = 58000; // 58s — must beat ALB 60s idle timeout
 
 /**
  * Generate animated GIF preview for an HTML stamp with detected animation.
@@ -1272,13 +1272,15 @@ async function handleS3GifPreview(
       ? `https://stampchain.io/content/${txHash}`
       : stampData.stamp_url;
 
-    // Capture multiple frames from CF Worker
+    // Capture multiple frames from CF Worker.
+    // 10 frames at 200ms = 2s of animation at 5fps — good balance of
+    // quality vs time budget (must finish within ALB 60s idle timeout).
     const frames = await renderMultiFrameWithCloudflare({
       url: contentUrl,
-      delay: 5000,
-      frames: 20,
-      frameInterval: 100,
-      timeout: 90000,
+      delay: 3000,
+      frames: 10,
+      frameInterval: 200,
+      timeout: 55000,
     });
 
     if (!frames || frames.length === 0) {
@@ -1298,7 +1300,7 @@ async function handleS3GifPreview(
     for (const frameB64 of frames) {
       const raw = Uint8Array.from(atob(frameB64), (c) => c.charCodeAt(0));
       const img = await Image.decode(raw);
-      gifFrames.push(Frame.from(img, 100)); // 100ms per frame = 10fps
+      gifFrames.push(Frame.from(img, 200)); // 200ms per frame = 5fps
     }
 
     const animatedGif = new GIF(gifFrames);
