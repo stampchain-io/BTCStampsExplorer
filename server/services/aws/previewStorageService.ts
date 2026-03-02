@@ -40,7 +40,7 @@ function getS3Client(): S3Client {
 }
 
 function getS3Key(identifier: string, format: PreviewFormat = "png"): string {
-  const dir = serverConfig.AWS_S3_IMAGE_DIR || "stamps";
+  const dir = (serverConfig.AWS_S3_IMAGE_DIR || "stamps").replace(/\/+$/, "");
   return `${dir}/previews/${identifier}.${format}`;
 }
 
