@@ -70,6 +70,7 @@ export default {
     const delay = body.delay ?? 5000;
 
     let browser;
+    let usedTieredFallback = false;
     try {
       browser = await puppeteer.launch(env.BROWSER);
       const page = await browser.newPage();
@@ -81,19 +82,55 @@ export default {
       });
 
       if (body.html) {
-        // HTML mode: set content directly (no network needed — keep tight timeout)
-        await page.setContent(body.html, {
-          waitUntil: "networkidle0",
-          timeout: 25000,
-        });
+        // HTML mode: set content directly. Use tiered timeout like URL mode —
+        // some stamps with CSS animations and embedded fonts prevent networkidle0
+        // from resolving even though no real network requests are made.
+        try {
+          await page.setContent(body.html, {
+            waitUntil: "networkidle0",
+            timeout: 15000,
+          });
+        } catch (htmlNavError) {
+          const htmlNavMsg = htmlNavError instanceof Error
+            ? htmlNavError.message
+            : String(htmlNavError);
+          if (htmlNavMsg.includes("timeout") || htmlNavMsg.includes("Timeout")) {
+            console.log(
+              `[stamp-preview-renderer] networkidle0 timed out for inline HTML — proceeding with extended delay`,
+            );
+            await new Promise((resolve) => setTimeout(resolve, 8000));
+            usedTieredFallback = true;
+          } else {
+            throw htmlNavError;
+          }
+        }
       } else if (body.url) {
-        // URL mode: navigate to URL — recursive stamps may load multiple resources,
-        // so allow a longer timeout than inline HTML mode.
-        // CF Browser Rendering allows up to 60s sessions.
-        await page.goto(body.url, {
-          waitUntil: "networkidle2",
-          timeout: 45000,
-        });
+        // URL mode: tiered-timeout approach for maximum reliability.
+        // Some stamps (Append framework, complex recursive) keep network connections
+        // alive indefinitely, causing networkidle2 to hang until timeout.
+        // Strategy: try networkidle2 with 20s timeout first. If it times out,
+        // the page content is already loaded — just wait a bit longer for
+        // rendering to complete, then screenshot anyway.
+        try {
+          await page.goto(body.url, {
+            waitUntil: "networkidle2",
+            timeout: 20000,
+          });
+        } catch (navError) {
+          const navMsg = navError instanceof Error ? navError.message : String(navError);
+          if (navMsg.includes("timeout") || navMsg.includes("Timeout")) {
+            // Page loaded but network didn't settle — content is likely rendered.
+            // Wait for rendering to complete before screenshot.
+            console.log(
+              `[stamp-preview-renderer] networkidle2 timed out for ${body.url} — proceeding with extended delay`,
+            );
+            await new Promise((resolve) => setTimeout(resolve, 12000));
+            usedTieredFallback = true;
+          } else {
+            // Genuine navigation error (DNS, SSL, 404, etc.) — re-throw
+            throw navError;
+          }
+        }
       }
 
       // Wait for dynamic content (animations, canvas rendering, etc.)
@@ -114,6 +151,7 @@ export default {
         headers: {
           "Content-Type": "image/png",
           "X-Rendering-Engine": "cloudflare-browser",
+          ...(usedTieredFallback && { "X-Tiered-Fallback": "true" }),
           "Cache-Control": "no-store",
         },
       });

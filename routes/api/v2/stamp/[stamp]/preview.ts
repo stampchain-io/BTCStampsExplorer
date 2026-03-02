@@ -527,6 +527,8 @@ async function renderHtmlPreview(
   }
 
   try {
+    const renderStart = Date.now();
+
     const htmlResponse = await fetch(stamp_url);
     if (!htmlResponse.ok) {
       console.error(
@@ -620,21 +622,30 @@ async function renderHtmlPreview(
         timeout: 45000,
       });
     } else {
-      // Simple static HTML: clean Rocket Loader artifacts, render inline
+      // Simple static HTML: clean Rocket Loader artifacts, render inline.
+      // Timeout of 40s accounts for CF Worker tiered fallback (15s networkidle0
+      // timeout + 8s extra delay + render overhead) on complex inline stamps.
       const cleanedHtml = cleanHtmlForRendering(rawHtml);
       cfBuffer = await renderWithCloudflare({
         html: cleanedHtml,
         viewport: { width: 1200, height: 1200 },
         delay,
+        timeout: 40000,
       });
     }
 
     // If inline mode produced a suspiciously small image (blank render),
     // retry with URL mode as a fallback before giving up.
+    // Skip retry if not enough time budget remains (handler timeout is 55s).
     const MIN_VALID_PNG_SIZE = 5_000;
-    if (cfBuffer && cfBuffer.length < MIN_VALID_PNG_SIZE && !isRecursive) {
+    const elapsedMs = Date.now() - renderStart;
+    const TIME_BUDGET_FOR_RETRY_MS = 40000; // URL mode needs ~37s worst case
+    if (
+      cfBuffer && cfBuffer.length < MIN_VALID_PNG_SIZE && !isRecursive &&
+      elapsedMs < (HANDLER_TIMEOUT_MS - TIME_BUDGET_FOR_RETRY_MS)
+    ) {
       console.warn(
-        `[HTML Preview] Stamp ${stampNumber} inline render too small (${cfBuffer.length}B) — retrying with URL mode`,
+        `[HTML Preview] Stamp ${stampNumber} inline render too small (${cfBuffer.length}B, ${elapsedMs}ms elapsed) — retrying with URL mode`,
       );
       cfBuffer = await renderWithCloudflare({
         url: contentUrl,
@@ -642,6 +653,12 @@ async function renderHtmlPreview(
         delay: 8000,
         timeout: 45000,
       });
+    } else if (
+      cfBuffer && cfBuffer.length < MIN_VALID_PNG_SIZE && !isRecursive
+    ) {
+      console.warn(
+        `[HTML Preview] Stamp ${stampNumber} inline render too small (${cfBuffer.length}B) — skipping URL retry (${elapsedMs}ms elapsed, not enough time budget)`,
+      );
     }
 
     if (cfBuffer && cfBuffer.length >= MIN_VALID_PNG_SIZE) {
