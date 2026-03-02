@@ -47,6 +47,21 @@ DB_ENABLE_RETRY=true
 DB_MAX_RETRIES=3
 ```
 
+### TLS / SSL Settings
+
+MySQL 8.4+ uses `caching_sha2_password` authentication by default. The Deno MySQL driver requires a TLS connection for this auth method to work reliably.
+
+TLS is **enabled by default**. The RDS CA certificate bundle is included in the repository at `certs/rds-ca-bundle.pem`.
+
+| Variable | Default | Description |
+|---|---|---|
+| `DB_ENABLE_TLS` | `true` (if omitted) | Set to `"false"` to disable TLS (local Docker MySQL only) |
+| `DB_CA_CERT_PATH` | `certs/rds-ca-bundle.pem` | Path to CA certificate bundle |
+
+**Note:** If you're connecting to a local MySQL 8.4 Docker container, either:
+- Set `DB_ENABLE_TLS=false`, or
+- Start MySQL with `--mysql-native-password=ON` in your docker-compose
+
 ### Development Settings
 
 ```bash
