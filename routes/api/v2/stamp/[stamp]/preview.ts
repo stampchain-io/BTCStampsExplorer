@@ -1364,7 +1364,8 @@ export const handler: Handlers = {
 
       const previewPromise = (async () => {
         let result: Response;
-        if (format === "gif" && useS3Storage) {
+        if (format === "gif") {
+          // GIF always uses S3 storage (too large for Redis)
           result = await handleS3GifPreview(stamp, forceRefresh);
         } else {
           result = useS3Storage
