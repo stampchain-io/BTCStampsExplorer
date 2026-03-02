@@ -622,12 +622,15 @@ async function renderHtmlPreview(
         timeout: 45000,
       });
     } else {
-      // Simple static HTML: clean Rocket Loader artifacts, render inline
+      // Simple static HTML: clean Rocket Loader artifacts, render inline.
+      // Timeout of 40s accounts for CF Worker tiered fallback (15s networkidle0
+      // timeout + 8s extra delay + render overhead) on complex inline stamps.
       const cleanedHtml = cleanHtmlForRendering(rawHtml);
       cfBuffer = await renderWithCloudflare({
         html: cleanedHtml,
         viewport: { width: 1200, height: 1200 },
         delay,
+        timeout: 40000,
       });
     }
 

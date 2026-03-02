@@ -82,11 +82,28 @@ export default {
       });
 
       if (body.html) {
-        // HTML mode: set content directly (no network needed — keep tight timeout)
-        await page.setContent(body.html, {
-          waitUntil: "networkidle0",
-          timeout: 25000,
-        });
+        // HTML mode: set content directly. Use tiered timeout like URL mode —
+        // some stamps with CSS animations and embedded fonts prevent networkidle0
+        // from resolving even though no real network requests are made.
+        try {
+          await page.setContent(body.html, {
+            waitUntil: "networkidle0",
+            timeout: 15000,
+          });
+        } catch (htmlNavError) {
+          const htmlNavMsg = htmlNavError instanceof Error
+            ? htmlNavError.message
+            : String(htmlNavError);
+          if (htmlNavMsg.includes("timeout") || htmlNavMsg.includes("Timeout")) {
+            console.log(
+              `[stamp-preview-renderer] networkidle0 timed out for inline HTML — proceeding with extended delay`,
+            );
+            await new Promise((resolve) => setTimeout(resolve, 8000));
+            usedTieredFallback = true;
+          } else {
+            throw htmlNavError;
+          }
+        }
       } else if (body.url) {
         // URL mode: tiered-timeout approach for maximum reliability.
         // Some stamps (Append framework, complex recursive) keep network connections
