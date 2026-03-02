@@ -31,7 +31,11 @@ import {
 } from "$lib/utils/ui/rendering/svgUtils.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
-import { GIF, Image } from "https://deno.land/x/imagescript@1.3.0/mod.ts";
+import {
+  Frame,
+  GIF,
+  Image,
+} from "https://deno.land/x/imagescript@1.3.0/mod.ts";
 import { initWasm, Resvg } from "npm:@resvg/resvg-wasm@2.6.0";
 
 // Initialize WASM on module load
@@ -213,6 +217,69 @@ async function renderWithCloudflare(params: {
   }
 
   return null;
+}
+
+/**
+ * Request multiple animation frames from the CF Worker for GIF assembly.
+ * Returns an array of base64-encoded PNG strings at 400x400 resolution,
+ * or null on failure. No retries — GIF generation is best-effort.
+ */
+async function renderMultiFrameWithCloudflare(params: {
+  url?: string;
+  html?: string;
+  delay?: number;
+  frames: number;
+  frameInterval: number;
+  timeout?: number;
+}): Promise<string[] | null> {
+  if (!isCfWorkerConfigured) return null;
+
+  const fetchTimeout = params.timeout ?? 90000;
+
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), fetchTimeout);
+
+    const response = await fetch(CF_WORKER_URL!, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${CF_WORKER_SECRET}`,
+      },
+      body: JSON.stringify({
+        ...params,
+        viewport: { width: 400, height: 400 },
+      }),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timer);
+
+    if (!response.ok) {
+      const errorBody = await response.text().catch(() => "");
+      console.error(
+        `[Preview GIF] CF Worker returned ${response.status}: ${errorBody}`,
+      );
+      return null;
+    }
+
+    const data = await response.json() as { frames?: string[] };
+    if (
+      !data.frames || !Array.isArray(data.frames) || data.frames.length === 0
+    ) {
+      console.error("[Preview GIF] CF Worker returned empty or invalid frames");
+      return null;
+    }
+
+    console.log(
+      `[Preview GIF] Received ${data.frames.length} frames from CF Worker`,
+    );
+    return data.frames;
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error(`[Preview GIF] CF Worker multi-frame request failed: ${msg}`);
+    return null;
+  }
 }
 
 // Cache control headers for different scenarios
@@ -1131,6 +1198,144 @@ async function handleRedisPreview(
 // Handler-level timeout: prevent the request from hanging indefinitely
 // when rendering takes too long (e.g. complex recursive stamps).
 const HANDLER_TIMEOUT_MS = 55000; // 55s — must beat ALB 60s idle timeout
+const GIF_HANDLER_TIMEOUT_MS = 120000; // 120s — GIF is opt-in, expected slow
+
+/**
+ * Generate animated GIF preview for an HTML stamp with detected animation.
+ * S3-only storage path (GIF previews are not cached in Redis).
+ *
+ * Flow: check S3 cache → detect animation → capture frames → assemble GIF → upload → redirect
+ */
+async function handleS3GifPreview(
+  stamp: string,
+  forceRefresh: boolean,
+): Promise<Response> {
+  // Check S3 cache for existing GIF
+  if (!forceRefresh && await previewExists(stamp, "gif")) {
+    return WebResponseUtil.redirect(getPreviewUrl(stamp, "gif"), 302, {
+      headers: {
+        "X-Cache": "s3-hit",
+        "X-Format": "gif",
+        ...CACHE_HEADERS.redirect,
+      },
+    });
+  }
+
+  // Look up stamp data to get stamp_url and mimetype
+  const stampData = await StampController.getSpecificStamp(stamp);
+  if (!stampData?.stamp_url || stampData.stamp_mimetype !== "text/html") {
+    // Not an HTML stamp — redirect to existing PNG preview
+    return WebResponseUtil.redirect(getPreviewUrl(stamp, "png"), 302, {
+      headers: {
+        "X-Gif-Skipped": "not-html",
+        ...CACHE_HEADERS.redirect,
+      },
+    });
+  }
+
+  // Fetch HTML content for animation detection
+  try {
+    const htmlResponse = await fetch(stampData.stamp_url);
+    if (!htmlResponse.ok) {
+      return WebResponseUtil.redirect(getPreviewUrl(stamp, "png"), 302, {
+        headers: { "X-Gif-Skipped": "html-fetch-failed" },
+      });
+    }
+
+    const rawHtml = await htmlResponse.text();
+    const animation = detectAnimation(rawHtml);
+
+    if (!animation.isAnimated) {
+      console.log(
+        `[Preview GIF] Stamp ${stamp} is not animated — returning PNG`,
+      );
+      return WebResponseUtil.redirect(getPreviewUrl(stamp, "png"), 302, {
+        headers: {
+          "X-Gif-Skipped": "not-animated",
+          ...CACHE_HEADERS.redirect,
+        },
+      });
+    }
+
+    console.log(
+      `[Preview GIF] Stamp ${stamp} has animation: ${
+        animation.patterns.join(", ")
+      }`,
+    );
+
+    // Build content URL for URL-mode rendering
+    const txHash = stampData.stamp_url.split("/stamps/").pop()?.replace(
+      /\.html?$/i,
+      "",
+    );
+    const contentUrl = txHash
+      ? `https://stampchain.io/content/${txHash}`
+      : stampData.stamp_url;
+
+    // Capture multiple frames from CF Worker
+    const frames = await renderMultiFrameWithCloudflare({
+      url: contentUrl,
+      delay: 5000,
+      frames: 20,
+      frameInterval: 100,
+      timeout: 90000,
+    });
+
+    if (!frames || frames.length === 0) {
+      console.warn(
+        `[Preview GIF] Frame capture failed for stamp ${stamp} — falling back to PNG`,
+      );
+      return WebResponseUtil.redirect(getPreviewUrl(stamp, "png"), 302, {
+        headers: {
+          "X-Gif-Skipped": "capture-failed",
+          ...CACHE_HEADERS.redirect,
+        },
+      });
+    }
+
+    // Assemble animated GIF from captured frames using ImageScript
+    const gifFrames: InstanceType<typeof Frame>[] = [];
+    for (const frameB64 of frames) {
+      const raw = Uint8Array.from(atob(frameB64), (c) => c.charCodeAt(0));
+      const img = await Image.decode(raw);
+      gifFrames.push(Frame.from(img, 100)); // 100ms per frame = 10fps
+    }
+
+    const animatedGif = new GIF(gifFrames);
+    const gifBytes = await animatedGif.encode();
+
+    console.log(
+      `[Preview GIF] Stamp ${stamp} GIF assembled: ${gifFrames.length} frames, ${gifBytes.length}B`,
+    );
+
+    // Upload GIF to S3
+    await uploadPreview(stamp, new Uint8Array(gifBytes), "gif", {
+      "X-Frame-Count": gifFrames.length.toString(),
+      "X-Animation-Patterns": animation.patterns.join(","),
+    });
+
+    return WebResponseUtil.redirect(getPreviewUrl(stamp, "gif"), 302, {
+      headers: {
+        "X-Cache": "s3-uploaded",
+        "X-Format": "gif",
+        "X-Frame-Count": gifFrames.length.toString(),
+        ...CACHE_HEADERS.redirect,
+      },
+    });
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error(
+      `[Preview GIF] Error generating GIF for stamp ${stamp}: ${msg}`,
+    );
+    // Graceful fallback to PNG
+    return WebResponseUtil.redirect(getPreviewUrl(stamp, "png"), 302, {
+      headers: {
+        "X-Gif-Skipped": "error",
+        ...CACHE_HEADERS.redirect,
+      },
+    });
+  }
+}
 
 export const handler: Handlers = {
   async GET(req, ctx) {
@@ -1139,17 +1344,35 @@ export const handler: Handlers = {
       const { stamp } = ctx.params;
       const url = new URL(req.url);
       const forceRefresh = url.searchParams.get("refresh") === "true";
+      const format = url.searchParams.get("format") || "png";
+
+      // Validate format parameter
+      if (format !== "png" && format !== "gif") {
+        return WebResponseUtil.badRequest(
+          `Invalid format: "${format}". Supported: png, gif`,
+        );
+      }
 
       console.log(
-        `[Preview] Handler start for stamp ${stamp}, forceRefresh=${forceRefresh}`,
+        `[Preview] Handler start for stamp ${stamp}, format=${format}, forceRefresh=${forceRefresh}`,
       );
 
+      // Choose timeout based on format — GIF generation is slower
+      const timeoutMs = format === "gif"
+        ? GIF_HANDLER_TIMEOUT_MS
+        : HANDLER_TIMEOUT_MS;
+
       const previewPromise = (async () => {
-        const result = useS3Storage
-          ? await handleS3Preview(stamp, forceRefresh)
-          : await handleRedisPreview(stamp, forceRefresh);
+        let result: Response;
+        if (format === "gif" && useS3Storage) {
+          result = await handleS3GifPreview(stamp, forceRefresh);
+        } else {
+          result = useS3Storage
+            ? await handleS3Preview(stamp, forceRefresh)
+            : await handleRedisPreview(stamp, forceRefresh);
+        }
         console.log(
-          `[Preview] Render complete for stamp ${stamp} in ${
+          `[Preview] Render complete for stamp ${stamp} (${format}) in ${
             Date.now() - handlerStart
           }ms`,
         );
@@ -1169,7 +1392,7 @@ export const handler: Handlers = {
               ...CACHE_HEADERS.error,
             },
           }));
-        }, HANDLER_TIMEOUT_MS);
+        }, timeoutMs);
       });
 
       const response = await Promise.race([previewPromise, timeoutPromise]);
