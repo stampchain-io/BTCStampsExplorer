@@ -1272,16 +1272,41 @@ async function handleS3GifPreview(
       ? `https://stampchain.io/content/${txHash}`
       : stampData.stamp_url;
 
+    // Determine render mode: recursive stamps use URL mode, inline use HTML mode.
+    // Same logic as the PNG path in renderHtmlPreview().
+    const hasIframe = rawHtml.includes("<iframe");
+    const hasExternalRef = rawHtml.includes("ordinals.com/") ||
+      rawHtml.includes("arweave.net/");
+    const hasRelativeScriptSrc = /src\s*=\s*["']\//.test(rawHtml);
+    const hasStampContentRef = /["']\/s\//.test(rawHtml) ||
+      /["']A\d{10,}["']/.test(rawHtml);
+    const isRecursive = hasIframe || hasExternalRef ||
+      hasRelativeScriptSrc || hasStampContentRef;
+
     // Capture multiple frames from CF Worker.
     // 10 frames at 200ms = 2s of animation at 5fps — good balance of
     // quality vs time budget (must finish within ALB 60s idle timeout).
-    const frames = await renderMultiFrameWithCloudflare({
-      url: contentUrl,
+    const renderParams: {
+      url?: string;
+      html?: string;
+      delay: number;
+      frames: number;
+      frameInterval: number;
+      timeout: number;
+    } = {
       delay: 3000,
       frames: 10,
       frameInterval: 200,
       timeout: 55000,
-    });
+    };
+
+    if (isRecursive) {
+      renderParams.url = contentUrl;
+    } else {
+      renderParams.html = cleanHtmlForRendering(rawHtml);
+    }
+
+    const frames = await renderMultiFrameWithCloudflare(renderParams);
 
     if (!frames || frames.length === 0) {
       console.warn(
