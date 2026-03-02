@@ -586,15 +586,19 @@ class DatabaseManager {
     // The deno-mysql driver's RSA key exchange is broken over plaintext;
     // TLS bypasses RSA entirely by sending credentials over the encrypted channel.
     if (Deno.env.get("DB_ENABLE_TLS") !== "false") {
+      const caCertPath = Deno.env.get("DB_CA_CERT_PATH") || "certs/rds-ca-bundle.pem";
       try {
-        const caCertPath = Deno.env.get("DB_CA_CERT_PATH") || "certs/rds-ca-bundle.pem";
         const caCert = await Deno.readTextFile(caCertPath);
         connectionOptions.tls = {
           mode: "verify_identity",
           caCerts: [caCert],
         };
       } catch {
-        // CA cert not found — fall back to plaintext connection
+        console.warn(
+          `[DB TLS] CA cert not found at "${caCertPath}" — falling back to plaintext. ` +
+          `This will fail with MySQL 8.4 caching_sha2_password. ` +
+          `Run: curl -o certs/rds-ca-bundle.pem https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem`,
+        );
       }
     }
 
