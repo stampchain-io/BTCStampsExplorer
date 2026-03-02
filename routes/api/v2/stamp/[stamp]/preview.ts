@@ -1321,31 +1321,61 @@ async function handleS3GifPreview(
     }
 
     // Assemble animated GIF from captured frames using ImageScript
-    const gifFrames: InstanceType<typeof Frame>[] = [];
-    for (const frameB64 of frames) {
-      const raw = Uint8Array.from(atob(frameB64), (c) => c.charCodeAt(0));
-      const img = await Image.decode(raw);
-      gifFrames.push(Frame.from(img, 200)); // 200ms per frame = 5fps
+    let gifBytes: Uint8Array;
+    try {
+      const gifFrames: InstanceType<typeof Frame>[] = [];
+      for (const frameB64 of frames) {
+        const raw = Uint8Array.from(atob(frameB64), (c) => c.charCodeAt(0));
+        const img = await Image.decode(raw);
+        gifFrames.push(Frame.from(img, 200)); // 200ms per frame = 5fps
+      }
+
+      const animatedGif = new GIF(gifFrames);
+      const encoded = await animatedGif.encode();
+      gifBytes = encoded instanceof Uint8Array
+        ? encoded
+        : new Uint8Array(encoded);
+
+      console.log(
+        `[Preview GIF] Stamp ${stamp} GIF assembled: ${gifFrames.length} frames, ${gifBytes.length}B`,
+      );
+    } catch (assemblyError) {
+      const msg = assemblyError instanceof Error
+        ? assemblyError.message
+        : String(assemblyError);
+      console.error(`[Preview GIF] Assembly failed for stamp ${stamp}: ${msg}`);
+      return WebResponseUtil.redirect(getPreviewUrl(stamp, "png"), 302, {
+        headers: {
+          "X-Gif-Skipped": `assembly-error: ${msg.slice(0, 100)}`,
+          ...CACHE_HEADERS.redirect,
+        },
+      });
     }
 
-    const animatedGif = new GIF(gifFrames);
-    const gifBytes = await animatedGif.encode();
-
-    console.log(
-      `[Preview GIF] Stamp ${stamp} GIF assembled: ${gifFrames.length} frames, ${gifBytes.length}B`,
-    );
-
     // Upload GIF to S3
-    await uploadPreview(stamp, new Uint8Array(gifBytes), "gif", {
-      "X-Frame-Count": gifFrames.length.toString(),
-      "X-Animation-Patterns": animation.patterns.join(","),
-    });
+    try {
+      await uploadPreview(stamp, gifBytes, "gif", {
+        "X-Animation-Patterns": animation.patterns.join(","),
+      });
+    } catch (uploadError) {
+      const msg = uploadError instanceof Error
+        ? uploadError.message
+        : String(uploadError);
+      console.error(
+        `[Preview GIF] S3 upload failed for stamp ${stamp}: ${msg}`,
+      );
+      return WebResponseUtil.redirect(getPreviewUrl(stamp, "png"), 302, {
+        headers: {
+          "X-Gif-Skipped": `upload-error: ${msg.slice(0, 100)}`,
+          ...CACHE_HEADERS.redirect,
+        },
+      });
+    }
 
     return WebResponseUtil.redirect(getPreviewUrl(stamp, "gif"), 302, {
       headers: {
         "X-Cache": "s3-uploaded",
         "X-Format": "gif",
-        "X-Frame-Count": gifFrames.length.toString(),
         ...CACHE_HEADERS.redirect,
       },
     });
@@ -1357,7 +1387,7 @@ async function handleS3GifPreview(
     // Graceful fallback to PNG
     return WebResponseUtil.redirect(getPreviewUrl(stamp, "png"), 302, {
       headers: {
-        "X-Gif-Skipped": "error",
+        "X-Gif-Skipped": `error: ${msg.slice(0, 100)}`,
         ...CACHE_HEADERS.redirect,
       },
     });
