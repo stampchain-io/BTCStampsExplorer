@@ -77,6 +77,8 @@ async function renderWithCloudflare(params: {
 }): Promise<Uint8Array | null> {
   if (!isCfWorkerConfigured) return null;
 
+  // Use caller's timeout (default 30s). The handler-level Promise.race at 55s
+  // is the safety net — if render exceeds that, the handler returns fallback.
   const fetchTimeout = params.timeout ?? 30000;
   const maxRetries = 2;
   const retryDelays = [2000, 4000];
@@ -124,10 +126,17 @@ async function renderWithCloudflare(params: {
       return null;
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
-      const isRetryable = msg.includes("abort") ||
+      const errName = error instanceof Error ? error.name : "";
+      // Don't retry abort/timeout errors — they mean the render genuinely
+      // timed out. Retrying a 45s timeout 3 times would hang for 141s.
+      const isAbort = msg.toLowerCase().includes("abort") ||
+        errName === "AbortError" ||
+        errName === "TimeoutError";
+      const isRetryable = !isAbort && (
         msg.includes("network") ||
         msg.includes("ECONNREFUSED") ||
-        msg.includes("ETIMEDOUT");
+        msg.includes("ETIMEDOUT")
+      );
 
       if (isRetryable && attempt < maxRetries) {
         console.warn(
@@ -139,7 +148,9 @@ async function renderWithCloudflare(params: {
         continue;
       }
 
-      console.error(`[Preview] CF Worker request failed: ${msg}`);
+      console.error(
+        `[Preview] CF Worker request failed (final): ${errName}: ${msg}`,
+      );
       return null;
     }
   }
@@ -541,11 +552,26 @@ async function renderHtmlPreview(
     const isRecursive = hasIframe || hasExternalRef || hasRelativeScriptSrc ||
       hasStampContentRef;
 
-    const isComplex = isRecursive ||
+    // Differentiate delay by content complexity:
+    // - Simple iframe wrappers: parent JS is synchronous, done by networkidle2. 3s is enough.
+    // - Complex content (canvas, animations, async scripts): needs more time. 8s.
+    // - Simple static HTML: 3s.
+    const hasCanvas = rawHtml.includes("<canvas") ||
+      rawHtml.includes("getContext");
+    const hasAnimation = rawHtml.includes("requestAnimationFrame") ||
+      rawHtml.includes("@keyframes") ||
+      rawHtml.includes("setInterval");
+    const hasAsyncLoad = rawHtml.includes("async") ||
+      rawHtml.includes("await") ||
+      rawHtml.includes(".then(");
+    const isSimpleIframe = hasIframe && !hasCanvas && !hasAnimation &&
+      !hasAsyncLoad &&
+      rawHtml.length < 500;
+    const isComplex = (isRecursive && !isSimpleIframe) ||
       stamp_url?.includes("recursive") ||
       stamp_url?.includes("fractal") ||
-      stamp_url?.includes("canvas");
-    const delay = isComplex ? 8000 : 5000;
+      hasCanvas;
+    const delay = isComplex ? 8000 : 3000;
 
     // Build content URL for URL-mode rendering — uses the /content/ endpoint
     // so relative paths (like /s/) resolve against stampchain.io origin.
@@ -559,14 +585,36 @@ async function renderHtmlPreview(
 
     let cfBuffer: Uint8Array | null = null;
 
-    if (isRecursive) {
-      // Recursive/dependent stamps: navigate Chrome to the /content/ endpoint.
-      // The /content/ endpoint already cleans Rocket Loader artifacts.
-      console.log(
-        `[HTML Preview] Stamp ${stampNumber} has recursive/dependent content — using URL mode (${contentUrl})`,
+    // For simple iframe wrappers, render the iframe target directly.
+    // Puppeteer's networkidle2 never fires for pages containing iframes
+    // because the iframe's network connections prevent the idle condition.
+    // Rendering the target URL directly bypasses this issue entirely.
+    let renderUrl = contentUrl;
+    if (isSimpleIframe) {
+      const iframeSrcMatch = rawHtml.match(
+        /src\s*=\s*["']([^"']+)["']/,
       );
+      if (iframeSrcMatch?.[1]) {
+        const iframeSrc = iframeSrcMatch[1];
+        renderUrl = iframeSrc.startsWith("/")
+          ? `https://stampchain.io${iframeSrc}`
+          : iframeSrc;
+        console.log(
+          `[HTML Preview] Stamp ${stampNumber} is simple iframe wrapper — rendering target directly (${renderUrl})`,
+        );
+      }
+    }
+
+    if (isRecursive) {
+      // Recursive/dependent stamps: navigate Chrome to the content URL.
+      // Simple iframes use the extracted target; others use /content/ endpoint.
+      if (!isSimpleIframe) {
+        console.log(
+          `[HTML Preview] Stamp ${stampNumber} has recursive/dependent content — using URL mode (${contentUrl})`,
+        );
+      }
       cfBuffer = await renderWithCloudflare({
-        url: contentUrl,
+        url: renderUrl,
         viewport: { width: 1200, height: 1200 },
         delay,
         timeout: 45000,
@@ -583,7 +631,7 @@ async function renderHtmlPreview(
 
     // If inline mode produced a suspiciously small image (blank render),
     // retry with URL mode as a fallback before giving up.
-    const MIN_VALID_PNG_SIZE = 10_000;
+    const MIN_VALID_PNG_SIZE = 5_000;
     if (cfBuffer && cfBuffer.length < MIN_VALID_PNG_SIZE && !isRecursive) {
       console.warn(
         `[HTML Preview] Stamp ${stampNumber} inline render too small (${cfBuffer.length}B) — retrying with URL mode`,
@@ -1006,17 +1054,57 @@ async function handleRedisPreview(
   });
 }
 
+// Handler-level timeout: prevent the request from hanging indefinitely
+// when rendering takes too long (e.g. complex recursive stamps).
+const HANDLER_TIMEOUT_MS = 55000; // 55s — must beat ALB 60s idle timeout
+
 export const handler: Handlers = {
   async GET(req, ctx) {
+    const handlerStart = Date.now();
     try {
       const { stamp } = ctx.params;
       const url = new URL(req.url);
       const forceRefresh = url.searchParams.get("refresh") === "true";
 
-      if (useS3Storage) {
-        return await handleS3Preview(stamp, forceRefresh);
-      }
-      return await handleRedisPreview(stamp, forceRefresh);
+      console.log(
+        `[Preview] Handler start for stamp ${stamp}, forceRefresh=${forceRefresh}`,
+      );
+
+      const previewPromise = (async () => {
+        const result = useS3Storage
+          ? await handleS3Preview(stamp, forceRefresh)
+          : await handleRedisPreview(stamp, forceRefresh);
+        console.log(
+          `[Preview] Render complete for stamp ${stamp} in ${
+            Date.now() - handlerStart
+          }ms`,
+        );
+        return result;
+      })();
+
+      const timeoutPromise = new Promise<Response>((resolve) => {
+        setTimeout(() => {
+          console.warn(
+            `[Preview] Handler timeout for stamp ${stamp} after ${
+              Date.now() - handlerStart
+            }ms`,
+          );
+          resolve(WebResponseUtil.redirect(FALLBACK_LOGO, 302, {
+            headers: {
+              "X-Fallback": "handler-timeout",
+              ...CACHE_HEADERS.error,
+            },
+          }));
+        }, HANDLER_TIMEOUT_MS);
+      });
+
+      const response = await Promise.race([previewPromise, timeoutPromise]);
+      console.log(
+        `[Preview] Response ready for stamp ${stamp} in ${
+          Date.now() - handlerStart
+        }ms`,
+      );
+      return response;
     } catch (error) {
       const errName = error instanceof Error ? error.name : "unknown";
       const errMsg = error instanceof Error ? error.message : String(error);

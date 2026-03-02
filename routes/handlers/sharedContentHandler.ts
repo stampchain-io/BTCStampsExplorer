@@ -80,9 +80,18 @@ export async function handleContentRequest(
             return WebResponseUtil.htmlResponse(htmlContent, {
               headers: {
                 ...Object.fromEntries(recursiveHeaders),
-                // Add headers to prevent Cloudflare from modifying the response
-                "CF-Cache-Level": "bypass",
-                "Cache-Control": "no-transform",
+                // Allow Cloudflare CDN to cache stamp content at the edge.
+                // Stamp data is immutable — once inscribed it never changes.
+                // Edge caching is critical for recursive stamps where the CF
+                // Browser Rendering worker loads sub-resources via iframes;
+                // without it every sub-request round-trips to ECS origin.
+                // CDN-Cache-Control is required because CF doesn't cache HTML
+                // by default even with Cache-Control s-maxage.
+                "Cache-Control": "public, max-age=3600, no-transform",
+                "CDN-Cache-Control": "public, max-age=86400",
+                // Override Vary to only include CF-supported values.
+                // Default "X-API-Version" in Vary causes CF to skip caching.
+                "Vary": "Accept-Encoding",
                 "X-Frame-Options": "SAMEORIGIN",
                 "X-Content-Type-Options": "nosniff",
                 "X-Content-Transformed": "true",
@@ -102,7 +111,28 @@ export async function handleContentRequest(
       return response;
     }
 
-    // For non-HTML or non-redirect responses, preserve as-is
+    // For direct 200 HTML responses, add edge caching headers.
+    // Stamp content is immutable — once inscribed it never changes.
+    // CDN-Cache-Control tells Cloudflare to cache HTML at the edge,
+    // which is critical for recursive stamp sub-resources loaded via
+    // iframes in the CF Browser Rendering worker.
+    const contentType = response.headers.get("content-type") || "";
+    if (response.ok && contentType.includes("text/html")) {
+      const body = await response.text();
+      const headers = new Headers(response.headers);
+      headers.set("Cache-Control", "public, max-age=3600, no-transform");
+      headers.set("CDN-Cache-Control", "public, max-age=86400");
+      // Override Vary to only include CF-supported values.
+      // Default "X-API-Version" in Vary causes CF to skip caching.
+      headers.set("Vary", "Accept-Encoding");
+      headers.set("X-Frame-Options", "SAMEORIGIN");
+      headers.set("X-Content-Type-Options", "nosniff");
+      return new Response(body, {
+        status: response.status,
+        headers,
+      });
+    }
+
     return response;
   } catch (error) {
     logger.error("content", {
