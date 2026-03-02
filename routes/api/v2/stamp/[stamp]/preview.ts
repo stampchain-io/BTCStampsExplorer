@@ -55,6 +55,63 @@ import {
 const useS3Storage = serverConfig.PREVIEW_STORAGE === "s3";
 console.log("[Preview] Storage mode:", useS3Storage ? "s3" : "redis");
 
+/**
+ * Detect whether HTML stamp content contains meaningful animation.
+ * Used to gate animated GIF generation — static HTML stamps skip GIF
+ * and return the existing PNG preview instead.
+ */
+interface AnimationDetection {
+  isAnimated: boolean;
+  patterns: string[];
+}
+
+export function detectAnimation(rawHtml: string): AnimationDetection {
+  const patterns: string[] = [];
+
+  // JS-driven animation loops
+  if (rawHtml.includes("requestAnimationFrame")) {
+    patterns.push("requestAnimationFrame");
+  }
+
+  // CSS keyframe animations (looping)
+  if (rawHtml.includes("@keyframes")) {
+    patterns.push("@keyframes");
+  }
+
+  // Canvas-based drawing (must have both canvas element and context)
+  if (
+    (rawHtml.includes("<canvas") || rawHtml.includes("createElement('canvas") ||
+      rawHtml.includes('createElement("canvas')) &&
+    rawHtml.includes("getContext")
+  ) {
+    patterns.push("canvas+getContext");
+  }
+
+  // Web Animations API
+  if (/\.animate\s*\(/.test(rawHtml)) {
+    patterns.push("WebAnimationsAPI");
+  }
+
+  // CSS animation property (not just transition)
+  if (/animation(-name)?\s*:/.test(rawHtml) && rawHtml.includes("@keyframes")) {
+    // Only count if paired with actual keyframes definition
+    patterns.push("css-animation");
+  }
+
+  // setInterval with drawing context (not standalone timers)
+  if (
+    rawHtml.includes("setInterval") &&
+    (rawHtml.includes("requestAnimationFrame") ||
+      rawHtml.includes("getContext") ||
+      rawHtml.includes("innerHTML") ||
+      rawHtml.includes("style."))
+  ) {
+    patterns.push("setInterval+DOM");
+  }
+
+  return { isAnimated: patterns.length > 0, patterns };
+}
+
 // Cloudflare Browser Rendering Worker configuration
 const CF_WORKER_URL = serverConfig.CF_PREVIEW_WORKER_URL;
 const CF_WORKER_SECRET = serverConfig.CF_PREVIEW_WORKER_SECRET;
@@ -963,7 +1020,7 @@ async function handleS3Preview(
 
   // Upload raw binary PNG to S3 (decode from base64)
   const pngBytes = fromBase64(rendered.png);
-  await uploadPreview(stamp, pngBytes, rendered.meta);
+  await uploadPreview(stamp, pngBytes, "png", rendered.meta);
 
   // Redirect to CloudFront URL — CF handles Cache-Control from S3 object metadata
   return WebResponseUtil.redirect(getPreviewUrl(stamp), 302, {

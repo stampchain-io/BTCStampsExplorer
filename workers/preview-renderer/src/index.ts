@@ -11,8 +11,12 @@
  *   { html: string }          - Set page content directly and screenshot
  *   { viewport: { width, height } }  - Optional, defaults to 1200x1200
  *   { delay: number }         - Optional ms to wait after load, defaults to 5000
+ *   { frames: number }        - Optional number of frames to capture, defaults to 1
+ *   { frameInterval: number } - Optional ms between frame captures, defaults to 100
  *
- * Response: PNG binary (image/png) on success, JSON error on failure.
+ * Response:
+ *   frames === 1 (default): PNG binary (image/png)
+ *   frames > 1:             JSON { frames: string[] } with base64-encoded PNGs
  */
 
 import puppeteer from "@cloudflare/puppeteer";
@@ -27,6 +31,8 @@ interface RenderRequest {
   html?: string;
   viewport?: { width: number; height: number };
   delay?: number;
+  frames?: number;
+  frameInterval?: number;
 }
 
 export default {
@@ -68,6 +74,12 @@ export default {
     const viewportWidth = body.viewport?.width || 1200;
     const viewportHeight = body.viewport?.height || 1200;
     const delay = body.delay ?? 5000;
+    const frames = body.frames ?? 1;
+    const frameInterval = body.frameInterval ?? 100;
+
+    // Multi-frame mode uses a fixed 400x400 viewport for GIF frame capture.
+    const effectiveViewportWidth = frames > 1 ? 400 : viewportWidth;
+    const effectiveViewportHeight = frames > 1 ? 400 : viewportHeight;
 
     let browser;
     let usedTieredFallback = false;
@@ -76,8 +88,8 @@ export default {
       const page = await browser.newPage();
 
       await page.setViewport({
-        width: viewportWidth,
-        height: viewportHeight,
+        width: effectiveViewportWidth,
+        height: effectiveViewportHeight,
         deviceScaleFactor: 1,
       });
 
@@ -138,6 +150,34 @@ export default {
         await new Promise((resolve) => setTimeout(resolve, delay));
       }
 
+      if (frames > 1) {
+        // Multi-frame capture mode: collect N screenshots for animated GIF generation.
+        // Viewport is fixed at 400x400 (set before navigation above).
+        const capturedFrames: string[] = [];
+        for (let i = 0; i < frames; i++) {
+          if (i > 0) {
+            await new Promise((r) => setTimeout(r, frameInterval));
+          }
+          const screenshot = await page.screenshot({
+            type: "png",
+            fullPage: false,
+            omitBackground: true,
+            clip: { x: 0, y: 0, width: 400, height: 400 },
+          });
+          capturedFrames.push(Buffer.from(screenshot).toString("base64"));
+        }
+
+        return new Response(JSON.stringify({ frames: capturedFrames }), {
+          status: 200,
+          headers: {
+            "Content-Type": "application/json",
+            "X-Rendering-Engine": "cloudflare-browser",
+            "Cache-Control": "no-store",
+          },
+        });
+      }
+
+      // Single-frame path (frames === 1, default): unchanged behavior.
       // Take screenshot with transparent background
       const screenshot = await page.screenshot({
         type: "png",
