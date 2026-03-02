@@ -1,11 +1,12 @@
 /**
  * S3 Preview Storage Service
  *
- * Stores rendered stamp preview PNGs in S3 for CloudFront delivery.
- * Raw binary PNG is stored (no base64 wrapping) — saves ~33% vs JSON+base64.
+ * Stores rendered stamp previews in S3 for CloudFront delivery.
+ * Supports PNG (default) and GIF formats.
+ * Raw binary is stored (no base64 wrapping) — saves ~33% vs JSON+base64.
  *
- * S3 key pattern: {IMAGE_DIR}/previews/{identifier}.png
- * CloudFront URL: https://{DOMAIN}/{IMAGE_DIR}/previews/{identifier}.png
+ * S3 key pattern: {IMAGE_DIR}/previews/{identifier}.{format}
+ * CloudFront URL: https://{DOMAIN}/{IMAGE_DIR}/previews/{identifier}.{format}
  */
 import {
   HeadObjectCommand,
@@ -13,6 +14,13 @@ import {
   S3Client,
 } from "@aws-sdk/client-s3";
 import { serverConfig } from "$server/config/config.ts";
+
+export type PreviewFormat = "png" | "gif";
+
+const CONTENT_TYPES: Record<PreviewFormat, string> = {
+  png: "image/png",
+  gif: "image/gif",
+};
 
 let _s3Client: S3Client | null = null;
 
@@ -31,28 +39,34 @@ function getS3Client(): S3Client {
   return _s3Client;
 }
 
-function getS3Key(identifier: string): string {
-  const dir = serverConfig.AWS_S3_IMAGE_DIR || "stamps";
-  return `${dir}/previews/${identifier}.png`;
+function getS3Key(identifier: string, format: PreviewFormat = "png"): string {
+  const dir = (serverConfig.AWS_S3_IMAGE_DIR || "stamps").replace(/\/+$/, "");
+  return `${dir}/previews/${identifier}.${format}`;
 }
 
 /**
  * Build the public CloudFront URL for a stored preview.
  */
-export function getPreviewUrl(identifier: string): string {
+export function getPreviewUrl(
+  identifier: string,
+  format: PreviewFormat = "png",
+): string {
   const domain = serverConfig.CLOUDFRONT_PREVIEW_DOMAIN || "stampchain.io";
-  return `https://${domain}/${getS3Key(identifier)}`;
+  return `https://${domain}/${getS3Key(identifier, format)}`;
 }
 
 /**
  * Check if a preview already exists in S3.
  */
-export async function previewExists(identifier: string): Promise<boolean> {
+export async function previewExists(
+  identifier: string,
+  format: PreviewFormat = "png",
+): Promise<boolean> {
   try {
     await getS3Client().send(
       new HeadObjectCommand({
         Bucket: serverConfig.AWS_S3_BUCKETNAME,
-        Key: getS3Key(identifier),
+        Key: getS3Key(identifier, format),
       }),
     );
     return true;
@@ -78,15 +92,16 @@ export async function previewExists(identifier: string): Promise<boolean> {
 }
 
 /**
- * Upload a rendered PNG to S3 with CDN-friendly cache headers.
+ * Upload a rendered preview to S3 with CDN-friendly cache headers.
  * Stamps are immutable — cache forever.
  */
 export async function uploadPreview(
   identifier: string,
-  pngBytes: Uint8Array,
+  imageBytes: Uint8Array,
+  format: PreviewFormat = "png",
   meta?: Record<string, string>,
 ): Promise<string> {
-  const key = getS3Key(identifier);
+  const key = getS3Key(identifier, format);
   const s3Meta: Record<string, string> = {};
   if (meta) {
     for (const [k, v] of Object.entries(meta)) {
@@ -99,12 +114,12 @@ export async function uploadPreview(
     new PutObjectCommand({
       Bucket: serverConfig.AWS_S3_BUCKETNAME,
       Key: key,
-      Body: pngBytes,
-      ContentType: "image/png",
+      Body: imageBytes,
+      ContentType: CONTENT_TYPES[format],
       CacheControl: "public, max-age=31536000, immutable",
       Metadata: s3Meta,
     }),
   );
 
-  return getPreviewUrl(identifier);
+  return getPreviewUrl(identifier, format);
 }
