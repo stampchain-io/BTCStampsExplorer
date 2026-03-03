@@ -68,6 +68,7 @@ jobs:
       DB_USER: root
       DB_PASSWORD: testpassword
       DB_NAME: stamps_test
+      DB_ENABLE_TLS: "false"
       # Redis configuration
       REDIS_URL: redis://127.0.0.1:6379
       ELASTICACHE_ENDPOINT: 127.0.0.1:6379
