@@ -140,6 +140,42 @@ export function MetaTags({
           key="twitter-description"
         />
       )}
+
+      {/* JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": "stampchain.io",
+            "url": "https://stampchain.io",
+            "description":
+              "Official Bitcoin Stamps block explorer and API. Search stamps, SRC-20 tokens, blocks, and transactions on the Bitcoin blockchain.",
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": "https://stampchain.io/stamp/{search_term_string}",
+              "query-input": "required name=search_term_string",
+            },
+          }),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "Stampchain",
+            "url": "https://stampchain.io",
+            "logo": "https://stampchain.io/img/logo/stampchain-logo-480.svg",
+            "sameAs": [
+              "https://x.com/ArmandDLV",
+              "https://github.com/stampchain-io",
+            ],
+          }),
+        }}
+      />
     </>
   );
 }
