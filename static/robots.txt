@@ -11,5 +11,158 @@ Disallow: /test/
 # llms.txt:      concise project summary for LLMs
 # llms-full.txt: comprehensive project details for LLMs
 
+# --- AI Crawler Explicit Rules ---
+# Crawl-delay of 2s for AI crawlers to protect API server resources
+
+# OpenAI
+User-agent: GPTBot
+Allow: /
+Crawl-delay: 2
+
+User-agent: ChatGPT-User
+Allow: /
+Crawl-delay: 2
+
+User-agent: OAI-SearchBot
+Allow: /
+Crawl-delay: 2
+
+# Google
+User-agent: Google-Extended
+Allow: /
+Crawl-delay: 2
+
+User-agent: GoogleOther
+Allow: /
+Crawl-delay: 2
+
+User-agent: GoogleAgent-Mariner
+Allow: /
+Crawl-delay: 2
+
+# Anthropic
+User-agent: ClaudeBot
+Allow: /
+Crawl-delay: 2
+
+User-agent: anthropic-ai
+Allow: /
+Crawl-delay: 2
+
+User-agent: claude-web
+Allow: /
+Crawl-delay: 2
+
+# xAI / Grok
+User-agent: GrokBot
+Allow: /
+Crawl-delay: 2
+
+User-agent: xAI-Grok
+Allow: /
+Crawl-delay: 2
+
+User-agent: Grok-DeepSearch
+Allow: /
+Crawl-delay: 2
+
+# Perplexity
+User-agent: PerplexityBot
+Allow: /
+Crawl-delay: 2
+
+User-agent: Perplexity-User
+Allow: /
+Crawl-delay: 2
+
+# Apple
+User-agent: Applebot
+Allow: /
+Crawl-delay: 2
+
+User-agent: Applebot-Extended
+Allow: /
+Crawl-delay: 2
+
+# Meta
+User-agent: Meta-ExternalAgent
+Allow: /
+Crawl-delay: 2
+
+User-agent: FacebookBot
+Allow: /
+Crawl-delay: 2
+
+# Microsoft
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 2
+
+# ByteDance
+User-agent: Bytespider
+Allow: /
+Crawl-delay: 2
+
+# Others
+User-agent: CCBot
+Allow: /
+Crawl-delay: 2
+
+User-agent: YouBot
+Allow: /
+Crawl-delay: 2
+
+User-agent: Amazonbot
+Allow: /
+Crawl-delay: 2
+
+User-agent: cohere-ai
+Allow: /
+Crawl-delay: 2
+
+User-agent: DuckAssistBot
+Allow: /
+Crawl-delay: 2
+
+User-agent: MistralAI-User
+Allow: /
+Crawl-delay: 2
+
+User-agent: Diffbot
+Allow: /
+Crawl-delay: 2
+
+User-agent: AI2Bot
+Allow: /
+Crawl-delay: 2
+
+User-agent: Timpibot
+Allow: /
+Crawl-delay: 2
+
+User-agent: LinkedInBot
+Allow: /
+Crawl-delay: 2
+
+User-agent: DeepSeekBot
+Allow: /
+Crawl-delay: 2
+
+User-agent: Qwen
+Allow: /
+Crawl-delay: 2
+
+User-agent: Gemini-Deep-Research
+Allow: /
+Crawl-delay: 2
+
+User-agent: Google-CloudVertexBot
+Allow: /
+Crawl-delay: 2
+
+User-agent: Meta-WebIndexer
+Allow: /
+Crawl-delay: 2
+
 # Sitemap
 Sitemap: https://stampchain.io/sitemap.xml
