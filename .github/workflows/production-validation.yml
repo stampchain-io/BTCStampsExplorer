@@ -242,6 +242,7 @@ jobs:
       DB_USER: root
       DB_PASSWORD: test
       DB_NAME: btcstamps_test
+      DB_ENABLE_TLS: "false"
       REDIS_URL: redis://127.0.0.1:6379
       ELASTICACHE_ENDPOINT: 127.0.0.1:6379
       SKIP_REDIS_CONNECTION: false
