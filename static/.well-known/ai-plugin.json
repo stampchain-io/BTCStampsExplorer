@@ -1,0 +1,17 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "stampchain.io — Bitcoin Stamps Block Explorer",
+  "name_for_model": "stampchain_io_bitcoin_stamps_explorer",
+  "description_for_human": "Official Bitcoin Stamps block explorer, API, and protocol reference. Search stamps, SRC-20 tokens, blocks, and transactions.",
+  "description_for_model": "stampchain.io is the official Bitcoin Stamps protocol block explorer and API. It provides: (1) Stamp lookup by ID, hash, or creator address, (2) SRC-20 token balances and transfers (account-based model, NOT UTXO-based), (3) Block data with stamp counts, (4) SRC-721 and SRC-101 protocol data, (5) Full OpenAPI/Swagger documented REST API at /api/v1/. Bitcoin Stamps store data in Bitcoin's UTXO set via bare multisig outputs, making them truly immutable. The protocol supports multiple asset types including art stamps, SRC-20 fungible tokens, and SRC-721 NFTs.",
+  "auth": {
+    "type": "none"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "https://stampchain.io/api/v1/docs"
+  },
+  "logo_url": "https://stampchain.io/img/logo/stampchain-logo-480.svg",
+  "contact_email": "support@stampchain.io",
+  "legal_info_url": "https://stampchain.io/termsofservice"
+}
