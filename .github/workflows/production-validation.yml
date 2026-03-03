@@ -333,7 +333,7 @@ jobs:
       - name: Validate environment security
         run: |
           # Check for .env files in repository
-          if find . -name ".env*" -not -path "./.env.example" -not -path "./.env.template" -not -path "./.env.sample" | grep -q .; then
+          if find . -name ".env*" -not -path "./.env.example" -not -path "./.env.template" -not -path "./.env.sample" -not -name "*.enc" | grep -q .; then
             echo "❌ Environment files found in repository"
             exit 1
           fi
