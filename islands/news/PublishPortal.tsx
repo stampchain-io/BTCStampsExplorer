@@ -1,4 +1,5 @@
 import { useComputed, useSignal } from "@preact/signals";
+import { useEffect } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
 
 export default function PublishPortalIsland() {
@@ -15,6 +16,17 @@ export default function PublishPortalIsland() {
   const burnerFunded = useSignal(false);
   const checkingFundStatus = useSignal(false);
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const savedWif = localStorage.getItem("snn_burner_wif");
+      const savedAddress = localStorage.getItem("snn_burner_address");
+      if (savedWif && savedAddress) {
+        burnerWif.value = savedWif;
+        burnerAddress.value = savedAddress;
+      }
+    }
+  }, []);
+
   const generateBurner = async () => {
     errorMessage.value = "";
     try {
@@ -23,6 +35,11 @@ export default function PublishPortalIsland() {
       const data = await res.json();
       burnerWif.value = data.wif;
       burnerAddress.value = data.address;
+      
+      if (typeof window !== "undefined") {
+        localStorage.setItem("snn_burner_wif", data.wif);
+        localStorage.setItem("snn_burner_address", data.address);
+      }
     } catch(e: any) {
       errorMessage.value = e.message;
     }
@@ -37,11 +54,11 @@ export default function PublishPortalIsland() {
       if (!res.ok) throw new Error("Failed to check funding.");
       
       const data = await res.json();
-      if (data.hasutxos && data.balanceSats > 500) {
+      if (data.hasutxos && data.balanceSats > 3500) {
          burnerFunded.value = true;
          errorMessage.value = "";
       } else {
-         errorMessage.value = `Address has ${data.balanceSats} sats. Minimum ~1500 sats needed.`;
+         errorMessage.value = `Address has ${data.balanceSats} sats. Minimum ~3500 sats needed.`;
       }
     } catch(e: any) {
       errorMessage.value = e.message;
@@ -72,6 +89,11 @@ export default function PublishPortalIsland() {
          
          burnerWif.value = "";
          burnerAddress.value = "";
+         
+         if (typeof window !== "undefined") {
+           localStorage.removeItem("snn_burner_wif");
+           localStorage.removeItem("snn_burner_address");
+         }
      } catch(e: any) {
          actionStatus.value = "error";
          errorMessage.value = e.message;
@@ -332,7 +354,7 @@ export default function PublishPortalIsland() {
                   <div class="flex flex-col gap-2 p-3 bg-black border border-slate-700">
                     <div class="flex justify-between items-center text-[10px] font-mono border-b border-slate-800 pb-2">
                       <span class="text-orange-500 font-bold uppercase">Funding Target</span>
-                      <span class="text-slate-400">~1,500 SATS</span>
+                      <span class="text-slate-400">~4,000 SATS</span>
                     </div>
                     <div class="text-[10px] uppercase font-mono text-slate-500 mt-2 tracking-widest text-center">Send to:</div>
                     <div class="bg-slate-900 border border-slate-800 p-2 text-center text-orange-400 font-mono text-xs select-all break-all">
