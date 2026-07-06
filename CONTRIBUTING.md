@@ -131,6 +131,39 @@ Follow the established directory structure:
 └── tests/            # Test files
 ```
 
+## Branch Model & Deployment
+
+stampchain.io uses a **staging → production** branch model. There are two
+long-lived branches, each mapped to an environment:
+
+| Branch | Role | Default | Deploys to | Protection |
+|--------|------|---------|-----------|------------|
+| `dev`  | Integration / staging — where all work lands first | ✅ yes | Preview / staging (Deno preview deploys on PRs) | PR + linear history; no force-push or deletion |
+| `main` | **Production** — the live site | no | **Production** — `production-deploy.yml` deploys on every push | PR + **1 approving review** + linear history; no force-push or deletion |
+
+### Day-to-day (contributors)
+
+1. Branch off **`dev`**: `git checkout dev && git pull && git checkout -b feature/description`
+2. Open your PR against **`dev`** (the default base). CI and a preview deploy run on the PR.
+3. Once it's approved and green, squash-merge into `dev`. Your change is now on staging.
+
+### Promotion to production (maintainers)
+
+Production is released **only** by landing `dev` → `main`:
+
+1. Open a PR **`dev` → `main`**, e.g. `release: promote dev to production (YYYY-MM-DD)`.
+2. Review the diff — it is exactly what will go live.
+3. Merge. The push to `main` triggers `production-deploy.yml`, which deploys to
+   production and runs post-deploy validation.
+
+There are no version tags — this is **continuous deployment**. `main` always
+reflects what is currently live; `dev` is everything staged for the next
+promotion.
+
+> ⚠️ **`main` is the production branch.** Never push to it directly (the branch
+> ruleset blocks it) — every production change goes through a reviewed
+> `dev → main` promotion PR.
+
 ## Submitting Changes
 
 ### Pull Request Process
