@@ -136,16 +136,17 @@ Follow the established directory structure:
 stampchain.io uses a **staging → production** branch model. There are two
 long-lived branches, each mapped to an environment:
 
-| Branch | Role | Default | Deploys to | Protection |
+| Branch | Role | Default | Deploys to | Protection & merge method |
 |--------|------|---------|-----------|------------|
-| `dev`  | Integration / staging — where all work lands first | ✅ yes | Preview / staging (Deno preview deploys on PRs) | PR + linear history; no force-push or deletion |
-| `main` | **Production** — the live site | no | **Production** — `production-deploy.yml` deploys on every push | PR + **1 approving review** + linear history; no force-push or deletion |
+| `dev`  | Integration / staging — where all work lands first | ✅ yes | Preview / staging (Deno preview deploys on PRs) | PR + linear history; no force-push or deletion. Feature PRs land via **squash**. |
+| `main` | **Production** — the live site | no | **Production** — `production-deploy.yml` deploys on every push | PR + **1 approving review**; no force-push or deletion. Promotions land via a **merge commit** (the only method enabled on `main`). |
 
 ### Day-to-day (contributors)
 
 1. Branch off **`dev`**: `git checkout dev && git pull && git checkout -b feature/description`
 2. Open your PR against **`dev`** (the default base). CI and a preview deploy run on the PR.
-3. Once it's approved and green, squash-merge into `dev`. Your change is now on staging.
+3. Once it's approved and green, **squash-merge** into `dev`. `dev` keeps a clean,
+   linear history; your feature branch collapses to a single commit.
 
 ### Promotion to production (maintainers)
 
@@ -153,8 +154,18 @@ Production is released **only** by landing `dev` → `main`:
 
 1. Open a PR **`dev` → `main`**, e.g. `release: promote dev to production (YYYY-MM-DD)`.
 2. Review the diff — it is exactly what will go live.
-3. Merge. The push to `main` triggers `production-deploy.yml`, which deploys to
-   production and runs post-deploy validation.
+3. **Merge it — do NOT squash.** `main` accepts only the **"Create a merge commit"**
+   method, so the promotion brings `dev`'s actual commits onto `main`. The push to
+   `main` triggers `production-deploy.yml`, which deploys to production and runs
+   post-deploy validation.
+
+Because promotions are **merge commits** (not squashes), `main` always stays an
+ancestor of — i.e. fully contained in — `dev`. The two histories never diverge,
+so there are **no phantom conflicts and no manual `main → dev` reconciliation**
+after a release. (Squash promotions used to create a commit on `main` that did
+not exist on `dev`, which forced a reconciliation merge after every release; that
+is why `main`'s ruleset no longer requires linear history and is pinned to
+merge-commit-only.)
 
 There are no version tags — this is **continuous deployment**. `main` always
 reflects what is currently live; `dev` is everything staged for the next
@@ -162,7 +173,7 @@ promotion.
 
 > ⚠️ **`main` is the production branch.** Never push to it directly (the branch
 > ruleset blocks it) — every production change goes through a reviewed
-> `dev → main` promotion PR.
+> `dev → main` promotion PR, merged as a merge commit.
 
 ## Submitting Changes
 
