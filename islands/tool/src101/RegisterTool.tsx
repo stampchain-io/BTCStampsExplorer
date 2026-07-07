@@ -380,7 +380,7 @@ export function SRC101RegisterTool({
             <Button
               type="button"
               variant="outline"
-              color="grey"
+              color="neutral"
               size="mdR"
               onClick={checkAvailability}
               aria-label="Check bitname availability"

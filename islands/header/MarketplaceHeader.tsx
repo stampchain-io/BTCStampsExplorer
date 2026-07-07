@@ -150,7 +150,7 @@ export const MarketplaceHeader = (
           value={currentMarketMode}
           onChange={handleMarketModeChange}
           size="xsR"
-          color="purple"
+          color="primary"
         />
 
         <div class="hidden tablet:flex w-auto">
@@ -166,7 +166,7 @@ export const MarketplaceHeader = (
             value={currentFilters.stampType || "all"}
             onChange={handleStampTypeChange}
             size="xsR"
-            color="purple"
+            color="primary"
           />
         </div>
 

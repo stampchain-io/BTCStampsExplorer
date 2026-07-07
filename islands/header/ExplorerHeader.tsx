@@ -79,7 +79,7 @@ export const ExplorerHeader = (
             value={currentSection}
             onChange={handleSectionChange}
             size="xsR"
-            color="purple"
+            color="primary"
             className="w-full mobileMd:w-auto"
           />
         </div>

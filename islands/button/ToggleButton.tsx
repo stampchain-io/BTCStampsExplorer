@@ -33,8 +33,7 @@ export const ToggleButton = ({
   disabledOptions?: string[];
   alwaysSelectedOptions?: string[];
   color?:
-    | "grey"
-    | "purple"
+    | "neutral"
     | "primary"
     | "secondary"
     | "test"

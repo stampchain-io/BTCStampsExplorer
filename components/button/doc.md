@@ -43,45 +43,27 @@ The Button system provides a comprehensive set of interactive button components 
 
 ### Button Variants
 
+There are only 3 variants. `flatOutline`, `outlineFlat`, and `text` were removed as unused/redundant — use `outline` and `flat` for toggle/selected states instead (see `SelectorButtons.tsx` and `ToggleButton.tsx`).
+
 | Variant | Visual Style | Use Case | Example |
 |---------|-------------|----------|---------|
-| **outline** | Semi-transparent with blur, border changes on hover | Primary interactive buttons | Filter, Sort, Navigation |
-| **flat** | Gradient overlay with color blur effect | Colorful call-to-action buttons | Submit, Mint, Create |
-| **flatOutline** | Gradient background, solid on selected | Toggle buttons (selected state) | Active filters, tabs |
-| **outlineFlat** | Transparent, gradient on hover | Toggle buttons (deselected state) | Inactive filters, tabs |
-| **text** | No background, text only | Inline links and subtle actions | Read more, View all |
-| **outline** | Transparent with border | Secondary actions | Cancel, Close |
-| **flat** | Solid gradient background | Legacy style (to be removed) | - |
+| **outline** | Transparent background, solid `1px` border, fills solid on hover | Secondary/default actions, deselected toggle state | Filter, Sort, Navigation, Cancel |
+| **flat** | Solid background, transparent on hover | Primary call-to-action buttons, selected toggle state | Submit, Mint, Create, Connect Wallet |
+| **custom** | No built-in styling — fully controlled via `className` | One-off custom buttons | - |
 
 ### Color Palettes
 
-The button system uses a 5-step gradient color system with CSS variables, providing smooth color transitions from dark to light shades. See [Layout System Documentation](mdc:components/layout/doc.md#tailwind-color-system) for the complete Tailwind color palette.
+The button system uses **solid colors** driven by a single `--color-button` CSS custom property (no gradients). Each `color` value simply points that variable at a different Tailwind color token. See [Layout System Documentation](mdc:components/layout/doc.md#tailwind-color-system) for the complete Tailwind color palette.
 
-#### Grey (Default)
-```css
-/* 5-step gradient system */
---color-button-dark: var(--color-grey-dark)           /* #585552 */
---color-button-semidark: var(--color-grey-semidark)   /* #817e78 */
---color-button: var(--color-grey)                     /* #a8a39d */
---color-button-semilight: var(--color-grey-semilight) /* #d1cbc3 */
---color-button-light: var(--color-grey-light)         /* #f9f2e9 */
-```
+| Color | CSS Variable Target | Usage |
+|-------|---------------------|-------|
+| **neutral** (default for `Button`/`ButtonProcessing`) | `var(--color-neutral-400)` | Neutral/secondary actions, default state |
+| **primary** (default for `ButtonIcon`) | `var(--color-primary-400)` | Primary brand actions, emphasis, call-to-action buttons |
+| **secondary** | `var(--color-secondary-400)` | Secondary emphasis, alternate accent |
+| **test** | `var(--color-green)` | Testing/QA-only buttons |
+| **custom** | *(empty)* | Fully controlled via `className` |
 
-**Usage:** Neutral actions, default state, secondary buttons
-
-#### Purple
-```css
-/* 5-step gradient system */
---color-button-dark: var(--color-purple-dark)           /* #43005c */
---color-button-semidark: var(--color-purple-semidark)   /* #610085 */
---color-button: var(--color-purple)                     /* #7f00ad */
---color-button-semilight: var(--color-purple-semilight) /* #9d00d6 */
---color-button-light: var(--color-purple-light)         /* #BB00FF */
-```
-
-**Usage:** Primary brand actions, emphasis, call-to-action buttons
-
-**Note:** These CSS variables are defined in `tailwind.config.ts` as Tailwind color classes (e.g., `color-purple-dark`, `color-grey-light`) and referenced in button styles via the `color` prop which applies them dynamically.
+**Note:** These CSS variables are referenced in the `variant` styles (e.g. `bg-[var(--color-button)]`, `text-[var(--color-button)]`), and the `color` prop simply sets `--color-button` to the desired token via an arbitrary-value Tailwind class (e.g. `[--color-button:var(--color-neutral-400)]`).
 
 ### Size Options
 
@@ -115,11 +97,10 @@ The button system uses a 5-step gradient color system with CSS variables, provid
     - Toggle/slider specific styles: `toggleButton`, `sliderKnob`, `trackFill`
   - **Location**: `components/button/styles.ts`
   - **Features**:
-    - 9 button variants with glassmorphism effects
-    - 2 color palettes (grey, purple) with 5-step gradients using CSS custom properties
-    - 11 size options including responsive variants
+    - 3 button variants (`outline`, `flat`, `custom`)
+    - 5 solid colors (`neutral`, `primary`, `secondary`, `test`, `custom`) via a single `--color-button` CSS custom property
+    - 13 size options including responsive variants and `custom`
     - State management (disabled, loading, active)
-    - Animated gradient overlays
 
 - **ButtonBase.tsx**: Core button component implementations
   - **Components**: `Button`, `ButtonIcon`, `ButtonProcessing`
@@ -134,9 +115,9 @@ The button system uses a 5-step gradient color system with CSS variables, provid
   - **Location**: `components/button/ButtonBase.tsx`
 
 - **ToggleSwitchButton.tsx**: Toggle switch UI component
-  - **Purpose**: iOS-style toggle switch with glassmorphism
-  - **Props**: `checked`, `onChange`, `disabled`, `label`
-  - **Features**: Smooth animations, accessible keyboard navigation
+  - **Purpose**: iOS-style toggle switch
+  - **Props**: `isActive`, `onToggle`, `toggleButtonId`, `activeSymbol`, `inactiveSymbol`, `activeKnobClassName`, `inactiveKnobClassName`, `onClick`, `onMouseEnter`, `onMouseLeave`, `buttonRef`
+  - **Features**: Smooth knob-slide animation, optional symbols inside the knob, overridable knob colors (solid, no gradients)
 
 - **ReadAllButton.tsx**: Expandable content toggle
   - **Purpose**: Show/hide full content with smooth transitions
@@ -175,9 +156,8 @@ The button system uses a 5-step gradient color system with CSS variables, provid
 ### Button Props
 ```typescript
 export interface ButtonProps extends Omit<JSX.HTMLAttributes<HTMLButtonElement>, "loading" | "size"> {
-  variant?: "text" | "outline" | "flat" | "flatOutline" |
-            "outlineFlat";
-  color?: "grey" | "purple" | "test" | "custom";
+  variant?: "outline" | "flat" | "custom";
+  color?: "neutral" | "primary" | "secondary" | "test" | "custom";
   size?: "xxs" | "xs" | "sm" | "md" | "lg" | "xl" | "xxl" |
          "xxsR" | "xsR" | "smR" | "mdR" | "lgR" | "custom";
   disabled?: boolean;
@@ -207,20 +187,20 @@ export interface ExtendedProcessingButtonProps extends ButtonProps {
 }
 ```
 
+`ButtonColor`, `ButtonSize`, and `ButtonVariant` are also exported as standalone types from `lib/constants/uiConstants.ts` and re-exported via `lib/types/ui.d.ts`, so they can be imported independently of the button props interfaces.
+
 ### Button Variants Type
 ```typescript
 export interface ButtonVariants {
   base: string;
-  variant: Record<string, string>;
-  color: Record<string, string>;
+  variant: Record<"outline" | "flat" | "custom", string>;
+  color: Record<"neutral" | "primary" | "secondary" | "test" | "custom", string>;
   size: Record<string, string>;
-  textSize: Record<string, string>;
   state: {
     disabled: string;
     loading: string;
     active: string;
   };
-  spinner: string;
 }
 ```
 
@@ -232,7 +212,7 @@ import { Button } from "$button";
 
 export function MyComponent() {
   return (
-    <Button variant="outline" color="grey" size="mdR">
+    <Button variant="outline" color="neutral" size="mdR">
       CLICK ME
     </Button>
   );
@@ -252,7 +232,7 @@ export function IconExample() {
   return (
     <ButtonIcon
       variant="outline"
-      color="purple"
+      color="primary"
       size="md"
       isLoading={isLoading}
       isActive={isActive}
@@ -284,7 +264,7 @@ export function FormExample() {
   return (
     <ButtonProcessing
       variant="flat"
-      color="purple"
+      color="primary"
       size="lg"
       isSubmitting={isSubmitting}
       isActive={isActive}
@@ -297,26 +277,26 @@ export function FormExample() {
 }
 ```
 
-### Outline Gradient Button (Animated Border)
+### Flat Primary Button
 ```tsx
 import { Button } from "$button";
 
 export function PremiumButton() {
   return (
-    <Button variant="flat" color="purple" size="xl">
+    <Button variant="flat" color="primary" size="xl">
       CONNECT WALLET
     </Button>
   );
 }
 ```
 
-### Text Button (Link Style)
+### Outline Button as a Link
 ```tsx
 import { Button } from "$button";
 
-export function TextLinkButton() {
+export function LearnMoreLink() {
   return (
-    <Button variant="text" color="purple" size="sm" href="/about">
+    <Button variant="outline" color="primary" size="sm" href="/about">
       Learn More →
     </Button>
   );
@@ -331,7 +311,7 @@ export function NavButton() {
   return (
     <Button
       variant="outline"
-      color="grey"
+      color="neutral"
       size="mdR"
       href="/stamps"
       f-partial="/stamps"  // Fresh partial navigation
@@ -352,13 +332,15 @@ export function SettingsToggle() {
 
   return (
     <ToggleSwitchButton
-      checked={enabled}
-      onChange={(checked) => setEnabled(checked)}
-      label="Enable Notifications"
+      isActive={enabled}
+      onToggle={() => setEnabled((prev) => !prev)}
+      toggleButtonId="notifications-toggle"
     />
   );
 }
 ```
+
+`activeKnobClassName`/`inactiveKnobClassName` default to `bg-color-primary-400`/`bg-color-neutral-400`; pass your own solid `bg-*` class to override (see `FeeCalculatorBase.tsx` for an example).
 
 ### Range Slider
 ```tsx
@@ -374,8 +356,7 @@ export function FeeSelector() {
       max={100}
       value={fee}
       onChange={(value) => setFee(value)}
-      label="Transaction Fee"
-      unit="sat/vB"
+      formatValue={(value) => `${value} sat/vB`}
     />
   );
 }
@@ -398,11 +379,13 @@ export function ViewModeSelector() {
       value="grid"
       onChange={(value) => console.log(value)}
       size="smR"
-      color="grey"
+      color="neutral"
     />
   );
 }
 ```
+
+`SelectorButtons` only supports `color="neutral"` or `color="primary"` (any other value falls back to `neutral`); it reads directly from `buttonStyles.color` in `styles.ts` rather than the full `ButtonColor` union.
 
 #### SelectorButtons implementation notes ([islands/button/SelectorButtons.tsx](mdc:islands/button/SelectorButtons.tsx))
 
@@ -416,30 +399,35 @@ export function ViewModeSelector() {
 
 ### CSS Custom Properties Pattern
 
-The button system uses CSS custom properties for dynamic theming:
+The button system uses a single CSS custom property, `--color-button`, for dynamic theming. The `color` style sets the variable; the `variant` style consumes it:
 
 ```typescript
-// Color palette applied via className
+// Color sets the --color-button custom property
 color: {
-  purple: `
-    [--color-dark:#AA00FF66]
-    [--color-medium:#AA00FF99]
-    [--color-light:#AA00FFCC]
-    [--color-border:#66009966]
-    [--color-border-hover:#660099CC]
-    [--color-text:#660099]
-    [--color-text-hover:#8800CC]
-  `
+  primary: `
+    [--color-button:var(--color-primary-400)]
+  `,
+  neutral: `
+    [--color-button:var(--color-neutral-400)]
+  `,
 }
 
-// Used in variant styles
+// Variant consumes --color-button
 variant: {
   outline: `
-    border-[var(--color-border)]
-    hover:border-[var(--color-border-hover)]
-    text-[var(--color-text)]
-    hover:text-[var(--color-text-hover)]
-  `
+    bg-transparent
+    border-[0.9px] border-[var(--color-button)] rounded-full
+    text-[var(--color-button)]
+    hover:bg-[var(--color-button)] hover:text-color-neutral-1000
+    backdrop-blur-md
+  `,
+  flat: `
+    bg-[var(--color-button)]
+    border-[0.9px] border-[var(--color-button)] rounded-full
+    text-color-neutral-1000
+    hover:bg-transparent hover:text-[var(--color-button)]
+    backdrop-blur-md
+  `,
 }
 ```
 
@@ -509,46 +497,22 @@ Tailwind processes at build
 Rendered with compiled CSS
 ```
 
-### Gradient Animation (outlineGradient)
-```css
-/* Conic gradient with CSS animation */
-before:bg-[conic-gradient(from_var(--angle),
-  var(--color-button-dark),
-  var(--color-button),
-  var(--color-button-light),
-  var(--color-button),
-  var(--color-button-dark))]
-before:[--angle:0deg]
-before:animate-rotate
+### Toggle & Slider Knob Styles
 
-/* Hover state brightens all stops */
-hover:before:bg-[conic-gradient(from_var(--angle),
-  var(--color-button-light),
-  var(--color-button-light),
-  var(--color-button-light),
-  var(--color-button-light),
-  var(--color-button-light))]
+`styles.ts` also exports a few standalone class strings for the non-`Button` toggle/slider components (all solid colors, no gradients):
+
+```typescript
+export const toggleButton = `flex items-center relative w-10 h-5 !rounded-full ...`;
+export const toggleKnobBackground = "flex justify-center items-center relative w-5 h-5 ...";
+export const toggleKnob =
+  "w-[14px] h-[14px] rounded-full cursor-pointer group-hover:bg-color-primary-400";
+
+export const sliderBar = `relative w-full h-5 tablet:h-4 !rounded-full ...`;
+export const trackFill = `absolute top-0.5 bottom-0.5 h-[14px] tablet:h-[10px] rounded-full ...`;
+export const sliderKnob = `... [&::-webkit-slider-thumb]:bg-color-neutral-400 group-hover:[&::-webkit-slider-thumb]:bg-color-primary-400 ...`;
 ```
 
-### glassmorphismColor Gradient Overlay
-```css
-/* Multi-stop gradient creating depth */
-before:bg-[linear-gradient(to_bottom_right,
-  var(--color-button-dark) 0%,
-  var(--color-button-dark) 20%,
-  var(--color-button) 20%,
-  var(--color-button) 45%,
-  var(--color-button-light) 45%,
-  var(--color-button-light) 52%,
-  var(--color-button) 52%,
-  var(--color-button) 70%,
-  var(--color-button-dark) 70%,
-  var(--color-button-dark) 100%)]
-
-/* Blur and scale on hover */
-before:blur-sm
-hover:before:scale-105
-```
+`ToggleSwitchButton.tsx` uses `toggleButton`/`toggleKnob`/`toggleKnobBackground` and accepts `activeKnobClassName`/`inactiveKnobClassName` overrides (default to `bg-color-primary-400` / `bg-color-neutral-400`) if a consumer needs different knob colors (see `FeeCalculatorBase.tsx` for an example override).
 
 ## Performance Considerations
 
@@ -572,14 +536,15 @@ hover:before:scale-105
 ## Best Practices
 
 ### Variant Selection
-- **outline**: Secondary buttons
-- **flat**: Primary action buttons, call-to-action buttons
-- **flatOutline/outlineFlat**: Toggle states, Toggle and Selector buttons
-- **text**: Inline links, secondary actions
+- **outline**: Secondary/default actions, deselected toggle state
+- **flat**: Primary action buttons, call-to-action buttons, selected toggle state
+- **custom**: One-off buttons fully styled via `className`
 
 ### Color Selection
-- **grey**: Mainly used
-- **purple**: Optional use, to stand out
+- **neutral**: Default/most-used color for secondary actions
+- **primary**: Optional use, to stand out (brand emphasis, primary CTAs)
+- **secondary**: Alternate accent when neither neutral nor primary fits
+- **test**: QA/testing-only buttons, not for production UI
 
 ### Size Selection
 - Use responsive sizes (`mdR`, `lgR`) for adaptive UI
@@ -606,7 +571,7 @@ hover:before:scale-105
 ```tsx
 <ButtonProcessing
   variant="flat"
-  color="purple"
+  color="primary"
   size="lg"
   isSubmitting={isSubmitting}
   type="submit"
@@ -619,7 +584,7 @@ hover:before:scale-105
 ```tsx
 <ButtonIcon
   variant="outline"
-  color="grey"
+  color="neutral"
   size="md"
   ariaLabel="Close"
   onClick={handleClose}
@@ -632,7 +597,7 @@ hover:before:scale-105
 ```tsx
 <Button
   variant="outline"
-  color="grey"
+  color="neutral"
   size="mdR"
   href="/collection/bitcoin-stamps"
   f-partial="/collection/bitcoin-stamps"
@@ -645,16 +610,16 @@ hover:before:scale-105
 ```tsx
 <div class="flex gap-2">
   <Button
-    variant={selected === 'grid' ? 'flatOutline' : 'outlineFlat'}
-    color="purple"
+    variant={selected === 'grid' ? 'flat' : 'outline'}
+    color="primary"
     size="sm"
     onClick={() => setSelected('grid')}
   >
     GRID
   </Button>
   <Button
-    variant={selected === 'list' ? 'flatOutline' : 'outlineFlat'}
-    color="purple"
+    variant={selected === 'list' ? 'flat' : 'outline'}
+    color="primary"
     size="sm"
     onClick={() => setSelected('list')}
   >
@@ -662,6 +627,8 @@ hover:before:scale-105
   </Button>
 </div>
 ```
+
+For controlled multi-option toggles like this, prefer the dedicated `SelectorButtons` or `ToggleButton` island components (they handle the pill/selection styling for you) over hand-rolling variant switching on a raw `Button`.
 
 ## Troubleshooting
 
@@ -690,5 +657,5 @@ hover:before:scale-105
 
 ---
 
-**Last Updated:** October 6, 2025
+**Last Updated:** July 7, 2026
 **Author:** baba

@@ -144,7 +144,7 @@ export const FilterContentExplorer = ({
           value={filters.section}
           onChange={handleSectionChange}
           size="xsR"
-          color="purple"
+          color="primary"
           className="w-full"
         />
       </div>

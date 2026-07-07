@@ -119,7 +119,7 @@ const ContactCta = () => {
                 <ButtonProcessing
                   type="submit"
                   variant="flat"
-                  color="grey"
+                  color="neutral"
                   size="mdR"
                   isSubmitting={isSubmitting}
                 >

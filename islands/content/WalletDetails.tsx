@@ -283,7 +283,7 @@ function DispenserStats({
         <div class="flex justify-end pt-6">
           <Button
             variant="outline"
-            color="purple"
+            color="primary"
             size="md"
           >
             BUY

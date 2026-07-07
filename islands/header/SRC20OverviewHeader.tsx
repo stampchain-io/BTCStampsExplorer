@@ -63,7 +63,7 @@ export const SRC20OverviewHeader = ({
             value={viewType}
             onChange={handleViewTypeClick}
             size="xsR"
-            color="purple"
+            color="primary"
             className="w-full mobileMd:w-auto"
           />
           {/* Trending Toggle */}
@@ -90,7 +90,7 @@ export const SRC20OverviewHeader = ({
             value={timeframe}
             onChange={handleTimeframeClick}
             size="xsR"
-            color="purple"
+            color="primary"
           />
         </div>
       </div>

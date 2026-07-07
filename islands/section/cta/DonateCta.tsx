@@ -306,7 +306,7 @@ export default function DonateCta() {
       </div>
       <Button
         variant="flat"
-        color="purple"
+        color="primary"
         size="mdR"
         onClick={onClick}
       >

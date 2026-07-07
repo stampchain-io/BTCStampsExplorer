@@ -484,7 +484,7 @@ const FilterDrawer = (
         >
           <Button
             variant="outline"
-            color="grey"
+            color="neutral"
             size="xsR"
             onClick={() => {
               isClearingRef.current = true;
@@ -501,7 +501,7 @@ const FilterDrawer = (
           </Button>
           <Button
             variant="outline"
-            color="purple"
+            color="primary"
             size="xsR"
             onClick={handleApplyFilters}
             class="w-full"

@@ -733,8 +733,8 @@ export function FeeCalculatorBase({
                 toggleButtonId="currency-toggle"
                 activeSymbol="$"
                 inactiveSymbol="₿"
-                activeKnobClassName="bg-gradient-to-r from-color-primary-300 to-color-primary-400"
-                inactiveKnobClassName="bg-gradient-to-r from-color-orange-400 to-color-orange-300"
+                activeKnobClassName="bg-color-primary-400"
+                inactiveKnobClassName="bg-color-orange-400"
                 onMouseEnter={handleCurrencyMouseEnter}
                 onMouseLeave={handleCurrencyMouseLeave}
               />
@@ -949,7 +949,7 @@ export function FeeCalculatorBase({
             {onCancel && (
               <Button
                 variant="outline"
-                color="grey"
+                color="neutral"
                 size="mdR"
                 onClick={() => {
                   logger.debug("ui", {
@@ -966,7 +966,7 @@ export function FeeCalculatorBase({
             )}
             <ButtonProcessing
               variant="flat"
-              color="grey"
+              color="neutral"
               size="mdR"
               isSubmitting={!!isSubmitting}
               onClick={() => {

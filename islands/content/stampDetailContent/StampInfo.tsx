@@ -811,7 +811,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                 <div className="flex justify-end">
                   <Button
                     variant="flat"
-                    color="grey"
+                    color="neutral"
                     size="mdR"
                     onClick={() =>
                       toggleModal(selectedDispenser || lowestPriceDispenser)}

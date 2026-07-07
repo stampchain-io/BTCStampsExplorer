@@ -1205,9 +1205,9 @@ import type {
   AnimationProps,
   // Accessibility Types
   AriaAttributes,
-  ButtonColor,
   // Button Types
-  ButtonProps,
+  BaseButtonProps,
+  ButtonColor,
   ButtonSize,
   DisplayCountBreakpoints,
   ErrorStateProps,
@@ -1227,61 +1227,51 @@ import type {
   SelectProps,
   // Bitcoin Stamps UI Types
   StampGalleryProps,
-  ToastProps,
+  ToastProps
 } from "../../lib/types/ui.d.ts";
 
 Deno.test("UI Component Types - Button Component Structure", () => {
   // Test ButtonVariant type
   const variants: ButtonVariant[] = [
-    "text",
     "flat",
     "outline",
-    "flatOutline",
-    "outlineFlat",
-    "outlineGradient",
   ];
-  assertEquals(variants.length, 6);
+  assertEquals(variants.length, 2);
 
   // Test ButtonColor type
   const colors: ButtonColor[] = [
-    "grey",
-    "greyDark",
-    "greyGradient",
-    "purple",
-    "purpleDark",
-    "purpleGradient",
+    "neutral",
+    "primary",
+    "secondary",
     "test",
     "custom",
   ];
-  assertEquals(colors.length, 8);
+  assertEquals(colors.length, 5);
 
   // Test ButtonSize type
   const sizes: ButtonSize[] = [
     "xxs",
     "xs",
     "sm",
-    "base",
     "md",
     "lg",
     "xl",
     "xxl",
   ];
-  assertEquals(sizes.length, 8);
+  assertEquals(sizes.length, 7);
 
-  // Test ButtonProps interface
-  const buttonProps: ButtonProps = {
+  // Test BaseButtonProps interface
+  const buttonProps: BaseButtonProps = {
     children: "Click me",
     variant: "flat",
-    color: "purple",
+    color: "primary",
     size: "md",
     disabled: false,
-    loading: false,
-    fullWidth: false,
     onClick: () => {},
   };
 
   assertEquals(buttonProps.variant, "flat");
-  assertEquals(buttonProps.color, "purple");
+  assertEquals(buttonProps.color, "primary");
   assertEquals(buttonProps.size, "md");
 });
 

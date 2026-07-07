@@ -47,7 +47,7 @@ export const StampchainContactCta = () => {
       <div class="flex gap-5 justify-end">
         <Button
           variant="outline"
-          color="grey"
+          color="neutral"
           size="mdR"
           href="/about/#contact"
         >
@@ -55,7 +55,7 @@ export const StampchainContactCta = () => {
         </Button>
         <Button
           variant="flat"
-          color="grey"
+          color="neutral"
           size="mdR"
           href="/about"
         >

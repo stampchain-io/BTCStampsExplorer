@@ -179,7 +179,7 @@ export function TransactionStatus({
             {txid && onViewTransaction && (
               <Button
                 variant="outline"
-                color="grey"
+                color="neutral"
                 size="mdR"
                 onClick={onViewTransaction}
               >
@@ -189,7 +189,7 @@ export function TransactionStatus({
             {state === "failed" && onRetry && (
               <Button
                 variant="flat"
-                color="grey"
+                color="neutral"
                 size="mdR"
                 onClick={onRetry}
               >

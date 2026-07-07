@@ -22,17 +22,13 @@ export interface ButtonProps
 export interface ButtonVariants {
   base: string;
   variant: Record<
-    | "text"
     | "outline"
     | "flat"
-    | "flatOutline"
-    | "outlineFlat"
     | "custom",
     string
   >;
   color: Record<
-    | "grey"
-    | "purple"
+    | "neutral"
     | "primary"
     | "secondary"
     | "test"
@@ -56,31 +52,12 @@ export interface ButtonVariants {
     | "custom",
     string
   >;
-  textSize: Record<
-    "xs" | "sm" | "md" | "lg" | "xl",
-    string
-  >;
   state: {
     disabled: string;
     loading: string;
     active: string;
   };
 }
-
-/* ===== BUTTON VARIANT BASE STYLES DEFINITIONS ===== */
-/* ToggleButton.tsx uses custom hover states for the selected state */
-const baseOutline = `
-  bg-transparent
-  border-[0.9px] border-[var(--color-button)] rounded-full
-  text-[var(--color-button)]
-  hover:bg-[linear-gradient(to_bottom,var(--color-button),var(--color-button),var(--color-button-dark))] hover:text-[var(--color-background)]
-  backdrop-blur-md`;
-const baseFlat = `
-  bg-[linear-gradient(to_bottom,var(--color-button),var(--color-button),var(--color-button-dark))]
-  border-[0.9px] border-[var(--color-button)] rounded-full
-  text-color-background
-  hover:bg-[linear-gradient(to_bottom,transparent,transparent,transparent)] hover:text-[var(--color-button)]
-  backdrop-blur-md`;
 
 export const buttonStyles: ButtonVariants = {
   /* ===== BASE STYLES ===== */
@@ -93,25 +70,19 @@ export const buttonStyles: ButtonVariants = {
   /* ===== VARIANT STYLES  ===== */
   /* If the outline/flat variants are changed then the SelectorButtons.tsx and ToggleButton.tsx files must be update too */
   variant: {
-    text: `
-      !items-start !justify-start !h-auto !p-0 bg-transparent
-      text-[var(--color-button-dark)] hover:text-[var(--color-button)]
-    `,
     outline: `
-      ${baseOutline}
+      bg-transparent
+      border-[0.9px] border-[var(--color-button)] rounded-full
+      text-[var(--color-button)]
+      hover:bg-[var(--color-button)] hover:text-color-neutral-1000
+      backdrop-blur-md
     `,
     flat: `
-      ${baseFlat}
-    `,
-    flatOutline: `
-      ${baseFlat}
-      !items-center !justify-center
-      hover:!bg-[linear-gradient(to_bottom,transparent,transparent,transparent)] hover:!text-[var(--color-button)]
-      `,
-    outlineFlat: `
-      ${baseOutline}
-      !items-center !justify-center
-      hover:!bg-[linear-gradient(to_bottom,var(--color-button),var(--color-button),var(--color-button-dark))] hover:!text-[var(--color-background)]
+      bg-[var(--color-button)]
+      border-[0.9px] border-[var(--color-button)] rounded-full
+      text-color-neutral-1000
+      hover:bg-transparent hover:text-[var(--color-button)]
+      backdrop-blur-md
     `,
     custom: ``,
   },
@@ -119,38 +90,17 @@ export const buttonStyles: ButtonVariants = {
   /* ===== COLOR STYLES ===== */
   /* Must use CSS variables, since Tailwind CSS definitions are utility classes and won't work */
   color: {
-    grey: `
-      [--color-button-light:var(--color-neutral-300)]
+    neutral: `
       [--color-button:var(--color-neutral-400)]
-      [--color-button-dark:var(--color-neutral-500)]
-
-      [--color-button-semidark:var(--color-secondary-400]
-      [--color-button-semilight:var(--color-secondary-400)]
-    `,
-    purple: `
-      [--color-button-light:var(--color-primary-300)]
-      [--color-button:var(--color-primary-400)]
-      [--color-button-dark:var(--color-primary-500)]
-
-      [--color-button-semilight:var(--color-primary-400)]
-      [--color-button-semidark:var(--color-primary-600)]
     `,
     primary: `
-      [--color-button-light:var(--color-primary-300)]
       [--color-button:var(--color-primary-400)]
-      [--color-button-dark:var(--color-primary-500)]
     `,
     secondary: `
-      [--color-button-light:var(--color-secondary-300)]
       [--color-button:var(--color-secondary-400)]
-      [--color-button-dark:var(--color-secondary-500)]
     `,
     test: `
-      [--color-button-dark:var(--color-red-dark)]
-      [--color-button-semidark:var(--color-red-semidark)]
       [--color-button:var(--color-green)]
-      [--color-button-semilight:var(--color-orange-semilight)]
-      [--color-button-light:var(--color-orange-light)]
     `,
     custom: "",
   },
@@ -170,15 +120,6 @@ export const buttonStyles: ButtonVariants = {
     mdR: "h-[38px] tablet:h-[34px] px-4 text-sm tablet:text-xs",
     lgR: "h-[42px] tablet:h-[38px] px-4 text-sm",
     custom: "/* Custom size - allows external sizing via className */",
-  },
-
-  /* ===== TEXT SIZE STYLES - ONLY USED FOR TEXT BUTTONS ===== */
-  textSize: {
-    xs: "text-xs",
-    sm: "text-sm",
-    md: "text-base",
-    lg: "text-lg",
-    xl: "text-xl",
   },
 
   /* ===== STATE STYLES ===== */
@@ -210,14 +151,14 @@ export const buttonStyles: ButtonVariants = {
 /* ===== ADDITIONAL STYLES ===== */
 /* ===== SELECTOR BUTTON AND ICON BUTTON BACKGROUND STYLES ===== */
 export const buttonHover = `px-1.5 py-0.5 bg-transparent rounded-full
-  hover:bg-gradient-to-b hover:from-color-neutral-700 hover:via-color-neutral-800 hover:to-color-neutral-800 hover:stroke-color-hover`;
+  hover:bg-gradient-to-b hover:from-color-neutral-700/80 hover:via-color-neutral-800/90 hover:to-color-neutral-800 hover:stroke-color-hover`;
 /* ===== TOGGLE SWITCH BUTTON STYLES ===== */
 export const toggleButton = `flex items-center relative w-10 h-5 !rounded-full
   ${container2Hover} group focus:outline-none focus-visible:outline-none transition duration-50`;
 export const toggleKnobBackground =
   "flex justify-center items-center relative w-5 h-5 bg-transparent rounded-full cursor-pointer transition ease-in-out transform duration-400";
 export const toggleKnob =
-  "w-[14px] h-[14px] rounded-full cursor-pointer group-hover:from-color-primary-400 group-hover:to-color-primary-400";
+  "w-[14px] h-[14px] rounded-full cursor-pointer group-hover:bg-color-primary-400";
 /* ===== SLIDER BUTTON STYLES ===== */
 export const sliderBar =
   `relative w-full h-5 tablet:h-4 !rounded-full ${container2Hover} group cursor-pointer`;

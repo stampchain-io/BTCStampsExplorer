@@ -121,7 +121,7 @@ export const StampOverviewHeader = (
             value={currentFilters.stampType || "all"}
             onChange={handleStampTypeChange}
             size="xsR"
-            color="purple"
+            color="primary"
             className="w-full mobileMd:w-auto"
           />
         </div>

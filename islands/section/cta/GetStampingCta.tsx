@@ -60,7 +60,7 @@ export default function GetStampingCta() {
         <div class="flex justify-end gap-5">
           <Button
             variant="outline"
-            color="grey"
+            color="neutral"
             size="mdR"
             href="/faq"
           >
@@ -68,7 +68,7 @@ export default function GetStampingCta() {
           </Button>
           <Button
             variant="flat"
-            color="grey"
+            color="neutral"
             size="mdR"
             href="/tool/stamp/create"
           >

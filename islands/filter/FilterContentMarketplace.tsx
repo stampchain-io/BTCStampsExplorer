@@ -957,7 +957,7 @@ export const FilterContentMarketplace = ({
           value={filters.market || "listings"}
           onChange={handleMarketSelectorChange}
           size="xsR"
-          color="purple"
+          color="primary"
           className="w-full"
         />
       </div>

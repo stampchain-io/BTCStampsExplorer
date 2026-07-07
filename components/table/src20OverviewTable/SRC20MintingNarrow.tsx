@@ -300,7 +300,7 @@ export function SRC20MintingNarrow({
                     >
                       <Button
                         variant="flat"
-                        color="grey"
+                        color="neutral"
                         size="xsR"
                         href={mintHref}
                         onClick={handleMintClick}

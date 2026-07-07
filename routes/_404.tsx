@@ -29,7 +29,7 @@ export default function Error404Page() {
         <div class="flex gap-6 mt-3">
           <Button
             variant="outline"
-            color="grey"
+            color="neutral"
             size="mdR"
             href="javascript:history.back()"
           >
@@ -37,7 +37,7 @@ export default function Error404Page() {
           </Button>
           <Button
             variant="flat"
-            color="grey"
+            color="neutral"
             size="mdR"
             href="/home"
             target="_top"

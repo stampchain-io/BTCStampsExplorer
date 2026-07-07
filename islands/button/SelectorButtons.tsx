@@ -62,8 +62,8 @@ export const SelectorButtons = ({
 
   // Use imported color from buttonStyles (needs the css variables)
   const colorVariants = {
-    grey: color.grey,
-    purple: color.purple,
+    neutral: color.neutral,
+    primary: color.primary,
   } as const satisfies Record<string, string>;
 
   // Helper function to determine if an option is disabled
@@ -85,9 +85,9 @@ export const SelectorButtons = ({
       class={`relative grid p-0 select-none
         ${container2} rounded-full
         ${
-        (colorProp === "purple" || colorProp === "grey")
+        (colorProp === "primary" || colorProp === "neutral")
           ? colorVariants[colorProp]
-          : colorVariants.grey
+          : colorVariants.neutral
       }
         ${disabledProp ? state.disabled : ""}
         ${className}
@@ -125,7 +125,7 @@ export const SelectorButtons = ({
         // Only appearance (color/bg) on the label — no cursor or disabled duplication.
         const labelClass = isSelected && isMounted
           ? `mx-0.5 text-color-neutral-1000 ${transitionColors}`
-          : `mx-0.5 bg-transparent text-color-neutral-500 ${
+          : `mx-0.5 bg-transparent text-color-neutral-400 ${
             isMounted
               ? `${transitionColors} hover:!text-color-hover ${buttonHover}`
               : "transition-none"
