@@ -1555,6 +1555,7 @@ export class StampRepository {
                 tx_hash: row.sale_tx_hash || row.tx_hash,
                 buyer_address: row.buyer_address,
                 seller_address: row.seller_address,
+                sale_time: row.sale_time ?? null,
                 time_ago: row.sale_time ? this.getTimeAgo(new Date(row.sale_time * 1000)) : null,
                 btc_amount_satoshis: row.btc_amount ? Math.round(parseFloat(row.btc_amount) * 100000000) : null,
                 dispenser_tx_hash: null

@@ -408,6 +408,11 @@ export interface SRC20TrxRequestParams {
   trendingWindow?: "24h" | "7d" | "30d"; // Time window for trending calculations
   includeProgress?: boolean; // Include progress_percentage, total_minted from market data
   mintVelocityMin?: number; // Minimum mint velocity for trending (mints per hour)
+
+  // Explorer filter params — token range and amount
+  stampMin?: number; // filter: st.stamp >= stampMin (custom range lower bound)
+  stampMax?: number; // filter: st.stamp < stampMax (preset or custom range upper bound)
+  amtMax?: string; // filter: CAST(src20.amt AS DECIMAL) <= amtMax
 }
 
 /**
@@ -785,6 +790,23 @@ export type StampPageProps = {
       totalPages: number;
     } | null;
     section?: "all" | "stamps" | "tokens";
+    cardView?: "detail" | "minimal" | "row";
+  };
+};
+
+/**
+ * MarketplacePageProps - Data structure for the Marketplace page
+ */
+export type MarketplacePageProps = {
+  data: {
+    stamps: StampRow[];
+    page: number;
+    totalPages: number;
+    selectedTab: "all" | "classic" | "posh" | "recent_sales";
+    sortBy: "ASC" | "DESC";
+    filterBy: StampFilterType[];
+    filters: StampFilters;
+    search: string;
     cardView?: "detail" | "minimal" | "row";
   };
 };

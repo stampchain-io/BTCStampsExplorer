@@ -146,12 +146,16 @@ export const DUMMY_STAMP_SRC721_DISPENSER = {
   oracle_price_last_updated: null,
 };
 
+/* Approximate BTC/USD rate used throughout dummy data */
+const _BTC_PRICE_USD = 62_000;
+
 /* 6-entry cycle: each type once without price, once with listing price */
 const _stampBases = [
   DUMMY_STAMP_CLASSIC,
   {
     ...DUMMY_STAMP_CLASSIC,
     floorPrice: 0.00042,
+    floorPriceUSD: 0.00042 * _BTC_PRICE_USD,
     marketData: { floorPriceBTC: 0.00042, recentSalePriceBTC: null },
     lowestPriceDispenser: DUMMY_STAMP_CLASSIC_DISPENSER,
   },
@@ -159,6 +163,7 @@ const _stampBases = [
   {
     ...DUMMY_STAMP_POSH,
     floorPrice: 0.0069,
+    floorPriceUSD: 0.0069 * _BTC_PRICE_USD,
     marketData: { floorPriceBTC: 0.0069, recentSalePriceBTC: null },
     lowestPriceDispenser: DUMMY_STAMP_POSH_DISPENSER,
   },
@@ -166,6 +171,7 @@ const _stampBases = [
   {
     ...DUMMY_STAMP_SRC721,
     floorPrice: 0.000021,
+    floorPriceUSD: 0.000021 * _BTC_PRICE_USD,
     marketData: { floorPriceBTC: 0.000021, recentSalePriceBTC: null },
     lowestPriceDispenser: DUMMY_STAMP_SRC721_DISPENSER,
   },
@@ -192,6 +198,7 @@ export function withDummyListingsData<T extends Record<string, any>>(
       ? {
         ...s,
         floorPrice: dispenser.satoshirate / 100000000,
+        floorPriceUSD: (dispenser.satoshirate / 100000000) * _BTC_PRICE_USD,
         marketData: {
           floorPriceBTC: dispenser.satoshirate / 100000000,
           recentSalePriceBTC: null,
@@ -206,14 +213,17 @@ export function withDummyListingsData<T extends Record<string, any>>(
 export function withDummySalesData<T extends Record<string, any>>(
   stamps: T[],
 ): T[] {
+  const BTC_AMOUNT = 0.00069;
   return stamps.map((s) => ({
     ...s,
+    floorPriceUSD: (s as any).floorPriceUSD ?? BTC_AMOUNT * _BTC_PRICE_USD,
     sale_data: (s as any).sale_data ?? {
-      btc_amount: 0.00069,
+      btc_amount: BTC_AMOUNT,
       block_index: 958500,
       tx_hash: (s as any).tx_hash,
       dispenser_address: (s as any).creator,
       buyer_address: "1A1zP1eP5QGefi2DMPTfTL5SLmv7Divf0Na",
+      sale_time: Math.floor((Date.now() - 4 * 3_600_000) / 1000), // 4 hours ago
       time_ago: "2h ago",
       dispense_quantity: 1,
     },
@@ -885,7 +895,11 @@ export const DUMMY_TOKEN_OVERVIEW_PAGE = DUMMY_EXPLORER_OVERVIEW_PAGE;
 
 /** Stamp detail page */
 export const DUMMY_STAMP_DETAIL_PAGE = {
-  stamp: { ...DUMMY_STAMP_CLASSIC, floorPrice: 0.00042 },
+  stamp: {
+    ...DUMMY_STAMP_CLASSIC,
+    floorPrice: 0.00042,
+    floorPriceUSD: 0.00042 * _BTC_PRICE_USD,
+  },
   total: 1,
   sends: [],
   dispensers: [DUMMY_STAMP_CLASSIC_DISPENSER],

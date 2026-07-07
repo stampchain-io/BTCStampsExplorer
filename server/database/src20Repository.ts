@@ -70,10 +70,14 @@ export class SRC20Repository {
       block_index = null,
       tx_hash = null,
       address = null,
+      stampMin,
+      stampMax,
+      amtMax,
     } = params;
 
     const queryParams = [];
     const whereConditions = [];
+    let needsStampJoin = false;
 
     if (tick !== null) {
       if (Array.isArray(tick)) {
@@ -112,21 +116,40 @@ export class SRC20Repository {
       queryParams.push(tx_hash);
     }
 
+    if (stampMax != null) {
+      whereConditions.push(`st.stamp < ?`);
+      queryParams.push(stampMax);
+      needsStampJoin = true;
+    }
+
+    if (stampMin != null) {
+      whereConditions.push(`st.stamp >= ?`);
+      queryParams.push(stampMin);
+      needsStampJoin = true;
+    }
+
+    if (amtMax != null) {
+      whereConditions.push(`CAST(src20.amt AS DECIMAL) <= ?`);
+      queryParams.push(amtMax);
+    }
+
     // 🚀 OPTIMIZED: Use pre-computed market data instead of expensive correlated subquery
     let fromClause = `FROM ${SRC20_TABLE} src20`;
 
+    if (needsStampJoin) {
+      fromClause += `\n        LEFT JOIN ${STAMP_TABLE} st ON st.tx_hash = src20.tx_hash`;
+    }
+
     if (excludeFullyMinted) {
       // Use LEFT JOIN with src20_market_data for much better performance
-      fromClause = `FROM ${SRC20_TABLE} src20
-        LEFT JOIN src20_market_data smd ON smd.tick = src20.tick`;
+      fromClause += `\n        LEFT JOIN src20_market_data smd ON smd.tick = src20.tick`;
       whereConditions.push(`COALESCE(smd.progress_percentage, 0) < 100`);
     }
 
     // 🚀 CRITICAL: Add filter for onlyFullyMinted
     if (onlyFullyMinted) {
       // Use LEFT JOIN with src20_market_data for filtering
-      fromClause = `FROM ${SRC20_TABLE} src20
-        LEFT JOIN src20_market_data smd ON smd.tick = src20.tick`;
+      fromClause += `\n        LEFT JOIN src20_market_data smd ON smd.tick = src20.tick`;
       whereConditions.push(`COALESCE(smd.progress_percentage, 0) >= 99.9`);
     }
 
@@ -161,6 +184,9 @@ export class SRC20Repository {
       filterBy: _filterBy,
       tx_hash,
       address,
+      stampMin,
+      stampMax,
+      amtMax,
     } = params;
 
     const queryParams = [];
@@ -199,6 +225,21 @@ export class SRC20Repository {
     if (address != null) {
       whereClauses.push(`(src20.creator = ? OR src20.destination = ?)`);
       queryParams.push(address, address);
+    }
+
+    if (stampMax != null) {
+      whereClauses.push(`st.stamp < ?`);
+      queryParams.push(stampMax);
+    }
+
+    if (stampMin != null) {
+      whereClauses.push(`st.stamp >= ?`);
+      queryParams.push(stampMin);
+    }
+
+    if (amtMax != null) {
+      whereClauses.push(`CAST(src20.amt AS DECIMAL) <= ?`);
+      queryParams.push(amtMax);
     }
 
     if (excludeFullyMinted) {

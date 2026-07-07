@@ -1499,6 +1499,7 @@ export interface StampWithEnhancedSaleData extends StampRow {
     buyer_address?: string;
     dispenser_address?: string;
     time_ago?: string;
+    sale_time?: number | null;
     btc_amount_satoshis?: number;
     dispenser_tx_hash?: string;
   };
