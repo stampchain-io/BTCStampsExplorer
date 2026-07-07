@@ -204,16 +204,16 @@ import * as $content_stampDetailContent_StampTextContent from "./islands/content
 import * as $error_ErrorDisplay from "./islands/error/ErrorDisplay.tsx";
 import * as $filter_FilterComponents from "./islands/filter/FilterComponents.tsx";
 import * as $filter_FilterContentExplorer from "./islands/filter/FilterContentExplorer.tsx";
+import * as $filter_FilterContentExplorerSRC20 from "./islands/filter/FilterContentExplorerSRC20.tsx";
+import * as $filter_FilterContentExplorerStamp from "./islands/filter/FilterContentExplorerStamp.tsx";
 import * as $filter_FilterContentMarketplace from "./islands/filter/FilterContentMarketplace.tsx";
 import * as $filter_FilterContentSRC20 from "./islands/filter/FilterContentSRC20.tsx";
-import * as $filter_FilterContentStamps from "./islands/filter/FilterContentStamps.tsx";
-import * as $filter_FilterContentTokens from "./islands/filter/FilterContentTokens.tsx";
 import * as $filter_FilterDrawer from "./islands/filter/FilterDrawer.tsx";
 import * as $filter_FilterOptionsExplorer from "./islands/filter/FilterOptionsExplorer.tsx";
+import * as $filter_FilterOptionsExplorerSRC20 from "./islands/filter/FilterOptionsExplorerSRC20.tsx";
+import * as $filter_FilterOptionsExplorerStamp from "./islands/filter/FilterOptionsExplorerStamp.tsx";
 import * as $filter_FilterOptionsMarketplace from "./islands/filter/FilterOptionsMarketplace.tsx";
 import * as $filter_FilterOptionsSRC20 from "./islands/filter/FilterOptionsSRC20.tsx";
-import * as $filter_FilterOptionsStamps from "./islands/filter/FilterOptionsStamps.tsx";
-import * as $filter_FilterOptionsTokens from "./islands/filter/FilterOptionsTokens.tsx";
 import * as $form_Checkbox from "./islands/form/Checkbox.tsx";
 import * as $form_InputField from "./islands/form/InputField.tsx";
 import * as $form_SRC20InputField from "./islands/form/SRC20InputField.tsx";
@@ -572,18 +572,22 @@ const manifest = {
     "./islands/error/ErrorDisplay.tsx": $error_ErrorDisplay,
     "./islands/filter/FilterComponents.tsx": $filter_FilterComponents,
     "./islands/filter/FilterContentExplorer.tsx": $filter_FilterContentExplorer,
+    "./islands/filter/FilterContentExplorerSRC20.tsx":
+      $filter_FilterContentExplorerSRC20,
+    "./islands/filter/FilterContentExplorerStamp.tsx":
+      $filter_FilterContentExplorerStamp,
     "./islands/filter/FilterContentMarketplace.tsx":
       $filter_FilterContentMarketplace,
     "./islands/filter/FilterContentSRC20.tsx": $filter_FilterContentSRC20,
-    "./islands/filter/FilterContentStamps.tsx": $filter_FilterContentStamps,
-    "./islands/filter/FilterContentTokens.tsx": $filter_FilterContentTokens,
     "./islands/filter/FilterDrawer.tsx": $filter_FilterDrawer,
     "./islands/filter/FilterOptionsExplorer.tsx": $filter_FilterOptionsExplorer,
+    "./islands/filter/FilterOptionsExplorerSRC20.tsx":
+      $filter_FilterOptionsExplorerSRC20,
+    "./islands/filter/FilterOptionsExplorerStamp.tsx":
+      $filter_FilterOptionsExplorerStamp,
     "./islands/filter/FilterOptionsMarketplace.tsx":
       $filter_FilterOptionsMarketplace,
     "./islands/filter/FilterOptionsSRC20.tsx": $filter_FilterOptionsSRC20,
-    "./islands/filter/FilterOptionsStamps.tsx": $filter_FilterOptionsStamps,
-    "./islands/filter/FilterOptionsTokens.tsx": $filter_FilterOptionsTokens,
     "./islands/form/Checkbox.tsx": $form_Checkbox,
     "./islands/form/InputField.tsx": $form_InputField,
     "./islands/form/SRC20InputField.tsx": $form_SRC20InputField,
