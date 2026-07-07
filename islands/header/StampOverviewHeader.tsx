@@ -8,9 +8,9 @@ import { ViewButton } from "$islands/button/ViewButton.tsx";
 import FilterDrawer from "$islands/filter/FilterDrawer.tsx";
 import {
   defaultFilters,
+  type ExplorerStampFilters as FilterStampFilters,
   filtersToQueryParams,
-  StampFilters as FilterStampFilters,
-} from "$islands/filter/FilterOptionsStamps.tsx";
+} from "$islands/filter/FilterOptionsExplorerStamp.tsx";
 import { container2 } from "$layout";
 import {
   getCurrentPathname,
