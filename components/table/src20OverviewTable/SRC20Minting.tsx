@@ -21,7 +21,7 @@ import {
 } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { formatDate } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { getSRC20ImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
-import { labelXxs, textXs, valueDarkSm } from "$text";
+import { cardRowStampNumber, labelXxs, textXs, valueDarkSm } from "$text";
 import type { SRC20Row } from "$types/src20.d.ts";
 import type { SRC20MintingProps } from "$types/ui.d.ts";
 
@@ -259,7 +259,7 @@ export function SRC20Minting({
                               return (
                                 <>
                                   {text && (
-                                    <span class="bg-gradient-to-r color-neutral-gradient color-gradient-hover inline-block">
+                                    <span class={cardRowStampNumber}>
                                       {text.toUpperCase()}
                                     </span>
                                   )}

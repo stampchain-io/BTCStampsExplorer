@@ -20,7 +20,7 @@ import {
   formatSupplyValue,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
-import { labelXxs, textXs, valueDarkSm } from "$text";
+import { cardRowStampNumber, labelXxs, textXs, valueDarkSm } from "$text";
 import type { StampRow } from "$types/stamp.d.ts";
 
 /* ===== CONSTANTS ===== */
@@ -116,7 +116,7 @@ export function StampOverviewRow({ stamp }: StampOverviewRowProps) {
           href={href}
           f-partial={href}
           target="_top"
-          class="font-extrabold text-sm bg-gradient-to-r color-neutral-gradient color-gradient-hover inline-block"
+          class={cardRowStampNumber}
         >
           {stamp.stamp != null
             ? (

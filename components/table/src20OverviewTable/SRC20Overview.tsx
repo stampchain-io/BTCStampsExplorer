@@ -21,6 +21,7 @@ import {
 import { formatDate } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { getSRC20ImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
 import {
+  cardRowStampNumber,
   labelXxs,
   textXs,
   valueDarkSm,
@@ -344,7 +345,7 @@ export function SRC20Overview({
                               return (
                                 <>
                                   {text && (
-                                    <span class="bg-gradient-to-r color-neutral-gradient color-gradient-hover inline-block">
+                                    <span class={cardRowStampNumber}>
                                       {text.toUpperCase()}
                                     </span>
                                   )}

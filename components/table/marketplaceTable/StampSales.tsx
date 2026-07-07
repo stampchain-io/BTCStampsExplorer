@@ -20,7 +20,7 @@ import {
   formatSupplyValue,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
-import { labelXxs, textXs, valueDarkSm } from "$text";
+import { cardRowStampNumber, labelXxs, textXs, valueDarkSm } from "$text";
 import type { StampWithEnhancedSaleData } from "$types/stamp.d.ts";
 
 /* ===== CONSTANTS ===== */
@@ -38,20 +38,21 @@ const HEADERS = [
 ];
 
 /* ===== HELPERS ===== */
-function formatSaleDate(blockTime: Date, timeAgo?: string): string {
+function formatSaleDate(saleTime?: number | null, timeAgo?: string): string {
   try {
-    const blockMs = new Date(blockTime).getTime();
-    if (isNaN(blockMs)) return "N/A";
-    const ageMs = Date.now() - blockMs;
-    if (ageMs < 86_400_000) {
-      if (timeAgo) return timeAgo;
-      const hours = Math.floor(ageMs / 3_600_000);
-      const mins = Math.floor((ageMs % 3_600_000) / 60_000);
-      if (hours > 0) return `${hours}H AGO`;
-      if (mins > 0) return `${mins}M AGO`;
-      return "JUST NOW";
+    if (!saleTime) return timeAgo ?? "N/A";
+    const saleMs = saleTime * 1000;
+    const ageMs = Date.now() - saleMs;
+    if (ageMs < 7 * 86_400_000) {
+      return timeAgo ?? (() => {
+        const hours = Math.floor(ageMs / 3_600_000);
+        const mins = Math.floor((ageMs % 3_600_000) / 60_000);
+        if (hours > 0) return `${hours}H AGO`;
+        if (mins > 0) return `${mins}M AGO`;
+        return "JUST NOW";
+      })();
     }
-    const d = new Date(blockTime);
+    const d = new Date(saleMs);
     return `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()}`;
   } catch {
     return "N/A";
@@ -84,9 +85,8 @@ export function MarketplaceSalesRow({ stamp }: MarketplaceSalesRowProps) {
     ? formatBTCAmount(sale.btc_amount, { includeSymbol: true, decimals: 8 })
     : "N/A";
 
-  const timeAgo = (sale as Record<string, unknown> | undefined)
-    ?.time_ago as string | undefined;
-  const dateDisplay = formatSaleDate(stamp.block_time, timeAgo);
+  const timeAgo = sale?.time_ago;
+  const dateDisplay = formatSaleDate(sale?.sale_time, timeAgo);
 
   /* ===== RENDER ===== */
   return (
@@ -136,7 +136,7 @@ export function MarketplaceSalesRow({ stamp }: MarketplaceSalesRowProps) {
           href={href}
           f-partial={href}
           target="_top"
-          class="font-extrabold text-sm bg-gradient-to-r color-neutral-gradient color-gradient-hover inline-block"
+          class={cardRowStampNumber}
         >
           {stamp.stamp != null
             ? (

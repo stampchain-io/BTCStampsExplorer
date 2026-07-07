@@ -23,7 +23,7 @@ import {
   formatDate,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { getSRC20ImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
-import { labelXxs, textXs, valueDarkSm } from "$text";
+import { cardRowStampNumber, labelXxs, textXs, valueDarkSm } from "$text";
 import type { SRC20Row } from "$types/src20.d.ts";
 
 /* ===== CONSTANTS ===== */
@@ -115,7 +115,7 @@ export function SRC20OverviewRow({ src20 }: SRC20OverviewRowProps) {
               href={href}
               f-partial={href}
               target="_top"
-              class="font-extrabold text-sm bg-gradient-to-r color-neutral-gradient color-gradient-hover inline-block w-fit"
+              class={cardRowStampNumber}
             >
               <span class="font-light">#</span>
               {src20.stamp.toLocaleString()}

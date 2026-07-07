@@ -4,8 +4,8 @@
 /* ===== BASE STYLES ===== */
 const logoFont = "font-black italic text-3xl tracking-wide inline-block w-fit";
 const titleFont =
-  "font-black text-3xl uppercase tracking-tight inline-block w-fit ";
-const subtitleFont = "font-light text-2xl uppercase mb-2";
+  "font-black text-3xl uppercase tracking-tight inline-block w-fit cursor-default";
+const subtitleFont = "font-light text-2xl uppercase mb-2 cursor-default";
 const textFont = "font-normal text-color-neutral-200";
 const labelFont = "font-light text-color-neutral-500 tracking-wide";
 const valueFont = "font-medium text-color-neutral-300";
@@ -18,9 +18,7 @@ const transitionColors = "transition-colors duration-200";
 
 /* ===== LOGO STYLES ===== */
 export const logoPrimary = // used in footer
-  `${logoFont} bg-gradient-to-r from-color-primary-400 via-color-primary-500 to-color-primary-600 bg-clip-text text-transparent ${select}`;
-export const logoPrimaryHover =
-  `${logoFont} bg-gradient-to-r color-primary-gradient color-gradient-hover cursor-pointer ${select}`;
+  `${logoFont} text-color-primary-400 ${select}`;
 
 /* ======================================================================== */
 
@@ -28,7 +26,7 @@ export const logoPrimaryHover =
 // Header Navigation - Desktop
 export const navLinkDesktop =
   `mt-0.5 font-normal tablet:font-normal text-sm tablet:text-xs uppercase
-  bg-gradient-to-b from-color-neutral-400 via-color-neutral-400 to-color-neutral-500 bg-clip-text text-transparent group-hover:from-color-primary-400 group-hover:via-color-primary-400 group-hover:to-color-primary-400 tracking-[0.01rem] ${transitionColors} cursor-pointer ${select}`;
+  text-color-neutral-400 group-hover:text-color-hover tracking-[0.01rem] ${transitionColors} cursor-pointer ${select}`;
 export const navLinkActiveDesktop =
   `${navLinkDesktop} !text-color-hover !cursor-default`;
 export const navSublinkDesktop =
@@ -57,22 +55,19 @@ export const navLinkFooterOverlay =
 /* ======================================================================== */
 
 /* ===== TITLE STYLES ===== */
-export const titleNeutral =
-  `${titleFont} bg-gradient-to-r color-neutral-gradient cursor-default ${select}`;
-export const titlePrimary =
-  `${titleFont} bg-gradient-to-r color-primary-gradient cursor-default ${select}`;
-export const titleSecondary =
-  `${titleFont} bg-gradient-to-r color-secondary-gradient cursor-default ${select}`;
+export const titleNeutral = `${titleFont} text-color-neutral-400 ${select}`;
+export const titlePrimary = `${titleFont} text-color-primary-400 ${select}`;
+export const titleSecondary = `${titleFont} text-color-secondary-400 ${select}`;
 
 /* ======================================================================== */
 
 /* ===== SUBTITLE STYLES ===== */
 export const subtitleNeutral =
-  `${subtitleFont} text-color-neutral-300 cursor-default ${select}`;
+  `${subtitleFont} text-color-neutral-300 ${select}`;
 export const subtitlePrimary =
-  `${subtitleFont} text-color-primary-400 cursor-default ${select}`;
+  `${subtitleFont} text-color-primary-300 ${select}`;
 export const subtitleSecondary =
-  `${subtitleFont} text-color-secondary-400 cursor-default ${select}`;
+  `${subtitleFont} text-color-secondary-300 ${select}`;
 
 /* ======================================================================== */
 
@@ -114,7 +109,7 @@ export const textLinkUnderline =
 export const labelXxs = `${labelFont} text-[10px] ${select}`;
 export const labelXs = `${labelFont} text-xs ${select}`;
 export const labelSm = `${labelFont} text-sm ${select}`;
-export const label = `${labelFont} text-base ${select}`; // old dataLabel name
+export const label = `${labelFont} text-base ${select}`;
 export const labelLg = `${labelFont} text-lg ${select}`;
 export const labelXl = `${labelFont} text-xl ${select}`;
 export const labelXsR = `${labelFont} text-xs tablet:text-[10px] ${select}`; // used for the filter file type labels
@@ -135,8 +130,8 @@ export const labelLogicResponsive = ( // used for the filter labels
       ? "text-color-primary-400 group-hover:text-color-hover"
       : "text-color-primary-400"
     : canHoverSelected
-    ? "text-color-neutral-500 group-hover:text-color-hover"
-    : "text-color-neutral-500"
+    ? "text-color-neutral-400 group-hover:text-color-hover"
+    : "text-color-neutral-400"
 }
 `;
 
@@ -191,13 +186,12 @@ export const valueNeutral = `text-color-neutral-400`;
 export const eyebrowNeutral =
   `font-bold text-sm tablet:text-[0.625rem] text-color-neutral-500 tracking-wider cursor-default ${select}`; // descriptive text above icons, links, etc.
 export const eyebrowPrimary =
-  `font-bold text-sm tablet:text-[0.625rem] text-color-primary-500 tracking-wider cursor-default ${select}`;
+  `font-bold text-sm tablet:text-[0.625rem] text-color-primary-300 tracking-wider cursor-default ${select}`;
 export const eyebrowSecondary =
-  `font-bold text-sm tablet:text-[0.625rem] text-color-secondary-500 tracking-wider cursor-default ${select}`;
+  `font-bold text-sm tablet:text-[0.625rem] text-color-secondary-300 tracking-wider cursor-default ${select}`;
 export const eyebrowPositionFilter =
-  `flex justify-end mt-1 tablet:mt-0 -mb-5 tablet:-mb-4`; // used for the filter file type label positioning
-export const tagline =
-  `font-regular text-xs bg-gradient-to-r from-color-primary-400 via-color-primary-500 to-color-primary-600 bg-clip-text text-transparent ${select}`; // used in footer
+  `flex justify-end mt-0 tablet:-mt-1 -mb-5 tablet:-mb-4`; // used for the filter file type label positioning
+export const tagline = `font-regular text-xs text-color-primary-400 ${select}`; // used in footer
 export const copyright =
   `font-normal text-xs text-color-neutral-600 cursor-default ${select}`; // used in the footer for copyright and counterparty version text
 export const toggleSymbol =
@@ -208,8 +202,9 @@ export const toggleSymbol =
 /* ===== CARD TEXT STYLES ===== */
 // Standard card styles
 export const cardStampNumber = `font-black text-md min-[420px]:text-lg
-   bg-gradient-to-r color-neutral-gradient color-gradient-hover
-   truncate ${select} w-fit`;
+   text-color-neutral-400 hover:text-color-hover tracking-wide truncate ${select}`;
+export const cardRowStampNumber = `font-black text-sm
+   text-color-neutral-400 group-hover:text-color-hover tracking-wide truncate ${select}`;
 export const cardCreator =
   `font-semibold text-xs mobileMd:text-sm text-color-neutral-200 break-words text-center ${select}`;
 export const cardSupply =
@@ -224,7 +219,7 @@ export const cardPrice =
 // Minimal card variant styles
 export const cardStampNumberMinimal =
   `max-w-full font-black text-xs mobileLg:text-sm
-  bg-gradient-to-r color-neutral-gradient color-gradient-hover truncate ${select}`;
+  text-color-neutral-400 hover:text-color-hover truncate ${select}`;
 export const cardPriceMinimal =
   `font-normal text-[10px] mobileLg:text-xs text-color-secondary-400 truncate text-nowrap ${select}`;
 
@@ -319,6 +314,7 @@ export type TextStyles = {
   toggleSymbol: string;
   // Card text styles
   cardStampNumber: string;
+  cardRowStampNumber: string;
   cardCreator: string;
   cardSupply: string;
   cardFileType: string;
