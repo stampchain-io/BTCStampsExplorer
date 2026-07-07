@@ -1,7 +1,7 @@
 import { cellAlign, colGroup } from "$components/layout/types.ts";
 import { SSRSafeUrlBuilder } from "$components/navigation/SSRSafeUrlBuilder.tsx";
 import { Icon, PlaceholderImage } from "$icon";
-import ChartWidget from "$islands/layout/ChartWidget.tsx";
+// import ChartWidget from "$islands/layout/ChartWidget.tsx";
 import {
   cellCenterL2Card,
   cellLeftL2Card,
@@ -30,7 +30,7 @@ import {
   valuePositive,
 } from "$text";
 import type { SRC20Row } from "$types/src20.d.ts";
-import type { HighchartsData } from "$types/ui.d.ts";
+// import type { HighchartsData } from "$types/ui.d.ts";
 
 function getMarketCap(src20: any): number {
   const marketCap = src20?.market_data?.market_cap_btc;
@@ -91,9 +91,9 @@ export function SRC20Overview({
     "CHANGE",
     "VOLUME",
     "MARKETCAP",
-    "DEPLOY",
     "HOLDERS",
-    "CHART",
+    "DEPLOY",
+    // "CHART",
   ];
 
   const handleHeaderClick = (headerName: string) => {
@@ -145,7 +145,7 @@ export function SRC20Overview({
   ) => {
     const baseClass = `${labelXxs} ${
       cellAlign(index, headers?.length ?? 0)
-    } py-1.5 !px-5`;
+    } py-1.5 !px-3`;
 
     const rowClass = isFirst
       ? cellLeftL2Card
@@ -216,9 +216,9 @@ export function SRC20Overview({
             { width: "min-w-[90px] w-auto" }, // CHANGE
             { width: "min-w-[110px] w-auto" }, // VOLUME
             { width: "min-w-[110px] w-auto" }, // MARKETCAP
-            { width: "min-w-[110px] w-auto" }, // DEPLOY
             { width: "min-w-[90px] w-auto" }, // HOLDERS
-            { width: "min-w-[150px] w-auto" }, // CHART
+            { width: "min-w-[110px] w-auto" }, // DEPLOY
+            // { width: "min-w-[150px] w-auto" }, // CHART
           ]).map((col) => <col key={col.key} class={col.className} />)}
         </colgroup>
         <thead>
@@ -363,7 +363,7 @@ export function SRC20Overview({
                     <td
                       class={`${
                         cellAlign(1, headers?.length ?? 0)
-                      } ${cellCenterL2Card}`}
+                      } ${cellCenterL2Card} text-color-secondary-400`}
                     >
                       {(() => {
                         const priceInBtc = getPrice(src20);
@@ -403,7 +403,7 @@ export function SRC20Overview({
                           return (
                             <span class="relative">
                               {priceDisplay}
-                              <sup class="text-[8px] text-color-neutral-500 ml-0.5">
+                              <sup class="text-[8px] text-color-neutral-400 ml-0.5">
                                 {sourceLabel}
                               </sup>
                             </span>
@@ -490,23 +490,11 @@ export function SRC20Overview({
                         }
                       })()}
                     </td>
-                    {/* DEPLOY */}
-                    <td
-                      class={`${
-                        cellAlign(5, headers?.length ?? 0)
-                      } ${cellCenterL2Card}`}
-                    >
-                      {formatDate(new Date(src20.block_time), {
-                        month: "numeric",
-                        day: "numeric",
-                        year: "numeric",
-                      }).toUpperCase()}
-                    </td>
                     {/* HOLDERS */}
                     <td
                       class={`${
-                        cellAlign(6, headers?.length ?? 0)
-                      } ${cellCenterL2Card}`}
+                        cellAlign(5, headers?.length ?? 0)
+                      } ${cellCenterL2Card} text-color-neutral-500`}
                     >
                       {(() => {
                         const holderCount = src20.market_data?.holder_count ??
@@ -515,8 +503,21 @@ export function SRC20Overview({
                         return Number(holderCount).toLocaleString();
                       })()}
                     </td>
-                    {/* CHART */}
+                    {/* DEPLOY */}
                     <td
+                      class={`${
+                        cellAlign(6, headers?.length ?? 0)
+                      } ${cellRightL2Card} pr-3`}
+                    >
+                      {formatDate(new Date(src20.block_time), {
+                        month: "numeric",
+                        day: "numeric",
+                        year: "numeric",
+                      }).toUpperCase()}
+                    </td>
+                    {/* CHART */}
+                    {
+                      /* <td
                       class={`${
                         cellAlign(7, headers?.length ?? 0)
                       } ${cellRightL2Card} !py-0`}
@@ -536,7 +537,8 @@ export function SRC20Overview({
                             <span>—</span>
                           </div>
                         )}
-                    </td>
+                    </td> */
+                    }
                   </tr>
                 );
               })

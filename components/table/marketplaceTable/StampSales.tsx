@@ -164,7 +164,12 @@ export function MarketplaceSalesRow({ stamp }: MarketplaceSalesRowProps) {
           cellAlign(3, HEADERS.length)
         } ${cellCenterL2Card} font-medium text-color-neutral-200`}
       >
-        {creatorDisplay}
+        <a
+          href={`/wallet/${stamp.creator}`}
+          class="link-neutral-200-cell"
+        >
+          {creatorDisplay}
+        </a>
       </td>
 
       {/* SOLD */}

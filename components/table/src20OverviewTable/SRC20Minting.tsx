@@ -45,8 +45,8 @@ export function SRC20Minting({
     "MINTS",
     "PROGRESS",
     "TRENDING",
-    "DEPLOY",
     "HOLDERS",
+    "DEPLOY",
     "MINT",
   ];
 
@@ -143,8 +143,8 @@ export function SRC20Minting({
             { width: "min-w-[100px] w-auto" }, // MINTS
             { width: "min-w-[130px] w-auto" }, // PROGRESS
             { width: "min-w-[110px] w-auto" }, // TRENDING
-            { width: "min-w-[110px] w-auto" }, // DEPLOY
             { width: "min-w-[90px] w-auto" }, // HOLDERS
+            { width: "min-w-[110px] w-auto" }, // DEPLOY
             { width: "min-w-[100px] w-auto" }, // MINT button
           ]).map((col) => <col key={col.key} class={col.className} />)}
         </colgroup>
@@ -311,7 +311,7 @@ export function SRC20Minting({
                               }}
                             />
                           </div>
-                          <div class="!text-[10px] shrink-0">
+                          <div class="!text-[10px] text-color-neutral-500 shrink-0">
                             {(() => {
                               const progressRaw =
                                 src20.mint_progress?.progress ??
@@ -335,10 +335,21 @@ export function SRC20Minting({
                     >
                       {"N/A"}
                     </td>
-                    {/* DEPLOY */}
+                    {/* HOLDERS */}
                     <td
                       class={`${
                         cellAlign(4, headers.length)
+                      } ${cellCenterL2Card} text-color-neutral-500`}
+                    >
+                      {Number(
+                        src20.market_data?.holder_count ??
+                          src20.holders ?? 0,
+                      ).toLocaleString()}
+                    </td>
+                    {/* DEPLOY */}
+                    <td
+                      class={`${
+                        cellAlign(5, headers.length)
                       } ${cellCenterL2Card}`}
                     >
                       {formatDate(new Date(src20.block_time), {
@@ -346,17 +357,6 @@ export function SRC20Minting({
                         day: "numeric",
                         year: "numeric",
                       }).toUpperCase()}
-                    </td>
-                    {/* HOLDERS */}
-                    <td
-                      class={`${
-                        cellAlign(5, headers.length)
-                      } ${cellCenterL2Card}`}
-                    >
-                      {Number(
-                        src20.market_data?.holder_count ??
-                          src20.holders ?? 0,
-                      ).toLocaleString()}
                     </td>
                     {/* MINT BUTTON */}
                     <td
