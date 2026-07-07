@@ -514,7 +514,8 @@ function hasActiveFilters(section: string, filters: StampFilters): boolean {
     case "market":
       return filters.market !== "" || filters.dispensers ||
         filters.atomics ||
-        filters.listings !== "" || filters.sales !== "";
+        filters.listings !== "" || filters.sales !== "" ||
+        filters.volume !== "";
     case "priceRange":
       return filters.listingsMin !== "" || filters.listingsMax !== "" ||
         filters.salesMin !== "" || filters.salesMax !== "";
@@ -821,47 +822,17 @@ export const FilterContentMarketplace = ({
     });
   };
 
-  // Helper function to handle sales type
-  const handleSalesType = (
-    type: "recent" | "premium" | "custom" | "volume",
-  ) => {
+  const handleActivityFilter = (period: "24h" | "7d" | "30d") => {
     setFilters((prevFilters) => {
+      const newVolume = prevFilters.volume === period ? "" : period;
       const newFilters = {
         ...prevFilters,
-        sales: type === "recent"
-          ? "recent"
-          : (prevFilters.sales === type ? "recent" : type),
-        // Clear price range and volume based on selection
-        salesMin: type === "custom" ? prevFilters.salesMin : "",
-        salesMax: type === "custom" ? prevFilters.salesMax : "",
-        volume: type === "volume"
-          ? ("24h" as "24h" | "7d" | "30d" | "")
-          : ("" as "24h" | "7d" | "30d" | ""),
-      } as StampFilters;
-
-      // Set predefined price range for premium sales
-      if (type === "premium") {
-        newFilters.salesMin = "0.1";
-        newFilters.salesMax = "";
-      }
-
+        volume: newVolume as "24h" | "7d" | "30d" | "",
+      };
       onFiltersChange(newFilters);
       return newFilters;
     });
   };
-
-  // TODO(@claude): Implement volume filter when UI is ready
-  // Handler for volume changes
-  // const handleVolumeChange = (period: string) => {
-  //   setFilters((prevFilters) => {
-  //     const newFilters = {
-  //       ...prevFilters,
-  //       volume: period as "24h" | "7d" | "30d",
-  //     };
-  //     onFiltersChange(newFilters);
-  //     return newFilters;
-  //   });
-  // };
 
   const handleFileSizeChange = (sizeType: StampFilesize | null) => {
     setFilters((prevFilters) => {
@@ -1058,67 +1029,45 @@ export const FilterContentMarketplace = ({
         {filters.market === "sales" && (
           <div>
             <Radio
-              label="RECENT"
-              value="recent"
-              name="salesType"
-              checked={filters.sales === "recent"}
-              onChange={() => handleSalesType("recent")}
-            />
-
-            {
-              /* <Radio
-              label="TRENDING"
-              value="volume"
-              name="salesType"
-              checked={filters.sales === "volume"}
-              onChange={() => handleSalesType("volume")}
+              label="ALL"
+              value=""
+              name="salesActivity"
+              checked={filters.volume === ""}
+              onChange={() => {
+                setFilters((prev) => {
+                  const n = {
+                    ...prev,
+                    volume: "" as "24h" | "7d" | "30d" | "",
+                  };
+                  onFiltersChange(n);
+                  return n;
+                });
+              }}
             />
             <div class={`${eyebrowPrimary} ${eyebrowPositionFilter}`}>
-              PRICE RANGE
+              ACTIVITY
             </div>
             <Radio
-              label="PREMIUM"
-              value="premium"
-              name="salesType"
-              checked={filters.sales === "premium"}
-              onChange={() => handleSalesType("premium")}
+              label="24 HOURS"
+              value="24h"
+              name="salesActivity"
+              checked={filters.volume === "24h"}
+              onChange={() => handleActivityFilter("24h")}
             />
             <Radio
-              label="CUSTOM PRICE"
-              value="custom"
-              name="salesType"
-              checked={filters.sales === "custom"}
-              onChange={() => handleSalesType("custom")}
-            /> */
-            }
-
-            {/* Custom price range slider for sales */}
-            {
-              /* {filters.sales === "custom" && (
-              <div class="mt-3 pl-0.5">
-                <RangeSliderDual
-                  variant="price"
-                  onChange={handlePriceRangeChange}
-                />
-              </div>
-            )} */
-            }
-
-            {/* Volume Period Selection - only show if TRENDING is selected */}
-            {
-              /* {filters.sales === "volume" && (
-              <div class="mt-3 pl-0.5">
-                <ToggleButton
-                  options={["24h", "7d", "30d"]}
-                  selected={filters.volume}
-                  onChange={(value) => handleVolumeChange(value as string)}
-                  mode="single"
-                  spacing="evenFullwidth"
-                  size="xsR"
-                />
-              </div>
-            )} */
-            }
+              label="7 DAYS"
+              value="7d"
+              name="salesActivity"
+              checked={filters.volume === "7d"}
+              onChange={() => handleActivityFilter("7d")}
+            />
+            <Radio
+              label="30 DAYS"
+              value="30d"
+              name="salesActivity"
+              checked={filters.volume === "30d"}
+              onChange={() => handleActivityFilter("30d")}
+            />
           </div>
         )}
       </CollapsibleSection>

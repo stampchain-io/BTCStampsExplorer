@@ -1,18 +1,18 @@
 import { RangeSliderDual } from "$button";
 import type { StampRange } from "$constants";
 import { Radiobutton } from "$islands/filter/FilterComponents.tsx";
-import type { TokenFilters } from "$islands/filter/FilterOptionsTokens.tsx";
+import type { ExplorerSRC20Filters } from "$islands/filter/FilterOptionsExplorerSRC20.tsx";
 import { CollapsibleSection } from "$islands/layout/CollapsibleSection.tsx";
 import { useEffect, useRef, useState } from "preact/hooks";
 
 type SectionKey = "range" | "operation" | "amount";
 
-export const FilterContentTokens = ({
+export const FilterContentExplorerSRC20 = ({
   initialFilters,
   onFiltersChange,
 }: {
-  initialFilters: TokenFilters;
-  onFiltersChange: (filters: TokenFilters) => void;
+  initialFilters: ExplorerSRC20Filters;
+  onFiltersChange: (filters: ExplorerSRC20Filters) => void;
 }) => {
   const [filters, setFilters] = useState(initialFilters);
   const [expandedSections, setExpandedSections] = useState<
@@ -62,7 +62,7 @@ export const FilterContentTokens = ({
 
   const handleRangeChange = (value: string | null) => {
     setFilters((prev) => {
-      const newFilters: TokenFilters = {
+      const newFilters: ExplorerSRC20Filters = {
         ...prev,
         range: prev.range === value ? null : value as StampRange | null,
         rangeMin: "",
@@ -76,7 +76,7 @@ export const FilterContentTokens = ({
   const handleCustomRangeToggle = () => {
     setFilters((prev) => {
       if (prev.rangeMin || prev.rangeMax) {
-        const newFilters: TokenFilters = {
+        const newFilters: ExplorerSRC20Filters = {
           ...prev,
           range: null,
           rangeMin: "",
@@ -92,7 +92,7 @@ export const FilterContentTokens = ({
 
   const handleRangeSliderChange = (min: number, max: number) => {
     setFilters((prev) => {
-      const newFilters: TokenFilters = {
+      const newFilters: ExplorerSRC20Filters = {
         ...prev,
         range: null,
         rangeMin: min.toString(),
@@ -103,9 +103,9 @@ export const FilterContentTokens = ({
     });
   };
 
-  const handleOpChange = (op: TokenFilters["op"]) => {
+  const handleOpChange = (op: ExplorerSRC20Filters["op"]) => {
     setFilters((prev) => {
-      const newFilters: TokenFilters = {
+      const newFilters: ExplorerSRC20Filters = {
         ...prev,
         op: prev.op === op ? "" : op,
       };
@@ -114,9 +114,9 @@ export const FilterContentTokens = ({
     });
   };
 
-  const handleAmountChange = (amount: TokenFilters["amount"]) => {
+  const handleAmountChange = (amount: ExplorerSRC20Filters["amount"]) => {
     setFilters((prev) => {
-      const newFilters: TokenFilters = {
+      const newFilters: ExplorerSRC20Filters = {
         ...prev,
         amount: prev.amount === amount ? "" : amount,
       };
@@ -248,4 +248,4 @@ export const FilterContentTokens = ({
   );
 };
 
-export default FilterContentTokens;
+export default FilterContentExplorerSRC20;

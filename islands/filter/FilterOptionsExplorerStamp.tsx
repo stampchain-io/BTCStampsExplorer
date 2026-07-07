@@ -8,7 +8,7 @@ import type {
 } from "$constants";
 import { FRONTEND_STAMP_TYPE_VALUES } from "$constants";
 
-export type StampFilters = {
+export type ExplorerStampFilters = {
   // Stamp Type Filter (NEW!)
   stampType: FrontendStampType;
 
@@ -67,7 +67,7 @@ export type StampFilters = {
   [key: string]: any; // Keep index signature for flexibility
 };
 
-export const defaultFilters: StampFilters = {
+export const defaultFilters: ExplorerStampFilters = {
   stampType: "all",
   market: "",
   dispensers: false,
@@ -105,7 +105,7 @@ export const defaultFilters: StampFilters = {
 
 export function filtersToQueryParams(
   search: string,
-  filters: StampFilters,
+  filters: ExplorerStampFilters,
 ) {
   const queryParams = new URLSearchParams(search);
 
@@ -322,7 +322,7 @@ export function filtersToQueryParams(
   return result;
 }
 
-export function filtersToServicePayload(filters: StampFilters) {
+export function filtersToServicePayload(filters: ExplorerStampFilters) {
   let range: StampRange | undefined = undefined;
   if (filters.range) {
     range = filters.range;
@@ -420,10 +420,10 @@ export const allQueryKeysFromFilters = [
   "priceSource",
 ];
 
-export function queryParamsToFilters(query: string): StampFilters {
+export function queryParamsToFilters(query: string): ExplorerStampFilters {
   const params = new URLSearchParams(query);
 
-  const filtersPartial: Partial<StampFilters> = {
+  const filtersPartial: Partial<ExplorerStampFilters> = {
     stampType: "all", // Default stamp type
     market: "",
     dispensers: false,

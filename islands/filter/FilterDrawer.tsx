@@ -1,17 +1,17 @@
+import { FilterContentExplorerStamp } from "$islands/filter/FilterContentExplorerStamp.tsx";
 import { FilterContentMarketplace } from "$islands/filter/FilterContentMarketplace.tsx";
-import { FilterContentStamps } from "$islands/filter/FilterContentStamps.tsx";
+import {
+  defaultFilters as stampDefaultFilters,
+  ExplorerStampFilters,
+  filtersToQueryParams as stampFiltersToQueryParams,
+  queryParamsToFilters as stampQueryParamsToFilters,
+} from "$islands/filter/FilterOptionsExplorerStamp.tsx";
 import {
   defaultFilters as marketplaceDefaultFilters,
   filtersToQueryParams as marketplaceFiltersToQueryParams,
   queryParamsToFilters as marketplaceQueryParamsToFilters,
   StampFilters as MarketplaceFilters,
 } from "$islands/filter/FilterOptionsMarketplace.tsx";
-import {
-  defaultFilters as stampDefaultFilters,
-  filtersToQueryParams as stampFiltersToQueryParams,
-  queryParamsToFilters as stampQueryParamsToFilters,
-  StampFilters,
-} from "$islands/filter/FilterOptionsStamps.tsx";
 import { useEffect, useRef, useState } from "preact/hooks";
 // Import SRC20 filter options
 import {
@@ -54,7 +54,7 @@ const Tooltip = ({ visible, text }: { visible: boolean; text: string }) => (
 
 // Define a type for all possible filter types
 type AllFilters =
-  | StampFilters
+  | ExplorerStampFilters
   | SRC20Filters
   | ExplorerFilters
   | MarketplaceFilters;
@@ -315,7 +315,7 @@ const FilterDrawer = (
     if (type === "stamp") {
       queryParams = stampFiltersToQueryParams(
         baseParams,
-        currentFilters as StampFilters,
+        currentFilters as ExplorerStampFilters,
       );
     } else if (type === "marketplace") {
       queryParams = marketplaceFiltersToQueryParams(
@@ -444,8 +444,8 @@ const FilterDrawer = (
           {/* Filter content based on type */}
           <div class="flex flex-col pt-6 pb-[120px] px-9 tablet:pt-5 tablet:pb-[100px] tablet:px-6">
             {type === "stamp" && (
-              <FilterContentStamps
-                initialFilters={currentFilters as StampFilters}
+              <FilterContentExplorerStamp
+                initialFilters={currentFilters as ExplorerStampFilters}
                 onFiltersChange={(filters) => {
                   setCurrentFilters(filters);
                 }}
@@ -485,7 +485,7 @@ const FilterDrawer = (
           <Button
             variant="outline"
             color="grey"
-            size="smR"
+            size="xsR"
             onClick={() => {
               isClearingRef.current = true;
               // Always clear to empty default filters (full reset)
@@ -502,7 +502,7 @@ const FilterDrawer = (
           <Button
             variant="outline"
             color="purple"
-            size="smR"
+            size="xsR"
             onClick={handleApplyFilters}
             class="w-full"
           >

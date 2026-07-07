@@ -1,6 +1,6 @@
 import type { StampRange } from "$constants";
 
-export type TokenFilters = {
+export type ExplorerSRC20Filters = {
   range: StampRange | null;
   rangeMin: string;
   rangeMax: string;
@@ -9,7 +9,7 @@ export type TokenFilters = {
   [key: string]: any;
 };
 
-export const defaultFilters: TokenFilters = {
+export const defaultFilters: ExplorerSRC20Filters = {
   range: null,
   rangeMin: "",
   rangeMax: "",
@@ -19,7 +19,7 @@ export const defaultFilters: TokenFilters = {
 
 export function filtersToQueryParams(
   search: string,
-  filters: TokenFilters,
+  filters: ExplorerSRC20Filters,
 ): string {
   const queryParams = new URLSearchParams(search);
 
@@ -56,9 +56,9 @@ export function filtersToQueryParams(
   return queryParams.toString();
 }
 
-export function queryParamsToFilters(query: string): TokenFilters {
+export function queryParamsToFilters(query: string): ExplorerSRC20Filters {
   const params = new URLSearchParams(query);
-  const filters: TokenFilters = { ...defaultFilters };
+  const filters: ExplorerSRC20Filters = { ...defaultFilters };
 
   const range = params.get("token[range]");
   if (range) {
@@ -77,7 +77,7 @@ export function queryParamsToFilters(query: string): TokenFilters {
 
   const op = params.get("token[op]");
   if (op && ["deploy", "mint", "transfer"].includes(op)) {
-    filters.op = op as TokenFilters["op"];
+    filters.op = op as ExplorerSRC20Filters["op"];
   }
 
   const amount = params.get("token[amount]");
@@ -85,13 +85,13 @@ export function queryParamsToFilters(query: string): TokenFilters {
     amount &&
     ["<50000", "<100000", "<250000", "<500000", "<1000000"].includes(amount)
   ) {
-    filters.amount = amount as TokenFilters["amount"];
+    filters.amount = amount as ExplorerSRC20Filters["amount"];
   }
 
   return filters;
 }
 
-export const allQueryKeysFromFiltersTokens = [
+export const allQueryKeysFromFiltersExplorerSRC20 = [
   "token[range]",
   "token[rangeMin]",
   "token[rangeMax]",

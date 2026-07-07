@@ -7,10 +7,10 @@ import { StampOverviewHeader } from "$header";
 import { containerBackground } from "$layout";
 
 import {
+  ExplorerStampFilters,
   queryParamsToFilters,
   queryParamsToServicePayload,
-  StampFilters,
-} from "$islands/filter/FilterOptionsStamps.tsx";
+} from "$islands/filter/FilterOptionsExplorerStamp.tsx";
 import type { StampPageProps } from "$types/api.d.ts";
 import type { StampRow, StampSaleRow } from "$types/stamp.d.ts";
 
@@ -413,7 +413,7 @@ export function StampOverviewPage(props: StampPageProps) {
     >
       {/* Header Component with Filter Controls */}
       <StampOverviewHeader
-        currentFilters={filters as StampFilters}
+        currentFilters={filters as ExplorerStampFilters}
         viewMode={cardView}
       />
 

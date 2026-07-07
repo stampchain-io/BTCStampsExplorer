@@ -1,14 +1,14 @@
 import { RangeSliderDual, SelectorButtons } from "$button";
 import type { StampRange } from "$constants";
 import { Radiobutton } from "$islands/filter/FilterComponents.tsx";
-import { FilterContentStamps } from "$islands/filter/FilterContentStamps.tsx";
-import { FilterContentTokens } from "$islands/filter/FilterContentTokens.tsx";
+import { FilterContentExplorerSRC20 } from "$islands/filter/FilterContentExplorerSRC20.tsx";
+import { FilterContentExplorerStamp } from "$islands/filter/FilterContentExplorerStamp.tsx";
 import {
   ExplorerFilters,
   ExplorerSection,
 } from "$islands/filter/FilterOptionsExplorer.tsx";
-import type { StampFilters } from "$islands/filter/FilterOptionsStamps.tsx";
-import type { TokenFilters } from "$islands/filter/FilterOptionsTokens.tsx";
+import type { ExplorerSRC20Filters } from "$islands/filter/FilterOptionsExplorerSRC20.tsx";
+import type { ExplorerStampFilters } from "$islands/filter/FilterOptionsExplorerStamp.tsx";
 import { CollapsibleSection } from "$islands/layout/CollapsibleSection.tsx";
 import { useEffect, useRef, useState } from "preact/hooks";
 
@@ -113,7 +113,7 @@ export const FilterContentExplorer = ({
   };
 
   /* ===== STAMP FILTERS CHANGE ===== */
-  const handleStampFiltersChange = (stampFilters: StampFilters) => {
+  const handleStampFiltersChange = (stampFilters: ExplorerStampFilters) => {
     setFilters((prev) => {
       const newFilters: ExplorerFilters = { ...prev, stampFilters };
       onFiltersChange(newFilters);
@@ -122,7 +122,7 @@ export const FilterContentExplorer = ({
   };
 
   /* ===== TOKEN FILTERS CHANGE ===== */
-  const handleTokenFiltersChange = (tokenFilters: TokenFilters) => {
+  const handleTokenFiltersChange = (tokenFilters: ExplorerSRC20Filters) => {
     setFilters((prev) => {
       const newFilters: ExplorerFilters = { ...prev, tokenFilters };
       onFiltersChange(newFilters);
@@ -197,7 +197,7 @@ export const FilterContentExplorer = ({
 
       {/* STAMPS: Full stamp filters */}
       {filters.section === "stamps" && (
-        <FilterContentStamps
+        <FilterContentExplorerStamp
           initialFilters={filters.stampFilters}
           onFiltersChange={handleStampFiltersChange}
         />
@@ -205,7 +205,7 @@ export const FilterContentExplorer = ({
 
       {/* TOKENS: Token-specific filters */}
       {filters.section === "tokens" && (
-        <FilterContentTokens
+        <FilterContentExplorerSRC20
           initialFilters={filters.tokenFilters}
           onFiltersChange={handleTokenFiltersChange}
         />

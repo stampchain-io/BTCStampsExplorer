@@ -1,4 +1,4 @@
-import { RangeSliderDual, ToggleButton } from "$button";
+import { RangeSliderDual } from "$button";
 import type {
   FrontendStampType,
   StampEdition,
@@ -8,7 +8,7 @@ import type {
 } from "$constants";
 import { inputCheckbox } from "$form";
 import { Checkbox } from "$islands/filter/FilterComponents.tsx";
-import { StampFilters } from "$islands/filter/FilterOptionsStamps.tsx";
+import { ExplorerStampFilters } from "$islands/filter/FilterOptionsExplorerStamp.tsx";
 import { CollapsibleSection } from "$islands/layout/CollapsibleSection.tsx";
 import {
   eyebrowPositionFilter,
@@ -18,7 +18,7 @@ import {
 import type { RadioProps } from "$types/ui.d.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
 
-const defaultFilters: StampFilters = {
+const defaultFilters: ExplorerStampFilters = {
   // Stamp Type
   stampType: "all",
   // Market Place
@@ -60,7 +60,10 @@ const defaultFilters: StampFilters = {
   priceSource: "",
 };
 
-export function filtersToQueryParams(search: string, filters: StampFilters) {
+export function filtersToQueryParams(
+  search: string,
+  filters: ExplorerStampFilters,
+) {
   const queryParams = new URLSearchParams(search);
 
   // MARKET TYPE
@@ -309,7 +312,7 @@ export const allQueryKeysFromFilters = [
   "rangeMax",
 ];
 
-export function queryParamsToFilters(query: string): StampFilters {
+export function queryParamsToFilters(query: string): ExplorerStampFilters {
   const params = new URLSearchParams(query);
   // Initialize with default filters
   const filters = { ...defaultFilters };
@@ -509,17 +512,11 @@ const Radio = ({ label, value, checked, onChange, name }: RadioProps) => {
 };
 
 // Helper function to check if a section has active filters
-function hasActiveFilters(section: string, filters: StampFilters): boolean {
+function hasActiveFilters(
+  section: string,
+  filters: ExplorerStampFilters,
+): boolean {
   switch (section) {
-    case "market":
-      return filters.market !== "" || filters.dispensers ||
-        filters.atomics ||
-        filters.listings !== "" || filters.sales !== "";
-    case "priceRange":
-      return filters.listingsMin !== "" || filters.listingsMax !== "" ||
-        filters.salesMin !== "" || filters.salesMax !== "";
-    case "volume":
-      return filters.volume !== "";
     case "fileType":
       return filters.fileType.length > 0;
     case "fileSize":
@@ -537,12 +534,12 @@ function hasActiveFilters(section: string, filters: StampFilters): boolean {
   }
 }
 
-export const FilterContentStamps = ({
+export const FilterContentExplorerStamp = ({
   initialFilters,
   onFiltersChange,
 }: {
-  initialFilters: StampFilters;
-  onFiltersChange: (filters: StampFilters) => void;
+  initialFilters: ExplorerStampFilters;
+  onFiltersChange: (filters: ExplorerStampFilters) => void;
 }) => {
   const [filters, setFilters] = useState(initialFilters);
   const [expandedSections, setExpandedSections] = useState({
@@ -551,9 +548,7 @@ export const FilterContentStamps = ({
     fileSize: hasActiveFilters("fileSize", filters),
     editions: hasActiveFilters("editions", filters),
     range: hasActiveFilters("range", filters),
-    market: hasActiveFilters("market", filters),
     customRange: filters.rangeMin !== "" || filters.rangeMax !== "",
-    priceRange: hasActiveFilters("priceRange", filters),
   });
 
   // Watch for changes to initialFilters
@@ -586,34 +581,24 @@ export const FilterContentStamps = ({
     });
   };
 
-  const [isDraggingPrice, setIsDraggingPrice] = useState(false);
   const [isDraggingRange, setIsDraggingRange] = useState(false);
   const drawerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleMouseUp = (_e: MouseEvent) => {
-      // Check if we're currently dragging either slider
-      if (isDraggingPrice) {
-        // Reset dragging state
-        setIsDraggingPrice(false);
-      }
-
       if (isDraggingRange) {
-        // Reset dragging state
         setIsDraggingRange(false);
       }
     };
 
-    // Add event listener for mouse up
     globalThis.addEventListener("mouseup", handleMouseUp);
     globalThis.addEventListener("mouseleave", handleMouseUp);
 
-    // Clean up
     return () => {
       globalThis.removeEventListener("mouseup", handleMouseUp);
       globalThis.removeEventListener("mouseleave", handleMouseUp);
     };
-  }, [isDraggingPrice, isDraggingRange]);
+  }, [isDraggingRange]);
 
   const handleRangeChange = (value: string | null) => {
     setFilters((prevFilters) => {
@@ -742,127 +727,6 @@ export const FilterContentStamps = ({
     });
   };
 
-  // Helper function to toggle main market type (LISTINGS vs SALES)
-  const toggleMarketType = (type: "listings" | "sales") => {
-    setFilters((prevFilters) => {
-      const newFilters: StampFilters = {
-        ...prevFilters,
-        market: prevFilters.market === type ? "" : type,
-        // Reset all sub-options when switching main type
-        dispensers: type === "listings" || type === "sales" ? true : false, // Auto-select DISPENSERS for both listings and sales
-        atomics: false,
-        listings: type === "listings" ? "all" : "", // Auto-select "all" when dispensers selected
-        sales: type === "sales" ? "recent" : "", // Auto-select "recent" for sales
-        listingsMin: "",
-        listingsMax: "",
-        salesMin: "",
-        salesMax: "",
-        volume: "",
-      };
-
-      onFiltersChange(newFilters);
-      return newFilters;
-    });
-  };
-
-  // Helper function to toggle dispensers/atomics
-  const toggleListingOption = (option: "dispensers" | "atomics") => {
-    setFilters((prevFilters) => {
-      const newValue = !prevFilters[option];
-      const newFilters: StampFilters = {
-        ...prevFilters,
-        [option]: newValue,
-        // Auto-select "all" when first dispenser/atomic is selected
-        listings: (newValue ||
-            prevFilters[option === "dispensers" ? "atomics" : "dispensers"])
-          ? (prevFilters.listings || "all")
-          : (!prevFilters[
-              option === "dispensers" ? "atomics" : "dispensers"
-            ]
-            ? ""
-            : prevFilters.listings),
-      } as StampFilters;
-
-      onFiltersChange(newFilters);
-      return newFilters;
-    });
-  };
-
-  // Helper function to handle listing price type
-  const handleListingPriceType = (
-    type: "all" | "bargain" | "affordable" | "premium" | "custom",
-  ) => {
-    setFilters((prevFilters) => {
-      const newFilters = {
-        ...prevFilters,
-        // "all" cannot be deselected - clicking it again keeps it selected
-        listings: type === "all"
-          ? "all"
-          : (prevFilters.listings === type ? "all" : type),
-        // Clear custom price range if switching away from custom
-        listingsMin: type === "custom" ? prevFilters.listingsMin : "",
-        listingsMax: type === "custom" ? prevFilters.listingsMax : "",
-      } as StampFilters;
-
-      // Set predefined price ranges
-      if (type === "bargain") {
-        newFilters.listingsMin = "0";
-        newFilters.listingsMax = "0.0025";
-      } else if (type === "affordable") {
-        newFilters.listingsMin = "0.005";
-        newFilters.listingsMax = "0.01";
-      } else if (type === "premium") {
-        newFilters.listingsMin = "0.1";
-        newFilters.listingsMax = "";
-      }
-
-      onFiltersChange(newFilters);
-      return newFilters;
-    });
-  };
-
-  // Helper function to handle sales type
-  const handleSalesType = (
-    type: "recent" | "premium" | "custom" | "volume",
-  ) => {
-    setFilters((prevFilters) => {
-      const newFilters = {
-        ...prevFilters,
-        sales: type === "recent"
-          ? "recent"
-          : (prevFilters.sales === type ? "recent" : type),
-        // Clear price range and volume based on selection
-        salesMin: type === "custom" ? prevFilters.salesMin : "",
-        salesMax: type === "custom" ? prevFilters.salesMax : "",
-        volume: type === "volume"
-          ? ("24h" as "24h" | "7d" | "30d" | "")
-          : ("" as "24h" | "7d" | "30d" | ""),
-      } as StampFilters;
-
-      // Set predefined price range for premium sales
-      if (type === "premium") {
-        newFilters.salesMin = "0.1";
-        newFilters.salesMax = "";
-      }
-
-      onFiltersChange(newFilters);
-      return newFilters;
-    });
-  };
-
-  // TODO(@claude): Implement volume filter when UI is ready
-  // Handler for volume changes
-  // const handleVolumeChange = (period: string) => {
-  //   setFilters((prevFilters) => {
-  //     const newFilters = {
-  //       ...prevFilters,
-  //       volume: period as "24h" | "7d" | "30d",
-  //     };
-  //     onFiltersChange(newFilters);
-  //     return newFilters;
-  //   });
-  // };
-
   const handleFileSizeChange = (sizeType: StampFilesize | null) => {
     setFilters((prevFilters) => {
       const newFilters = {
@@ -889,26 +753,6 @@ export const FilterContentStamps = ({
         return newFilters;
       });
     }
-  };
-
-  const handlePriceRangeChange = (min: number, max: number) => {
-    setFilters((prevFilters) => {
-      const newFilters = {
-        ...prevFilters,
-        // Update the appropriate price range based on current market type
-        ...(prevFilters.market === "listings"
-          ? {
-            listingsMin: min.toString(),
-            listingsMax: max === Infinity ? "" : max.toString(),
-          }
-          : {
-            salesMin: min.toString(),
-            salesMax: max === Infinity ? "" : max.toString(),
-          }),
-      };
-      onFiltersChange(newFilters);
-      return newFilters;
-    });
   };
 
   // Handler for stamp type changes
@@ -978,221 +822,6 @@ export const FilterContentStamps = ({
           checked={filters.stampType === "cursed"}
           onChange={() => handleStampTypeChange("cursed")}
         />
-      </CollapsibleSection>
-
-      <CollapsibleSection
-        title="MARKET PLACE"
-        section="market"
-        expanded={expandedSections.market}
-        toggle={() => toggleSection("market")}
-        variant="collapsibleTitle"
-      >
-        {/* Top Level: LISTINGS vs SALES */}
-        <div class="my-2">
-          <ToggleButton
-            options={["listings", "sales"]}
-            selected={filters.market}
-            onChange={(value) =>
-              toggleMarketType(value as "listings" | "sales")}
-            mode="single"
-            size="xsR"
-            color="primary"
-            spacing="evenFullwidth"
-          />
-        </div>
-
-        {/* LISTINGS Section */}
-        {filters.market === "listings" && (
-          <div>
-            {/* Dispensers and Atomics buttons */}
-            <div class="my-4">
-              <ToggleButton
-                options={["dispensers", "atomics"]}
-                selected={[
-                  ...(filters.dispensers ? ["dispensers"] : []),
-                  ...(filters.atomics ? ["atomics"] : []),
-                ]}
-                onChange={(values) => {
-                  const selectedArray = Array.isArray(values) ? values : [];
-                  const newDispensers = selectedArray.includes("dispensers");
-                  const newAtomics = selectedArray.includes("atomics");
-
-                  // Prevent deselecting dispensers - it should always stay selected
-                  if (
-                    newDispensers !== filters.dispensers &&
-                    newDispensers === true
-                  ) {
-                    toggleListingOption("dispensers");
-                  }
-                  if (newAtomics !== filters.atomics) {
-                    toggleListingOption("atomics");
-                  }
-                }}
-                mode="multi"
-                size="xsR"
-                spacing="evenFullwidth"
-                disabledOptions={["atomics"]}
-                alwaysSelectedOptions={["dispensers"]}
-                color="primary"
-              />
-            </div>
-
-            {/* Price options */}
-            {(filters.dispensers || filters.atomics) && (
-              <div>
-                <Radio
-                  label="ALL"
-                  value="all"
-                  name="listingPrice"
-                  checked={filters.listings === "all"}
-                  onChange={() => handleListingPriceType("all")}
-                />
-                <div class={`${eyebrowPrimary} ${eyebrowPositionFilter}`}>
-                  PRICE RANGE
-                </div>
-                <Radio
-                  label="BARGAIN"
-                  value="bargain"
-                  name="listingPrice"
-                  checked={filters.listings === "bargain"}
-                  onChange={() => handleListingPriceType("bargain")}
-                />
-                <Radio
-                  label="AFFORDABLE"
-                  value="affordable"
-                  name="listingPrice"
-                  checked={filters.listings === "affordable"}
-                  onChange={() => handleListingPriceType("affordable")}
-                />
-                <Radio
-                  label="PREMIUM"
-                  value="premium"
-                  name="listingPrice"
-                  checked={filters.listings === "premium"}
-                  onChange={() => handleListingPriceType("premium")}
-                />
-                <Radio
-                  label="CUSTOM PRICE"
-                  value="custom"
-                  name="listingPrice"
-                  checked={filters.listings === "custom"}
-                  onChange={() => handleListingPriceType("custom")}
-                />
-
-                {/* Custom price range slider */}
-                {filters.listings === "custom" && (
-                  <div class="mt-3 pl-0.5">
-                    <RangeSliderDual
-                      variant="price"
-                      onChange={handlePriceRangeChange}
-                    />
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* SALES Section */}
-        {filters.market === "sales" && (
-          <div>
-            {/* Dispensers and Atomics buttons */}
-            <div class="my-4">
-              <ToggleButton
-                options={["dispensers", "atomics"]}
-                selected={[
-                  ...(filters.dispensers ? ["dispensers"] : []),
-                  ...(filters.atomics ? ["atomics"] : []),
-                ]}
-                onChange={(values) => {
-                  const selectedArray = Array.isArray(values) ? values : [];
-                  const newDispensers = selectedArray.includes("dispensers");
-                  const newAtomics = selectedArray.includes("atomics");
-
-                  // Prevent deselecting dispensers - it should always stay selected
-                  if (
-                    newDispensers !== filters.dispensers &&
-                    newDispensers === true
-                  ) {
-                    toggleListingOption("dispensers");
-                  }
-                  if (newAtomics !== filters.atomics) {
-                    toggleListingOption("atomics");
-                  }
-                }}
-                mode="multi"
-                size="xsR"
-                spacing="evenFullwidth"
-                disabledOptions={["atomics"]}
-                alwaysSelectedOptions={["dispensers"]}
-                color="primary"
-              />
-            </div>
-
-            <Radio
-              label="RECENT"
-              value="recent"
-              name="salesType"
-              checked={filters.sales === "recent"}
-              onChange={() => handleSalesType("recent")}
-            />
-
-            {
-              /* <Radio
-              label="TRENDING"
-              value="volume"
-              name="salesType"
-              checked={filters.sales === "volume"}
-              onChange={() => handleSalesType("volume")}
-            />
-            <div class={`${eyebrowPrimary} ${eyebrowPositionFilter}`}>
-              PRICE RANGE
-            </div>
-            <Radio
-              label="PREMIUM"
-              value="premium"
-              name="salesType"
-              checked={filters.sales === "premium"}
-              onChange={() => handleSalesType("premium")}
-            />
-            <Radio
-              label="CUSTOM PRICE"
-              value="custom"
-              name="salesType"
-              checked={filters.sales === "custom"}
-              onChange={() => handleSalesType("custom")}
-            /> */
-            }
-
-            {/* Custom price range slider for sales */}
-            {
-              /* {filters.sales === "custom" && (
-              <div class="mt-3 pl-0.5">
-                <RangeSliderDual
-                  variant="price"
-                  onChange={handlePriceRangeChange}
-                />
-              </div>
-            )} */
-            }
-
-            {/* Volume Period Selection - only show if TRENDING is selected */}
-            {
-              /* {filters.sales === "volume" && (
-              <div class="mt-3 pl-0.5">
-                <ToggleButton
-                  options={["24h", "7d", "30d"]}
-                  selected={filters.volume}
-                  onChange={(value) => handleVolumeChange(value as string)}
-                  mode="single"
-                  spacing="evenFullwidth"
-                  size="xsR"
-                />
-              </div>
-            )} */
-            }
-          </div>
-        )}
       </CollapsibleSection>
 
       {filters.stampType !== "src-721" && (
@@ -1448,4 +1077,4 @@ export const FilterContentStamps = ({
   );
 };
 
-export default FilterContentStamps;
+export default FilterContentExplorerStamp;

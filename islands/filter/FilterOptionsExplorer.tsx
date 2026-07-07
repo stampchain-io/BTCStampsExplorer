@@ -1,17 +1,17 @@
 import type { StampRange } from "$constants";
 import {
   defaultFilters as stampDefaultFilters,
+  ExplorerStampFilters,
   filtersToQueryParams as stampFiltersToQueryParams,
   queryParamsToFilters as stampQueryParamsToFilters,
-  StampFilters,
-} from "$islands/filter/FilterOptionsStamps.tsx";
+} from "$islands/filter/FilterOptionsExplorerStamp.tsx";
 import {
-  allQueryKeysFromFiltersTokens,
+  allQueryKeysFromFiltersExplorerSRC20,
   defaultFilters as tokenDefaultFilters,
+  ExplorerSRC20Filters,
   filtersToQueryParams as tokenFiltersToQueryParams,
   queryParamsToFilters as tokenQueryParamsToFilters,
-  TokenFilters,
-} from "$islands/filter/FilterOptionsTokens.tsx";
+} from "$islands/filter/FilterOptionsExplorerSRC20.tsx";
 
 export type ExplorerSection = "all" | "stamps" | "tokens";
 
@@ -22,8 +22,8 @@ export type ExplorerFilters = {
   rangeMin: string;
   rangeMax: string;
   // Section-specific sub-filters (preserved across section switches)
-  stampFilters: StampFilters;
-  tokenFilters: TokenFilters;
+  stampFilters: ExplorerStampFilters;
+  tokenFilters: ExplorerSRC20Filters;
   [key: string]: any;
 };
 
@@ -90,7 +90,7 @@ export function filtersToQueryParams(
 
   if (filters.section === "stamps") {
     // Clear token and top-level range params
-    allQueryKeysFromFiltersTokens.forEach((k) => queryParams.delete(k));
+    allQueryKeysFromFiltersExplorerSRC20.forEach((k) => queryParams.delete(k));
     ALL_RANGE_KEYS.forEach((k) => queryParams.delete(k));
 
     // Serialize stamp filters (writes type, market, range, etc.)
@@ -110,13 +110,13 @@ export function filtersToQueryParams(
     const tokenQuery = tokenFiltersToQueryParams("", filters.tokenFilters);
     const tokenParams = new URLSearchParams(tokenQuery);
     tokenParams.forEach((value, key) => queryParams.set(key, value));
-    allQueryKeysFromFiltersTokens.forEach((k) => {
+    allQueryKeysFromFiltersExplorerSRC20.forEach((k) => {
       if (!tokenParams.has(k)) queryParams.delete(k);
     });
   } else {
     // ALL section: clear stamp and token params, write top-level range
     STAMP_FILTER_KEYS.forEach((k) => queryParams.delete(k));
-    allQueryKeysFromFiltersTokens.forEach((k) => queryParams.delete(k));
+    allQueryKeysFromFiltersExplorerSRC20.forEach((k) => queryParams.delete(k));
 
     if (filters.range) {
       queryParams.set("range", filters.range);
@@ -142,12 +142,11 @@ export function queryParamsToFilters(query: string): ExplorerFilters {
   const params = new URLSearchParams(query);
 
   const sectionParam = params.get("section");
-  const section: ExplorerSection =
-    sectionParam === "stamps"
-      ? "stamps"
-      : sectionParam === "tokens"
-      ? "tokens"
-      : "all";
+  const section: ExplorerSection = sectionParam === "stamps"
+    ? "stamps"
+    : sectionParam === "tokens"
+    ? "tokens"
+    : "all";
 
   // Always deserialize all sub-states so switching sections restores them
   const stampFilters = stampQueryParamsToFilters(query);
@@ -179,9 +178,6 @@ export function countActiveExplorerFilters(filters: ExplorerFilters): number {
   if (filters.section === "stamps") {
     const sf = filters.stampFilters;
     let count = 0;
-    const hasMarket = sf.market !== "" || sf.dispensers || sf.atomics ||
-      sf.listings !== "" || sf.sales !== "";
-    if (hasMarket) count++;
     if (sf.fileType.length > 0) count++;
     if (sf.editions.length > 0) count++;
     if (sf.range !== null || sf.rangeMin !== "" || sf.rangeMax !== "") count++;

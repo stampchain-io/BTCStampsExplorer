@@ -6,7 +6,7 @@ import type { SUBPROTOCOLS } from "$types/base.d.ts";
 
 import type { StampFilterType, StampType } from "$constants";
 import { ExplorerHeader } from "$header";
-import { queryParamsToServicePayload } from "$islands/filter/FilterOptionsStamps.tsx";
+import { queryParamsToServicePayload } from "$islands/filter/FilterOptionsExplorerStamp.tsx";
 import {
   DEV_DUMMY_MODE,
   DUMMY_EXPLORER_OVERVIEW_PAGE,

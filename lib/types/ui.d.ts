@@ -24,7 +24,7 @@ import type { ComponentChildren, ComponentProps, JSX, Ref } from "preact";
 export type { ButtonColor, ButtonSize, ButtonVariant };
 
 import type { StampFilterType, StampType } from "$constants";
-import type { StampFilters } from "$islands/filter/FilterOptionsStamps.tsx";
+import type { ExplorerStampFilters } from "$islands/filter/FilterOptionsExplorerStamp.tsx";
 import type { FeeEstimationResult as TransactionFeeEstimationResult } from "$lib/utils/bitcoin/minting/TransactionConstructionService.ts";
 import type {
   AlignmentType,
@@ -3124,7 +3124,7 @@ export interface SRC20DetailHeaderProps {
  * StampOverviewHeaderProps - Migrated from StampOverviewHeader.tsx
  */
 export type StampOverviewHeaderProps = {
-  currentFilters?: StampFilters;
+  currentFilters?: ExplorerStampFilters;
   viewMode?: "detail" | "minimal";
 };
 
@@ -3132,7 +3132,7 @@ export type StampOverviewHeaderProps = {
  * MarketplaceHeaderProps - Props for the MarketplaceHeader island
  */
 export type MarketplaceHeaderProps = {
-  currentFilters?: StampFilters;
+  currentFilters?: ExplorerStampFilters;
   viewMode?: "detail" | "minimal" | "row";
   isSalesMode?: boolean;
 };
