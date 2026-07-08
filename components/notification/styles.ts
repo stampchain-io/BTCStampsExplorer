@@ -7,7 +7,7 @@ const notificationContainer = `
 
 /* ===== TOOLTIPS STYLES ===== */
 const tooltipBackground =
-  "bg-color-background/75 px-2.5 py-1 rounded-lg transition-opacity duration-200 pointer-events-none";
+  "bg-color-background/90 px-2.5 py-1 rounded-lg transition-opacity duration-200 pointer-events-none";
 const tooltipText =
   "font-normal text-[10px] text-color-grey-light whitespace-nowrap";
 

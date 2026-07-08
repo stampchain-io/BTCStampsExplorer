@@ -215,7 +215,8 @@ export const cardFileSize =
   `font-normal text-xs text-color-neutral-400 text-nowrap ${select}`;
 export const cardPrice =
   `font-medium text-xs text-color-secondary-400 text-nowrap ${select}`;
-
+export const cardEyebrowNeutral =
+  `font-bold text-[0.625rem] text-color-neutral-600 tracking-wider ${select}`;
 // Minimal card variant styles
 export const cardStampNumberMinimal =
   `max-w-full font-black text-xs mobileLg:text-sm
@@ -320,6 +321,7 @@ export type TextStyles = {
   cardFileType: string;
   cardFileSize: string;
   cardPrice: string;
+  cardEyebrowNeutral: string;
   cardStampNumberMinimal: string;
   cardPriceMinimal: string;
 };

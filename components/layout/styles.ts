@@ -43,7 +43,7 @@ ${shadowGlowPurple} ${transitionColors}`;
 export const container3 =
   `bg-gradient-to-b from-color-neutral-800/80 via-color-neutral-900/90 to-color-neutral-900
   border border-color-neutral-800 rounded-xl cursor-default select-none`;
-export const containerPill = `flex items-center py-1 px-2.5 rounded-full
+export const containerPill = `flex items-center px-2.5 py-1 rounded-full
   bg-gradient-to-b from-color-neutral-700/80 via-color-neutral-800/90 to-color-neutral-800 cursor-pointer select-none`;
 
 /* ===== BODY STYLES ===== */

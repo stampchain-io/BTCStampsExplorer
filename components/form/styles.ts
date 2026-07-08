@@ -60,8 +60,8 @@ export const inputCheckbox = (
       ? "border-color-primary-400 after:bg-color-primary-400 group-hover:border-color-hover group-hover:after:bg-color-hover"
       : "border-color-primary-400 after:bg-color-primary-400"
     : canHoverSelected
-    ? "border-color-neutral-500 group-hover:border-color-hover"
-    : "border-color-neutral-500"
+    ? "border-color-neutral-400 group-hover:border-color-hover"
+    : "border-color-neutral-400"
 }
     after:content-['']
     after:block
