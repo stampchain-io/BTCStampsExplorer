@@ -1,4 +1,6 @@
-# BITCOIN STAMPS EXPLORER AND API
+<p align="center">
+  <img src="https://raw.githubusercontent.com/stampchain-io/stampchain.io/dev/static/img/github/stampchain-logo-app.png" alt="Stampchain - Bitcoin Stamps Explorer and API">
+</p>
 
 [![Code Quality](https://github.com/stampchain-io/stampchain.io/actions/workflows/deploy.yml/badge.svg)](https://github.com/stampchain-io/stampchain.io/actions/workflows/deploy.yml)
 [![Unit Tests](https://github.com/stampchain-io/stampchain.io/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/stampchain-io/stampchain.io/actions/workflows/unit-tests.yml)
@@ -8,10 +10,7 @@
 [![Docker Build Test](https://github.com/stampchain-io/stampchain.io/actions/workflows/docker-test.yml/badge.svg)](https://github.com/stampchain-io/stampchain.io/actions/workflows/docker-test.yml)
 [![Actionlint](https://github.com/stampchain-io/stampchain.io/actions/workflows/actionlint.yml/badge.svg)](https://github.com/stampchain-io/stampchain.io/actions/workflows/actionlint.yml)
 
-This is the official API and block explorer for
-[Bitcoin Stamps](https://stampchain.io/). It provides a comprehensive interface
-for exploring Bitcoin Stamps transactions and metadata, working in conjunction
-with the [Bitcoin Stamps Indexer](https://github.com/stampchain-io/btc_stamps).
+This is the official [block explorer](https://stampchain.io/) for Bitcoin Stamps, exposing a full set of API endpoints for exploring transactions and metadata. It works in conjunction with the [Bitcoin Stamps Indexer](https://github.com/stampchain-io/btc_stamps).
 
 ## Security
 
