@@ -6,6 +6,7 @@ import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { getSRC20ImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
 import {
   cardCreator,
+  cardEyebrowNeutral,
   cardFileSize,
   cardFileType,
   cardStampNumber,
@@ -42,26 +43,29 @@ export function SRC20Card({ src20, variant = "detail" }: SRC20CardProps) {
   const renderTopRow = () => (
     <>
       <div
-        class={`flex items-center ${container3} !rounded-full p-1 gap-2`}
+        class={`flex items-center ${container3} p-1 gap-2`}
       >
-        {/* Image — 24px rounded */}
-        <div class="flex-shrink-0 w-8 h-8 rounded-full overflow-hidden">
+        {/* Image */}
+        <div class="flex-shrink-0 w-10 h-10 rounded-lg overflow-hidden">
           {imageUrl
             ? (
               <img
                 src={imageUrl}
                 alt={tick}
-                class="w-full h-full object-cover"
+                class="w-full h-full object-cover rounded-lg"
                 onError={() => setImgError(true)}
               />
             )
-            : <PlaceholderImage variant="no-image" />}
+            : <PlaceholderImage variant="no-image" className="!rounded-lg" />}
         </div>
 
         {/* Ticker */}
         <div
-          class={`${cardCreator} min-[420px]:before:content-['$'] before:text-color-neutral-400`}
+          class={`${cardCreator} !font-bold`}
         >
+          <span class="hidden min-[420px]:inline-block font-light pr-0.5">
+            $
+          </span>
           {tick}
         </div>
       </div>
@@ -104,7 +108,7 @@ export function SRC20Card({ src20, variant = "detail" }: SRC20CardProps) {
           {src20.creator_name ?? abbreviateAddress(src20.creator, 5)}
         </div>
         <div
-          class={`hidden min-[420px]:flex text-[11px] bg-gradient-to-b from-color-neutral-200 to-color-neutral-400 bg-clip-text text-transparent`}
+          class={`hidden min-[420px]:flex ${cardEyebrowNeutral} py-0`}
         >
           TO
         </div>
@@ -220,9 +224,9 @@ export function SRC20Card({ src20, variant = "detail" }: SRC20CardProps) {
       <>
         {/* ticker row */}
         <div
-          class={`flex items-center ${container3} rounded-full p-1 gap-2`}
+          class={`flex items-center ${container3} rounded-xl p-1 gap-2`}
         >
-          <div class="flex-shrink-0 w-6 h-6 rounded-full overflow-hidden">
+          <div class="flex-shrink-0 w-6 h-6 rounded-xl overflow-hidden">
             {imageUrl
               ? (
                 <img
@@ -232,11 +236,14 @@ export function SRC20Card({ src20, variant = "detail" }: SRC20CardProps) {
                   onError={() => setImgError(true)}
                 />
               )
-              : <PlaceholderImage variant="no-image" />}
+              : <PlaceholderImage variant="no-image" className="!rounded-xl" />}
           </div>
           <div
-            class={`${cardCreator} min-[420px]:before:content-['$'] before:text-color-neutral-500`}
+            class={`${cardCreator} !font-bold`}
           >
+            <span class="hidden min-[420px]:inline-block font-light pr-0.5">
+              $
+            </span>
             {tick}
           </div>
         </div>

@@ -2,6 +2,7 @@
 /* @baba-update audio icon size (custom) - 247*/
 /*@baba-check styles+icon*/
 import { Button } from "$button";
+import { ActivityLevelIndicator } from "$components/indicators/ActivityLevelIndicator.tsx";
 import { Icon, LoadingIcon, PlaceholderImage } from "$icon";
 import StampTextContent from "$islands/content/stampDetailContent/StampTextContent.tsx";
 import { container3, containerCard, containerPill } from "$layout";
@@ -9,7 +10,6 @@ import {
   abbreviateAddress,
   formatFileSize,
   formatSupplyValue,
-  stripTrailingZeros,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import {
   getStampImageSrc,
@@ -18,6 +18,7 @@ import {
 import { tooltipIcon } from "$notification";
 import {
   cardCreator,
+  cardEyebrowNeutral,
   cardFileSize,
   cardFileType,
   cardPrice,
@@ -39,6 +40,7 @@ interface StampWithSaleData extends Omit<StampRow, "stamp_base64"> {
     buyer_address?: string;
     dispenser_address?: string;
     time_ago?: string;
+    sale_time?: number | null;
     dispense_quantity?: number;
   };
   stamp_base64?: string;
@@ -482,7 +484,7 @@ export function StampCard({
           <img
             src={src}
             loading="lazy"
-            alt={`Stamp No. ${stamp.stamp}`}
+            alt={`Stamp #${stamp.stamp}`}
             class="max-w-none object-contain rounded-xl pixelart stamp-image h-full w-full"
             onLoad={() => setLoading(false)}
             onError={handleImageError}
@@ -492,12 +494,13 @@ export function StampCard({
     );
   };
 
-  const renderPrice = () => {
+  const displayPriceBTC = () => {
+    const formatPriceBTC = (amount: number) =>
+      `${Number(amount).toFixed(8)} BTC`;
+
     if (isRecentSale && stamp.sale_data) {
       return {
-        text: `${
-          stripTrailingZeros(stamp.sale_data.btc_amount.toFixed(8))
-        } BTC`,
+        text: formatPriceBTC(stamp.sale_data.btc_amount),
         style: cardPrice,
       };
     }
@@ -512,10 +515,7 @@ export function StampCard({
         : marketData.recentSalePriceBTC;
 
       if (marketPrice !== null && marketPrice > 0) {
-        return {
-          text: `${stripTrailingZeros(Number(marketPrice).toFixed(8))} BTC`,
-          style: cardPrice,
-        };
+        return { text: formatPriceBTC(marketPrice), style: cardPrice };
       }
     }
 
@@ -543,7 +543,9 @@ export function StampCard({
     ? stamp.creator_name
     : abbreviateAddress(stamp.creator, abbreviationLength);
 
-  const stampValue = stamp.stamp != null ? `${stamp.stamp}` : `${stamp.cpid}`;
+  const stampValue = stamp.stamp != null
+    ? stamp.stamp.toLocaleString("en-US")
+    : `${stamp.cpid}`;
   const displayStampHash = stamp.stamp != null;
 
   const isLongNumber = (value: string | number) => {
@@ -551,7 +553,7 @@ export function StampCard({
     return stringValue.length > 6;
   };
 
-  const isListed = renderPrice().style === cardPrice;
+  const isListed = displayPriceBTC().style === cardPrice;
 
   /* ===== RENDER ===== */
   return (
@@ -628,9 +630,9 @@ export function StampCard({
                       type="icon"
                       name="bitcoin"
                       weight="bold"
-                      size="xxs"
+                      size="custom"
                       color="custom"
-                      className="stroke-color-secondary-400"
+                      className="w-[17px] h-[17px] stroke-color-secondary-400"
                       ariaLabel="BTC"
                     />
                     <div
@@ -638,7 +640,7 @@ export function StampCard({
                         isBtcTooltipVisible ? "opacity-100" : "opacity-0"
                       }`}
                     >
-                      {renderPrice().text}
+                      {displayPriceBTC().text}
                     </div>
                   </div>
                 )}
@@ -779,6 +781,44 @@ export function StampCard({
 
             {/* Row 3: Buy button (marketplace listings only) */}
             {variant === "imageDetailMarketplaceListings" && isListed && (
+              <>
+                <div
+                  class={`flex flex-col w-full mt-2 px-2.5 py-1 ${container3} cursor-pointer`}
+                >
+                  <div class="flex justify-end items-end min-[420px]:justify-between min-[420px]:items-center -ml-1">
+                    {stamp.activity_level && (
+                      <ActivityLevelIndicator
+                        level={stamp.activity_level}
+                        className="hidden min-[420px]:flex"
+                      />
+                    )}
+                    <div class="font-normal text-xs text-color-neutral-500 text-nowrap">
+                      {stamp.floorPriceUSD?.toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })} USD
+                    </div>
+                  </div>
+                  <div class={`${cardPrice} min-[420px]:!text-sm text-right`}>
+                    {displayPriceBTC().text}
+                  </div>
+                </div>
+                <div class="flex justify-center mt-2 w-full">
+                  <Button
+                    variant="outline"
+                    color="primary"
+                    size="xs"
+                    class="w-full rounded-xl"
+                  >
+                    BUY
+                  </Button>
+                </div>
+              </>
+            )}
+
+            {
+              /* Row 3: Buy button (marketplace listings only)
+            {variant === "imageDetailMarketplaceListings" && isListed && (
               <div class="flex justify-center mt-2 w-full">
                 <Button
                   variant="outline"
@@ -794,7 +834,7 @@ export function StampCard({
                 >
                   <span class="relative inline-flex items-center justify-center">
                     <span class="group-hover:opacity-0 transition-opacity duration-200 tracking-wide text-[var(--color-secondary-400)]">
-                      {renderPrice().text}
+                      {displayPriceBTC().text}
                     </span>
                     <span class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                       BUY
@@ -802,7 +842,8 @@ export function StampCard({
                   </span>
                 </Button>
               </div>
-            )}
+            )} */
+            }
           </div>
         )}
 
@@ -830,44 +871,92 @@ export function StampCard({
               {creatorDisplay}
             </div>
 
-            {/* Row B: amount pill (left) + time_ago pill (right) */}
+            {/* Row 1: amount pill (left) + time_ago pill (right) */}
             {stamp.sale_data && (
               <div class="flex items-center justify-between mt-2 w-full">
                 <div class={`${containerPill} ${cardSupply}`}>
                   {stamp.sale_data.dispense_quantity ?? 1}/{stamp.supply ?? 1}
                 </div>
-                {stamp.sale_data.time_ago && (
-                  <div class={`${containerPill} ${cardFileSize}`}>
-                    {stamp.sale_data.time_ago}
+                {(stamp.sale_data.sale_time || stamp.sale_data.time_ago) && (
+                  <div class={`${containerPill} ${cardFileSize} text-[10px]`}>
+                    {(() => {
+                      const { sale_time, time_ago } = stamp.sale_data!;
+                      if (sale_time) {
+                        const ageMs = Date.now() - sale_time * 1000;
+                        if (ageMs >= 7 * 86_400_000) {
+                          const d = new Date(sale_time * 1000);
+                          return `${
+                            d.getMonth() + 1
+                          }/${d.getDate()}/${d.getFullYear()}`;
+                        }
+                      }
+                      return time_ago;
+                    })()}
                   </div>
                 )}
               </div>
             )}
 
-            {/* Sale info container: sale price BTC (left) + buyer address (right) */}
-            {stamp.sale_data && (
-              <div
-                class={`flex flex-col w-full mt-2 items-center justify-center px-3 py-2 gap-1 ${container3} cursor-pointer`}
-              >
-                <div class={`${cardPrice}`}>
-                  {renderPrice().text}
-                </div>
-                <div
-                  class={`hidden min-[420px]:flex text-[11px] bg-gradient-to-b from-color-secondary-400 to-color-neutral-400 bg-clip-text text-transparent`}
-                >
-                  BY
-                </div>
-                {(stamp.sale_data.buyer_address ||
-                  stamp.sale_data.dispenser_address) && (
-                  <div class={`${cardFileSize}`}>
-                    {abbreviateAddress(
-                      stamp.sale_data.buyer_address ||
-                        stamp.sale_data.dispenser_address || "",
-                      abbreviationLength,
-                    )}
-                  </div>
-                )}
+            {/* Row 2: File type + File size pills */}
+            <div class="flex items-center justify-between mt-2 w-full">
+              <div class={`${containerPill} ${cardFileType}`}>
+                {stamp.stamp_mimetype?.split("/")[1]?.toUpperCase() ||
+                  "UNKNOWN"}
               </div>
+              {stamp.file_size_bytes != null && (
+                <div class={`${containerPill} ${cardFileSize}`}>
+                  {formatFileSize(
+                    stamp.file_size_bytes,
+                    stamp.stamp_mimetype === "text/plain",
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Row 3+4: Sale info containers: sale price USD / sale price BTC + buyer address (bottom) */}
+            {stamp.sale_data && (
+              <>
+                <div
+                  class={`flex flex-col items-end w-full mt-2 px-2.5 py-1 ${container3} cursor-pointer`}
+                >
+                  <div class="font-normal text-xs text-color-neutral-500 text-nowrap">
+                    {stamp.floorPriceUSD?.toLocaleString("en-US", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })} USD
+                  </div>
+                  <div class={`${cardPrice} min-[420px]:!text-sm`}>
+                    {displayPriceBTC().text}
+                  </div>
+                </div>
+
+                <div
+                  class={`flex flex-col w-full mt-2 px-2.5 py-1.5 ${container3} cursor-pointer`}
+                >
+                  <div class="flex justify-between items-center">
+                    <div
+                      class={`${cardEyebrowNeutral}`}
+                    >
+                      BUYER
+                    </div>
+                    <div class={`${cardFileSize}`}>
+                      {stamp.sale_data.buyer_address
+                        ? (
+                          <a
+                            href={`/wallet/${stamp.sale_data.buyer_address}`}
+                            class="link-neutral-400-cell"
+                          >
+                            {abbreviateAddress(
+                              stamp.sale_data.buyer_address,
+                              abbreviationLength,
+                            )}
+                          </a>
+                        )
+                        : "N/A"}
+                    </div>
+                  </div>
+                </div>
+              </>
             )}
           </div>
         )}
@@ -883,7 +972,7 @@ export function StampCard({
               {stampValue}
             </div>
             <div class={`mt-2 ${containerPill} ${cardPriceMinimal}`}>
-              {renderPrice().text}
+              {displayPriceBTC().text}
             </div>
           </div>
         )}
