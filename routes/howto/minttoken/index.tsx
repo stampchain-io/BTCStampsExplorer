@@ -1,4 +1,5 @@
 /* ===== MINT TOKEN HOW-TO PAGE ===== */
+import { Head } from "$fresh/runtime.ts";
 import {
   Article,
   AuthorSection,
@@ -7,6 +8,26 @@ import {
   MINT_STEPS,
   StepList,
 } from "$section";
+
+/* ===== JSON-LD STRUCTURED DATA (steps derived from the shared MINT_STEPS constant) ===== */
+const SUBTITLE = "MINT A SRC-20 TOKEN";
+
+const flattenText = (description: string | string[]): string =>
+  Array.isArray(description) ? description.join("\n") : description;
+
+const howToLd = {
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": `How to ${SUBTITLE.toLowerCase()}`,
+  "description":
+    `A step-by-step guide to ${SUBTITLE.toLowerCase()} on stampchain.io.`,
+  "step": MINT_STEPS.map((step) => ({
+    "@type": "HowToStep",
+    "name": step.title,
+    "text": flattenText(step.description),
+    "image": step.image,
+  })),
+};
 
 /* ===== INTRODUCTION COMPONENT ===== */
 function IntroSection() {
@@ -52,14 +73,22 @@ function MintSteps() {
 /* ===== MAIN PAGE COMPONENT ===== */
 export default function MintToken() {
   return (
-    <Article
-      title="HOW-TO"
-      subtitle="MINT A SRC-20 TOKEN"
-      headerImage="/img/how-tos/mintsrc20/00.png"
-      importantNotes={MINT_IMPORTANT_NOTES}
-    >
-      <IntroSection />
-      <MintSteps />
-    </Article>
+    <>
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(howToLd) }}
+        />
+      </Head>
+      <Article
+        title="HOW-TO"
+        subtitle={SUBTITLE}
+        headerImage="/img/how-tos/mintsrc20/00.png"
+        importantNotes={MINT_IMPORTANT_NOTES}
+      >
+        <IntroSection />
+        <MintSteps />
+      </Article>
+    </>
   );
 }
