@@ -123,6 +123,7 @@ import * as $handlers_sharedBlockWithStampsHandler from "./routes/handlers/share
 import * as $handlers_sharedCollectionHandler from "./routes/handlers/sharedCollectionHandler.ts";
 import * as $handlers_sharedContentHandler from "./routes/handlers/sharedContentHandler.ts";
 import * as $handlers_sharedStampHandler from "./routes/handlers/sharedStampHandler.ts";
+import * as $howto_buy_index from "./routes/howto/buy/index.tsx";
 import * as $howto_deploytoken_index from "./routes/howto/deploytoken/index.tsx";
 import * as $howto_index from "./routes/howto/index.tsx";
 import * as $howto_leatherconnect_index from "./routes/howto/leatherconnect/index.tsx";
@@ -476,6 +477,7 @@ const manifest = {
       $handlers_sharedCollectionHandler,
     "./routes/handlers/sharedContentHandler.ts": $handlers_sharedContentHandler,
     "./routes/handlers/sharedStampHandler.ts": $handlers_sharedStampHandler,
+    "./routes/howto/buy/index.tsx": $howto_buy_index,
     "./routes/howto/deploytoken/index.tsx": $howto_deploytoken_index,
     "./routes/howto/index.tsx": $howto_index,
     "./routes/howto/leatherconnect/index.tsx": $howto_leatherconnect_index,
