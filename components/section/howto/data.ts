@@ -8,6 +8,7 @@ export interface ArticleLinks {
 }
 
 export const ARTICLE_LINKS: ArticleLinks[] = [
+  { title: "HOW TO BUY", href: "/howto/buy" },
   { title: "CREATE A WALLET", href: "/howto/leathercreate" },
   { title: "CONNECT YOUR LEATHER WALLET", href: "/howto/leatherconnect" },
   { title: "DEPLOY YOUR OWN TOKEN", href: "/howto/deploytoken" },
@@ -468,6 +469,59 @@ export const TEMPLATE_SETUP_STEPS = [
 export const TEMPLATE_IMPORTANT_NOTES = [
   "First important note about the process",
   "Second important note about the process",
+];
+
+/* ===== BUY BITCOIN STAMPS & SRC-20 GUIDE ===== */
+export interface BuyFaqItem {
+  question: string;
+  answer: string;
+}
+
+// Section A — buying a Bitcoin Stamp via a dispenser (text-only, ordered)
+export const BUY_STAMP_STEPS: string[] = [
+  "Connect your Bitcoin wallet (for example, Leather) to stampchain.io.",
+  "Find a stamp with an open dispenser — browse the stamp explorer or open a specific stamp's page. Open dispensers show the price in BTC and the remaining quantity.",
+  "Review the dispenser price and the available supply before you buy.",
+  "Send the exact BTC amount to the dispenser address. The dispenser automatically sends the stamp to your wallet.",
+  "Confirm the stamp has arrived in your wallet or on the stamp's page.",
+];
+
+export const BUY_STAMP_IMPORTANT_NOTE =
+  "Only buy from dispensers shown on the stamp's own page, and verify the stamp ID and price before sending BTC. Dispenser purchases settle on-chain and are final.";
+
+// Section B — buying an SRC-20 token on a third-party marketplace (text-only, ordered)
+export const BUY_SRC20_STEPS: string[] = [
+  "Look up the token on stampchain.io's SRC-20 explorer to confirm its ticker, supply, and mint status.",
+  "Go to a marketplace that lists SRC-20 tokens: OpenStamp (SRC-20 marketplace and listings), StampScan (SRC-20 market data and listings), or BitMart (a centralized exchange that lists select SRC-20 tokens such as KEVIN).",
+  "Follow that venue's buy flow — connect your wallet or fund your exchange account, then place the order.",
+  "Before buying, confirm the token ticker exactly matches the one shown on stampchain.io, because SRC-20 tickers can be duplicated.",
+];
+
+export const BUY_SRC20_IMPORTANT_NOTE =
+  "stampchain.io is a neutral explorer and does not endorse any marketplace. A decentralized exchange on stampchain is a potential future development, pending community SIPs.";
+
+// FAQ — drives both the visible FAQ and the FAQPage JSON-LD (single source of truth)
+export const BUY_FAQ: BuyFaqItem[] = [
+  {
+    question: "Can I buy SRC-20 tokens on stampchain.io?",
+    answer:
+      "No. stampchain.io is the reference explorer for Bitcoin Stamps and SRC-20 data, but it does not currently operate a fungible-token exchange. SRC-20 tokens such as KEVIN are traded on third-party venues including OpenStamp, StampScan, and BitMart. A decentralized exchange on stampchain is a potential future development pending community SIPs.",
+  },
+  {
+    question: "How do I buy a Bitcoin Stamp?",
+    answer:
+      "Bitcoin Stamps are bought on stampchain.io through dispensers — automated on-chain sell orders. Connect a Bitcoin wallet, find a stamp with an open dispenser, and send the listed BTC amount; the dispenser sends the stamp to your wallet.",
+  },
+  {
+    question: "What is a dispenser?",
+    answer:
+      "A dispenser is an automated, on-chain sell order that dispenses a Bitcoin Stamp to any buyer who sends the specified amount of BTC to its address.",
+  },
+  {
+    question: "Where can I buy KEVIN?",
+    answer:
+      "KEVIN and other SRC-20 tokens trade on third-party marketplaces including OpenStamp, StampScan, and BitMart. Confirm the ticker on stampchain.io's SRC-20 explorer before buying.",
+  },
 ];
 
 /* ===== DESCRIPTION FORMATTING DOCUMENTATION ===== */
