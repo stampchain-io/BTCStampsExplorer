@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/stampchain-io/stampchain.io/dev/static/img/github/stampchain-logo-app.png" alt="Stampchain - Bitcoin Stamps Explorer and API">
+  <img src="https://raw.githubusercontent.com/stampchain-io/stampchain.io/dev/static/img/github/stampchain-logo-banner-appicon.png" alt="Stampchain - Bitcoin Stamps Explorer and API">
 </p>
 
 [![Code Quality](https://github.com/stampchain-io/stampchain.io/actions/workflows/deploy.yml/badge.svg)](https://github.com/stampchain-io/stampchain.io/actions/workflows/deploy.yml)
