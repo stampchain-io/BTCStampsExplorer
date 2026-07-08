@@ -161,9 +161,10 @@ const DEFAULTS = {
     "#F5D0FE", /* primary-200 */
     "#F0ABFC", /* primary-300 */
     "#F0ABFC", /* primary-300 */
+    "#F0ABFC", /* primary-300 */
     "#E879F9", /* primary-400 */
     "#E879F9", /* primary-400 */
-    "#D946EF", /* primary-500 */
+    "#E879F9", /* primary-400 */
     "#D946EF", /* primary-500 */
     "#C026D3", /* primary-600 */
     "#A21CAF", /* primary-700 */
