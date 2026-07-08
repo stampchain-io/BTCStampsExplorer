@@ -141,13 +141,14 @@ export function SRC20OverviewRow({ src20 }: SRC20OverviewRowProps) {
       <td
         class={`${cellAlign(3, HEADERS.length)} ${cellCenterL2Card}`}
       >
-        <div class="flex items-center justify-center gap-2 text-color-primary-400">
+        <div class="flex items-center justify-center gap-2 text-color-neutral-200">
           <Icon
             type="icon"
             name="src20Token"
             weight="bold"
             size="xxs"
-            color="purpleLight"
+            color="custom"
+            className="stroke-color-neutral-200"
           />
           {op}
         </div>
@@ -171,7 +172,7 @@ export function SRC20OverviewRow({ src20 }: SRC20OverviewRowProps) {
       <td
         class={`${
           cellAlign(5, HEADERS.length)
-        } ${cellCenterL2Card} text-color-neutral-200`}
+        } ${cellCenterL2Card} text-color-primary-400`}
       >
         {amount}
       </td>
@@ -205,7 +206,7 @@ export function SRC20OverviewRow({ src20 }: SRC20OverviewRowProps) {
       <td
         class={`${
           cellAlign(8, HEADERS.length)
-        } ${cellRightL2Card} text-color-neutral-200 pr-3`}
+        } ${cellRightL2Card} text-color-neutral-400 pr-3`}
       >
         {formatDate(new Date(src20.block_time), {
           month: "numeric",

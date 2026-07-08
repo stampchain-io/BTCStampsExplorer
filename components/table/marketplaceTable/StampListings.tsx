@@ -30,7 +30,7 @@ const HEADERS = [
   "IMAGE",
   "STAMP #",
   "CPID",
-  "CREATOR",
+  "ARTIST",
   "LISTED",
   "PRICE",
   "ACTIVITY",
@@ -156,7 +156,7 @@ export function StampListingsRow({ stamp }: StampListingsRowProps) {
         {stamp.cpid ?? "N/A"}
       </td>
 
-      {/* CREATOR */}
+      {/* CREATOR/ARTIST */}
       <td
         class={`${
           cellAlign(3, HEADERS.length)
@@ -174,7 +174,7 @@ export function StampListingsRow({ stamp }: StampListingsRowProps) {
       <td
         class={`${
           cellAlign(4, HEADERS.length)
-        } ${cellCenterL2Card} text-color-neutral-200`}
+        } ${cellCenterL2Card} text-color-primary-400`}
       >
         {listedDisplay}
       </td>
@@ -226,13 +226,13 @@ export function StampListingsRow({ stamp }: StampListingsRowProps) {
       <td
         class={`${
           cellAlign(8, HEADERS.length)
-        } ${cellCenterL2Card} text-color-neutral-400`}
+        } ${cellCenterL2Card} text-color-neutral-200`}
       >
         {(dispenser.origin ?? dispenser.source)
           ? (
             <a
               href={`/wallet/${dispenser.origin ?? dispenser.source}`}
-              class="link-neutral-400-cell"
+              class="link-neutral-200-cell"
             >
               {abbreviateAddress(
                 (dispenser.origin ?? dispenser.source)!,
@@ -278,7 +278,7 @@ export function StampListingsTable({ stamps }: StampListingsTableProps) {
             { width: "w-10" }, // IMAGE
             { width: "min-w-[100px] w-auto" }, // STAMP #
             { width: "min-w-[170px] w-auto" }, // CPID
-            { width: "min-w-[110px] w-auto" }, // CREATOR
+            { width: "min-w-[110px] w-auto" }, // ARTIST
             { width: "min-w-[70px] w-auto" }, // LISTED
             { width: "min-w-[110px] w-auto" }, // PRICE
             { width: "min-w-[60px] w-auto" }, // ACTIVITY

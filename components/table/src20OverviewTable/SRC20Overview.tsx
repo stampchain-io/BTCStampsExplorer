@@ -1,3 +1,4 @@
+import { Button } from "$button";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
 import { SSRSafeUrlBuilder } from "$components/navigation/SSRSafeUrlBuilder.tsx";
 import { Icon, PlaceholderImage } from "$icon";
@@ -18,7 +19,10 @@ import {
   splitTextAndEmojis,
   unicodeEscapeToEmoji,
 } from "$lib/utils/ui/formatting/emojiUtils.ts";
-import { formatDate } from "$lib/utils/ui/formatting/formatUtils.ts";
+import {
+  abbreviateAddress,
+  formatDate,
+} from "$lib/utils/ui/formatting/formatUtils.ts";
 import { getSRC20ImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
 import {
   cardRowStampNumber,
@@ -92,12 +96,13 @@ export function SRC20Overview({
     "VOLUME",
     "MARKETCAP",
     "HOLDERS",
+    "CREATOR",
     "DEPLOY",
-    // "CHART",
+    "TRADE",
   ];
 
   const handleHeaderClick = (headerName: string) => {
-    if (headerName === "CHART") {
+    if (headerName === "TRADE") {
       return;
     }
 
@@ -217,8 +222,9 @@ export function SRC20Overview({
             { width: "min-w-[110px] w-auto" }, // VOLUME
             { width: "min-w-[110px] w-auto" }, // MARKETCAP
             { width: "min-w-[90px] w-auto" }, // HOLDERS
+            { width: "min-w-[110px] w-auto" }, // CREATOR
             { width: "min-w-[110px] w-auto" }, // DEPLOY
-            // { width: "min-w-[150px] w-auto" }, // CHART
+            { width: "min-w-[100px] w-auto" }, // TRADE
           ]).map((col) => <col key={col.key} class={col.className} />)}
         </colgroup>
         <thead>
@@ -226,7 +232,7 @@ export function SRC20Overview({
             {headers.map((header, i) => {
               const isFirst = i === 0;
               const isLast = i === (headers?.length ?? 0) - 1;
-              const isClickable = header !== "CHART";
+              const isClickable = header !== "TRADE" && header !== "CREATOR";
 
               const sortMapping: Record<string, string> = {
                 "TOKEN": "TOKEN",
@@ -281,8 +287,10 @@ export function SRC20Overview({
                       const target = e.target as HTMLElement;
                       const isImage = target.tagName === "IMG";
                       const isChart = target.closest("[data-chart-widget]");
+                      const isLink = target.closest("a");
                       if (
-                        !isImage && !isChart && !e.ctrlKey && !e.metaKey &&
+                        !isImage && !isChart && !isLink && !e.ctrlKey &&
+                        !e.metaKey &&
                         e.button !== 1
                       ) {
                         e.preventDefault();
@@ -494,7 +502,7 @@ export function SRC20Overview({
                     <td
                       class={`${
                         cellAlign(5, headers?.length ?? 0)
-                      } ${cellCenterL2Card} text-color-neutral-500`}
+                      } ${cellCenterL2Card} text-color-primary-400`}
                     >
                       {(() => {
                         const holderCount = src20.market_data?.holder_count ??
@@ -503,11 +511,25 @@ export function SRC20Overview({
                         return Number(holderCount).toLocaleString();
                       })()}
                     </td>
-                    {/* DEPLOY */}
+                    {/* CREATOR */}
                     <td
                       class={`${
                         cellAlign(6, headers?.length ?? 0)
-                      } ${cellRightL2Card} pr-3`}
+                      } ${cellCenterL2Card} text-color-neutral-200`}
+                    >
+                      <a
+                        href={`/wallet/${src20.creator}`}
+                        class="link-neutral-200-cell"
+                      >
+                        {src20.creator_name ??
+                          abbreviateAddress(src20.creator, 5)}
+                      </a>
+                    </td>
+                    {/* DEPLOY */}
+                    <td
+                      class={`${
+                        cellAlign(7, headers?.length ?? 0)
+                      } ${cellCenterL2Card} text-color-neutral-400`}
                     >
                       {formatDate(new Date(src20.block_time), {
                         month: "numeric",
@@ -515,13 +537,22 @@ export function SRC20Overview({
                         year: "numeric",
                       }).toUpperCase()}
                     </td>
-                    {/* CHART */}
-                    {
-                      /* <td
+                    {/* TRADE */}
+                    <td
                       class={`${
-                        cellAlign(7, headers?.length ?? 0)
-                      } ${cellRightL2Card} !py-0`}
+                        cellAlign(8, headers?.length ?? 0)
+                      } ${cellRightL2Card}`}
                     >
+                      <Button
+                        variant="outline"
+                        color="custom"
+                        size="xxs"
+                        class="rounded-xl border-color-neutral-600 text-color-neutral-600 hover:border-color-neutral-600 hover:text-color-neutral-600 !cursor-not-allowed"
+                      >
+                        SOON
+                      </Button>
+                      {
+                        /*
                       {src20.chart
                         ? (
                           <ChartWidget
@@ -537,8 +568,9 @@ export function SRC20Overview({
                             <span>—</span>
                           </div>
                         )}
-                    </td> */
-                    }
+                      */
+                      }
+                    </td>
                   </tr>
                 );
               })

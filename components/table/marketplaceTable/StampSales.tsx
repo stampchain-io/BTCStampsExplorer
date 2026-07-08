@@ -28,7 +28,7 @@ const HEADERS = [
   "IMAGE",
   "STAMP #",
   "CPID",
-  "CREATOR",
+  "ARTIST",
   "SOLD",
   "PRICE",
   "DISPENSER",
@@ -158,7 +158,7 @@ export function MarketplaceSalesRow({ stamp }: MarketplaceSalesRowProps) {
         {stamp.cpid ?? "N/A"}
       </td>
 
-      {/* CREATOR */}
+      {/* CREATOR/ARTIST */}
       <td
         class={`${
           cellAlign(3, HEADERS.length)
@@ -176,7 +176,7 @@ export function MarketplaceSalesRow({ stamp }: MarketplaceSalesRowProps) {
       <td
         class={`${
           cellAlign(4, HEADERS.length)
-        } ${cellCenterL2Card} text-color-neutral-200`}
+        } ${cellCenterL2Card} text-color-primary-400`}
       >
         {soldDisplay}
       </td>
@@ -212,13 +212,13 @@ export function MarketplaceSalesRow({ stamp }: MarketplaceSalesRowProps) {
       <td
         class={`${
           cellAlign(7, HEADERS.length)
-        } ${cellCenterL2Card} text-color-neutral-400`}
+        } ${cellCenterL2Card} text-color-neutral-200`}
       >
         {sale?.buyer_address
           ? (
             <a
               href={`/wallet/${sale.buyer_address}`}
-              class="link-neutral-400-cell"
+              class="link-neutral-200-cell"
             >
               {abbreviateAddress(sale.buyer_address, 5)}
             </a>
@@ -250,7 +250,7 @@ export function MarketplaceSalesRow({ stamp }: MarketplaceSalesRowProps) {
       <td
         class={`${
           cellAlign(9, HEADERS.length)
-        } ${cellRightL2Card} pr-3 text-color-neutral-200`}
+        } ${cellRightL2Card} pr-3 text-color-neutral-400`}
       >
         {dateDisplay}
       </td>
@@ -274,7 +274,7 @@ export function MarketplaceSalesTable({ stamps }: MarketplaceSalesTableProps) {
             { width: "w-10" }, // IMAGE
             { width: "min-w-[100px] w-auto" }, // STAMP #
             { width: "min-w-[170px] w-auto" }, // CPID
-            { width: "min-w-[110px] w-auto" }, // CREATOR
+            { width: "min-w-[110px] w-auto" }, // ARTIST
             { width: "min-w-[70px] w-auto" }, // SOLD
             { width: "min-w-[110px] w-auto" }, // PRICE
             { width: "min-w-[110px] w-auto" }, // DISPENSER ADDY

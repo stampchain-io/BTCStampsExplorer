@@ -142,13 +142,14 @@ export function StampOverviewRow({ stamp }: StampOverviewRowProps) {
       <td
         class={`${cellAlign(3, HEADERS.length)} ${cellCenterL2Card}`}
       >
-        <div class="flex items-center justify-center gap-2 text-color-primary-400">
+        <div class="flex items-center justify-center gap-2 text-color-neutral-200">
           <Icon
             type="icon"
             name="artStamp"
             weight="bold"
             size="xxs"
-            color="purpleLight"
+            color="custom"
+            className="stroke-color-neutral-200"
           />
           {getStampType(stamp)}
         </div>
@@ -172,7 +173,7 @@ export function StampOverviewRow({ stamp }: StampOverviewRowProps) {
       <td
         class={`${
           cellAlign(5, HEADERS.length)
-        } ${cellCenterL2Card} text-color-neutral-200`}
+        } ${cellCenterL2Card} text-color-primary-400`}
       >
         {supplyDisplay}
       </td>
@@ -181,7 +182,7 @@ export function StampOverviewRow({ stamp }: StampOverviewRowProps) {
       <td
         class={`${
           cellAlign(6, HEADERS.length)
-        } ${cellCenterL2Card} text-color-neutral-200`}
+        } ${cellCenterL2Card} text-color-neutral-400`}
       >
         <a
           href={`https://mempool.space/tx/${stamp.tx_hash}`}
@@ -206,7 +207,7 @@ export function StampOverviewRow({ stamp }: StampOverviewRowProps) {
       <td
         class={`${
           cellAlign(8, HEADERS.length)
-        } ${cellRightL2Card} text-color-neutral-200 pr-3`}
+        } ${cellRightL2Card} text-color-neutral-400 pr-3`}
       >
         {formatDate(new Date(stamp.block_time), {
           month: "numeric",

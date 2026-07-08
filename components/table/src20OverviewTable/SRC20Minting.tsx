@@ -19,7 +19,10 @@ import {
   splitTextAndEmojis,
   unicodeEscapeToEmoji,
 } from "$lib/utils/ui/formatting/emojiUtils.ts";
-import { formatDate } from "$lib/utils/ui/formatting/formatUtils.ts";
+import {
+  abbreviateAddress,
+  formatDate,
+} from "$lib/utils/ui/formatting/formatUtils.ts";
 import { getSRC20ImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
 import { cardRowStampNumber, labelXxs, textXs, valueDarkSm } from "$text";
 import type { SRC20Row } from "$types/src20.d.ts";
@@ -46,6 +49,7 @@ export function SRC20Minting({
     "PROGRESS",
     "TRENDING",
     "HOLDERS",
+    "CREATOR",
     "DEPLOY",
     "MINT",
   ];
@@ -144,6 +148,7 @@ export function SRC20Minting({
             { width: "min-w-[130px] w-auto" }, // PROGRESS
             { width: "min-w-[110px] w-auto" }, // TRENDING
             { width: "min-w-[90px] w-auto" }, // HOLDERS
+            { width: "min-w-[110px] w-auto" }, // CREATOR
             { width: "min-w-[110px] w-auto" }, // DEPLOY
             { width: "min-w-[100px] w-auto" }, // MINT button
           ]).map((col) => <col key={col.key} class={col.className} />)}
@@ -339,18 +344,32 @@ export function SRC20Minting({
                     <td
                       class={`${
                         cellAlign(4, headers.length)
-                      } ${cellCenterL2Card} text-color-neutral-500`}
+                      } ${cellCenterL2Card} text-color-primary-400`}
                     >
                       {Number(
                         src20.market_data?.holder_count ??
                           src20.holders ?? 0,
                       ).toLocaleString()}
                     </td>
-                    {/* DEPLOY */}
+                    {/* CREATOR */}
                     <td
                       class={`${
                         cellAlign(5, headers.length)
-                      } ${cellCenterL2Card}`}
+                      } ${cellCenterL2Card} text-color-neutral-200`}
+                    >
+                      <a
+                        href={`/wallet/${src20.creator}`}
+                        class="link-neutral-200-cell"
+                      >
+                        {src20.creator_name ??
+                          abbreviateAddress(src20.creator, 5)}
+                      </a>
+                    </td>
+                    {/* DEPLOY */}
+                    <td
+                      class={`${
+                        cellAlign(6, headers.length)
+                      } ${cellCenterL2Card} text-color-neutral-400`}
                     >
                       {formatDate(new Date(src20.block_time), {
                         month: "numeric",

@@ -201,10 +201,10 @@ export const toggleSymbol =
 
 /* ===== CARD TEXT STYLES ===== */
 // Standard card styles
-export const cardStampNumber = `font-black text-md min-[420px]:text-lg
-   text-color-neutral-400 hover:text-color-hover tracking-wide truncate ${select}`;
-export const cardRowStampNumber = `font-black text-sm
-   text-color-neutral-400 group-hover:text-color-hover tracking-wide truncate ${select}`;
+export const cardStampNumber = `font-extrabold text-md min-[420px]:text-lg
+   text-color-neutral-200 group-hover:text-color-hover tracking-wide truncate ${select}`;
+export const cardRowStampNumber = `font-extrabold text-sm
+   text-color-neutral-200 group-hover:text-color-hover tracking-wide truncate ${select}`;
 export const cardCreator =
   `font-semibold text-xs mobileMd:text-sm text-color-neutral-200 break-words text-center ${select}`;
 export const cardSupply =
