@@ -53,6 +53,9 @@ const mobileLinks: FooterLink[] = [
 ];
 
 /* ===== SOCIAL MEDIA CONFIGURATION ===== */
+const socialIconTabletColor =
+  "tablet:stroke-color-primary-400 tablet:[&_path[class*='fill-stroke']]:fill-color-primary-400";
+
 const socialLinks = [
   {
     icon: (
@@ -62,6 +65,7 @@ const socialLinks = [
         weight="light"
         size="smR"
         color="greyLight"
+        className={socialIconTabletColor}
         href="https://x.com/Stampchain"
         target="_blank"
       />
@@ -75,6 +79,7 @@ const socialLinks = [
         weight="light"
         size="smR"
         color="greyLight"
+        className={socialIconTabletColor}
         href="https://t.me/BitcoinStamps"
         target="_blank"
       />
@@ -88,6 +93,7 @@ const socialLinks = [
         weight="light"
         size="smR"
         color="greyLight"
+        className={socialIconTabletColor}
         href="https://discord.gg/BRYRt4bH"
         target="_blank"
       />
@@ -101,6 +107,7 @@ const socialLinks = [
         weight="light"
         size="smR"
         color="greyLight"
+        className={socialIconTabletColor}
         href="https://github.com/stampchain-io/"
         target="_blank"
       />
@@ -130,28 +137,27 @@ export function Footer() {
           {/* ===== LOGO AND TAGLINE ===== */}
           <div class="flex flex-col items-center mobileMd:items-start">
             <h5 class={logoPrimary}>
-              STAMP<span class="bg-gradient-to-r from-color-secondary-500 via-color-secondary-400 to-color-secondary-300 bg-clip-text text-transparent">
+              STAMP<span class="text-color-neutral-400">
                 CHAIN
               </span>
             </h5>
             <h6 class={tagline}>
               IMMORTALISED ART
-              <span class="text-color-neutral-400">&nbsp;-&nbsp;</span>
-              <span class="bg-gradient-to-r from-color-secondary-500 via-color-secondary-400 to-color-secondary-300 bg-clip-text text-transparent">
-                STORED ON BITCOIN
+              <span class="text-color-neutral-400">
+                &nbsp;-&nbsp;STORED ON BITCOIN
               </span>
             </h6>
           </div>
 
           {/* ===== SOCIAL MEDIA ICONS ===== */}
-          <div class="flex gap-6 tablet:gap-4 mt-3 mobileMd:mt-0 tablet:mt-auto">
+          <div class="flex gap-6 tablet:gap-4 mt-3 -mb-1 mobileMd:mt-0 tablet:mt-1 tablet:mb-0">
             {socialLinks.map((link, index) => (
               <div key={index}>
                 {link.icon}
               </div>
             ))}
           </div>
-          <div class="hidden tablet:flex w-full mt-3 mb-1 tablet:mt-1 tablet:mb-0">
+          <div class="hidden tablet:flex w-full mt-3 mb-1 tablet:mt-auto tablet:mb-0">
             <h6 class={`${copyright}`}>
               <span class="italic">STAMPCHAIN</span> &copy; 2026
             </h6>

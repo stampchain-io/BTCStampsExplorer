@@ -73,7 +73,7 @@ export const SRC20OverviewHeader = ({
             onChange={handleTrendingClick}
             mode="single"
             size="xsR"
-            color="secondary"
+            color="neutral"
             className="mt-[3px] !text-xs tablet:!text-[10px]"
           />
         </div>

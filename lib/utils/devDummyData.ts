@@ -748,6 +748,14 @@ export const DUMMY_LANDING_PAGE = {
       (_, i) => ({ ..._stampBases[i % _stampBases.length] }),
     ),
   ),
+  stamps_posh: withDummyListingsData(
+    Array.from({ length: 14 }, () => ({ ...DUMMY_STAMP_POSH })),
+    DUMMY_STAMP_POSH_DISPENSER,
+  ),
+  stamps_src721: Array.from(
+    { length: 12 },
+    () => ({ ...DUMMY_STAMP_SRC721 }),
+  ),
   collectionData: [],
 };
 
