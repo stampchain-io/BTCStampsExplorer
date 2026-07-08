@@ -47,7 +47,10 @@ export const MarketplaceHeader = (
         stampType: type as FrontendStampType,
       };
 
-      const queryParams = filtersToQueryParams("", updatedFilters);
+      const queryParams = filtersToQueryParams(
+        globalThis.location.search,
+        updatedFilters,
+      );
       safeNavigate(
         getCurrentPathname() + (queryParams ? `?${queryParams}` : ""),
       );
@@ -57,6 +60,10 @@ export const MarketplaceHeader = (
 
   const handleMarketModeChange = useCallback(
     (mode: string) => {
+      if (typeof globalThis === "undefined" || !globalThis?.location) {
+        return;
+      }
+
       let updatedFilters: FilterStampFilters;
 
       if (mode === "sales") {
@@ -88,7 +95,10 @@ export const MarketplaceHeader = (
         };
       }
 
-      const queryParams = filtersToQueryParams("", updatedFilters);
+      const queryParams = filtersToQueryParams(
+        globalThis.location.search,
+        updatedFilters,
+      );
       safeNavigate(
         getCurrentPathname() + (queryParams ? `?${queryParams}` : ""),
       );

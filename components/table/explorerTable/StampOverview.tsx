@@ -102,7 +102,7 @@ export function StampOverviewRow({ stamp }: StampOverviewRowProps) {
                 class="w-6.5 h-6.5 object-contain rounded-xl pixelart"
               />
             )
-            : <PlaceholderImage variant="no-image" />}
+            : <PlaceholderImage variant="no-image" className="!rounded-xl" />}
         </a>
       </td>
 

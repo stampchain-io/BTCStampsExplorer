@@ -307,19 +307,29 @@ const FilterDrawer = (
     }
 
     const existingParams = new URLSearchParams(globalThis.location.search);
-    const baseParams = existingParams.get("type")
-      ? `type=${existingParams.get("type")}`
-      : "";
+    const typeParam = existingParams.get("type");
+    const viewParam = existingParams.get("view");
+    const sortParam = existingParams.get("sortBy");
+
+    const baseParams = typeParam ? `type=${typeParam}` : "";
+    // Preserve view mode + sort order across filter changes for pages that
+    // use them (stamp/marketplace carry "type" too; explorer uses "section"
+    // instead of "type" so it omits that key).
+    const baseParamsWithView = [
+      baseParams,
+      viewParam && `view=${viewParam}`,
+      sortParam && `sortBy=${sortParam}`,
+    ].filter(Boolean).join("&");
 
     let queryParams: string;
     if (type === "stamp") {
       queryParams = stampFiltersToQueryParams(
-        baseParams,
+        baseParamsWithView,
         currentFilters as ExplorerStampFilters,
       );
     } else if (type === "marketplace") {
       queryParams = marketplaceFiltersToQueryParams(
-        baseParams,
+        baseParamsWithView,
         currentFilters as MarketplaceFilters,
       );
     } else if (type === "src20") {
@@ -328,8 +338,6 @@ const FilterDrawer = (
         currentFilters as SRC20Filters,
       );
     } else if (type === "explorer") {
-      const viewParam = existingParams.get("view");
-      const sortParam = existingParams.get("sortBy");
       const base = [
         viewParam && `view=${viewParam}`,
         sortParam && `sortBy=${sortParam}`,

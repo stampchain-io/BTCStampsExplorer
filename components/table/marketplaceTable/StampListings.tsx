@@ -120,7 +120,7 @@ export function StampListingsRow({ stamp }: StampListingsRowProps) {
                 class="w-6.5 h-6.5 object-contain rounded-xl pixelart"
               />
             )
-            : <PlaceholderImage variant="no-image" />}
+            : <PlaceholderImage variant="no-image" className="!rounded-xl" />}
         </a>
       </td>
 
