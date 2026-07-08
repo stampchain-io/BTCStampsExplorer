@@ -219,7 +219,7 @@ export function ToolsButton({ onOpenDrawer, data }: ToolsButtonProps) {
       <div class="flex flex-col space-y-1 w-full">
         {/* Header row */}
         <h6
-          class={`pb-1 ${eyebrowNeutral} !text-sm tablet:!text-[0.625rem] text-center`}
+          class={`pb-1 ${eyebrowNeutral} text-center`}
         >
           TRANSACTION FEES
         </h6>

@@ -1,5 +1,5 @@
 import { Icon } from "$icon";
-import { containerStickyBottom } from "$layout";
+import { container3, containerStickyBottom } from "$layout";
 import {
   labelXs,
   navLinkActiveMobile,
@@ -174,7 +174,7 @@ export function MenuButton({ onOpenDrawer }: MenuButtonProps) {
         {/* Bottom - Sub navigation and version */}
         <div class={containerStickyBottom}>
           {subnavigation()}
-          <div class="flex items-end -mb-1.5 mt-3">
+          <div class={`${container3} flex items-end -mb-1.5 mt-3 px-3 py-2`}>
             <CounterpartyVersion />
           </div>
         </div>
