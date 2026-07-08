@@ -5,12 +5,10 @@ FROM denoland/deno:alpine-2.6.9
 ENV HOME=/app \
     DENO_DIR=/app/.deno \
     DENO_ENV=production \
-    NODE_DEBUG=* \
     XDG_CONFIG_HOME=/app/.config \
     XDG_CACHE_HOME=/app/.cache \
     XDG_DATA_HOME=/app/.local/share \
-    NPM_CONFIG_CACHE=/app/.npm \
-    REDIS_LOG_LEVEL=DEBUG
+    NPM_CONFIG_CACHE=/app/.npm
 
 # Install minimal runtime tools (Chromium removed — preview rendering offloaded to CF Worker)
 RUN apk add --no-cache \
@@ -51,10 +49,16 @@ USER deno
 # Build Fresh assets and ensure they're available
 RUN DENO_ENV=production deno run --allow-all main.ts build || (echo "Build failed" && exit 1)
 
-# Cache dependencies with proper error handling (without lock file)
+# Cache dependencies against the committed lockfile. --frozen=true forces deno
+# to fail the build if deno.lock is missing, out-of-date, or any integrity hash
+# doesn't match — defends against silent transitive-dep replacement (the npm
+# supply-chain attack class). To regenerate the lock after intentional dep
+# updates: `deno cache --lock=deno.lock main.ts` locally, commit deno.lock.
+# Optionally add --minimum-dependency-age=P7D when updating deps to filter out
+# packages published in the last 7 days (Deno 2.6+ unstable flag).
 RUN DENO_DIR=/app/.deno \
     NPM_CONFIG_CACHE=/app/.npm \
-    deno cache --reload main.ts || (echo "Cache failed" && exit 1)
+    deno cache --frozen=true main.ts || (echo "Cache failed — lockfile mismatch or missing? Run 'deno cache --lock=deno.lock main.ts' locally and recommit." && exit 1)
 
 # Ensure _fresh directory is present and has correct permissions
 RUN ls -la /app/_fresh 2>/dev/null || echo "Warning: _fresh directory not found after build"
@@ -75,7 +79,6 @@ ENV DENO_PERMISSIONS="--allow-net --allow-read --allow-write --allow-env --allow
     SKIP_REDIS_TLS=true \
     DENO_ENV=production \
     CACHE=true \
-    REDIS_DEBUG=true \
     REDIS_TIMEOUT=15000 \
     REDIS_MAX_RETRIES=10
 

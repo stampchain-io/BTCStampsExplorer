@@ -1,6 +1,5 @@
 # BITCOIN STAMPS EXPLORER AND API
 
-[![codecov](https://codecov.io/gh/stampchain-io/stampchain.io/graph/badge.svg?token=4AEWJ1OMM2)](https://codecov.io/gh/stampchain-io/stampchain.io)
 [![Code Quality](https://github.com/stampchain-io/stampchain.io/actions/workflows/deploy.yml/badge.svg)](https://github.com/stampchain-io/stampchain.io/actions/workflows/deploy.yml)
 [![Unit Tests](https://github.com/stampchain-io/stampchain.io/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/stampchain-io/stampchain.io/actions/workflows/unit-tests.yml)
 [![Integration Tests](https://github.com/stampchain-io/stampchain.io/actions/workflows/integration-tests.yml/badge.svg)](https://github.com/stampchain-io/stampchain.io/actions/workflows/integration-tests.yml)

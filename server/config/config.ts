@@ -9,6 +9,10 @@ type ServerConfig = {
   readonly CSRF_SECRET_KEY?: string;
   readonly MINTING_SERVICE_FEE_ENABLED: string;
   readonly MINTING_SERVICE_FEE_FIXED_SATS: string;
+  // Canonical service-fee defaults (env-backed, single source of truth).
+  // Callers that want the parsed typed values should use getServiceFeeConfig().
+  readonly SERVICE_FEE_SATS: string;
+  readonly SERVICE_FEE_ADDRESS: string;
   readonly OPENSTAMP_API_KEY: string;
   readonly API_KEY?: string;
   readonly QUICKNODE_ENDPOINT?: string;
@@ -32,6 +36,8 @@ type ServerConfig = {
   readonly INTERNAL_API_SECRET?: string;
   readonly CF_ACCESS_CLIENT_ID?: string;
   readonly CF_ACCESS_CLIENT_SECRET?: string;
+  readonly CLOUDFLARE_ZONE_ID?: string;
+  readonly CLOUDFLARE_API_TOKEN?: string;
   // Development & debugging
   readonly DEV_BASE_URL: string;
   readonly PROD_BASE_URL: string | undefined;
@@ -66,8 +72,24 @@ const serverConfig: ServerConfig = {
   get APP_ROOT() {
     return Deno.cwd();
   },
-  MINTING_SERVICE_FEE_ENABLED: "0",
-  MINTING_SERVICE_FEE_FIXED_SATS: "0",
+  // Env-backed getters: both default to "0" / "" so the service fee is
+  // disabled out of the box (safe default; operators opt-in via env vars).
+  get MINTING_SERVICE_FEE_ENABLED() {
+    return Deno.env.get("MINTING_SERVICE_FEE_ENABLED") || "0";
+  },
+  get MINTING_SERVICE_FEE_FIXED_SATS() {
+    return Deno.env.get("MINTING_SERVICE_FEE_FIXED_SATS") || "0";
+  },
+  // SERVICE_FEE_SATS / SERVICE_FEE_ADDRESS are the canonical env-backed
+  // defaults for the operator service fee (aliases of the MINTING_SERVICE_FEE_*
+  // env vars, kept under a single consistent name for cross-route use).
+  // Parse and type these values via getServiceFeeConfig().
+  get SERVICE_FEE_SATS() {
+    return Deno.env.get("MINTING_SERVICE_FEE_FIXED_SATS") || "0";
+  },
+  get SERVICE_FEE_ADDRESS() {
+    return Deno.env.get("MINTING_SERVICE_FEE_ADDRESS") || "";
+  },
 
   get IMAGES_SRC_PATH() {
     return Deno.env.get("IMAGES_SRC_PATH") || "";
@@ -143,6 +165,12 @@ const serverConfig: ServerConfig = {
   },
   get CF_ACCESS_CLIENT_SECRET() {
     return Deno.env.get("CF_ACCESS_CLIENT_SECRET") || "";
+  },
+  get CLOUDFLARE_ZONE_ID() {
+    return Deno.env.get("CLOUDFLARE_ZONE_ID") || "";
+  },
+  get CLOUDFLARE_API_TOKEN() {
+    return Deno.env.get("CLOUDFLARE_API_TOKEN") || "";
   },
   // Development & debugging
   get DEV_BASE_URL() {
@@ -235,5 +263,33 @@ export function getClientConfig() {
     MINTING_SERVICE_FEE_ADDRESS: serverConfig.MINTING_SERVICE_FEE_ADDRESS,
     DEBUG_NAMESPACES: serverConfig.DEBUG_NAMESPACES,
     IS_DEBUG_ENABLED: serverConfig.IS_DEBUG_ENABLED,
+  };
+}
+
+/**
+ * Return the operator service-fee defaults with their canonical types.
+ *
+ * These are the ENV-ONLY defaults. Each call site that supports a body/options
+ * override must apply that override BEFORE calling the buildServiceFeeOutputs()
+ * helper — see the precedence comment in routes/api/v2/trx/stampattach.ts.
+ *
+ * Precedence (highest → lowest, documented once here):
+ *   1. request body field  (e.g. body.service_fee)
+ *   2. options field       (e.g. options.service_fee)
+ *   3. env default         (MINTING_SERVICE_FEE_FIXED_SATS / MINTING_SERVICE_FEE_ADDRESS)
+ *
+ * Returns:
+ *   serviceFeeSats  — fee in satoshis as bigint (0n when the env var is absent
+ *                     or "0", meaning the service fee is disabled by default).
+ *   serviceFeeAddress — destination address string ("" when not configured).
+ */
+export function getServiceFeeConfig(): {
+  serviceFeeSats: bigint;
+  serviceFeeAddress: string;
+} {
+  const sats = parseInt(serverConfig.SERVICE_FEE_SATS, 10);
+  return {
+    serviceFeeSats: BigInt(Number.isFinite(sats) && sats > 0 ? sats : 0),
+    serviceFeeAddress: serverConfig.SERVICE_FEE_ADDRESS,
   };
 }

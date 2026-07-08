@@ -12,12 +12,12 @@ import { hex2bin } from "$lib/utils/data/binary/baseUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { estimateMintingTransactionSize } from "$lib/utils/bitcoin/minting/transactionSizes.ts";
 import { extractOutputs } from "$lib/utils/bitcoin/minting/transactionUtils.ts";
+import { opReturnDecodesFromInput } from "$lib/utils/bitcoin/minting/counterpartyInputs.ts";
 import { getScriptTypeInfo } from "$lib/utils/bitcoin/scripts/scriptTypeUtils.ts";
-import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
-import { OptimalUTXOSelection } from "$server/services/utxo/optimalUtxoSelection.ts";
+import { BitcoinUtxoManager } from "$server/services/transaction/bitcoinUtxoManager.ts";
 import type { ScriptType, UTXO } from "$types/base.d.ts";
-import { toBasicUTXOs, safeUTXOValue } from "$lib/utils/bitcoin/utxo/utxoTypeUtils.ts";
+import { safeUTXOValue } from "$lib/utils/bitcoin/utxo/utxoTypeUtils.ts";
 import * as bitcoin from "bitcoinjs-lib";
 import { Buffer } from "node:buffer";
 
@@ -47,6 +47,9 @@ export interface BitcoinTransactionGenerationResult {
 
 export class GeneralBitcoinTransactionBuilder {
   private static commonUtxoService = new CommonUTXOService();
+  // Canonical UTXO selector (same path stamp issuance uses). Selects on basic
+  // UTXOs then batch-fetches scripts ONLY for the selected ones.
+  private static utxoService = new BitcoinUtxoManager();
 
   /**
    * Universal PSBT generator for all Counterparty operations
@@ -169,60 +172,68 @@ export class GeneralBitcoinTransactionBuilder {
         });
       }
 
-      // Get UTXOs for funding
-      const fullUTXOs = await this.getFullUTXOsWithDetails(address, true, []);
-
-      if (fullUTXOs.length === 0) {
-        throw new Error(`No UTXOs available for ${operationType} operation`);
-      }
-
-      // Convert vouts for UTXO selection
-      const outputsForSelection = vouts.map(vout => ({
+      // Select funding UTXOs via the canonical BitcoinUtxoManager — the same
+      // path stamp issuance uses. It selects on basic UTXOs then batch-fetches
+      // scripts ONLY for the selected inputs (and hard-errors if a script is
+      // missing). The previous getFullUTXOsWithDetails fetched every UTXO's
+      // script up front AND then discarded them (script: undefined) before
+      // selection, so selected inputs were always scriptless -> "missing script"
+      // at addInput, which broke fairmint/detach entirely.
+      const outputsForSelection = vouts.map((vout) => ({
         value: vout.value,
-        script: vout.script ? Buffer.from(vout.script).toString('hex') : "",
-        ...(vout.address && { address: vout.address })
+        script: vout.script ? Buffer.from(vout.script).toString("hex") : "",
+        ...(vout.address && { address: vout.address }),
       }));
 
-      // Convert UTXOs to BasicUTXOs for the selection algorithm
-      const importedBasicUTXOs = toBasicUTXOs(fullUTXOs);
+      const selectionResult = await GeneralBitcoinTransactionBuilder.utxoService
+        .selectUTXOsForTransaction(
+          address,
+          outputsForSelection,
+          satsPerVB,
+          0, // sigops_rate
+          1.5, // rbfBuffer
+          { filterStampUTXOs: true, includeAncestors: true },
+        );
 
-      if (importedBasicUTXOs.length === 0) {
-        throw new Error(`No valid UTXOs available for ${operationType} operation`);
+      // Pin Counterparty's vin[0] (the ARC4 OP_RETURN key input) at PSBT index 0.
+      // CP encrypts the OP_RETURN against the txid of ITS first input, and the
+      // indexer derives the ARC4 key ONLY from vin[0]. extractOutputs() above
+      // discarded CP's inputs and we re-selected our own, so we must re-attach
+      // CP's vin[0] at index 0 or the issuance is silently dropped by the indexer
+      // (same failure mode as the pre-fix stamp issuance bug). Funding UTXOs are
+      // appended after it.
+      let inputs: UTXO[] = [...selectionResult.inputs];
+      const cpVin0 = (txObj.ins && txObj.ins.length > 0)
+        ? {
+          txid: Buffer.from(txObj.ins[0].hash).reverse().toString("hex"),
+          vout: txObj.ins[0].index,
+        }
+        : undefined;
+      if (cpVin0) {
+        const idx = inputs.findIndex(
+          (i) => i.txid === cpVin0.txid && i.vout === cpVin0.vout,
+        );
+        if (idx > 0) {
+          // Selected but not first — move it to index 0.
+          const [pin] = inputs.splice(idx, 1);
+          inputs = [pin, ...inputs];
+        } else if (idx === -1) {
+          // Not in our selection — fetch its details and prepend (adds funding).
+          const pinUtxo = await this.commonUtxoService.getSpecificUTXO(
+            cpVin0.txid,
+            cpVin0.vout,
+            { includeAncestorDetails: true },
+          );
+          if (!pinUtxo || !pinUtxo.script || pinUtxo.value === undefined) {
+            throw new Error(
+              `Failed to fetch Counterparty vin[0] UTXO ${cpVin0.txid}:${cpVin0.vout} ` +
+                `required for ARC4 key alignment of ${operationType}.`,
+            );
+          }
+          inputs = [pinUtxo, ...inputs];
+        }
+        // idx === 0: already first — nothing to do.
       }
-
-      // Convert to the local BasicUTXO interface expected by OptimalUTXOSelection
-      const basicUTXOs = importedBasicUTXOs.map(utxo => {
-        const localBasicUTXO: any = {
-          txid: utxo.txid,
-          vout: utxo.vout,
-          value: utxo.value,
-          script: undefined,
-          scriptType: undefined,
-          scriptDesc: undefined,
-          confirmations: undefined
-        };
-        
-        // Only include address if it exists and is not undefined
-        if (utxo.address !== undefined) {
-          localBasicUTXO.address = utxo.address;
-        }
-        
-        return localBasicUTXO;
-      });
-
-      // Select optimal UTXOs
-      const selectionResult = OptimalUTXOSelection.selectUTXOs(
-        basicUTXOs,
-        outputsForSelection,
-        satsPerVB,
-        {
-          avoidChange: true,
-          consolidationMode: false,
-          dustThreshold: 1000
-        }
-      );
-
-      const { inputs } = selectionResult;
       const totalInputValue = inputs.reduce((sum: number, input: UTXO) => sum + safeUTXOValue(input), 0);
 
       // Recalculate with actual inputs
@@ -330,6 +341,26 @@ export class GeneralBitcoinTransactionBuilder {
         size: actualEstimatedSize
       });
 
+      // Fail-closed ARC4 guard: if the Counterparty transaction carries an
+      // (ARC4-encrypted) OP_RETURN, it MUST decode from vin[0]. inputs[0] is
+      // vin[0] (added to the PSBT in array order above, with CP's vin[0] pinned
+      // first). Abort rather than emit an unindexable ${operationType}.
+      if (inputs.length > 0) {
+        const opReturnVout = vouts.find(
+          (v) => v.script instanceof Uint8Array && v.script[0] === 0x6a,
+        );
+        if (opReturnVout && opReturnVout.script instanceof Uint8Array) {
+          const opReturnHex = Buffer.from(opReturnVout.script).toString("hex");
+          if (!opReturnDecodesFromInput(opReturnHex, inputs[0].txid)) {
+            throw new Error(
+              `ARC4 key mismatch for ${operationType}: OP_RETURN does not decode ` +
+                `from vin[0] (${inputs[0].txid}). Aborting to avoid broadcasting an ` +
+                `unindexable Counterparty transaction.`,
+            );
+          }
+        }
+      }
+
       return {
         psbt,
         estimatedTxSize: actualEstimatedSize,
@@ -350,72 +381,5 @@ export class GeneralBitcoinTransactionBuilder {
       });
       throw error;
     }
-  }
-
-  /**
-   * Get full UTXO details (copied from StampCreationService pattern)
-   */
-  private static async getFullUTXOsWithDetails(
-    address: string,
-    filterStampUTXOs: boolean = true,
-    excludeUtxos: Array<{ txid: string; vout: number }> = []
-  ): Promise<UTXO[]> {
-    let basicUtxos = await this.commonUtxoService.getSpendableUTXOs(address, undefined, {
-      includeAncestorDetails: true,
-      confirmedOnly: false
-    });
-
-    // Apply exclusions
-    if (excludeUtxos.length > 0) {
-      const excludeSet = new Set(excludeUtxos.map(u => `${u.txid}:${u.vout}`));
-      basicUtxos = basicUtxos.filter(utxo => !excludeSet.has(`${utxo.txid}:${utxo.vout}`));
-    }
-
-    // Filter stamp UTXOs if requested
-    if (filterStampUTXOs) {
-      try {
-        const stampBalances = await CounterpartyApiManager.getXcpBalancesByAddress(address, undefined, true);
-        const utxosToExcludeFromStamps = new Set<string>();
-        for (const balance of stampBalances.balances) {
-          if (balance.utxo) {
-            utxosToExcludeFromStamps.add(balance.utxo);
-          }
-        }
-        basicUtxos = basicUtxos.filter(
-          (utxo) => !utxosToExcludeFromStamps.has(`${utxo.txid}:${utxo.vout}`),
-        );
-      } catch (error) {
-        logger.error("api", {
-          message: "Error filtering stamp UTXOs",
-          address,
-          error: (error as any).message
-        });
-      }
-    }
-
-    // Get full details for all UTXOs
-    const fullUTXOs: UTXO[] = [];
-    for (const basicUtxo of basicUtxos) {
-      try {
-        const fullUtxo = await this.commonUtxoService.getSpecificUTXO(
-          basicUtxo.txid,
-          basicUtxo.vout,
-          { includeAncestorDetails: true }
-        );
-
-        if (fullUtxo && fullUtxo.script && fullUtxo.value !== undefined && fullUtxo.value > 0) {
-          fullUTXOs.push(fullUtxo);
-        }
-      } catch (error) {
-        logger.warn("api", {
-          message: "Skipping UTXO due to fetch error",
-          txid: basicUtxo.txid,
-          vout: basicUtxo.vout,
-          error: (error as any).message
-        });
-      }
-    }
-
-    return fullUTXOs;
   }
 }

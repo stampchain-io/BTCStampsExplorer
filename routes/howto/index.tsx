@@ -27,6 +27,38 @@ export default function HowToPage() {
         </p>
       </section>
 
+      {/* ===== HOW TO BUY GUIDE ===== */}
+      <section class={containerBackground}>
+        <div
+          class={`grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 ${containerGap}`}
+        >
+          <img
+            src="/img/how-tos/stamping/00.png"
+            width="100%"
+            alt="How to buy Bitcoin Stamps and SRC-20 tokens such as KEVIN"
+            class="rounded-2xl"
+          />
+          <div class="flex flex-col desktop:col-span-2 gap-2">
+            <h2 class={`${headingGrey} mb-2`}>HOW TO BUY</h2>
+            <p class={text}>
+              There are two different kinds of Bitcoin Stamps assets, and you
+              buy them in different places. Bitcoin Stamps are bought directly
+              on stampchain.io through dispensers, while SRC-20 tokens such as
+              KEVIN are traded on third-party marketplaces.
+            </p>
+            <p class={text}>
+              <a
+                href="/howto/buy"
+                f-partial="/howto/buy"
+                class="animated-underline mb-1.5"
+              >
+                Learn how to buy Bitcoin Stamps and SRC-20 tokens
+              </a>
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* ===== LEATHER WALLET CREATION GUIDE ===== */}
       <section class={containerBackground}>
         <div

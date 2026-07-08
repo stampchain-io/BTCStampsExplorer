@@ -1,4 +1,5 @@
 /* ===== LEATHER CREATE HOW-TO PAGE ===== */
+import { Head } from "$fresh/runtime.ts";
 import {
   Article,
   AuthorSection,
@@ -9,6 +10,26 @@ import {
   List,
   StepList,
 } from "$section";
+
+/* ===== JSON-LD STRUCTURED DATA (steps derived from the shared LEATHER_CREATE_WALLET_STEPS constant) ===== */
+const SUBTITLE = "CREATE A LEATHER WALLET";
+
+const flattenText = (description: string | string[]): string =>
+  Array.isArray(description) ? description.join("\n") : description;
+
+const howToLd = {
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": `How to ${SUBTITLE.toLowerCase()}`,
+  "description":
+    `A step-by-step guide to ${SUBTITLE.toLowerCase()} on stampchain.io.`,
+  "step": LEATHER_CREATE_WALLET_STEPS.map((step) => ({
+    "@type": "HowToStep",
+    "name": step.title,
+    "text": flattenText(step.description),
+    "image": step.image,
+  })),
+};
 
 /* ===== INTRODUCTION COMPONENT ===== */
 function IntroSection() {
@@ -59,14 +80,22 @@ function WalletSteps() {
 /* ===== MAIN PAGE COMPONENT ===== */
 export default function LeatherCreate() {
   return (
-    <Article
-      title="HOW-TO"
-      subtitle="CREATE A LEATHER WALLET"
-      headerImage="/img/how-tos/createleatherwallet/00.png"
-      importantNotes={LEATHER_CREATE_IMPORTANT_NOTES}
-    >
-      <IntroSection />
-      <WalletSteps />
-    </Article>
+    <>
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(howToLd) }}
+        />
+      </Head>
+      <Article
+        title="HOW-TO"
+        subtitle={SUBTITLE}
+        headerImage="/img/how-tos/createleatherwallet/00.png"
+        importantNotes={LEATHER_CREATE_IMPORTANT_NOTES}
+      >
+        <IntroSection />
+        <WalletSteps />
+      </Article>
+    </>
   );
 }

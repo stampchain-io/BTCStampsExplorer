@@ -55,6 +55,8 @@ import * as $api_v2_error from "./routes/api/v2/error.ts";
 import * as $api_v2_fairmint_compose from "./routes/api/v2/fairmint/compose.ts";
 import * as $api_v2_fairmint_index from "./routes/api/v2/fairmint/index.ts";
 import * as $api_v2_health from "./routes/api/v2/health.ts";
+import * as $api_v2_keys_index from "./routes/api/v2/keys/index.ts";
+import * as $api_v2_keys_usage from "./routes/api/v2/keys/usage.ts";
 import * as $api_v2_olga_estimate from "./routes/api/v2/olga/estimate.ts";
 import * as $api_v2_olga_mint from "./routes/api/v2/olga/mint.ts";
 import * as $api_v2_src101_deploy_hash_tokenid_ from "./routes/api/v2/src101/[deploy_hash]/[tokenid].ts";
@@ -94,6 +96,7 @@ import * as $api_v2_stamps_id_sends from "./routes/api/v2/stamps/[id]/sends.ts";
 import * as $api_v2_stamps_balance_address_ from "./routes/api/v2/stamps/balance/[address].tsx";
 import * as $api_v2_stamps_block from "./routes/api/v2/stamps/block.ts";
 import * as $api_v2_stamps_block_block_index_ from "./routes/api/v2/stamps/block/[block_index].ts";
+import * as $api_v2_stamps_dispensers_address_ from "./routes/api/v2/stamps/dispensers/[address].ts";
 import * as $api_v2_stamps_ident_ident_ from "./routes/api/v2/stamps/ident/[ident].ts";
 import * as $api_v2_stamps_index from "./routes/api/v2/stamps/index.ts";
 import * as $api_v2_stamps_search from "./routes/api/v2/stamps/search.ts";
@@ -120,6 +123,7 @@ import * as $handlers_sharedBlockWithStampsHandler from "./routes/handlers/share
 import * as $handlers_sharedCollectionHandler from "./routes/handlers/sharedCollectionHandler.ts";
 import * as $handlers_sharedContentHandler from "./routes/handlers/sharedContentHandler.ts";
 import * as $handlers_sharedStampHandler from "./routes/handlers/sharedStampHandler.ts";
+import * as $howto_buy_index from "./routes/howto/buy/index.tsx";
 import * as $howto_deploytoken_index from "./routes/howto/deploytoken/index.tsx";
 import * as $howto_index from "./routes/howto/index.tsx";
 import * as $howto_leatherconnect_index from "./routes/howto/leatherconnect/index.tsx";
@@ -388,6 +392,8 @@ const manifest = {
     "./routes/api/v2/fairmint/compose.ts": $api_v2_fairmint_compose,
     "./routes/api/v2/fairmint/index.ts": $api_v2_fairmint_index,
     "./routes/api/v2/health.ts": $api_v2_health,
+    "./routes/api/v2/keys/index.ts": $api_v2_keys_index,
+    "./routes/api/v2/keys/usage.ts": $api_v2_keys_usage,
     "./routes/api/v2/olga/estimate.ts": $api_v2_olga_estimate,
     "./routes/api/v2/olga/mint.ts": $api_v2_olga_mint,
     "./routes/api/v2/src101/[deploy_hash]/[tokenid].ts":
@@ -445,6 +451,8 @@ const manifest = {
     "./routes/api/v2/stamps/block.ts": $api_v2_stamps_block,
     "./routes/api/v2/stamps/block/[block_index].ts":
       $api_v2_stamps_block_block_index_,
+    "./routes/api/v2/stamps/dispensers/[address].ts":
+      $api_v2_stamps_dispensers_address_,
     "./routes/api/v2/stamps/ident/[ident].ts": $api_v2_stamps_ident_ident_,
     "./routes/api/v2/stamps/index.ts": $api_v2_stamps_index,
     "./routes/api/v2/stamps/search.ts": $api_v2_stamps_search,
@@ -474,6 +482,7 @@ const manifest = {
       $handlers_sharedCollectionHandler,
     "./routes/handlers/sharedContentHandler.ts": $handlers_sharedContentHandler,
     "./routes/handlers/sharedStampHandler.ts": $handlers_sharedStampHandler,
+    "./routes/howto/buy/index.tsx": $howto_buy_index,
     "./routes/howto/deploytoken/index.tsx": $howto_deploytoken_index,
     "./routes/howto/index.tsx": $howto_index,
     "./routes/howto/leatherconnect/index.tsx": $howto_leatherconnect_index,
