@@ -1,22 +1,35 @@
-<p align="center">
-  <img src="https://raw.githubusercontent.com/stampchain-io/stampchain.io/dev/static/img/github/stampchain-logo-banner-appicon.png" alt="Stampchain - Bitcoin Stamps Explorer and API">
-</p>
+<div align="center">
+  <img src="https://raw.githubusercontent.com/stampchain-io/stampchain.io/main/static/img/github/stampchain-github-hero.png" alt="Stampchain - Explorer and API" width="100%">
 
-[![Code Quality](https://github.com/stampchain-io/stampchain.io/actions/workflows/deploy.yml/badge.svg)](https://github.com/stampchain-io/stampchain.io/actions/workflows/deploy.yml)
-[![Unit Tests](https://github.com/stampchain-io/stampchain.io/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/stampchain-io/stampchain.io/actions/workflows/unit-tests.yml)
-[![Integration Tests](https://github.com/stampchain-io/stampchain.io/actions/workflows/integration-tests.yml/badge.svg)](https://github.com/stampchain-io/stampchain.io/actions/workflows/integration-tests.yml)
+### Stampchain - Explorer and API Endpoints
+
+&nbsp;
+
+[![Code Quality](https://github.com/stampchain-io/stampchain.io/actions/workflows/deploy.yml/badge.svg)](https://github.com/stampchain-io/stampchain.io/actions/workflows/deploy.yml)&nbsp;&nbsp;
+[![Unit Tests](https://github.com/stampchain-io/stampchain.io/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/stampchain-io/stampchain.io/actions/workflows/unit-tests.yml)&nbsp;&nbsp;
+[![Integration Tests](https://github.com/stampchain-io/stampchain.io/actions/workflows/integration-tests.yml/badge.svg)](https://github.com/stampchain-io/stampchain.io/actions/workflows/integration-tests.yml)&nbsp;&nbsp;
 [![TypeScript Type Checking](https://github.com/stampchain-io/stampchain.io/actions/workflows/type-check.yml/badge.svg)](https://github.com/stampchain-io/stampchain.io/actions/workflows/type-check.yml)
-[![Newman API Tests](https://github.com/stampchain-io/stampchain.io/actions/workflows/newman-comprehensive-tests.yml/badge.svg)](https://github.com/stampchain-io/stampchain.io/actions/workflows/newman-comprehensive-tests.yml)
-[![Docker Build Test](https://github.com/stampchain-io/stampchain.io/actions/workflows/docker-test.yml/badge.svg)](https://github.com/stampchain-io/stampchain.io/actions/workflows/docker-test.yml)
+
+[![Newman API Tests](https://github.com/stampchain-io/stampchain.io/actions/workflows/newman-comprehensive-tests.yml/badge.svg)](https://github.com/stampchain-io/stampchain.io/actions/workflows/newman-comprehensive-tests.yml)&nbsp;&nbsp;
+[![Docker Build Test](https://github.com/stampchain-io/stampchain.io/actions/workflows/docker-test.yml/badge.svg)](https://github.com/stampchain-io/stampchain.io/actions/workflows/docker-test.yml)&nbsp;&nbsp;
 [![Actionlint](https://github.com/stampchain-io/stampchain.io/actions/workflows/actionlint.yml/badge.svg)](https://github.com/stampchain-io/stampchain.io/actions/workflows/actionlint.yml)
+
+&nbsp;
+
+---
+
+</div>
+&nbsp;
+
+## 📋 Overview
 
 This is the official [block explorer](https://stampchain.io/) for Bitcoin Stamps, exposing a full set of API endpoints for exploring transactions and metadata. It works in conjunction with the [Bitcoin Stamps Indexer](https://github.com/stampchain-io/btc_stamps).
 
-## Security
+## 🔒 Security
 
 This is a Deno project. For security information including how npm development dependencies are handled, see [SECURITY.md](./SECURITY.md).
 
-## Features
+## ⚡️ Features
 
 - Full Bitcoin Stamps block explorer
 - API with OpenAPI/Swagger documentation
@@ -139,3 +152,14 @@ docker run -p 8000:8000 \
 ## License
 
 This project is licensed under the [AGPL-3.0 License](LICENSE.md).
+See [LICENSE](LICENSE) for full details.
+
+&nbsp;
+
+---
+
+<div align="center">
+
+Built with Bitcoin 🧡 Permanent by design
+
+</div>
