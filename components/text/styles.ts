@@ -25,12 +25,12 @@ export const logoPrimary = // used in footer
 /* ===== NAVIGATION STYLES ===== */
 // Header Navigation - Desktop
 export const navLinkDesktop =
-  `mt-0.5 font-normal tablet:font-normal text-sm tablet:text-xs uppercase
+  `mt-0.5 font-normal tablet:font-normal text-xs tablet:text-[0.625rem] uppercase
   text-color-neutral-400 group-hover:text-color-hover tracking-[0.01rem] ${transitionColors} cursor-pointer ${select}`;
 export const navLinkActiveDesktop =
   `${navLinkDesktop} !text-color-hover !cursor-default`;
 export const navSublinkDesktop =
-  `font-normal text-xs uppercase text-color-neutral-400 hover:text-color-hover tracking-tight ${transitionColors} cursor-pointer ${select}`; // used in WalletButton and ToolsButton for submenu links
+  `font-normal text-[0.625rem] uppercase text-color-neutral-400 hover:text-color-hover tracking-tight ${transitionColors} cursor-pointer ${select}`; // used in WalletButton and ToolsButton for submenu links
 export const navSublinkActiveDesktop =
   `${navSublinkDesktop} !text-color-hover !cursor-default`;
 
@@ -48,7 +48,7 @@ export const navSublinkActiveMobile =
 
 // Footer - transparent text - used with the navLinkFooterOverlay class
 export const navLinkFooter =
-  `font-normal text-[13px] tablet:text-xs uppercase hover:text-color-hover tracking-tight ${transitionColors} cursor-pointer ${select}`;
+  `font-normal text-[0.8125rem] tablet:text-xs uppercase hover:text-color-hover tracking-tight ${transitionColors} cursor-pointer ${select}`;
 export const navLinkFooterOverlay =
   `bg-gradient-to-b tablet:bg-gradient-to-r from-color-neutral-400 via-color-neutral-400 to-color-neutral-500 text-transparent bg-clip-text`;
 
@@ -88,7 +88,7 @@ export const headingPurpleLD =
 /* ======================================================================== */
 
 /* ===== BODY TEXT STYLES ===== */
-export const textXxs = `${textFont} text-[10px]`;
+export const textXxs = `${textFont} text-[0.625rem]`;
 export const textXs = `${textFont} text-xs`;
 export const textSm = `${textFont} text-sm`;
 export const textSmLink =
@@ -106,13 +106,13 @@ export const textLinkUnderline =
 /* ======================================================================== */
 
 /* ===== LABEL STYLES ===== */
-export const labelXxs = `${labelFont} text-[10px] ${select}`;
+export const labelXxs = `${labelFont} text-[0.625rem] ${select}`;
 export const labelXs = `${labelFont} text-xs ${select}`;
 export const labelSm = `${labelFont} text-sm ${select}`;
 export const label = `${labelFont} text-base ${select}`;
 export const labelLg = `${labelFont} text-lg ${select}`;
 export const labelXl = `${labelFont} text-xl ${select}`;
-export const labelXsR = `${labelFont} text-xs tablet:text-[10px] ${select}`; // used for the filter file type labels
+export const labelXsR = `${labelFont} text-xs tablet:text-[0.625rem] ${select}`; // used for the filter file type labels
 export const labelLightSm = `font-light text-sm text-color-grey ${select}`;
 export const labelSmPurple =
   `font-light text-sm text-color-purple-light tracking-wide mb-0.5 ${select}`;
@@ -222,7 +222,7 @@ export const cardStampNumberMinimal =
   `max-w-full font-black text-xs mobileLg:text-sm
   text-color-neutral-400 hover:text-color-hover truncate ${select}`;
 export const cardPriceMinimal =
-  `font-normal text-[10px] mobileLg:text-xs text-color-secondary-400 truncate text-nowrap ${select}`;
+  `font-normal text-[0.625rem] mobileLg:text-xs text-color-secondary-400 truncate text-nowrap ${select}`;
 
 /* ===== UNCATEGORIZED STYLES ===== */
 // Add any new styles you cannot categorize here

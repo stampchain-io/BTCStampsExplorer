@@ -63,10 +63,10 @@ export function ViewButton(
     : "cardVertical";
 
   const iconName = viewMode === "cardSquare"
-    ? "viewCardMinimal"
+    ? "viewCardSquare"
     : viewMode === "cardRow"
-    ? "viewRow"
-    : "viewCardDetail";
+    ? "viewCardRow"
+    : "viewCardVertical";
 
   const ariaLabel = viewMode === "cardVertical"
     ? "Switch to minimal grid view"
