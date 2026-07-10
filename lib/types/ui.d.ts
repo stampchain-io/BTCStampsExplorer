@@ -1540,48 +1540,77 @@ export interface GearIconProps {
 // THEME AND DESIGN SYSTEM TYPES
 // =============================================================================
 
+/* NOT INITIALIZED IN THE CODEBASE */
+
 /**
- * Color palette definition for the design system
+ * A standard 50-950 color scale, matching the shape used by the
+ * `primary`, `secondary`, and status colors in tailwind.config.ts.
+ */
+export interface ColorScale {
+  50: string;
+  100: string;
+  200: string;
+  300: string;
+  400: string;
+  500: string;
+  600: string;
+  700: string;
+  800: string;
+  900: string;
+  950: string;
+}
+
+/**
+ * A status color scale as defined in tailwind.config.ts - a full numeric
+ * ColorScale plus the legacy dark/semidark/DEFAULT/semilight/light aliases.
+ */
+export interface StatusColorScale extends ColorScale {
+  dark: string;
+  semidark: string;
+  DEFAULT: string;
+  semilight: string;
+  light: string;
+}
+
+/**
+ * Color palette definition for the design system.
+ * Mirrors the actual color tokens defined in tailwind.config.ts
+ * (theme.extend.colors.color).
  */
 export interface ColorPalette {
-  // Primary colors
-  primary: {
-    50: string;
-    100: string;
-    200: string;
-    300: string;
-    400: string;
-    500: string;
-    600: string;
-    700: string;
-    800: string;
-    900: string;
+  // Grayscale, 0-1000 (includes pure white/black endpoints)
+  neutral: ColorScale & { 0: string; 1000: string };
+
+  // Brand primary (fuchsia)
+  primary: ColorScale;
+
+  // Brand secondary (orange)
+  secondary: ColorScale;
+
+  // Status colors - named red/green/orange in tailwind.config.ts,
+  // not success/warning/error/info
+  status: {
+    red: StatusColorScale;
+    green: StatusColorScale;
+    orange: StatusColorScale;
   };
 
-  // Bitcoin Stamps brand colors
-  stamp: {
+  // Surface tokens
+  background: string;
+  border: string;
+  hover: string;
+
+  /**
+   * @deprecated Legacy Bitcoin Stamps purple/grey aliases. tailwind.config.ts
+   * marks these "refactor and delete" - prefer `primary`/`neutral` instead.
+   */
+  stamp?: {
     purple: string;
     "purple-dark": string;
     "purple-light": string;
-    "purple-highlight": string;
     grey: string;
     "grey-dark": string;
     "grey-light": string;
-  };
-
-  // Semantic colors
-  semantic: {
-    success: string;
-    warning: string;
-    error: string;
-    info: string;
-  };
-
-  // Neutral colors
-  neutral: {
-    white: string;
-    black: string;
-    transparent: string;
   };
 }
 

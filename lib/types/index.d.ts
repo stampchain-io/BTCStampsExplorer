@@ -216,6 +216,7 @@ export type {
   ChartWidgetProps,
   // Theme and styling
   ColorPalette,
+  ColorScale,
   ComponentWithChildren,
   ContainerProps,
   EmptyStateProps,
@@ -249,6 +250,7 @@ export type {
   SharedListProps,
   SpacingScale,
   SRC20CardSize,
+  StatusColorScale,
   // Gallery and card types
   // Table and display types
   TableColumn,
