@@ -4,7 +4,7 @@ import { StampCard } from "$card";
 import { BREAKPOINTS } from "$constants";
 import { SortButton } from "$islands/button/SortButton.tsx";
 import { useLoadingSkeleton } from "$lib/hooks/useLoadingSkeleton.ts";
-import { subtitleNeutral, titleNeutral } from "$text";
+import { subtitlePrimary, titlePrimary } from "$text";
 import type { StampGalleryProps, StampRow } from "$types/stamp.d.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
 import Swiper from "swiper";
@@ -14,11 +14,9 @@ import { Autoplay, Navigation } from "swiper/modules";
 export default function StampGallery({
   title,
   subTitle,
-  type,
   stamps,
   layout = "grid",
   isRecentSales = false,
-  filterBy,
   variant = "cardSquare",
   gridClass,
   displayCounts,
@@ -41,38 +39,16 @@ export default function StampGallery({
   };
 
   /* ===== DATA PROCESSING ===== */
-  // Filter stamps based on filterBy prop if provided
-  const filteredStamps = filterBy
-    ? (stamps || []).filter((stamp) => {
-      if (Array.isArray(filterBy)) {
-        // Handle array of filters
-        return filterBy.some((filter) => {
-          switch (filter) {
-            case "pixel":
-              return stamp.stamp_mimetype.includes("image");
-            case "vector":
-              return stamp.stamp_mimetype === "image/svg+xml";
-            case "for sale":
-              return stamp.unbound_quantity > 0;
-            case "trending sales":
-              return stamp.recentSalePrice !== undefined;
-            case "sold":
-              return stamp.sale_data !== undefined;
-            case "recursive":
-              return stamp.stamp_mimetype === "text/html";
-            default:
-              return true;
-          }
-        });
-      }
-      return true;
-    })
-    : stamps || [];
+  const filteredStamps = stamps || [];
 
   // Apply layout-specific styling - @baba-check gap
   const containerClass = layout === "grid" ? gridClass : "flex flex-col gap-4"; // Row layout default styling
-  const seeAllLink = viewAllLink ||
-    (type === "all" ? "/stamp" : `/stamp?type=${type}`);
+
+  // Shared key derivation for both the swiper and grid render branches
+  const getStampKey = (stamp: StampRow, index: number) =>
+    isRecentSales && stamp.sale_data
+      ? `${stamp.tx_hash}-${stamp.sale_data.tx_hash}-${index}`
+      : `${stamp.tx_hash}-${index}`;
 
   /* ===== EFFECTS ===== */
   // Update display count based on window width
@@ -160,20 +136,7 @@ export default function StampGallery({
                 alignRight && "tablet:items-end"
               }`}
             >
-              <h1
-                class={`${
-                  alignRight ? titleNeutral : titleNeutral
-                } tablet:hidden`}
-              >
-                {title}
-              </h1>
-              <h1
-                class={`hidden tablet:block ${
-                  alignRight
-                    ? `${titleNeutral} !bg-gradient-to-l`
-                    : titleNeutral
-                }`}
-              >
+              <h1 class={titlePrimary}>
                 {title}
               </h1>
             </div>
@@ -184,7 +147,7 @@ export default function StampGallery({
                 alignRight && "tablet:items-end"
               }`}
             >
-              <h2 class={subtitleNeutral}>
+              <h2 class={subtitlePrimary}>
                 {subTitle}
               </h2>
             </div>
@@ -200,8 +163,8 @@ export default function StampGallery({
       </div>
 
       {/* ===== STAMP CONTENT ===== */}
-      {((viewAllLink && viewAllLink !== "/stamp/art" &&
-          viewAllLink !== "/collection/posh" && fromPage == "home") ||
+      {((viewAllLink && viewAllLink !== "/collection/posh" &&
+          fromPage == "home") ||
           fromPage === "stamp_detail")
         ? (
           <div class="swiper-container overflow-hidden">
@@ -210,9 +173,7 @@ export default function StampGallery({
                 filteredStamps.map((stamp: StampRow, index: number) => (
                   <div
                     class="swiper-slide"
-                    key={isRecentSales && stamp.sale_data
-                      ? `${stamp.tx_hash}-${stamp.sale_data.tx_hash}-${index}`
-                      : `${stamp.tx_hash}-${index}`}
+                    key={getStampKey(stamp, index)}
                   >
                     <StampCard
                       stamp={stamp}
@@ -249,9 +210,7 @@ export default function StampGallery({
                   index: number,
                 ) => (
                   <div
-                    key={isRecentSales && stamp.sale_data
-                      ? `${stamp.tx_hash}-${stamp.sale_data.tx_hash}-${index}`
-                      : `${stamp.tx_hash}-${index}`}
+                    key={getStampKey(stamp, index)}
                   >
                     <StampCard
                       stamp={stamp}
@@ -265,7 +224,7 @@ export default function StampGallery({
         )}
 
       {/* ===== NAVIGATION CONTROLS ===== */}
-      {viewAllLink && <ViewAllButton href={seeAllLink} />}
+      {viewAllLink && <ViewAllButton href={viewAllLink} />}
 
       {pagination && pagination.totalPages > 1 && (
         <div class="mt-7.5 tablet:mt-10">

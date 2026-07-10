@@ -14,11 +14,9 @@ import {
 } from "$lib/utils/devDummyData.ts";
 import {
   GetStampingCta,
-  PartnersBanner,
   SRC20Gallery,
   StampchainContactCta,
   StampOverviewGallery,
-  StampSalesGallery,
 } from "$section";
 import { StampController } from "$server/controller/stampController.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
@@ -339,26 +337,12 @@ export default function Home({ data }: PageProps<HomePageData>) {
             stamps_posh={stamps_posh}
             stamps_src721={stamps_src721}
             collectionData={collectionData}
+            recentSalesData={recentSalesData?.data || []}
           />
         </div>
 
         {/* ===== BELOW FOLD CONTENT - LAZY LOAD ===== */}
         <div style="content-visibility: auto; contain-intrinsic-size: 0 800px;">
-          <div class="flex flex-col">
-            <StampSalesGallery
-              title="RECENT SALES"
-              subTitle="HOT STAMPS"
-              variant="home"
-              initialData={recentSalesData?.data || []}
-              displayCounts={{
-                mobileSm: 3,
-                mobileMd: 4,
-                mobileLg: 5,
-                tablet: 6,
-                desktop: 7,
-              }}
-            />
-          </div>
           <div class="my-6 mobileLg:my-9">
             <GetStampingCta />
           </div>
@@ -391,7 +375,6 @@ export default function Home({ data }: PageProps<HomePageData>) {
 
         <div class={`flex flex-col ${containerGap}`}>
           <StampchainContactCta />
-          <PartnersBanner />
         </div>
       </div>
     </>

@@ -1,7 +1,6 @@
 /* ===== STAMP OVERVIEW GALLERY COMPONENT ===== */
 import { containerBackground, containerGap } from "$layout";
-import { StampGallery } from "$section";
-import { titleNeutral } from "$text";
+import { StampGallery, StampSalesGallery } from "$section";
 import type {
   StampGalleryProps,
   StampOverviewGalleryProps,
@@ -13,75 +12,36 @@ export function StampOverviewGallery({
   stamps_art = [],
   stamps_posh = [],
   collectionData: _collectionData = [],
+  recentSalesData = [],
 }: StampOverviewGalleryProps) {
-  /* ===== SECTION CONFIGURATIONS ===== */
-  const LatestArtStampsSection: StampGalleryProps[] = [
-    {
-      subTitle: "CLASSIC",
-      type: "classic",
-      stamps: stamps_art,
-      fromPage: "home",
-      layout: "grid",
-      variant: "cardSquare" as const,
-      viewAllLink: "/stamp/art",
-      gridClass: `
-        grid w-full gap-6
-        grid-cols-2 mobileMd:grid-cols-3 mobileLg:grid-cols-4 tablet:grid-cols-5 desktop:grid-cols-6
-        auto-rows-fr
-      `,
-      displayCounts: {
-        mobileSm: 8,
-        mobileMd: 12,
-        mobileLg: 16,
-        tablet: 20,
-        desktop: 24,
-      },
-    },
-  ];
+  /* ===== SECTION CONFIGURATION ===== */
+  // Combine Classic, Posh, and Recursive stamps into a single gallery,
+  // sorted by recency (tx_index) so the latest stamps across all types
+  // surface first regardless of which type they belong to.
+  const combinedStamps = [...stamps_art, ...stamps_posh, ...stamps_src721]
+    .sort((a, b) => (b.tx_index ?? 0) - (a.tx_index ?? 0));
 
-  const CollectionsSection: StampGalleryProps[] = [
-    {
-      subTitle: "FRESH POSH STAMPS",
-      type: "posh",
-      stamps: stamps_posh,
-      fromPage: "home",
-      layout: "grid",
-      variant: "cardSquare" as const,
-      viewAllLink: "/collection/posh",
-      gridClass: `
-        grid w-full gap-3 mobileMd:gap-6
-        grid-cols-2 mobileMd:grid-cols-3 mobileLg:grid-cols-4 tablet:grid-cols-6 desktop:grid-cols-7
-        auto-rows-fr
-      `,
-      displayCounts: {
-        mobileSm: 4,
-        mobileMd: 6,
-        mobileLg: 8,
-        tablet: 12,
-        desktop: 14,
-      },
+  const CombinedArtStampsSection: StampGalleryProps = {
+    title: "ART STAMPS",
+    subTitle: "LATEST CREATIONS",
+    type: "all",
+    stamps: combinedStamps,
+    layout: "grid",
+    variant: "cardSquare" as const,
+    viewAllLink: "/explorer?section=stamps",
+    gridClass: `
+      grid w-full gap-6
+      grid-cols-2 mobileMd:grid-cols-3 mobileLg:grid-cols-4 tablet:grid-cols-5 desktop:grid-cols-6
+      auto-rows-fr
+    `,
+    displayCounts: {
+      mobileSm: 4,
+      mobileMd: 6,
+      mobileLg: 8,
+      tablet: 10,
+      desktop: 12,
     },
-    {
-      subTitle: "RECENT RECURSIVE",
-      filterBy: "recursive",
-      stamps: stamps_src721,
-      fromPage: "home",
-      layout: "grid",
-      variant: "cardSquare" as const,
-      viewAllLink: "/collection/recursive",
-      gridClass: `
-        grid w-full gap-3 mobileMd:gap-6
-        grid-cols-4 mobileLg:grid-cols-5 tablet:grid-cols-6 desktop:grid-cols-6
-        auto-rows-fr
-      `,
-      displayCounts: {
-        mobileSm: 8,
-        mobileLg: 10,
-        tablet: 12,
-        desktop: 12,
-      },
-    },
-  ];
+  };
 
   /* ===== RENDER ===== */
   return (
@@ -89,34 +49,24 @@ export function StampOverviewGallery({
         flex flex-col max-w-desktop w-full mx-auto
         gap-12 mobileLg:gap-24 desktop:gap-36
       ">
-      {/* ===== LATEST ART STAMPS SECTION ===== */}
+      {/* ===== STAMPS SECTION ===== */}
       <div class={`${containerBackground} ${containerGap}`}>
-        <div class="w-full -mb-6 mobileLg:-mb-9">
-          <h1 class={titleNeutral}>
-            <span class="block mobileLg:hidden">LATEST STAMPS</span>
-            <span class="hidden mobileLg:block">LATEST ART STAMPS</span>
-          </h1>
-        </div>
-        <div class="flex flex-col gap-5">
-          {LatestArtStampsSection.map((section, index) => (
-            <StampGallery key={index} {...section} />
-          ))}
-        </div>
+        {/* ===== LATEST CREATIONS ===== */}
+        <StampGallery {...CombinedArtStampsSection} />
 
-        {
-          /* ===== FEATURED ARTISTS SECTION =====
-      <CollectionGallery {...FeaturedArtistsSection} />*/
-        }
-
-        {/* ===== COLLECTIONS SECTION ===== */}
-        {CollectionsSection.map((section, index) => (
-          <StampGallery key={index} {...section} />
-        ))}
-
-        {
-          /* ===== CUTTING EDGE SECTION =====
-      <CollectionGallery {...CuttingEdgeSection} />*/
-        }
+        {/* ===== RECENT SALES ===== */}
+        <StampSalesGallery
+          subTitle="RECENT SALES"
+          variant="home"
+          initialData={recentSalesData}
+          displayCounts={{
+            mobileSm: 3,
+            mobileMd: 4,
+            mobileLg: 5,
+            tablet: 6,
+            desktop: 7,
+          }}
+        />
       </div>
     </div>
   );

@@ -2294,7 +2294,6 @@ export interface StampGalleryProps {
   stamps: StampRow[];
   layout?: "grid" | "list";
   isRecentSales?: boolean;
-  filterBy?: string;
   variant?: StampCardVariant;
   gridClass?: string;
   displayCounts?: any;
@@ -2327,6 +2326,7 @@ export interface StampOverviewGalleryProps {
   stamps_art?: StampRow[];
   stamps_posh?: StampRow[];
   collectionData?: CollectionRow[];
+  recentSalesData?: Array<any>;
 }
 
 /**

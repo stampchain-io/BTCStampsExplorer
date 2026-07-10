@@ -116,11 +116,11 @@ export default function HowToBuy() {
           <p class={text}>
             Browse the{" "}
             <a
-              href="/stamp"
-              f-partial="/stamp"
+              href="/marketplace?market=listings"
+              f-partial="/marketplace?market=listings"
               class="animated-underline"
             >
-              stamp explorer
+              stamp marketplace
             </a>{" "}
             to find a stamp with an open dispenser.
           </p>

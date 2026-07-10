@@ -1,8 +1,8 @@
 /* ===== RECENT SALES GALLERY COMPONENT ===== */
 /*@baba-153+154-move Refreshing to ViewAllButton-remove default (not used)*/
-import { containerBackground, loaderSpinXsGrey } from "$layout";
+import { loaderSpinXsGrey } from "$layout";
 import { StampGallery } from "$section";
-import { titleNeutral, valueDarkSm } from "$text";
+import { titlePrimary, valueDarkSm } from "$text";
 import type { StampWithEnhancedSaleData } from "$types/marketData.d.ts";
 import type { StampSalesProps } from "$types/ui.d.ts";
 import { useEffect, useState } from "preact/hooks";
@@ -19,7 +19,7 @@ interface DisplayCountBreakpoints {
 /* ===== COMPONENT ===== */
 export function StampSalesGallery({
   initialData = [],
-  title = "LATEST STAMPS",
+  title,
   subTitle,
   variant = "detail",
   displayCounts,
@@ -122,9 +122,9 @@ export function StampSalesGallery({
   // Filter for hot stamps when activity data is available
   const filteredStamps = variant === "home" && recentSales.length > 0
     ? recentSales.filter((stamp) => {
-      // If activity_level is available, filter for HOT stamps
+      // If activity_level is available, filter for 24H, 7D, 30D sales
       if (stamp.activity_level) {
-        return stamp.activity_level === "HOT";
+        return ["HOT", "WARM", "COOL"].includes(stamp.activity_level);
       }
       // Fallback: show all recent sales if no activity data
       return true;
@@ -133,19 +133,19 @@ export function StampSalesGallery({
 
   const sectionProps = variant === "home"
     ? {
-      subTitle: subTitle || "HOT STAMPS",
+      subTitle: subTitle || "RECENT SALES",
       type: "recent",
       stamps: filteredStamps,
       fromPage: "home",
       layout: "grid" as const,
       isRecentSales: true,
       variant: "cardVerticalSaleCompact" as const,
-      viewAllLink: "/stamp?market=sales",
+      viewAllLink: "/marketplace?market=sales",
       gridClass: gridClass || defaultHomeGridClass,
       displayCounts: displayCounts || defaultHomeDisplayCounts,
     }
     : {
-      subTitle: subTitle || "LATEST TRANSACTIONS",
+      subTitle: subTitle || "LATEST SALES",
       type: "stamps",
       stamps: recentSales,
       layout: "grid" as const,
@@ -157,18 +157,20 @@ export function StampSalesGallery({
 
   /* ===== RENDER ===== */
   return (
-    <div class={containerBackground}>
-      <h3
-        class={variant === "home"
-          ? titleNeutral
-          : "text-3xl tablet:text-7xl text-left mb-2 bg-gradient-to-l color-primary-gradient font-black"}
-      >
-        {title}
-      </h3>
+    <div class="flex flex-col">
+      {title && (
+        <h3
+          class={variant === "home"
+            ? titlePrimary
+            : "text-3xl tablet:text-7xl text-left mb-2 bg-gradient-to-l color-primary-gradient font-black"}
+        >
+          {title}
+        </h3>
+      )}
       <div class="flex flex-col">
         {variant === "home" && filteredStamps.length === 0 && !isLoading && (
           <div class={`${valueDarkSm} text-center py-8`}>
-            <h6 class="text-lg">NO TRENDING STAMPS AVAILABLE AT THE MOMENT</h6>
+            <h6 class="text-lg">NO RECENT SALES AVAILABLE AT THE MOMENT</h6>
           </div>
         )}
         {(filteredStamps.length > 0 || variant !== "home") && (
