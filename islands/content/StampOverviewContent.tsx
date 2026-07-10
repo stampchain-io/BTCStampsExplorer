@@ -13,9 +13,9 @@ export function StampOverviewContent({
   stamps,
   isRecentSales = false,
   pagination,
-  viewMode = "detail",
+  viewMode = "cardVertical",
 }: StampOverviewContentProps) {
-  const cardVariant: StampCardVariant = viewMode === "minimal"
+  const cardVariant: StampCardVariant = viewMode === "cardSquare"
     ? "cardSquare"
     : "cardVerticalDetail";
 

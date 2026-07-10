@@ -1222,7 +1222,7 @@ export interface StampOverviewContentProps {
     prefix?: string;
   };
   fromPage?: string;
-  viewMode?: "detail" | "minimal";
+  viewMode?: "cardVertical" | "cardSquare";
 }
 
 export interface StampListingsAllProps {
@@ -2201,7 +2201,7 @@ export interface ExplorerContentProps extends BaseComponentProps {
     totalPages: number;
   } | null;
   section?: "all" | "stamps" | "tokens";
-  viewMode?: "detail" | "minimal" | "row";
+  viewMode?: "cardVertical" | "cardSquare" | "cardRow";
 }
 
 /**
@@ -2209,7 +2209,7 @@ export interface ExplorerContentProps extends BaseComponentProps {
  */
 export interface ExplorerHeaderProps extends BaseComponentProps {
   currentSection?: "all" | "stamps" | "tokens";
-  viewMode?: "detail" | "minimal" | "row";
+  viewMode?: "cardVertical" | "cardSquare" | "cardRow";
 }
 
 /**
@@ -3125,7 +3125,7 @@ export interface SRC20DetailHeaderProps {
  */
 export type StampOverviewHeaderProps = {
   currentFilters?: ExplorerStampFilters;
-  viewMode?: "detail" | "minimal";
+  viewMode?: "cardVertical" | "cardSquare";
 };
 
 /**
@@ -3133,7 +3133,7 @@ export type StampOverviewHeaderProps = {
  */
 export type MarketplaceHeaderProps = {
   currentFilters?: ExplorerStampFilters;
-  viewMode?: "detail" | "minimal" | "row";
+  viewMode?: "cardVertical" | "cardSquare" | "cardRow";
   isSalesMode?: boolean;
 };
 
@@ -3150,7 +3150,7 @@ export interface MarketplaceContentProps {
     prefix?: string;
   };
   fromPage?: string;
-  viewMode?: "detail" | "minimal" | "row";
+  viewMode?: "cardVertical" | "cardSquare" | "cardRow";
 }
 
 /**

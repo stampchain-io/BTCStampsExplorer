@@ -18,7 +18,7 @@ import { useState } from "preact/hooks";
 /* ===== TYPES ===== */
 interface SRC20CardProps {
   src20: SRC20Row;
-  variant?: "detail" | "minimal";
+  variant?: "cardVerticalDetail" | "cardSquare";
 }
 
 /* ===== HELPERS ===== */
@@ -30,7 +30,9 @@ function formatAmount(amt: string | bigint | undefined): string {
 }
 
 /* ===== COMPONENT ===== */
-export function SRC20Card({ src20, variant = "detail" }: SRC20CardProps) {
+export function SRC20Card(
+  { src20, variant = "cardVerticalDetail" }: SRC20CardProps,
+) {
   const [imgError, setImgError] = useState(false);
 
   const tick = unicodeEscapeToEmoji(src20.tick ?? "");
@@ -293,7 +295,7 @@ export function SRC20Card({ src20, variant = "detail" }: SRC20CardProps) {
         f-partial={href}
         class={containerCard}
       >
-        {variant === "minimal" ? renderMinimal() : (
+        {variant === "cardSquare" ? renderMinimal() : (
           <>
             {op === "TRANSFER" && renderTransfer()}
             {op === "DEPLOY" && renderDeploy()}

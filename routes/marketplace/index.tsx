@@ -34,9 +34,8 @@ export const handler: Handlers = {
     if (DEV_DUMMY_MODE) {
       const typeParam = url.searchParams.get("type") || "all";
       const viewParam = url.searchParams.get("view");
-      // Detect sales mode: new selector uses market=sales; legacy URL uses view=sales
-      const isSalesView = url.searchParams.get("market") === "sales" ||
-        viewParam === "sales";
+      // Detect sales mode via the market filter (view=sales is no longer supported)
+      const isSalesView = url.searchParams.get("market") === "sales";
       const all = DUMMY_STAMP_OVERVIEW_PAGE.data;
 
       const stampsByType: Record<string, typeof all> = {
@@ -52,11 +51,12 @@ export const handler: Handlers = {
       };
 
       const stampsByCurrentType = stampsByType[typeParam] ?? all;
-      const cardView: "detail" | "minimal" | "row" = viewParam === "minimal"
-        ? "minimal"
-        : viewParam === "row"
-        ? "row"
-        : "detail";
+      const cardView: "cardVertical" | "cardSquare" | "cardRow" =
+        viewParam === "cardSquare"
+          ? "cardSquare"
+          : viewParam === "cardRow"
+          ? "cardRow"
+          : "cardVertical";
 
       // Show listed-only stamps when in listings mode (no market param OR market=listings)
       const isDummyDefaultMarket =
@@ -112,11 +112,9 @@ export const handler: Handlers = {
           );
           const sortBy = url.searchParams.get("sortBy") || "DESC";
 
-          const viewMode = url.searchParams.get("view") || "all";
           const marketMode = url.searchParams.get("market") || "";
 
-          const recentSales = viewMode === "sales" ||
-            marketMode === "sales" ||
+          const recentSales = marketMode === "sales" ||
             url.searchParams.get("recentSales") === "true";
 
           const stampType = url.searchParams.get("type") || "all";
@@ -364,11 +362,12 @@ export const handler: Handlers = {
 
           /* ===== RENDER PAGE ===== */
           const viewParam = url.searchParams.get("view");
-          const cardView: "detail" | "minimal" | "row" = viewParam === "minimal"
-            ? "minimal"
-            : viewParam === "row"
-            ? "row"
-            : "detail";
+          const cardView: "cardVertical" | "cardSquare" | "cardRow" =
+            viewParam === "cardSquare"
+              ? "cardSquare"
+              : viewParam === "cardRow"
+              ? "cardRow"
+              : "cardVertical";
 
           const effectiveFilters = isDefaultMarketState
             ? {
@@ -403,7 +402,6 @@ export const handler: Handlers = {
 
       const viewParamFallback = url.searchParams.get("view");
       const fallbackIsDefaultMarket = !url.searchParams.has("market") &&
-        viewParamFallback !== "sales" &&
         url.searchParams.get("recentSales") !== "true";
       const fallbackFilters = fallbackIsDefaultMarket
         ? {
@@ -424,11 +422,11 @@ export const handler: Handlers = {
         sortBy: "DESC",
         selectedTab: "all",
         totalPages: 1,
-        cardView: viewParamFallback === "minimal"
-          ? "minimal"
-          : viewParamFallback === "row"
-          ? "row"
-          : "detail",
+        cardView: viewParamFallback === "cardSquare"
+          ? "cardSquare"
+          : viewParamFallback === "cardRow"
+          ? "cardRow"
+          : "cardVertical",
       });
     }
   },
@@ -446,11 +444,12 @@ export function MarketplacePage(props: MarketplacePageProps) {
     search: _search,
     cardView: cardViewRaw,
   } = props.data;
-  const cardView: "detail" | "minimal" | "row" = cardViewRaw === "minimal"
-    ? "minimal"
-    : cardViewRaw === "row"
-    ? "row"
-    : "detail";
+  const cardView: "cardVertical" | "cardSquare" | "cardRow" =
+    cardViewRaw === "cardSquare"
+      ? "cardSquare"
+      : cardViewRaw === "cardRow"
+      ? "cardRow"
+      : "cardVertical";
   const stampsArray = Array.isArray(stamps) ? stamps : [];
   const isRecentSales = selectedTab === "recent_sales";
   const isSalesMode = isRecentSales;

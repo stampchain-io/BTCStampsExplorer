@@ -15,7 +15,7 @@ export function ExplorerContent({
   pagination,
   src20DataCard,
   section = "all",
-  viewMode = "detail",
+  viewMode = "cardVertical",
 }: ExplorerContentProps) {
   /* ===== MERGE + SORT by block_index DESC ===== */
   const stampItems: MixedItem[] = (stamps ?? []).map((s) => ({
@@ -40,8 +40,10 @@ export function ExplorerContent({
 
   /* ===== RENDER ===== */
   return (
-    <div class={`w-full ${viewMode !== "row" ? "pt-3 mobileMd:pt-6" : "pt-3"}`}>
-      {viewMode === "row"
+    <div
+      class={`w-full ${viewMode !== "cardRow" ? "pt-3 mobileMd:pt-6" : "pt-3"}`}
+    >
+      {viewMode === "cardRow"
         ? (
           /* ===== ROW TABLE VIEW ===== */
           <ExplorerTableBase items={visible} />
@@ -61,7 +63,7 @@ export function ExplorerContent({
                   <StampCard
                     stamp={entry.item}
                     isRecentSale={isRecentSales}
-                    variant={viewMode === "minimal"
+                    variant={viewMode === "cardSquare"
                       ? "cardSquare"
                       : "cardVerticalDetail"}
                   />
@@ -69,14 +71,16 @@ export function ExplorerContent({
                 : (
                   <SRC20Card
                     src20={entry.item}
-                    variant={viewMode === "minimal" ? "minimal" : "detail"}
+                    variant={viewMode === "cardSquare"
+                      ? "cardSquare"
+                      : "cardVerticalDetail"}
                   />
                 );
 
               // MINIMAL view: square each cell so a taller SRC20 card can't
               // stretch the row and break the stamp's 1:1 aspect ratio.
               // Detailed view is rendered exactly as before.
-              return viewMode === "minimal"
+              return viewMode === "cardSquare"
                 ? (
                   <div key={key} class="w-full max-w-72 mx-auto aspect-square">
                     {card}

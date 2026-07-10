@@ -790,7 +790,7 @@ export type StampPageProps = {
       totalPages: number;
     } | null;
     section?: "all" | "stamps" | "tokens";
-    cardView?: "detail" | "minimal" | "row";
+    cardView?: "cardVertical" | "cardSquare" | "cardRow";
   };
 };
 
@@ -807,7 +807,7 @@ export type MarketplacePageProps = {
     filterBy: StampFilterType[];
     filters: StampFilters;
     search: string;
-    cardView?: "detail" | "minimal" | "row";
+    cardView?: "cardVertical" | "cardSquare" | "cardRow";
   };
 };
 

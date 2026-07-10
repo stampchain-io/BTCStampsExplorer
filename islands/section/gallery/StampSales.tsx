@@ -140,7 +140,7 @@ export function StampSalesGallery({
       layout: "grid" as const,
       isRecentSales: true,
       variant: "cardVerticalSaleCompact" as const,
-      viewAllLink: "/stamp?view=sales",
+      viewAllLink: "/stamp?market=sales",
       gridClass: gridClass || defaultHomeGridClass,
       displayCounts: displayCounts || defaultHomeDisplayCounts,
     }

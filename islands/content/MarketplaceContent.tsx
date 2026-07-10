@@ -12,9 +12,9 @@ export function MarketplaceContent({
   stamps,
   isRecentSales = false,
   pagination,
-  viewMode = "detail",
+  viewMode = "cardVertical",
 }: MarketplaceContentProps) {
-  const cardVariant: StampCardVariant = viewMode === "minimal"
+  const cardVariant: StampCardVariant = viewMode === "cardSquare"
     ? "cardSquare"
     : isRecentSales
     ? "cardVerticalSale"
@@ -22,8 +22,10 @@ export function MarketplaceContent({
 
   /* ===== RENDER ===== */
   return (
-    <div class={`w-full ${viewMode !== "row" ? "pt-3 mobileMd:pt-6" : "pt-3"}`}>
-      {viewMode === "row"
+    <div
+      class={`w-full ${viewMode !== "cardRow" ? "pt-3 mobileMd:pt-6" : "pt-3"}`}
+    >
+      {viewMode === "cardRow"
         ? (
           /* ===== ROW TABLE VIEW ===== */
           <MarketplaceTableBase

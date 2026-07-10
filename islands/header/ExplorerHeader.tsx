@@ -24,7 +24,7 @@ import { useEffect, useState } from "preact/hooks";
 export const ExplorerHeader = (
   {
     currentSection = "all",
-    viewMode = "detail",
+    viewMode = "cardVertical",
   }: ExplorerHeaderProps,
 ) => {
   /* ===== STATE ===== */

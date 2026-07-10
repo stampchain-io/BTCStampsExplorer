@@ -41,10 +41,8 @@ export const handler: Handlers<CollectionOverviewPageProps> = {
       const requestedPageSize = parseInt(url.searchParams.get("limit") || "60");
       const page_size = Math.min(requestedPageSize, MAX_PAGE_SIZE);
 
-      // Handle both new view parameter and legacy recentSales parameter
-      const viewMode = url.searchParams.get("view") || "all";
-      const isRecentSales = viewMode === "sales" ||
-        url.searchParams.get("recentSales") === "true";
+      // Handle legacy recentSales parameter
+      const isRecentSales = url.searchParams.get("recentSales") === "true";
 
       switch (overview) {
         case "artist": {

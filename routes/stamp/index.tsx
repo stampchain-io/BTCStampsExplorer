@@ -50,9 +50,9 @@ export const handler: Handlers = {
 
       const stamps = stampsByType[typeParam] ?? all;
       const viewParam = url.searchParams.get("view");
-      const cardView: "detail" | "minimal" = viewParam === "minimal"
-        ? "minimal"
-        : "detail";
+      const cardView: "cardVertical" | "cardSquare" = viewParam === "cardSquare"
+        ? "cardSquare"
+        : "cardVertical";
 
       return ctx.render({
         stamps,
@@ -82,13 +82,10 @@ export const handler: Handlers = {
           );
           const sortBy = url.searchParams.get("sortBy") || "DESC";
 
-          // ✅ IMPROVED: Handle view parameter for different stamp display modes
-          const viewMode = url.searchParams.get("view") || "all";
           const marketMode = url.searchParams.get("market") || "";
 
-          // Redirect marketplace sales filter to use the proven sales view logic
-          const recentSales = viewMode === "sales" ||
-            marketMode === "sales" || // ✅ NEW: marketplace sales filter uses sales view
+          // Sales mode is triggered by the market filter (view=sales is no longer supported)
+          const recentSales = marketMode === "sales" ||
             url.searchParams.get("recentSales") === "true"; // Backward compatibility
 
           // Handle type parameter for stamp filtering (all, classic, posh, src-721, cursed)
@@ -341,9 +338,8 @@ export const handler: Handlers = {
 
           /* ===== RENDER PAGE ===== */
           const viewParam = url.searchParams.get("view");
-          const cardView: "detail" | "minimal" = viewParam === "minimal"
-            ? "minimal"
-            : "detail";
+          const cardView: "cardVertical" | "cardSquare" =
+            viewParam === "cardSquare" ? "cardSquare" : "cardVertical";
 
           return ctx.render({
             stamps: stampsData.data || [],
@@ -380,7 +376,9 @@ export const handler: Handlers = {
         sortBy: "DESC",
         selectedTab: "all",
         totalPages: 1,
-        cardView: viewParamFallback === "minimal" ? "minimal" : "detail",
+        cardView: viewParamFallback === "cardSquare"
+          ? "cardSquare"
+          : "cardVertical",
       });
     }
   },
@@ -398,9 +396,9 @@ export function StampOverviewPage(props: StampPageProps) {
     search: _search,
     cardView: cardViewRaw,
   } = props.data;
-  const cardView: "detail" | "minimal" = cardViewRaw === "minimal"
-    ? "minimal"
-    : "detail";
+  const cardView: "cardVertical" | "cardSquare" = cardViewRaw === "cardSquare"
+    ? "cardSquare"
+    : "cardVertical";
   const stampsArray = Array.isArray(stamps) ? stamps : [];
   const isRecentSales = selectedTab === "recent_sales";
 

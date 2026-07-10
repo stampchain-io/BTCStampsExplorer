@@ -24,7 +24,7 @@ import { useCallback, useState } from "preact/hooks";
 export const MarketplaceHeader = (
   {
     currentFilters = defaultFilters,
-    viewMode = "detail",
+    viewMode = "cardVertical",
     isSalesMode = false,
   }: MarketplaceHeaderProps,
 ) => {

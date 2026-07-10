@@ -66,11 +66,12 @@ export const handler: Handlers = {
 
     // Read card view mode — "sales" is handled separately via recentSales
     const viewParam = url.searchParams.get("view");
-    const cardView: "detail" | "minimal" | "row" = viewParam === "minimal"
-      ? "minimal"
-      : viewParam === "row"
-      ? "row"
-      : "detail";
+    const cardView: "cardVertical" | "cardSquare" | "cardRow" =
+      viewParam === "cardSquare"
+        ? "cardSquare"
+        : viewParam === "cardRow"
+        ? "cardRow"
+        : "cardVertical";
 
     if (DEV_DUMMY_MODE) {
       const selectedTab = (url.searchParams.get("type") || "all") as StampType;
@@ -194,9 +195,7 @@ export const handler: Handlers = {
       const page = parseInt(url.searchParams.get("page") || "1");
       const requestedPageSize = parseInt(url.searchParams.get("limit") || "60");
       const page_size = Math.min(requestedPageSize, MAX_PAGE_SIZE);
-      const viewMode = url.searchParams.get("view") || "all";
-      const recentSales = viewMode === "sales" ||
-        url.searchParams.get("recentSales") === "true";
+      const recentSales = url.searchParams.get("recentSales") === "true";
 
       /* ===== DATA FETCHING ===== */
       // Fetch stamps and SRC-20 transactions in parallel.
@@ -350,7 +349,7 @@ export function ExplorerPage(props: StampPageProps) {
     selectedTab,
     src20DataCard,
     section = "all",
-    cardView = "detail",
+    cardView = "cardVertical",
   } = props.data;
 
   const stampsArray = Array.isArray(stamps) ? stamps : [];

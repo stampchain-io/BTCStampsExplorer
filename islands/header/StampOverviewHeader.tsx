@@ -25,7 +25,7 @@ import { useCallback, useState } from "preact/hooks";
 export const StampOverviewHeader = (
   {
     currentFilters = defaultFilters,
-    viewMode = "detail",
+    viewMode = "cardVertical",
   }: StampOverviewHeaderProps,
 ) => {
   /* ===== STATE MANAGEMENT ===== */

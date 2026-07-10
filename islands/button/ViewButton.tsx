@@ -9,7 +9,7 @@ import { tooltipIcon } from "$notification";
 import { useCallback, useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
-type ViewMode = "detail" | "minimal" | "row";
+type ViewMode = "cardVertical" | "cardSquare" | "cardRow";
 
 /* ===== COMPONENT ===== */
 export function ViewButton(
@@ -56,21 +56,21 @@ export function ViewButton(
     [],
   );
 
-  const nextMode: ViewMode = viewMode === "detail"
-    ? "minimal"
-    : viewMode === "minimal"
-    ? "row"
-    : "detail";
+  const nextMode: ViewMode = viewMode === "cardVertical"
+    ? "cardSquare"
+    : viewMode === "cardSquare"
+    ? "cardRow"
+    : "cardVertical";
 
-  const iconName = viewMode === "minimal"
+  const iconName = viewMode === "cardSquare"
     ? "viewCardMinimal"
-    : viewMode === "row"
+    : viewMode === "cardRow"
     ? "viewRow"
     : "viewCardDetail";
 
-  const ariaLabel = viewMode === "detail"
+  const ariaLabel = viewMode === "cardVertical"
     ? "Switch to minimal grid view"
-    : viewMode === "minimal"
+    : viewMode === "cardSquare"
     ? "Switch to row view"
     : "Switch to detailed grid view";
 
