@@ -143,9 +143,7 @@ import * as $sitemap_xml from "./routes/sitemap.xml.ts";
 import * as $src20_tick_ from "./routes/src20/[tick].tsx";
 import * as $src20_index from "./routes/src20/index.tsx";
 import * as $stamp_id_ from "./routes/stamp/[id].tsx";
-import * as $stamp_art from "./routes/stamp/art.tsx";
 import * as $stamp_index from "./routes/stamp/index.tsx";
-import * as $stamp_posh from "./routes/stamp/posh.tsx";
 import * as $termsofservice_index from "./routes/termsofservice/index.tsx";
 import * as $test_design_system from "./routes/test/design-system.tsx";
 import * as $test_horizon_psbt_html from "./routes/test/horizon-psbt.html.ts";
@@ -502,9 +500,7 @@ const manifest = {
     "./routes/src20/[tick].tsx": $src20_tick_,
     "./routes/src20/index.tsx": $src20_index,
     "./routes/stamp/[id].tsx": $stamp_id_,
-    "./routes/stamp/art.tsx": $stamp_art,
     "./routes/stamp/index.tsx": $stamp_index,
-    "./routes/stamp/posh.tsx": $stamp_posh,
     "./routes/termsofservice/index.tsx": $termsofservice_index,
     "./routes/test/design-system.tsx": $test_design_system,
     "./routes/test/horizon-psbt.html.ts": $test_horizon_psbt_html,

@@ -9,13 +9,11 @@ const STATIC_PAGES: Array<{
   changefreq: string;
 }> = [
   { path: "/", priority: "1.0", changefreq: "daily" },
-  { path: "/stamp", priority: "0.9", changefreq: "hourly" },
+  { path: "/stamp", priority: "0.9", changefreq: "daily" },
   { path: "/src20", priority: "0.9", changefreq: "hourly" },
   { path: "/collection", priority: "0.8", changefreq: "daily" },
   { path: "/explorer", priority: "0.8", changefreq: "hourly" },
   { path: "/block", priority: "0.7", changefreq: "hourly" },
-  { path: "/stamp/art", priority: "0.7", changefreq: "daily" },
-  { path: "/stamp/posh", priority: "0.7", changefreq: "daily" },
   { path: "/about", priority: "0.6", changefreq: "monthly" },
   { path: "/faq", priority: "0.6", changefreq: "monthly" },
   { path: "/docs", priority: "0.6", changefreq: "weekly" },
