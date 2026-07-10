@@ -62,8 +62,8 @@ export function ExplorerContent({
                     stamp={entry.item}
                     isRecentSale={isRecentSales}
                     variant={viewMode === "minimal"
-                      ? "image"
-                      : "imageDetailExplorer"}
+                      ? "cardSquare"
+                      : "cardVerticalDetail"}
                   />
                 )
                 : (

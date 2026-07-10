@@ -306,7 +306,7 @@ export default function StampDetailPage(props: StampDetailPageProps) {
     stamps: stamps_recent,
     layout: "grid" as const,
     fromPage: "stamp_detail",
-    variant: "image" as const,
+    variant: "cardSquare" as const,
     alignRight: false,
     gridClass: `
       grid w-full

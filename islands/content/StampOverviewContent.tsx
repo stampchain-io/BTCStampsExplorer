@@ -16,8 +16,8 @@ export function StampOverviewContent({
   viewMode = "detail",
 }: StampOverviewContentProps) {
   const cardVariant: StampCardVariant = viewMode === "minimal"
-    ? "image"
-    : "imageDetailExplorer";
+    ? "cardSquare"
+    : "cardVerticalDetail";
 
   /* ===== RENDER ===== */
   return (

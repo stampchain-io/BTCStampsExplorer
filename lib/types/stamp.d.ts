@@ -2269,20 +2269,20 @@ export declare function isValidStampTransaction(
 
 /**
  * Display variant for StampCard and gallery components.
- * - "image"                         : thumbnail only, no footer
- * - "imagePill"                     : thumbnail + supply overlay pill (bottom-right)
- * - "imageDetailExplorer"           : full footer + BTC icon overlay if listed
- * - "imageDetailMarketplaceListings": full footer + buy button row
- * - "imageDetailMarketplaceSales"   : full footer + sale price + time ago row
- * - "imageDetailHomeSales"          : minimal footer (stamp# + price pill)
+ * - "cardSquare"            : thumbnail only, no footer
+ * - "cardSquareDetail"      : thumbnail + supply overlay pill (bottom-right)
+ * - "cardVerticalDetail"    : full footer + BTC icon overlay if listed
+ * - "cardVerticalListing"   : full footer + buy button row
+ * - "cardVerticalSale"      : full footer + sale price + time ago row
+ * - "cardVerticalSaleCompact": minimal footer (stamp# + price pill)
  */
 export type StampCardVariant =
-  | "image"
-  | "imagePill"
-  | "imageDetailExplorer"
-  | "imageDetailMarketplaceListings"
-  | "imageDetailMarketplaceSales"
-  | "imageDetailHomeSales";
+  | "cardSquare"
+  | "cardSquareDetail"
+  | "cardVerticalDetail"
+  | "cardVerticalListing"
+  | "cardVerticalSale"
+  | "cardVerticalSaleCompact";
 
 /**
  * Props for StampGallery component

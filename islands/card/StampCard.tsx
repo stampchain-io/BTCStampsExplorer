@@ -50,7 +50,7 @@ interface StampWithSaleData extends Omit<StampRow, "stamp_base64"> {
 export function StampCard({
   stamp,
   isRecentSale = false,
-  variant = "imageDetailExplorer",
+  variant = "cardVerticalDetail",
 }: {
   stamp: StampWithSaleData;
   isRecentSale?: boolean;
@@ -575,7 +575,7 @@ export function StampCard({
             {renderContent()}
           </div>
           {/* ===== IMAGE PILL OVERLAY ===== */}
-          {variant === "imagePill" && (
+          {variant === "cardSquareDetail" && (
             <div class="absolute bottom-1 left-1 z-20">
               <div class={`${containerPill} ${cardSupply} cursor-pointer`}>
                 {supplyDisplay}
@@ -585,8 +585,8 @@ export function StampCard({
         </div>
 
         {/* ===== FULL DETAILS SECTION (explorer / marketplace listings) ===== */}
-        {(variant === "imageDetailExplorer" ||
-          variant === "imageDetailMarketplaceListings") && (
+        {(variant === "cardVerticalDetail" ||
+          variant === "cardVerticalListing") && (
           <div class="flex flex-col items-center p-0.5">
             {/* Stamp Number */}
             <div
@@ -598,7 +598,7 @@ export function StampCard({
             </div>
 
             {/* CPID (marketplace listings only) */}
-            {variant === "imageDetailMarketplaceListings" && stamp.cpid && (
+            {variant === "cardVerticalListing" && stamp.cpid && (
               <div class="font-mono text-xs text-color-neutral-500 truncate max-w-[90%] mt-0.5">
                 {stamp.cpid}
               </div>
@@ -612,7 +612,7 @@ export function StampCard({
             {/* Row 1: Supply (left) + Status Icons (right) */}
             <div class="flex justify-between items-center mt-2 w-full">
               <div class={`${containerPill} ${cardSupply}`}>
-                {variant === "imageDetailMarketplaceListings"
+                {variant === "cardVerticalListing"
                   ? `${
                     (stamp as any).lowestPriceDispenser?.give_remaining ??
                       stamp.supply ?? 1
@@ -620,7 +620,7 @@ export function StampCard({
                   : supplyDisplay}
               </div>
               <div class="flex items-center gap-1.5 mr-0.5">
-                {variant === "imageDetailExplorer" && isListed && (
+                {variant === "cardVerticalDetail" && isListed && (
                   <div
                     class="relative"
                     onMouseEnter={handleBtcMouseEnter}
@@ -780,7 +780,7 @@ export function StampCard({
             </div>
 
             {/* Row 3: Buy button (marketplace listings only) */}
-            {variant === "imageDetailMarketplaceListings" && isListed && (
+            {variant === "cardVerticalListing" && isListed && (
               <>
                 <div
                   class={`flex flex-col w-full mt-2 px-2.5 py-1 ${container3} cursor-pointer`}
@@ -818,7 +818,7 @@ export function StampCard({
 
             {
               /* Row 3: Buy button (marketplace listings only)
-            {variant === "imageDetailMarketplaceListings" && isListed && (
+            {variant === "cardVerticalListing" && isListed && (
               <div class="flex justify-center mt-2 w-full">
                 <Button
                   variant="outline"
@@ -848,7 +848,7 @@ export function StampCard({
         )}
 
         {/* ===== SALE DETAILS SECTION (marketplace sales) ===== */}
-        {variant === "imageDetailMarketplaceSales" && (
+        {variant === "cardVerticalSale" && (
           <div class="flex flex-col items-center p-0.5">
             {/* Stamp Number */}
             <div
@@ -962,7 +962,7 @@ export function StampCard({
         )}
 
         {/* ===== MINIMAL DETAILS SECTION (home / sales pages) ===== */}
-        {variant === "imageDetailHomeSales" && (
+        {variant === "cardVerticalSaleCompact" && (
           <div class="flex flex-col items-center px-1.5 mobileLg:px-3 pt-1.5 mobileLg:pt-3">
             <div
               class={`flex items-center justify-center

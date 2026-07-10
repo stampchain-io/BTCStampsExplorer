@@ -45,7 +45,7 @@ export default function ToolStampingPage({ data }: PageProps<StampPageData>) {
     type: "classic",
     stamps: data.latestStamps,
     layout: "grid" as const,
-    variant: "image" as const,
+    variant: "cardSquare" as const,
     alignRight: true,
     gridClass: `
       grid w-full

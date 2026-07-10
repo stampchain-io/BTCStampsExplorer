@@ -15,10 +15,10 @@ export function MarketplaceContent({
   viewMode = "detail",
 }: MarketplaceContentProps) {
   const cardVariant: StampCardVariant = viewMode === "minimal"
-    ? "image"
+    ? "cardSquare"
     : isRecentSales
-    ? "imageDetailMarketplaceSales"
-    : "imageDetailMarketplaceListings";
+    ? "cardVerticalSale"
+    : "cardVerticalListing";
 
   /* ===== RENDER ===== */
   return (

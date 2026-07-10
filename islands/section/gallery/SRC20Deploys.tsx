@@ -113,7 +113,7 @@ export default function SRC20DeploysGallery(): JSX.Element {
                   stamp_url: constructStampUrl(stamp.tx_hash, "svg"),
                 }}
                 isRecentSale={false}
-                variant="image"
+                variant="cardSquare"
               />
             ))}
           </div>

@@ -19,7 +19,7 @@ export default function StampGallery({
   layout = "grid",
   isRecentSales = false,
   filterBy,
-  variant = "image",
+  variant = "cardSquare",
   gridClass,
   displayCounts,
   pagination,
