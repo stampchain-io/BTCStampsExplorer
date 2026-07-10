@@ -25,12 +25,12 @@ export const logoPrimary = // used in footer
 /* ===== NAVIGATION STYLES ===== */
 // Header Navigation - Desktop
 export const navLinkDesktop =
-  `mt-0.5 font-normal tablet:font-normal text-xs tablet:text-[0.625rem] uppercase
+  `mt-0.5 font-normal tablet:font-normal text-sm tablet:text-xs uppercase
   text-color-neutral-400 group-hover:text-color-hover tracking-[0.01rem] ${transitionColors} cursor-pointer ${select}`;
 export const navLinkActiveDesktop =
   `${navLinkDesktop} !text-color-hover !cursor-default`;
 export const navSublinkDesktop =
-  `font-normal text-[0.625rem] uppercase text-color-neutral-400 hover:text-color-hover tracking-tight ${transitionColors} cursor-pointer ${select}`; // used in WalletButton and ToolsButton for submenu links
+  `font-normal text-xs uppercase text-color-neutral-400 hover:text-color-hover tracking-tight ${transitionColors} cursor-pointer ${select}`; // used in WalletButton and ToolsButton for submenu links
 export const navSublinkActiveDesktop =
   `${navSublinkDesktop} !text-color-hover !cursor-default`;
 

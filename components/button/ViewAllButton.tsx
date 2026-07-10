@@ -8,10 +8,10 @@ export function ViewAllButton({ href }: ViewAllButtonProps) {
     <div class="flex justify-end w-full mt-6 mobileLg:mt-9">
       <Button
         variant="flat"
-        color="neutral"
-        size="mdR"
+        color="primary"
+        size="xsR"
         href={href}
-        f-partial="/collection"
+        f-partial={href}
         target="_top"
       >
         VIEW ALL
