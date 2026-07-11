@@ -15,7 +15,6 @@ export default function StampGallery({
   title,
   subTitle,
   stamps,
-  layout = "grid",
   isRecentSales = false,
   variant = "cardSquare",
   gridClass,
@@ -43,8 +42,7 @@ export default function StampGallery({
   /* ===== DATA PROCESSING ===== */
   const filteredStamps = stamps || [];
 
-  // Apply layout-specific styling - @baba-check gap
-  const containerClass = layout === "grid" ? gridClass : "flex flex-col gap-4"; // Row layout default styling
+  const containerClass = gridClass ?? "grid grid-cols-2 gap-4";
 
   const resolvedSwiperBreakpoints = swiperBreakpoints || {
     360: { slidesPerView: 3 }, // mobileSm

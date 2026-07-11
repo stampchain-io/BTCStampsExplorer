@@ -26,7 +26,6 @@ export function StampOverviewGallery({
     subTitle: "LATEST CREATIONS",
     type: "all",
     stamps: combinedStamps,
-    layout: "grid",
     variant: "cardSquare" as const,
     viewAllLink: "/explorer?section=stamps",
     gridClass: `

@@ -2269,12 +2269,15 @@ export declare function isValidStampTransaction(
 
 /**
  * Display variant for StampCard and gallery components.
- * - "cardSquare"            : thumbnail only, no footer
- * - "cardSquareDetail"      : thumbnail + supply overlay pill (bottom-right)
+ * - "cardSquare"            : stamp image only
+ * - "cardSquareDetail"      : stamp image + editions pill (bottom-right)
  * - "cardVerticalDetail"    : full footer + BTC icon overlay if listed
  * - "cardVerticalListing"   : full footer + buy button row
  * - "cardVerticalSale"      : full footer + sale price + time ago row
  * - "cardVerticalSaleCompact": minimal footer (stamp# + price pill)
+ * - "cardHorizontalListing" : flex-row layout — thumbnail (left) + details
+ *   column (right): stamp#/cpid/creator, supply+status icons row, filetype+
+ *   filesize row, price + buy button row
  */
 export type StampCardVariant =
   | "cardSquare"
@@ -2282,7 +2285,8 @@ export type StampCardVariant =
   | "cardVerticalDetail"
   | "cardVerticalListing"
   | "cardVerticalSale"
-  | "cardVerticalSaleCompact";
+  | "cardVerticalSaleCompact"
+  | "cardHorizontalListing";
 
 /**
  * Props for StampGallery component
@@ -2292,7 +2296,6 @@ export interface StampGalleryProps {
   subTitle?: string;
   type?: string;
   stamps: StampRow[];
-  layout?: "grid" | "list";
   isRecentSales?: boolean;
   variant?: StampCardVariant;
   gridClass?: string;

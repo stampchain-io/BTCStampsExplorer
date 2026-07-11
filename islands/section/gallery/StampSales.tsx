@@ -101,7 +101,6 @@ export function StampSalesGallery({
     type: "recent",
     stamps: filteredStamps,
     fromPage: "home",
-    layout: "grid" as const,
     isRecentSales: true,
     variant: "cardVerticalSaleCompact" as const,
     viewAllLink: "/marketplace?market=sales",

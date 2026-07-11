@@ -84,7 +84,6 @@ export default function CollectionLandingPage(
       subTitle: "FRESH POSH STAMPS",
       type: "posh",
       stamps: stamps_posh,
-      layout: "grid",
       variant: "cardSquare" as const,
       gridClass: `
         grid w-full gap-6
@@ -109,7 +108,6 @@ export default function CollectionLandingPage(
       subTitle: "RECENT RECURSIVE",
       type: "recursive",
       stamps: stamps_src721,
-      layout: "grid",
       variant: "cardSquare" as const,
       gridClass: `
         grid w-full gap-6

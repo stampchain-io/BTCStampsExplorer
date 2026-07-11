@@ -304,7 +304,6 @@ export default function StampDetailPage(props: StampDetailPageProps) {
     subTitle: "ON-CHAIN MARVELS",
     type: "classic",
     stamps: stamps_recent,
-    layout: "grid" as const,
     fromPage: "stamp_detail",
     variant: "cardSquare" as const,
     alignRight: false,
