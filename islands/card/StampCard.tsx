@@ -22,9 +22,9 @@ import {
   cardFileSize,
   cardFileType,
   cardPrice,
-  cardPriceMinimal,
+  cardPriceCompact,
   cardStampNumber,
-  cardStampNumberMinimal,
+  cardStampNumberCompact,
   cardSupply,
 } from "$text";
 import type { StampCardVariant, StampRow } from "$types/stamp.d.ts";
@@ -590,7 +590,7 @@ export function StampCard({
           <div class="flex flex-col items-center p-0.5">
             {/* Stamp Number */}
             <div
-              class={`flex items-center justify-center max-w-[90%] mt-1
+              class={`flex items-center justify-center mt-1
               ${cardStampNumber}`}
             >
               {displayStampHash && <span class="font-light">#</span>}
@@ -599,7 +599,7 @@ export function StampCard({
 
             {/* CPID (marketplace listings only) */}
             {variant === "cardVerticalListing" && stamp.cpid && (
-              <div class="font-mono text-xs text-color-neutral-500 truncate max-w-[90%] mt-0.5">
+              <div class="font-mono text-xs text-color-neutral-500 truncate max-w-full mt-0.5">
                 {stamp.cpid}
               </div>
             )}
@@ -852,7 +852,7 @@ export function StampCard({
           <div class="flex flex-col items-center p-0.5">
             {/* Stamp Number */}
             <div
-              class={`flex items-center justify-center max-w-[90%] mt-1
+              class={`flex items-center justify-center mt-1
               ${cardStampNumber}`}
             >
               {displayStampHash && <span class="font-light">#</span>}
@@ -861,7 +861,7 @@ export function StampCard({
 
             {/* CPID */}
             {stamp.cpid && (
-              <div class="font-mono text-xs text-color-neutral-500 truncate max-w-[90%] mt-0.5">
+              <div class="font-mono text-xs text-color-neutral-500 truncate max-w-full mt-0.5">
                 {stamp.cpid}
               </div>
             )}
@@ -961,17 +961,18 @@ export function StampCard({
           </div>
         )}
 
-        {/* ===== MINIMAL DETAILS SECTION (home / sales pages) ===== */}
+        {/* ===== COMPACT DETAILS SECTION (home / sales pages) ===== */}
         {variant === "cardVerticalSaleCompact" && (
           <div class="flex flex-col items-center px-1.5 mobileLg:px-3 pt-1.5 mobileLg:pt-3">
             <div
-              class={`flex items-center justify-center
-              ${cardStampNumberMinimal}`}
+              class={`flex items-center justify-center ${cardStampNumberCompact}`}
             >
               {displayStampHash && <span class="font-light">#</span>}
               {stampValue}
             </div>
-            <div class={`mt-2 ${containerPill} ${cardPriceMinimal}`}>
+            <div
+              class={`mt-2 ${containerPill} ${cardPriceCompact}`}
+            >
               {displayPriceBTC().text}
             </div>
           </div>

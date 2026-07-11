@@ -1039,15 +1039,6 @@ export interface StampSalesProps {
   initialData?: Array<any>;
   title?: string;
   subTitle?: string;
-  variant?: string;
-  displayCounts?: {
-    mobileSm: number;
-    mobileMd: number;
-    mobileLg: number;
-    tablet: number;
-    desktop: number;
-  };
-  gridClass?: string;
 }
 
 export interface ToolSrc20PageProps {

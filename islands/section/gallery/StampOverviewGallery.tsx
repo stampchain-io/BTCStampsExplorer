@@ -57,15 +57,7 @@ export function StampOverviewGallery({
         {/* ===== RECENT SALES ===== */}
         <StampSalesGallery
           subTitle="RECENT SALES"
-          variant="home"
           initialData={recentSalesData}
-          displayCounts={{
-            mobileSm: 3,
-            mobileMd: 4,
-            mobileLg: 5,
-            tablet: 6,
-            desktop: 7,
-          }}
         />
       </div>
     </div>

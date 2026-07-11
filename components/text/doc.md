@@ -61,7 +61,7 @@ The Text system provides a comprehensive typography solution with consistent sty
 - `titleNeutral` = Title style with grey gradient from light to dark
 - `navLinkPurpleActive` = Purple navigation link in active state
 - `valueSmLink` = Small value with link hover effect
-- `cardStampNumberMinimal` = Minimal card variant for stamp numbers
+- `cardStampNumberCompact` = Compact card variant for stamp numbers
 
 ### Base Font Styles
 
@@ -443,10 +443,10 @@ Compact card style with gradient effects:
 cardHashSymbolMinimal: "font-light text-color-grey-light group-hover:text-color-purple-light"
 // Default: #f9f2e9 | Hover: #BB00FF
 
-cardStampNumberMinimal: "font-black color-grey-gradientDL group-hover:[-webkit-text-fill-color:var(--color-purple-light)] truncate"
+cardStampNumberCompact: "font-black color-grey-gradientDL group-hover:[-webkit-text-fill-color:var(--color-purple-light)] truncate"
 // Gradient: #585552 → ... → #f9f2e9 | Hover: #BB00FF solid
 
-cardPriceMinimal: "font-normal text-color-grey truncate text-[10px] mobileMd:text-xs"
+cardPriceCompact: "font-normal text-color-grey truncate text-[10px] mobileMd:text-xs"
 // Color: #a8a39d
 ```
 
@@ -583,8 +583,8 @@ export type TextStyles = {
   cardMimeType: string;
   cardSupply: string;
   cardHashSymbolMinimal: string;
-  cardStampNumberMinimal: string;
-  cardPriceMinimal: string;
+  cardStampNumberCompact: string;
+  cardPriceCompact: string;
   cardHashSymbolGrey: string;
   cardStampNumberGrey: string;
 };

@@ -5,11 +5,11 @@ import type { ViewAllButtonProps } from "$types/ui.d.ts";
 /* ===== COMPONENT ===== */
 export function ViewAllButton({ href }: ViewAllButtonProps) {
   return (
-    <div class="flex justify-end w-full mt-6 mobileLg:mt-9">
+    <div class="flex justify-end w-full mt-6">
       <Button
         variant="flat"
         color="primary"
-        size="xsR"
+        size="smR"
         href={href}
         f-partial={href}
         target="_top"

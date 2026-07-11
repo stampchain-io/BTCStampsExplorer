@@ -201,10 +201,11 @@ export const toggleSymbol =
 
 /* ===== CARD TEXT STYLES ===== */
 // Standard card styles
-export const cardStampNumber = `font-extrabold text-md min-[420px]:text-lg
-   text-color-neutral-200 group-hover:text-color-hover tracking-wide truncate ${select}`;
+export const cardStampNumber = `font-extrabold text-base min-[420px]:text-lg
+   text-color-neutral-200 group-hover:text-color-hover
+   tracking-wide truncate ${select} max-w-full`;
 export const cardRowStampNumber = `font-extrabold text-sm
-   text-color-neutral-200 group-hover:text-color-hover tracking-wide truncate ${select}`;
+   text-color-neutral-200 group-hover:text-color-hover tracking-wide truncate ${select} max-w-full`;
 export const cardCreator =
   `font-semibold text-xs mobileMd:text-sm text-color-neutral-200 break-words text-center ${select}`;
 export const cardSupply =
@@ -217,12 +218,13 @@ export const cardPrice =
   `font-medium text-xs text-color-secondary-400 text-nowrap ${select}`;
 export const cardEyebrowNeutral =
   `font-bold text-[0.625rem] text-color-neutral-600 tracking-wider ${select}`;
-// Minimal card variant styles
-export const cardStampNumberMinimal =
-  `max-w-full font-black text-xs mobileLg:text-sm
-  text-color-neutral-400 hover:text-color-hover truncate ${select}`;
-export const cardPriceMinimal =
-  `font-normal text-[0.625rem] mobileLg:text-xs text-color-secondary-400 truncate text-nowrap ${select}`;
+// Compact card variant styles
+export const cardStampNumberCompact =
+  `font-extrabold text-sm min-[420px]:text-base
+  text-color-neutral-200 group-hover:text-color-hover
+  tracking-wide truncate ${select} max-w-full`;
+export const cardPriceCompact = `font-medium text-[0.625rem] mobileLg:text-xs
+   text-color-secondary-400 text-nowrap ${select}`;
 
 /* ===== UNCATEGORIZED STYLES ===== */
 // Add any new styles you cannot categorize here
@@ -322,6 +324,6 @@ export type TextStyles = {
   cardFileSize: string;
   cardPrice: string;
   cardEyebrowNeutral: string;
-  cardStampNumberMinimal: string;
-  cardPriceMinimal: string;
+  cardStampNumberCompact: string;
+  cardPriceCompact: string;
 };

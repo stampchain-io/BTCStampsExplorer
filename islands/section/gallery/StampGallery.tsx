@@ -25,6 +25,8 @@ export default function StampGallery({
   alignRight = false,
   fromPage = "",
   sortBy = "ASC",
+  swiperSlidesPerView = 3,
+  swiperBreakpoints,
 }: StampGalleryProps) {
   /* ===== STATE ===== */
   const swiperRef = useRef<Swiper | null>(null);
@@ -43,6 +45,31 @@ export default function StampGallery({
 
   // Apply layout-specific styling - @baba-check gap
   const containerClass = layout === "grid" ? gridClass : "flex flex-col gap-4"; // Row layout default styling
+
+  const resolvedSwiperBreakpoints = swiperBreakpoints || {
+    360: { slidesPerView: 3 }, // mobileSm
+    568: { slidesPerView: 4 }, // mobileMd
+    768: { slidesPerView: 5 }, // mobileLg
+    1024: { slidesPerView: 6 }, // tablet
+    1440: { slidesPerView: 8 }, // desktop
+  };
+  const maxSlidesPerView = Math.max(
+    swiperSlidesPerView,
+    ...Object.values(resolvedSwiperBreakpoints).map((bp) => bp.slidesPerView),
+  );
+  // Swiper's loop mode needs comfortably more real slides than the
+  // largest slidesPerView it will ever show, or it can't build proper
+  // clone padding on both ends - causing the carousel to visibly break
+  // once it wraps around. Repeat the available stamps so there are always
+  // enough slides to loop smoothly, instead of disabling the loop.
+  const minSlidesForLoop = maxSlidesPerView * 2 + 1;
+  const swiperStamps = filteredStamps.length > 0 &&
+      filteredStamps.length < minSlidesForLoop
+    ? Array.from(
+      { length: minSlidesForLoop },
+      (_, index) => filteredStamps[index % filteredStamps.length],
+    )
+    : filteredStamps;
 
   // Shared key derivation for both the swiper and grid render branches
   const getStampKey = (stamp: StampRow, index: number) =>
@@ -101,7 +128,7 @@ export default function StampGallery({
   useEffect(() => {
     swiperRef.current = new Swiper(".swiper-container", {
       modules: [Navigation, Autoplay],
-      slidesPerView: 3,
+      slidesPerView: swiperSlidesPerView,
       spaceBetween: 20,
       loop: true,
       autoplay: {
@@ -112,13 +139,7 @@ export default function StampGallery({
         nextEl: ".swiper-button-next",
         prevEl: ".swiper-button-prev",
       },
-      breakpoints: {
-        360: { slidesPerView: 3 }, // mobileSm
-        568: { slidesPerView: 4 }, // mobileMd
-        768: { slidesPerView: 5 }, // mobileLg
-        1024: { slidesPerView: 6 }, // tablet
-        1440: { slidesPerView: 8 }, // desktop
-      },
+      breakpoints: resolvedSwiperBreakpoints,
     });
 
     return () => swiperRef.current?.destroy();
@@ -170,7 +191,7 @@ export default function StampGallery({
           <div class="swiper-container overflow-hidden">
             <div class="swiper-wrapper">
               {isLoading ? <div>Loading...</div> : (
-                filteredStamps.map((stamp: StampRow, index: number) => (
+                swiperStamps.map((stamp: StampRow, index: number) => (
                   <div
                     class="swiper-slide"
                     key={getStampKey(stamp, index)}

@@ -2302,6 +2302,9 @@ export interface StampGalleryProps {
   alignRight?: boolean;
   fromPage?: string;
   sortBy?: "ASC" | "DESC";
+  // Swiper carousel config - only used when the swiper/carousel render path is active
+  swiperSlidesPerView?: number;
+  swiperBreakpoints?: Record<number, { slidesPerView: number }>;
 }
 
 /**
