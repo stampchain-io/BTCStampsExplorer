@@ -289,7 +289,7 @@ export interface TableProps<T = any> {
 //   StampListingsAllProps,
 //   StampListingsOpenProps,
 //   StampOverviewContentProps,
-//   StampOverviewGalleryProps,
+//   StampGalleryHomeProps,
 //   StampSalesProps,
 //   StampTransfersProps,
 //   StatBaseProps,

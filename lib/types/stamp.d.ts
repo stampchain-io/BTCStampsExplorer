@@ -2329,9 +2329,9 @@ export interface StampGalleryWalletProps {
 }
 
 /**
- * Props for StampOverviewGallery component
+ * Props for StampGalleryHome component
  */
-export interface StampOverviewGalleryProps {
+export interface StampGalleryHomeProps {
   stamps_src721?: StampRow[];
   stamps_art?: StampRow[];
   stamps_posh?: StampRow[];

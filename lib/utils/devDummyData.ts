@@ -749,8 +749,8 @@ export const DUMMY_NEW_LISTINGS = withDummyActivityLevels(
 );
 
 /**
- * Home page — feeds StampOverviewGallery + SRC20Gallery panels.
- * Counts match the desktop displayCounts in StampOverviewGallery:
+ * Home page — feeds StampGalleryHome + SRC20Gallery panels.
+ * Counts match the desktop displayCounts in StampGalleryHome:
  *   stamps_art   → 24 (desktop: 24, 6 cols × 4 rows)
  *   stamps_posh  → 14 (desktop: 14, 7 cols × 2 rows)
  *   stamps_src721→ 12 (desktop: 12, 6 cols × 2 rows)

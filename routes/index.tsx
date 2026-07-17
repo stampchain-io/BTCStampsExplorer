@@ -17,7 +17,7 @@ import {
   GetStampingCta,
   SRC20Gallery,
   StampchainContactCta,
-  StampOverviewGallery,
+  StampGalleryHome,
 } from "$section";
 import { StampController } from "$server/controller/stampController.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
@@ -376,7 +376,7 @@ export default function Home({ data }: PageProps<HomePageData>) {
         {/* ===== NON-CRITICAL CONTENT ===== */
         }
         <div style="content-visibility: auto; contain-intrinsic-size: 0 500px;">
-          <StampOverviewGallery
+          <StampGalleryHome
             stamps_art={stamps_art}
             stamps_posh={stamps_posh}
             stamps_src721={stamps_src721}

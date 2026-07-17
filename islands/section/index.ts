@@ -7,7 +7,7 @@ export { default as CollectionDetailGallery } from "$islands/section/gallery/Col
 export { default as CollectionGallery } from "$islands/section/gallery/CollectionGallery.tsx";
 export * from "$islands/section/gallery/SRC20Gallery.tsx";
 export { default as StampGallery } from "$islands/section/gallery/StampGallery.tsx";
-export * from "$islands/section/gallery/StampOverviewGallery.tsx";
+export * from "$islands/section/gallery/StampGalleryHome.tsx";
 
 /* ===== CAROUSEL ===== */
 export * from "$components/section/gallery/CarouselHome.tsx";

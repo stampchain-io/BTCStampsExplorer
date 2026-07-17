@@ -1,24 +1,19 @@
-/* ===== STAMP OVERVIEW GALLERY COMPONENT ===== */
+/* ===== STAMP GALLERY HOME COMPONENT ===== */
 import { containerBackground, containerGap } from "$layout";
-import {
-  StampGallery,
-  StampListingsGallery,
-  StampSalesGallery,
-} from "$section";
+import { StampGallery, StampSalesGallery } from "$section";
 import type {
+  StampGalleryHomeProps,
   StampGalleryProps,
-  StampOverviewGalleryProps,
 } from "$types/stamp.d.ts";
 
 /* ===== COMPONENT ===== */
-export function StampOverviewGallery({
+export function StampGalleryHome({
   stamps_src721 = [],
   stamps_art = [],
   stamps_posh = [],
   collectionData: _collectionData = [],
   recentSalesData = [],
-  newListingsData = [],
-}: StampOverviewGalleryProps) {
+}: StampGalleryHomeProps) {
   /* ===== SECTION CONFIGURATION ===== */
   // Combine Classic, Posh, and Recursive stamps into a single gallery,
   // sorted by recency (tx_index) so the latest stamps across all types
@@ -35,15 +30,15 @@ export function StampOverviewGallery({
     viewAllLink: "/explorer?section=stamps",
     gridClass: `
       grid w-full gap-6
-      grid-cols-2 min-[420px]:grid-cols-3 mobileMd:grid-cols-4 mobileLg:grid-cols-5 tablet:grid-cols-6 desktop:grid-cols-7
+      grid-cols-2 mobileMd:grid-cols-3 mobileLg:grid-cols-4 tablet:grid-cols-5 desktop:grid-cols-6
       auto-rows-fr
     `,
     displayCounts: {
-      mobileSm: 6,
-      mobileMd: 8,
-      mobileLg: 10,
-      tablet: 12,
-      desktop: 14,
+      mobileSm: 4,
+      mobileMd: 6,
+      mobileLg: 8,
+      tablet: 10,
+      desktop: 12,
     },
   };
 
@@ -57,12 +52,6 @@ export function StampOverviewGallery({
       <div class={`${containerBackground} ${containerGap}`}>
         {/* ===== LATEST CREATIONS ===== */}
         <StampGallery {...CombinedArtStampsSection} />
-
-        {/* ===== NEW LISTINGS ===== */}
-        <StampListingsGallery
-          subTitle="New Listings"
-          initialData={newListingsData}
-        />
 
         {/* ===== RECENT SALES ===== */}
         <StampSalesGallery
