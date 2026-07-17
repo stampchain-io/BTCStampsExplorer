@@ -5,7 +5,7 @@
  */
 
 import { PaginationButtons } from "$button";
-import { SRC20OverviewNarrow } from "$components/table/src20OverviewTable/SRC20OverviewNarrow.tsx";
+import { SRC20OverviewCompact } from "$components/table/src20OverviewTable/SRC20OverviewCompact.tsx";
 import { LoadingIcon } from "$icon";
 import { useSSRSafeNavigation } from "$lib/hooks/useSSRSafeNavigation.ts";
 import { hasProperty, isNumber } from "$lib/utils/errorTypeGuards.ts";
@@ -393,7 +393,7 @@ export default function SRC20GalleryWallet({
 
       {/* SRC-20 Token Table */}
       <div class="relative">
-        <SRC20OverviewNarrow
+        <SRC20OverviewCompact
           data={memoizedTokens}
           fromPage={fromPage}
           onImageClick={(imgSrc: string) => {

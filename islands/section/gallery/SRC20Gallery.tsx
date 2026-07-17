@@ -3,9 +3,9 @@
 import { PaginationButtons, ViewAllButton } from "$button";
 import {
   SRC20Minting,
-  SRC20MintingNarrow,
+  SRC20MintingCompact,
   SRC20Overview,
-  SRC20OverviewNarrow,
+  SRC20OverviewCompact,
 } from "$card";
 import { useLoadingSkeleton } from "$lib/hooks/useLoadingSkeleton.ts";
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
@@ -87,7 +87,7 @@ export function SRC20Gallery({
       return viewType === "minted" ? SRC20Overview : SRC20Minting;
     }
     // For other pages (home, wallet), use small cards
-    return viewType === "minted" ? SRC20OverviewNarrow : SRC20MintingNarrow;
+    return viewType === "minted" ? SRC20OverviewCompact : SRC20MintingCompact;
   }, [viewType, fromPage]);
 
   // 🚀 PREACT OPTIMIZATION: Memoized card props

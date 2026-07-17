@@ -272,7 +272,7 @@ export interface TableProps<T = any> {
 //   SortProps,
 //   SpinnerProps,
 //   SRC101RegisterToolProps,
-//   SRC20MintingNarrowProps,
+//   SRC20MintingCompactProps,
 //   SRC20DetailPageProps,
 //   SRC20InputFieldProps,
 //   SRC20MintedTableProps,
@@ -3456,7 +3456,7 @@ export interface StampingProps {
 export interface SRC20MintingProps {
   // For stamping transaction tracking
   transactions?: SRC20Transaction[];
-  // For minting table components (SRC20Minting, SRC20MintingNarrow)
+  // For minting table components (SRC20Minting, SRC20MintingCompact)
   data?: SRC20Row[];
   fromPage?: "src20" | "wallet" | "stamping/src20" | "home";
   // For table components
@@ -4062,7 +4062,7 @@ export interface AlertContext {
 /**
  * Backward compatibility aliases for commonly expected type names
  */
-export interface SRC20MintingNarrowProps extends SRC20MintingProps {
+export interface SRC20MintingCompactProps extends SRC20MintingProps {
   onImageClick?: (imgSrc: string) => void;
 }
 export type SRC20MintsProps = SRC20MintingProps;

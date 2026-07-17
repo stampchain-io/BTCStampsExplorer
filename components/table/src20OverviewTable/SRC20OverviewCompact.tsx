@@ -25,17 +25,17 @@ import {
 } from "$text";
 import type { EnrichedSRC20Row } from "$types/src20.d.ts";
 
-interface SRC20OverviewNarrowProps {
+interface SRC20OverviewCompactProps {
   data: EnrichedSRC20Row[];
   fromPage: "src20" | "wallet" | "stamping/src20" | "home";
   onImageClick: (imgSrc: string) => void;
 }
 
-export function SRC20OverviewNarrow({
+export function SRC20OverviewCompact({
   data,
   fromPage,
   onImageClick,
-}: SRC20OverviewNarrowProps) {
+}: SRC20OverviewCompactProps) {
   function getMarketCap(src20: any): number {
     const marketCap = src20?.market_data?.market_cap_btc;
     if (!marketCap) return 0;

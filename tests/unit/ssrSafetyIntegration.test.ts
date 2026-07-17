@@ -12,7 +12,7 @@ describe("SSR Safety Integration Tests", () => {
   const testFiles = [
     "islands/modal/FilterSRC20Modal.tsx",
     "components/table/src20OverviewTable/SRC20Minting.tsx",
-    "components/table/src20OverviewTable/SRC20MintingNarrow.tsx",
+    "components/table/src20OverviewTable/SRC20MintingCompact.tsx",
     "lib/utils/navigation/freshNavigationUtils.ts",
     "islands/modal/SearchSRC20Modal.tsx",
     "islands/modal/SearchStampModal.tsx",

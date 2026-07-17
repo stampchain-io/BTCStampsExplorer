@@ -22,13 +22,13 @@ import {
 import { getSRC20ImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
 import { cardRowStampNumber, labelXxs, textXs, valueDarkSm } from "$text";
 import type { SRC20Row } from "$types/src20.d.ts";
-import type { SRC20MintingNarrowProps } from "$types/ui.d.ts";
+import type { SRC20MintingCompactProps } from "$types/ui.d.ts";
 import type { TargetedEvent } from "preact/compat";
 
-export function SRC20MintingNarrow({
+export function SRC20MintingCompact({
   data = [],
   onImageClick,
-}: SRC20MintingNarrowProps) {
+}: SRC20MintingCompactProps) {
   const headers = [
     "TOKEN",
     "MINTS",
