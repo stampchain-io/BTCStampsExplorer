@@ -1041,6 +1041,15 @@ export interface StampSalesProps {
   subTitle?: string;
 }
 
+/**
+ * Props for StampListingsGallery component
+ */
+export interface StampListingsProps {
+  initialData?: Array<any>;
+  title?: string;
+  subTitle?: string;
+}
+
 export interface ToolSrc20PageProps {
   selectedTab: string;
   trxType: "multisig" | "olga";

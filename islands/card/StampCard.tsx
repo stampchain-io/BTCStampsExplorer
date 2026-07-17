@@ -564,187 +564,260 @@ export function StampCard({
           target="_top"
           f-partial={`/stamp/${stamp.tx_hash}`}
           data-long-number={isLongNumber(stampValue)}
-          class={`${containerCard} !flex-row items-center gap-3`}
+          class={`${containerCard} gap-2`}
         >
-          {/* ===== LEFT: IMAGE ===== */}
-          <div class="relative shrink-0 w-20 h-20 mobileMd:w-24 mobileMd:h-24 rounded-xl overflow-hidden">
-            <div class="aspect-stamp w-full h-full overflow-hidden flex items-center justify-center">
-              {renderContent()}
+          {/* ===== TOP: IMAGE + DETAILS (2-COLUMN) ===== */}
+          {
+            /* CSS grid (not flex) so the "auto" image column's width can be
+              derived from the aspect-ratio + the row track's height, which
+              is itself set by the details column's natural content height */
+          }
+          <div class="grid grid-cols-[auto_1fr] gap-4">
+            {/* LEFT: IMAGE */}
+            <div class="relative aspect-stamp rounded-xl overflow-hidden">
+              <div class="w-full h-full overflow-hidden flex items-center justify-center">
+                {renderContent()}
+              </div>
+            </div>
+
+            {/* RIGHT: DETAILS COLUMN */}
+            <div class="flex flex-col min-w-0 justify-center gap-1.5">
+              {/* Stamp Number / CPID / Creator */}
+              <div class="flex flex-col min-w-0">
+                <div class={`${cardStampNumber} !text-lg`}>
+                  {displayStampHash && <span class="font-light">#</span>}
+                  {stampValue}
+                </div>
+                {stamp.cpid && (
+                  <div class="font-mono text-xs text-color-neutral-500 truncate max-w-full">
+                    {stamp.cpid}
+                  </div>
+                )}
+                <div class={`mt-0.5 ${cardCreator} !text-left`}>
+                  {creatorDisplay}
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* ===== RIGHT: DETAILS COLUMN ===== */}
-          <div class="flex flex-col flex-1 min-w-0 gap-1.5">
-            {/* Stamp Number / CPID / Creator */}
-            <div class="flex flex-col min-w-0">
-              <div class={cardStampNumber}>
-                {displayStampHash && <span class="font-light">#</span>}
-                {stampValue}
-              </div>
-              {stamp.cpid && (
-                <div class="font-mono text-xs text-color-neutral-500 truncate max-w-full">
-                  {stamp.cpid}
-                </div>
-              )}
-              <div class={`${cardCreator} !text-left`}>
-                {creatorDisplay}
-              </div>
+          {/* FULL WIDTH DETAILS COLUMN */}
+          {/* Row 1: Supply (left) + Status Icons (right) */}
+          <div class="flex justify-between items-center w-full">
+            <div class={`${containerPill} ${cardSupply}`}>
+              {(stamp as any).lowestPriceDispenser?.give_remaining ??
+                stamp.supply ?? 1}/{stamp.supply ?? 1}
             </div>
-
-            {/* Row 1: Supply (left) + Status Icons (right) */}
-            <div class="flex justify-between items-center w-full">
-              <div class={`${containerPill} ${cardSupply}`}>
-                {(stamp as any).lowestPriceDispenser?.give_remaining ??
-                  stamp.supply ?? 1}/{stamp.supply ?? 1}
-              </div>
-              <div class="flex items-center gap-1.5 mr-0.5">
-                {stamp.ident === "SRC-721" && (
-                  <div
-                    class="relative"
-                    onMouseEnter={handleRecursiveMouseEnter}
-                    onMouseLeave={handleRecursiveMouseLeave}
-                  >
-                    <Icon
-                      type="icon"
-                      name="recursive"
-                      weight="bold"
-                      size="xxs"
-                      color="greyLight"
-                      ariaLabel="Recursive"
-                    />
-                    <div
-                      class={`${tooltipIcon} ${
-                        isRecursiveTooltipVisible ? "opacity-100" : "opacity-0"
-                      }`}
-                    >
-                      RECURSIVE
-                    </div>
-                  </div>
-                )}
-                {stamp.divisible && (
-                  <div
-                    class="relative"
-                    onMouseEnter={handleDivisibleMouseEnter}
-                    onMouseLeave={handleDivisibleMouseLeave}
-                  >
-                    <Icon
-                      type="icon"
-                      name="divisible"
-                      weight="bold"
-                      size="xxs"
-                      color="greyLight"
-                      ariaLabel="Divisible"
-                    />
-                    <div
-                      class={`${tooltipIcon} ${
-                        isDivisibleTooltipVisible ? "opacity-100" : "opacity-0"
-                      }`}
-                    >
-                      DIVISIBLE
-                    </div>
-                  </div>
-                )}
-                {stamp.keyburn != null && (
-                  <div
-                    class="relative"
-                    onMouseEnter={handleKeyburnMouseEnter}
-                    onMouseLeave={handleKeyburnMouseLeave}
-                  >
-                    <Icon
-                      type="icon"
-                      name="keyburned"
-                      weight="bold"
-                      size="xxs"
-                      color="greyLight"
-                      ariaLabel="Keyburned"
-                    />
-                    <div
-                      class={`${tooltipIcon} ${
-                        isKeyburnTooltipVisible ? "opacity-100" : "opacity-0"
-                      }`}
-                    >
-                      KEYBURNED
-                    </div>
-                  </div>
-                )}
-                {stamp.locked
-                  ? (
-                    <div
-                      class="relative"
-                      onMouseEnter={handleLockedMouseEnter}
-                      onMouseLeave={handleLockedMouseLeave}
-                    >
-                      <Icon
-                        type="icon"
-                        name="locked"
-                        weight="bold"
-                        size="xxs"
-                        color="greyLight"
-                        ariaLabel="Locked"
-                      />
-                      <div
-                        class={`${tooltipIcon} ${
-                          isLockedTooltipVisible ? "opacity-100" : "opacity-0"
-                        }`}
-                      >
-                        LOCKED
-                      </div>
-                    </div>
-                  )
-                  : (
-                    <div
-                      class="relative"
-                      onMouseEnter={handleUnlockedMouseEnter}
-                      onMouseLeave={handleUnlockedMouseLeave}
-                    >
-                      <Icon
-                        type="icon"
-                        name="unlocked"
-                        weight="bold"
-                        size="xxs"
-                        color="greyLight"
-                        ariaLabel="Unlocked"
-                      />
-                      <div
-                        class={`${tooltipIcon} ${
-                          isUnlockedTooltipVisible ? "opacity-100" : "opacity-0"
-                        }`}
-                      >
-                        UNLOCKED
-                      </div>
-                    </div>
-                  )}
-              </div>
-            </div>
-
-            {/* Row 2: File type + File size pills */}
-            <div class="flex items-center justify-between w-full">
-              <div class={`${containerPill} ${cardFileType}`}>
-                {stamp.stamp_mimetype?.split("/")[1]?.toUpperCase() ||
-                  "UNKNOWN"}
-              </div>
-              {stamp.file_size_bytes != null && (
-                <div class={`${containerPill} ${cardFileSize}`}>
-                  {formatFileSize(
-                    stamp.file_size_bytes,
-                    stamp.stamp_mimetype === "text/plain",
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Row 3: Price + Buy button */}
-            {isListed && (
-              <div class="flex items-center justify-between gap-2 w-full">
-                <div class={cardPrice}>{displayPriceBTC().text}</div>
-                <Button
-                  variant="outline"
-                  color="primary"
-                  size="xs"
-                  class="rounded-xl shrink-0"
+            <div class="flex items-center gap-1.5 mr-0.5">
+              {stamp.ident === "SRC-721" && (
+                <div
+                  class="relative"
+                  onMouseEnter={handleRecursiveMouseEnter}
+                  onMouseLeave={handleRecursiveMouseLeave}
                 >
-                  BUY
-                </Button>
+                  <Icon
+                    type="icon"
+                    name="recursive"
+                    weight="bold"
+                    size="xxs"
+                    color="greyLight"
+                    ariaLabel="Recursive"
+                  />
+                  <div
+                    class={`${tooltipIcon} ${
+                      isRecursiveTooltipVisible ? "opacity-100" : "opacity-0"
+                    }`}
+                  >
+                    RECURSIVE
+                  </div>
+                </div>
+              )}
+              {stamp.divisible && (
+                <div
+                  class="relative"
+                  onMouseEnter={handleDivisibleMouseEnter}
+                  onMouseLeave={handleDivisibleMouseLeave}
+                >
+                  <Icon
+                    type="icon"
+                    name="divisible"
+                    weight="bold"
+                    size="xxs"
+                    color="greyLight"
+                    ariaLabel="Divisible"
+                  />
+                  <div
+                    class={`${tooltipIcon} ${
+                      isDivisibleTooltipVisible ? "opacity-100" : "opacity-0"
+                    }`}
+                  >
+                    DIVISIBLE
+                  </div>
+                </div>
+              )}
+              {stamp.keyburn != null && (
+                <div
+                  class="relative"
+                  onMouseEnter={handleKeyburnMouseEnter}
+                  onMouseLeave={handleKeyburnMouseLeave}
+                >
+                  <Icon
+                    type="icon"
+                    name="keyburned"
+                    weight="bold"
+                    size="xxs"
+                    color="greyLight"
+                    ariaLabel="Keyburned"
+                  />
+                  <div
+                    class={`${tooltipIcon} ${
+                      isKeyburnTooltipVisible ? "opacity-100" : "opacity-0"
+                    }`}
+                  >
+                    KEYBURNED
+                  </div>
+                </div>
+              )}
+              {stamp.locked
+                ? (
+                  <div
+                    class="relative"
+                    onMouseEnter={handleLockedMouseEnter}
+                    onMouseLeave={handleLockedMouseLeave}
+                  >
+                    <Icon
+                      type="icon"
+                      name="locked"
+                      weight="bold"
+                      size="xxs"
+                      color="greyLight"
+                      ariaLabel="Locked"
+                    />
+                    <div
+                      class={`${tooltipIcon} ${
+                        isLockedTooltipVisible ? "opacity-100" : "opacity-0"
+                      }`}
+                    >
+                      LOCKED
+                    </div>
+                  </div>
+                )
+                : (
+                  <div
+                    class="relative"
+                    onMouseEnter={handleUnlockedMouseEnter}
+                    onMouseLeave={handleUnlockedMouseLeave}
+                  >
+                    <Icon
+                      type="icon"
+                      name="unlocked"
+                      weight="bold"
+                      size="xxs"
+                      color="greyLight"
+                      ariaLabel="Unlocked"
+                    />
+                    <div
+                      class={`${tooltipIcon} ${
+                        isUnlockedTooltipVisible ? "opacity-100" : "opacity-0"
+                      }`}
+                    >
+                      UNLOCKED
+                    </div>
+                  </div>
+                )}
+            </div>
+          </div>
+
+          {/* Row 2: File type + File size pills */}
+          <div class="flex items-center justify-between w-full">
+            <div class={`${containerPill} ${cardFileType}`}>
+              {stamp.stamp_mimetype?.split("/")[1]?.toUpperCase() ||
+                "UNKNOWN"}
+            </div>
+            {stamp.file_size_bytes != null && (
+              <div class={`${containerPill} ${cardFileSize}`}>
+                {formatFileSize(
+                  stamp.file_size_bytes,
+                  stamp.stamp_mimetype === "text/plain",
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* ===== BOTTOM: FULL-WIDTH PRICE + BUY ===== */}
+          {isListed && (
+            <div class="flex items-center justify-between gap-2 w-full">
+              <div class="flex items-center gap-1.5 min-w-0">
+                {stamp.activity_level && (
+                  <ActivityLevelIndicator level={stamp.activity_level} />
+                )}
+                <div class={`${containerPill} ${cardPrice}`}>
+                  {displayPriceBTC().text}
+                </div>
+              </div>
+              <Button
+                variant="outline"
+                color="primary"
+                size="xsR"
+                class="rounded-xl shrink-0"
+              >
+                BUY
+              </Button>
+            </div>
+          )}
+        </a>
+      </div>
+    );
+  }
+
+  /* ===== RENDER: COMPACT HORIZONTAL LISTING VARIANT ===== */
+  if (variant === "cardHorizontalListingCompact") {
+    return (
+      <div class="relative flex w-full">
+        <a
+          href={`/stamp/${stamp.tx_hash}`}
+          target="_top"
+          f-partial={`/stamp/${stamp.tx_hash}`}
+          data-long-number={isLongNumber(stampValue)}
+          class={`${containerCard} gap-2`}
+        >
+          {/* ===== TOP: IMAGE + DETAILS (2-COLUMN) ===== */}
+          <div class="grid grid-cols-[auto_1fr] gap-4">
+            {/* LEFT: IMAGE */}
+            <div class="relative aspect-stamp rounded-xl overflow-hidden">
+              <div class="w-full h-full overflow-hidden flex items-center justify-center">
+                {renderContent()}
+              </div>
+            </div>
+
+            {/* RIGHT: DETAILS COLUMN */}
+            <div class="flex flex-col min-w-0 justify-center gap-1.5">
+              {/* Stamp Number / CPID / Creator */}
+              <div class="flex flex-col min-w-0">
+                <div class={`${cardStampNumber} !text-lg truncate max-w-[97%]`}>
+                  {displayStampHash && <span class="font-light">#</span>}
+                  {stampValue}
+                </div>
+                {stamp.cpid && (
+                  <div class="font-mono text-xs text-color-neutral-500 truncate max-w-[97%]">
+                    {stamp.cpid}
+                  </div>
+                )}
+                <div class={`mt-0.5 ${cardCreator} !text-left`}>
+                  {creatorDisplay}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ===== FOOTER: SUPPLY (LEFT) + PRICE (RIGHT) ===== */}
+          <div class="flex justify-between items-center w-full">
+            <div class={`${containerPill} ${cardSupply}`}>
+              {(stamp as any).lowestPriceDispenser?.give_remaining ??
+                stamp.supply ?? 1}/{stamp.supply ?? 1}
+            </div>
+            {isListed && (
+              <div class={`${containerPill} ${cardPrice}`}>
+                {displayPriceBTC().text}
               </div>
             )}
           </div>
@@ -754,7 +827,9 @@ export function StampCard({
   }
 
   /* ===== RENDER ===== */
+  /* ===== CARD VARIANTS ===== */
   return (
+    /* ===== SQUARE CARD (home / gallery pages) ===== */
     <div class="relative flex justify-center w-full h-full max-w-72">
       <a
         href={`/stamp/${stamp.tx_hash}`}
@@ -767,12 +842,11 @@ export function StampCard({
         {/* Note: Atomic icon is only shown on WalletStampCard for stamps with UTXO attachments */}
         {/* Regular StampCard does not show atomic icon as it lacks wallet-specific UTXO data */}
 
-        {/* ===== CONTENT SECTION ===== */}
         <div class="relative w-full h-full">
           <div class="aspect-stamp w-full h-full overflow-hidden flex items-center justify-center">
             {renderContent()}
           </div>
-          {/* ===== IMAGE PILL OVERLAY ===== */}
+          {/* ===== SQUARE CARD DETAIL ===== */}
           {variant === "cardSquareDetail" && (
             <div class="absolute bottom-1 left-1 z-20">
               <div class={`${containerPill} ${cardSupply} cursor-pointer`}>
@@ -782,7 +856,7 @@ export function StampCard({
           )}
         </div>
 
-        {/* ===== FULL DETAILS SECTION (explorer / marketplace listings) ===== */}
+        {/* ===== VERTICAL DETAIL CARD (explorer / marketplace listings) ===== */}
         {(variant === "cardVerticalDetail" ||
           variant === "cardVerticalListing") && (
           <div class="flex flex-col items-center p-0.5">
@@ -1045,7 +1119,7 @@ export function StampCard({
           </div>
         )}
 
-        {/* ===== SALE DETAILS SECTION (marketplace sales) ===== */}
+        {/* ===== VERTICAL SALE CARD (marketplace sales) ===== */}
         {variant === "cardVerticalSale" && (
           <div class="flex flex-col items-center p-0.5">
             {/* Stamp Number */}
@@ -1159,17 +1233,17 @@ export function StampCard({
           </div>
         )}
 
-        {/* ===== COMPACT DETAILS SECTION (home / sales pages) ===== */}
+        {/* ===== SALE COMPACT SECTION (home / sales pages) ===== */}
         {variant === "cardVerticalSaleCompact" && (
-          <div class="flex flex-col items-center px-1.5 mobileLg:px-3 pt-1.5 mobileLg:pt-3">
+          <div class="flex flex-col items-center p-0.5">
             <div
-              class={`flex items-center justify-center ${cardStampNumberCompact}`}
+              class={`flex items-center justify-center mt-1 ${cardStampNumberCompact}`}
             >
               {displayStampHash && <span class="font-light">#</span>}
               {stampValue}
             </div>
             <div
-              class={`mt-2 ${containerPill} ${cardPriceCompact}`}
+              class={`mt-1.5 ${containerPill} ${cardPriceCompact}`}
             >
               {displayPriceBTC().text}
             </div>

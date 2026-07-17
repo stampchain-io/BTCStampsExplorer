@@ -2278,6 +2278,9 @@ export declare function isValidStampTransaction(
  * - "cardHorizontalListing" : flex-row layout — thumbnail (left) + details
  *   column (right): stamp#/cpid/creator, supply+status icons row, filetype+
  *   filesize row, price + buy button row
+ * - "cardHorizontalListingCompact": same thumbnail + stamp#/cpid/creator
+ *   layout, but a single footer row (supply pill + status icons + BTC icon
+ *   with hover tooltip in place of the full price pill/BUY button)
  */
 export type StampCardVariant =
   | "cardSquare"
@@ -2286,7 +2289,8 @@ export type StampCardVariant =
   | "cardVerticalListing"
   | "cardVerticalSale"
   | "cardVerticalSaleCompact"
-  | "cardHorizontalListing";
+  | "cardHorizontalListing"
+  | "cardHorizontalListingCompact";
 
 /**
  * Props for StampGallery component
@@ -2333,6 +2337,7 @@ export interface StampOverviewGalleryProps {
   stamps_posh?: StampRow[];
   collectionData?: CollectionRow[];
   recentSalesData?: Array<any>;
+  newListingsData?: Array<any>;
 }
 
 /**

@@ -23,6 +23,7 @@ export { default as TeamBanner } from "$islands/section/gallery/TeamBanner.tsx";
 export { default as SRC20DeploysGallery } from "$islands/section/gallery/SRC20Deploys.tsx";
 export { default as SRC20MintsGallery } from "$islands/section/gallery/SRC20Mints.tsx";
 export { default as SRC20TransfersGallery } from "$islands/section/gallery/SRC20Transfers.tsx";
+export * from "$islands/section/gallery/StampListings.tsx";
 export * from "$islands/section/gallery/StampSales.tsx";
 export { default as StampSendsGallery } from "$islands/section/gallery/StampSends.tsx";
 /* export { default as SRC101RegistersGallery } from "$islands/section/gallery/SRC101Registers.tsx"; */

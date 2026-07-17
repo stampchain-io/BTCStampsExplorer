@@ -280,6 +280,7 @@ import * as $section_gallery_SRC20Mints from "./islands/section/gallery/SRC20Min
 import * as $section_gallery_SRC20Transfers from "./islands/section/gallery/SRC20Transfers.tsx";
 import * as $section_gallery_StampGallery from "./islands/section/gallery/StampGallery.tsx";
 import * as $section_gallery_StampGalleryWallet from "./islands/section/gallery/StampGalleryWallet.tsx";
+import * as $section_gallery_StampListings from "./islands/section/gallery/StampListings.tsx";
 import * as $section_gallery_StampOverviewGallery from "./islands/section/gallery/StampOverviewGallery.tsx";
 import * as $section_gallery_StampSales from "./islands/section/gallery/StampSales.tsx";
 import * as $section_gallery_StampSends from "./islands/section/gallery/StampSends.tsx";
@@ -669,6 +670,8 @@ const manifest = {
     "./islands/section/gallery/StampGallery.tsx": $section_gallery_StampGallery,
     "./islands/section/gallery/StampGalleryWallet.tsx":
       $section_gallery_StampGalleryWallet,
+    "./islands/section/gallery/StampListings.tsx":
+      $section_gallery_StampListings,
     "./islands/section/gallery/StampOverviewGallery.tsx":
       $section_gallery_StampOverviewGallery,
     "./islands/section/gallery/StampSales.tsx": $section_gallery_StampSales,

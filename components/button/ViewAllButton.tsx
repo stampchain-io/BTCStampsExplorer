@@ -5,7 +5,7 @@ import type { ViewAllButtonProps } from "$types/ui.d.ts";
 /* ===== COMPONENT ===== */
 export function ViewAllButton({ href }: ViewAllButtonProps) {
   return (
-    <div class="flex justify-end w-full mt-6">
+    <div class="flex justify-end w-full mt-5">
       <Button
         variant="flat"
         color="primary"

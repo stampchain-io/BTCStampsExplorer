@@ -9,6 +9,7 @@ import { body, containerBackground, containerGap } from "$layout";
 import {
   DEV_DUMMY_MODE,
   DUMMY_LANDING_PAGE,
+  DUMMY_NEW_LISTINGS,
   DUMMY_RECENT_SALES,
   DUMMY_TOKEN_OVERVIEW_PAGE,
 } from "$lib/utils/devDummyData.ts";
@@ -57,6 +58,13 @@ interface HomePageData extends StampControllerData {
     page: number;
     totalPages: number;
   };
+  // New listings data (stamps with open dispensers) for SSR optimization
+  newListingsData?: {
+    data: StampRow[];
+    total: number;
+    page: number;
+    totalPages: number;
+  };
 }
 
 /* ===== SERVER HANDLER ===== */
@@ -81,6 +89,12 @@ export const handler: Handlers<HomePageData> = {
         recentSalesData: {
           data: DUMMY_RECENT_SALES as any,
           total: DUMMY_RECENT_SALES.length,
+          page: 1,
+          totalPages: 1,
+        },
+        newListingsData: {
+          data: DUMMY_NEW_LISTINGS as any,
+          total: DUMMY_NEW_LISTINGS.length,
           page: 1,
           totalPages: 1,
         },
@@ -140,104 +154,129 @@ export const handler: Handlers<HomePageData> = {
       // This eliminates the internal API self-referencing issue where requests
       // were timing out due to EC2 IP resolution instead of localhost
 
-      const [pageData, mintedData, mintingData, recentSalesData] = await Promise
-        .allSettled([
-          // Stamp homepage data (carousels, galleries)
-          fetchWithFallback(
-            () =>
-              StampController.getHomePageData(btcPrice, btcPriceData.source),
-            DUMMY_LANDING_PAGE,
-            "StampController.getHomePageData",
-          ),
-          // Top minted SRC20 tokens - call service directly
-          fetchWithFallback(
-            async () => {
-              const result = await SRC20Service.QueryService
-                .fetchEnhancedSrc20Data(
-                  {
-                    op: "DEPLOY",
-                    sortBy: "TRENDING_24H_DESC",
-                    limit: 5,
-                    page: 1,
-                  },
-                  {
-                    onlyFullyMinted: true,
-                    includeMarketData: true,
-                    enrichWithProgress: true,
-                  },
-                );
-              // Type assertion for paginated response
-              const paginatedResult = result as {
-                data: unknown[];
-                page?: number;
-                totalPages?: number;
-                limit?: number;
-              };
-              const dataArray = Array.isArray(paginatedResult.data)
-                ? paginatedResult.data
-                : [];
-              return {
-                data: dataArray,
-                total: dataArray.length,
-                page: paginatedResult.page || 1,
-                totalPages: paginatedResult.totalPages || 1,
-              };
-            },
-            DUMMY_TOKEN_OVERVIEW_PAGE,
-            "fetchTopMintedTokens",
-          ),
-          // Trending minting SRC20 tokens - call service directly
-          fetchWithFallback(
-            async () => {
-              const result = await SRC20Service.QueryService
-                .fetchEnhancedSrc20Data(
-                  {
-                    op: "DEPLOY",
-                    sortBy: "TRENDING_MINTING_DESC",
-                    limit: 5,
-                    page: 1,
-                  },
-                  {
-                    excludeFullyMinted: true,
-                    includeMarketData: true,
-                    enrichWithProgress: true,
-                  },
-                );
-              // Type assertion for paginated response
-              const paginatedResult = result as {
-                data: unknown[];
-                page?: number;
-                totalPages?: number;
-                limit?: number;
-              };
-              const dataArray = Array.isArray(paginatedResult.data)
-                ? paginatedResult.data
-                : [];
-              return {
-                data: dataArray,
-                total: dataArray.length,
-                page: paginatedResult.page || 1,
-                totalPages: paginatedResult.totalPages || 1,
-              };
-            },
-            DUMMY_TOKEN_OVERVIEW_PAGE,
-            "fetchTrendingActiveMintingTokensV2",
-          ),
-          // Recent stamp sales - call controller directly
-          fetchWithFallback(
-            async () => {
-              const result = await StampController.getRecentSales(1, 8);
-              return {
-                data: result.data || [],
-                total: result.total || 0,
-                page: result.page || 1,
-                totalPages: result.totalPages || 0,
-              };
-            },
-            { data: [], total: 0, page: 1, totalPages: 0 },
-            "fetchRecentSalesData",
-          ),
-        ]);
+      const [
+        pageData,
+        mintedData,
+        mintingData,
+        recentSalesData,
+        newListingsData,
+      ] = await Promise.allSettled([
+        // Stamp homepage data (carousels, galleries)
+        fetchWithFallback(
+          () => StampController.getHomePageData(btcPrice, btcPriceData.source),
+          DUMMY_LANDING_PAGE,
+          "StampController.getHomePageData",
+        ),
+        // Top minted SRC20 tokens - call service directly
+        fetchWithFallback(
+          async () => {
+            const result = await SRC20Service.QueryService
+              .fetchEnhancedSrc20Data(
+                {
+                  op: "DEPLOY",
+                  sortBy: "TRENDING_24H_DESC",
+                  limit: 5,
+                  page: 1,
+                },
+                {
+                  onlyFullyMinted: true,
+                  includeMarketData: true,
+                  enrichWithProgress: true,
+                },
+              );
+            // Type assertion for paginated response
+            const paginatedResult = result as {
+              data: unknown[];
+              page?: number;
+              totalPages?: number;
+              limit?: number;
+            };
+            const dataArray = Array.isArray(paginatedResult.data)
+              ? paginatedResult.data
+              : [];
+            return {
+              data: dataArray,
+              total: dataArray.length,
+              page: paginatedResult.page || 1,
+              totalPages: paginatedResult.totalPages || 1,
+            };
+          },
+          DUMMY_TOKEN_OVERVIEW_PAGE,
+          "fetchTopMintedTokens",
+        ),
+        // Trending minting SRC20 tokens - call service directly
+        fetchWithFallback(
+          async () => {
+            const result = await SRC20Service.QueryService
+              .fetchEnhancedSrc20Data(
+                {
+                  op: "DEPLOY",
+                  sortBy: "TRENDING_MINTING_DESC",
+                  limit: 5,
+                  page: 1,
+                },
+                {
+                  excludeFullyMinted: true,
+                  includeMarketData: true,
+                  enrichWithProgress: true,
+                },
+              );
+            // Type assertion for paginated response
+            const paginatedResult = result as {
+              data: unknown[];
+              page?: number;
+              totalPages?: number;
+              limit?: number;
+            };
+            const dataArray = Array.isArray(paginatedResult.data)
+              ? paginatedResult.data
+              : [];
+            return {
+              data: dataArray,
+              total: dataArray.length,
+              page: paginatedResult.page || 1,
+              totalPages: paginatedResult.totalPages || 1,
+            };
+          },
+          DUMMY_TOKEN_OVERVIEW_PAGE,
+          "fetchTrendingActiveMintingTokensV2",
+        ),
+        // Recent stamp sales - call controller directly
+        fetchWithFallback(
+          async () => {
+            const result = await StampController.getRecentSales(1, 8);
+            return {
+              data: result.data || [],
+              total: result.total || 0,
+              page: result.page || 1,
+              totalPages: result.totalPages || 0,
+            };
+          },
+          { data: [], total: 0, page: 1, totalPages: 0 },
+          "fetchRecentSalesData",
+        ),
+        // New listings - stamps with open dispensers, call controller directly
+        fetchWithFallback(
+          async () => {
+            const result = await StampController.getStamps({
+              market: "listings",
+              dispensers: true,
+              listings: "all",
+              page: 1,
+              limit: 10,
+              sortBy: "DESC",
+            });
+            return {
+              data: Array.isArray(result.data) ? result.data : [],
+              total: "total" in result ? (result.total || 0) : 0,
+              page: "page" in result ? (result.page || 1) : 1,
+              totalPages: "totalPages" in result ? (result.totalPages || 0) : 0,
+            };
+          },
+          { data: [], total: 0, page: 1, totalPages: 0 },
+          "fetchNewListingsData",
+        ),
+      ]);
 
       clearTimeout(timeout);
 
@@ -261,6 +300,9 @@ export const handler: Handlers<HomePageData> = {
       const recentSalesResult = recentSalesData.status === "fulfilled"
         ? recentSalesData.value
         : { data: [], total: 0, page: 1, totalPages: 0 };
+      const newListingsResult = newListingsData.status === "fulfilled"
+        ? newListingsData.value
+        : { data: [], total: 0, page: 1, totalPages: 0 };
 
       /* ===== RESPONSE RENDERING ===== */
       const response = await ctx.render({
@@ -270,6 +312,7 @@ export const handler: Handlers<HomePageData> = {
           minting: mintingResult as any,
         },
         recentSalesData: recentSalesResult as any,
+        newListingsData: newListingsResult as any,
         // 🚀 PERFORMANCE: Pass BTC price to components to avoid redundant fetches
         btcPrice: btcPrice,
         btcPriceSource: btcPriceData.source,
@@ -304,6 +347,7 @@ export default function Home({ data }: PageProps<HomePageData>) {
     collectionData = [],
     src20Data,
     recentSalesData,
+    newListingsData,
   } = data || {};
 
   /* ===== RENDER ===== */
@@ -338,6 +382,7 @@ export default function Home({ data }: PageProps<HomePageData>) {
             stamps_src721={stamps_src721}
             collectionData={collectionData}
             recentSalesData={recentSalesData?.data || []}
+            newListingsData={newListingsData?.data || []}
           />
         </div>
 

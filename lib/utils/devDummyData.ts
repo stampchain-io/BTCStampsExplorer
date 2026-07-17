@@ -733,6 +733,22 @@ export const DUMMY_RECENT_SALES = _timeLabels.map((timeLabel, i) => {
 });
 
 /**
+ * New Listings — 10 entries cycling CLASSIC → POSH → SRC721, all currently
+ * listed (i.e. carrying an open dispenser + floorPriceBTC) so every card
+ * renders with a price and BUY button, matching a real "listings" query.
+ * Activity levels cycle HOT/WARM/COOL/DORMANT — "COLD" is excluded since
+ * every entry here always has an open dispenser.
+ */
+const _listingBase = [_stampBases[1], _stampBases[3], _stampBases[5]];
+export const DUMMY_NEW_LISTINGS = withDummyActivityLevels(
+  Array.from(
+    { length: 10 },
+    (_, i) => ({ ..._listingBase[i % _listingBase.length] }),
+  ),
+  ["HOT", "WARM", "COOL", "DORMANT"],
+);
+
+/**
  * Home page — feeds StampOverviewGallery + SRC20Gallery panels.
  * Counts match the desktop displayCounts in StampOverviewGallery:
  *   stamps_art   → 24 (desktop: 24, 6 cols × 4 rows)
