@@ -376,7 +376,7 @@ export default function Home({ data }: PageProps<HomePageData>) {
 
         {/* ===== NON-CRITICAL CONTENT ===== */
         }
-        <div style="content-visibility: auto; contain-intrinsic-size: 0 500px;">
+        <div style="content-visibility: auto; contain-intrinsic-size: 0 1240px;">
           <StampGalleryHome
             stamps_art={stamps_art}
             stamps_posh={stamps_posh}
@@ -388,8 +388,8 @@ export default function Home({ data }: PageProps<HomePageData>) {
         </div>
 
         {/* ===== BELOW FOLD CONTENT - LAZY LOAD ===== */}
-        <div style="content-visibility: auto; contain-intrinsic-size: 0 800px;">
-          <div class="my-6 mobileLg:my-9">
+        <div style="content-visibility: auto; contain-intrinsic-size: 0 360px;">
+          <div class="mb-5 mobileLg:mb-7.5">
             <GetStampingCta />
           </div>
 
@@ -419,7 +419,7 @@ export default function Home({ data }: PageProps<HomePageData>) {
           </div>
         </div>
 
-        <div class={`flex flex-col ${containerGap}`}>
+        <div>
           <StampchainContactCta />
         </div>
       </div>
