@@ -10,16 +10,19 @@ import {
   container2,
   shadowGlowPurple,
 } from "$layout";
-import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
-import { getSRC20ImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
-import { labelXs, textSm, valueDarkSm } from "$text";
-import type { SRC20Row } from "$types/src20.d.ts";
-import type { SRC20MintingNarrowProps } from "$types/ui.d.ts";
 import {
   getCurrentUrl,
   isBrowser,
   safeNavigate,
-} from "$utils/navigation/freshNavigationUtils.ts";
+} from "$lib/utils/navigation/freshNavigationUtils.ts";
+import {
+  splitTextAndEmojis,
+  unicodeEscapeToEmoji,
+} from "$lib/utils/ui/formatting/emojiUtils.ts";
+import { getSRC20ImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
+import { cardRowStampNumber, labelXxs, textXs, valueDarkSm } from "$text";
+import type { SRC20Row } from "$types/src20.d.ts";
+import type { SRC20MintingNarrowProps } from "$types/ui.d.ts";
 import type { TargetedEvent } from "preact/compat";
 
 export function SRC20MintingNarrow({
@@ -34,22 +37,10 @@ export function SRC20MintingNarrow({
     "MINT",
   ];
 
-  function splitTextAndEmojis(text: string): { text: string; emoji: string } {
-    const emojiRegex =
-      /[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F000}-\u{1F02F}\u{1F0A0}-\u{1F0FF}\u{1F100}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{1F900}-\u{1F9FF}]/gu;
-    const match = text.match(emojiRegex);
-    if (!match || !match[0]) return { text, emoji: "" };
-    const emojiIndex = text.indexOf(match[0]);
-    return {
-      text: text.slice(0, emojiIndex),
-      emoji: text.slice(emojiIndex),
-    };
-  }
-
   return (
     <div class="overflow-x-auto tablet:overflow-x-visible scrollbar-hide">
       <table
-        class={`w-full -mt-2 border-separate border-spacing-y-3 ${textSm}`}
+        class={`w-full -mt-2 border-separate border-spacing-y-3 ${textXs}`}
       >
         <colgroup>
           {colGroup([
@@ -90,9 +81,9 @@ export function SRC20MintingNarrow({
               return (
                 <th
                   key={header}
-                  class={`${labelXs} ${
+                  class={`${labelXxs} ${
                     cellAlign(i, headers?.length ?? 0)
-                  } py-2 ${rowClass} ${
+                  } py-1.5 !px-3 ${rowClass} ${
                     i === 1 ? "tablet:hidden min-[1280px]:table-cell" : ""
                   } ${isFirst ? cellStickyLeft : ""}`}
                 >
@@ -177,7 +168,7 @@ export function SRC20MintingNarrow({
                           ? (
                             <img
                               src={imageUrl}
-                              class="w-7 h-7 rounded-xl cursor-pointer"
+                              class="w-6.5 h-6.5 rounded-xl cursor-pointer"
                               onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
@@ -188,7 +179,7 @@ export function SRC20MintingNarrow({
                           )
                           : (
                             <div
-                              class="w-7 h-7 rounded-xl overflow-hidden"
+                              class="w-6.5 h-6.5 rounded-xl overflow-hidden"
                               onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
@@ -201,7 +192,7 @@ export function SRC20MintingNarrow({
                             </div>
                           )}
                         <div class="flex flex-col">
-                          <div class="font-bold text-base uppercase tracking-wide">
+                          <div class="font-extrabold text-sm uppercase tracking-wide">
                             {(() => {
                               const { text, emoji } = splitTextAndEmojis(
                                 unicodeEscapeToEmoji(src20.tick ?? ""),
@@ -209,7 +200,7 @@ export function SRC20MintingNarrow({
                               return (
                                 <>
                                   {text && (
-                                    <span class="bg-gradient-to-l color-neutral-gradient color-gradient-hover inline-block">
+                                    <span class={cardRowStampNumber}>
                                       {text.toUpperCase()}
                                     </span>
                                   )}
@@ -238,24 +229,11 @@ export function SRC20MintingNarrow({
                         cellAlign(2, headers?.length ?? 0)
                       } ${cellCenterL2Card}`}
                     >
-                      <div class="flex items-center justify-center w-full">
-                        <div class="flex flex-col w-[65px] min-[380px]:w-[75px] min-[400px]:w-[85px] min-[420px]:w-[100px] min-[480px]:w-[125px] mobileLg:w-[160px] tablet:w-[80px] min-[1080px]:w-[90px] min-[1180px]:w-[110px] desktop:w-[160px] gap-1">
-                          <div class="!text-xs text-center">
-                            {(() => {
-                              const progressRaw =
-                                src20.mint_progress?.progress ??
-                                  src20.progress ?? 0;
-                              const progressValue = Number(progressRaw);
-                              if (isNaN(progressValue)) {
-                                return "0";
-                              }
-                              return progressValue.toFixed(1);
-                            })()}
-                            <span class="text-color-grey-light">%</span>
-                          </div>
-                          <div class="relative h-1.5 bg-color-grey rounded-full">
+                      <div class="flex items-center justify-center w-full gap-2">
+                        <div class="flex flex-row items-center w-[90px] min-[420px]:w-[100px] mobileMd:w-[120px] mobileLg:w-[150px] tablet:w-[110px] desktop:w-[140px] gap-3">
+                          <div class="relative flex-1 h-1.5 bg-color-neutral-800 rounded-full">
                             <div
-                              class="absolute left-0 top-0 h-1.5 bg-color-purple rounded-full"
+                              class="absolute left-0 top-0 h-1.5 bg-gradient-to-r from-color-primary-500 via-color-primary-400 to-color-primary-300 rounded-full"
                               style={{
                                 width: `${
                                   (() => {
@@ -275,6 +253,19 @@ export function SRC20MintingNarrow({
                               }}
                             />
                           </div>
+                          <div class="!text-[10px] text-color-neutral-500 shrink-0">
+                            {(() => {
+                              const progressRaw =
+                                src20.mint_progress?.progress ??
+                                  src20.progress ?? 0;
+                              const progressValue = Number(progressRaw);
+                              if (isNaN(progressValue)) {
+                                return "0";
+                              }
+                              return progressValue.toFixed(1);
+                            })()}
+                            %
+                          </div>
                         </div>
                       </div>
                     </td>
@@ -285,9 +276,8 @@ export function SRC20MintingNarrow({
                       } ${cellCenterL2Card}`}
                     >
                       {(() => {
-                        const holderCount =
-                          (src20 as any)?.market_data?.holder_count ||
-                          (src20 as any)?.holders ||
+                        const holderCount = src20.market_data?.holder_count ??
+                          src20.holders ??
                           0;
                         return Number(holderCount).toLocaleString();
                       })()}
@@ -299,11 +289,12 @@ export function SRC20MintingNarrow({
                       } ${cellRightL2Card}`}
                     >
                       <Button
-                        variant="flat"
-                        color="neutral"
-                        size="xsR"
+                        variant="outline"
+                        color="primary"
+                        size="xxs"
                         href={mintHref}
                         onClick={handleMintClick}
+                        class="rounded-xl"
                       >
                         MINT
                       </Button>

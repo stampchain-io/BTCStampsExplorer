@@ -9,11 +9,15 @@ import {
   shadowGlowPurple,
 } from "$layout";
 import { safeNavigate } from "$lib/utils/navigation/freshNavigationUtils.ts";
-import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
+import {
+  splitTextAndEmojis,
+  unicodeEscapeToEmoji,
+} from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { getSRC20ImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
 import {
-  labelXs,
-  textSm,
+  cardRowStampNumber,
+  labelXxs,
+  textXs,
   valueDarkSm,
   valueNegative,
   valueNeutral,
@@ -70,22 +74,14 @@ export function SRC20OverviewNarrow({
       "MARKETCAP",
     ];
 
-  function splitTextAndEmojis(text: string): { text: string; emoji: string } {
-    const emojiRegex =
-      /[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F000}-\u{1F02F}\u{1F0A0}-\u{1F0FF}\u{1F100}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{1F900}-\u{1F9FF}]/gu;
-    const match = text.match(emojiRegex);
-    if (!match || !match[0]) return { text, emoji: "" };
-    const emojiIndex = text.indexOf(match[0]);
-    return {
-      text: text.slice(0, emojiIndex),
-      emoji: text.slice(emojiIndex),
-    };
-  }
+  // VOLUME is last visible col on tablet (MARKETCAP hidden); center on desktop
+  const cellVolume =
+    `${cellCenterL2Card} tablet:rounded-r-2xl tablet:border-r-[1px] tablet:!pr-3 tablet:text-right desktop:rounded-r-none desktop:border-r-0 desktop:text-center`;
 
   return (
     <div class="overflow-x-auto tablet:overflow-x-visible scrollbar-hide">
       <table
-        class={`w-full -mt-2 border-separate border-spacing-y-3 ${textSm}`}
+        class={`w-full -mt-2 border-separate border-spacing-y-3 ${textXs}`}
       >
         <colgroup>
           {colGroup(
@@ -142,17 +138,8 @@ export function SRC20OverviewNarrow({
               const isLast = i === (headers?.length ?? 0) - 1;
 
               let rowClass = "";
-              if (header === "TOKEN") {
-                rowClass = cellLeftL2Card;
-              } else if (header === "BALANCE") {
-                rowClass = cellCenterL2Card;
-              } else if (header === "PRICE") {
-                rowClass = cellCenterL2Card;
-              } else if (header === "CHANGE") {
-                rowClass = cellCenterL2Card;
-              } else if (header === "VOLUME") {
-                rowClass =
-                  `p-3 border-y-[1px] border-x-0 border-color-border/75 group-hover:border-color-purple-light transition-all duration-200 tablet:pr-4 tablet:rounded-r-2xl tablet:border-r-[1px] tablet:border-l-0 desktop:pr-3 desktop:rounded-r-none desktop:border-r-0`;
+              if (header === "VOLUME") {
+                rowClass = cellVolume;
               } else if (header === "MARKETCAP") {
                 rowClass = cellRightL2Card;
               } else {
@@ -166,20 +153,13 @@ export function SRC20OverviewNarrow({
               return (
                 <th
                   key={header}
-                  class={`${labelXs} ${
+                  class={`${labelXxs} ${
                     cellAlign(i, headers?.length ?? 0)
-                  } !py-2 ${rowClass}
-                                  ${
+                  } py-1.5 !px-3 ${rowClass} ${
                     header === "MARKETCAP"
                       ? "tablet:hidden desktop:table-cell"
-                      : header === "VOLUME"
-                      ? "text-center tablet:text-right desktop:text-center"
-                      : header === "CHANGE"
-                      ? "text-center"
                       : ""
-                  }
-                ${isFirst ? cellStickyLeft : ""}
-                `}
+                  } ${isFirst ? cellStickyLeft : ""}`}
                 >
                   {header}
                 </th>
@@ -226,7 +206,7 @@ export function SRC20OverviewNarrow({
                           ? (
                             <img
                               src={imageUrl}
-                              class="w-7 h-7 rounded-xl cursor-pointer"
+                              class="w-6.5 h-6.5 rounded-xl cursor-pointer"
                               onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
@@ -237,7 +217,7 @@ export function SRC20OverviewNarrow({
                           )
                           : (
                             <div
-                              class="w-7 h-7 rounded-xl overflow-hidden"
+                              class="w-6.5 h-6.5 rounded-xl overflow-hidden"
                               onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
@@ -250,7 +230,7 @@ export function SRC20OverviewNarrow({
                             </div>
                           )}
                         <div class="flex flex-col">
-                          <div class="font-bold text-base uppercase tracking-wide">
+                          <div class="font-extrabold text-sm uppercase tracking-wide">
                             {(() => {
                               const { text, emoji } = splitTextAndEmojis(
                                 unicodeEscapeToEmoji(src20.tick ?? ""),
@@ -258,7 +238,7 @@ export function SRC20OverviewNarrow({
                               return (
                                 <>
                                   {text && (
-                                    <span class="bg-gradient-to-l color-neutral-gradient color-gradient-hover inline-block">
+                                    <span class={cardRowStampNumber}>
                                       {text.toUpperCase()}
                                     </span>
                                   )}
@@ -293,7 +273,7 @@ export function SRC20OverviewNarrow({
                           fromPage === "wallet" ? 2 : 1,
                           headers?.length ?? 0,
                         )
-                      } ${cellCenterL2Card}`}
+                      } ${cellCenterL2Card} text-color-secondary-400`}
                     >
                       {(() => {
                         const priceInBtc = getPrice(src20);
@@ -324,34 +304,35 @@ export function SRC20OverviewNarrow({
                       class={`${cellCenterL2Card} text-center`}
                     >
                       {(() => {
-                        const changePercent =
-                          src20.market_data?.change_24h_percent ?? 0;
-
-                        const changeValue = Number(changePercent);
-                        if (isNaN(changeValue)) {
-                          return <span class="text-color-grey">N/A</span>;
+                        const change = src20.market_data?.change_24h_percent;
+                        if (change !== undefined && change !== null) {
+                          const changeNum = Number(change);
+                          if (!isNaN(changeNum)) {
+                            return (
+                              <span
+                                class={changeNum > 0
+                                  ? valuePositive
+                                  : changeNum < 0
+                                  ? valueNegative
+                                  : valueNeutral}
+                              >
+                                {changeNum > 0 ? "+" : ""}
+                                {changeNum.toFixed(2)}%
+                              </span>
+                            );
+                          }
                         }
-
-                        return (
-                          <span
-                            class={changeValue > 0
-                              ? valuePositive
-                              : changeValue < 0
-                              ? valueNegative
-                              : valueNeutral}
-                          >
-                            {changeValue > 0 ? "+" : ""}
-                            {changeValue.toFixed(2)}%
-                          </span>
-                        );
+                        return <span class="text-color-neutral-500">N/A</span>;
                       })()}
                     </td>
                     {/* VOLUME */}
                     <td
-                      class={`p-3 border-y-[1px] border-x-0 border-color-border/75 group-hover:border-color-purple-light transition-all duration-200
-                      tablet:pr-4 tablet:rounded-r-2xl tablet:border-r-[1px] tablet:border-l-0
-                      desktop:pr-3 desktop:rounded-r-none desktop:border-r-0
-                      text-center tablet:text-right desktop:text-center`}
+                      class={`${
+                        cellAlign(
+                          fromPage === "wallet" ? 4 : 3,
+                          headers?.length ?? 0,
+                        )
+                      } ${cellVolume}`}
                     >
                       {(() => {
                         const volume = getVolume24h(src20);
@@ -383,7 +364,7 @@ export function SRC20OverviewNarrow({
                           headers?.length ?? 0,
                         )
                       }
-                      ${cellRightL2Card}
+                      ${cellRightL2Card} !pr-3
                       tablet:hidden desktop:table-cell
                     `}
                     >
