@@ -8,10 +8,11 @@ import { HomeHeader } from "$header";
 import { body, containerBackground, containerGap } from "$layout";
 import {
   DEV_DUMMY_MODE,
+  DUMMY_HOME_SRC20_MINTED,
+  DUMMY_HOME_SRC20_MINTING,
   DUMMY_LANDING_PAGE,
   DUMMY_NEW_LISTINGS,
   DUMMY_RECENT_SALES,
-  DUMMY_TOKEN_OVERVIEW_PAGE,
 } from "$lib/utils/devDummyData.ts";
 import {
   GetStampingCta,
@@ -83,8 +84,8 @@ export const handler: Handlers<HomePageData> = {
       return await ctx.render({
         ...DUMMY_LANDING_PAGE,
         src20Data: {
-          minted: DUMMY_TOKEN_OVERVIEW_PAGE as any,
-          minting: DUMMY_TOKEN_OVERVIEW_PAGE as any,
+          minted: DUMMY_HOME_SRC20_MINTED as any,
+          minting: DUMMY_HOME_SRC20_MINTING as any,
         },
         recentSalesData: {
           data: DUMMY_RECENT_SALES as any,
@@ -201,7 +202,7 @@ export const handler: Handlers<HomePageData> = {
               totalPages: paginatedResult.totalPages || 1,
             };
           },
-          DUMMY_TOKEN_OVERVIEW_PAGE,
+          DUMMY_HOME_SRC20_MINTED,
           "fetchTopMintedTokens",
         ),
         // Trending minting SRC20 tokens - call service directly
@@ -238,7 +239,7 @@ export const handler: Handlers<HomePageData> = {
               totalPages: paginatedResult.totalPages || 1,
             };
           },
-          DUMMY_TOKEN_OVERVIEW_PAGE,
+          DUMMY_HOME_SRC20_MINTING,
           "fetchTrendingActiveMintingTokensV2",
         ),
         // Recent stamp sales - call controller directly
@@ -329,8 +330,8 @@ export const handler: Handlers<HomePageData> = {
       return await ctx.render({
         ...DUMMY_LANDING_PAGE,
         src20Data: {
-          minted: DUMMY_TOKEN_OVERVIEW_PAGE as any,
-          minting: DUMMY_TOKEN_OVERVIEW_PAGE as any,
+          minted: DUMMY_HOME_SRC20_MINTED as any,
+          minting: DUMMY_HOME_SRC20_MINTING as any,
         },
       });
     }

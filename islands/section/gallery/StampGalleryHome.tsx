@@ -1,18 +1,32 @@
 /* ===== STAMP GALLERY HOME COMPONENT ===== */
 import { containerBackground, containerGap } from "$layout";
-import { StampGallery, StampSalesGallery } from "$section";
+import {
+  StampGallery,
+  StampListingsGallery,
+  StampSalesGallery,
+} from "$section";
 import type {
   StampGalleryHomeProps,
   StampGalleryProps,
 } from "$types/stamp.d.ts";
 
-/* ===== COMPONENT ===== */
+/**
+ * Renders the three stamp galleries shown on the home page, in order:
+ *   1. Latest Creations — combined ART/POSH/SRC-721 stamps (SSR-only, via
+ *      StampGallery), sorted by tx_index (most recent first).
+ *   2. New Listings — stamps with open dispensers (SSR-only, via
+ *      StampListingsGallery), using the compact horizontal listing card
+ *      variant.
+ *   3. Recent Sales — stamps with a completed sale (SSR + client-side
+ *      polling every 3 min, via StampSalesGallery).
+ */
 export function StampGalleryHome({
   stamps_src721 = [],
   stamps_art = [],
   stamps_posh = [],
   collectionData: _collectionData = [],
   recentSalesData = [],
+  newListingsData = [],
 }: StampGalleryHomeProps) {
   /* ===== SECTION CONFIGURATION ===== */
   // Combine Classic, Posh, and Recursive stamps into a single gallery,
@@ -30,15 +44,15 @@ export function StampGalleryHome({
     viewAllLink: "/explorer?section=stamps",
     gridClass: `
       grid w-full gap-6
-      grid-cols-2 mobileMd:grid-cols-3 mobileLg:grid-cols-4 tablet:grid-cols-5 desktop:grid-cols-6
+      grid-cols-2 min-[420px]:grid-cols-3 mobileMd:grid-cols-4 mobileLg:grid-cols-5 tablet:grid-cols-6 desktop:grid-cols-7
       auto-rows-fr
     `,
     displayCounts: {
-      mobileSm: 4,
-      mobileMd: 6,
-      mobileLg: 8,
-      tablet: 10,
-      desktop: 12,
+      mobileSm: 6,
+      mobileMd: 8,
+      mobileLg: 10,
+      tablet: 12,
+      desktop: 14,
     },
   };
 
@@ -52,6 +66,12 @@ export function StampGalleryHome({
       <div class={`${containerBackground} ${containerGap}`}>
         {/* ===== LATEST CREATIONS ===== */}
         <StampGallery {...CombinedArtStampsSection} />
+
+        {/* ===== NEW LISTINGS ===== */}
+        <StampListingsGallery
+          subTitle="New Listings"
+          initialData={newListingsData}
+        />
 
         {/* ===== RECENT SALES ===== */}
         <StampSalesGallery

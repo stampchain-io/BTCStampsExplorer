@@ -738,6 +738,8 @@ export const DUMMY_RECENT_SALES = _timeLabels.map((timeLabel, i) => {
  * renders with a price and BUY button, matching a real "listings" query.
  * Activity levels cycle HOT/WARM/COOL/DORMANT — "COLD" is excluded since
  * every entry here always has an open dispenser.
+ * Count matches the desktop displayCounts in StampListingsGallery:
+ *   newListingsData → 10 (desktop: 10, 5 cols × 2 rows)
  */
 const _listingBase = [_stampBases[1], _stampBases[3], _stampBases[5]];
 export const DUMMY_NEW_LISTINGS = withDummyActivityLevels(
@@ -916,6 +918,45 @@ export const DUMMY_EXPLORER_OVERVIEW_PAGE = {
 
 /** Backward-compat alias — routes/index.tsx and routes/src20/index.tsx keep working */
 export const DUMMY_TOKEN_OVERVIEW_PAGE = DUMMY_EXPLORER_OVERVIEW_PAGE;
+
+/**
+ * Home page SRC-20 tables — DEPLOY rows only, split by mint status.
+ * Matches live filters: onlyFullyMinted vs excludeFullyMinted, limit 5.
+ * TOP TICKERS → KEVIN/STAMP; TRENDING MINTS → PEPE/BOBO.
+ */
+function _repeatToFive<T extends { tx_hash: string }>(rows: T[]): T[] {
+  const result: T[] = [];
+  for (let i = 0; i < 5; i++) {
+    const base = rows[i % rows.length];
+    result.push({ ...base, tx_hash: `${base.tx_hash}-dup${i}` });
+  }
+  return result;
+}
+
+const _homeSrc20Minted = _repeatToFive(
+  [DUMMY_TOKEN_KEVIN, DUMMY_TOKEN_STAMP].filter(
+    (row) => parseFloat(row.progress) >= 100,
+  ),
+);
+const _homeSrc20Minting = _repeatToFive(
+  [DUMMY_TOKEN_PEPE, DUMMY_TOKEN_BOBO].filter(
+    (row) => parseFloat(row.progress) < 100,
+  ),
+);
+
+export const DUMMY_HOME_SRC20_MINTED = {
+  data: _homeSrc20Minted,
+  total: _homeSrc20Minted.length,
+  page: 1,
+  totalPages: 1,
+};
+
+export const DUMMY_HOME_SRC20_MINTING = {
+  data: _homeSrc20Minting,
+  total: _homeSrc20Minting.length,
+  page: 1,
+  totalPages: 1,
+};
 
 /** Stamp detail page */
 export const DUMMY_STAMP_DETAIL_PAGE = {

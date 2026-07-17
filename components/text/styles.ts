@@ -11,6 +11,7 @@ const labelFont = "font-light text-color-neutral-500 tracking-wide";
 const valueFont = "font-medium text-color-neutral-300";
 const select = "select-none whitespace-nowrap";
 const transitionColors = "transition-colors duration-200";
+export const truncate = "truncate max-w-[97%]";
 
 /* ======================================================================== */
 
@@ -203,11 +204,11 @@ export const toggleSymbol =
 // Standard card styles
 export const cardStampNumber = `font-extrabold text-base min-[420px]:text-lg
    text-color-neutral-200 group-hover:text-color-hover
-   tracking-wide truncate ${select} max-w-full`;
+   tracking-wide ${truncate} ${select}`;
 export const cardRowStampNumber = `font-extrabold text-sm
-   text-color-neutral-200 group-hover:text-color-hover tracking-wide truncate ${select} max-w-full`;
+   text-color-neutral-200 group-hover:text-color-hover tracking-wide ${truncate} ${select}`;
 export const cardCreator =
-  `font-semibold text-xs mobileMd:text-sm text-color-neutral-200 break-words text-center ${select}`;
+  `font-semibold text-xs mobileMd:text-sm text-color-neutral-200 text-center ${truncate} ${select}`;
 export const cardSupply =
   `font-semibold text-xs text-color-primary-400 ${select}`;
 export const cardFileType =
@@ -233,6 +234,7 @@ export const cardPriceCompact = `font-medium text-[0.625rem] mobileLg:text-xs
 
 /* ===== TYPE DEFINITIONS ===== */
 export type TextStyles = {
+  truncate: string;
   // Logo styles
   logoPrimary: string;
   logoPrimaryHover: string;

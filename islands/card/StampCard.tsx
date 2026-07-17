@@ -26,6 +26,7 @@ import {
   cardStampNumber,
   cardStampNumberCompact,
   cardSupply,
+  truncate,
 } from "$text";
 import type { StampCardVariant, StampRow } from "$types/stamp.d.ts";
 import { VNode } from "preact";
@@ -589,7 +590,9 @@ export function StampCard({
                   {stampValue}
                 </div>
                 {stamp.cpid && (
-                  <div class="font-mono text-xs text-color-neutral-500 truncate max-w-full">
+                  <div
+                    class={`font-mono text-xs text-color-neutral-500 ${truncate}`}
+                  >
                     {stamp.cpid}
                   </div>
                 )}
@@ -793,16 +796,20 @@ export function StampCard({
             <div class="flex flex-col min-w-0 justify-center gap-1.5">
               {/* Stamp Number / CPID / Creator */}
               <div class="flex flex-col min-w-0">
-                <div class={`${cardStampNumber} !text-lg truncate max-w-[97%]`}>
+                <div class={`${cardStampNumber} !text-lg`}>
                   {displayStampHash && <span class="font-light">#</span>}
                   {stampValue}
                 </div>
                 {stamp.cpid && (
-                  <div class="font-mono text-xs text-color-neutral-500 truncate max-w-[97%]">
+                  <div
+                    class={`font-mono text-xs text-color-neutral-500 ${truncate}`}
+                  >
                     {stamp.cpid}
                   </div>
                 )}
-                <div class={`mt-0.5 ${cardCreator} !text-left`}>
+                <div
+                  class={`mt-0.5 ${cardCreator} !text-sm !text-left`}
+                >
                   {creatorDisplay}
                 </div>
               </div>
@@ -871,13 +878,15 @@ export function StampCard({
 
             {/* CPID (marketplace listings only) */}
             {variant === "cardVerticalListing" && stamp.cpid && (
-              <div class="font-mono text-xs text-color-neutral-500 truncate max-w-full mt-0.5">
+              <div
+                class={`mt-0.5 font-mono text-xs text-color-neutral-500 ${truncate}`}
+              >
                 {stamp.cpid}
               </div>
             )}
 
             {/* Creator Name or Abbreviated Address */}
-            <div class={`${cardCreator} mt-1`}>
+            <div class={`mt-1 ${cardCreator}`}>
               {creatorDisplay}
             </div>
 
@@ -1133,13 +1142,15 @@ export function StampCard({
 
             {/* CPID */}
             {stamp.cpid && (
-              <div class="font-mono text-xs text-color-neutral-500 truncate max-w-full mt-0.5">
+              <div
+                class={`mt-0.5 font-mono text-xs text-color-neutral-500 ${truncate}`}
+              >
                 {stamp.cpid}
               </div>
             )}
 
             {/* Creator Name or Abbreviated Address */}
-            <div class={`${cardCreator} mt-1`}>
+            <div class={`mt-1 ${cardCreator}`}>
               {creatorDisplay}
             </div>
 

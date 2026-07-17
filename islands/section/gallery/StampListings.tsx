@@ -18,7 +18,7 @@ export function StampListingsGallery({
     viewAllLink: "/marketplace",
     gridClass: `
       grid w-full gap-4
-      grid-cols-1 min-[500px]:grid-cols-2 mobileLg:grid-cols-3 tablet:grid-cols-4 desktop:grid-cols-5
+      grid-cols-1 min-[520px]:grid-cols-2 mobileLg:grid-cols-3 tablet:grid-cols-4 desktop:grid-cols-5
       auto-rows-fr
     `,
     displayCounts: {
