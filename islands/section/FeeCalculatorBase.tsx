@@ -950,7 +950,7 @@ export function FeeCalculatorBase({
               <Button
                 variant="outline"
                 color="neutral"
-                size="mdR"
+                size="smR"
                 onClick={() => {
                   logger.debug("ui", {
                     message: "Cancel clicked",
@@ -966,8 +966,8 @@ export function FeeCalculatorBase({
             )}
             <ButtonProcessing
               variant="flat"
-              color="neutral"
-              size="mdR"
+              color="primary"
+              size="smR"
               isSubmitting={!!isSubmitting}
               onClick={() => {
                 console.log(

@@ -3,6 +3,8 @@ import { Button } from "$button";
 import { ActivityLevelIndicator } from "$components/indicators/ActivityLevelIndicator.tsx";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
 import { PlaceholderImage } from "$icon";
+import BuyStampModal from "$islands/modal/BuyStampModal.tsx";
+import { openModal } from "$islands/modal/states.ts";
 import {
   cellCenterL2Card,
   cellLeftL2Card,
@@ -24,6 +26,7 @@ import {
 import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
 import { cardRowStampNumber, labelXxs, textXs, valueDarkSm } from "$text";
 import type { StampRow } from "$types/stamp.d.ts";
+import { useState } from "preact/hooks";
 
 /* ===== CONSTANTS ===== */
 const HEADERS = [
@@ -50,10 +53,17 @@ function getDispenser(stamp: StampRow): {
   source: string | null;
   origin: string | null;
   giveRemaining: number | null;
+  raw: Record<string, unknown> | null;
 } {
   const d = (stamp as unknown as Record<string, unknown>).lowestPriceDispenser;
   if (!d || typeof d !== "object") {
-    return { txHash: null, source: null, origin: null, giveRemaining: null };
+    return {
+      txHash: null,
+      source: null,
+      origin: null,
+      giveRemaining: null,
+      raw: null,
+    };
   }
   const dispenser = d as Record<string, unknown>;
   return {
@@ -63,6 +73,8 @@ function getDispenser(stamp: StampRow): {
     giveRemaining: typeof dispenser.give_remaining === "number"
       ? dispenser.give_remaining
       : null,
+    // Raw dispenser object (satoshirate, give_quantity, etc.) needed by BuyStampModal
+    raw: dispenser,
   };
 }
 
@@ -75,6 +87,7 @@ export function StampListingsRow({ stamp }: StampListingsRowProps) {
   const imgSrc = getStampImageSrc(stamp);
   const href = `/stamp/${stamp.tx_hash}`;
   const dispenser = getDispenser(stamp);
+  const [fee, setFee] = useState<number>(0);
 
   const creatorDisplay = stamp.creator_name
     ? stamp.creator_name
@@ -85,6 +98,26 @@ export function StampListingsRow({ stamp }: StampListingsRowProps) {
       formatSupplyValue(stamp.supply ?? 0, stamp.divisible)
     }`
     : formatSupplyValue(stamp.supply ?? 0, stamp.divisible);
+
+  // Opens the Buy modal instead of navigating to the stamp detail page.
+  // BuyStampModal handles the "wallet not connected" flow internally
+  // (opens Connect Wallet, then re-opens this modal once connected).
+  // Falls back to the button's default link navigation if dispenser data
+  // is unexpectedly missing.
+  const handleBuyClick = (e: MouseEvent) => {
+    if (!dispenser.raw) return;
+    e.preventDefault();
+    e.stopPropagation();
+    openModal(
+      <BuyStampModal
+        stamp={stamp}
+        fee={fee}
+        handleChangeFee={setFee}
+        dispenser={dispenser.raw}
+      />,
+      "slideUpDown",
+    );
+  };
 
   /* ===== RENDER ===== */
   return (
@@ -254,6 +287,7 @@ export function StampListingsRow({ stamp }: StampListingsRowProps) {
           href={href}
           target="_top"
           class="rounded-xl"
+          onClick={handleBuyClick}
         >
           BUY
         </Button>

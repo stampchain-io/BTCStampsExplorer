@@ -3,7 +3,7 @@ import { closeModal } from "$islands/modal/states.ts";
 import { container0, shadow } from "$layout";
 import { logger } from "$lib/utils/logger.ts";
 import { tooltipIcon } from "$notification";
-import { titleNeutral } from "$text";
+import { titlePrimary } from "$text";
 import type { ModalBaseProps } from "$types/ui.d.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
 
@@ -86,7 +86,7 @@ export function ModalBase({
       className={`
         relative w-[340px] min-[420px]:w-[360px] mobileMd:w-[380px] p-5
         ${container0} rounded-3xl
-        border border-color-border/50
+        border border-color-neutral-800
         ${shadow} ${className}
       `}
       onClick={(e) => e.stopPropagation()}
@@ -115,7 +115,7 @@ export function ModalBase({
             </div>
 
             <div class="w-full text-center">
-              <h2 class={`${titleNeutral} pb-6`}>
+              <h2 class={`${titlePrimary} pb-5`}>
                 {title}
               </h2>
             </div>

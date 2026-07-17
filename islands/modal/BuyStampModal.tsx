@@ -13,7 +13,7 @@ import { logger } from "$lib/utils/logger.ts";
 import { mapProgressiveFeeDetails } from "$lib/utils/performance/fees/fee-estimation-utils.ts";
 import { showToast } from "$lib/utils/ui/notifications/toastSignal.ts";
 import { FeeCalculatorBase } from "$section";
-import { labelLg, labelSm } from "$text";
+import { label, labelSm } from "$text";
 import type { BuyStampModalProps } from "$types/ui.d.ts";
 import { useEffect, useState } from "preact/hooks";
 
@@ -366,17 +366,19 @@ const BuyStampModal = ({
             />
           </div>
           <div className="flex flex-col w-full">
-            <h5 className="font-extrabold text-3xl bg-gradient-to-l color-neutral-gradient pt-1">
-              <span className="font-light text-color-grey-light">
+            <h5 className="font-extrabold text-2xl
+   text-color-neutral-200 group-hover:text-color-hover
+   tracking-wide pt-2">
+              <span className="font-light">
                 #
               </span>
               {stamp.stamp}
             </h5>
 
             {/* ===== QUANTITY SELECTION ===== */}
-            <div className="flex flex-row pt-3 w-full justify-between items-center">
+            <div className="flex flex-row pt-2 w-full justify-between items-center">
               <div className="flex flex-col items-start -space-y-0.5">
-                <h5 class={`${labelLg} !text-color-grey`}>
+                <h5 class={`${label} !text-color-neutral-200`}>
                   EDITIONS
                 </h5>
                 <h6 class={labelSm}>
