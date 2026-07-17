@@ -12,9 +12,9 @@ import { useRef, useState } from "preact/hooks";
  * COLD shows "none" text with no dots.
  */
 const DOT_ON = [
+  "bg-color-secondary-300",
   "bg-color-secondary-400",
   "bg-color-secondary-500",
-  "bg-color-secondary-600",
 ] as const;
 const DOT_OFF = "bg-color-neutral-700";
 

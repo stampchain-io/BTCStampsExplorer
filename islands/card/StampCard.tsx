@@ -2,9 +2,12 @@
 /* @baba-update audio icon size (custom) - 247*/
 /*@baba-check styles+icon*/
 import { Button } from "$button";
+import { ActivityLevelIcon } from "$components/indicators/ActivityLevelIcon.tsx";
 import { ActivityLevelIndicator } from "$components/indicators/ActivityLevelIndicator.tsx";
 import { Icon, LoadingIcon, PlaceholderImage } from "$icon";
 import StampTextContent from "$islands/content/stampDetailContent/StampTextContent.tsx";
+import BuyStampModal from "$islands/modal/BuyStampModal.tsx";
+import { openModal } from "$islands/modal/states.ts";
 import { container3, containerCard, containerPill } from "$layout";
 import {
   abbreviateAddress,
@@ -65,6 +68,9 @@ export function StampCard({
   const [windowWidth, setWindowWidth] = useState<number>(
     typeof globalThis !== "undefined" ? globalThis.innerWidth ?? 0 : 0,
   );
+
+  // Buy modal fee state (mirrors StampInfo's fee handling for BuyStampModal)
+  const [fee, setFee] = useState<number>(0);
 
   // Audio-related state (always declared to avoid conditional hooks)
   const [isPlaying, setIsPlaying] = useState(false);
@@ -556,6 +562,27 @@ export function StampCard({
 
   const isListed = displayPriceBTC().style === cardPrice;
 
+  // Dispenser data isn't part of the base StampRow type — API responses for
+  // listing/marketplace views attach it dynamically (see StampListings.tsx).
+  const lowestPriceDispenser = (stamp as any).lowestPriceDispenser;
+
+  const handleBuyClick = () => {
+    if (!lowestPriceDispenser) return;
+
+    // Opening BuyStampModal here also handles the "wallet not connected"
+    // case for us: it internally opens the Connect Wallet modal and
+    // re-opens this Buy modal once a wallet is connected.
+    openModal(
+      <BuyStampModal
+        stamp={stamp as StampRow}
+        fee={fee}
+        handleChangeFee={setFee}
+        dispenser={lowestPriceDispenser}
+      />,
+      "slideUpDown",
+    );
+  };
+
   /* ===== RENDER: HORIZONTAL LISTING VARIANT ===== */
   if (variant === "cardHorizontalListing") {
     return (
@@ -762,6 +789,11 @@ export function StampCard({
                 color="primary"
                 size="xsR"
                 class="rounded-xl shrink-0"
+                onClick={(e: MouseEvent) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleBuyClick();
+                }}
               >
                 BUY
               </Button>
@@ -823,8 +855,16 @@ export function StampCard({
                 stamp.supply ?? 1}/{stamp.supply ?? 1}
             </div>
             {isListed && (
-              <div class={`${containerPill} ${cardPrice}`}>
-                {displayPriceBTC().text}
+              <div class="flex items-center gap-1.5 min-w-0">
+                {stamp.activity_level && (
+                  <ActivityLevelIcon
+                    level={stamp.activity_level}
+                    className="hidden"
+                  />
+                )}
+                <div class={`${containerPill} ${cardPrice}`}>
+                  {displayPriceBTC().text}
+                </div>
               </div>
             )}
           </div>
@@ -1090,6 +1130,11 @@ export function StampCard({
                     color="primary"
                     size="xs"
                     class="w-full rounded-xl"
+                    onClick={(e: MouseEvent) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleBuyClick();
+                    }}
                   >
                     BUY
                   </Button>
