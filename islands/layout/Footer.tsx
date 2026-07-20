@@ -30,6 +30,11 @@ const resourcesLinks: FooterLink[] = [
       "https://drive.google.com/drive/folders/18QsMTZ_ZII5FVxuAs2CLFoLdZE3NOdlT",
     isExternal: true,
   },
+  {
+    title: "Protocol Doc",
+    href: "https://bitcoinstamps.xyz/en/",
+    isExternal: true,
+  },
 ];
 
 const aboutLinks: FooterLink[] = [
@@ -53,9 +58,6 @@ const mobileLinks: FooterLink[] = [
 ];
 
 /* ===== SOCIAL MEDIA CONFIGURATION ===== */
-const socialIconTabletColor =
-  "tablet:stroke-color-primary-400 tablet:[&_path[class*='fill-stroke']]:fill-color-primary-400";
-
 const socialLinks = [
   {
     icon: (
@@ -65,7 +67,6 @@ const socialLinks = [
         weight="light"
         size="smR"
         color="greyLight"
-        className={socialIconTabletColor}
         href="https://x.com/Stampchain"
         target="_blank"
       />
@@ -79,7 +80,6 @@ const socialLinks = [
         weight="light"
         size="smR"
         color="greyLight"
-        className={socialIconTabletColor}
         href="https://t.me/BitcoinStamps"
         target="_blank"
       />
@@ -93,7 +93,6 @@ const socialLinks = [
         weight="light"
         size="smR"
         color="greyLight"
-        className={socialIconTabletColor}
         href="https://discord.gg/BRYRt4bH"
         target="_blank"
       />
@@ -107,7 +106,6 @@ const socialLinks = [
         weight="light"
         size="smR"
         color="greyLight"
-        className={socialIconTabletColor}
         href="https://github.com/stampchain-io/"
         target="_blank"
       />
@@ -142,10 +140,7 @@ export function Footer() {
               </span>
             </h5>
             <h6 class={tagline}>
-              IMMORTALISED ART
-              <span class="text-color-neutral-400">
-                &nbsp;-&nbsp;STORED ON BITCOIN
-              </span>
+              IMMORTALISED ART STORED ON BITCOIN
             </h6>
           </div>
 

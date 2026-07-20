@@ -192,7 +192,7 @@ export const eyebrowSecondary =
   `font-bold text-sm tablet:text-[0.625rem] text-color-secondary-300 tracking-wider cursor-default ${select}`;
 export const eyebrowPositionFilter =
   `flex justify-end mt-0 tablet:-mt-1 -mb-5 tablet:-mb-4`; // used for the filter file type label positioning
-export const tagline = `font-regular text-xs text-color-primary-400 ${select}`; // used in footer
+export const tagline = `font-regular text-xs text-color-neutral-400 ${select}`; // used in footer
 export const copyright =
   `font-normal text-xs text-color-neutral-600 cursor-default ${select}`; // used in the footer for copyright and counterparty version text
 export const toggleSymbol =
