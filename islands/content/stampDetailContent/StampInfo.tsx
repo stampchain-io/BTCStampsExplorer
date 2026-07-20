@@ -28,6 +28,7 @@ import {
 import { tooltipIcon } from "$notification";
 import { Dispenser, StampListingsOpenTable } from "$table";
 import {
+  cardFileSize,
   cardPrice,
   cardSupply,
   labelXs,
@@ -402,6 +403,14 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     return !cpid?.startsWith("A");
   };
 
+  const getIdentLabel = () => {
+    if (stamp.ident === "SRC-20") return "SRC-20";
+    if (stamp.ident === "SRC-101") return "SRC-101";
+    if (stamp.ident === "SRC-721") return "RECURSIVE";
+    if (stamp.ident === "STAMP" && isPoshStamp(stamp.cpid)) return "POSH";
+    return "CLASSIC";
+  };
+
   const titleRef = useRef<HTMLParagraphElement>(null);
   const [scale, setScale] = useState(1);
 
@@ -510,13 +519,11 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     (stamp.floorPrice && stamp.floorPrice !== "priceless"
       ? stamp.floorPrice
       : null);
-  const floorPriceUSD = marketData
-    // For v2.3: calculate from marketData if available
-    ? (marketData.floorPriceBTC && marketData.volume24hBTC
+  const floorPriceUSD = marketData?.floorPriceUSD ??
+    (marketData?.floorPriceBTC && marketData?.volume24hBTC
       ? marketData.floorPriceBTC * 117888
-      : null)
-    // Legacy fallback
-    : stamp.floorPriceUSD;
+      : null) ??
+    stamp.floorPriceUSD;
 
   const btcPrice = floorPriceUSD && floorPriceBTC
     ? floorPriceUSD / floorPriceBTC
@@ -737,6 +744,14 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                 </h6>
               )}
 
+              {!isSrc20Stamp() && (
+                <div
+                  className={`${containerPill} ${cardSupply} !text-sm mt-1.5 w-fit`}
+                >
+                  {stamp.supply === 1 ? "1/1" : editionCount}
+                </div>
+              )}
+
               <div className="flex flex-col items-start pt-3">
                 <h6 className={labelXs}>ARTIST</h6>
                 <a
@@ -749,13 +764,11 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
               </div>
             </div>
 
-            {!isSrc20Stamp() && (
-              <div
-                className={`${containerPill} ${cardSupply} !text-sm shrink-0`}
-              >
-                {stamp.supply === 1 ? "1/1" : editionCount}
-              </div>
-            )}
+            <div
+              className={`${container3} ${cardFileSize} px-3.5 py-1 !text-sm shrink-0`}
+            >
+              {getIdentLabel()}
+            </div>
           </div>
 
           {(dispensers?.length > 0 || !!lowestPriceDispenser)
@@ -779,20 +792,22 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                 <div
                   className={`flex flex-col items-end self-end w-fit px-3 py-2.5 mb-3 ${container3}`}
                 >
-                  {activityLevel && (
-                    <ActivityLevelIndicator
-                      level={activityLevel}
-                      className="!cursor-default"
-                    />
-                  )}
-                  {displayPriceUSD != null && (
-                    <div className="mt-1 font-normal text-xs text-color-neutral-500 text-nowrap">
-                      {displayPriceUSD.toLocaleString("en-US", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })} USD
-                    </div>
-                  )}
+                  <div className="flex justify-between items-center w-full gap-3">
+                    {activityLevel && (
+                      <ActivityLevelIndicator
+                        level={activityLevel}
+                        className="!cursor-default"
+                      />
+                    )}
+                    {displayPriceUSD != null && (
+                      <div className="font-normal text-xs text-color-neutral-500 text-nowrap">
+                        {displayPriceUSD.toLocaleString("en-US", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })} USD
+                      </div>
+                    )}
+                  </div>
                   <div className={`${cardPrice} !text-sm`}>
                     {formatBTCAmount(
                       typeof displayPrice === "number" ? displayPrice : 0,

@@ -101,6 +101,21 @@ export const DUMMY_STAMP_POSH_DISPENSER = {
   oracle_price_last_updated: null,
 };
 
+/* ===== DISPENSER: KEVINA @ 0.0085 BTC (2nd listing for detail page) ===== */
+export const DUMMY_STAMP_POSH_DISPENSER_2 = {
+  tx_hash: "dddd4444eeee5555ffff6666aaaa1111bbbb2222cccc3333dddd4444eeee5555",
+  source: "1BpEi6DfDAUFd153wiGrvkiKW1BCTe4pEc",
+  origin: "bc1qr9nkqgzc6vzxjslqgxck3z480yq85aa98wu3fa",
+  cpid: "KEVINA",
+  give_quantity: 1,
+  escrow_quantity: 5,
+  satoshirate: 850000, // 0.0085 BTC in satoshis
+  status: 0, // 0 = open
+  give_remaining: 5,
+  oracle_price: null,
+  oracle_price_last_updated: null,
+};
+
 /* ===== BASE STAMP: SRC-721 ===== */
 /*
  * SRC-721 stamps are recursive stamps with ident "SRC-721".
@@ -958,8 +973,8 @@ export const DUMMY_HOME_SRC20_MINTING = {
   totalPages: 1,
 };
 
-/** Stamp detail page */
-export const DUMMY_STAMP_DETAIL_PAGE = {
+/** Stamp detail page (CLASSIC #4258 — 1 open dispenser) */
+export const DUMMY_STAMP_DETAIL_PAGE_CLASSIC = {
   stamp: {
     ...DUMMY_STAMP_CLASSIC,
     floorPrice: 0.00042,
@@ -981,6 +996,68 @@ export const DUMMY_STAMP_DETAIL_PAGE = {
   initialCounts: { dispensers: 1, sales: 0, transfers: 0 },
   url: "",
 };
+
+/** Stamp detail page (KEVINA/POSH — 2 open dispensers so listings UI shows) */
+export const DUMMY_STAMP_DETAIL_PAGE_POSH = {
+  stamp: {
+    ...DUMMY_STAMP_POSH,
+    floorPrice: 0.0069,
+    floorPriceUSD: 0.0069 * _BTC_PRICE_USD,
+    marketData: {
+      floorPriceBTC: 0.0069,
+      floorPriceUSD: 0.0069 * _BTC_PRICE_USD,
+      recentSalePriceBTC: null,
+    },
+    activity_level: "HOT" as const,
+  },
+  total: 1,
+  sends: [],
+  dispensers: [DUMMY_STAMP_POSH_DISPENSER, DUMMY_STAMP_POSH_DISPENSER_2],
+  dispenses: [],
+  holders: [],
+  vaults: [],
+  last_block: 0,
+  stamps_recent: withDummyListingsData(
+    Array.from({ length: 6 }, () => ({ ...DUMMY_STAMP_POSH })),
+    DUMMY_STAMP_POSH_DISPENSER,
+  ),
+  lowestPriceDispenser: DUMMY_STAMP_POSH_DISPENSER,
+  collectionInfo: null,
+  initialCounts: { dispensers: 2, sales: 0, transfers: 0 },
+  url: "",
+};
+
+/** Default dummy detail page (kept for backward-compat imports). */
+export const DUMMY_STAMP_DETAIL_PAGE = DUMMY_STAMP_DETAIL_PAGE_CLASSIC;
+
+/*
+ * Lookup by tx_hash (and stamp number, as a string) so the [id].tsx dev
+ * handler can render the dummy page that actually matches the requested
+ * stamp instead of always showing the same one regardless of the URL.
+ */
+const _DUMMY_STAMP_DETAIL_PAGES_BY_KEY: Record<
+  string,
+  typeof DUMMY_STAMP_DETAIL_PAGE_CLASSIC | typeof DUMMY_STAMP_DETAIL_PAGE_POSH
+> = {
+  [DUMMY_STAMP_CLASSIC.tx_hash]: DUMMY_STAMP_DETAIL_PAGE_CLASSIC,
+  [String(DUMMY_STAMP_CLASSIC.stamp)]: DUMMY_STAMP_DETAIL_PAGE_CLASSIC,
+  [DUMMY_STAMP_CLASSIC.cpid]: DUMMY_STAMP_DETAIL_PAGE_CLASSIC,
+  [DUMMY_STAMP_POSH.tx_hash]: DUMMY_STAMP_DETAIL_PAGE_POSH,
+  [String(DUMMY_STAMP_POSH.stamp)]: DUMMY_STAMP_DETAIL_PAGE_POSH,
+  [DUMMY_STAMP_POSH.cpid]: DUMMY_STAMP_DETAIL_PAGE_POSH,
+};
+
+/** Resolve the dummy stamp detail page matching the requested id/tx_hash/cpid. */
+export function getDummyStampDetailPage(
+  id: string | undefined,
+):
+  | typeof DUMMY_STAMP_DETAIL_PAGE_CLASSIC
+  | typeof DUMMY_STAMP_DETAIL_PAGE_POSH {
+  if (id && _DUMMY_STAMP_DETAIL_PAGES_BY_KEY[id]) {
+    return _DUMMY_STAMP_DETAIL_PAGES_BY_KEY[id];
+  }
+  return DUMMY_STAMP_DETAIL_PAGE_CLASSIC;
+}
 
 /** SRC-20 token detail page (KEVIN — fully minted) */
 export const DUMMY_TOKEN_DETAIL_PAGE = {

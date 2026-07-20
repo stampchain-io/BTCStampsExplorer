@@ -7,7 +7,7 @@ import { Handlers } from "$fresh/server.ts";
 import { body, containerBackground, containerGap } from "$layout";
 import {
   DEV_DUMMY_MODE,
-  DUMMY_STAMP_DETAIL_PAGE,
+  getDummyStampDetailPage,
   withTimeout,
 } from "$lib/utils/devDummyData.ts";
 import { generateStampJsonLd } from "$lib/utils/jsonLd.ts";
@@ -52,7 +52,10 @@ interface StampData {
 export const handler: Handlers<StampData> = {
   async GET(req: Request, ctx) {
     if (DEV_DUMMY_MODE) {
-      return ctx.render({ ...DUMMY_STAMP_DETAIL_PAGE, url: req.url });
+      return ctx.render({
+        ...getDummyStampDetailPage(ctx.params.id),
+        url: req.url,
+      });
     }
     try {
       const { id } = ctx.params;
@@ -196,7 +199,10 @@ export const handler: Handlers<StampData> = {
       if ((error as Error).message?.includes("Stamp not found")) {
         return ctx.renderNotFound();
       }
-      return ctx.render({ ...DUMMY_STAMP_DETAIL_PAGE, url: req.url });
+      return ctx.render({
+        ...getDummyStampDetailPage(ctx.params.id),
+        url: req.url,
+      });
     }
   },
 };
@@ -405,9 +411,9 @@ export default function StampDetailPage(props: StampDetailPageProps) {
 
       <div class={`${body} ${containerGap}`}>
         <div
-          class={`grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 ${containerGap}`}
+          class={`flex flex-col min-[900px]:flex-row ${containerGap}`}
         >
-          <div class="desktop:col-span-1">
+          <div class="w-full min-[900px]:w-[40%] tablet:w-[35%] desktop:w-[30%]">
             {stamp &&
               (
                 <StampImage
@@ -416,7 +422,7 @@ export default function StampDetailPage(props: StampDetailPageProps) {
                 />
               )}
           </div>
-          <div class="desktop:col-span-2">
+          <div class="w-full min-[900px]:w-[60%] tablet:w-[65%] desktop:w-[70%]">
             {stamp &&
               (
                 <StampInfo
