@@ -6,14 +6,10 @@ import TextContentIsland from "$islands/content/stampDetailContent/StampTextCont
 import PreviewCodeModal from "$islands/modal/PreviewCodeModal.tsx";
 import PreviewImageModal from "$islands/modal/PreviewImageModal.tsx";
 import { openModal } from "$islands/modal/states.ts";
-import {
-  body,
-  containerDetailImage,
-  containerGap,
-  container1,
-} from "$layout";
+import { body, container1, containerDetailImage, containerGap } from "$layout";
 import {
   getStampImageSrc,
+  getStampPreviewUrl,
   handleImageError,
 } from "$lib/utils/ui/media/imageUtils.ts";
 import { tooltipIcon } from "$notification";
@@ -63,6 +59,11 @@ function RightPanel(
   const [isToolsTooltipVisible, setIsToolsTooltipVisible] = useState(false);
   const toolsTooltipTimeoutRef = useRef<number | null>(null);
 
+  const [isDownloadTooltipVisible, setIsDownloadTooltipVisible] = useState(
+    false,
+  );
+  const downloadTooltipTimeoutRef = useRef<number | null>(null);
+
   /* ===== EFFECTS ===== */
   useEffect(() => {
     return () => {
@@ -77,6 +78,9 @@ function RightPanel(
       }
       if (fullscreenTooltipTimeoutRef.current) {
         globalThis.clearTimeout(fullscreenTooltipTimeoutRef.current);
+      }
+      if (downloadTooltipTimeoutRef.current) {
+        globalThis.clearTimeout(downloadTooltipTimeoutRef.current);
       }
     };
   }, []);
@@ -271,9 +275,37 @@ function RightPanel(
     setIsToolsTooltipVisible(false);
   };
 
+  const handleDownloadMouseEnter = () => {
+    if (downloadTooltipTimeoutRef.current) {
+      globalThis.clearTimeout(downloadTooltipTimeoutRef.current);
+    }
+    downloadTooltipTimeoutRef.current = globalThis.setTimeout(() => {
+      setIsDownloadTooltipVisible(true);
+    }, 1500);
+  };
+
+  const handleDownloadMouseLeave = () => {
+    if (downloadTooltipTimeoutRef.current) {
+      globalThis.clearTimeout(downloadTooltipTimeoutRef.current);
+    }
+    setIsDownloadTooltipVisible(false);
+  };
+
+  const handleDownloadPreview = async () => {
+    setIsDownloadTooltipVisible(false);
+    const res = await fetch(getStampPreviewUrl(stamp));
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `stamp-${stamp.stamp}.png`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+
   /* ===== RENDER ===== */
   return (
-    <div className={`${containerDetailImage} !py-4 px-5 flex justify-between`}>
+    <div className={`${container1} pt-3 pb-1.5 px-5 flex justify-between`}>
       <div className="flex gap-5 tablet:gap-3.5">
         <div
           ref={copyButtonRef}
@@ -287,7 +319,7 @@ function RightPanel(
             weight="normal"
             size="custom"
             color="greyLight"
-            className="w-[29px] h-[29px] tablet:w-[25px] tablet:h-[25px]"
+            className="w-[25px] h-[25px] tablet:w-[21px] tablet:h-[21px]"
             onClick={copyLink}
           />
           <div
@@ -315,7 +347,7 @@ function RightPanel(
             weight="normal"
             size="custom"
             color="greyLight"
-            className="w-[29px] h-[29px] tablet:w-[25px] tablet:h-[25px]"
+            className="w-[25px] h-[25px] tablet:w-[21px] tablet:h-[21px]"
             onClick={shareContent}
             ariaLabel="Share content"
           />
@@ -337,7 +369,7 @@ function RightPanel(
             type="iconButton"
             name="twitterImage"
             weight="normal"
-            size="mdR"
+            size="smR"
             color="greyLight"
             onClick={shareToX}
             ariaLabel="Share on X"
@@ -351,6 +383,7 @@ function RightPanel(
           </div>
         </div>
       </div>
+
       <div className="flex gap-5 tablet:gap-3.5">
         {showCodeButton && (
           <div
@@ -363,7 +396,7 @@ function RightPanel(
               type="iconButton"
               name="previewCode"
               weight="normal"
-              size="mdR"
+              size="smR"
               color="greyLight"
               onClick={() => {
                 setIsCodeTooltipVisible(false);
@@ -382,6 +415,28 @@ function RightPanel(
         )}
         <div
           class="relative"
+          onMouseEnter={handleDownloadMouseEnter}
+          onMouseLeave={handleDownloadMouseLeave}
+        >
+          <Icon
+            type="iconButton"
+            name="downloadImage"
+            weight="normal"
+            size="smR"
+            color="greyLight"
+            onClick={handleDownloadPreview}
+            ariaLabel="Download stamp preview image"
+          />
+          <div
+            class={`${tooltipIcon} ${
+              isDownloadTooltipVisible ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            DOWNLOAD
+          </div>
+        </div>
+        <div
+          class="relative"
           onMouseEnter={handleToolsMouseEnter}
           onMouseLeave={handleToolsMouseLeave}
         >
@@ -389,7 +444,7 @@ function RightPanel(
             type="iconButton"
             name="previewImageRaw"
             weight="normal"
-            size="mdR"
+            size="smR"
             color="greyLight"
             onClick={() =>
               globalThis.open(
@@ -420,7 +475,7 @@ function RightPanel(
             type="iconButton"
             name="previewImage"
             weight="normal"
-            size="mdR"
+            size="smR"
             color="greyLight"
             onClick={() => {
               setIsFullscreenTooltipVisible(false);
@@ -747,10 +802,9 @@ export function StampImage(
                 <iframe
                   width="100%"
                   height="100%"
-                  scrolling="no"
                   className={`${
                     className || ""
-                  } rounded-2xl absolute top-0 left-0 bg-transparent`}
+                  } rounded-2xl absolute top-0 left-0 bg-transparent overflow-hidden`}
                   sandbox="allow-scripts allow-same-origin"
                   src={src || ""}
                   loading="lazy"

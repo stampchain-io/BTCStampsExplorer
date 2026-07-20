@@ -404,7 +404,9 @@ export default function StampDetailPage(props: StampDetailPageProps) {
       </Head>
 
       <div class={`${body} ${containerGap}`}>
-        <div class="grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 gap-6 mobileLg:gap-9">
+        <div
+          class={`grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 ${containerGap}`}
+        >
           <div class="desktop:col-span-1">
             {stamp &&
               (

@@ -1786,11 +1786,10 @@ function StampingToolMain({ config }: { config: Config }) {
                 <iframe
                   width="100%"
                   height="100%"
-                  scrolling="no"
                   loading="lazy"
                   sandbox="allow-scripts allow-same-origin"
                   src={htmlPreviewUrl}
-                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded-2xl bg-color-grey/30 [image-rendering:pixelated]`}
+                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded-2xl bg-color-grey/30 overflow-hidden [image-rendering:pixelated]`}
                   onError={(e) => {
                     console.error("iframe error (detailed):", {
                       error: e,

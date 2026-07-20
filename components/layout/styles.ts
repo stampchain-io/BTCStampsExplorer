@@ -60,7 +60,7 @@ export const bodyArticle = `
 // Base styles
 export const containerBackground = `${body} p-5 ${container1}`;
 export const containerGap = "gap-5 mobileLg:gap-7.5";
-export const containerDetailImage = `relative p-5 ${container1}`;
+export const containerDetailImage = `relative p-2 ${container1}`;
 export const containerStickyBottom = `sticky bottom-0 mt-auto py-9 tablet:py-6`;
 
 // Table card container styles - check if used

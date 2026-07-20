@@ -135,6 +135,7 @@ export function Icon(props: IconVariants) {
       // - Tools, loader placeholder and donate CTA icons
       stamp: "stampchain",
       uploadImage: "imageUpload",
+      downloadImage: "imageDownload",
 
       // Notification Display Icons
       info: "info",
