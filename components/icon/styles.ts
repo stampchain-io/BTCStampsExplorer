@@ -1,6 +1,6 @@
 /* ===== ICON STYLES MODULE ===== */
 /* @baba - check icon button hover states */
-import { JSX } from "preact";
+import type { AriaRole } from "preact";
 
 /* ===== TYPE DEFINITIONS ===== */
 export interface IconVariants {
@@ -33,7 +33,7 @@ export interface IconVariants {
     | "purpleLight"
     | "custom";
   className?: string | undefined;
-  role?: JSX.AriaRole;
+  role?: AriaRole;
   ariaLabel?: string;
   isOpen?: boolean;
   onClick?:

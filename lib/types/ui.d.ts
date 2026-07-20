@@ -18,7 +18,13 @@ import type {
   CircuitState,
 } from "$constants";
 import type { Signal } from "@preact/signals";
-import type { ComponentChildren, ComponentProps, JSX, Ref } from "preact";
+import type {
+  AriaRole,
+  ComponentChildren,
+  ComponentProps,
+  JSX,
+  Ref,
+} from "preact";
 
 // Re-export button types for use by other modules
 export type { ButtonColor, ButtonSize, ButtonVariant };
@@ -1887,7 +1893,7 @@ export interface TableColumn<T = any> {
  */
 export interface AriaAttributes {
   /** ARIA role */
-  "aria-role"?: JSX.AriaRole;
+  "aria-role"?: AriaRole;
   /** ARIA label */
   "aria-label"?: string;
   /** ARIA labelledby */
