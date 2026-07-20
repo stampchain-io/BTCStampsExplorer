@@ -67,7 +67,7 @@
  *         text: "Link text",
  *         href: "https://example.com",
  *         target: "_blank",
- *         className: "animated-underline",
+ *         className: "link-neutral-200-bold",
  *       },
  *     ],
  *     listItems: [
@@ -75,7 +75,7 @@
  *         text: "List item text",
  *         href: "https://example.com",
  *         target: "_blank",
- *         className: "animated-underline",
+ *         className: "link-neutral-200-bold",
  *       },
  *     ],
  *   },
@@ -111,7 +111,7 @@
  *     text: "Link text",
  *     href: "https://example.com",
  *     target: "_blank", // Optional: opens in new tab
- *     className: "animated-underline", // Optional: adds animation
+ *     className: "link-neutral-200-bold", // Optional: adds animation
  *   },
  * ]
  * 
@@ -124,12 +124,12 @@
  *     text: "Lorem",
  *     href: "https://example.com",
  *     target: "_blank",
- *     className: "animated-underline",
+ *     className: "link-neutral-200-bold",
  *   },
  *   {
  *     text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
  *     href: "/internal/folder/file",
- *     className: "animated-underline",
+ *     className: "link-neutral-200-bold",
  *   },
  * ]
  * 

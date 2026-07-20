@@ -50,7 +50,7 @@ export default function HowToPage() {
               <a
                 href="/howto/buy"
                 f-partial="/howto/buy"
-                class="animated-underline mb-1.5"
+                class="link-neutral-200-bold mb-1.5"
               >
                 Learn how to buy Bitcoin Stamps and SRC-20 tokens
               </a>
@@ -81,7 +81,7 @@ export default function HowToPage() {
               <a
                 href="/howto/leathercreate"
                 f-partial="/howto/leathercreate"
-                class="animated-underline mb-1.5"
+                class="link-neutral-200-bold mb-1.5"
               >
                 Start your stamps journey by creating a Leather wallet
               </a>
@@ -112,7 +112,7 @@ export default function HowToPage() {
               <a
                 href="/howto/leatherconnect"
                 f-partial="/howto/leatherconnect"
-                class="animated-underline mb-1.5"
+                class="link-neutral-200-bold mb-1.5"
               >
                 Learn how connect your Leather wallet to stampchain.io
               </a>
@@ -143,7 +143,7 @@ export default function HowToPage() {
               <a
                 href="/howto/deploytoken"
                 f-partial="/howto/deploytoken"
-                class="animated-underline mb-1.5"
+                class="link-neutral-200-bold mb-1.5"
               >
                 Read how to deploy your very own SRC-20 token
               </a>
@@ -173,7 +173,7 @@ export default function HowToPage() {
               <a
                 href="/howto/minttoken"
                 f-partial="/howto/minttoken"
-                class="animated-underline mb-1.5"
+                class="link-neutral-200-bold mb-1.5"
               >
                 Learn how to mint a SRC-20 token
               </a>
@@ -205,7 +205,7 @@ export default function HowToPage() {
               <a
                 href="/howto/stamp"
                 f-partial="/howto/stamp"
-                class="animated-underline mb-1.5"
+                class="link-neutral-200-bold mb-1.5"
               >
                 Time to get stamping !
               </a>

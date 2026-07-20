@@ -335,7 +335,7 @@ export function SRC20Minting({
                     <td class={`${cellCenterL2Card} text-color-neutral-200`}>
                       <a
                         href={`/wallet/${src20.creator}`}
-                        class="link-neutral-200-cell"
+                        class="link-neutral-200"
                       >
                         {src20.creator_name ??
                           abbreviateAddress(src20.creator, 5)}

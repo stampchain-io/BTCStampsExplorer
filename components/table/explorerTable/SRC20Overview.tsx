@@ -156,7 +156,7 @@ export function SRC20OverviewRow({ src20 }: SRC20OverviewRowProps) {
       >
         <a
           href={`/wallet/${src20.creator}`}
-          class="link-neutral-200-cell"
+          class="link-neutral-200"
         >
           {src20.creator_name ?? abbreviateAddress(src20.creator, 5)}
         </a>
@@ -177,7 +177,7 @@ export function SRC20OverviewRow({ src20 }: SRC20OverviewRowProps) {
           href={`https://mempool.space/tx/${src20.tx_hash}`}
           target="_blank"
           rel="noopener noreferrer"
-          class="link-neutral-400-cell"
+          class="link-neutral-400"
         >
           {abbreviateAddress(src20.tx_hash, 6)}
         </a>

@@ -60,7 +60,7 @@ export const SRC101RegisterHowto = () => {
             href="https://mempool.space/"
             target="_blank"
             rel="noopener noreferrer"
-            class="animated-underline"
+            class="link-neutral-200-bold"
           >
             blockchain explorer
           </a>.

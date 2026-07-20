@@ -369,37 +369,61 @@ b, strong {
 
 /* Animated underline for links */
 /* Animate right to left - background-position controls the direction of the animation */
-.animated-underline {
-  font-weight: 700;
+/* Thin underline - text weight is handled by the text style class (normal) - no text-shadow */
+.link-neutral-200 {
   text-decoration: none;
-  background-image: linear-gradient(var(--color-primary-400), var(--color-primary-400));
-  background-position: 0% 100%;
+  background-image: linear-gradient(var(--color-neutral-200), var(--color-neutral-200));
+    background-position: 0% 100%;
   background-repeat: no-repeat;
-  background-size: 100% 2px;
+  background-size: 100% 0.8px;
   transition: background-size .2s, color .4s;
-  padding-bottom: 3px;
-  text-shadow:
-    -3px 0 #000,
-    /* Left */
-    3px 0 #000,
-    /* Right */
-    0 -3px #000,
-    /* Top */
-    0 3px #000;
-  /* Bottom */
+  padding-bottom: 1px;
 }
 
-.animated-underline:hover,
-.animated-underline:focus {
+.link-neutral-400 {
+  text-decoration: none;
+  background-image: linear-gradient(var(--color-neutral-400), var(--color-neutral-400));
+  background-position: 0% 100%;
+  background-repeat: no-repeat;
+  background-size: 100% 0.8px;
+  transition: background-size .2s, color .4s;
+  padding-bottom: 1px;
+}
+.link-neutral-200:hover,
+.link-neutral-200:focus,
+.link-neutral-400:hover,
+.link-neutral-400:focus {
+  background-size: 0% 0.8px;
+  color: var(--color-primary-400);
+}
+
+/* Thick underline - text weight is handled by the font-weight class (bold) - text shadow */
+.link-neutral-200-bold {
+  font-weight: 700; /* text font-weight */
+  text-decoration: none;
+  background-image: linear-gradient(var(--color-neutral-200), var(--color-neutral-200));
+  background-position: 0% 100%;
+  background-repeat: no-repeat;
+  background-size: 100% 2px; /* underline thickness */
+  transition: background-size .2s, color .4s;
+  padding-bottom: 1px;
+  text-shadow:
+    -2px 0 #000, /* Left */
+    2px 0 #000, /* Right */
+    0 2px #000; /* Bottom */
+}
+
+.link-neutral-200-bold:hover,
+.link-neutral-200-bold:focus {
   background-size: 0% 2px;
-  color: var(--color-primary-300);
+  color: var(--color-primary-400);
 }
 
 /* Animate left to right */
-.animated-underline-thin {
+/* .animated-underline-thin {
   font-weight: 400;
   text-decoration: none;
-  background-image: linear-gradient(var(--color-grey-semilight), var(--color-grey-semilight));
+  background-image: linear-gradient(var(--color-neutral-400), var(--color-neutral-400));
   background-position: 100% 100%;
   background-repeat: no-repeat;
   background-size: 100% 1px;
@@ -407,49 +431,21 @@ b, strong {
   padding-bottom: 2px;
   text-shadow:
     -2px 0 #000,
-    /* Left */
+    /* Left
     2px 0 #000,
-    /* Right */
+    /* Right
     0 -2px #000,
-    /* Top */
+    /* Top
     0 2px #000;
-  /* Bottom */
+  /* Bottom
 }
 
 .animated-underline-thin:hover,
 .animated-underline-thin:focus {
   background-size: 0% 1px;
-  color: var(--color-purple-light);
-}
-
-/* Animated underline for inline links inside table cells */
-/* No text-shadow — gradient cell backgrounds make knockout shadows unnecessary */
-.link-neutral-200-cell {
-  text-decoration: none;
-  background-image: linear-gradient(var(--color-neutral-200), var(--color-neutral-200));
-    background-position: 0% 100%;
-  background-repeat: no-repeat;
-  background-size: 100% 1px;
-  transition: background-size .2s, color .4s;
-  padding-bottom: 1px;
-}
-
-.link-neutral-400-cell {
-  text-decoration: none;
-  background-image: linear-gradient(var(--color-neutral-400), var(--color-neutral-400));
-  background-position: 0% 100%;
-  background-repeat: no-repeat;
-  background-size: 100% 1px;
-  transition: background-size .2s, color .4s;
-  padding-bottom: 1px;
-}
-.link-neutral-200-cell:hover,
-.link-neutral-200-cell:focus,
-.link-neutral-400-cell:hover,
-.link-neutral-400-cell:focus {
-  background-size: 0% 1px;
   color: var(--color-primary-400);
 }
+*/
 
 /* ========================================================================== */
 
@@ -458,7 +454,7 @@ b, strong {
 
 /* Emoji ticker styling for SRC20 cards */
 .emoji-ticker {
-  @apply text-color-purple-light;
+  @apply text-color-primary-400;
   font-family: system-ui;
   line-height: 1;
   display: inline-flex;

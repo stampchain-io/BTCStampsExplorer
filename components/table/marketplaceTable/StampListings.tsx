@@ -189,7 +189,7 @@ export function StampListingsRow({ stamp }: StampListingsRowProps) {
       >
         <a
           href={`/wallet/${stamp.creator}`}
-          class="link-neutral-200-cell"
+          class="link-neutral-200"
         >
           {creatorDisplay}
         </a>
@@ -231,7 +231,7 @@ export function StampListingsRow({ stamp }: StampListingsRowProps) {
           ? (
             <a
               href={`/wallet/${dispenser.source}`}
-              class="link-neutral-200-cell"
+              class="link-neutral-200"
             >
               {abbreviateAddress(dispenser.source, 5)}
             </a>
@@ -247,7 +247,7 @@ export function StampListingsRow({ stamp }: StampListingsRowProps) {
           ? (
             <a
               href={`/wallet/${dispenser.origin ?? dispenser.source}`}
-              class="link-neutral-200-cell"
+              class="link-neutral-200"
             >
               {abbreviateAddress(
                 (dispenser.origin ?? dispenser.source)!,

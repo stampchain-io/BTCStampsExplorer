@@ -1272,7 +1272,7 @@ export function StampCard({
                         ? (
                           <a
                             href={`/wallet/${stamp.sale_data.buyer_address}`}
-                            class="link-neutral-400-cell"
+                            class="link-neutral-400"
                           >
                             {abbreviateAddress(
                               stamp.sale_data.buyer_address,

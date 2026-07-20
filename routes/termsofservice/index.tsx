@@ -767,7 +767,7 @@ export default function TermsOfServicePage() {
             further information regarding use of the Services, please{" "}
             <a
               href="/about#contact"
-              class={`${textSm} animated-underline`}
+              class={`${textSm} link-neutral-200-bold`}
             >
               send us an email
             </a>.

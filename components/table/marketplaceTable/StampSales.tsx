@@ -158,7 +158,7 @@ export function MarketplaceSalesRow({ stamp }: MarketplaceSalesRowProps) {
       >
         <a
           href={`/wallet/${stamp.creator}`}
-          class="link-neutral-200-cell"
+          class="link-neutral-200"
         >
           {creatorDisplay}
         </a>
@@ -186,7 +186,7 @@ export function MarketplaceSalesRow({ stamp }: MarketplaceSalesRowProps) {
           ? (
             <a
               href={`/wallet/${sale.dispenser_address}`}
-              class="link-neutral-200-cell"
+              class="link-neutral-200"
             >
               {abbreviateAddress(sale.dispenser_address, 5)}
             </a>
@@ -202,7 +202,7 @@ export function MarketplaceSalesRow({ stamp }: MarketplaceSalesRowProps) {
           ? (
             <a
               href={`/wallet/${sale.buyer_address}`}
-              class="link-neutral-200-cell"
+              class="link-neutral-200"
             >
               {abbreviateAddress(sale.buyer_address, 5)}
             </a>
@@ -220,7 +220,7 @@ export function MarketplaceSalesRow({ stamp }: MarketplaceSalesRowProps) {
               href={`https://mempool.space/tx/${sale.tx_hash}`}
               target="_blank"
               rel="noopener noreferrer"
-              class="link-neutral-400-cell"
+              class="link-neutral-400"
             >
               {abbreviateAddress(sale.tx_hash, 6)}
             </a>

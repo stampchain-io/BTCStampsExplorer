@@ -155,7 +155,7 @@ export function StampOverviewRow({ stamp }: StampOverviewRowProps) {
       >
         <a
           href={`/wallet/${stamp.creator}`}
-          class="link-neutral-200-cell"
+          class="link-neutral-200"
         >
           {creatorDisplay}
         </a>
@@ -176,7 +176,7 @@ export function StampOverviewRow({ stamp }: StampOverviewRowProps) {
           href={`https://mempool.space/tx/${stamp.tx_hash}`}
           target="_blank"
           rel="noopener noreferrer"
-          class="link-neutral-400-cell"
+          class="link-neutral-400"
         >
           {abbreviateAddress(stamp.tx_hash, 6)}
         </a>

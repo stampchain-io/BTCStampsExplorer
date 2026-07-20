@@ -99,10 +99,10 @@ export const textLg = `${textFont} text-lg`;
 export const textXl = `${textFont} text-xl`;
 export const text2xl = `${textFont} text-2xl`;
 export const textLinkUnderline =
-  `font-medium text-base text-color-primary-400 animated-underline ${transitionColors}`;
+  `font-bold text-base text-color-neutral-200 link-neutral-200-bold ${transitionColors}`;
 
 /* ===== LINK STYLES ===== */
-// Use the specific link styles created or just add "animated-underline" to the class name to apply an animated underline effect
+// Use the specific link styles created or just add "link-neutral-200-bold" to the class name to apply an animated underline effect
 
 /* ======================================================================== */
 

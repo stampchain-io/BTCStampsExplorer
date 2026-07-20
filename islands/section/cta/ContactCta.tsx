@@ -63,7 +63,7 @@ const ContactCta = () => {
               <a
                 href="https://t.me/BitcoinStamps"
                 target="_blank"
-                class="animated-underline"
+                class="link-neutral-200-bold"
               >
                 Get in touch via Telegram
               </a>{" "}

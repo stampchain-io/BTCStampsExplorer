@@ -1,6 +1,6 @@
 /* ===== ABOUT HEADER COMPONENT ===== */
 import { containerBackground } from "$layout";
-import { subtitleNeutral, text, textLg, titleNeutral } from "$text";
+import { subtitlePrimary, text, textLg, titlePrimary } from "$text";
 
 /* ===== COMPONENT ===== */
 export default function AboutHeader() {
@@ -8,8 +8,8 @@ export default function AboutHeader() {
     <section class={containerBackground}>
       <div class="flex flex-col">
         {/* ===== HEADER SECTION ===== */}
-        <h1 class={titleNeutral}>ABOUT</h1>
-        <h2 class={subtitleNeutral}>STAMPCHAIN</h2>
+        <h1 class={titlePrimary}>ABOUT</h1>
+        <h2 class={subtitlePrimary}>STAMPCHAIN</h2>
 
         {/* ===== INTRODUCTION SECTION ===== */}
         <p class={textLg}>

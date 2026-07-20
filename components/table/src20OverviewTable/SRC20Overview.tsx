@@ -501,7 +501,7 @@ export function SRC20Overview({
                     >
                       <a
                         href={`/wallet/${src20.creator}`}
-                        class="link-neutral-200-cell"
+                        class="link-neutral-200"
                       >
                         {src20.creator_name ??
                           abbreviateAddress(src20.creator, 5)}

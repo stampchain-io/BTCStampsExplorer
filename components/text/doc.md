@@ -173,7 +173,7 @@ All gradients use the 5-step color system defined as CSS variables:
 |--------|---------------|----------|
 | **-hover suffix** | Gradient color change on hover | Interactive headings, links |
 | **transitionColors** | 200ms color transition | Smooth hover animations |
-| **animated-underline** | Growing underline animation | Text links |
+| **link-neutral-200-bold** | Growing underline animation | Text links |
 | **cursor-pointer** | Pointer cursor on hover | Clickable elements |
 
 ## Style Categories
@@ -319,7 +319,7 @@ text2xl: "font-normal text-color-grey-light text-2xl"
 textSmLink: "text-sm hover:text-color-purple-light transition-colors cursor-pointer"
 // Hover: #BB00FF
 
-textLinkUnderline: "font-bold text-base text-color-grey-light animated-underline"
+textLinkUnderline: "font-bold text-base text-color-grey-light link-neutral-200-bold"
 // Base: #f9f2e9 with underline animation
 ```
 

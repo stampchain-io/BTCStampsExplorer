@@ -235,7 +235,7 @@
  *         <a
  *           href="/howto/newarticle"
  *           f-partial="/howto/newarticle"
- *           className="animated-underline"
+ *           className="link-neutral-200-bold"
  *         >
  *           Call to action text
  *         </a>
