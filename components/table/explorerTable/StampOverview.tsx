@@ -1,5 +1,5 @@
 /* ===== STAMP EXPLORER TABLE COMPONENT ===== */
-import { cellAlign, colGroup } from "$components/layout/types.ts";
+import { colGroup } from "$components/layout/types.ts";
 import { Icon, PlaceholderImage } from "$icon";
 import {
   cellCenterL2Card,
@@ -84,9 +84,7 @@ export function StampOverviewRow({ stamp }: StampOverviewRowProps) {
     >
       {/* IMAGE */}
       <td
-        class={`${
-          cellAlign(0, HEADERS.length)
-        } ${cellLeftL2Card} ${cellStickyLeft}`}
+        class={`${cellLeftL2Card} ${cellStickyLeft}`}
       >
         <a
           href={href}
@@ -108,9 +106,7 @@ export function StampOverviewRow({ stamp }: StampOverviewRowProps) {
 
       {/* STAMP # */}
       <td
-        class={`${
-          cellAlign(1, HEADERS.length)
-        } ${cellCenterL2Card} ${cellStickyLeft2}`}
+        class={`${cellCenterL2Card} ${cellStickyLeft2}`}
       >
         <a
           href={href}
@@ -131,16 +127,14 @@ export function StampOverviewRow({ stamp }: StampOverviewRowProps) {
 
       {/* CPID */}
       <td
-        class={`${
-          cellAlign(2, HEADERS.length)
-        } ${cellCenterL2Card} font-mono text-color-neutral-400`}
+        class={`${cellCenterL2Card} font-mono text-color-neutral-400`}
       >
         {stamp.cpid ?? "—"}
       </td>
 
       {/* TYPE */}
       <td
-        class={`${cellAlign(3, HEADERS.length)} ${cellCenterL2Card}`}
+        class={`${cellCenterL2Card}`}
       >
         <div class="flex items-center justify-center gap-2 text-color-neutral-200">
           <Icon
@@ -157,9 +151,7 @@ export function StampOverviewRow({ stamp }: StampOverviewRowProps) {
 
       {/* CREATOR */}
       <td
-        class={`${
-          cellAlign(4, HEADERS.length)
-        } ${cellCenterL2Card} text-color-neutral-200`}
+        class={`${cellCenterL2Card} text-color-neutral-200`}
       >
         <a
           href={`/wallet/${stamp.creator}`}
@@ -171,18 +163,14 @@ export function StampOverviewRow({ stamp }: StampOverviewRowProps) {
 
       {/* SUPPLY */}
       <td
-        class={`${
-          cellAlign(5, HEADERS.length)
-        } ${cellCenterL2Card} text-color-primary-400`}
+        class={`${cellCenterL2Card} text-color-primary-400`}
       >
         {supplyDisplay}
       </td>
 
       {/* TX HASH */}
       <td
-        class={`${
-          cellAlign(6, HEADERS.length)
-        } ${cellCenterL2Card} text-color-neutral-400`}
+        class={`${cellCenterL2Card} text-color-neutral-400`}
       >
         <a
           href={`https://mempool.space/tx/${stamp.tx_hash}`}
@@ -196,18 +184,14 @@ export function StampOverviewRow({ stamp }: StampOverviewRowProps) {
 
       {/* BLOCK */}
       <td
-        class={`${
-          cellAlign(7, HEADERS.length)
-        } ${cellCenterL2Card} text-color-neutral-400`}
+        class={`${cellCenterL2Card} text-color-neutral-400`}
       >
         {stamp.block_index.toLocaleString()}
       </td>
 
       {/* DATE */}
       <td
-        class={`${
-          cellAlign(8, HEADERS.length)
-        } ${cellRightL2Card} text-color-neutral-400 pr-3`}
+        class={`${cellRightL2Card} text-color-neutral-400 pr-3`}
       >
         {formatDate(new Date(stamp.block_time), {
           month: "numeric",
@@ -261,9 +245,7 @@ export function StampOverviewTable({ stamps }: StampOverviewTableProps) {
               return (
                 <th
                   key={header}
-                  class={`${labelXxs} ${
-                    cellAlign(i, HEADERS.length)
-                  } py-1.5 !px-3 ${rowClass} ${stickyClass} text-color-neutral-500`}
+                  class={`${labelXxs} py-1.5 !px-3 ${rowClass} ${stickyClass} text-color-neutral-500`}
                 >
                   {header}
                 </th>

@@ -100,20 +100,20 @@ const cell =
   "py-1 px-1 bg-gradient-to-b from-color-neutral-800/40 via-color-neutral-900/60 to-neutral-900/80 whitespace-nowrap";
 export const cellLeftL2Card =
   `${cell} rounded-l-2xl border-y-[1px] border-l-[1px] border-r-0 border-color-neutral-700
-  group-hover:bg-black/20 group-hover:border-color-hover ${transitionColors} `;
+  group-hover:bg-black/20 group-hover:border-color-hover ${transitionColors} text-left`;
 export const cellRightL2Card =
   `${cell} rounded-r-2xl border-y-[1px] border-r-[1px] border-l-0 border-color-neutral-700
-  group-hover:bg-black/20 group-hover:border-color-hover ${transitionColors} `;
+  group-hover:bg-black/20 group-hover:border-color-hover ${transitionColors} text-right`;
 export const cellCenterL2Card =
   `${cell} border-y-[1px] border-x-0 border-color-neutral-700
-  group-hover:bg-black/20 group-hover:border-color-hover ${transitionColors} `;
+  group-hover:bg-black/20 group-hover:border-color-hover ${transitionColors} text-center`;
 // Stamp and SRC20 Detail pages Table Rows
 export const cellLeftL2Detail =
-  `p-1.5 pl-3 rounded-l-2xl border-y-[1px] border-l-[1px] border-r-0 border-color-neutral-700 group-hover:bg-black/20 group-hover:border-color-border ${transitionColors} whitespace-nowrap`;
+  `p-1.5 pl-3 rounded-l-2xl border-y-[1px] border-l-[1px] border-r-0 border-color-neutral-700 group-hover:bg-black/20 group-hover:border-color-border ${transitionColors} whitespace-nowrap text-left`;
 export const cellRightL2Detail =
-  `p-1.5 pr-3 rounded-r-2xl border-y-[1px] border-r-[1px] border-l-0 border-color-neutral-700 group-hover:bg-black/20 group-hover:border-color-border ${transitionColors} whitespace-nowrap`;
+  `p-1.5 pr-3 rounded-r-2xl border-y-[1px] border-r-[1px] border-l-0 border-color-neutral-700 group-hover:bg-black/20 group-hover:border-color-border ${transitionColors} whitespace-nowrap text-right`;
 export const cellCenterL2Detail =
-  `p-1.5 border-y-[1px] border-x-0 border-color-neutral-700 group-hover:bg-black/20 group-hover:border-color-border ${transitionColors} whitespace-nowrap`;
+  `p-1.5 border-y-[1px] border-x-0 border-color-neutral-700 group-hover:bg-black/20 group-hover:border-color-border ${transitionColors} whitespace-nowrap text-center`;
 /* refactor to base style and rename */
 export const cellStickyLeft = `sticky left-0 ${cell} z-10`;
 export const cellStickyLeft2 = `sticky left-10 ${cell} z-10`;

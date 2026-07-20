@@ -1,5 +1,5 @@
 /* ===== STAMP SALES TABLE COMPONENT ===== */
-import { cellAlign, colGroup } from "$components/layout/types.ts";
+import { colGroup } from "$components/layout/types.ts";
 import {
   cellCenterL2Detail,
   cellLeftL2Detail,
@@ -40,7 +40,7 @@ export function StampSalesTable(
         {/* ===== TABLE HEADER ===== */}
         <thead class="sticky top-0 z-10">
           {/* Only sticky on desktop */}
-          <tr class={`${container2}`}>
+          <tr class={container2}>
             {headers.map((header, i) => {
               const isFirst = i === 0;
               const isLast = i === (headers?.length ?? 0) - 1;
@@ -55,9 +55,7 @@ export function StampSalesTable(
               return (
                 <th
                   key={header}
-                  class={`${
-                    cellAlign(i, headers?.length ?? 0)
-                  } !py-1.5 ${rowClass} ${labelXs}`}
+                  class={`!py-1.5 ${rowClass} ${labelXs}`}
                 >
                   {header}
                 </th>
@@ -75,9 +73,7 @@ export function StampSalesTable(
               >
                 {/* FROM */}
                 <td
-                  class={`${
-                    cellAlign(0, headers?.length ?? 0)
-                  } ${cellLeftL2Detail}`}
+                  class={cellLeftL2Detail}
                 >
                   <a
                     href={`/wallet/${dispense.source}`}
@@ -93,9 +89,7 @@ export function StampSalesTable(
                 </td>
                 {/* TO */}
                 <td
-                  class={`${
-                    cellAlign(1, headers?.length ?? 0)
-                  } ${cellCenterL2Detail}`}
+                  class={cellCenterL2Detail}
                 >
                   <a
                     href={`/wallet/${dispense.destination}`}
@@ -111,17 +105,13 @@ export function StampSalesTable(
                 </td>
                 {/* QUANTITY */}
                 <td
-                  class={`${
-                    cellAlign(2, headers?.length ?? 0)
-                  } ${cellCenterL2Detail}`}
+                  class={cellCenterL2Detail}
                 >
                   {Number(dispense.dispense_quantity).toLocaleString()}
                 </td>
                 {/* PRICE */}
                 <td
-                  class={`${
-                    cellAlign(3, headers?.length ?? 0)
-                  } ${cellCenterL2Detail}`}
+                  class={cellCenterL2Detail}
                 >
                   {formatSatoshisToBTC(dispense.satoshirate, {
                     includeSymbol: true,
@@ -131,9 +121,7 @@ export function StampSalesTable(
                 </td>
                 {/* DATE */}
                 <td
-                  class={`${
-                    cellAlign(4, headers?.length ?? 0)
-                  } ${cellRightL2Detail} text-color-grey`}
+                  class={`${cellRightL2Detail} text-color-grey`}
                 >
                   {dispense.block_time
                     ? formatDate(new Date(dispense.block_time), {

@@ -1,5 +1,5 @@
 /* ===== MARKETPLACE SALES TABLE COMPONENT ===== */
-import { cellAlign, colGroup } from "$components/layout/types.ts";
+import { colGroup } from "$components/layout/types.ts";
 import { PlaceholderImage } from "$icon";
 import {
   cellCenterL2Card,
@@ -104,9 +104,7 @@ export function MarketplaceSalesRow({ stamp }: MarketplaceSalesRowProps) {
     >
       {/* IMAGE — sticky col 0 */}
       <td
-        class={`${
-          cellAlign(0, HEADERS.length)
-        } ${cellLeftL2Card} ${cellStickyLeft}`}
+        class={`${cellLeftL2Card} ${cellStickyLeft}`}
       >
         <a
           href={href}
@@ -128,9 +126,7 @@ export function MarketplaceSalesRow({ stamp }: MarketplaceSalesRowProps) {
 
       {/* STAMP # — sticky col 1 */}
       <td
-        class={`${
-          cellAlign(1, HEADERS.length)
-        } ${cellCenterL2Card} ${cellStickyLeft2}`}
+        class={`${cellCenterL2Card} ${cellStickyLeft2}`}
       >
         <a
           href={href}
@@ -151,18 +147,14 @@ export function MarketplaceSalesRow({ stamp }: MarketplaceSalesRowProps) {
 
       {/* CPID */}
       <td
-        class={`${
-          cellAlign(2, HEADERS.length)
-        } ${cellCenterL2Card} font-mono text-color-neutral-400`}
+        class={`${cellCenterL2Card} font-mono text-color-neutral-400`}
       >
         {stamp.cpid ?? "N/A"}
       </td>
 
       {/* CREATOR/ARTIST */}
       <td
-        class={`${
-          cellAlign(3, HEADERS.length)
-        } ${cellCenterL2Card} font-medium text-color-neutral-200`}
+        class={`${cellCenterL2Card} font-medium text-color-neutral-200`}
       >
         <a
           href={`/wallet/${stamp.creator}`}
@@ -174,27 +166,21 @@ export function MarketplaceSalesRow({ stamp }: MarketplaceSalesRowProps) {
 
       {/* SOLD */}
       <td
-        class={`${
-          cellAlign(4, HEADERS.length)
-        } ${cellCenterL2Card} text-color-primary-400`}
+        class={`${cellCenterL2Card} text-color-primary-400`}
       >
         {soldDisplay}
       </td>
 
       {/* PRICE */}
       <td
-        class={`${
-          cellAlign(5, HEADERS.length)
-        } ${cellCenterL2Card} text-color-secondary-400`}
+        class={`${cellCenterL2Card} text-color-secondary-400`}
       >
         {priceDisplay}
       </td>
 
       {/* DISPENSER ADDY */}
       <td
-        class={`${
-          cellAlign(6, HEADERS.length)
-        } ${cellCenterL2Card} text-color-neutral-200`}
+        class={`${cellCenterL2Card} text-color-neutral-200`}
       >
         {sale?.dispenser_address
           ? (
@@ -210,9 +196,7 @@ export function MarketplaceSalesRow({ stamp }: MarketplaceSalesRowProps) {
 
       {/* BUYER ADDY */}
       <td
-        class={`${
-          cellAlign(7, HEADERS.length)
-        } ${cellCenterL2Card} text-color-neutral-200`}
+        class={`${cellCenterL2Card} text-color-neutral-200`}
       >
         {sale?.buyer_address
           ? (
@@ -228,9 +212,7 @@ export function MarketplaceSalesRow({ stamp }: MarketplaceSalesRowProps) {
 
       {/* TX HASH */}
       <td
-        class={`${
-          cellAlign(8, HEADERS.length)
-        } ${cellCenterL2Card} text-color-neutral-400`}
+        class={`${cellCenterL2Card} text-color-neutral-400`}
       >
         {sale?.tx_hash
           ? (
@@ -248,9 +230,7 @@ export function MarketplaceSalesRow({ stamp }: MarketplaceSalesRowProps) {
 
       {/* DATE */}
       <td
-        class={`${
-          cellAlign(9, HEADERS.length)
-        } ${cellRightL2Card} pr-3 text-color-neutral-400`}
+        class={`${cellRightL2Card} pr-3 text-color-neutral-400`}
       >
         {dateDisplay}
       </td>
@@ -301,9 +281,7 @@ export function MarketplaceSalesTable({ stamps }: MarketplaceSalesTableProps) {
               return (
                 <th
                   key={header}
-                  class={`${labelXxs} ${
-                    cellAlign(i, HEADERS.length)
-                  } py-1.5 !px-3 ${rowClass} ${stickyClass} text-color-neutral-500`}
+                  class={`${labelXxs} py-1.5 !px-3 ${rowClass} ${stickyClass} text-color-neutral-500`}
                 >
                   {header}
                 </th>

@@ -1,7 +1,7 @@
 /* ===== MARKETPLACE LISTINGS TABLE COMPONENT ===== */
 import { Button } from "$button";
 import { ActivityLevelIndicator } from "$components/indicators/ActivityLevelIndicator.tsx";
-import { cellAlign, colGroup } from "$components/layout/types.ts";
+import { colGroup } from "$components/layout/types.ts";
 import { PlaceholderImage } from "$icon";
 import BuyStampModal from "$islands/modal/BuyStampModal.tsx";
 import { openModal } from "$islands/modal/states.ts";
@@ -135,9 +135,7 @@ export function StampListingsRow({ stamp }: StampListingsRowProps) {
     >
       {/* IMAGE — sticky col 0 */}
       <td
-        class={`${
-          cellAlign(0, HEADERS.length)
-        } ${cellLeftL2Card} ${cellStickyLeft}`}
+        class={`${cellLeftL2Card} ${cellStickyLeft}`}
       >
         <a
           href={href}
@@ -159,9 +157,7 @@ export function StampListingsRow({ stamp }: StampListingsRowProps) {
 
       {/* STAMP # — sticky col 1 */}
       <td
-        class={`${
-          cellAlign(1, HEADERS.length)
-        } ${cellCenterL2Card} ${cellStickyLeft2}`}
+        class={`${cellCenterL2Card} ${cellStickyLeft2}`}
       >
         <a
           href={href}
@@ -182,18 +178,14 @@ export function StampListingsRow({ stamp }: StampListingsRowProps) {
 
       {/* CPID */}
       <td
-        class={`${
-          cellAlign(2, HEADERS.length)
-        } ${cellCenterL2Card} font-mono text-color-neutral-400`}
+        class={`${cellCenterL2Card} font-mono text-color-neutral-400`}
       >
         {stamp.cpid ?? "N/A"}
       </td>
 
       {/* CREATOR/ARTIST */}
       <td
-        class={`${
-          cellAlign(3, HEADERS.length)
-        } ${cellCenterL2Card} font-medium text-color-neutral-200`}
+        class={`${cellCenterL2Card} font-medium text-color-neutral-200`}
       >
         <a
           href={`/wallet/${stamp.creator}`}
@@ -205,27 +197,21 @@ export function StampListingsRow({ stamp }: StampListingsRowProps) {
 
       {/* LISTED */}
       <td
-        class={`${
-          cellAlign(4, HEADERS.length)
-        } ${cellCenterL2Card} text-color-primary-400`}
+        class={`${cellCenterL2Card} text-color-primary-400`}
       >
         {listedDisplay}
       </td>
 
       {/* PRICE */}
       <td
-        class={`${
-          cellAlign(5, HEADERS.length)
-        } ${cellCenterL2Card} text-color-secondary-400`}
+        class={`${cellCenterL2Card} text-color-secondary-400`}
       >
         {formatPrice(stamp.floorPrice)}
       </td>
 
       {/* ACTIVITY */}
       <td
-        class={`${
-          cellAlign(6, HEADERS.length)
-        } ${cellCenterL2Card} text-center`}
+        class={`${cellCenterL2Card}`}
       >
         {stamp.activity_level
           ? (
@@ -239,9 +225,7 @@ export function StampListingsRow({ stamp }: StampListingsRowProps) {
 
       {/* DISPENSER ADDY */}
       <td
-        class={`${
-          cellAlign(7, HEADERS.length)
-        } ${cellCenterL2Card} text-color-neutral-200`}
+        class={`${cellCenterL2Card} text-color-neutral-200`}
       >
         {dispenser.source
           ? (
@@ -257,9 +241,7 @@ export function StampListingsRow({ stamp }: StampListingsRowProps) {
 
       {/* SELLER ADDY */}
       <td
-        class={`${
-          cellAlign(8, HEADERS.length)
-        } ${cellCenterL2Card} text-color-neutral-200`}
+        class={`${cellCenterL2Card} text-color-neutral-200`}
       >
         {(dispenser.origin ?? dispenser.source)
           ? (
@@ -278,7 +260,7 @@ export function StampListingsRow({ stamp }: StampListingsRowProps) {
 
       {/* BUY */}
       <td
-        class={`${cellAlign(9, HEADERS.length)} ${cellRightL2Card}`}
+        class={`${cellRightL2Card}`}
       >
         <Button
           variant="outline"
@@ -339,9 +321,7 @@ export function StampListingsTable({ stamps }: StampListingsTableProps) {
               return (
                 <th
                   key={header}
-                  class={`${labelXxs} ${
-                    cellAlign(i, HEADERS.length)
-                  } py-1.5 !px-3 ${rowClass} ${stickyClass} text-color-neutral-500`}
+                  class={`${labelXxs} py-1.5 !px-3 ${rowClass} ${stickyClass} text-color-neutral-500`}
                 >
                   {header}
                 </th>

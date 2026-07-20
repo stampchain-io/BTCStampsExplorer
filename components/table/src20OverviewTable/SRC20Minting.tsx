@@ -1,6 +1,6 @@
 /* reinamora - update Trending calculations */
 import { Button } from "$button";
-import { cellAlign, colGroup } from "$components/layout/types.ts";
+import { colGroup } from "$components/layout/types.ts";
 import { SSRSafeUrlBuilder } from "$components/navigation/SSRSafeUrlBuilder.tsx";
 import { Icon, PlaceholderImage } from "$icon";
 import {
@@ -87,9 +87,7 @@ export function SRC20Minting({
     isSelected: boolean,
     isClickable: boolean,
   ) => {
-    const baseClass = `${labelXxs} ${
-      cellAlign(index, headers.length)
-    } py-1.5 !px-3`;
+    const baseClass = `${labelXxs} py-1.5 !px-3`;
 
     const rowClass = isFirst
       ? cellLeftL2Card
@@ -223,9 +221,7 @@ export function SRC20Minting({
                   >
                     {/* TOKEN */}
                     <td
-                      class={`${
-                        cellAlign(0, headers.length)
-                      } ${cellLeftL2Card} ${cellStickyLeft}`}
+                      class={`${cellLeftL2Card} ${cellStickyLeft}`}
                     >
                       <div class="flex items-center gap-4">
                         {imageUrl
@@ -279,19 +275,11 @@ export function SRC20Minting({
                       </div>
                     </td>
                     {/* MINTS */}
-                    <td
-                      class={`${
-                        cellAlign(1, headers.length)
-                      } ${cellCenterL2Card}`}
-                    >
+                    <td class={cellCenterL2Card}>
                       {src20.mint_progress?.total_mints || "N/A"}
                     </td>
                     {/* PROGRESS */}
-                    <td
-                      class={`${
-                        cellAlign(2, headers.length)
-                      } ${cellCenterL2Card}`}
-                    >
+                    <td class={cellCenterL2Card}>
                       <div class="flex items-center justify-center w-full">
                         <div class="flex flex-row items-center w-[100px] min-[420px]:w-[120px] mobileLg:w-[140px] gap-1.5">
                           <div class="relative flex-1 h-1.5 bg-color-neutral-800 rounded-full">
@@ -333,30 +321,18 @@ export function SRC20Minting({
                       </div>
                     </td>
                     {/* TRENDING */}
-                    <td
-                      class={`${
-                        cellAlign(3, headers.length)
-                      } ${cellCenterL2Card}`}
-                    >
+                    <td class={cellCenterL2Card}>
                       {"N/A"}
                     </td>
                     {/* HOLDERS */}
-                    <td
-                      class={`${
-                        cellAlign(4, headers.length)
-                      } ${cellCenterL2Card} text-color-primary-400`}
-                    >
+                    <td class={`${cellCenterL2Card} text-color-primary-400`}>
                       {Number(
                         src20.market_data?.holder_count ??
                           src20.holders ?? 0,
                       ).toLocaleString()}
                     </td>
                     {/* CREATOR */}
-                    <td
-                      class={`${
-                        cellAlign(5, headers.length)
-                      } ${cellCenterL2Card} text-color-neutral-200`}
-                    >
+                    <td class={`${cellCenterL2Card} text-color-neutral-200`}>
                       <a
                         href={`/wallet/${src20.creator}`}
                         class="link-neutral-200-cell"
@@ -366,11 +342,7 @@ export function SRC20Minting({
                       </a>
                     </td>
                     {/* DEPLOY */}
-                    <td
-                      class={`${
-                        cellAlign(6, headers.length)
-                      } ${cellCenterL2Card} text-color-neutral-400`}
-                    >
+                    <td class={`${cellCenterL2Card} text-color-neutral-400`}>
                       {formatDate(new Date(src20.block_time), {
                         month: "numeric",
                         day: "numeric",
@@ -378,9 +350,7 @@ export function SRC20Minting({
                       }).toUpperCase()}
                     </td>
                     {/* MINT BUTTON */}
-                    <td
-                      class={`text-right ${cellRightL2Card}`}
-                    >
+                    <td class={cellRightL2Card}>
                       <Button
                         variant="outline"
                         color="primary"

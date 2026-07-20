@@ -1,5 +1,5 @@
 /* ===== STAMP LISTINGS OPEN TABLE COMPONENT ===== */
-import { cellAlign, colGroup } from "$components/layout/types.ts";
+import { colGroup } from "$components/layout/types.ts";
 import {
   cellCenterL2Detail,
   cellLeftL2Detail,
@@ -48,7 +48,7 @@ export function StampListingsOpenTable({
             {/* ===== TABLE HEADER ===== */}
             <thead class="sticky top-0 z-10">
               {/* Only sticky on desktop */}
-              <tr class={`${container2}`}>
+              <tr class={container2}>
                 {headers.map((header, i) => {
                   const isFirst = i === 0;
                   const isLast = i === (headers?.length ?? 0) - 1;
@@ -61,9 +61,7 @@ export function StampListingsOpenTable({
                   return (
                     <th
                       key={header}
-                      class={`${
-                        cellAlign(i, headers?.length ?? 0)
-                      } !py-1.5 ${rowClass} ${labelXs}`}
+                      class={`!py-1.5 ${rowClass} ${labelXs}`}
                     >
                       {header}
                     </th>
@@ -95,9 +93,7 @@ export function StampListingsOpenTable({
                   >
                     {/* PRICE */}
                     <td
-                      class={`${
-                        cellAlign(0, headers?.length ?? 0)
-                      } ${cellLeftL2Detail} group-hover:text-color-purple-light`}
+                      class={`${cellLeftL2Detail} group-hover:text-color-purple-light`}
                     >
                       {formatSatoshisToBTC(dispenser.satoshirate, {
                         includeSymbol: true,
@@ -107,33 +103,25 @@ export function StampListingsOpenTable({
                     </td>
                     {/* ESCROW */}
                     <td
-                      class={`${
-                        cellAlign(1, headers?.length ?? 0)
-                      } ${cellCenterL2Detail}`}
+                      class={cellCenterL2Detail}
                     >
                       {formatNumber(dispenser.escrow_quantity, 0)}
                     </td>
                     {/* GIVE */}
                     <td
-                      class={`${
-                        cellAlign(2, headers?.length ?? 0)
-                      } ${cellCenterL2Detail}`}
+                      class={cellCenterL2Detail}
                     >
                       {formatNumber(dispenser.give_quantity, 0)}
                     </td>
                     {/* REMAIN */}
                     <td
-                      class={`${
-                        cellAlign(3, headers?.length ?? 0)
-                      } ${cellCenterL2Detail}`}
+                      class={cellCenterL2Detail}
                     >
                       {formatNumber(dispenser.give_remaining, 0)}
                     </td>
                     {/* SOURCE */}
                     <td
-                      class={`${
-                        cellAlign(4, headers?.length ?? 0)
-                      } ${cellRightL2Detail} group-hover:text-color-grey-light`}
+                      class={`${cellRightL2Detail} group-hover:text-color-grey-light`}
                     >
                       DISPENSER
                     </td>

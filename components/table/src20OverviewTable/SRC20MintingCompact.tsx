@@ -1,6 +1,6 @@
 /* @reinamora - update Trending calculations */
 import { Button } from "$button";
-import { cellAlign, colGroup } from "$components/layout/types.ts";
+import { colGroup } from "$components/layout/types.ts";
 import { PlaceholderImage } from "$icon";
 import {
   cellCenterL2Card,
@@ -67,7 +67,7 @@ export function SRC20MintingCompact({
           ]).map((col) => <col key={col.key} class={col.className} />)}
         </colgroup>
         <thead>
-          <tr class={`${container2}`}>
+          <tr class={container2}>
             {headers.map((header, i) => {
               const isFirst = i === 0;
               const isLast = i === (headers?.length ?? 0) - 1;
@@ -81,9 +81,7 @@ export function SRC20MintingCompact({
               return (
                 <th
                   key={header}
-                  class={`${labelXxs} ${
-                    cellAlign(i, headers?.length ?? 0)
-                  } py-1.5 !px-3 ${rowClass} ${
+                  class={`${labelXxs} py-1.5 !px-3 ${rowClass} ${
                     i === 1 ? "tablet:hidden min-[1280px]:table-cell" : ""
                   } ${isFirst ? cellStickyLeft : ""}`}
                 >
@@ -159,9 +157,7 @@ export function SRC20MintingCompact({
                   >
                     {/* TOKEN */}
                     <td
-                      class={`${
-                        cellAlign(0, headers?.length ?? 0)
-                      } ${cellLeftL2Card} ${cellStickyLeft}`}
+                      class={`${cellLeftL2Card} ${cellStickyLeft}`}
                     >
                       <div class="flex items-center gap-4">
                         {imageUrl
@@ -216,18 +212,14 @@ export function SRC20MintingCompact({
                     </td>
                     {/* MINTS */}
                     <td
-                      class={`${
-                        cellAlign(1, headers?.length ?? 0)
-                      } ${cellCenterL2Card} tablet:hidden min-[1280px]:table-cell`}
+                      class={`${cellCenterL2Card} tablet:hidden min-[1280px]:table-cell`}
                     >
                       {src20.mint_progress?.total_mints || src20.mint_count ||
                         "N/A"}
                     </td>
                     {/* PROGRESS */}
                     <td
-                      class={`${
-                        cellAlign(2, headers?.length ?? 0)
-                      } ${cellCenterL2Card}`}
+                      class={cellCenterL2Card}
                     >
                       <div class="flex items-center justify-center w-full gap-2">
                         <div class="flex flex-row items-center w-[90px] min-[420px]:w-[100px] mobileMd:w-[120px] mobileLg:w-[150px] tablet:w-[110px] desktop:w-[140px] gap-3">
@@ -243,8 +235,7 @@ export function SRC20MintingCompact({
                                     const progressValue = Number(progressRaw);
                                     if (isNaN(progressValue)) {
                                       return 0;
-                                    }
-                                    return Math.min(
+                                    } return Math.min(
                                       100,
                                       Math.max(0, progressValue),
                                     );
@@ -271,9 +262,7 @@ export function SRC20MintingCompact({
                     </td>
                     {/* HOLDERS */}
                     <td
-                      class={`${
-                        cellAlign(3, headers?.length ?? 0)
-                      } ${cellCenterL2Card}`}
+                      class={cellCenterL2Card}
                     >
                       {(() => {
                         const holderCount = src20.market_data?.holder_count ??
@@ -284,9 +273,7 @@ export function SRC20MintingCompact({
                     </td>
                     {/* MINT BUTTON */}
                     <td
-                      class={`${
-                        cellAlign(4, headers?.length ?? 0)
-                      } ${cellRightL2Card}`}
+                      class={cellRightL2Card}
                     >
                       <Button
                         variant="outline"

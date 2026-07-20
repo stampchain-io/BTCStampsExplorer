@@ -1,5 +1,5 @@
 /* ===== STAMP LISTINGS ALL TABLE COMPONENT ===== */
-import { cellAlign, colGroup } from "$components/layout/types.ts";
+import { colGroup } from "$components/layout/types.ts";
 import {
   cellCenterL2Detail,
   cellLeftL2Detail,
@@ -50,7 +50,7 @@ export function StampListingsAllTable(
         {/* ===== TABLE HEADER ===== */}
         <thead class="sticky top-0 z-10">
           {/* Only sticky on desktop */}
-          <tr class={`${container2}`}>
+          <tr class={container2}>
             {headers.map((header, i) => {
               const isFirst = i === 0;
               const isLast = i === (headers?.length ?? 0) - 1;
@@ -65,9 +65,7 @@ export function StampListingsAllTable(
               return (
                 <th
                   key={header}
-                  class={`${
-                    cellAlign(i, headers?.length ?? 0)
-                  } !py-1.5 ${rowClass} ${labelXs}`}
+                  class={`!py-1.5 ${rowClass} ${labelXs}`}
                 >
                   {header}
                 </th>
@@ -90,9 +88,7 @@ export function StampListingsAllTable(
                 >
                   {/* PRICE */}
                   <td
-                    class={`${
-                      cellAlign(0, headers?.length ?? 0)
-                    } ${cellLeftL2Detail}`}
+                    class={cellLeftL2Detail}
                   >
                     {formatSatoshisToBTC(dispenser.satoshirate, {
                       includeSymbol: true,
@@ -102,41 +98,31 @@ export function StampListingsAllTable(
                   </td>
                   {/* ESCROW */}
                   <td
-                    class={`${
-                      cellAlign(1, headers?.length ?? 0)
-                    } ${cellCenterL2Detail}`}
+                    class={cellCenterL2Detail}
                   >
                     {dispenser.escrow_quantity.toLocaleString()}
                   </td>
                   {/* GIVE */}
                   <td
-                    class={`${
-                      cellAlign(2, headers?.length ?? 0)
-                    } ${cellCenterL2Detail}`}
+                    class={cellCenterL2Detail}
                   >
                     {dispenser.give_quantity.toLocaleString()}
                   </td>
                   {/* REMAIN */}
                   <td
-                    class={`${
-                      cellAlign(3, headers?.length ?? 0)
-                    } ${cellCenterL2Detail}`}
+                    class={cellCenterL2Detail}
                   >
                     {dispenser.give_remaining.toLocaleString()}
                   </td>
                   {/* SOURCE */}
                   <td
-                    class={`${
-                      cellAlign(4, headers?.length ?? 0)
-                    } ${cellCenterL2Detail}`}
+                    class={cellCenterL2Detail}
                   >
                     DISPENSER
                   </td>
                   {/* ADDRESS */}
                   <td
-                    class={`${
-                      cellAlign(5, headers?.length ?? 0)
-                    } ${cellCenterL2Detail}`}
+                    class={cellCenterL2Detail}
                   >
                     <a
                       href={`/wallet/${dispenser.source}`}
@@ -156,9 +142,7 @@ export function StampListingsAllTable(
                   </td>
                   {/* STATUS */}
                   <td
-                    class={`${
-                      cellAlign(6, headers?.length ?? 0)
-                    } ${cellRightL2Detail}`}
+                    class={cellRightL2Detail}
                   >
                     {!dispenser.close_block_index ||
                         dispenser.close_block_index <= 0

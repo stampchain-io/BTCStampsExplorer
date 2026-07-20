@@ -1,5 +1,5 @@
 import { Button } from "$button";
-import { cellAlign, colGroup } from "$components/layout/types.ts";
+import { colGroup } from "$components/layout/types.ts";
 import { SSRSafeUrlBuilder } from "$components/navigation/SSRSafeUrlBuilder.tsx";
 import { Icon, PlaceholderImage } from "$icon";
 // import ChartWidget from "$islands/layout/ChartWidget.tsx";
@@ -142,15 +142,12 @@ export function SRC20Overview({
   };
 
   const getSegmentedHeaderClass = (
-    index: number,
     isFirst: boolean,
     isLast: boolean,
     isSelected: boolean,
     isClickable: boolean,
   ) => {
-    const baseClass = `${labelXxs} ${
-      cellAlign(index, headers?.length ?? 0)
-    } py-1.5 !px-3`;
+    const baseClass = `${labelXxs} py-1.5 !px-3`;
 
     const rowClass = isFirst
       ? cellLeftL2Card
@@ -228,7 +225,7 @@ export function SRC20Overview({
           ]).map((col) => <col key={col.key} class={col.className} />)}
         </colgroup>
         <thead>
-          <tr class={`${container2}`}>
+          <tr class={container2}>
             {headers.map((header, i) => {
               const isFirst = i === 0;
               const isLast = i === (headers?.length ?? 0) - 1;
@@ -251,7 +248,6 @@ export function SRC20Overview({
                   key={header}
                   class={`${
                     getSegmentedHeaderClass(
-                      i,
                       isFirst,
                       isLast,
                       isSelected,
@@ -308,9 +304,7 @@ export function SRC20Overview({
                   >
                     {/* TOKEN */}
                     <td
-                      class={`${
-                        cellAlign(0, headers?.length ?? 0)
-                      } ${cellLeftL2Card} ${cellStickyLeft}`}
+                      class={`${cellLeftL2Card} ${cellStickyLeft}`}
                     >
                       <div class="flex items-center gap-4">
                         {imageUrl
@@ -369,9 +363,7 @@ export function SRC20Overview({
                     </td>
                     {/* PRICE */}
                     <td
-                      class={`${
-                        cellAlign(1, headers?.length ?? 0)
-                      } ${cellCenterL2Card} text-color-secondary-400`}
+                      class={`${cellCenterL2Card} text-color-secondary-400`}
                     >
                       {(() => {
                         const priceInBtc = getPrice(src20);
@@ -423,9 +415,7 @@ export function SRC20Overview({
                     </td>
                     {/* CHANGE */}
                     <td
-                      class={`${
-                        cellAlign(2, headers?.length ?? 0)
-                      } ${cellCenterL2Card} text-center`}
+                      class={cellCenterL2Card}
                     >
                       {(() => {
                         const change = src20.market_data?.change_24h_percent;
@@ -451,9 +441,7 @@ export function SRC20Overview({
                     </td>
                     {/* VOLUME */}
                     <td
-                      class={`${
-                        cellAlign(3, headers?.length ?? 0)
-                      } ${cellCenterL2Card}`}
+                      class={cellCenterL2Card}
                     >
                       {(() => {
                         const volume = getVolume24h(src20);
@@ -478,9 +466,7 @@ export function SRC20Overview({
                     </td>
                     {/* MARKETCAP */}
                     <td
-                      class={`${
-                        cellAlign(4, headers?.length ?? 0)
-                      } ${cellCenterL2Card}`}
+                      class={cellCenterL2Card}
                     >
                       {(() => {
                         const marketCap = getMarketCap(src20);
@@ -500,9 +486,7 @@ export function SRC20Overview({
                     </td>
                     {/* HOLDERS */}
                     <td
-                      class={`${
-                        cellAlign(5, headers?.length ?? 0)
-                      } ${cellCenterL2Card} text-color-primary-400`}
+                      class={`${cellCenterL2Card} text-color-primary-400`}
                     >
                       {(() => {
                         const holderCount = src20.market_data?.holder_count ??
@@ -513,9 +497,7 @@ export function SRC20Overview({
                     </td>
                     {/* CREATOR */}
                     <td
-                      class={`${
-                        cellAlign(6, headers?.length ?? 0)
-                      } ${cellCenterL2Card} text-color-neutral-200`}
+                      class={`${cellCenterL2Card} text-color-neutral-200`}
                     >
                       <a
                         href={`/wallet/${src20.creator}`}
@@ -527,9 +509,7 @@ export function SRC20Overview({
                     </td>
                     {/* DEPLOY */}
                     <td
-                      class={`${
-                        cellAlign(7, headers?.length ?? 0)
-                      } ${cellCenterL2Card} text-color-neutral-400`}
+                      class={`${cellCenterL2Card} text-color-neutral-400`}
                     >
                       {formatDate(new Date(src20.block_time), {
                         month: "numeric",
@@ -539,9 +519,7 @@ export function SRC20Overview({
                     </td>
                     {/* TRADE */}
                     <td
-                      class={`${
-                        cellAlign(8, headers?.length ?? 0)
-                      } ${cellRightL2Card}`}
+                      class={cellRightL2Card}
                     >
                       <Button
                         variant="outline"

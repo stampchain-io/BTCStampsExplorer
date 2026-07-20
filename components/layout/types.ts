@@ -83,37 +83,10 @@ export interface FetchResponse {
   total: number;
 }
 
-/* ===== TABLE STYLING CONSTANTS ===== */
-export const defaultColGroup = {
-  columns: 5,
-  width: "w-[20%]",
-};
-
-export const cellAlignment = {
-  first: "text-left",
-  middle: "text-center",
-  last: "text-right",
-};
-
 /* ===== TABLE STYLING UTILITIES ===== */
-export const colGroup = (customColumns?: Array<{ width: string }>) => {
-  if (customColumns) {
-    return customColumns.map((col, i) => ({
-      key: i,
-      className: col.width,
-    }));
-  }
-
-  return Array(defaultColGroup.columns)
-    .fill(null)
-    .map((_, i) => ({
-      key: i,
-      className: defaultColGroup.width,
-    }));
-};
-
-export const cellAlign = (index: number, total: number) => {
-  if (index === 0) return cellAlignment.first;
-  if (index === total - 1) return cellAlignment.last;
-  return cellAlignment.middle;
+export const colGroup = (customColumns: Array<{ width: string }>) => {
+  return customColumns.map((col, i) => ({
+    key: i,
+    className: col.width,
+  }));
 };

@@ -1,5 +1,5 @@
 /* ===== UNIFIED EXPLORER TABLE COMPONENT ===== */
-import { cellAlign, colGroup } from "$components/layout/types.ts";
+import { colGroup } from "$components/layout/types.ts";
 import {
   cellCenterL2Card,
   cellLeftL2Card,
@@ -68,9 +68,7 @@ export function ExplorerTableBase({ items }: ExplorerTableBaseProps) {
               return (
                 <th
                   key={header}
-                  class={`${labelXxs} ${
-                    cellAlign(i, HEADERS.length)
-                  } py-1.5 !px-3 ${rowClass} text-color-neutral-500`}
+                  class={`${labelXxs} py-1.5 !px-3 ${rowClass} text-color-neutral-500`}
                 >
                   {header}
                 </th>

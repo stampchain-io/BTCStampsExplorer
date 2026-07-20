@@ -1,5 +1,5 @@
 /* ===== SRC20 EXPLORER TABLE COMPONENT ===== */
-import { cellAlign, colGroup } from "$components/layout/types.ts";
+import { colGroup } from "$components/layout/types.ts";
 import { Icon, PlaceholderImage } from "$icon";
 import {
   cellCenterL2Card,
@@ -81,9 +81,7 @@ export function SRC20OverviewRow({ src20 }: SRC20OverviewRowProps) {
     >
       {/* IMAGE */}
       <td
-        class={`${
-          cellAlign(0, HEADERS.length)
-        } ${cellLeftL2Card} ${cellStickyLeft}`}
+        class={`${cellLeftL2Card} ${cellStickyLeft}`}
       >
         <a
           href={href}
@@ -105,9 +103,7 @@ export function SRC20OverviewRow({ src20 }: SRC20OverviewRowProps) {
 
       {/* STAMP # */}
       <td
-        class={`${
-          cellAlign(1, HEADERS.length)
-        } ${cellCenterL2Card} ${cellStickyLeft2}`}
+        class={`${cellCenterL2Card} ${cellStickyLeft2}`}
       >
         {src20.stamp != null
           ? (
@@ -125,7 +121,7 @@ export function SRC20OverviewRow({ src20 }: SRC20OverviewRowProps) {
       </td>
 
       {/* TICK */}
-      <td class={`${cellAlign(2, HEADERS.length)} ${cellCenterL2Card}`}>
+      <td class={`${cellCenterL2Card}`}>
         <a
           href={href}
           f-partial={href}
@@ -139,7 +135,7 @@ export function SRC20OverviewRow({ src20 }: SRC20OverviewRowProps) {
 
       {/* TYPE */}
       <td
-        class={`${cellAlign(3, HEADERS.length)} ${cellCenterL2Card}`}
+        class={`${cellCenterL2Card}`}
       >
         <div class="flex items-center justify-center gap-2 text-color-neutral-200">
           <Icon
@@ -156,9 +152,7 @@ export function SRC20OverviewRow({ src20 }: SRC20OverviewRowProps) {
 
       {/* ADDRESS */}
       <td
-        class={`${
-          cellAlign(4, HEADERS.length)
-        } ${cellCenterL2Card} text-color-neutral-200`}
+        class={`${cellCenterL2Card} text-color-neutral-200`}
       >
         <a
           href={`/wallet/${src20.creator}`}
@@ -170,18 +164,14 @@ export function SRC20OverviewRow({ src20 }: SRC20OverviewRowProps) {
 
       {/* AMOUNT */}
       <td
-        class={`${
-          cellAlign(5, HEADERS.length)
-        } ${cellCenterL2Card} text-color-primary-400`}
+        class={`${cellCenterL2Card} text-color-primary-400`}
       >
         {amount}
       </td>
 
       {/* TX HASH */}
       <td
-        class={`${
-          cellAlign(6, HEADERS.length)
-        } ${cellCenterL2Card} text-color-neutral-400`}
+        class={`${cellCenterL2Card} text-color-neutral-400`}
       >
         <a
           href={`https://mempool.space/tx/${src20.tx_hash}`}
@@ -195,18 +185,14 @@ export function SRC20OverviewRow({ src20 }: SRC20OverviewRowProps) {
 
       {/* BLOCK */}
       <td
-        class={`${
-          cellAlign(7, HEADERS.length)
-        } ${cellCenterL2Card} text-color-neutral-400`}
+        class={`${cellCenterL2Card} text-color-neutral-400`}
       >
         {src20.block_index.toLocaleString()}
       </td>
 
       {/* DATE */}
       <td
-        class={`${
-          cellAlign(8, HEADERS.length)
-        } ${cellRightL2Card} text-color-neutral-400 pr-3`}
+        class={`${cellRightL2Card} text-color-neutral-400 pr-3`}
       >
         {formatDate(new Date(src20.block_time), {
           month: "numeric",
@@ -260,9 +246,7 @@ export function SRC20OverviewTable({ src20s }: SRC20OverviewTableProps) {
               return (
                 <th
                   key={header}
-                  class={`${labelXxs} ${
-                    cellAlign(i, HEADERS.length)
-                  } py-1.5 !px-3 ${rowClass} ${stickyClass} text-color-neutral-500`}
+                  class={`${labelXxs} py-1.5 !px-3 ${rowClass} ${stickyClass} text-color-neutral-500`}
                 >
                   {header}
                 </th>

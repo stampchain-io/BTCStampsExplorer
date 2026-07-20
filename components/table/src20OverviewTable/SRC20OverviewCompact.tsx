@@ -1,4 +1,4 @@
-import { cellAlign, colGroup } from "$components/layout/types.ts";
+import { colGroup } from "$components/layout/types.ts";
 import { PlaceholderImage } from "$icon";
 import {
   cellCenterL2Card,
@@ -132,7 +132,7 @@ export function SRC20OverviewCompact({
           ).map((col) => <col key={col.key} class={col.className} />)}
         </colgroup>
         <thead>
-          <tr class={`${container2}`}>
+          <tr class={container2}>
             {headers.map((header, i) => {
               const isFirst = i === 0;
               const isLast = i === (headers?.length ?? 0) - 1;
@@ -153,9 +153,7 @@ export function SRC20OverviewCompact({
               return (
                 <th
                   key={header}
-                  class={`${labelXxs} ${
-                    cellAlign(i, headers?.length ?? 0)
-                  } py-1.5 !px-3 ${rowClass} ${
+                  class={`${labelXxs} py-1.5 !px-3 ${rowClass} ${
                     header === "MARKETCAP"
                       ? "tablet:hidden desktop:table-cell"
                       : ""
@@ -197,9 +195,7 @@ export function SRC20OverviewCompact({
                   >
                     {/* TOKEN */}
                     <td
-                      class={`${
-                        cellAlign(0, headers?.length ?? 0)
-                      } ${cellLeftL2Card} ${cellStickyLeft}`}
+                      class={`${cellLeftL2Card} ${cellStickyLeft}`}
                     >
                       <div class="flex items-center gap-4">
                         {imageUrl
@@ -255,9 +251,7 @@ export function SRC20OverviewCompact({
                     {/* BALANCE - only show in wallet view */}
                     {fromPage === "wallet" && (
                       <td
-                        class={`${
-                          cellAlign(1, headers?.length ?? 0)
-                        } ${cellCenterL2Card}`}
+                        class={cellCenterL2Card}
                       >
                         {(() => {
                           const balance = Number(src20.amt || 0);
@@ -268,12 +262,7 @@ export function SRC20OverviewCompact({
                     )}
                     {/* PRICE */}
                     <td
-                      class={`${
-                        cellAlign(
-                          fromPage === "wallet" ? 2 : 1,
-                          headers?.length ?? 0,
-                        )
-                      } ${cellCenterL2Card} text-color-secondary-400`}
+                      class={`${cellCenterL2Card} text-color-secondary-400`}
                     >
                       {(() => {
                         const priceInBtc = getPrice(src20);
@@ -301,7 +290,7 @@ export function SRC20OverviewCompact({
                     </td>
                     {/* CHANGE */}
                     <td
-                      class={`${cellCenterL2Card} text-center`}
+                      class={cellCenterL2Card}
                     >
                       {(() => {
                         const change = src20.market_data?.change_24h_percent;
@@ -327,12 +316,7 @@ export function SRC20OverviewCompact({
                     </td>
                     {/* VOLUME */}
                     <td
-                      class={`${
-                        cellAlign(
-                          fromPage === "wallet" ? 4 : 3,
-                          headers?.length ?? 0,
-                        )
-                      } ${cellVolume}`}
+                      class={cellVolume}
                     >
                       {(() => {
                         const volume = getVolume24h(src20);
@@ -357,14 +341,7 @@ export function SRC20OverviewCompact({
                     </td>
                     {/* MARKETCAP */}
                     <td
-                      class={`
-                      ${
-                        cellAlign(
-                          fromPage === "wallet" ? 5 : 4,
-                          headers?.length ?? 0,
-                        )
-                      }
-                      ${cellRightL2Card} !pr-3
+                      class={`${cellRightL2Card} !pr-3
                       tablet:hidden desktop:table-cell
                     `}
                     >
