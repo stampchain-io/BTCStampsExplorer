@@ -107,15 +107,15 @@ export const buttonStyles: ButtonVariants = {
 
   /* ===== SIZE STYLES ===== */
   size: {
-    xxs: "h-[26px] px-[14px] text-[10px]",
+    xxs: "h-[26px] px-[14px] text-[0.625rem]",
     xs: "h-[30px] px-[14px] text-xs",
     sm: "h-[34px] px-4 text-xs",
     md: "h-[38px] px-4 text-sm",
     lg: "h-[42px] px-4 text-sm",
     xl: "h-[46px] px-5 text-base",
     xxl: "h-[50px] px-6 text-lg",
-    xxsR: "h-[26px] tablet:h-[22px] px-[14px] text-[10px]",
-    xsR: "h-[30px] tablet:h-[26px] px-[14px] text-xs tablet:text-[10px]",
+    xxsR: "h-[26px] tablet:h-[22px] px-[14px] text-[0.625rem]",
+    xsR: "h-[30px] tablet:h-[26px] px-[14px] text-xs tablet:text-[0.625rem]",
     smR: "h-[34px] tablet:h-[30px] px-4 text-xs",
     mdR: "h-[38px] tablet:h-[34px] px-4 text-sm tablet:text-xs",
     lgR: "h-[42px] tablet:h-[38px] px-4 text-sm",
