@@ -1,14 +1,17 @@
 /* ===== STAMP INFO COMPONENT ===== */
 /*@baba-750+764+815+icons - refactor to StatItems */
 import { Button } from "$button";
+import { ActivityLevelIndicator } from "$components/indicators/ActivityLevelIndicator.tsx";
 import { Icon } from "$icon";
 import BuyStampModal from "$islands/modal/BuyStampModal.tsx";
 import { openModal } from "$islands/modal/states.ts";
 import {
   body,
+  container3,
   containerBackground,
   containerColData,
   containerGap,
+  containerPill,
 } from "$layout";
 import type { Src101Detail } from "$lib/types/src101.d.ts";
 import type { StampRow } from "$lib/types/stamp.d.ts";
@@ -25,11 +28,11 @@ import {
 import { tooltipIcon } from "$notification";
 import { Dispenser, StampListingsOpenTable } from "$table";
 import {
-  headingGreyDLLink,
-  labelSm,
-  titleNeutral,
+  cardPrice,
+  cardSupply,
+  labelXs,
+  titlePrimary,
   value2xl,
-  value3xl,
   valueDark,
   valueSm,
 } from "$text";
@@ -109,7 +112,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
 
   const creatorDisplay = stamp.creator_name
     ? stamp.creator_name
-    : abbreviateAddress(stamp.creator, 8);
+    : abbreviateAddress(stamp.creator, 12);
 
   const [isDivisibleTooltipVisible, setIsDivisibleTooltipVisible] = useState(
     false,
@@ -535,6 +538,10 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
         btcPrice
       : floorPriceUSD;
 
+  const activityLevel = stamp.activity_level ??
+    marketData?.activityLevel ??
+    null;
+
   // Debug effects for development only
   useEffect(() => {
     if (globalThis.location?.hostname === "localhost") {
@@ -667,88 +674,95 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
         <div
           className={containerBackground}
         >
-          <div>
-            <h2
-              ref={titleRef}
-              className={`${titleNeutral} overflow-hidden`}
-              style={{
-                transform: `scale(${scale})`,
-                transformOrigin: "left",
-                width: `${(100 / scale)}%`,
-                marginTop: `${-0.2 * (1 / scale - 1)}em`,
-                marginBottom: `${-0.26 * (1 / scale - 1)}em`,
-              }}
-            >
-              {isSrc101Stamp() && src101
-                ? (
-                  <span className="font-light">
-                    {src101?.tokenid?.length && atob(src101?.tokenid[0])}
-                  </span>
-                )
-                : isSrc20Stamp()
-                ? (
-                  <>
-                    <span className="font-light">#</span>
-                    <span className="font-black">{stamp.stamp}</span>
-                  </>
-                )
-                : (isPoshStamp(stamp.cpid) ||
-                    (htmlStampTitle && stamp.stamp_mimetype === "text/html"))
-                ? (
-                  <span className="font-black uppercase text-ellipsis overflow-hidden">
-                    {isPoshStamp(stamp.cpid) ? stamp.cpid : htmlStampTitle}
-                  </span>
-                )
-                : (
-                  <>
-                    <span className="font-light">#</span>
-                    <span className="font-black">{stamp.stamp}</span>
-                  </>
-                )}
-            </h2>
-
-            {isSrc20Stamp() && stamp.cpid && (
-              <h6 className={`${valueDark} -mt-1 pb-1 block`}>
-                {stamp.cpid}
-              </h6>
-            )}
-
-            <h5 className="-mt-1.5 font-light text-xl text-color-grey block">
-              {(!isSrc20Stamp() && (isPoshStamp(stamp.cpid) ||
-                (htmlStampTitle && stamp.stamp_mimetype === "text/html"))) && (
-                <>
-                  #{stamp.stamp}
-                </>
-              )}
-            </h5>
-
-            {(!isPoshStamp(stamp.cpid) && stamp.cpid) && (
-              <h6 className={`${valueDark} block`}>
-                {stamp.cpid}
-              </h6>
-            )}
-
-            <div className="flex flex-col items-start pt-3">
-              <h6 className={labelSm}>ARTIST</h6>
-              <a
-                className={headingGreyDLLink}
-                href={`/wallet/${stamp.creator}`}
-                target="_parent"
+          <div className="flex justify-between items-start gap-3">
+            <div className="min-w-0">
+              <h2
+                ref={titleRef}
+                className={`${titlePrimary} overflow-hidden`}
+                style={{
+                  transform: `scale(${scale})`,
+                  transformOrigin: "left",
+                  width: `${(100 / scale)}%`,
+                  marginTop: `${-0.2 * (1 / scale - 1)}em`,
+                  marginBottom: `${-0.26 * (1 / scale - 1)}em`,
+                }}
               >
-                {creatorDisplay}
-              </a>
+                {isSrc101Stamp() && src101
+                  ? (
+                    <span className="font-light">
+                      {src101?.tokenid?.length && atob(src101?.tokenid[0])}
+                    </span>
+                  )
+                  : isSrc20Stamp()
+                  ? (
+                    <>
+                      <span className="font-light">#</span>
+                      <span className="font-black">{stamp.stamp}</span>
+                    </>
+                  )
+                  : (isPoshStamp(stamp.cpid) ||
+                      (htmlStampTitle && stamp.stamp_mimetype === "text/html"))
+                  ? (
+                    <span className="font-black uppercase text-ellipsis overflow-hidden">
+                      {isPoshStamp(stamp.cpid) ? stamp.cpid : htmlStampTitle}
+                    </span>
+                  )
+                  : (
+                    <>
+                      <span className="font-light">#</span>
+                      <span className="font-black">{stamp.stamp}</span>
+                    </>
+                  )}
+              </h2>
+
+              {isSrc20Stamp() && stamp.cpid && (
+                <h6 className={`${valueDark} -mt-1 pb-1 block`}>
+                  {stamp.cpid}
+                </h6>
+              )}
+
+              <h5 className="-mt-1.5 font-mono font-light text-xl text-color-neutral-500 block">
+                {(!isSrc20Stamp() && (isPoshStamp(stamp.cpid) ||
+                  (htmlStampTitle && stamp.stamp_mimetype === "text/html"))) &&
+                  (
+                    <>
+                      #{stamp.stamp}
+                    </>
+                  )}
+              </h5>
+
+              {(!isPoshStamp(stamp.cpid) && stamp.cpid) && (
+                <h6 className={`${valueDark} block`}>
+                  {stamp.cpid}
+                </h6>
+              )}
+
+              <div className="flex flex-col items-start pt-3">
+                <h6 className={labelXs}>ARTIST</h6>
+                <a
+                  className="font-bold text-sm text-color-neutral-200 link-neutral-200-bold"
+                  href={`/wallet/${stamp.creator}`}
+                  target="_parent"
+                >
+                  {creatorDisplay}
+                </a>
+              </div>
             </div>
+
+            {!isSrc20Stamp() && (
+              <div
+                className={`${containerPill} ${cardSupply} !text-sm shrink-0`}
+              >
+                {stamp.supply === 1 ? "1/1" : editionCount}
+              </div>
+            )}
           </div>
 
           {(dispensers?.length > 0 || !!lowestPriceDispenser)
             ? (
               <div className="flex flex-col w-full pt-6 mobileLg:pt-12">
-                <div
-                  className={`flex w-full gap-6 mb-2 items-end ${
-                    dispensers?.length >= 2 ? "justify-between" : "justify-end"
-                  }`}
-                >
-                  {dispensers?.length >= 2 && (
+                {dispensers?.length >= 2 && (
+                  <div className="flex mb-2">
                     <Icon
                       type="iconButton"
                       name="dispenserListings"
@@ -759,26 +773,35 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                       onClick={() => setShowListings(!showListings)}
                       className="pb-0.5"
                     />
-                  )}
+                  </div>
+                )}
 
-                  <div className="text-right">
-                    {displayPriceUSD && (
-                      <h6 className={labelSm}>
-                        {displayPriceUSD.toLocaleString("en-US", {
-                          maximumFractionDigits: 2,
-                        })} <span className="font-light">USD</span>
-                      </h6>
-                    )}
-                    <h6 className={value2xl}>
-                      {formatBTCAmount(
-                        typeof displayPrice === "number" ? displayPrice : 0,
-                        {
-                          excludeSuffix: true,
-                          decimals: 8,
-                          stripZeros: true,
-                        },
-                      )} <span className="font-extralight">BTC</span>
-                    </h6>
+                <div
+                  className={`flex flex-col items-end self-end w-fit px-3 py-2.5 mb-3 ${container3}`}
+                >
+                  {activityLevel && (
+                    <ActivityLevelIndicator
+                      level={activityLevel}
+                      className="!cursor-default"
+                    />
+                  )}
+                  {displayPriceUSD != null && (
+                    <div className="mt-1 font-normal text-xs text-color-neutral-500 text-nowrap">
+                      {displayPriceUSD.toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })} USD
+                    </div>
+                  )}
+                  <div className={`${cardPrice} !text-sm`}>
+                    {formatBTCAmount(
+                      typeof displayPrice === "number" ? displayPrice : 0,
+                      {
+                        excludeSuffix: true,
+                        decimals: 8,
+                        stripZeros: false,
+                      },
+                    )} <span className="font-light">BTC</span>
                   </div>
                 </div>
 
@@ -811,8 +834,8 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                 <div className="flex justify-end">
                   <Button
                     variant="flat"
-                    color="neutral"
-                    size="mdR"
+                    color="primary"
+                    size="smR"
                     onClick={() =>
                       toggleModal(selectedDispenser || lowestPriceDispenser)}
                   >
@@ -827,14 +850,14 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
         <div className={containerBackground}>
           {!isSrc20Stamp() && (
             <div className="flex flex-col pb-3">
-              <h6 className={labelSm}>{editionLabel}</h6>
-              <h6 className={value3xl}>{editionCount}</h6>
+              <h6 className={labelXs}>{editionLabel}</h6>
+              <h6 className={value2xl}>{editionCount}</h6>
             </div>
           )}
 
           <div className="flex flex-row">
             <div className={`${containerColData} flex-1 items-start`}>
-              <h6 className={labelSm}>TYPE</h6>
+              <h6 className={labelXs}>TYPE</h6>
               <h6 className={valueSm}>
                 {isSrc20Stamp()
                   ? "SRC-20"
@@ -844,7 +867,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
               </h6>
             </div>
             <div className={`${containerColData} flex-1 items-center`}>
-              <h6 className={labelSm}>
+              <h6 className={labelXs}>
                 {(isSrc20Stamp() || isSrc101Stamp())
                   ? "TRANSACTION"
                   : isMediaFile
@@ -995,7 +1018,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
 
           <div className="flex flex-row pt-3">
             <div className={`${containerColData} flex-1 items-start`}>
-              <h6 className={labelSm}>SIZE</h6>
+              <h6 className={labelXs}>SIZE</h6>
               <h6 className={valueSm}>
                 {stamp.file_size_bytes !== null
                   ? formatFileSize(
@@ -1006,7 +1029,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
               </h6>
             </div>
             <div className={`${containerColData} flex-1 items-center`}>
-              <h6 className={labelSm}>
+              <h6 className={labelXs}>
                 {isSrc20Stamp() ? "SENT" : "CREATED"}
               </h6>
               <h6 className={valueSm}>
@@ -1015,7 +1038,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
             </div>
             {/* @baba - fix logic handling for no tx hash */}
             <div className={`${containerColData} flex-1 items-end`}>
-              <h6 className={labelSm}>TX HASH</h6>
+              <h6 className={labelXs}>TX HASH</h6>
               <a
                 href={`https://www.blockchain.com/explorer/transactions/btc/${stamp.tx_hash}`}
                 target="_blank"

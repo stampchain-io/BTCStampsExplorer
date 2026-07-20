@@ -306,7 +306,7 @@ function RightPanel(
   /* ===== RENDER ===== */
   return (
     <div className={`${container1} pt-3 pb-1.5 px-5 flex justify-between`}>
-      <div className="flex gap-5 tablet:gap-3.5">
+      <div className="flex gap-4 min-[420px]:gap-5 tablet:gap-3.5">
         <div
           ref={copyButtonRef}
           class="relative"
@@ -384,7 +384,7 @@ function RightPanel(
         </div>
       </div>
 
-      <div className="flex gap-5 tablet:gap-3.5">
+      <div className="flex gap-4 min-[420px]:gap-5 tablet:gap-3.5">
         {showCodeButton && (
           <div
             ref={codeButtonRef}

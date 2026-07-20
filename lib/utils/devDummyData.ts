@@ -964,6 +964,7 @@ export const DUMMY_STAMP_DETAIL_PAGE = {
     ...DUMMY_STAMP_CLASSIC,
     floorPrice: 0.00042,
     floorPriceUSD: 0.00042 * _BTC_PRICE_USD,
+    activity_level: "HOT" as const,
   },
   total: 1,
   sends: [],

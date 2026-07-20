@@ -1,11 +1,11 @@
 import type {
-    StampEdition,
-    StampFilesize,
-    StampFiletype,
-    StampFilterType,
-    StampMarketplace,
-    StampRange,
-    StampSuffixFilter
+  StampEdition,
+  StampFilesize,
+  StampFiletype,
+  StampFilterType,
+  StampMarketplace,
+  StampRange,
+  StampSuffixFilter
 } from "$constants";
 import { type StampType } from "$constants";
 import { StampRepository } from "$server/database/index.ts";
@@ -660,6 +660,8 @@ export class StampService {
 
     return {
       ...stamp,
+      // Activity tracking (top-level for StampCard / StampInfo)
+      activity_level: marketData.activityLevel || null,
       // v2.3+: market_data contains all market information (consistent snake_case)
       market_data: marketData ? {
         // Convert camelCase to snake_case for API consistency
@@ -681,6 +683,7 @@ export class StampService {
         last_price_update: marketData.lastPriceUpdate || null,
         cache_status: marketData.lastUpdated ?
           this.getCacheStatus(marketData.lastUpdated) : undefined,
+        activity_level: marketData.activityLevel || null,
         dispensers: {
           open_count: marketData.openDispensersCount || 0,
           closed_count: marketData.closedDispensersCount || 0,
@@ -702,7 +705,8 @@ export class StampService {
         lastUpdated: marketData.lastUpdated,
         openDispensersCount: marketData.openDispensersCount || 0,
         closedDispensersCount: marketData.closedDispensersCount || 0,
-        totalDispensersCount: marketData.totalDispensersCount || 0
+        totalDispensersCount: marketData.totalDispensersCount || 0,
+        activityLevel: marketData.activityLevel || null,
       } : null,
       marketDataMessage: marketData ? undefined : "No market data available for this stamp"
     };
