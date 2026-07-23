@@ -2,8 +2,8 @@
 import { PaginationButtons } from "$button";
 import { StampCard } from "$card";
 import { MarketplaceTableBase } from "$components/table/marketplaceTable/MarketplaceTableBase.tsx";
-import { containerBackground } from "$layout";
-import { valueDark } from "$text";
+import { container2 } from "$layout";
+import { valueDarkSm } from "$text";
 import type { StampCardVariant, StampRow } from "$types/stamp.d.ts";
 import type { MarketplaceContentProps } from "$types/ui.d.ts";
 
@@ -51,10 +51,12 @@ export function MarketplaceContent({
         )
         : (
           <div
-            class={`${containerBackground} flex-col flex justify-center items-center`}
+            class={`${container2} flex-col flex justify-center items-center`}
           >
             <img src="/img/ic_content.svg" width="160" />
-            <h6 class={`py-2 ${valueDark} text-center`}>NO LISTINGS</h6>
+            <h6 class={`pb-3 ${valueDarkSm} text-center`}>
+              {isRecentSales ? "NO SALES TO DISPLAY" : "NO LISTINGS TO DISPLAY"}
+            </h6>
           </div>
         )}
       {pagination && pagination.totalPages > 1 && (

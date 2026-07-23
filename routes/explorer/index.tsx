@@ -330,7 +330,27 @@ export const handler: Handlers = {
       });
     } catch (error) {
       console.error(error);
-      return ctx.render(DATA_PLACEHOLDER_PROD_EXPLORER_OVERVIEW_PAGE);
+      // Preserve the requested section/tab/view so the selector buttons and
+      // empty-state messages stay in sync with the URL even when the
+      // underlying data fetch fails (e.g. DB unavailable) — otherwise every
+      // failed request falls back to the same "all" defaults, making it
+      // look like the section/tab selection isn't taking effect.
+      const selectedTab = (url.searchParams.get("type") || "all") as StampType;
+      const recentSales = url.searchParams.get("recentSales") === "true";
+      return ctx.render({
+        ...DATA_PLACEHOLDER_PROD_EXPLORER_OVERVIEW_PAGE,
+        stamps: [],
+        pagination: { total: 0 },
+        page: 1,
+        totalPages: 0,
+        filterBy: [],
+        sortBy: "DESC",
+        selectedTab: recentSales ? "recent_sales" : selectedTab,
+        src20DataCard: { data: [], total: 0, page: 1, totalPages: 0 },
+        section,
+        cardView,
+        partial: url.searchParams.has("_fresh"),
+      });
     }
   },
 };

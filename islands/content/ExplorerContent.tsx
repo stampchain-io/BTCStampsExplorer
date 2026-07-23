@@ -6,6 +6,8 @@ import {
   type MixedItem,
 } from "$components/table/explorerTable/ExplorerTableBase.tsx";
 import { SRC20Card } from "$islands/card/SRC20Card.tsx";
+import { container2 } from "$layout";
+import { valueDarkSm } from "$text";
 import type { ExplorerContentProps } from "$types/ui.d.ts";
 
 /* ===== COMPONENT ===== */
@@ -47,6 +49,21 @@ export function ExplorerContent({
         ? (
           /* ===== ROW TABLE VIEW ===== */
           <ExplorerTableBase items={visible} />
+        )
+        : visible.length === 0
+        ? (
+          <div
+            class={`${container2} flex-col flex justify-center items-center`}
+          >
+            <img src="/img/ic_content.svg" width="160" />
+            <h6 class={`pb-3 ${valueDarkSm} text-center`}>
+              {section === "stamps"
+                ? "NO STAMPS TO DISPLAY"
+                : section === "tokens"
+                ? "NO TOKENS TO DISPLAY"
+                : "NO STAMPS OR TOKENS TO DISPLAY"}
+            </h6>
+          </div>
         )
         : (
           /* ===== CARD GRID VIEW ===== */
