@@ -215,7 +215,7 @@ export function SRC20MintingCompact({
                       class={`${cellCenterL2Card} tablet:hidden min-[1280px]:table-cell`}
                     >
                       {src20.mint_progress?.total_mints || src20.mint_count ||
-                        "N/A"}
+                        <span class="text-color-neutral-500">N/A</span>}
                     </td>
                     {/* PROGRESS */}
                     <td

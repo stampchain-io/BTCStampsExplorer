@@ -76,9 +76,15 @@ export function ActivityLevelIndicator({
           )
           : (
             <div className="flex items-center gap-1">
-              <div className={`size-1.5 rounded-full ${dots[0]}`} />
-              <div className={`size-1.5 rounded-full ${dots[1]}`} />
-              <div className={`size-1.5 rounded-full ${dots[2]}`} />
+              <div
+                className={`size-1.5 rounded-full ${dots[0]}`}
+              />
+              <div
+                className={`size-1.5 rounded-full ${dots[1]}`}
+              />
+              <div
+                className={`size-1.5 rounded-full ${dots[2]}`}
+              />
             </div>
           )}
       </div>

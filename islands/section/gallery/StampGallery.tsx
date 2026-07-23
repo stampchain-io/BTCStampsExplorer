@@ -3,8 +3,9 @@ import { PaginationButtons, ViewAllButton } from "$button";
 import { StampCard } from "$card";
 import { BREAKPOINTS } from "$constants";
 import { SortButton } from "$islands/button/SortButton.tsx";
+import { container2 } from "$layout";
 import { useLoadingSkeleton } from "$lib/hooks/useLoadingSkeleton.ts";
-import { subtitlePrimary, titlePrimary } from "$text";
+import { subtitlePrimary, titlePrimary, valueDarkSm } from "$text";
 import type { StampGalleryProps, StampRow } from "$types/stamp.d.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
 import Swiper from "swiper";
@@ -182,9 +183,19 @@ export default function StampGallery({
       </div>
 
       {/* ===== STAMP CONTENT ===== */}
-      {((viewAllLink && viewAllLink !== "/collection/posh" &&
-          fromPage == "home") ||
-          fromPage === "stamp_detail")
+      {!isLoading && filteredStamps.length === 0
+        ? (
+          <div
+            class={`${container2} flex items-center justify-center w-full h-[46px]`}
+          >
+            <h6 class={`${valueDarkSm} text-center`}>
+              NO STAMP CREATIONS AVAILABLE
+            </h6>
+          </div>
+        )
+        : ((viewAllLink && viewAllLink !== "/collection/posh" &&
+            fromPage == "home") ||
+            fromPage === "stamp_detail")
         ? (
           <div class="swiper-container overflow-hidden">
             <div class="swiper-wrapper">
@@ -243,7 +254,9 @@ export default function StampGallery({
         )}
 
       {/* ===== NAVIGATION CONTROLS ===== */}
-      {viewAllLink && <ViewAllButton href={viewAllLink} />}
+      {viewAllLink && filteredStamps.length > 0 && (
+        <ViewAllButton href={viewAllLink} />
+      )}
 
       {pagination && pagination.totalPages > 1 && (
         <div class="mt-7.5 tablet:mt-10">

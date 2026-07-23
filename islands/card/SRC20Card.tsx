@@ -63,7 +63,7 @@ export function SRC20Card(
 
         {/* Ticker */}
         <div
-          class={`${cardCreator} !font-bold`}
+          class={`${cardCreator} !font-bold uppercase`}
         >
           <span class="hidden min-[420px]:inline-block font-light pr-0.5">
             $
@@ -216,7 +216,7 @@ export function SRC20Card(
     );
   };
 
-  /* ===== MINIMAL LAYOUT (all ops) ===== */
+  /* ===== COMPACT LAYOUT (all ops) ===== */
   const renderMinimal = () => {
     const amount = op === "DEPLOY"
       ? formatAmount(src20.max)
@@ -241,7 +241,7 @@ export function SRC20Card(
               : <PlaceholderImage variant="no-image" className="!rounded-xl" />}
           </div>
           <div
-            class={`${cardCreator} !font-bold`}
+            class={`${cardCreator} !font-bold uppercase`}
           >
             <span class="hidden min-[420px]:inline-block font-light pr-0.5">
               $
@@ -293,7 +293,9 @@ export function SRC20Card(
         href={href}
         target="_top"
         f-partial={href}
-        class={containerCard}
+        class={`${containerCard} ${
+          variant === "cardVerticalDetail" ? "min-h-[260px]" : ""
+        }`}
       >
         {variant === "cardSquare" ? renderMinimal() : (
           <>

@@ -981,8 +981,8 @@ export function StampCard({
               {stampValue}
             </div>
 
-            {/* CPID (marketplace listings only) */}
-            {variant === "cardVerticalListing" && stamp.cpid && (
+            {/* CPID */}
+            {stamp.cpid && (
               <div
                 class={`mt-0.5 font-mono text-xs text-color-neutral-500 ${truncate}`}
               >

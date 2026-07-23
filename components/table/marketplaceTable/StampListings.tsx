@@ -3,9 +3,9 @@ import { Button } from "$button";
 import { ActivityLevelIndicator } from "$components/indicators/ActivityLevelIndicator.tsx";
 import { colGroup } from "$components/layout/types.ts";
 import { PlaceholderImage } from "$icon";
+import StampTextContent from "$islands/content/stampDetailContent/StampTextContent.tsx";
 import BuyStampModal from "$islands/modal/BuyStampModal.tsx";
 import { openModal } from "$islands/modal/states.ts";
-import StampTextContent from "$islands/content/stampDetailContent/StampTextContent.tsx";
 import {
   cellCenterL2Card,
   cellLeftL2Card,
@@ -184,7 +184,7 @@ export function StampListingsRow({ stamp }: StampListingsRowProps) {
                 {stamp.stamp}
               </>
             )
-            : "N/A"}
+            : <span class="text-color-neutral-500">N/A</span>}
         </a>
       </td>
 
@@ -232,7 +232,7 @@ export function StampListingsRow({ stamp }: StampListingsRowProps) {
               className="mx-auto"
             />
           )
-          : <span class="text-color-neutral-400">N/A</span>}
+          : <span class="text-color-neutral-500">N/A</span>}
       </td>
 
       {/* DISPENSER ADDY */}
@@ -248,7 +248,7 @@ export function StampListingsRow({ stamp }: StampListingsRowProps) {
               {abbreviateAddress(dispenser.source, 5)}
             </a>
           )
-          : "N/A"}
+          : <span class="text-color-neutral-500">N/A</span>}
       </td>
 
       {/* SELLER ADDY */}
@@ -267,7 +267,7 @@ export function StampListingsRow({ stamp }: StampListingsRowProps) {
               )}
             </a>
           )
-          : "N/A"}
+          : <span class="text-color-neutral-500">N/A</span>}
       </td>
 
       {/* BUY */}

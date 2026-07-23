@@ -81,7 +81,7 @@ export function SRC20Minting({
   };
 
   const getSegmentedHeaderClass = (
-    index: number,
+    _index: number,
     isFirst: boolean,
     isLast: boolean,
     isSelected: boolean,
@@ -276,7 +276,9 @@ export function SRC20Minting({
                     </td>
                     {/* MINTS */}
                     <td class={cellCenterL2Card}>
-                      {src20.mint_progress?.total_mints || "N/A"}
+                      {src20.mint_progress?.total_mints || (
+                        <span class="text-color-neutral-500">N/A</span>
+                      )}
                     </td>
                     {/* PROGRESS */}
                     <td class={cellCenterL2Card}>
@@ -322,7 +324,7 @@ export function SRC20Minting({
                     </td>
                     {/* TRENDING */}
                     <td class={cellCenterL2Card}>
-                      {"N/A"}
+                      <span class="text-color-neutral-500">N/A</span>
                     </td>
                     {/* HOLDERS */}
                     <td class={`${cellCenterL2Card} text-color-primary-400`}>

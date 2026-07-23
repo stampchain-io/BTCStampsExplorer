@@ -89,7 +89,7 @@ export function MarketplaceSalesRow({ stamp }: MarketplaceSalesRowProps) {
 
   const priceDisplay = sale?.btc_amount != null
     ? formatBTCAmount(sale.btc_amount, { includeSymbol: true, decimals: 8 })
-    : "N/A";
+    : null;
 
   const timeAgo = sale?.time_ago;
   const dateDisplay = formatSaleDate(sale?.sale_time, timeAgo);
@@ -154,7 +154,7 @@ export function MarketplaceSalesRow({ stamp }: MarketplaceSalesRowProps) {
                 {stamp.stamp}
               </>
             )
-            : "N/A"}
+            : <span class="text-color-neutral-500">N/A</span>}
         </a>
       </td>
 
@@ -188,7 +188,7 @@ export function MarketplaceSalesRow({ stamp }: MarketplaceSalesRowProps) {
       <td
         class={`${cellCenterL2Card} text-color-secondary-400`}
       >
-        {priceDisplay}
+        {priceDisplay ?? <span class="text-color-neutral-500">N/A</span>}
       </td>
 
       {/* DISPENSER ADDY */}
@@ -204,7 +204,7 @@ export function MarketplaceSalesRow({ stamp }: MarketplaceSalesRowProps) {
               {abbreviateAddress(sale.dispenser_address, 5)}
             </a>
           )
-          : "N/A"}
+          : <span class="text-color-neutral-500">N/A</span>}
       </td>
 
       {/* BUYER ADDY */}
@@ -220,7 +220,7 @@ export function MarketplaceSalesRow({ stamp }: MarketplaceSalesRowProps) {
               {abbreviateAddress(sale.buyer_address, 5)}
             </a>
           )
-          : "N/A"}
+          : <span class="text-color-neutral-500">N/A</span>}
       </td>
 
       {/* TX HASH */}
