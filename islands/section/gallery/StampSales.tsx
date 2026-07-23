@@ -1,6 +1,6 @@
 /* ===== RECENT SALES GALLERY COMPONENT ===== */
 /*@baba-153+154-move Refreshing to ViewAllButton-remove default (not used)*/
-import { container3, loaderSpinXsGrey } from "$layout";
+import { container2, loaderSpinXsGrey } from "$layout";
 import { notificationTextError } from "$notification";
 import { StampGallery } from "$section";
 import { titlePrimary, valueDarkSm } from "$text";
@@ -122,8 +122,10 @@ export function StampSalesGallery({
       {title && <h3 class={titlePrimary}>{title}</h3>}
       <div class="flex flex-col">
         {filteredStamps.length === 0 && !isLoading && (
-          <div class={`${container3} ${valueDarkSm} text-center py-8`}>
-            <h6 class="text-base">NO RECENT SALES AVAILABLE AT THE MOMENT</h6>
+          <div class={`${container2} w-full h-[46px]`}>
+            <h6 class={`${valueDarkSm} text-center`}>
+              NO RECENT SALES AVAILABLE AT THE MOMENT
+            </h6>
           </div>
         )}
         {filteredStamps.length > 0 && <StampGallery {...sectionProps} />}

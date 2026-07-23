@@ -371,7 +371,7 @@ export function SRC20OverviewCompact({
               <tr>
                 <td
                   colSpan={headers?.length ?? 0}
-                  class={`w-full h-[46px] ${container2}`}
+                  class={`${container2} w-full h-[46px]`}
                 >
                   <h6 class={`${valueDarkSm} text-center`}>
                     NO TOKENS TO DISPLAY

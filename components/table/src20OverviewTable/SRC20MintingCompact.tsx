@@ -235,7 +235,8 @@ export function SRC20MintingCompact({
                                     const progressValue = Number(progressRaw);
                                     if (isNaN(progressValue)) {
                                       return 0;
-                                    } return Math.min(
+                                    }
+                                    return Math.min(
                                       100,
                                       Math.max(0, progressValue),
                                     );
@@ -294,7 +295,7 @@ export function SRC20MintingCompact({
               <tr>
                 <td
                   colSpan={headers?.length ?? 0}
-                  class={`w-full h-[46px] ${container2}`}
+                  class={`${container2} w-full h-[46px]`}
                 >
                   <h6 class={`${valueDarkSm} text-center`}>
                     NO MINTING TOKENS
