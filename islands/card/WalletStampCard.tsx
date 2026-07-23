@@ -52,6 +52,7 @@ const WalletStampCardComponent = (
 ) => {
   /* ===== STATE ===== */
   const [loading, setLoading] = useState<boolean>(true);
+  const [imageFailed, setImageFailed] = useState<boolean>(false);
   const [src, setSrc] = useState<string | undefined>(undefined);
   const [validatedContent, setValidatedContent] = useState<VNode | null>(null);
   const [isValidating, setIsValidating] = useState<boolean>(false);
@@ -69,14 +70,12 @@ const WalletStampCardComponent = (
     stamp.stamp_mimetype === "text/json";
 
   /* ===== HANDLERS ===== */
-  const handleImageError = (e: Event) => {
-    if (e.currentTarget instanceof HTMLImageElement) {
-      // Use transparent pixel data URI to prevent infinite error loops
-      // (setting src="" resolves to the page URL, which isn't an image → re-triggers error)
-      e.currentTarget.src =
-        "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
-      e.currentTarget.alt = "Content not available";
-    }
+  // Swaps the broken <img> for the local "no image" placeholder icon instead
+  // of leaving a transparent pixel (which just reveals the checkerboard
+  // background) or the unrelated Stampchain logo.
+  const handleImageError = (_e: Event) => {
+    setImageFailed(true);
+    setLoading(false);
   };
 
   const getAbbreviationLength = () => {
@@ -90,6 +89,7 @@ const WalletStampCardComponent = (
 
   const fetchStampImage = () => {
     setLoading(true);
+    setImageFailed(false);
     // Use centralized image URL logic
     const imageSrc = getStampImageSrc(stamp);
     setSrc(imageSrc);
@@ -272,11 +272,20 @@ const WalletStampCardComponent = (
 
     // Handle HTML content — show cached preview PNG instead of iframe
     if (stamp.stamp_mimetype === "text/html") {
+      if (imageFailed) {
+        return (
+          <div class="stamp-container relative">
+            <div class="relative z-10 aspect-square">
+              <PlaceholderImage variant="no-image" />
+            </div>
+          </div>
+        );
+      }
       return (
         <div class="stamp-container relative">
           <div class="relative z-10 aspect-square">
             <img
-              src={getStampPreviewUrl(stamp)}
+              src={getStampPreviewUrl(stamp, { placeholderOnFail: true })}
               loading="lazy"
               alt={`Stamp No. ${stamp.stamp}`}
               class="max-w-none object-contain rounded-2xl pixelart stamp-image h-full w-full"
@@ -309,6 +318,15 @@ const WalletStampCardComponent = (
           </div>
         );
       }
+      if (imageFailed) {
+        return (
+          <div class="stamp-container">
+            <div class="relative z-10 aspect-square">
+              <PlaceholderImage variant="no-image" />
+            </div>
+          </div>
+        );
+      }
       return validatedContent || (
         <div class="stamp-container">
           <div class="relative z-10 aspect-square">
@@ -335,6 +353,15 @@ const WalletStampCardComponent = (
     }
 
     // Regular images
+    if (imageFailed) {
+      return (
+        <div class="stamp-container">
+          <div class="relative z-10 aspect-square">
+            <PlaceholderImage variant="no-image" />
+          </div>
+        </div>
+      );
+    }
     return (
       <div class="stamp-container">
         <div class="relative z-10 aspect-square">

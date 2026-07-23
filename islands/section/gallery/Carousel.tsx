@@ -3,6 +3,7 @@
 import createCarouselSlider from "$client/utils/carousel-slider.ts";
 import { IS_BROWSER } from "$fresh/runtime.ts";
 import { PlaceholderImage } from "$icon";
+import StampTextContent from "$islands/content/stampDetailContent/StampTextContent.tsx";
 import { container2, shadowGlowPurple } from "$layout";
 import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
 import {
@@ -56,9 +57,17 @@ export default function CarouselGallery(props: CarouselHomeProps) {
   const [stampSources, setStampSources] = useState<
     Record<string, string | null>
   >({});
+  const [imageFailed, setImageFailed] = useState<Record<string, boolean>>({});
 
   /* ===== EVENT HANDLERS ===== */
   const handleLoad = () => {
+    setLoading(false);
+  };
+
+  // Swaps the broken <img> for the local "no image" placeholder icon
+  // instead of leaving the browser's native broken-image icon.
+  const handleImageError = (txHash: string) => {
+    setImageFailed((prev) => ({ ...prev, [txHash]: true }));
     setLoading(false);
   };
 
@@ -108,16 +117,30 @@ export default function CarouselGallery(props: CarouselHomeProps) {
             return;
           }
 
+          // Handle plain text content — render the actual text instead of
+          // trying to load the raw .txt file as an <img> (which can't decode)
+          if (stamp.stamp_mimetype === "text/plain") {
+            validated[stamp.tx_hash] = (
+              <a target="_top" href={`/stamp/${stamp.tx_hash}`}>
+                <div class="cursor-pointer desktop:min-w-[408px] tablet:min-w-[269px] mobileLg:min-w-[200px] mobileMd:min-w-[242px] min-w-[150px] rounded-2xl aspect-square overflow-hidden">
+                  <StampTextContent src={src} />
+                </div>
+              </a>
+            );
+            return;
+          }
+
           // Handle HTML content — show cached preview PNG instead of iframe
           if (stamp.stamp_mimetype === "text/html") {
             validated[stamp.tx_hash] = (
               <a target="_top" href={`/stamp/${stamp.tx_hash}`}>
                 <img
-                  src={getStampPreviewUrl(stamp)}
+                  src={getStampPreviewUrl(stamp, { placeholderOnFail: true })}
                   alt={`Stamp #${stamp.stamp}`}
                   loading="lazy"
                   class="object-contain cursor-pointer desktop:min-w-[408px] tablet:min-w-[269px] mobileLg:min-w-[200px] mobileMd:min-w-[242px] min-w-[150px] rounded-2xl aspect-square pixelart stamp-image"
                   onLoad={handleLoad}
+                  onError={() => handleImageError(stamp.tx_hash)}
                 />
               </a>
             );
@@ -140,11 +163,12 @@ export default function CarouselGallery(props: CarouselHomeProps) {
                     [stamp.tx_hash]: (
                       <a target="_top" href={`/stamp/${stamp.tx_hash}`}>
                         <img
-                          src={`/api/v2/stamp/${stamp.stamp}/preview`}
+                          src={`/api/v2/stamp/${stamp.stamp}/preview?placeholderOnFail=true`}
                           alt={`Stamp #${stamp.stamp}`}
                           loading="lazy"
                           class="object-contain cursor-pointer desktop:min-w-[408px] tablet:min-w-[269px] mobileLg:min-w-[200px] mobileMd:min-w-[242px] min-w-[150px] rounded-2xl pixelart stamp-image"
                           onLoad={handleLoad}
+                          onError={() => handleImageError(stamp.tx_hash)}
                         />
                       </a>
                     ),
@@ -244,15 +268,23 @@ export default function CarouselGallery(props: CarouselHomeProps) {
                       <div
                         class={`relative min-h-[150px] mobileMd:min-h-[242px] mobileLg:min-h-[200px] tablet:min-h-[269px] desktop:min-h-[408px] p-[6px] mobileMd:p-[12px] desktop:p-[18px] rounded-3xl ${container2} hover:bg-black`}
                       >
-                        {validatedContent[stamp.tx_hash] || (
-                          <img
-                            src={stampSources[stamp.tx_hash] || stamp.stamp_url}
-                            alt={`Stamp #${stamp.stamp}`}
-                            loading="lazy"
-                            class="object-contain cursor-pointer desktop:min-w-[408px] tablet:min-w-[269px] mobileLg:min-w-[200px] mobileMd:min-w-[242px] min-w-[150px] rounded-2xl pixelart stamp-image"
-                            onLoad={handleLoad}
-                          />
-                        )}
+                        {imageFailed[stamp.tx_hash]
+                          ? (
+                            <div class="object-contain desktop:min-w-[408px] tablet:min-w-[269px] mobileLg:min-w-[200px] mobileMd:min-w-[242px] min-w-[150px] rounded-2xl aspect-square">
+                              <PlaceholderImage variant="no-image" />
+                            </div>
+                          )
+                          : (validatedContent[stamp.tx_hash] || (
+                            <img
+                              src={stampSources[stamp.tx_hash] ||
+                                stamp.stamp_url}
+                              alt={`Stamp #${stamp.stamp}`}
+                              loading="lazy"
+                              class="object-contain cursor-pointer desktop:min-w-[408px] tablet:min-w-[269px] mobileLg:min-w-[200px] mobileMd:min-w-[242px] min-w-[150px] rounded-2xl pixelart stamp-image"
+                              onLoad={handleLoad}
+                              onError={() => handleImageError(stamp.tx_hash)}
+                            />
+                          ))}
                         {/* ===== HOVER OVERLAY ===== */}
                         {activeSlideIndex - 1 == index && (
                           <div

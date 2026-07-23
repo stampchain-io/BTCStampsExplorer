@@ -36,18 +36,34 @@ import { VNode } from "preact";
 import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
+interface StampSaleData {
+  btc_amount: number;
+  block_index: number;
+  tx_hash: string;
+  buyer_address?: string | undefined;
+  dispenser_address?: string | undefined;
+  time_ago?: string | undefined;
+  sale_time?: number | null | undefined;
+  dispense_quantity?: number | undefined;
+  btc_amount_satoshis?: number | undefined;
+  dispenser_tx_hash?: string | undefined;
+}
+
 interface StampWithSaleData extends Omit<StampRow, "stamp_base64"> {
-  sale_data?: {
-    btc_amount: number;
-    block_index: number;
-    tx_hash: string;
-    buyer_address?: string;
-    dispenser_address?: string;
-    time_ago?: string;
-    sale_time?: number | null;
-    dispense_quantity?: number;
-  };
+  sale_data?: StampSaleData;
   stamp_base64?: string;
+  // StampController.getRecentSales (and StampService.getRecentSales) return
+  // these sale details as flat top-level fields rather than nested under
+  // `sale_data`. Callers can pass that result straight through — see
+  // `saleData` below, which normalizes either shape — instead of every call
+  // site re-wrapping the flat fields into `sale_data` itself.
+  btc_amount?: number;
+  btc_amount_satoshis?: number;
+  buyer_address?: string;
+  dispenser_address?: string;
+  dispenser_tx_hash?: string;
+  time_ago?: string;
+  dispense_quantity?: number;
 }
 
 /* ===== COMPONENT ===== */
@@ -62,6 +78,7 @@ export function StampCard({
 }) {
   /* ===== STATE ===== */
   const [loading, setLoading] = useState<boolean>(true);
+  const [imageFailed, setImageFailed] = useState<boolean>(false);
   const [src, setSrc] = useState<string | undefined>(undefined);
   const [validatedContent, setValidatedContent] = useState<VNode | null>(null);
   const [isValidating, setIsValidating] = useState<boolean>(false);
@@ -109,6 +126,24 @@ export function StampCard({
     stamp.stamp_mimetype === "application/gzip" ||
     stamp.stamp_mimetype === "application/json" ||
     stamp.stamp_mimetype === "text/json";
+
+  // Normalize sale info: accept either the nested `sale_data` shape or the
+  // flat fields StampController.getRecentSales returns directly, so callers
+  // don't each have to re-wrap the flat result themselves.
+  const saleData: StampSaleData | undefined = stamp.sale_data ??
+    (isRecentSale && stamp.btc_amount != null
+      ? {
+        btc_amount: stamp.btc_amount,
+        block_index: stamp.block_index,
+        tx_hash: stamp.tx_hash,
+        buyer_address: stamp.buyer_address,
+        dispenser_address: stamp.dispenser_address,
+        time_ago: stamp.time_ago,
+        btc_amount_satoshis: stamp.btc_amount_satoshis,
+        dispenser_tx_hash: stamp.dispenser_tx_hash,
+        dispense_quantity: stamp.dispense_quantity,
+      }
+      : undefined);
 
   /* ===== TOOLTIP HANDLERS ===== */
   const handleRecursiveMouseEnter = () => {
@@ -226,20 +261,19 @@ export function StampCard({
   };
 
   /* ===== HANDLERS ===== */
-  const handleImageError = (e: Event) => {
-    if (e.currentTarget instanceof HTMLImageElement) {
-      // Use transparent pixel data URI to prevent infinite error loops
-      // (setting src="" resolves to the page URL, which isn't an image → re-triggers error)
-      e.currentTarget.src =
-        "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
-      e.currentTarget.alt = "Content not available";
-    }
+  // Swaps the broken <img> for the local "no image" placeholder icon instead
+  // of leaving a transparent pixel (which just reveals the checkerboard
+  // background) or the unrelated Stampchain logo.
+  const handleImageError = (_e: Event) => {
+    setImageFailed(true);
+    setLoading(false);
   };
 
   const abbreviationLength = windowWidth < 768 ? 4 : windowWidth < 1024 ? 5 : 5;
 
   const fetchStampImage = () => {
     setLoading(true);
+    setImageFailed(false);
     // Use embedded base64 as a data URI when available — works without CDN access
     if (stamp.stamp_base64) {
       const mime = stamp.stamp_mimetype ?? "image/png";
@@ -307,7 +341,9 @@ export function StampCard({
               <div class="stamp-container">
                 <div class="relative z-10 aspect-square">
                   <img
-                    src={getStampPreviewUrl(stamp as StampRow)}
+                    src={getStampPreviewUrl(stamp as StampRow, {
+                      placeholderOnFail: true,
+                    })}
                     loading="lazy"
                     alt={`Stamp No. ${stamp.stamp}`}
                     class="max-w-none object-contain rounded-xl pixelart stamp-image h-full w-full"
@@ -422,11 +458,22 @@ export function StampCard({
 
     // Handle HTML content - show cached preview PNG in grid view
     if (stamp.stamp_mimetype === "text/html") {
+      if (imageFailed) {
+        return (
+          <div class="stamp-container">
+            <div class="relative z-10 aspect-square">
+              <PlaceholderImage variant="no-image" />
+            </div>
+          </div>
+        );
+      }
       return (
         <div class="stamp-container">
           <div class="relative z-10 aspect-square">
             <img
-              src={getStampPreviewUrl(stamp as StampRow)}
+              src={getStampPreviewUrl(stamp as StampRow, {
+                placeholderOnFail: true,
+              })}
               loading="lazy"
               alt={`Stamp No. ${stamp.stamp}`}
               class="max-w-none object-contain rounded-xl pixelart stamp-image h-full w-full"
@@ -459,6 +506,15 @@ export function StampCard({
           </div>
         );
       }
+      if (imageFailed) {
+        return (
+          <div class="stamp-container">
+            <div class="relative z-10 aspect-square">
+              <PlaceholderImage variant="no-image" />
+            </div>
+          </div>
+        );
+      }
       return validatedContent || (
         <div class="stamp-container">
           <div class="relative z-10 aspect-square">
@@ -485,6 +541,15 @@ export function StampCard({
     }
 
     // Regular images
+    if (imageFailed) {
+      return (
+        <div class="stamp-container">
+          <div class="relative z-10 aspect-square">
+            <PlaceholderImage variant="no-image" />
+          </div>
+        </div>
+      );
+    }
     return (
       <div class="stamp-container">
         <div class="relative z-10 aspect-square">
@@ -505,9 +570,9 @@ export function StampCard({
     const formatPriceBTC = (amount: number) =>
       `${Number(amount).toFixed(8)} BTC`;
 
-    if (isRecentSale && stamp.sale_data) {
+    if (isRecentSale && saleData) {
       return {
-        text: formatPriceBTC(stamp.sale_data.btc_amount),
+        text: formatPriceBTC(saleData.btc_amount),
         style: cardPrice,
       };
     }
@@ -684,7 +749,7 @@ export function StampCard({
                   </div>
                 </div>
               )}
-              {stamp.keyburn != null && (
+              {stamp.keyburn && (
                 <div
                   class="relative"
                   onMouseEnter={handleKeyburnMouseEnter}
@@ -1011,7 +1076,7 @@ export function StampCard({
                     </div>
                   </div>
                 )}
-                {stamp.keyburn != null && (
+                {stamp.keyburn && (
                   <div
                     class="relative"
                     onMouseEnter={handleKeyburnMouseEnter}
@@ -1200,15 +1265,15 @@ export function StampCard({
             </div>
 
             {/* Row 1: amount pill (left) + time_ago pill (right) */}
-            {stamp.sale_data && (
+            {saleData && (
               <div class="flex items-center justify-between mt-2 w-full">
                 <div class={`${containerPill} ${cardSupply}`}>
-                  {stamp.sale_data.dispense_quantity ?? 1}/{stamp.supply ?? 1}
+                  {saleData.dispense_quantity ?? 1}/{stamp.supply ?? 1}
                 </div>
-                {(stamp.sale_data.sale_time || stamp.sale_data.time_ago) && (
+                {(saleData.sale_time || saleData.time_ago) && (
                   <div class={`${containerPill} ${cardFileSize} text-[10px]`}>
                     {(() => {
-                      const { sale_time, time_ago } = stamp.sale_data!;
+                      const { sale_time, time_ago } = saleData;
                       if (sale_time) {
                         const ageMs = Date.now() - sale_time * 1000;
                         if (ageMs >= 7 * 86_400_000) {
@@ -1242,7 +1307,7 @@ export function StampCard({
             </div>
 
             {/* Row 3+4: Sale info containers: sale price USD / sale price BTC + buyer address (bottom) */}
-            {stamp.sale_data && (
+            {saleData && (
               <>
                 <div
                   class={`flex flex-col items-end w-full mt-2 px-2.5 py-1 ${container3} cursor-pointer`}
@@ -1268,14 +1333,14 @@ export function StampCard({
                       BUYER
                     </div>
                     <div class={`${cardFileSize}`}>
-                      {stamp.sale_data.buyer_address
+                      {saleData.buyer_address
                         ? (
                           <a
-                            href={`/wallet/${stamp.sale_data.buyer_address}`}
+                            href={`/wallet/${saleData.buyer_address}`}
                             class="link-neutral-400"
                           >
                             {abbreviateAddress(
-                              stamp.sale_data.buyer_address,
+                              saleData.buyer_address,
                               abbreviationLength,
                             )}
                           </a>
