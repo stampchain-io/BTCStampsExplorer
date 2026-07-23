@@ -150,7 +150,7 @@ export function bigFloatToString(
   return result.replace(/\.?0+$/, "");
 }
 
-export function formatSupplyValue(
+export function formatSupply(
   supply: number | string | undefined,
   divisible: boolean,
 ): string {
@@ -367,6 +367,28 @@ export function formatFileSize(
 }
 
 /**
+ * Maps a mimetype subtype (e.g. from "text/plain" -> "plain") to a short
+ * display label used in stamp card badges.
+ */
+const FILE_TYPE_LABEL_OVERRIDES: Record<string, string> = {
+  javascript: "JS",
+  plain: "TXT",
+  "svg+xml": "SVG",
+};
+
+/**
+ * Formats a stamp mimetype subtype into a short, human-readable label
+ * for display in stamp card file-type badges (e.g. "javascript" -> "JS").
+ * @param mimetype The full mimetype string (e.g. "text/javascript")
+ * @returns The abbreviated label, or "N/A" if no mimetype is provided
+ */
+export function formatFileType(mimetype?: string | null): string {
+  const subtype = mimetype?.split("/")[1]?.toLowerCase();
+  if (!subtype) return "N/A";
+  return FILE_TYPE_LABEL_OVERRIDES[subtype] ?? subtype.toUpperCase();
+}
+
+/**
  * Formats market cap
  * @param marketCap The market cap in BTC
  * @returns Formatted market cap string
@@ -432,7 +454,7 @@ export function formatBalanceDisplay(
   let formattedSupply: string;
 
   if (divisible) {
-    // For divisible stamps, use formatSupplyValue but abbreviate if result is too long
+    // For divisible stamps, use formatSupply but abbreviate if result is too long
     const balanceValue = balance / 100000000;
     const supplyValue = supply / 100000000;
 

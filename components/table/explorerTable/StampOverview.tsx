@@ -17,7 +17,7 @@ import {
 import {
   abbreviateAddress,
   formatDate,
-  formatSupplyValue,
+  formatSupply,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import StampTextContent from "$islands/content/stampDetailContent/StampTextContent.tsx";
 import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
@@ -65,14 +65,14 @@ export function StampOverviewRow({ stamp }: StampOverviewRowProps) {
     : abbreviateAddress(stamp.creator, 5);
 
   const supplyDisplay = stamp.ident !== "SRC-20" && stamp.balance
-    ? `${formatSupplyValue(Number(stamp.balance), stamp.divisible)}/${
+    ? `${formatSupply(Number(stamp.balance), stamp.divisible)}/${
       stamp.supply < 100000 && !stamp.divisible
-        ? formatSupplyValue(stamp.supply ?? 0, stamp.divisible)
+        ? formatSupply(stamp.supply ?? 0, stamp.divisible)
         : "+100000"
     }`
     : stamp.supply === 1
     ? "1/1"
-    : `${formatSupplyValue(stamp.supply ?? 0, stamp.divisible)}`;
+    : `${formatSupply(stamp.supply ?? 0, stamp.divisible)}`;
 
   /* ===== RENDER ===== */
   return (

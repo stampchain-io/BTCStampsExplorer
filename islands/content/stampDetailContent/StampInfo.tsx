@@ -20,6 +20,7 @@ import {
   formatBTCAmount,
   formatDate,
   formatFileSize,
+  formatFileType,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import {
   getSRC101Data,
@@ -878,7 +879,9 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                   ? "SRC-20"
                   : isSrc101Stamp()
                   ? "SRC-101"
-                  : fileExtension}
+                  : fileExtension === "BMN"
+                  ? "BMN"
+                  : formatFileType(stamp.stamp_mimetype)}
               </h6>
             </div>
             <div className={`${containerColData} flex-1 items-center`}>

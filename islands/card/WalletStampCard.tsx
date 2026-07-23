@@ -13,6 +13,7 @@ import { isAtomicIconVisible } from "$lib/utils/bitcoin/stamps/stampUtils.ts";
 import {
   abbreviateAddress,
   formatBalanceDisplay,
+  formatFileType,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import {
   getStampImageSrc,
@@ -408,7 +409,7 @@ const WalletStampCardComponent = (
 
   // Determine fallback display
   const fallbackDisplay = {
-    text: stamp.stamp_mimetype?.split("/")[1]?.toUpperCase() || "UNKNOWN",
+    text: formatFileType(stamp.stamp_mimetype),
     style: cardFileType,
     title: `File Type: ${stamp.stamp_mimetype || "Unknown"}`,
   };

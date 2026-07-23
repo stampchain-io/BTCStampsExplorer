@@ -18,7 +18,7 @@ import {
 import {
   abbreviateAddress,
   formatBTCAmount,
-  formatSupplyValue,
+  formatSupply,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
 import { cardRowStampNumber, labelXxs, textXs, valueDarkSm } from "$text";
@@ -83,9 +83,9 @@ export function MarketplaceSalesRow({ stamp }: MarketplaceSalesRowProps) {
     ?.dispense_quantity;
   const soldDisplay = soldQuantity != null
     ? `${Number(soldQuantity).toLocaleString()}/${
-      formatSupplyValue(stamp.supply ?? 0, stamp.divisible)
+      formatSupply(stamp.supply ?? 0, stamp.divisible)
     }`
-    : `1/${formatSupplyValue(stamp.supply ?? 0, stamp.divisible)}`;
+    : `1/${formatSupply(stamp.supply ?? 0, stamp.divisible)}`;
 
   const priceDisplay = sale?.btc_amount != null
     ? formatBTCAmount(sale.btc_amount, { includeSymbol: true, decimals: 8 })

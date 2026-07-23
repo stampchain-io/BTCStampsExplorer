@@ -12,7 +12,8 @@ import { container3, containerCard, containerPill } from "$layout";
 import {
   abbreviateAddress,
   formatFileSize,
-  formatSupplyValue,
+  formatFileType,
+  formatSupply,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import {
   getStampImageSrc,
@@ -592,7 +593,7 @@ export function StampCard({
     }
 
     return {
-      text: stamp.stamp_mimetype?.split("/")[1]?.toUpperCase() || "UNKNOWN",
+      text: formatFileType(stamp.stamp_mimetype),
       style: cardFileType,
     };
   };
@@ -601,14 +602,14 @@ export function StampCard({
   const supplyDisplay = isRecentSale
     ? `${stamp.supply || 1}` // For recent sales, show transaction quantity
     : stamp.ident !== "SRC-20" && stamp.balance
-    ? `${formatSupplyValue(Number(stamp.balance), stamp.divisible)}/${
+    ? `${formatSupply(Number(stamp.balance), stamp.divisible)}/${
       stamp.supply < 100000 && !stamp.divisible
-        ? formatSupplyValue(stamp.supply ?? 0, stamp.divisible)
+        ? formatSupply(stamp.supply ?? 0, stamp.divisible)
         : "+100000"
     }`
     : stamp.supply === 1
     ? "1/1"
-    : `${formatSupplyValue(stamp.supply ?? 0, stamp.divisible)}`;
+    : `${formatSupply(stamp.supply ?? 0, stamp.divisible)}`;
 
   // Use dynamic abbreviation length
   const creatorDisplay = stamp.creator_name
@@ -825,8 +826,7 @@ export function StampCard({
           {/* Row 2: File type + File size pills */}
           <div class="flex items-center justify-between w-full">
             <div class={`${containerPill} ${cardFileType}`}>
-              {stamp.stamp_mimetype?.split("/")[1]?.toUpperCase() ||
-                "UNKNOWN"}
+              {formatFileType(stamp.stamp_mimetype)}
             </div>
             {stamp.file_size_bytes != null && (
               <div class={`${containerPill} ${cardFileSize}`}>
@@ -1152,8 +1152,7 @@ export function StampCard({
             {/* Row 2: File type + File size pills */}
             <div class="flex items-center justify-between mt-2 w-full">
               <div class={`${containerPill} ${cardFileType}`}>
-                {stamp.stamp_mimetype?.split("/")[1]?.toUpperCase() ||
-                  "UNKNOWN"}
+                {formatFileType(stamp.stamp_mimetype)}
               </div>
               {stamp.file_size_bytes != null && (
                 <div class={`${containerPill} ${cardFileSize}`}>
@@ -1293,8 +1292,7 @@ export function StampCard({
             {/* Row 2: File type + File size pills */}
             <div class="flex items-center justify-between mt-2 w-full">
               <div class={`${containerPill} ${cardFileType}`}>
-                {stamp.stamp_mimetype?.split("/")[1]?.toUpperCase() ||
-                  "UNKNOWN"}
+                {formatFileType(stamp.stamp_mimetype)}
               </div>
               {stamp.file_size_bytes != null && (
                 <div class={`${containerPill} ${cardFileSize}`}>

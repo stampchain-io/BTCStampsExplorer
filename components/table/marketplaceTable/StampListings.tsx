@@ -22,7 +22,7 @@ import {
 import {
   abbreviateAddress,
   formatBTCAmount,
-  formatSupplyValue,
+  formatSupply,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
 import { cardRowStampNumber, labelXxs, textXs, valueDarkSm } from "$text";
@@ -100,9 +100,9 @@ export function StampListingsRow({ stamp }: StampListingsRowProps) {
 
   const listedDisplay = dispenser.giveRemaining != null
     ? `${dispenser.giveRemaining.toLocaleString()}/${
-      formatSupplyValue(stamp.supply ?? 0, stamp.divisible)
+      formatSupply(stamp.supply ?? 0, stamp.divisible)
     }`
-    : formatSupplyValue(stamp.supply ?? 0, stamp.divisible);
+    : formatSupply(stamp.supply ?? 0, stamp.divisible);
 
   // Opens the Buy modal instead of navigating to the stamp detail page.
   // BuyStampModal handles the "wallet not connected" flow internally
