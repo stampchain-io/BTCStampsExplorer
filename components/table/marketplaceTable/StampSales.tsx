@@ -1,6 +1,7 @@
 /* ===== MARKETPLACE SALES TABLE COMPONENT ===== */
 import { colGroup } from "$components/layout/types.ts";
 import { PlaceholderImage } from "$icon";
+import StampTextContent from "$islands/content/stampDetailContent/StampTextContent.tsx";
 import {
   cellCenterL2Card,
   cellLeftL2Card,
@@ -22,6 +23,7 @@ import {
 import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
 import { cardRowStampNumber, labelXxs, textXs, valueDarkSm } from "$text";
 import type { StampWithEnhancedSaleData } from "$types/stamp.d.ts";
+import { useState } from "preact/hooks";
 
 /* ===== CONSTANTS ===== */
 const HEADERS = [
@@ -66,6 +68,10 @@ interface MarketplaceSalesRowProps {
 
 export function MarketplaceSalesRow({ stamp }: MarketplaceSalesRowProps) {
   const imgSrc = getStampImageSrc(stamp);
+  // getStampImageSrc points HTML (and some other) mimetypes at a content
+  // URL that can't render inside an <img> — track load failure so we swap
+  // to the placeholder icon instead of leaving a broken-image icon.
+  const [imageFailed, setImageFailed] = useState(false);
   const href = `/stamp/${stamp.tx_hash}`;
   const sale = stamp.sale_data;
 
@@ -112,12 +118,19 @@ export function MarketplaceSalesRow({ stamp }: MarketplaceSalesRowProps) {
           target="_top"
           class="flex items-center justify-center w-6.5 h-6.5 rounded-xl overflow-hidden"
         >
-          {imgSrc
+          {stamp.stamp_mimetype === "text/plain"
+            ? (
+              <div class="w-6.5 h-6.5 rounded-xl overflow-hidden">
+                <StampTextContent src={imgSrc} />
+              </div>
+            )
+            : imgSrc && !imageFailed
             ? (
               <img
                 src={imgSrc}
                 alt={`Stamp ${stamp.stamp ?? stamp.cpid ?? ""}`}
                 class="w-6.5 h-6.5 object-contain rounded-xl pixelart"
+                onError={() => setImageFailed(true)}
               />
             )
             : <PlaceholderImage variant="no-image" className="!rounded-xl" />}

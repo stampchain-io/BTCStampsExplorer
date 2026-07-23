@@ -5,6 +5,7 @@ import { colGroup } from "$components/layout/types.ts";
 import { PlaceholderImage } from "$icon";
 import BuyStampModal from "$islands/modal/BuyStampModal.tsx";
 import { openModal } from "$islands/modal/states.ts";
+import StampTextContent from "$islands/content/stampDetailContent/StampTextContent.tsx";
 import {
   cellCenterL2Card,
   cellLeftL2Card,
@@ -88,6 +89,10 @@ export function StampListingsRow({ stamp }: StampListingsRowProps) {
   const href = `/stamp/${stamp.tx_hash}`;
   const dispenser = getDispenser(stamp);
   const [fee, setFee] = useState<number>(0);
+  // getStampImageSrc points HTML (and some other) mimetypes at a content
+  // URL that can't render inside an <img> — track load failure so we swap
+  // to the placeholder icon instead of leaving a broken-image icon.
+  const [imageFailed, setImageFailed] = useState(false);
 
   const creatorDisplay = stamp.creator_name
     ? stamp.creator_name
@@ -143,12 +148,19 @@ export function StampListingsRow({ stamp }: StampListingsRowProps) {
           target="_top"
           class="flex items-center justify-center w-6.5 h-6.5 rounded-xl overflow-hidden"
         >
-          {imgSrc
+          {stamp.stamp_mimetype === "text/plain"
+            ? (
+              <div class="w-6.5 h-6.5 rounded-xl overflow-hidden">
+                <StampTextContent src={imgSrc} />
+              </div>
+            )
+            : imgSrc && !imageFailed
             ? (
               <img
                 src={imgSrc}
                 alt={`Stamp ${stamp.stamp ?? stamp.cpid ?? ""}`}
                 class="w-6.5 h-6.5 object-contain rounded-xl pixelart"
+                onError={() => setImageFailed(true)}
               />
             )
             : <PlaceholderImage variant="no-image" className="!rounded-xl" />}
