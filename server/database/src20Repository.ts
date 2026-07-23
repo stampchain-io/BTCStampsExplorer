@@ -423,6 +423,30 @@ export class SRC20Repository {
           LEFT JOIN transactions txns ON src20.tx_hash = txns.tx_hash` : "";
     // feeFieldsOutput removed - no longer needed in simplified query
 
+    // 🚀 PERFORMANCE: Avoid "join-before-limit" pessimization. When sorting/
+    // filtering only depends on native SRC20Valid columns (i.e. we don't need
+    // market data or a stamp-range filter, and we're not sorting by the
+    // joined creator name), sort+limit SRC20Valid FIRST in a derived table,
+    // then join the enrichment tables (creator, market data, stamp) onto only
+    // those N rows. Otherwise MySQL streams the full multi-million-row join
+    // before it can apply ORDER BY + LIMIT, which is fine on fast SSD/large
+    // buffer pools but disastrous on slow disks. All whereClauses reference
+    // only src20.* columns in this case, so it's safe to push them down
+    // unchanged.
+    const canPushDownLimit = !needsMarketData &&
+      stampMin == null &&
+      stampMax == null &&
+      !finalOrderBy.includes("creator_info");
+
+    const src20FromClause = canPushDownLimit
+      ? `(
+          SELECT * FROM ${SRC20_TABLE} src20
+          ${whereClause}
+          ORDER BY ${finalOrderBy}
+          ${limitOffsetClause}
+        ) src20`
+      : `${SRC20_TABLE} src20`;
+
     try {
       // 🚀 SIMPLIFIED QUERY: Remove expensive CTE and ROW_NUMBER() for better performance
       const query = `
@@ -461,14 +485,14 @@ export class SRC20Repository {
           smd.volume_24h_btc,
           smd.price_change_24h_percent,
           smd.price_source_type` : ''}${feeFieldsSelect}
-        FROM ${SRC20_TABLE} src20
+        FROM ${src20FromClause}
         LEFT JOIN creator creator_info ON src20.creator = creator_info.address
         LEFT JOIN creator destination_info ON src20.destination = destination_info.address
         LEFT JOIN src20_market_data smd ON smd.tick = src20.tick
         LEFT JOIN ${STAMP_TABLE} st ON st.tx_hash = src20.tx_hash${feeFieldsJoin}
-        ${whereClause}
+        ${canPushDownLimit ? "" : whereClause}
         ORDER BY ${finalOrderBy}
-        ${limitOffsetClause}
+        ${canPushDownLimit ? "" : limitOffsetClause}
       `;
 
       // 🚀 SIMPLIFIED PARAMS: No offset parameter needed since ROW_NUMBER() was removed
