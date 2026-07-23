@@ -122,7 +122,9 @@ export function StampSalesGallery({
       {title && <h3 class={titlePrimary}>{title}</h3>}
       <div class="flex flex-col">
         {filteredStamps.length === 0 && !isLoading && (
-          <div class={`${container2} w-full h-[46px]`}>
+          <div
+            class={`${container2} flex items-center justify-center w-full h-[46px]`}
+          >
             <h6 class={`${valueDarkSm} text-center`}>
               NO RECENT SALES AVAILABLE AT THE MOMENT
             </h6>
