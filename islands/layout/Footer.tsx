@@ -31,7 +31,7 @@ const resourcesLinks: FooterLink[] = [
     isExternal: true,
   },
   {
-    title: "Protocol Doc",
+    title: "Documentation",
     href: "https://bitcoinstamps.xyz/en/",
     isExternal: true,
   },

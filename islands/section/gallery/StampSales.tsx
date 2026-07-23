@@ -1,7 +1,6 @@
 /* ===== RECENT SALES GALLERY COMPONENT ===== */
 /*@baba-153+154-move Refreshing to ViewAllButton-remove default (not used)*/
 import { container2, loaderSpinXsGrey } from "$layout";
-import { notificationTextError } from "$notification";
 import { StampGallery } from "$section";
 import { titlePrimary, valueDarkSm } from "$text";
 import type { StampWithEnhancedSaleData } from "$types/marketData.d.ts";
@@ -76,7 +75,7 @@ export function StampSalesGallery({
   if (error) {
     return (
       <div
-        class={`${notificationTextError} font-semibold text-base text-center py-4`}
+        class={`${container2} flex items-center justify-center w-full h-[46px] ${valueDarkSm} text-center`}
       >
         {error}
       </div>
@@ -134,7 +133,7 @@ export function StampSalesGallery({
         {isLoading && (
           <div class="flex items-center gap-3 -mt-[29px] mb-[9px]">
             <div class={loaderSpinXsGrey} />
-            <div class="animate-pulse font-medium text-xs text-color-grey">
+            <div class="animate-pulse font-medium text-xs text-color-neutral-400">
               REFRESHING
             </div>
           </div>

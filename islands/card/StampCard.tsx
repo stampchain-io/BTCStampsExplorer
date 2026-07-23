@@ -662,13 +662,15 @@ export function StampCard({
         >
           {/* ===== TOP: IMAGE + DETAILS (2-COLUMN) ===== */}
           {
-            /* CSS grid (not flex) so the "auto" image column's width can be
-              derived from the aspect-ratio + the row track's height, which
-              is itself set by the details column's natural content height */
+            /* Fixed-width image column (not "auto") — with no explicit
+              size, an `auto` column falls back to the <img>'s natural
+              pixel resolution (since it uses max-w-none), so stamps with
+              different native dimensions rendered at different visual
+              sizes. A fixed width keeps every thumbnail uniform. */
           }
-          <div class="grid grid-cols-[auto_1fr] gap-4">
+          <div class="grid grid-cols-[5.5rem_1fr] gap-4">
             {/* LEFT: IMAGE */}
-            <div class="relative aspect-stamp rounded-xl overflow-hidden">
+            <div class="relative aspect-stamp rounded-xl overflow-hidden w-full">
               <div class="w-full h-full overflow-hidden flex items-center justify-center">
                 {renderContent()}
               </div>
@@ -881,9 +883,14 @@ export function StampCard({
           class={`${containerCard} gap-2`}
         >
           {/* ===== TOP: IMAGE + DETAILS (2-COLUMN) ===== */}
-          <div class="grid grid-cols-[auto_1fr] gap-4">
+          {
+            /* Fixed-width image column (not "auto") — see cardHorizontalListing
+              above for why "auto" lets the <img>'s natural resolution drive
+              the column width, producing inconsistent thumbnail sizes. */
+          }
+          <div class="grid grid-cols-[5.5rem_1fr] gap-4">
             {/* LEFT: IMAGE */}
-            <div class="relative aspect-stamp rounded-xl overflow-hidden">
+            <div class="relative aspect-stamp rounded-xl overflow-hidden w-full">
               <div class="w-full h-full overflow-hidden flex items-center justify-center">
                 {renderContent()}
               </div>

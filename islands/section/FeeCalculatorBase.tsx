@@ -728,13 +728,13 @@ export function FeeCalculatorBase({
           >
             <div className="relative">
               <ToggleSwitchButton
-                isActive={coinType === "USDT"}
+                isActive={coinType === "BTC"}
                 onToggle={handleCoinToggle}
                 toggleButtonId="currency-toggle"
-                activeSymbol="$"
-                inactiveSymbol="₿"
-                activeKnobClassName="bg-color-primary-400"
-                inactiveKnobClassName="bg-color-orange-400"
+                activeSymbol="₿"
+                inactiveSymbol="$"
+                activeKnobClassName="bg-color-orange-400"
+                inactiveKnobClassName="bg-color-neutral-400"
                 onMouseEnter={handleCurrencyMouseEnter}
                 onMouseLeave={handleCurrencyMouseLeave}
               />
@@ -755,7 +755,7 @@ export function FeeCalculatorBase({
           class={`text-base font-light cursor-default select-none ${
             coinType === "BTC"
               ? "text-color-orange-400"
-              : "text-color-primary-400"
+              : "text-color-neutral-400"
           }`}
         >
           <span class="text-color-neutral-500">ESTIMATE</span>
@@ -909,6 +909,7 @@ export function FeeCalculatorBase({
                 <span class="tablet:hidden">
                   <a
                     href="/termsofservice"
+                    target="_blank"
                     className={`
                       uppercase transition-colors duration-200
                       ${
@@ -925,6 +926,7 @@ export function FeeCalculatorBase({
                 <span class="hidden tablet:inline">
                   <a
                     href="/termsofservice"
+                    target="_blank"
                     className={`
                       uppercase transition-colors duration-200
                       ${
