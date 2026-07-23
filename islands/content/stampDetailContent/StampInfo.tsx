@@ -958,7 +958,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                   </div>
                 </div>
               )}
-              {stamp.keyburn && (
+              {Boolean(stamp.keyburn) && (
                 <div
                   className="relative group"
                   onMouseEnter={handleKeyburnMouseEnter}

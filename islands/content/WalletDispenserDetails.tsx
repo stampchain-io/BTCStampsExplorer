@@ -193,7 +193,7 @@ function StampStats({
               </div>
             </div>
           )}
-          {stampData.keyburn && (
+          {Boolean(stampData.keyburn) && (
             <div
               className="relative group"
               onMouseEnter={handleKeyburnMouseEnter}

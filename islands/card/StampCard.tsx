@@ -726,7 +726,7 @@ export function StampCard({
                   </div>
                 </div>
               )}
-              {stamp.divisible && (
+              {Boolean(stamp.divisible) && (
                 <div
                   class="relative"
                   onMouseEnter={handleDivisibleMouseEnter}
@@ -749,7 +749,7 @@ export function StampCard({
                   </div>
                 </div>
               )}
-              {stamp.keyburn && (
+              {Boolean(stamp.keyburn) && (
                 <div
                   class="relative"
                   onMouseEnter={handleKeyburnMouseEnter}
@@ -1053,7 +1053,7 @@ export function StampCard({
                     </div>
                   </div>
                 )}
-                {stamp.divisible && (
+                {Boolean(stamp.divisible) && (
                   <div
                     class="relative"
                     onMouseEnter={handleDivisibleMouseEnter}
@@ -1076,7 +1076,7 @@ export function StampCard({
                     </div>
                   </div>
                 )}
-                {stamp.keyburn && (
+                {Boolean(stamp.keyburn) && (
                   <div
                     class="relative"
                     onMouseEnter={handleKeyburnMouseEnter}
