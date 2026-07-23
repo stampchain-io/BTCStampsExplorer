@@ -8,11 +8,10 @@ import type { StampFilterType, StampType } from "$constants";
 import { ExplorerHeader } from "$header";
 import { queryParamsToServicePayload } from "$islands/filter/FilterOptionsExplorerStamp.tsx";
 import {
-  DEV_DUMMY_MODE,
-  DUMMY_EXPLORER_OVERVIEW_PAGE,
-  DUMMY_STAMP_OVERVIEW_PAGE,
-  withTimeout,
-} from "$lib/utils/devDummyData.ts";
+  DATA_PLACEHOLDER_DEV,
+  DATA_PLACEHOLDER_PROD_EXPLORER_OVERVIEW_PAGE,
+} from "$lib/utils/dataPlaceholderProd.ts";
+import { ErrorHandlingUtils } from "$lib/utils/errorHandling.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { CollectionService } from "$server/services/core/collectionService.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
@@ -73,9 +72,13 @@ export const handler: Handlers = {
         ? "cardRow"
         : "cardVertical";
 
-    if (DEV_DUMMY_MODE) {
+    if (DATA_PLACEHOLDER_DEV) {
+      const {
+        DATA_PLACEHOLDER_DEV_EXPLORER_OVERVIEW_PAGE,
+        DATA_PLACEHOLDER_DEV_STAMP_OVERVIEW_PAGE,
+      } = await import("$lib/utils/dataPlaceholderDev.ts");
       const selectedTab = (url.searchParams.get("type") || "all") as StampType;
-      const all = DUMMY_STAMP_OVERVIEW_PAGE.data;
+      const all = DATA_PLACEHOLDER_DEV_STAMP_OVERVIEW_PAGE.data;
       const stampsByType: Record<string, typeof all> = {
         all,
         classic: all.filter((s) =>
@@ -105,7 +108,7 @@ export const handler: Handlers = {
 
       let src20Data = section === "stamps"
         ? null
-        : DUMMY_EXPLORER_OVERVIEW_PAGE;
+        : DATA_PLACEHOLDER_DEV_EXPLORER_OVERVIEW_PAGE;
 
       if (src20Data) {
         // DEV: apply token op filter
@@ -167,7 +170,7 @@ export const handler: Handlers = {
       return ctx.render({
         stamps,
         pagination: {
-          ...DUMMY_STAMP_OVERVIEW_PAGE.pagination,
+          ...DATA_PLACEHOLDER_DEV_STAMP_OVERVIEW_PAGE.pagination,
           total: stamps.length,
         },
         src20DataCard: src20Data,
@@ -237,22 +240,27 @@ export const handler: Handlers = {
         // Recent sales view — SRC-20 excluded by design
         const recentSalesType = selectedTab === "src20" ? "all" : selectedTab;
         [stampResult] = await Promise.all([
-          withTimeout(
+          ErrorHandlingUtils.withTimeout(
             StampController.getRecentSales(page, page_size, {
               type: recentSalesType === "all" ? "all" : recentSalesType,
             }),
             15000,
+            "DB timeout after 15000ms",
           ),
         ]);
+        // StampController.getRecentSales returns flat sale fields
+        // (btc_amount, buyer_address, etc.) — StampCard normalizes this
+        // itself (via isRecentSale) so no nesting is needed here.
       } else {
         // Regular stamp listing + SRC-20 transactions in parallel.
         // Skip each fetch when the section selector excludes it.
         let collectionId;
 
         if (selectedTab === "posh" && section !== "tokens") {
-          const poshCollection = await withTimeout(
+          const poshCollection = await ErrorHandlingUtils.withTimeout(
             CollectionService.getCollectionByName("posh"),
             15000,
+            "DB timeout after 15000ms",
           );
           if (poshCollection) {
             collectionId = poshCollection.collection_id;
@@ -263,7 +271,7 @@ export const handler: Handlers = {
 
         const stampFetch = section === "tokens"
           ? Promise.resolve({ data: [], total: 0, page: 1, totalPages: 1 })
-          : withTimeout(
+          : ErrorHandlingUtils.withTimeout(
             StampController.getStamps({
               ...cleanStampFilters, // filter payload from URL (range, fileType, etc.)
               page,
@@ -276,11 +284,12 @@ export const handler: Handlers = {
               url: url.origin,
             }),
             15000,
+            "DB timeout after 15000ms",
           );
 
         const src20Fetch = section === "stamps"
           ? Promise.resolve({ data: [], total: 0, page: 1, totalPages: 1 })
-          : withTimeout(
+          : ErrorHandlingUtils.withTimeout(
             SRC20Service.QueryService.fetchBasicSrc20Data({
               limit: page_size,
               page,
@@ -291,6 +300,7 @@ export const handler: Handlers = {
               ...(amtMax && { amtMax }),
             }).then(extractSrc20Rows),
             15000,
+            "DB timeout after 15000ms",
           );
 
         [stampResult, src20Result] = await Promise.all([
@@ -320,20 +330,7 @@ export const handler: Handlers = {
       });
     } catch (error) {
       console.error(error);
-      return ctx.render({
-        stamps: DUMMY_STAMP_OVERVIEW_PAGE.data,
-        pagination: DUMMY_STAMP_OVERVIEW_PAGE.pagination,
-        src20DataCard: DUMMY_EXPLORER_OVERVIEW_PAGE,
-        page: 1,
-        limit: 60,
-        totalPages: 1,
-        filterBy: [],
-        sortBy: "DESC",
-        selectedTab: "all",
-        section,
-        cardView,
-        partial: false,
-      });
+      return ctx.render(DATA_PLACEHOLDER_PROD_EXPLORER_OVERVIEW_PAGE);
     }
   },
 };

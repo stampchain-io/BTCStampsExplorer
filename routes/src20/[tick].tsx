@@ -4,10 +4,10 @@ import { SRC20DetailHeader } from "$islands/header/index.ts";
 import ChartWidget from "$islands/layout/ChartWidget.tsx";
 import { body, containerGap } from "$layout";
 import {
-  DEV_DUMMY_MODE,
-  DUMMY_TOKEN_DETAIL_PAGE,
-  withTimeout,
-} from "$lib/utils/devDummyData.ts";
+  DATA_PLACEHOLDER_DEV,
+  DATA_PLACEHOLDER_PROD_TOKEN_DETAIL_PAGE,
+} from "$lib/utils/dataPlaceholderProd.ts";
+import { ErrorHandlingUtils } from "$lib/utils/errorHandling.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { DetailsTableBase, HoldersTable } from "$table";
 import type { ProcessedHolder } from "$types/wallet.d.ts";
@@ -15,8 +15,11 @@ import type { ProcessedHolder } from "$types/wallet.d.ts";
 /* ===== SERVER HANDLER ===== */
 export const handler: Handlers = {
   async GET(_req, ctx) {
-    if (DEV_DUMMY_MODE) {
-      return await ctx.render(DUMMY_TOKEN_DETAIL_PAGE);
+    if (DATA_PLACEHOLDER_DEV) {
+      const { DATA_PLACEHOLDER_DEV_TOKEN_DETAIL_PAGE } = await import(
+        "$lib/utils/dataPlaceholderDev.ts"
+      );
+      return await ctx.render(DATA_PLACEHOLDER_DEV_TOKEN_DETAIL_PAGE);
     }
     try {
       /* ===== TOKEN IDENTIFICATION ===== */
@@ -26,7 +29,7 @@ export const handler: Handlers = {
 
       /* ===== SERVER-SIDE DATA FETCHING ===== */
       const [body, transferCount, mintCount, combinedListings] =
-        await withTimeout(
+        await ErrorHandlingUtils.withTimeout(
           Promise.all([
             Src20Controller.fetchSrc20TickPageData(decodedTick),
             // 🚀 SERVER-SIDE: Use controller directly instead of HTTP fetch
@@ -49,6 +52,7 @@ export const handler: Handlers = {
             ).then((r) => r.ok ? r.json() : []).catch(() => []),
           ]),
           15000,
+          "DB timeout after 15000ms",
         );
 
       if (!body) {
@@ -76,7 +80,10 @@ export const handler: Handlers = {
       if ((error as Error).message?.includes("not found")) {
         return ctx.renderNotFound();
       }
-      return await ctx.render(DUMMY_TOKEN_DETAIL_PAGE);
+      return await ctx.render({
+        ...DATA_PLACEHOLDER_PROD_TOKEN_DETAIL_PAGE,
+        error: error instanceof Error ? error.message : "Internal server error",
+      });
     }
   },
 };

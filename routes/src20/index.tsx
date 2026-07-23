@@ -5,9 +5,9 @@ import { Handlers } from "$fresh/server.ts";
 import { SRC20OverviewHeader } from "$header";
 import { containerBackground } from "$layout";
 import {
-  DEV_DUMMY_MODE,
-  DUMMY_TOKEN_OVERVIEW_PAGE,
-} from "$lib/utils/devDummyData.ts";
+  DATA_PLACEHOLDER_DEV,
+  DATA_PLACEHOLDER_PROD_TOKEN_OVERVIEW_PAGE,
+} from "$lib/utils/dataPlaceholderProd.ts";
 
 /* ===== HELPER FUNCTIONS ===== */
 /**
@@ -67,7 +67,7 @@ async function fetchFromAPI(endpoint: string, baseUrl: string): Promise<any> {
       `[SRC20] API call error: ${endpoint}`,
       error,
     );
-    return DUMMY_TOKEN_OVERVIEW_PAGE;
+    return DATA_PLACEHOLDER_PROD_TOKEN_OVERVIEW_PAGE;
   }
 }
 
@@ -76,7 +76,10 @@ export const handler: Handlers = {
   async GET(req, ctx) {
     const url = new URL(req.url);
 
-    if (DEV_DUMMY_MODE) {
+    if (DATA_PLACEHOLDER_DEV) {
+      const { DATA_PLACEHOLDER_DEV_TOKEN_OVERVIEW_PAGE } = await import(
+        "$lib/utils/dataPlaceholderDev.ts"
+      );
       const dummyTimeframe = url.searchParams.get("timeframe") || "24H";
       const dummySortBy = url.searchParams.get("sortBy") || "TRENDING";
       const dummySortDirection = url.searchParams.get("sortDirection") ||
@@ -87,7 +90,7 @@ export const handler: Handlers = {
 
       // Mirror the real API (op=DEPLOY = one row per token), then split by
       // minting status: progress < 100 = still minting, >= 100 = fully minted.
-      const deployRows = DUMMY_TOKEN_OVERVIEW_PAGE.data.filter(
+      const deployRows = DATA_PLACEHOLDER_DEV_TOKEN_OVERVIEW_PAGE.data.filter(
         (row: { op?: string }) => row?.op === "DEPLOY",
       );
       const filtered = deployRows.filter((row: { progress?: string }) => {
@@ -97,7 +100,7 @@ export const handler: Handlers = {
 
       return ctx.render({
         mintingData: {
-          ...DUMMY_TOKEN_OVERVIEW_PAGE,
+          ...DATA_PLACEHOLDER_DEV_TOKEN_OVERVIEW_PAGE,
           data: filtered,
           total: filtered.length,
         },
@@ -289,7 +292,7 @@ export const handler: Handlers = {
       );
 
       return ctx.render({
-        mintingData: DUMMY_TOKEN_OVERVIEW_PAGE,
+        mintingData: DATA_PLACEHOLDER_PROD_TOKEN_OVERVIEW_PAGE,
         timeframe,
         sortBy,
         sortDirection,

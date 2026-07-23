@@ -7,13 +7,9 @@ import type { StampRow, StampSaleRow } from "$types/stamp.d.ts";
 import { HomeHeader } from "$header";
 import { body, containerBackground, containerGap } from "$layout";
 import {
-  DEV_DUMMY_MODE,
-  DUMMY_HOME_SRC20_MINTED,
-  DUMMY_HOME_SRC20_MINTING,
-  DUMMY_LANDING_PAGE,
-  DUMMY_NEW_LISTINGS,
-  DUMMY_RECENT_SALES,
-} from "$lib/utils/devDummyData.ts";
+  DATA_PLACEHOLDER_DEV,
+  DATA_PLACEHOLDER_PROD_HOME,
+} from "$lib/utils/dataPlaceholderProd.ts";
 import {
   GetStampingCta,
   SRC20Gallery,
@@ -80,22 +76,29 @@ export const handler: Handlers<HomePageData> = {
 
     console.log(`[HOMEPAGE] Starting homepage request`);
 
-    if (DEV_DUMMY_MODE) {
+    if (DATA_PLACEHOLDER_DEV) {
+      const {
+        DATA_PLACEHOLDER_DEV_HOME_SRC20_MINTED,
+        DATA_PLACEHOLDER_DEV_HOME_SRC20_MINTING,
+        DATA_PLACEHOLDER_DEV_LANDING_PAGE,
+        DATA_PLACEHOLDER_DEV_NEW_LISTINGS,
+        DATA_PLACEHOLDER_DEV_RECENT_SALES,
+      } = await import("$lib/utils/dataPlaceholderDev.ts");
       return await ctx.render({
-        ...DUMMY_LANDING_PAGE,
+        ...DATA_PLACEHOLDER_DEV_LANDING_PAGE,
         src20Data: {
-          minted: DUMMY_HOME_SRC20_MINTED as any,
-          minting: DUMMY_HOME_SRC20_MINTING as any,
+          minted: DATA_PLACEHOLDER_DEV_HOME_SRC20_MINTED as any,
+          minting: DATA_PLACEHOLDER_DEV_HOME_SRC20_MINTING as any,
         },
         recentSalesData: {
-          data: DUMMY_RECENT_SALES as any,
-          total: DUMMY_RECENT_SALES.length,
+          data: DATA_PLACEHOLDER_DEV_RECENT_SALES as any,
+          total: DATA_PLACEHOLDER_DEV_RECENT_SALES.length,
           page: 1,
           totalPages: 1,
         },
         newListingsData: {
-          data: DUMMY_NEW_LISTINGS as any,
-          total: DUMMY_NEW_LISTINGS.length,
+          data: DATA_PLACEHOLDER_DEV_NEW_LISTINGS as any,
+          total: DATA_PLACEHOLDER_DEV_NEW_LISTINGS.length,
           page: 1,
           totalPages: 1,
         },
@@ -165,7 +168,13 @@ export const handler: Handlers<HomePageData> = {
         // Stamp homepage data (carousels, galleries)
         fetchWithFallback(
           () => StampController.getHomePageData(btcPrice, btcPriceData.source),
-          DUMMY_LANDING_PAGE,
+          {
+            carouselStamps: [],
+            stamps_art: [],
+            stamps_src721: [],
+            stamps_posh: [],
+            collectionData: [],
+          },
           "StampController.getHomePageData",
         ),
         // Top minted SRC20 tokens - call service directly
@@ -202,7 +211,7 @@ export const handler: Handlers<HomePageData> = {
               totalPages: paginatedResult.totalPages || 1,
             };
           },
-          DUMMY_HOME_SRC20_MINTED,
+          { data: [], total: 0, page: 1, totalPages: 0 },
           "fetchTopMintedTokens",
         ),
         // Trending minting SRC20 tokens - call service directly
@@ -239,13 +248,16 @@ export const handler: Handlers<HomePageData> = {
               totalPages: paginatedResult.totalPages || 1,
             };
           },
-          DUMMY_HOME_SRC20_MINTING,
+          { data: [], total: 0, page: 1, totalPages: 0 },
           "fetchTrendingActiveMintingTokensV2",
         ),
         // Recent stamp sales - call controller directly
         fetchWithFallback(
           async () => {
             const result = await StampController.getRecentSales(1, 8);
+            // StampController.getRecentSales returns flat sale fields
+            // (btc_amount, buyer_address, etc.) — StampCard normalizes this
+            // itself (via isRecentSale) so no nesting is needed here.
             return {
               data: result.data || [],
               total: result.total || 0,
@@ -326,14 +338,8 @@ export const handler: Handlers<HomePageData> = {
         console.error("[HOMEPAGE] Error stack:", error.stack);
       }
 
-      // ECS-specific: Return minimal working page instead of failing completely
-      return await ctx.render({
-        ...DUMMY_LANDING_PAGE,
-        src20Data: {
-          minted: DUMMY_HOME_SRC20_MINTED as any,
-          minting: DUMMY_HOME_SRC20_MINTING as any,
-        },
-      });
+      // Return the original error/empty state instead of failing completely
+      return await ctx.render(DATA_PLACEHOLDER_PROD_HOME);
     }
   },
 };

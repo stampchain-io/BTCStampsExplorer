@@ -1,12 +1,15 @@
-/* ===== DUMMY DATA FOR NO-DB DEVELOPMENT ===== */
+/* ===== DEV-ONLY PREVIEW DATASET ===== */
 /*
- * DEV_DUMMY_MODE (default: false)
- *   false → dummy data only shows when DB is unreachable (catch/fallback path)
- *   true  → dummy data is always shown, bypassing all DB calls entirely
+ * This file is loaded ONLY via dynamic `await import(...)` from route
+ * handlers, gated behind the `DATA_PLACEHOLDER_DEV` flag exported from
+ * `dataPlaceholderProd.ts`. Never import this file statically — that would
+ * pull the whole dataset (including base64 images) into every build,
+ * defeating the point of the split. `scripts/check-boundary.sh` enforces
+ * this at CI time.
  *
- * Flip to true when developing UI without a database connection.
+ * For the tiny, always-loaded production error/empty-state fallbacks, see
+ * `dataPlaceholderProd.ts` instead.
  */
-export const DEV_DUMMY_MODE = true;
 
 /* ===== BASE STAMP: #4258 (CLASSIC) ===== */
 /*
@@ -14,7 +17,7 @@ export const DEV_DUMMY_MODE = true;
  * stamp_url points to the Stampchain CDN (separate from DB — usually still up).
  * stamp_base64 holds the raw PNG for any component that renders it directly.
  */
-export const DUMMY_STAMP_CLASSIC = {
+export const DATA_PLACEHOLDER_DEV_STAMP_CLASSIC = {
   stamp: 4258,
   cpid: "A6074625865641549156",
   ident: "STAMP" as const,
@@ -41,7 +44,7 @@ export const DUMMY_STAMP_CLASSIC = {
 };
 
 /* ===== DISPENSER: #4258 @ 0.00042 BTC ===== */
-export const DUMMY_STAMP_CLASSIC_DISPENSER = {
+export const DATA_PLACEHOLDER_DEV_STAMP_CLASSIC_DISPENSER = {
   tx_hash: "aaaa1111bbbb2222cccc3333dddd4444eeee5555ffff6666aaaa1111bbbb2222",
   source: "1GZsmqM5PFBytkC81JxcSWDU5QzNwaCs2M",
   origin: "bc1qm34lsc65zpw79lxes69zkqmk6ee3ewf0j77s3h",
@@ -60,7 +63,7 @@ export const DUMMY_STAMP_CLASSIC_DISPENSER = {
  * POSH stamps have a named cpid (not starting with "A") and a negative stamp number.
  * ident stays "STAMP" — it's the cpid format that distinguishes POSH.
  */
-export const DUMMY_STAMP_POSH = {
+export const DATA_PLACEHOLDER_DEV_STAMP_POSH = {
   stamp: -1829,
   cpid: "KEVINA",
   ident: "STAMP" as const,
@@ -68,7 +71,7 @@ export const DUMMY_STAMP_POSH = {
   stamp_url:
     "https://stampchain.io/stamps/32257e9db4f9d979f8a5d0a703a630c7056ce5a5cae8cba9f69ea168c0562e39.png",
   stamp_base64:
-    "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",
+    "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",
   block_index: 813000,
   tx_hash: "32257e9db4f9d979f8a5d0a703a630c7056ce5a5cae8cba9f69ea168c0562e39",
   tx_index: 0,
@@ -87,7 +90,7 @@ export const DUMMY_STAMP_POSH = {
 };
 
 /* ===== DISPENSER: KEVINA @ 0.0069 BTC ===== */
-export const DUMMY_STAMP_POSH_DISPENSER = {
+export const DATA_PLACEHOLDER_DEV_STAMP_POSH_DISPENSER = {
   tx_hash: "bbbb2222cccc3333dddd4444eeee5555ffff6666aaaa1111bbbb2222cccc3333",
   source: "bc1qr9nkqgzc6vzxjslqgxck3z480yq85aa98wu3fa",
   origin: "1BpEi6DfDAUFd153wiGrvkiKW1BCTe4pEc",
@@ -102,7 +105,7 @@ export const DUMMY_STAMP_POSH_DISPENSER = {
 };
 
 /* ===== DISPENSER: KEVINA @ 0.0085 BTC (2nd listing for detail page) ===== */
-export const DUMMY_STAMP_POSH_DISPENSER_2 = {
+export const DATA_PLACEHOLDER_DEV_STAMP_POSH_DISPENSER_2 = {
   tx_hash: "dddd4444eeee5555ffff6666aaaa1111bbbb2222cccc3333dddd4444eeee5555",
   source: "1BpEi6DfDAUFd153wiGrvkiKW1BCTe4pEc",
   origin: "bc1qr9nkqgzc6vzxjslqgxck3z480yq85aa98wu3fa",
@@ -120,7 +123,7 @@ export const DUMMY_STAMP_POSH_DISPENSER_2 = {
 /*
  * SRC-721 stamps are recursive stamps with ident "SRC-721".
  */
-export const DUMMY_STAMP_SRC721 = {
+export const DATA_PLACEHOLDER_DEV_STAMP_SRC721 = {
   stamp: 1383566,
   cpid: "A863311966656466479",
   ident: "SRC-721" as const,
@@ -147,7 +150,7 @@ export const DUMMY_STAMP_SRC721 = {
 };
 
 /* ===== DISPENSER: SRC-721 @ 0.000021 BTC ===== */
-export const DUMMY_STAMP_SRC721_DISPENSER = {
+export const DATA_PLACEHOLDER_DEV_STAMP_SRC721_DISPENSER = {
   tx_hash: "cccc3333dddd4444eeee5555ffff6666aaaa1111bbbb2222cccc3333dddd4444",
   source: "bc1qefhvcqwuz6g6qy6nck5dq2el2r37pky73tqxkc",
   origin: "1A1zP1eP5QGefi2DMPTfTL5SLmv7Divf4a",
@@ -166,47 +169,37 @@ const _BTC_PRICE_USD = 62_000;
 
 /* 6-entry cycle: each type once without price, once with listing price */
 const _stampBases = [
-  DUMMY_STAMP_CLASSIC,
+  DATA_PLACEHOLDER_DEV_STAMP_CLASSIC,
   {
-    ...DUMMY_STAMP_CLASSIC,
+    ...DATA_PLACEHOLDER_DEV_STAMP_CLASSIC,
     floorPrice: 0.00042,
     floorPriceUSD: 0.00042 * _BTC_PRICE_USD,
     marketData: { floorPriceBTC: 0.00042, recentSalePriceBTC: null },
-    lowestPriceDispenser: DUMMY_STAMP_CLASSIC_DISPENSER,
+    lowestPriceDispenser: DATA_PLACEHOLDER_DEV_STAMP_CLASSIC_DISPENSER,
   },
-  DUMMY_STAMP_POSH,
+  DATA_PLACEHOLDER_DEV_STAMP_POSH,
   {
-    ...DUMMY_STAMP_POSH,
+    ...DATA_PLACEHOLDER_DEV_STAMP_POSH,
     floorPrice: 0.0069,
     floorPriceUSD: 0.0069 * _BTC_PRICE_USD,
     marketData: { floorPriceBTC: 0.0069, recentSalePriceBTC: null },
-    lowestPriceDispenser: DUMMY_STAMP_POSH_DISPENSER,
+    lowestPriceDispenser: DATA_PLACEHOLDER_DEV_STAMP_POSH_DISPENSER,
   },
-  DUMMY_STAMP_SRC721,
+  DATA_PLACEHOLDER_DEV_STAMP_SRC721,
   {
-    ...DUMMY_STAMP_SRC721,
+    ...DATA_PLACEHOLDER_DEV_STAMP_SRC721,
     floorPrice: 0.000021,
     floorPriceUSD: 0.000021 * _BTC_PRICE_USD,
     marketData: { floorPriceBTC: 0.000021, recentSalePriceBTC: null },
-    lowestPriceDispenser: DUMMY_STAMP_SRC721_DISPENSER,
+    lowestPriceDispenser: DATA_PLACEHOLDER_DEV_STAMP_SRC721_DISPENSER,
   },
 ];
 
-/* ===== HELPER: reject after ms milliseconds ===== */
-export function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
-  return Promise.race([
-    promise,
-    new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error(`DB timeout after ${ms}ms`)), ms)
-    ),
-  ]);
-}
-
 /* ===== HELPER: mark every 3rd stamp as listed (listings view) ===== */
-/* Pass a custom dispenser to override the default (e.g. DUMMY_POSH_DISPENSER). */
+/* Pass a custom dispenser to override the default (e.g. DATA_PLACEHOLDER_DEV_POSH_DISPENSER). */
 export function withDummyListingsData<T extends Record<string, any>>(
   stamps: T[],
-  dispenser: Record<string, any> = DUMMY_STAMP_CLASSIC_DISPENSER,
+  dispenser: Record<string, any> = DATA_PLACEHOLDER_DEV_STAMP_CLASSIC_DISPENSER,
 ): T[] {
   return stamps.map((s, i) =>
     (i + 1) % 3 === 0
@@ -277,7 +270,7 @@ function shuffle<T>(arr: T[]): T[] {
 /* ===== SRC-20 TOKENS ===== */
 
 /* ----- KEVIN: fully minted, active market ----- */
-export const DUMMY_TOKEN_KEVIN = {
+export const DATA_PLACEHOLDER_DEV_TOKEN_KEVIN = {
   p: "SRC-20",
   tick: "KEVIN",
   tick_hash: "kevin0000000000000000000000000000000000000000000000000000000000",
@@ -323,7 +316,7 @@ export const DUMMY_TOKEN_KEVIN = {
 };
 
 /* ----- STAMP: fully minted, bearish market ----- */
-export const DUMMY_TOKEN_STAMP = {
+export const DATA_PLACEHOLDER_DEV_TOKEN_STAMP = {
   p: "SRC-20",
   tick: "STAMP",
   tick_hash: "stamp000000000000000000000000000000000000000000000000000000000",
@@ -369,7 +362,7 @@ export const DUMMY_TOKEN_STAMP = {
 };
 
 /* ----- PEPE: minting in progress (~72%) ----- */
-export const DUMMY_TOKEN_PEPE = {
+export const DATA_PLACEHOLDER_DEV_TOKEN_PEPE = {
   p: "SRC-20",
   tick: "PEPE",
   tick_hash: "pepe0000000000000000000000000000000000000000000000000000000000",
@@ -408,7 +401,7 @@ export const DUMMY_TOKEN_PEPE = {
 };
 
 /* ----- BOBO: early minting stage (~18%) ----- */
-export const DUMMY_TOKEN_BOBO = {
+export const DATA_PLACEHOLDER_DEV_TOKEN_BOBO = {
   p: "SRC-20",
   tick: "BOBO",
   tick_hash: "bobo0000000000000000000000000000000000000000000000000000000000",
@@ -446,8 +439,9 @@ export const DUMMY_TOKEN_BOBO = {
   market_data: null,
 };
 
-/* Backward-compat alias — old code that imports DUMMY_TOKEN_SRC20 keeps working */
-export const DUMMY_TOKEN_SRC20 = DUMMY_TOKEN_KEVIN;
+/* Backward-compat alias — old code that imports DATA_PLACEHOLDER_DEV_TOKEN_SRC20 keeps working */
+export const DATA_PLACEHOLDER_DEV_TOKEN_SRC20 =
+  DATA_PLACEHOLDER_DEV_TOKEN_KEVIN;
 
 /* ===== SRC-20 TRANSACTION DATA ===== */
 /*
@@ -456,7 +450,7 @@ export const DUMMY_TOKEN_SRC20 = DUMMY_TOKEN_KEVIN;
  * amt uses string representation for serialisation safety.
  */
 
-export const DUMMY_SRC20_DEPLOYS = [
+export const DATA_PLACEHOLDER_DEV_SRC20_DEPLOYS = [
   {
     tx_hash: "kevin1111111111111111111111111111111111111111111111111111111111",
     block_index: 800000,
@@ -523,7 +517,7 @@ export const DUMMY_SRC20_DEPLOYS = [
   },
 ];
 
-export const DUMMY_SRC20_MINTS = [
+export const DATA_PLACEHOLDER_DEV_SRC20_MINTS = [
   {
     tx_hash: "kevinmint111111111111111111111111111111111111111111111111111111",
     block_index: 800100,
@@ -622,7 +616,7 @@ export const DUMMY_SRC20_MINTS = [
   },
 ];
 
-export const DUMMY_SRC20_TRANSFERS = [
+export const DATA_PLACEHOLDER_DEV_SRC20_TRANSFERS = [
   {
     tx_hash: "kevintx1111111111111111111111111111111111111111111111111111111",
     block_index: 801000,
@@ -694,22 +688,22 @@ export const DUMMY_SRC20_TRANSFERS = [
 /* Sale entries cycling [CLASSIC, POSH, SRC721] with staggered time labels */
 const _saleBase = [
   {
-    stamp: DUMMY_STAMP_CLASSIC,
-    dispenser: DUMMY_STAMP_CLASSIC_DISPENSER,
+    stamp: DATA_PLACEHOLDER_DEV_STAMP_CLASSIC,
+    dispenser: DATA_PLACEHOLDER_DEV_STAMP_CLASSIC_DISPENSER,
     price: 0.00042,
     sats: 42000,
     buyer: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
   },
   {
-    stamp: DUMMY_STAMP_POSH,
-    dispenser: DUMMY_STAMP_POSH_DISPENSER,
+    stamp: DATA_PLACEHOLDER_DEV_STAMP_POSH,
+    dispenser: DATA_PLACEHOLDER_DEV_STAMP_POSH_DISPENSER,
     price: 0.0069,
     sats: 690000,
     buyer: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
   },
   {
-    stamp: DUMMY_STAMP_SRC721,
-    dispenser: DUMMY_STAMP_SRC721_DISPENSER,
+    stamp: DATA_PLACEHOLDER_DEV_STAMP_SRC721,
+    dispenser: DATA_PLACEHOLDER_DEV_STAMP_SRC721_DISPENSER,
     price: 0.000021,
     sats: 2100,
     buyer: "bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq",
@@ -727,25 +721,27 @@ const _timeLabels = [
 ];
 
 /** Recent Sales — 7 entries cycling CLASSIC → POSH → SRC721 with all 5 activity levels */
-export const DUMMY_RECENT_SALES = _timeLabels.map((timeLabel, i) => {
-  const { stamp, dispenser, price, sats, buyer } =
-    _saleBase[i % _saleBase.length];
-  return {
-    ...stamp,
-    activity_level: _ACTIVITY_CYCLE[i % _ACTIVITY_CYCLE.length],
-    last_activity_time: Date.now() - i * 3_600_000,
-    sale_data: {
-      btc_amount: price,
-      btc_amount_satoshis: sats,
-      block_index: stamp.block_index,
-      tx_hash: dispenser.tx_hash,
-      buyer_address: buyer,
-      dispenser_address: stamp.creator,
-      dispenser_tx_hash: dispenser.tx_hash,
-      time_ago: timeLabel,
-    },
-  };
-});
+export const DATA_PLACEHOLDER_DEV_RECENT_SALES = _timeLabels.map(
+  (timeLabel, i) => {
+    const { stamp, dispenser, price, sats, buyer } =
+      _saleBase[i % _saleBase.length];
+    return {
+      ...stamp,
+      activity_level: _ACTIVITY_CYCLE[i % _ACTIVITY_CYCLE.length],
+      last_activity_time: Date.now() - i * 3_600_000,
+      sale_data: {
+        btc_amount: price,
+        btc_amount_satoshis: sats,
+        block_index: stamp.block_index,
+        tx_hash: dispenser.tx_hash,
+        buyer_address: buyer,
+        dispenser_address: stamp.creator,
+        dispenser_tx_hash: dispenser.tx_hash,
+        time_ago: timeLabel,
+      },
+    };
+  },
+);
 
 /**
  * New Listings — 10 entries cycling CLASSIC → POSH → SRC721, all currently
@@ -757,7 +753,7 @@ export const DUMMY_RECENT_SALES = _timeLabels.map((timeLabel, i) => {
  *   newListingsData → 10 (desktop: 10, 5 cols × 2 rows)
  */
 const _listingBase = [_stampBases[1], _stampBases[3], _stampBases[5]];
-export const DUMMY_NEW_LISTINGS = withDummyActivityLevels(
+export const DATA_PLACEHOLDER_DEV_NEW_LISTINGS = withDummyActivityLevels(
   Array.from(
     { length: 10 },
     (_, i) => ({ ..._listingBase[i % _listingBase.length] }),
@@ -773,7 +769,7 @@ export const DUMMY_NEW_LISTINGS = withDummyActivityLevels(
  *   stamps_src721→ 12 (desktop: 12, 6 cols × 2 rows)
  * Every 3rd POSH stamp is marked for sale via withDummyListingsData.
  */
-export const DUMMY_LANDING_PAGE = {
+export const DATA_PLACEHOLDER_DEV_LANDING_PAGE = {
   carouselStamps: [],
   stamps_art: shuffle(
     Array.from(
@@ -782,12 +778,12 @@ export const DUMMY_LANDING_PAGE = {
     ),
   ),
   stamps_posh: withDummyListingsData(
-    Array.from({ length: 14 }, () => ({ ...DUMMY_STAMP_POSH })),
-    DUMMY_STAMP_POSH_DISPENSER,
+    Array.from({ length: 14 }, () => ({ ...DATA_PLACEHOLDER_DEV_STAMP_POSH })),
+    DATA_PLACEHOLDER_DEV_STAMP_POSH_DISPENSER,
   ),
   stamps_src721: Array.from(
     { length: 12 },
-    () => ({ ...DUMMY_STAMP_SRC721 }),
+    () => ({ ...DATA_PLACEHOLDER_DEV_STAMP_SRC721 }),
   ),
   collectionData: [],
 };
@@ -803,7 +799,7 @@ const _overviewStamps = shuffle(
     (_, i) => ({ ..._stampBases[i % _stampBases.length] }),
   ),
 );
-export const DUMMY_STAMP_OVERVIEW_PAGE = {
+export const DATA_PLACEHOLDER_DEV_STAMP_OVERVIEW_PAGE = {
   data: _overviewStamps,
   pagination: { total: 24, page: 1, totalPages: 1 },
 };
@@ -811,14 +807,14 @@ export const DUMMY_STAMP_OVERVIEW_PAGE = {
 /**
  * SRC-20 explorer overview — 4 tokens: 2 fully minted (KEVIN, STAMP),
  * 2 still minting (PEPE at 72%, BOBO at 18%).
- * Used in both the explorer page and /src20 overview in DEV_DUMMY_MODE.
+ * Used in both the explorer page and /src20 overview in dev preview mode.
  */
-export const DUMMY_EXPLORER_OVERVIEW_PAGE = {
+export const DATA_PLACEHOLDER_DEV_EXPLORER_OVERVIEW_PAGE = {
   data: shuffle([
     /* ===== KEVIN ===== */
-    DUMMY_TOKEN_KEVIN,
+    DATA_PLACEHOLDER_DEV_TOKEN_KEVIN,
     {
-      ...DUMMY_TOKEN_KEVIN,
+      ...DATA_PLACEHOLDER_DEV_TOKEN_KEVIN,
       op: "MINT",
       amt: "100000",
       tx_hash:
@@ -831,7 +827,7 @@ export const DUMMY_EXPLORER_OVERVIEW_PAGE = {
       destination_name: null,
     },
     {
-      ...DUMMY_TOKEN_KEVIN,
+      ...DATA_PLACEHOLDER_DEV_TOKEN_KEVIN,
       op: "TRANSFER",
       amt: "50000",
       tx_hash:
@@ -844,9 +840,9 @@ export const DUMMY_EXPLORER_OVERVIEW_PAGE = {
       destination_name: null,
     },
     /* ===== STAMP ===== */
-    DUMMY_TOKEN_STAMP,
+    DATA_PLACEHOLDER_DEV_TOKEN_STAMP,
     {
-      ...DUMMY_TOKEN_STAMP,
+      ...DATA_PLACEHOLDER_DEV_TOKEN_STAMP,
       op: "MINT",
       amt: "1000000",
       tx_hash: "stamp222222222222222222222222222222222222222222222222222222222",
@@ -858,7 +854,7 @@ export const DUMMY_EXPLORER_OVERVIEW_PAGE = {
       destination_name: "stamper.btc",
     },
     {
-      ...DUMMY_TOKEN_STAMP,
+      ...DATA_PLACEHOLDER_DEV_TOKEN_STAMP,
       op: "TRANSFER",
       amt: "500000",
       tx_hash: "stamp333333333333333333333333333333333333333333333333333333333",
@@ -870,9 +866,9 @@ export const DUMMY_EXPLORER_OVERVIEW_PAGE = {
       destination_name: null,
     },
     /* ===== PEPE ===== */
-    DUMMY_TOKEN_PEPE,
+    DATA_PLACEHOLDER_DEV_TOKEN_PEPE,
     {
-      ...DUMMY_TOKEN_PEPE,
+      ...DATA_PLACEHOLDER_DEV_TOKEN_PEPE,
       op: "MINT",
       amt: "690000",
       tx_hash:
@@ -885,7 +881,7 @@ export const DUMMY_EXPLORER_OVERVIEW_PAGE = {
       destination_name: "stamper.btc",
     },
     {
-      ...DUMMY_TOKEN_PEPE,
+      ...DATA_PLACEHOLDER_DEV_TOKEN_PEPE,
       op: "TRANSFER",
       amt: "345000",
       tx_hash:
@@ -898,9 +894,9 @@ export const DUMMY_EXPLORER_OVERVIEW_PAGE = {
       destination_name: null,
     },
     /* ===== BOBO ===== */
-    DUMMY_TOKEN_BOBO,
+    DATA_PLACEHOLDER_DEV_TOKEN_BOBO,
     {
-      ...DUMMY_TOKEN_BOBO,
+      ...DATA_PLACEHOLDER_DEV_TOKEN_BOBO,
       op: "MINT",
       amt: "420000",
       tx_hash:
@@ -913,7 +909,7 @@ export const DUMMY_EXPLORER_OVERVIEW_PAGE = {
       destination_name: null,
     },
     {
-      ...DUMMY_TOKEN_BOBO,
+      ...DATA_PLACEHOLDER_DEV_TOKEN_BOBO,
       op: "TRANSFER",
       amt: "210000",
       tx_hash:
@@ -932,7 +928,8 @@ export const DUMMY_EXPLORER_OVERVIEW_PAGE = {
 };
 
 /** Backward-compat alias — routes/index.tsx and routes/src20/index.tsx keep working */
-export const DUMMY_TOKEN_OVERVIEW_PAGE = DUMMY_EXPLORER_OVERVIEW_PAGE;
+export const DATA_PLACEHOLDER_DEV_TOKEN_OVERVIEW_PAGE =
+  DATA_PLACEHOLDER_DEV_EXPLORER_OVERVIEW_PAGE;
 
 /**
  * Home page SRC-20 tables — DEPLOY rows only, split by mint status.
@@ -949,24 +946,24 @@ function _repeatToFive<T extends { tx_hash: string }>(rows: T[]): T[] {
 }
 
 const _homeSrc20Minted = _repeatToFive(
-  [DUMMY_TOKEN_KEVIN, DUMMY_TOKEN_STAMP].filter(
+  [DATA_PLACEHOLDER_DEV_TOKEN_KEVIN, DATA_PLACEHOLDER_DEV_TOKEN_STAMP].filter(
     (row) => parseFloat(row.progress) >= 100,
   ),
 );
 const _homeSrc20Minting = _repeatToFive(
-  [DUMMY_TOKEN_PEPE, DUMMY_TOKEN_BOBO].filter(
+  [DATA_PLACEHOLDER_DEV_TOKEN_PEPE, DATA_PLACEHOLDER_DEV_TOKEN_BOBO].filter(
     (row) => parseFloat(row.progress) < 100,
   ),
 );
 
-export const DUMMY_HOME_SRC20_MINTED = {
+export const DATA_PLACEHOLDER_DEV_HOME_SRC20_MINTED = {
   data: _homeSrc20Minted,
   total: _homeSrc20Minted.length,
   page: 1,
   totalPages: 1,
 };
 
-export const DUMMY_HOME_SRC20_MINTING = {
+export const DATA_PLACEHOLDER_DEV_HOME_SRC20_MINTING = {
   data: _homeSrc20Minting,
   total: _homeSrc20Minting.length,
   page: 1,
@@ -974,33 +971,36 @@ export const DUMMY_HOME_SRC20_MINTING = {
 };
 
 /** Stamp detail page (CLASSIC #4258 — 1 open dispenser) */
-export const DUMMY_STAMP_DETAIL_PAGE_CLASSIC = {
+export const DATA_PLACEHOLDER_DEV_STAMP_DETAIL_PAGE_CLASSIC = {
   stamp: {
-    ...DUMMY_STAMP_CLASSIC,
+    ...DATA_PLACEHOLDER_DEV_STAMP_CLASSIC,
     floorPrice: 0.00042,
     floorPriceUSD: 0.00042 * _BTC_PRICE_USD,
     activity_level: "HOT" as const,
   },
   total: 1,
   sends: [],
-  dispensers: [DUMMY_STAMP_CLASSIC_DISPENSER],
+  dispensers: [DATA_PLACEHOLDER_DEV_STAMP_CLASSIC_DISPENSER],
   dispenses: [],
   holders: [],
   vaults: [],
   last_block: 0,
   stamps_recent: withDummyListingsData(
-    Array.from({ length: 6 }, () => ({ ...DUMMY_STAMP_CLASSIC })),
+    Array.from(
+      { length: 6 },
+      () => ({ ...DATA_PLACEHOLDER_DEV_STAMP_CLASSIC }),
+    ),
   ),
-  lowestPriceDispenser: DUMMY_STAMP_CLASSIC_DISPENSER,
+  lowestPriceDispenser: DATA_PLACEHOLDER_DEV_STAMP_CLASSIC_DISPENSER,
   collectionInfo: null,
   initialCounts: { dispensers: 1, sales: 0, transfers: 0 },
   url: "",
 };
 
 /** Stamp detail page (KEVINA/POSH — 2 open dispensers so listings UI shows) */
-export const DUMMY_STAMP_DETAIL_PAGE_POSH = {
+export const DATA_PLACEHOLDER_DEV_STAMP_DETAIL_PAGE_POSH = {
   stamp: {
-    ...DUMMY_STAMP_POSH,
+    ...DATA_PLACEHOLDER_DEV_STAMP_POSH,
     floorPrice: 0.0069,
     floorPriceUSD: 0.0069 * _BTC_PRICE_USD,
     marketData: {
@@ -1012,56 +1012,67 @@ export const DUMMY_STAMP_DETAIL_PAGE_POSH = {
   },
   total: 1,
   sends: [],
-  dispensers: [DUMMY_STAMP_POSH_DISPENSER, DUMMY_STAMP_POSH_DISPENSER_2],
+  dispensers: [
+    DATA_PLACEHOLDER_DEV_STAMP_POSH_DISPENSER,
+    DATA_PLACEHOLDER_DEV_STAMP_POSH_DISPENSER_2,
+  ],
   dispenses: [],
   holders: [],
   vaults: [],
   last_block: 0,
   stamps_recent: withDummyListingsData(
-    Array.from({ length: 6 }, () => ({ ...DUMMY_STAMP_POSH })),
-    DUMMY_STAMP_POSH_DISPENSER,
+    Array.from({ length: 6 }, () => ({ ...DATA_PLACEHOLDER_DEV_STAMP_POSH })),
+    DATA_PLACEHOLDER_DEV_STAMP_POSH_DISPENSER,
   ),
-  lowestPriceDispenser: DUMMY_STAMP_POSH_DISPENSER,
+  lowestPriceDispenser: DATA_PLACEHOLDER_DEV_STAMP_POSH_DISPENSER,
   collectionInfo: null,
   initialCounts: { dispensers: 2, sales: 0, transfers: 0 },
   url: "",
 };
 
 /** Default dummy detail page (kept for backward-compat imports). */
-export const DUMMY_STAMP_DETAIL_PAGE = DUMMY_STAMP_DETAIL_PAGE_CLASSIC;
+export const DATA_PLACEHOLDER_DEV_STAMP_DETAIL_PAGE =
+  DATA_PLACEHOLDER_DEV_STAMP_DETAIL_PAGE_CLASSIC;
 
 /*
  * Lookup by tx_hash (and stamp number, as a string) so the [id].tsx dev
  * handler can render the dummy page that actually matches the requested
  * stamp instead of always showing the same one regardless of the URL.
  */
-const _DUMMY_STAMP_DETAIL_PAGES_BY_KEY: Record<
+const _DATA_PLACEHOLDER_DEV_STAMP_DETAIL_PAGES_BY_KEY: Record<
   string,
-  typeof DUMMY_STAMP_DETAIL_PAGE_CLASSIC | typeof DUMMY_STAMP_DETAIL_PAGE_POSH
+  | typeof DATA_PLACEHOLDER_DEV_STAMP_DETAIL_PAGE_CLASSIC
+  | typeof DATA_PLACEHOLDER_DEV_STAMP_DETAIL_PAGE_POSH
 > = {
-  [DUMMY_STAMP_CLASSIC.tx_hash]: DUMMY_STAMP_DETAIL_PAGE_CLASSIC,
-  [String(DUMMY_STAMP_CLASSIC.stamp)]: DUMMY_STAMP_DETAIL_PAGE_CLASSIC,
-  [DUMMY_STAMP_CLASSIC.cpid]: DUMMY_STAMP_DETAIL_PAGE_CLASSIC,
-  [DUMMY_STAMP_POSH.tx_hash]: DUMMY_STAMP_DETAIL_PAGE_POSH,
-  [String(DUMMY_STAMP_POSH.stamp)]: DUMMY_STAMP_DETAIL_PAGE_POSH,
-  [DUMMY_STAMP_POSH.cpid]: DUMMY_STAMP_DETAIL_PAGE_POSH,
+  [DATA_PLACEHOLDER_DEV_STAMP_CLASSIC.tx_hash]:
+    DATA_PLACEHOLDER_DEV_STAMP_DETAIL_PAGE_CLASSIC,
+  [String(DATA_PLACEHOLDER_DEV_STAMP_CLASSIC.stamp)]:
+    DATA_PLACEHOLDER_DEV_STAMP_DETAIL_PAGE_CLASSIC,
+  [DATA_PLACEHOLDER_DEV_STAMP_CLASSIC.cpid]:
+    DATA_PLACEHOLDER_DEV_STAMP_DETAIL_PAGE_CLASSIC,
+  [DATA_PLACEHOLDER_DEV_STAMP_POSH.tx_hash]:
+    DATA_PLACEHOLDER_DEV_STAMP_DETAIL_PAGE_POSH,
+  [String(DATA_PLACEHOLDER_DEV_STAMP_POSH.stamp)]:
+    DATA_PLACEHOLDER_DEV_STAMP_DETAIL_PAGE_POSH,
+  [DATA_PLACEHOLDER_DEV_STAMP_POSH.cpid]:
+    DATA_PLACEHOLDER_DEV_STAMP_DETAIL_PAGE_POSH,
 };
 
 /** Resolve the dummy stamp detail page matching the requested id/tx_hash/cpid. */
 export function getDummyStampDetailPage(
   id: string | undefined,
 ):
-  | typeof DUMMY_STAMP_DETAIL_PAGE_CLASSIC
-  | typeof DUMMY_STAMP_DETAIL_PAGE_POSH {
-  if (id && _DUMMY_STAMP_DETAIL_PAGES_BY_KEY[id]) {
-    return _DUMMY_STAMP_DETAIL_PAGES_BY_KEY[id];
+  | typeof DATA_PLACEHOLDER_DEV_STAMP_DETAIL_PAGE_CLASSIC
+  | typeof DATA_PLACEHOLDER_DEV_STAMP_DETAIL_PAGE_POSH {
+  if (id && _DATA_PLACEHOLDER_DEV_STAMP_DETAIL_PAGES_BY_KEY[id]) {
+    return _DATA_PLACEHOLDER_DEV_STAMP_DETAIL_PAGES_BY_KEY[id];
   }
-  return DUMMY_STAMP_DETAIL_PAGE_CLASSIC;
+  return DATA_PLACEHOLDER_DEV_STAMP_DETAIL_PAGE_CLASSIC;
 }
 
 /** SRC-20 token detail page (KEVIN — fully minted) */
-export const DUMMY_TOKEN_DETAIL_PAGE = {
-  deployment: DUMMY_TOKEN_KEVIN,
+export const DATA_PLACEHOLDER_DEV_TOKEN_DETAIL_PAGE = {
+  deployment: DATA_PLACEHOLDER_DEV_TOKEN_KEVIN,
   mint_status: {
     max_supply: 21000000,
     total_minted: 21000000,
@@ -1076,7 +1087,7 @@ export const DUMMY_TOKEN_DETAIL_PAGE = {
   holders: [],
   last_block: 0,
   highcharts: [],
-  sends: DUMMY_SRC20_TRANSFERS.filter((t) => t.tick === "KEVIN"),
-  mints: DUMMY_SRC20_MINTS.filter((m) => m.tick === "KEVIN"),
+  sends: DATA_PLACEHOLDER_DEV_SRC20_TRANSFERS.filter((t) => t.tick === "KEVIN"),
+  mints: DATA_PLACEHOLDER_DEV_SRC20_MINTS.filter((m) => m.tick === "KEVIN"),
   initialCounts: { totalTransfers: 2, totalMints: 21000 },
 };

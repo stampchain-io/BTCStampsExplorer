@@ -6,10 +6,10 @@ import { Head } from "$fresh/runtime.ts";
 import { Handlers } from "$fresh/server.ts";
 import { body, containerBackground, containerGap } from "$layout";
 import {
-  DEV_DUMMY_MODE,
-  getDummyStampDetailPage,
-  withTimeout,
-} from "$lib/utils/devDummyData.ts";
+  DATA_PLACEHOLDER_DEV,
+  DATA_PLACEHOLDER_PROD_STAMP_DETAIL_PAGE,
+} from "$lib/utils/dataPlaceholderProd.ts";
+import { ErrorHandlingUtils } from "$lib/utils/errorHandling.ts";
 import { generateStampJsonLd } from "$lib/utils/jsonLd.ts";
 import { logger, LogNamespace } from "$lib/utils/logger.ts";
 import { StampGallery } from "$section";
@@ -51,7 +51,10 @@ interface StampData {
 /* ===== SERVER HANDLER ===== */
 export const handler: Handlers<StampData> = {
   async GET(req: Request, ctx) {
-    if (DEV_DUMMY_MODE) {
+    if (DATA_PLACEHOLDER_DEV) {
+      const { getDummyStampDetailPage } = await import(
+        "$lib/utils/dataPlaceholderDev.ts"
+      );
       return ctx.render({
         ...getDummyStampDetailPage(ctx.params.id),
         url: req.url,
@@ -60,7 +63,7 @@ export const handler: Handlers<StampData> = {
     try {
       const { id } = ctx.params;
       // Get stamp details first with market data
-      const stampData = await withTimeout(
+      const stampData = await ErrorHandlingUtils.withTimeout(
         StampController.getStampDetailsById(
           id,
           "all",
@@ -70,6 +73,7 @@ export const handler: Handlers<StampData> = {
           false,
         ),
         15000,
+        "DB timeout after 15000ms",
       );
       if (!stampData?.data?.stamp) {
         return ctx.renderNotFound();
@@ -200,7 +204,8 @@ export const handler: Handlers<StampData> = {
         return ctx.renderNotFound();
       }
       return ctx.render({
-        ...getDummyStampDetailPage(ctx.params.id),
+        ...DATA_PLACEHOLDER_PROD_STAMP_DETAIL_PAGE,
+        error: error instanceof Error ? error.message : "Internal server error",
         url: req.url,
       });
     }
@@ -295,7 +300,9 @@ export default function StampDetailPage(props: StampDetailPageProps) {
     ? stamp.name || "Unprunable UTXO Art"
     : "Unprunable UTXO Art";
 
-  const jsonLd = stamp
+  // block_time is required to derive datePublished — skip JSON-LD entirely
+  // for the empty fallback stamp (e.g. rendered when the DB is unreachable).
+  const jsonLd = stamp?.block_time
     ? generateStampJsonLd(
       stamp,
       { url: metaInfo.url, baseUrl },

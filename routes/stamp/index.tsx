@@ -15,10 +15,10 @@ import type { StampPageProps } from "$types/api.d.ts";
 import type { StampRow, StampSaleRow } from "$types/stamp.d.ts";
 
 import {
-  DEV_DUMMY_MODE,
-  DUMMY_STAMP_OVERVIEW_PAGE,
-  withTimeout,
-} from "$lib/utils/devDummyData.ts";
+  DATA_PLACEHOLDER_DEV,
+  DATA_PLACEHOLDER_PROD_STAMP_OVERVIEW_PAGE,
+} from "$lib/utils/dataPlaceholderProd.ts";
+import { ErrorHandlingUtils } from "$lib/utils/errorHandling.ts";
 import { StampController } from "$server/controller/stampController.ts";
 
 /* ===== CONSTANTS ===== */
@@ -31,9 +31,12 @@ export const handler: Handlers = {
     // ✅ REMOVED: baseUrl was causing internal API self-referencing via EC2 IP
     // Now using direct controller/service calls instead of HTTP fetch
 
-    if (DEV_DUMMY_MODE) {
+    if (DATA_PLACEHOLDER_DEV) {
+      const { DATA_PLACEHOLDER_DEV_STAMP_OVERVIEW_PAGE } = await import(
+        "$lib/utils/dataPlaceholderDev.ts"
+      );
       const typeParam = url.searchParams.get("type") || "all";
-      const all = DUMMY_STAMP_OVERVIEW_PAGE.data;
+      const all = DATA_PLACEHOLDER_DEV_STAMP_OVERVIEW_PAGE.data;
 
       // Filter dummy stamps to match the selected tab
       const stampsByType: Record<string, typeof all> = {
@@ -57,7 +60,7 @@ export const handler: Handlers = {
       return ctx.render({
         stamps,
         pagination: {
-          ...DUMMY_STAMP_OVERVIEW_PAGE.pagination,
+          ...DATA_PLACEHOLDER_DEV_STAMP_OVERVIEW_PAGE.pagination,
           total: stamps.length,
         },
         recentSales: [],
@@ -72,7 +75,7 @@ export const handler: Handlers = {
     }
 
     try {
-      return await withTimeout(
+      return await ErrorHandlingUtils.withTimeout(
         (async () => {
           /* ===== URL PARAMS ===== */
           const page = parseInt(url.searchParams.get("page") || "1");
@@ -188,9 +191,20 @@ export const handler: Handlers = {
                     keyburn: null,
                     locked: 0,
                     // For recent sales, show transaction quantity instead of total supply
-                    supply: sale.sale_data?.dispense_quantity || 1,
-                    unbound_quantity: sale.sale_data?.dispense_quantity || 1,
-                    sale_data: sale.sale_data,
+                    supply: sale.dispense_quantity || 1,
+                    unbound_quantity: sale.dispense_quantity || 1,
+                    // StampController.getRecentSales returns flat sale
+                    // fields (btc_amount, buyer_address, etc.) — spread
+                    // them through so StampCard's isRecentSale fallback
+                    // (which reads flat fields when sale_data is absent)
+                    // can render the sale price.
+                    btc_amount: sale.btc_amount,
+                    btc_amount_satoshis: sale.btc_amount_satoshis,
+                    buyer_address: sale.buyer_address,
+                    dispenser_address: sale.dispenser_address,
+                    dispenser_tx_hash: sale.dispenser_tx_hash,
+                    time_ago: sale.time_ago,
+                    dispense_quantity: sale.dispense_quantity,
                   };
                 }),
                 pagination: {
@@ -357,6 +371,7 @@ export const handler: Handlers = {
           });
         })(),
         15000,
+        `DB timeout after 15000ms`,
       );
     } catch (error) {
       console.error(
@@ -367,15 +382,8 @@ export const handler: Handlers = {
       // Ultimate fallback
       const viewParamFallback = url.searchParams.get("view");
       return ctx.render({
-        stamps: DUMMY_STAMP_OVERVIEW_PAGE.data,
-        pagination: DUMMY_STAMP_OVERVIEW_PAGE.pagination,
-        recentSales: [],
+        ...DATA_PLACEHOLDER_PROD_STAMP_OVERVIEW_PAGE,
         filters: queryParamsToFilters(url.search),
-        page: 1,
-        page_size: 60,
-        sortBy: "DESC",
-        selectedTab: "all",
-        totalPages: 1,
         cardView: viewParamFallback === "cardSquare"
           ? "cardSquare"
           : "cardVertical",
