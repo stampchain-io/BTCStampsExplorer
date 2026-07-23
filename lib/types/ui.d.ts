@@ -1247,7 +1247,6 @@ export interface StampListingsOpenProps {
   onSelect?: (listing: any) => void;
   selectedDispenser?: any;
   dispensers?: import("./stamp.d.ts").Dispenser[];
-  floorPrice?: number;
   onSelectDispenser?: (dispenser: any) => void;
 }
 
@@ -2897,6 +2896,7 @@ export interface StampDetailPageProps {
     last_block: number;
     stamps_recent: any;
     lowestPriceDispenser: any;
+    btcPriceUSD?: number;
     htmlTitle?: string;
     previewImageUrl?: string;
     error?: string;

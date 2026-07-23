@@ -37,6 +37,7 @@ interface StampData {
   last_block: number;
   stamps_recent: any;
   lowestPriceDispenser: any;
+  btcPriceUSD?: number;
   htmlTitle?: string;
   error?: string;
   url: string;
@@ -186,6 +187,8 @@ export const handler: Handlers<StampData> = {
         stamps_recent: mainCategories[0]?.stamps ?? [],
         holders: holders.data,
         lowestPriceDispenser: lowestPriceDispenser,
+        btcPriceUSD: (stampData as { metadata?: { btcPrice?: number } })
+          .metadata?.btcPrice,
         collectionInfo,
         url: req.url,
         initialCounts: {
@@ -254,6 +257,7 @@ export default function StampDetailPage(props: StampDetailPageProps) {
     holders,
     stamps_recent,
     lowestPriceDispenser = null,
+    btcPriceUSD,
     collectionInfo,
   } = props.data;
 
@@ -435,6 +439,7 @@ export default function StampDetailPage(props: StampDetailPageProps) {
                 <StampInfo
                   stamp={stamp}
                   lowestPriceDispenser={lowestPriceDispenser}
+                  {...(btcPriceUSD !== undefined ? { btcPriceUSD } : {})}
                 />
               )}
           </div>

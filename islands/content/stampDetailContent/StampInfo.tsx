@@ -1,12 +1,13 @@
 /* ===== STAMP INFO COMPONENT ===== */
 /*@baba-750+764+815+icons - refactor to StatItems */
-import { Button } from "$button";
+import { Button, buttonHover } from "$button";
 import { ActivityLevelIndicator } from "$components/indicators/ActivityLevelIndicator.tsx";
 import { Icon } from "$icon";
 import BuyStampModal from "$islands/modal/BuyStampModal.tsx";
 import { openModal } from "$islands/modal/states.ts";
 import {
   body,
+  container2,
   container3,
   containerBackground,
   containerColData,
@@ -29,7 +30,6 @@ import {
 import { tooltipIcon } from "$notification";
 import { Dispenser, StampListingsOpenTable } from "$table";
 import {
-  cardFileSize,
   cardPrice,
   cardSupply,
   labelXs,
@@ -44,6 +44,7 @@ import { useEffect, useRef, useState } from "preact/hooks";
 interface StampInfoProps {
   stamp: StampRow;
   lowestPriceDispenser: any;
+  btcPriceUSD?: number;
 }
 
 interface DimensionsType {
@@ -53,7 +54,9 @@ interface DimensionsType {
 }
 
 /* ===== COMPONENT ===== */
-export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
+export function StampInfo(
+  { stamp, lowestPriceDispenser, btcPriceUSD }: StampInfoProps,
+) {
   /* ===== STATE ===== */
   const [fee, setFee] = useState<number>(0);
   const handleChangeFee = (newFee: number) => {
@@ -520,15 +523,16 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     (stamp.floorPrice && stamp.floorPrice !== "priceless"
       ? stamp.floorPrice
       : null);
-  const floorPriceUSD = marketData?.floorPriceUSD ??
-    (marketData?.floorPriceBTC && marketData?.volume24hBTC
-      ? marketData.floorPriceBTC * 117888
-      : null) ??
-    stamp.floorPriceUSD;
+  const floorPriceUSD = stampWithMarketData?.market_data?.floor_price_usd ??
+    stamp.floorPriceUSD ??
+    null;
 
+  // Prefer the BTC/USD ratio implied by cached market data; fall back to
+  // the live BTC price fetched server-side so USD still renders for stamps
+  // without cached market data (e.g. priced purely from a dispenser).
   const btcPrice = floorPriceUSD && floorPriceBTC
     ? floorPriceUSD / floorPriceBTC
-    : null;
+    : btcPriceUSD ?? null;
 
   // Calculate display price: dispenser price > floor price
   const displayPrice = selectedDispenser
@@ -741,19 +745,12 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
 
               {(!isPoshStamp(stamp.cpid) && stamp.cpid) && (
                 <h6 className={`${valueDark} block`}>
+                  <span className={labelXs}>CPID&nbsp;&nbsp;</span>
                   {stamp.cpid}
                 </h6>
               )}
 
-              {!isSrc20Stamp() && (
-                <div
-                  className={`${containerPill} ${cardSupply} !text-sm mt-1.5 w-fit`}
-                >
-                  {stamp.supply === 1 ? "1/1" : editionCount}
-                </div>
-              )}
-
-              <div className="flex flex-col items-start pt-3">
+              <div className="flex flex-col items-start mt-2">
                 <h6 className={labelXs}>ARTIST</h6>
                 <a
                   className="font-bold text-sm text-color-neutral-200 link-neutral-200-bold"
@@ -763,10 +760,18 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                   {creatorDisplay}
                 </a>
               </div>
+
+              {!isSrc20Stamp() && (
+                <div
+                  className={`${containerPill} ${cardSupply} !text-sm mt-5 w-fit`}
+                >
+                  {stamp.supply === 1 ? "1/1" : editionCount}
+                </div>
+              )}
             </div>
 
             <div
-              className={`${container3} ${cardFileSize} px-3.5 py-1 !text-sm shrink-0`}
+              className={`${container3} px-3.5 py-1 font-semibold text-xs text-color-neutral-500 shrink-0`}
             >
               {getIdentLabel()}
             </div>
@@ -775,49 +780,53 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
           {(dispensers?.length > 0 || !!lowestPriceDispenser)
             ? (
               <div className="flex flex-col w-full pt-6 mobileLg:pt-12">
-                {dispensers?.length >= 2 && (
-                  <div className="flex mb-2">
-                    <Icon
-                      type="iconButton"
-                      name="dispenserListings"
-                      weight="normal"
-                      size="mdR"
-                      color="greyLight"
-                      ariaLabel="Listings"
-                      onClick={() => setShowListings(!showListings)}
-                      className="pb-0.5"
-                    />
-                  </div>
-                )}
-
-                <div
-                  className={`flex flex-col items-end self-end w-fit px-3 py-2.5 mb-3 ${container3}`}
-                >
-                  <div className="flex justify-between items-center w-full gap-3">
-                    {activityLevel && (
-                      <ActivityLevelIndicator
-                        level={activityLevel}
-                        className="!cursor-default"
+                <div className="flex items-end justify-end gap-2 mb-3">
+                  {dispensers?.length >= 2 && (
+                    <div
+                      className={`relative flex items-center justify-center px-1 py-0.5 mr-auto ${container2} rounded-full`}
+                    >
+                      <Icon
+                        type="iconButton"
+                        name="artStamps"
+                        weight="normal"
+                        size="lgR"
+                        color="greyLight"
+                        ariaLabel="Listings"
+                        onClick={() => setShowListings(!showListings)}
+                        className={buttonHover}
                       />
-                    )}
-                    {displayPriceUSD != null && (
-                      <div className="font-normal text-xs text-color-neutral-500 text-nowrap">
-                        {displayPriceUSD.toLocaleString("en-US", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })} USD
-                      </div>
-                    )}
-                  </div>
-                  <div className={`${cardPrice} !text-sm`}>
-                    {formatBTCAmount(
-                      typeof displayPrice === "number" ? displayPrice : 0,
-                      {
-                        excludeSuffix: true,
-                        decimals: 8,
-                        stripZeros: false,
-                      },
-                    )} <span className="font-light">BTC</span>
+                    </div>
+                  )}
+
+                  <div
+                    className={`flex flex-col items-end w-fit px-3 py-2.5 ${container3}`}
+                  >
+                    <div className="flex justify-between items-center w-full gap-3">
+                      {activityLevel && (
+                        <ActivityLevelIndicator
+                          level={activityLevel}
+                          className="!cursor-default"
+                        />
+                      )}
+                      {displayPriceUSD != null && (
+                        <div className="font-normal text-xs text-color-neutral-500 text-nowrap">
+                          {displayPriceUSD.toLocaleString("en-US", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })} USD
+                        </div>
+                      )}
+                    </div>
+                    <div className={`${cardPrice} !text-sm`}>
+                      {formatBTCAmount(
+                        typeof displayPrice === "number" ? displayPrice : 0,
+                        {
+                          excludeSuffix: true,
+                          decimals: 8,
+                          stripZeros: false,
+                        },
+                      )} <span className="font-light">BTC</span>
+                    </div>
                   </div>
                 </div>
 
@@ -827,7 +836,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                       className={`overflow-hidden transition-all duration-500 ease-in-out
                       ${
                         showListings
-                          ? "max-h-[244px] mt-1 mb-3 opacity-100"
+                          ? "max-h-[222px] mt-1 mb-3 opacity-100"
                           : "max-h-0 opacity-0"
                       }`}
                     >
@@ -837,7 +846,6 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                           : (
                             <StampListingsOpenTable
                               dispensers={dispensers}
-                              floorPrice={floorPriceBTC || 0}
                               onSelectDispenser={handleDispenserSelect}
                               selectedDispenser={selectedDispenser}
                             />
