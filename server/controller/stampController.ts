@@ -185,7 +185,7 @@ export class StampController {
     let finalIdent: SUBPROTOCOLS[] = ident || [];
 
     // Validate ident parameter if provided
-    const VALID_IDENTS = ["STAMP", "SRC-20", "SRC-721"];
+    const VALID_IDENTS = ["STAMP", "SRC-20", "SRC-721", "SRC-101"];
     if (ident && ident.length > 0) {
       // Check if all provided idents are valid
       const invalidIdents = ident.filter(id => !VALID_IDENTS.includes(id));
