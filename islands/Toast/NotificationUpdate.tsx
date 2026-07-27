@@ -13,32 +13,15 @@ import { useEffect } from "preact/hooks";
  */
 
 /**
- * localStorage key for tracking if update notification has been shown
- * INCREMENT VERSION for each new major update announcement
+ * Feature flag to enable/disable the notification
+ * Set to false to prevent notification from showing
  */
-const NOTIFICATION_UPDATE_VERSION = "feature-update-v3.1";
-
-/**
- * Message content for update notification
- * Supports multi-line formatting with bullet points
- */
-const NOTIFICATION_UPDATE_MESSAGE = `Website Updates
-• Enhanced color palette with vibrant hues
-• Improved Wallet Profile page with updated design
-• Minor UI tweaks and bug fixes
-• Major code optimization and performance improvements
-
-Please clear browser cache and refresh the page for all updates to take effect.`;
+const SHOW_NOTIFICATION = true;
 
 /**
  * Delay before showing notification (milliseconds)
  */
 const DELAY = 2000;
-
-/**
- * Toast type - "info" | "success" | "warning" | "error"
- */
-const TYPE = "info" as const;
 
 /**
  * Whether toast should auto-dismiss
@@ -47,10 +30,28 @@ const TYPE = "info" as const;
 const AUTO_DISMISS = false;
 
 /**
- * Feature flag to enable/disable the notification
- * Set to false to prevent notification from showing
+ * Toast type - "info" | "success" | "warning" | "error"
  */
-const SHOW_NOTIFICATION = false;
+const TYPE = "info" as const;
+
+/**
+ * localStorage key for tracking if update notification has been shown
+ * INCREMENT VERSION for each new major update announcement
+ */
+const NOTIFICATION_UPDATE_VERSION = "feature-update-v3.001257";
+
+/**
+ * Message content for update notification
+ * Supports multi-line formatting with bullet points
+ */
+const NOTIFICATION_UPDATE_MESSAGE = `Website Redesign
+• New logo, typeface, and color palette
+• Reimagined stamp cards with multiple view modes
+• Improved Explorer page with fully featured filters
+• Added Marketplace page with listings and sales
+• Code optimization and performance improvements
+
+Please clear browser cache and refresh the page for all updates to take effect.`;
 
 /**
  * Displays a one-time notification for major app updates

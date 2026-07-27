@@ -7,33 +7,33 @@ const notificationContainer = `
 
 /* ===== TOOLTIPS STYLES ===== */
 const tooltipBackground =
-  "bg-color-background/90 px-2.5 py-1 rounded-lg transition-opacity duration-200 pointer-events-none";
+  "bg-color-neutral-1000/90 px-2.5 py-1 rounded-lg transition-opacity duration-200 pointer-events-none";
 const tooltipText =
-  "font-normal text-[10px] text-color-grey-light whitespace-nowrap";
+  "font-normal text-[0.625rem] text-color-neutral-200 whitespace-nowrap";
 
 /* ===== NOTIFICATION STYLES ===== */
 /* General */
 export const notificationHeading =
-  `font-semibold text-[15px] text-color-grey-light`;
-export const notificationBody = `font-normal text-sm text-color-grey-semilight`;
-export const notificationTextError = `!text-color-red`;
-export const notificationTextSuccess = `!text-color-green`;
+  `font-bold text-base text-color-neutral-200 tracking-wider`;
+export const notificationBody = `font-normal text-sm text-color-neutral-200`;
+export const notificationTextError = `!text-color-red-400`;
+export const notificationTextSuccess = `!text-color-green-400`;
 
 /* Info */
 export const notificationContainerInfo =
-  `${notificationContainer} bg-gradient-to-br from-color-grey-dark/60 via-color-background/60 to-color-background/90 border-color-grey-semidark/80`;
+  `${notificationContainer} bg-gradient-to-br from-color-neutral-800/90 via-color-neutral-900/80 to-color-neutral-1000/90 border-color-neutral-500`;
 
 /* Error */
 export const notificationContainerError =
-  `${notificationContainer} bg-gradient-to-br from-color-red-dark/60 via-color-background/60 to-color-background/90 border-color-red-semidark/80`;
+  `${notificationContainer} bg-gradient-to-br from-color-red-950/90 via-color-neutral-900/80 to-color-neutral-1000/90 border-color-red-700`;
 
 /* Warning */
 export const notificationContainerWarning =
-  `${notificationContainer} bg-gradient-to-br from-color-orange-dark/60 via-color-background/60 to-color-background/90 border-color-orange/80`;
+  `${notificationContainer} bg-gradient-to-br from-color-orange-950/90 via-color-neutral-900/80 to-color-neutral-1000/90 border-color-orange-500`;
 
 /* Success */
 export const notificationContainerSuccess =
-  `${notificationContainer} bg-gradient-to-br from-color-green-dark/60 via-color-background/60 to-color-background/90 border-color-green-semidark/80`;
+  `${notificationContainer} bg-gradient-to-br from-color-green-950/90 via-color-neutral-900/80 to-color-neutral-1000/90 border-color-green-700`;
 
 /* ===== TOOLTIP STYLES ===== */
 export const tooltipButton = `

@@ -1,3 +1,4 @@
+import { buttonHover } from "$button";
 import { Icon } from "$icon";
 import type { Toast as ToastTypeFromProvider } from "$islands/Toast/ToastProvider.tsx";
 import {
@@ -41,14 +42,14 @@ export const ToastComponent = (
   const getIconColor = (toastType: ToastTypeFromProvider["type"]) => {
     switch (toastType) {
       case "error":
-        return "stroke-color-red";
+        return "stroke-color-red-700";
       case "warning":
-        return "stroke-color-orange";
+        return "stroke-color-orange-500";
       case "success":
-        return "stroke-color-green";
+        return "stroke-color-green-700";
       case "info":
       default:
-        return "stroke-color-grey";
+        return "stroke-color-neutral-400";
     }
   };
 
@@ -69,14 +70,14 @@ export const ToastComponent = (
   const getProgressBarColor = (toastType: ToastTypeFromProvider["type"]) => {
     switch (toastType) {
       case "error":
-        return "bg-color-red-semidark";
+        return "bg-color-red-700";
       case "warning":
-        return "bg-color-orange";
+        return "bg-color-orange-500";
       case "success":
-        return "bg-color-green-semidark";
+        return "bg-color-green-700";
       case "info":
       default:
-        return "bg-color-grey-semidark";
+        return "bg-color-neutral-500";
     }
   };
 
@@ -124,15 +125,16 @@ export const ToastComponent = (
           type="iconButton"
           name="close"
           weight="bold"
-          size="xs"
+          size="mdR"
           color="greyLight"
+          className={`${buttonHover} -mt-1 tablet:-mt-0.5 ml-auto -mr-1 tablet:-mr-0.5 !p-0.5`}
+          ariaLabel="Close notification"
           onClick={onClose}
-          className="ml-auto -mt-1.5"
         />
       </div>
 
       {autoDismiss && (
-        <div class="mt-2 w-full h-0.5 rounded-full bg-color-border">
+        <div class="mt-2 w-full h-0.5 rounded-full bg-color-neutral-800">
           <div
             class={`h-full rounded-full ${
               getProgressBarColor(type)
