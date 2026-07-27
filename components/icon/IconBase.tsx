@@ -263,11 +263,6 @@ export function Icon(props: IconVariants) {
   throw new Error(`Invalid icon type: ${type}`);
 }
 
-/* ===== SPECIALIZED ICONS ===== */
-// Hambirger menu icon is defined in: MenuIcon.tsx - its built with css/html instead of svg for better animation
-// Gradient close menu icon is defined in: CloseIcon.tsx
-// Animated gear icon code is in: GearIcon.tsx
-
 /* ===== BADGE ICON COMPONENT ===== */
 export function BadgeIcon({ text, className = "" }: BadgeVariants) {
   return (

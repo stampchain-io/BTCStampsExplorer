@@ -1,5 +1,6 @@
+import { buttonHover } from "$button";
 import { ModalBase } from "$components/layout/ModalBase.tsx";
-import { CloseIcon } from "$icon";
+import { Icon } from "$icon";
 import { container1 } from "$layout";
 import { tooltipIcon } from "$notification";
 import { titlePrimary } from "$text";
@@ -64,10 +65,14 @@ export function MaraServiceUnavailableModal({
           onMouseEnter={handleCloseMouseEnter}
           onMouseLeave={handleCloseMouseLeave}
         >
-          <CloseIcon
-            size="sm"
+          <Icon
+            type="iconButton"
+            name="close"
+            size="lgR"
             weight="bold"
-            color="purpleLight"
+            color="greyLight"
+            className={`${buttonHover} !p-0.5`}
+            ariaLabel="Close"
             onClick={onClose}
           />
           <div

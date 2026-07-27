@@ -1,4 +1,5 @@
-import { CloseIcon } from "$icon";
+import { buttonHover } from "$button";
+import { Icon } from "$icon";
 import { closeModal } from "$islands/modal/states.ts";
 import { container0, shadow } from "$layout";
 import { logger } from "$lib/utils/logger.ts";
@@ -99,10 +100,14 @@ export function ModalBase({
               onMouseEnter={handleCloseMouseEnter}
               onMouseLeave={handleCloseMouseLeave}
             >
-              <CloseIcon
-                size="sm"
+              <Icon
+                type="iconButton"
+                name="close"
+                size="lgR"
                 weight="bold"
                 color="greyLight"
+                className={`${buttonHover} !p-0.5 -mt-1`}
+                ariaLabel="Close"
                 onClick={() => handleClose()}
               />
               <div

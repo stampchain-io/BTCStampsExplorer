@@ -27,7 +27,6 @@ The Icon system provides a lightweight, versatile solution for rendering SVG ico
 ┌─────────────────────────────────────────────────────┐
 │  Icon Base Components                               │
 │  - Icon: Main icon component (IconBase.tsx)         │
-│  - CloseIcon: Special gradient close button         │
 │  - LoadingIcon: Animated loading spinner            │
 │  - PlaceholderImage: Placeholder graphics           │
 └────────────────┬────────────────────────────────────┘
@@ -219,11 +218,6 @@ cursor: pointer
     - ARIA accessibility attributes
     - Fresh partial navigation support
   - **Location**: `components/icon/IconBase.tsx`
-
-- **CloseIcon.tsx**: Special close button icon
-  - **Purpose**: Close button with optional gradient fill
-  - **Features**: Custom gradient definitions, conditional styling
-  - **Usage**: Modal close buttons, drawer dismissal
 
 - **LoadingIcon.tsx**: Animated loading spinner
   - **Purpose**: Loading state indicator with animation

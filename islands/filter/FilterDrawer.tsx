@@ -29,8 +29,8 @@ import {
   queryParamsToFilters as explorerQueryParamsToFilters,
 } from "$islands/filter/FilterOptionsExplorer.tsx";
 // Import SRC20 filter content
-import { Button } from "$button";
-import { CloseIcon, Icon } from "$icon";
+import { Button, buttonHover } from "$button";
+import { Icon } from "$icon";
 import type { FilterType } from "$islands/button/FilterButton.tsx";
 import { FilterContentSRC20 } from "$islands/filter/FilterContentSRC20.tsx";
 import {
@@ -397,34 +397,13 @@ const FilterDrawer = (
       aria-labelledby="drawer-form-label"
     >
       {/* Content container with flex column to separate scrollable area from sticky buttons */}
-      <div class="h-full pt-[29px] mobileLg:pt-[41px] tablet:pt-[40px] flex flex-col">
+      <div class="flex flex-col h-full pt-[21px] mobileLg:pt-[33px] tablet:pt-[33px]">
         {/* Scrollable content area - overflow only on this section */}
         <div class="flex-1 overflow-y-auto scrollbar-background-overlay">
           <div class="px-9 tablet:px-6">
             <div class="relative w-full">
-              {/* Mobile CloseIcon - shows by default, hidden on tablet+ */}
-              <div class="flex flex-row tablet:hidden justify-between items-center w-full">
-                <h6 class="font-extrabold text-2xl bg-gradient-to-r color-neutral-gradient tracking-wide select-none inline-block w-fit">
-                  FILTERS
-                </h6>
-                <div class="relative">
-                  <Tooltip
-                    visible={isCloseTooltipVisible}
-                    text={closeTooltipText}
-                  />
-                  <CloseIcon
-                    size="md"
-                    weight="bold"
-                    color="greyLight"
-                    onClick={handleCloseDrawer}
-                    onMouseEnter={handleCloseMouseEnter}
-                    onMouseLeave={handleCloseMouseLeave}
-                    aria-label="Close"
-                  />
-                </div>
-              </div>
-              {/* Tablet+ Icon - hidden on mobile, shows on tablet+ */}
-              <div class="hidden tablet:flex flex-row justify-between items-center w-full">
+              {/* Close icon + heading - order flips between mobile and tablet+ via flex-row-reverse */}
+              <div class="flex flex-row-reverse tablet:flex-row justify-between items-center w-full">
                 <div class="relative">
                   <Tooltip
                     visible={isCloseTooltipVisible}
@@ -434,15 +413,16 @@ const FilterDrawer = (
                     type="iconButton"
                     name="close"
                     weight="bold"
-                    size="xs"
+                    size="lgR"
                     color="greyLight"
+                    className={`${buttonHover} !p-0.5 mt-2`}
+                    ariaLabel="Close"
                     onClick={handleCloseDrawer}
                     onMouseEnter={handleCloseMouseEnter}
                     onMouseLeave={handleCloseMouseLeave}
-                    aria-label="Close menu"
                   />
                 </div>
-                <h6 class="font-normal text-lg bg-gradient-to-r color-neutral-gradient mt-[2px] select-none inline-block w-fit">
+                <h6 class="font-black text-2xl tablet:text-lg text-color-neutral-700 tracking-wide tablet:tracking-normal select-none">
                   FILTERS
                 </h6>
               </div>

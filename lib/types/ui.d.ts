@@ -9,7 +9,6 @@
  * Usage: Import UI component types and interfaces
  */
 
-import type { IconVariants } from "$components/icon/styles.ts";
 import type { Timeframe } from "$components/layout/types.ts";
 import type {
   ButtonColor,
@@ -1517,30 +1516,6 @@ export interface TransactionHexDisplayProps {
   class?: string;
 }
 
-/**
- * Icon component props
- */
-export interface CloseIconProps {
-  onClick: (e?: MouseEvent) => void;
-  size: IconVariants["size"];
-  weight: IconVariants["weight"];
-  color: "greyLight" | "purpleLight";
-  className?: string;
-  onMouseEnter?: (() => void) | undefined;
-  onMouseLeave?: (() => void) | undefined;
-  "aria-label"?: string;
-}
-
-export interface GearIconProps {
-  className?: string;
-  onClick?: () => void;
-  size?: IconSize | number;
-  color?: string;
-  isOpen?: boolean;
-  onToggle?: () => void;
-  weight?: IconWeight;
-}
-
 // =============================================================================
 // THEME AND DESIGN SYSTEM TYPES
 // =============================================================================
@@ -2650,10 +2625,6 @@ export interface ToggleSwitchButtonProps {
 
 /**
  * Loading Icon component props
- */
-
-/**
- * Gear Icon component props
  */
 
 /**

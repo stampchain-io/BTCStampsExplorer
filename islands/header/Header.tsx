@@ -1,5 +1,6 @@
 /* ===== HEADER COMPONENT ===== */
-import { CloseIcon, Icon, LogoIcon } from "$icon";
+import { buttonHover } from "$button";
+import { Icon, LogoIcon } from "$icon";
 import { MenuButton } from "$islands/button/MenuButton.tsx";
 import { SearchButton } from "$islands/button/SearchButton.tsx";
 import { ToolsButton } from "$islands/button/ToolsButton.tsx";
@@ -428,7 +429,7 @@ export function Header() {
         id={`navbar-collapse-${type}`}
       >
         <div class="flex flex-col h-full">
-          <div class="pt-[29px] mobileLg:pt-[41px] px-9">
+          <div class="pt-[21px] mobileLg:pt-[33px] px-9">
             <div class="flex flex-row justify-between items-center w-full">
               <div class="relative">
                 <div
@@ -438,10 +439,14 @@ export function Header() {
                 >
                   {closeTooltipText}
                 </div>
-                <CloseIcon
-                  size="md"
+                <Icon
+                  type="iconButton"
+                  name="close"
+                  size="lg"
                   weight="bold"
                   color="greyLight"
+                  className={`${buttonHover} !p-0.5 mt-2`}
+                  ariaLabel="Close menu"
                   onClick={() => {
                     if (open) {
                       closeMenu();
@@ -449,12 +454,11 @@ export function Header() {
                   }}
                   onMouseEnter={handleCloseMouseEnter}
                   onMouseLeave={handleCloseMouseLeave}
-                  aria-label="Close menu"
                 />
               </div>
               <h6
-                class={`font-extrabold text-2xl bg-gradient-to-r color-primary-gradient tracking-wide select-none inline-block w-fit ${
-                  type === "menu" ? "italic font-black pr-0.5" : ""
+                class={`font-black text-2xl text-color-neutral-700 tracking-wide select-none ${
+                  type === "menu" ? "italic pr-0.5" : ""
                 }`}
               >
                 {getTitle()}
