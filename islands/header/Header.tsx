@@ -1,5 +1,4 @@
 /* ===== HEADER COMPONENT ===== */
-import { buttonHover } from "$button";
 import { Icon, LogoIcon } from "$icon";
 import { MenuButton } from "$islands/button/MenuButton.tsx";
 import { SearchButton } from "$islands/button/SearchButton.tsx";
@@ -429,9 +428,9 @@ export function Header() {
         id={`navbar-collapse-${type}`}
       >
         <div class="flex flex-col h-full">
-          <div class="pt-[21px] mobileLg:pt-[33px] px-9">
+          <div class="pt-[25px] mobileLg:pt-[36px] px-7.5">
             <div class="flex flex-row justify-between items-center w-full">
-              <div class="relative">
+              <div class="relative -translate-x-3 translate-y-[1px]">
                 <div
                   class={`${tooltipIcon} ${
                     isCloseTooltipVisible ? "opacity-100" : "opacity-0"
@@ -442,10 +441,9 @@ export function Header() {
                 <Icon
                   type="iconButton"
                   name="close"
-                  size="lg"
+                  size="md"
                   weight="bold"
                   color="greyLight"
-                  className={`${buttonHover} !p-0.5 mt-2`}
                   ariaLabel="Close menu"
                   onClick={() => {
                     if (open) {
@@ -508,7 +506,7 @@ export function Header() {
                   weight="normal"
                   size="xxs"
                   color="greyLight"
-                  className="group-hover:stroke-color-purple-light"
+                  className="group-hover:stroke-color-hover"
                 />
               )}
               {/* Text label */}
@@ -533,17 +531,17 @@ export function Header() {
   return (
     <header class="mobileLg:flex justify-between items-center max-w-desktop w-full mx-auto
      px-gutter-mobile mobileLg:px-gutter-tablet tablet:px-gutter-desktop
-     pt-6 pb-9 mobileLg:pt-9 tablet:pb-14">
+     pt-6 pb-9 mobileLg:pt-9 tablet:pb-9">
       {/* ===== MOBILE NAVIGATION ===== */}
       <div class="mobileLg:hidden flex items-center w-full relative z-header">
         <div
-          class={`flex items-center justify-between w-full gap-7 py-1.5 px-5 ${container1} !rounded-full`}
+          class={`flex items-center justify-between w-full gap-7 py-0.5 px-5 ${container1} !rounded-full`}
         >
           {/* Left: Logo Icon */}
           {logoIcon}
 
           {/* Right: Search, Tools, Wallet and Menu Buttons */}
-          <div class="flex items-center gap-6">
+          <div class="flex items-center gap-2.5">
             <SearchButton />
             {ToolsButton({ onOpenDrawer: openDrawer, data: toolsData }).icon}
             {WalletButton({
@@ -559,7 +557,7 @@ export function Header() {
       <div class="hidden mobileLg:flex items-center w-full relative z-header">
         <div
           class={`relative flex items-center justify-between w-full
-             py-1.5 px-6
+             py-0.5 px-4
              ${container1} !rounded-full`}
         >
           {/* Left: Logo Icon */}
@@ -567,15 +565,15 @@ export function Header() {
 
           {/* Center: Navigation Links (only when NAV_POSITION === "center") */}
           {NAV_POSITION === "center" && (
-            <div class="absolute left-1/2 -translate-x-1/2 flex items-center gap-6 tablet:gap-6">
+            <div class="absolute left-1/2 -translate-x-1/2 flex items-center gap-6 tablet:gap-5">
               {renderNavLinks()}
             </div>
           )}
 
           {/* Right: Icon Buttons (nav links prepended when NAV_POSITION === "right") */}
-          <div class="flex items-center gap-4">
+          <div class="flex items-center gap-2.5 tablet:gap-1.5">
             {NAV_POSITION === "right" && (
-              <div class="flex items-center gap-10 tablet:gap-10 mr-2">
+              <div class="flex items-center gap-6 tablet:gap-5 mr-2.5">
                 {renderNavLinks()}
               </div>
             )}

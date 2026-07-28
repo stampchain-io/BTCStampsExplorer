@@ -1,4 +1,3 @@
-import { buttonHover } from "$button";
 import { Icon } from "$icon";
 import type { Toast as ToastTypeFromProvider } from "$islands/Toast/ToastProvider.tsx";
 import {
@@ -90,12 +89,29 @@ export const ToastComponent = (
     <div
       id={`toast-${id}`}
       class={`fixed top-5 inset-x-5 z-notification !w-auto
-        min-[460px]:left-5 min-[460px]:right-auto min-[460px]:max-w-[460px] overflow-hidden ${
+        min-[460px]:left-5 min-[460px]:right-auto min-[460px]:max-w-[460px] ${
         shouldAnimateOut ? "notification-exit" : "notification-enter"
       } ${getContainerStyle(type)}`}
       role="alert"
     >
-      <div class="flex items-start space-x-6">
+      {
+        /* Positioned outside the padded/flex content so it can hug the
+          corner without being constrained by the container's padding
+          (this container intentionally has no overflow-hidden). */
+      }
+      <div class="absolute top-0.5 right-0.5">
+        <Icon
+          type="iconButton"
+          name="close"
+          weight="bold"
+          size="mdR"
+          color="greyLight"
+          ariaLabel="Close notification"
+          onClick={onClose}
+        />
+      </div>
+
+      <div class="flex items-start space-x-6 pr-8">
         <Icon
           type="icon"
           name={getIconName(type)}
@@ -120,17 +136,6 @@ export const ToastComponent = (
               </div>
             )}
         </div>
-
-        <Icon
-          type="iconButton"
-          name="close"
-          weight="bold"
-          size="mdR"
-          color="greyLight"
-          className={`${buttonHover} -mt-1 tablet:-mt-0.5 ml-auto -mr-1 tablet:-mr-0.5 !p-0.5`}
-          ariaLabel="Close notification"
-          onClick={onClose}
-        />
       </div>
 
       {autoDismiss && (

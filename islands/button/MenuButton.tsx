@@ -128,7 +128,7 @@ export function MenuButton({ onOpenDrawer }: MenuButtonProps) {
 
   const subnavigation = () => {
     return (
-      <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-3 mb-2.5">
         {subNavLinks.map((link) => (
           <a
             key={link.title}
@@ -157,24 +157,23 @@ export function MenuButton({ onOpenDrawer }: MenuButtonProps) {
         name="menu"
         weight="normal"
         size="sm"
-        color="custom"
-        className="stroke-color-neutral-400 hover:stroke-color-hover"
+        color="greyLight"
         isOpen={false}
         onClick={handleMenuClick}
       />
     ),
     // The menu drawer content
     drawer: (
-      <div class="flex flex-col h-full px-9 tablet:px-6">
+      <div class="flex flex-col h-full px-7.5">
         {/* Top - Main navigation content */}
-        <div class="flex flex-col flex-1 items-start pt-9 tablet:pt-6 gap-5">
+        <div class="flex flex-col flex-1 items-start pt-8 gap-5">
           {navigation()}
         </div>
 
         {/* Bottom - Sub navigation and version */}
         <div class={containerStickyBottom}>
           {subnavigation()}
-          <div class={`${container3} flex items-end -mb-1.5 mt-3 px-3 py-2`}>
+          <div class={`${container3} flex items-end mt-4.5 px-3 py-2`}>
             <CounterpartyVersion />
           </div>
         </div>

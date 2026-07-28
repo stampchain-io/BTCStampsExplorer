@@ -3,7 +3,7 @@ import { Icon } from "$icon";
 import { containerBackground } from "$layout";
 import {
   copyright,
-  eyebrowPrimary,
+  eyebrowNeutral,
   logoPrimary,
   navLinkFooter,
   navLinkFooterOverlay,
@@ -145,7 +145,7 @@ export function Footer() {
           </div>
 
           {/* ===== SOCIAL MEDIA ICONS ===== */}
-          <div class="flex gap-6 tablet:gap-4 mt-3 -mb-1 mobileMd:mt-0 tablet:mt-1 tablet:mb-0">
+          <div class="flex gap-2.5 tablet:gap-2 mt-1.5 -mb-1 mobileMd:mt-0 tablet:mb-0">
             {socialLinks.map((link, index) => (
               <div key={index}>
                 {link.icon}
@@ -164,8 +164,8 @@ export function Footer() {
           <div class="hidden tablet:flex flex-row justify-end w-[300px] pt-1">
             {/* ===== RESOURCES LINKS ===== */}
             <div class="flex w-1/2 ">
-              <div class="flex flex-col w-full justify-center gap-1">
-                <h6 class={`${eyebrowPrimary}`}>RESOURCES</h6>
+              <div class="flex flex-col w-full justify-start gap-1">
+                <h6 class={`${eyebrowNeutral}`}>RESOURCES</h6>
                 {resourcesLinks.map((link) => (
                   <a
                     key={link.href}
@@ -183,8 +183,8 @@ export function Footer() {
 
             {/* ===== ABOUT LINKS  ===== */}
             <div class="flex w-1/2">
-              <div class="flex flex-col w-full justify-center gap-1 text-right">
-                <h6 class={`${eyebrowPrimary}`}>ABOUT</h6>
+              <div class="flex flex-col w-full justify-start gap-1 text-right">
+                <h6 class={`${eyebrowNeutral}`}>ABOUT</h6>
                 {aboutLinks.map((link) => (
                   <a
                     key={link.href}
@@ -203,7 +203,7 @@ export function Footer() {
 
           {/* ===== MOBILE BOTTOM ROW SECTION ===== */}
           {/* ===== MIXED LINKS  ===== */}
-          <div class="flex tablet:hidden w-full justify-center mobileMd:justify-start mx-auto mt-3 mobileMd:mt-2 mb-2 mobileMd:mb-0 overflow-hidden">
+          <div class="flex tablet:hidden w-full justify-start mobileMd:justify-start mx-auto mt-3 mobileMd:mt-2 mb-2 mobileMd:mb-0 overflow-hidden">
             {/* ===== BASE/MOBILESM: EVENLY DISTRIBUTED LINKS ===== */}
             <div class="flex mobileMd:hidden flex-row flex-wrap w-full justify-center items-center mx-auto gap-6">
               {mobileLinks.filter((link) => !link.hiddenOnMobile).map((
@@ -275,7 +275,7 @@ export function Footer() {
               <span class="italic">STAMPCHAIN</span> &copy; 2026
             </h6>
           </div>
-          <div class="hidden tablet:flex mt-[18px] justify-end">
+          <div class="hidden tablet:flex justify-end mt-2">
             <CounterpartyVersion />
           </div>
         </div>

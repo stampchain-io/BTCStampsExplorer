@@ -82,7 +82,7 @@ export const SelectorButtons = ({
 
   return (
     <div
-      class={`relative grid p-0 select-none
+      class={`relative grid select-none
         ${container2} rounded-full
         ${
         (colorProp === "primary" || colorProp === "neutral")
@@ -150,7 +150,9 @@ export const SelectorButtons = ({
               for={`${uniqueName.current}-${option.value}`}
               class={`
                 relative flex items-center justify-center my-0.5 z-20 cursor-[inherit]
-                font-medium text-center tracking-wide !rounded-full
+                ${
+                isSelected ? "font-medium" : "font-normal"
+              } text-center tracking-wide !rounded-full
                 ${buttonStyles.size[size]}
                 ${labelClass}
               `}

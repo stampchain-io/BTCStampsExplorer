@@ -73,7 +73,7 @@ export const CollapsibleSection = ({
                 } transition-colors duration-200`}
               >
                 <Icon
-                  type="iconButton"
+                  type="iconHover"
                   name="caretDown"
                   weight="normal"
                   size="xsR"
@@ -121,7 +121,7 @@ export const CollapsibleSection = ({
               } transition-colors duration-200`}
             >
               <Icon
-                type="iconButton"
+                type="iconHover"
                 name="caretDown"
                 weight="normal"
                 size="xxsR"

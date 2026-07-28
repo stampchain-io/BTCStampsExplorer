@@ -35,6 +35,8 @@ export const container2 =
   border border-color-neutral-700 rounded-2xl`;
 export const container2Hover =
   `${container2} hover:border-color-hover ${transitionColors}`;
+export const container2Icon =
+  `relative flex items-center justify-between ${container2} rounded-full p-0.5 gap-1.5 tablet:gap-1`;
 // Card container styles - used for all cards
 export const containerCard = `group relative z-0 flex flex-col
 w-full h-full p-1 ${container2Hover}
@@ -61,7 +63,8 @@ export const bodyArticle = `
 export const containerBackground = `${body} p-5 ${container1}`;
 export const containerGap = "gap-5 mobileLg:gap-7.5";
 export const containerDetailImage = `relative p-2 ${container1}`;
-export const containerStickyBottom = `sticky bottom-0 mt-auto py-9 tablet:py-6`;
+export const containerStickyBottom =
+  `sticky bottom-0 mt-auto pb-7.5 tablet:pb-5`;
 
 // Table card container styles - check if used
 export const containerCardTable = `rounded-3xl ${container1} ${shadowGlowPurple}
@@ -156,6 +159,7 @@ export type LayoutStyles = {
   container1: string;
   container2: string;
   container2Hover: string;
+  container2Icon: string;
   container3: string;
   containerPill: string;
 

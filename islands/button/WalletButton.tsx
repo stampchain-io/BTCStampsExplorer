@@ -195,9 +195,9 @@ export const WalletButton = (
             type="iconButton"
             name="wallet"
             weight="normal"
-            size="smR"
-            color="custom"
-            className="stroke-color-neutral-400 hover:stroke-color-hover"
+            size="custom"
+            color="greyLight"
+            className="w-[26px] h-[26px] tablet:w-[22px] tablet:h-[22px]"
             onClick={handleWalletIconClick}
           />
         )}
@@ -211,9 +211,9 @@ export const WalletButton = (
                 type="iconButton"
                 name="wallet"
                 weight="normal"
-                size="smR"
-                color="custom"
-                className="stroke-color-neutral-400 hover:stroke-color-hover"
+                size="custom"
+                color="greyLight"
+                className="w-[25px] h-[25px] tablet:w-[21px] tablet:h-[21px]"
                 colorAccent="var(--color-orange-400)"
                 colorAccentHover="var(--color-hover)"
                 onClick={handleWalletIconClick}
@@ -307,9 +307,9 @@ export const WalletButton = (
       : null,
     // The wallet drawer content
     drawer: (
-      <div class="flex flex-col h-full px-9 tablet:px-6">
+      <div class="flex flex-col h-full px-7.5 tablet:px-5">
         {/* Top - Main navigation content */}
-        <div class="flex flex-col flex-1 items-start pt-9 tablet:pt-6 gap-5">
+        <div class="flex flex-col flex-1 items-start pt-8 gap-5">
           {getWalletLinks(address).map((link) => (
             <a
               key={link.title}

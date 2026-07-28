@@ -1,5 +1,4 @@
 /* ===== VIEW MODE TOGGLE BUTTON COMPONENT ===== */
-import { buttonHover } from "$button";
 import { Icon } from "$icon";
 import {
   getCurrentPathname,
@@ -86,7 +85,7 @@ export function ViewButton(
         weight="bold"
         size="custom"
         color="greyLight"
-        className={`${buttonHover} w-[31px] h-[31px] tablet:w-[27px] tablet:h-[27px]`}
+        className="w-[16px] h-[16px] tablet:w-[13px] tablet:h-[13px] stroke-width:1.5"
         onClick={() => handleViewModeChange(nextMode)}
         ariaLabel={ariaLabel}
       />

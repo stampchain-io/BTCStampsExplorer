@@ -3,7 +3,6 @@ import { containerStickyBottom } from "$layout";
 import { formatUSDValue } from "$lib/utils/ui/formatting/formatUtils.ts";
 import {
   eyebrowNeutral,
-  eyebrowPrimary,
   labelXs,
   navLinkActiveMobile,
   navLinkMobile,
@@ -98,7 +97,7 @@ export function ToolsButton({ onOpenDrawer, data }: ToolsButtonProps) {
       <div class="flex flex-col space-y-0 w-full">
         {/* STAMPS Section */}
         <div class="flex flex-col space-y-5">
-          <h6 class={`${eyebrowPrimary} -mb-7 text-right`}>
+          <h6 class={`${eyebrowNeutral} -mb-7 text-right`}>
             STAMPS
           </h6>
           {toolLinks.filter((link) =>
@@ -122,7 +121,7 @@ export function ToolsButton({ onOpenDrawer, data }: ToolsButtonProps) {
 
         {/* TOKENS Section */}
         <div class="flex flex-col space-y-5">
-          <h6 class={`${eyebrowPrimary} mt-3 -mb-7 text-right`}>
+          <h6 class={`${eyebrowNeutral} mt-3 -mb-7 text-right`}>
             TOKENS
           </h6>
           {toolLinks.filter((link) =>
@@ -147,7 +146,7 @@ export function ToolsButton({ onOpenDrawer, data }: ToolsButtonProps) {
 
         {/* BITNAME Section */}
         <div class="flex flex-col space-y-5">
-          <h6 class={`${eyebrowPrimary} mt-3 -mb-7 text-right`}>
+          <h6 class={`${eyebrowNeutral} mt-3 -mb-7 text-right`}>
             BITNAME
           </h6>
           {toolLinks.filter((link) => link.href === "/tool/src101/mint")
@@ -219,7 +218,7 @@ export function ToolsButton({ onOpenDrawer, data }: ToolsButtonProps) {
       <div class="flex flex-col space-y-1 w-full">
         {/* Header row */}
         <h6
-          class={`pb-1 ${eyebrowNeutral} text-center`}
+          class={`pb-1 ${eyebrowNeutral} !text-color-neutral-500 text-center`}
         >
           TRANSACTION FEES
         </h6>
@@ -280,8 +279,8 @@ export function ToolsButton({ onOpenDrawer, data }: ToolsButtonProps) {
           name="tools"
           weight="normal"
           size="smR"
-          color="custom"
-          className="mb-[1px] stroke-color-neutral-400 hover:stroke-color-hover"
+          color="greyLight"
+          className="mb-[1px]"
           onClick={handleToolsClick}
         />
         {/* Dropdown content is rendered by Header.tsx */}
@@ -300,7 +299,7 @@ export function ToolsButton({ onOpenDrawer, data }: ToolsButtonProps) {
 
         {/* Column 2: Left aligned - Stamp tools */}
         <div class="flex flex-col -ml-3 space-y-1 text-left">
-          <h6 class={eyebrowPrimary}>
+          <h6 class={eyebrowNeutral}>
             STAMPS
           </h6>
           {toolLinks.filter((link) =>
@@ -324,7 +323,7 @@ export function ToolsButton({ onOpenDrawer, data }: ToolsButtonProps) {
 
         {/* Column 3: Center aligned - Token tools */}
         <div class="flex flex-col -ml-6 space-y-1 text-center">
-          <h6 class={eyebrowPrimary}>
+          <h6 class={eyebrowNeutral}>
             TOKENS
           </h6>
           {toolLinks.filter((link) =>
@@ -349,7 +348,7 @@ export function ToolsButton({ onOpenDrawer, data }: ToolsButtonProps) {
 
         {/* Column 4: Right aligned - Register */}
         <div class="flex flex-col space-y-1 text-right">
-          <h6 class={eyebrowPrimary}>
+          <h6 class={eyebrowNeutral}>
             BITNAME
           </h6>
           {toolLinks.filter((link) => link.href === "/tool/src101/mint")
@@ -372,9 +371,9 @@ export function ToolsButton({ onOpenDrawer, data }: ToolsButtonProps) {
     ),
     // The tools drawer content
     drawer: (
-      <div class="flex flex-col h-full px-9 tablet:px-6">
+      <div class="flex flex-col h-full px-7.5">
         {/* Top - Main navigation content */}
-        <div class="flex flex-col flex-1 items-start pt-9 tablet:pt-6 gap-3">
+        <div class="flex flex-col flex-1 items-start pt-6 gap-3">
           {tools()}
         </div>
 

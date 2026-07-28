@@ -3,6 +3,7 @@ import * as iconPaths from "$components/icon/paths.ts";
 import {
   BadgeVariants,
   globalSvgAttributes,
+  iconButtonPill,
   iconStyles,
   IconVariants,
 } from "$icon";
@@ -22,22 +23,33 @@ export function Icon(props: IconVariants) {
     colorAccentHover,
     isOpen: _isOpen,
     onClick,
+    onMouseEnter,
+    onMouseLeave,
     ["f-partial"]: fPartial,
     ...rest
   } = props;
 
+  const isInteractive = type === "iconButton" || type === "iconHover";
+
   /* ===== STYLES ===== */
   const combinedClasses = `${iconStyles.base} ${iconStyles.size[size]} ${
-    type === "icon"
-      ? iconStyles.icon[color].replace("stroke-1", "")
-      : iconStyles.iconButton[color]
+    isInteractive
+      ? iconStyles.iconButton[color]
+      : iconStyles.icon[color].replace("stroke-1", "")
   } ${iconStyles.weight[weight]} group ${className}`;
 
+  // For iconButton/iconHover, click/hover/a11y semantics live on the <a>
+  // wrapper (see render branch below) so the clickable/hoverable area
+  // matches the visible pill instead of being limited to the inner <svg>.
   const commonProps = {
     className: combinedClasses,
-    role: role || (type === "iconButton" ? "button" : undefined),
-    "aria-label": ariaLabel || name,
-    onClick,
+    ...(isInteractive ? {} : {
+      role,
+      "aria-label": ariaLabel || name,
+      onClick,
+      onMouseEnter,
+      onMouseLeave,
+    }),
     ...rest,
   };
 
@@ -166,7 +178,9 @@ export function Icon(props: IconVariants) {
         // Handle path object with custom styling
         if (typeof pathItem === "object" && pathItem.path && pathItem.style) {
           // Extract stroke colors and convert to fill
-          const iconStyleClass = iconStyles[type][color];
+          const iconStyleClass = isInteractive
+            ? iconStyles.iconButton[color]
+            : iconStyles.icon[color];
           const baseStroke = iconStyleClass.match(/(?:^|\s)(stroke-[a-z0-9-]+)/)
             ?.[1];
           const hoverStroke = iconStyleClass.match(
@@ -244,7 +258,7 @@ export function Icon(props: IconVariants) {
     return svgElement;
   }
 
-  if (type === "iconButton") {
+  if (isInteractive) {
     const { href, target, rel } = props;
     return (
       <a
@@ -252,7 +266,14 @@ export function Icon(props: IconVariants) {
         target={target}
         rel={rel}
         {...(fPartial !== undefined ? { "f-partial": fPartial } : {})}
-        class="inline-flex items-center"
+        role={role || "button"}
+        aria-label={ariaLabel || name}
+        onClick={onClick}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        class={`inline-flex items-center group cursor-pointer ${
+          type === "iconButton" ? iconButtonPill : ""
+        }`}
       >
         {svgElement}
       </a>

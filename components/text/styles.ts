@@ -36,16 +36,16 @@ export const navSublinkActiveDesktop =
   `${navSublinkDesktop} !text-color-hover !cursor-default`;
 
 // Drawer Navigation - Mobile/tablet
-export const navLinkMobile = `font-extrabold text-xl uppercase
-  bg-gradient-to-r color-neutral-gradient color-gradient-hover
-  tracking-wider inline-block w-fit cursor-pointer ${select}`;
-export const navLinkActiveMobile =
-  `${navLinkMobile} [--gradient-stop-from:var(--color-primary-400)] [--gradient-stop-via:var(--color-primary-400)] [--gradient-stop-to:var(--color-primary-400)] !cursor-default`;
-export const navSublinkMobile = `font-semibold text-sm tablet:text-xs uppercase
+export const navLinkMobile = `font-light text-xl uppercase
   text-color-neutral-400 hover:text-color-hover
+  tracking-wider cursor-pointer ${select}`;
+export const navLinkActiveMobile =
+  `${navLinkMobile} text-color-hover !cursor-default`;
+export const navSublinkMobile = `font-semibold text-sm tablet:text-xs uppercase
+  text-color-neutral-500 hover:text-color-hover
   tracking-wide ${transitionColors} cursor-pointer ${select}`;
 export const navSublinkActiveMobile =
-  `${navSublinkMobile} !text-color-hover !cursor-default ${select}`;
+  `${navSublinkMobile} !text-color-hover !cursor-default`;
 
 // Footer - transparent text - used with the navLinkFooterOverlay class
 export const navLinkFooter =
@@ -185,7 +185,7 @@ export const valueNeutral = `text-color-neutral-400`;
 
 /* ===== SPECIAL TEXT STYLES ===== */
 export const eyebrowNeutral =
-  `font-bold text-sm tablet:text-[0.625rem] text-color-neutral-500 tracking-wider cursor-default ${select}`; // descriptive text above icons, links, etc.
+  `font-bold text-xs tablet:text-[0.625rem] text-color-neutral-700 tracking-wider cursor-default ${select}`; // descriptive text above icons, links, etc.
 export const eyebrowPrimary =
   `font-bold text-sm tablet:text-[0.625rem] text-color-primary-300 tracking-wider cursor-default ${select}`;
 export const eyebrowSecondary =

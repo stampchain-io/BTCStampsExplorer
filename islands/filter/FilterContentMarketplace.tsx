@@ -11,8 +11,8 @@ import { Checkbox } from "$islands/filter/FilterComponents.tsx";
 import { StampFilters } from "$islands/filter/FilterOptionsMarketplace.tsx";
 import { CollapsibleSection } from "$islands/layout/CollapsibleSection.tsx";
 import {
+  eyebrowNeutral,
   eyebrowPositionFilter,
-  eyebrowPrimary,
   labelLogicResponsive,
 } from "$text";
 import type { RadioProps } from "$types/ui.d.ts";
@@ -980,7 +980,7 @@ export const FilterContentMarketplace = ({
                 checked={filters.listings === "all"}
                 onChange={() => handleListingPriceType("all")}
               />
-              <div class={`${eyebrowPrimary} ${eyebrowPositionFilter}`}>
+              <div class={`${eyebrowNeutral} ${eyebrowPositionFilter}`}>
                 PRICE RANGE
               </div>
               <Radio
@@ -1044,7 +1044,7 @@ export const FilterContentMarketplace = ({
                 });
               }}
             />
-            <div class={`${eyebrowPrimary} ${eyebrowPositionFilter}`}>
+            <div class={`${eyebrowNeutral} ${eyebrowPositionFilter}`}>
               ACTIVITY
             </div>
             <Radio
@@ -1125,7 +1125,7 @@ export const FilterContentMarketplace = ({
           variant="collapsibleTitle"
         >
           {/* Category: PIXEL */}
-          <div class={`${eyebrowPrimary} ${eyebrowPositionFilter}`}>
+          <div class={`${eyebrowNeutral} ${eyebrowPositionFilter}`}>
             PIXELS
           </div>
           <Checkbox
@@ -1168,7 +1168,7 @@ export const FilterContentMarketplace = ({
           />
 
           {/* Category: VECTOR */}
-          <div class={`${eyebrowPrimary} ${eyebrowPositionFilter}`}>
+          <div class={`${eyebrowNeutral} ${eyebrowPositionFilter}`}>
             VECTOR
           </div>
           <Checkbox
@@ -1193,7 +1193,7 @@ export const FilterContentMarketplace = ({
           }
 
           {/* Category: AUDIO */}
-          <div class={`${eyebrowPrimary} ${eyebrowPositionFilter}`}>
+          <div class={`${eyebrowNeutral} ${eyebrowPositionFilter}`}>
             AUDIO
           </div>
           <Checkbox
@@ -1205,7 +1205,7 @@ export const FilterContentMarketplace = ({
           />
 
           {/* Category: ENCODING */}
-          <div class={`${eyebrowPrimary} ${eyebrowPositionFilter}`}>
+          <div class={`${eyebrowNeutral} ${eyebrowPositionFilter}`}>
             ENCODING
           </div>
           <Checkbox

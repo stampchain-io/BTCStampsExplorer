@@ -4,7 +4,7 @@ import type { AriaRole } from "preact";
 
 /* ===== TYPE DEFINITIONS ===== */
 export interface IconVariants {
-  type: "icon" | "iconButton";
+  type: "icon" | "iconHover" | "iconButton";
   name: string;
   weight: "extraLight" | "light" | "normal" | "bold" | "custom";
   size:
@@ -172,6 +172,14 @@ export const iconStyles = {
 } as const;
 
 /* ===== INTERACTIVE ELEMENT STYLES ===== */
+/* ===== ICON BUTTON HOVER PILL =====
+ * Applied automatically to type="iconButton" Icons (see IconBase.tsx) on the
+ * wrapping <a>, not the svg. Icons that want the same interactive coloring
+ * without the pill (e.g. tightly-spaced carets) should use type="iconHover"
+ * instead. */
+export const iconButtonPill = `p-1.5 bg-transparent rounded-full
+  hover:bg-gradient-to-b hover:from-color-neutral-700/80 hover:via-color-neutral-800/90 hover:to-color-neutral-800`;
+
 /* ===== SLIDER HANDLE ===== */
 export const handleIcon = `
   absolute w-full h-4 tablet:h-3 rounded-full appearance-none bg-transparent pointer-events-none

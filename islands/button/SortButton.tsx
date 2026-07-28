@@ -1,4 +1,3 @@
-import { buttonHover } from "$button";
 import { Icon } from "$icon";
 import { useSSRSafeNavigation } from "$lib/hooks/useSSRSafeNavigation.ts";
 import { tooltipIcon } from "$notification";
@@ -96,9 +95,9 @@ export function SortButton(
         type="iconButton"
         name={sort === "DESC" ? "sortDesc" : "sortAsc"}
         weight="bold"
-        size="lgR"
+        size="custom"
         color="greyLight"
-        className={buttonHover}
+        className="w-[17px] h-[17px] tablet:w-[14px] tablet:h-[14px] stroke-width:1.5"
         href={getSortUrl()}
         f-partial={getSortUrl()}
         ariaLabel={`Sorted ${sort === "DESC" ? "descending" : "ascending"}`}

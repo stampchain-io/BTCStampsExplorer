@@ -1,4 +1,3 @@
-import { buttonHover } from "$button";
 import { Icon } from "$icon";
 import { closeModal } from "$islands/modal/states.ts";
 import { container0, shadow } from "$layout";
@@ -96,7 +95,7 @@ export function ModalBase({
         {!hideHeader && (
           <>
             <div
-              class="absolute top-0 right-0 -mr-1.5 -mt-1.5 ms-auto cursor-pointer"
+              class="absolute -top-[18px] -right-[18px] ms-auto cursor-pointer"
               onMouseEnter={handleCloseMouseEnter}
               onMouseLeave={handleCloseMouseLeave}
             >
@@ -106,8 +105,7 @@ export function ModalBase({
                 size="lgR"
                 weight="bold"
                 color="greyLight"
-                className={`${buttonHover} !p-0.5 -mt-1`}
-                ariaLabel="Close"
+                ariaLabel="Close modal"
                 onClick={() => handleClose()}
               />
               <div

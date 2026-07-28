@@ -29,7 +29,7 @@ import {
   queryParamsToFilters as explorerQueryParamsToFilters,
 } from "$islands/filter/FilterOptionsExplorer.tsx";
 // Import SRC20 filter content
-import { Button, buttonHover } from "$button";
+import { Button } from "$button";
 import { Icon } from "$icon";
 import type { FilterType } from "$islands/button/FilterButton.tsx";
 import { FilterContentSRC20 } from "$islands/filter/FilterContentSRC20.tsx";
@@ -397,14 +397,14 @@ const FilterDrawer = (
       aria-labelledby="drawer-form-label"
     >
       {/* Content container with flex column to separate scrollable area from sticky buttons */}
-      <div class="flex flex-col h-full pt-[21px] mobileLg:pt-[33px] tablet:pt-[33px]">
+      <div class="flex flex-col h-full pt-[25px] mobileLg:pt-[36px]">
         {/* Scrollable content area - overflow only on this section */}
         <div class="flex-1 overflow-y-auto scrollbar-background-overlay">
-          <div class="px-9 tablet:px-6">
+          <div class="px-7.5 tablet:px-5">
             <div class="relative w-full">
               {/* Close icon + heading - order flips between mobile and tablet+ via flex-row-reverse */}
               <div class="flex flex-row-reverse tablet:flex-row justify-between items-center w-full">
-                <div class="relative">
+                <div class="relative tablet:-translate-x-2 translate-y-[1px]">
                   <Tooltip
                     visible={isCloseTooltipVisible}
                     text={closeTooltipText}
@@ -413,10 +413,9 @@ const FilterDrawer = (
                     type="iconButton"
                     name="close"
                     weight="bold"
-                    size="lgR"
+                    size="mdR"
                     color="greyLight"
-                    className={`${buttonHover} !p-0.5 mt-2`}
-                    ariaLabel="Close"
+                    ariaLabel="Close filter drawer"
                     onClick={handleCloseDrawer}
                     onMouseEnter={handleCloseMouseEnter}
                     onMouseLeave={handleCloseMouseLeave}
@@ -468,7 +467,7 @@ const FilterDrawer = (
 
         {/* Sticky buttons - now outside overflow container */}
         <div
-          class={`flex justify-between ${containerStickyBottom} !mt-0 w-full px-9 tablet:px-6 gap-6 bg-transparent`}
+          class={`flex justify-between ${containerStickyBottom} !mt-0 w-full px-7.5 tablet:px-5 gap-5 bg-transparent`}
         >
           <Button
             variant="outline"
@@ -488,7 +487,7 @@ const FilterDrawer = (
             CLEAR
           </Button>
           <Button
-            variant="outline"
+            variant="flat"
             color="primary"
             size="xsR"
             onClick={handleApplyFilters}

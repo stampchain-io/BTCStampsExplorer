@@ -1,4 +1,3 @@
-import { buttonHover } from "$button";
 import { ModalBase } from "$components/layout/ModalBase.tsx";
 import { Icon } from "$icon";
 import { container1 } from "$layout";
@@ -75,7 +74,6 @@ export function MaraModeWarningModal({
             size="lgR"
             weight="bold"
             color="greyLight"
-            className={`${buttonHover} !p-0.5`}
             ariaLabel="Close"
             onClick={onCancel || (() => {})}
           />

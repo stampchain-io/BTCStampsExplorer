@@ -1,6 +1,6 @@
 /* ===== STAMP INFO COMPONENT ===== */
 /*@baba-750+764+815+icons - refactor to StatItems */
-import { Button, buttonHover } from "$button";
+import { Button } from "$button";
 import { ActivityLevelIndicator } from "$components/indicators/ActivityLevelIndicator.tsx";
 import { Icon } from "$icon";
 import BuyStampModal from "$islands/modal/BuyStampModal.tsx";
@@ -793,7 +793,6 @@ export function StampInfo(
                         color="greyLight"
                         ariaLabel="Listings"
                         onClick={() => setShowListings(!showListings)}
-                        className={buttonHover}
                       />
                     </div>
                   )}

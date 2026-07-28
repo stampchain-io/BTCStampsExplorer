@@ -8,7 +8,7 @@ import {
   countActiveExplorerFilters,
   queryParamsToFilters as explorerQueryParamsToFilters,
 } from "$islands/filter/FilterOptionsExplorer.tsx";
-import { container2 } from "$layout";
+import { container2Icon } from "$layout";
 import {
   getCurrentPathname,
   getSearchParams,
@@ -88,14 +88,14 @@ export const ExplorerHeader = (
         <div class="flex justify-start mobileMd:justify-end pt-3 mobileMd:pt-0 gap-3">
           {/* View Mode Toggle */}
           <div
-            class={`relative flex items-center justify-center px-1 py-0.5 ${container2} rounded-full`}
+            class={container2Icon}
           >
             <ViewButton viewMode={viewMode} />
           </div>
 
           {/* Filter + Sort Controls */}
           <div
-            class={`relative flex items-center justify-between px-1 py-0.5 gap-3 tablet:gap-1 ${container2} rounded-full`}
+            class={`${container2Icon} gap-1.5 tablet:gap-1`}
           >
             <FilterButton
               count={activeFilterCount}

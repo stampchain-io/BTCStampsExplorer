@@ -11,8 +11,8 @@ import { Checkbox } from "$islands/filter/FilterComponents.tsx";
 import { ExplorerStampFilters } from "$islands/filter/FilterOptionsExplorerStamp.tsx";
 import { CollapsibleSection } from "$islands/layout/CollapsibleSection.tsx";
 import {
+  eyebrowNeutral,
   eyebrowPositionFilter,
-  eyebrowPrimary,
   labelLogicResponsive,
 } from "$text";
 import type { RadioProps } from "$types/ui.d.ts";
@@ -833,7 +833,7 @@ export const FilterContentExplorerStamp = ({
           variant="collapsibleTitle"
         >
           {/* Category: PIXEL */}
-          <div class={`${eyebrowPrimary} ${eyebrowPositionFilter}`}>
+          <div class={`${eyebrowNeutral} ${eyebrowPositionFilter}`}>
             PIXELS
           </div>
           <Checkbox
@@ -876,7 +876,7 @@ export const FilterContentExplorerStamp = ({
           />
 
           {/* Category: VECTOR */}
-          <div class={`${eyebrowPrimary} ${eyebrowPositionFilter}`}>
+          <div class={`${eyebrowNeutral} ${eyebrowPositionFilter}`}>
             VECTOR
           </div>
           <Checkbox
@@ -901,7 +901,7 @@ export const FilterContentExplorerStamp = ({
           }
 
           {/* Category: AUDIO */}
-          <div class={`${eyebrowPrimary} ${eyebrowPositionFilter}`}>
+          <div class={`${eyebrowNeutral} ${eyebrowPositionFilter}`}>
             AUDIO
           </div>
           <Checkbox
@@ -913,7 +913,7 @@ export const FilterContentExplorerStamp = ({
           />
 
           {/* Category: ENCODING */}
-          <div class={`${eyebrowPrimary} ${eyebrowPositionFilter}`}>
+          <div class={`${eyebrowNeutral} ${eyebrowPositionFilter}`}>
             ENCODING
           </div>
           <Checkbox

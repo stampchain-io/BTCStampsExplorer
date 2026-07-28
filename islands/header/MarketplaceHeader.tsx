@@ -10,7 +10,7 @@ import {
   filtersToQueryParams,
   StampFilters as FilterStampFilters,
 } from "$islands/filter/FilterOptionsMarketplace.tsx";
-import { container2 } from "$layout";
+import { container2Icon } from "$layout";
 import {
   getCurrentPathname,
   safeNavigate,
@@ -180,17 +180,17 @@ export const MarketplaceHeader = (
           />
         </div>
 
-        <div class="flex justify-end gap-2">
+        <div class="flex justify-end gap-3">
           {/* View Mode Toggle */}
           <div
-            class={`relative flex items-center justify-center p-0.5 ${container2} rounded-full`}
+            class={container2Icon}
           >
             <ViewButton viewMode={viewMode} />
           </div>
 
           {/* Filter and Sort Controls */}
           <div
-            class={`relative flex items-center justify-between p-0.5 gap-2 tablet:gap-1 ${container2} rounded-full`}
+            class={`${container2Icon} gap-1.5 tablet:gap-1`}
           >
             <FilterButton
               count={countActiveMarketplaceFilters(

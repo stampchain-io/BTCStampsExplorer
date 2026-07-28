@@ -22,7 +22,7 @@
 
  */
 
-import { Icon } from "$icon";
+import { Icon, iconButtonPill } from "$icon";
 
 interface LogoIconProps {
   href?: string;
@@ -52,9 +52,9 @@ export function LogoIcon({
           type="icon"
           name="stampchain"
           weight="light"
-          size="mdR"
-          color="custom"
-          className="stroke-color-neutral-400 hover:stroke-color-primary-500"
+          size="xlR"
+          color="greyLight"
+          className={`hover:stroke-color-primary-400 ${iconButtonPill} !p-1`}
         />
       </span>
     </a>

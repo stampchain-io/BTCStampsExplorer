@@ -34,9 +34,9 @@ export function SearchButton() {
         type="iconButton"
         name="search"
         weight="normal"
-        size="smR"
-        color="custom"
-        className="mb-[1px] mobileLg:-ml-1 -mr-0.5 mobileLg:mr-0 stroke-color-neutral-400 hover:stroke-color-hover"
+        size="custom"
+        color="greyLight"
+        className="w-[25px] h-[25px] tablet:w-[21px] tablet:h-[21px]"
         onClick={openContextualSearch}
         role="button"
         aria-label="Search"
