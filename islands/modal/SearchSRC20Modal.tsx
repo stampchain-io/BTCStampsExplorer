@@ -177,7 +177,7 @@ function SearchContent({
         ? <SearchErrorDisplay error={error} />
         : rawResults.length > 0
         ? (
-          <ul class="max-h-[266px] bg-color-background/50 rounded-b-3xl z-modal overflow-y-auto scrollbar-background-overlay [&::-webkit-scrollbar]:!rounded-[2px] [&::-webkit-scrollbar]:!w-[4px]">
+          <ul class="max-h-[266px] rounded-b-3xl z-modal overflow-y-auto scrollbar-background-overlay [&::-webkit-scrollbar]:!rounded-[2px] [&::-webkit-scrollbar]:!w-[4px]">
             {rawResults.map(
               (result) =>
                 result._addressLink
