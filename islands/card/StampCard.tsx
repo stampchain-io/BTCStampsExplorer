@@ -852,7 +852,7 @@ export function StampCard({
                 </div>
               </div>
               <Button
-                variant="outline"
+                variant="flat"
                 color="primary"
                 size="xsR"
                 class="rounded-xl shrink-0"
@@ -1197,7 +1197,7 @@ export function StampCard({
                 </div>
                 <div class="flex justify-center mt-2 w-full">
                   <Button
-                    variant="outline"
+                    variant="flat"
                     color="primary"
                     size="xs"
                     class="w-full rounded-xl"

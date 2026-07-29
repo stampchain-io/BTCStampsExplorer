@@ -275,7 +275,7 @@ export function StampListingsRow({ stamp }: StampListingsRowProps) {
         class={`${cellRightL2Card}`}
       >
         <Button
-          variant="outline"
+          variant="flat"
           color="primary"
           size="xxs"
           href={href}

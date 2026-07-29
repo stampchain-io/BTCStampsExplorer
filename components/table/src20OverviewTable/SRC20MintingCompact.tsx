@@ -277,7 +277,7 @@ export function SRC20MintingCompact({
                       class={cellRightL2Card}
                     >
                       <Button
-                        variant="outline"
+                        variant="flat"
                         color="primary"
                         size="xxs"
                         href={mintHref}

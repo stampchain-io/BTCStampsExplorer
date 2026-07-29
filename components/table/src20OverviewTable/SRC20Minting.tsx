@@ -354,7 +354,7 @@ export function SRC20Minting({
                     {/* MINT BUTTON */}
                     <td class={cellRightL2Card}>
                       <Button
-                        variant="outline"
+                        variant="flat"
                         color="primary"
                         size="xxs"
                         href={mintHref}

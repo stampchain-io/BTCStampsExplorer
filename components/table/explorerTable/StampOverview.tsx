@@ -1,6 +1,7 @@
 /* ===== STAMP EXPLORER TABLE COMPONENT ===== */
 import { colGroup } from "$components/layout/types.ts";
 import { Icon, PlaceholderImage } from "$icon";
+import StampTextContent from "$islands/content/stampDetailContent/StampTextContent.tsx";
 import {
   cellCenterL2Card,
   cellLeftL2Card,
@@ -19,7 +20,6 @@ import {
   formatDate,
   formatSupply,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
-import StampTextContent from "$islands/content/stampDetailContent/StampTextContent.tsx";
 import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
 import { cardRowStampNumber, labelXxs, textXs, valueDarkSm } from "$text";
 import type { StampRow } from "$types/stamp.d.ts";
