@@ -590,20 +590,28 @@ class DatabaseManager {
     };
 
     // Enable TLS for MySQL 8.4+ caching_sha2_password support.
-    // The deno-mysql driver's RSA key exchange is broken over plaintext;
-    // TLS bypasses RSA entirely by sending credentials over the encrypted channel.
+    // NOTE: the deno-mysql driver (v2.12.1) only supports two TLS modes:
+    // "disabled" and "verify_identity" (no "verify_ca"). "verify_identity"
+    // requires the server cert's CN/SAN to match the connection hostname
+    // (e.g. "127.0.0.1"), which self-signed local dev certs typically don't
+    // have — it will fail even with correct credentials in that case.
+    // Also note: TLS does NOT bypass the driver's broken RSA "full auth"
+    // path for caching_sha2_password (only MySQL's fast-auth cache being
+    // warm does — i.e. a prior successful login by any client). Set
+    // DB_ENABLE_TLS=false for local dev against a self-signed cert.
     if (Deno.env.get("DB_ENABLE_TLS") !== "false") {
       const caCertPath = Deno.env.get("DB_CA_CERT_PATH") || "certs/rds-ca-bundle.pem";
       try {
         const caCert = await Deno.readTextFile(caCertPath);
-        connectionOptions.tls = {
-          mode: "verify_identity",
-          caCerts: [caCert],
-        };
+        const tlsMode = Deno.env.get("DB_TLS_MODE") || "verify_identity";
+        if (tlsMode !== "disabled" && tlsMode !== "verify_identity") {
+          throw new Error(`Invalid DB_TLS_MODE "${tlsMode}"; must be "disabled" or "verify_identity"`);
+        }
+        connectionOptions.tls = { mode: tlsMode, caCerts: [caCert] };
       } catch {
         console.warn(
           `[DB TLS] CA cert not found at "${caCertPath}" — falling back to plaintext. ` +
-          `This will fail with MySQL 8.4 caching_sha2_password. ` +
+          `This will fail with MySQL 8.4 caching_sha2_password unless the fast-auth cache is warm. ` +
           `Run: curl -o certs/rds-ca-bundle.pem https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem`,
         );
       }
