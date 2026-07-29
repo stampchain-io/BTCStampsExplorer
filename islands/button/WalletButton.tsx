@@ -214,7 +214,7 @@ export const WalletButton = (
                 size="custom"
                 color="greyLight"
                 className="w-[25px] h-[25px] tablet:w-[21px] tablet:h-[21px]"
-                colorAccent="var(--color-orange-400)"
+                colorAccent="var(--color-primary-400)"
                 colorAccentHover="var(--color-hover)"
                 onClick={handleWalletIconClick}
               />
