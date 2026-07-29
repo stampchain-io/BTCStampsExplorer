@@ -52,9 +52,9 @@ export const SRC20OverviewHeader = ({
       </div>
 
       {/* ===== MINTED/MINTING, TRENDING AND TIMEFRAME BUTTONS ===== */}
-      <div class="flex flex-col mobileLg:flex-row justify-between w-full">
+      <div class="flex flex-col mobileMd:flex-row justify-between w-full">
         {/* Minting/Minted */}
-        <div class="flex justify-between gap-3 w-full mobileMd:w-auto">
+        <div class="flex justify-between gap-3">
           <SelectorButtons
             options={[
               { value: "minted", label: "MINTED" },
@@ -66,20 +66,22 @@ export const SRC20OverviewHeader = ({
             color="primary"
             className="w-full mobileMd:w-auto"
           />
-          {/* Trending Toggle */}
-          <ToggleButton
-            options={["TRENDING"]}
-            selected={sortBy === "TRENDING" ? "TRENDING" : ""}
-            onChange={handleTrendingClick}
-            mode="single"
-            size="xsR"
-            color="neutral"
-            className="mt-[3px] !text-xs tablet:!text-[10px]"
-          />
+          {/* Trending Toggle - mobileMd+ only, stays alongside Minted/Minting */}
+          <div class="hidden mobileMd:flex">
+            <ToggleButton
+              options={["TRENDING"]}
+              selected={sortBy === "TRENDING" ? "TRENDING" : ""}
+              onChange={handleTrendingClick}
+              mode="single"
+              size="xsR"
+              color="neutral"
+              className="mt-[3px] !text-xs tablet:!text-[10px]"
+            />
+          </div>
         </div>
 
         {/* Trending and Timeframes - Right */}
-        <div class="flex justify-start mobileMd:justify-end pt-3 mobileLg:pt-0 gap-3">
+        <div class="flex justify-between mobileMd:justify-end pt-3 mobileMd:pt-0 gap-3">
           {/* Timeframe Buttons */}
           <SelectorButtons
             options={[
@@ -92,6 +94,19 @@ export const SRC20OverviewHeader = ({
             size="xsR"
             color="primary"
           />
+
+          {/* Trending Toggle - mobile only, moved to second row, right-aligned */}
+          <div class="flex mobileMd:hidden">
+            <ToggleButton
+              options={["TRENDING"]}
+              selected={sortBy === "TRENDING" ? "TRENDING" : ""}
+              onChange={handleTrendingClick}
+              mode="single"
+              size="xsR"
+              color="neutral"
+              className="mt-[3px] !text-xs tablet:!text-[10px]"
+            />
+          </div>
         </div>
       </div>
     </div>

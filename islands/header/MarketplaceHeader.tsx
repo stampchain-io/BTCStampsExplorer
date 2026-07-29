@@ -150,7 +150,7 @@ export const MarketplaceHeader = (
       </div>
 
       {/* ===== CONTROLS ROW ===== */}
-      <div class="flex justify-between items-center w-full">
+      <div class="flex flex-col mobileMd:flex-row justify-between mobileMd:items-center w-full">
         {/* Market Mode Selector */}
         <SelectorButtons
           options={[
@@ -161,6 +161,7 @@ export const MarketplaceHeader = (
           onChange={handleMarketModeChange}
           size="xsR"
           color="primary"
+          className="w-full mobileMd:w-auto"
         />
 
         <div class="hidden tablet:flex w-auto">
@@ -180,11 +181,9 @@ export const MarketplaceHeader = (
           />
         </div>
 
-        <div class="flex justify-end gap-3">
+        <div class="flex justify-between mobileMd:justify-end pt-3 mobileMd:pt-0 gap-3">
           {/* View Mode Toggle */}
-          <div
-            class={container2Icon}
-          >
+          <div class={container2Icon}>
             <ViewButton viewMode={viewMode} />
           </div>
 

@@ -69,7 +69,7 @@ export const ExplorerHeader = (
       {/* Section Selector + Controls */}
       <div class="flex flex-col mobileMd:flex-row justify-between mobileMd:items-center w-full">
         {/* Section Selector - Left */}
-        <div class="flex gap-3 w-full mobileMd:w-auto">
+        <div class="flex gap-3">
           <SelectorButtons
             options={[
               { value: "all", label: "ALL" },
@@ -85,7 +85,7 @@ export const ExplorerHeader = (
         </div>
 
         {/* View Toggle + Filter + Sort Controls - Right */}
-        <div class="flex justify-start mobileMd:justify-end pt-3 mobileMd:pt-0 gap-3">
+        <div class="flex justify-between mobileMd:justify-end pt-3 mobileMd:pt-0 gap-3">
           {/* View Mode Toggle */}
           <div
             class={container2Icon}

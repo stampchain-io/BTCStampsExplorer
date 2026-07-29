@@ -109,7 +109,7 @@ export const StampOverviewHeader = (
       {/* ===== STAMP TYPE SELECTOR AND CONTROLS ===== */}
       <div class="flex flex-col mobileMd:flex-row justify-between w-full">
         {/* Stamp Type Selector - Left */}
-        <div class="flex gap-3 w-full mobileMd:w-auto">
+        <div class="flex gap-3">
           <SelectorButtons
             options={[
               { value: "all", label: "ALL" },
