@@ -1021,6 +1021,14 @@ export interface StatTitleProps {
   target?: "_self" | "_blank";
 }
 
+export interface StatPriceProps {
+  priceBTC: string | number | ComponentChildren;
+  priceUSD?: string | number | ComponentChildren | null;
+  activityLevel?: "HOT" | "WARM" | "COOL" | "DORMANT" | "COLD" | null;
+  align?: "left" | "center" | "right";
+  class?: string;
+}
+
 export interface RadioProps {
   label: string;
   value: string;
