@@ -31,12 +31,8 @@ export const Accordion = (
         {/* Title with Gradient Styling - uses bg-gradient-to-r color-neutral-gradient color-gradient-hover instead of headingGreyLDLink because group-hover overrides the hover state */}
         {/* group-hover overrides --gradient-stop-* to a custom grey instead of the default primary-400 used by color-gradient-hover */}
         <h2
-          class={`font-bold text-xl tracking-wide bg-gradient-to-r color-neutral-gradient color-gradient-hover group-hover:[--gradient-stop-from:var(--color-grey-semilight)] group-hover:[--gradient-stop-via:var(--color-grey-semilight)] group-hover:[--gradient-stop-to:var(--color-grey-semilight)]
-            ${
-            isOpen
-              ? "[--gradient-stop-from:var(--color-grey-semilight)] [--gradient-stop-via:var(--color-grey-semilight)] [--gradient-stop-to:var(--color-grey-semilight)]"
-              : ""
-          }`}
+          class={`font-bold text-xl text-color-neutral-200 group-hover:text-color-hover tracking-wide
+            ${isOpen ? "text-color-primary-400" : ""}`}
         >
           {title}
         </h2>
@@ -45,8 +41,8 @@ export const Accordion = (
         <span
           class={`transition-transform duration-400 ${
             isOpen
-              ? "stroke-color-grey-light rotate-45"
-              : "stroke-color-grey-semidark group-hover:stroke-color-grey-light transition-colors duration-400 rotate-0"
+              ? "stroke-color-hover rotate-45"
+              : "stroke-color-neutral-200 group-hover:stroke-color-hover transition-colors duration-400 rotate-0"
           }`}
         >
           <Icon
@@ -55,7 +51,6 @@ export const Accordion = (
             weight="bold"
             size="xsR"
             color="custom"
-            className="-mt-[3px]"
           />
         </span>
       </div>

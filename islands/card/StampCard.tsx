@@ -9,6 +9,7 @@ import StampTextContent from "$islands/content/stampDetailContent/StampTextConte
 import BuyStampModal from "$islands/modal/BuyStampModal.tsx";
 import { openModal } from "$islands/modal/states.ts";
 import { container3, containerCard, containerPill } from "$layout";
+import { fetchLowestPriceOpenDispenser } from "$lib/utils/api/dispensers/fetchLowestPriceDispenser.ts";
 import {
   abbreviateAddress,
   formatFileSize,
@@ -19,6 +20,7 @@ import {
   getStampImageSrc,
   getStampPreviewUrl,
 } from "$lib/utils/ui/media/imageUtils.ts";
+import { showToast } from "$lib/utils/ui/notifications/toastSignal.ts";
 import { tooltipIcon } from "$notification";
 import {
   cardCreator,
@@ -65,6 +67,10 @@ interface StampWithSaleData extends Omit<StampRow, "stamp_base64"> {
   dispenser_tx_hash?: string;
   time_ago?: string;
   dispense_quantity?: number;
+  // StampService.getRecentSales returns the USD sale price as these flat
+  // top-level fields (not nested under `market_data`) — see displayPriceUSD.
+  usd_price?: number;
+  lastSalePriceUSD?: number;
 }
 
 /* ===== COMPONENT ===== */
@@ -89,6 +95,10 @@ export function StampCard({
 
   // Buy modal fee state (mirrors StampInfo's fee handling for BuyStampModal)
   const [fee, setFee] = useState<number>(0);
+  // Marketplace/listing responses don't attach a real dispenser to buy from
+  // (only aggregated market data) — tracks the on-demand fetch triggered by
+  // clicking BUY. See handleBuyClick below.
+  const [isFetchingDispenser, setIsFetchingDispenser] = useState(false);
 
   // Audio-related state (always declared to avoid conditional hooks)
   const [isPlaying, setIsPlaying] = useState(false);
@@ -598,6 +608,25 @@ export function StampCard({
     };
   };
 
+  // v2.3 API moved USD prices into the nested `market_data` object
+  // (snake_case); the old root-level `floorPriceUSD` field was removed from
+  // the API entirely, so there's no fallback to it.
+  const displayPriceUSD = () => {
+    const marketData = (stamp as any)?.market_data;
+
+    if (isRecentSale && saleData) {
+      // StampService.getRecentSales doesn't nest its USD price under
+      // `market_data` — it returns flat `usd_price`/`lastSalePriceUSD`
+      // fields instead (see routes/index.tsx & routes/marketplace/index.tsx).
+      return marketData?.recent_sale_price_usd ??
+        stamp.usd_price ??
+        stamp.lastSalePriceUSD ??
+        null;
+    }
+
+    return marketData?.floor_price_usd ?? null;
+  };
+
   /* ===== COMPUTED VALUES ===== */
   const supplyDisplay = isRecentSale
     ? `${stamp.supply || 1}` // For recent sales, show transaction quantity
@@ -626,15 +655,23 @@ export function StampCard({
     return stringValue.length > 6;
   };
 
-  const isListed = displayPriceBTC().style === cardPrice;
-
-  // Dispenser data isn't part of the base StampRow type — API responses for
-  // listing/marketplace views attach it dynamically (see StampListings.tsx).
+  // Dispenser data isn't part of the base StampRow type — only the stamp
+  // detail page (routes/stamp/[id].tsx) attaches a real one server-side.
+  // Marketplace/listing responses only carry aggregated market data, so
+  // this is typically undefined there and handleBuyClick fetches it on
+  // demand instead (see fetchLowestPriceOpenDispenser).
   const lowestPriceDispenser = (stamp as any).lowestPriceDispenser;
 
-  const handleBuyClick = () => {
-    if (!lowestPriceDispenser) return;
+  // Whether the stamp actually has a dispenser open to buy from right now.
+  // Gates every price display AND the BUY button/CTA — deliberately never
+  // falls back to recentSalePriceBTC (marketData's valuation fallback, used
+  // e.g. for wallet portfolio value in lib/hooks/useBTCValue.ts), since a
+  // stamp merely having sold once in the past doesn't mean there's anything
+  // to buy today.
+  const isListed = Boolean(lowestPriceDispenser) ||
+    ((stamp as any).marketData?.openDispensersCount ?? 0) > 0;
 
+  const openBuyModal = (dispenser: unknown) => {
     // Opening BuyStampModal here also handles the "wallet not connected"
     // case for us: it internally opens the Connect Wallet modal and
     // re-opens this Buy modal once a wallet is connected.
@@ -643,10 +680,30 @@ export function StampCard({
         stamp={stamp as StampRow}
         fee={fee}
         handleChangeFee={setFee}
-        dispenser={lowestPriceDispenser}
+        dispenser={dispenser}
       />,
       "slideUpDown",
     );
+  };
+
+  const handleBuyClick = async () => {
+    if (lowestPriceDispenser) {
+      openBuyModal(lowestPriceDispenser);
+      return;
+    }
+
+    if (isFetchingDispenser || !stamp.cpid) return;
+    setIsFetchingDispenser(true);
+    try {
+      const dispenser = await fetchLowestPriceOpenDispenser(stamp.cpid);
+      if (!dispenser) {
+        showToast("This stamp is no longer listed for sale.", "info");
+        return;
+      }
+      openBuyModal(dispenser);
+    } finally {
+      setIsFetchingDispenser(false);
+    }
   };
 
   /* ===== RENDER: HORIZONTAL LISTING VARIANT ===== */
@@ -855,14 +912,16 @@ export function StampCard({
                 variant="flat"
                 color="primary"
                 size="xsR"
-                class="rounded-xl shrink-0"
+                class={`rounded-xl shrink-0 ${
+                  isFetchingDispenser ? "!opacity-60 !cursor-wait" : ""
+                }`}
                 onClick={(e: MouseEvent) => {
                   e.preventDefault();
                   e.stopPropagation();
                   handleBuyClick();
                 }}
               >
-                BUY
+                {isFetchingDispenser ? "..." : "BUY"}
               </Button>
             </div>
           )}
@@ -1185,7 +1244,7 @@ export function StampCard({
                       />
                     )}
                     <div class="font-normal text-xs text-color-neutral-500 text-nowrap">
-                      {stamp.floorPriceUSD?.toLocaleString("en-US", {
+                      {displayPriceUSD()?.toLocaleString("en-US", {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       })} USD
@@ -1200,14 +1259,16 @@ export function StampCard({
                     variant="flat"
                     color="primary"
                     size="xs"
-                    class="w-full rounded-xl"
+                    class={`w-full rounded-xl ${
+                      isFetchingDispenser ? "!opacity-60 !cursor-wait" : ""
+                    }`}
                     onClick={(e: MouseEvent) => {
                       e.preventDefault();
                       e.stopPropagation();
                       handleBuyClick();
                     }}
                   >
-                    BUY
+                    {isFetchingDispenser ? "..." : "BUY"}
                   </Button>
                 </div>
               </>
@@ -1318,7 +1379,7 @@ export function StampCard({
                   class={`flex flex-col items-end w-full mt-2 px-2.5 py-1 ${container3} cursor-pointer`}
                 >
                   <div class="font-normal text-xs text-color-neutral-500 text-nowrap">
-                    {stamp.floorPriceUSD?.toLocaleString("en-US", {
+                    {displayPriceUSD()?.toLocaleString("en-US", {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
                     })} USD
@@ -1350,7 +1411,7 @@ export function StampCard({
                             )}
                           </a>
                         )
-                        : "N/A"}
+                        : <span class="text-color-neutral-500">N/A</span>}
                     </div>
                   </div>
                 </div>

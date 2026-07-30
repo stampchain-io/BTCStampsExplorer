@@ -15,6 +15,7 @@ import {
   container2,
   shadowGlowPurple,
 } from "$layout";
+import { fetchLowestPriceOpenDispenser } from "$lib/utils/api/dispensers/fetchLowestPriceDispenser.ts";
 import {
   isBrowser,
   safeNavigate,
@@ -25,6 +26,7 @@ import {
   formatSupply,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
+import { showToast } from "$lib/utils/ui/notifications/toastSignal.ts";
 import { cardRowStampNumber, labelXxs, textXs, valueDarkSm } from "$text";
 import type { StampRow } from "$types/stamp.d.ts";
 import { useState } from "preact/hooks";
@@ -44,11 +46,6 @@ const HEADERS = [
 ];
 
 /* ===== HELPERS ===== */
-function formatPrice(floorPrice: number | "priceless" | undefined): string {
-  if (!floorPrice || floorPrice === "priceless") return "PRICELESS";
-  return formatBTCAmount(floorPrice, { includeSymbol: true, decimals: 8 });
-}
-
 function getDispenser(stamp: StampRow): {
   txHash: string | null;
   source: string | null;
@@ -93,10 +90,22 @@ export function StampListingsRow({ stamp }: StampListingsRowProps) {
   // URL that can't render inside an <img> — track load failure so we swap
   // to the placeholder icon instead of leaving a broken-image icon.
   const [imageFailed, setImageFailed] = useState(false);
+  // Marketplace/listing responses don't attach a real dispenser to buy from
+  // (only aggregated market data) — tracks the on-demand fetch triggered by
+  // clicking BUY when dispenser.raw is missing. See handleBuyClick below.
+  const [isFetchingDispenser, setIsFetchingDispenser] = useState(false);
 
   const creatorDisplay = stamp.creator_name
     ? stamp.creator_name
     : abbreviateAddress(stamp.creator, 5);
+
+  const floorPrice = (stamp as unknown as {
+    marketData?: { floorPriceBTC: number | null };
+  }).marketData?.floorPriceBTC;
+
+  const priceDisplay = floorPrice != null
+    ? formatBTCAmount(floorPrice, { includeSymbol: true, decimals: 8 })
+    : null;
 
   const listedDisplay = dispenser.giveRemaining != null
     ? `${dispenser.giveRemaining.toLocaleString()}/${
@@ -107,21 +116,48 @@ export function StampListingsRow({ stamp }: StampListingsRowProps) {
   // Opens the Buy modal instead of navigating to the stamp detail page.
   // BuyStampModal handles the "wallet not connected" flow internally
   // (opens Connect Wallet, then re-opens this modal once connected).
-  // Falls back to the button's default link navigation if dispenser data
-  // is unexpectedly missing.
-  const handleBuyClick = (e: MouseEvent) => {
-    if (!dispenser.raw) return;
+  // Marketplace/listing responses don't attach a real dispenser
+  // (dispenser.raw), so this fetches the live one on demand — falling back
+  // to the button's default link navigation only if the stamp truly has no
+  // open dispenser left (e.g. it sold out after the page loaded).
+  const handleBuyClick = async (e: MouseEvent) => {
+    if (dispenser.raw) {
+      e.preventDefault();
+      e.stopPropagation();
+      openModal(
+        <BuyStampModal
+          stamp={stamp}
+          fee={fee}
+          handleChangeFee={setFee}
+          dispenser={dispenser.raw}
+        />,
+        "slideUpDown",
+      );
+      return;
+    }
+
+    if (isFetchingDispenser || !stamp.cpid) return;
     e.preventDefault();
     e.stopPropagation();
-    openModal(
-      <BuyStampModal
-        stamp={stamp}
-        fee={fee}
-        handleChangeFee={setFee}
-        dispenser={dispenser.raw}
-      />,
-      "slideUpDown",
-    );
+    setIsFetchingDispenser(true);
+    try {
+      const liveDispenser = await fetchLowestPriceOpenDispenser(stamp.cpid);
+      if (!liveDispenser) {
+        showToast("This stamp is no longer listed for sale.", "info");
+        return;
+      }
+      openModal(
+        <BuyStampModal
+          stamp={stamp}
+          fee={fee}
+          handleChangeFee={setFee}
+          dispenser={liveDispenser}
+        />,
+        "slideUpDown",
+      );
+    } finally {
+      setIsFetchingDispenser(false);
+    }
   };
 
   /* ===== RENDER ===== */
@@ -218,7 +254,7 @@ export function StampListingsRow({ stamp }: StampListingsRowProps) {
       <td
         class={`${cellCenterL2Card} text-color-secondary-400`}
       >
-        {formatPrice(stamp.floorPrice)}
+        {priceDisplay ?? <span class="text-color-neutral-500">N/A</span>}
       </td>
 
       {/* ACTIVITY */}
@@ -280,10 +316,12 @@ export function StampListingsRow({ stamp }: StampListingsRowProps) {
           size="xxs"
           href={href}
           target="_top"
-          class="rounded-xl"
+          class={`rounded-xl ${
+            isFetchingDispenser ? "!opacity-60 !cursor-wait" : ""
+          }`}
           onClick={handleBuyClick}
         >
-          BUY
+          {isFetchingDispenser ? "..." : "BUY"}
         </Button>
       </td>
     </tr>
