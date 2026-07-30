@@ -67,7 +67,7 @@ export function MaraServiceUnavailableModal({
           <Icon
             type="iconButton"
             name="close"
-            size="lgR"
+            size="mdR"
             weight="bold"
             color="greyLight"
             ariaLabel="Close"
