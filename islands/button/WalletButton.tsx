@@ -230,7 +230,7 @@ export const WalletButton = (
           <div class="flex flex-row-reverse justify-end items-center gap-3">
             <div
               ref={copyButtonRef}
-              class="relative peer"
+              class="relative peer translate-y-0.5"
               onMouseEnter={handleCopyMouseEnter}
               onMouseLeave={handleCopyMouseLeave}
             >
@@ -240,7 +240,6 @@ export const WalletButton = (
                 weight="normal"
                 size="xxs"
                 color="grey"
-                className="mb-0.5"
                 onClick={copy}
               />
               <div
@@ -341,7 +340,7 @@ export const WalletButton = (
             <div class="flex flex-row-reverse justify-start items-center gap-3">
               <div
                 ref={copyButtonRef}
-                class="relative peer"
+                class="relative peer translate-y-0.5"
                 onMouseEnter={handleCopyMouseEnter}
                 onMouseLeave={handleCopyMouseLeave}
               >
@@ -351,7 +350,6 @@ export const WalletButton = (
                   weight="normal"
                   size="xs"
                   color="grey"
-                  className="mb-0.5"
                   onClick={copy}
                 />
                 <div
@@ -372,7 +370,7 @@ export const WalletButton = (
               <h6
                 class={`${valueDarkSm} transition-colors duration-200 peer-hover:text-color-hover`}
               >
-                {abbreviateAddress(address, 11)}
+                {abbreviateAddress(address, 9)}
               </h6>
             </div>
             <div class="flex justify-between items-end flex-1">

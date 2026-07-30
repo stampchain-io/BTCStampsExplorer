@@ -95,14 +95,14 @@ export function ModalBase({
         {!hideHeader && (
           <>
             <div
-              class="absolute -top-[18px] -right-[18px] ms-auto cursor-pointer"
+              class="absolute -top-[16px] -right-[16px] ms-auto cursor-pointer"
               onMouseEnter={handleCloseMouseEnter}
               onMouseLeave={handleCloseMouseLeave}
             >
               <Icon
                 type="iconButton"
                 name="close"
-                size="lgR"
+                size="mdR"
                 weight="bold"
                 color="greyLight"
                 ariaLabel="Close modal"
@@ -118,7 +118,7 @@ export function ModalBase({
             </div>
 
             <div class="w-full text-center">
-              <h2 class={`${titlePrimary} pb-5`}>
+              <h2 class={`${titlePrimary} pt-3 pb-5`}>
                 {title}
               </h2>
             </div>
