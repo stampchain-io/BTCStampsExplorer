@@ -418,7 +418,7 @@ export function Header() {
       <div
         ref={drawerContent === type ? drawerRef : null}
         class={`flex tablet:hidden flex-col justify-between
-          fixed top-0 right-0 left-auto w-full min-[420px]:w-[340px] h-[100dvh] z-modal
+          fixed top-0 right-0 left-auto w-full min-[420px]:w-[320px] h-[100dvh] z-modal
           min-[420px]:rounded-l-3xl min-[420px]:border-l-[1px]
           min-[420px]:border-l-color-border/75 min-[420px]:shadow-[-12px_0_12px_-6px_rgba(8,7,8,0.75)]
           ${container0} ${transitionTransform} transition-transform will-change-transform
