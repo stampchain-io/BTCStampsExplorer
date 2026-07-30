@@ -1477,7 +1477,9 @@ export class StampRepository {
         smd.volume_24h_btc,
         smd.volume_7d_btc,
         smd.holder_count,
-        smd.data_quality_score
+        smd.data_quality_score,
+        smd.activity_level,
+        smd.last_activity_time
         ` : ''}
       FROM ${STAMP_TABLE} s
       INNER JOIN stamp_sales_history ssh ON s.cpid = ssh.cpid
@@ -1547,7 +1549,9 @@ export class StampRepository {
                 lastPriceUpdate: row.sale_time ? new Date(row.sale_time * 1000) : null, // Convert unix timestamp
                 dataQualityScore: row.data_quality_score || 0,
                 minutesSinceSale: row.sale_time ? Math.floor((Date.now() - (row.sale_time * 1000)) / 60000) : 0,
-                lastSaleQuantity: row.quantity ? parseInt(row.quantity) : 1 // Quantity sold in transaction
+                lastSaleQuantity: row.quantity ? parseInt(row.quantity) : 1, // Quantity sold in transaction
+                activityLevel: row.activity_level || null,
+                lastActivityTime: row.last_activity_time || null
               },
               sale_data: {
                 btc_amount: row.btc_amount ? parseFloat(row.btc_amount) : 0,

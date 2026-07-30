@@ -227,6 +227,11 @@ export const handler: Handlers = {
                     dispenser_tx_hash: sale.dispenser_tx_hash,
                     time_ago: sale.time_ago,
                     dispense_quantity: sale.dispense_quantity,
+                    // USD sale price — also flat (see StampCard's
+                    // displayPriceUSD), so it must be carried through here
+                    // too or the USD price silently disappears.
+                    usd_price: sale.usd_price,
+                    lastSalePriceUSD: sale.lastSalePriceUSD,
                   };
                 }),
                 pagination: {

@@ -409,16 +409,26 @@ export class StampService {
       const marketData = stamp.marketData;
       if (!marketData) return null;
 
+      // StampRepository.getRecentlyActiveSold returns the actual per-sale
+      // transaction details (buyer/seller address, tx hash, block index)
+      // under `sale_data` — sourced from stamp_sales_history — not nested
+      // under `marketData`. `marketData.lastSale*` fields referenced below
+      // don't exist on this query's shape, so reading them here always
+      // produced null (this is why buyer/dispenser address never rendered).
+      const saleData = stamp.sale_data || {};
+
       // Calculate time ago
-      const saleTime = new Date(marketData.lastPriceUpdate);
-      const timeAgo = this.getTimeAgo(saleTime);
+      const saleTime = saleData.sale_time
+        ? new Date(saleData.sale_time * 1000)
+        : new Date(marketData.lastPriceUpdate);
+      const timeAgo = saleData.time_ago || this.getTimeAgo(saleTime);
 
       // Use enhanced transaction detail fields if available, fall back to existing data
-      const btcAmount = marketData.lastSaleBtcAmount || marketData.recentSalePriceBTC || 0;
-      const txHash = marketData.lastSaleTxHash || stamp.tx_hash;
-      const blockIndex = marketData.lastSaleBlockIndex || stamp.block_index;
-      const buyerAddress = marketData.lastSaleBuyerAddress || null;
-      const dispenserAddress = marketData.lastSaleDispenserAddress || null;
+      const btcAmount = saleData.btc_amount || marketData.recentSalePriceBTC || 0;
+      const txHash = saleData.tx_hash || stamp.tx_hash;
+      const blockIndex = saleData.block_index || stamp.block_index;
+      const buyerAddress = saleData.buyer_address || null;
+      const dispenserAddress = saleData.seller_address || null;
 
       // Return EnhancedStampSale format (schema-compliant)
       return {
@@ -439,7 +449,7 @@ export class StampService {
         dispenser_address: dispenserAddress, // v2.2 compatibility
 
         // Dispenser info
-        dispenser_tx_hash: marketData.lastSaleDispenserTxHash || null,
+        dispenser_tx_hash: saleData.dispenser_tx_hash || null,
         dispense_quantity: marketData.lastSaleQuantity || 1, // Use actual quantity from sales history
 
         // Price info
@@ -477,7 +487,9 @@ export class StampService {
         creator: stamp.creator,
         creator_name: stamp.creator_name,
 
-        // Activity tracking
+        // Activity tracking (now sourced from stamp_market_data via the
+        // smd.activity_level / smd.last_activity_time columns added to
+        // getRecentlyActiveSold's query)
         activity_level: marketData.activityLevel || null,
         last_activity_time: marketData.lastActivityTime || null,
       };

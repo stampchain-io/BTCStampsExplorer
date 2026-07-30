@@ -173,24 +173,26 @@ const _stampBases = [
   {
     ...DATA_PLACEHOLDER_DEV_STAMP_CLASSIC,
     floorPrice: 0.00042,
-    floorPriceUSD: 0.00042 * _BTC_PRICE_USD,
     marketData: { floorPriceBTC: 0.00042, recentSalePriceBTC: null },
+    // v2.3 API shape: StampCard reads USD prices from `market_data`
+    // (snake_case) — there is no root-level fallback anymore.
+    market_data: { floor_price_usd: 0.00042 * _BTC_PRICE_USD },
     lowestPriceDispenser: DATA_PLACEHOLDER_DEV_STAMP_CLASSIC_DISPENSER,
   },
   DATA_PLACEHOLDER_DEV_STAMP_POSH,
   {
     ...DATA_PLACEHOLDER_DEV_STAMP_POSH,
     floorPrice: 0.0069,
-    floorPriceUSD: 0.0069 * _BTC_PRICE_USD,
     marketData: { floorPriceBTC: 0.0069, recentSalePriceBTC: null },
+    market_data: { floor_price_usd: 0.0069 * _BTC_PRICE_USD },
     lowestPriceDispenser: DATA_PLACEHOLDER_DEV_STAMP_POSH_DISPENSER,
   },
   DATA_PLACEHOLDER_DEV_STAMP_SRC721,
   {
     ...DATA_PLACEHOLDER_DEV_STAMP_SRC721,
     floorPrice: 0.000021,
-    floorPriceUSD: 0.000021 * _BTC_PRICE_USD,
     marketData: { floorPriceBTC: 0.000021, recentSalePriceBTC: null },
+    market_data: { floor_price_usd: 0.000021 * _BTC_PRICE_USD },
     lowestPriceDispenser: DATA_PLACEHOLDER_DEV_STAMP_SRC721_DISPENSER,
   },
 ];
@@ -206,10 +208,15 @@ export function withDummyListingsData<T extends Record<string, any>>(
       ? {
         ...s,
         floorPrice: dispenser.satoshirate / 100000000,
-        floorPriceUSD: (dispenser.satoshirate / 100000000) * _BTC_PRICE_USD,
         marketData: {
           floorPriceBTC: dispenser.satoshirate / 100000000,
           recentSalePriceBTC: null,
+        },
+        // v2.3 API shape: StampCard reads USD prices from `market_data`
+        // (snake_case) — there is no root-level fallback anymore.
+        market_data: {
+          floor_price_usd: (dispenser.satoshirate / 100000000) *
+            _BTC_PRICE_USD,
         },
         lowestPriceDispenser: dispenser,
       }
@@ -222,20 +229,30 @@ export function withDummySalesData<T extends Record<string, any>>(
   stamps: T[],
 ): T[] {
   const BTC_AMOUNT = 0.00069;
-  return stamps.map((s) => ({
-    ...s,
-    floorPriceUSD: (s as any).floorPriceUSD ?? BTC_AMOUNT * _BTC_PRICE_USD,
-    sale_data: (s as any).sale_data ?? {
-      btc_amount: BTC_AMOUNT,
-      block_index: 958500,
-      tx_hash: (s as any).tx_hash,
-      dispenser_address: (s as any).creator,
-      buyer_address: "1A1zP1eP5QGefi2DMPTfTL5SLmv7Divf0Na",
-      sale_time: Math.floor((Date.now() - 4 * 3_600_000) / 1000), // 4 hours ago
-      time_ago: "2h ago",
-      dispense_quantity: 1,
-    },
-  }));
+  return stamps.map((s) => {
+    const btcAmount = (s as any).sale_data?.btc_amount ?? BTC_AMOUNT;
+    return {
+      ...s,
+      // v2.3 API shape: StampCard's sale card reads the USD sale price from
+      // `market_data.recent_sale_price_usd` (snake_case) — there is no
+      // root-level fallback anymore.
+      market_data: {
+        ...(s as any).market_data,
+        recent_sale_price_usd: (s as any).market_data
+          ?.recent_sale_price_usd ?? btcAmount * _BTC_PRICE_USD,
+      },
+      sale_data: (s as any).sale_data ?? {
+        btc_amount: BTC_AMOUNT,
+        block_index: 958500,
+        tx_hash: (s as any).tx_hash,
+        dispenser_address: (s as any).creator,
+        buyer_address: "1A1zP1eP5QGefi2DMPTfTL5SLmv7Divf0Na",
+        sale_time: Math.floor((Date.now() - 4 * 3_600_000) / 1000), // 4 hours ago
+        time_ago: "2h ago",
+        dispense_quantity: 1,
+      },
+    };
+  });
 }
 
 /* ===== HELPER: add cycling activity levels to any stamp array ===== */
@@ -729,6 +746,10 @@ export const DATA_PLACEHOLDER_DEV_RECENT_SALES = _timeLabels.map(
       ...stamp,
       activity_level: _ACTIVITY_CYCLE[i % _ACTIVITY_CYCLE.length],
       last_activity_time: Date.now() - i * 3_600_000,
+      // v2.3 API shape: StampCard's sale card reads the USD sale price from
+      // `market_data.recent_sale_price_usd` (snake_case) — there is no
+      // root-level fallback anymore.
+      market_data: { recent_sale_price_usd: price * _BTC_PRICE_USD },
       sale_data: {
         btc_amount: price,
         btc_amount_satoshis: sats,
@@ -975,7 +996,7 @@ export const DATA_PLACEHOLDER_DEV_STAMP_DETAIL_PAGE_CLASSIC = {
   stamp: {
     ...DATA_PLACEHOLDER_DEV_STAMP_CLASSIC,
     floorPrice: 0.00042,
-    floorPriceUSD: 0.00042 * _BTC_PRICE_USD,
+    market_data: { floor_price_usd: 0.00042 * _BTC_PRICE_USD },
     activity_level: "HOT" as const,
   },
   total: 1,
@@ -1002,12 +1023,11 @@ export const DATA_PLACEHOLDER_DEV_STAMP_DETAIL_PAGE_POSH = {
   stamp: {
     ...DATA_PLACEHOLDER_DEV_STAMP_POSH,
     floorPrice: 0.0069,
-    floorPriceUSD: 0.0069 * _BTC_PRICE_USD,
     marketData: {
       floorPriceBTC: 0.0069,
-      floorPriceUSD: 0.0069 * _BTC_PRICE_USD,
       recentSalePriceBTC: null,
     },
+    market_data: { floor_price_usd: 0.0069 * _BTC_PRICE_USD },
     activity_level: "HOT" as const,
   },
   total: 1,
