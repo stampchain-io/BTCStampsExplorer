@@ -1,7 +1,5 @@
 /* ===== STAMP INFO COMPONENT ===== */
-/*@baba-750+764+815+icons - refactor to StatItems */
 import { Button } from "$button";
-import { ActivityLevelIndicator } from "$components/indicators/ActivityLevelIndicator.tsx";
 import { Icon } from "$icon";
 import BuyStampModal from "$islands/modal/BuyStampModal.tsx";
 import { openModal } from "$islands/modal/states.ts";
@@ -13,6 +11,8 @@ import {
   containerColData,
   containerGap,
   containerPill,
+  StatItem,
+  StatPrice,
 } from "$layout";
 import type { Src101Detail } from "$lib/types/src101.d.ts";
 import type { StampRow } from "$lib/types/stamp.d.ts";
@@ -30,7 +30,6 @@ import {
 import { tooltipIcon } from "$notification";
 import { Dispenser, StampListingsOpenTable } from "$table";
 import {
-  cardPrice,
   cardSupply,
   labelXs,
   titlePrimary,
@@ -800,32 +799,24 @@ export function StampInfo(
                   <div
                     className={`flex flex-col items-end w-fit px-3 py-2.5 ${container3}`}
                   >
-                    <div className="flex justify-between items-center w-full gap-3">
-                      {activityLevel && (
-                        <ActivityLevelIndicator
-                          level={activityLevel}
-                          className="!cursor-default"
-                        />
-                      )}
-                      {displayPriceUSD != null && (
-                        <div className="font-normal text-xs text-color-neutral-500 text-nowrap">
-                          {displayPriceUSD.toLocaleString("en-US", {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          })} USD
-                        </div>
-                      )}
-                    </div>
-                    <div className={`${cardPrice} !text-sm`}>
-                      {formatBTCAmount(
+                    <StatPrice
+                      priceBTC={formatBTCAmount(
                         typeof displayPrice === "number" ? displayPrice : 0,
                         {
                           excludeSuffix: true,
                           decimals: 8,
                           stripZeros: false,
                         },
-                      )} <span className="font-light">BTC</span>
-                    </div>
+                      )}
+                      priceUSD={displayPriceUSD != null
+                        ? displayPriceUSD.toLocaleString("en-US", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })
+                        : null}
+                      activityLevel={activityLevel}
+                      align="right"
+                    />
                   </div>
                 </div>
 
@@ -879,48 +870,45 @@ export function StampInfo(
           )}
 
           <div className="flex flex-row">
-            <div className={`${containerColData} flex-1 items-start`}>
-              <h6 className={labelXs}>TYPE</h6>
-              <h6 className={valueSm}>
-                {isSrc20Stamp()
-                  ? "SRC-20"
-                  : isSrc101Stamp()
-                  ? "SRC-101"
-                  : fileExtension === "BMN"
-                  ? "BMN"
-                  : formatFileType(stamp.stamp_mimetype)}
-              </h6>
-            </div>
-            <div className={`${containerColData} flex-1 items-center`}>
-              <h6 className={labelXs}>
-                {(isSrc20Stamp() || isSrc101Stamp())
-                  ? "TRANSACTION"
-                  : isMediaFile
-                  ? "DURATION"
-                  : "DIMENSIONS"}
-              </h6>
-              <h6 className={valueSm}>
-                {isSrc20Stamp()
-                  ? stamp.stamp_base64 &&
-                      JSON.parse(atob(stamp.stamp_base64))?.op === "DEPLOY"
-                    ? "DEPLOY"
-                    : stamp.stamp_base64 &&
-                        JSON.parse(atob(stamp.stamp_base64))?.op === "MINT"
-                    ? "MINT"
-                    : "TRANSFER"
-                  : isMediaFile
-                  ? (mediaDuration ? formatDuration(mediaDuration) : "-")
-                  : isSrc101Stamp()
-                  ? stamp.stamp_base64 &&
-                      JSON.parse(atob(stamp.stamp_base64))?.op === "DEPLOY"
-                    ? "SALE"
-                    : stamp.stamp_base64 &&
-                        JSON.parse(atob(stamp.stamp_base64))?.op === "MINT"
-                    ? "REGISTER"
-                    : "TRANSFER"
-                  : getDimensionsDisplay(imageDimensions)}
-              </h6>
-            </div>
+            <StatItem
+              label="TYPE"
+              value={isSrc20Stamp()
+                ? "SRC-20"
+                : isSrc101Stamp()
+                ? "SRC-101"
+                : fileExtension === "BMN"
+                ? "BMN"
+                : formatFileType(stamp.stamp_mimetype)}
+              class="flex-1"
+            />
+            <StatItem
+              label={(isSrc20Stamp() || isSrc101Stamp())
+                ? "TRANSACTION"
+                : isMediaFile
+                ? "DURATION"
+                : "DIMENSIONS"}
+              value={isSrc20Stamp()
+                ? stamp.stamp_base64 &&
+                    JSON.parse(atob(stamp.stamp_base64))?.op === "DEPLOY"
+                  ? "DEPLOY"
+                  : stamp.stamp_base64 &&
+                      JSON.parse(atob(stamp.stamp_base64))?.op === "MINT"
+                  ? "MINT"
+                  : "TRANSFER"
+                : isMediaFile
+                ? (mediaDuration ? formatDuration(mediaDuration) : "-")
+                : isSrc101Stamp()
+                ? stamp.stamp_base64 &&
+                    JSON.parse(atob(stamp.stamp_base64))?.op === "DEPLOY"
+                  ? "SALE"
+                  : stamp.stamp_base64 &&
+                      JSON.parse(atob(stamp.stamp_base64))?.op === "MINT"
+                  ? "REGISTER"
+                  : "TRANSFER"
+                : getDimensionsDisplay(imageDimensions)}
+              align="center"
+              class="flex-1"
+            />
             <div className="flex flex-1 justify-end items-end pb-1 space-x-[9px]">
               {stamp.ident === "SRC-721" && (
                 <div
@@ -1042,25 +1030,22 @@ export function StampInfo(
           </div>
 
           <div className="flex flex-row pt-3">
-            <div className={`${containerColData} flex-1 items-start`}>
-              <h6 className={labelXs}>SIZE</h6>
-              <h6 className={valueSm}>
-                {stamp.file_size_bytes !== null
-                  ? formatFileSize(
-                    stamp.file_size_bytes,
-                    stamp.stamp_mimetype === "text/plain",
-                  )
-                  : "N/A"}
-              </h6>
-            </div>
-            <div className={`${containerColData} flex-1 items-center`}>
-              <h6 className={labelXs}>
-                {isSrc20Stamp() ? "SENT" : "CREATED"}
-              </h6>
-              <h6 className={valueSm}>
-                {createdDate}
-              </h6>
-            </div>
+            <StatItem
+              label="SIZE"
+              value={stamp.file_size_bytes !== null
+                ? formatFileSize(
+                  stamp.file_size_bytes,
+                  stamp.stamp_mimetype === "text/plain",
+                )
+                : "N/A"}
+              class="flex-1"
+            />
+            <StatItem
+              label={isSrc20Stamp() ? "SENT" : "CREATED"}
+              value={createdDate}
+              align="center"
+              class="flex-1"
+            />
             {/* @baba - fix logic handling for no tx hash */}
             <div className={`${containerColData} flex-1 items-end`}>
               <h6 className={labelXs}>TX HASH</h6>

@@ -27,3 +27,6 @@ export * from "$islands/layout/FontLoader.tsx";
 /* ===== MODAL ===== */
 export * from "$components/layout/ModalBase.tsx";
 export * from "$components/layout/ModalSearchBase.tsx";
+
+/* ===== STAT DISPLAY STYLES ===== */
+export * from "$components/layout/StatStyles.tsx";

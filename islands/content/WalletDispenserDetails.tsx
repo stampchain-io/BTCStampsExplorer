@@ -1,11 +1,10 @@
 /* ===== WALLET DISPENSER DETAILS COMPONENT ===== */
 import { Button } from "$button";
-import { StatItem, StatTitle } from "$components/section/WalletComponents.tsx";
 import { StampImage } from "$content";
 import { Icon } from "$icon";
 import BuyStampModal from "$islands/modal/BuyStampModal.tsx";
 import { openModal } from "$islands/modal/states.ts";
-import { containerBackground } from "$layout";
+import { containerBackground, StatItem, StatPrice, StatTitle } from "$layout";
 import type { WalletOverviewInfo } from "$lib/types/wallet.d.ts";
 import {
   abbreviateAddress,
@@ -354,23 +353,15 @@ function DispenserStats({
           }
           align="center"
         />
-        <StatItem
-          label={
-            <>
-              {((firstDispenser.satoshirate || 0) / 100000000 * btcPrice)
-                .toFixed(2)} <span class="font-light">USD</span>
-            </>
-          }
-          value={
-            <>
-              {formatBTCAmount(
-                (firstDispenser.satoshirate || 0) / 100000000,
-                {
-                  excludeSuffix: true,
-                },
-              )} <span class="font-extralight">BTC</span>
-            </>
-          }
+        <StatPrice
+          priceUSD={((firstDispenser.satoshirate || 0) / 100000000 * btcPrice)
+            .toFixed(2)}
+          priceBTC={formatBTCAmount(
+            (firstDispenser.satoshirate || 0) / 100000000,
+            {
+              excludeSuffix: true,
+            },
+          )}
           align="right"
         />
       </div>

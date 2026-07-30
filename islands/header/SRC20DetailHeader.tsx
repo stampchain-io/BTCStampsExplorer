@@ -1,7 +1,12 @@
 /* ===== SRC20 DETAIL HEADER COMPONENT ===== */
-import { StatItem, StatTitle } from "$components/section/WalletComponents.tsx";
 import { Icon } from "$icon";
-import { body, containerBackground, containerGap } from "$layout";
+import {
+  body,
+  containerBackground,
+  containerGap,
+  StatItem,
+  StatTitle,
+} from "$layout";
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import {
   abbreviateAddress,

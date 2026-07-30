@@ -214,7 +214,7 @@ export type LayoutStyles = {
 };
 
 /* ===== ALIGNMENT UTILITIES ===== */
-// Used in WalletComponents.tsx
+// Used in StatStyles.tsx
 export const alignmentClasses = {
   left: "text-left",
   center: "text-center",
