@@ -1,7 +1,14 @@
 /* ===== WALLET PROFILE DETAILS COMPONENT ===== */
-import { StatItem, StatTitle } from "$components/section/WalletComponents.tsx";
+import { walletContext } from "$client/wallet/wallet.ts";
 import { Icon } from "$icon";
-import { containerBackground, containerGap } from "$layout";
+import EditCreatorNameModal from "$islands/modal/EditCreatorNameModal.tsx";
+import { openModal } from "$islands/modal/states.ts";
+import {
+  containerBackground,
+  containerGap,
+  StatItem,
+  StatPrice,
+} from "$layout";
 import type { WalletOverviewInfo } from "$lib/types/wallet.d.ts";
 import {
   abbreviateAddress,
@@ -9,12 +16,9 @@ import {
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { showToast } from "$lib/utils/ui/notifications/toastSignal.ts";
 import { tooltipIcon } from "$notification";
-import { label, subtitleNeutral, titleNeutral, valueSm } from "$text";
+import { label, subtitlePrimary, titlePrimary, valueSm } from "$text";
 import type { WalletProfileDetailsProps } from "$types/ui.d.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
-import EditCreatorNameModal from "$islands/modal/EditCreatorNameModal.tsx";
-import { openModal } from "$islands/modal/states.ts";
-import { walletContext } from "$client/wallet/wallet.ts";
 
 /* ===== TYPES ===== */
 
@@ -25,7 +29,7 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
   const [isTooltipVisible, setIsTooltipVisible] = useState(false);
   const [allowTooltip, setAllowTooltip] = useState(true);
   const [displayName, setDisplayName] = useState(
-    walletData.creatorName || walletData.address,
+    walletData.creatorName || "ANONYMOUS",
   );
 
   /* ===== WALLET CONTEXT ===== */
@@ -123,38 +127,38 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
   /* ===== RENDER ===== */
   return (
     <div class="flex flex-col w-full">
-      <h1 class={titleNeutral}>WALLET</h1>
-      <div class="flex items-center gap-2">
-        <h2 class={`${subtitleNeutral} tracking-wider`}>
+      <h1 class={titlePrimary}>WALLET</h1>
+      <div class="flex items-center mb-3 gap-3">
+        <h2 class={`${subtitlePrimary} truncate max-w-[97%]`}>
           {displayName}
         </h2>
         {isOwner && (
-          <Icon
-            type="icon"
-            name="edit"
-            weight="normal"
-            size="smR"
-            color="greyDark"
-            className="cursor-pointer hover:stroke-color-grey-light transition-colors duration-200"
-            onClick={handleEditClick}
-            ariaLabel="Edit creator name"
-          />
+          <div class="-translate-y-1">
+            <Icon
+              type="iconButton"
+              name="edit"
+              weight="bold"
+              size="xsR"
+              color="grey"
+              onClick={handleEditClick}
+              ariaLabel="Edit creator name"
+            />
+          </div>
         )}
       </div>
-      <div class="flex flex-row-reverse justify-end gap-4">
+      <div class="flex flex-row-reverse justify-end gap-3">
         <div
           ref={copyButtonRef}
-          class="relative peer"
+          class="relative peer -translate-y-[3px]"
           onMouseEnter={handleCopyMouseEnter}
           onMouseLeave={handleCopyMouseLeave}
         >
           <Icon
             type="iconButton"
             name="copy"
-            weight="normal"
-            size="smR"
-            color="greyDark"
-            className="mb-1"
+            weight="bold"
+            size="xsR"
+            color="grey"
             onClick={copy}
           />
           <div
@@ -172,17 +176,17 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
         </div>
 
         <h6
-          class={`${label} text-color-grey hidden mobileMd:block mobileLg:hidden tablet:block transition-colors duration-200 peer-hover:text-color-grey-light`}
+          class={`${label} hidden mobileMd:block mobileLg:hidden tablet:block transition-colors duration-200 peer-hover:text-color-hover`}
         >
           {walletData.address}
         </h6>
         <h6
-          class={`${label} text-color-grey hidden mobileLg:block tablet:hidden transition-colors duration-200 peer-hover:text-color-grey-light`}
+          class={`${label} hidden mobileLg:block tablet:hidden transition-colors duration-200 peer-hover:text-color-hover`}
         >
           {abbreviateAddress(walletData.address, 13)}
         </h6>
         <h6
-          class={`${label} text-color-grey block mobileMd:hidden transition-colors duration-200 peer-hover:text-color-grey-light`}
+          class={`${label} block mobileMd:hidden  transition-colors duration-200 peer-hover:text-color-hover`}
         >
           {abbreviateAddress(walletData.address, 12)}
         </h6>
@@ -241,26 +245,16 @@ function TokenStats(
         <Icon
           type="icon"
           name="bitcoins"
-          weight="normal"
-          size="sm"
+          weight="bold"
+          size="xs"
           color="greyDark"
-          className="mb-1.5"
         />
-        <StatTitle
-          label={
-            <>
-              {walletData.usdValue.toFixed(2)}{" "}
-              <span class="font-extralight">USD</span>
-            </>
-          }
-          value={
-            <>
-              {formatBTCAmount(walletData.balance, {
-                includeSymbol: false,
-                stripZeros: true,
-              })} <span class="font-extralight">BTC</span>
-            </>
-          }
+        <StatPrice
+          priceUSD={walletData.usdValue.toFixed(2)}
+          priceBTC={formatBTCAmount(walletData.balance, {
+            includeSymbol: false,
+            stripZeros: true,
+          })}
           align="right"
         />
       </div>
