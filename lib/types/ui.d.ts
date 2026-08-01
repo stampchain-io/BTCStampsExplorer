@@ -2230,6 +2230,30 @@ export interface ExplorerHeaderProps extends BaseComponentProps {
 }
 
 /**
+ * Wallet page — Stamps container sub-tabs
+ */
+export type WalletStampsTab =
+  | "collected"
+  | "stamped"
+  | "listings"
+  | "collections";
+
+/**
+ * Wallet page — Tokens container sub-tabs
+ */
+export type WalletTokensTab = "collected" | "deployed";
+
+export interface WalletStampsHeaderProps extends BaseComponentProps {
+  activeTab?: WalletStampsTab;
+  viewMode?: "cardVertical" | "cardSquare" | "cardRow";
+}
+
+export interface WalletTokensHeaderProps extends BaseComponentProps {
+  activeTab?: WalletTokensTab;
+  viewMode?: "cardVertical" | "cardSquare" | "cardRow";
+}
+
+/**
  * Block component props
  */
 export interface BlockProps extends BaseComponentProps {
@@ -3627,6 +3651,67 @@ export interface WalletContentProps {
   stampsSortBy?: "ASC" | "DESC";
   src20SortBy?: "ASC" | "DESC";
   dispensersSortBy?: "ASC" | "DESC";
+}
+
+/**
+ * Pagination summary shared by the Stamps and Tokens containers on the
+ * wallet page — only the active sub-tab's data/pagination is fetched
+ * server-side and passed down (see routes/wallet/[address].tsx).
+ */
+export interface WalletContainerPagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+/**
+ * WalletProfileContentProps - props for the two-container (Stamps/Tokens)
+ * wallet content island. Replaces the legacy EnhancedWalletContentProps /
+ * advanced-sorting shape.
+ */
+export interface WalletProfileContentProps {
+  address: string;
+  anchor?: string | undefined;
+
+  stampsTab?: WalletStampsTab | undefined;
+  stampsView?: "cardVertical" | "cardSquare" | "cardRow" | undefined;
+  stampsSortBy?: "ASC" | "DESC" | undefined;
+  stampsData?: any[] | undefined;
+  stampsPagination?: WalletContainerPagination | undefined;
+
+  tokensTab?: WalletTokensTab | undefined;
+  tokensView?: "cardVertical" | "cardSquare" | "cardRow" | undefined;
+  tokensSortBy?: "ASC" | "DESC" | undefined;
+  tokensData?: any[] | undefined;
+  tokensPagination?: WalletContainerPagination | undefined;
+}
+
+/**
+ * WalletProfilePageProps - flat props shape rendered by the wallet profile
+ * page's handler (routes/wallet/[address].tsx). Deliberately separate from
+ * the legacy `WalletPageProps` (still used by routes/dashboard/[address].tsx
+ * with its nested `data.data.{stamps,src20,dispensers}` shape) since the two
+ * routes now diverge — this page fetches per-container, per-sub-tab data
+ * instead of always fetching every section.
+ */
+export interface WalletProfilePageProps {
+  address: string;
+  walletData: WalletOverviewInfo;
+  stampsTotal: number;
+  src20Total: number;
+  stampsCreated: number;
+  anchor?: string;
+
+  stampsTab?: WalletStampsTab;
+  stampsView?: "cardVertical" | "cardSquare" | "cardRow";
+  stampsData?: any[];
+  stampsPagination?: WalletContainerPagination;
+
+  tokensTab?: WalletTokensTab;
+  tokensView?: "cardVertical" | "cardSquare" | "cardRow";
+  tokensData?: any[];
+  tokensPagination?: WalletContainerPagination;
 }
 
 /**

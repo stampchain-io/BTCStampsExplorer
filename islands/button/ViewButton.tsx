@@ -12,7 +12,10 @@ type ViewMode = "cardVertical" | "cardSquare" | "cardRow";
 
 /* ===== COMPONENT ===== */
 export function ViewButton(
-  { viewMode }: { viewMode: ViewMode },
+  { viewMode, paramName = "view" }: {
+    viewMode: ViewMode;
+    paramName?: string;
+  },
 ) {
   const [isTooltipVisible, setIsTooltipVisible] = useState(false);
   const [allowTooltip, setAllowTooltip] = useState(true);
@@ -49,10 +52,10 @@ export function ViewButton(
     (mode: ViewMode) => {
       if (typeof globalThis === "undefined" || !globalThis?.location) return;
       const params = new URLSearchParams(globalThis.location.search);
-      params.set("view", mode);
+      params.set(paramName, mode);
       safeNavigate(getCurrentPathname() + `?${params.toString()}`);
     },
-    [],
+    [paramName],
   );
 
   const nextMode: ViewMode = viewMode === "cardVertical"

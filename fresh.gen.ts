@@ -233,6 +233,8 @@ import * as $header_SRC20OverviewHeader from "./islands/header/SRC20OverviewHead
 import * as $header_StampOverviewHeader from "./islands/header/StampOverviewHeader.tsx";
 import * as $header_WalletDashboardHeader from "./islands/header/WalletDashboardHeader.tsx";
 import * as $header_WalletProfileHeader from "./islands/header/WalletProfileHeader.tsx";
+import * as $header_WalletStampsHeader from "./islands/header/WalletStampsHeader.tsx";
+import * as $header_WalletTokensHeader from "./islands/header/WalletTokensHeader.tsx";
 import * as $header_index from "./islands/header/index.ts";
 import * as $layout_AnimationControlsManager from "./islands/layout/AnimationControlsManager.tsx";
 import * as $layout_BackgroundTopology from "./islands/layout/BackgroundTopology.tsx";
@@ -611,6 +613,8 @@ const manifest = {
     "./islands/header/StampOverviewHeader.tsx": $header_StampOverviewHeader,
     "./islands/header/WalletDashboardHeader.tsx": $header_WalletDashboardHeader,
     "./islands/header/WalletProfileHeader.tsx": $header_WalletProfileHeader,
+    "./islands/header/WalletStampsHeader.tsx": $header_WalletStampsHeader,
+    "./islands/header/WalletTokensHeader.tsx": $header_WalletTokensHeader,
     "./islands/header/index.ts": $header_index,
     "./islands/layout/AnimationControlsManager.tsx":
       $layout_AnimationControlsManager,

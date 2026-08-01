@@ -34,6 +34,8 @@ export function SortButton(
     switch (sortParam) {
       case "stampsSortBy":
         return "stamps";
+      case "tokensSortBy":
+        return "tokens";
       case "src20SortBy":
         return "src20";
       case "dispensersSortBy":

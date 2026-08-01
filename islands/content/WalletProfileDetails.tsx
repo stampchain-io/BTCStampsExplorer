@@ -128,7 +128,7 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
   return (
     <div class="flex flex-col w-full">
       <h1 class={titlePrimary}>WALLET</h1>
-      <div class="flex items-center mb-3 gap-3">
+      <div class="flex items-center gap-3">
         <h2 class={`${subtitlePrimary} truncate max-w-[97%]`}>
           {displayName}
         </h2>
