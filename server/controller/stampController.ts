@@ -33,6 +33,7 @@ export class StampController {
     collectionId,
     identifier,
     blockIdentifier,
+    creatorAddress,
     cacheDuration,
     noPagination = false,
     allColumns = false,
@@ -96,6 +97,7 @@ export class StampController {
     allColumns?: boolean;
     identifier?: string | number | (string | number)[];
     blockIdentifier?: string | number;
+    creatorAddress?: string;
     noPagination?: boolean;
     cacheDuration?: number;
     includeSecondary?: boolean;
@@ -302,6 +304,7 @@ export class StampController {
       ...(collectionId !== undefined ? { collectionId } : {}),
       ...(identifier !== undefined ? { identifier } : {}),
       ...(blockIdentifier !== undefined ? { blockIdentifier } : {}),
+      ...(creatorAddress !== undefined ? { creatorAddress } : {}),
       ...(cacheDuration !== undefined ? { cacheDuration } : {}),
       noPagination,
       sortColumn,

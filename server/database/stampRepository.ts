@@ -1554,14 +1554,19 @@ export class StampRepository {
                 lastActivityTime: row.last_activity_time || null
               },
               sale_data: {
-                btc_amount: row.btc_amount ? parseFloat(row.btc_amount) : 0,
+                // `stamp_sales_history.btc_amount` is a BIGINT column storing
+                // satoshis (it matches unit_price_sats for qty=1 sales), not
+                // a decimal BTC value — must divide by 1e8, same as
+                // unit_price_sats above. Not doing this made sale prices
+                // display 100,000,000x too large (e.g. "52500 BTC").
+                btc_amount: row.btc_amount ? parseFloat(row.btc_amount) / 100000000 : 0,
                 block_index: row.sale_block_index || row.block_index,
                 tx_hash: row.sale_tx_hash || row.tx_hash,
                 buyer_address: row.buyer_address,
                 seller_address: row.seller_address,
                 sale_time: row.sale_time ?? null,
                 time_ago: row.sale_time ? this.getTimeAgo(new Date(row.sale_time * 1000)) : null,
-                btc_amount_satoshis: row.btc_amount ? Math.round(parseFloat(row.btc_amount) * 100000000) : null,
+                btc_amount_satoshis: row.btc_amount ? Math.round(parseFloat(row.btc_amount)) : null,
                 dispenser_tx_hash: null
               }
             };
@@ -2193,7 +2198,8 @@ export class StampRepository {
   }
 
   /**
-   * Calculate time ago string from date
+   * Calculate time ago string from date. Sales older than 7 days switch to
+   * an absolute M/D/YYYY date instead of an ever-growing "Nd ago" string.
    */
   private static getTimeAgo(date: Date): string {
     const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
@@ -2201,6 +2207,7 @@ export class StampRepository {
     if (seconds < 60) return `${seconds}s ago`;
     if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
     if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
-    return `${Math.floor(seconds / 86400)}d ago`;
+    if (seconds < 7 * 86400) return `${Math.floor(seconds / 86400)}d ago`;
+    return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
   }
 }

@@ -517,7 +517,8 @@ export class StampService {
   }
 
   /**
-   * Calculate time ago string from date
+   * Calculate time ago string from date. Sales older than 7 days switch to
+   * an absolute M/D/YYYY date instead of an ever-growing "Nd ago" string.
    */
   private static getTimeAgo(date: Date): string {
     const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
@@ -525,7 +526,8 @@ export class StampService {
     if (seconds < 60) return `${seconds}s ago`;
     if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
     if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
-    return `${Math.floor(seconds / 86400)}d ago`;
+    if (seconds < 7 * 86400) return `${Math.floor(seconds / 86400)}d ago`;
+    return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
   }
 
   static async getCreatorNameByAddress(

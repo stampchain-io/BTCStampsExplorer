@@ -1,12 +1,7 @@
 /* ===== MEDIA KIT PAGE ===== */
 import { Button } from "$button";
 import { Icon } from "$icon";
-import {
-  body,
-  containerBackground,
-  containerGap,
-  container2,
-} from "$layout";
+import { body, container2, containerBackground, containerGap } from "$layout";
 import {
   label,
   labelSm,
@@ -233,7 +228,7 @@ export default function PressKit() {
                   weight="bold"
                   size="xxs"
                   color="custom"
-                  className="mb-1 stroke-color-grey-light group-hover:stroke-color-grey transition-colors"
+                  className="stroke-color-grey-light group-hover:stroke-color-grey transition-colors"
                   href="https://fonts.google.com/specimen/Open+Sans"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -342,7 +337,7 @@ export default function PressKit() {
                   weight="bold"
                   size="xxs"
                   color="custom"
-                  className="mb-1 stroke-color-grey-light group-hover:stroke-color-grey transition-colors"
+                  className="stroke-color-grey-light group-hover:stroke-color-grey transition-colors"
                   href="https://fonts.google.com/specimen/Montserrat"
                   target="_blank"
                   rel="noopener noreferrer"
