@@ -912,18 +912,65 @@ class DatabaseManager {
     }
   }
 
-  private generateCacheKey(query: string, params: unknown[]): string {
+  // Pure function of (query, params) — deterministic and side-effect free,
+  // so any process can independently recompute the exact same key that a
+  // different process cached. This is what makes invalidateCacheKey() work
+  // correctly across ECS tasks/deploys, unlike the category registry below
+  // which only tracks keys seen by the *current* process.
+  private computeCacheKeyHash(query: string, params: unknown[]): string {
     const input = `${query}:${JSON.stringify(params)}`;
     const encoder = new TextEncoder();
     const data = encoder.encode(input);
     const hashBuffer = crypto.subtle.digestSync("SHA-256", data);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const cacheKey = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  private generateCacheKey(query: string, params: unknown[]): string {
+    const cacheKey = this.computeCacheKeyHash(query, params);
 
     // Register cache key by category based on query content
     this.registerCacheKey(cacheKey, query);
 
     return cacheKey;
+  }
+
+  /**
+   * Invalidate the single cache entry for a specific (query, params) pair
+   * without relying on the in-process category registry used by
+   * invalidateCacheByCategory(). Since the cache key is a deterministic
+   * hash of the query text + params, any process can recompute the exact
+   * key a *different* process cached and delete it directly — this is the
+   * only reliable way to invalidate a specific read across multiple ECS
+   * tasks or across a deploy (the registry is empty on every process
+   * restart, while Redis entries survive it).
+   *
+   * Callers must pass the exact same query string used for the read (same
+   * whitespace/formatting), since it's part of the hash input.
+   */
+  public async invalidateCacheKey(query: string, params: unknown[]): Promise<void> {
+    const cacheKey = this.computeCacheKeyHash(query, params);
+
+    if (this.#redisAvailable && this.#redisClient) {
+      try {
+        await this.#redisClient.del(cacheKey);
+      } catch (error) {
+        console.error(
+          `[CACHE] Redis direct key invalidation error for key ${cacheKey.substring(0, 12)}...:`,
+          error,
+        );
+      }
+    }
+
+    // Always clear the in-memory cache too (used as fallback when Redis is
+    // unavailable, so a stale entry could otherwise linger there as well).
+    this.removeFromInMemoryCache(cacheKey);
+
+    // Best-effort cleanup of the local registry, in case this process
+    // happens to have this key registered under some category.
+    for (const keys of Object.values(this.#cacheKeyRegistry)) {
+      keys.delete(cacheKey);
+    }
   }
 
   private registerCacheKey(cacheKey: string, query: string): void {

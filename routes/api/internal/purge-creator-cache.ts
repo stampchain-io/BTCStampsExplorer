@@ -3,6 +3,7 @@ import { dbManager } from "$server/database/databaseManager.ts";
 import { WebResponseUtil } from "$lib/utils/api/responses/webResponseUtil.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { InternalRouteGuard } from "$server/services/security/internalRouteGuard.ts";
+import { StampRepository } from "$server/database/stampRepository.ts";
 
 export async function handler(
   req: Request,
@@ -32,11 +33,18 @@ export async function handler(
       },
     );
 
-    // Invalidate all creator cache entries
-    await dbManager.invalidateCacheByCategory("creator");
+    if (address) {
+      // Deterministic direct-key invalidation for this specific address —
+      // recomputes the same cache-key hash the read used, so it reliably
+      // clears the entry regardless of which ECS task originally cached it.
+      await StampRepository.invalidateCreatorNameCache(address);
+    }
 
-    // Also try pattern-based invalidation for backwards compatibility
-    await dbManager.invalidateCacheByPattern("creator_*");
+    // Also clear whatever this process's local category registry knows
+    // about. Note: this only catches keys registered on *this* process —
+    // it's a best-effort supplement, not a substitute for the direct-key
+    // invalidation above when a specific address is provided.
+    await dbManager.invalidateCacheByCategory("creator");
 
     const message = address
       ? `Creator cache purged for address: ${address}`

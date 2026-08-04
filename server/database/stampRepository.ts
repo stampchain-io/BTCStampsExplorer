@@ -1262,19 +1262,28 @@ export class StampRepository {
     return (result as any).rows;
   }
 
+  // Shared verbatim between reads and cache invalidation — the cache key is
+  // a hash of this exact string + params, so the read and the invalidation
+  // call must use an identical query string or the invalidation would
+  // silently target the wrong (non-existent) key.
+  private static readonly CREATOR_NAME_QUERY =
+    "SELECT creator FROM creator WHERE address = ?";
+
+  // Cache duration for creator name reads. Kept short (rather than the
+  // previous 7 days) as a safety net: invalidateCacheKey() below already
+  // deterministically clears the exact cached read on every successful
+  // write, but a short TTL bounds the staleness window for any edge case
+  // where that direct invalidation doesn't run (e.g. a thrown error after
+  // the DB write but before invalidation completes).
+  private static readonly CREATOR_NAME_CACHE_SECONDS = 3600; // 1 hour
+
   static async getCreatorNameByAddress(
     address: string
   ): Promise<string | null> {
-    const query = `
-      SELECT creator
-      FROM creator
-      WHERE address = ?
-    `;
-
     const result = await this.db.executeQueryWithCache(
-      query,
+      this.CREATOR_NAME_QUERY,
       [address],
-      604800 // 1 week cache (7 days), will be invalidated on updates
+      this.CREATOR_NAME_CACHE_SECONDS,
     );
 
     if ((result as any) && (result as any).rows && (result as any).rows.length > 0) {
@@ -1282,6 +1291,17 @@ export class StampRepository {
     }
 
     return null;
+  }
+
+  /**
+   * Invalidate the cached creator-name read for a specific address.
+   * Uses a deterministic direct-key delete (recomputes the same hash the
+   * read used) rather than the process-local category registry, so it
+   * works correctly even when the write and the original cached read
+   * happened on different ECS tasks or across a deploy.
+   */
+  static async invalidateCreatorNameCache(address: string): Promise<void> {
+    await this.db.invalidateCacheKey(this.CREATOR_NAME_QUERY, [address]);
   }
 
   static async updateCreatorName(
@@ -1304,6 +1324,11 @@ export class StampRepository {
       // Invalidate creator cache after successful update
       if ((result as any).affectedRows > 0) {
         console.log(`[CACHE] Invalidating creator cache after update for address: ${address}`);
+        // Deterministic, cross-instance-safe invalidation of this address's
+        // cached read (see invalidateCreatorNameCache doc comment above).
+        await this.invalidateCreatorNameCache(address);
+        // Also clear the process-local category registry as a secondary
+        // measure — cheap, and covers same-process cached variations.
         await this.db.invalidateCacheByCategory('creator');
         return true;
       }

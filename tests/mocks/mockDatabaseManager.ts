@@ -1,21 +1,21 @@
 import { MAX_PAGINATION_LIMIT } from "$constants";
 import blockFixturesData from "../fixtures/blockData.json" with {
-  type: "json",
+  type: "json"
 };
 import collectionFixturesData from "../fixtures/collectionData.json" with {
-  type: "json",
+  type: "json"
 };
 import marketDataFixturesData from "../fixtures/marketData.json" with {
-  type: "json",
+  type: "json"
 };
 import src101FixturesData from "../fixtures/src101Data.json" with {
-  type: "json",
+  type: "json"
 };
 import src20FixturesData from "../fixtures/src20Data.json" with {
-  type: "json",
+  type: "json"
 };
 import stampFixturesData from "../fixtures/stampData.json" with {
-  type: "json",
+  type: "json"
 };
 
 interface QueryResult {
@@ -1503,6 +1503,18 @@ export class MockDatabaseManager {
   async invalidateCacheByCategory(category: string): Promise<void> {
     // Log for test verification if needed
     console.log(`[MOCK] Invalidating cache for category: ${category}`);
+    return Promise.resolve();
+  }
+
+  /**
+   * Mock implementation of invalidateCacheKey
+   * In tests, this just logs the action without doing anything
+   */
+  async invalidateCacheKey(query: string, params: unknown[]): Promise<void> {
+    console.log(
+      `[MOCK] Invalidating cache key for query: ${query.slice(0, 50)}...`,
+      params,
+    );
     return Promise.resolve();
   }
 }

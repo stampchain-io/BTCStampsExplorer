@@ -1109,21 +1109,6 @@ export interface SRC20BackgroundUploadResponse {
 
 // Additional Internal Endpoint Types
 /**
- * Creator name cache response
- * Response from /api/internal/creatorName
- */
-export interface CreatorNameResponse {
-  /** Creator address */
-  address: string;
-  /** Creator display name */
-  name: string;
-  /** Cache timestamp */
-  timestamp: number;
-  /** Cache TTL remaining */
-  ttl?: number;
-}
-
-/**
  * UTXO query response
  * Response from /api/internal/utxoquery
  */

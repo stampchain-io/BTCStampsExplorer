@@ -957,26 +957,6 @@ export class StampController {
     });
   }
 
-  static async getCreatorNameByAddress(address: string): Promise<Response> {
-    try {
-      const name = await StampService.getCreatorNameByAddress(address);
-      return WebResponseUtil.jsonResponse({ name });
-    } catch (error) {
-      console.error("Error in getCreatorNameByAddress:", error);
-      return WebResponseUtil.internalError(error, "Error getting creator name");
-    }
-  }
-
-  static async updateCreatorName(address: string, newName: string): Promise<Response> {
-    try {
-      const success = await StampService.updateCreatorName(address, newName);
-      return WebResponseUtil.jsonResponse({ success });
-    } catch (error) {
-      console.error("Error in updateCreatorName:", error);
-      return WebResponseUtil.internalError(error, "Error updating creator name");
-    }
-  }
-
   static async getDispensersWithStampsByAddress(
     address: string,
     page: number = 1,

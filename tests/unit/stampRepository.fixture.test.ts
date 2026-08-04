@@ -1,15 +1,15 @@
+import { StampRepository } from "$server/database/stampRepository.ts";
+import type { StampRow } from "$types/stamp.d.ts";
 import { assertEquals, assertExists } from "@std/assert";
+import { stub } from "@std/testing@1.0.14/mock";
 import {
   afterEach,
   beforeEach,
   describe,
   it,
 } from "jsr:@std/testing@1.0.14/bdd";
-import { stub } from "@std/testing@1.0.14/mock";
-import { StampRepository } from "$server/database/stampRepository.ts";
 import stampFixtures from "../fixtures/stampData.json" with { type: "json" };
 import { createMockStampRow } from "./utils/testFactories.ts";
-import type { StampRow } from "$types/stamp.d.ts";
 
 // Mock database manager for testing
 class MockDatabaseManager {
@@ -19,6 +19,11 @@ class MockDatabaseManager {
   async invalidateCacheByCategory(category: string): Promise<void> {
     // Mock implementation - just log for testing
     console.log(`[MOCK] Invalidating cache for category: ${category}`);
+    return Promise.resolve();
+  }
+
+  async invalidateCacheKey(_query: string, _params: unknown[]): Promise<void> {
+    // Mock implementation - no-op for testing
     return Promise.resolve();
   }
 }
