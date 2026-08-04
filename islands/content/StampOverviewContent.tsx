@@ -1,7 +1,7 @@
 /* ===== STAMP OVERVIEW CONTENT COMPONENT ===== */
 import { PaginationButtons } from "$button";
 import { StampCard } from "$card";
-import { containerBackground } from "$layout";
+import { containerBackground, gridCard } from "$layout";
 import { valueDark } from "$text";
 import type { StampCardVariant, StampRow } from "$types/stamp.d.ts";
 import type { StampOverviewContentProps } from "$types/ui.d.ts";
@@ -24,7 +24,7 @@ export function StampOverviewContent({
     <div class="w-full pt-3 mobileMd:pt-6">
       {stamps?.length
         ? (
-          <div class="grid grid-cols-2 mobileMd:grid-cols-3 mobileLg:grid-cols-4 tablet:grid-cols-5 desktop:grid-cols-6 gap-3 mobileMd:gap-6 w-full auto-rows-fr">
+          <div class={gridCard(viewMode)}>
             {stamps.map((stamp: StampRow, index: number) => (
               <StampCard
                 key={isRecentSales && stamp.sale_data

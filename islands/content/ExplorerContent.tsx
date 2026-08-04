@@ -6,7 +6,7 @@ import {
   type MixedItem,
 } from "$components/table/explorerTable/ExplorerTableBase.tsx";
 import { SRC20Card } from "$islands/card/SRC20Card.tsx";
-import { container2 } from "$layout";
+import { container2, gridCard } from "$layout";
 import { valueDarkSm } from "$text";
 import type { ExplorerContentProps } from "$types/ui.d.ts";
 
@@ -67,7 +67,7 @@ export function ExplorerContent({
         )
         : (
           /* ===== CARD GRID VIEW ===== */
-          <div class="grid grid-cols-2 mobileMd:grid-cols-3 mobileLg:grid-cols-4 tablet:grid-cols-5 desktop:grid-cols-6 gap-6 w-full auto-rows-fr">
+          <div class={gridCard(viewMode)}>
             {visible.map((entry, index) => {
               const key = entry.kind === "stamp"
                 ? (isRecentSales && entry.item.sale_data

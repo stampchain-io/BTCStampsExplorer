@@ -762,7 +762,7 @@ export function StampCard({
               {(stamp as any).lowestPriceDispenser?.give_remaining ??
                 stamp.supply ?? 1}/{stamp.supply ?? 1}
             </div>
-            <div class="flex items-center gap-1.5 mr-0.5">
+            <div class="flex items-center gap-1.5 mr-0.5 -translate-y-0.5">
               {stamp.ident === "SRC-721" && (
                 <div
                   class="relative"
@@ -1071,7 +1071,7 @@ export function StampCard({
                   }/${stamp.supply ?? 1}`
                   : supplyDisplay}
               </div>
-              <div class="flex items-center gap-1.5 mr-0.5">
+              <div class="flex items-center gap-1.5 mr-0.5 -translate-y-0.5">
                 {variant === "cardVerticalDetail" && isListed && (
                   <div
                     class="relative"

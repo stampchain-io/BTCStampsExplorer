@@ -76,6 +76,22 @@ export const containerColData = "flex flex-col -space-y-1"; // Data specific
 export const containerColForm = "flex flex-col w-full gap-5";
 export const containerRowForm = "flex w-full gap-5";
 
+/* ===== CARD GRID STYLES ===== */
+// Shared by WalletProfileContent, ExplorerContent, MarketplaceContent,
+// StampOverviewContent — keeps column counts/gap consistent across pages.
+export const gridCardVertical =
+  "grid grid-cols-2 mobileMd:grid-cols-3 mobileLg:grid-cols-4 tablet:grid-cols-5 desktop:grid-cols-6 gap-5 w-full auto-rows-fr";
+export const gridCardSquare =
+  "grid grid-cols-3 mobileMd:grid-cols-4 mobileLg:grid-cols-6 tablet:grid-cols-8 desktop:grid-cols-10 gap-5 w-full auto-rows-fr";
+
+export function gridCard(
+  viewMode: "cardVertical" | "cardSquare" | "cardRow" | "cardHorizontal",
+): string {
+  // cardRow renders a table (never calls this) and cardHorizontal has no
+  // dedicated layout yet — falls back to the vertical grid until built.
+  return viewMode === "cardSquare" ? gridCardSquare : gridCardVertical;
+}
+
 /* ===== ROW STYLES ===== */
 // Form styles
 export const rowForm = "flex w-full";

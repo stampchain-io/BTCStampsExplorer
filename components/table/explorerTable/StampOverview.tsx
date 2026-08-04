@@ -199,7 +199,7 @@ export function StampOverviewRow({ stamp }: StampOverviewRowProps) {
       <td
         class={`${cellCenterL2Card} text-color-neutral-400`}
       >
-        {stamp.block_index.toLocaleString()}
+        {stamp.block_index != null ? stamp.block_index.toLocaleString() : "N/A"}
       </td>
 
       {/* DATE */}

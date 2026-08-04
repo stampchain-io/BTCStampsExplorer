@@ -5,7 +5,7 @@ import { StampOverviewTable } from "$components/table/explorerTable/StampOvervie
 import { StampListingsTable } from "$components/table/marketplaceTable/StampListings.tsx";
 import { SRC20OverviewCompact } from "$components/table/src20OverviewTable/SRC20OverviewCompact.tsx";
 import { WalletStampsHeader, WalletTokensHeader } from "$header";
-import { containerBackground, rowContainerBackground } from "$layout";
+import { containerBackground, gridCard, rowContainerBackground } from "$layout";
 import { subtitleNeutral, valueDarkSm } from "$text";
 import type { DispenserRow, StampRow } from "$types/stamp.d.ts";
 import type {
@@ -18,7 +18,10 @@ import type { ComponentChildren } from "preact";
 import { useEffect } from "preact/hooks";
 
 /* ===== VIEW TYPES ===== */
-type ViewMode = "cardVertical" | "cardSquare" | "cardRow";
+// "cardHorizontal" is a reserved placeholder for a future layout — none of
+// the render branches below handle it yet (gridCard falls back to the
+// vertical grid, and no tab switches on it).
+type ViewMode = "cardVertical" | "cardSquare" | "cardRow" | "cardHorizontal";
 
 /* ===== HELPERS ===== */
 
@@ -74,9 +77,6 @@ function PaginationBlock({
 }
 
 /* ===== GRID WRAPPER (matches ExplorerContent's card grid conventions) ===== */
-const cardGridClass =
-  "grid grid-cols-2 mobileMd:grid-cols-3 mobileLg:grid-cols-4 tablet:grid-cols-5 desktop:grid-cols-6 gap-3 mobileMd:gap-6 w-full auto-rows-fr";
-
 function GridCell(
   { view, children }: { view: ViewMode; children: ComponentChildren },
 ) {
@@ -114,7 +114,7 @@ function StampsGridContent({
 
   return (
     <>
-      <div class={cardGridClass}>
+      <div class={gridCard(view)}>
         {stamps.map((stamp) => (
           <GridCell key={stamp.tx_hash} view={view}>
             <StampCard
@@ -143,7 +143,7 @@ function ListingsGroup({
     return <StampListingsTable stamps={stamps} />;
   }
   return (
-    <div class={cardGridClass}>
+    <div class={gridCard(view)}>
       {stamps.map((stamp) => (
         <GridCell key={stamp.lowestPriceDispenser.tx_hash} view={view}>
           <StampCard
@@ -295,7 +295,7 @@ function TokensTabContent({
 
   return (
     <>
-      <div class={cardGridClass}>
+      <div class={gridCard(view)}>
         {data.map((src20) => (
           <GridCell key={src20.tx_hash} view={view}>
             <SRC20Card

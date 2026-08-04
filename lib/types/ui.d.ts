@@ -1235,7 +1235,7 @@ export interface StampOverviewContentProps {
     prefix?: string;
   };
   fromPage?: string;
-  viewMode?: "cardVertical" | "cardSquare";
+  viewMode?: "cardVertical" | "cardSquare" | "cardHorizontal";
 }
 
 export interface StampListingsAllProps {
@@ -2218,7 +2218,7 @@ export interface ExplorerContentProps extends BaseComponentProps {
     totalPages: number;
   } | null;
   section?: "all" | "stamps" | "tokens";
-  viewMode?: "cardVertical" | "cardSquare" | "cardRow";
+  viewMode?: "cardVertical" | "cardSquare" | "cardRow" | "cardHorizontal";
 }
 
 /**
@@ -2245,12 +2245,12 @@ export type WalletTokensTab = "collected" | "deployed";
 
 export interface WalletStampsHeaderProps extends BaseComponentProps {
   activeTab?: WalletStampsTab;
-  viewMode?: "cardVertical" | "cardSquare" | "cardRow";
+  viewMode?: "cardVertical" | "cardSquare" | "cardRow" | "cardHorizontal";
 }
 
 export interface WalletTokensHeaderProps extends BaseComponentProps {
   activeTab?: WalletTokensTab;
-  viewMode?: "cardVertical" | "cardSquare" | "cardRow";
+  viewMode?: "cardVertical" | "cardSquare" | "cardRow" | "cardHorizontal";
 }
 
 /**
@@ -3188,7 +3188,7 @@ export interface MarketplaceContentProps {
     prefix?: string;
   };
   fromPage?: string;
-  viewMode?: "cardVertical" | "cardSquare" | "cardRow";
+  viewMode?: "cardVertical" | "cardSquare" | "cardRow" | "cardHorizontal";
 }
 
 /**
@@ -3675,13 +3675,23 @@ export interface WalletProfileContentProps {
   anchor?: string | undefined;
 
   stampsTab?: WalletStampsTab | undefined;
-  stampsView?: "cardVertical" | "cardSquare" | "cardRow" | undefined;
+  stampsView?:
+    | "cardVertical"
+    | "cardSquare"
+    | "cardRow"
+    | "cardHorizontal"
+    | undefined;
   stampsSortBy?: "ASC" | "DESC" | undefined;
   stampsData?: any[] | undefined;
   stampsPagination?: WalletContainerPagination | undefined;
 
   tokensTab?: WalletTokensTab | undefined;
-  tokensView?: "cardVertical" | "cardSquare" | "cardRow" | undefined;
+  tokensView?:
+    | "cardVertical"
+    | "cardSquare"
+    | "cardRow"
+    | "cardHorizontal"
+    | undefined;
   tokensSortBy?: "ASC" | "DESC" | undefined;
   tokensData?: any[] | undefined;
   tokensPagination?: WalletContainerPagination | undefined;
@@ -3704,12 +3714,12 @@ export interface WalletProfilePageProps {
   anchor?: string;
 
   stampsTab?: WalletStampsTab;
-  stampsView?: "cardVertical" | "cardSquare" | "cardRow";
+  stampsView?: "cardVertical" | "cardSquare" | "cardRow" | "cardHorizontal";
   stampsData?: any[];
   stampsPagination?: WalletContainerPagination;
 
   tokensTab?: WalletTokensTab;
-  tokensView?: "cardVertical" | "cardSquare" | "cardRow";
+  tokensView?: "cardVertical" | "cardSquare" | "cardRow" | "cardHorizontal";
   tokensData?: any[];
   tokensPagination?: WalletContainerPagination;
 }

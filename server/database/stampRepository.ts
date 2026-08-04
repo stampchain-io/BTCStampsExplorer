@@ -1177,6 +1177,9 @@ export class StampRepository {
           st.supply,
           st.locked,
           st.creator,
+          st.file_size_bytes,
+          st.block_index,
+          st.block_time,
           cr.creator AS creator_name
         FROM ${STAMP_TABLE} st
         LEFT JOIN creator cr ON st.creator = cr.address

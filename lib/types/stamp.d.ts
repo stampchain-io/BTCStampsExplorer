@@ -654,6 +654,9 @@ export interface StampBalance {
   creator: string;
   creator_name: string | null;
   balance: number | string;
+  file_size_bytes: number | null;
+  block_index: number;
+  block_time: Date;
   // Market data pricing fields - added for backward compatibility
   floorPrice?: number | "priceless";
   recentSalePrice?: number | "priceless";

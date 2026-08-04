@@ -8,7 +8,13 @@ import { tooltipIcon } from "$notification";
 import { useCallback, useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
-type ViewMode = "cardVertical" | "cardSquare" | "cardRow";
+// "cardHorizontal" is a reserved placeholder for a future layout — it is
+// not part of the click-cycle below yet (see nextMode/iconName/ariaLabel).
+type ViewMode =
+  | "cardVertical"
+  | "cardSquare"
+  | "cardRow"
+  | "cardHorizontal";
 
 /* ===== COMPONENT ===== */
 export function ViewButton(
