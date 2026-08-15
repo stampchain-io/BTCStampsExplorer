@@ -1188,7 +1188,7 @@ export interface SRC20GalleryProps {
   pagination?: {
     page: any;
     totalPages: any;
-    onPageChange: (newPage: number) => void;
+    onPageChange?: (newPage: number) => void;
   };
   title?: string;
   initialPagination?: { page: number; limit: number; total?: number };
@@ -2233,23 +2233,36 @@ export interface ExplorerHeaderProps extends BaseComponentProps {
  * Wallet page — Stamps container sub-tabs
  */
 export type WalletStampsTab =
-  | "collected"
-  | "stamped"
+  | "balance"
+  | "created"
   | "listings"
   | "collections";
 
 /**
  * Wallet page — Tokens container sub-tabs
  */
-export type WalletTokensTab = "collected" | "deployed";
+export type WalletTokensTab = "balance" | "created";
 
-export interface WalletStampsHeaderProps extends BaseComponentProps {
-  activeTab?: WalletStampsTab;
-  viewMode?: "cardVertical" | "cardSquare" | "cardRow" | "cardHorizontal";
-}
+/**
+ * Wallet page — top-level content selector (WalletSubHeader): which
+ * asset type(s) the unified wallet content container displays.
+ */
+export type WalletContentTabId = "all" | "stamps" | "tokens";
 
-export interface WalletTokensHeaderProps extends BaseComponentProps {
-  activeTab?: WalletTokensTab;
+/**
+ * Wallet page — unified sub-tab selector (WalletSubHeader). `listings` and
+ * `collections` are stamps-only and only selectable when
+ * `WalletContentTabId` is `"stamps"`.
+ */
+export type WalletContentTabIdSub =
+  | "balance"
+  | "created"
+  | "listings"
+  | "collections";
+
+export interface WalletSubHeaderProps extends BaseComponentProps {
+  section?: WalletContentTabId;
+  tab?: WalletContentTabIdSub;
   viewMode?: "cardVertical" | "cardSquare" | "cardRow" | "cardHorizontal";
 }
 
@@ -3124,22 +3137,6 @@ export interface TransactionStatusProps {
 }
 
 /**
- * EnhancedWalletContentProps - Migrated from WalletProfileContent.tsx
- */
-export interface EnhancedWalletContentProps extends WalletContentProps {
-  /** Enable advanced sorting features (default: false for backward compatibility) */
-  enableAdvancedSorting?: boolean;
-  /** Show performance metrics for sorting operations */
-  showSortingMetrics?: boolean;
-  /** Additional sorting configuration */
-  sortingConfig?: {
-    enableUrlSync?: boolean;
-    enablePersistence?: boolean;
-    enableMetrics?: boolean;
-  };
-}
-
-/**
  * SRC20DetailHeaderProps - Migrated from SRC20DetailHeader.tsx
  */
 export interface SRC20DetailHeaderProps {
@@ -3640,20 +3637,6 @@ export interface WalletPageProps {
 }
 
 /**
- * WalletContentProps - Migrated from wallet.d.ts
- */
-export interface WalletContentProps {
-  stamps: any;
-  src20: any;
-  dispensers: any;
-  address: string;
-  anchor?: string;
-  stampsSortBy?: "ASC" | "DESC";
-  src20SortBy?: "ASC" | "DESC";
-  dispensersSortBy?: "ASC" | "DESC";
-}
-
-/**
  * Pagination summary shared by the Stamps and Tokens containers on the
  * wallet page — only the active sub-tab's data/pagination is fetched
  * server-side and passed down (see routes/wallet/[address].tsx).
@@ -3666,33 +3649,28 @@ export interface WalletContainerPagination {
 }
 
 /**
- * WalletProfileContentProps - props for the two-container (Stamps/Tokens)
- * wallet content island. Replaces the legacy EnhancedWalletContentProps /
- * advanced-sorting shape.
+ * WalletContentProps - props for the unified wallet content island. A
+ * single shared container renders Stamps and/or Tokens panels depending on
+ * `section`, with a shared `tab`/`view` driving both panels at once.
+ * Replaces the legacy EnhancedWalletContentProps / advanced-sorting shape
+ * and the earlier two-container `WalletProfileContentProps` shape.
  */
-export interface WalletProfileContentProps {
+export interface WalletContentProps {
   address: string;
   anchor?: string | undefined;
 
-  stampsTab?: WalletStampsTab | undefined;
-  stampsView?:
+  section?: WalletContentTabId | undefined;
+  tab?: WalletContentTabIdSub | undefined;
+  view?:
     | "cardVertical"
     | "cardSquare"
     | "cardRow"
     | "cardHorizontal"
     | undefined;
-  stampsSortBy?: "ASC" | "DESC" | undefined;
+
   stampsData?: any[] | undefined;
   stampsPagination?: WalletContainerPagination | undefined;
 
-  tokensTab?: WalletTokensTab | undefined;
-  tokensView?:
-    | "cardVertical"
-    | "cardSquare"
-    | "cardRow"
-    | "cardHorizontal"
-    | undefined;
-  tokensSortBy?: "ASC" | "DESC" | undefined;
   tokensData?: any[] | undefined;
   tokensPagination?: WalletContainerPagination | undefined;
 }
@@ -3713,13 +3691,13 @@ export interface WalletProfilePageProps {
   stampsCreated: number;
   anchor?: string;
 
-  stampsTab?: WalletStampsTab;
-  stampsView?: "cardVertical" | "cardSquare" | "cardRow" | "cardHorizontal";
+  section?: WalletContentTabId;
+  tab?: WalletContentTabIdSub;
+  view?: "cardVertical" | "cardSquare" | "cardRow" | "cardHorizontal";
+
   stampsData?: any[];
   stampsPagination?: WalletContainerPagination;
 
-  tokensTab?: WalletTokensTab;
-  tokensView?: "cardVertical" | "cardSquare" | "cardRow" | "cardHorizontal";
   tokensData?: any[];
   tokensPagination?: WalletContainerPagination;
 }

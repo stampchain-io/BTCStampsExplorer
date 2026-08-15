@@ -285,7 +285,7 @@ function WalletOverview(
         </button>
       </div>
 
-      <div class="flex items-center pt-3 mobileMd:pt-6 text-base mobileLg:text-lg text-color-purple-semilight font-medium select-none">
+      <div class="flex items-center pt-5 text-base mobileLg:text-lg text-color-purple-semilight font-medium select-none">
         <h6 class="hidden tablet:block">
           {abbreviateAddress(walletData.address, 12)}
         </h6>

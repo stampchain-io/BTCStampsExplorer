@@ -1,16 +1,17 @@
-/* ===== WALLET PROFILE CONTENT COMPONENT ===== */
+/* ===== WALLET CONTENT COMPONENT ===== */
 import { PaginationButtons } from "$button";
 import { CollectionCard, SRC20Card, StampCard } from "$card";
 import { StampOverviewTable } from "$components/table/explorerTable/StampOverview.tsx";
 import { StampListingsTable } from "$components/table/marketplaceTable/StampListings.tsx";
 import { SRC20OverviewCompact } from "$components/table/src20OverviewTable/SRC20OverviewCompact.tsx";
-import { WalletStampsHeader, WalletTokensHeader } from "$header";
+import { WalletSubHeader } from "$header";
 import { containerBackground, gridCard, rowContainerBackground } from "$layout";
 import { subtitleNeutral, valueDarkSm } from "$text";
 import type { DispenserRow, StampRow } from "$types/stamp.d.ts";
 import type {
   WalletContainerPagination,
-  WalletProfileContentProps,
+  WalletContentProps,
+  WalletContentTabIdSub,
   WalletStampsTab,
   WalletTokensTab,
 } from "$types/ui.d.ts";
@@ -22,6 +23,21 @@ import { useEffect } from "preact/hooks";
 // the render branches below handle it yet (gridCard falls back to the
 // vertical grid, and no tab switches on it).
 type ViewMode = "cardVertical" | "cardSquare" | "cardRow" | "cardHorizontal";
+
+/* ===== TAB MAPPING ===== */
+// The header exposes one unified sub-tab (balance/created/listings/
+// collections) that drives both the Stamps and Tokens panels at once —
+// map it back to each side's existing internal tab type so
+// StampsTabContent/TokensTabContent don't need to change.
+function mapTabToStampsTab(tab: WalletContentTabIdSub): WalletStampsTab {
+  return tab;
+}
+
+function mapTabToTokensTab(tab: WalletContentTabIdSub): WalletTokensTab {
+  // "listings"/"collections" have no Tokens equivalent — only reachable
+  // when section === "stamps", where the Tokens panel isn't rendered.
+  return tab === "created" ? "created" : "balance";
+}
 
 /* ===== HELPERS ===== */
 
@@ -251,7 +267,7 @@ function StampsTabContent({
       stamps={data as StampRow[]}
       view={view}
       pagination={pagination}
-      emptyLabel={tab === "stamped"
+      emptyLabel={tab === "created"
         ? "NO STAMPS CREATED BY THIS ADDRESS"
         : "NO STAMPS IN THE WALLET"}
     />
@@ -273,7 +289,7 @@ function TokensTabContent({
   if (!data.length) {
     return (
       <EmptyState
-        label={tab === "deployed"
+        label={tab === "created"
           ? "NO TOKENS DEPLOYED BY THIS ADDRESS"
           : "NO TOKENS IN THE WALLET"}
       />
@@ -313,32 +329,35 @@ function TokensTabContent({
 }
 
 /* ===== MAIN COMPONENT ===== */
-export default function WalletProfileContent({
+export default function WalletContent({
   address: _address,
   anchor,
-  stampsTab = "collected",
-  stampsView = "cardVertical",
+  section = "all",
+  tab = "balance",
+  view = "cardVertical",
   stampsData = [],
   stampsPagination,
-  tokensTab = "collected",
-  tokensView = "cardVertical",
   tokensData = [],
   tokensPagination,
-}: WalletProfileContentProps) {
+}: WalletContentProps) {
   /* ===== EFFECTS ===== */
   useEffect(() => {
     if (anchor) {
       const sectionMap: Record<string, string> = {
-        stamp: "stamps-section",
-        stamps: "stamps-section",
-        tokens: "tokens-section",
-        src20: "tokens-section",
+        stamp: "stamps-panel",
+        stamps: "stamps-panel",
+        tokens: "tokens-panel",
+        src20: "tokens-panel",
         open_listings: "open-listings-section",
         closed_listings: "closed-listings-section",
+        wallet: "wallet-content-section",
       };
       const sectionId = sectionMap[anchor];
       if (sectionId) {
-        const element = document.getElementById(sectionId);
+        // "stamps-panel"/"tokens-panel" only exist when section === "all"
+        // (split view) — fall back to the outer container otherwise.
+        const element = document.getElementById(sectionId) ??
+          document.getElementById("wallet-content-section");
         if (element) {
           element.scrollIntoView({ behavior: "smooth" });
         }
@@ -346,33 +365,59 @@ export default function WalletProfileContent({
     }
   }, [anchor]);
 
+  /* ===== DERIVED TAB VALUES ===== */
+  const stampsTab = mapTabToStampsTab(tab);
+  const tokensTab = mapTabToTokensTab(tab);
+
   /* ===== RENDER ===== */
   return (
-    <div class="flex flex-col gap-6">
-      {/* Stamps Container */}
-      <div id="stamps-section" class={containerBackground}>
-        <WalletStampsHeader activeTab={stampsTab} viewMode={stampsView} />
-        <div class="pt-3 mobileMd:pt-6">
-          <StampsTabContent
-            tab={stampsTab}
-            view={stampsView}
-            data={stampsData}
-            pagination={stampsPagination}
-          />
-        </div>
-      </div>
-
-      {/* Tokens Container */}
-      <div id="tokens-section" class={containerBackground}>
-        <WalletTokensHeader activeTab={tokensTab} viewMode={tokensView} />
-        <div class="pt-3 mobileMd:pt-6">
-          <TokensTabContent
-            tab={tokensTab}
-            view={tokensView}
-            data={tokensData}
-            pagination={tokensPagination}
-          />
-        </div>
+    <div id="wallet-content-section" class={containerBackground}>
+      <WalletSubHeader section={section} tab={tab} viewMode={view} />
+      <div class={`w-full ${view !== "cardRow" ? "pt-5" : "pt-2"}`}>
+        {section === "all"
+          ? (
+            <div class="flex flex-col tablet:flex-row gap-6">
+              <div
+                id="tokens-panel"
+                class="w-full tablet:w-1/2 desktop:w-1/3"
+              >
+                <TokensTabContent
+                  tab={tokensTab}
+                  view={view}
+                  data={tokensData}
+                  pagination={tokensPagination}
+                />
+              </div>
+              <div
+                id="stamps-panel"
+                class="w-full tablet:w-1/2 desktop:w-2/3"
+              >
+                <StampsTabContent
+                  tab={stampsTab}
+                  view={view}
+                  data={stampsData}
+                  pagination={stampsPagination}
+                />
+              </div>
+            </div>
+          )
+          : section === "stamps"
+          ? (
+            <StampsTabContent
+              tab={stampsTab}
+              view={view}
+              data={stampsData}
+              pagination={stampsPagination}
+            />
+          )
+          : (
+            <TokensTabContent
+              tab={tokensTab}
+              view={view}
+              data={tokensData}
+              pagination={tokensPagination}
+            />
+          )}
       </div>
     </div>
   );

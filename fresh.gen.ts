@@ -187,11 +187,11 @@ import * as $content_ExplorerContent from "./islands/content/ExplorerContent.tsx
 import * as $content_MarketplaceContent from "./islands/content/MarketplaceContent.tsx";
 import * as $content_SRC20OverviewContent from "./islands/content/SRC20OverviewContent.tsx";
 import * as $content_StampOverviewContent from "./islands/content/StampOverviewContent.tsx";
+import * as $content_WalletContent from "./islands/content/WalletContent.tsx";
 import * as $content_WalletDashboardContent from "./islands/content/WalletDashboardContent.tsx";
 import * as $content_WalletDashboardDetails from "./islands/content/WalletDashboardDetails.tsx";
 import * as $content_WalletDetails from "./islands/content/WalletDetails.tsx";
 import * as $content_WalletDispenserDetails from "./islands/content/WalletDispenserDetails.tsx";
-import * as $content_WalletProfileContent from "./islands/content/WalletProfileContent.tsx";
 import * as $content_WalletProfileDetails from "./islands/content/WalletProfileDetails.tsx";
 import * as $content_blockContent_BlockSelector from "./islands/content/blockContent/BlockSelector.tsx";
 import * as $content_blockContent_BlockTransactions from "./islands/content/blockContent/BlockTransactions.tsx";
@@ -233,8 +233,7 @@ import * as $header_SRC20OverviewHeader from "./islands/header/SRC20OverviewHead
 import * as $header_StampOverviewHeader from "./islands/header/StampOverviewHeader.tsx";
 import * as $header_WalletDashboardHeader from "./islands/header/WalletDashboardHeader.tsx";
 import * as $header_WalletProfileHeader from "./islands/header/WalletProfileHeader.tsx";
-import * as $header_WalletStampsHeader from "./islands/header/WalletStampsHeader.tsx";
-import * as $header_WalletTokensHeader from "./islands/header/WalletTokensHeader.tsx";
+import * as $header_WalletSubHeader from "./islands/header/WalletSubHeader.tsx";
 import * as $header_index from "./islands/header/index.ts";
 import * as $layout_AnimationControlsManager from "./islands/layout/AnimationControlsManager.tsx";
 import * as $layout_BackgroundTopology from "./islands/layout/BackgroundTopology.tsx";
@@ -247,6 +246,7 @@ import * as $layout_ModalProvider from "./islands/layout/ModalProvider.tsx";
 import * as $layout_ModalStack from "./islands/layout/ModalStack.tsx";
 import * as $layout_NavigatorProvider from "./islands/layout/NavigatorProvider.tsx";
 import * as $layout_PageVisibilityManager from "./islands/layout/PageVisibilityManager.tsx";
+import * as $layout_ScrollFadeRow from "./islands/layout/ScrollFadeRow.tsx";
 import * as $layout_WalletProvider from "./islands/layout/WalletProvider.tsx";
 import * as $modal_BuyStampModal from "./islands/modal/BuyStampModal.tsx";
 import * as $modal_ConnectWalletModal from "./islands/modal/ConnectWalletModal.tsx";
@@ -549,6 +549,7 @@ const manifest = {
     "./islands/content/MarketplaceContent.tsx": $content_MarketplaceContent,
     "./islands/content/SRC20OverviewContent.tsx": $content_SRC20OverviewContent,
     "./islands/content/StampOverviewContent.tsx": $content_StampOverviewContent,
+    "./islands/content/WalletContent.tsx": $content_WalletContent,
     "./islands/content/WalletDashboardContent.tsx":
       $content_WalletDashboardContent,
     "./islands/content/WalletDashboardDetails.tsx":
@@ -556,7 +557,6 @@ const manifest = {
     "./islands/content/WalletDetails.tsx": $content_WalletDetails,
     "./islands/content/WalletDispenserDetails.tsx":
       $content_WalletDispenserDetails,
-    "./islands/content/WalletProfileContent.tsx": $content_WalletProfileContent,
     "./islands/content/WalletProfileDetails.tsx": $content_WalletProfileDetails,
     "./islands/content/blockContent/BlockSelector.tsx":
       $content_blockContent_BlockSelector,
@@ -613,8 +613,7 @@ const manifest = {
     "./islands/header/StampOverviewHeader.tsx": $header_StampOverviewHeader,
     "./islands/header/WalletDashboardHeader.tsx": $header_WalletDashboardHeader,
     "./islands/header/WalletProfileHeader.tsx": $header_WalletProfileHeader,
-    "./islands/header/WalletStampsHeader.tsx": $header_WalletStampsHeader,
-    "./islands/header/WalletTokensHeader.tsx": $header_WalletTokensHeader,
+    "./islands/header/WalletSubHeader.tsx": $header_WalletSubHeader,
     "./islands/header/index.ts": $header_index,
     "./islands/layout/AnimationControlsManager.tsx":
       $layout_AnimationControlsManager,
@@ -628,6 +627,7 @@ const manifest = {
     "./islands/layout/ModalStack.tsx": $layout_ModalStack,
     "./islands/layout/NavigatorProvider.tsx": $layout_NavigatorProvider,
     "./islands/layout/PageVisibilityManager.tsx": $layout_PageVisibilityManager,
+    "./islands/layout/ScrollFadeRow.tsx": $layout_ScrollFadeRow,
     "./islands/layout/WalletProvider.tsx": $layout_WalletProvider,
     "./islands/modal/BuyStampModal.tsx": $modal_BuyStampModal,
     "./islands/modal/ConnectWalletModal.tsx": $modal_ConnectWalletModal,

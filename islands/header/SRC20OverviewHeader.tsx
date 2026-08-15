@@ -1,5 +1,6 @@
 /* ===== SRC20 HEADER COMPONENT ===== */
 import { SelectorButtons, ToggleButton } from "$button";
+import { ScrollFadeRow } from "$layout";
 import {
   navigateWithFreshPartial,
 } from "$lib/utils/navigation/freshNavigationUtils.ts";
@@ -52,9 +53,9 @@ export const SRC20OverviewHeader = ({
       </div>
 
       {/* ===== MINTED/MINTING, TRENDING AND TIMEFRAME BUTTONS ===== */}
-      <div class="flex flex-col mobileMd:flex-row justify-between w-full">
+      <ScrollFadeRow deps={[viewType, sortBy, timeframe]}>
         {/* Minting/Minted */}
-        <div class="flex justify-between gap-3">
+        <div class="shrink-0">
           <SelectorButtons
             options={[
               { value: "minted", label: "MINTED" },
@@ -64,25 +65,24 @@ export const SRC20OverviewHeader = ({
             onChange={handleViewTypeClick}
             size="xsR"
             color="primary"
-            className="w-full mobileMd:w-auto"
           />
-          {/* Trending Toggle - mobileMd+ only, stays alongside Minted/Minting */}
-          <div class="hidden mobileMd:flex">
-            <ToggleButton
-              options={["TRENDING"]}
-              selected={sortBy === "TRENDING" ? "TRENDING" : ""}
-              onChange={handleTrendingClick}
-              mode="single"
-              size="xsR"
-              color="neutral"
-              className="mt-[3px] !text-xs tablet:!text-[10px]"
-            />
-          </div>
         </div>
 
-        {/* Trending and Timeframes - Right */}
-        <div class="flex justify-between mobileMd:justify-end pt-3 mobileMd:pt-0 gap-3">
-          {/* Timeframe Buttons */}
+        {/* Trending Toggle */}
+        <div class="shrink-0">
+          <ToggleButton
+            options={["TRENDING"]}
+            selected={sortBy === "TRENDING" ? "TRENDING" : ""}
+            onChange={handleTrendingClick}
+            mode="single"
+            size="xsR"
+            color="neutral"
+            className="mt-[3px] !text-xs tablet:!text-[10px]"
+          />
+        </div>
+
+        {/* Timeframe Buttons - Right */}
+        <div class="shrink-0 ml-auto">
           <SelectorButtons
             options={[
               { value: "24H", label: "24H" },
@@ -94,21 +94,8 @@ export const SRC20OverviewHeader = ({
             size="xsR"
             color="primary"
           />
-
-          {/* Trending Toggle - mobile only, moved to second row, right-aligned */}
-          <div class="flex mobileMd:hidden">
-            <ToggleButton
-              options={["TRENDING"]}
-              selected={sortBy === "TRENDING" ? "TRENDING" : ""}
-              onChange={handleTrendingClick}
-              mode="single"
-              size="xsR"
-              color="neutral"
-              className="mt-[3px] !text-xs tablet:!text-[10px]"
-            />
-          </div>
         </div>
-      </div>
+      </ScrollFadeRow>
     </div>
   );
 };

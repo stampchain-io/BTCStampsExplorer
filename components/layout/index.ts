@@ -18,6 +18,9 @@ export * from "$components/layout/data.ts";
 /* ===== TABLE SCROLL CONTAINER ===== */
 export * from "$components/layout/ScrollContainer.tsx";
 
+/* ===== HORIZONTAL SCROLL FADE ROW ===== */
+export * from "$islands/layout/ScrollFadeRow.tsx";
+
 /* ===== NAVIGATOR ===== */
 export * from "$islands/layout/NavigatorProvider.tsx";
 

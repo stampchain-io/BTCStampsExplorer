@@ -40,6 +40,8 @@ export function SortButton(
         return "src20";
       case "dispensersSortBy":
         return "dispensers";
+      case "sortBy":
+        return "wallet";
       default:
         return "stamps";
     }

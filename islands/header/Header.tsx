@@ -320,7 +320,7 @@ export function Header() {
       const rect = walletButtonRef.current.getBoundingClientRect();
       walletPos = {
         top: rect.bottom + 20,
-        left: rect.right - 150 - 15,
+        left: rect.right - 150 - 50,
       };
     }
 

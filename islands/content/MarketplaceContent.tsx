@@ -23,7 +23,7 @@ export function MarketplaceContent({
   /* ===== RENDER ===== */
   return (
     <div
-      class={`w-full ${viewMode !== "cardRow" ? "pt-3 mobileMd:pt-6" : "pt-3"}`}
+      class={`w-full ${viewMode !== "cardRow" ? "pt-5" : "pt-2"}`}
     >
       {viewMode === "cardRow"
         ? (

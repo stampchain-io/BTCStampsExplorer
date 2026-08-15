@@ -36,7 +36,7 @@ export function SRC20OverviewContent({
   };
 
   return (
-    <div class="w-full pt-3">
+    <div class="w-full pt-2">
       <SRC20Gallery
         viewType={viewType || "minted"}
         fromPage="src20"

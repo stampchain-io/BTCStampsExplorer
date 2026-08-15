@@ -263,7 +263,7 @@ export const WalletButton = (
               {abbreviateAddress(address, 8)}
             </h6>
           </div>
-          <div class="flex items-center gap-3 mb-0.5">
+          <div class="flex items-center justify-between gap-3 mb-0.5">
             <Icon
               type="icon"
               name="bitcoins"

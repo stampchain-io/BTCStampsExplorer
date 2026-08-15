@@ -10,7 +10,7 @@ import {
   filtersToQueryParams,
   StampFilters as FilterStampFilters,
 } from "$islands/filter/FilterOptionsMarketplace.tsx";
-import { container2Icon } from "$layout";
+import { container2Icon, ScrollFadeRow } from "$layout";
 import {
   getCurrentPathname,
   safeNavigate,
@@ -150,22 +150,23 @@ export const MarketplaceHeader = (
       </div>
 
       {/* ===== CONTROLS ROW ===== */}
-      <div class="flex flex-col mobileMd:flex-row justify-between mobileMd:items-center w-full">
+      <ScrollFadeRow deps={[currentMarketMode, currentFilters.stampType]}>
         {/* Market Mode Selector */}
-        <SelectorButtons
-          options={[
-            { value: "listings", label: "LISTINGS" },
-            { value: "sales", label: "SALES" },
-          ]}
-          value={currentMarketMode}
-          onChange={handleMarketModeChange}
-          size="xsR"
-          color="primary"
-          className="w-full mobileMd:w-auto"
-        />
+        <div class="shrink-0">
+          <SelectorButtons
+            options={[
+              { value: "listings", label: "LISTINGS" },
+              { value: "sales", label: "SALES" },
+            ]}
+            value={currentMarketMode}
+            onChange={handleMarketModeChange}
+            size="xsR"
+            color="primary"
+          />
+        </div>
 
-        <div class="hidden tablet:flex w-auto">
-          {/* Stamp Type Selector */}
+        {/* Stamp Type Selector - Center */}
+        <div class="grow shrink-0 flex justify-center">
           <SelectorButtons
             options={[
               { value: "all", label: "ALL" },
@@ -181,13 +182,12 @@ export const MarketplaceHeader = (
           />
         </div>
 
-        <div class="flex justify-between mobileMd:justify-end pt-3 mobileMd:pt-0 gap-3">
-          {/* View Mode Toggle */}
+        {/* View Mode Toggle + Filter and Sort Controls - Right */}
+        <div class="flex shrink-0 gap-3">
           <div class={container2Icon}>
             <ViewButton viewMode={viewMode} />
           </div>
 
-          {/* Filter and Sort Controls */}
           <div
             class={`${container2Icon} gap-1.5 tablet:gap-1`}
           >
@@ -202,7 +202,7 @@ export const MarketplaceHeader = (
             <SortButton />
           </div>
         </div>
-      </div>
+      </ScrollFadeRow>
 
       {/* Filter Drawer — portalled to document.body to escape backdrop-filter containing block */}
       {typeof document !== "undefined" && createPortal(

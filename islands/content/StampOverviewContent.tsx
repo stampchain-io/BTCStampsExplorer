@@ -21,7 +21,7 @@ export function StampOverviewContent({
 
   /* ===== RENDER ===== */
   return (
-    <div class="w-full pt-3 mobileMd:pt-6">
+    <div class="w-full pt-5">
       {stamps?.length
         ? (
           <div class={gridCard(viewMode)}>

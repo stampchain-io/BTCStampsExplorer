@@ -77,7 +77,7 @@ export const containerColForm = "flex flex-col w-full gap-5";
 export const containerRowForm = "flex w-full gap-5";
 
 /* ===== CARD GRID STYLES ===== */
-// Shared by WalletProfileContent, ExplorerContent, MarketplaceContent,
+// Shared by WalletContent, ExplorerContent, MarketplaceContent,
 // StampOverviewContent — keeps column counts/gap consistent across pages.
 export const gridCardVertical =
   "grid grid-cols-2 mobileMd:grid-cols-3 mobileLg:grid-cols-4 tablet:grid-cols-5 desktop:grid-cols-6 gap-5 w-full auto-rows-fr";
@@ -99,6 +99,7 @@ export const rowResponsiveForm =
   "flex flex-col min-[420px]:flex-row w-full gap-5 min-[420px]:[&>*]:flex-1";
 export const rowContainerBackground =
   `flex items-center justify-center w-full h-[46px] ${container1}`; // update all tables to use this instead of custom code
+
 /* ===== COL STYLES ===== */
 
 /* ===== CELL STYLES ===== */
