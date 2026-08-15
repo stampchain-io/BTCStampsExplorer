@@ -1,5 +1,5 @@
 /* ===== LIST COMPONENT ===== */
-import { headingGrey, text } from "$text";
+import { subtitleNeutral, text } from "$text";
 import type { HowToStepProps, SharedListProps } from "$types/ui.d.ts";
 
 /* ===== TYPES ===== */
@@ -17,22 +17,20 @@ const formatLines = (text: string) => {
 /* ===== COMPONENT ===== */
 export function List({ title, image, description }: HowToStepProps) {
   return (
-    <li
-      class={`${headingGrey} font-light list-decimal list-inside mb-9 mobileLg:mb-12`}
-    >
+    <li class="list-decimal list-inside mb-5 mobileLg:mb-7.5 marker:font-black marker:text-2xl marker:text-color-neutral-400">
       {/* ===== LIST TITLE ===== */}
-      <div class={`${headingGrey} inline-flex pl-1 pb-4`}>
+      <span class={`${subtitleNeutral} pl-1 !whitespace-normal`}>
         {title}
-      </div>
+      </span>
 
       {/* ===== LIST CONTENT ===== */}
-      <section class="flex flex-col gap-9">
+      <section class="flex flex-col gap-3">
         {/* ===== LIST IMAGE ===== */}
         <img
           src={image}
           width="100%"
           alt="Screenshot"
-          class="rounded-2xl aspect-16/9"
+          class="my-2 rounded-2xl aspect-16/9"
         />
 
         {/* ===== LIST DESCRIPTION ===== */}
@@ -67,9 +65,7 @@ export function StepList(
 ) {
   return (
     <ul
-      class={`pt-9 mobileMd:pt-9 mobileLg:pt-12 tablet:pt-12 list-decimal ${
-        !hasImportantNotes ? "-mb-10" : ""
-      }`}
+      class={`pt-7.5 list-decimal ${!hasImportantNotes ? "-mb-5" : ""}`}
     >
       {children}
     </ul>
