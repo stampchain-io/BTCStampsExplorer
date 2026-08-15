@@ -56,25 +56,6 @@ export function SRC20Gallery({
     setIsLoading(false);
   }, [initialData]);
 
-  // 🚀 REMOVED: Client-side API calls for /src20 page - use server-side rendering only
-  // This eliminates dual data sources and ensures consistency
-
-  // 🚀 FRESH.JS NAVIGATION: Server-side rendering with URL updates
-  const handlePageChange = (page: number) => {
-    if (pagination?.onPageChange) {
-      pagination.onPageChange(page);
-    } else {
-      // Always use server-side navigation for /src20 page
-      // SSR-safe browser environment check
-      if (typeof globalThis === "undefined" || !globalThis?.location) {
-        return; // Cannot navigate during SSR
-      }
-      const url = new URL(globalThis.location.href);
-      url.searchParams.set("page", page.toString());
-      globalThis.location.href = url.toString();
-    }
-  };
-
   // 🚀 SIMPLIFIED: Basic image click handler
   const handleImageClick = (_imgSrc: string) => {
     // TODO(@dev): Implement image click handler
@@ -109,11 +90,6 @@ export function SRC20Gallery({
     return <div class={skeletonClasses} />;
   }
 
-  // 🚀 DENO FRESH 2.3+ OPTIMIZATION: Early return for src20 page with optimized rendering
-  if (fromPage === "src20" || fromPage === "stamping/src20") {
-    return <CardComponent {...cardProps} />;
-  }
-
   return (
     <div class="w-full">
       {title && (
@@ -135,7 +111,6 @@ export function SRC20Gallery({
         </h2>
       )}
 
-      {/* 🚀 OPTIMIZED: Use dynamic card component selection based on minting status */}
       <CardComponent {...cardProps} />
 
       {fromPage === "home" && (
@@ -151,8 +126,10 @@ export function SRC20Gallery({
           <PaginationButtons
             page={pagination.page}
             totalPages={pagination.totalPages}
-            prefix={fromPage === "wallet" ? "src20" : ""}
-            onPageChange={handlePageChange}
+            {...(fromPage === "wallet" ? { prefix: "src20" } : {})}
+            {...(pagination.onPageChange
+              ? { onPageChange: pagination.onPageChange }
+              : {})}
           />
         </div>
       )}

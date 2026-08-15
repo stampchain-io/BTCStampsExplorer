@@ -345,8 +345,21 @@ export const handler: Handlers = {
 
       /* ===== RESPONSE FORMATTING ===== */
       const { data: stamps = [], ...restResult } = stampResult;
+      // The "section" filter can exclude stamps or tokens from the fetch
+      // entirely (stubbed to totalPages: 1 above), so the pager must read
+      // totalPages from whichever dataset(s) are actually shown — otherwise
+      // switching to the TOKENS-only filter always hides pagination.
+      const stampTotalPages =
+        (restResult as { totalPages?: number }).totalPages ?? 1;
+      const tokenTotalPages = src20Result.totalPages ?? 1;
+      const totalPages = recentSales || section === "stamps"
+        ? stampTotalPages
+        : section === "tokens"
+        ? tokenTotalPages
+        : Math.max(stampTotalPages, tokenTotalPages);
       const data = {
         ...restResult,
+        totalPages,
         stamps: Array.isArray(stamps) ? stamps : [],
         filterBy,
         sortBy,

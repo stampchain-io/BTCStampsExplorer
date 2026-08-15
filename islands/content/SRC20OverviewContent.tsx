@@ -1,7 +1,6 @@
 /* ===== SRC20 OVERVIEW CONTENT COMPONENT ===== */
 import { SRC20Gallery } from "$section";
 import type { SRC20OverviewContentProps } from "$types/ui.d.ts";
-import { createFreshPaginationHandler } from "$utils/navigation/freshNavigationUtils.ts";
 
 /* ===== TYPES ===== */
 type SortOption =
@@ -47,7 +46,7 @@ export function SRC20OverviewContent({
         pagination={{
           page: currentPage,
           totalPages: totalPages,
-          onPageChange: createFreshPaginationHandler("/src20"),
+          // Omit onPageChange so PaginationButtons uses built-in Fresh navigation
         }}
       />
     </div>

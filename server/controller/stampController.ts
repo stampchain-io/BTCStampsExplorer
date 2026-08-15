@@ -388,8 +388,8 @@ export class StampController {
       return {
         ...baseResponse,
         page: paginatedResult.page || page,
-        limit: paginatedResult.page_size || limit,
-        totalPages: paginatedResult.pages || 0,
+        limit: paginatedResult.limit || limit,
+        totalPages: paginatedResult.totalPages || 0,
         total: skipTotalCount ? undefined : (paginatedResult.total || 0),
       };
     }

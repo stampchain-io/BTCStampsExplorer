@@ -1,6 +1,7 @@
+import { buttonHover } from "$components/button/styles.ts";
 import { IS_BROWSER } from "$fresh/runtime.ts";
 import { Icon } from "$icon";
-import { container2, container2Hover } from "$layout";
+import { container2Icon } from "$layout";
 import { useSSRSafeNavigation } from "$lib/hooks/useSSRSafeNavigation.ts";
 import type { PaginationProps } from "$types/pagination.d.ts";
 import { getWindowWidth } from "$utils/navigation/freshNavigationUtils.ts";
@@ -12,15 +13,19 @@ const MOBILEMD_MAX_PAGE_RANGE = 2;
 const TABLET_MAX_PAGE_RANGE = 3;
 const DESKTOP_MAX_PAGE_RANGE = 4;
 
-const navBase = `
-  flex items-center justify-center
-${container2} ${container2Hover}
-!rounded-full !backdrop-blur-md`;
-const navArrow = `${navBase} group
-  w-10 h-10 tablet:w-9 tablet:h-9`;
-const navContent = `${navBase} group
-  h-10 px-[16px] tablet:h-9 tablet:px-[14px]
-  font-light text-sm text-color-grey-semidark hover:text-color-grey leading-[16.5px]`;
+// Each button gets its own container2Icon pill (wrapping div below).
+// buttonHover is applied per-button in render — never on the current page.
+// Digit buttons size by character count (1-2 / 3 / 4+).
+const navBase = "flex items-center justify-center group";
+const navArrow = `${navBase} w-7 h-7 tablet:w-6 tablet:h-6`;
+const navDigit = `${navBase}
+  font-light text-xs text-color-neutral-400 hover:text-color-hover leading-[16.5px]`;
+const navDigitSize = (pageNum: number) => {
+  const chars = String(pageNum).length;
+  if (chars >= 4) return "w-11 h-7 tablet:w-10 tablet:h-6";
+  if (chars === 3) return "w-10 h-7 tablet:w-9 tablet:h-6";
+  return "w-7 h-7 tablet:w-6 tablet:h-6";
+};
 
 // SSR-safe screen size hook
 const useScreenSize = () => {
@@ -92,34 +97,40 @@ export function PaginationButtons({
 
   const renderPageButton = (pageNum: number, iconName?: string) => {
     const isCurrentPage = pageNum === page;
-    // Use navArrow class for caret buttons, otherwise use navContent
-    const baseClass = iconName ? navArrow : navContent;
+    const baseClass = iconName
+      ? navArrow
+      : `${navDigit} ${navDigitSize(pageNum)}`;
     const buttonClass = isCurrentPage
-      ? `${baseClass} !bg-color-border/15 !border-color-border
-       !text-color-grey hover:!text-color-grey font-medium
-       hover:!bg-color-border/15 hover:!border-color-border`
-      : `${baseClass}`;
+      ? `${baseClass} font-medium !text-color-primary-400`
+      : `${baseClass} ${buttonHover}`;
+    // Current page: same pill shape + neutral border as container2Icon, but
+    // no gradient fill so the background stays transparent.
+    const wrapperClass = isCurrentPage
+      ? "relative flex items-center justify-between border border-color-neutral-700 rounded-full p-0.5 gap-1.5 tablet:gap-1"
+      : container2Icon;
 
     return (
-      <button
-        type="button"
-        class={buttonClass}
-        onClick={() => handlePageChange(pageNum)}
-        disabled={isCurrentPage}
-      >
-        {iconName
-          ? (
-            <Icon
-              type="icon"
-              name={iconName}
-              weight="bold"
-              size="xxs"
-              color="custom"
-              className="stroke-color-grey-semidark group-hover:stroke-color-grey"
-            />
-          )
-          : <span>{pageNum}</span>}
-      </button>
+      <div class={wrapperClass}>
+        <button
+          type="button"
+          class={buttonClass}
+          onClick={() => handlePageChange(pageNum)}
+          disabled={isCurrentPage}
+          aria-label={`Go to page ${pageNum}`}
+        >
+          {iconName
+            ? (
+              <Icon
+                type="iconHover"
+                name={iconName}
+                weight="bold"
+                size="xxs"
+                color="greyLight"
+              />
+            )
+            : <span>{pageNum}</span>}
+        </button>
+      </div>
     );
   };
 
@@ -142,9 +153,7 @@ export function PaginationButtons({
       aria-label="Page navigation"
       class="flex items-center justify-center"
     >
-      <ul
-        class={`inline-flex items-center -space-x-px gap-3.5`}
-      >
+      <ul class="inline-flex items-center gap-3.5">
         {/* First and Previous */}
         {page > 1 && (
           <>
