@@ -573,6 +573,29 @@ export interface StampTransactionFeeAnalysis {
 // ============================================================================
 
 /**
+ * Canonical shape for a single sale's transaction details, as attached to a
+ * stamp under `sale_data`. This is the single source of truth for this
+ * shape — previously four independent, drifted copies existed across this
+ * file, marketData.d.ts, and StampCard.tsx (see stampchain.io#1209 /
+ * btc_stamps#939 history for context on why that drift caused bugs).
+ */
+export interface StampSaleData {
+  btc_amount: number;
+  block_index: number;
+  tx_hash: string;
+  buyer_address?: string;
+  seller_address?: string;
+  dispenser_address?: string;
+  dispenser_tx_hash?: string;
+  sale_time?: number | null;
+  time_ago?: string;
+  btc_amount_satoshis?: number;
+  dispense_quantity?: number;
+  usd_price?: number;
+  sale_type?: string;
+}
+
+/**
  * Core stamp data interface representing a Bitcoin stamp
  * This is the main data structure for stamps in the protocol
  *
@@ -620,11 +643,7 @@ export interface StampRow {
   unbound_quantity: number;
 
   // Sale information (optional)
-  sale_data?: {
-    btc_amount: number;
-    block_index: number;
-    tx_hash: string;
-  };
+  sale_data?: StampSaleData;
 
   // Extended fields (optional)
   asset_longname?: string | null;
@@ -1147,11 +1166,7 @@ export interface WalletContext {
  * StampWithSaleData - Migrated from StampCard.tsx
  */
 export interface StampWithSaleData extends Omit<StampRow, "stamp_base64"> {
-  sale_data?: {
-    btc_amount: number;
-    block_index: number;
-    tx_hash: string;
-  };
+  sale_data?: StampSaleData;
   stamp_base64?: string;
 }
 
@@ -1397,6 +1412,12 @@ export interface StampMarketData {
   // Activity tracking fields
   activityLevel: StampDispenserActivityLevel | null;
   lastActivityTime: number | null; // Unix timestamp
+  // Parsed from the lowest_dispenser_* columns (btc_stamps#939) by
+  // MarketDataRepository.parseStampMarketDataRow — kept in sync with the
+  // canonical StampMarketData in marketData.d.ts (these two interfaces are
+  // duplicates; see that file for the full field comment). `null` when the
+  // stamp has no open dispenser.
+  lowestPriceDispenser: DispenserRow | null;
 }
 
 /**
@@ -1495,17 +1516,7 @@ export interface RecentSaleData {
  * StampWithEnhancedSaleData - Migrated from marketData.d.ts
  */
 export interface StampWithEnhancedSaleData extends StampRow {
-  sale_data?: {
-    btc_amount: number;
-    block_index: number;
-    tx_hash: string;
-    buyer_address?: string;
-    dispenser_address?: string;
-    time_ago?: string;
-    sale_time?: number | null;
-    btc_amount_satoshis?: number;
-    dispenser_tx_hash?: string;
-  };
+  sale_data?: StampSaleData;
   marketData?: StampMarketData;
   activity_level?: StampDispenserActivityLevel | null;
   last_activity_time?: number;

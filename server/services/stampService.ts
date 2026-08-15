@@ -436,6 +436,11 @@ export class StampService {
         tx_hash: txHash,
         block_index: blockIndex,
         timestamp: saleTime.toISOString(),
+        // Raw unix-seconds counterpart to `timestamp` — routes need this to
+        // build a nested `sale_data.sale_time` without re-parsing the ISO
+        // string, matching what StampRepository.getRecentlyActiveSold
+        // already provides at the DB layer.
+        sale_time: Math.floor(saleTime.getTime() / 1000),
 
         // Stamp info
         cpid: stamp.cpid,
@@ -447,6 +452,11 @@ export class StampService {
         destination: buyerAddress || null, // Buyer
         buyer_address: buyerAddress, // v2.2 compatibility
         dispenser_address: dispenserAddress, // v2.2 compatibility
+        // Same value as dispenser_address today (100% of sales are
+        // sale_type='dispenser'), exposed under its own name too so callers
+        // building a canonical sale_data object don't have to assume that.
+        seller_address: dispenserAddress,
+        sale_type: saleData.sale_type || null,
 
         // Dispenser info
         dispenser_tx_hash: saleData.dispenser_tx_hash || null,
@@ -636,6 +646,9 @@ export class StampService {
       return {
         ...stamp,
         market_data: null,
+        // btc_stamps#939 forward-compat (see below) — no market data row at
+        // all means no dispenser info either.
+        lowestPriceDispenser: null,
         marketDataMessage: "No market data available for this stamp"
       };
     }
@@ -676,6 +689,15 @@ export class StampService {
       ...stamp,
       // Activity tracking (top-level for StampCard / StampInfo)
       activity_level: marketData.activityLevel || null,
+      // btc_stamps#939 ("Store lowest-price open dispenser in
+      // stamp_market_data") forward-compat: MarketDataRepository already
+      // parses this from the lowest_dispenser_* columns (null until the
+      // indexer ships them) — forward it as-is, no new SQL here.
+      // StampCard.tsx / StampListingsRow / useLowestPriceDispenser already
+      // read stamp.lowestPriceDispenser in exactly this DispenserRow shape
+      // (from the #1209 stopgap), so this needs zero other changes once
+      // the column data starts flowing.
+      lowestPriceDispenser: marketData.lowestPriceDispenser || null,
       // v2.3+: market_data contains all market information (consistent snake_case)
       market_data: marketData ? {
         // Convert camelCase to snake_case for API consistency

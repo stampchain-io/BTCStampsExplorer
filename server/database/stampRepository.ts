@@ -1497,6 +1497,8 @@ export class StampRepository {
         ssh.quantity,
         ssh.buyer_address,
         ssh.seller_address,
+        ssh.dispenser_tx_hash,
+        ssh.sale_type,
         ssh.block_time as sale_time,
         ssh.tx_hash as sale_tx_hash,
         ssh.block_index as sale_block_index,
@@ -1592,10 +1594,16 @@ export class StampRepository {
                 tx_hash: row.sale_tx_hash || row.tx_hash,
                 buyer_address: row.buyer_address,
                 seller_address: row.seller_address,
+                // Today every sale is sale_type='dispenser', so the seller's
+                // address IS the dispenser's address — mirrored here under
+                // both names so DISPENSER-column consumers don't need to
+                // know which sale_type produced the row.
+                dispenser_address: row.seller_address,
                 sale_time: row.sale_time ?? null,
                 time_ago: row.sale_time ? this.getTimeAgo(new Date(row.sale_time * 1000)) : null,
                 btc_amount_satoshis: row.btc_amount ? Math.round(parseFloat(row.btc_amount)) : null,
-                dispenser_tx_hash: null
+                dispenser_tx_hash: row.dispenser_tx_hash || null,
+                sale_type: row.sale_type || null,
               }
             };
           }

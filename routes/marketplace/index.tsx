@@ -216,22 +216,26 @@ export const handler: Handlers = {
                     supply: sale.dispense_quantity || 1,
                     unbound_quantity: sale.dispense_quantity || 1,
                     // StampController.getRecentSales returns flat sale
-                    // fields (btc_amount, buyer_address, etc.) — spread
-                    // them through so StampCard's isRecentSale fallback
-                    // (which reads flat fields when sale_data is absent)
-                    // can render the sale price.
-                    btc_amount: sale.btc_amount,
-                    btc_amount_satoshis: sale.btc_amount_satoshis,
-                    buyer_address: sale.buyer_address,
-                    dispenser_address: sale.dispenser_address,
-                    dispenser_tx_hash: sale.dispenser_tx_hash,
-                    time_ago: sale.time_ago,
-                    dispense_quantity: sale.dispense_quantity,
-                    // USD sale price — also flat (see StampCard's
-                    // displayPriceUSD), so it must be carried through here
-                    // too or the USD price silently disappears.
-                    usd_price: sale.usd_price,
-                    lastSalePriceUSD: sale.lastSalePriceUSD,
+                    // fields (btc_amount, buyer_address, etc.) — nest them
+                    // into the canonical sale_data shape (StampSaleData,
+                    // $types/stamp.d.ts) so StampSales.tsx (which only ever
+                    // reads stamp.sale_data.*) and StampCard (which reads
+                    // stamp.sale_data directly) get the same data.
+                    sale_data: {
+                      btc_amount: sale.btc_amount,
+                      block_index: sale.block_index,
+                      tx_hash: sale.tx_hash,
+                      buyer_address: sale.buyer_address,
+                      seller_address: sale.seller_address,
+                      dispenser_address: sale.dispenser_address,
+                      dispenser_tx_hash: sale.dispenser_tx_hash,
+                      sale_time: sale.sale_time ?? null,
+                      time_ago: sale.time_ago,
+                      btc_amount_satoshis: sale.btc_amount_satoshis,
+                      dispense_quantity: sale.dispense_quantity,
+                      usd_price: sale.usd_price,
+                      sale_type: sale.sale_type,
+                    },
                   };
                 }),
                 pagination: {

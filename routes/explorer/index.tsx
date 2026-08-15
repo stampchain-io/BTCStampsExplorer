@@ -22,6 +22,35 @@ import type { SRC20Row } from "$types/src20.d.ts";
 const MAX_PAGE_SIZE = 120;
 
 /* ===== HELPERS ===== */
+/**
+ * StampController.getRecentSales returns flat sale fields (btc_amount,
+ * buyer_address, etc.) rather than nesting them under `sale_data`. Nest
+ * them into the canonical shape (StampSaleData, $types/stamp.d.ts) here
+ * instead of passing the flat controller shape straight through, so
+ * StampCard can read `stamp.sale_data` directly without a flat-field
+ * fallback.
+ */
+function nestRecentSaleData(sale: any) {
+  return {
+    ...sale,
+    sale_data: {
+      btc_amount: sale.btc_amount,
+      block_index: sale.block_index,
+      tx_hash: sale.tx_hash,
+      buyer_address: sale.buyer_address,
+      seller_address: sale.seller_address,
+      dispenser_address: sale.dispenser_address,
+      dispenser_tx_hash: sale.dispenser_tx_hash,
+      sale_time: sale.sale_time ?? null,
+      time_ago: sale.time_ago,
+      btc_amount_satoshis: sale.btc_amount_satoshis,
+      dispense_quantity: sale.dispense_quantity,
+      usd_price: sale.usd_price,
+      sale_type: sale.sale_type,
+    },
+  };
+}
+
 function extractSrc20Rows(
   result: unknown,
 ): { data: SRC20Row[]; total: number; page: number; totalPages: number } {
@@ -249,8 +278,13 @@ export const handler: Handlers = {
           ),
         ]);
         // StampController.getRecentSales returns flat sale fields
-        // (btc_amount, buyer_address, etc.) — StampCard normalizes this
-        // itself (via isRecentSale) so no nesting is needed here.
+        // (btc_amount, buyer_address, etc.) — nest them into sale_data so
+        // StampCard can read stamp.sale_data directly.
+        stampResult = {
+          ...stampResult,
+          data: (Array.isArray(stampResult.data) ? stampResult.data : [])
+            .map(nestRecentSaleData),
+        };
       } else {
         // Regular stamp listing + SRC-20 transactions in parallel.
         // Skip each fetch when the section selector excludes it.

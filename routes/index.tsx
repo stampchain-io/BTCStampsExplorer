@@ -19,6 +19,35 @@ import {
 import { StampController } from "$server/controller/stampController.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
 
+/* ===== HELPERS ===== */
+/**
+ * StampController.getRecentSales returns flat sale fields (btc_amount,
+ * buyer_address, etc.) rather than nesting them under `sale_data`. Nest them
+ * into the canonical shape (StampSaleData, $types/stamp.d.ts) here instead
+ * of passing the flat controller shape straight through, so StampCard can
+ * read `stamp.sale_data` directly without a flat-field fallback.
+ */
+function nestRecentSaleData(sale: any) {
+  return {
+    ...sale,
+    sale_data: {
+      btc_amount: sale.btc_amount,
+      block_index: sale.block_index,
+      tx_hash: sale.tx_hash,
+      buyer_address: sale.buyer_address,
+      seller_address: sale.seller_address,
+      dispenser_address: sale.dispenser_address,
+      dispenser_tx_hash: sale.dispenser_tx_hash,
+      sale_time: sale.sale_time ?? null,
+      time_ago: sale.time_ago,
+      btc_amount_satoshis: sale.btc_amount_satoshis,
+      dispense_quantity: sale.dispense_quantity,
+      usd_price: sale.usd_price,
+      sale_type: sale.sale_type,
+    },
+  };
+}
+
 /* ===== TYPES ===== */
 // Define the shape of pageData from StampController.getHomePageData()
 interface StampControllerData {
@@ -255,11 +284,8 @@ export const handler: Handlers<HomePageData> = {
         fetchWithFallback(
           async () => {
             const result = await StampController.getRecentSales(1, 8);
-            // StampController.getRecentSales returns flat sale fields
-            // (btc_amount, buyer_address, etc.) — StampCard normalizes this
-            // itself (via isRecentSale) so no nesting is needed here.
             return {
-              data: result.data || [],
+              data: (result.data || []).map(nestRecentSaleData),
               total: result.total || 0,
               page: result.page || 1,
               totalPages: result.totalPages || 0,

@@ -9,7 +9,10 @@ import StampTextContent from "$islands/content/stampDetailContent/StampTextConte
 import BuyStampModal from "$islands/modal/BuyStampModal.tsx";
 import { openModal } from "$islands/modal/states.ts";
 import { container3, containerCard, containerPill } from "$layout";
-import { fetchLowestPriceOpenDispenser } from "$lib/utils/api/dispensers/fetchLowestPriceDispenser.ts";
+import {
+  getFreshDispenserForPurchase,
+  useLowestPriceDispenser,
+} from "$lib/hooks/useLowestPriceDispenser.ts";
 import {
   abbreviateAddress,
   formatFileSize,
@@ -34,43 +37,18 @@ import {
   cardSupply,
   truncate,
 } from "$text";
-import type { StampCardVariant, StampRow } from "$types/stamp.d.ts";
+import type {
+  StampCardVariant,
+  StampRow,
+  StampSaleData,
+} from "$types/stamp.d.ts";
 import { VNode } from "preact";
 import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
-interface StampSaleData {
-  btc_amount: number;
-  block_index: number;
-  tx_hash: string;
-  buyer_address?: string | undefined;
-  dispenser_address?: string | undefined;
-  time_ago?: string | undefined;
-  sale_time?: number | null | undefined;
-  dispense_quantity?: number | undefined;
-  btc_amount_satoshis?: number | undefined;
-  dispenser_tx_hash?: string | undefined;
-}
-
 interface StampWithSaleData extends Omit<StampRow, "stamp_base64"> {
   sale_data?: StampSaleData;
   stamp_base64?: string;
-  // StampController.getRecentSales (and StampService.getRecentSales) return
-  // these sale details as flat top-level fields rather than nested under
-  // `sale_data`. Callers can pass that result straight through — see
-  // `saleData` below, which normalizes either shape — instead of every call
-  // site re-wrapping the flat fields into `sale_data` itself.
-  btc_amount?: number;
-  btc_amount_satoshis?: number;
-  buyer_address?: string;
-  dispenser_address?: string;
-  dispenser_tx_hash?: string;
-  time_ago?: string;
-  dispense_quantity?: number;
-  // StampService.getRecentSales returns the USD sale price as these flat
-  // top-level fields (not nested under `market_data`) — see displayPriceUSD.
-  usd_price?: number;
-  lastSalePriceUSD?: number;
 }
 
 /* ===== COMPONENT ===== */
@@ -95,10 +73,14 @@ export function StampCard({
 
   // Buy modal fee state (mirrors StampInfo's fee handling for BuyStampModal)
   const [fee, setFee] = useState<number>(0);
-  // Marketplace/listing responses don't attach a real dispenser to buy from
-  // (only aggregated market data) — tracks the on-demand fetch triggered by
-  // clicking BUY. See handleBuyClick below.
+  // Tracks the BUY-click purchase flow (distinct from the passive
+  // useLowestPriceDispenser fetch below) — see handleBuyClick.
   const [isFetchingDispenser, setIsFetchingDispenser] = useState(false);
+
+  // Root element ref for the shared lazy-dispenser hook (see below) —
+  // shared across all render variants since only one JSX tree is ever
+  // returned per render.
+  const cardRef = useRef<HTMLDivElement>(null);
 
   // Audio-related state (always declared to avoid conditional hooks)
   const [isPlaying, setIsPlaying] = useState(false);
@@ -138,23 +120,11 @@ export function StampCard({
     stamp.stamp_mimetype === "application/json" ||
     stamp.stamp_mimetype === "text/json";
 
-  // Normalize sale info: accept either the nested `sale_data` shape or the
-  // flat fields StampController.getRecentSales returns directly, so callers
-  // don't each have to re-wrap the flat result themselves.
-  const saleData: StampSaleData | undefined = stamp.sale_data ??
-    (isRecentSale && stamp.btc_amount != null
-      ? {
-        btc_amount: stamp.btc_amount,
-        block_index: stamp.block_index,
-        tx_hash: stamp.tx_hash,
-        buyer_address: stamp.buyer_address,
-        dispenser_address: stamp.dispenser_address,
-        time_ago: stamp.time_ago,
-        btc_amount_satoshis: stamp.btc_amount_satoshis,
-        dispenser_tx_hash: stamp.dispenser_tx_hash,
-        dispense_quantity: stamp.dispense_quantity,
-      }
-      : undefined);
+  // Every caller (routes/index.tsx, routes/explorer/index.tsx,
+  // routes/stamp/index.tsx, routes/marketplace/index.tsx) now nests sale
+  // details under `sale_data` (StampSaleData, $types/stamp.d.ts) — no flat
+  // top-level fallback needed here anymore.
+  const saleData: StampSaleData | undefined = stamp.sale_data;
 
   /* ===== TOOLTIP HANDLERS ===== */
   const handleRecursiveMouseEnter = () => {
@@ -615,12 +585,10 @@ export function StampCard({
     const marketData = (stamp as any)?.market_data;
 
     if (isRecentSale && saleData) {
-      // StampService.getRecentSales doesn't nest its USD price under
-      // `market_data` — it returns flat `usd_price`/`lastSalePriceUSD`
-      // fields instead (see routes/index.tsx & routes/marketplace/index.tsx).
+      // usd_price is computed server-side (StampService.getRecentSales) and
+      // nested under sale_data by every route — see saleData above.
       return marketData?.recent_sale_price_usd ??
-        stamp.usd_price ??
-        stamp.lastSalePriceUSD ??
+        saleData.usd_price ??
         null;
     }
 
@@ -655,12 +623,25 @@ export function StampCard({
     return stringValue.length > 6;
   };
 
-  // Dispenser data isn't part of the base StampRow type — only the stamp
-  // detail page (routes/stamp/[id].tsx) attaches a real one server-side.
-  // Marketplace/listing responses only carry aggregated market data, so
-  // this is typically undefined there and handleBuyClick fetches it on
-  // demand instead (see fetchLowestPriceOpenDispenser).
-  const lowestPriceDispenser = (stamp as any).lowestPriceDispenser;
+  // Only the listing variants (marketplace grid + row-equivalent cards)
+  // need a live dispenser to buy from — cardVerticalDetail and friends are
+  // used on pages with their own buy flow (e.g. StampInfo.tsx), so gate the
+  // hook's fetch to listing variants only, even though the ref below is
+  // attached to every variant's shared root element.
+  const isListingVariant = variant === "cardHorizontalListing" ||
+    variant === "cardHorizontalListingCompact" ||
+    variant === "cardVerticalListing";
+
+  // Per stampchain.io#1209 / btc_stamps#939: marketplace/listing responses
+  // only carry aggregated market data, never a concrete dispenser to buy
+  // from — this hook lazily resolves one once the card scrolls into view
+  // (shared cache with StampListingsRow, the table's equivalent), and
+  // short-circuits entirely once the server starts providing
+  // stamp.lowestPriceDispenser directly (see the hook for details).
+  const { dispenser: lowestPriceDispenser } = useLowestPriceDispenser(
+    isListingVariant ? stamp : null,
+    cardRef,
+  );
 
   // Whether the stamp actually has a dispenser open to buy from right now.
   // Gates every price display AND the BUY button/CTA — deliberately never
@@ -686,16 +667,17 @@ export function StampCard({
     );
   };
 
+  // Because BUY constructs a real spend transaction, this re-checks for a
+  // fresher dispenser rather than blindly trusting whatever the passive
+  // useLowestPriceDispenser hook above already resolved — getFreshDispenser
+  // ForPurchase treats a cache hit older than ~12s as stale and re-fetches
+  // once more. Usually resolves instantly since the display hook already
+  // populated the shared cache by the time a user can click BUY.
   const handleBuyClick = async () => {
-    if (lowestPriceDispenser) {
-      openBuyModal(lowestPriceDispenser);
-      return;
-    }
-
     if (isFetchingDispenser || !stamp.cpid) return;
     setIsFetchingDispenser(true);
     try {
-      const dispenser = await fetchLowestPriceOpenDispenser(stamp.cpid);
+      const dispenser = await getFreshDispenserForPurchase(stamp);
       if (!dispenser) {
         showToast("This stamp is no longer listed for sale.", "info");
         return;
@@ -709,7 +691,7 @@ export function StampCard({
   /* ===== RENDER: HORIZONTAL LISTING VARIANT ===== */
   if (variant === "cardHorizontalListing") {
     return (
-      <div class="relative flex w-full">
+      <div ref={cardRef} class="relative flex w-full">
         <a
           href={`/stamp/${stamp.tx_hash}`}
           target="_top"
@@ -759,7 +741,7 @@ export function StampCard({
           {/* Row 1: Supply (left) + Status Icons (right) */}
           <div class="flex justify-between items-center w-full">
             <div class={`${containerPill} ${cardSupply}`}>
-              {(stamp as any).lowestPriceDispenser?.give_remaining ??
+              {lowestPriceDispenser?.give_remaining ??
                 stamp.supply ?? 1}/{stamp.supply ?? 1}
             </div>
             <div class="flex items-center gap-1.5 mr-0.5 -translate-y-0.5">
@@ -933,7 +915,7 @@ export function StampCard({
   /* ===== RENDER: COMPACT HORIZONTAL LISTING VARIANT ===== */
   if (variant === "cardHorizontalListingCompact") {
     return (
-      <div class="relative flex w-full">
+      <div ref={cardRef} class="relative flex w-full">
         <a
           href={`/stamp/${stamp.tx_hash}`}
           target="_top"
@@ -982,7 +964,7 @@ export function StampCard({
           {/* ===== FOOTER: SUPPLY (LEFT) + PRICE (RIGHT) ===== */}
           <div class="flex justify-between items-center w-full">
             <div class={`${containerPill} ${cardSupply}`}>
-              {(stamp as any).lowestPriceDispenser?.give_remaining ??
+              {lowestPriceDispenser?.give_remaining ??
                 stamp.supply ?? 1}/{stamp.supply ?? 1}
             </div>
             {isListed && (
@@ -1008,7 +990,10 @@ export function StampCard({
   /* ===== CARD VARIANTS ===== */
   return (
     /* ===== SQUARE CARD (home / gallery pages) ===== */
-    <div class="relative flex justify-center w-full h-full max-w-72">
+    <div
+      ref={cardRef}
+      class="relative flex justify-center w-full h-full max-w-72"
+    >
       <a
         href={`/stamp/${stamp.tx_hash}`}
         target="_top"
@@ -1066,8 +1051,7 @@ export function StampCard({
               <div class={`${containerPill} ${cardSupply}`}>
                 {variant === "cardVerticalListing"
                   ? `${
-                    (stamp as any).lowestPriceDispenser?.give_remaining ??
-                      stamp.supply ?? 1
+                    lowestPriceDispenser?.give_remaining ?? stamp.supply ?? 1
                   }/${stamp.supply ?? 1}`
                   : supplyDisplay}
               </div>

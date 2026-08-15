@@ -1,5 +1,5 @@
 import { DEFAULT_CACHE_DURATION, MAX_PAGINATION_LIMIT } from "$constants";
-import type { StampFilters, StampRow } from "$types/stamp.d.ts";
+import type { DispenserRow, StampFilters, StampRow } from "$types/stamp.d.ts";
 import type {
     CacheStatus,
     CollectionMarketData,
@@ -39,6 +39,49 @@ function parseExchangeSources(sources: any): string[] {
   return [];
 }
 
+/**
+ * Builds the DispenserRow-shaped `lowestPriceDispenser` from the
+ * lowest_dispenser_* columns (btc_stamps#939), or `null` if the stamp has
+ * no open dispenser (or the columns aren't populated yet). satoshirate /
+ * give_quantity / give_remaining / escrow_quantity are BIGINT columns that
+ * come back as strings, same as last_sale_btc_amount elsewhere in this
+ * file — parsed here as raw satoshi integers (not divided by 1e8), matching
+ * DispenserRow.satoshirate's existing convention across the app (see
+ * BuyStampModal.tsx, which divides by 1e8 itself when displaying BTC).
+ *
+ * Fields the indexer doesn't store per #939's proposal (block_index,
+ * confirmed, close_block_index, status) are filled with sensible defaults
+ * for an open dispenser, since this is only ever "the lowest-price OPEN
+ * dispenser" by definition.
+ */
+function parseLowestPriceDispenser(
+  row: StampMarketDataRow,
+): DispenserRow | null {
+  if (!row.lowest_dispenser_tx_hash) return null;
+
+  const satoshirate = parseInt(row.lowest_dispenser_satoshirate || "0", 10) ||
+    0;
+
+  return {
+    tx_hash: row.lowest_dispenser_tx_hash,
+    block_index: 0,
+    source: row.lowest_dispenser_source || "",
+    cpid: row.cpid,
+    give_quantity: parseInt(row.lowest_dispenser_give_quantity || "0", 10) ||
+      0,
+    give_remaining:
+      parseInt(row.lowest_dispenser_give_remaining || "0", 10) || 0,
+    escrow_quantity:
+      parseInt(row.lowest_dispenser_escrow_quantity || "0", 10) || 0,
+    satoshirate,
+    btcrate: satoshirate / 100000000,
+    origin: row.lowest_dispenser_origin || row.lowest_dispenser_source || "",
+    confirmed: true,
+    close_block_index: null,
+    status: "open",
+  };
+}
+
 function parseVolumeSources(sources: any): any {
   if (!sources) return {};
   if (typeof sources === 'object' && sources !== null && !Array.isArray(sources)) {
@@ -65,6 +108,69 @@ function parseVolumeSources(sources: any): any {
 
 import { dbManager } from "$server/database/databaseManager.ts";
 
+// Lowest-price open dispenser columns proposed in btc_stamps#939 ("Store
+// lowest-price open dispenser in stamp_market_data") — not yet added by the
+// indexer. Referencing a column that genuinely doesn't exist in a MySQL
+// SELECT is a hard query error (not a soft null), so probe for these once
+// per process and only include them in the SELECTs below once they're
+// actually there. The moment the indexer ships the migration, this flips
+// to true (next process restart, or immediately on a cold cache) with zero
+// code changes needed anywhere else in this repo — see
+// parseStampMarketDataRow, StampService.enrichStampWithMarketData, and
+// useLowestPriceDispenser (lib/hooks/) for the rest of the forward-compat
+// chain.
+const LOWEST_DISPENSER_COLUMNS = [
+  "lowest_dispenser_tx_hash",
+  "lowest_dispenser_source",
+  "lowest_dispenser_origin",
+  "lowest_dispenser_satoshirate",
+  "lowest_dispenser_give_quantity",
+  "lowest_dispenser_give_remaining",
+  "lowest_dispenser_escrow_quantity",
+] as const;
+
+let lowestDispenserColumnsAvailable: Promise<boolean> | null = null;
+
+async function checkLowestDispenserColumnsAvailable(
+  db: typeof dbManager,
+): Promise<boolean> {
+  try {
+    const result = await db.executeQuery<{ rows?: Array<{ col_count: number }> }>(
+      `SELECT COUNT(*) as col_count
+       FROM INFORMATION_SCHEMA.COLUMNS
+       WHERE TABLE_SCHEMA = DATABASE()
+         AND TABLE_NAME = 'stamp_market_data'
+         AND COLUMN_NAME = 'lowest_dispenser_tx_hash'`,
+      [],
+    );
+    return (result?.rows?.[0]?.col_count ?? 0) > 0;
+  } catch {
+    // Fail closed (act as if unavailable) rather than let a probe error
+    // take down every caller of the three market data SELECTs below.
+    return false;
+  }
+}
+
+/**
+ * Returns the SQL fragment selecting the 7 lowest_dispenser_* columns
+ * (with an optional `prefix`, e.g. "smd." for the getStampsWithMarketData
+ * JOIN), or an empty string if the columns don't exist on this schema yet.
+ * The availability check itself is memoized for the life of the process.
+ */
+async function getLowestDispenserColumnsSql(
+  db: typeof dbManager,
+  prefix = "",
+): Promise<string> {
+  if (!lowestDispenserColumnsAvailable) {
+    lowestDispenserColumnsAvailable = checkLowestDispenserColumnsAvailable(db);
+  }
+  const available = await lowestDispenserColumnsAvailable;
+  if (!available) return "";
+  return LOWEST_DISPENSER_COLUMNS.map((col) => `${prefix}${col},`).join(
+    "\n        ",
+  ) + "\n       ";
+}
+
 /**
  * Repository for accessing market data from cache tables.
  * Provides methods to retrieve market data for stamps, SRC-20 tokens,
@@ -84,6 +190,9 @@ export class MarketDataRepository {
    * @returns StampMarketData or null if not found/no market data
    */
   static async getStampMarketData(cpid: string): Promise<StampMarketData | null> {
+    const lowestDispenserColumnsSql = await getLowestDispenserColumnsSql(
+      this.db,
+    );
     const query = `
       SELECT
         cpid,
@@ -115,6 +224,7 @@ export class MarketDataRepository {
         last_sale_block_index,
         activity_level,
         last_activity_time,
+        ${lowestDispenserColumnsSql}
         TIMESTAMPDIFF(MINUTE, last_updated, UTC_TIMESTAMP()) as cache_age_minutes
       FROM stamp_market_data
       WHERE cpid = ?
@@ -164,6 +274,11 @@ export class MarketDataRepository {
       sortOrder = 'DESC'
     } = options;
 
+    const lowestDispenserColumnsSql = await getLowestDispenserColumnsSql(
+      this.db,
+      "smd.",
+    );
+
     // Build the query with LEFT JOIN to include stamps without market data
     let query = `
       SELECT
@@ -189,6 +304,7 @@ export class MarketDataRepository {
         smd.last_updated as market_data_last_updated,
         smd.last_price_update,
         smd.update_frequency_minutes,
+        ${lowestDispenserColumnsSql}
         TIMESTAMPDIFF(MINUTE, smd.last_updated, UTC_TIMESTAMP()) as cache_age_minutes
       FROM stamps st
       LEFT JOIN creator cr ON st.creator = cr.address
@@ -294,6 +410,18 @@ export class MarketDataRepository {
             last_sale_block_index: row.last_sale_block_index,
             activity_level: row.activity_level,
             last_activity_time: row.last_activity_time,
+            // Selected as smd.lowest_dispenser_* above (only present once
+            // btc_stamps#939 ships) — row.* picks them up under their bare
+            // column names same as every other smd.* field here.
+            lowest_dispenser_tx_hash: row.lowest_dispenser_tx_hash,
+            lowest_dispenser_source: row.lowest_dispenser_source,
+            lowest_dispenser_origin: row.lowest_dispenser_origin,
+            lowest_dispenser_satoshirate: row.lowest_dispenser_satoshirate,
+            lowest_dispenser_give_quantity: row.lowest_dispenser_give_quantity,
+            lowest_dispenser_give_remaining:
+              row.lowest_dispenser_give_remaining,
+            lowest_dispenser_escrow_quantity:
+              row.lowest_dispenser_escrow_quantity,
             cache_age_minutes: row.cache_age_minutes
           };
 
@@ -551,6 +679,10 @@ export class MarketDataRepository {
     // Build placeholders for the IN clause
     const placeholders = cpids.map(() => '?').join(',');
 
+    const lowestDispenserColumnsSql = await getLowestDispenserColumnsSql(
+      this.db,
+    );
+
     const query = `
       SELECT
         cpid,
@@ -582,6 +714,7 @@ export class MarketDataRepository {
         last_sale_block_index,
         activity_level,
         last_activity_time,
+        ${lowestDispenserColumnsSql}
         TIMESTAMPDIFF(MINUTE, last_updated, UTC_TIMESTAMP()) as cache_age_minutes
       FROM stamp_market_data
       WHERE cpid IN (${placeholders})
@@ -657,6 +790,8 @@ export class MarketDataRepository {
         // Activity tracking fields
         activityLevel: row.activity_level,
         lastActivityTime: row.last_activity_time,
+        // btc_stamps#939 forward-compat — see parseLowestPriceDispenser.
+        lowestPriceDispenser: parseLowestPriceDispenser(row),
       };
     } catch (error) {
       console.error("Error parsing stamp market data row:", error);

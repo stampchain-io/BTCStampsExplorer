@@ -15,7 +15,6 @@ import {
   container2,
   shadowGlowPurple,
 } from "$layout";
-import { fetchLowestPriceOpenDispenser } from "$lib/utils/api/dispensers/fetchLowestPriceDispenser.ts";
 import {
   isBrowser,
   safeNavigate,
@@ -29,7 +28,11 @@ import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
 import { showToast } from "$lib/utils/ui/notifications/toastSignal.ts";
 import { cardRowStampNumber, labelXxs, textXs, valueDarkSm } from "$text";
 import type { StampRow } from "$types/stamp.d.ts";
-import { useState } from "preact/hooks";
+import {
+  getFreshDispenserForPurchase,
+  useLowestPriceDispenser,
+} from "$lib/hooks/useLowestPriceDispenser.ts";
+import { useRef, useState } from "preact/hooks";
 
 /* ===== CONSTANTS ===== */
 const HEADERS = [
@@ -45,37 +48,6 @@ const HEADERS = [
   "BUY",
 ];
 
-/* ===== HELPERS ===== */
-function getDispenser(stamp: StampRow): {
-  txHash: string | null;
-  source: string | null;
-  origin: string | null;
-  giveRemaining: number | null;
-  raw: Record<string, unknown> | null;
-} {
-  const d = (stamp as unknown as Record<string, unknown>).lowestPriceDispenser;
-  if (!d || typeof d !== "object") {
-    return {
-      txHash: null,
-      source: null,
-      origin: null,
-      giveRemaining: null,
-      raw: null,
-    };
-  }
-  const dispenser = d as Record<string, unknown>;
-  return {
-    txHash: typeof dispenser.tx_hash === "string" ? dispenser.tx_hash : null,
-    source: typeof dispenser.source === "string" ? dispenser.source : null,
-    origin: typeof dispenser.origin === "string" ? dispenser.origin : null,
-    giveRemaining: typeof dispenser.give_remaining === "number"
-      ? dispenser.give_remaining
-      : null,
-    // Raw dispenser object (satoshirate, give_quantity, etc.) needed by BuyStampModal
-    raw: dispenser,
-  };
-}
-
 /* ===== ROW COMPONENT ===== */
 interface StampListingsRowProps {
   stamp: StampRow;
@@ -84,16 +56,24 @@ interface StampListingsRowProps {
 export function StampListingsRow({ stamp }: StampListingsRowProps) {
   const imgSrc = getStampImageSrc(stamp);
   const href = `/stamp/${stamp.tx_hash}`;
-  const dispenser = getDispenser(stamp);
+  const rowRef = useRef<HTMLTableRowElement>(null);
+  // Lazily resolves the live open dispenser once this row scrolls into
+  // view (per stampchain.io#1209 / btc_stamps#939 — see the hook for why
+  // this can't be a bulk server-side fetch). `dispenser` is a DispenserRow,
+  // so its fields (source, origin, give_remaining, tx_hash, ...) can be
+  // read directly and passed straight to BuyStampModal.
+  const { dispenser, isLoading: isDispenserLoading } = useLowestPriceDispenser(
+    stamp,
+    rowRef,
+  );
   const [fee, setFee] = useState<number>(0);
   // getStampImageSrc points HTML (and some other) mimetypes at a content
   // URL that can't render inside an <img> — track load failure so we swap
   // to the placeholder icon instead of leaving a broken-image icon.
   const [imageFailed, setImageFailed] = useState(false);
-  // Marketplace/listing responses don't attach a real dispenser to buy from
-  // (only aggregated market data) — tracks the on-demand fetch triggered by
-  // clicking BUY when dispenser.raw is missing. See handleBuyClick below.
-  const [isFetchingDispenser, setIsFetchingDispenser] = useState(false);
+  // Tracks the BUY-click purchase flow (distinct from isDispenserLoading,
+  // the passive display fetch above) — see handleBuyClick below.
+  const [isPurchasing, setIsPurchasing] = useState(false);
 
   const creatorDisplay = stamp.creator_name
     ? stamp.creator_name
@@ -107,8 +87,8 @@ export function StampListingsRow({ stamp }: StampListingsRowProps) {
     ? formatBTCAmount(floorPrice, { includeSymbol: true, decimals: 8 })
     : null;
 
-  const listedDisplay = dispenser.giveRemaining != null
-    ? `${dispenser.giveRemaining.toLocaleString()}/${
+  const listedDisplay = dispenser?.give_remaining != null
+    ? `${dispenser.give_remaining.toLocaleString()}/${
       formatSupply(stamp.supply ?? 0, stamp.divisible)
     }`
     : formatSupply(stamp.supply ?? 0, stamp.divisible);
@@ -116,32 +96,19 @@ export function StampListingsRow({ stamp }: StampListingsRowProps) {
   // Opens the Buy modal instead of navigating to the stamp detail page.
   // BuyStampModal handles the "wallet not connected" flow internally
   // (opens Connect Wallet, then re-opens this modal once connected).
-  // Marketplace/listing responses don't attach a real dispenser
-  // (dispenser.raw), so this fetches the live one on demand — falling back
-  // to the button's default link navigation only if the stamp truly has no
-  // open dispenser left (e.g. it sold out after the page loaded).
+  // Because BUY constructs a real spend transaction, this re-checks for a
+  // fresher dispenser (getFreshDispenserForPurchase treats a cache hit
+  // older than ~12s as stale) rather than blindly trusting whatever the
+  // passive display hook above already resolved — falling back to the
+  // button's default link navigation only if the stamp truly has no open
+  // dispenser left (e.g. it sold out after the page loaded).
   const handleBuyClick = async (e: MouseEvent) => {
-    if (dispenser.raw) {
-      e.preventDefault();
-      e.stopPropagation();
-      openModal(
-        <BuyStampModal
-          stamp={stamp}
-          fee={fee}
-          handleChangeFee={setFee}
-          dispenser={dispenser.raw}
-        />,
-        "slideUpDown",
-      );
-      return;
-    }
-
-    if (isFetchingDispenser || !stamp.cpid) return;
+    if (isPurchasing || !stamp.cpid) return;
     e.preventDefault();
     e.stopPropagation();
-    setIsFetchingDispenser(true);
+    setIsPurchasing(true);
     try {
-      const liveDispenser = await fetchLowestPriceOpenDispenser(stamp.cpid);
+      const liveDispenser = await getFreshDispenserForPurchase(stamp);
       if (!liveDispenser) {
         showToast("This stamp is no longer listed for sale.", "info");
         return;
@@ -156,13 +123,14 @@ export function StampListingsRow({ stamp }: StampListingsRowProps) {
         "slideUpDown",
       );
     } finally {
-      setIsFetchingDispenser(false);
+      setIsPurchasing(false);
     }
   };
 
   /* ===== RENDER ===== */
   return (
     <tr
+      ref={rowRef}
       class={`${container2} ${shadowGlowPurple}`}
       onClick={(e) => {
         const target = e.target as HTMLElement;
@@ -275,7 +243,7 @@ export function StampListingsRow({ stamp }: StampListingsRowProps) {
       <td
         class={`${cellCenterL2Card} text-color-neutral-200`}
       >
-        {dispenser.source
+        {dispenser?.source
           ? (
             <a
               href={`/wallet/${dispenser.source}`}
@@ -284,6 +252,8 @@ export function StampListingsRow({ stamp }: StampListingsRowProps) {
               {abbreviateAddress(dispenser.source, 5)}
             </a>
           )
+          : isDispenserLoading
+          ? <span class="text-color-neutral-500">···</span>
           : <span class="text-color-neutral-500">N/A</span>}
       </td>
 
@@ -291,18 +261,20 @@ export function StampListingsRow({ stamp }: StampListingsRowProps) {
       <td
         class={`${cellCenterL2Card} text-color-neutral-200`}
       >
-        {(dispenser.origin ?? dispenser.source)
+        {(dispenser?.origin ?? dispenser?.source)
           ? (
             <a
-              href={`/wallet/${dispenser.origin ?? dispenser.source}`}
+              href={`/wallet/${dispenser!.origin ?? dispenser!.source}`}
               class="link-neutral-200"
             >
               {abbreviateAddress(
-                (dispenser.origin ?? dispenser.source)!,
+                (dispenser!.origin ?? dispenser!.source)!,
                 5,
               )}
             </a>
           )
+          : isDispenserLoading
+          ? <span class="text-color-neutral-500">···</span>
           : <span class="text-color-neutral-500">N/A</span>}
       </td>
 
@@ -316,12 +288,10 @@ export function StampListingsRow({ stamp }: StampListingsRowProps) {
           size="xxs"
           href={href}
           target="_top"
-          class={`rounded-xl ${
-            isFetchingDispenser ? "!opacity-60 !cursor-wait" : ""
-          }`}
+          class={`rounded-xl ${isPurchasing ? "!opacity-60 !cursor-wait" : ""}`}
           onClick={handleBuyClick}
         >
-          {isFetchingDispenser ? "..." : "BUY"}
+          {isPurchasing ? "..." : "BUY"}
         </Button>
       </td>
     </tr>

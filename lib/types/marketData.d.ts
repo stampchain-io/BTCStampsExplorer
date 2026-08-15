@@ -1,11 +1,11 @@
 import type { StampDispenserActivityLevel } from "$constants";
 import type { CollectionRow } from "$server/types/collection.d.ts";
 import type { SRC20Row } from "$types/src20.d.ts";
-import type { StampRow } from "$types/stamp.d.ts";
+import type { DispenserRow, StampRow } from "$types/stamp.d.ts";
 import type { MarketDataCacheInfo } from "$types/utils.d.ts";
 
 // Re-export for other modules
-export type { MarketDataCacheInfo, SRC20Row, StampRow };
+export type { DispenserRow, MarketDataCacheInfo, SRC20Row, StampRow };
 
 export interface MarketListingSummary {
   tick: string;
@@ -133,6 +133,19 @@ export interface StampMarketDataRow {
   // Activity tracking fields
   activity_level: StampDispenserActivityLevel | null;
   last_activity_time: number | null; // Unix timestamp
+  // Lowest-price open dispenser fields — not yet populated by the indexer
+  // (proposed in btc_stamps#939, "Store lowest-price open dispenser in
+  // stamp_market_data"). Optional so this type stays valid on both the
+  // current schema (columns absent, rows come back as `undefined`) and the
+  // future one (columns present, `null` when a stamp has no open
+  // dispenser). See MarketDataRepository.parseStampMarketDataRow.
+  lowest_dispenser_tx_hash?: string | null;
+  lowest_dispenser_source?: string | null;
+  lowest_dispenser_origin?: string | null;
+  lowest_dispenser_satoshirate?: string | null; // BIGINT stored as string (satoshis)
+  lowest_dispenser_give_quantity?: string | null;
+  lowest_dispenser_give_remaining?: string | null;
+  lowest_dispenser_escrow_quantity?: string | null;
 }
 
 /**
@@ -222,6 +235,14 @@ export interface StampMarketData {
   // Activity tracking fields
   activityLevel: StampDispenserActivityLevel | null;
   lastActivityTime: number | null; // Unix timestamp
+  // Parsed from the lowest_dispenser_* columns above (btc_stamps#939).
+  // DispenserRow-shaped (same snake_case fields as the live Counterparty
+  // API / fetchLowestPriceOpenDispenser) so it's a drop-in replacement
+  // everywhere a live-fetched dispenser is used today — see
+  // useLowestPriceDispenser, StampCard.tsx, and StampListingsRow, which
+  // already all read stamp.lowestPriceDispenser in this shape from the
+  // #1209 stopgap. `null` when the stamp has no open dispenser.
+  lowestPriceDispenser: DispenserRow | null;
 }
 
 export interface SRC20MarketData {
@@ -511,21 +532,10 @@ export interface RecentSalesResponse {
 }
 
 /**
- * Enhanced stamp interface with sale data for backward compatibility
+ * Enhanced stamp interface with sale data for backward compatibility.
+ * Canonical definition lives in stamp.d.ts — re-exported here so existing
+ * imports from this module keep working (previously a byte-for-byte
+ * duplicate had drifted from the stamp.d.ts copy; see stampchain.io#1209 /
+ * btc_stamps#939 history for context).
  */
-export interface StampWithEnhancedSaleData extends StampRow {
-  sale_data?: {
-    btc_amount: number;
-    block_index: number;
-    tx_hash: string;
-    buyer_address?: string;
-    dispenser_address?: string;
-    time_ago?: string;
-    sale_time?: number | null;
-    btc_amount_satoshis?: number;
-    dispenser_tx_hash?: string;
-  };
-  marketData?: StampMarketData;
-  activity_level?: StampDispenserActivityLevel;
-  last_activity_time?: number;
-}
+export type { StampWithEnhancedSaleData } from "$types/stamp.d.ts";

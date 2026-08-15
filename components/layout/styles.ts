@@ -82,7 +82,7 @@ export const containerRowForm = "flex w-full gap-5";
 export const gridCardVertical =
   "grid grid-cols-2 mobileMd:grid-cols-3 mobileLg:grid-cols-4 tablet:grid-cols-5 desktop:grid-cols-6 gap-5 w-full auto-rows-fr";
 export const gridCardSquare =
-  "grid grid-cols-3 mobileMd:grid-cols-4 mobileLg:grid-cols-6 tablet:grid-cols-8 desktop:grid-cols-10 gap-5 w-full auto-rows-fr";
+  "grid grid-cols-3 mobileMd:grid-cols-4 mobileLg:grid-cols-5 tablet:grid-cols-6 desktop:grid-cols-8 gap-5 w-full auto-rows-fr";
 
 export function gridCard(
   viewMode: "cardVertical" | "cardSquare" | "cardRow" | "cardHorizontal",
