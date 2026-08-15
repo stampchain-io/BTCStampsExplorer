@@ -97,13 +97,11 @@ export default function CollectionDetailPage(
     >
       <CollectionDetailHeader collection={collection} stamps={stamps} />
       <CollectionDetailContent stamps={stamps} />
-      <div class="mt-7.5 tablet:mt-10">
-        <PaginationButtons
-          page={page}
-          totalPages={pages}
-          // Remove onPageChange to let PaginationButtons component use its built-in Fresh navigation
-        />
-      </div>
+      <PaginationButtons
+        page={page}
+        totalPages={pages}
+        // Remove onPageChange to let PaginationButtons component use its built-in Fresh navigation
+      />
     </div>
   );
 }

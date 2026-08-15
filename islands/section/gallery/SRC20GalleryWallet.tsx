@@ -412,15 +412,13 @@ export default function SRC20GalleryWallet({
               isNumber(pagination.limit)
           ? Math.ceil(pagination.total / Math.max(pagination.limit, 1))
           : 0;
-        return totalPages > 1 && (
-          <div class="mt-6">
-            <PaginationButtons
-              page={pagination?.page ?? 1}
-              totalPages={totalPages}
-              prefix="src20"
-              onPageChange={handlePageChange}
-            />
-          </div>
+        return (
+          <PaginationButtons
+            page={pagination?.page ?? 1}
+            totalPages={totalPages}
+            prefix="src20"
+            onPageChange={handlePageChange}
+          />
         );
       })()}
     </div>

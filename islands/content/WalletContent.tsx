@@ -80,15 +80,13 @@ function PaginationBlock({
   pagination?: WalletContainerPagination | undefined;
   prefix: string;
 }) {
-  if (!pagination || pagination.totalPages <= 1) return null;
+  if (!pagination) return null;
   return (
-    <div class="mt-7.5 tablet:mt-10">
-      <PaginationButtons
-        page={pagination.page}
-        totalPages={pagination.totalPages}
-        prefix={prefix}
-      />
-    </div>
+    <PaginationButtons
+      page={pagination.page}
+      totalPages={pagination.totalPages}
+      prefix={prefix}
+    />
   );
 }
 

@@ -121,17 +121,15 @@ export function SRC20Gallery({
         </div>
       )}
 
-      {pagination && pagination.totalPages > 1 && (
-        <div class="mt-7.5 tablet:mt-10">
-          <PaginationButtons
-            page={pagination.page}
-            totalPages={pagination.totalPages}
-            {...(fromPage === "wallet" ? { prefix: "src20" } : {})}
-            {...(pagination.onPageChange
-              ? { onPageChange: pagination.onPageChange }
-              : {})}
-          />
-        </div>
+      {pagination && (
+        <PaginationButtons
+          page={pagination.page}
+          totalPages={pagination.totalPages}
+          {...(fromPage === "wallet" ? { prefix: "src20" } : {})}
+          {...(pagination.onPageChange
+            ? { onPageChange: pagination.onPageChange }
+            : {})}
+        />
       )}
     </div>
   );

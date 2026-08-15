@@ -113,15 +113,13 @@ export default function CollectionDetailGallery({
       </div>
       <ViewAllButton href="/collection/artist" />
 
-      {pagination && pagination.totalPages > 1 && (
-        <div class="mt-7.5 tablet:mt-10">
-          <PaginationButtons
-            page={pagination.page}
-            totalPages={pagination.totalPages}
-            {...(pagination.prefix && { prefix: pagination.prefix })}
-            onPageChange={handlePageChange}
-          />
-        </div>
+      {pagination && (
+        <PaginationButtons
+          page={pagination.page}
+          totalPages={pagination.totalPages}
+          {...(pagination.prefix && { prefix: pagination.prefix })}
+          onPageChange={handlePageChange}
+        />
       )}
     </div>
   );

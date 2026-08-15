@@ -303,15 +303,11 @@ export function StampGalleryWallet({
       </div>
 
       {/* Pagination */}
-      {pagination.totalPages > 1 && (
-        <div class="mt-6">
-          <PaginationButtons
-            page={pagination.page}
-            totalPages={pagination.totalPages}
-            onPageChange={handlePageChange}
-          />
-        </div>
-      )}
+      <PaginationButtons
+        page={pagination.page}
+        totalPages={pagination.totalPages}
+        onPageChange={handlePageChange}
+      />
     </div>
   );
 }

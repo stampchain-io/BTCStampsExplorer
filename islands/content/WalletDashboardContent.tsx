@@ -185,18 +185,16 @@ function DispenserItem({
       </div>
 
       {/* Pagination */}
-      {pagination && pagination.totalPages > 1 && (
-        <div class="mt-6">
-          <PaginationButtons
-            page={pagination.page}
-            totalPages={pagination.totalPages}
-            prefix="dispensers"
-            onPageChange={createPaginationHandler(
-              "dispensers_page",
-              "closed_listings",
-            )}
-          />
-        </div>
+      {pagination && (
+        <PaginationButtons
+          page={pagination.page}
+          totalPages={pagination.totalPages}
+          prefix="dispensers"
+          onPageChange={createPaginationHandler(
+            "dispensers_page",
+            "closed_listings",
+          )}
+        />
       )}
     </div>
   );

@@ -258,15 +258,13 @@ export default function StampGallery({
         <ViewAllButton href={viewAllLink} />
       )}
 
-      {pagination && pagination.totalPages > 1 && (
-        <div class="mt-7.5 tablet:mt-10">
-          <PaginationButtons
-            page={pagination.page}
-            totalPages={pagination.totalPages}
-            {...(pagination.prefix && { prefix: pagination.prefix })}
-            onPageChange={handlePageChange}
-          />
-        </div>
+      {pagination && (
+        <PaginationButtons
+          page={pagination.page}
+          totalPages={pagination.totalPages}
+          {...(pagination.prefix && { prefix: pagination.prefix })}
+          onPageChange={handlePageChange}
+        />
       )}
     </div>
   );

@@ -27,6 +27,11 @@ const navDigitSize = (pageNum: number) => {
   return "w-7 h-7 tablet:w-6 tablet:h-6";
 };
 
+// Top margin above the control — was duplicated as a wrapper <div> at every
+// call site; centralized here since this component already knows whether
+// it renders anything (see the totalPages <= 1 guard below).
+const navSpacing = "mt-5 tablet:mt-7.5";
+
 // SSR-safe screen size hook
 const useScreenSize = () => {
   const [screenSize, setScreenSize] = useState("mobileSm");
@@ -151,7 +156,7 @@ export function PaginationButtons({
   return (
     <nav
       aria-label="Page navigation"
-      class="flex items-center justify-center"
+      class={`flex items-center justify-center ${navSpacing}`}
     >
       <ul class="inline-flex items-center gap-3.5">
         {/* First and Previous */}

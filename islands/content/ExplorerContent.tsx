@@ -109,16 +109,14 @@ export function ExplorerContent({
         )}
 
       {/* ===== PAGINATION ===== */}
-      {pagination && pagination.totalPages > 1 && (
-        <div class="mt-7.5 tablet:mt-10">
-          <PaginationButtons
-            page={pagination.page}
-            totalPages={pagination.totalPages}
-            {...(pagination.prefix && { prefix: pagination.prefix })}
-            {...(pagination.onPageChange &&
-              { onPageChange: pagination.onPageChange })}
-          />
-        </div>
+      {pagination && (
+        <PaginationButtons
+          page={pagination.page}
+          totalPages={pagination.totalPages}
+          {...(pagination.prefix && { prefix: pagination.prefix })}
+          {...(pagination.onPageChange &&
+            { onPageChange: pagination.onPageChange })}
+        />
       )}
     </div>
   );

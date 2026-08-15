@@ -163,14 +163,12 @@ export default function CollectionOverviewPage(
         return (
           <>
             <CollectionDetailGallery collections={collections || []} />
-            <div class="mt-7.5 tablet:mt-10">
-              <PaginationButtons
-                page={page ?? 1}
-                totalPages={pages ?? 1}
-                // Remove onPageChange to let PaginationButtons component use its built-in Fresh navigation
-                prefix=""
-              />
-            </div>
+            <PaginationButtons
+              page={page ?? 1}
+              totalPages={pages ?? 1}
+              // Remove onPageChange to let PaginationButtons component use its built-in Fresh navigation
+              prefix=""
+            />
           </>
         );
 
