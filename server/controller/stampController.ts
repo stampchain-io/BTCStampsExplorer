@@ -524,6 +524,7 @@ export class StampController {
         page,
         limit,
         totalPages: Math.ceil(total / limit),
+        total,
         last_block: lastBlock,
         data: stamps,
       };

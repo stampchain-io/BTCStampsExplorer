@@ -467,6 +467,7 @@ export interface PaginatedStampBalanceResponseBody {
   page: number;
   limit: number;
   totalPages: number;
+  total: number;
   data: StampBalance[];
 }
 
