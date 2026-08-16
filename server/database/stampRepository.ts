@@ -1127,6 +1127,7 @@ export class StampRepository {
         ...(filterBy && { filterBy }),
         ...(suffix && { suffix }),
         ...(fileType && { fileType }),
+        ...(creatorAddress && { creatorAddress }),
       });
       total = (totalResult as any).rows[0]?.total || 0;
       totalPages = noPagination ? 1 : Math.ceil(total / limit);

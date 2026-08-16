@@ -68,7 +68,7 @@ export const buttonStyles: ButtonVariants = {
   `,
 
   /* ===== VARIANT STYLES  ===== */
-  /* If the outline/flat variants are changed then the SelectorButtons.tsx and ToggleButton.tsx files must be update too */
+  /* If the outline/flat variants are changed then ToggleButton.tsx and SelectorButtons.tsx must be updated too. Both use inline styles copying the variant styles. */
   variant: {
     outline: `
       bg-transparent

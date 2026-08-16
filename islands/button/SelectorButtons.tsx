@@ -96,10 +96,10 @@ export const SelectorButtons = ({
         gridTemplateColumns: `repeat(${N}, minmax(0, 1fr))`,
       }}
     >
-      {/* Pill — hidden during SSR, positioned via pure CSS math after hydration */}
+      {/* Pill — hidden during SSR, positioned via CSS calc. */}
       {isMounted && selectedIndex !== -1 && (
         <div
-          class={`!absolute top-0.5 bottom-0.5 z-10 ${buttonStyles.variant.flat}`}
+          class={`!absolute top-0.5 bottom-0.5 z-10 hover:!bg-[var(--color-button)] ${buttonStyles.variant.flat}`}
           style={{
             left: `calc(2px + ${selectedIndex} * (100% - 2px) / ${N})`,
             width: `calc((100% - 2px) / ${N} - 2px)`,
