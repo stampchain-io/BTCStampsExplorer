@@ -7,8 +7,8 @@ import { Handlers } from "$fresh/server.ts";
 import { body, containerGap } from "$layout";
 import type { DispenserRow, StampRow } from "$types/stamp.d.ts";
 
-import WalletDispenserDetails from "$islands/content/WalletDispenserDetails.tsx";
-import WalletProfileDetails from "$islands/content/WalletProfileDetails.tsx";
+import WalletContentDispenser from "$islands/content/WalletContentDispenser.tsx";
+import WalletHeader from "$islands/header/WalletHeader.tsx";
 import { getBTCBalanceInfo } from "$lib/utils/data/processing/balanceUtils.ts";
 import { DATA_PLACEHOLDER_DEV } from "$lib/utils/dataPlaceholderProd.ts";
 import { CollectionController } from "$server/controller/collectionController.ts";
@@ -702,7 +702,7 @@ export default function WalletPage(props: { data: WalletProfilePageProps }) {
       />
       {isDispenserOnly
         ? (
-          <WalletDispenserDetails
+          <WalletContentDispenser
             walletData={routeData.walletData as WalletOverviewInfo}
             stampsTotal={routeData.stampsTotal || 0}
             src20Total={routeData.src20Total || 0}
@@ -712,7 +712,7 @@ export default function WalletPage(props: { data: WalletProfilePageProps }) {
         )
         : (
           <>
-            <WalletProfileDetails
+            <WalletHeader
               walletData={routeData.walletData as WalletOverviewInfo}
               stampsTotal={routeData.stampsTotal}
               src20Total={routeData.src20Total}

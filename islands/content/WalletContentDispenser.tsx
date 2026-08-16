@@ -1,4 +1,4 @@
-/* ===== WALLET DISPENSER DETAILS COMPONENT ===== */
+/* ===== WALLET CONTENT DISPENSER COMPONENT ===== */
 import { Button } from "$button";
 import { StampImage } from "$content";
 import { Icon } from "$icon";
@@ -13,7 +13,7 @@ import {
 import { tooltipIcon } from "$notification";
 import { headingGreyLD, textXs, titleNeutral } from "$text";
 import type { StampRow } from "$types/stamp.d.ts";
-import type { WalletDispenserDetailsProps } from "$types/ui.d.ts";
+import type { WalletContentDispenserProps } from "$types/ui.d.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
@@ -503,9 +503,9 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
 }
 
 /* ===== MAIN COMPONENT ===== */
-export default function WalletDispenserDetails({
+export default function WalletContentDispenser({
   walletData,
-}: WalletDispenserDetailsProps) {
+}: WalletContentDispenserProps) {
   /* ===== COMPUTED VALUES ===== */
   const firstDispenser = (walletData.dispensers as any)?.items?.[0];
   const stampData = firstDispenser?.stamp;

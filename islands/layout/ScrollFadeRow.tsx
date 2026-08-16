@@ -1,7 +1,7 @@
 /* ===== SCROLL FADE ROW COMPONENT ===== */
 // Horizontally scrollable control row with edge fade masks that only
 // appear while there is more content to scroll to in that direction.
-// Used for header control rows (e.g. WalletSubHeader, MarketplaceHeader,
+// Used for header control rows (e.g. WalletHeaderContent, MarketplaceHeader,
 // SRC20OverviewHeader) that need to fit many selector/icon groups on
 // narrow screens without squeezing their content.
 import { useScrollFade } from "$lib/hooks/useScrollFade.ts";

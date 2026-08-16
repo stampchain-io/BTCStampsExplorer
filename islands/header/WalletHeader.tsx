@@ -1,4 +1,4 @@
-/* ===== WALLET PROFILE DETAILS COMPONENT ===== */
+/* ===== WALLET HEADER COMPONENT ===== */
 import { walletContext } from "$client/wallet/wallet.ts";
 import { Icon } from "$icon";
 import EditCreatorNameModal from "$islands/modal/EditCreatorNameModal.tsx";
@@ -17,7 +17,7 @@ import {
 import { showToast } from "$lib/utils/ui/notifications/toastSignal.ts";
 import { tooltipIcon } from "$notification";
 import { label, subtitlePrimary, titlePrimary, valueSm } from "$text";
-import type { WalletProfileDetailsProps } from "$types/ui.d.ts";
+import type { WalletHeaderProps } from "$types/ui.d.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
@@ -330,14 +330,14 @@ function WalletStats(
   );
 }
 
-/* ===== MAIN WALLET PROFILE DETAILS COMPONENT ===== */
-export default function WalletProfileDetails({
+/* ===== MAIN WALLET HEADER COMPONENT ===== */
+export default function WalletHeader({
   walletData,
   stampsTotal,
   src20Total,
   stampsCreated,
   setShowItem,
-}: WalletProfileDetailsProps) {
+}: WalletHeaderProps) {
   /* ===== EFFECTS ===== */
   useEffect(() => {
     const status = (walletData as any).marketDataStatus;

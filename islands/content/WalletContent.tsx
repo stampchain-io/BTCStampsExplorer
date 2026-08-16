@@ -4,7 +4,7 @@ import { CollectionCard, SRC20Card, StampCard } from "$card";
 import { StampOverviewTable } from "$components/table/explorerTable/StampOverview.tsx";
 import { StampListingsTable } from "$components/table/marketplaceTable/StampListings.tsx";
 import { SRC20OverviewCompact } from "$components/table/src20OverviewTable/SRC20OverviewCompact.tsx";
-import { WalletSubHeader } from "$header";
+import { WalletHeaderContent } from "$header";
 import { containerBackground, gridCard, rowContainerBackground } from "$layout";
 import { subtitleNeutral, valueDarkSm } from "$text";
 import type { DispenserRow, StampRow } from "$types/stamp.d.ts";
@@ -370,7 +370,7 @@ export default function WalletContent({
   /* ===== RENDER ===== */
   return (
     <div id="wallet-content-section" class={containerBackground}>
-      <WalletSubHeader section={section} tab={tab} viewMode={view} />
+      <WalletHeaderContent section={section} tab={tab} viewMode={view} />
       <div class={`w-full ${view !== "cardRow" ? "pt-5" : "pt-2"}`}>
         {section === "all"
           ? (

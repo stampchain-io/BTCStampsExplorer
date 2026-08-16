@@ -323,8 +323,8 @@ export interface TableProps<T = any> {
 //   TransitionProps,
 //   WalletComponentProps,
 //   WalletDashboardDetailsProps,
-//   WalletDispenserDetailsProps,
-//   WalletProfileDetailsProps,
+//   WalletContentDispenserProps,
+//   WalletHeaderProps,
 //   WalletProviderProps,
 //   WalletStampCardProps,
 //   WalletStampValueProps,
@@ -1103,7 +1103,7 @@ export interface WalletDashboardDetailsProps {
   setShowItem: (item: string) => void;
 }
 
-export interface WalletProfileDetailsProps {
+export interface WalletHeaderProps {
   walletData: any; // Replace with proper WalletData type if available
   stampsTotal: number;
   src20Total: number;
@@ -1111,7 +1111,7 @@ export interface WalletProfileDetailsProps {
   setShowItem: (item: string) => void;
 }
 
-export interface WalletDispenserDetailsProps {
+export interface WalletContentDispenserProps {
   walletData: WalletOverviewInfo;
   stampsTotal?: number;
   src20Total?: number;
@@ -2244,14 +2244,14 @@ export type WalletStampsTab =
 export type WalletTokensTab = "balance" | "created";
 
 /**
- * Wallet page — top-level content selector (WalletSubHeader): which
+ * Wallet page — top-level content selector (WalletHeaderContent): which
  * asset type(s) the unified wallet content container displays.
  */
 export type WalletContentTabId = "all" | "stamps" | "tokens";
 
 /**
- * Wallet page — unified sub-tab selector (WalletSubHeader). `listings` and
- * `collections` are stamps-only and only selectable when
+ * Wallet page — unified sub-tab selector (WalletHeaderContent). `listings`
+ * and `collections` are stamps-only and only selectable when
  * `WalletContentTabId` is `"stamps"`.
  */
 export type WalletContentTabIdSub =
@@ -2260,7 +2260,7 @@ export type WalletContentTabIdSub =
   | "listings"
   | "collections";
 
-export interface WalletSubHeaderProps extends BaseComponentProps {
+export interface WalletHeaderContentProps extends BaseComponentProps {
   section?: WalletContentTabId;
   tab?: WalletContentTabIdSub;
   viewMode?: "cardVertical" | "cardSquare" | "cardRow" | "cardHorizontal";

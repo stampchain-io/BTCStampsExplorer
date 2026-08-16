@@ -1,6 +1,6 @@
 /**
- * @fileoverview WalletProfileDetails Integration Tests
- * @description Tests for edit button integration and modal interaction in WalletProfileDetails
+ * @fileoverview WalletHeader Integration Tests
+ * @description Tests for edit button integration and modal interaction in WalletHeader
  */
 
 import { assertEquals, assertExists } from "@std/assert";
@@ -46,7 +46,7 @@ function createMockWalletData(
   };
 }
 
-describe("WalletProfileDetails - Edit Button Integration", () => {
+describe("WalletHeader - Edit Button Integration", () => {
   beforeEach(() => {
     // Reset mocks before each test
     mockWalletState = { address: null };

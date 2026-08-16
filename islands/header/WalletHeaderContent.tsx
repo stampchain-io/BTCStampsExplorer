@@ -1,4 +1,4 @@
-/* ===== WALLET SUB HEADER COMPONENT ===== */
+/* ===== WALLET HEADER CONTENT COMPONENT ===== */
 import { SelectorButtons } from "$button";
 import { SortButton } from "$islands/button/SortButton.tsx";
 import { ViewButton } from "$islands/button/ViewButton.tsx";
@@ -8,15 +8,15 @@ import {
   safeNavigate,
 } from "$lib/utils/navigation/freshNavigationUtils.ts";
 import { subtitlePrimary } from "$text";
-import type { WalletSubHeaderProps } from "$types/ui.d.ts";
+import type { WalletHeaderContentProps } from "$types/ui.d.ts";
 
 /* ===== COMPONENT ===== */
-export const WalletSubHeader = (
+export const WalletHeaderContent = (
   {
     section = "all",
     tab = "balance",
     viewMode = "cardVertical",
-  }: WalletSubHeaderProps,
+  }: WalletHeaderContentProps,
 ) => {
   /* ===== EVENT HANDLERS ===== */
   const handleSectionChange = (value: string) => {
@@ -118,4 +118,4 @@ export const WalletSubHeader = (
   );
 };
 
-export default WalletSubHeader;
+export default WalletHeaderContent;
