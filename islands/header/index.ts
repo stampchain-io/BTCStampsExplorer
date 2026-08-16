@@ -21,7 +21,6 @@ export * from "$islands/header/CollectionOverviewHeader.tsx";
 
 /* ===== WALLET ===== */
 export { default as WalletDashboardHeader } from "$islands/header/WalletDashboardHeader.tsx";
-export { default as WalletProfileHeader } from "$islands/header/WalletProfileHeader.tsx";
 export { default as WalletSubHeader } from "$islands/header/WalletSubHeader.tsx";
 
 /* ===== ABOUT ===== */
