@@ -59,6 +59,20 @@ export class SRC20Repository {
     };
   }
 
+  /**
+   * Adds the wallet-address filter shared by list and count queries.
+   * SRC20Valid has no `address` column — a wallet can appear as either
+   * the sender (`creator`) or the recipient (`destination`) of a tx.
+   */
+  private static pushAddressCondition(
+    whereConditions: string[],
+    queryParams: unknown[],
+    address: string,
+  ): void {
+    whereConditions.push(`(src20.creator = ? OR src20.destination = ?)`);
+    queryParams.push(address, address);
+  }
+
   static async getTotalCountValidSrc20TxFromDb(
     params: SRC20TrxRequestParams,
     excludeFullyMinted: boolean = false,
@@ -107,8 +121,7 @@ export class SRC20Repository {
     }
 
     if (address !== null) {
-      whereConditions.push(`address = ?`);
-      queryParams.push(address);
+      this.pushAddressCondition(whereConditions, queryParams, address);
     }
 
     if (tx_hash !== null) {
@@ -223,8 +236,7 @@ export class SRC20Repository {
     }
 
     if (address != null) {
-      whereClauses.push(`(src20.creator = ? OR src20.destination = ?)`);
-      queryParams.push(address, address);
+      this.pushAddressCondition(whereClauses, queryParams, address);
     }
 
     if (stampMax != null) {
@@ -1348,8 +1360,7 @@ export class SRC20Repository {
     }
 
     if (address !== null) {
-      whereConditions.push(`src20.address = ?`);
-      queryParams.push(address);
+      this.pushAddressCondition(whereConditions, queryParams, address);
     }
 
     if (tx_hash !== null) {

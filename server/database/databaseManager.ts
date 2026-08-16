@@ -86,6 +86,72 @@ function shouldInitializeRedis(): boolean {
   return !skip;
 }
 
+export type SqlErrorReason =
+  | "nonRetryable"
+  | "queryTimeout"
+  | "poolExhaustion"
+  | "connectionError"
+  | "unknown";
+
+export interface SqlErrorClassification {
+  reason: SqlErrorReason;
+  shouldRetry: boolean;
+  isConnectionError: boolean;
+}
+
+/**
+ * Classifies a MySQL error message so `executeQuery` knows whether to
+ * retry, and whether the client connection must be closed rather than
+ * returned to the pool.
+ *
+ * Order matters: query/read timeouts (e.g. "connection read timed out")
+ * also match the generic "connection" substring further down, so they are
+ * checked first. Otherwise a slow-but-still-running query would get
+ * retried on a fresh connection while the original kept executing
+ * server-side, compounding load instead of recovering from it.
+ */
+export function classifySqlError(message: string): SqlErrorClassification {
+  // Schema/syntax errors can never succeed on retry.
+  if (
+    message.includes("syntax error") ||
+    message.includes("Unknown column") ||
+    message.includes("doesn't exist") ||
+    message.includes("ER_BAD_FIELD_ERROR") ||
+    message.includes("ER_NO_SUCH_TABLE") ||
+    message.includes("ER_PARSE_ERROR") ||
+    message.includes("constraint") ||
+    message.includes("duplicate") ||
+    message.includes("foreign key")
+  ) {
+    return { reason: "nonRetryable", shouldRetry: false, isConnectionError: false };
+  }
+
+  // Query/read timeouts: the original query may still be running
+  // server-side, so retrying just piles up duplicate work on top of it.
+  if (message.includes("timed out") || message.includes("ETIMEDOUT")) {
+    return { reason: "queryTimeout", shouldRetry: false, isConnectionError: true };
+  }
+
+  // Pool exhaustion has no client to clean up — just back off and retry.
+  if (message.includes("No available connections in the pool")) {
+    return { reason: "poolExhaustion", shouldRetry: true, isConnectionError: false };
+  }
+
+  // Transient connection/network errors: safe to close and retry fresh.
+  if (
+    message.includes("disconnected by the server") ||
+    message.includes("wait_timeout") ||
+    message.includes("interactive_timeout") ||
+    message.includes("connection") ||
+    message.includes("PROTOCOL_CONNECTION_LOST") ||
+    message.includes("ECONNRESET")
+  ) {
+    return { reason: "connectionError", shouldRetry: true, isConnectionError: true };
+  }
+
+  return { reason: "unknown", shouldRetry: true, isConnectionError: false };
+}
+
 class DatabaseManager {
   #pool: Client[] = [];
   #activeConnections = 0; // Track active connections
@@ -410,33 +476,22 @@ class DatabaseManager {
         let isConnectionError = false;
 
         if (error instanceof Error) {
-          // Check if it's a connection pool exhaustion error
-          if (error.message.includes("No available connections in the pool")) {
+          const classification = classifySqlError(error.message);
+          shouldRetry = classification.shouldRetry;
+          isConnectionError = classification.isConnectionError;
+
+          if (classification.reason === "poolExhaustion") {
             this.#logger.warn(
               `Connection pool exhausted on attempt ${attempt}. Pool stats: ${JSON.stringify(this.getConnectionStats())}`,
             );
-            // Don't set isConnectionError for pool exhaustion - there's no client to clean up
-            shouldRetry = true;
-          }
-          // Check if it's a connection timeout/network error
-          else if (error.message.includes("disconnected by the server") ||
-                   error.message.includes("wait_timeout") ||
-                   error.message.includes("interactive_timeout") ||
-                   error.message.includes("connection") ||
-                   error.message.includes("PROTOCOL_CONNECTION_LOST") ||
-                   error.message.includes("ECONNRESET") ||
-                   error.message.includes("ETIMEDOUT")) {
+          } else if (classification.reason === "connectionError") {
             this.#logger.warn(
               `Connection error detected on attempt ${attempt}: ${error.message}`,
             );
-            isConnectionError = true;
-          }
-          // For SQL syntax errors or constraint violations, don't retry
-          else if (error.message.includes("syntax error") ||
-                   error.message.includes("constraint") ||
-                   error.message.includes("duplicate") ||
-                   error.message.includes("foreign key")) {
-            shouldRetry = false;
+          } else if (classification.reason === "queryTimeout") {
+            this.#logger.warn(
+              `Query timed out on attempt ${attempt}, not retrying (original query may still be running server-side): ${error.message}`,
+            );
           }
         }
 
@@ -460,9 +515,9 @@ class DatabaseManager {
           );
           throw error;
         } else {
+          const errorMessage = error instanceof Error ? error.message : String(error);
           this.#logger.warn(
-            `Query failed on attempt ${attempt}, retrying...`,
-            error instanceof Error ? error.message : String(error),
+            `Query failed on attempt ${attempt}, retrying...: ${errorMessage}`,
           );
         }
       }
