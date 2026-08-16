@@ -55,14 +55,15 @@ export const bodyTool = `
   ${body} mobileMd:max-w-[420px] mobileMd:mx-auto
 `;
 export const bodyArticle = `
-  ${body} tablet:max-w-[922px] tablet:mx-auto p-5 ${container1}
+  ${body} ${container1} tablet:max-w-[922px] tablet:mx-auto p-5
 `;
 
 /* ===== CONTAINER STYLES ===== */
 // Base styles
-export const containerBackground = `${body} p-5 ${container1}`;
-export const containerGap = "gap-5 mobileLg:gap-7.5";
-export const containerDetailImage = `relative p-2 ${container1}`;
+export const containerBackground = `${body} ${container1} p-5`;
+export const containerGap =
+  "gap-section-mobile mobileLg:gap-section-tablet tablet:gap-section-desktop";
+export const containerDetailImage = `relative ${container1} p-2`;
 export const containerStickyBottom =
   `sticky bottom-0 mt-auto pb-7.5 tablet:pb-5`;
 

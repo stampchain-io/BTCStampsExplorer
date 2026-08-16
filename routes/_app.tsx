@@ -212,7 +212,7 @@ export default function App({ Component, state, url }: PageProps<unknown>) {
                 {/* ===== LAYOUT STRUCTURE ===== */}
                 <Header />
                 <main
-                  class="flex flex-col flex-grow w-full max-w-desktop mx-auto px-gutter-mobile mobileLg:px-gutter-tablet tablet:px-gutter-desktop"
+                  class="flex flex-col flex-grow w-full max-w-desktop mx-auto px-shell-mobile mobileLg:px-shell-tablet tablet:px-shell-desktop"
                   f-client-nav
                 >
                   <Partial name="body">

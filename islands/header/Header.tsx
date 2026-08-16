@@ -283,7 +283,7 @@ export function Header() {
     if (toolsButtonRef.current) {
       const rect = toolsButtonRef.current.getBoundingClientRect();
       toolsPos = {
-        top: rect.bottom + 20,
+        top: rect.bottom + 23,
         left: rect.right - 550 + 61,
       };
     }
@@ -319,7 +319,7 @@ export function Header() {
     if (walletButtonRef.current) {
       const rect = walletButtonRef.current.getBoundingClientRect();
       walletPos = {
-        top: rect.bottom + 20,
+        top: rect.bottom + 23,
         left: rect.right - 150 - 50,
       };
     }
@@ -530,8 +530,8 @@ export function Header() {
   /* ===== COMPONENT RENDER ===== */
   return (
     <header class="mobileLg:flex justify-between items-center max-w-desktop w-full mx-auto
-     px-gutter-mobile mobileLg:px-gutter-tablet tablet:px-gutter-desktop
-     pt-6 pb-9 mobileLg:pt-9 tablet:pb-9">
+     px-shell-mobile mobileLg:px-shell-tablet tablet:px-shell-desktop
+     pt-shell-mobile mobileLg:pt-shell-tablet tablet:pt-shell-desktop pb-5">
       {/* ===== MOBILE NAVIGATION ===== */}
       <div class="mobileLg:hidden flex items-center w-full relative z-header">
         <div

@@ -198,16 +198,16 @@ export default {
         "7.5": "30px",
         "9.5": "38px",
 
-        // PAGE GUTTERS (horizontal padding from screen edges to header, footer and body containers)
-        "gutter-mobile": "20px", // updated breakpoint naming convention
-        "gutter-tablet": "20px", // updated breakpoint naming convention
-        "gutter-desktop": "40px", // updated breakpoint naming convention
+        // PAGE SHELL - horizontal gutter and vertical padding from screen edges to header, footer and horisontal gutter for body containers
+        "shell-mobile": "20px", // updated breakpoint naming convention
+        "shell-tablet": "20px", // updated breakpoint naming convention
+        "shell-desktop": "30px", // updated breakpoint naming convention
 
-        // LAYOUT GAP (vertical spacing between the body, and the header and footer)
-        // Defined in the header and footer files - /islands/layout/
-
-        // SECTION GAPS (vertical spacing between sections in the body)
-        // Defined in /components/layout/styles.ts
+        // SECTION GAPS - vertical spacing between containers in the body)
+        "section-mobile": "20px", // updated breakpoint naming convention
+        "section-tablet": "30px", // updated breakpoint naming convention
+        "section-desktop": "30px", // updated breakpoint naming convention
+        // Applied via containerGap in /components/layout/styles.ts
 
         // GRID GAPS (spacing between grid/flex items)
         // Defined in /components/layout/styles.ts
@@ -217,12 +217,13 @@ export default {
 
         // CONTENT PADDING
         // STACK SPACING
-        "margin-mobile": "18px", // not updated - needs attention
-        "margin-tablet": "36px", // not updated - needs attention
-        "margin-desktop": "72px", // not updated - needs attention
-        "padding-mobile": "12px", // not updated - needs attention
-        "padding-tablet": "24px", // not updated - needs attention
-        "padding-desktop": "48px", // not updated - needs attention
+        // "margin-mobile": "18px", // not updated - needs attention
+        // "margin-tablet": "36px", // not updated - needs attention
+        // "margin-desktop": "72px", // not updated - needs attention
+        // "padding-mobile": "12px", // not updated - needs attention
+        // "padding-tablet": "24px", // not updated - needs attention
+        // "padding-desktop": "48px", // not updated - needs attention
+
         // CALCULATIONS
         "calc-12": "calc(100% - 12px)",
         "calc-24": "calc(100% - 24px)",

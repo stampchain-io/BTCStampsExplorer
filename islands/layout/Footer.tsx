@@ -119,8 +119,8 @@ export function Footer() {
   return (
     <footer class="
       flex flex-col tablet:flex-row justify-between max-w-desktop w-full mx-auto
-      px-gutter-mobile mobileLg:px-gutter-tablet tablet:px-gutter-desktop
-      pt-10 pb-7.5 tablet:pt-15 tablet:pb-10
+      px-shell-mobile mobileLg:px-shell-tablet tablet:px-shell-desktop
+      pt-5 pb-shell-mobile mobileLg:pb-shell-tablet tablet:pb-shell-desktop
       gap-2 mobileMd:gap-3 tablet:gap-4
     ">
       {/* ===== MOBILE SMALL CENTER SECTION - MOBILE MEDIUM+ LEFT SECTION ===== */}
