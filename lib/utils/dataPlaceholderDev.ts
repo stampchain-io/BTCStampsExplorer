@@ -9,6 +9,38 @@
  *
  * For the tiny, always-loaded production error/empty-state fallbacks, see
  * `dataPlaceholderProd.ts` instead.
+ *
+ * ===== ROUTES WITH DUMMY DATA (as of 2026-08-16) =====
+ *   /                          routes/index.tsx
+ *   /stamp                     routes/stamp/index.tsx
+ *   /stamp/[id]                routes/stamp/[id].tsx
+ *   /marketplace               routes/marketplace/index.tsx
+ *   /explorer                  routes/explorer/index.tsx
+ *   /src20                     routes/src20/index.tsx
+ *   /src20/[tick]              routes/src20/[tick].tsx
+ *   /wallet/[address]          routes/wallet/[address].tsx
+ *   /dashboard/[address]       routes/dashboard/[address].tsx
+ *
+ * ===== ROUTES STILL MISSING DUMMY DATA (still hit the DB/API even when
+ * DATA_PLACEHOLDER_DEV is true) =====
+ *   /collection                routes/collection/index.tsx
+ *   /collection/artist|posh|recursive
+ *                               routes/collection/[overview].tsx
+ *   /collection/detail/[id]    routes/collection/detail/[id].tsx
+ *   /block                     routes/block/index.tsx
+ *   /block/[block_index]       routes/block/[block_index].tsx
+ *   /upload                    routes/upload/index.tsx
+ *   /tool/stamp/create         routes/tool/stamp/create.tsx
+ *   /tool/fairmint             routes/tool/fairmint/index.tsx
+ *   /tool/src20/[action]       routes/tool/src20/[action].tsx (only when
+ *                               `?tick=` is set — mint/deploy/transfer forms
+ *                               otherwise work fine without a DB call)
+ *
+ * When adding dummy data for one of the routes above, follow the pattern
+ * used by the wallet/dashboard routes: export a small set of static
+ * fixtures here, add a `getDummy*Page()` assembler function, then gate a
+ * dynamic `await import(...)` behind `DATA_PLACEHOLDER_DEV` in the route's
+ * handler (before the real DB/service calls).
  */
 
 /* ===== BASE STAMP: #4258 (CLASSIC) ===== */
@@ -1111,3 +1143,250 @@ export const DATA_PLACEHOLDER_DEV_TOKEN_DETAIL_PAGE = {
   mints: DATA_PLACEHOLDER_DEV_SRC20_MINTS.filter((m) => m.tick === "KEVIN"),
   initialCounts: { totalTransfers: 2, totalMints: 21000 },
 };
+
+/* ===== WALLET PAGE (routes/wallet/[address].tsx) ===== */
+
+/** Demo address used across all wallet dummy data below. */
+export const DATA_PLACEHOLDER_DEV_WALLET_ADDRESS =
+  "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh";
+
+/** "Balance" stamps — 14 stamps cycling [CLASSIC, POSH, SRC-721], each holding a small quantity. */
+export const DATA_PLACEHOLDER_DEV_WALLET_STAMPS_BALANCE = Array.from(
+  { length: 14 },
+  (_, i) => ({
+    ..._stampBases[i % _stampBases.length],
+    balance: (i % 3) + 1,
+  }),
+);
+
+/** "Created" stamps — 6 stamps (CLASSIC/SRC-721) authored by this address. */
+export const DATA_PLACEHOLDER_DEV_WALLET_STAMPS_CREATED = Array.from(
+  { length: 6 },
+  (_, i) => ({
+    ...(i % 2 === 0
+      ? DATA_PLACEHOLDER_DEV_STAMP_CLASSIC
+      : DATA_PLACEHOLDER_DEV_STAMP_SRC721),
+    balance: 1,
+  }),
+);
+
+/**
+ * "Listings" dispensers — 2 open (CLASSIC, POSH) + 1 closed (SRC-721), each
+ * carrying a nested `stamp` (matches `DispenserRow.stamp` from
+ * `getDispensersWithStampsByAddress`) so the listings gallery has an image
+ * and price to render.
+ */
+export const DATA_PLACEHOLDER_DEV_WALLET_DISPENSERS = [
+  {
+    ...DATA_PLACEHOLDER_DEV_STAMP_CLASSIC_DISPENSER,
+    btcrate: DATA_PLACEHOLDER_DEV_STAMP_CLASSIC_DISPENSER.satoshirate /
+      100000000,
+    confirmed: true,
+    close_block_index: null,
+    status: "open" as const,
+    stamp: DATA_PLACEHOLDER_DEV_STAMP_CLASSIC,
+  },
+  {
+    ...DATA_PLACEHOLDER_DEV_STAMP_POSH_DISPENSER,
+    btcrate: DATA_PLACEHOLDER_DEV_STAMP_POSH_DISPENSER.satoshirate / 100000000,
+    confirmed: true,
+    close_block_index: null,
+    status: "open" as const,
+    stamp: DATA_PLACEHOLDER_DEV_STAMP_POSH,
+  },
+  {
+    ...DATA_PLACEHOLDER_DEV_STAMP_SRC721_DISPENSER,
+    give_remaining: 0,
+    btcrate: DATA_PLACEHOLDER_DEV_STAMP_SRC721_DISPENSER.satoshirate /
+      100000000,
+    confirmed: true,
+    close_block_index: 841500,
+    status: "closed" as const,
+    stamp: DATA_PLACEHOLDER_DEV_STAMP_SRC721,
+  },
+];
+
+/** "Balance" tokens — 4 tokens held by this address, each with an `amt` owned. */
+export const DATA_PLACEHOLDER_DEV_WALLET_TOKENS_BALANCE = [
+  { ...DATA_PLACEHOLDER_DEV_TOKEN_KEVIN, amt: "250000" },
+  { ...DATA_PLACEHOLDER_DEV_TOKEN_STAMP, amt: "1000000" },
+  { ...DATA_PLACEHOLDER_DEV_TOKEN_PEPE, amt: "69000" },
+  { ...DATA_PLACEHOLDER_DEV_TOKEN_BOBO, amt: "42000" },
+];
+
+/** "Created" tokens — 2 of the 4 tokens deployed by this address. */
+export const DATA_PLACEHOLDER_DEV_WALLET_TOKENS_CREATED = [
+  DATA_PLACEHOLDER_DEV_TOKEN_KEVIN,
+  DATA_PLACEHOLDER_DEV_TOKEN_PEPE,
+];
+
+/** "Collections" — 1 collection created by this address. */
+export const DATA_PLACEHOLDER_DEV_WALLET_COLLECTIONS = [
+  {
+    collection_id: "dummy-collection-1",
+    collection_name: "Dummy Collection",
+    collection_description: "A sample collection for UI preview.",
+    creators: [DATA_PLACEHOLDER_DEV_WALLET_ADDRESS],
+    stamp_count: 6,
+    total_editions: 6,
+    stamps: [
+      DATA_PLACEHOLDER_DEV_STAMP_CLASSIC,
+      DATA_PLACEHOLDER_DEV_STAMP_SRC721,
+    ],
+    img: DATA_PLACEHOLDER_DEV_STAMP_CLASSIC.stamp_url,
+  },
+];
+
+/** Wallet overview info (top profile card) for the dev preview address. */
+export const DATA_PLACEHOLDER_DEV_WALLET_INFO = {
+  balance: 0.1337,
+  usdValue: 0.1337 * _BTC_PRICE_USD,
+  address: DATA_PLACEHOLDER_DEV_WALLET_ADDRESS,
+  btcPrice: _BTC_PRICE_USD,
+  fee: 0,
+  creatorName: "stamper.btc",
+  txCount: 128,
+  unconfirmedBalance: 0,
+  unconfirmedTxCount: 0,
+  stampValue: 0.00042 * 5 + 0.0069 * 5 + 0.000021 * 4,
+  src20Value: 0.05,
+  marketDataStatus: {
+    stampsMarketData: "available" as const,
+    src20MarketData: "available" as const,
+    overallStatus: "full" as const,
+  },
+  dispensers: { open: 2, closed: 1, total: 3 },
+  src101: { names: ["dummy.btc"], total: 1 },
+};
+
+/**
+ * Assembles the full `WalletProfilePageProps` shape for the wallet page's
+ * dev-preview branch — mirrors the real handler's response, but reads from
+ * the static arrays above instead of hitting the DB/Counterparty API.
+ */
+export function getDummyWalletPage(
+  address: string,
+  params: {
+    section: "all" | "stamps" | "tokens";
+    tab: "balance" | "created" | "listings" | "collections";
+    view: "cardVertical" | "cardSquare" | "cardRow";
+    stampsPage: number;
+    tokensPage: number;
+  },
+) {
+  const { section, tab, view, stampsPage, tokensPage } = params;
+  const tokensTab = tab === "created" ? "created" : "balance";
+
+  let stampsData: Record<string, unknown>[] =
+    DATA_PLACEHOLDER_DEV_WALLET_STAMPS_BALANCE;
+  if (tab === "created") {
+    stampsData = DATA_PLACEHOLDER_DEV_WALLET_STAMPS_CREATED;
+  } else if (tab === "listings") {
+    stampsData = DATA_PLACEHOLDER_DEV_WALLET_DISPENSERS;
+  } else if (tab === "collections") {
+    stampsData = DATA_PLACEHOLDER_DEV_WALLET_COLLECTIONS;
+  }
+
+  const tokensData = tokensTab === "created"
+    ? DATA_PLACEHOLDER_DEV_WALLET_TOKENS_CREATED
+    : DATA_PLACEHOLDER_DEV_WALLET_TOKENS_BALANCE;
+
+  return {
+    address,
+    walletData: { ...DATA_PLACEHOLDER_DEV_WALLET_INFO, address },
+    stampsTotal: DATA_PLACEHOLDER_DEV_WALLET_STAMPS_BALANCE.length,
+    src20Total: DATA_PLACEHOLDER_DEV_WALLET_TOKENS_BALANCE.length,
+    stampsCreated: DATA_PLACEHOLDER_DEV_WALLET_STAMPS_CREATED.length,
+    anchor: "",
+
+    section,
+    tab,
+    view,
+
+    stampsData,
+    stampsPagination: {
+      page: stampsPage,
+      limit: stampsData.length,
+      total: stampsData.length,
+      totalPages: 1,
+    },
+
+    tokensData,
+    tokensPagination: {
+      page: tokensPage,
+      limit: tokensData.length,
+      total: tokensData.length,
+      totalPages: 1,
+    },
+  };
+}
+
+/* ===== WALLET DASHBOARD PAGE (routes/dashboard/[address].tsx) ===== */
+/*
+ * Legacy nested `data.data.{stamps,src20,dispensers}` shape — distinct from
+ * `getDummyWalletPage` above since this route was never migrated to the
+ * flatter per-container response shape.
+ */
+export function getDummyWalletDashboardPage(
+  address: string,
+  params: {
+    stampsParams: { page: number; limit: number };
+    src20Params: { page: number; limit: number };
+    dispensersParams: { page: number; limit: number };
+    stampsSortBy: "ASC" | "DESC";
+    src20SortBy: "ASC" | "DESC";
+    dispensersSortBy: "ASC" | "DESC";
+  },
+) {
+  const { stampsParams, src20Params, dispensersParams } = params;
+
+  const stamps = DATA_PLACEHOLDER_DEV_WALLET_STAMPS_BALANCE;
+  const src20 = DATA_PLACEHOLDER_DEV_WALLET_TOKENS_BALANCE;
+  const dispensers = DATA_PLACEHOLDER_DEV_WALLET_DISPENSERS.map((d) => ({
+    ...d,
+    dispenses: [],
+  }));
+
+  return {
+    data: {
+      data: {
+        stamps: {
+          data: stamps,
+          pagination: {
+            page: stampsParams.page,
+            limit: stampsParams.limit,
+            total: stamps.length,
+            totalPages: 1,
+          },
+        },
+        src20: {
+          data: src20,
+          pagination: {
+            page: src20Params.page,
+            limit: src20Params.limit,
+            total: src20.length,
+            totalPages: 1,
+          },
+        },
+        dispensers: {
+          data: dispensers,
+          pagination: {
+            page: dispensersParams.page,
+            limit: dispensersParams.limit,
+            total: dispensers.length,
+            totalPages: 1,
+          },
+        },
+      },
+      address,
+      walletData: { ...DATA_PLACEHOLDER_DEV_WALLET_INFO, address },
+      stampsTotal: stamps.length,
+      src20Total: src20.length,
+      stampsCreated: DATA_PLACEHOLDER_DEV_WALLET_STAMPS_CREATED.length,
+      anchor: "",
+    },
+    stampsSortBy: params.stampsSortBy,
+    src20SortBy: params.src20SortBy,
+    dispensersSortBy: params.dispensersSortBy,
+  };
+}

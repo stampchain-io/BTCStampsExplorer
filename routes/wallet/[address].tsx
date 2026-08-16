@@ -10,6 +10,7 @@ import type { DispenserRow, StampRow } from "$types/stamp.d.ts";
 import WalletDispenserDetails from "$islands/content/WalletDispenserDetails.tsx";
 import WalletProfileDetails from "$islands/content/WalletProfileDetails.tsx";
 import { getBTCBalanceInfo } from "$lib/utils/data/processing/balanceUtils.ts";
+import { DATA_PLACEHOLDER_DEV } from "$lib/utils/dataPlaceholderProd.ts";
 import { CollectionController } from "$server/controller/collectionController.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { StampController } from "$server/controller/stampController.ts";
@@ -173,6 +174,21 @@ export const handler: Handlers = {
     );
 
     const anchor = url.searchParams.get("anchor");
+
+    if (DATA_PLACEHOLDER_DEV) {
+      const { getDummyWalletPage } = await import(
+        "$lib/utils/dataPlaceholderDev.ts"
+      );
+      return ctx.render(
+        getDummyWalletPage(address, {
+          section,
+          tab,
+          view,
+          stampsPage,
+          tokensPage,
+        }),
+      );
+    }
 
     // Only the visible side(s) need full-grid-limit data — e.g. when
     // section === "stamps", tokensTab is still "balance" (mapped from the

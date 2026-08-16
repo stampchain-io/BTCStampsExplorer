@@ -9,6 +9,7 @@ import WalletDashboardDetails from "$islands/content/WalletDashboardDetails.tsx"
 import { body } from "$layout";
 import type { PaginatedResponse } from "$lib/types/pagination.d.ts";
 import { getBTCBalanceInfo } from "$lib/utils/data/processing/balanceUtils.ts";
+import { DATA_PLACEHOLDER_DEV } from "$lib/utils/dataPlaceholderProd.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import type { SRC20Row } from "$types/src20.d.ts";
@@ -63,6 +64,22 @@ export const handler: Handlers = {
     const dispensersParams = paginationParams.dispensers;
 
     const anchor = url.searchParams.get("anchor");
+
+    if (DATA_PLACEHOLDER_DEV) {
+      const { getDummyWalletDashboardPage } = await import(
+        "$lib/utils/dataPlaceholderDev.ts"
+      );
+      return ctx.render(
+        getDummyWalletDashboardPage(address, {
+          stampsParams,
+          src20Params,
+          dispensersParams,
+          stampsSortBy,
+          src20SortBy,
+          dispensersSortBy,
+        }),
+      );
+    }
 
     /* ===== DATA FETCHING ===== */
     try {

@@ -283,8 +283,8 @@ export function Header() {
     if (toolsButtonRef.current) {
       const rect = toolsButtonRef.current.getBoundingClientRect();
       toolsPos = {
-        top: rect.bottom + 23,
-        left: rect.right - 550 + 61,
+        top: rect.bottom + 24,
+        left: rect.right - 550 + 56,
       };
     }
 
@@ -319,7 +319,7 @@ export function Header() {
     if (walletButtonRef.current) {
       const rect = walletButtonRef.current.getBoundingClientRect();
       walletPos = {
-        top: rect.bottom + 23,
+        top: rect.bottom + 23.5,
         left: rect.right - 150 - 50,
       };
     }
