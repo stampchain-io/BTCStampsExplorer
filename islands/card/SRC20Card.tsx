@@ -9,8 +9,13 @@ import {
   cardEyebrowNeutral,
   cardFileSize,
   cardFileType,
+  cardPrice,
   cardStampNumber,
   cardSupply,
+  truncate,
+  valueNegative,
+  valueNeutral,
+  valuePositive,
 } from "$text";
 import type { SRC20Row } from "$types/src20.d.ts";
 import { useState } from "preact/hooks";
@@ -18,7 +23,12 @@ import { useState } from "preact/hooks";
 /* ===== TYPES ===== */
 interface SRC20CardProps {
   src20: SRC20Row;
-  variant?: "cardVerticalDetail" | "cardSquare";
+  variant?:
+    | "cardVerticalDetail"
+    | "cardVerticalBalance"
+    | "cardSquare"
+    | "cardSquareBalance"
+    | "cardHorizontal";
 }
 
 /* ===== HELPERS ===== */
@@ -27,6 +37,27 @@ function formatAmount(amt: string | bigint | undefined): string {
   const n = Number(amt);
   if (isNaN(n)) return String(amt);
   return n.toLocaleString();
+}
+
+// Mirrors the SATS formatting used by SRC20OverviewCompact's PRICE column —
+// keeps unit-price display consistent across the table and card views.
+function formatPriceSats(priceBtc: number): string {
+  if (!priceBtc) return "0 SATS";
+  const sats = priceBtc * 1e8;
+  if (sats < 0.0001) return `${sats.toFixed(6)} SATS`;
+  if (sats < 1) return `${sats.toFixed(4)} SATS`;
+  if (sats < 10) return `${sats.toFixed(2)} SATS`;
+  if (sats < 100) return `${sats.toFixed(1)} SATS`;
+  return `${Math.round(sats).toLocaleString()} SATS`;
+}
+
+// Mirrors the BTC formatting used by SRC20OverviewCompact's MARKETCAP
+// column — reused here for the holding's total BTC value (balance * price).
+function formatValueBtc(valueBtc: number): string {
+  if (!valueBtc) return "0 BTC";
+  if (valueBtc < 1) return `${valueBtc.toFixed(4)} BTC`;
+  if (valueBtc < 1000) return `${valueBtc.toFixed(2)} BTC`;
+  return `${Math.round(valueBtc).toLocaleString()} BTC`;
 }
 
 /* ===== COMPONENT ===== */
@@ -40,6 +71,81 @@ export function SRC20Card(
   const imageUrl = imgError ? null : getSRC20ImageSrc(src20) ?? null;
 
   const href = `/src20/${encodeURIComponent(tick)}`;
+
+  // Unit price in BTC — market_data.price_btc (v2.3) is preferred, falling
+  // back to the legacy floor_price_btc field.
+  const priceBtc = src20.market_data?.price_btc != null
+    ? parseFloat(String(src20.market_data.price_btc))
+    : src20.floor_price_btc ?? 0;
+  const balanceAmt = src20.amt !== undefined ? Number(src20.amt) : NaN;
+  const valueBtc = !isNaN(balanceAmt) && priceBtc ? balanceAmt * priceBtc : 0;
+
+  // 24H price change percentage — same source field as SRC20OverviewCompact's
+  // CHANGE column.
+  const change24h = src20.market_data?.change_24h_percent != null
+    ? Number(src20.market_data.change_24h_percent)
+    : null;
+
+  /* ===== HORIZONTAL LAYOUT (row card: image · ticker · balance · price · value) ===== */
+  const renderHorizontal = () => (
+    <div
+      class={`flex items-center justify-between ${container3} p-0.5 pr-2 w-full`}
+    >
+      {/* Image + Ticker */}
+      <div class="flex items-center gap-2 min-w-0">
+        <div class="flex-shrink-0 h-6 w-6 rounded-full overflow-hidden">
+          {imageUrl
+            ? (
+              <img
+                src={imageUrl}
+                alt={tick}
+                class="w-full h-full object-cover rounded-full"
+                onError={() => setImgError(true)}
+              />
+            )
+            : <PlaceholderImage variant="no-image" className="!rounded-full" />}
+        </div>
+        <div class={`${cardCreator} !text-left !text-sm uppercase ${truncate}`}>
+          <span class="font-light pr-0.5">$</span>
+          {tick}
+        </div>
+      </div>
+
+      {/* Price */}
+      <div
+        class={`hidden min-[420px]:flex ${cardFileType} text-right shrink-0`}
+      >
+        {formatPriceSats(priceBtc)}
+      </div>
+
+      {/* Change (24H) */}
+      <div
+        class={`hidden mobileMd:flex tablet:hidden ${cardFileType} text-right shrink-0 ${
+          change24h == null
+            ? valueNeutral
+            : change24h > 0
+            ? valuePositive
+            : change24h < 0
+            ? valueNegative
+            : valueNeutral
+        }`}
+      >
+        {change24h == null
+          ? "N/A"
+          : `${change24h > 0 ? "+" : ""}${change24h.toFixed(2)}%`}
+      </div>
+
+      {/* Balance */}
+      <div class={`${cardSupply} text-right shrink-0`}>
+        {formatAmount(src20.amt)}
+      </div>
+
+      {/* Value */}
+      <div class={`hidden mobileMd:flex ${cardPrice} text-right shrink-0`}>
+        {formatValueBtc(valueBtc)}
+      </div>
+    </div>
+  );
 
   /* ===== SHARED TOP ROW: image + ticker ===== */
   const renderTopRow = () => (
@@ -286,6 +392,174 @@ export function SRC20Card(
     );
   };
 
+  /* ===== SQUARE WALLET LAYOUT (image+ticker, price, balance, value) ===== */
+  const renderWallet = () => (
+    <>
+      {/* ticker row */}
+      <div
+        class={`flex items-center ${container3} rounded-xl p-1 gap-2`}
+      >
+        <div class="flex-shrink-0 w-6 h-6 rounded-xl overflow-hidden">
+          {imageUrl
+            ? (
+              <img
+                src={imageUrl}
+                alt={tick}
+                class="w-full h-full object-cover"
+                onError={() => setImgError(true)}
+              />
+            )
+            : <PlaceholderImage variant="no-image" className="!rounded-xl" />}
+        </div>
+        <div
+          class={`${cardCreator} !font-bold uppercase`}
+        >
+          <span class="hidden min-[420px]:inline-block font-light pr-0.5">
+            $
+          </span>
+          {tick}
+        </div>
+      </div>
+
+      {/* spacer 1 */}
+      <div class="flex-[0_1_8px]" />
+
+      {/* price */}
+      <div class="flex justify-center">
+        <div class={`w-fit ${containerPill} ${cardFileType}`}>
+          {formatPriceSats(priceBtc)}
+        </div>
+      </div>
+
+      {/* spacer 2 */}
+      <div class="flex-[0_1_8px]" />
+
+      {/* balance */}
+      <div class="flex justify-center">
+        <div class={`w-fit ${containerPill} ${cardSupply}`}>
+          {formatAmount(src20.amt)}
+        </div>
+      </div>
+
+      {/* spacer 3 */}
+      <div class="flex-[0_1_8px]" />
+
+      {/* value */}
+      <div class="flex justify-center">
+        <div class={`w-fit ${containerPill} ${cardPrice}`}>
+          {formatValueBtc(valueBtc)}
+        </div>
+      </div>
+    </>
+  );
+
+  /* ===== VERTICAL WALLET LAYOUT (image+ticker, price+change, balance, holders, value) ===== */
+  const renderWalletVertical = () => (
+    <>
+      {/* ticker row */}
+      <div
+        class={`flex items-center ${container3} rounded-xl p-1 gap-2`}
+      >
+        <div class="flex-shrink-0 w-6 h-6 rounded-xl overflow-hidden">
+          {imageUrl
+            ? (
+              <img
+                src={imageUrl}
+                alt={tick}
+                class="w-full h-full object-cover"
+                onError={() => setImgError(true)}
+              />
+            )
+            : <PlaceholderImage variant="no-image" className="!rounded-xl" />}
+        </div>
+        <div
+          class={`${cardCreator} !font-bold uppercase`}
+        >
+          <span class="hidden min-[420px]:inline-block font-light pr-0.5">
+            $
+          </span>
+          {tick}
+        </div>
+      </div>
+
+      {/* spacer 1 */}
+      <div class="flex-[0_1_8px]" />
+
+      {/* price */}
+      <div class="flex justify-center">
+        <div class={`w-fit ${containerPill} ${cardFileType}`}>
+          {formatPriceSats(priceBtc)}
+        </div>
+      </div>
+
+      {/* spacer 2 */}
+      <div class="flex-[0_1_8px]" />
+
+      {/* 24h change */}
+      <div class="flex justify-center">
+        <div
+          class={`w-fit ${containerPill} ${cardFileType} ${
+            change24h == null
+              ? valueNeutral
+              : change24h > 0
+              ? valuePositive
+              : change24h < 0
+              ? valueNegative
+              : valueNeutral
+          }`}
+        >
+          {change24h == null
+            ? "N/A"
+            : `${change24h > 0 ? "+" : ""}${change24h.toFixed(2)}%`}
+        </div>
+      </div>
+
+      {/* spacer 3 */}
+      <div class="flex-[0_1_8px]" />
+
+      {/* balance */}
+      <div class="flex justify-center">
+        <div class={`w-fit ${containerPill} ${cardSupply}`}>
+          {formatAmount(src20.amt)}
+        </div>
+      </div>
+
+      {/* spacer 4 */}
+      <div class="flex-[0_1_8px]" />
+
+      {/* holders */}
+      <div class="flex justify-center">
+        <div class={`w-fit ${containerPill} ${cardFileSize}`}>
+          {src20.holders != null ? src20.holders.toLocaleString() : "—"} HOLDERS
+        </div>
+      </div>
+
+      {/* spacer 5 */}
+      <div class="flex-[0_1_8px]" />
+
+      {/* value */}
+      <div class="flex justify-center">
+        <div class={`w-fit ${containerPill} ${cardPrice}`}>
+          {formatValueBtc(valueBtc)}
+        </div>
+      </div>
+    </>
+  );
+
+  /* ===== RENDER: HORIZONTAL ROW VARIANT ===== */
+  if (variant === "cardHorizontal") {
+    return (
+      <a
+        href={href}
+        target="_top"
+        f-partial={href}
+        class="relative flex w-full"
+      >
+        {renderHorizontal()}
+      </a>
+    );
+  }
+
   /* ===== RENDER ===== */
   return (
     <div class="relative flex justify-center w-full h-full max-w-72">
@@ -294,19 +568,27 @@ export function SRC20Card(
         target="_top"
         f-partial={href}
         class={`${containerCard} ${
-          variant === "cardVerticalDetail" ? "min-h-[260px]" : ""
+          variant === "cardVerticalDetail" || variant === "cardVerticalBalance"
+            ? "min-h-[260px]"
+            : ""
         }`}
       >
-        {variant === "cardSquare" ? renderMinimal() : (
-          <>
-            {op === "TRANSFER" && renderTransfer()}
-            {op === "DEPLOY" && renderDeploy()}
-            {op === "MINT" && renderMint()}
-            {op !== "TRANSFER" && op !== "DEPLOY" && op !== "MINT" && (
-              renderDeploy()
-            )}
-          </>
-        )}
+        {variant === "cardSquare"
+          ? renderMinimal()
+          : variant === "cardSquareBalance"
+          ? renderWallet()
+          : variant === "cardVerticalBalance"
+          ? renderWalletVertical()
+          : (
+            <>
+              {op === "TRANSFER" && renderTransfer()}
+              {op === "DEPLOY" && renderDeploy()}
+              {op === "MINT" && renderMint()}
+              {op !== "TRANSFER" && op !== "DEPLOY" && op !== "MINT" && (
+                renderDeploy()
+              )}
+            </>
+          )}
       </a>
     </div>
   );
