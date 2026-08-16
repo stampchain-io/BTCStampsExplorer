@@ -78,19 +78,55 @@ export const containerColForm = "flex flex-col w-full gap-5";
 export const containerRowForm = "flex w-full gap-5";
 
 /* ===== CARD GRID STYLES ===== */
-// Shared by WalletContent, ExplorerContent, MarketplaceContent,
-// StampOverviewContent — keeps column counts/gap consistent across pages.
-export const gridCardVertical =
-  "grid grid-cols-2 mobileMd:grid-cols-3 mobileLg:grid-cols-4 tablet:grid-cols-5 desktop:grid-cols-6 gap-5 w-full auto-rows-fr";
-export const gridCardSquare =
+// Card-size tiers (Sm/Md/Lg), decoupled from the cardSquare/cardVertical
+// view-mode language — Sm packs the most columns (smallest cards), Lg the
+// fewest (largest cards). Shared by WalletContent, ExplorerContent,
+// MarketplaceContent, StampOverviewContent — keeps column counts/gap
+// consistent across pages.
+export const gridCardSm =
   "grid grid-cols-3 mobileMd:grid-cols-4 mobileLg:grid-cols-5 tablet:grid-cols-6 desktop:grid-cols-8 gap-5 w-full auto-rows-fr";
+export const gridCardMd =
+  "grid grid-cols-2 mobileMd:grid-cols-3 mobileLg:grid-cols-4 tablet:grid-cols-5 desktop:grid-cols-6 gap-5 w-full auto-rows-fr";
+// Not in use yet — reserved for a future, even larger card tier.
+export const gridCardLg =
+  "grid grid-cols-1 mobileMd:grid-cols-2 mobileLg:grid-cols-3 tablet:grid-cols-4 desktop:grid-cols-5 gap-5 w-full auto-rows-fr";
+
+// Md-tier variants sized for the wallet page's split-panel layout — the
+// stamps panel is desktop:w-2/3 (more columns), the tokens panel is
+// desktop:w-1/3 (fewer columns).
+export const gridCardMdSplitSm =
+  "grid grid-cols-2 mobileMd:grid-cols-3 mobileLg:grid-cols-4 tablet:grid-cols-3 desktop:grid-cols-5 gap-5 w-full auto-rows-fr";
+export const gridCardMdSplitMd =
+  "grid grid-cols-2 mobileMd:grid-cols-3 mobileLg:grid-cols-4 tablet:grid-cols-3 desktop:grid-cols-4 gap-5 w-full auto-rows-fr";
+export const gridCardMdSplitLg =
+  "grid grid-cols-2 mobileMd:grid-cols-3 mobileLg:grid-cols-4 tablet:grid-cols-3 desktop:grid-cols-3 gap-5 w-full auto-rows-fr";
 
 export function gridCard(
   viewMode: "cardVertical" | "cardSquare" | "cardRow" | "cardHorizontal",
 ): string {
   // cardRow renders a table (never calls this) and cardHorizontal has no
-  // dedicated layout yet — falls back to the vertical grid until built.
-  return viewMode === "cardSquare" ? gridCardSquare : gridCardVertical;
+  // dedicated layout yet — falls back to the Md grid until built.
+  return viewMode === "cardSquare" ? gridCardSm : gridCardMd;
+}
+
+// Wallet-specific grid picker: the split "all" section renders stamps and
+// tokens side by side in narrower panels, so each panel gets a
+// size-appropriate Md-split variant. The tokens panel (desktop:w-1/3)
+// always uses the sparsest split tier. The stamps panel (desktop:w-2/3)
+// packs in an extra column only for cardSquare (small, uniform cells
+// tolerate the denser grid) — cardVertical keeps the medium split tier.
+// Dedicated full-width stamps/tokens pages use the standard
+// viewMode-based grid like every other page.
+export function gridCardWallet(
+  viewMode: "cardVertical" | "cardSquare" | "cardRow" | "cardHorizontal",
+  section: "all" | "stamps" | "tokens",
+  panel: "stamps" | "tokens",
+): string {
+  if (section === "all") {
+    if (panel === "tokens") return gridCardMdSplitLg;
+    return viewMode === "cardSquare" ? gridCardMdSplitSm : gridCardMdSplitMd;
+  }
+  return viewMode === "cardSquare" ? gridCardSm : gridCardMd;
 }
 
 /* ===== ROW STYLES ===== */
@@ -201,6 +237,14 @@ export type LayoutStyles = {
   rowForm: string;
   rowResponsiveForm: string;
   rowContainerBackground: string;
+
+  // Grid styles
+  gridCardSm: string;
+  gridCardMd: string;
+  gridCardLg: string;
+  gridCardMdSplitSm: string;
+  gridCardMdSplitMd: string;
+  gridCardMdSplitLg: string;
 
   // Cell styles
   // cellLeftCard: string;   // unused — replaced by cellLeftL2Card

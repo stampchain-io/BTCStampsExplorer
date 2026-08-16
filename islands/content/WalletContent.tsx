@@ -5,12 +5,17 @@ import { StampOverviewTable } from "$components/table/explorerTable/StampOvervie
 import { StampListingsTable } from "$components/table/marketplaceTable/StampListings.tsx";
 import { SRC20OverviewCompact } from "$components/table/src20OverviewTable/SRC20OverviewCompact.tsx";
 import { WalletHeaderContent } from "$header";
-import { containerBackground, gridCard, rowContainerBackground } from "$layout";
+import {
+  containerBackground,
+  gridCardWallet,
+  rowContainerBackground,
+} from "$layout";
 import { subtitleNeutral, valueDarkSm } from "$text";
 import type { DispenserRow, StampRow } from "$types/stamp.d.ts";
 import type {
   WalletContainerPagination,
   WalletContentProps,
+  WalletContentTabId,
   WalletContentTabIdSub,
   WalletStampsTab,
   WalletTokensTab,
@@ -20,8 +25,8 @@ import { useEffect } from "preact/hooks";
 
 /* ===== VIEW TYPES ===== */
 // "cardHorizontal" is a reserved placeholder for a future layout — none of
-// the render branches below handle it yet (gridCard falls back to the
-// vertical grid, and no tab switches on it).
+// the render branches below handle it yet (gridCardWallet falls back to
+// the Md grid, and no tab switches on it).
 type ViewMode = "cardVertical" | "cardSquare" | "cardRow" | "cardHorizontal";
 
 /* ===== TAB MAPPING ===== */
@@ -105,11 +110,13 @@ function GridCell(
 function StampsGridContent({
   stamps,
   view,
+  section,
   pagination,
   emptyLabel,
 }: {
   stamps: StampRow[];
   view: ViewMode;
+  section: WalletContentTabId;
   pagination?: WalletContainerPagination | undefined;
   emptyLabel: string;
 }) {
@@ -128,7 +135,7 @@ function StampsGridContent({
 
   return (
     <>
-      <div class={gridCard(view)}>
+      <div class={gridCardWallet(view, section, "stamps")}>
         {stamps.map((stamp) => (
           <GridCell key={stamp.tx_hash} view={view}>
             <StampCard
@@ -149,15 +156,17 @@ function StampsGridContent({
 function ListingsGroup({
   stamps,
   view,
+  section,
 }: {
   stamps: (StampRow & { lowestPriceDispenser: DispenserRow })[];
   view: ViewMode;
+  section: WalletContentTabId;
 }) {
   if (view === "cardRow") {
     return <StampListingsTable stamps={stamps} />;
   }
   return (
-    <div class={gridCard(view)}>
+    <div class={gridCardWallet(view, section, "stamps")}>
       {stamps.map((stamp) => (
         <GridCell key={stamp.lowestPriceDispenser.tx_hash} view={view}>
           <StampCard
@@ -175,10 +184,12 @@ function ListingsGroup({
 function ListingsTabContent({
   dispensers,
   view,
+  section,
   pagination,
 }: {
   dispensers: DispenserRow[];
   view: ViewMode;
+  section: WalletContentTabId;
   pagination?: WalletContainerPagination | undefined;
 }) {
   const withStamps = dispensers.filter((d) => d.stamp);
@@ -198,13 +209,13 @@ function ListingsTabContent({
       {open.length > 0 && (
         <div id="open-listings-section">
           <h3 class={subtitleNeutral}>OPEN LISTINGS - {open.length}</h3>
-          <ListingsGroup stamps={open} view={view} />
+          <ListingsGroup stamps={open} view={view} section={section} />
         </div>
       )}
       {closed.length > 0 && (
         <div id="closed-listings-section">
           <h3 class={subtitleNeutral}>CLOSED LISTINGS - {closed.length}</h3>
-          <ListingsGroup stamps={closed} view={view} />
+          <ListingsGroup stamps={closed} view={view} section={section} />
         </div>
       )}
       <PaginationBlock pagination={pagination} prefix="stamps" />
@@ -240,11 +251,13 @@ function CollectionsTabContent({
 function StampsTabContent({
   tab,
   view,
+  section,
   data,
   pagination,
 }: {
   tab: WalletStampsTab;
   view: ViewMode;
+  section: WalletContentTabId;
   data: any[];
   pagination?: WalletContainerPagination | undefined;
 }) {
@@ -256,6 +269,7 @@ function StampsTabContent({
       <ListingsTabContent
         dispensers={data as DispenserRow[]}
         view={view}
+        section={section}
         pagination={pagination}
       />
     );
@@ -264,6 +278,7 @@ function StampsTabContent({
     <StampsGridContent
       stamps={data as StampRow[]}
       view={view}
+      section={section}
       pagination={pagination}
       emptyLabel={tab === "created"
         ? "NO STAMPS CREATED BY THIS ADDRESS"
@@ -276,11 +291,13 @@ function StampsTabContent({
 function TokensTabContent({
   tab,
   view,
+  section,
   data,
   pagination,
 }: {
   tab: WalletTokensTab;
   view: ViewMode;
+  section: WalletContentTabId;
   data: any[];
   pagination?: WalletContainerPagination | undefined;
 }) {
@@ -309,7 +326,7 @@ function TokensTabContent({
 
   return (
     <>
-      <div class={gridCard(view)}>
+      <div class={gridCardWallet(view, section, "tokens")}>
         {data.map((src20) => (
           <GridCell key={src20.tx_hash} view={view}>
             <SRC20Card
@@ -382,6 +399,7 @@ export default function WalletContent({
                 <TokensTabContent
                   tab={tokensTab}
                   view={view}
+                  section={section}
                   data={tokensData}
                   pagination={tokensPagination}
                 />
@@ -393,6 +411,7 @@ export default function WalletContent({
                 <StampsTabContent
                   tab={stampsTab}
                   view={view}
+                  section={section}
                   data={stampsData}
                   pagination={stampsPagination}
                 />
@@ -404,6 +423,7 @@ export default function WalletContent({
             <StampsTabContent
               tab={stampsTab}
               view={view}
+              section={section}
               data={stampsData}
               pagination={stampsPagination}
             />
@@ -412,6 +432,7 @@ export default function WalletContent({
             <TokensTabContent
               tab={tokensTab}
               view={view}
+              section={section}
               data={tokensData}
               pagination={tokensPagination}
             />
