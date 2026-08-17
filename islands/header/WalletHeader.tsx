@@ -340,21 +340,40 @@ export default function WalletHeader({
 }: WalletHeaderProps) {
   /* ===== EFFECTS ===== */
   useEffect(() => {
+    // Selector button clicks remount this island via partial navigation,
+    // so this "mount-once" effect would otherwise re-fire the toast on
+    // every section/tab/view/sort change. Gate it with sessionStorage
+    // (keyed per address) so it only shows once per wallet per tab
+    // session, but can still warn again in a future session/tab if the
+    // underlying data gap persists.
+    if (typeof globalThis === "undefined" || !globalThis.sessionStorage) {
+      return;
+    }
+
     const status = (walletData as any).marketDataStatus;
-    if (status) {
-      if (status.overallStatus === "partial") {
-        showToast(
-          "Some market data might be delayed or unavailable at the moment",
-          "warning",
-          true,
-        );
-      } else if (status.overallStatus === "unavailable") {
-        showToast(
-          "Market data is currently unavailable",
-          "warning",
-          true,
-        );
-      }
+    if (!status || status.overallStatus === "full") return;
+
+    const storageKey = `wallet-market-data-toast:${walletData.address}`;
+    try {
+      if (sessionStorage.getItem(storageKey)) return;
+      sessionStorage.setItem(storageKey, "1");
+    } catch {
+      // sessionStorage blocked (e.g. private browsing) — fall through and
+      // show the toast anyway rather than silently suppressing it.
+    }
+
+    if (status.overallStatus === "partial") {
+      showToast(
+        "Some market data may be delayed or unavailable at the moment",
+        "warning",
+        true,
+      );
+    } else if (status.overallStatus === "unavailable") {
+      showToast(
+        "Market data is currently unavailable",
+        "warning",
+        true,
+      );
     }
   }, []); // Empty dependency array - only run on mount
 
