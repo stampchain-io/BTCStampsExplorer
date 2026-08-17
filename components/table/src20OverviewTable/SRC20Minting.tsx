@@ -9,6 +9,7 @@ import {
   cellRightL2Card,
   cellStickyLeft,
   container2,
+  EmptyState,
   shadowGlowPurple,
 } from "$layout";
 import {
@@ -24,7 +25,7 @@ import {
   formatDate,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { getSRC20ImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
-import { cardRowStampNumber, labelXxs, textXs, valueDarkSm } from "$text";
+import { cardRowStampNumber, labelXxs, textXs } from "$text";
 import type { SRC20Row } from "$types/src20.d.ts";
 import type { SRC20MintingProps } from "$types/ui.d.ts";
 
@@ -369,13 +370,8 @@ export function SRC20Minting({
             )
             : (
               <tr>
-                <td
-                  colSpan={headers.length}
-                  class={`w-full h-[46px] ${container2}`}
-                >
-                  <h6 class={`${valueDarkSm} text-center`}>
-                    NO MINTING TOKENS
-                  </h6>
+                <td colSpan={headers.length}>
+                  <EmptyState label="NO MINTING TOKENS" icon="src20Tokens" />
                 </td>
               </tr>
             )}

@@ -9,6 +9,7 @@ import {
   cellStickyLeft,
   cellStickyLeft2,
   container2,
+  EmptyState,
   shadowGlowPurple,
 } from "$layout";
 import {
@@ -21,7 +22,7 @@ import {
   formatSupply,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
-import { cardRowStampNumber, labelXxs, textXs, valueDarkSm } from "$text";
+import { cardRowStampNumber, labelXxs, textXs } from "$text";
 import type { StampWithEnhancedSaleData } from "$types/stamp.d.ts";
 import { useState } from "preact/hooks";
 
@@ -314,13 +315,8 @@ export function MarketplaceSalesTable({ stamps }: MarketplaceSalesTableProps) {
             ))
             : (
               <tr>
-                <td
-                  colSpan={HEADERS.length}
-                  class={`w-full h-[46px] ${container2}`}
-                >
-                  <h6 class={`${valueDarkSm} text-center`}>
-                    NO SALES TO DISPLAY
-                  </h6>
+                <td colSpan={HEADERS.length}>
+                  <EmptyState label="NO SALES TO DISPLAY" icon="artStamps" />
                 </td>
               </tr>
             )}

@@ -1,6 +1,6 @@
 /* ===== RECENT SALES GALLERY COMPONENT ===== */
 /*@baba-153+154-move Refreshing to ViewAllButton-remove default (not used)*/
-import { container2, loaderSpinXsGrey } from "$layout";
+import { container2, EmptyState, loaderSpinXsGrey } from "$layout";
 import { StampGallery } from "$section";
 import { titlePrimary, valueDarkSm } from "$text";
 import type { StampWithEnhancedSaleData } from "$types/marketData.d.ts";
@@ -121,13 +121,10 @@ export function StampSalesGallery({
       {title && <h3 class={titlePrimary}>{title}</h3>}
       <div class="flex flex-col">
         {filteredStamps.length === 0 && !isLoading && (
-          <div
-            class={`${container2} flex items-center justify-center w-full h-[46px]`}
-          >
-            <h6 class={`${valueDarkSm} text-center`}>
-              NO RECENT SALES AVAILABLE AT THE MOMENT
-            </h6>
-          </div>
+          <EmptyState
+            label="NO RECENT SALES AVAILABLE AT THE MOMENT"
+            icon="artStamps"
+          />
         )}
         {filteredStamps.length > 0 && <StampGallery {...sectionProps} />}
         {isLoading && (

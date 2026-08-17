@@ -1,6 +1,6 @@
 /* ===== SRC20 RECENT DEPLOYS GALLERY COMPONENT ===== */
 import { StampCard } from "$card";
-import { containerBackground } from "$layout";
+import { containerBackground, EmptyState } from "$layout";
 import type { StampTransaction } from "$lib/types/stamping.ts";
 import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
 import {
@@ -98,11 +98,7 @@ export default function SRC20DeploysGallery(): JSX.Element {
           </div>
         )
         : transactions.length === 0
-        ? (
-          <div class="text-color-grey-dark text-sm">
-            NO RECENT DEPLOYS FOUND
-          </div>
-        )
+        ? <EmptyState label="NO RECENT DEPLOYS FOUND" icon="src20Tokens" />
         : (
           <div class="w-full grid grid-cols-3 mobileMd:grid-cols-4 mobileLg:grid-cols-6 tablet:grid-cols-3 desktop:grid-cols-4 gap-5">
             {transactions.map((stamp, index) => (

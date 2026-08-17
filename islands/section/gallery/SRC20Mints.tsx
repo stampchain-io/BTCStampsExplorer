@@ -1,6 +1,6 @@
 /* ===== SRC20 RECENT MINTS GALLERY COMPONENT ===== */
 import { SRC20MintingCompact } from "$card";
-import { containerBackground } from "$layout";
+import { containerBackground, EmptyState } from "$layout";
 import {
   notificationBody,
   notificationContainerError,
@@ -98,11 +98,7 @@ export default function SRC20MintsGallery() {
           </div>
         )
         : transactions.length === 0
-        ? (
-          <div class="text-color-grey-dark text-sm">
-            NO TRENDING TOKENS FOUND
-          </div>
-        )
+        ? <EmptyState label="NO TRENDING TOKENS FOUND" icon="src20Tokens" />
         : (
           <div class="-mb-3">
             <SRC20MintingCompact

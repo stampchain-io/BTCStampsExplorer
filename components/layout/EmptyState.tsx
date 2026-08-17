@@ -9,7 +9,6 @@ import {
   colContainerBackground,
   rowContainerBackground,
 } from "$components/layout/styles.ts";
-import { valueDarkSm } from "$text";
 
 /* ===== TYPES ===== */
 export interface EmptyStateProps {
@@ -29,7 +28,7 @@ export function EmptyState({ label, icon, className = "" }: EmptyStateProps) {
       } ${className}`}
     >
       {icons.length > 0 && (
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-3">
           {icons.map((iconName) => (
             <Icon
               key={iconName}
@@ -37,13 +36,13 @@ export function EmptyState({ label, icon, className = "" }: EmptyStateProps) {
               name={iconName}
               weight="custom"
               size="custom"
-              color="grey"
-              className="w-20 h-20 flex-shrink-0 [stroke-width:0.35]"
+              color="greyLight"
+              className="w-16 h-16 mobileMd:w-20 mobileMd:h-20 flex-shrink-0 [stroke-width:0.35]"
             />
           ))}
         </div>
       )}
-      <h6 class={`${valueDarkSm} mb-1`}>{label}</h6>
+      <h6 class={`font-normal text-sm text-color-neutral-400 my-1`}>{label}</h6>
     </div>
   );
 }

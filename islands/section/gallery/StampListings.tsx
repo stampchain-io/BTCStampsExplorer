@@ -1,7 +1,7 @@
 /* ===== NEW LISTINGS GALLERY COMPONENT ===== */
-import { container2 } from "$layout";
+import { EmptyState } from "$layout";
 import { StampGallery } from "$section";
-import { titlePrimary, valueDarkSm } from "$text";
+import { titlePrimary } from "$text";
 import type { StampListingsProps } from "$types/ui.d.ts";
 
 /* ===== COMPONENT ===== */
@@ -37,11 +37,10 @@ export function StampListingsGallery({
       {title && <h3 class={titlePrimary}>{title}</h3>}
       <div class="flex flex-col">
         {initialData.length === 0 && (
-          <div class={`${container2} flex items-center justify-center w-full h-[46px]`}>
-            <h6 class={`${valueDarkSm} text-center`}>
-              NO NEW LISTINGS AVAILABLE AT THE MOMENT
-            </h6>
-          </div>
+          <EmptyState
+            label="NO NEW LISTINGS AVAILABLE AT THE MOMENT"
+            icon="artStamps"
+          />
         )}
         {initialData.length > 0 && <StampGallery {...sectionProps} />}
       </div>

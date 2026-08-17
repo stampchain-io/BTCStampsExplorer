@@ -16,7 +16,7 @@ import {
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { showToast } from "$lib/utils/ui/notifications/toastSignal.ts";
 import { tooltipIcon } from "$notification";
-import { label, subtitlePrimary, titlePrimary, valueSm } from "$text";
+import { subtitlePrimary, text, titlePrimary, valueSm } from "$text";
 import type { WalletHeaderProps } from "$types/ui.d.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
 
@@ -146,7 +146,7 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
           </div>
         )}
       </div>
-      <div class="flex flex-row-reverse justify-end gap-3">
+      <div class="flex flex-row-reverse justify-end gap-3 -mt-1">
         <div
           ref={copyButtonRef}
           class="relative peer -translate-y-[3px]"
@@ -176,19 +176,19 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
         </div>
 
         <h6
-          class={`${label} hidden tablet:block transition-colors duration-200 peer-hover:text-color-hover`}
+          class={`${text} hidden tablet:block transition-colors duration-200 peer-hover:text-color-hover`}
         >
           {walletData.address}
         </h6>
         <h6
-          class={`${label} hidden mobileLg:block tablet:hidden transition-colors duration-200 peer-hover:text-color-hover`}
+          class={`${text} hidden mobileLg:block tablet:hidden transition-colors duration-200 peer-hover:text-color-hover`}
         >
-          {abbreviateAddress(walletData.address, 11)}
+          {abbreviateAddress(walletData.address, 13)}
         </h6>
         <h6
-          class={`${label} block mobileLg:hidden  transition-colors duration-200 peer-hover:text-color-hover`}
+          class={`${text} block mobileLg:hidden transition-colors duration-200 peer-hover:text-color-hover`}
         >
-          {abbreviateAddress(walletData.address, 9)}
+          {abbreviateAddress(walletData.address, 11)}
         </h6>
       </div>
 
@@ -379,7 +379,7 @@ export default function WalletHeader({
 
   /* ===== RENDER ===== */
   return (
-    <div class={`flex flex-col mobileLg:flex-row ${containerGap}`}>
+    <div class={`flex flex-col mobileMd:flex-row ${containerGap}`}>
       <div className="flex flex-col h-fit w-full mobileMd:w-2/3 tablet:w-3/4">
         <div className={containerBackground}>
           <WalletOverview walletData={walletData} />

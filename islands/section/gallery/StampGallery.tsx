@@ -3,9 +3,9 @@ import { PaginationButtons, ViewAllButton } from "$button";
 import { StampCard } from "$card";
 import { BREAKPOINTS } from "$constants";
 import { SortButton } from "$islands/button/SortButton.tsx";
-import { container2 } from "$layout";
+import { EmptyState } from "$layout";
 import { useLoadingSkeleton } from "$lib/hooks/useLoadingSkeleton.ts";
-import { subtitlePrimary, titlePrimary, valueDarkSm } from "$text";
+import { subtitlePrimary, titlePrimary } from "$text";
 import type { StampGalleryProps, StampRow } from "$types/stamp.d.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
 import Swiper from "swiper";
@@ -184,15 +184,7 @@ export default function StampGallery({
 
       {/* ===== STAMP CONTENT ===== */}
       {!isLoading && filteredStamps.length === 0
-        ? (
-          <div
-            class={`${container2} flex items-center justify-center w-full h-[46px]`}
-          >
-            <h6 class={`${valueDarkSm} text-center`}>
-              NO STAMP CREATIONS AVAILABLE
-            </h6>
-          </div>
-        )
+        ? <EmptyState label="NO STAMP CREATIONS AVAILABLE" icon="artStamps" />
         : ((viewAllLink && viewAllLink !== "/collection/posh" &&
             fromPage == "home") ||
             fromPage === "stamp_detail")

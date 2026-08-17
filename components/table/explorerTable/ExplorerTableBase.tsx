@@ -5,6 +5,7 @@ import {
   cellLeftL2Card,
   cellRightL2Card,
   container2,
+  EmptyState,
 } from "$layout";
 import { labelXxs, textXs } from "$text";
 import type { SRC20Row } from "$types/src20.d.ts";
@@ -34,9 +35,12 @@ const HEADERS = [
 /* ===== COMPONENT ===== */
 interface ExplorerTableBaseProps {
   items: MixedItem[];
+  section?: "all" | "stamps" | "tokens";
 }
 
-export function ExplorerTableBase({ items }: ExplorerTableBaseProps) {
+export function ExplorerTableBase(
+  { items, section = "all" }: ExplorerTableBaseProps,
+) {
   return (
     <div class="overflow-x-auto tablet:overflow-x-visible scrollbar-hide">
       <table
@@ -95,13 +99,19 @@ export function ExplorerTableBase({ items }: ExplorerTableBaseProps) {
             )
             : (
               <tr>
-                <td
-                  colSpan={HEADERS.length}
-                  class={`w-full h-[46px] ${container2}`}
-                >
-                  <p class="text-center text-color-neutral-500 text-xs">
-                    NO ITEMS TO DISPLAY
-                  </p>
+                <td colSpan={HEADERS.length}>
+                  <EmptyState
+                    label={section === "stamps"
+                      ? "NO STAMPS TO DISPLAY"
+                      : section === "tokens"
+                      ? "NO TOKENS TO DISPLAY"
+                      : "NO STAMPS OR TOKENS TO DISPLAY"}
+                    icon={section === "stamps"
+                      ? "artStamps"
+                      : section === "tokens"
+                      ? "src20Tokens"
+                      : ["artStamps", "src20Tokens"]}
+                  />
                 </td>
               </tr>
             )}

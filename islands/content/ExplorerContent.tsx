@@ -47,7 +47,7 @@ export function ExplorerContent({
       {viewMode === "cardRow"
         ? (
           /* ===== ROW TABLE VIEW ===== */
-          <ExplorerTableBase items={visible} />
+          <ExplorerTableBase items={visible} section={section} />
         )
         : visible.length === 0
         ? (

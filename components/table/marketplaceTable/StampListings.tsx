@@ -13,8 +13,13 @@ import {
   cellStickyLeft,
   cellStickyLeft2,
   container2,
+  EmptyState,
   shadowGlowPurple,
 } from "$layout";
+import {
+  getFreshDispenserForPurchase,
+  useLowestPriceDispenser,
+} from "$lib/hooks/useLowestPriceDispenser.ts";
 import {
   isBrowser,
   safeNavigate,
@@ -26,12 +31,8 @@ import {
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
 import { showToast } from "$lib/utils/ui/notifications/toastSignal.ts";
-import { cardRowStampNumber, labelXxs, textXs, valueDarkSm } from "$text";
+import { cardRowStampNumber, labelXxs, textXs } from "$text";
 import type { StampRow } from "$types/stamp.d.ts";
-import {
-  getFreshDispenserForPurchase,
-  useLowestPriceDispenser,
-} from "$lib/hooks/useLowestPriceDispenser.ts";
 import { useRef, useState } from "preact/hooks";
 
 /* ===== CONSTANTS ===== */
@@ -359,13 +360,8 @@ export function StampListingsTable({ stamps }: StampListingsTableProps) {
             ))
             : (
               <tr>
-                <td
-                  colSpan={HEADERS.length}
-                  class={`w-full h-[46px] ${container2}`}
-                >
-                  <h6 class={`${valueDarkSm} text-center`}>
-                    NO LISTINGS TO DISPLAY
-                  </h6>
+                <td colSpan={HEADERS.length}>
+                  <EmptyState label="NO LISTINGS TO DISPLAY" icon="artStamps" />
                 </td>
               </tr>
             )}

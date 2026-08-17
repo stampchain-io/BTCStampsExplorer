@@ -8,6 +8,7 @@ import {
   cellRightL2Card,
   cellStickyLeft,
   container2,
+  EmptyState,
   shadowGlowPurple,
 } from "$layout";
 import {
@@ -20,7 +21,7 @@ import {
   unicodeEscapeToEmoji,
 } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { getSRC20ImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
-import { cardRowStampNumber, labelXxs, textXs, valueDarkSm } from "$text";
+import { cardRowStampNumber, labelXxs, textXs } from "$text";
 import type { SRC20Row } from "$types/src20.d.ts";
 import type { SRC20MintingCompactProps } from "$types/ui.d.ts";
 import type { TargetedEvent } from "preact/compat";
@@ -293,13 +294,8 @@ export function SRC20MintingCompact({
             )
             : (
               <tr>
-                <td
-                  colSpan={headers?.length ?? 0}
-                  class={`${container2} w-full h-[46px]`}
-                >
-                  <h6 class={`${valueDarkSm} text-center`}>
-                    NO MINTING TOKENS
-                  </h6>
+                <td colSpan={headers?.length ?? 0}>
+                  <EmptyState label="NO MINTING TOKENS" icon="src20Tokens" />
                 </td>
               </tr>
             )}
