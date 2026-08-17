@@ -3516,6 +3516,8 @@ export interface ToastComponentProps {
   autoDismiss: boolean;
   duration: number;
   isAnimatingOut?: boolean;
+  /** True only for the one-time app update announcement toast. */
+  isUpdate?: boolean | undefined;
 }
 
 /**

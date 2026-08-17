@@ -6,7 +6,8 @@ import {
   notificationContainerInfo,
   notificationContainerSuccess,
   notificationContainerWarning,
-  notificationHeading,
+  notificationFooter,
+  notificationHeader,
 } from "$notification";
 import type { ToastComponentProps } from "$types/ui.d.ts";
 
@@ -20,6 +21,7 @@ export const ToastComponent = (
     autoDismiss,
     duration = 3000,
     isAnimatingOut: externalIsAnimatingOut,
+    isUpdate = false,
   }: ToastComponentProps & { isAnimatingOut?: boolean },
 ) => {
   // Use the external animation state from the provider
@@ -84,12 +86,16 @@ export const ToastComponent = (
   const lines = message.split("\n");
   const firstLine = lines[0];
   const remainingLines = lines.slice(1);
+  // Only the update announcement toast distinguishes heading/footer lines;
+  // all other toasts render every line with the plain body style.
+  const lastLine = lines[lines.length - 1];
+  const middleLines = lines.slice(1, -1);
 
   return (
     <div
       id={`toast-${id}`}
       class={`fixed top-5 inset-x-5 z-notification !w-auto
-        min-[460px]:left-5 min-[460px]:right-auto min-[460px]:max-w-[460px] ${
+        min-[460px]:left-5 min-[460px]:right-auto min-[420px]:max-w-[420px] ${
         shouldAnimateOut ? "notification-exit" : "notification-enter"
       } ${getContainerStyle(type)}`}
       role="alert"
@@ -123,17 +129,35 @@ export const ToastComponent = (
         />
 
         <div class="flex-1 ml-6 break-words">
-          <div class={notificationHeading}>{firstLine}</div>
-          {body
+          {isUpdate
             ? (
-              <div class={notificationBody}>
-                {body}
-              </div>
+              <>
+                <div class={notificationHeader}>{firstLine}</div>
+                {middleLines.length > 0 && (
+                  <div class={`${notificationBody} whitespace-pre-line`}>
+                    {middleLines.join("\n")}
+                  </div>
+                )}
+                {lines.length > 1 && (
+                  <div class={`${notificationFooter} mt-1`}>{lastLine}</div>
+                )}
+              </>
             )
-            : remainingLines.length > 0 && (
-              <div class={`${notificationBody} whitespace-pre-line`}>
-                {remainingLines.join("\n")}
-              </div>
+            : (
+              <>
+                <div class={notificationBody}>{firstLine}</div>
+                {body
+                  ? (
+                    <div class={notificationBody}>
+                      {body}
+                    </div>
+                  )
+                  : remainingLines.length > 0 && (
+                    <div class={`${notificationBody} whitespace-pre-line`}>
+                      {remainingLines.join("\n")}
+                    </div>
+                  )}
+              </>
             )}
         </div>
       </div>

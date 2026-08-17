@@ -6,7 +6,7 @@ import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
 import {
   notificationBody,
   notificationContainerError,
-  notificationHeading,
+  notificationHeader,
   notificationTextError,
 } from "$notification";
 import { subtitleNeutral, titleNeutral } from "$text";
@@ -89,7 +89,7 @@ export default function SRC20TransfersGallery(): JSX.Element {
         : error
         ? (
           <div class={`mt-3 ${notificationContainerError}`}>
-            <h6 class={`${notificationHeading} ${notificationTextError}`}>
+            <h6 class={`${notificationHeader} ${notificationTextError}`}>
               ERROR LOADING RECENT TRANSFERS
             </h6>
             <h6 class={`${notificationBody} ${notificationTextError}`}>

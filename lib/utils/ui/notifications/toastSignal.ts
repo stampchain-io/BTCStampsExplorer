@@ -16,8 +16,9 @@ export function showToast(
   type: BaseToast["type"],
   autoDismiss = true,
   body?: BaseToast["body"],
+  isUpdate?: BaseToast["isUpdate"],
 ) {
-  toastSignal.value = { message, type, autoDismiss, body };
+  toastSignal.value = { message, type, autoDismiss, body, isUpdate };
   // Clear the signal after a short delay to allow the ToastProvider to pick up the change.
   // This ensures that if showToast is called multiple times quickly with the same content,
   // each call will trigger an update in subscribers because the signal value changes to null then back.

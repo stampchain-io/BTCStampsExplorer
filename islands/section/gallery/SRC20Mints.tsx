@@ -4,7 +4,7 @@ import { containerBackground } from "$layout";
 import {
   notificationBody,
   notificationContainerError,
-  notificationHeading,
+  notificationHeader,
   notificationTextError,
 } from "$notification";
 import { subtitleNeutral, titleNeutral } from "$text";
@@ -89,7 +89,7 @@ export default function SRC20MintsGallery() {
         : error
         ? (
           <div class={`mt-3 ${notificationContainerError}`}>
-            <h6 class={`${notificationHeading} ${notificationTextError}`}>
+            <h6 class={`${notificationHeader} ${notificationTextError}`}>
               ERROR LOADING TRENDING TOKENS
             </h6>
             <h6 class={`${notificationBody} ${notificationTextError}`}>

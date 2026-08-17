@@ -38,7 +38,7 @@ const TYPE = "info" as const;
  * localStorage key for tracking if update notification has been shown
  * INCREMENT VERSION for each new major update announcement
  */
-const NOTIFICATION_UPDATE_VERSION = "feature-update-v3.001279";
+const NOTIFICATION_UPDATE_VERSION = "feature-update-v3.001283";
 
 /**
  * Message content for update notification
@@ -77,6 +77,8 @@ export function NotificationUpdate() {
         NOTIFICATION_UPDATE_MESSAGE,
         TYPE,
         AUTO_DISMISS,
+        undefined,
+        true,
       );
 
       // Mark as shown (user has been notified)
