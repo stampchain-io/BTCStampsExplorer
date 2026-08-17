@@ -33,3 +33,6 @@ export * from "$components/layout/ModalSearchBase.tsx";
 
 /* ===== STAT DISPLAY STYLES ===== */
 export * from "$components/layout/StatStyles.tsx";
+
+/* ===== EMPTY STATE ===== */
+export * from "$components/layout/EmptyState.tsx";

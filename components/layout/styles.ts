@@ -134,10 +134,13 @@ export function gridCardWallet(
 export const rowForm = "flex w-full";
 export const rowResponsiveForm =
   "flex flex-col min-[420px]:flex-row w-full gap-5 min-[420px]:[&>*]:flex-1";
+// Row container styles - used for all gallery (no content) containers
 export const rowContainerBackground =
-  `flex items-center justify-center w-full h-[46px] ${container1}`; // update all tables to use this instead of custom code
+  `flex items-center justify-center w-full h-[42px] ${container2} px-2`; // update all tables to use this instead of custom code
 
 /* ===== COL STYLES ===== */
+export const colContainerBackground =
+  `flex flex-col items-center w-full ${container2} p-2`;
 
 /* ===== CELL STYLES ===== */
 // Layer 1
@@ -237,6 +240,9 @@ export type LayoutStyles = {
   rowForm: string;
   rowResponsiveForm: string;
   rowContainerBackground: string;
+
+  // Col styles
+  colContainerBackground: string;
 
   // Grid styles
   gridCardSm: string;

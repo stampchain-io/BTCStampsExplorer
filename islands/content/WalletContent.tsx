@@ -5,12 +5,8 @@ import { StampOverviewTable } from "$components/table/explorerTable/StampOvervie
 import { StampListingsTable } from "$components/table/marketplaceTable/StampListings.tsx";
 import { SRC20OverviewCompact } from "$components/table/src20OverviewTable/SRC20OverviewCompact.tsx";
 import { WalletHeaderContent } from "$header";
-import {
-  containerBackground,
-  gridCardWallet,
-  rowContainerBackground,
-} from "$layout";
-import { subtitleNeutral, valueDarkSm } from "$text";
+import { containerBackground, EmptyState, gridCardWallet } from "$layout";
+import { subtitleNeutral } from "$text";
 import type { DispenserRow, StampRow } from "$types/stamp.d.ts";
 import type {
   WalletContainerPagination,
@@ -68,15 +64,6 @@ function dispenserToListingStamp(
   } as StampRow & { lowestPriceDispenser: DispenserRow };
 }
 
-/* ===== SHARED EMPTY STATE ===== */
-function EmptyState({ label }: { label: string }) {
-  return (
-    <div class={rowContainerBackground}>
-      <h6 class={valueDarkSm}>{label}</h6>
-    </div>
-  );
-}
-
 /* ===== SHARED PAGINATION BLOCK ===== */
 function PaginationBlock({
   pagination,
@@ -121,7 +108,7 @@ function StampsGridContent({
   emptyLabel: string;
 }) {
   if (!stamps.length) {
-    return <EmptyState label={emptyLabel} />;
+    return <EmptyState label={emptyLabel} icon="artStamps" />;
   }
 
   if (view === "cardRow") {
@@ -201,7 +188,7 @@ function ListingsTabContent({
   );
 
   if (!open.length && !closed.length) {
-    return <EmptyState label="NO LISTINGS FOUND" />;
+    return <EmptyState label="NO LISTINGS FOUND" icon="artStamps" />;
   }
 
   return (
@@ -232,10 +219,10 @@ function CollectionsTabContent({
   pagination?: WalletContainerPagination | undefined;
 }) {
   if (!collections.length) {
-    return <EmptyState label="NO COLLECTIONS FOUND" />;
+    return <EmptyState label="NO COLLECTIONS FOUND" icon="artStamps" />;
   }
   return (
-    <div class="flex flex-col gap-6">
+    <div class="flex flex-col gap-5">
       {collections.map((collection) => (
         <CollectionCard
           key={collection.collection_id}
@@ -281,8 +268,8 @@ function StampsTabContent({
       section={section}
       pagination={pagination}
       emptyLabel={tab === "created"
-        ? "NO STAMPS CREATED BY THIS ADDRESS"
-        : "NO STAMPS IN THE WALLET"}
+        ? "NO STAMPS CREATED BY THIS ADDY"
+        : "NO ART STAMPS IN THE WALLET"}
     />
   );
 }
@@ -305,8 +292,9 @@ function TokensTabContent({
     return (
       <EmptyState
         label={tab === "created"
-          ? "NO TOKENS DEPLOYED BY THIS ADDRESS"
-          : "NO TOKENS IN THE WALLET"}
+          ? "NO TOKENS DEPLOYED BY THIS ADDY"
+          : "NO SRC20 TOKENS IN THE WALLET"}
+        icon="src20Tokens"
       />
     );
   }
@@ -393,7 +381,7 @@ export default function WalletContent({
       <div class={`w-full ${view !== "cardRow" ? "pt-5" : "pt-2"}`}>
         {section === "all"
           ? (
-            <div class="flex flex-col tablet:flex-row gap-6">
+            <div class="flex flex-col tablet:flex-row gap-5">
               <div
                 id="tokens-panel"
                 class="w-full tablet:w-1/2 desktop:w-1/3"

@@ -176,19 +176,19 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
         </div>
 
         <h6
-          class={`${label} hidden mobileMd:block mobileLg:hidden tablet:block transition-colors duration-200 peer-hover:text-color-hover`}
+          class={`${label} hidden tablet:block transition-colors duration-200 peer-hover:text-color-hover`}
         >
           {walletData.address}
         </h6>
         <h6
           class={`${label} hidden mobileLg:block tablet:hidden transition-colors duration-200 peer-hover:text-color-hover`}
         >
-          {abbreviateAddress(walletData.address, 13)}
+          {abbreviateAddress(walletData.address, 11)}
         </h6>
         <h6
-          class={`${label} block mobileMd:hidden  transition-colors duration-200 peer-hover:text-color-hover`}
+          class={`${label} block mobileLg:hidden  transition-colors duration-200 peer-hover:text-color-hover`}
         >
-          {abbreviateAddress(walletData.address, 12)}
+          {abbreviateAddress(walletData.address, 9)}
         </h6>
       </div>
 
@@ -380,13 +380,13 @@ export default function WalletHeader({
   /* ===== RENDER ===== */
   return (
     <div class={`flex flex-col mobileLg:flex-row ${containerGap}`}>
-      <div className="flex flex-col h-fit w-full mobileLg:w-1/2 tablet:w-2/3">
+      <div className="flex flex-col h-fit w-full mobileMd:w-2/3 tablet:w-3/4">
         <div className={containerBackground}>
           <WalletOverview walletData={walletData} />
         </div>
       </div>
       <div
-        class={`flex flex-col w-full mobileLg:w-1/2 tablet:w-1/3 ${containerGap}`}
+        class={`flex flex-col w-full mobileMd:w-1/3 tablet:w-1/4 ${containerGap}`}
       >
         <div className={containerBackground}>
           <WalletStats

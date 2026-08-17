@@ -6,6 +6,7 @@ import {
   cellRightL2Card,
   cellStickyLeft,
   container2,
+  EmptyState,
   shadowGlowPurple,
 } from "$layout";
 import { safeNavigate } from "$lib/utils/navigation/freshNavigationUtils.ts";
@@ -18,7 +19,6 @@ import {
   cardRowStampNumber,
   labelXxs,
   textXs,
-  valueDarkSm,
   valueNegative,
   valueNeutral,
   valuePositive,
@@ -369,13 +369,8 @@ export function SRC20OverviewCompact({
             )
             : (
               <tr>
-                <td
-                  colSpan={headers?.length ?? 0}
-                  class={`${container2} w-full h-[46px]`}
-                >
-                  <h6 class={`${valueDarkSm} text-center`}>
-                    NO TOKENS TO DISPLAY
-                  </h6>
+                <td colSpan={headers?.length ?? 0}>
+                  <EmptyState label="NO TOKENS TO DISPLAY" icon="src20Tokens" />
                 </td>
               </tr>
             )}

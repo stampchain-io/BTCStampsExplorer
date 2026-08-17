@@ -1,8 +1,7 @@
 /* ===== STAMP OVERVIEW CONTENT COMPONENT ===== */
 import { PaginationButtons } from "$button";
 import { StampCard } from "$card";
-import { containerBackground, gridCard } from "$layout";
-import { valueDark } from "$text";
+import { EmptyState, gridCard } from "$layout";
 import type { StampCardVariant, StampRow } from "$types/stamp.d.ts";
 import type { StampOverviewContentProps } from "$types/ui.d.ts";
 
@@ -37,14 +36,7 @@ export function StampOverviewContent({
             ))}
           </div>
         )
-        : (
-          <div
-            class={`${containerBackground} flex-col flex justify-center items-center`}
-          >
-            <img src="/img/ic_content.svg" width="160" />
-            <h6 class={`py-2 ${valueDark} text-center`}>NO STAMPS</h6>
-          </div>
-        )}
+        : <EmptyState label="NO STAMPS" icon="artStamps" />}
       {pagination && (
         <PaginationButtons
           page={pagination.page}

@@ -2,8 +2,7 @@
 import { PaginationButtons } from "$button";
 import { StampCard } from "$card";
 import { MarketplaceTableBase } from "$components/table/marketplaceTable/MarketplaceTableBase.tsx";
-import { container2, gridCard } from "$layout";
-import { valueDarkSm } from "$text";
+import { EmptyState, gridCard } from "$layout";
 import type { StampCardVariant, StampRow } from "$types/stamp.d.ts";
 import type { MarketplaceContentProps } from "$types/ui.d.ts";
 
@@ -50,14 +49,12 @@ export function MarketplaceContent({
           </div>
         )
         : (
-          <div
-            class={`${container2} flex-col flex justify-center items-center`}
-          >
-            <img src="/img/ic_content.svg" width="160" />
-            <h6 class={`pb-3 ${valueDarkSm} text-center`}>
-              {isRecentSales ? "NO SALES TO DISPLAY" : "NO LISTINGS TO DISPLAY"}
-            </h6>
-          </div>
+          <EmptyState
+            label={isRecentSales
+              ? "NO SALES TO DISPLAY"
+              : "NO LISTINGS TO DISPLAY"}
+            icon="artStamps"
+          />
         )}
       {pagination && (
         <PaginationButtons

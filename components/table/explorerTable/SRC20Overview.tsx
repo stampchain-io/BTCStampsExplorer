@@ -8,6 +8,7 @@ import {
   cellStickyLeft,
   cellStickyLeft2,
   container2,
+  EmptyState,
   shadowGlowPurple,
 } from "$layout";
 import {
@@ -23,7 +24,7 @@ import {
   formatDate,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { getSRC20ImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
-import { cardRowStampNumber, labelXxs, textXs, valueDarkSm } from "$text";
+import { cardRowStampNumber, labelXxs, textXs } from "$text";
 import type { SRC20Row } from "$types/src20.d.ts";
 
 /* ===== CONSTANTS ===== */
@@ -264,13 +265,8 @@ export function SRC20OverviewTable({ src20s }: SRC20OverviewTableProps) {
             ))
             : (
               <tr>
-                <td
-                  colSpan={HEADERS.length}
-                  class={`w-full h-[46px] ${container2}`}
-                >
-                  <h6 class={`${valueDarkSm} text-center`}>
-                    NO TOKENS TO DISPLAY
-                  </h6>
+                <td colSpan={HEADERS.length}>
+                  <EmptyState label="NO TOKENS TO DISPLAY" icon="src20Tokens" />
                 </td>
               </tr>
             )}
