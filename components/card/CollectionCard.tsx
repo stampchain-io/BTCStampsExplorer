@@ -31,7 +31,7 @@ export function CollectionCard(
 
   return (
     <a
-      href={`/collection/detail/${collectionName}`}
+      href={`/collection/${collectionName}`}
       className={`${containerBackground} gap-6 hover:border-color-purple-light ${shadowGlowPurple} hover:border-solid border-2 border-transparent group`}
     >
       {/* ===== CARD HEADER ===== */}

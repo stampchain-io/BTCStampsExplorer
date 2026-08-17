@@ -47,7 +47,6 @@ import type {
 } from "$types/index.d.ts";
 import type { MarketListingAggregated } from "$types/marketData.d.ts";
 import type {
-  CollectionWithOptionalMarketData,
   Deployment,
   FeeData,
   PSBTFees,
@@ -3716,23 +3715,6 @@ export interface WalletAuthState {
   maxFailedAttempts: number;
   failedAttempts: number;
 }
-
-/**
- * CollectionLandingPageProps - Migrated from index.tsx
- */
-export type CollectionLandingPageProps = {
-  data: {
-    collections: CollectionWithOptionalMarketData[];
-    total: number;
-    _page: number;
-    _pages: number;
-    _page_size: number;
-    _filterBy: string[];
-    sortBy: "ASC" | "DESC";
-    stamps_src721: StampRow[];
-    stamps_posh: StampRow[];
-  };
-};
 
 /**
  * State - Migrated from sharedContentHandler.ts

@@ -1,14 +1,12 @@
-/* ===== COLLECTION DETAIL GALLERY COMPONENT ===== */
-/* @baba - not updated */
-import { PaginationButtons, ViewAllButton } from "$button";
-import { CollectionCard } from "$card";
+/* ===== COLLECTION GALLERY BANNER COMPONENT ===== */
 import { BREAKPOINTS } from "$constants";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
+import { CollectionsBanner } from "$section";
 import { subtitleNeutral, titleNeutral } from "$text";
 import type { Collection } from "$types/stamp.d.ts";
 import { useEffect, useState } from "preact/hooks";
 // Local copy of props to avoid importing server-only types
-export interface CollectionGalleryProps {
+export interface CollectionGalleryBannerProps {
   title?: string;
   subTitle?: string;
   collections: Collection[];
@@ -20,42 +18,21 @@ export interface CollectionGalleryProps {
     mobileMd?: number;
     mobileSm?: number;
   };
-  pagination?: {
-    page: number;
-    totalPages: number;
-    prefix?: string;
-    onPageChange?: (page: number) => void;
-  };
 }
 
 /* ===== STATE ===== */
-export default function CollectionDetailGallery({
+export default function CollectionGalleryBanner({
   title,
   subTitle,
   collections,
   gridClass,
   displayCounts,
-  pagination,
-}: CollectionGalleryProps) {
-  const { width } = useWindowSize();
+}: CollectionGalleryBannerProps) {
   const collectionArray = Array.isArray(collections) ? collections : [];
   const [displayCount, setDisplayCount] = useState(collectionArray.length);
+  const { width } = useWindowSize();
 
   /* ===== EVENT HANDLERS ===== */
-  const handlePageChange = (page: number) => {
-    if (pagination?.onPageChange) {
-      pagination.onPageChange(page);
-    } else {
-      // SSR-safe browser environment check
-      if (typeof globalThis === "undefined" || !globalThis?.location) {
-        return; // Cannot navigate during SSR
-      }
-      const url = new URL(globalThis.location.href);
-      url.searchParams.set("page", page.toString());
-      globalThis.location.href = url.toString();
-    }
-  };
-
   useEffect(() => {
     const updateDisplayCount = () => {
       if (displayCounts) {
@@ -96,7 +73,7 @@ export default function CollectionDetailGallery({
       {subTitle && (
         <h4
           class={subtitleNeutral +
-            " mb-3 mobileMd:mb-6"}
+            "mb-6"}
         >
           {subTitle}
         </h4>
@@ -104,23 +81,15 @@ export default function CollectionDetailGallery({
       <div class={grid}>
         {collectionArray.slice(0, displayCount).map((
           collection: Collection,
+          key: number,
         ) => (
-          <CollectionCard
+          <CollectionsBanner
             key={collection.collection_id}
             collection={collection}
+            isDarkMode={key % 2 ? false : true}
           />
         ))}
       </div>
-      <ViewAllButton href="/collection/artist" />
-
-      {pagination && (
-        <PaginationButtons
-          page={pagination.page}
-          totalPages={pagination.totalPages}
-          {...(pagination.prefix && { prefix: pagination.prefix })}
-          onPageChange={handlePageChange}
-        />
-      )}
     </div>
   );
 }

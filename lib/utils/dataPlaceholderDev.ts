@@ -24,9 +24,7 @@
  * ===== ROUTES STILL MISSING DUMMY DATA (still hit the DB/API even when
  * DATA_PLACEHOLDER_DEV is true) =====
  *   /collection                routes/collection/index.tsx
- *   /collection/artist|posh|recursive
- *                               routes/collection/[overview].tsx
- *   /collection/detail/[id]    routes/collection/detail/[id].tsx
+ *   /collection/[id]           routes/collection/[id].tsx
  *   /block                     routes/block/index.tsx
  *   /block/[block_index]       routes/block/[block_index].tsx
  *   /upload                    routes/upload/index.tsx

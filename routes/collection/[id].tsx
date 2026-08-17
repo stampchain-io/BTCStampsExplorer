@@ -2,7 +2,7 @@ import type { SUBPROTOCOLS } from "$types/base.d.ts";
 /* ===== COLLECTION DETAILS PAGE ===== */
 
 import type { StampFilterType } from "$constants";
-import { CollectionDetailContent } from "$content";
+import { CollectionContent } from "$content";
 import { FreshContext, Handlers } from "$fresh/server.ts";
 import type { CollectionDetailsPageProps } from "$types/ui.d.ts";
 
@@ -93,10 +93,10 @@ export default function CollectionDetailPage(
     <div
       class="flex flex-col gap-6"
       f-client-nav
-      data-partial={`/collection/detail/${id}`}
+      data-partial={`/collection/${id}`}
     >
       <CollectionDetailHeader collection={collection} stamps={stamps} />
-      <CollectionDetailContent stamps={stamps} />
+      <CollectionContent stamps={stamps} />
       <PaginationButtons
         page={page}
         totalPages={pages}

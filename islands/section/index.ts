@@ -3,8 +3,8 @@
 export { FeeCalculatorBase } from "$islands/section/FeeCalculatorBase.tsx";
 
 /* ===== GALLERIES ===== */
-export { default as CollectionDetailGallery } from "$islands/section/gallery/CollectionDetailGallery.tsx";
 export { default as CollectionGallery } from "$islands/section/gallery/CollectionGallery.tsx";
+export { default as CollectionGalleryBanner } from "$islands/section/gallery/CollectionGalleryBanner.tsx";
 export * from "$islands/section/gallery/SRC20Gallery.tsx";
 export { default as StampGallery } from "$islands/section/gallery/StampGallery.tsx";
 export * from "$islands/section/gallery/StampGalleryHome.tsx";

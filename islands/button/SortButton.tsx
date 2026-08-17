@@ -29,33 +29,20 @@ export function SortButton(
   const [allowTooltip, setAllowTooltip] = useState(true);
   const tooltipTimeoutRef = useRef<number | null>(null);
 
-  // Helper function to determine the anchor based on sort parameter
-  const getSectionAnchor = (sortParam: string): string => {
-    switch (sortParam) {
-      case "stampsSortBy":
-        return "stamps";
-      case "tokensSortBy":
-        return "tokens";
-      case "src20SortBy":
-        return "src20";
-      case "dispensersSortBy":
-        return "dispensers";
-      case "sortBy":
-        return "wallet";
-      default:
-        return "stamps";
-    }
-  };
-
   // Generate the sort URL for Fresh.js partial navigation
   const getSortUrl = (): string => {
     // Get current URL in an SSR-safe way
     const url = new URL(getUrl());
-    const currentSort = isClient ? getSearchParam(sortParam) || "DESC" : "DESC";
+    // Fall back to `initSort` (rather than a hardcoded "DESC") so pages that
+    // default to ascending sort still toggle correctly before any `sortBy`
+    // param exists in the URL.
+    const defaultSort = initSort || "DESC";
+    const currentSort = isClient
+      ? getSearchParam(sortParam) || defaultSort
+      : defaultSort;
     const newSort = currentSort === "ASC" ? "DESC" : "ASC";
 
     url.searchParams.set(sortParam, newSort);
-    url.searchParams.set("anchor", getSectionAnchor(sortParam));
 
     return url.toString();
   };

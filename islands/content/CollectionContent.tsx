@@ -1,9 +1,9 @@
-/* ===== COLLECTION DETAILS CONTENT COMPONENT ===== */
+/* ===== COLLECTION CONTENT COMPONENT ===== */
 import type { StampRow } from "$types/stamp.d.ts";
 import { StampCard } from "$card";
 
 /* ===== COMPONENT ===== */
-export const CollectionDetailContent = ({ stamps = [] }: {
+export const CollectionContent = ({ stamps = [] }: {
   stamps: StampRow[];
 }) => {
   return (

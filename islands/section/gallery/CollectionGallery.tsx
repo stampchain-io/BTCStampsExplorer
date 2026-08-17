@@ -1,7 +1,9 @@
 /* ===== COLLECTION GALLERY COMPONENT ===== */
+/* @baba - not updated */
+import { PaginationButtons, ViewAllButton } from "$button";
+import { CollectionCard } from "$card";
 import { BREAKPOINTS } from "$constants";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
-import { CollectionsBanner } from "$section";
 import { subtitleNeutral, titleNeutral } from "$text";
 import type { Collection } from "$types/stamp.d.ts";
 import { useEffect, useState } from "preact/hooks";
@@ -18,6 +20,13 @@ export interface CollectionGalleryProps {
     mobileMd?: number;
     mobileSm?: number;
   };
+  pagination?: {
+    page: number;
+    totalPages: number;
+    prefix?: string;
+    onPageChange?: (page: number) => void;
+  };
+  viewAllHref?: string;
 }
 
 /* ===== STATE ===== */
@@ -27,12 +36,28 @@ export default function CollectionGallery({
   collections,
   gridClass,
   displayCounts,
+  pagination,
+  viewAllHref,
 }: CollectionGalleryProps) {
+  const { width } = useWindowSize();
   const collectionArray = Array.isArray(collections) ? collections : [];
   const [displayCount, setDisplayCount] = useState(collectionArray.length);
-  const { width } = useWindowSize();
 
   /* ===== EVENT HANDLERS ===== */
+  const handlePageChange = (page: number) => {
+    if (pagination?.onPageChange) {
+      pagination.onPageChange(page);
+    } else {
+      // SSR-safe browser environment check
+      if (typeof globalThis === "undefined" || !globalThis?.location) {
+        return; // Cannot navigate during SSR
+      }
+      const url = new URL(globalThis.location.href);
+      url.searchParams.set("page", page.toString());
+      globalThis.location.href = url.toString();
+    }
+  };
+
   useEffect(() => {
     const updateDisplayCount = () => {
       if (displayCounts) {
@@ -73,7 +98,7 @@ export default function CollectionGallery({
       {subTitle && (
         <h4
           class={subtitleNeutral +
-            "mb-6"}
+            " mb-3 mobileMd:mb-6"}
         >
           {subTitle}
         </h4>
@@ -81,15 +106,23 @@ export default function CollectionGallery({
       <div class={grid}>
         {collectionArray.slice(0, displayCount).map((
           collection: Collection,
-          key: number,
         ) => (
-          <CollectionsBanner
+          <CollectionCard
             key={collection.collection_id}
             collection={collection}
-            isDarkMode={key % 2 ? false : true}
           />
         ))}
       </div>
+      {viewAllHref && <ViewAllButton href={viewAllHref} />}
+
+      {pagination && (
+        <PaginationButtons
+          page={pagination.page}
+          totalPages={pagination.totalPages}
+          onPageChange={handlePageChange}
+          {...(pagination.prefix && { prefix: pagination.prefix })}
+        />
+      )}
     </div>
   );
 }

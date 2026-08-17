@@ -110,8 +110,7 @@ import * as $api_v2_versions_changelog from "./routes/api/v2/versions/changelog.
 import * as $api_v2_versions_index from "./routes/api/v2/versions/index.ts";
 import * as $block_block_index_ from "./routes/block/[block_index].tsx";
 import * as $block_index from "./routes/block/index.tsx";
-import * as $collection_overview_ from "./routes/collection/[overview].tsx";
-import * as $collection_detail_id_ from "./routes/collection/detail/[id].tsx";
+import * as $collection_id_ from "./routes/collection/[id].tsx";
 import * as $collection_index from "./routes/collection/index.tsx";
 import * as $config from "./routes/config.ts";
 import * as $content_imgpath_ from "./routes/content/[...imgpath].tsx";
@@ -182,7 +181,7 @@ import * as $card_SRC20Card from "./islands/card/SRC20Card.tsx";
 import * as $card_StampCard from "./islands/card/StampCard.tsx";
 import * as $card_WalletStampCard from "./islands/card/WalletStampCard.tsx";
 import * as $card_index from "./islands/card/index.ts";
-import * as $content_CollectionDetailContent from "./islands/content/CollectionDetailContent.tsx";
+import * as $content_CollectionContent from "./islands/content/CollectionContent.tsx";
 import * as $content_ExplorerContent from "./islands/content/ExplorerContent.tsx";
 import * as $content_MarketplaceContent from "./islands/content/MarketplaceContent.tsx";
 import * as $content_SRC20OverviewContent from "./islands/content/SRC20OverviewContent.tsx";
@@ -268,8 +267,8 @@ import * as $section_cta_StampPoshCta from "./islands/section/cta/StampPoshCta.t
 import * as $section_cta_StampchainContactCta from "./islands/section/cta/StampchainContactCta.tsx";
 import * as $section_feed_SalesActivityFeed from "./islands/section/feed/SalesActivityFeed.tsx";
 import * as $section_gallery_Carousel from "./islands/section/gallery/Carousel.tsx";
-import * as $section_gallery_CollectionDetailGallery from "./islands/section/gallery/CollectionDetailGallery.tsx";
 import * as $section_gallery_CollectionGallery from "./islands/section/gallery/CollectionGallery.tsx";
+import * as $section_gallery_CollectionGalleryBanner from "./islands/section/gallery/CollectionGalleryBanner.tsx";
 import * as $section_gallery_PartnersBanner from "./islands/section/gallery/PartnersBanner.tsx";
 import * as $section_gallery_SRC20Deploys from "./islands/section/gallery/SRC20Deploys.tsx";
 import * as $section_gallery_SRC20Gallery from "./islands/section/gallery/SRC20Gallery.tsx";
@@ -464,8 +463,7 @@ const manifest = {
     "./routes/api/v2/versions/index.ts": $api_v2_versions_index,
     "./routes/block/[block_index].tsx": $block_block_index_,
     "./routes/block/index.tsx": $block_index,
-    "./routes/collection/[overview].tsx": $collection_overview_,
-    "./routes/collection/detail/[id].tsx": $collection_detail_id_,
+    "./routes/collection/[id].tsx": $collection_id_,
     "./routes/collection/index.tsx": $collection_index,
     "./routes/config.ts": $config,
     "./routes/content/[...imgpath].tsx": $content_imgpath_,
@@ -541,8 +539,7 @@ const manifest = {
     "./islands/card/StampCard.tsx": $card_StampCard,
     "./islands/card/WalletStampCard.tsx": $card_WalletStampCard,
     "./islands/card/index.ts": $card_index,
-    "./islands/content/CollectionDetailContent.tsx":
-      $content_CollectionDetailContent,
+    "./islands/content/CollectionContent.tsx": $content_CollectionContent,
     "./islands/content/ExplorerContent.tsx": $content_ExplorerContent,
     "./islands/content/MarketplaceContent.tsx": $content_MarketplaceContent,
     "./islands/content/SRC20OverviewContent.tsx": $content_SRC20OverviewContent,
@@ -650,10 +647,10 @@ const manifest = {
     "./islands/section/feed/SalesActivityFeed.tsx":
       $section_feed_SalesActivityFeed,
     "./islands/section/gallery/Carousel.tsx": $section_gallery_Carousel,
-    "./islands/section/gallery/CollectionDetailGallery.tsx":
-      $section_gallery_CollectionDetailGallery,
     "./islands/section/gallery/CollectionGallery.tsx":
       $section_gallery_CollectionGallery,
+    "./islands/section/gallery/CollectionGalleryBanner.tsx":
+      $section_gallery_CollectionGalleryBanner,
     "./islands/section/gallery/PartnersBanner.tsx":
       $section_gallery_PartnersBanner,
     "./islands/section/gallery/SRC20Deploys.tsx": $section_gallery_SRC20Deploys,

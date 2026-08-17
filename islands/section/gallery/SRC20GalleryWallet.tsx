@@ -212,7 +212,6 @@ export default function SRC20GalleryWallet({
       updateSearchParams((params) => {
         params.set("src20SortBy", newSort);
         params.delete("src20_page"); // Reset to page 1 on sort change
-        params.set("anchor", "src20");
       });
     }
 
