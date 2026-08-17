@@ -12,7 +12,7 @@ import {
   headingGreyDLLink,
   labelSm,
   textSm,
-  titleNeutral,
+  titlePrimary,
   value3xl,
   valueSm,
 } from "$text";
@@ -50,7 +50,7 @@ export const CollectionDetailHeader = (
               </div>
             )}
             <div class="flex flex-col pl-6">
-              <h1 class={`${titleNeutral} pb-1.5`}>
+              <h1 class={`${titlePrimary} pb-1.5`}>
                 {collection.collection_name.length > 12
                   ? (
                     <>
@@ -79,7 +79,7 @@ export const CollectionDetailHeader = (
                         collection.creator_names.length > 0
                       ? collection.creator_names[0]
                       : abbreviateAddress(collection.creators[0], 6))
-                    : "N/A"}
+                    : "ANONYMOUS"}
                 </a>
               </div>
             </div>

@@ -486,7 +486,7 @@ export function SRC20Overview({
                     </td>
                     {/* HOLDERS */}
                     <td
-                      class={`${cellCenterL2Card} text-color-primary-400`}
+                      class={`${cellCenterL2Card} text-color-neutral-400`}
                     >
                       {(() => {
                         const holderCount = src20.market_data?.holder_count ??

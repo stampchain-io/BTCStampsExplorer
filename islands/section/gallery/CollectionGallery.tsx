@@ -40,7 +40,22 @@ export default function CollectionGallery({
   viewAllHref,
 }: CollectionGalleryProps) {
   const { width } = useWindowSize();
-  const collectionArray = Array.isArray(collections) ? collections : [];
+  // TODO(@baba): temporary filter - hide collections with no stamps and
+  // known test/placeholder collections until backend excludes them
+  const HIDDEN_COLLECTION_NAMES = [
+    "testtt",
+    "valtius",
+    "posh",
+    "hnft pepe cash",
+    "alpha_pxllabs",
+  ];
+  const collectionArray = (Array.isArray(collections) ? collections : [])
+    .filter((collection) => (collection.stamp_count ?? 0) > 0)
+    .filter((collection) =>
+      !HIDDEN_COLLECTION_NAMES.includes(
+        (collection.collection_name ?? "").toLowerCase(),
+      )
+    );
   const [displayCount, setDisplayCount] = useState(collectionArray.length);
 
   /* ===== EVENT HANDLERS ===== */
@@ -91,7 +106,7 @@ export default function CollectionGallery({
   }, [width, displayCounts, collectionArray.length]);
 
   /* ===== RENDER ===== */
-  const grid = gridClass ?? "grid grid-cols-1 gap-4";
+  const grid = gridClass ?? "grid grid-cols-1 tablet:grid-cols-2 gap-5";
   return (
     <div>
       {title && <h3 class={titleNeutral}>{title}</h3>}
