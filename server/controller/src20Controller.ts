@@ -354,7 +354,12 @@ export class Src20Controller {
         tick,
         sortBy: "DESC",
         includePagination: true,
-        limit: 1000000
+        // Cap the holders fetch instead of pulling every row: high-holder-count
+        // tickers (e.g. STAMP) made this query extremely expensive without a
+        // supporting (tick, amt) index, exhausting the DB connection pool.
+        // `total_holders` below still reflects the true count via a separate
+        // COUNT query, independent of this cap.
+        limit: 500,
       };
 
       const [
@@ -388,7 +393,9 @@ export class Src20Controller {
         deployment,
         total_transfers,
         total_mints,
-        total_holders: Array.isArray(balanceResponse.data)
+        total_holders: typeof balanceResponse.total === "number"
+          ? balanceResponse.total
+          : Array.isArray(balanceResponse.data)
           ? balanceResponse.data.length
           : 0,
         holders: Array.isArray(balanceResponse.data)

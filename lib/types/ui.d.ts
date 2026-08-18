@@ -170,6 +170,15 @@ export interface TableProps<T = any> {
   cpid?: string;
   tick?: string;
   initialCounts?: Record<string, number>;
+  holders?: import("./wallet.d.ts").HolderRow[];
+  title?: string;
+  // Serializable deploy metadata (e.g. SRC-20 creator/date/params) used to
+  // render the non-fetched "info" tab. Must stay plain JSON-safe data —
+  // islands can't receive VNodes/functions as props (they get dropped
+  // during Fresh's client-state serialization), so `DetailsTableBase`
+  // renders `SRC20DetailInfo` itself from this data instead of accepting
+  // pre-built JSX.
+  deployment?: SRC20DetailInfoProps["deployment"];
 }
 // Removed circular self-import block - these types should be defined locally
 // import type {
@@ -3152,6 +3161,17 @@ export interface SRC20DetailHeaderProps {
   _totalTransfers: number;
   marketInfo?: MarketListingAggregated;
   _align?: AlignmentType;
+  // Price history series rendered beneath the ticker row via ChartWidget.
+  highcharts?: HighchartsData;
+}
+
+/**
+ * SRC20DetailInfoProps - Props for the SRC20 deploy metadata block
+ * (creator, deploy date/block/tx, and token parameters), rendered inside
+ * the "INFO" tab of the Details selector on the SRC-20 detail page.
+ */
+export interface SRC20DetailInfoProps {
+  deployment: SRC20DetailHeaderProps["deployment"];
 }
 
 /**
