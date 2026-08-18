@@ -10,7 +10,7 @@ import {
   abbreviateAddress,
   formatDate,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
-import { labelXs, textSm, valueDarkSm, valueSmLink } from "$text";
+import { labelXxs, textXs, valueDarkSm } from "$text";
 import type { SRC20Row } from "$types/src20.d.ts";
 import type { SRC20MintsProps } from "$types/ui.d.ts";
 
@@ -23,9 +23,9 @@ export function SRC20MintsTable(
 
   /* ===== RENDER ===== */
   return (
-    <div class="-mt-2 overflow-x-auto tablet:overflow-x-visible scrollbar-hide">
+    <div class="overflow-x-auto overflow-y-hidden tablet:overflow-x-visible scrollbar-hide">
       <table
-        class={`w-full border-separate border-spacing-y-2 ${textSm}`}
+        class={`w-full -my-2 border-separate border-spacing-y-2 ${textXs}`}
       >
         {/* ===== TABLE STRUCTURE ===== */}
         <colgroup>
@@ -55,7 +55,7 @@ export function SRC20MintsTable(
               return (
                 <th
                   key={header}
-                  class={`!py-1.5 ${rowClass} ${labelXs}`}
+                  class={`!py-1.5 ${rowClass} ${labelXxs}`}
                 >
                   {header}
                 </th>
@@ -83,7 +83,7 @@ export function SRC20MintsTable(
                 >
                   <a
                     href={`/wallet/${mint.destination}`}
-                    className={valueSmLink}
+                    className="link-neutral-200"
                   >
                     <span class="tablet:hidden">
                       {abbreviateAddress(mint.destination, 4)}
@@ -117,7 +117,7 @@ export function SRC20MintsTable(
                         "_blank",
                       );
                     }}
-                    className={valueSmLink}
+                    className="link-neutral-200"
                   >
                     <span class="tablet:hidden">
                       {abbreviateAddress(mint.tx_hash, 4)}
@@ -129,7 +129,7 @@ export function SRC20MintsTable(
                 </td>
                 {/* BLOCK */}
                 <td
-                  class={`${cellRightL2Detail} text-color-grey`}
+                  class={`${cellRightL2Detail} text-color-neutral-400`}
                 >
                   {mint.block_index.toLocaleString()}
                 </td>

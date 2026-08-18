@@ -348,7 +348,7 @@ export default function DetailsTableBase({
       {/* ===== TAB CONTENT ===== */}
       {selectedTab === "holders"
         ? (
-          <div class="flex flex-col tablet:flex-row w-full gap-3">
+          <div class="flex flex-col tablet:flex-row w-full gap-5">
             <div class="flex justify-center tablet:justify-start">
               <HoldersPieChart holders={holders} />
             </div>
@@ -361,7 +361,7 @@ export default function DetailsTableBase({
         ? (deployment ? <SRC20DetailInfo deployment={deployment} /> : null)
         : (
           <ScrollContainer
-            class="min-h-[72px] max-h-[290px] scrollbar-background-layer1"
+            class="min-h-[72px] max-h-[296px] scrollbar-background-layer1"
             onScroll={handleScroll}
           >
             <div class="">

@@ -389,10 +389,23 @@ b, strong {
   transition: background-size .2s, color .4s;
   padding-bottom: 1px;
 }
+
+.link-neutral-500 {
+  text-decoration: none;
+  background-image: linear-gradient(var(--color-neutral-500), var(--color-neutral-500));
+  background-position: 0% 100%;
+  background-repeat: no-repeat;
+  background-size: 100% 0.8px;
+  transition: background-size .2s, color .4s;
+  padding-bottom: 1px;
+}
+
 .link-neutral-200:hover,
 .link-neutral-200:focus,
 .link-neutral-400:hover,
-.link-neutral-400:focus {
+.link-neutral-400:focus,
+.link-neutral-500:hover,
+.link-neutral-500:focus {
   background-size: 0% 0.8px;
   color: var(--color-primary-400);
 }

@@ -8,7 +8,7 @@ import {
   ScrollContainer,
 } from "$layout";
 import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
-import { labelXs, textSm, valueSmLink } from "$text";
+import { labelXxs, textXs } from "$text";
 import type { HoldersTableProps } from "$types/ui.d.ts";
 import { useEffect, useMemo, useState } from "preact/hooks";
 
@@ -91,12 +91,12 @@ const HoldersTableBase = (
   return (
     <div class="w-full">
       <ScrollContainer
-        class="min-h-[80px] max-h-[290px] w-full scrollbar-background-layer1"
+        class="min-h-[72px] max-h-[296px] w-full scrollbar-background-layer1"
         onScroll={handleScroll}
       >
-        <div class="!-my-2 overflow-x-auto tablet:overflow-x-visible scrollbar-hide">
+        <div class="overflow-x-auto overflow-y-hidden tablet:overflow-x-visible scrollbar-hide">
           <table
-            class={`w-full -mb-2 border-separate border-spacing-y-2 ${textSm}`}
+            class={`w-full -my-2 border-separate border-spacing-y-2 ${textXs}`}
           >
             {/* ===== TABLE STRUCTURE ===== */}
             <colgroup>
@@ -131,7 +131,7 @@ const HoldersTableBase = (
                     <th
                       key={header}
                       scope="col"
-                      class={`!py-1.5 ${rowClass} ${labelXs}`}
+                      class={`!py-1.5 ${rowClass} ${labelXxs}`}
                     >
                       {header}
                     </th>
@@ -183,7 +183,7 @@ const HoldersTableBase = (
                       <a
                         target="_top"
                         href={`/wallet/${holder.address}`}
-                        className={valueSmLink}
+                        className="link-neutral-200"
                       >
                         <span class="mobileLg:hidden">
                           {abbreviateAddress(holder.address, 8)}

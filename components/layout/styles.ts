@@ -168,11 +168,11 @@ export const cellCenterL2Card = `p-1 ${cell} border-y-[1px] border-x-0
   group-hover:bg-black/20 group-hover:border-color-hover ${transitionColors} text-center`;
 // Stamp and SRC20 Detail pages Table Rows
 export const cellLeftL2Detail =
-  `p-1.5 pl-3 ${cell} rounded-l-2xl border-y-[1px] border-l-[1px] border-r-0 group-hover:bg-black/20 group-hover:border-color-hover ${transitionColors} whitespace-nowrap text-left`;
+  `p-1.5 pl-3 ${cell} rounded-l-2xl border-y-[1px] border-l-[1px] border-r-0 group-hover:bg-black/20 ${transitionColors} whitespace-nowrap text-left`;
 export const cellRightL2Detail =
-  `p-1.5 pr-3 ${cell} rounded-r-2xl border-y-[1px] border-r-[1px] border-l-0 group-hover:bg-black/20 group-hover:border-color-hover ${transitionColors} whitespace-nowrap text-right`;
+  `p-1.5 pr-3 ${cell} rounded-r-2xl border-y-[1px] border-r-[1px] border-l-0 group-hover:bg-black/20 ${transitionColors} whitespace-nowrap text-right`;
 export const cellCenterL2Detail =
-  `p-1.5 ${cell} border-y-[1px] border-x-0 group-hover:bg-black/20 group-hover:border-color-hover ${transitionColors} whitespace-nowrap text-center`;
+  `p-1.5 ${cell} border-y-[1px] border-x-0 group-hover:bg-black/20 ${transitionColors} whitespace-nowrap text-center`;
 /* refactor to base style and rename */
 export const cellStickyLeft = `sticky left-0 ${cell} z-10`;
 export const cellStickyLeft2 = `sticky left-10 ${cell} z-10`;

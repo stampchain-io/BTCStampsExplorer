@@ -55,8 +55,8 @@ export const HoldersPieChart = ({ holders: rawHolders }: PieChartProps) => {
     /* ===== CHART CONFIGURATION ===== */
     const DoughnutConfig = {
       type: "doughnut" as const,
-      width: 300,
-      height: 300,
+      width: 290,
+      height: 290,
       options: {
         responsive: false,
         maintainAspectRatio: false,
@@ -71,8 +71,8 @@ export const HoldersPieChart = ({ holders: rawHolders }: PieChartProps) => {
             enabled: true,
             position: "nearest" as const,
             yAlign: "bottom" as const,
-            backgroundColor: "#0d0a0dbf",
-            borderColor: "#303030",
+            backgroundColor: "#000000e6",
+            borderColor: "#262626",
             borderWidth: 1,
             cornerRadius: 12,
             padding: {
@@ -81,8 +81,8 @@ export const HoldersPieChart = ({ holders: rawHolders }: PieChartProps) => {
               left: 16,
               right: 16,
             },
-            titleColor: "#fff8f0",
-            bodyColor: "#d8d2ca",
+            titleColor: "#A3A3A3",
+            bodyColor: "#E5E5E5",
             usePointStyle: true,
             boxWidth: 10,
             boxHeight: 10,
@@ -105,7 +105,7 @@ export const HoldersPieChart = ({ holders: rawHolders }: PieChartProps) => {
         labels: holders.map((h: any) => h.address || "Unknown"),
         datasets: [{
           borderColor: [...Array(holders.length)].fill(
-            "#0d0a0dbf",
+            "#000000e6",
           ),
           label: "Graph Holder",
           data: holders.map((holder: any) => Number(holder.amt)),
@@ -117,13 +117,13 @@ export const HoldersPieChart = ({ holders: rawHolders }: PieChartProps) => {
 
     /* ===== RENDER ===== */
     return (
-      <div class="flex items-center justify-center w-[300px] h-[300px] p-6">
+      <div class="flex items-center justify-center w-[290px] h-[290px] tablet:pt-1">
         <Chart {...DoughnutConfig} />
       </div>
     );
   } catch (error) {
     /* ===== ERROR STATE ===== */
     console.error("Error rendering chart:", error);
-    return <div class="text-center py-6">ERROR RENDERING CHART</div>;
+    return <div class="text-center py-5">ERROR RENDERING CHART</div>;
   }
 };

@@ -46,9 +46,11 @@ export function StampListingsOpenTable({
   /* ===== RENDER ===== */
   return (
     <div class="relative w-full">
-      <ScrollContainer class="min-h-[76px] max-h-[244px] scrollbar-background-layer1">
-        <div class="!-my-2 overflow-x-auto tablet:overflow-x-visible scrollbar-hide">
-          <table class={`w-full border-separate border-spacing-y-2 ${textXs}`}>
+      <ScrollContainer class="min-h-[72px] max-h-[220px] scrollbar-background-layer1">
+        <div class="overflow-x-auto overflow-y-hidden tablet:overflow-x-visible scrollbar-hide">
+          <table
+            class={`w-full -my-2 border-separate border-spacing-y-2 ${textXs}`}
+          >
             {/* ===== TABLE STRUCTURE ===== */}
             <colgroup>
               {colGroup([
@@ -107,7 +109,7 @@ export function StampListingsOpenTable({
                   >
                     {/* PRICE */}
                     <td
-                      class={`${cellLeftL2Detail} text-color-orange-400 group-hover:text-color-hover`}
+                      class={`${cellLeftL2Detail} text-color-orange-400 group-hover:border-color-hover`}
                     >
                       {formatSatoshisToBTC(dispenser.satoshirate, {
                         includeSymbol: true,
@@ -117,25 +119,29 @@ export function StampListingsOpenTable({
                     </td>
                     {/* ESCROW */}
                     <td
-                      class={cellCenterL2Detail}
+                      class={`${cellCenterL2Detail} group-hover:border-color-hover`}
                     >
                       {formatNumber(dispenser.escrow_quantity, 0)}
                     </td>
                     {/* GIVE */}
                     <td
-                      class={cellCenterL2Detail}
+                      class={`${cellCenterL2Detail} group-hover:border-color-hover`}
                     >
                       {formatNumber(dispenser.give_quantity, 0)}
                     </td>
                     {/* REMAIN */}
                     <td
-                      class={`${cellCenterL2Detail} text-color-neutral-200`}
+                      class={`${cellCenterL2Detail} group-hover:border-color-hover ${
+                        dispenser.give_remaining > 0
+                          ? "text-color-primary-400"
+                          : "text-color-neutral-200"
+                      }`}
                     >
                       {formatNumber(dispenser.give_remaining, 0)}
                     </td>
                     {/* SOURCE */}
                     <td
-                      class={`${cellRightL2Detail} group-hover:text-color-neutral-200`}
+                      class={`${cellRightL2Detail} group-hover:border-color-hover group-hover:text-color-neutral-200`}
                     >
                       DISPENSER
                     </td>

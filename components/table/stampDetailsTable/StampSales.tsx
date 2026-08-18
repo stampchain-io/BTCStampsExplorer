@@ -11,7 +11,7 @@ import {
   formatDate,
   formatSatoshisToBTC,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
-import { labelXs, textSm, valueDarkSm, valueSmLink } from "$text";
+import { labelXxs, textXs, valueDarkSm } from "$text";
 import type { StampSalesProps } from "$types/ui.d.ts";
 
 /* ===== COMPONENT ===== */
@@ -23,9 +23,9 @@ export function StampSalesTable(
 
   /* ===== RENDER ===== */
   return (
-    <div class="-mt-2 overflow-x-auto tablet:overflow-x-visible scrollbar-hide">
+    <div class="overflow-x-auto overflow-y-hidden tablet:overflow-x-visible scrollbar-hide">
       <table
-        class={`w-full border-separate border-spacing-y-2 ${textSm}`}
+        class={`w-full -my-2 border-separate border-spacing-y-2 ${textXs}`}
       >
         {/* ===== TABLE STRUCTURE ===== */}
         <colgroup>
@@ -55,7 +55,7 @@ export function StampSalesTable(
               return (
                 <th
                   key={header}
-                  class={`!py-1.5 ${rowClass} ${labelXs}`}
+                  class={`!py-1.5 ${rowClass} ${labelXxs}`}
                 >
                   {header}
                 </th>
@@ -77,7 +77,7 @@ export function StampSalesTable(
                 >
                   <a
                     href={`/wallet/${dispense.source}`}
-                    className={`${valueSmLink}`}
+                    className="link-neutral-200"
                   >
                     <span class="tablet:hidden">
                       {abbreviateAddress(dispense.source, 4)}
@@ -93,7 +93,7 @@ export function StampSalesTable(
                 >
                   <a
                     href={`/wallet/${dispense.destination}`}
-                    className={`${valueSmLink}`}
+                    className="link-neutral-200"
                   >
                     <span class="tablet:hidden">
                       {abbreviateAddress(dispense.destination, 4)}
@@ -105,13 +105,13 @@ export function StampSalesTable(
                 </td>
                 {/* QUANTITY */}
                 <td
-                  class={cellCenterL2Detail}
+                  class={`${cellCenterL2Detail} text-color-primary-400`}
                 >
                   {Number(dispense.dispense_quantity).toLocaleString()}
                 </td>
                 {/* PRICE */}
                 <td
-                  class={cellCenterL2Detail}
+                  class={`${cellCenterL2Detail} text-color-orange-400`}
                 >
                   {formatSatoshisToBTC(dispense.satoshirate, {
                     includeSymbol: true,
@@ -121,7 +121,7 @@ export function StampSalesTable(
                 </td>
                 {/* DATE */}
                 <td
-                  class={`${cellRightL2Detail} text-color-grey`}
+                  class={`${cellRightL2Detail} text-color-neutral-400`}
                 >
                   {dispense.block_time
                     ? formatDate(new Date(dispense.block_time), {

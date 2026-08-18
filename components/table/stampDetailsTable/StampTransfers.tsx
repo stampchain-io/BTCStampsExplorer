@@ -10,7 +10,7 @@ import {
   abbreviateAddress,
   formatDate,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
-import { labelXs, textSm, valueDarkSm, valueSmLink } from "$text";
+import { labelXxs, textXs, valueDarkSm } from "$text";
 import type { StampTransfersProps } from "$types/ui.d.ts";
 
 /* ===== TYPES ===== */
@@ -33,9 +33,9 @@ export function StampTransfersTable(
 
   /* ===== RENDER ===== */
   return (
-    <div class="-mt-2 overflow-x-auto tablet:overflow-x-visible scrollbar-hide">
+    <div class="overflow-x-auto overflow-y-hidden tablet:overflow-x-visible scrollbar-hide">
       <table
-        class={`w-full border-separate border-spacing-y-2 ${textSm}`}
+        class={`w-full -my-2 border-separate border-spacing-y-2 ${textXs}`}
       >
         {/* ===== TABLE STRUCTURE ===== */}
         <colgroup>
@@ -65,7 +65,7 @@ export function StampTransfersTable(
               return (
                 <th
                   key={header}
-                  class={`!py-1.5 ${rowClass} ${labelXs}`}
+                  class={`!py-1.5 ${rowClass} ${labelXxs}`}
                 >
                   {header}
                 </th>
@@ -89,7 +89,7 @@ export function StampTransfersTable(
                     ? (
                       <a
                         href={`/wallet/${send.source}`}
-                        className={valueSmLink}
+                        className="link-neutral-200"
                       >
                         <span class="tablet:hidden">
                           {abbreviateAddress(send.source, 4)}
@@ -109,7 +109,7 @@ export function StampTransfersTable(
                     ? (
                       <a
                         href={`/wallet/${send.destination}`}
-                        className={valueSmLink}
+                        className="link-neutral-200"
                       >
                         <span class="tablet:hidden">
                           {abbreviateAddress(send.destination, 4)}
@@ -123,7 +123,7 @@ export function StampTransfersTable(
                 </td>
                 {/* QUANTITY */}
                 <td
-                  class={cellCenterL2Detail}
+                  class={`${cellCenterL2Detail} text-color-primary-400`}
                 >
                   {send.quantity.toLocaleString()}
                 </td>
@@ -141,7 +141,7 @@ export function StampTransfersTable(
                         "_blank",
                       );
                     }}
-                    className={valueSmLink}
+                    className="link-neutral-200"
                   >
                     <span class="tablet:hidden">
                       {abbreviateAddress(send.tx_hash, 4)}
@@ -153,7 +153,7 @@ export function StampTransfersTable(
                 </td>
                 {/* DATE */}
                 <td
-                  class={`${cellRightL2Detail} text-color-grey`}
+                  class={`${cellRightL2Detail} text-color-neutral-400`}
                 >
                   {send.block_time
                     ? formatDate(new Date(send.block_time), {
