@@ -205,8 +205,8 @@ export default {
 
         // SECTION GAPS - vertical spacing between containers in the body)
         "section-mobile": "20px", // updated breakpoint naming convention
-        "section-tablet": "30px", // updated breakpoint naming convention
-        "section-desktop": "30px", // updated breakpoint naming convention
+        "section-tablet": "20px", // updated breakpoint naming convention
+        "section-desktop": "20px", // updated breakpoint naming convention
         // Applied via containerGap in /components/layout/styles.ts
 
         // GRID GAPS (spacing between grid/flex items)

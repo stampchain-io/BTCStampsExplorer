@@ -18,12 +18,14 @@ export function StatItem({
 }: StatItemProps) {
   const alignmentClass = alignmentClasses[align];
   const content = (
-    <div class={`flex flex-col -space-y-1 ${customClass || ""}`}>
-      <h5 class={`${labelXs} ${alignmentClass}`}>
+    <div class="flex flex-col -space-y-1">
+      <h5 class={`${labelXs} ${alignmentClass} ${customClass || ""}`}>
         {label}
       </h5>
       <h6
-        class={`${valueSm} ${alignmentClass} group-hover:text-color-hover transition-colors duration-200`}
+        class={`${valueSm} ${alignmentClass} ${
+          customClass || ""
+        } group-hover:text-color-hover transition-colors duration-200`}
       >
         {value}
       </h6>

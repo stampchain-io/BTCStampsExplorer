@@ -91,11 +91,13 @@ const HoldersTableBase = (
   return (
     <div class="w-full">
       <ScrollContainer
-        class="min-h-[80px] max-h-[290px] mt-5 w-full scrollbar-background-layer1"
+        class="min-h-[80px] max-h-[290px] w-full scrollbar-background-layer1"
         onScroll={handleScroll}
       >
         <div class="!-my-2 overflow-x-auto tablet:overflow-x-visible scrollbar-hide">
-          <table class={`w-full border-separate border-spacing-y-2 ${textSm}`}>
+          <table
+            class={`w-full -mb-2 border-separate border-spacing-y-2 ${textSm}`}
+          >
             {/* ===== TABLE STRUCTURE ===== */}
             <colgroup>
               {colGroup([
@@ -155,13 +157,13 @@ const HoldersTableBase = (
                       </td>
                       {/* AMOUNT */}
                       <td
-                        class={cellCenterL2Detail}
+                        class={`${cellCenterL2Detail} text-color-primary-400`}
                       >
                         {Number(holder.amt).toLocaleString()}
                       </td>
                       {/* PERCENT */}
                       <td
-                        class={`${cellRightL2Detail} text-color-grey`}
+                        class={cellRightL2Detail}
                       >
                         {holder.percentage}%
                       </td>
@@ -193,13 +195,13 @@ const HoldersTableBase = (
                     </td>
                     {/* AMOUNT */}
                     <td
-                      class={cellCenterL2Detail}
+                      class={`${cellCenterL2Detail} text-color-primary-400`}
                     >
                       {Number(holder.amt).toLocaleString()}
                     </td>
                     {/* PERCENT */}
                     <td
-                      class={`${cellRightL2Detail} text-color-grey`}
+                      class={cellRightL2Detail}
                     >
                       {holder.percentage}%
                     </td>

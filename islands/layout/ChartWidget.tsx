@@ -1,4 +1,4 @@
-import { containerBackground, loaderSpinLgGrey } from "$layout";
+import { loaderSpinLgGrey } from "$layout";
 import type { ChartWidgetProps, HighchartsData } from "$types/ui.d.ts";
 import Highcharts from "highcharts/highstock";
 import { useEffect, useState } from "preact/hooks";
@@ -164,16 +164,14 @@ const ChartWidget = (
 
   if (!data || data.length === 0) {
     return (
-      <div
-        class={`${containerBackground} text-sm text-color-grey text-center`}
-      >
+      <div class="text-sm text-color-neutral-500 text-center">
         NO DATA
       </div>
     );
   }
 
   return (
-    <div class={containerBackground}>
+    <>
       {loading
         ? (
           <div
@@ -182,7 +180,7 @@ const ChartWidget = (
         )
         : null}
       <div id={containerId} />
-    </div>
+    </>
   );
 };
 

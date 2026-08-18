@@ -19,7 +19,7 @@ import { CollectionRepository } from "$server/database/collectionRepository.ts";
 import { getPreviewUrl } from "$server/services/aws/previewStorageService.ts";
 import { CounterpartyDispenserService } from "$server/services/counterpartyApiService.ts";
 import { RouteType } from "$server/services/infrastructure/cacheService.ts";
-import { DetailsTableBase, HoldersTable } from "$table";
+import { DetailsTableBase } from "$table";
 import type { StampRow } from "$types/stamp.d.ts";
 import type { StampDetailPageProps } from "$types/ui.d.ts";
 import type { HolderRow } from "$types/wallet.d.ts";
@@ -347,6 +347,11 @@ export default function StampDetailPage(props: StampDetailPageProps) {
 
   const tableConfigs = [
     {
+      id: "holders",
+      label: "HOLDERS",
+      count: holders?.length || 0,
+    },
+    {
       id: "dispensers",
       label: "DISPENSERS",
       count: dispensers?.length || 0,
@@ -445,8 +450,12 @@ export default function StampDetailPage(props: StampDetailPageProps) {
           </div>
         </div>
 
-        {holders && holders.length > 0 && (
-          <HoldersTable
+        {stamp?.ident !== "SRC-20" && (
+          <DetailsTableBase
+            type="stamps"
+            title="DETAILS"
+            configs={tableConfigs}
+            cpid={stamp?.cpid || ""}
             holders={holders.map((holder) => ({
               quantity: Number(holder.quantity),
               divisible: holder.divisible,
@@ -454,14 +463,6 @@ export default function StampDetailPage(props: StampDetailPageProps) {
               amt: Number(holder.amt ?? 0),
               percentage: Number(holder.percentage ?? 0),
             }))}
-          />
-        )}
-
-        {stamp?.ident !== "SRC-20" && (
-          <DetailsTableBase
-            type="stamps"
-            configs={tableConfigs}
-            cpid={stamp?.cpid || ""}
           />
         )}
 

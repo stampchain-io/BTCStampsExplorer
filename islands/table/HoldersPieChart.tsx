@@ -25,20 +25,25 @@ export const HoldersPieChart = ({ holders: rawHolders }: PieChartProps) => {
 
   /* ===== HELPER FUNCTIONS ===== */
   const generateColors = (count: number) => {
-    // Convert hex to RGB for easier interpolation
-    const startColor = { r: 0xaa, g: 0x00, b: 0xff };
-    const endColor = { r: 0x44, g: 0x00, b: 0x66 };
+    // Primary fuchsia stops: #D946EF, #E879F9, #F0ABFC
+    const palette = [
+      { r: 0xe8, g: 0x79, b: 0xf9 },
+      { r: 0xf0, g: 0xab, b: 0xfc },
+      { r: 0xf5, g: 0xd0, b: 0xfe },
+    ];
 
     return Array(count).fill(0).map((_, index) => {
-      // Calculate interpolation factor (0 to 1)
       const factor = count === 1 ? 0 : index / (count - 1);
+      const scaled = factor * (palette.length - 1);
+      const fromIndex = Math.min(Math.floor(scaled), palette.length - 2);
+      const localFactor = scaled - fromIndex;
+      const from = palette[fromIndex];
+      const to = palette[fromIndex + 1];
 
-      // Interpolate between colors
-      const r = Math.round(startColor.r + (endColor.r - startColor.r) * factor);
-      const g = Math.round(startColor.g + (endColor.g - startColor.g) * factor);
-      const b = Math.round(startColor.b + (endColor.b - startColor.b) * factor);
+      const r = Math.round(from.r + (to.r - from.r) * localFactor);
+      const g = Math.round(from.g + (to.g - from.g) * localFactor);
+      const b = Math.round(from.b + (to.b - from.b) * localFactor);
 
-      // Convert back to hex
       return `#${r.toString(16).padStart(2, "0")}${
         g.toString(16).padStart(2, "0")
       }${b.toString(16).padStart(2, "0")}`;
