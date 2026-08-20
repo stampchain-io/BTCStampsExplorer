@@ -15,10 +15,12 @@ import type { ProcessedHolder } from "$types/wallet.d.ts";
 export const handler: Handlers = {
   async GET(_req, ctx) {
     if (DATA_PLACEHOLDER_DEV) {
-      const { DATA_PLACEHOLDER_DEV_TOKEN_DETAIL_PAGE } = await import(
+      const { getDummyTokenDetailPage } = await import(
         "$lib/utils/dataPlaceholderDev.ts"
       );
-      return await ctx.render(DATA_PLACEHOLDER_DEV_TOKEN_DETAIL_PAGE);
+      return await ctx.render(
+        getDummyTokenDetailPage(decodeURIComponent(ctx.params.tick)),
+      );
     }
     try {
       /* ===== TOKEN IDENTIFICATION ===== */
@@ -27,7 +29,7 @@ export const handler: Handlers = {
       const encodedTick = encodeURIComponent(rawTick);
 
       /* ===== SERVER-SIDE DATA FETCHING ===== */
-      const [body, transferCount, mintCount, combinedListings] =
+      const [body, transferCount, mintCount, _combinedListings] =
         await ErrorHandlingUtils.withTimeout(
           Promise.all([
             Src20Controller.fetchSrc20TickPageData(decodedTick),
@@ -58,20 +60,21 @@ export const handler: Handlers = {
         return ctx.renderNotFound();
       }
       /* @fullman */
-      const highchartsData = combinedListings.map((
-        item: any,
-        _index: number,
-      ) => [
-        new Date(item.date).getTime(),
-        item.unit_price_btc * 100000000, // Convert BTC to sats
-      ]).sort((a: any, b: any) => a[0] - b[0]);
+      // ===== CHARTS WIDGET (temporarily disabled, easy to re-enable later) =====
+      // const highchartsData = combinedListings.map((
+      //   item: any,
+      //   _index: number,
+      // ) => [
+      //   new Date(item.date).getTime(),
+      //   item.unit_price_btc * 100000000, // Convert BTC to sats
+      // ]).sort((a: any, b: any) => a[0] - b[0]);
 
       /* ===== RESPONSE FORMATTING ===== */
       body.initialCounts = {
         totalTransfers: transferCount.total || 0,
         totalMints: mintCount.total || 0,
       };
-      body.highcharts = highchartsData || [];
+      // body.highcharts = highchartsData || [];
 
       return await ctx.render(body);
     } catch (error) {
@@ -117,7 +120,7 @@ function SRC20DetailPage(props: { data: SRC20DetailPageData }) {
     total_mints,
     total_transfers,
     marketInfo,
-    highcharts,
+    // highcharts, // ===== CHARTS WIDGET (temporarily disabled) =====
   } = props.data;
 
   const tick = deployment.tick;
@@ -138,14 +141,18 @@ function SRC20DetailPage(props: { data: SRC20DetailPageData }) {
         _mintStatus={mint_status}
         _totalMints={total_mints}
         _totalTransfers={total_transfers}
-        highcharts={highcharts}
-        {...(marketInfo && { marketInfo })}
+        {
+          // ===== CHARTS WIDGET (temporarily disabled, easy to re-enable later) =====
+          // highcharts={highcharts}
+          ...(marketInfo && { marketInfo })
+        }
       />
       <DetailsTableBase
         type="src20"
         title="DETAILS"
         configs={tableConfigs}
         tick={tick}
+        deployment={deployment}
         holders={holders.map((h) => ({
           address: h.address,
           quantity: h.amt,
@@ -153,7 +160,6 @@ function SRC20DetailPage(props: { data: SRC20DetailPageData }) {
           amt: h.amt,
           percentage: h.percentage,
         }))}
-        deployment={deployment}
       />
     </div>
   );

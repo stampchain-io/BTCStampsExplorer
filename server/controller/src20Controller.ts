@@ -359,7 +359,7 @@ export class Src20Controller {
         // supporting (tick, amt) index, exhausting the DB connection pool.
         // `total_holders` below still reflects the true count via a separate
         // COUNT query, independent of this cap.
-        limit: 500,
+        limit: 10,
       };
 
       const [

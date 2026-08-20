@@ -342,6 +342,12 @@ export const DATA_PLACEHOLDER_DEV_TOKEN_KEVIN = {
   deploy_tx: "kevin1111111111111111111111111111111111111111111111111111111111",
   progress: "100.00",
   top_mints_percentage: null,
+  description:
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.",
+  email: "mailto:hello@kevin-token.example",
+  web: "https://kevin-token.example",
+  tg: "https://t.me/kevin_token",
+  x: "https://x.com/kevin_token",
   mint_progress: {
     max_supply: "21000000",
     total_minted: "21000000",
@@ -388,6 +394,12 @@ export const DATA_PLACEHOLDER_DEV_TOKEN_STAMP = {
   deploy_tx: "stamp111111111111111111111111111111111111111111111111111111111",
   progress: "100.00",
   top_mints_percentage: null,
+  description:
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim.",
+  email: "mailto:hello@stamp-token.example",
+  web: "https://stamp-token.example",
+  tg: "https://t.me/stamp_token",
+  x: "https://x.com/stamp_token",
   mint_progress: {
     max_supply: "100000000",
     total_minted: "100000000",
@@ -434,6 +446,12 @@ export const DATA_PLACEHOLDER_DEV_TOKEN_PEPE = {
   deploy_tx: "pepe1111111111111111111111111111111111111111111111111111111111",
   progress: "72.00",
   top_mints_percentage: 23.5,
+  description:
+    "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua enim ad minim veniam quis.",
+  email: "mailto:hello@pepe-token.example",
+  web: "https://pepe-token.example",
+  tg: "https://t.me/pepe_token",
+  x: "https://x.com/pepe_token",
   mint_progress: {
     max_supply: "69000000",
     total_minted: "49680000",
@@ -473,6 +491,12 @@ export const DATA_PLACEHOLDER_DEV_TOKEN_BOBO = {
   deploy_tx: "bobo1111111111111111111111111111111111111111111111111111111111",
   progress: "18.00",
   top_mints_percentage: 8.2,
+  description:
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim.",
+  email: "mailto:hello@bobo-token.example",
+  web: "https://bobo-token.example",
+  tg: "https://t.me/bobo_token",
+  x: "https://x.com/bobo_token",
   mint_progress: {
     max_supply: "42000000",
     total_minted: "7560000",
@@ -1120,8 +1144,29 @@ export function getDummyStampDetailPage(
   return DATA_PLACEHOLDER_DEV_STAMP_DETAIL_PAGE_CLASSIC;
 }
 
-/** SRC-20 token detail page (KEVIN — fully minted) */
-export const DATA_PLACEHOLDER_DEV_TOKEN_DETAIL_PAGE = {
+/** Holders for KEVIN — fully minted, wide distribution across 8 addresses. */
+export const DATA_PLACEHOLDER_DEV_TOKEN_KEVIN_HOLDERS = [
+  { address: "1GZsmqM5PFBytkC81JxcSWDU5QzNwaCs2M", amt: "4200000", percentage: "20.00" },
+  { address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh", amt: "3150000", percentage: "15.00" },
+  { address: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa", amt: "2730000", percentage: "13.00" },
+  { address: "bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq", amt: "2100000", percentage: "10.00" },
+  { address: "bc1q9d3xa5gg45q2j39szuqn9k7pt3lmnah37mqad5", amt: "1680000", percentage: "8.00" },
+  { address: "3J98t1WpEZ73CNmQviecrnyiWrnqRhWNLy", amt: "1260000", percentage: "6.00" },
+  { address: "bc1qm34lsc65zpw79lxes69zkqmk6ee3ewf0j77s3h", amt: "840000", percentage: "4.00" },
+  { address: null, amt: "5040000", percentage: "24.00" },
+];
+
+/** Holders for PEPE — minting in progress, fewer/smaller holders so far. */
+export const DATA_PLACEHOLDER_DEV_TOKEN_PEPE_HOLDERS = [
+  { address: "bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq", amt: "8280000", percentage: "16.67" },
+  { address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh", amt: "6900000", percentage: "13.89" },
+  { address: "1GZsmqM5PFBytkC81JxcSWDU5QzNwaCs2M", amt: "4830000", percentage: "9.72" },
+  { address: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa", amt: "3450000", percentage: "6.94" },
+  { address: "bc1q9d3xa5gg45q2j39szuqn9k7pt3lmnah37mqad5", amt: "2070000", percentage: "4.17" },
+];
+
+/** SRC-20 token detail page (KEVIN — fully minted, active market) */
+export const DATA_PLACEHOLDER_DEV_TOKEN_DETAIL_PAGE_KEVIN = {
   deployment: DATA_PLACEHOLDER_DEV_TOKEN_KEVIN,
   mint_status: {
     max_supply: 21000000,
@@ -1134,13 +1179,80 @@ export const DATA_PLACEHOLDER_DEV_TOKEN_DETAIL_PAGE = {
   total_holders: 42069,
   total_mints: 21000,
   total_transfers: 2,
-  holders: [],
+  holders: DATA_PLACEHOLDER_DEV_TOKEN_KEVIN_HOLDERS,
   last_block: 0,
   highcharts: [],
   sends: DATA_PLACEHOLDER_DEV_SRC20_TRANSFERS.filter((t) => t.tick === "KEVIN"),
   mints: DATA_PLACEHOLDER_DEV_SRC20_MINTS.filter((m) => m.tick === "KEVIN"),
   initialCounts: { totalTransfers: 2, totalMints: 21000 },
+  marketInfo: {
+    tick: "KEVIN",
+    floor_price_btc: DATA_PLACEHOLDER_DEV_TOKEN_KEVIN.market_data.price_btc,
+    market_cap_btc: DATA_PLACEHOLDER_DEV_TOKEN_KEVIN.market_data.market_cap_btc,
+    volume_24h_btc: DATA_PLACEHOLDER_DEV_TOKEN_KEVIN.market_data.volume_24h_btc,
+    change_24h: DATA_PLACEHOLDER_DEV_TOKEN_KEVIN.market_data.change_24h_percent,
+    stamp_url: null,
+    tx_hash: DATA_PLACEHOLDER_DEV_TOKEN_KEVIN.tx_hash,
+    holder_count: DATA_PLACEHOLDER_DEV_TOKEN_KEVIN.market_data.holder_count,
+  },
 };
+
+/** SRC-20 token detail page (PEPE — minting in progress, ~72%) */
+export const DATA_PLACEHOLDER_DEV_TOKEN_DETAIL_PAGE_PEPE = {
+  deployment: DATA_PLACEHOLDER_DEV_TOKEN_PEPE,
+  mint_status: {
+    max_supply: 69000000,
+    total_minted: 49680000,
+    total_mints: 72,
+    progress: "72.00",
+    limit: 690000,
+    decimals: 18,
+  },
+  total_holders: 2847,
+  total_mints: 72,
+  total_transfers: 0,
+  holders: DATA_PLACEHOLDER_DEV_TOKEN_PEPE_HOLDERS,
+  last_block: 0,
+  highcharts: [],
+  sends: DATA_PLACEHOLDER_DEV_SRC20_TRANSFERS.filter((t) => t.tick === "PEPE"),
+  mints: DATA_PLACEHOLDER_DEV_SRC20_MINTS.filter((m) => m.tick === "PEPE"),
+  initialCounts: { totalTransfers: 0, totalMints: 72 },
+  // Minting tokens have no secondary-market trades yet, so marketInfo is
+  // intentionally omitted (matches the header's "N/A"/"0 SATS" fallback).
+};
+
+/** Default dummy token detail page (kept for backward-compat imports). */
+export const DATA_PLACEHOLDER_DEV_TOKEN_DETAIL_PAGE =
+  DATA_PLACEHOLDER_DEV_TOKEN_DETAIL_PAGE_KEVIN;
+
+/*
+ * Lookup by tick so the [tick].tsx dev handler can render the dummy page
+ * that actually matches the requested token instead of always showing the
+ * same one regardless of the URL.
+ */
+const _DATA_PLACEHOLDER_DEV_TOKEN_DETAIL_PAGES_BY_TICK: Record<
+  string,
+  | typeof DATA_PLACEHOLDER_DEV_TOKEN_DETAIL_PAGE_KEVIN
+  | typeof DATA_PLACEHOLDER_DEV_TOKEN_DETAIL_PAGE_PEPE
+> = {
+  [DATA_PLACEHOLDER_DEV_TOKEN_KEVIN.tick]:
+    DATA_PLACEHOLDER_DEV_TOKEN_DETAIL_PAGE_KEVIN,
+  [DATA_PLACEHOLDER_DEV_TOKEN_PEPE.tick]:
+    DATA_PLACEHOLDER_DEV_TOKEN_DETAIL_PAGE_PEPE,
+};
+
+/** Resolve the dummy token detail page matching the requested tick. */
+export function getDummyTokenDetailPage(
+  tick: string | undefined,
+):
+  | typeof DATA_PLACEHOLDER_DEV_TOKEN_DETAIL_PAGE_KEVIN
+  | typeof DATA_PLACEHOLDER_DEV_TOKEN_DETAIL_PAGE_PEPE {
+  const key = tick?.toUpperCase();
+  if (key && _DATA_PLACEHOLDER_DEV_TOKEN_DETAIL_PAGES_BY_TICK[key]) {
+    return _DATA_PLACEHOLDER_DEV_TOKEN_DETAIL_PAGES_BY_TICK[key];
+  }
+  return DATA_PLACEHOLDER_DEV_TOKEN_DETAIL_PAGE_KEVIN;
+}
 
 /* ===== WALLET PAGE (routes/wallet/[address].tsx) ===== */
 

@@ -1,6 +1,5 @@
 /* ===== SRC20 DETAIL HEADER COMPONENT ===== */
 import { Icon, PlaceholderImage } from "$icon";
-import ChartWidget from "$islands/layout/ChartWidget.tsx";
 import {
   body,
   containerBackground,
@@ -18,12 +17,10 @@ import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
 import {
   cardFileType,
   cardPrice,
-  labelSm,
   titlePrimary,
   valueNegative,
   valueNeutral,
   valuePositive,
-  valueSm,
 } from "$text";
 import type {
   SRC20DetailHeaderProps,
@@ -35,7 +32,7 @@ import { useState } from "preact/hooks";
 export function SRC20DetailHeader({
   deployment,
   marketInfo,
-  highcharts,
+  // highcharts, // ===== CHARTS WIDGET (temporarily disabled) =====
 }: SRC20DetailHeaderProps) {
   /* ===== STATE ===== */
   const [imgError, setImgError] = useState(false);
@@ -98,136 +95,173 @@ export function SRC20DetailHeader({
   const volume24hBTCFormatted = formatBTCVolume(volume24hBTC);
   const marketCapBTCFormatted = formatMarketCap(marketCapBTC);
 
+  /* ===== SHARED SUB-COMPONENTS (rendered once per breakpoint layout) ===== */
+  const tokenImageAndName = (
+    <div class="flex gap-5">
+      <div class="w-9 h-9 shrink-0 rounded-2xl overflow-hidden">
+        {imageUrl
+          ? (
+            <img
+              src={imageUrl}
+              class="w-full h-full object-contain rounded-2xl"
+              alt={`${deployment.tick} token image`}
+              loading="lazy"
+              onError={() => setImgError(true)}
+            />
+          )
+          : (
+            <PlaceholderImage
+              variant="no-image"
+              className="!rounded-2xl"
+            />
+          )}
+      </div>
+      {/* Token name and social links */}
+      <div class="flex">
+        <h1 class={`${titlePrimary} uppercase`}>
+          {tickValue}
+        </h1>
+        <div class="flex gap-2 items-center">
+          {deployment.email && (
+            <Icon
+              type="iconButton"
+              name="email"
+              weight="normal"
+              size="xxs"
+              color="greyLight"
+              href={deployment.email}
+              target="_blank"
+            />
+          )}
+          {deployment.web && (
+            <Icon
+              type="iconButton"
+              name="website"
+              weight="normal"
+              size="xxs"
+              color="greyLight"
+              href={deployment.web}
+              target="_blank"
+            />
+          )}
+          {deployment.tg && (
+            <Icon
+              type="iconButton"
+              name="telegram"
+              weight="normal"
+              size="xxs"
+              color="greyLight"
+              href={deployment.tg}
+              target="_blank"
+            />
+          )}
+          {deployment.x && (
+            <Icon
+              type="iconButton"
+              name="twitter"
+              weight="normal"
+              size="xxs"
+              color="greyLight"
+              href={deployment.x}
+              target="_blank"
+            />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
+  const pricePill = (
+    <div class={`${containerPill} ${cardPrice} !text-sm`}>
+      {floorPriceSatsFormatted}
+    </div>
+  );
+
+  const changePill = (
+    <div
+      class={`${containerPill} ${cardFileType} !text-sm ${
+        change24h === null
+          ? valueNeutral
+          : change24h >= 0
+          ? valuePositive
+          : valueNegative
+      }`}
+    >
+      {change24h !== null
+        ? `${change24h >= 0 ? "+" : ""}${change24h.toFixed(2)}%`
+        : "N/A %"}
+    </div>
+  );
+
+  const supplyValue = formatNumber(deployment.max ?? 0, 0);
+
   /* ===== RENDER ===== */
   return (
     <>
       <div class={`${body} ${containerGap}`}>
         {/* ===== TOKEN INFO CARD ===== */}
         <div class={`relative ${containerBackground} flex-wrap`}>
-          <div class="flex flex-row w-full items-center justify-between">
-            {/* ===== TOKEN IMAGE AND NAME ===== */}
-            <div class="flex gap-5">
-              <div class="w-9 h-9 shrink-0 rounded-2xl overflow-hidden">
-                {imageUrl
-                  ? (
-                    <img
-                      src={imageUrl}
-                      class="w-full h-full object-contain rounded-2xl"
-                      alt={`${deployment.tick} token image`}
-                      loading="lazy"
-                      onError={() => setImgError(true)}
-                    />
-                  )
-                  : (
-                    <PlaceholderImage
-                      variant="no-image"
-                      className="!rounded-2xl"
-                    />
-                  )}
-              </div>
-              {/* Token name and social links */}
-              <div class="flex">
-                <h1 class={`${titlePrimary} uppercase`}>
-                  {tickValue}
-                </h1>
-                <div class="flex gap-2 items-center">
-                  {deployment.email && (
-                    <Icon
-                      type="iconButton"
-                      name="email"
-                      weight="normal"
-                      size="xxs"
-                      color="greyLight"
-                      href={deployment.email}
-                      target="_blank"
-                    />
-                  )}
-                  {deployment.web && (
-                    <Icon
-                      type="iconButton"
-                      name="website"
-                      weight="normal"
-                      size="xxs"
-                      color="greyLight"
-                      href={deployment.web}
-                      target="_blank"
-                    />
-                  )}
-                  {deployment.tg && (
-                    <Icon
-                      type="iconButton"
-                      name="telegram"
-                      weight="normal"
-                      size="xxs"
-                      color="greyLight"
-                      href={deployment.tg}
-                      target="_blank"
-                    />
-                  )}
-                  {deployment.x && (
-                    <Icon
-                      type="iconButton"
-                      name="twitter"
-                      weight="normal"
-                      size="xxs"
-                      color="greyLight"
-                      href={deployment.x}
-                      target="_blank"
-                    />
-                  )}
-                </div>
+          {/* ===== MOBILE LAYOUT (base, below mobileLg) ===== */}
+          <div class="flex flex-col gap-3 mobileLg:hidden">
+            {/* Row 1: image + ticker ... price pill */}
+            <div class="flex items-center justify-between gap-5">
+              {tokenImageAndName}
+              <div class="flex items-center justify-end gap-2">
+                {pricePill}
+                <div class="hidden min-[500px]:block">{changePill}</div>
               </div>
             </div>
 
-            {/* ===== PRICE + 24H CHANGE PILLS ===== */}
-            <div class="flex items-center gap-2">
-              <div class={`${containerPill} ${cardPrice} !text-sm`}>
-                {floorPriceSatsFormatted}
-              </div>
-              <div
-                class={`${containerPill} ${cardFileType} !text-sm ${
-                  change24h === null
-                    ? valueNeutral
-                    : change24h >= 0
-                    ? valuePositive
-                    : valueNegative
-                }`}
-              >
-                {change24h !== null
-                  ? `${change24h >= 0 ? "+" : ""}${change24h.toFixed(2)}%`
-                  : "N/A %"}
-              </div>
-            </div>
-
-            {/* ===== VOLUME + MARKET CAP + SUPPLY ===== */}
-            <div class="hidden min-[700px]:flex items-center gap-5">
+            {/* Row 2: volume + market cap + supply ... change pill */}
+            <div class="flex items-center justify-between gap-5">
               <StatItem
-                label="VOLUME (24H)"
+                label="VOLUME"
                 value={volume24hBTCFormatted}
                 align="left"
               />
               <StatItem
                 label="MARKET CAP"
                 value={marketCapBTCFormatted}
-                class="text-right min-[800px]:text-center"
+                align="left"
               />
-              <StatItem
-                label="SUPPLY"
-                value={formatNumber(deployment.max ?? 0, 0)}
-                align="right"
-                class="hidden min-[800px]:block"
-              />
+              <StatItem label="SUPPLY" value={supplyValue} align="left" />
+              <div class="flex min-[500px]:hidden">
+                {changePill}
+              </div>
             </div>
           </div>
 
-          {/* ===== PRICE CHART ===== */}
-          <div class="pt-3">
-            <ChartWidget
-              type="line"
-              data={highcharts || []}
-              fromPage="src20"
-              tick={deployment.tick}
-            />
+          {/* ===== DESKTOP LAYOUT (mobileLg and up) ===== */}
+          <div class="hidden mobileLg:flex flex-col gap-3">
+            <div class="flex flex-row w-full items-center justify-between">
+              {tokenImageAndName}
+
+              {/* ===== PRICE + 24H CHANGE PILLS ===== */}
+              <div class="flex items-center gap-2">
+                {pricePill}
+                {changePill}
+              </div>
+
+              {/* ===== VOLUME + MARKET CAP + SUPPLY ===== */}
+              <div class="flex items-center gap-5">
+                <StatItem
+                  label="VOLUME"
+                  value={volume24hBTCFormatted}
+                  align="left"
+                />
+                <StatItem
+                  label="MARKET CAP"
+                  value={marketCapBTCFormatted}
+                  class="text-right min-[800px]:text-center"
+                />
+                <StatItem
+                  label="SUPPLY"
+                  value={supplyValue}
+                  align="right"
+                  class="hidden min-[800px]:block"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -235,87 +269,76 @@ export function SRC20DetailHeader({
   );
 }
 
-/* ===== INFO TAB CONTENT ===== */
-/**
- * Renders the SRC-20 deploy metadata (creator, deploy date/block/tx, and
- * token parameters) that previously lived on the header. Rendered inside
- * the "INFO" tab of the Details selector on the SRC-20 detail page.
- */
+/* ===== SRC20 DETAIL INFO (rendered in the DetailsTableBase "INFO" tab) ===== */
 export function SRC20DetailInfo({ deployment }: SRC20DetailInfoProps) {
   const deployDate = formatDate(new Date(deployment.block_time || 0), {
     month: "short",
     year: "numeric",
   });
 
+  const creatorLink = (
+    <a
+      href={`/wallet/${deployment.destination}`}
+      class="link-neutral-200"
+    >
+      {deployment.creator_name ||
+        abbreviateAddress(deployment.destination || "", 8)}
+    </a>
+  );
+
+  const txHashLink = deployment.tx_hash
+    ? (
+      <a
+        href={`https://www.blockchain.com/explorer/transactions/btc/${deployment.tx_hash}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="link-neutral-200"
+      >
+        {abbreviateAddress(deployment.tx_hash, 8)}
+      </a>
+    )
+    : "N/A";
+
+  const limitValue = deployment.lim !== undefined
+    ? formatNumber(deployment.lim as number, 0)
+    : "N/A";
+
   return (
-    <div class="flex flex-wrap gap-6 justify-between w-full py-1">
-      {/* ===== CREATOR ===== */}
-      <div class="flex flex-col -space-y-0.5">
-        <h6 class={labelSm}>
-          CREATOR
-        </h6>
-        <h5 class="font-bold text-lg bg-gradient-to-r color-neutral-gradient color-gradient-hover tracking-wide">
-          {deployment.creator_name ||
-            abbreviateAddress(deployment.destination || "")}
-        </h5>
-      </div>
+    <div class="flex flex-col gap-5">
+      {deployment.description && (
+        <StatItem
+          label="ABOUT"
+          value={deployment.description}
+          align="left"
+        />
+      )}
 
-      {/* ===== DEPLOYMENT DETAILS ===== */}
-      <div class="flex flex-col -space-y-0.5">
-        <div class="flex items-center gap-1.5">
-          <h5 class={labelSm}>
-            DEPLOY
-          </h5>
-          <h6 class={valueSm}>
-            {deployDate.toUpperCase()}
-          </h6>
-        </div>
-        <div class="flex items-center gap-1.5">
-          <h5 class={labelSm}>
-            BLOCK #
-          </h5>
-          <h6 class={valueSm}>
-            {deployment.block_index}
-          </h6>
-        </div>
-        <div class="flex items-center gap-1.5">
-          <h5 class={labelSm}>
-            TX ID
-          </h5>
-          <h6 class={valueSm}>
-            {deployment.tx_hash ? abbreviateAddress(deployment.tx_hash) : "N/A"}
-          </h6>
-        </div>
-      </div>
-
-      {/* ===== TOKEN PARAMETERS ===== */}
-      <div class="flex flex-col -space-y-0.5 text-right">
-        <div class="flex items-center gap-1.5 justify-end">
-          <h5 class={labelSm}>
-            DECIMALS
-          </h5>
-          <h6 class={valueSm}>
-            {deployment.deci}
-          </h6>
-        </div>
-        <div class="flex items-center gap-1.5 justify-end">
-          <h5 class={labelSm}>
-            LIMIT
-          </h5>
-          <h6 class={valueSm}>
-            {deployment.lim !== undefined
-              ? formatNumber(deployment.lim as number, 0)
-              : "N/A"}
-          </h6>
-        </div>
-        <div class="flex items-center gap-1.5 justify-end">
-          <h5 class={labelSm}>
-            SUPPLY
-          </h5>
-          <h6 class={valueSm}>
-            {formatNumber(deployment.max ?? 0, 0)}
-          </h6>
-        </div>
+      <div class="flex flex-wrap items-center justify-between gap-5">
+        <StatItem label="CREATOR" value={creatorLink} align="left" />
+        <StatItem
+          label="DEPLOY"
+          value={deployDate.toUpperCase()}
+          align="center"
+          class="text-color-neutral-400"
+        />
+        <StatItem
+          label="TX HASH"
+          value={txHashLink}
+          align="center"
+        />
+        <StatItem
+          label="BLOCK #"
+          value={deployment.block_index}
+          align="center"
+          class="text-color-neutral-400"
+        />
+        <StatItem
+          label="DECIMALS"
+          value={deployment.deci}
+          align="center"
+          class="text-color-neutral-400"
+        />
+        <StatItem label="LIMIT" value={limitValue} align="right" />
       </div>
     </div>
   );

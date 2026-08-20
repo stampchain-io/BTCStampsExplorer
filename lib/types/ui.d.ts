@@ -3155,6 +3155,9 @@ export interface SRC20DetailHeaderProps {
     x?: string;
     stamp_url?: string;
     deploy_img?: string;
+    // Optional about/description text; not yet populated by the API, so
+    // the header hides this stat entirely when absent.
+    description?: string;
   };
   _mintStatus: SRC20MintStatus;
   _totalMints: number;
@@ -3162,16 +3165,32 @@ export interface SRC20DetailHeaderProps {
   marketInfo?: MarketListingAggregated;
   _align?: AlignmentType;
   // Price history series rendered beneath the ticker row via ChartWidget.
+  // Chart is temporarily disabled (see routes/src20/[tick].tsx) but the
+  // prop stays so the widget can be re-enabled easily later.
   highcharts?: HighchartsData;
 }
 
 /**
- * SRC20DetailInfoProps - Props for the SRC20 deploy metadata block
- * (creator, deploy date/block/tx, and token parameters), rendered inside
- * the "INFO" tab of the Details selector on the SRC-20 detail page.
+ * SRC20DetailInfoProps - deploy metadata rendered in the DetailsTableBase
+ * "INFO" tab (about, creator, deploy date, tx hash, block, decimals, limit).
  */
 export interface SRC20DetailInfoProps {
-  deployment: SRC20DetailHeaderProps["deployment"];
+  deployment: Pick<
+    SRC20DetailHeaderProps["deployment"],
+    | "destination"
+    | "creator_name"
+    | "tx_hash"
+    | "block_index"
+    | "block_time"
+    | "deci"
+    | "lim"
+    | "max"
+    | "description"
+    | "email"
+    | "web"
+    | "tg"
+    | "x"
+  >;
 }
 
 /**

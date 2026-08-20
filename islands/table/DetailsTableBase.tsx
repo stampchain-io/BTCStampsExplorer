@@ -58,8 +58,8 @@ export default function DetailsTableBase({
     tabId: string,
     isTabChange = false,
   ) => {
-    // Holders data comes from the `holders` prop (SSR), not a client fetch.
-    // Info is static content rendered from the `deployment` prop, not a client fetch.
+    // Holders data comes from the `holders` prop (SSR), not a client fetch,
+    // and "info" is rendered directly from the `deployment` prop.
     if (tabId === "holders" || tabId === "info") return;
     if (!isTabChange && !hasMore) return;
 
@@ -358,7 +358,7 @@ export default function DetailsTableBase({
           </div>
         )
         : selectedTab === "info"
-        ? (deployment ? <SRC20DetailInfo deployment={deployment} /> : null)
+        ? deployment && <SRC20DetailInfo deployment={deployment} />
         : (
           <ScrollContainer
             class="min-h-[72px] max-h-[296px] scrollbar-background-layer1"
