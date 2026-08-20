@@ -25,11 +25,11 @@ export const HoldersPieChart = ({ holders: rawHolders }: PieChartProps) => {
 
   /* ===== HELPER FUNCTIONS ===== */
   const generateColors = (count: number) => {
-    // Primary fuchsia stops: #D946EF, #E879F9, #F0ABFC
+    // Primary fuchsia stops from tailwind.config.ts: primary.500 (#D946EF), primary.400 (#E879F9), primary.300 (#F0ABFC)
     const palette = [
+      { r: 0xd9, g: 0x46, b: 0xef },
       { r: 0xe8, g: 0x79, b: 0xf9 },
       { r: 0xf0, g: 0xab, b: 0xfc },
-      { r: 0xf5, g: 0xd0, b: 0xfe },
     ];
 
     return Array(count).fill(0).map((_, index) => {

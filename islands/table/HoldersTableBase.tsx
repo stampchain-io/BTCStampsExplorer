@@ -94,7 +94,7 @@ const HoldersTableBase = (
         class="min-h-[72px] max-h-[296px] w-full scrollbar-background-layer1"
         onScroll={handleScroll}
       >
-        <div class="overflow-x-clip overflow-y-clip tablet:overflow-x-clip flow-root scrollbar-hide">
+        <div class="overflow-x-auto overflow-y-clip tablet:overflow-x-clip flow-root scrollbar-hide">
           <table
             class={`w-full -my-2 border-separate border-spacing-y-2 ${textXs}`}
           >
