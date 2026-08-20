@@ -1017,6 +1017,7 @@ export interface StatItemProps {
   value: string | ComponentChildren;
   align?: "left" | "center" | "right";
   class?: string;
+  valueClass?: string;
   href?: string;
   target?: "_self" | "_blank";
 }

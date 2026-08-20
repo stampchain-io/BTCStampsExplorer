@@ -2,6 +2,7 @@
 import { Icon, PlaceholderImage } from "$icon";
 import {
   body,
+  container1,
   container2,
   containerGap,
   containerPill,
@@ -15,12 +16,13 @@ import {
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
 import {
-  cardFileType,
   cardPrice,
+  labelXs,
   titlePrimary,
   valueNegative,
   valueNeutral,
   valuePositive,
+  valueSm,
 } from "$text";
 import type {
   SRC20DetailHeaderProps,
@@ -98,7 +100,7 @@ export function SRC20DetailHeader({
   /* ===== SHARED SUB-COMPONENTS (rendered once per breakpoint layout) ===== */
   const tokenImageAndName = (
     <div class="flex gap-3">
-      <div class="w-10 h-10 shrink-0 rounded-2xl overflow-hidden">
+      <div class="w-11 h-11 shrink-0 rounded-2xl overflow-hidden">
         {imageUrl
           ? (
             <img
@@ -118,7 +120,7 @@ export function SRC20DetailHeader({
       </div>
       {/* Token name */}
       <div class="flex">
-        <h1 class={`${titlePrimary} uppercase`}>
+        <h1 class={`pt-1 ${titlePrimary} uppercase`}>
           {tickValue}
         </h1>
       </div>
@@ -133,7 +135,7 @@ export function SRC20DetailHeader({
 
   const changePill = (
     <div
-      class={`${containerPill} ${cardFileType} !text-sm ${
+      class={`${containerPill} font-medium text-sm select-none whitespace-nowrap ${
         change24h === null
           ? valueNeutral
           : change24h >= 0
@@ -154,20 +156,22 @@ export function SRC20DetailHeader({
     <>
       <div class={`${body} ${containerGap}`}>
         {/* ===== TOKEN INFO CARD ===== */}
-        <div class={`relative ${container2} p-0.5 flex-wrap`}>
+        <div class={`relative ${container1} p-0.5 flex-wrap`}>
           {/* ===== MOBILE LAYOUT (base, below mobileLg) ===== */}
           <div class="flex flex-col gap-3 mobileLg:hidden">
             {/* Row 1: image + ticker ... price pill */}
             <div class="flex items-center justify-between gap-5">
               {tokenImageAndName}
-              <div class="flex items-center justify-end gap-2">
-                {pricePill}
-                <div class="hidden min-[460px]:block">{changePill}</div>
+              <div class="pr-2.5">
+                <div class="flex items-center justify-end gap-2">
+                  {pricePill}
+                  <div class="hidden min-[460px]:block">{changePill}</div>
+                </div>
               </div>
             </div>
 
             {/* Row 2: volume + market cap + supply ... change pill */}
-            <div class="flex items-center">
+            <div class="flex items-center px-5">
               <div class="flex-1">
                 <StatItem
                   label="VOLUME"
@@ -189,7 +193,7 @@ export function SRC20DetailHeader({
                   align="right"
                   class="hidden min-[460px]:block text-color-neutral-400"
                 />
-                <div class="flex min-[460px]:hidden">
+                <div class="flex min-[460px]:hidden -mr-4">
                   {changePill}
                 </div>
               </div>
@@ -208,7 +212,7 @@ export function SRC20DetailHeader({
               </div>
 
               {/* ===== VOLUME + MARKET CAP + SUPPLY ===== */}
-              <div class="flex items-center gap-5">
+              <div class="flex items-center pr-5 gap-5">
                 <StatItem
                   label="VOLUME"
                   value={volume24hBTCFormatted}
@@ -217,13 +221,13 @@ export function SRC20DetailHeader({
                 <StatItem
                   label="MARKET CAP"
                   value={marketCapBTCFormatted}
-                  class="text-right min-[800px]:text-center"
+                  align="center"
                 />
                 <StatItem
                   label="SUPPLY"
                   value={supplyValue}
                   align="right"
-                  class="hidden min-[800px]:block text-color-neutral-400"
+                  class="text-color-neutral-400"
                 />
               </div>
             </div>
@@ -236,10 +240,24 @@ export function SRC20DetailHeader({
 
 /* ===== SRC20 DETAIL INFO (rendered in the DetailsTableBase "INFO" tab) ===== */
 export function SRC20DetailInfo({ deployment }: SRC20DetailInfoProps) {
-  const deployDate = formatDate(new Date(deployment.block_time || 0), {
-    month: "short",
+  const deployTimestamp = new Date(deployment.block_time || 0);
+  const [deployDatePart, deployTimePart] = formatDate(deployTimestamp, {
+    month: "2-digit",
+    day: "2-digit",
     year: "numeric",
-  });
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).split(", ");
+  const deployDateValue = (
+    <>
+      {deployDatePart.toUpperCase()}
+      <span class="hidden min-[420px]:inline">
+        {" - "}
+        {deployTimePart.toUpperCase()}
+      </span>
+    </>
+  );
 
   const creatorLink = (
     <a
@@ -247,7 +265,7 @@ export function SRC20DetailInfo({ deployment }: SRC20DetailInfoProps) {
       class="link-neutral-200"
     >
       {deployment.creator_name ||
-        abbreviateAddress(deployment.destination || "", 8)}
+        abbreviateAddress(deployment.destination || "", 7)}
     </a>
   );
 
@@ -259,7 +277,7 @@ export function SRC20DetailInfo({ deployment }: SRC20DetailInfoProps) {
         rel="noopener noreferrer"
         class="link-neutral-200"
       >
-        {abbreviateAddress(deployment.tx_hash, 8)}
+        {abbreviateAddress(deployment.tx_hash, 7)}
       </a>
     )
     : "N/A";
@@ -275,13 +293,13 @@ export function SRC20DetailInfo({ deployment }: SRC20DetailInfoProps) {
   );
 
   const socialLinks = (
-    <div class="flex shrink-0 justify-end items-start -mt-4 -mr-2 gap-1 w-fit">
+    <div class="float-right -mt-1.5 -mr-2 ml-4 flex shrink-0 justify-end items-start gap-2 tablet:gap-1 w-fit">
       {deployment.x && (
         <Icon
           type="iconButton"
           name="twitter"
           weight="normal"
-          size="xxs"
+          size="smR"
           color="greyLight"
           href={deployment.x}
           target="_blank"
@@ -292,7 +310,7 @@ export function SRC20DetailInfo({ deployment }: SRC20DetailInfoProps) {
           type="iconButton"
           name="telegram"
           weight="normal"
-          size="xxs"
+          size="smR"
           color="greyLight"
           href={deployment.tg}
           target="_blank"
@@ -303,7 +321,7 @@ export function SRC20DetailInfo({ deployment }: SRC20DetailInfoProps) {
           type="iconButton"
           name="website"
           weight="normal"
-          size="xxs"
+          size="smR"
           color="greyLight"
           href={deployment.web}
           target="_blank"
@@ -314,7 +332,7 @@ export function SRC20DetailInfo({ deployment }: SRC20DetailInfoProps) {
           type="iconButton"
           name="email"
           weight="normal"
-          size="xxs"
+          size="smR"
           color="greyLight"
           href={deployment.email}
           target="_blank"
@@ -326,24 +344,27 @@ export function SRC20DetailInfo({ deployment }: SRC20DetailInfoProps) {
   return (
     <div class="flex flex-col gap-5">
       {(deployment.description || hasSocialLinks) && (
-        <div
-          class={`flex items-center justify-between ${container2} px-3 py-2 gap-5`}
-        >
+        <div class={`flow-root ${container2} px-3 py-2 gap-5`}>
+          {
+            /* Float must come before the text in DOM order so only the lines
+              that overlap its height get indented; text below it uses the
+              full width automatically. */
+          }
+          {hasSocialLinks && socialLinks}
           {deployment.description && (
-            <div class="flex-1 min-w-0">
-              <StatItem
-                label="ABOUT"
-                value={deployment.description}
-                align="left"
-                class="!whitespace-normal break-words"
-              />
+            <div class="min-w-0">
+              <h5 class={`${labelXs} text-left`}>ABOUT</h5>
+              <h6
+                class={`${valueSm} !text-base -mt-0.5 text-left !whitespace-normal break-words`}
+              >
+                {deployment.description}
+              </h6>
             </div>
           )}
-          {hasSocialLinks && socialLinks}
         </div>
       )}
 
-      <div class={`${container2} px-3 py-2 gap-3 flex-wrap`}>
+      <div class={`${container2} px-3 py-2 space-y-3 flex-wrap`}>
         {/* Row 1: supply + limit + decimals */}
         <div class="flex items-center justify-between gap-5">
           <StatItem
@@ -365,7 +386,7 @@ export function SRC20DetailInfo({ deployment }: SRC20DetailInfoProps) {
           <StatItem label="CREATOR" value={creatorLink} align="left" />
           <StatItem
             label="DEPLOY"
-            value={deployDate.toUpperCase()}
+            value={deployDateValue}
             align="right"
             class="text-color-neutral-400"
           />
@@ -375,7 +396,7 @@ export function SRC20DetailInfo({ deployment }: SRC20DetailInfoProps) {
         <div class="flex items-center justify-between gap-5">
           <StatItem label="TX HASH" value={txHashLink} align="left" />
           <StatItem
-            label="BLOCK #"
+            label="BLOCK"
             value={deployment.block_index}
             align="right"
             class="text-color-neutral-400"

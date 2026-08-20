@@ -13,18 +13,19 @@ export function StatItem({
   value,
   align = "left",
   class: customClass,
+  valueClass,
   href,
   target = "_self",
 }: StatItemProps) {
   const alignmentClass = alignmentClasses[align];
   const content = (
-    <div class="flex flex-col -space-y-1">
+    <div class="flex flex-col -space-y-0.5">
       <h5 class={`${labelXs} ${alignmentClass} ${customClass || ""}`}>
         {label}
       </h5>
       <h6
-        class={`${valueSm} ${alignmentClass} ${
-          customClass || ""
+        class={`${valueSm} ${alignmentClass} ${customClass || ""} ${
+          valueClass || ""
         } group-hover:text-color-hover transition-colors duration-200`}
       >
         {value}
@@ -50,7 +51,7 @@ export function StatTitle({
 }: StatTitleProps) {
   const alignmentClass = alignmentClasses[align];
   const content = (
-    <div class="flex flex-col -space-y-1">
+    <div class="flex flex-col -space-y-0.5">
       <h5 class={`${labelXs} ${alignmentClass}`}>
         {label}
       </h5>
@@ -81,7 +82,7 @@ export function StatPrice({
   const alignmentClass = alignmentClasses[align];
 
   return (
-    <div class={`flex flex-col -space-y-1 ${customClass || ""}`}>
+    <div class={`flex flex-col -space-y-0.5 ${customClass || ""}`}>
       {activityLevel !== undefined
         ? (
           <div class="flex justify-between items-center w-full gap-3">

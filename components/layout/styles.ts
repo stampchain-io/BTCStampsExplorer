@@ -159,12 +159,12 @@ export const colContainerBackground =
 const cell =
   "bg-gradient-to-b from-color-neutral-800/40 via-color-neutral-900/60 to-neutral-900/80 border-color-neutral-700 whitespace-nowrap";
 export const cellLeftL2Card =
-  `p-1 ${cell} rounded-l-2xl border-y-[1px] border-l-[1px] border-r-0
+  `p-0.5 ${cell} rounded-l-2xl border-y-[1px] border-l-[1px] border-r-0
   group-hover:bg-black/20 group-hover:border-color-hover ${transitionColors} text-left`;
 export const cellRightL2Card =
-  `p-1 ${cell} rounded-r-2xl border-y-[1px] border-r-[1px] border-l-0
+  `p-0.5 ${cell} rounded-r-2xl border-y-[1px] border-r-[1px] border-l-0
   group-hover:bg-black/20 group-hover:border-color-hover ${transitionColors} text-right`;
-export const cellCenterL2Card = `p-1 ${cell} border-y-[1px] border-x-0
+export const cellCenterL2Card = `p-0.5 ${cell} border-y-[1px] border-x-0
   group-hover:bg-black/20 group-hover:border-color-hover ${transitionColors} text-center`;
 // Stamp and SRC20 Detail pages Table Rows
 export const cellLeftL2Detail =

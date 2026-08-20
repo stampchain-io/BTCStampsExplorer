@@ -192,6 +192,8 @@ export default {
       },
       spacing: {
         // CUSTOM SPACING
+        "1.5": "6px",
+        "2.5": "10px",
         "3.5": "14px",
         "4.5": "18px",
         "6.5": "26px",

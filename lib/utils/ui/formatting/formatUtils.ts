@@ -1,6 +1,9 @@
 import { SATOSHIS_PER_BTC } from "$constants";
 import { BigFloat } from "bigfloat/mod.ts";
+// @ts-expect-error - esm.sh's dayjs type declaration uses `export =`, so it
+// has no `default` export per its .d.ts, even though the runtime module does.
 import dayjs from "dayjs";
+// @ts-expect-error - same `export =` typing issue as the dayjs import above.
 import relativeTime from "dayjs/plugin/relativeTime";
 
 dayjs.extend(relativeTime);
@@ -86,6 +89,9 @@ interface DateFormatOptions {
   month?: "short" | "long" | "numeric" | "2-digit";
   year?: "numeric" | "2-digit";
   day?: "numeric" | "2-digit";
+  hour?: "numeric" | "2-digit";
+  minute?: "numeric" | "2-digit";
+  hour12?: boolean;
   includeRelative?: boolean;
 }
 
@@ -110,8 +116,15 @@ export function formatDate(
   if (options.month) formatOptions.month = options.month;
   if (options.year) formatOptions.year = options.year;
   if (options.day) formatOptions.day = options.day;
+  if (options.hour) formatOptions.hour = options.hour;
+  if (options.minute) formatOptions.minute = options.minute;
+  if (options.hour12 !== undefined) formatOptions.hour12 = options.hour12;
 
-  const formattedDate = date.toLocaleDateString(locale, formatOptions);
+  // Use toLocaleString (date + time) when time components are requested,
+  // otherwise keep the date-only formatter.
+  const formattedDate = (options.hour || options.minute)
+    ? date.toLocaleString(locale, formatOptions)
+    : date.toLocaleDateString(locale, formatOptions);
 
   // Add relative time if requested
   if (options.includeRelative) {
