@@ -541,7 +541,7 @@ export function Header() {
           {logoIcon}
 
           {/* Right: Search, Tools, Wallet and Menu Buttons */}
-          <div class="flex items-center gap-2.5">
+          <div class="flex items-center gap-2 -mr-2">
             <SearchButton />
             {ToolsButton({ onOpenDrawer: openDrawer, data: toolsData }).icon}
             {WalletButton({
@@ -571,12 +571,13 @@ export function Header() {
           )}
 
           {/* Right: Icon Buttons (nav links prepended when NAV_POSITION === "right") */}
-          <div class="flex items-center gap-2.5 tablet:gap-1.5">
+          <div class="flex items-center gap-2 tablet:gap-1">
             {NAV_POSITION === "right" && (
-              <div class="flex items-center gap-6 tablet:gap-5 mr-2.5">
+              <div class="flex items-center gap-6 tablet:gap-5 mr-2">
                 {renderNavLinks()}
               </div>
             )}
+
             <div class="relative group">
               <SearchButton />
             </div>

@@ -145,7 +145,7 @@ export function Footer() {
           </div>
 
           {/* ===== SOCIAL MEDIA ICONS ===== */}
-          <div class="flex gap-2.5 tablet:gap-2 mt-1.5 -mb-1 mobileMd:mt-0 tablet:mb-0">
+          <div class="flex gap-2 tablet:gap-1 mt-1.5 -mb-1 mobileMd:mt-0 tablet:mb-0">
             {socialLinks.map((link, index) => (
               <div key={index}>
                 {link.icon}
