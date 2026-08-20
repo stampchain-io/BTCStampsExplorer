@@ -151,7 +151,7 @@ export function SRC20Card(
   const renderTopRow = () => (
     <>
       <div
-        class={`flex items-center ${container3} p-1 gap-2`}
+        class={`flex items-center ${container3} p-0.5 gap-2`}
       >
         {/* Image */}
         <div class="flex-shrink-0 w-10 h-10 rounded-lg overflow-hidden">
@@ -332,7 +332,7 @@ export function SRC20Card(
       <>
         {/* ticker row */}
         <div
-          class={`flex items-center ${container3} rounded-xl p-1 gap-2`}
+          class={`flex items-center ${container3} rounded-xl p-0.5 gap-2`}
         >
           <div class="flex-shrink-0 w-6 h-6 rounded-xl overflow-hidden">
             {imageUrl
@@ -397,7 +397,7 @@ export function SRC20Card(
     <>
       {/* ticker row */}
       <div
-        class={`flex items-center ${container3} rounded-xl p-1 gap-2`}
+        class={`flex items-center ${container3} rounded-xl p-0.5 gap-2`}
       >
         <div class="flex-shrink-0 w-6 h-6 rounded-xl overflow-hidden">
           {imageUrl
@@ -458,7 +458,7 @@ export function SRC20Card(
     <>
       {/* ticker row */}
       <div
-        class={`flex items-center ${container3} rounded-xl p-1 gap-2`}
+        class={`flex items-center ${container3} rounded-xl p-0.5 gap-2`}
       >
         <div class="flex-shrink-0 w-6 h-6 rounded-xl overflow-hidden">
           {imageUrl

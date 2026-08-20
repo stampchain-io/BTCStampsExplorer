@@ -305,8 +305,8 @@ function RightPanel(
 
   /* ===== RENDER ===== */
   return (
-    <div className={`${container1} pt-3 pb-1.5 px-5 flex justify-between`}>
-      <div className="flex gap-4 min-[420px]:gap-5 tablet:gap-3.5">
+    <div className={`${container1} pt-0.5 pb-[1px] px-4 flex justify-between`}>
+      <div className="flex gap-2 tablet:gap-1">
         <div
           ref={copyButtonRef}
           class="relative"
@@ -384,7 +384,7 @@ function RightPanel(
         </div>
       </div>
 
-      <div className="flex gap-4 min-[420px]:gap-5 tablet:gap-3.5">
+      <div className="flex gap-2 tablet:gap-1">
         {showCodeButton && (
           <div
             ref={codeButtonRef}
@@ -778,7 +778,7 @@ export function StampImage(
   return (
     <>
       {(!src || isUnrenderable) && (
-        <div className={`${container1} p-5`}>
+        <div className={`${container1} p-1`}>
           <PlaceholderImage variant={isUnrenderable ? "error" : "no-image"} />
         </div>
       )}
