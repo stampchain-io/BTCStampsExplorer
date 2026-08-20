@@ -1,4 +1,5 @@
 /* ===== SRC20 DETAIL HEADER COMPONENT ===== */
+import { Button } from "$button";
 import { Icon, PlaceholderImage } from "$icon";
 import {
   body,
@@ -34,6 +35,7 @@ import { useState } from "preact/hooks";
 export function SRC20DetailHeader({
   deployment,
   marketInfo,
+  _mintStatus,
   // highcharts, // ===== CHARTS WIDGET (temporarily disabled) =====
 }: SRC20DetailHeaderProps) {
   /* ===== STATE ===== */
@@ -53,6 +55,10 @@ export function SRC20DetailHeader({
   const imageUrl = imgError ? null : deployment.deploy_img ||
     deployment.stamp_url ||
     (deployment.tx_hash ? constructStampUrl(deployment.tx_hash) : null);
+
+  // Minting state: still minting while progress hasn't reached 100%
+  const progress = _mintStatus ? parseFloat(String(_mintStatus.progress)) : 100;
+  const isMinting = !Number.isNaN(progress) && progress < 100;
 
   const floorPriceBTC = marketInfo?.floor_price_btc ?? 0; // ✅ v2.3 standardized field
   const volume24hBTC = marketInfo?.volume_24h_btc ?? 0; // ✅ v2.3 standardized field
@@ -150,6 +156,42 @@ export function SRC20DetailHeader({
   );
 
   const supplyValue = formatNumber(deployment.max ?? 0, 0);
+  const limitValue = deployment.lim !== undefined
+    ? formatNumber(deployment.lim as number, 0)
+    : "N/A";
+  const holdersValue = formatNumber(marketInfo?.holder_count ?? 0, 0);
+
+  const progressBar = (
+    <div
+      class={`flex flex-col-reverse min-[460px]:flex-row items-center gap-1 min-[460px]:gap-3`}
+    >
+      <div class="w-24 min-[420px]:w-[140px] min-[460px]:w-[50px] min-[520px]:w-[90px] mobileMd:w-36 min-[640px]:w-40 mobileLg:w-20 min-[880px]:w-40 tablet:w-60 h-2 tablet:h-1.5 rounded-full bg-color-neutral-800 overflow-hidden">
+        <div
+          class="h-full rounded-full bg-gradient-to-r from-color-primary-500 via-color-primary-400 to-color-primary-300 transition-all duration-300"
+          style={{ width: `${Math.min(Math.round(progress), 100)}%` }}
+        />
+      </div>
+      <span
+        class={`-mt-1 min-[460px]:-mt-0 min-[460px]:mr-5 ${valueSm} !text-xs min-[460px]:!text-sm`}
+      >
+        {progress.toFixed(1)}%
+      </span>
+    </div>
+  );
+
+  const mintButton = (
+    <Button
+      variant="flat"
+      color="primary"
+      size="xs"
+      href={`/tool/src20/mint?tick=${
+        encodeURIComponent(deployment.tick ?? "")
+      }&trxType=olga`}
+      class="rounded-2xl"
+    >
+      MINT
+    </Button>
+  );
 
   /* ===== RENDER ===== */
   return (
@@ -159,44 +201,92 @@ export function SRC20DetailHeader({
         <div class={`relative ${container1} p-0.5 flex-wrap`}>
           {/* ===== MOBILE LAYOUT (base, below mobileLg) ===== */}
           <div class="flex flex-col gap-3 mobileLg:hidden">
-            {/* Row 1: image + ticker ... price pill */}
+            {/* Row 1: image + ticker ... price pill / progress pill */}
             <div class="flex items-center justify-between gap-5">
               {tokenImageAndName}
               <div class="pr-2.5">
-                <div class="flex items-center justify-end gap-2">
-                  {pricePill}
-                  <div class="hidden min-[460px]:block">{changePill}</div>
+                <div class="flex items-center justify-end gap-3">
+                  {isMinting
+                    ? (
+                      <>
+                        {progressBar}
+                        <div class="hidden min-[460px]:block">
+                          {mintButton}
+                        </div>
+                      </>
+                    )
+                    : (
+                      <>
+                        {pricePill}
+                        <div class="hidden min-[460px]:block">
+                          {changePill}
+                        </div>
+                      </>
+                    )}
                 </div>
               </div>
             </div>
 
-            {/* Row 2: volume + market cap + supply ... change pill */}
+            {/* Row 2: (volume + market cap + supply ... change pill) or (holders + supply + limit ... mint button) */}
             <div class="flex items-center px-5">
-              <div class="flex-1">
-                <StatItem
-                  label="VOLUME"
-                  value={volume24hBTCFormatted}
-                  align="left"
-                />
-              </div>
-              <div class="flex-1">
-                <StatItem
-                  label="MARKET CAP"
-                  value={marketCapBTCFormatted}
-                  align="center"
-                />
-              </div>
-              <div class="flex-1 flex justify-end">
-                <StatItem
-                  label="SUPPLY"
-                  value={supplyValue}
-                  align="right"
-                  class="hidden min-[460px]:block text-color-neutral-400"
-                />
-                <div class="flex min-[460px]:hidden -mr-4">
-                  {changePill}
-                </div>
-              </div>
+              {isMinting
+                ? (
+                  <>
+                    <div class="flex-1 hidden min-[460px]:flex">
+                      <StatItem
+                        label="HOLDERS"
+                        value={holdersValue}
+                        align="left"
+                      />
+                    </div>
+                    <div class="flex-1">
+                      <StatItem
+                        label="SUPPLY"
+                        value={supplyValue}
+                        class="text-left min-[460px]:text-center"
+                      />
+                    </div>
+                    <div class="flex-1">
+                      <StatItem
+                        label="LIMIT"
+                        value={limitValue}
+                        class="text-center min-[460px]:text-right text-color-neutral-400"
+                      />
+                    </div>
+                    <div class="flex min-[460px]:hidden -mr-2.5">
+                      {mintButton}
+                    </div>
+                  </>
+                )
+                : (
+                  <>
+                    <div class="flex-1">
+                      <StatItem
+                        label="VOLUME"
+                        value={volume24hBTCFormatted}
+                        align="left"
+                      />
+                    </div>
+                    <div class="flex-1">
+                      <StatItem
+                        label="MARKET CAP"
+                        value={marketCapBTCFormatted}
+                        align="center"
+                      />
+                    </div>
+                    <div class="flex-1 flex justify-end">
+                      <StatItem
+                        label="SUPPLY"
+                        value={supplyValue}
+                        align="right"
+                        class="hidden min-[460px]:block text-color-neutral-400"
+                      />
+                      <div class="flex min-[460px]:hidden -mr-2.5">
+                        {changePill}
+                      </div>
+                    </div>
+                  </>
+                )}
             </div>
           </div>
 
@@ -205,31 +295,65 @@ export function SRC20DetailHeader({
             <div class="flex flex-row w-full items-center justify-between">
               {tokenImageAndName}
 
-              {/* ===== PRICE + 24H CHANGE PILLS ===== */}
-              <div class="flex items-center gap-2">
-                {pricePill}
-                {changePill}
-              </div>
+              {isMinting
+                ? (
+                  <>
+                    {/* ===== MINT PROGRESS PILL ===== */}
+                    <div class="flex items-center">
+                      {progressBar}
+                    </div>
 
-              {/* ===== VOLUME + MARKET CAP + SUPPLY ===== */}
-              <div class="flex items-center pr-5 gap-5">
-                <StatItem
-                  label="VOLUME"
-                  value={volume24hBTCFormatted}
-                  align="left"
-                />
-                <StatItem
-                  label="MARKET CAP"
-                  value={marketCapBTCFormatted}
-                  align="center"
-                />
-                <StatItem
-                  label="SUPPLY"
-                  value={supplyValue}
-                  align="right"
-                  class="text-color-neutral-400"
-                />
-              </div>
+                    {/* ===== HOLDERS + SUPPLY + LIMIT + MINT BUTTON ===== */}
+                    <div class="flex items-center pr-5 gap-7.5">
+                      <StatItem
+                        label="HOLDERS"
+                        value={holdersValue}
+                        align="left"
+                      />
+                      <StatItem
+                        label="SUPPLY"
+                        value={supplyValue}
+                        align="center"
+                      />
+                      <StatItem
+                        label="LIMIT"
+                        value={limitValue}
+                        align="right"
+                        class="text-color-neutral-400"
+                      />
+                      {mintButton}
+                    </div>
+                  </>
+                )
+                : (
+                  <>
+                    {/* ===== PRICE + 24H CHANGE PILLS ===== */}
+                    <div class="flex items-center gap-3">
+                      {pricePill}
+                      {changePill}
+                    </div>
+
+                    {/* ===== VOLUME + MARKET CAP + SUPPLY ===== */}
+                    <div class="flex items-center pr-5 gap-7.5">
+                      <StatItem
+                        label="VOLUME"
+                        value={volume24hBTCFormatted}
+                        align="left"
+                      />
+                      <StatItem
+                        label="MARKET CAP"
+                        value={marketCapBTCFormatted}
+                        align="center"
+                      />
+                      <StatItem
+                        label="SUPPLY"
+                        value={supplyValue}
+                        align="right"
+                        class="text-color-neutral-400"
+                      />
+                    </div>
+                  </>
+                )}
             </div>
           </div>
         </div>
