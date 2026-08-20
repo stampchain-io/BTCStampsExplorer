@@ -72,7 +72,7 @@ export function SRC20MintsTable(
               >
                 {/* AMOUNT */}
                 <td
-                  class={cellLeftL2Detail}
+                  class={`${cellLeftL2Detail} text-color-primary-400`}
                 >
                   {Number(mint.amt).toLocaleString()}
                 </td>

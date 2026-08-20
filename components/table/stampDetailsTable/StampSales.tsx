@@ -19,7 +19,7 @@ export function StampSalesTable(
   { dispenses, isLoading = false }: StampSalesProps,
 ) {
   /* ===== CONSTANTS ===== */
-  const headers = ["FROM", "TO", "QUANTITY", "PRICE", "DATE"];
+  const headers = ["FROM", "TO", "AMOUNT", "PRICE", "DATE"];
 
   /* ===== RENDER ===== */
   return (
@@ -32,7 +32,7 @@ export function StampSalesTable(
           {colGroup([
             { width: "min-w-[150px] w-auto" }, // FROM
             { width: "min-w-[150px] w-auto" }, // TO
-            { width: "min-w-[100px] w-auto" }, // QUANTITY
+            { width: "min-w-[100px] w-auto" }, // AMOUNT
             { width: "min-w-[150px] w-auto" }, // PRICE
             { width: "min-w-[150px] w-auto" }, // DATE
           ]).map((col) => <col key={col.key} class={col.className} />)}
@@ -102,7 +102,7 @@ export function StampSalesTable(
                     </span>
                   </a>
                 </td>
-                {/* QUANTITY */}
+                {/* AMOUNT */}
                 <td
                   class={`${cellCenterL2Detail} text-color-primary-400`}
                 >

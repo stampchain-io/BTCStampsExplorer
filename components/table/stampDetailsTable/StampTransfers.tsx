@@ -29,7 +29,7 @@ export function StampTransfersTable(
   { sends, isLoading = false }: StampTransfersProps,
 ) {
   /* ===== CONSTANTS ===== */
-  const headers = ["FROM", "TO", "QUANTITY", "TX HASH", "DATE"];
+  const headers = ["FROM", "TO", "AMOUNT", "TX HASH", "DATE"];
 
   /* ===== RENDER ===== */
   return (
@@ -42,7 +42,7 @@ export function StampTransfersTable(
           {colGroup([
             { width: "min-w-[150px] w-auto" }, // FROM
             { width: "min-w-[150px] w-auto" }, // TO
-            { width: "min-w-[100px] w-auto" }, // QUANTITY
+            { width: "min-w-[100px] w-auto" }, // AMOUNT
             { width: "min-w-[150px] w-auto" }, // TX HASH
             { width: "min-w-[150px] w-auto" }, // DATE
           ]).map((col) => <col key={col.key} class={col.className} />)}
@@ -120,7 +120,7 @@ export function StampTransfersTable(
                     )
                     : "N/A"}
                 </td>
-                {/* QUANTITY */}
+                {/* AMOUNT */}
                 <td
                   class={`${cellCenterL2Detail} text-color-primary-400`}
                 >
