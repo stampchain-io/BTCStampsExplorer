@@ -94,7 +94,7 @@ const HoldersTableBase = (
         class="min-h-[72px] max-h-[296px] w-full scrollbar-background-layer1"
         onScroll={handleScroll}
       >
-        <div class="overflow-x-auto overflow-y-hidden tablet:overflow-x-visible scrollbar-hide">
+        <div class="overflow-x-clip overflow-y-clip tablet:overflow-x-clip flow-root scrollbar-hide">
           <table
             class={`w-full -my-2 border-separate border-spacing-y-2 ${textXs}`}
           >
@@ -113,8 +113,7 @@ const HoldersTableBase = (
             </colgroup>
 
             {/* ===== TABLE HEADER ===== */}
-            <thead class="sticky top-0 z-10">
-              {/* Only sticky on desktop */}
+            <thead>
               <tr class={container2}>
                 {headers.map((header, i) => {
                   const isFirst = i === 0;
@@ -131,7 +130,7 @@ const HoldersTableBase = (
                     <th
                       key={header}
                       scope="col"
-                      class={`!py-1.5 ${rowClass} ${labelXxs}`}
+                      class={`sticky top-0 z-10 !py-1.5 ${rowClass} ${labelXxs}`}
                     >
                       {header}
                     </th>

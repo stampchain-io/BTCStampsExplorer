@@ -1,7 +1,7 @@
 /* ===== DETAILS TABLE COMPONENT ===== */
 import { SelectorButtons } from "$button";
 import { SRC20DetailInfo } from "$islands/header/index.ts";
-import { containerBackground, ScrollContainer } from "$layout";
+import { containerBackground, ScrollContainer, ScrollFadeRow } from "$layout";
 import {
   HoldersPieChart,
   HoldersTableBase,
@@ -336,14 +336,18 @@ export default function DetailsTableBase({
       {/* ===== TITLE ===== */}
       {title && <h4 class={subtitlePrimary}>{title}</h4>}
       {/* ===== TABS SECTION ===== */}
-      <div class="flex justify-between items-start w-full mb-5">
-        <SelectorButtons
-          options={selectorOptions}
-          value={selectedTab}
-          onChange={setSelectedTab}
-          size="xsR"
-          color="primary"
-        />
+      <div class="w-full mb-5">
+        <ScrollFadeRow deps={[selectedTab, selectorOptions]}>
+          <div class="shrink-0">
+            <SelectorButtons
+              options={selectorOptions}
+              value={selectedTab}
+              onChange={setSelectedTab}
+              size="xsR"
+              color="primary"
+            />
+          </div>
+        </ScrollFadeRow>
       </div>
       {/* ===== TAB CONTENT ===== */}
       {selectedTab === "holders"

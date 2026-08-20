@@ -23,7 +23,7 @@ export function StampSalesTable(
 
   /* ===== RENDER ===== */
   return (
-    <div class="overflow-x-auto overflow-y-hidden tablet:overflow-x-visible scrollbar-hide">
+    <div class="overflow-x-auto overflow-y-clip tablet:overflow-x-clip flow-root scrollbar-hide">
       <table
         class={`w-full -my-2 border-separate border-spacing-y-2 ${textXs}`}
       >
@@ -38,8 +38,7 @@ export function StampSalesTable(
           ]).map((col) => <col key={col.key} class={col.className} />)}
         </colgroup>
         {/* ===== TABLE HEADER ===== */}
-        <thead class="sticky top-0 z-10">
-          {/* Only sticky on desktop */}
+        <thead>
           <tr class={container2}>
             {headers.map((header, i) => {
               const isFirst = i === 0;
@@ -55,7 +54,7 @@ export function StampSalesTable(
               return (
                 <th
                   key={header}
-                  class={`!py-1.5 ${rowClass} ${labelXxs}`}
+                  class={`sticky top-0 z-10 !py-1.5 ${rowClass} ${labelXxs}`}
                 >
                   {header}
                 </th>

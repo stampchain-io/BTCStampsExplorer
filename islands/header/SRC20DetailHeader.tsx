@@ -2,7 +2,7 @@
 import { Icon, PlaceholderImage } from "$icon";
 import {
   body,
-  containerBackground,
+  container2,
   containerGap,
   containerPill,
   StatItem,
@@ -97,8 +97,8 @@ export function SRC20DetailHeader({
 
   /* ===== SHARED SUB-COMPONENTS (rendered once per breakpoint layout) ===== */
   const tokenImageAndName = (
-    <div class="flex gap-5">
-      <div class="w-9 h-9 shrink-0 rounded-2xl overflow-hidden">
+    <div class="flex gap-3">
+      <div class="w-10 h-10 shrink-0 rounded-2xl overflow-hidden">
         {imageUrl
           ? (
             <img
@@ -116,57 +116,11 @@ export function SRC20DetailHeader({
             />
           )}
       </div>
-      {/* Token name and social links */}
+      {/* Token name */}
       <div class="flex">
         <h1 class={`${titlePrimary} uppercase`}>
           {tickValue}
         </h1>
-        <div class="flex gap-2 items-center">
-          {deployment.email && (
-            <Icon
-              type="iconButton"
-              name="email"
-              weight="normal"
-              size="xxs"
-              color="greyLight"
-              href={deployment.email}
-              target="_blank"
-            />
-          )}
-          {deployment.web && (
-            <Icon
-              type="iconButton"
-              name="website"
-              weight="normal"
-              size="xxs"
-              color="greyLight"
-              href={deployment.web}
-              target="_blank"
-            />
-          )}
-          {deployment.tg && (
-            <Icon
-              type="iconButton"
-              name="telegram"
-              weight="normal"
-              size="xxs"
-              color="greyLight"
-              href={deployment.tg}
-              target="_blank"
-            />
-          )}
-          {deployment.x && (
-            <Icon
-              type="iconButton"
-              name="twitter"
-              weight="normal"
-              size="xxs"
-              color="greyLight"
-              href={deployment.x}
-              target="_blank"
-            />
-          )}
-        </div>
       </div>
     </div>
   );
@@ -200,7 +154,7 @@ export function SRC20DetailHeader({
     <>
       <div class={`${body} ${containerGap}`}>
         {/* ===== TOKEN INFO CARD ===== */}
-        <div class={`relative ${containerBackground} flex-wrap`}>
+        <div class={`relative ${container2} p-0.5 flex-wrap`}>
           {/* ===== MOBILE LAYOUT (base, below mobileLg) ===== */}
           <div class="flex flex-col gap-3 mobileLg:hidden">
             {/* Row 1: image + ticker ... price pill */}
@@ -208,25 +162,36 @@ export function SRC20DetailHeader({
               {tokenImageAndName}
               <div class="flex items-center justify-end gap-2">
                 {pricePill}
-                <div class="hidden min-[500px]:block">{changePill}</div>
+                <div class="hidden min-[460px]:block">{changePill}</div>
               </div>
             </div>
 
             {/* Row 2: volume + market cap + supply ... change pill */}
-            <div class="flex items-center justify-between gap-5">
-              <StatItem
-                label="VOLUME"
-                value={volume24hBTCFormatted}
-                align="left"
-              />
-              <StatItem
-                label="MARKET CAP"
-                value={marketCapBTCFormatted}
-                align="left"
-              />
-              <StatItem label="SUPPLY" value={supplyValue} align="left" />
-              <div class="flex min-[500px]:hidden">
-                {changePill}
+            <div class="flex items-center">
+              <div class="flex-1">
+                <StatItem
+                  label="VOLUME"
+                  value={volume24hBTCFormatted}
+                  align="left"
+                />
+              </div>
+              <div class="flex-1">
+                <StatItem
+                  label="MARKET CAP"
+                  value={marketCapBTCFormatted}
+                  align="center"
+                />
+              </div>
+              <div class="flex-1 flex justify-end">
+                <StatItem
+                  label="SUPPLY"
+                  value={supplyValue}
+                  align="right"
+                  class="hidden min-[460px]:block text-color-neutral-400"
+                />
+                <div class="flex min-[460px]:hidden">
+                  {changePill}
+                </div>
               </div>
             </div>
           </div>
@@ -258,7 +223,7 @@ export function SRC20DetailHeader({
                   label="SUPPLY"
                   value={supplyValue}
                   align="right"
-                  class="hidden min-[800px]:block"
+                  class="hidden min-[800px]:block text-color-neutral-400"
                 />
               </div>
             </div>
@@ -303,42 +268,119 @@ export function SRC20DetailInfo({ deployment }: SRC20DetailInfoProps) {
     ? formatNumber(deployment.lim as number, 0)
     : "N/A";
 
-  return (
-    <div class="flex flex-col gap-5">
-      {deployment.description && (
-        <StatItem
-          label="ABOUT"
-          value={deployment.description}
-          align="left"
+  const supplyValue = formatNumber(deployment.max ?? 0, 0);
+
+  const hasSocialLinks = Boolean(
+    deployment.x || deployment.tg || deployment.web || deployment.email,
+  );
+
+  const socialLinks = (
+    <div class="flex shrink-0 justify-end items-start -mt-4 -mr-2 gap-1 w-fit">
+      {deployment.x && (
+        <Icon
+          type="iconButton"
+          name="twitter"
+          weight="normal"
+          size="xxs"
+          color="greyLight"
+          href={deployment.x}
+          target="_blank"
         />
       )}
+      {deployment.tg && (
+        <Icon
+          type="iconButton"
+          name="telegram"
+          weight="normal"
+          size="xxs"
+          color="greyLight"
+          href={deployment.tg}
+          target="_blank"
+        />
+      )}
+      {deployment.web && (
+        <Icon
+          type="iconButton"
+          name="website"
+          weight="normal"
+          size="xxs"
+          color="greyLight"
+          href={deployment.web}
+          target="_blank"
+        />
+      )}
+      {deployment.email && (
+        <Icon
+          type="iconButton"
+          name="email"
+          weight="normal"
+          size="xxs"
+          color="greyLight"
+          href={deployment.email}
+          target="_blank"
+        />
+      )}
+    </div>
+  );
 
-      <div class="flex flex-wrap items-center justify-between gap-5">
-        <StatItem label="CREATOR" value={creatorLink} align="left" />
-        <StatItem
-          label="DEPLOY"
-          value={deployDate.toUpperCase()}
-          align="center"
-          class="text-color-neutral-400"
-        />
-        <StatItem
-          label="TX HASH"
-          value={txHashLink}
-          align="center"
-        />
-        <StatItem
-          label="BLOCK #"
-          value={deployment.block_index}
-          align="center"
-          class="text-color-neutral-400"
-        />
-        <StatItem
-          label="DECIMALS"
-          value={deployment.deci}
-          align="center"
-          class="text-color-neutral-400"
-        />
-        <StatItem label="LIMIT" value={limitValue} align="right" />
+  return (
+    <div class="flex flex-col gap-5">
+      {(deployment.description || hasSocialLinks) && (
+        <div
+          class={`flex items-center justify-between ${container2} px-3 py-2 gap-5`}
+        >
+          {deployment.description && (
+            <div class="flex-1 min-w-0">
+              <StatItem
+                label="ABOUT"
+                value={deployment.description}
+                align="left"
+                class="!whitespace-normal break-words"
+              />
+            </div>
+          )}
+          {hasSocialLinks && socialLinks}
+        </div>
+      )}
+
+      <div class={`${container2} px-3 py-2 gap-3 flex-wrap`}>
+        {/* Row 1: supply + limit + decimals */}
+        <div class="flex items-center justify-between gap-5">
+          <StatItem
+            label="SUPPLY"
+            value={supplyValue}
+            align="left"
+          />
+          <StatItem label="LIMIT" value={limitValue} align="center" />
+          <StatItem
+            label="DECIMALS"
+            value={deployment.deci}
+            align="right"
+            class="text-color-neutral-400"
+          />
+        </div>
+
+        {/* Row 2: creator + deploy */}
+        <div class="flex items-center justify-between gap-5">
+          <StatItem label="CREATOR" value={creatorLink} align="left" />
+          <StatItem
+            label="DEPLOY"
+            value={deployDate.toUpperCase()}
+            align="right"
+            class="text-color-neutral-400"
+          />
+        </div>
+
+        {/* Row 3: tx hash + block # */}
+        <div class="flex items-center justify-between gap-5">
+          <StatItem label="TX HASH" value={txHashLink} align="left" />
+          <StatItem
+            label="BLOCK #"
+            value={deployment.block_index}
+            align="right"
+            class="text-color-neutral-400"
+          />
+        </div>
       </div>
     </div>
   );

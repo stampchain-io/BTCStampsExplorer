@@ -47,7 +47,7 @@ export function StampListingsOpenTable({
   return (
     <div class="relative w-full">
       <ScrollContainer class="min-h-[72px] max-h-[220px] scrollbar-background-layer1">
-        <div class="overflow-x-auto overflow-y-hidden tablet:overflow-x-visible scrollbar-hide">
+        <div class="overflow-x-auto overflow-y-clip tablet:overflow-x-clip flow-root scrollbar-hide">
           <table
             class={`w-full -my-2 border-separate border-spacing-y-2 ${textXs}`}
           >
@@ -62,8 +62,7 @@ export function StampListingsOpenTable({
               ]).map((col) => <col key={col.key} class={col.className} />)}
             </colgroup>
             {/* ===== TABLE HEADER ===== */}
-            <thead class="sticky top-0 z-10">
-              {/* Only sticky on desktop */}
+            <thead>
               <tr class={container2}>
                 {headers.map((header, i) => {
                   const isFirst = i === 0;
@@ -77,7 +76,7 @@ export function StampListingsOpenTable({
                   return (
                     <th
                       key={header}
-                      class={`!py-1.5 !px-3 ${rowClass} ${labelXxs} text-color-neutral-500`}
+                      class={`sticky top-0 z-10 !py-1.5 !px-3 ${rowClass} ${labelXxs} text-color-neutral-500`}
                     >
                       {header}
                     </th>
