@@ -6,7 +6,13 @@ import TextContentIsland from "$islands/content/stampDetailContent/StampTextCont
 import PreviewCodeModal from "$islands/modal/PreviewCodeModal.tsx";
 import PreviewImageModal from "$islands/modal/PreviewImageModal.tsx";
 import { openModal } from "$islands/modal/states.ts";
-import { body, container1, containerDetailImage, containerGap } from "$layout";
+import {
+  body,
+  container1,
+  container2,
+  containerDetailImage,
+  containerGap,
+} from "$layout";
 import {
   getStampImageSrc,
   getStampPreviewUrl,
@@ -305,7 +311,14 @@ function RightPanel(
 
   /* ===== RENDER ===== */
   return (
-    <div className={`${container1} pt-0.5 pb-[1px] px-4 flex justify-between`}>
+    <div
+      className={`${container1} tablet:${container2} pt-0.5 pb-[1px] px-4 flex justify-between
+        tablet:absolute tablet:inset-x-2 tablet:bottom-2 tablet:z-10
+        tablet:opacity-0 tablet:translate-y-3 tablet:pointer-events-none
+        tablet:transition-all tablet:duration-300 tablet:ease-out
+        tablet:group-hover/panel:opacity-100 tablet:group-hover/panel:translate-y-0
+        tablet:group-hover/panel:pointer-events-auto`}
+    >
       <div className="flex gap-2 tablet:gap-1">
         <div
           ref={copyButtonRef}
@@ -778,13 +791,15 @@ export function StampImage(
   return (
     <>
       {(!src || isUnrenderable) && (
-        <div className={`${container1} p-1`}>
+        <div className={`${container1} p-0.5`}>
           <PlaceholderImage variant={isUnrenderable ? "error" : "no-image"} />
         </div>
       )}
 
       {src && isHtml && (
-        <div className={`${className} ${body} ${containerGap}`}>
+        <div
+          className={`${className} ${body} ${containerGap} group/panel tablet:relative`}
+        >
           <div
             className={`relative ${
               flag ? `${containerDetailImage} ${containerClassName || ""}` : ""
@@ -877,7 +892,7 @@ export function StampImage(
       )}
 
       {src && isPlainText && (
-        <div class={`${body} ${containerGap}`}>
+        <div class={`${body} ${containerGap} group/panel tablet:relative`}>
           <div
             className={`${containerDetailImage} ${containerClassName || ""}`}
           >
@@ -899,7 +914,9 @@ export function StampImage(
       )}
 
       {src && isAudio && (
-        <div className={`${className} ${body} ${containerGap}`}>
+        <div
+          className={`${className} ${body} ${containerGap} group/panel tablet:relative`}
+        >
           <div
             className={`${containerDetailImage} ${containerClassName || ""}`}
           >
@@ -943,7 +960,9 @@ export function StampImage(
       )}
 
       {src && isLibraryFile && (
-        <div className={`${className} ${body} ${containerGap}`}>
+        <div
+          className={`${className} ${body} ${containerGap} group/panel tablet:relative`}
+        >
           <div
             className={`${containerDetailImage} ${containerClassName || ""}`}
           >
@@ -966,7 +985,9 @@ export function StampImage(
         !isLibraryFile && !isUnrenderable && (
           flag
             ? (
-              <div class={`${body} ${containerGap}`}>
+              <div
+                class={`${body} ${containerGap} group/panel tablet:relative`}
+              >
                 <div
                   className={`${containerDetailImage} ${
                     containerClassName || ""

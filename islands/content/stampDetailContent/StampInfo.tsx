@@ -6,12 +6,11 @@ import { openModal } from "$islands/modal/states.ts";
 import {
   body,
   container2,
+  container2Icon,
   container3,
   containerBackground,
-  containerColData,
   containerGap,
   containerPill,
-  StatItem,
   StatPrice,
 } from "$layout";
 import type { Src101Detail } from "$lib/types/src101.d.ts";
@@ -33,11 +32,9 @@ import {
   cardFileSize,
   cardFileType,
   cardSupply,
-  labelXs,
   subtitlePrimary,
   titlePrimary,
-  value2xl,
-  valueSm,
+  truncate,
 } from "$text";
 import { useEffect, useRef, useState } from "preact/hooks";
 
@@ -107,7 +104,6 @@ export function StampInfo(
     ? "+100000"
     : stamp.supply;
 
-  const editionLabel = stamp.supply === 1 ? "EDITION" : "EDITIONS";
   /* ===== REFS AND UI STATE ===== */
   const [imageDimensions, setImageDimensions] = useState<DimensionsType | null>(
     null,
@@ -739,6 +735,26 @@ export function StampInfo(
     )
     : "N/A";
 
+  const dimensionsValue = isSrc20Stamp()
+    ? stamp.stamp_base64 &&
+        JSON.parse(atob(stamp.stamp_base64))?.op === "DEPLOY"
+      ? "DEPLOY"
+      : stamp.stamp_base64 &&
+          JSON.parse(atob(stamp.stamp_base64))?.op === "MINT"
+      ? "MINT"
+      : "TRANSFER"
+    : isMediaFile
+    ? (mediaDuration ? formatDuration(mediaDuration) : "-")
+    : isSrc101Stamp()
+    ? stamp.stamp_base64 &&
+        JSON.parse(atob(stamp.stamp_base64))?.op === "DEPLOY"
+      ? "SALE"
+      : stamp.stamp_base64 &&
+          JSON.parse(atob(stamp.stamp_base64))?.op === "MINT"
+      ? "REGISTER"
+      : "TRANSFER"
+    : getDimensionsDisplay(imageDimensions);
+
   // Effect to handle document title updates
   useEffect(() => {
     document.title = `Bitcoin Stamp #${stamp.stamp} - stampchain.io`;
@@ -794,228 +810,6 @@ export function StampInfo(
                     </>
                   )}
               </h2>
-
-              {isSrc20Stamp() && stamp.cpid && (
-                <h6 className={`${subtitlePrimary} -mt-1 pb-1 block`}>
-                  {stamp.cpid}
-                </h6>
-              )}
-
-              <h5 className="-mt-1.5 font-mono font-light text-xl text-color-neutral-500 block">
-                {(!isSrc20Stamp() && (isPoshStamp(stamp.cpid) ||
-                  (htmlStampTitle && stamp.stamp_mimetype === "text/html"))) &&
-                  (
-                    <>
-                      #{stamp.stamp}
-                    </>
-                  )}
-              </h5>
-
-              {(!isPoshStamp(stamp.cpid) && stamp.cpid) && (
-                <h6 className={`${subtitlePrimary} block`}>
-                  <span className="inline-flex flex-row-reverse items-center gap-3">
-                    <span
-                      ref={cpidCopyButtonRef}
-                      className="relative peer -translate-y-[1px]"
-                      onMouseEnter={handleCpidCopyMouseEnter}
-                      onMouseLeave={handleCpidCopyMouseLeave}
-                    >
-                      <Icon
-                        type="iconButton"
-                        name="copy"
-                        weight="normal"
-                        size="xxs"
-                        color="grey"
-                        onClick={copyCpid}
-                      />
-                      <div
-                        className={`${tooltipIcon} ${
-                          isCpidTooltipVisible ? "opacity-100" : "opacity-0"
-                        }`}
-                      >
-                        COPY CPID
-                      </div>
-                      <div
-                        className={`${tooltipIcon} ${
-                          showCpidCopied ? "opacity-100" : "opacity-0"
-                        }`}
-                      >
-                        CPID COPIED
-                      </div>
-                    </span>
-                    <span
-                      className={`peer-hover:text-color-hover transition-colors duration-200`}
-                    >
-                      {stamp.cpid}
-                    </span>
-                  </span>
-                </h6>
-              )}
-
-              <div className="flex items-center gap-2 mt-2">
-                <Icon
-                  type="icon"
-                  name="userCircle"
-                  weight="bold"
-                  size="xs"
-                  color="custom"
-                  className="stroke-color-neutral-200 translate-y-0.5"
-                />
-                <a
-                  className="font-normal text-sm text-color-neutral-200 link-neutral-200"
-                  href={`/wallet/${stamp.creator}`}
-                  target="_parent"
-                >
-                  {creatorDisplay}
-                </a>
-              </div>
-
-              <div className="flex items-center gap-2 mt-2">
-                {!isSrc20Stamp() && (
-                  <div
-                    className={`${containerPill} ${cardSupply} !text-sm w-fit`}
-                  >
-                    {stamp.supply === 1 ? "1/1" : editionCount}
-                  </div>
-                )}
-                <div className="flex items-center space-x-[9px]">
-                  {stamp.ident === "SRC-721" && (
-                    <div
-                      className="relative group"
-                      onMouseEnter={handleRecursiveMouseEnter}
-                      onMouseLeave={handleRecursiveMouseLeave}
-                    >
-                      <Icon
-                        type="icon"
-                        name="recursive"
-                        weight="normal"
-                        size="xs"
-                        color="greyDark"
-                        ariaLabel="Recursive"
-                      />
-                      <div
-                        className={`${tooltipIcon} ${
-                          isRecursiveTooltipVisible
-                            ? "opacity-100"
-                            : "opacity-0"
-                        }`}
-                      >
-                        RECURSIVE
-                      </div>
-                    </div>
-                  )}
-                  {stamp.divisible == true && (
-                    <div
-                      className="relative group"
-                      onMouseEnter={handleDivisibleMouseEnter}
-                      onMouseLeave={handleDivisibleMouseLeave}
-                    >
-                      <Icon
-                        type="icon"
-                        name="divisible"
-                        weight="normal"
-                        size="xs"
-                        color="greyDark"
-                        ariaLabel="Divisible"
-                      />
-                      <div
-                        className={`${tooltipIcon} ${
-                          isDivisibleTooltipVisible
-                            ? "opacity-100"
-                            : "opacity-0"
-                        }`}
-                      >
-                        DIVISIBLE
-                      </div>
-                    </div>
-                  )}
-                  {Boolean(stamp.keyburn) && (
-                    <div
-                      className="relative group"
-                      onMouseEnter={handleKeyburnMouseEnter}
-                      onMouseLeave={handleKeyburnMouseLeave}
-                    >
-                      <Icon
-                        type="icon"
-                        name="keyburned"
-                        weight="normal"
-                        size="xs"
-                        color="greyDark"
-                        ariaLabel="Keyburned"
-                      />
-                      <div
-                        className={`${tooltipIcon} ${
-                          isKeyburnTooltipVisible ? "opacity-100" : "opacity-0"
-                        }`}
-                      >
-                        KEYBURNED
-                      </div>
-                    </div>
-                  )}
-                  {stamp.locked
-                    ? (
-                      <div
-                        className="relative group"
-                        onMouseEnter={handleLockedMouseEnter}
-                        onMouseLeave={handleLockedMouseLeave}
-                      >
-                        <Icon
-                          type="icon"
-                          name="locked"
-                          weight="normal"
-                          size="xs"
-                          color="greyDark"
-                          ariaLabel="Locked"
-                        />
-                        <div
-                          className={`${tooltipIcon} ${
-                            isLockedTooltipVisible ? "opacity-100" : "opacity-0"
-                          }`}
-                        >
-                          LOCKED
-                        </div>
-                      </div>
-                    )
-                    : (
-                      <div
-                        className="relative group"
-                        onMouseEnter={handleUnlockedMouseEnter}
-                        onMouseLeave={handleUnlockedMouseLeave}
-                      >
-                        <Icon
-                          type="icon"
-                          name="unlocked"
-                          weight="normal"
-                          size="xs"
-                          color="greyDark"
-                          ariaLabel="Unlocked"
-                        />
-                        <div
-                          className={`${tooltipIcon} ${
-                            isUnlockedTooltipVisible
-                              ? "opacity-100"
-                              : "opacity-0"
-                          }`}
-                        >
-                          UNLOCKED
-                        </div>
-                      </div>
-                    )}
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 mt-2">
-                <div
-                  className={`${containerPill} ${cardFileType} !text-sm w-fit`}
-                >
-                  {fileTypeValue}
-                </div>
-                <div
-                  className={`${containerPill} ${cardFileSize} !text-sm w-fit`}
-                >
-                  {fileSizeValue}
-                </div>
-              </div>
             </div>
 
             <div
@@ -1025,19 +819,288 @@ export function StampInfo(
             </div>
           </div>
 
+          <div className="w-full min-w-0">
+            {isSrc20Stamp() && stamp.cpid && (
+              <h6 className={`${subtitlePrimary} -mt-1 pb-1 block`}>
+                {stamp.cpid}
+              </h6>
+            )}
+
+            <h5 className="-mt-1.5 font-mono font-light text-xl text-color-neutral-500 block">
+              {(!isSrc20Stamp() && (isPoshStamp(stamp.cpid) ||
+                (htmlStampTitle && stamp.stamp_mimetype === "text/html"))) &&
+                (
+                  <>
+                    #{stamp.stamp}
+                  </>
+                )}
+            </h5>
+
+            {(!isPoshStamp(stamp.cpid) && stamp.cpid) && (
+              <h6 className={`${subtitlePrimary} block min-w-0`}>
+                <span className="inline-flex max-w-full flex-row-reverse items-center gap-3 min-w-0">
+                  <span
+                    ref={cpidCopyButtonRef}
+                    className="relative peer -translate-y-[1px] shrink-0"
+                    onMouseEnter={handleCpidCopyMouseEnter}
+                    onMouseLeave={handleCpidCopyMouseLeave}
+                  >
+                    <Icon
+                      type="iconButton"
+                      name="copy"
+                      weight="normal"
+                      size="xxs"
+                      color="grey"
+                      onClick={copyCpid}
+                    />
+                    <div
+                      className={`${tooltipIcon} ${
+                        isCpidTooltipVisible ? "opacity-100" : "opacity-0"
+                      }`}
+                    >
+                      COPY CPID
+                    </div>
+                    <div
+                      className={`${tooltipIcon} ${
+                        showCpidCopied ? "opacity-100" : "opacity-0"
+                      }`}
+                    >
+                      CPID COPIED
+                    </div>
+                  </span>
+                  <span
+                    className={`${truncate} peer-hover:text-color-hover transition-colors duration-200 min-w-0`}
+                  >
+                    {stamp.cpid}
+                  </span>
+                </span>
+              </h6>
+            )}
+
+            <div className="flex items-center gap-2 mt-2">
+              <Icon
+                type="icon"
+                name="userCircle"
+                weight="bold"
+                size="xs"
+                color="custom"
+                className="stroke-color-neutral-200 group-hover:stroke-color-hover transition-colors duration-200 translate-y-0.5"
+              />
+              <span className="font-normal text-sm text-color-neutral-200 link-neutral-200 group-hover:text-color-hover transition-colors duration-200">
+                {creatorDisplay}
+              </span>
+            </div>
+
+            <div className="flex flex-wrap justify-between w-full min-[420px]:w-[270px] gap-2 mt-6">
+              {!isSrc20Stamp() && (
+                <div
+                  className={`${containerPill} ${cardSupply} !text-sm w-fit`}
+                >
+                  {stamp.supply === 1 ? "1/1" : editionCount}
+                </div>
+              )}
+              <div className="flex items-center -mt-1 space-x-2">
+                {stamp.ident === "SRC-721" && (
+                  <div
+                    className="relative group"
+                    onMouseEnter={handleRecursiveMouseEnter}
+                    onMouseLeave={handleRecursiveMouseLeave}
+                  >
+                    <Icon
+                      type="icon"
+                      name="recursive"
+                      weight="normal"
+                      size="xs"
+                      color="greyDark"
+                      ariaLabel="Recursive"
+                    />
+                    <div
+                      className={`${tooltipIcon} ${
+                        isRecursiveTooltipVisible ? "opacity-100" : "opacity-0"
+                      }`}
+                    >
+                      RECURSIVE
+                    </div>
+                  </div>
+                )}
+                {stamp.divisible == true && (
+                  <div
+                    className="relative group"
+                    onMouseEnter={handleDivisibleMouseEnter}
+                    onMouseLeave={handleDivisibleMouseLeave}
+                  >
+                    <Icon
+                      type="icon"
+                      name="divisible"
+                      weight="normal"
+                      size="xs"
+                      color="greyDark"
+                      ariaLabel="Divisible"
+                    />
+                    <div
+                      className={`${tooltipIcon} ${
+                        isDivisibleTooltipVisible ? "opacity-100" : "opacity-0"
+                      }`}
+                    >
+                      DIVISIBLE
+                    </div>
+                  </div>
+                )}
+                {Boolean(stamp.keyburn) && (
+                  <div
+                    className="relative group"
+                    onMouseEnter={handleKeyburnMouseEnter}
+                    onMouseLeave={handleKeyburnMouseLeave}
+                  >
+                    <Icon
+                      type="icon"
+                      name="keyburned"
+                      weight="normal"
+                      size="xs"
+                      color="greyDark"
+                      ariaLabel="Keyburned"
+                    />
+                    <div
+                      className={`${tooltipIcon} ${
+                        isKeyburnTooltipVisible ? "opacity-100" : "opacity-0"
+                      }`}
+                    >
+                      KEYBURNED
+                    </div>
+                  </div>
+                )}
+                {stamp.locked
+                  ? (
+                    <div
+                      className="relative group"
+                      onMouseEnter={handleLockedMouseEnter}
+                      onMouseLeave={handleLockedMouseLeave}
+                    >
+                      <Icon
+                        type="icon"
+                        name="locked"
+                        weight="normal"
+                        size="xs"
+                        color="greyDark"
+                        ariaLabel="Locked"
+                      />
+                      <div
+                        className={`${tooltipIcon} ${
+                          isLockedTooltipVisible ? "opacity-100" : "opacity-0"
+                        }`}
+                      >
+                        LOCKED
+                      </div>
+                    </div>
+                  )
+                  : (
+                    <div
+                      className="relative group"
+                      onMouseEnter={handleUnlockedMouseEnter}
+                      onMouseLeave={handleUnlockedMouseLeave}
+                    >
+                      <Icon
+                        type="icon"
+                        name="unlocked"
+                        weight="normal"
+                        size="xs"
+                        color="greyDark"
+                        ariaLabel="Unlocked"
+                      />
+                      <div
+                        className={`${tooltipIcon} ${
+                          isUnlockedTooltipVisible ? "opacity-100" : "opacity-0"
+                        }`}
+                      >
+                        UNLOCKED
+                      </div>
+                    </div>
+                  )}
+              </div>
+            </div>
+
+            <div
+              className={`flex flex-col w-full min-[420px]:w-[270px] mt-5 ${container2} px-3 py-2 gap-2`}
+            >
+              <div className="flex flex-wrap justify-between gap-2">
+                <div
+                  className={`${containerPill} ${cardFileType} w-fit`}
+                >
+                  {fileTypeValue}
+                </div>
+                <div
+                  className={`${containerPill} ${cardFileSize} !text-color-neutral-200 w-fit`}
+                >
+                  {fileSizeValue}
+                </div>
+                <div
+                  className={`${containerPill} ${cardFileSize} !text-color-neutral-200 w-fit`}
+                >
+                  {dimensionsValue}
+                </div>
+              </div>
+
+              <div className="flex flex-wrap justify-between gap-2 mt-2">
+                <div
+                  className={`${containerPill} ${cardFileSize} w-fit`}
+                >
+                  {createdDate}
+                </div>
+                <div
+                  className={`${containerPill} ${cardFileSize} w-fit`}
+                >
+                  {stamp.tx_hash !== null
+                    ? (
+                      <a
+                        href={`https://www.blockchain.com/explorer/transactions/btc/${stamp.tx_hash}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="link-neutral-400 transition-colors duration-200"
+                      >
+                        {abbreviateAddress(stamp.tx_hash, 8)}
+                      </a>
+                    )
+                    : "N/A"}
+                </div>
+              </div>
+            </div>
+          </div>
           {(dispensers?.length > 0 || !!lowestPriceDispenser)
             ? (
-              <div className="flex flex-col w-full pt-6 mobileLg:pt-12">
-                <div className="flex items-end justify-end gap-2 mb-3">
+              <div className="flex flex-col w-full mt-7.5">
+                <div
+                  className={`flex flex-col items-start tablet:items-end w-fit ml-auto px-3 py-2.5 mb-3 ${container3}`}
+                >
+                  <StatPrice
+                    priceBTC={formatBTCAmount(
+                      typeof displayPrice === "number" ? displayPrice : 0,
+                      {
+                        excludeSuffix: true,
+                        decimals: 8,
+                        stripZeros: false,
+                      },
+                    )}
+                    priceUSD={displayPriceUSD != null
+                      ? displayPriceUSD.toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })
+                      : null}
+                    activityLevel={activityLevel}
+                    align="right"
+                  />
+                </div>
+
+                <div className="flex items-center justify-end gap-5">
                   {dispensers?.length >= 2 && (
                     <div
-                      className={`relative flex items-center justify-center px-1 py-0.5 mr-auto ${container2} rounded-full`}
+                      class={container2Icon}
                     >
                       <Icon
                         type="iconButton"
                         name="artStamps"
                         weight="normal"
-                        size="lgR"
+                        size="xsR"
                         color="greyLight"
                         ariaLabel="Listings"
                         onClick={() => setShowListings(!showListings)}
@@ -1045,28 +1108,15 @@ export function StampInfo(
                     </div>
                   )}
 
-                  <div
-                    className={`flex flex-col items-end w-fit px-3 py-2.5 ${container3}`}
+                  <Button
+                    variant="flat"
+                    color="primary"
+                    size="smR"
+                    onClick={() =>
+                      toggleModal(selectedDispenser || lowestPriceDispenser)}
                   >
-                    <StatPrice
-                      priceBTC={formatBTCAmount(
-                        typeof displayPrice === "number" ? displayPrice : 0,
-                        {
-                          excludeSuffix: true,
-                          decimals: 8,
-                          stripZeros: false,
-                        },
-                      )}
-                      priceUSD={displayPriceUSD != null
-                        ? displayPriceUSD.toLocaleString("en-US", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })
-                        : null}
-                      activityLevel={activityLevel}
-                      align="right"
-                    />
-                  </div>
+                    BUY
+                  </Button>
                 </div>
 
                 {(dispensers?.length >= 2)
@@ -1075,7 +1125,7 @@ export function StampInfo(
                       className={`overflow-hidden transition-all duration-500 ease-in-out
                       ${
                         showListings
-                          ? "max-h-[222px] mt-1 mb-3 opacity-100"
+                          ? "max-h-[222px] mt-3 opacity-100"
                           : "max-h-0 opacity-0"
                       }`}
                     >
@@ -1093,83 +1143,9 @@ export function StampInfo(
                     </div>
                   )
                   : null}
-
-                <div className="flex justify-end">
-                  <Button
-                    variant="flat"
-                    color="primary"
-                    size="smR"
-                    onClick={() =>
-                      toggleModal(selectedDispenser || lowestPriceDispenser)}
-                  >
-                    BUY
-                  </Button>
-                </div>
               </div>
             )
             : null}
-        </div>
-
-        <div className={containerBackground}>
-          {!isSrc20Stamp() && (
-            <div className="flex flex-col pb-3">
-              <h6 className={labelXs}>{editionLabel}</h6>
-              <h6 className={value2xl}>{editionCount}</h6>
-            </div>
-          )}
-
-          <div className="flex flex-row">
-            <StatItem
-              label={(isSrc20Stamp() || isSrc101Stamp())
-                ? "TRANSACTION"
-                : isMediaFile
-                ? "DURATION"
-                : "DIMENSIONS"}
-              value={isSrc20Stamp()
-                ? stamp.stamp_base64 &&
-                    JSON.parse(atob(stamp.stamp_base64))?.op === "DEPLOY"
-                  ? "DEPLOY"
-                  : stamp.stamp_base64 &&
-                      JSON.parse(atob(stamp.stamp_base64))?.op === "MINT"
-                  ? "MINT"
-                  : "TRANSFER"
-                : isMediaFile
-                ? (mediaDuration ? formatDuration(mediaDuration) : "-")
-                : isSrc101Stamp()
-                ? stamp.stamp_base64 &&
-                    JSON.parse(atob(stamp.stamp_base64))?.op === "DEPLOY"
-                  ? "SALE"
-                  : stamp.stamp_base64 &&
-                      JSON.parse(atob(stamp.stamp_base64))?.op === "MINT"
-                  ? "REGISTER"
-                  : "TRANSFER"
-                : getDimensionsDisplay(imageDimensions)}
-              align="center"
-              class="flex-1"
-            />
-          </div>
-
-          <div className="flex flex-row pt-3">
-            <StatItem
-              label={isSrc20Stamp() ? "SENT" : "CREATED"}
-              value={createdDate}
-              class="flex-1"
-            />
-            {/* @baba - fix logic handling for no tx hash */}
-            <div className={`${containerColData} flex-1 items-end`}>
-              <h6 className={labelXs}>TX HASH</h6>
-              <a
-                href={`https://www.blockchain.com/explorer/transactions/btc/${stamp.tx_hash}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`${valueSm} hover:text-color-grey transition-colors duration-300`}
-              >
-                {stamp.tx_hash !== null
-                  ? abbreviateAddress(stamp.tx_hash, 4)
-                  : "N/A"}
-              </a>
-            </div>
-          </div>
         </div>
       </div>
     </>
