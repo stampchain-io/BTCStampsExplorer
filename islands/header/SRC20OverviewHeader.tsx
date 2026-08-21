@@ -1,6 +1,6 @@
 /* ===== SRC20 HEADER COMPONENT ===== */
-import { SelectorButtons, ToggleButton } from "$button";
-import { ScrollFadeRow } from "$layout";
+import { SelectorButtons, TrendingButton } from "$button";
+import { container2Icon, ScrollFadeRow } from "$layout";
 import {
   navigateWithFreshPartial,
 } from "$lib/utils/navigation/freshNavigationUtils.ts";
@@ -68,21 +68,14 @@ export const SRC20OverviewHeader = ({
           />
         </div>
 
-        {/* Trending Toggle */}
-        <div class="shrink-0">
-          <ToggleButton
-            options={["TRENDING"]}
-            selected={sortBy === "TRENDING" ? "TRENDING" : ""}
-            onChange={handleTrendingClick}
-            mode="single"
-            size="xsR"
-            color="neutral"
-            className="mt-[3px] !text-xs tablet:!text-[10px]"
-          />
-        </div>
-
         {/* Timeframe Buttons - Right */}
-        <div class="shrink-0 ml-auto">
+        <div class="shrink-0 flex ml-auto gap-3">
+          <div class={container2Icon}>
+            <TrendingButton
+              selected={sortBy === "TRENDING"}
+              onClick={handleTrendingClick}
+            />
+          </div>
           <SelectorButtons
             options={[
               { value: "24H", label: "24H" },

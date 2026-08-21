@@ -130,6 +130,10 @@ export function Icon(props: IconVariants) {
       edit: "pencil",
       pencil: "pencil",
 
+      // SRC-101 Specific Icons
+      chartUp: "chartUp",
+      chartDown: "chartDown",
+
       // Bitcoin Specific Icons
       bitcoin: "bitcoin",
       bitcoins: "bitcoins",
