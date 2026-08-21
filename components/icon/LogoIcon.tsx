@@ -22,7 +22,7 @@
 
  */
 
-import { Icon, iconButtonPill } from "$icon";
+import { Icon } from "$icon";
 import type { ComponentChildren } from "preact";
 
 interface LogoIconProps {
@@ -52,12 +52,12 @@ export function LogoIcon({
     >
       <span aria-hidden="true">
         <Icon
-          type="icon"
+          type="iconButton"
           name="stampchain"
-          weight="light"
-          size="xlR"
+          weight="bold"
+          size="smR"
           color="greyLight"
-          className={`group-hover:stroke-color-primary-400 ${iconButtonPill} !p-1`}
+          className={`group-hover:stroke-color-primary-400`}
         />
       </span>
       {children}
