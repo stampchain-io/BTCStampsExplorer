@@ -30,11 +30,13 @@ import {
 import { tooltipIcon } from "$notification";
 import { Dispenser, StampListingsOpenTable } from "$table";
 import {
+  cardFileSize,
+  cardFileType,
   cardSupply,
   labelXs,
+  subtitlePrimary,
   titlePrimary,
   value2xl,
-  valueDark,
   valueSm,
 } from "$text";
 import { useEffect, useRef, useState } from "preact/hooks";
@@ -140,6 +142,13 @@ export function StampInfo(
   const unlockedTooltipTimeoutRef = useRef<number | null>(null);
   const recursiveTooltipTimeoutRef = useRef<number | null>(null);
 
+  /* ===== CPID COPY STATE ===== */
+  const [showCpidCopied, setShowCpidCopied] = useState(false);
+  const [isCpidTooltipVisible, setIsCpidTooltipVisible] = useState(false);
+  const [allowCpidTooltip, setAllowCpidTooltip] = useState(true);
+  const cpidCopyButtonRef = useRef<HTMLDivElement>(null);
+  const cpidTooltipTimeoutRef = useRef<number | null>(null);
+
   /* ===== EFFECTS ===== */
   // Cleanup effect
   useEffect(() => {
@@ -150,6 +159,7 @@ export function StampInfo(
         lockedTooltipTimeoutRef,
         unlockedTooltipTimeoutRef,
         recursiveTooltipTimeoutRef,
+        cpidTooltipTimeoutRef,
       ].forEach((ref) => {
         if (ref.current) {
           globalThis.clearTimeout(ref.current);
@@ -157,6 +167,50 @@ export function StampInfo(
       });
     };
   }, []);
+
+  /* ===== CPID COPY HANDLERS ===== */
+  const handleCpidCopyMouseEnter = () => {
+    if (allowCpidTooltip) {
+      if (cpidTooltipTimeoutRef.current) {
+        globalThis.clearTimeout(cpidTooltipTimeoutRef.current);
+      }
+
+      cpidTooltipTimeoutRef.current = globalThis.setTimeout(() => {
+        const buttonRect = cpidCopyButtonRef.current?.getBoundingClientRect();
+        if (buttonRect) {
+          setIsCpidTooltipVisible(true);
+        }
+      }, 1500);
+    }
+  };
+
+  const handleCpidCopyMouseLeave = () => {
+    if (cpidTooltipTimeoutRef.current) {
+      globalThis.clearTimeout(cpidTooltipTimeoutRef.current);
+    }
+    setIsCpidTooltipVisible(false);
+    setShowCpidCopied(false);
+    setAllowCpidTooltip(true);
+  };
+
+  const copyCpid = async () => {
+    try {
+      await navigator.clipboard.writeText(stamp.cpid);
+      setShowCpidCopied(true);
+      setIsCpidTooltipVisible(false);
+      setAllowCpidTooltip(false);
+
+      if (cpidTooltipTimeoutRef.current) {
+        globalThis.clearTimeout(cpidTooltipTimeoutRef.current);
+      }
+
+      cpidTooltipTimeoutRef.current = globalThis.setTimeout(() => {
+        setShowCpidCopied(false);
+      }, 1500);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  };
 
   /* ===== EVENT HANDLERS ===== */
   // Tooltip handlers
@@ -670,6 +724,21 @@ export function StampInfo(
     return stamp.ident === "SRC-101";
   };
 
+  const fileTypeValue = isSrc20Stamp()
+    ? "SRC-20"
+    : isSrc101Stamp()
+    ? "SRC-101"
+    : fileExtension === "BMN"
+    ? "BMN"
+    : formatFileType(stamp.stamp_mimetype);
+
+  const fileSizeValue = stamp.file_size_bytes !== null
+    ? formatFileSize(
+      stamp.file_size_bytes,
+      stamp.stamp_mimetype === "text/plain",
+    )
+    : "N/A";
+
   // Effect to handle document title updates
   useEffect(() => {
     document.title = `Bitcoin Stamp #${stamp.stamp} - stampchain.io`;
@@ -686,7 +755,7 @@ export function StampInfo(
           className={containerBackground}
         >
           <div className="flex justify-between items-start gap-3">
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <h2
                 ref={titleRef}
                 className={`${titlePrimary} overflow-hidden`}
@@ -727,7 +796,7 @@ export function StampInfo(
               </h2>
 
               {isSrc20Stamp() && stamp.cpid && (
-                <h6 className={`${valueDark} -mt-1 pb-1 block`}>
+                <h6 className={`${subtitlePrimary} -mt-1 pb-1 block`}>
                   {stamp.cpid}
                 </h6>
               )}
@@ -743,16 +812,57 @@ export function StampInfo(
               </h5>
 
               {(!isPoshStamp(stamp.cpid) && stamp.cpid) && (
-                <h6 className={`${valueDark} block`}>
-                  <span className={labelXs}>CPID&nbsp;&nbsp;</span>
-                  {stamp.cpid}
+                <h6 className={`${subtitlePrimary} block`}>
+                  <span className="inline-flex flex-row-reverse items-center gap-3">
+                    <span
+                      ref={cpidCopyButtonRef}
+                      className="relative peer -translate-y-[1px]"
+                      onMouseEnter={handleCpidCopyMouseEnter}
+                      onMouseLeave={handleCpidCopyMouseLeave}
+                    >
+                      <Icon
+                        type="iconButton"
+                        name="copy"
+                        weight="normal"
+                        size="xxs"
+                        color="grey"
+                        onClick={copyCpid}
+                      />
+                      <div
+                        className={`${tooltipIcon} ${
+                          isCpidTooltipVisible ? "opacity-100" : "opacity-0"
+                        }`}
+                      >
+                        COPY CPID
+                      </div>
+                      <div
+                        className={`${tooltipIcon} ${
+                          showCpidCopied ? "opacity-100" : "opacity-0"
+                        }`}
+                      >
+                        CPID COPIED
+                      </div>
+                    </span>
+                    <span
+                      className={`peer-hover:text-color-hover transition-colors duration-200`}
+                    >
+                      {stamp.cpid}
+                    </span>
+                  </span>
                 </h6>
               )}
 
-              <div className="flex flex-col items-start mt-2">
-                <h6 className={labelXs}>ARTIST</h6>
+              <div className="flex items-center gap-2 mt-2">
+                <Icon
+                  type="icon"
+                  name="userCircle"
+                  weight="bold"
+                  size="xs"
+                  color="custom"
+                  className="stroke-color-neutral-200 translate-y-0.5"
+                />
                 <a
-                  className="font-bold text-sm text-color-neutral-200 link-neutral-200-bold"
+                  className="font-normal text-sm text-color-neutral-200 link-neutral-200"
                   href={`/wallet/${stamp.creator}`}
                   target="_parent"
                 >
@@ -760,13 +870,152 @@ export function StampInfo(
                 </a>
               </div>
 
-              {!isSrc20Stamp() && (
-                <div
-                  className={`${containerPill} ${cardSupply} !text-sm mt-5 w-fit`}
-                >
-                  {stamp.supply === 1 ? "1/1" : editionCount}
+              <div className="flex items-center gap-2 mt-2">
+                {!isSrc20Stamp() && (
+                  <div
+                    className={`${containerPill} ${cardSupply} !text-sm w-fit`}
+                  >
+                    {stamp.supply === 1 ? "1/1" : editionCount}
+                  </div>
+                )}
+                <div className="flex items-center space-x-[9px]">
+                  {stamp.ident === "SRC-721" && (
+                    <div
+                      className="relative group"
+                      onMouseEnter={handleRecursiveMouseEnter}
+                      onMouseLeave={handleRecursiveMouseLeave}
+                    >
+                      <Icon
+                        type="icon"
+                        name="recursive"
+                        weight="normal"
+                        size="xs"
+                        color="greyDark"
+                        ariaLabel="Recursive"
+                      />
+                      <div
+                        className={`${tooltipIcon} ${
+                          isRecursiveTooltipVisible
+                            ? "opacity-100"
+                            : "opacity-0"
+                        }`}
+                      >
+                        RECURSIVE
+                      </div>
+                    </div>
+                  )}
+                  {stamp.divisible == true && (
+                    <div
+                      className="relative group"
+                      onMouseEnter={handleDivisibleMouseEnter}
+                      onMouseLeave={handleDivisibleMouseLeave}
+                    >
+                      <Icon
+                        type="icon"
+                        name="divisible"
+                        weight="normal"
+                        size="xs"
+                        color="greyDark"
+                        ariaLabel="Divisible"
+                      />
+                      <div
+                        className={`${tooltipIcon} ${
+                          isDivisibleTooltipVisible
+                            ? "opacity-100"
+                            : "opacity-0"
+                        }`}
+                      >
+                        DIVISIBLE
+                      </div>
+                    </div>
+                  )}
+                  {Boolean(stamp.keyburn) && (
+                    <div
+                      className="relative group"
+                      onMouseEnter={handleKeyburnMouseEnter}
+                      onMouseLeave={handleKeyburnMouseLeave}
+                    >
+                      <Icon
+                        type="icon"
+                        name="keyburned"
+                        weight="normal"
+                        size="xs"
+                        color="greyDark"
+                        ariaLabel="Keyburned"
+                      />
+                      <div
+                        className={`${tooltipIcon} ${
+                          isKeyburnTooltipVisible ? "opacity-100" : "opacity-0"
+                        }`}
+                      >
+                        KEYBURNED
+                      </div>
+                    </div>
+                  )}
+                  {stamp.locked
+                    ? (
+                      <div
+                        className="relative group"
+                        onMouseEnter={handleLockedMouseEnter}
+                        onMouseLeave={handleLockedMouseLeave}
+                      >
+                        <Icon
+                          type="icon"
+                          name="locked"
+                          weight="normal"
+                          size="xs"
+                          color="greyDark"
+                          ariaLabel="Locked"
+                        />
+                        <div
+                          className={`${tooltipIcon} ${
+                            isLockedTooltipVisible ? "opacity-100" : "opacity-0"
+                          }`}
+                        >
+                          LOCKED
+                        </div>
+                      </div>
+                    )
+                    : (
+                      <div
+                        className="relative group"
+                        onMouseEnter={handleUnlockedMouseEnter}
+                        onMouseLeave={handleUnlockedMouseLeave}
+                      >
+                        <Icon
+                          type="icon"
+                          name="unlocked"
+                          weight="normal"
+                          size="xs"
+                          color="greyDark"
+                          ariaLabel="Unlocked"
+                        />
+                        <div
+                          className={`${tooltipIcon} ${
+                            isUnlockedTooltipVisible
+                              ? "opacity-100"
+                              : "opacity-0"
+                          }`}
+                        >
+                          UNLOCKED
+                        </div>
+                      </div>
+                    )}
                 </div>
-              )}
+              </div>
+
+              <div className="flex items-center gap-2 mt-2">
+                <div
+                  className={`${containerPill} ${cardFileType} !text-sm w-fit`}
+                >
+                  {fileTypeValue}
+                </div>
+                <div
+                  className={`${containerPill} ${cardFileSize} !text-sm w-fit`}
+                >
+                  {fileSizeValue}
+                </div>
+              </div>
             </div>
 
             <div
@@ -871,17 +1120,6 @@ export function StampInfo(
 
           <div className="flex flex-row">
             <StatItem
-              label="TYPE"
-              value={isSrc20Stamp()
-                ? "SRC-20"
-                : isSrc101Stamp()
-                ? "SRC-101"
-                : fileExtension === "BMN"
-                ? "BMN"
-                : formatFileType(stamp.stamp_mimetype)}
-              class="flex-1"
-            />
-            <StatItem
               label={(isSrc20Stamp() || isSrc101Stamp())
                 ? "TRANSACTION"
                 : isMediaFile
@@ -909,141 +1147,12 @@ export function StampInfo(
               align="center"
               class="flex-1"
             />
-            <div className="flex flex-1 justify-end items-end pb-1 space-x-[9px]">
-              {stamp.ident === "SRC-721" && (
-                <div
-                  className="relative group"
-                  onMouseEnter={handleRecursiveMouseEnter}
-                  onMouseLeave={handleRecursiveMouseLeave}
-                >
-                  <Icon
-                    type="icon"
-                    name="recursive"
-                    weight="normal"
-                    size="xs"
-                    color="greyDark"
-                    ariaLabel="Recursive"
-                  />
-                  <div
-                    className={`${tooltipIcon} ${
-                      isRecursiveTooltipVisible ? "opacity-100" : "opacity-0"
-                    }`}
-                  >
-                    RECURSIVE
-                  </div>
-                </div>
-              )}
-              {stamp.divisible == true && (
-                <div
-                  className="relative group"
-                  onMouseEnter={handleDivisibleMouseEnter}
-                  onMouseLeave={handleDivisibleMouseLeave}
-                >
-                  <Icon
-                    type="icon"
-                    name="divisible"
-                    weight="normal"
-                    size="xs"
-                    color="greyDark"
-                    ariaLabel="Divisible"
-                  />
-                  <div
-                    className={`${tooltipIcon} ${
-                      isDivisibleTooltipVisible ? "opacity-100" : "opacity-0"
-                    }`}
-                  >
-                    DIVISIBLE
-                  </div>
-                </div>
-              )}
-              {Boolean(stamp.keyburn) && (
-                <div
-                  className="relative group"
-                  onMouseEnter={handleKeyburnMouseEnter}
-                  onMouseLeave={handleKeyburnMouseLeave}
-                >
-                  <Icon
-                    type="icon"
-                    name="keyburned"
-                    weight="normal"
-                    size="xs"
-                    color="greyDark"
-                    ariaLabel="Keyburned"
-                  />
-                  <div
-                    className={`${tooltipIcon} ${
-                      isKeyburnTooltipVisible ? "opacity-100" : "opacity-0"
-                    }`}
-                  >
-                    KEYBURNED
-                  </div>
-                </div>
-              )}
-              {stamp.locked
-                ? (
-                  <div
-                    className="relative group"
-                    onMouseEnter={handleLockedMouseEnter}
-                    onMouseLeave={handleLockedMouseLeave}
-                  >
-                    <Icon
-                      type="icon"
-                      name="locked"
-                      weight="normal"
-                      size="xs"
-                      color="greyDark"
-                      ariaLabel="Locked"
-                    />
-                    <div
-                      className={`${tooltipIcon} ${
-                        isLockedTooltipVisible ? "opacity-100" : "opacity-0"
-                      }`}
-                    >
-                      LOCKED
-                    </div>
-                  </div>
-                )
-                : (
-                  <div
-                    className="relative group"
-                    onMouseEnter={handleUnlockedMouseEnter}
-                    onMouseLeave={handleUnlockedMouseLeave}
-                  >
-                    <Icon
-                      type="icon"
-                      name="unlocked"
-                      weight="normal"
-                      size="xs"
-                      color="greyDark"
-                      ariaLabel="Unlocked"
-                    />
-                    <div
-                      className={`${tooltipIcon} ${
-                        isUnlockedTooltipVisible ? "opacity-100" : "opacity-0"
-                      }`}
-                    >
-                      UNLOCKED
-                    </div>
-                  </div>
-                )}
-            </div>
           </div>
 
           <div className="flex flex-row pt-3">
             <StatItem
-              label="SIZE"
-              value={stamp.file_size_bytes !== null
-                ? formatFileSize(
-                  stamp.file_size_bytes,
-                  stamp.stamp_mimetype === "text/plain",
-                )
-                : "N/A"}
-              class="flex-1"
-            />
-            <StatItem
               label={isSrc20Stamp() ? "SENT" : "CREATED"}
               value={createdDate}
-              align="center"
               class="flex-1"
             />
             {/* @baba - fix logic handling for no tx hash */}

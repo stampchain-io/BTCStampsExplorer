@@ -125,6 +125,7 @@ export function Icon(props: IconVariants) {
       // Wallet Specific Icons
       view: "eye",
       hide: "eyeSlash",
+      userCircle: "userCircle",
       collection: "images",
       copy: "copy",
       edit: "pencil",
