@@ -7,7 +7,7 @@ import { WalletButton } from "$islands/button/WalletButton.tsx";
 import { container0, container1, transitionTransform } from "$layout";
 import { useFees } from "$lib/hooks/useFees.ts";
 import { tooltipIcon } from "$notification";
-import { navLinkActiveDesktop, navLinkDesktop } from "$text";
+import { logoHeader, navLinkActiveDesktop, navLinkDesktop } from "$text";
 import { createPortal } from "preact/compat";
 import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 
@@ -524,7 +524,13 @@ export function Header() {
       href="/home"
       f-partial="/home"
       onClick={() => setCurrentPath("home")}
-    />
+    >
+      <span class={`${logoHeader} hidden tablet:inline`}>
+        <span class="group-hover:text-color-hover transition-colors duration-200">
+          STAMP
+        </span>CHAIN
+      </span>
+    </LogoIcon>
   );
 
   /* ===== COMPONENT RENDER ===== */

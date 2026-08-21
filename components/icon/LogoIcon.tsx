@@ -23,6 +23,7 @@
  */
 
 import { Icon, iconButtonPill } from "$icon";
+import type { ComponentChildren } from "preact";
 
 interface LogoIconProps {
   href?: string;
@@ -30,6 +31,7 @@ interface LogoIconProps {
   className?: string;
   ariaLabel?: string;
   "f-partial"?: string;
+  children?: ComponentChildren;
 }
 
 export function LogoIcon({
@@ -38,13 +40,14 @@ export function LogoIcon({
   className = "",
   ariaLabel = "Stampchain home",
   "f-partial": fPartial,
+  children,
 }: LogoIconProps) {
   return (
     <a
       href={href}
       onClick={onClick}
       aria-label={ariaLabel}
-      class={`inline-block ${className}`.trim()}
+      class={`inline-flex items-center gap-2 group ${className}`.trim()}
       {...(fPartial !== undefined ? { "f-partial": fPartial } : {})}
     >
       <span aria-hidden="true">
@@ -54,9 +57,10 @@ export function LogoIcon({
           weight="light"
           size="xlR"
           color="greyLight"
-          className={`hover:stroke-color-primary-400 ${iconButtonPill} !p-1`}
+          className={`group-hover:stroke-color-primary-400 ${iconButtonPill} !p-1`}
         />
       </span>
+      {children}
     </a>
   );
 }

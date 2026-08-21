@@ -2,7 +2,7 @@
 /* ======================================================================== */
 
 /* ===== BASE STYLES ===== */
-const logoFont = "font-black italic text-3xl tracking-wide inline-block w-fit";
+const logoFont = "font-black italic tracking-wide";
 const titleFont =
   "font-black text-3xl uppercase tracking-tight inline-block w-fit cursor-default";
 const subtitleFont = "font-light text-2xl uppercase mb-2 cursor-default";
@@ -18,8 +18,10 @@ export const truncate = "truncate max-w-[97%]";
 /* ======================================================================== */
 
 /* ===== LOGO STYLES ===== */
-export const logoPrimary = // used in footer
-  `${logoFont} text-color-primary-400 ${select}`;
+export const logoHeader = // used in header wordmark (tablet+)
+  `${logoFont} text-xl text-color-neutral-400 ${transitionColors} ${select}`;
+export const logoFooter = // used in footer
+  `${logoFont} text-3xl text-color-primary-400 ${select}`;
 
 /* ======================================================================== */
 
@@ -236,8 +238,8 @@ export const cardPriceCompact = `font-medium text-[0.625rem] mobileLg:text-xs
 export type TextStyles = {
   truncate: string;
   // Logo styles
-  logoPrimary: string;
-  logoPrimaryHover: string;
+  logoHeader: string;
+  logoFooter: string;
   // Navigation styles
   navLinkDesktop: string;
   navLinkActiveDesktop: string;

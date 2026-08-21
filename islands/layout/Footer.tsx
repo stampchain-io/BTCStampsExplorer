@@ -4,7 +4,7 @@ import { containerBackground } from "$layout";
 import {
   copyright,
   eyebrowNeutral,
-  logoPrimary,
+  logoFooter,
   navLinkFooter,
   navLinkFooterOverlay,
   tagline,
@@ -134,7 +134,7 @@ export function Footer() {
       ">
           {/* ===== LOGO AND TAGLINE ===== */}
           <div class="flex flex-col items-center mobileMd:items-start">
-            <h5 class={logoPrimary}>
+            <h5 class={logoFooter}>
               STAMP<span class="text-color-neutral-400">
                 CHAIN
               </span>
