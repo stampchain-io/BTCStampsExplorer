@@ -911,7 +911,7 @@ export function StampCard({
                   <IconWithTooltip label={displayPriceBTC().text}>
                     <Icon
                       type="icon"
-                      name="bitcoin"
+                      name="listings"
                       weight="bold"
                       size="custom"
                       color="custom"
@@ -1213,7 +1213,8 @@ export function StampCard({
               )}
             </div>
 
-            {/* Row 3: Holder address container (bottom) - hidden for now,
+            {
+              /* Row 3: Holder address container (bottom) - hidden for now,
             pending real top-holder data (see github-issue-holder-data.md);
             stamp.creator is only the original creator, not necessarily the
             current holder
@@ -1238,7 +1239,8 @@ export function StampCard({
                 </div>
               </div>
             </div>
-            */}
+            */
+            }
           </div>
         )}
 

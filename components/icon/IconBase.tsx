@@ -140,6 +140,7 @@ export function Icon(props: IconVariants) {
       bitcoins: "bitcoins",
       bitcoinTx: "bitcoinTx",
       bitcoinBlock: "blockchain",
+      listings: "bitcoinTag",
       version: "bitcoinCpu",
       send: "bitcoinOut",
       receive: "bitcoinIn",

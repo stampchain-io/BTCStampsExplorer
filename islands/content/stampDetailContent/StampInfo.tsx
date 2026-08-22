@@ -170,12 +170,20 @@ export function StampInfo(
   const cpidCopyButtonRef = useRef<HTMLDivElement>(null);
   const cpidTooltipTimeoutRef = useRef<number | null>(null);
 
+  /* ===== LISTINGS TOOLTIP STATE ===== */
+  const [isListingsTooltipVisible, setIsListingsTooltipVisible] = useState(
+    false,
+  );
+  const [allowListingsTooltip, setAllowListingsTooltip] = useState(true);
+  const listingsTooltipTimeoutRef = useRef<number | null>(null);
+
   /* ===== EFFECTS ===== */
   // Cleanup effect
   useEffect(() => {
     return () => {
       [
         cpidTooltipTimeoutRef,
+        listingsTooltipTimeoutRef,
       ].forEach((ref) => {
         if (ref.current) {
           globalThis.clearTimeout(ref.current);
@@ -226,6 +234,26 @@ export function StampInfo(
     } catch (err) {
       console.error("Failed to copy:", err);
     }
+  };
+
+  /* ===== LISTINGS TOOLTIP HANDLERS ===== */
+  const handleListingsMouseEnter = () => {
+    if (allowListingsTooltip) {
+      if (listingsTooltipTimeoutRef.current) {
+        globalThis.clearTimeout(listingsTooltipTimeoutRef.current);
+      }
+      listingsTooltipTimeoutRef.current = globalThis.setTimeout(() => {
+        setIsListingsTooltipVisible(true);
+      }, 500);
+    }
+  };
+
+  const handleListingsMouseLeave = () => {
+    if (listingsTooltipTimeoutRef.current) {
+      globalThis.clearTimeout(listingsTooltipTimeoutRef.current);
+    }
+    setIsListingsTooltipVisible(false);
+    setAllowListingsTooltip(true);
   };
 
   /* ===== HELPER FUNCTIONS ===== */
@@ -808,10 +836,12 @@ export function StampInfo(
             </div>
 
             <div className="flex flex-col items-end gap-2 shrink-0">
-              <PillContentCount
-                value={getIdentLabel()}
-                class="!static !text-color-neutral-500"
-              />
+              <PillWithTooltip label="STAMP TYPE" className="w-fit">
+                <PillContentCount
+                  value={getIdentLabel()}
+                  class="!static !text-color-neutral-500"
+                />
+              </PillWithTooltip>
 
               {!isSrc20Stamp() && (
                 <PillWithTooltip
@@ -889,23 +919,32 @@ export function StampInfo(
           </div>
 
           <div className="w-full min-w-0">
-            {collectionInfo?.collection_name && (
+            {collectionInfo?.collection_name &&
+              collectionInfo.collection_name.toLowerCase() !== "posh" && (
               <div className="w-fit">
                 <PillWithTooltip
                   label="COLLECTION"
                   className={`flex items-center gap-1.5 w-fit mt-5 px-3 py-1 ${container3}`}
                 >
-                  <Icon
-                    type="icon"
-                    name="artStamps"
-                    weight="bold"
-                    size="xs"
-                    color="grey"
-                    ariaLabel="Collection"
-                  />
-                  <span className="font-medium text-sm text-color-neutral-500">
-                    {collectionInfo.collection_name}
-                  </span>
+                  <a
+                    href={`/collection/${
+                      encodeURIComponent(collectionInfo.collection_name)
+                    }`}
+                    class="group flex items-center gap-1.5 no-underline"
+                  >
+                    <Icon
+                      type="icon"
+                      name="artStamps"
+                      weight="bold"
+                      size="xs"
+                      color="custom"
+                      className="stroke-color-neutral-500 fill-none [&_path[class*='fill-stroke']]:fill-color-neutral-500 group-hover:stroke-color-hover group-hover:[&_path[class*='fill-stroke']]:fill-color-hover transition-colors duration-200"
+                      ariaLabel="Collection"
+                    />
+                    <span className="font-medium text-sm text-color-neutral-500 group-hover:text-color-hover transition-colors duration-200">
+                      {collectionInfo.collection_name}
+                    </span>
+                  </a>
                 </PillWithTooltip>
               </div>
             )}
@@ -993,16 +1032,31 @@ export function StampInfo(
                       {dispensers?.length >= 2 && (
                         <div
                           class={container2Icon}
+                          onMouseEnter={handleListingsMouseEnter}
+                          onMouseLeave={handleListingsMouseLeave}
                         >
                           <Icon
                             type="iconButton"
-                            name="artStamps"
-                            weight="normal"
-                            size="xsR"
+                            name="listings"
+                            weight="bold"
+                            size="xxsR"
                             color="greyLight"
                             ariaLabel="Listings"
-                            onClick={() => setShowListings(!showListings)}
+                            onClick={() => {
+                              setShowListings(!showListings);
+                              setIsListingsTooltipVisible(false);
+                              setAllowListingsTooltip(false);
+                            }}
                           />
+                          <div
+                            className={`${tooltipIcon} ${
+                              isListingsTooltipVisible
+                                ? "opacity-100"
+                                : "opacity-0"
+                            }`}
+                          >
+                            LISTINGS
+                          </div>
                         </div>
                       )}
 

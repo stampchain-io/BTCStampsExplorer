@@ -303,7 +303,14 @@ export class CollectionRepository {
         return null;
       }
 
-      const row = result.rows[0];
+      // "posh" is a stamp classification (CPID naming), not a curatorial
+      // collection — skip it so a real collection can surface if present.
+      const row = result.rows.find(
+        (r) => r.collection_name.toLowerCase() !== "posh",
+      );
+      if (!row) {
+        return null;
+      }
       console.debug(
         `getCollectionByStamp: stamp=${stampNumber} -> collection="${row.collection_name}" (${row.collection_id})`,
       );

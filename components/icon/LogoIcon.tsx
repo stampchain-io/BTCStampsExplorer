@@ -22,7 +22,7 @@
 
  */
 
-import { Icon } from "$icon";
+import { Icon, iconButtonPill } from "$icon";
 import type { ComponentChildren } from "preact";
 
 interface LogoIconProps {
@@ -50,9 +50,16 @@ export function LogoIcon({
       class={`inline-flex items-center gap-2 group ${className}`.trim()}
       {...(fPartial !== undefined ? { "f-partial": fPartial } : {})}
     >
-      <span aria-hidden="true">
+      <span
+        aria-hidden="true"
+        class={`inline-flex items-center ${iconButtonPill}`}
+      >
+        {
+          /* type="icon": iconButton would nest a second <a> inside this
+            link and the HTML parser would break the flex group on SSR. */
+        }
         <Icon
-          type="iconButton"
+          type="icon"
           name="stampchain"
           weight="bold"
           size="smR"
