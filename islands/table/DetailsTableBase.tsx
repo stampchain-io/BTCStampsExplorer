@@ -343,7 +343,7 @@ export default function DetailsTableBase({
       {/* ===== TITLE ===== */}
       {title && (
         <div class="relative">
-          <h4 class={`-mt-2 ${subtitlePrimary}`}>{title}</h4>
+          <h4 class={`-mt-1.5 ${subtitlePrimary}`}>{title}</h4>
           {selectedTab !== "info" && <PillContentCount value={countPill} />}
         </div>
       )}

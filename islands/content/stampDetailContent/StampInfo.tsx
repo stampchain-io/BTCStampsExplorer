@@ -4,14 +4,11 @@ import { Icon, UserProfileIcon } from "$icon";
 import BuyStampModal from "$islands/modal/BuyStampModal.tsx";
 import { openModal } from "$islands/modal/states.ts";
 import {
-  body,
-  container2,
   container2Icon,
   container3,
-  containerBackground,
-  containerGap,
   containerPill,
   PillContentCount,
+  StatItem,
   StatPrice,
 } from "$layout";
 import type { Src101Detail } from "$lib/types/src101.d.ts";
@@ -30,12 +27,11 @@ import {
 import { tooltipButton, tooltipIcon } from "$notification";
 import { Dispenser, StampListingsOpenTable } from "$table";
 import {
-  cardFileSize,
-  cardFileType,
   cardSupply,
   subtitlePrimary,
   titlePrimary,
   truncate,
+  valueDarkLg,
 } from "$text";
 import type { ComponentChildren } from "preact";
 import { useEffect, useRef, useState } from "preact/hooks";
@@ -83,6 +79,14 @@ interface StampInfoProps {
   stamp: StampRow;
   lowestPriceDispenser: any;
   btcPriceUSD?: number;
+  collectionInfo?:
+    | {
+      collection_id: string;
+      collection_name: string;
+      collection_description: string;
+    }
+    | null
+    | undefined;
 }
 
 interface DimensionsType {
@@ -93,7 +97,7 @@ interface DimensionsType {
 
 /* ===== COMPONENT ===== */
 export function StampInfo(
-  { stamp, lowestPriceDispenser, btcPriceUSD }: StampInfoProps,
+  { stamp, lowestPriceDispenser, btcPriceUSD, collectionInfo }: StampInfoProps,
 ) {
   /* ===== STATE ===== */
   const [fee, setFee] = useState<number>(0);
@@ -152,6 +156,9 @@ export function StampInfo(
   const fileExtension = stamp.stamp_url?.split(".")?.pop()?.toUpperCase() ||
     "UNKNOWN";
 
+  const creatorDisplaySm = stamp.creator_name
+    ? stamp.creator_name
+    : abbreviateAddress(stamp.creator, 7);
   const creatorDisplay = stamp.creator_name
     ? stamp.creator_name
     : abbreviateAddress(stamp.creator, 12);
@@ -682,10 +689,8 @@ export function StampInfo(
   /* ===== RENDER ===== */
   return (
     <>
-      <div className={`${body} ${containerGap}`}>
-        <div
-          className={containerBackground}
-        >
+      <div className="h-full">
+        <div className="flex flex-col h-full">
           <div className="flex justify-between items-start gap-3">
             <div className="min-w-0 flex-1">
               <h2
@@ -712,11 +717,10 @@ export function StampInfo(
                       <span className="font-black">{stamp.stamp}</span>
                     </>
                   )
-                  : (isPoshStamp(stamp.cpid) ||
-                      (htmlStampTitle && stamp.stamp_mimetype === "text/html"))
+                  : isPoshStamp(stamp.cpid)
                   ? (
                     <span className="font-black uppercase text-ellipsis overflow-hidden">
-                      {isPoshStamp(stamp.cpid) ? stamp.cpid : htmlStampTitle}
+                      {stamp.cpid}
                     </span>
                   )
                   : (
@@ -726,94 +730,99 @@ export function StampInfo(
                     </>
                   )}
               </h2>
-            </div>
 
-            <PillContentCount
-              value={getIdentLabel()}
-              class="!static shrink-0"
-            />
-          </div>
+              {isSrc20Stamp() && stamp.cpid && (
+                <h6 className={`${subtitlePrimary} -mt-1 pb-1 block`}>
+                  {stamp.cpid}
+                </h6>
+              )}
 
-          <div className="w-full min-w-0">
-            {isSrc20Stamp() && stamp.cpid && (
-              <h6 className={`${subtitlePrimary} -mt-1 pb-1 block`}>
-                {stamp.cpid}
-              </h6>
-            )}
+              {(!isSrc20Stamp() && isPoshStamp(stamp.cpid)) && (
+                <h5 className={`${subtitlePrimary} -mt-1.5 block`}>
+                  #{stamp.stamp}
+                </h5>
+              )}
 
-            <h5 className="-mt-1.5 font-mono font-light text-xl text-color-neutral-500 block">
-              {(!isSrc20Stamp() && (isPoshStamp(stamp.cpid) ||
-                (htmlStampTitle && stamp.stamp_mimetype === "text/html"))) &&
-                (
-                  <>
-                    #{stamp.stamp}
-                  </>
-                )}
-            </h5>
-
-            {(!isPoshStamp(stamp.cpid) && stamp.cpid) && (
-              <h6 className={`${subtitlePrimary} block min-w-0`}>
-                <span className="inline-flex max-w-full flex-row-reverse items-center gap-3 min-w-0">
-                  <span
-                    ref={cpidCopyButtonRef}
-                    className="relative peer -translate-y-[1px] shrink-0"
-                    onMouseEnter={handleCpidCopyMouseEnter}
-                    onMouseLeave={handleCpidCopyMouseLeave}
-                  >
-                    <Icon
-                      type="iconButton"
-                      name="copy"
-                      weight="normal"
-                      size="xxs"
-                      color="grey"
-                      onClick={copyCpid}
-                    />
-                    <div
-                      className={`${tooltipIcon} ${
-                        isCpidTooltipVisible ? "opacity-100" : "opacity-0"
-                      }`}
+              {(!isPoshStamp(stamp.cpid) && stamp.cpid) && (
+                <h6 className={`${subtitlePrimary} -mt-1.5 block min-w-0`}>
+                  <span className="inline-flex max-w-full flex-row-reverse items-center gap-3 min-w-0">
+                    <span
+                      ref={cpidCopyButtonRef}
+                      className="relative peer -translate-y-[1px] shrink-0"
+                      onMouseEnter={handleCpidCopyMouseEnter}
+                      onMouseLeave={handleCpidCopyMouseLeave}
                     >
-                      COPY CPID
-                    </div>
-                    <div
-                      className={`${tooltipIcon} ${
-                        showCpidCopied ? "opacity-100" : "opacity-0"
-                      }`}
+                      <Icon
+                        type="iconButton"
+                        name="copy"
+                        weight="normal"
+                        size="xxs"
+                        color="grey"
+                        onClick={copyCpid}
+                      />
+                      <div
+                        className={`${tooltipIcon} ${
+                          isCpidTooltipVisible ? "opacity-100" : "opacity-0"
+                        }`}
+                      >
+                        COPY CPID
+                      </div>
+                      <div
+                        className={`${tooltipIcon} ${
+                          showCpidCopied ? "opacity-100" : "opacity-0"
+                        }`}
+                      >
+                        CPID COPIED
+                      </div>
+                    </span>
+                    <span
+                      className={`${truncate} peer-hover:text-color-hover transition-colors duration-200 min-w-0`}
                     >
-                      CPID COPIED
-                    </div>
+                      {stamp.cpid}
+                    </span>
                   </span>
-                  <span
-                    className={`${truncate} peer-hover:text-color-hover transition-colors duration-200 min-w-0`}
-                  >
-                    {stamp.cpid}
+                </h6>
+              )}
+
+              {(!isSrc20Stamp() && !isPoshStamp(stamp.cpid) && htmlStampTitle &&
+                stamp.stamp_mimetype === "text/html") && (
+                <h6 className={`${valueDarkLg} -mt-2 mb-1 block`}>
+                  {htmlStampTitle}
+                </h6>
+              )}
+
+              <UserProfileIcon
+                size="xs"
+                weight="bold"
+                className="stroke-color-neutral-200 translate-y-0.5"
+                wrapperClassName="mt-2"
+                link
+              >
+                <span className="font-normal text-sm text-color-neutral-200 link-neutral-200 group-hover:text-color-hover transition-colors duration-200">
+                  <span className="min-[420px]:hidden">{creatorDisplaySm}</span>
+                  <span className="hidden min-[420px]:inline">
+                    {creatorDisplay}
                   </span>
                 </span>
-              </h6>
-            )}
+              </UserProfileIcon>
+            </div>
 
-            <UserProfileIcon
-              size="xs"
-              weight="bold"
-              className="stroke-color-neutral-200 translate-y-0.5"
-              wrapperClassName="mt-2"
-              link
-            >
-              <span className="font-normal text-sm text-color-neutral-200 link-neutral-200 group-hover:text-color-hover transition-colors duration-200">
-                {creatorDisplay}
-              </span>
-            </UserProfileIcon>
+            <div className="flex flex-col items-end gap-2 shrink-0">
+              <PillContentCount
+                value={getIdentLabel()}
+                class="!static !text-color-neutral-500"
+              />
 
-            <div className="flex flex-wrap justify-between w-full min-[420px]:w-[270px] gap-2 mt-6">
               {!isSrc20Stamp() && (
                 <PillWithTooltip
-                  label="EDITION"
+                  label={stamp.supply === 1 ? "EDITION" : "EDITIONS"}
                   className={`${containerPill} ${cardSupply} !text-sm w-fit`}
                 >
                   {stamp.supply === 1 ? "1/1" : editionCount}
                 </PillWithTooltip>
               )}
-              <div className="flex items-center -mt-1 space-x-2">
+
+              <div className="flex items-center space-x-2">
                 {stamp.ident === "SRC-721" && (
                   <IconWithTooltip label="RECURSIVE">
                     <Icon
@@ -877,43 +886,63 @@ export function StampInfo(
                   )}
               </div>
             </div>
+          </div>
 
-            <div
-              className={`flex flex-col w-full min-[420px]:w-[270px] mt-5 ${container2} px-3 py-2 gap-2`}
-            >
-              <div className="flex flex-wrap justify-between gap-2">
+          <div className="w-full min-w-0">
+            {collectionInfo?.collection_name && (
+              <div className="w-fit">
                 <PillWithTooltip
-                  label="FILE TYPE"
-                  className={`${containerPill} ${cardFileType} w-fit`}
+                  label="COLLECTION"
+                  className={`flex items-center gap-1.5 w-fit mt-5 px-3 py-1 ${container3}`}
                 >
-                  {fileTypeValue}
-                </PillWithTooltip>
-                <PillWithTooltip
-                  label="FILE SIZE"
-                  className={`${containerPill} ${cardFileSize} !text-color-neutral-200 w-fit`}
-                >
-                  {fileSizeValue}
-                </PillWithTooltip>
-                <PillWithTooltip
-                  label="DIMENSIONS"
-                  className={`${containerPill} ${cardFileSize} !text-color-neutral-200 w-fit`}
-                >
-                  {dimensionsValue}
+                  <Icon
+                    type="icon"
+                    name="artStamps"
+                    weight="bold"
+                    size="xs"
+                    color="grey"
+                    ariaLabel="Collection"
+                  />
+                  <span className="font-medium text-sm text-color-neutral-500">
+                    {collectionInfo.collection_name}
+                  </span>
                 </PillWithTooltip>
               </div>
+            )}
+          </div>
 
-              <div className="flex flex-wrap justify-between gap-2 mt-2">
-                <PillWithTooltip
+          <div className="flex flex-col mobileMd:flex-row mobileMd:justify-between mobileMd:items-end gap-3 mt-auto -mb-1.5">
+            <div
+              className={`flex flex-col w-full mobileMd:w-[310px] mobileMd:shrink-0 mt-10 gap-1`}
+            >
+              <div className="flex justify-between mobileMd:flex-wrap w-full gap-5">
+                <StatItem
+                  label="FILE TYPE"
+                  value={fileTypeValue}
+                  align="left"
+                />
+                <StatItem
+                  label="FILE SIZE"
+                  value={fileSizeValue}
+                  align="center"
+                />
+                <StatItem
+                  label="DIMENSIONS"
+                  value={dimensionsValue}
+                  align="right"
+                  valueClass="!text-color-neutral-400"
+                />
+              </div>
+
+              <div className="flex justify-between mobileMd:flex-wrap w-full gap-5 mt-2">
+                <StatItem
                   label="CREATED"
-                  className={`${containerPill} ${cardFileSize} w-fit`}
-                >
-                  {createdDate}
-                </PillWithTooltip>
-                <PillWithTooltip
-                  label="TRANSACTION HASH"
-                  className={`${containerPill} ${cardFileSize} w-fit`}
-                >
-                  {stamp.tx_hash !== null
+                  value={createdDate}
+                  valueClass="!text-color-neutral-400"
+                />
+                <StatItem
+                  label="TX HASH"
+                  value={stamp.tx_hash !== null
                     ? (
                       <a
                         href={`https://www.blockchain.com/explorer/transactions/btc/${stamp.tx_hash}`}
@@ -925,91 +954,100 @@ export function StampInfo(
                       </a>
                     )
                     : "N/A"}
-                </PillWithTooltip>
+                  align="right"
+                />
               </div>
             </div>
-          </div>
-          {(dispensers?.length > 0 || !!lowestPriceDispenser)
-            ? (
-              <div className="flex flex-col w-full mt-7.5">
-                <div
-                  className={`flex flex-col items-start tablet:items-end w-fit ml-auto px-3 py-2.5 mb-3 ${container3}`}
-                >
-                  <StatPrice
-                    priceBTC={formatBTCAmount(
-                      typeof displayPrice === "number" ? displayPrice : 0,
-                      {
-                        excludeSuffix: true,
-                        decimals: 8,
-                        stripZeros: false,
-                      },
-                    )}
-                    priceUSD={displayPriceUSD != null
-                      ? displayPriceUSD.toLocaleString("en-US", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })
-                      : null}
-                    activityLevel={activityLevel}
-                    align="right"
-                  />
-                </div>
 
-                <div className="flex items-center justify-end gap-5">
-                  {dispensers?.length >= 2 && (
+            {(dispensers?.length > 0 || !!lowestPriceDispenser)
+              ? (
+                <div className="flex flex-col w-full mobileMd:min-w-0 mobileMd:flex-1">
+                  <div className="flex w-full mt-0.5 mb-5 mobileMd:hidden">
+                    <hr className="w-full border-color-neutral-800 border-t-1" />
+                  </div>
+                  <div className="flex flex-row mobileMd:flex-col justify-between mobileMd:justify-end items-end gap-3 min-w-0">
                     <div
-                      class={container2Icon}
+                      className={`flex flex-col items-start tablet:items-end w-fit px-3 py-2.5 ${container3}`}
                     >
-                      <Icon
-                        type="iconButton"
-                        name="artStamps"
-                        weight="normal"
-                        size="xsR"
-                        color="greyLight"
-                        ariaLabel="Listings"
-                        onClick={() => setShowListings(!showListings)}
+                      <StatPrice
+                        priceBTC={formatBTCAmount(
+                          typeof displayPrice === "number" ? displayPrice : 0,
+                          {
+                            excludeSuffix: true,
+                            decimals: 8,
+                            stripZeros: false,
+                          },
+                        )}
+                        priceUSD={displayPriceUSD != null
+                          ? displayPriceUSD.toLocaleString("en-US", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })
+                          : null}
+                        activityLevel={activityLevel}
+                        align="right"
                       />
                     </div>
-                  )}
 
-                  <Button
-                    variant="flat"
-                    color="primary"
-                    size="smR"
-                    onClick={() =>
-                      toggleModal(selectedDispenser || lowestPriceDispenser)}
-                  >
-                    BUY
-                  </Button>
-                </div>
+                    <div className="flex items-center justify-end gap-5">
+                      {dispensers?.length >= 2 && (
+                        <div
+                          class={container2Icon}
+                        >
+                          <Icon
+                            type="iconButton"
+                            name="artStamps"
+                            weight="normal"
+                            size="xsR"
+                            color="greyLight"
+                            ariaLabel="Listings"
+                            onClick={() => setShowListings(!showListings)}
+                          />
+                        </div>
+                      )}
 
-                {(dispensers?.length >= 2)
-                  ? (
-                    <div
-                      className={`overflow-hidden transition-all duration-500 ease-in-out
-                      ${
-                        showListings
-                          ? "max-h-[222px] mt-3 opacity-100"
-                          : "max-h-0 opacity-0"
-                      }`}
-                    >
-                      <div className="w-full mb-4">
-                        {isLoadingDispensers
-                          ? <h6>LOADING</h6>
-                          : (
-                            <StampListingsOpenTable
-                              dispensers={dispensers}
-                              onSelectDispenser={handleDispenserSelect}
-                              selectedDispenser={selectedDispenser}
-                            />
+                      <Button
+                        variant="flat"
+                        color="primary"
+                        size="smR"
+                        onClick={() =>
+                          toggleModal(
+                            selectedDispenser || lowestPriceDispenser,
                           )}
-                      </div>
+                      >
+                        BUY
+                      </Button>
                     </div>
-                  )
-                  : null}
-              </div>
-            )
-            : null}
+                  </div>
+
+                  {(dispensers?.length >= 2)
+                    ? (
+                      <div
+                        className={`overflow-hidden transition-all duration-500 ease-in-out
+                      ${
+                          showListings
+                            ? "max-h-[222px] mt-3 opacity-100"
+                            : "max-h-0 opacity-0"
+                        }`}
+                      >
+                        <div className="w-full mb-4">
+                          {isLoadingDispensers
+                            ? <h6>LOADING</h6>
+                            : (
+                              <StampListingsOpenTable
+                                dispensers={dispensers}
+                                onSelectDispenser={handleDispenserSelect}
+                                selectedDispenser={selectedDispenser}
+                              />
+                            )}
+                        </div>
+                      </div>
+                    )
+                    : null}
+                </div>
+              )
+              : null}
+          </div>
         </div>
       </div>
     </>

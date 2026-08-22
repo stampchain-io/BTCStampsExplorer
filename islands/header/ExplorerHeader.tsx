@@ -76,7 +76,7 @@ export const ExplorerHeader = (
     <div class="flex flex-col w-full gap-1.5">
       <div class="relative flex flex-row justify-between items-start w-full">
         {/* Title Section */}
-        <h1 class={`-mt-2 ${titlePrimary}`}>EXPLORER</h1>
+        <h1 class={titlePrimary}>EXPLORER</h1>
         <PillContentCount value={countPill} />
       </div>
 

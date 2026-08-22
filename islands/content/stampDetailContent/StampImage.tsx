@@ -8,8 +8,8 @@ import PreviewImageModal from "$islands/modal/PreviewImageModal.tsx";
 import { openModal } from "$islands/modal/states.ts";
 import {
   body,
-  container1,
   container2,
+  container3,
   containerDetailImage,
   containerGap,
 } from "$layout";
@@ -312,8 +312,9 @@ function RightPanel(
   /* ===== RENDER ===== */
   return (
     <div
-      className={`${container1} tablet:${container2} pt-0.5 pb-[1px] px-4 flex justify-between
-        tablet:absolute tablet:inset-x-2 tablet:bottom-2 tablet:z-10
+      className={`flex justify-between !rounded-full
+        ${container2} pt-0.5 pb-[1px] px-0.5 tablet:${container3}
+        tablet:absolute tablet:inset-x-0 tablet:bottom-0 tablet:z-10
         tablet:opacity-0 tablet:translate-y-3 tablet:pointer-events-none
         tablet:transition-all tablet:duration-300 tablet:ease-out
         tablet:group-hover/panel:opacity-100 tablet:group-hover/panel:translate-y-0
@@ -791,7 +792,7 @@ export function StampImage(
   return (
     <>
       {(!src || isUnrenderable) && (
-        <div className={`${container1} p-0.5`}>
+        <div className={`${container2} p-0.5`}>
           <PlaceholderImage variant={isUnrenderable ? "error" : "no-image"} />
         </div>
       )}

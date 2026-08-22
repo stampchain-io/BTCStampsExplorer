@@ -4,7 +4,7 @@
 /* ===== BASE STYLES ===== */
 const logoFont = "font-black italic tracking-wide";
 const titleFont =
-  "font-black text-3xl uppercase tracking-tight inline-block w-fit cursor-default";
+  "font-black text-3xl uppercase tracking-tight -mt-1.5 inline-block w-fit cursor-default";
 const subtitleFont = "font-light text-2xl uppercase mb-2 cursor-default";
 const textFont = "font-normal text-color-neutral-200";
 const labelFont = "font-light text-color-neutral-500 tracking-wide";
@@ -171,6 +171,8 @@ export const valueDarkSm =
   `font-normal text-sm text-color-neutral-500 ${select}`; // used for tables and addy styling in wallet button
 export const valueDark =
   `font-semibold text-base text-color-neutral-500 ${select}`; // used in stamp details CPID and stamp number
+export const valueDarkLg =
+  `font-semibold text-lg text-color-neutral-500 ${select}`; // used in stamp details html title
 // Color variants
 export const valuePositive = `text-color-green-400`;
 export const valueNegative = `text-color-red-400`;

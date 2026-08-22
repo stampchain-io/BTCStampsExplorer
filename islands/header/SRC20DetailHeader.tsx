@@ -127,7 +127,7 @@ export function SRC20DetailHeader({
       </div>
       {/* Token name */}
       <div class="flex">
-        <h1 class={`pt-1 ${titlePrimary} uppercase`}>
+        <h1 class={`mt-1 ${titlePrimary} uppercase`}>
           {tickValue}
         </h1>
       </div>
@@ -233,7 +233,7 @@ export function SRC20DetailHeader({
                     : (
                       <>
                         {pricePill}
-                        <div class="hidden min-[460px]:block">
+                        <div class="hidden min-[460px]:block mr-2.5">
                           {changePill}
                         </div>
                       </>
@@ -243,7 +243,7 @@ export function SRC20DetailHeader({
             </div>
 
             {/* Row 2: (volume + market cap + supply ... change pill) or (holders + supply + limit ... mint button) */}
-            <div class="flex items-center px-5">
+            <div class="flex items-center pb-1.5 px-5">
               {isMinting
                 ? (
                   <>

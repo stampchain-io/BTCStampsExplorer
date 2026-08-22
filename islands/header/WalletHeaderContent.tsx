@@ -86,7 +86,7 @@ export const WalletHeaderContent = (
   return (
     <div class="flex flex-col w-full gap-1.5">
       <div class="relative flex flex-row justify-between items-start w-full -mb-2">
-        <h2 class={`-mt-2 ${subtitlePrimary}`}>PORTFOLIO</h2>
+        <h2 class={`-mt-1.5 ${subtitlePrimary}`}>PORTFOLIO</h2>
         <PillContentCount value={countPill} />
       </div>
 

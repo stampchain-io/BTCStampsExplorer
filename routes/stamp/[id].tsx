@@ -426,27 +426,30 @@ export default function StampDetailPage(props: StampDetailPageProps) {
       </Head>
 
       <div class={`${body} ${containerGap}`}>
-        <div
-          class={`flex flex-col min-[900px]:flex-row ${containerGap}`}
-        >
-          <div class="w-full min-w-0 min-[900px]:w-[35%] tablet:w-[30%] desktop:w-[25%]">
-            {stamp &&
-              (
-                <StampImage
-                  stamp={stamp}
-                  flag
-                />
-              )}
-          </div>
-          <div class="w-full min-w-0 min-[900px]:w-[65%] tablet:w-[70%] desktop:w-75%]">
-            {stamp &&
-              (
-                <StampInfo
-                  stamp={stamp}
-                  lowestPriceDispenser={lowestPriceDispenser}
-                  {...(btcPriceUSD !== undefined ? { btcPriceUSD } : {})}
-                />
-              )}
+        <div class={containerBackground}>
+          <div
+            class={`flex flex-col min-[900px]:flex-row gap-x-7.5 gap-y-5`}
+          >
+            <div class="w-full min-w-0 min-[900px]:w-[38%] tablet:w-[33%] desktop:w-[26%]">
+              {stamp &&
+                (
+                  <StampImage
+                    stamp={stamp}
+                    flag
+                  />
+                )}
+            </div>
+            <div class="w-full min-w-0 min-[900px]:w-[62%] tablet:w-[67%] desktop:w-[74%]">
+              {stamp &&
+                (
+                  <StampInfo
+                    stamp={stamp}
+                    lowestPriceDispenser={lowestPriceDispenser}
+                    collectionInfo={collectionInfo}
+                    {...(btcPriceUSD !== undefined ? { btcPriceUSD } : {})}
+                  />
+                )}
+            </div>
           </div>
         </div>
 
