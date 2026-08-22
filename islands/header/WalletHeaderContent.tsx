@@ -2,11 +2,12 @@
 import { SelectorButtons } from "$button";
 import { SortButton } from "$islands/button/SortButton.tsx";
 import { ViewButton } from "$islands/button/ViewButton.tsx";
-import { container2Icon, ScrollFadeRow } from "$layout";
+import { container2Icon, PillContentCount, ScrollFadeRow } from "$layout";
 import {
   getCurrentPathname,
   safeNavigate,
 } from "$lib/utils/navigation/freshNavigationUtils.ts";
+import { formatNumberWithCommas } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { subtitlePrimary } from "$text";
 import type { WalletHeaderContentProps } from "$types/ui.d.ts";
 
@@ -16,6 +17,8 @@ export const WalletHeaderContent = (
     section = "all",
     tab = "balance",
     viewMode = "cardVertical",
+    stampsTotal = 0,
+    tokensTotal = 0,
   }: WalletHeaderContentProps,
 ) => {
   /* ===== EVENT HANDLERS ===== */
@@ -69,11 +72,22 @@ export const WalletHeaderContent = (
       { value: "created", label: "CREATED" },
     ];
 
+  /* ===== COUNT PILL =====
+   * Reflects only the currently active section + sub-tab combo - "all"
+   * combines both panels' totals (both are always fetched together in
+   * that mode, so no extra query is needed). */
+  const countPill = section === "stamps"
+    ? formatNumberWithCommas(stampsTotal)
+    : section === "tokens"
+    ? formatNumberWithCommas(tokensTotal)
+    : formatNumberWithCommas(stampsTotal + tokensTotal);
+
   /* ===== RENDER ===== */
   return (
-    <div class="relative flex flex-col w-full gap-1.5">
-      <div class="flex flex-row justify-between items-start w-full -mb-2">
-        <h2 class={subtitlePrimary}>PORTFOLIO</h2>
+    <div class="flex flex-col w-full gap-1.5">
+      <div class="relative flex flex-row justify-between items-start w-full -mb-2">
+        <h2 class={`-mt-2 ${subtitlePrimary}`}>PORTFOLIO</h2>
+        <PillContentCount value={countPill} />
       </div>
 
       {/* Section Selector + Sub-tab Selector + View/Sort Controls */}

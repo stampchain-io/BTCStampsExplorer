@@ -127,7 +127,7 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
   /* ===== RENDER ===== */
   return (
     <div class="flex flex-col w-full">
-      <h1 class={titlePrimary}>WALLET</h1>
+      <h1 class={`-mt-2 ${titlePrimary}`}>WALLET</h1>
       <div class="flex items-center gap-3">
         <h2 class={`${subtitlePrimary} truncate max-w-[97%]`}>
           {displayName}

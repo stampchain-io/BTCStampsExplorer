@@ -54,7 +54,7 @@ import type {
 } from "$types/services.d.ts";
 import type { SortDirection, SortKey, SortMetrics } from "$types/sorting.d.ts";
 import type { ScriptType, SRC20_TYPES, SRC20Row } from "$types/src20.d.ts";
-import type { StampRow } from "$types/stamp.d.ts";
+import type { Collection, StampRow } from "$types/stamp.d.ts";
 import type {
   SRC20Transaction,
   StampTransaction,
@@ -2236,6 +2236,10 @@ export interface ExplorerContentProps extends BaseComponentProps {
 export interface ExplorerHeaderProps extends BaseComponentProps {
   currentSection?: "all" | "stamps" | "tokens";
   viewMode?: "cardVertical" | "cardSquare" | "cardRow";
+  // Counts for the section-selector's PillContentCount badge — combined
+  // for "all", stamps-only for "stamps", tokens-only for "tokens"
+  stampsTotal?: number;
+  tokensTotal?: number;
 }
 
 /**
@@ -2273,6 +2277,10 @@ export interface WalletHeaderContentProps extends BaseComponentProps {
   section?: WalletContentTabId;
   tab?: WalletContentTabIdSub;
   viewMode?: "cardVertical" | "cardSquare" | "cardRow" | "cardHorizontal";
+  // Totals for the currently active section/tab combo - used by the count
+  // pill (stampsPagination.total / tokensPagination.total from the route)
+  stampsTotal?: number;
+  tokensTotal?: number;
 }
 
 /**
@@ -3209,6 +3217,9 @@ export type MarketplaceHeaderProps = {
   currentFilters?: ExplorerStampFilters;
   viewMode?: "cardVertical" | "cardSquare" | "cardRow";
   isSalesMode?: boolean;
+  // Total count for the current market mode + stamp-type combo - used by
+  // the count pill
+  currentTotal?: number;
 };
 
 /**
@@ -3225,6 +3236,20 @@ export interface MarketplaceContentProps {
   };
   fromPage?: string;
   viewMode?: "cardVertical" | "cardSquare" | "cardRow" | "cardHorizontal";
+}
+
+/**
+ * CollectionOverviewContentProps - Props for the CollectionOverviewContent
+ * island (collection landing/overview page)
+ */
+export interface CollectionOverviewContentProps {
+  collections?: Collection[];
+  pagination?: {
+    page: number;
+    totalPages: number;
+    onPageChange?: (newPage: number) => void;
+    prefix?: string;
+  };
 }
 
 /**
@@ -3594,6 +3619,8 @@ export interface SRC20OverviewHeaderProps {
   timeframe?: string;
   sortBy?: string;
   sortDirection?: string;
+  // Total count for the current minted/minting view - used by the count pill
+  currentTotal?: number;
 }
 
 /**

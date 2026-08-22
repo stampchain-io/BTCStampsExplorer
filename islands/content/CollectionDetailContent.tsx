@@ -2,7 +2,7 @@
 import { SelectorButtons } from "$button";
 import { StampCard } from "$card";
 import { SortButton } from "$islands/button/SortButton.tsx";
-import { container2Icon, containerPillCount, EmptyState } from "$layout";
+import { container2Icon, EmptyState, PillContentCount } from "$layout";
 import {
   getCurrentPathname,
   safeNavigate,
@@ -37,12 +37,7 @@ export const CollectionDetailContent = (
     ? formatNumberWithCommas(totalEditions)
     : "N/A";
   const countPill = market === "listings"
-    ? (
-      <>
-        {listedStamps !== null ? formatNumberWithCommas(listedStamps) : "N/A"}
-        <span class="ml-1.5 text-color-neutral-600">LISTINGS</span>
-      </>
-    )
+    ? (listedStamps !== null ? formatNumberWithCommas(listedStamps) : "N/A")
     : totalStamps !== totalEditions
     ? (
       <>
@@ -50,12 +45,7 @@ export const CollectionDetailContent = (
         <span class="ml-1.5 text-color-neutral-600">/ {editionsValue}</span>
       </>
     )
-    : (
-      <>
-        {stampsValue}
-        <span class="ml-1.5 text-color-neutral-600">STAMPS</span>
-      </>
-    );
+    : stampsValue;
 
   /* ===== EVENT HANDLERS ===== */
   // Same "market=listings" filter as /marketplace - re-navigates through the
@@ -81,13 +71,9 @@ export const CollectionDetailContent = (
 
   return (
     <div data-name="stamps" class="relative">
-      <div
-        class={`absolute -top-2 right-0 ${containerPillCount}`}
-      >
-        {countPill}
-      </div>
+      <PillContentCount value={countPill} />
 
-      <div class={`flex ${subtitlePrimary} -mt-2`}>
+      <div class={`flex -mt-2 ${subtitlePrimary}`}>
         COLLECTION
       </div>
 

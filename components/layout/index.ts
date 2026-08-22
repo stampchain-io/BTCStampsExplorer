@@ -34,5 +34,8 @@ export * from "$components/layout/ModalSearchBase.tsx";
 /* ===== STAT DISPLAY STYLES ===== */
 export * from "$components/layout/StatStyles.tsx";
 
+/* ===== PILL CONTENT COUNT ===== */
+export * from "$components/layout/PillContentCount.tsx";
+
 /* ===== EMPTY STATE ===== */
 export * from "$components/layout/EmptyState.tsx";

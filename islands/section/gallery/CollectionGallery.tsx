@@ -1,7 +1,7 @@
 /* ===== COLLECTION GALLERY COMPONENT ===== */
 /* @baba - not updated */
 import { PaginationButtons, ViewAllButton } from "$button";
-import { CollectionCard } from "$card";
+import { CollectionCardHorizontal } from "$card";
 import { BREAKPOINTS } from "$constants";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
 import { subtitleNeutral, titleNeutral } from "$text";
@@ -40,22 +40,10 @@ export default function CollectionGallery({
   viewAllHref,
 }: CollectionGalleryProps) {
   const { width } = useWindowSize();
-  // TODO(@baba): temporary filter - hide collections with no stamps and
-  // known test/placeholder collections until backend excludes them
-  const HIDDEN_COLLECTION_NAMES = [
-    "testtt",
-    "valtius",
-    "posh",
-    "hnft pepe cash",
-    "alpha_pxllabs",
-  ];
-  const collectionArray = (Array.isArray(collections) ? collections : [])
-    .filter((collection) => (collection.stamp_count ?? 0) > 0)
-    .filter((collection) =>
-      !HIDDEN_COLLECTION_NAMES.includes(
-        (collection.collection_name ?? "").toLowerCase(),
-      )
-    );
+  // Empty-collection and known test/placeholder name filtering is enforced
+  // server-side (CollectionRepository) so this list always matches the
+  // overview page's total count pill.
+  const collectionArray = Array.isArray(collections) ? collections : [];
   const [displayCount, setDisplayCount] = useState(collectionArray.length);
 
   /* ===== EVENT HANDLERS ===== */
@@ -122,7 +110,7 @@ export default function CollectionGallery({
         {collectionArray.slice(0, displayCount).map((
           collection: Collection,
         ) => (
-          <CollectionCard
+          <CollectionCardHorizontal
             key={collection.collection_id}
             collection={collection}
           />

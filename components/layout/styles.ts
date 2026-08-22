@@ -36,6 +36,14 @@ export const container2Hover =
   `${container2} hover:border-color-hover ${transitionColors}`;
 export const container2Icon =
   `relative flex items-center justify-between ${container2} rounded-full p-0.5 gap-1.5 tablet:gap-1`;
+// Pill styles
+export const containerPill = `flex items-center
+ px-2.5 py-1 rounded-full
+  bg-gradient-to-b from-color-neutral-700/80 via-color-neutral-800/90 to-color-neutral-800 select-none`; // do not add cursor-pointer here
+export const containerPillCount = `flex items-center
+ px-2.5 py-1 rounded-full border border-color-neutral-800
+ bg-gradient-to-b from-color-neutral-800/40 via-color-neutral-900/60 to-neutral-900/80
+ font-normal text-xs text-color-primary-400 cursor-default`;
 // Card container styles - used for all cards
 export const containerCard = `group relative z-0 flex flex-col
  w-full h-full p-1 ${container2Hover}
@@ -44,13 +52,6 @@ ${shadowGlowPurple} ${transitionColors}`;
 export const container3 =
   `bg-gradient-to-b from-color-neutral-800/80 via-color-neutral-900/90 to-color-neutral-900
  border border-color-neutral-800 rounded-xl cursor-default select-none`;
-export const containerPill = `flex items-center
- px-2.5 py-1 rounded-full
-  bg-gradient-to-b from-color-neutral-700/80 via-color-neutral-800/90 to-color-neutral-800 select-none`; // do not add cursor-pointer here
-export const containerPillCount = `flex items-center
- px-3 py-1 rounded-full border border-color-neutral-700
- bg-gradient-to-b from-color-neutral-800/40 via-color-neutral-900/60 to-neutral-900/80
- font-normal text-xs text-color-neutral-500 cursor-default`;
 
 /* ===== BODY STYLES ===== */
 // Main body styles

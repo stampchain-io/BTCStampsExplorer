@@ -377,7 +377,13 @@ export default function WalletContent({
   /* ===== RENDER ===== */
   return (
     <div id="wallet-content-section" class={containerBackground}>
-      <WalletHeaderContent section={section} tab={tab} viewMode={view} />
+      <WalletHeaderContent
+        section={section}
+        tab={tab}
+        viewMode={view}
+        stampsTotal={stampsPagination?.total}
+        tokensTotal={tokensPagination?.total}
+      />
       <div class={`w-full ${view !== "cardRow" ? "pt-5" : "pt-2"}`}>
         {section === "all"
           ? (

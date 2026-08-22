@@ -1,7 +1,13 @@
 /* ===== DETAILS TABLE COMPONENT ===== */
 import { SelectorButtons } from "$button";
 import { SRC20DetailInfo } from "$islands/header/index.ts";
-import { containerBackground, ScrollContainer, ScrollFadeRow } from "$layout";
+import {
+  containerBackground,
+  PillContentCount,
+  ScrollContainer,
+  ScrollFadeRow,
+} from "$layout";
+import { formatNumberWithCommas } from "$lib/utils/ui/formatting/formatUtils.ts";
 import {
   HoldersPieChart,
   HoldersTableBase,
@@ -319,22 +325,28 @@ export default function DetailsTableBase({
     }
   };
 
-  /* ===== PILL OPTIONS =====
-   * `count` is threaded through for future use (not yet rendered by
-   * SelectorButtons) so the badge data is ready when the UI is added. */
   const selectorOptions = configs.map(({ id }) => ({
     value: id,
     label: type ? getTabLabel(type, id) : id.toUpperCase(),
-    count: id === "holders"
-      ? holders.length
-      : totalCounts[id as keyof typeof totalCounts] || 0,
   }));
+
+  /* ===== COUNT PILL ===== */
+  // Reflects only the currently selected tab's own count.
+  const selectedTabCount = selectedTab === "holders"
+    ? holders.length
+    : totalCounts[selectedTab as keyof typeof totalCounts] || 0;
+  const countPill = formatNumberWithCommas(selectedTabCount);
 
   /* ===== RENDER ===== */
   return (
     <div class={containerBackground}>
       {/* ===== TITLE ===== */}
-      {title && <h4 class={subtitlePrimary}>{title}</h4>}
+      {title && (
+        <div class="relative">
+          <h4 class={`-mt-2 ${subtitlePrimary}`}>{title}</h4>
+          {selectedTab !== "info" && <PillContentCount value={countPill} />}
+        </div>
+      )}
       {/* ===== TABS SECTION ===== */}
       <div class="w-full mb-5">
         <ScrollFadeRow deps={[selectedTab, selectorOptions]}>

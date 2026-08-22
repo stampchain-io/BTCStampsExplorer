@@ -3,7 +3,6 @@ import { containerPill } from "$layout";
 import { tooltipButton } from "$notification";
 import type { ActivityLevelIndicatorProps } from "$types/ui.d.ts";
 import { VNode } from "preact";
-import { useRef, useState } from "preact/hooks";
 
 /**
  * Dot colors match ProgressiveEstimationIndicator's primary scale.
@@ -37,37 +36,14 @@ export function ActivityLevelIndicator({
   level,
   className = "",
 }: ActivityLevelIndicatorProps): VNode<any> | null {
-  const [isTooltipVisible, setIsTooltipVisible] = useState(false);
-  const tooltipTimeoutRef = useRef<number | null>(null);
-
   if (!level) return null;
-
-  const handleMouseEnter = () => {
-    if (tooltipTimeoutRef.current) {
-      globalThis.clearTimeout(tooltipTimeoutRef.current);
-    }
-    tooltipTimeoutRef.current = globalThis.setTimeout(() => {
-      setIsTooltipVisible(true);
-    }, 500);
-  };
-
-  const handleMouseLeave = () => {
-    if (tooltipTimeoutRef.current) {
-      globalThis.clearTimeout(tooltipTimeoutRef.current);
-    }
-    setIsTooltipVisible(false);
-  };
 
   const isCold = level === "COLD";
   const dots = DOTS_BY_LEVEL[level];
 
   return (
-    <div class={`relative w-fit ${className}`}>
-      <div
-        className={containerPill}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-      >
+    <div class={`relative w-fit group/pill ${className}`}>
+      <div className={containerPill}>
         {isCold
           ? (
             <span className="text-[10px] text-color-neutral-600 tracking-wide select-none">
@@ -89,9 +65,7 @@ export function ActivityLevelIndicator({
           )}
       </div>
       <div
-        className={`${tooltipButton} transition-opacity duration-150 ${
-          isTooltipVisible ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
+        className={`${tooltipButton} opacity-0 group-hover/pill:opacity-100 transition-opacity duration-150`}
       >
         {TOOLTIP_LABEL[level] ?? level}
       </div>

@@ -1,9 +1,10 @@
 /* ===== SRC20 HEADER COMPONENT ===== */
 import { SelectorButtons, TrendingButton } from "$button";
-import { container2Icon, ScrollFadeRow } from "$layout";
+import { container2Icon, PillContentCount, ScrollFadeRow } from "$layout";
 import {
   navigateWithFreshPartial,
 } from "$lib/utils/navigation/freshNavigationUtils.ts";
+import { formatNumberWithCommas } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { titlePrimary } from "$text";
 import type { SRC20OverviewHeaderProps } from "$types/ui.d.ts";
 import { useCallback } from "preact/hooks";
@@ -14,6 +15,7 @@ export const SRC20OverviewHeader = ({
   timeframe = "24H",
   sortBy = "TRENDING",
   sortDirection = "desc",
+  currentTotal = 0,
 }: SRC20OverviewHeaderProps) => {
   /* ===== NAVIGATION HANDLERS ===== */
   const handleViewTypeClick = useCallback((newViewType: string) => {
@@ -44,12 +46,17 @@ export const SRC20OverviewHeader = ({
     }, true);
   }, [sortBy, sortDirection, viewType, timeframe]);
 
+  /* ===== COUNT PILL ===== */
+  // Reflects only the currently active MINTED/MINTING view.
+  const countPill = formatNumberWithCommas(currentTotal);
+
   /* ===== RENDER ===== */
   return (
-    <div class="relative flex flex-col w-full gap-1.5">
-      <div class="flex flex-row justify-between items-start w-full">
+    <div class="flex flex-col w-full gap-1.5">
+      <div class="relative flex flex-row justify-between items-start w-full">
         {/* ===== TITLE ===== */}
-        <h1 class={`${titlePrimary} ml-1.5`}>SRC-20 TOKENS</h1>
+        <h1 class={`-mt-2 ${titlePrimary}`}>SRC-20 TOKENS</h1>
+        <PillContentCount value={countPill} />
       </div>
 
       {/* ===== MINTED/MINTING, TRENDING AND TIMEFRAME BUTTONS ===== */}

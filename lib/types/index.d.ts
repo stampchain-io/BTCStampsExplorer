@@ -486,8 +486,12 @@ export interface CollectionOverviewPageProps {
   page?: number;
   pages?: number;
   page_size?: number;
+  // Total collection count for the current editions filter - used by
+  // CollectionOverviewHeader's count pill
+  total?: number;
   filterBy?: string[];
   sortBy?: "ASC" | "DESC";
+  editionsFilter?: "single" | "multiple";
   error?: string;
 }
 

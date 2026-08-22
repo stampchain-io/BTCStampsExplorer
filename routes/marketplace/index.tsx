@@ -455,6 +455,7 @@ export function MarketplacePage(props: MarketplacePageProps) {
     stamps,
     page,
     totalPages,
+    pagination,
     sortBy: _sortBy,
     selectedTab,
     filters,
@@ -483,6 +484,7 @@ export function MarketplacePage(props: MarketplacePageProps) {
         currentFilters={filters as StampFilters}
         viewMode={cardView}
         isSalesMode={isSalesMode}
+        currentTotal={pagination?.total ?? 0}
       />
 
       {/* Main Content with Pagination */}

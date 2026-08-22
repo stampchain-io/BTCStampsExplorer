@@ -1,19 +1,80 @@
 /* ===== COLLECTION OVERVIEW HEADER COMPONENT ===== */
+import { SelectorButtons } from "$button";
 import { SortButton } from "$islands/button/SortButton.tsx";
-import { container2Icon } from "$layout";
+import { container2Icon, PillContentCount } from "$layout";
+import {
+  getCurrentPathname,
+  safeNavigate,
+} from "$lib/utils/navigation/freshNavigationUtils.ts";
+import { formatNumberWithCommas } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { titlePrimary } from "$text";
+import { useCallback } from "preact/hooks";
 
 /* ===== COMPONENT ===== */
 function CollectionOverviewHeader(
-  { sortBy = "ASC" }: { sortBy?: "ASC" | "DESC" },
+  {
+    sortBy = "ASC",
+    editionsFilter = "all",
+    total = 0,
+  }: {
+    sortBy?: "ASC" | "DESC";
+    editionsFilter?: "all" | "single" | "multiple";
+    total?: number;
+  },
 ) {
+  /* ===== EVENT HANDLERS ===== */
+  // Filters collections to those containing exclusively 1/1 (single edition)
+  // stamps, or those with at least one multi-edition stamp
+  const handleEditionsChange = useCallback((value: string) => {
+    if (typeof globalThis === "undefined" || !globalThis?.location) {
+      return;
+    }
+
+    const params = new URLSearchParams(globalThis.location.search);
+    if (value === "all") {
+      params.delete("editions");
+    } else {
+      params.set("editions", value);
+    }
+    params.set("page", "1");
+
+    const queryString = params.toString();
+    safeNavigate(
+      getCurrentPathname() + (queryString ? `?${queryString}` : ""),
+    );
+  }, []);
+
   return (
-    <div class="flex flex-row justify-between items-start w-full mb-2">
-      <h1 class={titlePrimary}>
-        COLLECTIONS
-      </h1>
-      <div class={container2Icon}>
-        <SortButton initSort={sortBy} />
+    <div class="flex flex-col w-full gap-1.5">
+      <div class="relative flex flex-row justify-between items-start w-full">
+        <h1 class={`-mt-2 ${titlePrimary}`}>
+          COLLECTIONS
+        </h1>
+        <PillContentCount value={formatNumberWithCommas(total)} />
+      </div>
+
+      <div class="flex flex-col mobileMd:flex-row justify-between mobileMd:items-center w-full">
+        {/* Editions Selector - Left */}
+        <div class="flex gap-3">
+          <SelectorButtons
+            options={[
+              { value: "all", label: "ALL" },
+              { value: "single", label: "1/1 EDITIONS" },
+              { value: "multiple", label: "MULTIPLE" },
+            ]}
+            value={editionsFilter}
+            onChange={handleEditionsChange}
+            size="xsR"
+            color="primary"
+          />
+        </div>
+
+        {/* Sort Control - Right */}
+        <div class="flex justify-end pt-3 mobileMd:pt-0">
+          <div class={container2Icon}>
+            <SortButton initSort={sortBy} />
+          </div>
+        </div>
       </div>
     </div>
   );

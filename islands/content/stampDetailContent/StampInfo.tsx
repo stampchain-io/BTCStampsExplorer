@@ -11,6 +11,7 @@ import {
   containerBackground,
   containerGap,
   containerPill,
+  PillContentCount,
   StatPrice,
 } from "$layout";
 import type { Src101Detail } from "$lib/types/src101.d.ts";
@@ -26,7 +27,7 @@ import {
   getSRC101Data,
   getStampImageSrc,
 } from "$lib/utils/ui/media/imageUtils.ts";
-import { tooltipIcon } from "$notification";
+import { tooltipButton, tooltipIcon } from "$notification";
 import { Dispenser, StampListingsOpenTable } from "$table";
 import {
   cardFileSize,
@@ -36,7 +37,46 @@ import {
   titlePrimary,
   truncate,
 } from "$text";
+import type { ComponentChildren } from "preact";
 import { useEffect, useRef, useState } from "preact/hooks";
+
+/* ===== TOOLTIP HELPERS ===== */
+function PillWithTooltip(
+  { label, className, children }: {
+    label: string;
+    className: string;
+    children: ComponentChildren;
+  },
+) {
+  return (
+    <div class="relative group/pill">
+      <div class={className}>{children}</div>
+      <div
+        class={`${tooltipButton} opacity-0 group-hover/pill:opacity-100 transition-opacity duration-150`}
+      >
+        {label}
+      </div>
+    </div>
+  );
+}
+
+function IconWithTooltip(
+  { label, children }: {
+    label: ComponentChildren;
+    children: ComponentChildren;
+  },
+) {
+  return (
+    <div class="relative group/icon">
+      {children}
+      <div
+        class={`${tooltipIcon} opacity-0 group-hover/icon:opacity-100`}
+      >
+        {label}
+      </div>
+    </div>
+  );
+}
 
 /* ===== TYPES ===== */
 interface StampInfoProps {
@@ -116,28 +156,6 @@ export function StampInfo(
     ? stamp.creator_name
     : abbreviateAddress(stamp.creator, 12);
 
-  const [isDivisibleTooltipVisible, setIsDivisibleTooltipVisible] = useState(
-    false,
-  );
-  const [isKeyburnTooltipVisible, setIsKeyburnTooltipVisible] = useState(false);
-  const [isLockedTooltipVisible, setIsLockedTooltipVisible] = useState(false);
-  const [isUnlockedTooltipVisible, setIsUnlockedTooltipVisible] = useState(
-    false,
-  );
-  const [isRecursiveTooltipVisible, setIsRecursiveTooltipVisible] = useState(
-    false,
-  );
-  const [allowDivisibleTooltip, setAllowDivisibleTooltip] = useState(true);
-  const [allowKeyburnTooltip, setAllowKeyburnTooltip] = useState(true);
-  const [allowLockedTooltip, setAllowLockedTooltip] = useState(true);
-  const [allowUnlockedTooltip, setAllowUnlockedTooltip] = useState(true);
-  const [allowRecursiveTooltip, setAllowRecursiveTooltip] = useState(true);
-  const divisibleTooltipTimeoutRef = useRef<number | null>(null);
-  const keyburnTooltipTimeoutRef = useRef<number | null>(null);
-  const lockedTooltipTimeoutRef = useRef<number | null>(null);
-  const unlockedTooltipTimeoutRef = useRef<number | null>(null);
-  const recursiveTooltipTimeoutRef = useRef<number | null>(null);
-
   /* ===== CPID COPY STATE ===== */
   const [showCpidCopied, setShowCpidCopied] = useState(false);
   const [isCpidTooltipVisible, setIsCpidTooltipVisible] = useState(false);
@@ -150,11 +168,6 @@ export function StampInfo(
   useEffect(() => {
     return () => {
       [
-        divisibleTooltipTimeoutRef,
-        keyburnTooltipTimeoutRef,
-        lockedTooltipTimeoutRef,
-        unlockedTooltipTimeoutRef,
-        recursiveTooltipTimeoutRef,
         cpidTooltipTimeoutRef,
       ].forEach((ref) => {
         if (ref.current) {
@@ -206,103 +219,6 @@ export function StampInfo(
     } catch (err) {
       console.error("Failed to copy:", err);
     }
-  };
-
-  /* ===== EVENT HANDLERS ===== */
-  // Tooltip handlers
-  const handleDivisibleMouseEnter = () => {
-    if (allowDivisibleTooltip) {
-      if (divisibleTooltipTimeoutRef.current) {
-        globalThis.clearTimeout(divisibleTooltipTimeoutRef.current);
-      }
-      divisibleTooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        setIsDivisibleTooltipVisible(true);
-      }, 500);
-    }
-  };
-
-  const handleDivisibleMouseLeave = () => {
-    if (divisibleTooltipTimeoutRef.current) {
-      globalThis.clearTimeout(divisibleTooltipTimeoutRef.current);
-    }
-    setIsDivisibleTooltipVisible(false);
-    setAllowDivisibleTooltip(true);
-  };
-
-  const handleKeyburnMouseEnter = () => {
-    if (allowKeyburnTooltip) {
-      if (keyburnTooltipTimeoutRef.current) {
-        globalThis.clearTimeout(keyburnTooltipTimeoutRef.current);
-      }
-      keyburnTooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        setIsKeyburnTooltipVisible(true);
-      }, 500);
-    }
-  };
-
-  const handleKeyburnMouseLeave = () => {
-    if (keyburnTooltipTimeoutRef.current) {
-      globalThis.clearTimeout(keyburnTooltipTimeoutRef.current);
-    }
-    setIsKeyburnTooltipVisible(false);
-    setAllowKeyburnTooltip(true);
-  };
-
-  const handleLockedMouseEnter = () => {
-    if (allowLockedTooltip) {
-      if (lockedTooltipTimeoutRef.current) {
-        globalThis.clearTimeout(lockedTooltipTimeoutRef.current);
-      }
-      lockedTooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        setIsLockedTooltipVisible(true);
-      }, 500);
-    }
-  };
-
-  const handleLockedMouseLeave = () => {
-    if (lockedTooltipTimeoutRef.current) {
-      globalThis.clearTimeout(lockedTooltipTimeoutRef.current);
-    }
-    setIsLockedTooltipVisible(false);
-    setAllowLockedTooltip(true);
-  };
-
-  const handleUnlockedMouseEnter = () => {
-    if (allowUnlockedTooltip) {
-      if (unlockedTooltipTimeoutRef.current) {
-        globalThis.clearTimeout(unlockedTooltipTimeoutRef.current);
-      }
-      unlockedTooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        setIsUnlockedTooltipVisible(true);
-      }, 500);
-    }
-  };
-
-  const handleUnlockedMouseLeave = () => {
-    if (unlockedTooltipTimeoutRef.current) {
-      globalThis.clearTimeout(unlockedTooltipTimeoutRef.current);
-    }
-    setIsUnlockedTooltipVisible(false);
-    setAllowUnlockedTooltip(true);
-  };
-
-  const handleRecursiveMouseEnter = () => {
-    if (allowRecursiveTooltip) {
-      if (recursiveTooltipTimeoutRef.current) {
-        globalThis.clearTimeout(recursiveTooltipTimeoutRef.current);
-      }
-      recursiveTooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        setIsRecursiveTooltipVisible(true);
-      }, 500);
-    }
-  };
-
-  const handleRecursiveMouseLeave = () => {
-    if (recursiveTooltipTimeoutRef.current) {
-      globalThis.clearTimeout(recursiveTooltipTimeoutRef.current);
-    }
-    setIsRecursiveTooltipVisible(false);
-    setAllowRecursiveTooltip(true);
   };
 
   /* ===== HELPER FUNCTIONS ===== */
@@ -812,11 +728,10 @@ export function StampInfo(
               </h2>
             </div>
 
-            <div
-              className={`${container3} px-3.5 py-1 font-semibold text-xs text-color-neutral-500 shrink-0`}
-            >
-              {getIdentLabel()}
-            </div>
+            <PillContentCount
+              value={getIdentLabel()}
+              class="!static shrink-0"
+            />
           </div>
 
           <div className="w-full min-w-0">
@@ -893,19 +808,16 @@ export function StampInfo(
 
             <div className="flex flex-wrap justify-between w-full min-[420px]:w-[270px] gap-2 mt-6">
               {!isSrc20Stamp() && (
-                <div
+                <PillWithTooltip
+                  label="EDITION"
                   className={`${containerPill} ${cardSupply} !text-sm w-fit`}
                 >
                   {stamp.supply === 1 ? "1/1" : editionCount}
-                </div>
+                </PillWithTooltip>
               )}
               <div className="flex items-center -mt-1 space-x-2">
                 {stamp.ident === "SRC-721" && (
-                  <div
-                    className="relative group"
-                    onMouseEnter={handleRecursiveMouseEnter}
-                    onMouseLeave={handleRecursiveMouseLeave}
-                  >
+                  <IconWithTooltip label="RECURSIVE">
                     <Icon
                       type="icon"
                       name="recursive"
@@ -914,21 +826,10 @@ export function StampInfo(
                       color="greyDark"
                       ariaLabel="Recursive"
                     />
-                    <div
-                      className={`${tooltipIcon} ${
-                        isRecursiveTooltipVisible ? "opacity-100" : "opacity-0"
-                      }`}
-                    >
-                      RECURSIVE
-                    </div>
-                  </div>
+                  </IconWithTooltip>
                 )}
                 {stamp.divisible == true && (
-                  <div
-                    className="relative group"
-                    onMouseEnter={handleDivisibleMouseEnter}
-                    onMouseLeave={handleDivisibleMouseLeave}
-                  >
+                  <IconWithTooltip label="DIVISIBLE">
                     <Icon
                       type="icon"
                       name="divisible"
@@ -937,21 +838,10 @@ export function StampInfo(
                       color="greyDark"
                       ariaLabel="Divisible"
                     />
-                    <div
-                      className={`${tooltipIcon} ${
-                        isDivisibleTooltipVisible ? "opacity-100" : "opacity-0"
-                      }`}
-                    >
-                      DIVISIBLE
-                    </div>
-                  </div>
+                  </IconWithTooltip>
                 )}
                 {Boolean(stamp.keyburn) && (
-                  <div
-                    className="relative group"
-                    onMouseEnter={handleKeyburnMouseEnter}
-                    onMouseLeave={handleKeyburnMouseLeave}
-                  >
+                  <IconWithTooltip label="KEYBURNED">
                     <Icon
                       type="icon"
                       name="keyburned"
@@ -960,22 +850,11 @@ export function StampInfo(
                       color="greyDark"
                       ariaLabel="Keyburned"
                     />
-                    <div
-                      className={`${tooltipIcon} ${
-                        isKeyburnTooltipVisible ? "opacity-100" : "opacity-0"
-                      }`}
-                    >
-                      KEYBURNED
-                    </div>
-                  </div>
+                  </IconWithTooltip>
                 )}
                 {stamp.locked
                   ? (
-                    <div
-                      className="relative group"
-                      onMouseEnter={handleLockedMouseEnter}
-                      onMouseLeave={handleLockedMouseLeave}
-                    >
+                    <IconWithTooltip label="LOCKED">
                       <Icon
                         type="icon"
                         name="locked"
@@ -984,21 +863,10 @@ export function StampInfo(
                         color="greyDark"
                         ariaLabel="Locked"
                       />
-                      <div
-                        className={`${tooltipIcon} ${
-                          isLockedTooltipVisible ? "opacity-100" : "opacity-0"
-                        }`}
-                      >
-                        LOCKED
-                      </div>
-                    </div>
+                    </IconWithTooltip>
                   )
                   : (
-                    <div
-                      className="relative group"
-                      onMouseEnter={handleUnlockedMouseEnter}
-                      onMouseLeave={handleUnlockedMouseLeave}
-                    >
+                    <IconWithTooltip label="UNLOCKED">
                       <Icon
                         type="icon"
                         name="unlocked"
@@ -1007,14 +875,7 @@ export function StampInfo(
                         color="greyDark"
                         ariaLabel="Unlocked"
                       />
-                      <div
-                        className={`${tooltipIcon} ${
-                          isUnlockedTooltipVisible ? "opacity-100" : "opacity-0"
-                        }`}
-                      >
-                        UNLOCKED
-                      </div>
-                    </div>
+                    </IconWithTooltip>
                   )}
               </div>
             </div>
@@ -1023,30 +884,35 @@ export function StampInfo(
               className={`flex flex-col w-full min-[420px]:w-[270px] mt-5 ${container2} px-3 py-2 gap-2`}
             >
               <div className="flex flex-wrap justify-between gap-2">
-                <div
+                <PillWithTooltip
+                  label="FILE TYPE"
                   className={`${containerPill} ${cardFileType} w-fit`}
                 >
                   {fileTypeValue}
-                </div>
-                <div
+                </PillWithTooltip>
+                <PillWithTooltip
+                  label="FILE SIZE"
                   className={`${containerPill} ${cardFileSize} !text-color-neutral-200 w-fit`}
                 >
                   {fileSizeValue}
-                </div>
-                <div
+                </PillWithTooltip>
+                <PillWithTooltip
+                  label="DIMENSIONS"
                   className={`${containerPill} ${cardFileSize} !text-color-neutral-200 w-fit`}
                 >
                   {dimensionsValue}
-                </div>
+                </PillWithTooltip>
               </div>
 
               <div className="flex flex-wrap justify-between gap-2 mt-2">
-                <div
+                <PillWithTooltip
+                  label="CREATED"
                   className={`${containerPill} ${cardFileSize} w-fit`}
                 >
                   {createdDate}
-                </div>
-                <div
+                </PillWithTooltip>
+                <PillWithTooltip
+                  label="TRANSACTION HASH"
                   className={`${containerPill} ${cardFileSize} w-fit`}
                 >
                   {stamp.tx_hash !== null
@@ -1061,7 +927,7 @@ export function StampInfo(
                       </a>
                     )
                     : "N/A"}
-                </div>
+                </PillWithTooltip>
               </div>
             </div>
           </div>

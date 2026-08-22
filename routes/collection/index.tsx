@@ -1,10 +1,9 @@
 /* ===== COLLECTION LANDING PAGE ===== */
 
-import { PaginationButtons } from "$button";
+import { CollectionOverviewContent } from "$content";
 import { FreshContext, Handlers, PageProps } from "$fresh/server.ts";
 import { CollectionOverviewHeader } from "$header";
 import { containerBackground } from "$layout";
-import { CollectionGallery } from "$section";
 import { CollectionController } from "$server/controller/collectionController.ts";
 import type { CollectionOverviewPageProps } from "$types/index.d.ts";
 
@@ -23,11 +22,17 @@ export const handler: Handlers<CollectionOverviewPageProps> = {
       const requestedPageSize = parseInt(url.searchParams.get("limit") || "60");
       const page_size = Math.min(requestedPageSize, MAX_PAGE_SIZE);
       const filterBy = url.searchParams.get("filterBy")?.split(",") || [];
+      const editionsParam = url.searchParams.get("editions");
+      const editionsFilter: "single" | "multiple" | undefined =
+        editionsParam === "single" || editionsParam === "multiple"
+          ? editionsParam
+          : undefined;
 
       const collectionsData = await CollectionController.getCollectionStamps({
         limit: page_size,
         page,
         sortBy,
+        ...(editionsFilter && { editionsFilter }),
       });
 
       return ctx.render({
@@ -35,8 +40,10 @@ export const handler: Handlers<CollectionOverviewPageProps> = {
         page: collectionsData.page,
         pages: collectionsData.totalPages,
         page_size: collectionsData.limit,
+        total: collectionsData.total,
         filterBy,
         sortBy,
+        editionsFilter,
       });
     } catch (error) {
       console.error("Error in collection overview:", error);
@@ -51,7 +58,14 @@ export const handler: Handlers<CollectionOverviewPageProps> = {
 export default function CollectionLandingPage(
   { data }: PageProps<CollectionOverviewPageProps>,
 ) {
-  const { collections, page, pages, sortBy = "ASC" } = data;
+  const {
+    collections,
+    page,
+    pages,
+    total,
+    sortBy = "ASC",
+    editionsFilter,
+  } = data;
 
   /* ===== COMPONENT ===== */
   return (
@@ -60,13 +74,19 @@ export default function CollectionLandingPage(
       f-client-nav
       data-partial="/collection"
     >
-      <CollectionOverviewHeader sortBy={sortBy} />
-      <CollectionGallery collections={collections || []} />
-      <PaginationButtons
-        page={page ?? 1}
-        totalPages={pages ?? 1}
-        // Remove onPageChange to let PaginationButtons component use its built-in Fresh navigation
-        prefix=""
+      <CollectionOverviewHeader
+        sortBy={sortBy}
+        total={total ?? 0}
+        {...(editionsFilter && { editionsFilter })}
+      />
+      <CollectionOverviewContent
+        collections={collections || []}
+        pagination={{
+          page: page ?? 1,
+          totalPages: pages ?? 1,
+          // Remove onPageChange to let PaginationButtons component use its built-in Fresh navigation
+          prefix: "",
+        }}
       />
     </div>
   );

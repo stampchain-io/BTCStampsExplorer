@@ -15,6 +15,7 @@ export * from "$islands/content/SRC20OverviewContent.tsx";
 
 /* ===== COLLECTION ===== */
 export * from "$islands/content/CollectionDetailContent.tsx";
+export * from "$islands/content/CollectionOverviewContent.tsx";
 
 /* ===== WALLET ===== */
 export { default as WalletContent } from "$islands/content/WalletContent.tsx";

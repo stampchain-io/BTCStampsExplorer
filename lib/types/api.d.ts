@@ -779,6 +779,10 @@ export type StampPageProps = {
     stamps: StampRow[];
     page: number;
     totalPages: number;
+    // Total stamp count for the current filters/section — used by
+    // ExplorerHeader's count pill (combined with src20DataCard.total when
+    // section is "all")
+    total?: number;
     selectedTab: "all" | "classic" | "posh" | "recent_sales";
     sortBy: "ASC" | "DESC";
     filterBy: StampFilterType[];
@@ -803,6 +807,9 @@ export type MarketplacePageProps = {
     stamps: StampRow[];
     page: number;
     totalPages: number;
+    // Total count for the current market mode + stamp-type filter combo -
+    // used by MarketplaceHeader's count pill
+    pagination?: { total: number };
     selectedTab: "all" | "classic" | "posh" | "recent_sales";
     sortBy: "ASC" | "DESC";
     filterBy: StampFilterType[];

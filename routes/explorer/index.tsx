@@ -202,6 +202,7 @@ export const handler: Handlers = {
           ...DATA_PLACEHOLDER_DEV_STAMP_OVERVIEW_PAGE.pagination,
           total: stamps.length,
         },
+        total: stamps.length,
         src20DataCard: src20Data,
         page: 1,
         limit: 60,
@@ -408,6 +409,7 @@ export function ExplorerPage(props: StampPageProps) {
     stamps,
     page,
     totalPages,
+    total,
     filterBy: _filterBy,
     sortBy: _sortBy,
     selectedTab,
@@ -430,6 +432,8 @@ export function ExplorerPage(props: StampPageProps) {
       <ExplorerHeader
         currentSection={section}
         viewMode={cardView}
+        stampsTotal={total ?? 0}
+        tokensTotal={src20DataCard?.total ?? 0}
       />
 
       {/* Main Content with Pagination */}

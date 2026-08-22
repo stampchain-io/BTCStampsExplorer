@@ -34,15 +34,22 @@ interface SRC20CardProps {
 }
 
 /* ===== PILL WITH TOOLTIP (instant on hover, no delay/timeout) ===== */
+// `wrapperClassName` carries layout/spacing utilities (margins, w-fit,
+// mx-auto, flex, etc.) that must live on the *outer* element — putting them
+// on the inner pill instead desyncs the tooltip from the pill whenever this
+// wrapper ends up as a direct flex item (e.g. inside containerCard's
+// `flex flex-col`), since flex items establish their own block formatting
+// context and stop the inner margin from collapsing into the wrapper.
 function PillWithTooltip(
-  { label, className, children }: {
+  { label, className, wrapperClassName, children }: {
     label: string;
     className: string;
+    wrapperClassName?: string;
     children: ComponentChildren;
   },
 ) {
   return (
-    <div class="relative group/pill">
+    <div class={`relative group/pill ${wrapperClassName ?? ""}`}>
       <div class={className}>{children}</div>
       <div
         class={`${tooltipButton} opacity-0 group-hover/pill:opacity-100 transition-opacity duration-150`}
@@ -230,7 +237,8 @@ export function SRC20Card(
       {/* Amount */}
       <PillWithTooltip
         label="AMOUNT"
-        className={`mt-2 w-fit mx-auto ${containerPill} ${cardFileType}`}
+        wrapperClassName="mt-2 w-fit mx-auto"
+        className={`${containerPill} ${cardFileType}`}
       >
         {formatAmount(src20.amt)}
       </PillWithTooltip>
@@ -264,7 +272,8 @@ export function SRC20Card(
       {/* Max supply */}
       <PillWithTooltip
         label="MAX SUPPLY"
-        className={`mt-2 w-fit mx-auto ${containerPill} ${cardFileType}`}
+        wrapperClassName="mt-2 w-fit mx-auto"
+        className={`${containerPill} ${cardFileType}`}
       >
         {src20.max ? formatAmount(src20.max) : "—"}
       </PillWithTooltip>
@@ -273,7 +282,8 @@ export function SRC20Card(
       {src20.lim && (
         <PillWithTooltip
           label="LIMIT PER MINT"
-          className={`mt-2 w-fit mx-auto ${containerPill} ${cardFileSize}`}
+          wrapperClassName="mt-2 w-fit mx-auto"
+          className={`${containerPill} ${cardFileSize}`}
         >
           {formatAmount(src20.lim)}
         </PillWithTooltip>
@@ -307,7 +317,8 @@ export function SRC20Card(
         {(src20.max || src20.mint_progress?.max_supply) && (
           <PillWithTooltip
             label="MAX SUPPLY"
-            className={`flex mt-2 w-fit mx-auto ${containerPill} ${cardFileSize}`}
+            wrapperClassName="flex mt-2 w-fit mx-auto"
+            className={`${containerPill} ${cardFileSize}`}
           >
             {formatAmount(src20.max ?? src20.mint_progress?.max_supply)}
           </PillWithTooltip>
@@ -317,7 +328,8 @@ export function SRC20Card(
         {src20.amt !== undefined && (
           <PillWithTooltip
             label="AMOUNT"
-            className={`mt-2 w-fit mx-auto ${containerPill} ${cardFileType}`}
+            wrapperClassName="mt-2 w-fit mx-auto"
+            className={`${containerPill} ${cardFileType}`}
           >
             {formatAmount(src20.amt)}
           </PillWithTooltip>

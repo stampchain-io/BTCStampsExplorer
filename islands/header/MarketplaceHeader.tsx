@@ -10,11 +10,12 @@ import {
   filtersToQueryParams,
   StampFilters as FilterStampFilters,
 } from "$islands/filter/FilterOptionsMarketplace.tsx";
-import { container2Icon, ScrollFadeRow } from "$layout";
+import { container2Icon, PillContentCount, ScrollFadeRow } from "$layout";
 import {
   getCurrentPathname,
   safeNavigate,
 } from "$lib/utils/navigation/freshNavigationUtils.ts";
+import { formatNumberWithCommas } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { titlePrimary } from "$text";
 import type { MarketplaceHeaderProps } from "$types/ui.d.ts";
 import { createPortal } from "preact/compat";
@@ -26,6 +27,7 @@ export const MarketplaceHeader = (
     currentFilters = defaultFilters,
     viewMode = "cardVertical",
     isSalesMode = false,
+    currentTotal = 0,
   }: MarketplaceHeaderProps,
 ) => {
   /* ===== STATE MANAGEMENT ===== */
@@ -141,12 +143,18 @@ export const MarketplaceHeader = (
     ? "sales"
     : "listings";
 
+  /* ===== COUNT PILL =====
+   * Reflects the currently active market mode + stamp-type combo only -
+   * same total already fetched to render the grid/table below. */
+  const countPill = formatNumberWithCommas(currentTotal);
+
   /* ===== RENDER ===== */
   return (
-    <div class="relative flex flex-col w-full gap-1.5">
-      <div class="flex flex-row justify-between items-start w-full">
+    <div class="flex flex-col w-full gap-1.5">
+      <div class="relative flex flex-row justify-between items-start w-full">
         {/* ===== TITLE ===== */}
-        <h1 class={`${titlePrimary} ml-1.5`}>MARKETPLACE</h1>
+        <h1 class={`-mt-2 ${titlePrimary}`}>MARKETPLACE</h1>
+        <PillContentCount value={countPill} />
       </div>
 
       {/* ===== CONTROLS ROW ===== */}

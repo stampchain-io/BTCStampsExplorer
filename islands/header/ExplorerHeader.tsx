@@ -8,13 +8,14 @@ import {
   countActiveExplorerFilters,
   queryParamsToFilters as explorerQueryParamsToFilters,
 } from "$islands/filter/FilterOptionsExplorer.tsx";
-import { container2Icon } from "$layout";
+import { container2Icon, PillContentCount } from "$layout";
 import {
   getCurrentPathname,
   getSearchParams,
   isBrowser,
   safeNavigate,
 } from "$lib/utils/navigation/freshNavigationUtils.ts";
+import { formatNumberWithCommas } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { titlePrimary } from "$text";
 import type { ExplorerHeaderProps } from "$types/ui.d.ts";
 import { createPortal } from "preact/compat";
@@ -25,6 +26,8 @@ export const ExplorerHeader = (
   {
     currentSection = "all",
     viewMode = "cardVertical",
+    stampsTotal = 0,
+    tokensTotal = 0,
   }: ExplorerHeaderProps,
 ) => {
   /* ===== STATE ===== */
@@ -58,12 +61,23 @@ export const ExplorerHeader = (
     setIsOpen(open);
   };
 
+  /* ===== COUNT PILL ===== */
+  // Reflects only the currently active section - combined stamps+tokens
+  // total for "all" (both are always fetched together in that mode, so no
+  // extra query is needed), otherwise whichever single total applies.
+  const countPill = currentSection === "stamps"
+    ? formatNumberWithCommas(stampsTotal)
+    : currentSection === "tokens"
+    ? formatNumberWithCommas(tokensTotal)
+    : formatNumberWithCommas(stampsTotal + tokensTotal);
+
   /* ===== RENDER ===== */
   return (
-    <div class="relative flex flex-col w-full gap-1.5">
-      <div class="flex flex-row justify-between items-start w-full">
+    <div class="flex flex-col w-full gap-1.5">
+      <div class="relative flex flex-row justify-between items-start w-full">
         {/* Title Section */}
-        <h1 class={`${titlePrimary} ml-1.5`}>EXPLORER</h1>
+        <h1 class={`-mt-2 ${titlePrimary}`}>EXPLORER</h1>
+        <PillContentCount value={countPill} />
       </div>
 
       {/* Section Selector + Controls */}

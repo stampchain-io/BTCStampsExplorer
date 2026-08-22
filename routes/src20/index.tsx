@@ -331,6 +331,7 @@ export default function SRC20OverviewPage({ data }: any) {
         timeframe={timeframe}
         sortBy={sortBy}
         sortDirection={sortDirection}
+        currentTotal={mintingData?.total ?? 0}
       />
       <SRC20OverviewContent
         mintingData={mintingData}
