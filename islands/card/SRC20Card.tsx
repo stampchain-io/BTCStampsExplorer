@@ -4,6 +4,7 @@ import { container3, containerCard, containerPill } from "$layout";
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { getSRC20ImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
+import { tooltipButton } from "$notification";
 import {
   cardCreator,
   cardEyebrowNeutral,
@@ -18,6 +19,7 @@ import {
   valuePositive,
 } from "$text";
 import type { SRC20Row } from "$types/src20.d.ts";
+import { ComponentChildren } from "preact";
 import { useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
@@ -29,6 +31,26 @@ interface SRC20CardProps {
     | "cardSquare"
     | "cardSquareBalance"
     | "cardHorizontal";
+}
+
+/* ===== PILL WITH TOOLTIP (instant on hover, no delay/timeout) ===== */
+function PillWithTooltip(
+  { label, className, children }: {
+    label: string;
+    className: string;
+    children: ComponentChildren;
+  },
+) {
+  return (
+    <div class="relative group/pill">
+      <div class={className}>{children}</div>
+      <div
+        class={`${tooltipButton} opacity-0 group-hover/pill:opacity-100 transition-opacity duration-150`}
+      >
+        {label}
+      </div>
+    </div>
+  );
 }
 
 /* ===== HELPERS ===== */
@@ -190,9 +212,12 @@ export function SRC20Card(
 
       {/* Operation type pill — centered */}
       <div class="mt-2 flex justify-center">
-        <div class={`${containerPill} ${cardSupply}`}>
+        <PillWithTooltip
+          label="OPERATION"
+          className={`${containerPill} ${cardSupply}`}
+        >
           {op}
-        </div>
+        </PillWithTooltip>
       </div>
     </>
   );
@@ -203,9 +228,12 @@ export function SRC20Card(
       {renderTopRow()}
 
       {/* Amount */}
-      <div class={`mt-2 w-fit mx-auto ${containerPill} ${cardFileType}`}>
+      <PillWithTooltip
+        label="AMOUNT"
+        className={`mt-2 w-fit mx-auto ${containerPill} ${cardFileType}`}
+      >
         {formatAmount(src20.amt)}
-      </div>
+      </PillWithTooltip>
 
       {/* From → To */}
       <div class="flex flex-1 min-h-2" />
@@ -234,17 +262,21 @@ export function SRC20Card(
       {renderTopRow()}
 
       {/* Max supply */}
-      <div
-        class={`mt-2 w-fit mx-auto ${containerPill} ${cardFileType}`}
+      <PillWithTooltip
+        label="MAX SUPPLY"
+        className={`mt-2 w-fit mx-auto ${containerPill} ${cardFileType}`}
       >
         {src20.max ? formatAmount(src20.max) : "—"}
-      </div>
+      </PillWithTooltip>
 
       {/* Limit per mint */}
       {src20.lim && (
-        <div class={`mt-2 w-fit mx-auto ${containerPill} ${cardFileSize}`}>
+        <PillWithTooltip
+          label="LIMIT PER MINT"
+          className={`mt-2 w-fit mx-auto ${containerPill} ${cardFileSize}`}
+        >
           {formatAmount(src20.lim)}
-        </div>
+        </PillWithTooltip>
       )}
 
       {/* Creator */}
@@ -273,20 +305,22 @@ export function SRC20Card(
 
         {/* Max supply */}
         {(src20.max || src20.mint_progress?.max_supply) && (
-          <div
-            class={`flex mt-2 w-fit mx-auto ${containerPill} ${cardFileSize}`}
+          <PillWithTooltip
+            label="MAX SUPPLY"
+            className={`flex mt-2 w-fit mx-auto ${containerPill} ${cardFileSize}`}
           >
             {formatAmount(src20.max ?? src20.mint_progress?.max_supply)}
-          </div>
+          </PillWithTooltip>
         )}
 
-        {/* Limit per mint */}
-        {src20.lim && (
-          <div
-            class={`mt-2 w-fit mx-auto ${containerPill} ${cardFileType}`}
+        {/* Amount minted */}
+        {src20.amt !== undefined && (
+          <PillWithTooltip
+            label="AMOUNT"
+            className={`mt-2 w-fit mx-auto ${containerPill} ${cardFileType}`}
           >
-            {formatAmount(src20.lim)}
-          </div>
+            {formatAmount(src20.amt)}
+          </PillWithTooltip>
         )}
 
         {/* Recipient (destination) */}
@@ -374,9 +408,12 @@ export function SRC20Card(
 
         {/* op pill */}
         <div class="flex justify-center">
-          <div class={`${containerPill} ${cardSupply}`}>
+          <PillWithTooltip
+            label="OPERATION"
+            className={`${containerPill} ${cardSupply}`}
+          >
             {op}
-          </div>
+          </PillWithTooltip>
         </div>
 
         {/* spacer 3 */}
@@ -384,9 +421,12 @@ export function SRC20Card(
 
         {/* amount */}
         <div class="flex justify-center">
-          <div class={`w-fit ${containerPill} ${cardFileType}`}>
+          <PillWithTooltip
+            label="AMOUNT"
+            className={`w-fit ${containerPill} ${cardFileType}`}
+          >
             {amount}
-          </div>
+          </PillWithTooltip>
         </div>
       </>
     );
@@ -426,9 +466,12 @@ export function SRC20Card(
 
       {/* price */}
       <div class="flex justify-center">
-        <div class={`w-fit ${containerPill} ${cardFileType}`}>
+        <PillWithTooltip
+          label="PRICE"
+          className={`w-fit ${containerPill} ${cardFileType}`}
+        >
           {formatPriceSats(priceBtc)}
-        </div>
+        </PillWithTooltip>
       </div>
 
       {/* spacer 2 */}
@@ -436,9 +479,12 @@ export function SRC20Card(
 
       {/* balance */}
       <div class="flex justify-center">
-        <div class={`w-fit ${containerPill} ${cardSupply}`}>
+        <PillWithTooltip
+          label="BALANCE"
+          className={`w-fit ${containerPill} ${cardSupply}`}
+        >
           {formatAmount(src20.amt)}
-        </div>
+        </PillWithTooltip>
       </div>
 
       {/* spacer 3 */}
@@ -446,9 +492,12 @@ export function SRC20Card(
 
       {/* value */}
       <div class="flex justify-center">
-        <div class={`w-fit ${containerPill} ${cardPrice}`}>
+        <PillWithTooltip
+          label="VALUE"
+          className={`w-fit ${containerPill} ${cardPrice}`}
+        >
           {formatValueBtc(valueBtc)}
-        </div>
+        </PillWithTooltip>
       </div>
     </>
   );
@@ -487,9 +536,12 @@ export function SRC20Card(
 
       {/* price */}
       <div class="flex justify-center">
-        <div class={`w-fit ${containerPill} ${cardFileType}`}>
+        <PillWithTooltip
+          label="PRICE"
+          className={`w-fit ${containerPill} ${cardFileType}`}
+        >
           {formatPriceSats(priceBtc)}
-        </div>
+        </PillWithTooltip>
       </div>
 
       {/* spacer 2 */}
@@ -497,8 +549,9 @@ export function SRC20Card(
 
       {/* 24h change */}
       <div class="flex justify-center">
-        <div
-          class={`w-fit ${containerPill} ${cardFileType} ${
+        <PillWithTooltip
+          label="24H CHANGE"
+          className={`w-fit ${containerPill} ${cardFileType} ${
             change24h == null
               ? valueNeutral
               : change24h > 0
@@ -511,7 +564,7 @@ export function SRC20Card(
           {change24h == null
             ? "N/A"
             : `${change24h > 0 ? "+" : ""}${change24h.toFixed(2)}%`}
-        </div>
+        </PillWithTooltip>
       </div>
 
       {/* spacer 3 */}
@@ -519,9 +572,12 @@ export function SRC20Card(
 
       {/* balance */}
       <div class="flex justify-center">
-        <div class={`w-fit ${containerPill} ${cardSupply}`}>
+        <PillWithTooltip
+          label="BALANCE"
+          className={`w-fit ${containerPill} ${cardSupply}`}
+        >
           {formatAmount(src20.amt)}
-        </div>
+        </PillWithTooltip>
       </div>
 
       {/* spacer 4 */}
@@ -529,9 +585,12 @@ export function SRC20Card(
 
       {/* holders */}
       <div class="flex justify-center">
-        <div class={`w-fit ${containerPill} ${cardFileSize}`}>
+        <PillWithTooltip
+          label="HOLDERS"
+          className={`w-fit ${containerPill} ${cardFileSize}`}
+        >
           {src20.holders != null ? src20.holders.toLocaleString() : "—"} HOLDERS
-        </div>
+        </PillWithTooltip>
       </div>
 
       {/* spacer 5 */}
@@ -539,9 +598,12 @@ export function SRC20Card(
 
       {/* value */}
       <div class="flex justify-center">
-        <div class={`w-fit ${containerPill} ${cardPrice}`}>
+        <PillWithTooltip
+          label="VALUE"
+          className={`w-fit ${containerPill} ${cardPrice}`}
+        >
           {formatValueBtc(valueBtc)}
-        </div>
+        </PillWithTooltip>
       </div>
     </>
   );

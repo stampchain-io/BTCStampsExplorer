@@ -16,6 +16,7 @@ import {
   formatNumber,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
+import { tooltipButton } from "$notification";
 import {
   cardPrice,
   labelXs,
@@ -105,7 +106,7 @@ export function SRC20DetailHeader({
 
   /* ===== SHARED SUB-COMPONENTS (rendered once per breakpoint layout) ===== */
   const tokenImageAndName = (
-    <div class="flex gap-3">
+    <div class="flex gap-5">
       <div class="w-11 h-11 shrink-0 rounded-2xl overflow-hidden">
         {imageUrl
           ? (
@@ -134,24 +135,38 @@ export function SRC20DetailHeader({
   );
 
   const pricePill = (
-    <div class={`${containerPill} ${cardPrice} !text-sm`}>
-      {floorPriceSatsFormatted}
+    <div class="relative group/price">
+      <div class={`${containerPill} ${cardPrice}`}>
+        {floorPriceSatsFormatted}
+      </div>
+      <div
+        class={`${tooltipButton} opacity-0 group-hover/price:opacity-100 transition-opacity duration-150`}
+      >
+        FLOOR PRICE
+      </div>
     </div>
   );
 
   const changePill = (
-    <div
-      class={`${containerPill} font-medium text-sm select-none whitespace-nowrap ${
-        change24h === null
-          ? valueNeutral
-          : change24h >= 0
-          ? valuePositive
-          : valueNegative
-      }`}
-    >
-      {change24h !== null
-        ? `${change24h >= 0 ? "+" : ""}${change24h.toFixed(2)}%`
-        : "N/A %"}
+    <div class="relative group/change">
+      <div
+        class={`${containerPill} font-medium text-xs select-none whitespace-nowrap ${
+          change24h === null
+            ? valueNeutral
+            : change24h >= 0
+            ? valuePositive
+            : valueNegative
+        }`}
+      >
+        {change24h !== null
+          ? `${change24h >= 0 ? "+" : ""}${change24h.toFixed(2)}%`
+          : "N/A %"}
+      </div>
+      <div
+        class={`${tooltipButton} opacity-0 group-hover/change:opacity-100 transition-opacity duration-150`}
+      >
+        24H CHANGE
+      </div>
     </div>
   );
 
@@ -304,7 +319,7 @@ export function SRC20DetailHeader({
                     </div>
 
                     {/* ===== HOLDERS + SUPPLY + LIMIT + MINT BUTTON ===== */}
-                    <div class="flex items-center pr-5 gap-7.5">
+                    <div class="flex items-center pr-5 gap-5">
                       <StatItem
                         label="HOLDERS"
                         value={holdersValue}
@@ -334,7 +349,7 @@ export function SRC20DetailHeader({
                     </div>
 
                     {/* ===== VOLUME + MARKET CAP + SUPPLY ===== */}
-                    <div class="flex items-center pr-5 gap-7.5">
+                    <div class="flex items-center pr-5 gap-5">
                       <StatItem
                         label="VOLUME"
                         value={volume24hBTCFormatted}

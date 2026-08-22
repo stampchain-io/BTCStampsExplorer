@@ -4,6 +4,7 @@ import {
   abbreviateAddress,
   formatBTC,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
+import { tooltipButton } from "$notification";
 import {
   cardPrice,
   cardStampNumber,
@@ -13,6 +14,27 @@ import {
   valueSm,
 } from "$text";
 import type { CollectionWithOptionalMarketData } from "$types/index.d.ts";
+import type { ComponentChildren } from "preact";
+
+/* ===== PILL WITH TOOLTIP (instant on hover, no delay/timeout) ===== */
+function PillWithTooltip(
+  { label, className, children }: {
+    label: string;
+    className: string;
+    children: ComponentChildren;
+  },
+) {
+  return (
+    <div class="relative group/pill">
+      <div class={className}>{children}</div>
+      <div
+        class={`${tooltipButton} opacity-0 group-hover/pill:opacity-100 transition-opacity duration-150`}
+      >
+        {label}
+      </div>
+    </div>
+  );
+}
 
 /* ===== HELPERS ===== */
 // Visibility per gallery image index, aligned to the grid's column counts:
@@ -48,14 +70,20 @@ export function CollectionCard(
 
   const statsPills = (
     <>
-      <div class={`${containerPill} ${cardSupply}`}>
+      <PillWithTooltip
+        label="STAMPS"
+        className={`${containerPill} ${cardSupply}`}
+      >
         {stampCount}
-      </div>
-      <div class={`${containerPill} ${cardPrice}`}>
+      </PillWithTooltip>
+      <PillWithTooltip
+        label="FLOOR PRICE"
+        className={`${containerPill} ${cardPrice}`}
+      >
         {collection.marketData?.floorPriceBTC
           ? formatBTC(collection.marketData.floorPriceBTC)
           : "N/A"} BTC
-      </div>
+      </PillWithTooltip>
     </>
   );
 

@@ -24,7 +24,7 @@ import {
   getStampPreviewUrl,
 } from "$lib/utils/ui/media/imageUtils.ts";
 import { showToast } from "$lib/utils/ui/notifications/toastSignal.ts";
-import { tooltipIcon } from "$notification";
+import { tooltipButton, tooltipIcon } from "$notification";
 import {
   cardCreator,
   cardEyebrowNeutral,
@@ -42,13 +42,52 @@ import type {
   StampRow,
   StampSaleData,
 } from "$types/stamp.d.ts";
-import { VNode } from "preact";
+import { ComponentChildren, VNode } from "preact";
 import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
 interface StampWithSaleData extends Omit<StampRow, "stamp_base64"> {
   sale_data?: StampSaleData;
   stamp_base64?: string;
+}
+
+/* ===== PILL WITH TOOLTIP (instant on hover, no delay/timeout) ===== */
+function PillWithTooltip(
+  { label, className, children }: {
+    label: string;
+    className: string;
+    children: ComponentChildren;
+  },
+) {
+  return (
+    <div class="relative group/pill">
+      <div class={className}>{children}</div>
+      <div
+        class={`${tooltipButton} opacity-0 group-hover/pill:opacity-100 transition-opacity duration-150`}
+      >
+        {label}
+      </div>
+    </div>
+  );
+}
+
+/* ===== ICON WITH TOOLTIP (instant on hover, no delay/timeout) ===== */
+function IconWithTooltip(
+  { label, children }: {
+    label: ComponentChildren;
+    children: ComponentChildren;
+  },
+) {
+  return (
+    <div class="relative group/icon">
+      {children}
+      <div
+        class={`${tooltipIcon} opacity-0 group-hover/icon:opacity-100`}
+      >
+        {label}
+      </div>
+    </div>
+  );
 }
 
 /* ===== COMPONENT ===== */
@@ -86,32 +125,6 @@ export function StampCard({
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  // Tooltip visibility state
-  const [isRecursiveTooltipVisible, setIsRecursiveTooltipVisible] = useState(
-    false,
-  );
-  const [isDivisibleTooltipVisible, setIsDivisibleTooltipVisible] = useState(
-    false,
-  );
-  const [isKeyburnTooltipVisible, setIsKeyburnTooltipVisible] = useState(false);
-  const [isLockedTooltipVisible, setIsLockedTooltipVisible] = useState(false);
-  const [isUnlockedTooltipVisible, setIsUnlockedTooltipVisible] = useState(
-    false,
-  );
-  const [allowRecursiveTooltip, setAllowRecursiveTooltip] = useState(true);
-  const [allowDivisibleTooltip, setAllowDivisibleTooltip] = useState(true);
-  const [allowKeyburnTooltip, setAllowKeyburnTooltip] = useState(true);
-  const [allowLockedTooltip, setAllowLockedTooltip] = useState(true);
-  const [allowUnlockedTooltip, setAllowUnlockedTooltip] = useState(true);
-  const [isBtcTooltipVisible, setIsBtcTooltipVisible] = useState(false);
-  const [allowBtcTooltip, setAllowBtcTooltip] = useState(true);
-  const recursiveTooltipTimeoutRef = useRef<number | null>(null);
-  const divisibleTooltipTimeoutRef = useRef<number | null>(null);
-  const keyburnTooltipTimeoutRef = useRef<number | null>(null);
-  const lockedTooltipTimeoutRef = useRef<number | null>(null);
-  const unlockedTooltipTimeoutRef = useRef<number | null>(null);
-  const btcTooltipTimeoutRef = useRef<number | null>(null);
-
   // Library file detection (CSS, JS, GZIP, JSON)
   const isLibraryFile = stamp.stamp_mimetype === "text/css" ||
     stamp.stamp_mimetype === "text/javascript" ||
@@ -125,121 +138,6 @@ export function StampCard({
   // details under `sale_data` (StampSaleData, $types/stamp.d.ts) — no flat
   // top-level fallback needed here anymore.
   const saleData: StampSaleData | undefined = stamp.sale_data;
-
-  /* ===== TOOLTIP HANDLERS ===== */
-  const handleRecursiveMouseEnter = () => {
-    if (allowRecursiveTooltip) {
-      if (recursiveTooltipTimeoutRef.current) {
-        globalThis.clearTimeout(recursiveTooltipTimeoutRef.current);
-      }
-      recursiveTooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        setIsRecursiveTooltipVisible(true);
-      }, 500);
-    }
-  };
-
-  const handleRecursiveMouseLeave = () => {
-    if (recursiveTooltipTimeoutRef.current) {
-      globalThis.clearTimeout(recursiveTooltipTimeoutRef.current);
-    }
-    setIsRecursiveTooltipVisible(false);
-    setAllowRecursiveTooltip(true);
-  };
-
-  const handleDivisibleMouseEnter = () => {
-    if (allowDivisibleTooltip) {
-      if (divisibleTooltipTimeoutRef.current) {
-        globalThis.clearTimeout(divisibleTooltipTimeoutRef.current);
-      }
-      divisibleTooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        setIsDivisibleTooltipVisible(true);
-      }, 500);
-    }
-  };
-
-  const handleDivisibleMouseLeave = () => {
-    if (divisibleTooltipTimeoutRef.current) {
-      globalThis.clearTimeout(divisibleTooltipTimeoutRef.current);
-    }
-    setIsDivisibleTooltipVisible(false);
-    setAllowDivisibleTooltip(true);
-  };
-
-  const handleKeyburnMouseEnter = () => {
-    if (allowKeyburnTooltip) {
-      if (keyburnTooltipTimeoutRef.current) {
-        globalThis.clearTimeout(keyburnTooltipTimeoutRef.current);
-      }
-      keyburnTooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        setIsKeyburnTooltipVisible(true);
-      }, 500);
-    }
-  };
-
-  const handleKeyburnMouseLeave = () => {
-    if (keyburnTooltipTimeoutRef.current) {
-      globalThis.clearTimeout(keyburnTooltipTimeoutRef.current);
-    }
-    setIsKeyburnTooltipVisible(false);
-    setAllowKeyburnTooltip(true);
-  };
-
-  const handleLockedMouseEnter = () => {
-    if (allowLockedTooltip) {
-      if (lockedTooltipTimeoutRef.current) {
-        globalThis.clearTimeout(lockedTooltipTimeoutRef.current);
-      }
-      lockedTooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        setIsLockedTooltipVisible(true);
-      }, 500);
-    }
-  };
-
-  const handleLockedMouseLeave = () => {
-    if (lockedTooltipTimeoutRef.current) {
-      globalThis.clearTimeout(lockedTooltipTimeoutRef.current);
-    }
-    setIsLockedTooltipVisible(false);
-    setAllowLockedTooltip(true);
-  };
-
-  const handleUnlockedMouseEnter = () => {
-    if (allowUnlockedTooltip) {
-      if (unlockedTooltipTimeoutRef.current) {
-        globalThis.clearTimeout(unlockedTooltipTimeoutRef.current);
-      }
-      unlockedTooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        setIsUnlockedTooltipVisible(true);
-      }, 500);
-    }
-  };
-
-  const handleUnlockedMouseLeave = () => {
-    if (unlockedTooltipTimeoutRef.current) {
-      globalThis.clearTimeout(unlockedTooltipTimeoutRef.current);
-    }
-    setIsUnlockedTooltipVisible(false);
-    setAllowUnlockedTooltip(true);
-  };
-
-  const handleBtcMouseEnter = () => {
-    if (allowBtcTooltip) {
-      if (btcTooltipTimeoutRef.current) {
-        globalThis.clearTimeout(btcTooltipTimeoutRef.current);
-      }
-      btcTooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        setIsBtcTooltipVisible(true);
-      }, 500);
-    }
-  };
-
-  const handleBtcMouseLeave = () => {
-    if (btcTooltipTimeoutRef.current) {
-      globalThis.clearTimeout(btcTooltipTimeoutRef.current);
-    }
-    setIsBtcTooltipVisible(false);
-    setAllowBtcTooltip(true);
-  };
 
   /* ===== HANDLERS ===== */
   // Swaps the broken <img> for the local "no image" placeholder icon instead
@@ -268,24 +166,6 @@ export function StampCard({
   };
 
   /* ===== EFFECTS ===== */
-  // Cleanup tooltip timeouts on unmount
-  useEffect(() => {
-    return () => {
-      [
-        recursiveTooltipTimeoutRef,
-        divisibleTooltipTimeoutRef,
-        keyburnTooltipTimeoutRef,
-        lockedTooltipTimeoutRef,
-        unlockedTooltipTimeoutRef,
-        btcTooltipTimeoutRef,
-      ].forEach((ref) => {
-        if (ref.current) {
-          globalThis.clearTimeout(ref.current);
-        }
-      });
-    };
-  }, []);
-
   // Update abbreviation length on window resize
   useEffect(() => {
     const handleResize = () => setWindowWidth(globalThis.innerWidth ?? 0);
@@ -740,17 +620,16 @@ export function StampCard({
           {/* FULL WIDTH DETAILS COLUMN */}
           {/* Row 1: Supply (left) + Status Icons (right) */}
           <div class="flex justify-between items-center w-full">
-            <div class={`${containerPill} ${cardSupply}`}>
+            <PillWithTooltip
+              label="SUPPLY"
+              className={`${containerPill} ${cardSupply}`}
+            >
               {lowestPriceDispenser?.give_remaining ??
                 stamp.supply ?? 1}/{stamp.supply ?? 1}
-            </div>
+            </PillWithTooltip>
             <div class="flex items-center gap-1.5 mr-0.5 -translate-y-0.5">
               {stamp.ident === "SRC-721" && (
-                <div
-                  class="relative"
-                  onMouseEnter={handleRecursiveMouseEnter}
-                  onMouseLeave={handleRecursiveMouseLeave}
-                >
+                <IconWithTooltip label="RECURSIVE">
                   <Icon
                     type="icon"
                     name="recursive"
@@ -759,21 +638,10 @@ export function StampCard({
                     color="greyLight"
                     ariaLabel="Recursive"
                   />
-                  <div
-                    class={`${tooltipIcon} ${
-                      isRecursiveTooltipVisible ? "opacity-100" : "opacity-0"
-                    }`}
-                  >
-                    RECURSIVE
-                  </div>
-                </div>
+                </IconWithTooltip>
               )}
               {Boolean(stamp.divisible) && (
-                <div
-                  class="relative"
-                  onMouseEnter={handleDivisibleMouseEnter}
-                  onMouseLeave={handleDivisibleMouseLeave}
-                >
+                <IconWithTooltip label="DIVISIBLE">
                   <Icon
                     type="icon"
                     name="divisible"
@@ -782,21 +650,10 @@ export function StampCard({
                     color="greyLight"
                     ariaLabel="Divisible"
                   />
-                  <div
-                    class={`${tooltipIcon} ${
-                      isDivisibleTooltipVisible ? "opacity-100" : "opacity-0"
-                    }`}
-                  >
-                    DIVISIBLE
-                  </div>
-                </div>
+                </IconWithTooltip>
               )}
               {Boolean(stamp.keyburn) && (
-                <div
-                  class="relative"
-                  onMouseEnter={handleKeyburnMouseEnter}
-                  onMouseLeave={handleKeyburnMouseLeave}
-                >
+                <IconWithTooltip label="KEYBURNED">
                   <Icon
                     type="icon"
                     name="keyburned"
@@ -805,22 +662,11 @@ export function StampCard({
                     color="greyLight"
                     ariaLabel="Keyburned"
                   />
-                  <div
-                    class={`${tooltipIcon} ${
-                      isKeyburnTooltipVisible ? "opacity-100" : "opacity-0"
-                    }`}
-                  >
-                    KEYBURNED
-                  </div>
-                </div>
+                </IconWithTooltip>
               )}
               {stamp.locked
                 ? (
-                  <div
-                    class="relative"
-                    onMouseEnter={handleLockedMouseEnter}
-                    onMouseLeave={handleLockedMouseLeave}
-                  >
+                  <IconWithTooltip label="LOCKED">
                     <Icon
                       type="icon"
                       name="locked"
@@ -829,21 +675,10 @@ export function StampCard({
                       color="greyLight"
                       ariaLabel="Locked"
                     />
-                    <div
-                      class={`${tooltipIcon} ${
-                        isLockedTooltipVisible ? "opacity-100" : "opacity-0"
-                      }`}
-                    >
-                      LOCKED
-                    </div>
-                  </div>
+                  </IconWithTooltip>
                 )
                 : (
-                  <div
-                    class="relative"
-                    onMouseEnter={handleUnlockedMouseEnter}
-                    onMouseLeave={handleUnlockedMouseLeave}
-                  >
+                  <IconWithTooltip label="UNLOCKED">
                     <Icon
                       type="icon"
                       name="unlocked"
@@ -852,30 +687,29 @@ export function StampCard({
                       color="greyLight"
                       ariaLabel="Unlocked"
                     />
-                    <div
-                      class={`${tooltipIcon} ${
-                        isUnlockedTooltipVisible ? "opacity-100" : "opacity-0"
-                      }`}
-                    >
-                      UNLOCKED
-                    </div>
-                  </div>
+                  </IconWithTooltip>
                 )}
             </div>
           </div>
 
           {/* Row 2: File type + File size pills */}
           <div class="flex items-center justify-between w-full">
-            <div class={`${containerPill} ${cardFileType}`}>
+            <PillWithTooltip
+              label="FILE TYPE"
+              className={`${containerPill} ${cardFileType}`}
+            >
               {formatFileType(stamp.stamp_mimetype)}
-            </div>
+            </PillWithTooltip>
             {stamp.file_size_bytes != null && (
-              <div class={`${containerPill} ${cardFileSize}`}>
+              <PillWithTooltip
+                label="FILE SIZE"
+                className={`${containerPill} ${cardFileSize}`}
+              >
                 {formatFileSize(
                   stamp.file_size_bytes,
                   stamp.stamp_mimetype === "text/plain",
                 )}
-              </div>
+              </PillWithTooltip>
             )}
           </div>
 
@@ -886,9 +720,12 @@ export function StampCard({
                 {stamp.activity_level && (
                   <ActivityLevelIndicator level={stamp.activity_level} />
                 )}
-                <div class={`${containerPill} ${cardPrice}`}>
+                <PillWithTooltip
+                  label="PRICE"
+                  className={`${containerPill} ${cardPrice}`}
+                >
                   {displayPriceBTC().text}
-                </div>
+                </PillWithTooltip>
               </div>
               <Button
                 variant="flat"
@@ -963,10 +800,13 @@ export function StampCard({
 
           {/* ===== FOOTER: SUPPLY (LEFT) + PRICE (RIGHT) ===== */}
           <div class="flex justify-between items-center w-full">
-            <div class={`${containerPill} ${cardSupply}`}>
+            <PillWithTooltip
+              label="SUPPLY"
+              className={`${containerPill} ${cardSupply}`}
+            >
               {lowestPriceDispenser?.give_remaining ??
                 stamp.supply ?? 1}/{stamp.supply ?? 1}
-            </div>
+            </PillWithTooltip>
             {isListed && (
               <div class="flex items-center gap-1.5 min-w-0">
                 {stamp.activity_level && (
@@ -975,9 +815,12 @@ export function StampCard({
                     className="hidden"
                   />
                 )}
-                <div class={`${containerPill} ${cardPrice}`}>
+                <PillWithTooltip
+                  label="PRICE"
+                  className={`${containerPill} ${cardPrice}`}
+                >
                   {displayPriceBTC().text}
-                </div>
+                </PillWithTooltip>
               </div>
             )}
           </div>
@@ -1012,9 +855,12 @@ export function StampCard({
           {/* ===== SQUARE CARD DETAIL ===== */}
           {variant === "cardSquareDetail" && (
             <div class="absolute bottom-1 left-1 z-20">
-              <div class={`${containerPill} ${cardSupply} cursor-pointer`}>
+              <PillWithTooltip
+                label="SUPPLY"
+                className={`${containerPill} ${cardSupply} cursor-pointer`}
+              >
                 {supplyDisplay}
-              </div>
+              </PillWithTooltip>
             </div>
           )}
         </div>
@@ -1048,20 +894,19 @@ export function StampCard({
 
             {/* Row 1: Supply (left) + Status Icons (right) */}
             <div class="flex justify-between items-center mt-2 w-full">
-              <div class={`${containerPill} ${cardSupply}`}>
+              <PillWithTooltip
+                label="SUPPLY"
+                className={`${containerPill} ${cardSupply}`}
+              >
                 {variant === "cardVerticalListing"
                   ? `${
                     lowestPriceDispenser?.give_remaining ?? stamp.supply ?? 1
                   }/${stamp.supply ?? 1}`
                   : supplyDisplay}
-              </div>
+              </PillWithTooltip>
               <div class="flex items-center gap-1.5 mr-0.5 -translate-y-0.5">
                 {variant === "cardVerticalDetail" && isListed && (
-                  <div
-                    class="relative"
-                    onMouseEnter={handleBtcMouseEnter}
-                    onMouseLeave={handleBtcMouseLeave}
-                  >
+                  <IconWithTooltip label={displayPriceBTC().text}>
                     <Icon
                       type="icon"
                       name="bitcoin"
@@ -1071,21 +916,10 @@ export function StampCard({
                       className="w-[17px] h-[17px] stroke-color-secondary-400"
                       ariaLabel="BTC"
                     />
-                    <div
-                      class={`${tooltipIcon} ${
-                        isBtcTooltipVisible ? "opacity-100" : "opacity-0"
-                      }`}
-                    >
-                      {displayPriceBTC().text}
-                    </div>
-                  </div>
+                  </IconWithTooltip>
                 )}
                 {stamp.ident === "SRC-721" && (
-                  <div
-                    class="relative"
-                    onMouseEnter={handleRecursiveMouseEnter}
-                    onMouseLeave={handleRecursiveMouseLeave}
-                  >
+                  <IconWithTooltip label="RECURSIVE">
                     <Icon
                       type="icon"
                       name="recursive"
@@ -1094,21 +928,10 @@ export function StampCard({
                       color="greyLight"
                       ariaLabel="Recursive"
                     />
-                    <div
-                      class={`${tooltipIcon} ${
-                        isRecursiveTooltipVisible ? "opacity-100" : "opacity-0"
-                      }`}
-                    >
-                      RECURSIVE
-                    </div>
-                  </div>
+                  </IconWithTooltip>
                 )}
                 {Boolean(stamp.divisible) && (
-                  <div
-                    class="relative"
-                    onMouseEnter={handleDivisibleMouseEnter}
-                    onMouseLeave={handleDivisibleMouseLeave}
-                  >
+                  <IconWithTooltip label="DIVISIBLE">
                     <Icon
                       type="icon"
                       name="divisible"
@@ -1117,21 +940,10 @@ export function StampCard({
                       color="greyLight"
                       ariaLabel="Divisible"
                     />
-                    <div
-                      class={`${tooltipIcon} ${
-                        isDivisibleTooltipVisible ? "opacity-100" : "opacity-0"
-                      }`}
-                    >
-                      DIVISIBLE
-                    </div>
-                  </div>
+                  </IconWithTooltip>
                 )}
                 {Boolean(stamp.keyburn) && (
-                  <div
-                    class="relative"
-                    onMouseEnter={handleKeyburnMouseEnter}
-                    onMouseLeave={handleKeyburnMouseLeave}
-                  >
+                  <IconWithTooltip label="KEYBURNED">
                     <Icon
                       type="icon"
                       name="keyburned"
@@ -1140,22 +952,11 @@ export function StampCard({
                       color="greyLight"
                       ariaLabel="Keyburned"
                     />
-                    <div
-                      class={`${tooltipIcon} ${
-                        isKeyburnTooltipVisible ? "opacity-100" : "opacity-0"
-                      }`}
-                    >
-                      KEYBURNED
-                    </div>
-                  </div>
+                  </IconWithTooltip>
                 )}
                 {stamp.locked
                   ? (
-                    <div
-                      class="relative"
-                      onMouseEnter={handleLockedMouseEnter}
-                      onMouseLeave={handleLockedMouseLeave}
-                    >
+                    <IconWithTooltip label="LOCKED">
                       <Icon
                         type="icon"
                         name="locked"
@@ -1164,21 +965,10 @@ export function StampCard({
                         color="greyLight"
                         ariaLabel="Locked"
                       />
-                      <div
-                        class={`${tooltipIcon} ${
-                          isLockedTooltipVisible ? "opacity-100" : "opacity-0"
-                        }`}
-                      >
-                        LOCKED
-                      </div>
-                    </div>
+                    </IconWithTooltip>
                   )
                   : (
-                    <div
-                      class="relative"
-                      onMouseEnter={handleUnlockedMouseEnter}
-                      onMouseLeave={handleUnlockedMouseLeave}
-                    >
+                    <IconWithTooltip label="UNLOCKED">
                       <Icon
                         type="icon"
                         name="unlocked"
@@ -1187,30 +977,29 @@ export function StampCard({
                         color="greyLight"
                         ariaLabel="Unlocked"
                       />
-                      <div
-                        class={`${tooltipIcon} ${
-                          isUnlockedTooltipVisible ? "opacity-100" : "opacity-0"
-                        }`}
-                      >
-                        UNLOCKED
-                      </div>
-                    </div>
+                    </IconWithTooltip>
                   )}
               </div>
             </div>
 
             {/* Row 2: File type + File size pills */}
             <div class="flex items-center justify-between mt-2 w-full">
-              <div class={`${containerPill} ${cardFileType}`}>
+              <PillWithTooltip
+                label="FILE TYPE"
+                className={`${containerPill} ${cardFileType}`}
+              >
                 {formatFileType(stamp.stamp_mimetype)}
-              </div>
+              </PillWithTooltip>
               {stamp.file_size_bytes != null && (
-                <div class={`${containerPill} ${cardFileSize}`}>
+                <PillWithTooltip
+                  label="FILE SIZE"
+                  className={`${containerPill} ${cardFileSize}`}
+                >
                   {formatFileSize(
                     stamp.file_size_bytes,
                     stamp.stamp_mimetype === "text/plain",
                   )}
-                </div>
+                </PillWithTooltip>
               )}
             </div>
 
@@ -1318,11 +1107,17 @@ export function StampCard({
             {/* Row 1: amount pill (left) + time_ago pill (right) */}
             {saleData && (
               <div class="flex items-center justify-between mt-2 w-full">
-                <div class={`${containerPill} ${cardSupply}`}>
+                <PillWithTooltip
+                  label="SUPPLY"
+                  className={`${containerPill} ${cardSupply}`}
+                >
                   {saleData.dispense_quantity ?? 1}/{stamp.supply ?? 1}
-                </div>
+                </PillWithTooltip>
                 {(saleData.sale_time || saleData.time_ago) && (
-                  <div class={`${containerPill} ${cardFileSize} text-[10px]`}>
+                  <PillWithTooltip
+                    label="SALE TIME"
+                    className={`${containerPill} ${cardFileSize} text-[10px]`}
+                  >
                     {(() => {
                       const { sale_time, time_ago } = saleData;
                       if (sale_time) {
@@ -1336,23 +1131,29 @@ export function StampCard({
                       }
                       return time_ago;
                     })()}
-                  </div>
+                  </PillWithTooltip>
                 )}
               </div>
             )}
 
             {/* Row 2: File type + File size pills */}
             <div class="flex items-center justify-between mt-2 w-full">
-              <div class={`${containerPill} ${cardFileType}`}>
+              <PillWithTooltip
+                label="FILE TYPE"
+                className={`${containerPill} ${cardFileType}`}
+              >
                 {formatFileType(stamp.stamp_mimetype)}
-              </div>
+              </PillWithTooltip>
               {stamp.file_size_bytes != null && (
-                <div class={`${containerPill} ${cardFileSize}`}>
+                <PillWithTooltip
+                  label="FILE SIZE"
+                  className={`${containerPill} ${cardFileSize}`}
+                >
                   {formatFileSize(
                     stamp.file_size_bytes,
                     stamp.stamp_mimetype === "text/plain",
                   )}
-                </div>
+                </PillWithTooltip>
               )}
             </div>
 
@@ -1413,11 +1214,12 @@ export function StampCard({
               {displayStampHash && <span class="font-light">#</span>}
               {stampValue}
             </div>
-            <div
-              class={`mt-1.5 ${containerPill} ${cardPriceCompact}`}
+            <PillWithTooltip
+              label="PRICE"
+              className={`mt-1.5 ${containerPill} ${cardPriceCompact}`}
             >
               {displayPriceBTC().text}
-            </div>
+            </PillWithTooltip>
           </div>
         )}
       </a>
