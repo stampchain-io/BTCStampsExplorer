@@ -1,5 +1,5 @@
 /* ===== COLLECTION DETAILS HEADER COMPONENT ===== */
-import { Icon, PlaceholderImage } from "$icon";
+import { Icon, PlaceholderImage, UserProfileIcon } from "$icon";
 import {
   body,
   container1,
@@ -162,19 +162,16 @@ export const CollectionDetailHeader = (
   // Plain icon + address, no label - matches StampInfo's creator/artist
   // layout (size, weight, underline, hover) - used in the desktop second row
   const creatorInline = (
-    <span class="group flex items-center gap-2">
-      <Icon
-        type="icon"
-        name="userCircle"
-        weight="bold"
-        size="xs"
-        color="custom"
-        className="stroke-color-neutral-200 group-hover:stroke-color-hover transition-colors duration-200 translate-y-0.5"
-      />
+    <UserProfileIcon
+      size="xs"
+      weight="bold"
+      className="stroke-color-neutral-200 translate-y-0.5"
+      link
+    >
       <span class="font-normal text-sm text-color-neutral-200 link-neutral-200 group-hover:text-color-hover transition-colors duration-200">
         {creatorDisplay}
       </span>
-    </span>
+    </UserProfileIcon>
   );
 
   // Covers the whole header container (instead of a small anchored box) on

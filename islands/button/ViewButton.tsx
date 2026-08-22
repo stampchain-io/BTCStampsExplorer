@@ -8,19 +8,39 @@ import { tooltipIcon } from "$notification";
 import { useCallback, useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
-// "cardHorizontal" is a reserved placeholder for a future layout — it is
-// not part of the click-cycle below yet (see nextMode/iconName/ariaLabel).
 type ViewMode =
   | "cardVertical"
   | "cardSquare"
   | "cardRow"
   | "cardHorizontal";
 
+/* ===== CONSTANTS ===== */
+const ICON_BY_MODE: Record<ViewMode, string> = {
+  cardVertical: "viewCardVertical",
+  cardSquare: "viewCardSquare",
+  cardRow: "viewCardRow",
+  cardHorizontal: "viewCardHorizontal",
+};
+const ARIA_LABEL_BY_MODE: Record<ViewMode, string> = {
+  cardVertical: "Switch to detailed grid view",
+  cardSquare: "Switch to minimal grid view",
+  cardRow: "Switch to row view",
+  cardHorizontal: "Switch to horizontal view",
+};
+
 /* ===== COMPONENT ===== */
 export function ViewButton(
-  { viewMode, paramName = "view" }: {
+  {
+    viewMode,
+    paramName = "view",
+    modes = ["cardVertical", "cardSquare", "cardRow"],
+  }: {
     viewMode: ViewMode;
     paramName?: string;
+    // Modes to cycle through on click, in order. Defaults to the original
+    // 3-mode cycle used by explorer/marketplace; pass a custom (e.g. 2-mode)
+    // list for other pages such as the collection overview.
+    modes?: ViewMode[];
   },
 ) {
   const [isTooltipVisible, setIsTooltipVisible] = useState(false);
@@ -64,23 +84,12 @@ export function ViewButton(
     [paramName],
   );
 
-  const nextMode: ViewMode = viewMode === "cardVertical"
-    ? "cardSquare"
-    : viewMode === "cardSquare"
-    ? "cardRow"
-    : "cardVertical";
+  const currentIndex = modes.indexOf(viewMode);
+  const nextMode: ViewMode =
+    modes[(currentIndex + 1 + modes.length) % modes.length] ?? modes[0];
 
-  const iconName = viewMode === "cardSquare"
-    ? "viewCardSquare"
-    : viewMode === "cardRow"
-    ? "viewCardRow"
-    : "viewCardVertical";
-
-  const ariaLabel = viewMode === "cardVertical"
-    ? "Switch to minimal grid view"
-    : viewMode === "cardSquare"
-    ? "Switch to row view"
-    : "Switch to detailed grid view";
+  const iconName = ICON_BY_MODE[viewMode];
+  const ariaLabel = ARIA_LABEL_BY_MODE[nextMode];
 
   return (
     <div

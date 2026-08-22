@@ -1,8 +1,9 @@
 /* ===== COLLECTION GALLERY COMPONENT ===== */
 /* @baba - not updated */
 import { PaginationButtons, ViewAllButton } from "$button";
-import { CollectionCardHorizontal } from "$card";
+import { CollectionCardHorizontal, CollectionCardVertical } from "$card";
 import { BREAKPOINTS } from "$constants";
+import { gridCardMd } from "$layout";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
 import { subtitleNeutral, titleNeutral } from "$text";
 import type { Collection } from "$types/stamp.d.ts";
@@ -27,6 +28,9 @@ export interface CollectionGalleryProps {
     onPageChange?: (page: number) => void;
   };
   viewAllHref?: string;
+  // "cardHorizontal" (default): full-width row card with background image.
+  // "cardVertical": StampCard-style square grid card.
+  viewMode?: "cardHorizontal" | "cardVertical";
 }
 
 /* ===== STATE ===== */
@@ -38,6 +42,7 @@ export default function CollectionGallery({
   displayCounts,
   pagination,
   viewAllHref,
+  viewMode = "cardHorizontal",
 }: CollectionGalleryProps) {
   const { width } = useWindowSize();
   // Empty-collection and known test/placeholder name filtering is enforced
@@ -94,7 +99,13 @@ export default function CollectionGallery({
   }, [width, displayCounts, collectionArray.length]);
 
   /* ===== RENDER ===== */
-  const grid = gridClass ?? "grid grid-cols-1 tablet:grid-cols-2 gap-5";
+  const grid = gridClass ??
+    (viewMode === "cardVertical"
+      ? gridCardMd
+      : "grid grid-cols-1 tablet:grid-cols-2 gap-5");
+  const CardComponent = viewMode === "cardVertical"
+    ? CollectionCardVertical
+    : CollectionCardHorizontal;
   return (
     <div>
       {title && <h3 class={titleNeutral}>{title}</h3>}
@@ -110,7 +121,7 @@ export default function CollectionGallery({
         {collectionArray.slice(0, displayCount).map((
           collection: Collection,
         ) => (
-          <CollectionCardHorizontal
+          <CardComponent
             key={collection.collection_id}
             collection={collection}
           />

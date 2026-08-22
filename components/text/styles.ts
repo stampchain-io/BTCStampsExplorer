@@ -210,7 +210,7 @@ export const cardStampNumber = `font-extrabold text-base min-[420px]:text-lg
 export const cardRowStampNumber = `font-extrabold text-sm
    text-color-neutral-200 group-hover:text-color-hover tracking-wide ${truncate} ${select}`;
 export const cardCreator =
-  `font-semibold text-xs mobileMd:text-sm text-color-neutral-200 text-center ${truncate} ${select}`;
+  `font-medium text-sm text-color-neutral-200 text-center ${truncate} ${select}`;
 export const cardSupply =
   `font-semibold text-xs text-color-primary-400 ${select}`;
 export const cardFileType =

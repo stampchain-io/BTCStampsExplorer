@@ -1,15 +1,23 @@
 /* ===== COLLECTION OVERVIEW CARD COMPONENT ===== */
-import { container2Hover, containerPill, shadowGlowPurple } from "$layout";
+import { UserProfileIcon } from "$icon";
+import {
+  container2Hover,
+  containerCard,
+  containerPill,
+  shadowGlowPurple,
+} from "$layout";
 import {
   abbreviateAddress,
   formatBTC,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { tooltipButton } from "$notification";
 import {
+  cardCreator,
+  cardFileSize,
+  cardFileType,
   cardPrice,
   cardStampNumber,
   cardSupply,
-  labelSm,
   textSm,
   valueSm,
 } from "$text";
@@ -109,48 +117,49 @@ export function CollectionCard(
               {collectionName.toUpperCase()}
             </h2>
 
-            <h5 class={`${labelSm} mt-1`}>
-              BY{" "}
-              <span class={`${valueSm} normal-case`}>
-                {collection.creators && collection.creators.length > 0
-                  ? (
-                    <>
-                      {/* Use creator name if available, otherwise fall back to address */}
-                      {collection.creator_names &&
-                          collection.creator_names.length > 0
-                        ? <span>{collection.creator_names?.[0] ?? ""}</span>
-                        : (
-                          <>
-                            <span class="min-[420px]:hidden">
-                              {abbreviateAddress(
-                                collection.creators?.[0] ?? "",
-                                4,
-                              )}
-                            </span>
-                            <span class="hidden min-[420px]:inline mobileMd:hidden">
-                              {abbreviateAddress(
-                                collection.creators?.[0] ?? "",
-                                6,
-                              )}
-                            </span>
-                            <span class="hidden mobileMd:inline mobileLg:hidden tablet:inline desktop:hidden">
-                              {abbreviateAddress(
-                                collection.creators?.[0] ?? "",
-                                8,
-                              )}
-                            </span>
-                            <span class="hidden mobileLg:inline tablet:hidden desktop:inline">
-                              {abbreviateAddress(
-                                collection.creators?.[0] ?? "",
-                                12,
-                              )}
-                            </span>
-                          </>
-                        )}
-                    </>
-                  )
-                  : "N/A"}
-              </span>
+            <h5 class="mt-1">
+              <UserProfileIcon size="xxs" weight="bold">
+                <span class={`${valueSm} normal-case`}>
+                  {collection.creators && collection.creators.length > 0
+                    ? (
+                      <>
+                        {/* Use creator name if available, otherwise fall back to address */}
+                        {collection.creator_names &&
+                            collection.creator_names.length > 0
+                          ? <span>{collection.creator_names?.[0] ?? ""}</span>
+                          : (
+                            <>
+                              <span class="min-[420px]:hidden">
+                                {abbreviateAddress(
+                                  collection.creators?.[0] ?? "",
+                                  4,
+                                )}
+                              </span>
+                              <span class="hidden min-[420px]:inline mobileMd:hidden">
+                                {abbreviateAddress(
+                                  collection.creators?.[0] ?? "",
+                                  6,
+                                )}
+                              </span>
+                              <span class="hidden mobileMd:inline mobileLg:hidden tablet:inline desktop:hidden">
+                                {abbreviateAddress(
+                                  collection.creators?.[0] ?? "",
+                                  8,
+                                )}
+                              </span>
+                              <span class="hidden mobileLg:inline tablet:hidden desktop:inline">
+                                {abbreviateAddress(
+                                  collection.creators?.[0] ?? "",
+                                  12,
+                                )}
+                              </span>
+                            </>
+                          )}
+                      </>
+                    )
+                    : "UNKNOWN"}
+                </span>
+              </UserProfileIcon>
             </h5>
 
             {/* ===== STATS (base breakpoint, left-aligned below BY) ===== */}
@@ -176,6 +185,256 @@ export function CollectionCard(
 
       {/* ===== CARD GALLERY ===== */}
       <div class="grid grid-cols-4 min-[420px]:grid-cols-6 mobileMd:grid-cols-7 mobileLg:grid-cols-8 min-[880px]:grid-cols-9 tablet:grid-cols-7 desktop:grid-cols-8 mt-4 gap-5">
+        {collection.stamp_images &&
+          collection.stamp_images.slice(-9).reverse().map(
+            (imageUrl: string, index: number) => {
+              return (
+                <div
+                  className={`w-full h-full rounded-xl aspect-stamp image-rendering-pixelated overflow-hidden ${
+                    GALLERY_IMAGE_VISIBILITY[index] ?? ""
+                  }`}
+                >
+                  <div class="relative flex items-center justify-center w-full h-full">
+                    <img
+                      key={index}
+                      src={imageUrl}
+                      alt=""
+                      className={`w-full h-full object-contain pixelart`}
+                    />
+                  </div>
+                </div>
+              );
+            },
+          )}
+      </div>
+    </a>
+  );
+}
+
+/* ===== COMPONENT (VERTICAL VARIANT) ===== */
+// Layout borrowed from StampCard's cardVerticalDetail: square image on top,
+// then a centered info column below (CPID row skipped - collections have no
+// CPID). Rows: name, creator, stamps+holders, floor price+mcap.
+export function CollectionCardVertical(
+  { collection }: { collection: CollectionWithOptionalMarketData },
+) {
+  // Early return if collection is undefined
+  if (!collection) {
+    return null;
+  }
+
+  // Safe access to collection properties with fallbacks
+  const collectionName = collection.collection_name ?? "Unknown Collection";
+  const stampImage = collection.first_stamp_image ?? collection.img ?? "";
+  const stampCount = collection.stamp_count ?? 0;
+  const holderCount = collection.marketData?.uniqueHolders ?? null;
+  const floorPriceBTC = collection.marketData?.floorPriceBTC ?? null;
+  const marketCapBTC = collection.marketData?.totalValueBTC ?? null;
+
+  const creatorDisplay = collection.creators && collection.creators.length > 0
+    ? (collection.creator_names && collection.creator_names.length > 0
+      ? collection.creator_names[0] ?? "UNKNOWN"
+      : abbreviateAddress(collection.creators[0] ?? "", 6))
+    : "UNKNOWN";
+
+  return (
+    <div class="relative flex justify-center w-full h-full max-w-72">
+      <a
+        href={`/collection/${collectionName}`}
+        className={containerCard}
+      >
+        {/* ===== IMAGE ===== */}
+        <div class="relative w-full h-full">
+          <div class="aspect-stamp w-full h-full rounded-xl overflow-hidden">
+            <img
+              src={stampImage}
+              alt=""
+              className="w-full h-full object-cover"
+            />
+          </div>
+        </div>
+
+        {/* ===== INFO COLUMN ===== */}
+        <div class="flex flex-col items-center p-0.5">
+          {/* Collection Name */}
+          <h2
+            class={`block mt-1 w-full text-center truncate ${cardStampNumber} !text-lg`}
+          >
+            {collectionName.toUpperCase()}
+          </h2>
+
+          {/* Creator Name or Abbreviated Address */}
+          <h5 class="mt-1 max-w-full">
+            <UserProfileIcon wrapperClassName="justify-center w-full">
+              <span class={cardCreator}>{creatorDisplay}</span>
+            </UserProfileIcon>
+          </h5>
+
+          {/* Row 1: Stamps (left) + Holders (right) */}
+          <div class="flex justify-between items-center gap-2 mt-2 w-full">
+            <PillWithTooltip
+              label="STAMPS"
+              className={`${containerPill} ${cardSupply}`}
+            >
+              {stampCount}
+            </PillWithTooltip>
+            <PillWithTooltip
+              label="HOLDERS"
+              className={`${containerPill} ${cardFileType}`}
+            >
+              {holderCount ?? "N/A"}
+            </PillWithTooltip>
+          </div>
+
+          {/* Row 2: Floor price (left) + Market cap (right) */}
+          <div class="flex items-center justify-between gap-2 mt-2 w-full">
+            <PillWithTooltip
+              label="FLOOR PRICE"
+              className={`${containerPill} ${cardPrice}`}
+            >
+              {floorPriceBTC ? formatBTC(floorPriceBTC) : "N/A"} BTC
+            </PillWithTooltip>
+            <PillWithTooltip
+              label="MARKET CAP"
+              className={`${containerPill} ${cardFileSize}`}
+            >
+              {marketCapBTC ? formatBTC(marketCapBTC) : "N/A"} BTC
+            </PillWithTooltip>
+          </div>
+        </div>
+      </a>
+    </div>
+  );
+}
+
+/* ===== COMPONENT (HORIZONTAL VARIANT) ===== */
+// Same content as CollectionCard, but the stampImage is rendered full-bleed
+// behind the card content instead of as a left-aligned thumbnail.
+export function CollectionCardHorizontal(
+  { collection }: { collection: CollectionWithOptionalMarketData },
+) {
+  // Early return if collection is undefined
+  if (!collection) {
+    return null;
+  }
+
+  // Safe access to collection properties with fallbacks
+  const collectionName = collection.collection_name ?? "Unknown Collection";
+  const stampImage = collection.first_stamp_image ?? collection.img ?? "";
+  const stampCount = collection.stamp_count ?? 0;
+
+  const statsPills = (
+    <>
+      <PillWithTooltip
+        label="STAMPS"
+        className={`${containerPill} ${cardSupply}`}
+      >
+        {stampCount}
+      </PillWithTooltip>
+      <PillWithTooltip
+        label="FLOOR PRICE"
+        className={`${containerPill} ${cardPrice}`}
+      >
+        {collection.marketData?.floorPriceBTC
+          ? formatBTC(collection.marketData.floorPriceBTC)
+          : "N/A"} BTC
+      </PillWithTooltip>
+    </>
+  );
+
+  return (
+    <a
+      href={`/collection/${collectionName}`}
+      className={`relative h-[280px] overflow-hidden ${container2Hover} ${shadowGlowPurple} p-3 !gap-5 group`}
+    >
+      {/* ===== STAMP IMAGE with dark overlay gradient (top -> bottom) ===== */}
+      {stampImage && (
+        <div class="absolute inset-0 z-0">
+          <img
+            src={stampImage}
+            alt=""
+            className="w-full h-full object-cover"
+          />
+          <div class="absolute inset-0 bg-gradient-to-b from-color-neutral-900/95 via-color-neutral-950/85 to-color-neutral-950/75" />
+        </div>
+      )}
+
+      {/* ===== CARD HEADER ===== */}
+      <div class="relative z-10 flex w-full gap-5">
+        <div class="flex justify-between gap-3 w-full min-w-0">
+          <div class="flex flex-col flex-1 min-w-0 mt-0.5">
+            <h2 class={`truncate ${cardStampNumber} !text-lg`}>
+              {collectionName.toUpperCase()}
+            </h2>
+
+            <h5 class="mt-1">
+              <UserProfileIcon size="xxs" weight="bold">
+                <span class={`${valueSm} normal-case`}>
+                  {collection.creators && collection.creators.length > 0
+                    ? (
+                      <>
+                        {/* Use creator name if available, otherwise fall back to address */}
+                        {collection.creator_names &&
+                            collection.creator_names.length > 0
+                          ? <span>{collection.creator_names?.[0] ?? ""}</span>
+                          : (
+                            <>
+                              <span class="min-[420px]:hidden">
+                                {abbreviateAddress(
+                                  collection.creators?.[0] ?? "",
+                                  4,
+                                )}
+                              </span>
+                              <span class="hidden min-[420px]:inline mobileMd:hidden">
+                                {abbreviateAddress(
+                                  collection.creators?.[0] ?? "",
+                                  6,
+                                )}
+                              </span>
+                              <span class="hidden mobileMd:inline mobileLg:hidden tablet:inline desktop:hidden">
+                                {abbreviateAddress(
+                                  collection.creators?.[0] ?? "",
+                                  8,
+                                )}
+                              </span>
+                              <span class="hidden mobileLg:inline tablet:hidden desktop:inline">
+                                {abbreviateAddress(
+                                  collection.creators?.[0] ?? "",
+                                  12,
+                                )}
+                              </span>
+                            </>
+                          )}
+                      </>
+                    )
+                    : "UNKNOWN"}
+                </span>
+              </UserProfileIcon>
+            </h5>
+
+            {/* ===== STATS (base breakpoint, left-aligned below BY) ===== */}
+            <div class="flex flex-col items-start min-[480px]:hidden gap-2 pt-2">
+              {statsPills}
+            </div>
+
+            {collection.collection_description && (
+              <h6
+                class={`${textSm} hidden min-[480px]:line-clamp-2 pt-2`}
+              >
+                {collection.collection_description}
+              </h6>
+            )}
+          </div>
+
+          {/* ===== STATS (min-[480px]+, top-right column) ===== */}
+          <div class="hidden min-[480px]:flex flex-col items-end gap-2 shrink-0">
+            {statsPills}
+          </div>
+        </div>
+      </div>
+
+      {/* ===== CARD GALLERY ===== */}
+      <div class="relative z-10 grid grid-cols-4 min-[420px]:grid-cols-6 mobileMd:grid-cols-7 mobileLg:grid-cols-8 min-[880px]:grid-cols-9 tablet:grid-cols-7 desktop:grid-cols-8 mt-4 gap-5">
         {collection.stamp_images &&
           collection.stamp_images.slice(-9).reverse().map(
             (imageUrl: string, index: number) => {

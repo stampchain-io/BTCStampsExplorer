@@ -4,7 +4,7 @@
 import { Button } from "$button";
 import { ActivityLevelIcon } from "$components/indicators/ActivityLevelIcon.tsx";
 import { ActivityLevelIndicator } from "$components/indicators/ActivityLevelIndicator.tsx";
-import { Icon, LoadingIcon, PlaceholderImage } from "$icon";
+import { Icon, LoadingIcon, PlaceholderImage, UserProfileIcon } from "$icon";
 import StampTextContent from "$islands/content/stampDetailContent/StampTextContent.tsx";
 import BuyStampModal from "$islands/modal/BuyStampModal.tsx";
 import { openModal } from "$islands/modal/states.ts";
@@ -610,9 +610,11 @@ export function StampCard({
                     {stamp.cpid}
                   </div>
                 )}
-                <div class={`mt-0.5 ${cardCreator} !text-left`}>
-                  {creatorDisplay}
-                </div>
+                <UserProfileIcon wrapperClassName="mt-0.5">
+                  <span class={`${cardCreator} !text-left`}>
+                    {creatorDisplay}
+                  </span>
+                </UserProfileIcon>
               </div>
             </div>
           </div>
@@ -789,11 +791,11 @@ export function StampCard({
                     {stamp.cpid}
                   </div>
                 )}
-                <div
-                  class={`mt-0.5 ${cardCreator} !text-sm !text-left`}
-                >
-                  {creatorDisplay}
-                </div>
+                <UserProfileIcon wrapperClassName="mt-0.5">
+                  <span class={`${cardCreator} !text-sm !text-left`}>
+                    {creatorDisplay}
+                  </span>
+                </UserProfileIcon>
               </div>
             </div>
           </div>
@@ -888,9 +890,9 @@ export function StampCard({
             )}
 
             {/* Creator Name or Abbreviated Address */}
-            <div class={`mt-1 ${cardCreator}`}>
-              {creatorDisplay}
-            </div>
+            <UserProfileIcon wrapperClassName="justify-center w-full mt-1">
+              <span class={cardCreator}>{creatorDisplay}</span>
+            </UserProfileIcon>
 
             {/* Row 1: Supply (left) + Status Icons (right) */}
             <div class="flex justify-between items-center mt-2 w-full">
@@ -1100,9 +1102,9 @@ export function StampCard({
             )}
 
             {/* Creator Name or Abbreviated Address */}
-            <div class={`mt-1 ${cardCreator}`}>
-              {creatorDisplay}
-            </div>
+            <UserProfileIcon wrapperClassName="justify-center w-full mt-1">
+              <span class={cardCreator}>{creatorDisplay}</span>
+            </UserProfileIcon>
 
             {/* Row 1: amount pill (left) + time_ago pill (right) */}
             {saleData && (

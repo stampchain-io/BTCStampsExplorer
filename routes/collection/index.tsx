@@ -27,6 +27,10 @@ export const handler: Handlers<CollectionOverviewPageProps> = {
         editionsParam === "single" || editionsParam === "multiple"
           ? editionsParam
           : undefined;
+      const viewMode: "cardHorizontal" | "cardVertical" =
+        url.searchParams.get("view") === "cardVertical"
+          ? "cardVertical"
+          : "cardHorizontal";
 
       const collectionsData = await CollectionController.getCollectionStamps({
         limit: page_size,
@@ -44,6 +48,7 @@ export const handler: Handlers<CollectionOverviewPageProps> = {
         filterBy,
         sortBy,
         editionsFilter,
+        viewMode,
       });
     } catch (error) {
       console.error("Error in collection overview:", error);
@@ -65,6 +70,7 @@ export default function CollectionLandingPage(
     total,
     sortBy = "ASC",
     editionsFilter,
+    viewMode = "cardHorizontal",
   } = data;
 
   /* ===== COMPONENT ===== */
@@ -77,10 +83,12 @@ export default function CollectionLandingPage(
       <CollectionOverviewHeader
         sortBy={sortBy}
         total={total ?? 0}
+        viewMode={viewMode}
         {...(editionsFilter && { editionsFilter })}
       />
       <CollectionOverviewContent
         collections={collections || []}
+        viewMode={viewMode}
         pagination={{
           page: page ?? 1,
           totalPages: pages ?? 1,

@@ -6,12 +6,14 @@ import type { CollectionOverviewContentProps } from "$types/ui.d.ts";
 export function CollectionOverviewContent({
   collections = [],
   pagination,
+  viewMode = "cardHorizontal",
 }: CollectionOverviewContentProps) {
   /* ===== RENDER ===== */
   return (
     <div class="w-full pt-5">
       <CollectionGallery
         collections={collections}
+        viewMode={viewMode}
         {...(pagination && { pagination })}
       />
     </div>

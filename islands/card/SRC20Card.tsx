@@ -1,5 +1,5 @@
 /* ===== SRC20 TRANSACTION CARD COMPONENT ===== */
-import { PlaceholderImage } from "$icon";
+import { PlaceholderImage, UserProfileIcon } from "$icon";
 import { container3, containerCard, containerPill } from "$layout";
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
@@ -248,9 +248,11 @@ export function SRC20Card(
       <div
         class={`flex flex-col items-center justify-center px-3 py-2 gap-1 ${container3} cursor-pointer`}
       >
-        <div class={cardFileType}>
-          {src20.creator_name ?? abbreviateAddress(src20.creator, 5)}
-        </div>
+        <UserProfileIcon>
+          <span class={cardFileType}>
+            {src20.creator_name ?? abbreviateAddress(src20.creator, 5)}
+          </span>
+        </UserProfileIcon>
         <div
           class={`hidden min-[420px]:flex ${cardEyebrowNeutral} py-0`}
         >
@@ -294,9 +296,11 @@ export function SRC20Card(
       <div
         class={`flex flex-col items-center justify-center px-3 py-2 ${container3} cursor-pointer`}
       >
-        <div class={cardFileType}>
-          {src20.creator_name ?? abbreviateAddress(src20.creator, 5)}
-        </div>
+        <UserProfileIcon>
+          <span class={cardFileType}>
+            {src20.creator_name ?? abbreviateAddress(src20.creator, 5)}
+          </span>
+        </UserProfileIcon>
       </div>
     </>
   );

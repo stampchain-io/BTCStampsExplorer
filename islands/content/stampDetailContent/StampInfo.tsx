@@ -1,6 +1,6 @@
 /* ===== STAMP INFO COMPONENT ===== */
 import { Button } from "$button";
-import { Icon } from "$icon";
+import { Icon, UserProfileIcon } from "$icon";
 import BuyStampModal from "$islands/modal/BuyStampModal.tsx";
 import { openModal } from "$islands/modal/states.ts";
 import {
@@ -792,19 +792,17 @@ export function StampInfo(
               </h6>
             )}
 
-            <div className="flex items-center gap-2 mt-2">
-              <Icon
-                type="icon"
-                name="userCircle"
-                weight="bold"
-                size="xs"
-                color="custom"
-                className="stroke-color-neutral-200 group-hover:stroke-color-hover transition-colors duration-200 translate-y-0.5"
-              />
+            <UserProfileIcon
+              size="xs"
+              weight="bold"
+              className="stroke-color-neutral-200 translate-y-0.5"
+              wrapperClassName="mt-2"
+              link
+            >
               <span className="font-normal text-sm text-color-neutral-200 link-neutral-200 group-hover:text-color-hover transition-colors duration-200">
                 {creatorDisplay}
               </span>
-            </div>
+            </UserProfileIcon>
 
             <div className="flex flex-wrap justify-between w-full min-[420px]:w-[270px] gap-2 mt-6">
               {!isSrc20Stamp() && (

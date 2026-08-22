@@ -1,6 +1,7 @@
 /* ===== COLLECTION OVERVIEW HEADER COMPONENT ===== */
 import { SelectorButtons } from "$button";
 import { SortButton } from "$islands/button/SortButton.tsx";
+import { ViewButton } from "$islands/button/ViewButton.tsx";
 import { container2Icon, PillContentCount } from "$layout";
 import {
   getCurrentPathname,
@@ -16,10 +17,12 @@ function CollectionOverviewHeader(
     sortBy = "ASC",
     editionsFilter = "all",
     total = 0,
+    viewMode = "cardHorizontal",
   }: {
     sortBy?: "ASC" | "DESC";
     editionsFilter?: "all" | "single" | "multiple";
     total?: number;
+    viewMode?: "cardHorizontal" | "cardVertical";
   },
 ) {
   /* ===== EVENT HANDLERS ===== */
@@ -69,8 +72,14 @@ function CollectionOverviewHeader(
           />
         </div>
 
-        {/* Sort Control - Right */}
-        <div class="flex justify-end pt-3 mobileMd:pt-0">
+        {/* View Toggle + Sort Controls - Right */}
+        <div class="flex justify-end gap-3 pt-3 mobileMd:pt-0">
+          <div class={container2Icon}>
+            <ViewButton
+              viewMode={viewMode}
+              modes={["cardHorizontal", "cardVertical"]}
+            />
+          </div>
           <div class={container2Icon}>
             <SortButton initSort={sortBy} />
           </div>

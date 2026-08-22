@@ -1,5 +1,5 @@
 /* ===== COLLECTION DETAILS HEADER COMPONENT ===== */
-import { Icon, PlaceholderImage } from "$icon";
+import { Icon, PlaceholderImage, UserProfileIcon } from "$icon";
 import {
   body,
   container1,
@@ -171,22 +171,18 @@ export const CollectionDetailHeader = (
     <StatItem
       label="CREATOR"
       value={
-        <span class="flex items-center gap-1.5">
-          <Icon
-            type="icon"
-            name="userCircle"
-            weight="bold"
-            size="xxs"
-            color="custom"
-            className="stroke-color-neutral-200"
-          />
+        <UserProfileIcon
+          size="xxs"
+          weight="bold"
+          className="stroke-color-neutral-200"
+        >
           <span class="mobileMd:hidden tablet:inline">
             {creatorDisplayAbbreviated}
           </span>
           <span class="hidden mobileMd:inline tablet:hidden">
             {creatorDisplayFull}
           </span>
-        </span>
+        </UserProfileIcon>
       }
       align="left"
     />
