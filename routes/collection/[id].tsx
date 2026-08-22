@@ -42,6 +42,11 @@ export const handler: Handlers = {
       const market: "all" | "listings" =
         url.searchParams.get("market") === "listings" ? "listings" : "all";
 
+      const viewMode: "cardVertical" | "cardSquare" =
+        url.searchParams.get("view") === "cardSquare"
+          ? "cardSquare"
+          : "cardVertical";
+
       const collection = await CollectionService.getCollectionByName(id);
 
       if (!collection) {
@@ -77,6 +82,7 @@ export const handler: Handlers = {
         sortBy,
         selectedTab,
         market,
+        viewMode,
       };
       return await ctx.render(data);
     } catch (error) {
@@ -103,6 +109,7 @@ export default function CollectionDetailPage(
     collection,
     market = "all",
     sortBy,
+    viewMode = "cardVertical",
   } = props.data;
 
   /* ===== COMPONENT ===== */
@@ -118,6 +125,7 @@ export default function CollectionDetailPage(
           stamps={stamps}
           market={market}
           sortBy={sortBy}
+          viewMode={viewMode}
           totalStamps={collection?.stamp_count}
           totalEditions={collection?.total_editions}
           listedStamps={collection?.marketData?.listedStamps ?? null}

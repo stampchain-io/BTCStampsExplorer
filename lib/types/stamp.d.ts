@@ -2300,6 +2300,7 @@ export type StampCardVariant =
   | "cardSquare"
   | "cardSquareDetail"
   | "cardVerticalDetail"
+  | "cardVerticalCollection"
   | "cardVerticalListing"
   | "cardVerticalSale"
   | "cardVerticalSaleCompact"

@@ -206,7 +206,7 @@ export const handler: Handlers = {
                     stamp_mimetype: sale.stamp_mimetype || "",
                     stamp_hash: "",
                     file_hash: "",
-                    file_size_bytes: null,
+                    file_size_bytes: sale.file_size_bytes ?? null,
                     ident: "STAMP" as const,
                     creator: sale.creator || sale.source,
                     creator_name: sale.creator_name,

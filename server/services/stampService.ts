@@ -494,6 +494,7 @@ export class StampService {
         // Additional stamp metadata for compatibility
         stamp_url: stamp.stamp_url,
         stamp_mimetype: stamp.stamp_mimetype,
+        file_size_bytes: stamp.file_size_bytes ?? null,
         creator: stamp.creator,
         creator_name: stamp.creator_name,
 

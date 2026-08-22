@@ -423,7 +423,7 @@ cardHashSymbol: "font-light text-color-purple-light text-lg mobileLg:text-xl"
 cardStampNumber: "font-extrabold text-color-purple-light truncate text-lg mobileLg:text-xl"
 // Color: #BB00FF
 
-cardCreator: "font-semibold text-color-grey-light break-words text-center text-xs mobileMd:text-sm"
+cardCreator: "font-medium text-color-grey-light break-words text-center text-sm"
 // Color: #f9f2e9
 
 cardPrice: "font-normal text-color-grey-light text-nowrap text-xs mobileLg:text-sm"

@@ -792,7 +792,7 @@ export function StampCard({
                   </div>
                 )}
                 <UserProfileIcon wrapperClassName="mt-0.5">
-                  <span class={`${cardCreator} !text-sm !text-left`}>
+                  <span class={`${cardCreator} !text-left`}>
                     {creatorDisplay}
                   </span>
                 </UserProfileIcon>
@@ -1077,6 +1077,168 @@ export function StampCard({
               </div>
             )} */
             }
+          </div>
+        )}
+
+        {/* ===== VERTICAL COLLECTION CARD (collection detail page) ===== */}
+        {variant === "cardVerticalCollection" && (
+          <div class="flex flex-col items-center p-0.5">
+            {/* Stamp Number */}
+            <div
+              class={`flex items-center justify-center mt-1
+              ${cardStampNumber}`}
+            >
+              {displayStampHash && <span class="font-light">#</span>}
+              {stampValue}
+            </div>
+
+            {/* CPID */}
+            {stamp.cpid && (
+              <div
+                class={`mt-0.5 font-mono text-xs text-color-neutral-500 ${truncate}`}
+              >
+                {stamp.cpid}
+              </div>
+            )}
+
+            {/* Creator Name or Abbreviated Address */}
+            <UserProfileIcon wrapperClassName="justify-center w-full mt-1">
+              <span class={cardCreator}>{creatorDisplay}</span>
+            </UserProfileIcon>
+
+            {/* Row 1: Supply (left) + Status Icons (right) */}
+            <div class="flex justify-between items-center mt-2 w-full">
+              <PillWithTooltip
+                label="SUPPLY"
+                className={`${containerPill} ${cardSupply}`}
+              >
+                {supplyDisplay}
+              </PillWithTooltip>
+              <div class="flex items-center gap-1.5 mr-0.5 -translate-y-0.5">
+                {isListed && (
+                  <IconWithTooltip label={displayPriceBTC().text}>
+                    <Icon
+                      type="icon"
+                      name="bitcoin"
+                      weight="bold"
+                      size="custom"
+                      color="custom"
+                      className="w-[17px] h-[17px] stroke-color-secondary-400"
+                      ariaLabel="BTC"
+                    />
+                  </IconWithTooltip>
+                )}
+                {stamp.ident === "SRC-721" && (
+                  <IconWithTooltip label="RECURSIVE">
+                    <Icon
+                      type="icon"
+                      name="recursive"
+                      weight="bold"
+                      size="xxs"
+                      color="greyLight"
+                      ariaLabel="Recursive"
+                    />
+                  </IconWithTooltip>
+                )}
+                {Boolean(stamp.divisible) && (
+                  <IconWithTooltip label="DIVISIBLE">
+                    <Icon
+                      type="icon"
+                      name="divisible"
+                      weight="bold"
+                      size="xxs"
+                      color="greyLight"
+                      ariaLabel="Divisible"
+                    />
+                  </IconWithTooltip>
+                )}
+                {Boolean(stamp.keyburn) && (
+                  <IconWithTooltip label="KEYBURNED">
+                    <Icon
+                      type="icon"
+                      name="keyburned"
+                      weight="bold"
+                      size="xxs"
+                      color="greyLight"
+                      ariaLabel="Keyburned"
+                    />
+                  </IconWithTooltip>
+                )}
+                {stamp.locked
+                  ? (
+                    <IconWithTooltip label="LOCKED">
+                      <Icon
+                        type="icon"
+                        name="locked"
+                        weight="bold"
+                        size="xxs"
+                        color="greyLight"
+                        ariaLabel="Locked"
+                      />
+                    </IconWithTooltip>
+                  )
+                  : (
+                    <IconWithTooltip label="UNLOCKED">
+                      <Icon
+                        type="icon"
+                        name="unlocked"
+                        weight="bold"
+                        size="xxs"
+                        color="greyLight"
+                        ariaLabel="Unlocked"
+                      />
+                    </IconWithTooltip>
+                  )}
+              </div>
+            </div>
+
+            {/* Row 2: File type + File size pills */}
+            <div class="flex items-center justify-between mt-2 w-full">
+              <PillWithTooltip
+                label="FILE TYPE"
+                className={`${containerPill} ${cardFileType}`}
+              >
+                {formatFileType(stamp.stamp_mimetype)}
+              </PillWithTooltip>
+              {stamp.file_size_bytes != null && (
+                <PillWithTooltip
+                  label="FILE SIZE"
+                  className={`${containerPill} ${cardFileSize}`}
+                >
+                  {formatFileSize(
+                    stamp.file_size_bytes,
+                    stamp.stamp_mimetype === "text/plain",
+                  )}
+                </PillWithTooltip>
+              )}
+            </div>
+
+            {/* Row 3: Holder address container (bottom) - hidden for now,
+            pending real top-holder data (see github-issue-holder-data.md);
+            stamp.creator is only the original creator, not necessarily the
+            current holder
+            <div
+              class={`flex flex-col w-full mt-2 px-2.5 py-1.5 ${container3} cursor-pointer`}
+            >
+              <div class="flex justify-between items-center">
+                <div class={cardEyebrowNeutral}>
+                  HOLDER
+                </div>
+                <div class={cardFileSize}>
+                  {stamp.creator
+                    ? (
+                      <a
+                        href={`/wallet/${stamp.creator}`}
+                        class="link-neutral-400"
+                      >
+                        {abbreviateAddress(stamp.creator, abbreviationLength)}
+                      </a>
+                    )
+                    : <span class="text-color-neutral-500">N/A</span>}
+                </div>
+              </div>
+            </div>
+            */}
           </div>
         )}
 

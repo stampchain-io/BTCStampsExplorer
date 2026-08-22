@@ -134,7 +134,7 @@ export function SRC20Card(
             )
             : <PlaceholderImage variant="no-image" className="!rounded-full" />}
         </div>
-        <div class={`${cardCreator} !text-left !text-sm uppercase ${truncate}`}>
+        <div class={`${cardCreator} !text-left uppercase ${truncate}`}>
           <span class="font-light pr-0.5">$</span>
           {tick}
         </div>

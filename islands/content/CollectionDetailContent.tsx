@@ -2,14 +2,20 @@
 import { SelectorButtons } from "$button";
 import { StampCard } from "$card";
 import { SortButton } from "$islands/button/SortButton.tsx";
-import { container2Icon, EmptyState, PillContentCount } from "$layout";
+import { ViewButton } from "$islands/button/ViewButton.tsx";
+import {
+  container2Icon,
+  EmptyState,
+  gridCard,
+  PillContentCount,
+} from "$layout";
 import {
   getCurrentPathname,
   safeNavigate,
 } from "$lib/utils/navigation/freshNavigationUtils.ts";
 import { formatNumberWithCommas } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { subtitlePrimary } from "$text";
-import type { StampRow } from "$types/stamp.d.ts";
+import type { StampCardVariant, StampRow } from "$types/stamp.d.ts";
 import { useCallback } from "preact/hooks";
 
 /* ===== COMPONENT ===== */
@@ -18,6 +24,7 @@ export const CollectionDetailContent = (
     stamps = [],
     market = "all",
     sortBy = "DESC",
+    viewMode = "cardVertical",
     totalStamps = null,
     totalEditions = null,
     listedStamps = null,
@@ -25,11 +32,16 @@ export const CollectionDetailContent = (
     stamps: StampRow[];
     market?: "all" | "listings";
     sortBy?: "ASC" | "DESC";
+    viewMode?: "cardVertical" | "cardSquare";
     totalStamps?: number | null;
     totalEditions?: number | null;
     listedStamps?: number | null;
   },
 ) => {
+  const cardVariant: StampCardVariant = viewMode === "cardSquare"
+    ? "cardSquare"
+    : "cardVerticalCollection";
+
   const stampsValue = totalStamps !== null
     ? formatNumberWithCommas(totalStamps)
     : "N/A";
@@ -88,18 +100,27 @@ export const CollectionDetailContent = (
           size="xsR"
           color="primary"
         />
-        <div class={container2Icon}>
-          <SortButton initSort={sortBy} />
+        <div class="flex items-center gap-3">
+          <div class={container2Icon}>
+            <ViewButton
+              viewMode={viewMode}
+              modes={["cardVertical", "cardSquare"]}
+            />
+          </div>
+          <div class={container2Icon}>
+            <SortButton initSort={sortBy} />
+          </div>
         </div>
       </div>
 
       {stamps.length
         ? (
-          <div class="grid grid-cols-2 mobileMd:grid-cols-3 mobileLg:grid-cols-4 tablet:grid-cols-5 desktop:grid-cols-6 gap-5">
+          <div class={gridCard(viewMode)}>
             {stamps.map((stamp: StampRow) => (
               <StampCard
                 key={stamp.tx_hash}
                 stamp={stamp}
+                variant={cardVariant}
               />
             ))}
           </div>

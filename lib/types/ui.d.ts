@@ -3969,6 +3969,7 @@ export type CollectionDetailsPageProps = {
     sortBy: "ASC" | "DESC";
     filterBy: string[];
     market?: "all" | "listings";
+    viewMode?: "cardVertical" | "cardSquare";
   };
 };
 

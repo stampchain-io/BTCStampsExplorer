@@ -1561,6 +1561,7 @@ export class StampRepository {
         s.supply,
         s.divisible,
         s.locked,
+        s.file_size_bytes,
         ${includeMarketData ? `
         -- Sales data from stamp_sales_history
         ssh.btc_amount,
@@ -1635,7 +1636,8 @@ export class StampRepository {
             ident: row.ident,
             supply: row.supply,
             divisible: row.divisible,
-            locked: row.locked
+            locked: row.locked,
+            file_size_bytes: row.file_size_bytes ?? null
           };
 
           if (includeMarketData) {
