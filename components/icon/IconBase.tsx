@@ -295,7 +295,7 @@ export function BadgeIcon({ text, className = "" }: BadgeVariants) {
     <span
       class={`
         flex items-center justify-center z-[-999]
-        absolute top-[-16px] left-[-16px]
+        absolute top-[-15px] left-[-15px]
         size-5 rounded-full
         font-semibold text-[10px] text-color-hover tracking-wider
         bg-transparent group-hover:bg-gradient-to-b group-hover:from-color-neutral-800 group-hover:via-color-neutral-800 group-hover:to-color-neutral-900 border border-color-neutral-700

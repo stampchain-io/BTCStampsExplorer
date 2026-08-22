@@ -66,7 +66,9 @@ export function ExplorerContent({
         )
         : (
           /* ===== CARD GRID VIEW ===== */
-          <div class={gridCard(viewMode)}>
+          // Explorer page opts into the Md grid tier (2/3/4/5/6 cols) even
+          // in cardSquare view — other galleries keep the denser Sm tier.
+          <div class={gridCard(viewMode, true)}>
             {visible.map((entry, index) => {
               const key = entry.kind === "stamp"
                 ? (isRecentSales && entry.item.sale_data

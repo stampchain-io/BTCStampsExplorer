@@ -2,7 +2,7 @@
 import { SelectorButtons } from "$button";
 import { SortButton } from "$islands/button/SortButton.tsx";
 import { ViewButton } from "$islands/button/ViewButton.tsx";
-import { container2Icon, PillContentCount } from "$layout";
+import { container2Icon, PillContentCount, ScrollFadeRow } from "$layout";
 import {
   getCurrentPathname,
   safeNavigate,
@@ -22,7 +22,7 @@ function CollectionOverviewHeader(
     sortBy?: "ASC" | "DESC";
     editionsFilter?: "all" | "single" | "multiple";
     total?: number;
-    viewMode?: "cardHorizontal" | "cardVertical";
+    viewMode?: "cardHorizontal" | "cardVertical" | "cardSquare";
   },
 ) {
   /* ===== EVENT HANDLERS ===== */
@@ -56,9 +56,9 @@ function CollectionOverviewHeader(
         <PillContentCount value={formatNumberWithCommas(total)} />
       </div>
 
-      <div class="flex flex-col mobileMd:flex-row justify-between mobileMd:items-center w-full">
+      <ScrollFadeRow deps={[editionsFilter, viewMode, sortBy]}>
         {/* Editions Selector - Left */}
-        <div class="flex gap-3">
+        <div class="shrink-0">
           <SelectorButtons
             options={[
               { value: "all", label: "ALL" },
@@ -73,18 +73,18 @@ function CollectionOverviewHeader(
         </div>
 
         {/* View Toggle + Sort Controls - Right */}
-        <div class="flex justify-end gap-3 pt-3 mobileMd:pt-0">
+        <div class="shrink-0 flex ml-auto gap-3">
           <div class={container2Icon}>
             <ViewButton
               viewMode={viewMode}
-              modes={["cardHorizontal", "cardVertical"]}
+              modes={["cardHorizontal", "cardVertical", "cardSquare"]}
             />
           </div>
           <div class={container2Icon}>
             <SortButton initSort={sortBy} />
           </div>
         </div>
-      </div>
+      </ScrollFadeRow>
     </div>
   );
 }

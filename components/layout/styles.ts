@@ -108,10 +108,16 @@ export const gridCardMdSplitLg =
 
 export function gridCard(
   viewMode: "cardVertical" | "cardSquare" | "cardRow" | "cardHorizontal",
+  // Explorer page opts into the Md tier for cardSquare too (larger cards,
+  // matching cardVertical's column counts) — other galleries (marketplace,
+  // stamp overview, wallet) keep the denser Sm tier for cardSquare.
+  gridCardSmVariant = false,
 ): string {
   // cardRow renders a table (never calls this) and cardHorizontal has no
   // dedicated layout yet — falls back to the Md grid until built.
-  return viewMode === "cardSquare" ? gridCardSm : gridCardMd;
+  return viewMode === "cardSquare" && !gridCardSmVariant
+    ? gridCardSm
+    : gridCardMd;
 }
 
 // Wallet-specific grid picker: the split "all" section renders stamps and

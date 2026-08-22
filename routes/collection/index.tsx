@@ -27,9 +27,10 @@ export const handler: Handlers<CollectionOverviewPageProps> = {
         editionsParam === "single" || editionsParam === "multiple"
           ? editionsParam
           : undefined;
-      const viewMode: "cardHorizontal" | "cardVertical" =
-        url.searchParams.get("view") === "cardVertical"
-          ? "cardVertical"
+      const viewParam = url.searchParams.get("view");
+      const viewMode: "cardHorizontal" | "cardVertical" | "cardSquare" =
+        viewParam === "cardVertical" || viewParam === "cardSquare"
+          ? viewParam
           : "cardHorizontal";
 
       const collectionsData = await CollectionController.getCollectionStamps({

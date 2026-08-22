@@ -492,7 +492,7 @@ export interface CollectionOverviewPageProps {
   filterBy?: string[];
   sortBy?: "ASC" | "DESC";
   editionsFilter?: "single" | "multiple";
-  viewMode?: "cardHorizontal" | "cardVertical";
+  viewMode?: "cardHorizontal" | "cardVertical" | "cardSquare";
   error?: string;
 }
 

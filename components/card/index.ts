@@ -3,5 +3,6 @@
 export {
   CollectionCard,
   CollectionCardHorizontal,
+  CollectionCardSquare,
   CollectionCardVertical,
 } from "./CollectionCard.tsx";

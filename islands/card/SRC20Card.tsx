@@ -221,7 +221,7 @@ export function SRC20Card(
       <div class="mt-2 flex justify-center">
         <PillWithTooltip
           label="OPERATION"
-          className={`${containerPill} ${cardSupply}`}
+          className={`${containerPill} ${cardFileType}`}
         >
           {op}
         </PillWithTooltip>
@@ -238,10 +238,21 @@ export function SRC20Card(
       <PillWithTooltip
         label="AMOUNT"
         wrapperClassName="mt-2 w-fit mx-auto"
-        className={`${containerPill} ${cardFileType}`}
+        className={`${containerPill} ${cardSupply}`}
       >
         {formatAmount(src20.amt)}
       </PillWithTooltip>
+
+      {/* Max supply */}
+      {(src20.max || src20.mint_progress?.max_supply) && (
+        <PillWithTooltip
+          label="SUPPLY"
+          wrapperClassName="mt-2 w-fit mx-auto"
+          className={`${containerPill} ${cardFileSize}`}
+        >
+          {formatAmount(src20.max ?? src20.mint_progress?.max_supply)}
+        </PillWithTooltip>
+      )}
 
       {/* From → To */}
       <div class="flex flex-1 min-h-2" />
@@ -258,10 +269,17 @@ export function SRC20Card(
         >
           TO
         </div>
-        <div class={`hidden min-[420px]:flex ${cardFileSize}`}>
-          {src20.destination_name ??
-            (src20.destination ? abbreviateAddress(src20.destination, 5) : "—")}
-        </div>
+        <UserProfileIcon
+          className="w-[14px] h-[14px] stroke-[2] stroke-color-neutral-400 shrink-0"
+          wrapperClassName="hidden min-[420px]:flex"
+        >
+          <span class={cardFileSize}>
+            {src20.destination_name ??
+              (src20.destination
+                ? abbreviateAddress(src20.destination, 5)
+                : "—")}
+          </span>
+        </UserProfileIcon>
       </div>
     </>
   );
@@ -273,9 +291,9 @@ export function SRC20Card(
 
       {/* Max supply */}
       <PillWithTooltip
-        label="MAX SUPPLY"
+        label="SUPPLY"
         wrapperClassName="mt-2 w-fit mx-auto"
-        className={`${containerPill} ${cardFileType}`}
+        className={`${containerPill} ${cardSupply}`}
       >
         {src20.max ? formatAmount(src20.max) : "—"}
       </PillWithTooltip>
@@ -317,25 +335,25 @@ export function SRC20Card(
       <>
         {renderTopRow()}
 
-        {/* Max supply */}
-        {(src20.max || src20.mint_progress?.max_supply) && (
-          <PillWithTooltip
-            label="MAX SUPPLY"
-            wrapperClassName="flex mt-2 w-fit mx-auto"
-            className={`${containerPill} ${cardFileSize}`}
-          >
-            {formatAmount(src20.max ?? src20.mint_progress?.max_supply)}
-          </PillWithTooltip>
-        )}
-
         {/* Amount minted */}
         {src20.amt !== undefined && (
           <PillWithTooltip
             label="AMOUNT"
-            wrapperClassName="mt-2 w-fit mx-auto"
-            className={`${containerPill} ${cardFileType}`}
+            wrapperClassName="flex mt-2 w-fit mx-auto"
+            className={`${containerPill} ${cardSupply}`}
           >
             {formatAmount(src20.amt)}
+          </PillWithTooltip>
+        )}
+
+        {/* Max supply */}
+        {(src20.max || src20.mint_progress?.max_supply) && (
+          <PillWithTooltip
+            label="SUPPLY"
+            wrapperClassName="mt-2 w-fit mx-auto"
+            className={`${containerPill} ${cardFileSize}`}
+          >
+            {formatAmount(src20.max ?? src20.mint_progress?.max_supply)}
           </PillWithTooltip>
         )}
 
@@ -344,12 +362,14 @@ export function SRC20Card(
         <div
           class={`flex flex-col items-center justify-center px-3 py-2 gap-2 ${container3} cursor-pointer`}
         >
-          <div class={cardFileType}>
-            {src20.destination_name ??
-              (src20.destination
-                ? abbreviateAddress(src20.destination, 5)
-                : src20.creator_name ?? abbreviateAddress(src20.creator, 5))}
-          </div>
+          <UserProfileIcon>
+            <span class={cardFileType}>
+              {src20.destination_name ??
+                (src20.destination
+                  ? abbreviateAddress(src20.destination, 5)
+                  : src20.creator_name ?? abbreviateAddress(src20.creator, 5))}
+            </span>
+          </UserProfileIcon>
 
           {/* Mint progress */}
           {progress !== null && (
@@ -426,7 +446,7 @@ export function SRC20Card(
         <div class="flex justify-center">
           <PillWithTooltip
             label="OPERATION"
-            className={`${containerPill} ${cardSupply}`}
+            className={`${containerPill} ${cardFileType}`}
           >
             {op}
           </PillWithTooltip>
@@ -439,7 +459,7 @@ export function SRC20Card(
         <div class="flex justify-center">
           <PillWithTooltip
             label="AMOUNT"
-            className={`w-fit ${containerPill} ${cardFileType}`}
+            className={`w-fit ${containerPill} ${cardSupply}`}
           >
             {amount}
           </PillWithTooltip>

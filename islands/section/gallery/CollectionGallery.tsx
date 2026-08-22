@@ -1,9 +1,13 @@
 /* ===== COLLECTION GALLERY COMPONENT ===== */
 /* @baba - not updated */
 import { PaginationButtons, ViewAllButton } from "$button";
-import { CollectionCardHorizontal, CollectionCardVertical } from "$card";
+import {
+  CollectionCardHorizontal,
+  CollectionCardSquare,
+  CollectionCardVertical,
+} from "$card";
 import { BREAKPOINTS } from "$constants";
-import { gridCardMd } from "$layout";
+import { gridCardMd, gridCardSm } from "$layout";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
 import { subtitleNeutral, titleNeutral } from "$text";
 import type { Collection } from "$types/stamp.d.ts";
@@ -29,8 +33,10 @@ export interface CollectionGalleryProps {
   };
   viewAllHref?: string;
   // "cardHorizontal" (default): full-width row card with background image.
-  // "cardVertical": StampCard-style square grid card.
-  viewMode?: "cardHorizontal" | "cardVertical";
+  // "cardVertical": StampCard-style square grid card with info column.
+  // "cardSquare": StampCard-style bare square thumbnail, no info column -
+  // densest grid tier.
+  viewMode?: "cardHorizontal" | "cardVertical" | "cardSquare";
 }
 
 /* ===== STATE ===== */
@@ -100,10 +106,14 @@ export default function CollectionGallery({
 
   /* ===== RENDER ===== */
   const grid = gridClass ??
-    (viewMode === "cardVertical"
+    (viewMode === "cardSquare"
+      ? gridCardSm
+      : viewMode === "cardVertical"
       ? gridCardMd
       : "grid grid-cols-1 tablet:grid-cols-2 gap-5");
-  const CardComponent = viewMode === "cardVertical"
+  const CardComponent = viewMode === "cardSquare"
+    ? CollectionCardSquare
+    : viewMode === "cardVertical"
     ? CollectionCardVertical
     : CollectionCardHorizontal;
   return (

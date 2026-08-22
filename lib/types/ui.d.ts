@@ -3250,7 +3250,7 @@ export interface CollectionOverviewContentProps {
     onPageChange?: (newPage: number) => void;
     prefix?: string;
   };
-  viewMode?: "cardHorizontal" | "cardVertical";
+  viewMode?: "cardHorizontal" | "cardVertical" | "cardSquare";
 }
 
 /**
