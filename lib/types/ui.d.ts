@@ -3938,8 +3938,9 @@ export type CollectionDetailsPageProps = {
     pages: number;
     page_size: number;
     selectedTab: "all" | "classic" | "posh";
-    sortBy: string;
+    sortBy: "ASC" | "DESC";
     filterBy: string[];
+    market?: "all" | "listings";
   };
 };
 

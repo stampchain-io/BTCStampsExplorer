@@ -355,6 +355,18 @@ export class StampRepository {
     suffix?: StampSuffixFilter[];
     fileType?: StampFiletype[];
     creatorAddress?: string;
+    market?: "listings" | "sales" | "";
+    dispensers?: boolean;
+    atomics?: boolean;
+    listings?: "all" | "bargain" | "affordable" | "premium" | "custom" | "";
+    listingsMin?: string;
+    listingsMax?: string;
+    sales?: "recent" | "premium" | "custom" | "volume" | "";
+    salesMin?: string;
+    salesMax?: string;
+    volume?: "24h" | "7d" | "30d" | "";
+    volumeMin?: string;
+    volumeMax?: string;
   }) {
     const {
       type = STAMP_TYPE_CONSTANTS.STAMPS,
@@ -366,6 +378,18 @@ export class StampRepository {
       suffix = [],
       fileType = [],
       creatorAddress,
+      market,
+      dispensers,
+      atomics,
+      listings,
+      listingsMin,
+      listingsMax,
+      sales,
+      salesMin,
+      salesMax,
+      volume,
+      volumeMin,
+      volumeMax,
     } = options;
 
     // Combine filters
@@ -385,25 +409,26 @@ export class StampRepository {
       filterBy,
       combinedFilters,
       false,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined
+      undefined, // filters
+      undefined, // editions
+      undefined, // range
+      undefined, // rangeMin
+      undefined, // rangeMax
+      undefined, // fileSize
+      undefined, // fileSizeMin
+      undefined, // fileSizeMax
+      market,
+      dispensers,
+      atomics,
+      listings,
+      listingsMin,
+      listingsMax,
+      sales,
+      salesMin,
+      salesMax,
+      volume,
+      volumeMin,
+      volumeMax
     );
 
     if (creatorAddress) {
@@ -421,6 +446,23 @@ export class StampRepository {
       LEFT JOIN creator AS cr ON st.creator = cr.address
     `;
 
+    // Add marketplace joins if needed (mirrors getStamps' main query) - the
+    // WHERE conditions from buildMarketplaceFilterConditions above reference
+    // smd.* / ss.* columns, which are unresolvable without these joins
+    const hasListingsFilter = market === "listings" || dispensers || listings;
+    const hasSalesFilter = market === "sales" || sales || volume;
+
+    if (hasListingsFilter || hasSalesFilter) {
+      joinClause += `
+        LEFT JOIN stamp_market_data smd ON st.cpid = smd.cpid
+      `;
+    }
+    if (hasSalesFilter) {
+      joinClause += `
+        LEFT JOIN stamp_sales_history ss ON st.cpid = ss.cpid
+      `;
+    }
+
     // Include collection_stamps join only if collectionId is provided
     if (collectionId) {
       joinClause = `
@@ -429,8 +471,13 @@ export class StampRepository {
       `;
     }
 
+    // Use COUNT(DISTINCT ...) when the sales history join is present, since
+    // a stamp with multiple sales would otherwise be counted more than once
+    // (mirrors the "DISTINCT" select prefix used in the main getStamps query)
+    const countExpression = hasSalesFilter ? "COUNT(DISTINCT st.stamp)" : "COUNT(*)";
+
     const queryTotal = `
-      SELECT COUNT(*) AS total
+      SELECT ${countExpression} AS total
       FROM ${STAMP_TABLE} AS st
       ${joinClause}
       ${whereClause}
@@ -1017,10 +1064,18 @@ export class StampRepository {
         LEFT JOIN creator AS cr ON st.creator = cr.address
       `;
 
-      // Add market data join if needed for collections
-      if (hasMarketDataFilters) {
+      // Add market data join if needed for collections - covers both the
+      // Task 42 market data filters and the listings/sales marketplace
+      // filters (dispenser counts / floor price live on stamp_market_data)
+      if (hasMarketDataFilters || hasListingsFilter || hasSalesFilter) {
         joinClause += `
           LEFT JOIN stamp_market_data smd ON st.cpid = smd.cpid
+        `;
+      }
+
+      if (hasSalesFilter) {
+        joinClause += `
+          LEFT JOIN stamp_sales_history ss ON st.cpid = ss.cpid
         `;
       }
     }
@@ -1128,6 +1183,21 @@ export class StampRepository {
         ...(suffix && { suffix }),
         ...(fileType && { fileType }),
         ...(creatorAddress && { creatorAddress }),
+        // Marketplace filters (Task 42 + listings/sales) must mirror the data
+        // query, otherwise totalPages reflects the unfiltered collection size
+        // (e.g. pagination showing pages for a "listings" view with 0 rows)
+        ...(_market && { market: _market }),
+        ...(_dispensers && { dispensers: _dispensers }),
+        ...(_atomics && { atomics: _atomics }),
+        ...(_listings && { listings: _listings }),
+        ...(_listingsMin && { listingsMin: _listingsMin }),
+        ...(_listingsMax && { listingsMax: _listingsMax }),
+        ...(_sales && { sales: _sales }),
+        ...(_salesMin && { salesMin: _salesMin }),
+        ...(_salesMax && { salesMax: _salesMax }),
+        ...(_volume && { volume: _volume }),
+        ...(_volumeMin && { volumeMin: _volumeMin }),
+        ...(_volumeMax && { volumeMax: _volumeMax }),
       });
       total = (totalResult as any).rows[0]?.total || 0;
       totalPages = noPagination ? 1 : Math.ceil(total / limit);

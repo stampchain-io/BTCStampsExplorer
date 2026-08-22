@@ -429,7 +429,7 @@ export default function StampDetailPage(props: StampDetailPageProps) {
         <div
           class={`flex flex-col min-[900px]:flex-row ${containerGap}`}
         >
-          <div class="w-full min-w-0 min-[900px]:w-[40%] tablet:w-[35%] desktop:w-[30%]">
+          <div class="w-full min-w-0 min-[900px]:w-[35%] tablet:w-[30%] desktop:w-[25%]">
             {stamp &&
               (
                 <StampImage
@@ -438,7 +438,7 @@ export default function StampDetailPage(props: StampDetailPageProps) {
                 />
               )}
           </div>
-          <div class="w-full min-w-0 min-[900px]:w-[60%] tablet:w-[65%] desktop:w-[70%]">
+          <div class="w-full min-w-0 min-[900px]:w-[65%] tablet:w-[70%] desktop:w-75%]">
             {stamp &&
               (
                 <StampInfo

@@ -1,4 +1,4 @@
-import { shadow } from "$layout";
+import { container3, shadow } from "$layout";
 
 /* ===== BASE STYLES ===== */
 /* ===== NOTIFICATION STYLES ===== */
@@ -51,6 +51,21 @@ export const tooltipButtonInCollapsible = `
 export const tooltipImage = `
   absolute mb-1.5 z-tooltip
   ${tooltipBackground} ${tooltipText}
+`;
+
+// Wider overlay variant for multi-line content (e.g. descriptions) that
+// needs to wrap instead of the single-line tooltips above.
+// NOTE: this is absolutely positioned against its (often tiny, e.g. an
+// icon button) anchor, so `w-full`/`w-screen` would resolve against that
+// anchor's width, not the viewport - use a viewport-relative calc()
+// instead so the box is actually full-width on small screens.
+export const tooltipOverlay = `
+  absolute -top-2.5 right-0 mobileLg:left-0
+  w-[calc(100vw-2.5rem)] mobileMd:w-[400px] mobileLg:w-[380px] tablet:w-[420px]
+  !px-5 !py-2.5 z-tooltip
+  ${container3} !rounded-3xl border border-color-neutral-800
+  font-normal text-sm/6 text-color-neutral-200 whitespace-normal break-words
+  transition-opacity duration-200
 `;
 
 /* ===== LEGACY STYLES ===== */

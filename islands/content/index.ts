@@ -14,7 +14,7 @@ export { default as StampTextContent } from "$islands/content/stampDetailContent
 export * from "$islands/content/SRC20OverviewContent.tsx";
 
 /* ===== COLLECTION ===== */
-export * from "$islands/content/CollectionContent.tsx";
+export * from "$islands/content/CollectionDetailContent.tsx";
 
 /* ===== WALLET ===== */
 export { default as WalletContent } from "$islands/content/WalletContent.tsx";

@@ -186,9 +186,21 @@ export class CollectionRepository {
       query,
       [collectionName],
       60 * 10, // Cache for 10 minutes instead of never
-    ) as { rows: CollectionRow[] };
+    ) as { rows: any[] };
 
-    return result.rows.length > 0 ? result.rows[0] : null;
+    if (result.rows.length === 0) return null;
+
+    const row = result.rows[0];
+    return {
+      ...row,
+      creators: row.creators ? row.creators.split(",") : [],
+      stamp_count: typeof row.stamp_count === "string"
+        ? parseInt(row.stamp_count)
+        : row.stamp_count,
+      total_editions: typeof row.total_editions === "string"
+        ? parseFloat(row.total_editions)
+        : row.total_editions,
+    } as CollectionRow;
   }
 
   static async getCollectionByStamp(

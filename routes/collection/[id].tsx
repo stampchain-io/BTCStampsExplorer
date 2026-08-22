@@ -2,12 +2,13 @@ import type { SUBPROTOCOLS } from "$types/base.d.ts";
 /* ===== COLLECTION DETAILS PAGE ===== */
 
 import type { StampFilterType } from "$constants";
-import { CollectionContent } from "$content";
+import { CollectionDetailContent } from "$content";
 import { FreshContext, Handlers } from "$fresh/server.ts";
 import type { CollectionDetailsPageProps } from "$types/ui.d.ts";
 
 import { PaginationButtons } from "$button";
 import { CollectionDetailHeader } from "$header";
+import { containerBackground } from "$layout";
 import { StampController } from "$server/controller/stampController.ts";
 import { CollectionService } from "$server/services/core/collectionService.ts";
 /* ===== TYPES ===== */
@@ -35,6 +36,12 @@ export const handler: Handlers = {
 
       const type: "stamps" | "cursed" | "all" = "all";
 
+      // "market=listings" scopes the collection's stamp grid down to stamps
+      // that currently have an open dispenser (same filter as the /marketplace
+      // "LISTINGS" mode)
+      const market: "all" | "listings" =
+        url.searchParams.get("market") === "listings" ? "listings" : "all";
+
       const collection = await CollectionService.getCollectionByName(id);
 
       if (!collection) {
@@ -50,6 +57,13 @@ export const handler: Handlers = {
         filterBy,
         ident,
         collectionId,
+        ...(market === "listings"
+          ? {
+            market: "listings" as const,
+            dispensers: true,
+            listings: "all" as const,
+          }
+          : {}),
       });
 
       const data = {
@@ -62,6 +76,7 @@ export const handler: Handlers = {
         filterBy,
         sortBy,
         selectedTab,
+        market,
       };
       return await ctx.render(data);
     } catch (error) {
@@ -86,22 +101,33 @@ export default function CollectionDetailPage(
     page,
     pages,
     collection,
+    market = "all",
+    sortBy,
   } = props.data;
 
   /* ===== COMPONENT ===== */
   return (
     <div
-      class="flex flex-col gap-6"
+      class="flex flex-col gap-5"
       f-client-nav
       data-partial={`/collection/${id}`}
     >
       <CollectionDetailHeader collection={collection} stamps={stamps} />
-      <CollectionContent stamps={stamps} />
-      <PaginationButtons
-        page={page}
-        totalPages={pages}
-        // Remove onPageChange to let PaginationButtons component use its built-in Fresh navigation
-      />
+      <div class={containerBackground}>
+        <CollectionDetailContent
+          stamps={stamps}
+          market={market}
+          sortBy={sortBy}
+          totalStamps={collection?.stamp_count}
+          totalEditions={collection?.total_editions}
+          listedStamps={collection?.marketData?.listedStamps ?? null}
+        />
+        <PaginationButtons
+          page={page}
+          totalPages={pages}
+          // Remove onPageChange to let PaginationButtons component use its built-in Fresh navigation
+        />
+      </div>
     </div>
   );
 }

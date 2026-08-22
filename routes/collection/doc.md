@@ -27,7 +27,7 @@
  * in via the existing barrels:
  * - CollectionOverviewHeader, CollectionDetailHeader — islands/header/index.ts ($header)
  * - CollectionGallery, CollectionGalleryBanner, CollectionsBanner — islands/section/index.ts ($section)
- * - CollectionContent — islands/content/index.ts ($content)
+ * - CollectionDetailContent — islands/content/index.ts ($content)
  * - CollectionCard — components/card/index.ts ($card)
  *
  */
