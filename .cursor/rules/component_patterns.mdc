@@ -28,6 +28,7 @@ component_patterns:
 - **DO** set `cursor-[inherit]` on the hidden radio `input` and on the `label` so inherited `!cursor-pointer` / `!cursor-default` from the wrapper win over UA styles.
 - **Reference docs**: [components/button/doc.md](mdc:components/button/doc.md) (Selector Buttons section).
 
-# Art Stamps type selector ([islands/header/StampOverviewHeader.tsx](mdc:islands/header/StampOverviewHeader.tsx))
+# Art Stamps type selector ([islands/header/MarketplaceHeader.tsx](mdc:islands/header/MarketplaceHeader.tsx))
 
-- Options map to `FrontendStampType` in [lib/constants/stampConstants.ts](mdc:lib/constants/stampConstants.ts) (`all`, `classic`, `posh`, `src-721`, `cursed`). Keep [routes/stamp/index.tsx](mdc:routes/stamp/index.tsx) and [FilterOptionsStamp.tsx](mdc:islands/filter/FilterOptionsStamp.tsx) (`filtersToQueryParams`, `queryParamsToFilters`) in sync when adding or renaming types.
+- `/stamp` now permanently redirects to `/explorer` ([routes/stamp/index.tsx](mdc:routes/stamp/index.tsx)); the Art Stamps type selector lives in [routes/marketplace/index.tsx](mdc:routes/marketplace/index.tsx) (rendered via `MarketplaceHeader`) and in [routes/explorer/index.tsx](mdc:routes/explorer/index.tsx).
+- Options map to `FrontendStampType` in [lib/constants/stampConstants.ts](mdc:lib/constants/stampConstants.ts) (`all`, `classic`, `posh`, `src-721`, `cursed`). Keep [routes/marketplace/index.tsx](mdc:routes/marketplace/index.tsx) and [FilterOptionsMarketplace.tsx](mdc:islands/filter/FilterOptionsMarketplace.tsx) (`filtersToQueryParams`/`queryParamsToFilters`) in sync when adding or renaming types. The Explorer equivalent lives in [FilterOptionsExplorerStamp.tsx](mdc:islands/filter/FilterOptionsExplorerStamp.tsx).

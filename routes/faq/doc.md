@@ -16,14 +16,22 @@
  * 
  * Directory Structure
  * ------------------
- * components/faq/
- * ├── data.ts           # Content management
- * ├── FaqHeader.tsx     # Header component
- * └── doc.md            # This documentation
+ * There's no dedicated faq/ folder — components are grouped by UI element
+ * type, like the rest of the codebase, and pulled in via the existing
+ * barrels:
+ * components/layout/
+ * └── data.ts                    # Content management (FAQ_CONTENT), exported via $layout
  * 
- * islands/faq/
- * ├── FaqAccordion.tsx  # Accordion component
- * └── AccordionBase.tsx # Base accordion implementation
+ * components/header/
+ * └── FaqHeader.tsx               # Header component, exported via $header
+ * 
+ * islands/content/faqContent/
+ * ├── FaqAccordion.tsx            # Accordion component, exported via $content
+ * └── AccordionBase.tsx           # Base accordion implementation
+ * 
+ * routes/faq/
+ * ├── index.tsx                   # The FAQ page (/faq)
+ * └── doc.md                      # This documentation
  * 
  * Content Management (data.ts)
  * ---------------------------
@@ -189,6 +197,6 @@
  *    - Verify link paths
  *    - Test all navigation
  * 
- * @lastUpdated April 4, 2025
+ * @lastUpdated August 23, 2026
  * @author baba
  */

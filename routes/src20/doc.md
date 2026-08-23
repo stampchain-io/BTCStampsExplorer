@@ -4,15 +4,18 @@
  * 
  * Overview
  * --------
- * The index.tsx contains the Src20 Overiew page
+ * The index.tsx contains the Src20 Overview page
  * The [tick].tsx contains the Src20 Details page
  *
  *
- * Barrel files
- * ------------
- * The barrel file for exporting all src20-related islands components is located in:
- * /islands/src20/index.ts
- * All src20 related files can be imported using:
- * import { SRC20Xxxx, SRC20Yyyy } from "$src20";
+ * Components
+ * ----------
+ * There's no dedicated `$src20` barrel — src20-related components are
+ * grouped by UI element type, like the rest of the codebase, and pulled
+ * in via the existing barrels:
+ * - SRC20OverviewHeader, SRC20DetailHeader — islands/header/index.ts ($header)
+ * - SRC20OverviewContent — islands/content/index.ts ($content)
+ * - DetailsTableBase — islands/table/index.ts ($table), used on the detail
+ *   page to render the HOLDERS / MINTS / TRANSFERS / INFO tables
  *
  */

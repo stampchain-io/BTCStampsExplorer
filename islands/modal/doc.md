@@ -9,29 +9,29 @@
 *
 * Core Components
 * --------------
-* - ModalOverlay.tsx: Handles modal animations and backdrop
-* - ModalProvider.tsx: Root-level provider that manages modal state
-* - states.ts: Centralized state management for modals
-* - ModalStack.tsx: Manages modal stacking and transformations
+* - ModalOverlay.tsx (islands/layout/): Handles modal animations and backdrop
+* - ModalProvider.tsx (islands/layout/): Root-level provider that manages modal state
+* - states.ts (islands/modal/): Centralized state management for modals
+* - ModalStack.tsx (islands/layout/): Manages modal stacking and transformations
 *
 * Integration
 * ----------
 * The modal system is integrated at the root level in _app.tsx, ensuring consistent behavior across the application.
-* Example implementation from StampOverviewHeader.tsx:
+* Example implementation from SearchStampModal.tsx (opened via SearchButton.tsx):
 *
 * ```tsx
-* const handleOpenSearch = () => {
-*   searchState.value = { term: "", error: "" };
+* export function openStampSearch() {
+*   const handleClose = () => {
+*     searchState.value = { term: "", error: "", results: [] };
+*     closeModal();
+*   };
 *   const modalContent = (
-*     <ModalSearchBase onClose={() => {
-*       searchState.value = { term: "", error: "" };
-*       closeModal();
-*     }}>
-*       <SearchContent {...props} />
+*     <ModalSearchBase onClose={handleClose}>
+*       {/* search input + results content */}
 *     </ModalSearchBase>
 *   );
 *   openModal(modalContent, "slideDownUp");
-* };
+* }
 * ```
 *
 * Modal Stacking
@@ -71,7 +71,7 @@
 * 1. Import required components:
 *    ```tsx
 *    import { openModal, closeModal } from "$islands/modal/states.ts";
-*    import { foregroundConnectWalletModal } from "$islands/modal/ModalStack.tsx";
+*    import { stackConnectWalletModal } from "$islands/layout/ModalStack.tsx";
 *    ```
 *
 * 2. Create modal content:
@@ -93,9 +93,9 @@
 *    // Example: Opening wallet connect from buy modal
 *    const handleBuyClick = async () => {
 *      if (!wallet?.address) {
-*        const { modalContent } = foregroundConnectWalletModal(() => {
+*        const { modalContent } = stackConnectWalletModal(() => {
 *          // Transform back to buy modal after connection
-*          openModal(<BuyStampModal {...props} />, "slideDownUp");
+*          openModal(<BuyStampModal {...props} />, "slideUpDown");
 *        });
 *        openModal(modalContent, "slideUpDown");
 *        return;
@@ -109,10 +109,10 @@
 *
 * Base Components
 * --------------
-* - ModalBase.tsx: Primary base component for most modals
-* - ModalSearchBase.tsx: Specialized base for search-related modals
-* - WalletProvider.tsx: Base component for wallet connection functionality
-* - ModalStack.tsx: Manages modal transformations and stacking
+* - ModalBase.tsx (components/layout/): Primary base component for most modals
+* - ModalSearchBase.tsx (components/layout/): Specialized base for search-related modals
+* - WalletProvider.tsx (islands/layout/): Base component for wallet connection functionality
+* - ModalStack.tsx (islands/layout/): Manages modal transformations and stacking
 *
 * Active Modals
 * ------------
@@ -121,9 +121,9 @@
 *    - Purpose: Handles stamp purchase transactions
 *
 * 2. ConnectWalletModal.tsx
-*    - Base: ModalBase + WalletProviderBase
+*    - Base: ModalBase
 *    - Purpose: Manages wallet connections
-*    - Note: Integrates with WalletProviderBase for provider functionality
+*    - Note: Rendered with a list of WalletProvider connectors (one per supported wallet)
 *
 * 3. DetailSRC101Modal.tsx
 *    - Base: ModalBase
@@ -133,39 +133,37 @@
 *    - Base: ModalBase
 *    - Purpose: Handles stamp donation transactions
 *
-* 5. FilterSRC20Modal.tsx
+* 5. EditCreatorNameModal.tsx
+*    - Base: ModalBase
+*    - Purpose: Allows a stamp creator to edit/update their display name
+*
+* 6. FilterSRC20Modal.tsx
 *    - Base: ModalBase
 *    - Purpose: Provides filtering options for SRC20 tokens
 *
-* 6. PreviewCodeModal.tsx
+* 7. PreviewCodeModal.tsx
 *    - Base: ModalBase
 *    - Purpose: Displays code previews
 *
-* 7. PreviewImageModal.tsx
+* 8. PreviewImageModal.tsx
 *    - Base: ModalBase
 *    - Purpose: Shows image previews
 *
-* 8. RecieveAddyModal.tsx
+* 9. RecieveAddyModal.tsx
 *    - Base: ModalBase
 *    - Purpose: Displays receiving address with QR code
 *
-* 9. SearchSRC20Modal.tsx
+* 10. SearchSRC20Modal.tsx
 *    - Base: ModalSearchBase
 *    - Purpose: Search functionality for SRC20 tokens
 *
-* 10. SearchStampModal.tsx
+* 11. SearchStampModal.tsx
 *    - Base: ModalSearchBase
 *    - Purpose: Search functionality for stamps
 *
-* 11. SendBTCModal.tsx
+* 12. SendBTCModal.tsx
 *    - Base: ModalBase
 *    - Purpose: Handles BTC sending transactions
-*
-* Work in Progress
-* ---------------
-* - SendStampModalWIP.tsx
-*   - Status: Not in active use
-*   - Purpose: Planned implementation for stamp sending functionality
 *
 * State Management
 * ---------------

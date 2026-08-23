@@ -21,7 +21,7 @@ avoid duplication and keeps this guide concise.
   - `_middleware.ts` – root middleware.
   - `api/` – API endpoints (e.g., `api/v2`, `api/internal`).
 - `islands/` – Interactive UI components hydrated on the client.
-  - Pill segmented controls use [`SelectorButtons`](components/button/doc.md) (`CSS calc` for the sliding pill; cursor inheritance on radio + label). Art Stamps type tabs (`StampOverviewHeader`, URL `type`) align with `FrontendStampType` in [`lib/constants/stampConstants.ts`](lib/constants/stampConstants.ts) and [`islands/filter/FilterOptionsStamps.tsx`](islands/filter/FilterOptionsStamps.tsx).
+  - Pill segmented controls use [`SelectorButtons`](components/button/doc.md) (`CSS calc` for the sliding pill; cursor inheritance on radio + label). Art Stamps type tabs (`MarketplaceHeader`, URL `type`) align with `FrontendStampType` in [`lib/constants/stampConstants.ts`](lib/constants/stampConstants.ts) and [`islands/filter/FilterOptionsMarketplace.tsx`](islands/filter/FilterOptionsMarketplace.tsx) (Explorer equivalent: [`islands/filter/FilterOptionsExplorerStamp.tsx`](islands/filter/FilterOptionsExplorerStamp.tsx)).
 - `components/` – Server‑side Preact components and layouts.
 - `lib/` – Shared utilities, hooks, and type definitions.
 - `server/` – Backend services, controllers, database logic, and

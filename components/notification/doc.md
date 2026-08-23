@@ -32,8 +32,8 @@ The Toast notification system follows the app's dark-themed glassmorphism design
 - **Backdrop blur**: `backdrop-blur-md`
 - **Shadow**: `$layout` `shadow` token
 - **Padding**: `px-4 pt-3 pb-4` with a 1px border
-- **Position**: `fixed top-5 inset-x-5 z-notification`; from `min-[420px]` left-aligned (`left-5 right-auto max-w-[420px]`)
-- **Width**: Defined on `ToastComponent` (not the style tokens). Below 420px the toast spans `inset-x-5` (`!w-auto`). From 420px up it is `max-w-[420px]`. Inner `notificationContainer` is `w-full` of that wrapper.
+- **Position**: `fixed top-5 inset-x-5 z-notification`; from `min-[460px]` left-aligned (`left-5 right-auto`)
+- **Width**: Defined on `ToastComponent` (not the style tokens). Below 420px the toast spans `inset-x-5` (`!w-auto`). From `min-[420px]` up it caps at `max-w-[420px]` (while still spanning `inset-x-5` until 460px, at which point `left-5 right-auto` take over). Inner `notificationContainer` is `w-full` of that wrapper.
 - **Colors**: Type-specific palettes (`neutral`, `green`, `orange`, `red`) with gradient backgrounds from the [Tailwind color system](mdc:components/layout/doc.md#tailwind-color-system)
 
 Shared container classes (`notificationContainer` in `styles.ts`):
@@ -486,14 +486,15 @@ const SHOW_NOTIFICATION = true; // feature flag
 const DELAY = 2000;
 const AUTO_DISMISS = false;
 const TYPE = "info" as const;
-const NOTIFICATION_UPDATE_VERSION = "feature-update-v3.001279";
+const NOTIFICATION_UPDATE_VERSION = "feature-update-v3.2";
 
-const NOTIFICATION_UPDATE_MESSAGE = `Website Redesign
+const NOTIFICATION_UPDATE_MESSAGE = `Website UI Reimagined
 • New logo, typeface, and color palette
-• Reimagined stamp cards with multiple view modes
+• Redesigned stamp cards with multiple view modes
 • Improved Explorer page with fully featured filters
 • Added Marketplace page with listings and sales
-• Code optimization and performance improvements
+• Updated Collection and Wallet pages
+• Codebase optimization and performance improvements
 
 Please clear browser cache and refresh the page for all updates to take effect.`;
 ```
@@ -511,8 +512,8 @@ Please clear browser cache and refresh the page for all updates to take effect.`
 To create a new update announcement, edit `islands/Toast/NotificationUpdate.tsx`:
 
 ```typescript
-// 1. Increment the version identifier (current: feature-update-v3.001279)
-const NOTIFICATION_UPDATE_VERSION = "feature-update-v3.001280";
+// 1. Increment the version identifier (current: feature-update-v3.2)
+const NOTIFICATION_UPDATE_VERSION = "feature-update-v3.3";
 
 // 2. Update the message: first line = header, bullets = body, last line = footer
 const NOTIFICATION_UPDATE_MESSAGE = `New Features Released
@@ -581,7 +582,7 @@ Already wired in `routes/_app.tsx` (must stay inside `ToastProvider`):
 
 ### Best Practices
 
-- **Version Naming**: Increment `NOTIFICATION_UPDATE_VERSION` for each new announcement (current: `feature-update-v3.001279`)
+- **Version Naming**: Increment `NOTIFICATION_UPDATE_VERSION` for each new announcement (current: `feature-update-v3.2`)
 - **Message Content**: Keep concise but informative; first line is the header, bullets are the body, last line is the muted footer
 - **isUpdate**: Always pass `true` as the fifth `showToast` argument so header/footer styles apply
 - **Timing**: 2-3 second delay prevents overwhelming users on page load
@@ -652,5 +653,5 @@ As outlined in [Issue #860](https://github.com/stampchain-io/stampchain.io/issue
 
 ---
 
-**Last Updated:** August 17, 2026
+**Last Updated:** August 23, 2026
 **Author:** baba

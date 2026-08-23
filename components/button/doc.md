@@ -142,6 +142,8 @@ The button system uses **solid colors** driven by a single `--color-button` CSS 
 - **RangeSlider.tsx**: Single value range slider
 - **RangeSliderDual.tsx**: Dual handle range slider
 - **SettingsButton.tsx**: Settings panel trigger
+- **TrendingButton.tsx**: Icon-based toggle for sorting/filtering by trending activity, with a hover tooltip
+- **ViewButton.tsx**: Icon-based control that cycles through gallery view modes (`cardVertical`/`cardSquare`/`cardRow`/`cardHorizontal`) via URL params, with a hover tooltip
 
 ### Hooks & Utilities
 
@@ -154,6 +156,9 @@ The button system uses **solid colors** driven by a single `--color-button` CSS 
 ## Type Definitions
 
 ### Button Props
+
+`components/button/styles.ts` defines the style-composition `ButtonProps` interface (used to type the `variant`/`color`/`size`/state values consumed by the `button()` function):
+
 ```typescript
 export interface ButtonProps extends Omit<JSX.HTMLAttributes<HTMLButtonElement>, "loading" | "size"> {
   variant?: "outline" | "flat" | "custom";
@@ -168,24 +173,52 @@ export interface ButtonProps extends Omit<JSX.HTMLAttributes<HTMLButtonElement>,
   "data-type"?: string;
   "f-partial"?: string;
 }
-
-export interface ExtendedButtonProps extends ButtonProps {
-  isActive?: boolean;
-  href?: string;
-}
-
-export interface ExtendedIconButtonProps extends ButtonProps {
-  isLoading?: boolean;
-  isActive?: boolean;
-  href?: string;
-}
-
-export interface ExtendedProcessingButtonProps extends ButtonProps {
-  isSubmitting?: boolean;
-  isActive?: boolean;
-  href?: string;
-}
 ```
+
+The actual component prop types consumed by `Button`, `ButtonIcon`, and `ButtonProcessing` (`ExtendedButtonProps`, `ExtendedIconButtonProps`, `ExtendedProcessingButtonProps`) live in `lib/types/ui.d.ts` and build on `BaseButtonProps` there, not on the `ButtonProps` above:
+
+```typescript
+export interface BaseButtonProps extends BaseComponentProps {
+  variant?: ButtonVariant;
+  color?: ButtonColor;
+  size?: ButtonSize;
+  disabled?: boolean;
+  isActive?: boolean;
+  href?: string;
+  target?: string;
+  type?: "button" | "submit" | "reset";
+  onClick?: MouseEventHandler<HTMLElement> | ((event: JSX.TargetedEvent<HTMLButtonElement>) => void);
+  onMouseEnter?: MouseEventHandler;
+  onMouseLeave?: MouseEventHandler;
+  onFocus?: JSX.FocusEventHandler<HTMLElement>;
+  onBlur?: JSX.FocusEventHandler<HTMLElement>;
+  "data-type"?: string;
+  "f-partial"?: string;
+  role?: string;
+  ref?: Ref<HTMLButtonElement | HTMLAnchorElement>;
+}
+
+export type ExtendedButtonProps = BaseButtonProps & {
+  "f-partial"?: string | SignalLike<string | undefined>;
+  isActive?: boolean;
+  type?: "button" | "submit" | "reset";
+  ariaLabel?: string;
+  ref?: preact.RefObject<HTMLElement> | ((instance: HTMLElement | null) => void) | null;
+};
+
+export type ExtendedIconButtonProps = ExtendedButtonProps & {
+  isLoading?: boolean;
+  ariaLabel?: string;
+};
+
+export type ExtendedProcessingButtonProps = ExtendedButtonProps & {
+  isSubmitting: boolean;
+  type?: "button" | "submit" | "reset";
+  ariaLabel?: string;
+};
+```
+
+**Note:** `isSubmitting` on `ExtendedProcessingButtonProps` is required, not optional — `ButtonProcessing` always expects callers to pass it explicitly.
 
 `ButtonColor`, `ButtonSize`, and `ButtonVariant` are also exported as standalone types from `lib/constants/uiConstants.ts` and re-exported via `lib/types/ui.d.ts`, so they can be imported independently of the button props interfaces.
 
@@ -434,13 +467,13 @@ variant: {
 ### State Management
 
 #### Disabled State
-- Opacity reduced to 50%
+- Opacity reduced to 60% (`!opacity-60`)
 - Cursor changes to `not-allowed`
 - Shows "SOON™" tooltip on hover
 - Prevents all interactions
 
 #### Loading State
-- Opacity reduced to 70%
+- Opacity reduced to 60% (`!opacity-60`)
 - Cursor changes to `wait`
 - Replaces content with spinning loader
 - Disables button interactions
@@ -657,5 +690,5 @@ For controlled multi-option toggles like this, prefer the dedicated `SelectorBut
 
 ---
 
-**Last Updated:** July 7, 2026
+**Last Updated:** August 23, 2026
 **Author:** baba

@@ -10,14 +10,14 @@
  * Core Components
  * --------------
  * 1. ArticleBase.tsx - Main article layout component
- * 2. ListBase.tsx - Step-by-step list component
+ * 2. ListBase.tsx - Step-by-step list component (List, StepList, BulletList)
  * 3. AuthorBase.tsx - Author information component
- * 4. ArticlesOverviewBase.tsx - Related articles navigation - added subsection to the article
+ * 4. ArticlesOverviewBase.tsx - Related articles navigation - automatically appended to every article
  * 5. data.ts - Centralized content management
  *
  * Directory Structure
  * ------------------
- * components/howto/
+ * components/section/howto/
  * ├── ArticleBase.tsx    # Main article layout
  * ├── ArticlesOverviewBase.tsx  # Related articles
  * ├── AuthorBase.tsx     # Author information
@@ -29,10 +29,9 @@
  * ---------------------------
  * The data.ts file serves as the central content management system for all how-to articles.
  * It contains:
- * - Article navigation links
- * - Step-by-step instructions
- * - Important notes
- * - Author information
+ * - Article navigation links (ARTICLE_LINKS)
+ * - Step-by-step instructions (e.g. STAMP_STEPS, DEPLOY_STEPS, MINT_STEPS, ...)
+ * - Important notes (e.g. STAMP_IMPORTANT_NOTES, DEPLOY_IMPORTANT_NOTES, ...)
  *
  * Content Structure
  * ----------------
@@ -41,7 +40,7 @@
  * 2. Author information
  * 3. Step-by-step instructions
  * 4. Important notes - if added
- * 5. Related articles
+ * 5. Related articles - rendered automatically by the Article component
  *
  * Creating a New Article
  * ---------------------
@@ -54,9 +53,9 @@
  * ];
  *
  * 2. Create Step Data
- * Define steps in data.ts using the ListProps interface:
+ * Define steps in data.ts using the HowToStepProps interface:
  * @example
- * export const NEW_ARTICLE_STEPS: ListProps[] = [
+ * export const NEW_ARTICLE_STEPS: HowToStepProps[] = [
  *   {
  *     title: "STEP TITLE",
  *     image: "/img/how-tos/newarticle/01.png",
@@ -73,25 +72,66 @@
  * ];
  *
  * 4. Create Article Route
- * Create a new route file at routes/howto/newarticle.tsx:
+ * Create a new route file at routes/howto/newarticle/index.tsx. The Article
+ * component no longer accepts `steps`/`author` props directly - compose the
+ * intro, author info and steps as children instead:
  * @example
- * import { Article } from "$howto";
- * import { NEW_ARTICLE_STEPS, NEW_ARTICLE_IMPORTANT_NOTES } from "$components/howto/data.ts";
+ * import {
+ *   Article,
+ *   AuthorSection,
+ *   List,
+ *   NEW_ARTICLE_IMPORTANT_NOTES,
+ *   NEW_ARTICLE_STEPS,
+ *   StepList,
+ * } from "$section";
+ *
+ * function IntroSection() {
+ *   return (
+ *     <div class="flex flex-col-reverse min-[520px]:flex-row min-[520px]:justify-between gap-5">
+ *       <div class="w-full min-[520px]:w-3/4">
+ *         <p>Introduction text for the new article.</p>
+ *       </div>
+ *       <AuthorSection
+ *         name="Author Name"
+ *         twitter="authortwitter"
+ *         website="https://authorwebsite.com"
+ *         class="justify-end items-end w-full min-[520px]:w-1/4"
+ *       />
+ *     </div>
+ *   );
+ * }
+ *
+ * function NewArticleSteps() {
+ *   return (
+ *     <StepList hasImportantNotes={NEW_ARTICLE_IMPORTANT_NOTES?.length > 0}>
+ *       {NEW_ARTICLE_STEPS.map((step) => (
+ *         <List
+ *           key={step.title}
+ *           title={step.title}
+ *           image={step.image}
+ *           description={step.description}
+ *         />
+ *       ))}
+ *     </StepList>
+ *   );
+ * }
  *
  * export default function NewArticle() {
  *   return (
  *     <Article
- *       title="NEW ARTICLE TITLE"
- *       steps={NEW_ARTICLE_STEPS}
+ *       title="HOW-TO"
+ *       subtitle="NEW ARTICLE TITLE"
+ *       headerImage="/img/how-tos/newarticle/00.png"
  *       importantNotes={NEW_ARTICLE_IMPORTANT_NOTES}
- *       author={{
- *         name: "Author Name",
- *         twitter: "authortwitter",
- *         website: "https://authorwebsite.com"
- *       }}
- *     />
+ *     >
+ *       <IntroSection />
+ *       <NewArticleSteps />
+ *     </Article>
  *   );
  * }
+ *
+ * See routes/howto/template/index.tsx for a full working template, including
+ * the optional BulletList setup-steps pattern.
  *
  * Step Description Formatting
  * -------------------------
@@ -123,21 +163,39 @@
  * Component Usage
  * -------------
  * 1. Article Component
+ * Renders the title/subtitle, header image, children content, optional
+ * important notes, and always appends the ArticlesOverview subsection.
  * @example
  * <Article
- *   title="Article Title"
- *   steps={STEPS_DATA}
+ *   title="HOW-TO"
+ *   subtitle="Article Subtitle"
+ *   headerImage="/path/to/header.png"
  *   importantNotes={IMPORTANT_NOTES}
- *   author={AUTHOR_INFO}
- * />
+ * >
+ *   <IntroSection />
+ *   <ArticleSteps />
+ * </Article>
  *
- * 2. List Component
+ * 2. List / StepList / BulletList Components
+ * `List` renders a single numbered step; wrap a series of `List` items in
+ * `StepList`. `BulletList` renders a plain bulleted list, useful for short
+ * setup steps in the intro section.
  * @example
- * <List
- *   title="Step Title"
- *   image="/path/to/image.png"
- *   description="Step description"
- * />
+ * <StepList hasImportantNotes={IMPORTANT_NOTES?.length > 0}>
+ *   {STEPS_DATA.map((step) => (
+ *     <List
+ *       key={step.title}
+ *       title={step.title}
+ *       image={step.image}
+ *       description={step.description}
+ *     />
+ *   ))}
+ * </StepList>
+ *
+ * @example
+ * <BulletList>
+ *   {SETUP_STEPS.map((step, index) => <li key={index}>{step}</li>)}
+ * </BulletList>
  *
  * 3. Author Component
  * @example
@@ -148,6 +206,8 @@
  * />
  *
  * 4. Articles Overview Component
+ * Rendered automatically at the end of every `<Article>` - manual usage is
+ * only needed outside of an Article (e.g. a standalone "keep reading" block).
  * @example
  * <ArticlesOverview />
  *
@@ -216,26 +276,24 @@
  * 1. Create a new section in the overview page:
  * @example
  * {/* ===== NEW ARTICLE GUIDE ===== *\/}
- * <section>
- *   <h2 className={`${headingGrey} mb-4`}>NEW ARTICLE TITLE</h2>
- *   <div className={`grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 ${containerGap}`}>
+ * <section class={containerBackground}>
+ *   <div class={`grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 ${containerGap}`}>
  *     <img
  *       src="/img/how-tos/newarticle/00.png"
  *       width="100%"
  *       alt="Description of the guide"
- *       class="rounded"
+ *       class="rounded-2xl"
  *     />
- *     <div className="flex flex-col desktop:col-span-2 gap-2">
- *       <p className={text}>
+ *     <div class="flex flex-col desktop:col-span-2">
+ *       <h2 class={subtitleNeutral}>NEW ARTICLE TITLE</h2>
+ *       <p class={text}>
  *         Brief introduction to the guide and its purpose.
- *         <br />
- *         Additional context or important information.
  *       </p>
- *       <p className={text}>
+ *       <p class={text}>
  *         <a
  *           href="/howto/newarticle"
  *           f-partial="/howto/newarticle"
- *           className="link-neutral-200-bold"
+ *           class="link-neutral-200-bold mb-1.5"
  *         >
  *           Call to action text
  *         </a>
@@ -252,7 +310,7 @@
  *
  * 3. Layout Options:
  * - Default layout: Image on left, text on right
- * - Alternative layout: Add `class="block mobileLg:order-last"` to img for right-side image
+ * - Alternative layout: Add `class="block tablet:order-last rounded-2xl"` to img for right-side image
  * - Text can span 2 columns on desktop with `desktop:col-span-2`
  *
  * 4. Best Practices:
@@ -262,6 +320,6 @@
  * - Ensure proper spacing and grid alignment
  * - Test responsive behavior across all breakpoints
  *
- * @lastUpdated April 3, 2025
+ * @lastUpdated August 23, 2026
  * @author baba
  */
