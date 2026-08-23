@@ -92,14 +92,33 @@ export class Src20Controller {
       // Process data based on pagination requirements
       // For paginated requests: ensure data is array for consistency
       // For single object requests: maintain single object structure per schema
+      //
+      // `fetchSrc20Balance` returns a sentinel `{ last_block, data: [] }`
+      // object (not `null`/`[]`) when there's no matching balance data (see
+      // `SRC20QueryService.fetchSrc20Balance`) — detect that shape here so it
+      // isn't mistaken for an actual balance row and wrapped into a
+      // phantom/empty result item below.
+      const isEmptyBalanceSentinel = !!rawData &&
+        typeof rawData === "object" &&
+        !Array.isArray(rawData) &&
+        Array.isArray((rawData as any).data);
+
       let processedData: any;
 
       if (balanceParams.includePagination) {
         // Paginated endpoint: data must be array
-        processedData = Array.isArray(rawData) ? [...rawData] : (rawData ? [rawData] : []);
+        processedData = Array.isArray(rawData)
+          ? [...rawData]
+          : isEmptyBalanceSentinel
+          ? [...(rawData as any).data]
+          : (rawData ? [rawData] : []);
       } else {
         // Single object endpoint: data must be object (not array)
-        processedData = Array.isArray(rawData) ? rawData[0] || null : rawData;
+        processedData = Array.isArray(rawData)
+          ? rawData[0] || null
+          : isEmptyBalanceSentinel
+          ? null
+          : rawData;
       }
 
       // 🚀 CENTRALIZED MARKET DATA ENRICHMENT (v2.3 format)

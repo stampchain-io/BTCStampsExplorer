@@ -400,6 +400,109 @@ export function SRC20Card(
 
     return (
       <>
+        {/* ===== BACKGROUND IMAGE with dark overlay gradient (top -> bottom) ===== */}
+        {imageUrl && (
+          <div class="absolute inset-0 z-0 overflow-hidden rounded-xl">
+            <img
+              src={imageUrl}
+              alt=""
+              className="w-full h-full object-cover"
+            />
+            <div class="absolute inset-0 bg-gradient-to-b from-color-neutral-950/95 via-color-neutral-900/70 to-color-neutral-1000/90" />
+          </div>
+        )}
+
+        <div class="relative z-10 flex flex-col w-full h-full">
+          {/* ticker row */}
+          <div
+            class={`flex items-center ${container3} rounded-xl p-0.5 gap-2`}
+          >
+            <div class="flex-shrink-0 w-6 h-6 rounded-xl overflow-hidden">
+              {imageUrl
+                ? (
+                  <img
+                    src={imageUrl}
+                    alt={tick}
+                    class="w-full h-full object-cover"
+                    onError={() => setImgError(true)}
+                  />
+                )
+                : (
+                  <PlaceholderImage
+                    variant="no-image"
+                    className="!rounded-xl"
+                  />
+                )}
+            </div>
+            <div
+              class={`${cardCreator} !font-bold uppercase`}
+            >
+              <span class="hidden min-[420px]:inline-block font-light pr-0.5">
+                $
+              </span>
+              {tick}
+            </div>
+          </div>
+
+          {/* spacer 1 */}
+          <div class="flex-[0_1_8px]" />
+
+          {/* stamp number */}
+          {src20.stamp != null && (
+            <div class="flex justify-center">
+              <div class={cardStampNumber}>
+                <span class="font-light">#</span>
+                {src20.stamp.toLocaleString()}
+              </div>
+            </div>
+          )}
+
+          {/* spacer 2 */}
+          <div class="flex-[0_1_8px]" />
+
+          {/* op pill */}
+          <div class="flex justify-center">
+            <PillWithTooltip
+              label="OPERATION"
+              className={`${containerPill} ${cardFileType}`}
+            >
+              {op}
+            </PillWithTooltip>
+          </div>
+
+          {/* spacer 3 */}
+          <div class="flex-[0_1_8px]" />
+
+          {/* amount */}
+          <div class="flex justify-center">
+            <PillWithTooltip
+              label="AMOUNT"
+              className={`w-fit ${containerPill} ${cardSupply}`}
+            >
+              {amount}
+            </PillWithTooltip>
+          </div>
+        </div>
+      </>
+    );
+  };
+
+  /* ===== SQUARE WALLET LAYOUT (image+ticker, price, balance, value) ===== */
+  const renderWallet = () => (
+    <>
+      {/* ===== BACKGROUND IMAGE with dark overlay gradient (top -> bottom) ===== */}
+      {imageUrl && (
+        <div class="absolute inset-0 z-0 overflow-hidden rounded-xl">
+          <img
+            src={imageUrl}
+            alt=""
+            className="w-full h-full object-cover"
+          />
+          <div class="absolute inset-0 bg-gradient-to-b from-color-neutral-950/95 via-color-neutral-900/70 to-color-neutral-1000/90" />
+        </div>
+      )}
+
+      <div class="relative z-10 flex flex-col w-full h-full">
         {/* ticker row */}
         <div
           class={`flex items-center ${container3} rounded-xl p-0.5 gap-2`}
@@ -429,111 +532,41 @@ export function SRC20Card(
         {/* spacer 1 */}
         <div class="flex-[0_1_8px]" />
 
-        {/* stamp number */}
-        {src20.stamp != null && (
-          <div class="flex justify-center">
-            <div class={cardStampNumber}>
-              <span class="font-light">#</span>
-              {src20.stamp.toLocaleString()}
-            </div>
-          </div>
-        )}
+        {/* price */}
+        <div class="flex justify-center">
+          <PillWithTooltip
+            label="PRICE"
+            className={`w-fit ${containerPill} ${cardPrice}`}
+          >
+            {formatPriceSats(priceBtc)}
+          </PillWithTooltip>
+        </div>
 
         {/* spacer 2 */}
         <div class="flex-[0_1_8px]" />
 
-        {/* op pill */}
-        <div class="flex justify-center">
+        {/* balance */}
+        <div class="flex justify-center mt-auto">
           <PillWithTooltip
-            label="OPERATION"
-            className={`${containerPill} ${cardFileType}`}
+            label="BALANCE"
+            className={`w-fit ${containerPill} ${cardSupply}`}
           >
-            {op}
+            {formatAmount(src20.amt)}
           </PillWithTooltip>
         </div>
 
         {/* spacer 3 */}
         <div class="flex-[0_1_8px]" />
 
-        {/* amount */}
+        {/* value */}
         <div class="flex justify-center">
           <PillWithTooltip
-            label="AMOUNT"
-            className={`w-fit ${containerPill} ${cardSupply}`}
+            label="VALUE"
+            className={`w-fit ${containerPill} ${cardFileType}`}
           >
-            {amount}
+            {formatValueBtc(valueBtc)}
           </PillWithTooltip>
         </div>
-      </>
-    );
-  };
-
-  /* ===== SQUARE WALLET LAYOUT (image+ticker, price, balance, value) ===== */
-  const renderWallet = () => (
-    <>
-      {/* ticker row */}
-      <div
-        class={`flex items-center ${container3} rounded-xl p-0.5 gap-2`}
-      >
-        <div class="flex-shrink-0 w-6 h-6 rounded-xl overflow-hidden">
-          {imageUrl
-            ? (
-              <img
-                src={imageUrl}
-                alt={tick}
-                class="w-full h-full object-cover"
-                onError={() => setImgError(true)}
-              />
-            )
-            : <PlaceholderImage variant="no-image" className="!rounded-xl" />}
-        </div>
-        <div
-          class={`${cardCreator} !font-bold uppercase`}
-        >
-          <span class="hidden min-[420px]:inline-block font-light pr-0.5">
-            $
-          </span>
-          {tick}
-        </div>
-      </div>
-
-      {/* spacer 1 */}
-      <div class="flex-[0_1_8px]" />
-
-      {/* price */}
-      <div class="flex justify-center">
-        <PillWithTooltip
-          label="PRICE"
-          className={`w-fit ${containerPill} ${cardFileType}`}
-        >
-          {formatPriceSats(priceBtc)}
-        </PillWithTooltip>
-      </div>
-
-      {/* spacer 2 */}
-      <div class="flex-[0_1_8px]" />
-
-      {/* balance */}
-      <div class="flex justify-center">
-        <PillWithTooltip
-          label="BALANCE"
-          className={`w-fit ${containerPill} ${cardSupply}`}
-        >
-          {formatAmount(src20.amt)}
-        </PillWithTooltip>
-      </div>
-
-      {/* spacer 3 */}
-      <div class="flex-[0_1_8px]" />
-
-      {/* value */}
-      <div class="flex justify-center">
-        <PillWithTooltip
-          label="VALUE"
-          className={`w-fit ${containerPill} ${cardPrice}`}
-        >
-          {formatValueBtc(valueBtc)}
-        </PillWithTooltip>
       </div>
     </>
   );
@@ -543,20 +576,23 @@ export function SRC20Card(
     <>
       {/* ticker row */}
       <div
-        class={`flex items-center ${container3} rounded-xl p-0.5 gap-2`}
+        class={`flex items-center ${container3} p-0.5 gap-2`}
       >
-        <div class="flex-shrink-0 w-6 h-6 rounded-xl overflow-hidden">
+        {/* Image */}
+        <div class="flex-shrink-0 w-10 h-10 rounded-lg overflow-hidden">
           {imageUrl
             ? (
               <img
                 src={imageUrl}
                 alt={tick}
-                class="w-full h-full object-cover"
+                class="w-full h-full object-cover rounded-lg"
                 onError={() => setImgError(true)}
               />
             )
-            : <PlaceholderImage variant="no-image" className="!rounded-xl" />}
+            : <PlaceholderImage variant="no-image" className="!rounded-lg" />}
         </div>
+
+        {/* Ticker */}
         <div
           class={`${cardCreator} !font-bold uppercase`}
         >
@@ -574,7 +610,7 @@ export function SRC20Card(
       <div class="flex justify-center">
         <PillWithTooltip
           label="PRICE"
-          className={`w-fit ${containerPill} ${cardFileType}`}
+          className={`w-fit ${containerPill} ${cardPrice}`}
         >
           {formatPriceSats(priceBtc)}
         </PillWithTooltip>
@@ -606,6 +642,19 @@ export function SRC20Card(
       {/* spacer 3 */}
       <div class="flex-[0_1_8px]" />
 
+      {/* holders */}
+      <div class="flex justify-center">
+        <PillWithTooltip
+          label="HOLDERS"
+          className={`w-fit ${containerPill} ${cardFileSize}`}
+        >
+          {src20.holders != null ? src20.holders.toLocaleString() : "N/A"}
+        </PillWithTooltip>
+      </div>
+
+      {/* spacer 4 */}
+      <div class="flex-[0_1_20px]" />
+
       {/* balance */}
       <div class="flex justify-center">
         <PillWithTooltip
@@ -616,19 +665,6 @@ export function SRC20Card(
         </PillWithTooltip>
       </div>
 
-      {/* spacer 4 */}
-      <div class="flex-[0_1_8px]" />
-
-      {/* holders */}
-      <div class="flex justify-center">
-        <PillWithTooltip
-          label="HOLDERS"
-          className={`w-fit ${containerPill} ${cardFileSize}`}
-        >
-          {src20.holders != null ? src20.holders.toLocaleString() : "—"} HOLDERS
-        </PillWithTooltip>
-      </div>
-
       {/* spacer 5 */}
       <div class="flex-[0_1_8px]" />
 
@@ -636,7 +672,7 @@ export function SRC20Card(
       <div class="flex justify-center">
         <PillWithTooltip
           label="VALUE"
-          className={`w-fit ${containerPill} ${cardPrice}`}
+          className={`w-fit ${containerPill} ${cardFileType}`}
         >
           {formatValueBtc(valueBtc)}
         </PillWithTooltip>
@@ -660,14 +696,20 @@ export function SRC20Card(
 
   /* ===== RENDER ===== */
   return (
-    <div class="relative flex justify-center w-full h-full max-w-72">
+    <div
+      class={`relative flex justify-center w-full max-w-72 ${
+        variant === "cardVerticalBalance" ? "!h-fit" : "h-full"
+      }`}
+    >
       <a
         href={href}
         target="_top"
         f-partial={href}
         class={`${containerCard} ${
-          variant === "cardVerticalDetail" || variant === "cardVerticalBalance"
+          variant === "cardVerticalDetail"
             ? "min-h-[260px]"
+            : variant === "cardVerticalBalance"
+            ? "!h-fit"
             : ""
         }`}
       >

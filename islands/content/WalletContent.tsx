@@ -371,11 +371,9 @@ function TokensTabContent({
           <GridCell key={src20.tx_hash} view={view}>
             <SRC20Card
               src20={src20}
-              variant={view !== "cardSquare"
-                ? "cardVerticalBalance"
-                : section === "all"
+              variant={view === "cardSquare"
                 ? "cardSquareBalance"
-                : "cardSquare"}
+                : "cardVerticalBalance"}
             />
           </GridCell>
         ))}
