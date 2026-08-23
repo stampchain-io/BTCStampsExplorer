@@ -373,12 +373,13 @@ export class Src20Controller {
         tick,
         sortBy: "DESC",
         includePagination: true,
-        // Cap the holders fetch instead of pulling every row: high-holder-count
-        // tickers (e.g. STAMP) made this query extremely expensive without a
-        // supporting (tick, amt) index, exhausting the DB connection pool.
+        // In dev cap the holders fetch temporarily instead of pulling every
+        // row: high-holder-count tickers (e.g. STAMP) made this query
+        // extremely expensive without a supporting (tick, amt) index, /////
+        // exhausting the DB connection pool.
         // `total_holders` below still reflects the true count via a separate
         // COUNT query, independent of this cap.
-        limit: 100,
+        limit: 1000000,
       };
 
       const [
