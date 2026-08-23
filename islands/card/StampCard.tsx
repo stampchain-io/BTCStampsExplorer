@@ -1020,26 +1020,29 @@ export function StampCard({
               </div>
             </div>
 
-            {/* Row 2: File type + File size pills */}
-            <div class="flex items-center justify-between mt-2 w-full">
-              <PillWithTooltip
-                label="FILE TYPE"
-                className={`${containerPill} ${cardFileType}`}
-              >
-                {formatFileType(stamp.stamp_mimetype)}
-              </PillWithTooltip>
-              {stamp.file_size_bytes != null && (
+            {/* Row 2: File type + File size pills (hidden for listing/balance variants) */}
+            {variant !== "cardVerticalListing" &&
+              variant !== "cardVerticalBalance" && (
+              <div class="flex items-center justify-between mt-2 w-full">
                 <PillWithTooltip
-                  label="FILE SIZE"
-                  className={`${containerPill} ${cardFileSize}`}
+                  label="FILE TYPE"
+                  className={`${containerPill} ${cardFileType}`}
                 >
-                  {formatFileSize(
-                    stamp.file_size_bytes,
-                    stamp.stamp_mimetype === "text/plain",
-                  )}
+                  {formatFileType(stamp.stamp_mimetype)}
                 </PillWithTooltip>
-              )}
-            </div>
+                {stamp.file_size_bytes != null && (
+                  <PillWithTooltip
+                    label="FILE SIZE"
+                    className={`${containerPill} ${cardFileSize}`}
+                  >
+                    {formatFileSize(
+                      stamp.file_size_bytes,
+                      stamp.stamp_mimetype === "text/plain",
+                    )}
+                  </PillWithTooltip>
+                )}
+              </div>
+            )}
 
             {/* Row 3: Buy button (marketplace listings only) */}
             {variant === "cardVerticalListing" && isListed && (
@@ -1338,28 +1341,7 @@ export function StampCard({
               </div>
             )}
 
-            {/* Row 2: File type + File size pills */}
-            <div class="flex items-center justify-between mt-2 w-full">
-              <PillWithTooltip
-                label="FILE TYPE"
-                className={`${containerPill} ${cardFileType}`}
-              >
-                {formatFileType(stamp.stamp_mimetype)}
-              </PillWithTooltip>
-              {stamp.file_size_bytes != null && (
-                <PillWithTooltip
-                  label="FILE SIZE"
-                  className={`${containerPill} ${cardFileSize}`}
-                >
-                  {formatFileSize(
-                    stamp.file_size_bytes,
-                    stamp.stamp_mimetype === "text/plain",
-                  )}
-                </PillWithTooltip>
-              )}
-            </div>
-
-            {/* Row 3+4: Sale info containers: sale price USD / sale price BTC + buyer address (bottom) */}
+            {/* Row 2: Sale info containers: sale price USD / sale price BTC */}
             {saleData && (
               <>
                 <div
@@ -1376,6 +1358,7 @@ export function StampCard({
                   </div>
                 </div>
 
+                {/* Row 3: Buyer address container */}
                 <div
                   class={`flex flex-col w-full mt-2 px-2.5 py-1.5 ${container3} cursor-pointer`}
                 >
