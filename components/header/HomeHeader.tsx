@@ -1,3 +1,4 @@
+import { containerBackground } from "$layout";
 import { ComponentChildren } from "preact";
 
 function TitleText({
@@ -24,33 +25,34 @@ function TitleText({
 
 export function HomeHeader() {
   return (
-    <header class="
-      flex flex-col items-center justify-center
-      gap-1.5 mobileMd:gap-3 mobileLg:gap-[18px]
-      w-full
-      h-[220px] tablet:h-[250px]
-      mt-0 mb-6
-      relative overflow-visible
-    ">
+    <header
+      class={`
+        relative overflow-hidden
+        flex flex-col items-center justify-center
+        ${containerBackground} h-[420px] tablet:h-[520px]
+        gap-1.5 mobileMd:gap-3 mobileLg:gap-[18px]
+      `}
+    >
+      {/* ===== BACKGROUND IMAGE with dark overlay gradient (top -> bottom) ===== */}
+      <div class="absolute inset-0 z-0">
+        <img
+          src="/img/components/stamps-collage-6000x4000.png"
+          alt=""
+          className="w-full h-full object-cover"
+        />
+        <div class="absolute inset-0 bg-gradient-to-b from-color-neutral-950/95 via-color-neutral-900/70 to-color-neutral-1000/90" />
+      </div>
+
       <div class="
-          w-[336px]
-          min-[420px]:w-[376px]
-          mobileMd:w-[520px]
-          mobileLg:w-[720px]
-          tablet:w-[976px]
-          flex flex-col justify-center
-          relative
+          relative z-10
+          w-[clamp(21rem,80vw,61rem)]
+          flex flex-col justify-center leading-[1]
         ">
         <h1 class="text-center">
           <TitleText class="
               font-black
               bg-gradient-to-r color-neutral-gradient
-              text-2xl
-              min-[420px]:text-3xl
-              mobileMd:text-4xl
-              mobileLg:text-5xl
-              tablet:text-5xl
-              desktop:text-5xl
+              text-[clamp(1.5rem,5vw,3rem)]
             ">
             UNPRUNABLE{" "}
             <span class="bg-gradient-to-l color-primary-gradient">
@@ -62,13 +64,7 @@ export function HomeHeader() {
               font-bold
               bg-gradient-to-r color-neutral-gradient
               uppercase
-              text-xl
-              min-[420px]:text-2xl
-              mobileMd:text-3xl
-              mobileLg:text-4xl
-              tablet:text-4xl
-              -mt-1
-              tablet:mt-0
+              text-[clamp(1.25rem,4vw,2.25rem)]
             ">
             BECAUSE SATS DON'T EXIST
           </TitleText>
@@ -76,17 +72,11 @@ export function HomeHeader() {
       </div>
 
       <h3 class="
-          mx-auto
-          w-full
-          max-w-[310px]
-          text-center
-          font-normal
-          text-color-grey-light
-          text-base
-          mobileLg:text-xl
-          mobileMd:max-w-[380px]
-          mobileLg:max-w-[515px]
-          tablet:max-w-[550px]
+          relative z-10 mx-auto
+          w-[clamp(19.375rem,80vw,34.375rem)]
+          font-normal text-center text-color-neutral-200
+          text-[clamp(1rem,2.5vw,1.25rem)]
+          leading-[1.3]
         ">
         Welcome to the forefront of digital collectibles, where each stamp is a
         unique piece of art intertwined with the immutability of the blockchain.
