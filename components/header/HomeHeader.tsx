@@ -52,7 +52,7 @@ export function HomeHeader() {
           <TitleText class="
               font-black
               bg-gradient-to-r color-neutral-gradient
-              text-[clamp(1.5rem,5vw,3rem)]
+              text-[clamp(1.375rem,5vw,2.75rem)]
             ">
             UNPRUNABLE{" "}
             <span class="bg-gradient-to-l color-primary-gradient">
@@ -64,7 +64,7 @@ export function HomeHeader() {
               font-bold
               bg-gradient-to-r color-neutral-gradient
               uppercase
-              text-[clamp(1.25rem,4vw,2.25rem)]
+              text-[clamp(1.125rem,4vw,2rem)]
             ">
             BECAUSE SATS DON'T EXIST
           </TitleText>
@@ -75,7 +75,7 @@ export function HomeHeader() {
           relative z-10 mx-auto
           w-[clamp(19.375rem,80vw,34.375rem)]
           font-normal text-center text-color-neutral-200
-          text-[clamp(1rem,2.5vw,1.25rem)]
+          text-[clamp(0.8125rem,2vw,0.9375rem)]
           leading-[1.3]
         ">
         Welcome to the forefront of digital collectibles, where each stamp is a
