@@ -1,7 +1,4 @@
 /* ===== PAGECONTENT ===== */
-/* ===== STAMP =====  */
-export * from "$islands/content/StampOverviewContent.tsx";
-
 /* ===== MARKETPLACE ===== */
 export * from "$islands/content/MarketplaceContent.tsx";
 /*@baba-refactor/rename stamp details content  */

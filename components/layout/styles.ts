@@ -86,8 +86,7 @@ export const containerRowForm = "flex w-full gap-5";
 // Card-size tiers (Sm/Md/Lg), decoupled from the cardSquare/cardVertical
 // view-mode language — Sm packs the most columns (smallest cards), Lg the
 // fewest (largest cards). Shared by WalletContent, ExplorerContent,
-// MarketplaceContent, StampOverviewContent — keeps column counts/gap
-// consistent across pages.
+// MarketplaceContent — keeps column counts/gap consistent across pages.
 export const gridCardSm =
   "grid grid-cols-3 mobileMd:grid-cols-4 mobileLg:grid-cols-5 tablet:grid-cols-6 desktop:grid-cols-8 gap-5 w-full auto-rows-fr";
 export const gridCardMd =

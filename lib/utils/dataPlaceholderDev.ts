@@ -10,9 +10,8 @@
  * For the tiny, always-loaded production error/empty-state fallbacks, see
  * `dataPlaceholderProd.ts` instead.
  *
- * ===== ROUTES WITH DUMMY DATA (as of 2026-08-16) =====
+ * ===== ROUTES WITH DUMMY DATA (as of 2026-08-23) =====
  *   /                          routes/index.tsx
- *   /stamp                     routes/stamp/index.tsx
  *   /stamp/[id]                routes/stamp/[id].tsx
  *   /marketplace               routes/marketplace/index.tsx
  *   /explorer                  routes/explorer/index.tsx

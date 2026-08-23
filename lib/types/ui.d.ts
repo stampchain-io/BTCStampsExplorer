@@ -1230,23 +1230,6 @@ export interface StatusMessagesProps {
   onDismiss?: (index: number) => void;
 }
 
-export interface StampOverviewContentProps {
-  stamp?: any;
-  marketData?: any;
-  loading?: boolean;
-  error?: string;
-  stamps?: StampRow[];
-  isRecentSales?: boolean;
-  pagination?: {
-    page: number;
-    totalPages: number;
-    onPageChange?: (newPage: number) => void;
-    prefix?: string;
-  };
-  fromPage?: string;
-  viewMode?: "cardVertical" | "cardSquare" | "cardHorizontal";
-}
-
 export interface StampListingsAllProps {
   listings: Array<any>;
   loading?: boolean;
@@ -3201,14 +3184,6 @@ export interface SRC20DetailInfoProps {
     | "x"
   >;
 }
-
-/**
- * StampOverviewHeaderProps - Migrated from StampOverviewHeader.tsx
- */
-export type StampOverviewHeaderProps = {
-  currentFilters?: ExplorerStampFilters;
-  viewMode?: "cardVertical" | "cardSquare";
-};
 
 /**
  * MarketplaceHeaderProps - Props for the MarketplaceHeader island

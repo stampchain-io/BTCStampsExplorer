@@ -187,7 +187,6 @@ import * as $content_CollectionOverviewContent from "./islands/content/Collectio
 import * as $content_ExplorerContent from "./islands/content/ExplorerContent.tsx";
 import * as $content_MarketplaceContent from "./islands/content/MarketplaceContent.tsx";
 import * as $content_SRC20OverviewContent from "./islands/content/SRC20OverviewContent.tsx";
-import * as $content_StampOverviewContent from "./islands/content/StampOverviewContent.tsx";
 import * as $content_WalletContent from "./islands/content/WalletContent.tsx";
 import * as $content_WalletContentDispenser from "./islands/content/WalletContentDispenser.tsx";
 import * as $content_WalletDashboardContent from "./islands/content/WalletDashboardContent.tsx";
@@ -230,7 +229,6 @@ import * as $header_Header from "./islands/header/Header.tsx";
 import * as $header_MarketplaceHeader from "./islands/header/MarketplaceHeader.tsx";
 import * as $header_SRC20DetailHeader from "./islands/header/SRC20DetailHeader.tsx";
 import * as $header_SRC20OverviewHeader from "./islands/header/SRC20OverviewHeader.tsx";
-import * as $header_StampOverviewHeader from "./islands/header/StampOverviewHeader.tsx";
 import * as $header_WalletDashboardHeader from "./islands/header/WalletDashboardHeader.tsx";
 import * as $header_WalletHeader from "./islands/header/WalletHeader.tsx";
 import * as $header_WalletHeaderContent from "./islands/header/WalletHeaderContent.tsx";
@@ -550,7 +548,6 @@ const manifest = {
     "./islands/content/ExplorerContent.tsx": $content_ExplorerContent,
     "./islands/content/MarketplaceContent.tsx": $content_MarketplaceContent,
     "./islands/content/SRC20OverviewContent.tsx": $content_SRC20OverviewContent,
-    "./islands/content/StampOverviewContent.tsx": $content_StampOverviewContent,
     "./islands/content/WalletContent.tsx": $content_WalletContent,
     "./islands/content/WalletContentDispenser.tsx":
       $content_WalletContentDispenser,
@@ -612,7 +609,6 @@ const manifest = {
     "./islands/header/MarketplaceHeader.tsx": $header_MarketplaceHeader,
     "./islands/header/SRC20DetailHeader.tsx": $header_SRC20DetailHeader,
     "./islands/header/SRC20OverviewHeader.tsx": $header_SRC20OverviewHeader,
-    "./islands/header/StampOverviewHeader.tsx": $header_StampOverviewHeader,
     "./islands/header/WalletDashboardHeader.tsx": $header_WalletDashboardHeader,
     "./islands/header/WalletHeader.tsx": $header_WalletHeader,
     "./islands/header/WalletHeaderContent.tsx": $header_WalletHeaderContent,
