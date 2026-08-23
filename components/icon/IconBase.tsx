@@ -57,7 +57,7 @@ export function Icon(props: IconVariants) {
   const getIconPath = () => {
     const iconNameMap = {
       // Social Media Icons
-      stampchain: "stampchain",
+      stampchain: "stampchainFill",
       twitter: "twitter",
       telegram: "telegram",
       github: "github",
@@ -151,7 +151,7 @@ export function Icon(props: IconVariants) {
 
       // Misc Icons
       // - Tools, loader placeholder and donate CTA icons
-      stamp: "stampchain",
+      stamp: "stampchainOutline",
       uploadImage: "imageUpload",
       downloadImage: "imageDownload",
 

@@ -201,32 +201,32 @@ export type PlaceholderVariant = "no-image" | "audio" | "library" | "error";
 type Palette = { bg: string; stroke: string; fill: string };
 
 export const placeholderColor: Record<
-  "grey" | "red" | "green" | "orange",
+  "neutral" | "red" | "green" | "orange",
   Palette
 > = {
-  grey: {
+  neutral: {
     bg:
-      "bg-gradient-to-br from-color-grey-semidark/75 via-color-grey-dark/75 to-black",
-    stroke: "stroke-color-grey-semidark",
-    fill: "fill-color-grey-semidark",
+      "bg-gradient-to-br from-color-neutral-500 via-color-neutral-700 to-color-neutral-900",
+    stroke: "stroke-color-neutral-500",
+    fill: "fill-color-neutral-500",
   },
   red: {
     bg:
-      "bg-gradient-to-br from-color-red-semidark/75 via-color-red-dark/75 to-black",
-    stroke: "stroke-color-red-semidark",
-    fill: "fill-color-red-semidark",
+      "bg-gradient-to-br from-color-red-600 via-color-red-800 to-color-neutral-900",
+    stroke: "stroke-color-red-600",
+    fill: "fill-color-red-600",
   },
   green: {
     bg:
-      "bg-gradient-to-br from-color-green-semidark/75 via-color-green-dark/75 to-black",
-    stroke: "stroke-color-green-semidark",
-    fill: "fill-color-green-semidark",
+      "bg-gradient-to-br from-color-green-600 via-color-green-800 to-color-neutral-900",
+    stroke: "stroke-color-green-600",
+    fill: "fill-color-green-600",
   },
   orange: {
     bg:
-      "bg-gradient-to-br from-color-orange-semidark/75 via-color-orange-dark/75 to-black",
-    stroke: "stroke-color-orange-semidark",
-    fill: "fill-color-orange-semidark",
+      "bg-gradient-to-br from-color-orange-600 via-color-orange-800 to-color-neutral-900",
+    stroke: "stroke-color-orange-600",
+    fill: "fill-color-orange-600",
   },
 };
 
@@ -234,7 +234,7 @@ export const variantColor: Record<
   PlaceholderVariant,
   keyof typeof placeholderColor
 > = {
-  "no-image": "grey",
+  "no-image": "neutral",
   "audio": "orange",
   "library": "green",
   "error": "red",
