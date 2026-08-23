@@ -372,10 +372,10 @@ export default function DonateCta() {
               dev wallet.
             </p>
 
-            <div class="flex justify-start gap-6 items-center mt-3">
+            <div class="flex justify-start gap-3 items-center mt-3">
               <div
                 ref={receiveButtonRef}
-                class="relative group order-1 tablet:order-2"
+                class="relative group order-1 tablet:order-2 peer "
                 onMouseEnter={handleReceiveMouseEnter}
                 onMouseLeave={handleReceiveMouseLeave}
               >
@@ -402,7 +402,7 @@ export default function DonateCta() {
               {/* Address Text - second on mobile, first on tablet+ */}
               <a
                 href={`/wallet/${DONATE_ADDRESS}`}
-                class="font-medium text-base text-color-neutral-400 hover:text-color-hover link-neutral-400 transition-colors duration-200 order-2 tablet:order-1"
+                class="font-medium text-base text-color-neutral-400 hover:text-color-hover link-neutral-400 transition-colors duration-200 order-2 tablet:order-1 peer-hover:text-color-hover peer-hover:[background-size:0%_0.8px]"
               >
                 <span class="hidden tablet:block">{DONATE_ADDRESS}</span>
                 <span class="hidden mobileMd:block tablet:hidden">

@@ -13,6 +13,7 @@ import {
 import { container2Icon, PillContentCount, ScrollFadeRow } from "$layout";
 import {
   getCurrentPathname,
+  getSearchParams,
   safeNavigate,
 } from "$lib/utils/navigation/freshNavigationUtils.ts";
 import { formatNumberWithCommas } from "$lib/utils/ui/formatting/formatUtils.ts";
@@ -50,7 +51,7 @@ export const MarketplaceHeader = (
       };
 
       const queryParams = filtersToQueryParams(
-        globalThis.location.search,
+        getSearchParams().toString(),
         updatedFilters,
       );
       safeNavigate(
@@ -98,7 +99,7 @@ export const MarketplaceHeader = (
       }
 
       const queryParams = filtersToQueryParams(
-        globalThis.location.search,
+        getSearchParams().toString(),
         updatedFilters,
       );
       safeNavigate(
