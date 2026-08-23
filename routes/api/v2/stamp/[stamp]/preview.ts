@@ -1331,7 +1331,11 @@ async function handleRedisPreview(
         placeholderOnFail,
       );
     }
-    return fallbackResponse(retryReason, CACHE_HEADERS.error, placeholderOnFail);
+    return fallbackResponse(
+      retryReason,
+      CACHE_HEADERS.error,
+      placeholderOnFail,
+    );
   }
 
   if (cached?.png) {

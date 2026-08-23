@@ -140,7 +140,8 @@ export default function CarouselGallery(props: CarouselHomeProps) {
                   loading="lazy"
                   class="object-contain cursor-pointer desktop:min-w-[408px] tablet:min-w-[269px] mobileLg:min-w-[200px] mobileMd:min-w-[242px] min-w-[150px] rounded-2xl aspect-square pixelart stamp-image"
                   onLoad={handleLoad}
-                  onError={() => handleImageError(stamp.tx_hash)}
+                  onError={() =>
+                    handleImageError(stamp.tx_hash)}
                 />
               </a>
             );
@@ -168,7 +169,8 @@ export default function CarouselGallery(props: CarouselHomeProps) {
                           loading="lazy"
                           class="object-contain cursor-pointer desktop:min-w-[408px] tablet:min-w-[269px] mobileLg:min-w-[200px] mobileMd:min-w-[242px] min-w-[150px] rounded-2xl pixelart stamp-image"
                           onLoad={handleLoad}
-                          onError={() => handleImageError(stamp.tx_hash)}
+                          onError={() =>
+                            handleImageError(stamp.tx_hash)}
                         />
                       </a>
                     ),

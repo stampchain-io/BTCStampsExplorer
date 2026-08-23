@@ -129,8 +129,10 @@ export const WalletHeaderContent = (
         )}
 
         {/* View Toggle + Sort Controls - Right */}
-        {/* ml-auto: keeps this pinned right even when the sub-tab selector
-            (the other flex-grow element) is hidden for "all". */}
+        {
+          /* ml-auto: keeps this pinned right even when the sub-tab selector
+            (the other flex-grow element) is hidden for "all". */
+        }
         <div class="flex shrink-0 gap-3 ml-auto">
           <div class={container2Icon}>
             {/* "cardRow" excluded — wallet table variants aren't updated yet. */}

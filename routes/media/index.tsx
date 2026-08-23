@@ -1,12 +1,7 @@
 /* ===== MEDIA PAGE ===== */
 /* TODO @baba: Refactor the page and create island components for each section  - similar to About page */
 import { Button } from "$button";
-import {
-  body,
-  containerBackground,
-  containerGap,
-  container1,
-} from "$layout";
+import { body, container1, containerBackground, containerGap } from "$layout";
 import {
   headingGreyLDLink,
   subtitleNeutral,

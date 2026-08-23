@@ -23,9 +23,9 @@ export function InputField({
     <div class="w-full">
       <input
         type={type}
-        class={`${inputField} ${
-          textAlign === "center" ? "text-center" : ""
-        } ${isUppercase ? "uppercase" : ""} ${extraClass}`}
+        class={`${inputField} ${textAlign === "center" ? "text-center" : ""} ${
+          isUppercase ? "uppercase" : ""
+        } ${extraClass}`}
         placeholder={placeholder}
         value={isUppercase ? value?.toUpperCase() : value}
         onChange={onChange}

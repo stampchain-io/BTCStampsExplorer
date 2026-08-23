@@ -19,7 +19,9 @@ export default function StampSendsGallery({
         <h3 class={`${titleNeutral} tablet:hidden`}>
           RECENT SALES
         </h3>
-        <h3 class={`hidden tablet:block w-full text-right ${titleNeutral} !bg-gradient-to-l`}>
+        <h3
+          class={`hidden tablet:block w-full text-right ${titleNeutral} !bg-gradient-to-l`}
+        >
           RECENT SALES
         </h3>
       </div>

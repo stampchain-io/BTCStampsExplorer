@@ -1145,23 +1145,71 @@ export function getDummyStampDetailPage(
 
 /** Holders for KEVIN — fully minted, wide distribution across 8 addresses. */
 export const DATA_PLACEHOLDER_DEV_TOKEN_KEVIN_HOLDERS = [
-  { address: "1GZsmqM5PFBytkC81JxcSWDU5QzNwaCs2M", amt: "4200000", percentage: "20.00" },
-  { address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh", amt: "3150000", percentage: "15.00" },
-  { address: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa", amt: "2730000", percentage: "13.00" },
-  { address: "bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq", amt: "2100000", percentage: "10.00" },
-  { address: "bc1q9d3xa5gg45q2j39szuqn9k7pt3lmnah37mqad5", amt: "1680000", percentage: "8.00" },
-  { address: "3J98t1WpEZ73CNmQviecrnyiWrnqRhWNLy", amt: "1260000", percentage: "6.00" },
-  { address: "bc1qm34lsc65zpw79lxes69zkqmk6ee3ewf0j77s3h", amt: "840000", percentage: "4.00" },
+  {
+    address: "1GZsmqM5PFBytkC81JxcSWDU5QzNwaCs2M",
+    amt: "4200000",
+    percentage: "20.00",
+  },
+  {
+    address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
+    amt: "3150000",
+    percentage: "15.00",
+  },
+  {
+    address: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+    amt: "2730000",
+    percentage: "13.00",
+  },
+  {
+    address: "bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq",
+    amt: "2100000",
+    percentage: "10.00",
+  },
+  {
+    address: "bc1q9d3xa5gg45q2j39szuqn9k7pt3lmnah37mqad5",
+    amt: "1680000",
+    percentage: "8.00",
+  },
+  {
+    address: "3J98t1WpEZ73CNmQviecrnyiWrnqRhWNLy",
+    amt: "1260000",
+    percentage: "6.00",
+  },
+  {
+    address: "bc1qm34lsc65zpw79lxes69zkqmk6ee3ewf0j77s3h",
+    amt: "840000",
+    percentage: "4.00",
+  },
   { address: null, amt: "5040000", percentage: "24.00" },
 ];
 
 /** Holders for PEPE — minting in progress, fewer/smaller holders so far. */
 export const DATA_PLACEHOLDER_DEV_TOKEN_PEPE_HOLDERS = [
-  { address: "bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq", amt: "8280000", percentage: "16.67" },
-  { address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh", amt: "6900000", percentage: "13.89" },
-  { address: "1GZsmqM5PFBytkC81JxcSWDU5QzNwaCs2M", amt: "4830000", percentage: "9.72" },
-  { address: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa", amt: "3450000", percentage: "6.94" },
-  { address: "bc1q9d3xa5gg45q2j39szuqn9k7pt3lmnah37mqad5", amt: "2070000", percentage: "4.17" },
+  {
+    address: "bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq",
+    amt: "8280000",
+    percentage: "16.67",
+  },
+  {
+    address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
+    amt: "6900000",
+    percentage: "13.89",
+  },
+  {
+    address: "1GZsmqM5PFBytkC81JxcSWDU5QzNwaCs2M",
+    amt: "4830000",
+    percentage: "9.72",
+  },
+  {
+    address: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+    amt: "3450000",
+    percentage: "6.94",
+  },
+  {
+    address: "bc1q9d3xa5gg45q2j39szuqn9k7pt3lmnah37mqad5",
+    amt: "2070000",
+    percentage: "4.17",
+  },
 ];
 
 /** SRC-20 token detail page (KEVIN — fully minted, active market) */
