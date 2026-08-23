@@ -8,7 +8,7 @@ export function ReadAllButton({ href = "/howto" }: ReadAllButtonProps) {
       <Button
         variant="outline"
         color="neutral"
-        size="mdR"
+        size="smR"
         href={href}
         target="_top"
       >

@@ -35,7 +35,7 @@ const ContactCta = () => {
   /* ===== COMPONENT ===== */
   return (
     <>
-      <section class={containerBackground}>
+      <section id="contact" class={containerBackground}>
         {/* ===== HEADER SECTION ===== */}
         <div class="flex flex-col">
           <h4 class={titleNeutral}>
@@ -120,7 +120,7 @@ const ContactCta = () => {
                   type="submit"
                   variant="flat"
                   color="neutral"
-                  size="mdR"
+                  size="smR"
                   isSubmitting={isSubmitting}
                 >
                   SEND

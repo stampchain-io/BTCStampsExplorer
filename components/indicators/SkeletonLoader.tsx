@@ -232,7 +232,7 @@ export function FeeCalculatorSkeleton() {
             widths={["w-[160px] tablet:w-[226px]"]}
             className="-mb-1 tablet:-mb-0.5"
           />
-          <SkeletonButton size="mdR" width="w-[168px] tablet:w-[150px]" />
+          <SkeletonButton size="smR" width="w-[168px] tablet:w-[150px]" />
         </div>
       </div>
     </SkeletonContainer>
@@ -461,7 +461,7 @@ export function RegisterToolSkeleton({ className = "" }: SkeletonLoaderProps) {
           </div>
 
           {/* Available button skeleton */}
-          <SkeletonButton size="mdR" width="w-[116px]" />
+          <SkeletonButton size="smR" width="w-[116px]" />
         </div>
       </SkeletonContainer>
 

@@ -180,7 +180,7 @@ export function TransactionStatus({
               <Button
                 variant="outline"
                 color="neutral"
-                size="mdR"
+                size="smR"
                 onClick={onViewTransaction}
               >
                 VIEW TRANSACTION
@@ -190,7 +190,7 @@ export function TransactionStatus({
               <Button
                 variant="flat"
                 color="neutral"
-                size="mdR"
+                size="smR"
                 onClick={onRetry}
               >
                 RETRY

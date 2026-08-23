@@ -783,7 +783,7 @@ export function StampTradeTool() {
           <Button
             variant="flat"
             color="neutral"
-            size="mdR"
+            size="smR"
             onClick={handleCreatePSBT}
             disabled={isSubmitting}
           >
@@ -984,7 +984,7 @@ export function StampTradeTool() {
           <Button
             variant="flat"
             color="neutral"
-            size="mdR"
+            size="smR"
             onClick={handleUtxoAttach}
             disabled={isSubmitting}
           >
@@ -1100,7 +1100,7 @@ export function StampTradeTool() {
           <Button
             variant="flat"
             color="neutral"
-            size="mdR"
+            size="smR"
             onClick={handleCompleteSwap}
             disabled={isSubmitting}
           >
