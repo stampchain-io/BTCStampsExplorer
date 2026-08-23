@@ -743,52 +743,6 @@ export const FilterContentMarketplace = ({
     });
   };
 
-  // Helper function to toggle main market type (LISTINGS vs SALES)
-  const _toggleMarketType = (type: "listings" | "sales") => {
-    setFilters((prevFilters) => {
-      const newFilters: StampFilters = {
-        ...prevFilters,
-        market: prevFilters.market === type ? "" : type,
-        // Reset all sub-options when switching main type
-        dispensers: type === "listings" || type === "sales" ? true : false, // Auto-select DISPENSERS for both listings and sales
-        atomics: false,
-        listings: type === "listings" ? "all" : "", // Auto-select "all" when dispensers selected
-        sales: type === "sales" ? "recent" : "", // Auto-select "recent" for sales
-        listingsMin: "",
-        listingsMax: "",
-        salesMin: "",
-        salesMax: "",
-        volume: "",
-      };
-
-      onFiltersChange(newFilters);
-      return newFilters;
-    });
-  };
-
-  // Helper function to toggle dispensers/atomics
-  const _toggleListingOption = (option: "dispensers" | "atomics") => {
-    setFilters((prevFilters) => {
-      const newValue = !prevFilters[option];
-      const newFilters: StampFilters = {
-        ...prevFilters,
-        [option]: newValue,
-        // Auto-select "all" when first dispenser/atomic is selected
-        listings: (newValue ||
-            prevFilters[option === "dispensers" ? "atomics" : "dispensers"])
-          ? (prevFilters.listings || "all")
-          : (!prevFilters[
-              option === "dispensers" ? "atomics" : "dispensers"
-            ]
-            ? ""
-            : prevFilters.listings),
-      } as StampFilters;
-
-      onFiltersChange(newFilters);
-      return newFilters;
-    });
-  };
-
   // Helper function to handle listing price type
   const handleListingPriceType = (
     type: "all" | "bargain" | "affordable" | "premium" | "custom",

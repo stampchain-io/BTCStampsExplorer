@@ -2262,8 +2262,8 @@ export interface WalletHeaderContentProps extends BaseComponentProps {
   viewMode?: "cardVertical" | "cardSquare" | "cardRow" | "cardHorizontal";
   // Totals for the currently active section/tab combo - used by the count
   // pill (stampsPagination.total / tokensPagination.total from the route)
-  stampsTotal?: number;
-  tokensTotal?: number;
+  stampsTotal?: number | undefined;
+  tokensTotal?: number | undefined;
 }
 
 /**

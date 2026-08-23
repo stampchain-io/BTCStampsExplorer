@@ -1,9 +1,9 @@
 import { SATOSHIS_PER_BTC } from "$constants";
 import { BigFloat } from "bigfloat/mod.ts";
-// @ts-expect-error - esm.sh's dayjs type declaration uses `export =`, so it
+// @ts-ignore - esm.sh's dayjs type declaration uses `export =`, so it
 // has no `default` export per its .d.ts, even though the runtime module does.
 import dayjs from "dayjs";
-// @ts-expect-error - same `export =` typing issue as the dayjs import above.
+// @ts-ignore - same `export =` typing issue as the dayjs import above.
 import relativeTime from "dayjs/plugin/relativeTime";
 
 dayjs.extend(relativeTime);
