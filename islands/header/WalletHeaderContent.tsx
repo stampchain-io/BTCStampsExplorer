@@ -69,7 +69,11 @@ export const WalletHeaderContent = (
     ]
     : [
       { value: "balance", label: "BALANCE" },
-      { value: "created", label: "CREATED" },
+      // Tokens are "deployed", not "created" — Stamps keeps "CREATED".
+      {
+        value: "created",
+        label: section === "tokens" ? "DEPLOYED" : "CREATED",
+      },
     ];
 
   /* ===== COUNT PILL =====
@@ -108,20 +112,33 @@ export const WalletHeaderContent = (
         </div>
 
         {/* Sub-tab Selector - Center */}
-        <div class="grow shrink-0 flex justify-center">
-          <SelectorButtons
-            options={tabOptions}
-            value={tab}
-            onChange={handleTabChange}
-            size="xsR"
-            color="primary"
-          />
-        </div>
+        {
+          /* "all" only ever shows Balance data — hide the tab selector so
+            users can't switch to a sub-tab with nothing to show there. */
+        }
+        {section !== "all" && (
+          <div class="grow shrink-0 flex justify-center">
+            <SelectorButtons
+              options={tabOptions}
+              value={tab}
+              onChange={handleTabChange}
+              size="xsR"
+              color="primary"
+            />
+          </div>
+        )}
 
         {/* View Toggle + Sort Controls - Right */}
-        <div class="flex shrink-0 gap-3">
+        {/* ml-auto: keeps this pinned right even when the sub-tab selector
+            (the other flex-grow element) is hidden for "all". */}
+        <div class="flex shrink-0 gap-3 ml-auto">
           <div class={container2Icon}>
-            <ViewButton viewMode={viewMode} paramName="view" />
+            {/* "cardRow" excluded — wallet table variants aren't updated yet. */}
+            <ViewButton
+              viewMode={viewMode}
+              paramName="view"
+              modes={["cardVertical", "cardSquare"]}
+            />
           </div>
           <div class={`${container2Icon} gap-1.5 tablet:gap-1`}>
             <SortButton sortParam="sortBy" />

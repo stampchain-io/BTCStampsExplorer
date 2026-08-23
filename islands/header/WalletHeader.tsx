@@ -380,15 +380,15 @@ export default function WalletHeader({
   /* ===== RENDER ===== */
   return (
     <div class={`flex flex-col mobileMd:flex-row ${containerGap}`}>
-      <div className="flex flex-col h-fit w-full mobileMd:w-2/3 tablet:w-3/4">
-        <div className={containerBackground}>
+      <div className="flex flex-col w-full mobileMd:w-2/3 tablet:w-3/4">
+        <div className={`${containerBackground} flex-1`}>
           <WalletOverview walletData={walletData} />
         </div>
       </div>
       <div
         class={`flex flex-col w-full mobileMd:w-1/3 tablet:w-1/4 ${containerGap}`}
       >
-        <div className={containerBackground}>
+        <div className={`${containerBackground} !py-3`}>
           <WalletStats
             stampsTotal={stampsTotal}
             src20Total={src20Total}

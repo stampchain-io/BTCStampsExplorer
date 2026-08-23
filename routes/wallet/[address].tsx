@@ -33,7 +33,9 @@ const CONTENT_TAB_VALUES: WalletContentTabIdSub[] = [
   "listings",
   "collections",
 ];
-const VIEW_MODE_VALUES = ["cardVertical", "cardSquare", "cardRow"] as const;
+// "cardRow" is temporarily excluded — the wallet-specific table variants
+// aren't updated yet (see WalletContent.tsx).
+const VIEW_MODE_VALUES = ["cardVertical", "cardSquare"] as const;
 type ViewMode = typeof VIEW_MODE_VALUES[number];
 
 // Grid-friendly page sizes per sub-tab

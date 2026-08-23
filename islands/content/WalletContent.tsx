@@ -1,12 +1,13 @@
 /* ===== WALLET CONTENT COMPONENT ===== */
 import { PaginationButtons } from "$button";
-import { CollectionCard, SRC20Card, StampCard } from "$card";
-import { StampOverviewTable } from "$components/table/explorerTable/StampOverview.tsx";
-import { StampListingsTable } from "$components/table/marketplaceTable/StampListings.tsx";
-import { SRC20OverviewCompact } from "$components/table/src20OverviewTable/SRC20OverviewCompact.tsx";
+import {
+  CollectionCardSquare,
+  CollectionCardVertical,
+  SRC20Card,
+  StampCard,
+} from "$card";
 import { WalletHeaderContent } from "$header";
 import { containerBackground, EmptyState, gridCardWallet } from "$layout";
-import { subtitleNeutral } from "$text";
 import type { DispenserRow, StampRow } from "$types/stamp.d.ts";
 import type {
   WalletContainerPagination,
@@ -19,11 +20,15 @@ import type {
 import type { ComponentChildren } from "preact";
 import { useEffect } from "preact/hooks";
 
-/* ===== VIEW TYPES ===== */
-// "cardHorizontal" is a reserved placeholder for a future layout — none of
-// the render branches below handle it yet (gridCardWallet falls back to
-// the Md grid, and no tab switches on it).
-type ViewMode = "cardVertical" | "cardSquare" | "cardRow" | "cardHorizontal";
+/* ===== VIEW TYPES =====
+ * "cardRow" is temporarily disabled — the wallet-specific table variants
+ * (StampOverviewTable/StampListingsTable/SRC20OverviewCompact) aren't
+ * updated for this layout yet, so the ViewButton (see WalletHeaderContent)
+ * no longer offers it and the route no longer accepts it as a `view`
+ * value. "cardHorizontal" is a reserved placeholder for a future layout —
+ * none of the render branches below handle it yet (gridCardWallet falls
+ * back to the Md grid, and no tab switches on it). */
+type ViewMode = "cardVertical" | "cardSquare" | "cardHorizontal";
 
 /* ===== TAB MAPPING ===== */
 // The header exposes one unified sub-tab (balance/created/listings/
@@ -93,30 +98,58 @@ function GridCell(
     : <div class="contents">{children}</div>;
 }
 
-/* ===== STAMPS: COLLECTED / STAMPED (grid + row) ===== */
-function StampsGridContent({
+/* ===== STAMPS: BALANCE (stamps held by this address) ===== */
+function BalanceTabContent({
   stamps,
   view,
   section,
   pagination,
-  emptyLabel,
 }: {
   stamps: StampRow[];
   view: ViewMode;
   section: WalletContentTabId;
   pagination?: WalletContainerPagination | undefined;
-  emptyLabel: string;
 }) {
   if (!stamps.length) {
-    return <EmptyState label={emptyLabel} icon="artStamps" />;
+    return <EmptyState label="NO ART STAMPS IN THE WALLET" icon="artStamps" />;
   }
 
-  if (view === "cardRow") {
+  return (
+    <>
+      <div class={gridCardWallet(view, section, "stamps")}>
+        {stamps.map((stamp) => (
+          <GridCell key={stamp.tx_hash} view={view}>
+            <StampCard
+              stamp={stamp}
+              variant={view === "cardSquare"
+                ? "cardSquareBalance"
+                : "cardVerticalBalance"}
+            />
+          </GridCell>
+        ))}
+      </div>
+      <PaginationBlock pagination={pagination} prefix="stamps" />
+    </>
+  );
+}
+
+/* ===== STAMPS: CREATED (stamps minted by this address, not necessarily
+ * still held) — regular supply pill rather than the wallet's BALANCE pill,
+ * since "created" stamps aren't necessarily held by this wallet. ===== */
+function CreatedTabContent({
+  stamps,
+  view,
+  section,
+  pagination,
+}: {
+  stamps: StampRow[];
+  view: ViewMode;
+  section: WalletContentTabId;
+  pagination?: WalletContainerPagination | undefined;
+}) {
+  if (!stamps.length) {
     return (
-      <>
-        <StampOverviewTable stamps={stamps} />
-        <PaginationBlock pagination={pagination} prefix="stamps" />
-      </>
+      <EmptyState label="NO STAMPS CREATED BY THIS ADDY" icon="artStamps" />
     );
   }
 
@@ -128,7 +161,7 @@ function StampsGridContent({
             <StampCard
               stamp={stamp}
               variant={view === "cardSquare"
-                ? "cardSquare"
+                ? "cardSquareDetail"
                 : "cardVerticalDetail"}
             />
           </GridCell>
@@ -144,24 +177,32 @@ function ListingsGroup({
   stamps,
   view,
   section,
+  isClosed = false,
 }: {
   stamps: (StampRow & { lowestPriceDispenser: DispenserRow })[];
   view: ViewMode;
   section: WalletContentTabId;
+  isClosed?: boolean;
 }) {
-  if (view === "cardRow") {
-    return <StampListingsTable stamps={stamps} />;
-  }
   return (
     <div class={gridCardWallet(view, section, "stamps")}>
       {stamps.map((stamp) => (
         <GridCell key={stamp.lowestPriceDispenser.tx_hash} view={view}>
-          <StampCard
-            stamp={stamp}
-            variant={view === "cardSquare"
-              ? "cardSquare"
-              : "cardVerticalListing"}
-          />
+          <div class="relative">
+            <StampCard
+              stamp={stamp}
+              variant={view === "cardSquare"
+                ? "cardSquareBalance"
+                : "cardVerticalBalance"}
+            />
+            {isClosed && (
+              <div class="absolute inset-0 flex items-center justify-center rounded-2xl bg-gradient-to-b from-color-neutral-950/95 via-color-neutral-900/70 to-color-neutral-1000/90 pointer-events-none">
+                <span class="font-bold text-sm text-color-neutral-400">
+                  CLOSED
+                </span>
+              </div>
+            )}
+          </div>
         </GridCell>
       ))}
     </div>
@@ -195,14 +236,17 @@ function ListingsTabContent({
     <div class="flex flex-col gap-8">
       {open.length > 0 && (
         <div id="open-listings-section">
-          <h3 class={subtitleNeutral}>OPEN LISTINGS - {open.length}</h3>
           <ListingsGroup stamps={open} view={view} section={section} />
         </div>
       )}
       {closed.length > 0 && (
         <div id="closed-listings-section">
-          <h3 class={subtitleNeutral}>CLOSED LISTINGS - {closed.length}</h3>
-          <ListingsGroup stamps={closed} view={view} section={section} />
+          <ListingsGroup
+            stamps={closed}
+            view={view}
+            section={section}
+            isClosed
+          />
         </div>
       )}
       <PaginationBlock pagination={pagination} prefix="stamps" />
@@ -210,27 +254,34 @@ function ListingsTabContent({
   );
 }
 
-/* ===== STAMPS: COLLECTIONS (stacked CollectionCard list) ===== */
+/* ===== STAMPS: COLLECTIONS (grid, mirrors Balance/CreatedTabContent) ===== */
 function CollectionsTabContent({
   collections,
+  view,
+  section,
   pagination,
 }: {
   collections: any[];
+  view: ViewMode;
+  section: WalletContentTabId;
   pagination?: WalletContainerPagination | undefined;
 }) {
   if (!collections.length) {
     return <EmptyState label="NO COLLECTIONS FOUND" icon="artStamps" />;
   }
   return (
-    <div class="flex flex-col gap-5">
-      {collections.map((collection) => (
-        <CollectionCard
-          key={collection.collection_id}
-          collection={collection}
-        />
-      ))}
+    <>
+      <div class={gridCardWallet(view, section, "stamps")}>
+        {collections.map((collection) => (
+          <GridCell key={collection.collection_id} view={view}>
+            {view === "cardSquare"
+              ? <CollectionCardSquare collection={collection} />
+              : <CollectionCardVertical collection={collection} />}
+          </GridCell>
+        ))}
+      </div>
       <PaginationBlock pagination={pagination} prefix="stamps" />
-    </div>
+    </>
   );
 }
 
@@ -249,7 +300,14 @@ function StampsTabContent({
   pagination?: WalletContainerPagination | undefined;
 }) {
   if (tab === "collections") {
-    return <CollectionsTabContent collections={data} pagination={pagination} />;
+    return (
+      <CollectionsTabContent
+        collections={data}
+        view={view}
+        section={section}
+        pagination={pagination}
+      />
+    );
   }
   if (tab === "listings") {
     return (
@@ -261,15 +319,22 @@ function StampsTabContent({
       />
     );
   }
+  if (tab === "created") {
+    return (
+      <CreatedTabContent
+        stamps={data as StampRow[]}
+        view={view}
+        section={section}
+        pagination={pagination}
+      />
+    );
+  }
   return (
-    <StampsGridContent
+    <BalanceTabContent
       stamps={data as StampRow[]}
       view={view}
       section={section}
       pagination={pagination}
-      emptyLabel={tab === "created"
-        ? "NO STAMPS CREATED BY THIS ADDY"
-        : "NO ART STAMPS IN THE WALLET"}
     />
   );
 }
@@ -296,19 +361,6 @@ function TokensTabContent({
           : "NO SRC20 TOKENS IN THE WALLET"}
         icon="src20Tokens"
       />
-    );
-  }
-
-  if (view === "cardRow") {
-    return (
-      <>
-        <SRC20OverviewCompact
-          data={data}
-          fromPage="wallet"
-          onImageClick={() => {}}
-        />
-        <PaginationBlock pagination={pagination} prefix="tokens" />
-      </>
     );
   }
 
@@ -339,12 +391,16 @@ export default function WalletContent({
   anchor,
   section = "all",
   tab = "balance",
-  view = "cardVertical",
+  view: rawView = "cardVertical",
   stampsData = [],
   stampsPagination,
   tokensData = [],
   tokensPagination,
 }: WalletContentProps) {
+  // "cardRow" is disabled here (see the ViewMode comment above) — the route
+  // already excludes it from the `view` query param, but fall back safely
+  // in case a stale value ever reaches this component directly.
+  const view: ViewMode = rawView === "cardRow" ? "cardVertical" : rawView;
   /* ===== EFFECTS ===== */
   useEffect(() => {
     if (anchor) {
@@ -370,9 +426,14 @@ export default function WalletContent({
     }
   }, [anchor]);
 
-  /* ===== DERIVED TAB VALUES ===== */
-  const stampsTab = mapTabToStampsTab(tab);
-  const tokensTab = mapTabToTokensTab(tab);
+  /* ===== DERIVED TAB VALUES =====
+   * "all" only ever shows Balance data (its tab selector is hidden) — force
+   * "balance" here too in case a stale `tab` query param slips through. */
+  const effectiveTab: WalletContentTabIdSub = section === "all"
+    ? "balance"
+    : tab;
+  const stampsTab = mapTabToStampsTab(effectiveTab);
+  const tokensTab = mapTabToTokensTab(effectiveTab);
 
   /* ===== RENDER ===== */
   return (
@@ -384,13 +445,13 @@ export default function WalletContent({
         stampsTotal={stampsPagination?.total}
         tokensTotal={tokensPagination?.total}
       />
-      <div class={`w-full ${view !== "cardRow" ? "pt-5" : "pt-2"}`}>
+      <div class="w-full pt-5">
         {section === "all"
           ? (
             <div class="flex flex-col tablet:flex-row gap-5">
               <div
                 id="tokens-panel"
-                class="w-full tablet:w-1/2 desktop:w-1/3"
+                class="w-full tablet:w-1/2 desktop:w-[37%]"
               >
                 <TokensTabContent
                   tab={tokensTab}
@@ -402,7 +463,7 @@ export default function WalletContent({
               </div>
               <div
                 id="stamps-panel"
-                class="w-full tablet:w-1/2 desktop:w-2/3"
+                class="w-full tablet:w-1/2 desktop:w-[63%]"
               >
                 <StampsTabContent
                   tab={stampsTab}

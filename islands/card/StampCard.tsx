@@ -623,7 +623,7 @@ export function StampCard({
           {/* Row 1: Supply (left) + Status Icons (right) */}
           <div class="flex justify-between items-center w-full">
             <PillWithTooltip
-              label="SUPPLY"
+              label="EDITIONS"
               className={`${containerPill} ${cardSupply}`}
             >
               {lowestPriceDispenser?.give_remaining ??
@@ -800,10 +800,10 @@ export function StampCard({
             </div>
           </div>
 
-          {/* ===== FOOTER: SUPPLY (LEFT) + PRICE (RIGHT) ===== */}
+          {/* ===== FOOTER: EDITIONS (LEFT) + PRICE (RIGHT) ===== */}
           <div class="flex justify-between items-center w-full">
             <PillWithTooltip
-              label="SUPPLY"
+              label="EDITIONS"
               className={`${containerPill} ${cardSupply}`}
             >
               {lowestPriceDispenser?.give_remaining ??
@@ -856,20 +856,36 @@ export function StampCard({
           </div>
           {/* ===== SQUARE CARD DETAIL ===== */}
           {variant === "cardSquareDetail" && (
-            <div class="absolute bottom-1 left-1 z-20">
+            <div class="absolute bottom-0.5 right-0.5 z-20">
               <PillWithTooltip
-                label="SUPPLY"
+                label="EDITIONS"
                 className={`${containerPill} ${cardSupply} cursor-pointer`}
               >
                 {supplyDisplay}
               </PillWithTooltip>
             </div>
           )}
+
+          {/* ===== SQUARE CARD WALLET BALANCE (bottom-right) ===== */}
+          {variant === "cardSquareBalance" && (
+            <div class="absolute bottom-0.5 right-0.5 z-20">
+              <PillWithTooltip
+                label="BALANCE"
+                className={`${containerPill} ${cardSupply} cursor-pointer`}
+              >
+                {formatSupply(
+                  Number(stamp.balance ?? 0),
+                  Boolean(stamp.divisible),
+                )}
+              </PillWithTooltip>
+            </div>
+          )}
         </div>
 
-        {/* ===== VERTICAL DETAIL CARD (explorer / marketplace listings) ===== */}
+        {/* ===== VERTICAL DETAIL CARD (explorer / marketplace listings / wallet balance) ===== */}
         {(variant === "cardVerticalDetail" ||
-          variant === "cardVerticalListing") && (
+          variant === "cardVerticalListing" ||
+          variant === "cardVerticalBalance") && (
           <div class="flex flex-col items-center p-0.5">
             {/* Stamp Number */}
             <div
@@ -894,20 +910,40 @@ export function StampCard({
               <span class={cardCreator}>{creatorDisplay}</span>
             </UserProfileIcon>
 
-            {/* Row 1: Supply (left) + Status Icons (right) */}
+            {/* Row 1: Supply/Balance (left) + Status Icons (right) */}
             <div class="flex justify-between items-center mt-2 w-full">
               <PillWithTooltip
-                label="SUPPLY"
+                label={variant === "cardVerticalBalance"
+                  ? "BALANCE"
+                  : "EDITIONS"}
                 className={`${containerPill} ${cardSupply}`}
               >
                 {variant === "cardVerticalListing"
                   ? `${
                     lowestPriceDispenser?.give_remaining ?? stamp.supply ?? 1
                   }/${stamp.supply ?? 1}`
+                  : variant === "cardVerticalBalance"
+                  ? (Number(stamp.balance ?? 0) > 100000
+                    ? formatSupply(
+                      Number(stamp.balance ?? 0),
+                      Boolean(stamp.divisible),
+                    )
+                    : `${
+                      formatSupply(
+                        Number(stamp.balance ?? 0),
+                        Boolean(stamp.divisible),
+                      )
+                    }/${
+                      formatSupply(
+                        Number(stamp.supply ?? 0),
+                        Boolean(stamp.divisible),
+                      )
+                    }`)
                   : supplyDisplay}
               </PillWithTooltip>
               <div class="flex items-center gap-1.5 mr-0.5 -translate-y-0.5">
-                {variant === "cardVerticalDetail" && isListed && (
+                {(variant === "cardVerticalDetail" ||
+                  variant === "cardVerticalBalance") && isListed && (
                   <IconWithTooltip label={displayPriceBTC().text}>
                     <Icon
                       type="icon"
@@ -1109,7 +1145,7 @@ export function StampCard({
             {/* Row 1: Supply (left) + Status Icons (right) */}
             <div class="flex justify-between items-center mt-2 w-full">
               <PillWithTooltip
-                label="SUPPLY"
+                label="EDITIONS"
                 className={`${containerPill} ${cardSupply}`}
               >
                 {supplyDisplay}
@@ -1274,7 +1310,7 @@ export function StampCard({
             {saleData && (
               <div class="flex items-center justify-between mt-2 w-full">
                 <PillWithTooltip
-                  label="SUPPLY"
+                  label="EDITIONS"
                   className={`${containerPill} ${cardSupply}`}
                 >
                   {saleData.dispense_quantity ?? 1}/{stamp.supply ?? 1}

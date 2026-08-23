@@ -973,25 +973,22 @@ export class StampController {
         options
       });
 
-      const dispensersData = await CounterpartyApiManager.getDispensersByAddress(address, {
+      // Counterparty's dispenser list (and its `total`) covers every asset
+      // the address has ever dispensed, not just Bitcoin Stamps — some
+      // entries won't match an indexed stamp below and get dropped. If we
+      // paginated via Counterparty's own page/limit first, `total` would
+      // overcount vs. what's actually rendered (stampchain.io wallet
+      // pagination bug: more page buttons than there's real listing data).
+      // So fetch everything up front (capped at 1000, matching the
+      // pagination-count "hack" already used elsewhere for this address),
+      // filter down to stamp-matched dispensers, THEN paginate in-memory.
+      const allDispensersData = await CounterpartyApiManager.getDispensersByAddress(address, {
         verbose: true,
-        page,
-        limit,
+        limit: 1000,
         ...options
       });
 
-      // Add detailed logging for dispenser data
-      console.log("[StampController] Dispenser data details:", {
-        total: dispensersData.total,
-        dispensersCount: dispensersData.dispensers?.length ?? 0,
-        page,
-        limit,
-        hasDispensers: (dispensersData.dispensers?.length ?? 0) > 0,
-        firstDispenser: dispensersData.dispensers?.[0]?.cpid,
-        lastDispenser: dispensersData.dispensers?.[Math.max(0, (dispensersData.dispensers?.length ?? 1) - 1)]?.cpid
-      });
-
-      if (!(dispensersData.dispensers?.length)) {
+      if (!(allDispensersData.dispensers?.length)) {
         return {
           dispensers: [],
           total: 0
@@ -999,7 +996,7 @@ export class StampController {
       }
 
       // Get unique CPIDs from dispensers
-      const uniqueCpids = [...new Set(dispensersData.dispensers?.map(d => d.cpid) ?? [])];
+      const uniqueCpids = [...new Set(allDispensersData.dispensers.map(d => d.cpid))];
 
       // Fetch stamps data for all CPIDs
       const stampsData = await this.getStamps({
@@ -1013,15 +1010,35 @@ export class StampController {
         stampsData.data?.map((stamp: any) => [stamp.cpid, stamp]) || []
       );
 
-      // Merge stamp data into dispensers
-      const dispensersWithStamps = dispensersData.dispensers?.map(dispenser => ({
-        ...dispenser,
-        stamp: stampsByCpid.get(dispenser.cpid) || null
-      })) ?? [];
+      // Merge stamp data into dispensers, then drop any without a matching
+      // indexed stamp — callers (e.g. WalletContent's Listings tab) only
+      // ever render dispensers with a `.stamp`, so `total` must reflect
+      // this filtered set, not the raw Counterparty count.
+      const dispensersWithStamps = allDispensersData.dispensers
+        .map(dispenser => ({
+          ...dispenser,
+          stamp: stampsByCpid.get(dispenser.cpid) || null
+        }))
+        .filter((dispenser) => dispenser.stamp);
+
+      const total = dispensersWithStamps.length;
+      const start = (page - 1) * limit;
+      const pageDispensers = dispensersWithStamps.slice(start, start + limit);
+
+      // Add detailed logging for dispenser data
+      console.log("[StampController] Dispenser data details:", {
+        total,
+        dispensersCount: pageDispensers.length,
+        page,
+        limit,
+        hasDispensers: pageDispensers.length > 0,
+        firstDispenser: pageDispensers[0]?.cpid,
+        lastDispenser: pageDispensers[Math.max(0, pageDispensers.length - 1)]?.cpid
+      });
 
       return {
-        dispensers: dispensersWithStamps,
-        total: dispensersData.total
+        dispensers: pageDispensers,
+        total
       };
     } catch (error) {
       logger.error("stamps", {

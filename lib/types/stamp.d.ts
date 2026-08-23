@@ -2285,7 +2285,10 @@ export declare function isValidStampTransaction(
  * Display variant for StampCard and gallery components.
  * - "cardSquare"            : stamp image only
  * - "cardSquareDetail"      : stamp image + editions pill (bottom-right)
+ * - "cardSquareBalance"     : stamp image + wallet balance pill (bottom-right)
  * - "cardVerticalDetail"    : full footer + BTC icon overlay if listed
+ * - "cardVerticalBalance"   : full footer, SUPPLY pill replaced with wallet
+ *   BALANCE pill; BTC icon overlay if listed (same as cardVerticalDetail)
  * - "cardVerticalListing"   : full footer + buy button row
  * - "cardVerticalSale"      : full footer + sale price + time ago row
  * - "cardVerticalSaleCompact": minimal footer (stamp# + price pill)
@@ -2299,7 +2302,9 @@ export declare function isValidStampTransaction(
 export type StampCardVariant =
   | "cardSquare"
   | "cardSquareDetail"
+  | "cardSquareBalance"
   | "cardVerticalDetail"
+  | "cardVerticalBalance"
   | "cardVerticalCollection"
   | "cardVerticalListing"
   | "cardVerticalSale"
