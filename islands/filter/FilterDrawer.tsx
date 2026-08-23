@@ -397,7 +397,7 @@ const FilterDrawer = (
       aria-labelledby="drawer-form-label"
     >
       {/* Content container with flex column to separate scrollable area from sticky buttons */}
-      <div class="flex flex-col h-full pt-[25px] mobileLg:pt-[36px]">
+      <div class="flex flex-col h-full pt-[21px] mobileLg:pt-[31px]">
         {/* Scrollable content area - overflow only on this section */}
         <div class="flex-1 overflow-y-auto scrollbar-background-overlay">
           <div class="px-7.5 tablet:px-5">

@@ -428,7 +428,7 @@ export function Header() {
         id={`navbar-collapse-${type}`}
       >
         <div class="flex flex-col h-full">
-          <div class="pt-[25px] mobileLg:pt-[36px] px-7.5">
+          <div class="pt-[21px] px-7.5">
             <div class="flex flex-row justify-between items-center w-full">
               <div class="relative -translate-x-3 translate-y-[1px]">
                 <div

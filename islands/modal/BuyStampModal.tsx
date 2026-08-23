@@ -4,6 +4,7 @@ import { walletContext } from "$client/wallet/wallet.ts";
 import { handleModalClose } from "$components/layout/ModalBase.tsx";
 import { StampImage } from "$content";
 import { inputFieldSquare } from "$form";
+import { UserProfileIcon } from "$icon";
 import { stackConnectWalletModal } from "$islands/layout/ModalStack.tsx";
 import { closeModal, openModal } from "$islands/modal/states.ts";
 import { ModalBase } from "$layout";
@@ -11,6 +12,7 @@ import { useTransactionConstructionService } from "$lib/hooks/useTransactionCons
 import { handleUnknownError } from "$lib/utils/errorHandling.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { mapProgressiveFeeDetails } from "$lib/utils/performance/fees/fee-estimation-utils.ts";
+import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { showToast } from "$lib/utils/ui/notifications/toastSignal.ts";
 import { FeeCalculatorBase } from "$section";
 import { label, labelSm } from "$text";
@@ -45,6 +47,10 @@ const BuyStampModal = ({
     ? parseInt(dispenser.satoshirate.toString(), 10) / 100000000
     : (marketData?.lastPriceBTC ||
       (stamp && typeof stamp.floorPrice === "number" ? stamp.floorPrice : 0));
+
+  const creatorDisplay = stamp?.creator_name
+    ? stamp.creator_name
+    : abbreviateAddress(stamp?.creator || "", 8);
 
   /* ===== FORM HANDLING ===== */
   const {
@@ -357,46 +363,66 @@ const BuyStampModal = ({
     >
       {/* ===== STAMP DETAILS SECTION ===== */}
       {stamp && (
-        <div className="flex flex-row gap-5">
-          <div className="flex flex-col w-[156px] mobileLg:w-[164px]">
-            <StampImage
-              stamp={stamp}
-              containerClassName="!p-1"
-              flag={false}
-            />
-          </div>
-          <div className="flex flex-col w-full">
-            <h5 className="font-extrabold text-2xl
+        <div className="flex flex-col gap-2">
+          <div className="flex flex-row gap-5">
+            <div className="flex flex-col w-[92px] aspect-square">
+              <StampImage
+                stamp={stamp}
+                containerClassName="!p-0.5"
+                flag={false}
+              />
+            </div>
+            <div className="flex flex-col">
+              <h5 className="font-extrabold text-2xl
    text-color-neutral-200 group-hover:text-color-hover
    tracking-wide pt-2">
-              <span className="font-light">
-                #
-              </span>
-              {stamp.stamp}
-            </h5>
+                <span className="font-light">
+                  #
+                </span>
+                {stamp.stamp}
+              </h5>
 
-            {/* ===== QUANTITY SELECTION ===== */}
-            <div className="flex flex-row pt-2 w-full justify-between items-center">
-              <div className="flex flex-col items-start -space-y-0.5">
-                <h5 class={`${label} !text-color-neutral-200`}>
-                  EDITIONS
-                </h5>
-                <h6 class={labelSm}>
-                  MAX {maxQuantity}
+              {stamp.cpid && (
+                <h6 class={`${labelSm} truncate`}>
+                  {stamp.cpid}
                 </h6>
-              </div>
-              <div className="flex flex-col items-end">
-                <input
-                  type="number"
-                  min="1"
-                  max={maxQuantity}
-                  value={quantity}
-                  onChange={handleQuantityChange}
-                  className={inputFieldSquare}
-                />
-              </div>
+              )}
+
+              <UserProfileIcon
+                size="xs"
+                weight="bold"
+                className="stroke-color-neutral-200"
+                wrapperClassName="mt-1"
+              >
+                <span className="font-normal text-sm text-color-neutral-200">
+                  {creatorDisplay}
+                </span>
+              </UserProfileIcon>
             </div>
           </div>
+
+          {/* ===== QUANTITY SELECTION ===== */}
+          <div className="flex flex-row pt-2 w-full justify-between items-center">
+            <div className="flex flex-col items-start -space-y-0.5">
+              <h5 class={`${label} !text-color-neutral-200`}>
+                EDITIONS
+              </h5>
+              <h6 class={labelSm}>
+                MAX {maxQuantity}
+              </h6>
+            </div>
+            <div className="flex flex-col items-end">
+              <input
+                type="number"
+                min="1"
+                max={maxQuantity}
+                value={quantity}
+                onChange={handleQuantityChange}
+                className={inputFieldSquare}
+              />
+            </div>
+          </div>
+          <hr className="w-full mt-2 mb-4.5 border-color-neutral-800 border-t-1" />
         </div>
       )}
 
@@ -434,7 +460,6 @@ const BuyStampModal = ({
           handleModalClose();
         }}
         buttonName="BUY"
-        className="pt-9 mobileLg:pt-12"
         // ===== 🚀 PROGRESSIVE FEE DETAILS INTEGRATION =====
         feeDetails={(() => {
           const baseFeeDetails = mapProgressiveFeeDetails(

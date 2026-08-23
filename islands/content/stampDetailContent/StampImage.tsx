@@ -792,7 +792,7 @@ export function StampImage(
   return (
     <>
       {(!src || isUnrenderable) && (
-        <div className={`${container2} p-0.5`}>
+        <div className={`${container2} p-1`}>
           <PlaceholderImage variant={isUnrenderable ? "error" : "no-image"} />
         </div>
       )}

@@ -14,7 +14,7 @@ export default function Error404Page() {
       </Head>
 
       <div
-        class={`${containerBackground} mobileMd:max-w-[420px] mobileMd:mx-auto justify-center items-center`}
+        class={`${containerBackground} justify-center items-center`}
       >
         <div class="flex flex-col justify-center items-center">
           <div class={titleNeutral}>WHOOPS</div>
@@ -30,7 +30,7 @@ export default function Error404Page() {
           <Button
             variant="outline"
             color="neutral"
-            size="mdR"
+            size="smR"
             href="javascript:history.back()"
           >
             GO BACK
@@ -38,7 +38,7 @@ export default function Error404Page() {
           <Button
             variant="flat"
             color="neutral"
-            size="mdR"
+            size="smR"
             href="/home"
             target="_top"
           >

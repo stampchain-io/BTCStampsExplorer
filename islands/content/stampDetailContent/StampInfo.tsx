@@ -706,6 +706,19 @@ export function StampInfo(
       : "TRANSFER"
     : getDimensionsDisplay(imageDimensions);
 
+  const txHashValue = stamp.tx_hash !== null
+    ? (
+      <a
+        href={`https://www.blockchain.com/explorer/transactions/btc/${stamp.tx_hash}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="link-neutral-400 transition-colors duration-200"
+      >
+        {abbreviateAddress(stamp.tx_hash, 8)}
+      </a>
+    )
+    : "N/A";
+
   // Effect to handle document title updates
   useEffect(() => {
     document.title = `Bitcoin Stamp #${stamp.stamp} - stampchain.io`;
@@ -715,9 +728,13 @@ export function StampInfo(
   }, [stamp.stamp]);
 
   /* ===== RENDER ===== */
+  // `contents` lets the listings table participate in the parent CSS grid
+  // (routes/stamp/[id].tsx) as a full-width row beneath image + info.
+  // That grows the card by the table height only — `h-full` inside a
+  // stretch-sized flex column cannot, so the table used to overflow.
   return (
-    <>
-      <div className="h-full">
+    <div className="contents">
+      <div className="min-w-0 h-full">
         <div className="flex flex-col h-full">
           <div className="flex justify-between items-start gap-3">
             <div className="min-w-0 flex-1">
@@ -823,7 +840,7 @@ export function StampInfo(
                 size="xs"
                 weight="bold"
                 className="stroke-color-neutral-200 translate-y-0.5"
-                wrapperClassName="mt-2"
+                wrapperClassName="mt-1"
                 link
               >
                 <span className="font-normal text-sm text-color-neutral-200 link-neutral-200 group-hover:text-color-hover transition-colors duration-200">
@@ -924,24 +941,24 @@ export function StampInfo(
               <div className="w-fit">
                 <PillWithTooltip
                   label="COLLECTION"
-                  className={`flex items-center gap-1.5 w-fit mt-5 px-3 py-1 ${container3}`}
+                  className={`flex items-center gap-1.5 w-fit mt-4 px-3 py-1 ${container3} group`}
                 >
                   <a
                     href={`/collection/${
                       encodeURIComponent(collectionInfo.collection_name)
                     }`}
-                    class="group flex items-center gap-1.5 no-underline"
+                    class="flex items-center gap-1.5"
                   >
                     <Icon
                       type="icon"
                       name="artStamps"
-                      weight="bold"
-                      size="xs"
+                      weight="normal"
+                      size="xxs"
                       color="custom"
-                      className="stroke-color-neutral-500 fill-none [&_path[class*='fill-stroke']]:fill-color-neutral-500 group-hover:stroke-color-hover group-hover:[&_path[class*='fill-stroke']]:fill-color-hover transition-colors duration-200"
+                      className="stroke-color-neutral-500  group-hover:stroke-color-hover transition-colors duration-200"
                       ariaLabel="Collection"
                     />
-                    <span className="font-medium text-sm text-color-neutral-500 group-hover:text-color-hover transition-colors duration-200">
+                    <span className="font-normal text-xs text-color-neutral-500 group-hover:text-color-hover transition-colors duration-200">
                       {collectionInfo.collection_name}
                     </span>
                   </a>
@@ -951,59 +968,120 @@ export function StampInfo(
           </div>
 
           <div className="flex flex-col mobileMd:flex-row mobileMd:justify-between mobileMd:items-end gap-3 mt-auto -mb-1.5">
-            <div
-              className={`flex flex-col w-full mobileMd:w-[310px] mobileMd:shrink-0 mt-10 gap-1`}
-            >
-              <div className="flex justify-between mobileMd:flex-wrap w-full gap-5">
-                <StatItem
-                  label="FILE TYPE"
-                  value={fileTypeValue}
-                  align="left"
-                />
-                <StatItem
-                  label="FILE SIZE"
-                  value={fileSizeValue}
-                  align="center"
-                />
-                <StatItem
-                  label="DIMENSIONS"
-                  value={dimensionsValue}
-                  align="right"
-                  valueClass="!text-color-neutral-400"
-                />
-              </div>
+            {(dispensers?.length > 0 || !!lowestPriceDispenser)
+              ? (
+                <>
+                  <hr className="w-full mt-12 mb-0.5 border-color-neutral-800 border-t-1 mobileMd:hidden" />
+                  <div
+                    className={`flex flex-col w-full mobileMd:w-[310px] mobileMd:shrink-0 mobileMd:mt-16 tablet:mt-16 gap-1`}
+                  >
+                    <div className="flex justify-between mobileMd:flex-wrap w-full gap-5">
+                      <StatItem
+                        label="FILE TYPE"
+                        value={fileTypeValue}
+                        align="left"
+                      />
+                      <StatItem
+                        label="FILE SIZE"
+                        value={fileSizeValue}
+                        align="center"
+                      />
+                      <StatItem
+                        label="DIMENSIONS"
+                        value={dimensionsValue}
+                        align="right"
+                        valueClass="!text-color-neutral-400"
+                      />
+                    </div>
 
-              <div className="flex justify-between mobileMd:flex-wrap w-full gap-5 mt-2">
-                <StatItem
-                  label="CREATED"
-                  value={createdDate}
-                  valueClass="!text-color-neutral-400"
-                />
-                <StatItem
-                  label="TX HASH"
-                  value={stamp.tx_hash !== null
-                    ? (
-                      <a
-                        href={`https://www.blockchain.com/explorer/transactions/btc/${stamp.tx_hash}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="link-neutral-400 transition-colors duration-200"
-                      >
-                        {abbreviateAddress(stamp.tx_hash, 8)}
-                      </a>
-                    )
-                    : "N/A"}
-                  align="right"
-                />
-              </div>
-            </div>
+                    <div className="flex justify-between mobileMd:flex-wrap w-full gap-5 mt-2">
+                      <StatItem
+                        label="CREATED"
+                        value={createdDate}
+                        valueClass="!text-color-neutral-400"
+                      />
+                      <StatItem
+                        label="TX HASH"
+                        value={txHashValue}
+                        align="right"
+                      />
+                    </div>
+                  </div>
+                </>
+              )
+              : (
+                <div className="flex flex-col w-full mt-16 tablet:mt-0 gap-1">
+                  <hr className="w-full mb-3 border-color-neutral-800 border-t-1" />
+                  <div className="flex flex-col gap-1 mobileMd:hidden min-[900px]:flex min-[900px]:flex-col tablet:hidden">
+                    <div className="flex justify-between w-full gap-5">
+                      <StatItem
+                        label="FILE TYPE"
+                        value={fileTypeValue}
+                        align="left"
+                      />
+                      <StatItem
+                        label="FILE SIZE"
+                        value={fileSizeValue}
+                        align="center"
+                      />
+                      <StatItem
+                        label="DIMENSIONS"
+                        value={dimensionsValue}
+                        align="right"
+                        valueClass="!text-color-neutral-400"
+                      />
+                    </div>
+
+                    <div className="flex justify-between w-full gap-5 mt-2">
+                      <StatItem
+                        label="CREATED"
+                        value={createdDate}
+                        valueClass="!text-color-neutral-400"
+                      />
+                      <StatItem
+                        label="TX HASH"
+                        value={txHashValue}
+                        align="right"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="hidden mobileMd:flex min-[900px]:hidden tablet:flex justify-between w-full gap-5">
+                    <StatItem
+                      label="FILE TYPE"
+                      value={fileTypeValue}
+                      align="left"
+                    />
+                    <StatItem
+                      label="FILE SIZE"
+                      value={fileSizeValue}
+                      align="center"
+                    />
+                    <StatItem
+                      label="DIMENSIONS"
+                      value={dimensionsValue}
+                      align="center"
+                      valueClass="!text-color-neutral-400"
+                    />
+                    <StatItem
+                      label="CREATED"
+                      value={createdDate}
+                      align="center"
+                      valueClass="!text-color-neutral-400"
+                    />
+                    <StatItem
+                      label="TX HASH"
+                      value={txHashValue}
+                      align="right"
+                    />
+                  </div>
+                </div>
+              )}
 
             {(dispensers?.length > 0 || !!lowestPriceDispenser)
               ? (
                 <div className="flex flex-col w-full mobileMd:min-w-0 mobileMd:flex-1">
-                  <div className="flex w-full mt-0.5 mb-5 mobileMd:hidden">
-                    <hr className="w-full border-color-neutral-800 border-t-1" />
-                  </div>
+                  <hr className="w-full mt-0.5 mb-12 border-color-neutral-800 border-t-1 mobileMd:hidden" />
                   <div className="flex flex-row mobileMd:flex-col justify-between mobileMd:justify-end items-end gap-3 min-w-0">
                     <div
                       className={`flex flex-col items-start tablet:items-end w-fit px-3 py-2.5 ${container3}`}
@@ -1040,7 +1118,8 @@ export function StampInfo(
                             name="listings"
                             weight="bold"
                             size="xxsR"
-                            color="greyLight"
+                            color="custom"
+                            className="stroke-color-orange-400 group-hover:stroke-color-hover transition-colors duration-200"
                             ariaLabel="Listings"
                             onClick={() => {
                               setShowListings(!showListings);
@@ -1049,7 +1128,7 @@ export function StampInfo(
                             }}
                           />
                           <div
-                            className={`${tooltipIcon} ${
+                            className={`${tooltipIcon} pointer-events-none ${
                               isListingsTooltipVisible
                                 ? "opacity-100"
                                 : "opacity-0"
@@ -1073,37 +1152,33 @@ export function StampInfo(
                       </Button>
                     </div>
                   </div>
-
-                  {(dispensers?.length >= 2)
-                    ? (
-                      <div
-                        className={`overflow-hidden transition-all duration-500 ease-in-out
-                      ${
-                          showListings
-                            ? "max-h-[222px] mt-3 opacity-100"
-                            : "max-h-0 opacity-0"
-                        }`}
-                      >
-                        <div className="w-full mb-4">
-                          {isLoadingDispensers
-                            ? <h6>LOADING</h6>
-                            : (
-                              <StampListingsOpenTable
-                                dispensers={dispensers}
-                                onSelectDispenser={handleDispenserSelect}
-                                selectedDispenser={selectedDispenser}
-                              />
-                            )}
-                        </div>
-                      </div>
-                    )
-                    : null}
                 </div>
               )
               : null}
           </div>
         </div>
       </div>
-    </>
+
+      {(dispensers?.length >= 2)
+        ? (
+          <div
+            className={`col-span-full overflow-hidden transition-all duration-500 ease-in-out
+                      ${
+              showListings
+                ? "max-h-[222px] mt-5 opacity-100"
+                : "max-h-0 mt-0 opacity-0"
+            }`}
+          >
+            {isLoadingDispensers ? <h6>LOADING</h6> : (
+              <StampListingsOpenTable
+                dispensers={dispensers}
+                onSelectDispenser={handleDispenserSelect}
+                selectedDispenser={selectedDispenser}
+              />
+            )}
+          </div>
+        )
+        : null}
+    </div>
   );
 }

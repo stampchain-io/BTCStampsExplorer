@@ -428,9 +428,9 @@ export default function StampDetailPage(props: StampDetailPageProps) {
       <div class={`${body} ${containerGap}`}>
         <div class={containerBackground}>
           <div
-            class={`flex flex-col min-[900px]:flex-row gap-x-7.5 gap-y-5`}
+            class={`grid grid-cols-1 min-[900px]:grid-cols-[minmax(0,38fr)_minmax(0,62fr)] tablet:grid-cols-[minmax(0,33fr)_minmax(0,67fr)] desktop:grid-cols-[minmax(0,26fr)_minmax(0,74fr)] gap-x-7.5`}
           >
-            <div class="w-full min-w-0 min-[900px]:w-[38%] tablet:w-[33%] desktop:w-[26%]">
+            <div class="min-w-0 mb-5 min-[900px]:mb-0">
               {stamp &&
                 (
                   <StampImage
@@ -439,17 +439,15 @@ export default function StampDetailPage(props: StampDetailPageProps) {
                   />
                 )}
             </div>
-            <div class="w-full min-w-0 min-[900px]:w-[62%] tablet:w-[67%] desktop:w-[74%]">
-              {stamp &&
-                (
-                  <StampInfo
-                    stamp={stamp}
-                    lowestPriceDispenser={lowestPriceDispenser}
-                    collectionInfo={collectionInfo}
-                    {...(btcPriceUSD !== undefined ? { btcPriceUSD } : {})}
-                  />
-                )}
-            </div>
+            {stamp &&
+              (
+                <StampInfo
+                  stamp={stamp}
+                  lowestPriceDispenser={lowestPriceDispenser}
+                  collectionInfo={collectionInfo}
+                  {...(btcPriceUSD !== undefined ? { btcPriceUSD } : {})}
+                />
+              )}
           </div>
         </div>
 
