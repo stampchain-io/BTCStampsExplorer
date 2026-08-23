@@ -57,7 +57,7 @@ export function Icon(props: IconVariants) {
   const getIconPath = () => {
     const iconNameMap = {
       // Social Media Icons
-      stampchain: "stampchainDuotone",
+      stampchain: "stampchain",
       twitter: "twitter",
       telegram: "telegram",
       github: "github",
