@@ -6,7 +6,6 @@ import { type PageProps } from "$fresh/server.ts";
 import { Header } from "$header";
 import AnimationControlsManager from "$islands/layout/AnimationControlsManager.tsx";
 import BackgroundTopology from "$islands/layout/BackgroundTopology.tsx";
-import FontLoader from "$islands/layout/FontLoader.tsx";
 import ModalProvider from "$islands/layout/ModalProvider.tsx";
 import PageVisibilityManager from "$islands/layout/PageVisibilityManager.tsx";
 import { NotificationUpdate } from "$islands/Toast/NotificationUpdate.tsx";
@@ -55,7 +54,23 @@ export default function App({ Component, state, url }: PageProps<unknown>) {
         <link rel="stylesheet" href="/slick.css" />
 
         {/* ===== FONT LOADING ===== */}
-        <FontLoader />
+        {
+          /* Emitted as plain <head> markup, not an island. Fresh does not
+            hydrate islands rendered from _app.tsx, so <FontLoader /> here
+            produced no output at all and Montserrat never loaded — every
+            font-montserrat / font-sans class silently fell back to the
+            system sans-serif. */
+        }
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+        />
 
         {/* ===== CRITICAL STYLES ===== */}
         <style>
