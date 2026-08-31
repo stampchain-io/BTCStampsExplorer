@@ -1,13 +1,40 @@
 /* ===== FAQ PAGE ===== */
+import { Head } from "$fresh/runtime.ts";
 import { FaqAccordion } from "$content";
 import { FaqHeader } from "$header";
 import { body, containerBackground, containerGap, FAQ_CONTENT } from "$layout";
 import { subtitleGrey, text, titleGreyLD } from "$text";
 
+/* ===== JSON-LD STRUCTURED DATA (derived from the same FAQ_CONTENT the page renders) ===== */
+const flattenAnswer = (content: string | string[]): string =>
+  Array.isArray(content) ? content.join("\n") : content;
+
+const faqPageLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": FAQ_CONTENT.flatMap((section) =>
+    section.items.map((item) => ({
+      "@type": "Question",
+      "name": item.title,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": flattenAnswer(item.content),
+      },
+    }))
+  ),
+};
+
 /* ===== PAGE COMPONENT ===== */
 export default function FaqPage() {
   return (
     <div class={`${body} ${containerGap}`}>
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqPageLd) }}
+        />
+      </Head>
+
       {/* ===== HEADER SECTION ===== */}
       <FaqHeader />
 

@@ -1,4 +1,5 @@
 /* ===== STAMPING GUIDE HOW-TO PAGE ===== */
+import { Head } from "$fresh/runtime.ts";
 import {
   Article,
   AuthorSection,
@@ -7,6 +8,26 @@ import {
   STAMP_STEPS,
   StepList,
 } from "$section";
+
+/* ===== JSON-LD STRUCTURED DATA (steps derived from the shared STAMP_STEPS constant) ===== */
+const SUBTITLE = "STAMP YOUR ART";
+
+const flattenText = (description: string | string[]): string =>
+  Array.isArray(description) ? description.join("\n") : description;
+
+const howToLd = {
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": `How to ${SUBTITLE.toLowerCase()}`,
+  "description":
+    `A step-by-step guide to ${SUBTITLE.toLowerCase()} on stampchain.io.`,
+  "step": STAMP_STEPS.map((step) => ({
+    "@type": "HowToStep",
+    "name": step.title,
+    "text": flattenText(step.description),
+    "image": step.image,
+  })),
+};
 
 /* ===== INTRODUCTION COMPONENT ===== */
 function IntroSection() {
@@ -50,14 +71,22 @@ function StampSteps() {
 /* ===== MAIN PAGE COMPONENT ===== */
 export default function StampingGuide() {
   return (
-    <Article
-      title="HOW-TO"
-      subtitle="STAMP YOUR ART"
-      headerImage="/img/how-tos/stamping/00.png"
-      importantNotes={STAMP_IMPORTANT_NOTES}
-    >
-      <IntroSection />
-      <StampSteps />
-    </Article>
+    <>
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(howToLd) }}
+        />
+      </Head>
+      <Article
+        title="HOW-TO"
+        subtitle={SUBTITLE}
+        headerImage="/img/how-tos/stamping/00.png"
+        importantNotes={STAMP_IMPORTANT_NOTES}
+      >
+        <IntroSection />
+        <StampSteps />
+      </Article>
+    </>
   );
 }

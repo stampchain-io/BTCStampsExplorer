@@ -2,6 +2,37 @@ const MAX_RETRIES = 3;
 import { MEMPOOL_API_BASE_URL } from "$constants";
 import type { BTCBalance, MempoolAddressResponse } from "$lib/types/index.d.ts";
 
+// Default deadline for external balance/API fetches. Without a timeout a hung
+// upstream (mempool.space / BlockCypher) blocks the caller indefinitely — this
+// is what hung the aggregate `/api/v2/balance/{address}` endpoint (#1198).
+export const DEFAULT_FETCH_TIMEOUT_MS = 5000;
+
+/**
+ * `fetch` with an `AbortController` deadline so a slow/unresponsive upstream
+ * fails fast instead of hanging the caller. On timeout it throws an `Error`
+ * with `name === "TimeoutError"`; otherwise it behaves exactly like `fetch`.
+ */
+export async function fetchWithTimeout(
+  input: string | URL,
+  timeoutMs: number = DEFAULT_FETCH_TIMEOUT_MS,
+  init: RequestInit = {},
+): Promise<Response> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(input, { ...init, signal: controller.signal });
+  } catch (error) {
+    if (error instanceof Error && error.name === "AbortError") {
+      const timeoutError = new Error(`Request timed out after ${timeoutMs}ms`);
+      timeoutError.name = "TimeoutError";
+      throw timeoutError;
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
 interface RecommendedFees {
   fastestFee: number;
   halfHourFee: number;
@@ -93,7 +124,7 @@ export const getBTCBalanceFromMempool = async (
 ): Promise<BTCBalance | null> => {
   try {
     const endpoint = `${MEMPOOL_API_BASE_URL}/address/${address}`;
-    const response = await fetch(endpoint);
+    const response = await fetchWithTimeout(endpoint);
     if (!response.ok) {
       throw new Error(
         `Error: response for: ${endpoint} unsuccessful. Response: ${response.status}`,
@@ -114,6 +145,13 @@ export const getBTCBalanceFromMempool = async (
       unconfirmedTxCount: data.mempool_stats.tx_count,
     };
   } catch (error) {
+    // A timeout means the upstream is unresponsive; retrying just re-accumulates
+    // the delay (MAX_RETRIES x timeout) — exactly what let this hang the aggregate
+    // balance endpoint (#1198). Fail fast so the caller can fall through / degrade.
+    if (error instanceof Error && error.name === "TimeoutError") {
+      console.error("Mempool balance fetch timed out:", error);
+      return null;
+    }
     if (retries < MAX_RETRIES) {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       return await getBTCBalanceFromMempool(address, retries + 1);
