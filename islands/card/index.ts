@@ -1,6 +1,5 @@
 /* ===== STAMP CARDS ===== */
 export * from "$islands/card/StampCard.tsx";
-export * from "$islands/card/WalletStampCard.tsx";
 
 /* ===== SRC20 CARDS ===== */
 export * from "$islands/card/SRC20Card.tsx";

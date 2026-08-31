@@ -136,7 +136,7 @@ export const getStampPreviewUrl = (
 // broken-image icon forever. Excluded here so every caller gets `undefined`
 // (→ "no image" placeholder) up front instead of depending on a runtime
 // load failure. NOTE: audio/* and text/plain are intentionally NOT excluded
-// — StampCard/WalletStampCard reuse this same `src` for the <audio> source
+// — StampCard/wallet table rows reuse this same `src` for the <audio> source
 // and for fetching text content (StampTextContent), so it must stay a real
 // URL for those mimetypes.
 const NON_RENDERABLE_IMAGE_MIMETYPES = new Set([

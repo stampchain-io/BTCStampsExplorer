@@ -3561,14 +3561,6 @@ export interface ToastComponentProps {
 }
 
 /**
- * WalletStampCardProps - Props for WalletStampCard component
- */
-export interface WalletStampCardProps {
-  stamp: any;
-  fromPage?: string;
-}
-
-/**
  * StampInfoProps - Props for StampInfo component
  */
 export interface StampInfoProps {

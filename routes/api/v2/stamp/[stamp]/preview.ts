@@ -400,7 +400,7 @@ function fallbackCacheHeaders(
  * URL directly, without going through getStampPreviewUrl, so it always gets
  * this branch) — a branded image beats no image on a share card.
  *
- * In-app thumbnails (StampCard, WalletStampCard, Carousel) instead pass
+ * In-app thumbnails (StampCard, wallet table rows, Carousel) instead pass
  * `?placeholderOnFail=true` (see getStampPreviewUrl) so they get a 404 here
  * — that fails the `<img>` load, letting the client swap in the local
  * "no image" placeholder icon instead of showing the unrelated logo inside
