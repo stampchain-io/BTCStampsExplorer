@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/stampchain-io/stampchain.io/main/static/img/github/stampchain-github-hero.png" alt="Stampchain - Explorer and API" width="100%">
+  <img src="static/img/github/stampchain-github-hero.png" alt="Stampchain - Explorer and API" width="100%">
 
 ### Stampchain - Explorer and API Endpoints
 
@@ -152,7 +152,6 @@ docker run -p 8000:8000 \
 ## License
 
 This project is licensed under the [AGPL-3.0 License](LICENSE.md).
-See [LICENSE](LICENSE) for full details.
 
 &nbsp;
 
