@@ -1,13 +1,23 @@
 /* ===== DETAILS TABLE COMPONENT ===== */
-import { containerBackground, ScrollContainer } from "$layout";
+import { SelectorButtons } from "$button";
+import { SRC20DetailInfo } from "$islands/header/index.ts";
 import {
+  containerBackground,
+  PillContentCount,
+  ScrollContainer,
+  ScrollFadeRow,
+} from "$layout";
+import { formatNumberWithCommas } from "$lib/utils/ui/formatting/formatUtils.ts";
+import {
+  HoldersPieChart,
+  HoldersTableBase,
   SRC20MintsTable,
   SRC20TransfersTable,
   StampListingsAllTable,
   StampSalesTable,
   StampTransfersTable,
 } from "$table";
-import { labelSm, value3xlTransparent } from "$text";
+import { subtitlePrimary } from "$text";
 import type { TabData, TableProps, TableType } from "$types/ui.d.ts";
 import { useEffect, useState } from "preact/hooks";
 
@@ -21,6 +31,9 @@ export default function DetailsTableBase({
   cpid,
   tick,
   initialCounts = {},
+  holders = [],
+  title,
+  deployment,
 }: TableProps) {
   /* ===== STATE ===== */
   const [selectedTab, setSelectedTab] = useState<string>(
@@ -51,6 +64,9 @@ export default function DetailsTableBase({
     tabId: string,
     isTabChange = false,
   ) => {
+    // Holders data comes from the `holders` prop (SSR), not a client fetch,
+    // and "info" is rendered directly from the `deployment` prop.
+    if (tabId === "holders" || tabId === "info") return;
     if (!isTabChange && !hasMore) return;
 
     setIsLoading(true);
@@ -285,24 +301,10 @@ export default function DetailsTableBase({
   }, [type, cpid, tick]);
 
   /* ===== HELPER FUNCTIONS ===== */
-  const getTabAlignment = (id: string, totalTabs: number) => {
-    // For 3 tabs
-    if (totalTabs === 3) {
-      if (configs[0] && id === configs[0].id) return "text-left";
-      if (configs[1] && id === configs[1].id) return "text-center";
-      return "text-right";
-    }
-
-    // For 2 tabs
-    if (totalTabs === 2) {
-      return configs[0] && id === configs[0].id ? "text-left" : "text-right";
-    }
-
-    // For 1 tab
-    return "text-left";
-  };
-
   const getTabLabel = (type: TableType, id: string) => {
+    if (id === "holders") return "HOLDERS";
+    if (id === "info") return "INFO";
+
     switch (type) {
       case "stamps":
         return id === "dispensers"
@@ -323,59 +325,77 @@ export default function DetailsTableBase({
     }
   };
 
+  const selectorOptions = configs.map(({ id }) => ({
+    value: id,
+    label: type ? getTabLabel(type, id) : id.toUpperCase(),
+  }));
+
+  /* ===== COUNT PILL ===== */
+  // Reflects only the currently selected tab's own count.
+  const selectedTabCount = selectedTab === "holders"
+    ? holders.length
+    : totalCounts[selectedTab as keyof typeof totalCounts] || 0;
+  const countPill = formatNumberWithCommas(selectedTabCount);
+
   /* ===== RENDER ===== */
   return (
     <div class={containerBackground}>
-      {/* ===== TABS SECTION ===== */}
-      <div class="flex justify-between items-start w-full mb-5">
-        {configs.map(({ id }) => {
-          const count = totalCounts[id as keyof typeof totalCounts];
-          const alignment = getTabAlignment(id, configs.length);
-
-          return (
-            <div
-              key={id}
-              class={`cursor-pointer group ${alignment}`}
-              onClick={() => setSelectedTab(id)}
-            >
-              <span
-                class={`${labelSm} group-hover:text-color-grey-light`}
-              >
-                {type ? getTabLabel(type, id) : id}
-              </span>
-              <div
-                class={`${value3xlTransparent} ${
-                  selectedTab === id
-                    ? "text-color-grey-light"
-                    : "text-color-grey-semidark"
-                } group-hover:text-color-grey-light`}
-              >
-                {count || 0}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-      {/* ===== TABLE CONTENT ===== */}
-      <ScrollContainer
-        class="min-h-[72px] max-h-[290px] scrollbar-background-layer1"
-        onScroll={handleScroll}
-      >
-        <div class="">
-          {renderTabContent()}
-          {/* ===== LOADING INDICATOR ===== */}
-          {isLoading && (
-            <div class="flex flex-col w-full mb-2 gap-2">
-              {[...Array(6)].map((_, index) => (
-                <div
-                  key={index}
-                  class="loading-skeleton running w-full rounded-2xl h-[34px]"
-                />
-              ))}
-            </div>
-          )}
+      {/* ===== TITLE ===== */}
+      {title && (
+        <div class="relative">
+          <h4 class={`-mt-1.5 ${subtitlePrimary}`}>{title}</h4>
+          {selectedTab !== "info" && <PillContentCount value={countPill} />}
         </div>
-      </ScrollContainer>
+      )}
+      {/* ===== TABS SECTION ===== */}
+      <div class="w-full mb-5">
+        <ScrollFadeRow deps={[selectedTab, selectorOptions]}>
+          <div class="shrink-0">
+            <SelectorButtons
+              options={selectorOptions}
+              value={selectedTab}
+              onChange={setSelectedTab}
+              size="xsR"
+              color="primary"
+            />
+          </div>
+        </ScrollFadeRow>
+      </div>
+      {/* ===== TAB CONTENT ===== */}
+      {selectedTab === "holders"
+        ? (
+          <div class="flex flex-col tablet:flex-row w-full gap-5">
+            <div class="flex justify-center tablet:justify-start">
+              <HoldersPieChart holders={holders} />
+            </div>
+            <div class="relative w-full max-w-full">
+              <HoldersTableBase holders={holders} />
+            </div>
+          </div>
+        )
+        : selectedTab === "info"
+        ? deployment && <SRC20DetailInfo deployment={deployment} />
+        : (
+          <ScrollContainer
+            class="min-h-[72px] max-h-[296px] scrollbar-background-layer1"
+            onScroll={handleScroll}
+          >
+            <div class="">
+              {renderTabContent()}
+              {/* ===== LOADING INDICATOR ===== */}
+              {isLoading && (
+                <div class="flex flex-col w-full mb-2 gap-2">
+                  {[...Array(6)].map((_, index) => (
+                    <div
+                      key={index}
+                      class="loading-skeleton running w-full rounded-2xl h-[34px]"
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </ScrollContainer>
+        )}
     </div>
   );
 }

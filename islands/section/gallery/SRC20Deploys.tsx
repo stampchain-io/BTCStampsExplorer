@@ -1,15 +1,15 @@
 /* ===== SRC20 RECENT DEPLOYS GALLERY COMPONENT ===== */
 import { StampCard } from "$card";
-import { containerBackground } from "$layout";
+import { containerBackground, EmptyState } from "$layout";
 import type { StampTransaction } from "$lib/types/stamping.ts";
 import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
 import {
   notificationBody,
   notificationContainerError,
-  notificationHeading,
+  notificationHeader,
   notificationTextError,
 } from "$notification";
-import { subtitleGrey, titleGreyDL, titleGreyLD } from "$text";
+import { subtitleNeutral, titleNeutral } from "$text";
 import type { JSX } from "preact";
 import { useEffect, useState } from "preact/hooks";
 
@@ -57,18 +57,18 @@ export default function SRC20DeploysGallery(): JSX.Element {
     <div class={`${containerBackground} items-start tablet:items-end`}>
       {/* ===== TITLE SECTION ===== */}
       <div>
-        <h4 class={`${titleGreyLD} tablet:hidden`}>
+        <h4 class={`${titleNeutral} tablet:hidden`}>
           RECENT DEPLOYS
         </h4>
         <h4
-          class={`${titleGreyDL} hidden tablet:block w-full tablet:text-right`}
+          class={`${titleNeutral} !bg-gradient-to-l hidden tablet:block w-full tablet:text-right`}
         >
           RECENT DEPLOYS
         </h4>
       </div>
 
       {/* Show block title with loading state */}
-      <h3 class={`${subtitleGrey} tablet:text-right`}>
+      <h3 class={`${subtitleNeutral} tablet:text-right`}>
         {isLoading ? <span class="animate-pulse">BLOCK #XXX,XXX</span> : (
           transactions.length > 0 && `BLOCK #${transactions[0].block_index}`
         )}
@@ -89,7 +89,7 @@ export default function SRC20DeploysGallery(): JSX.Element {
         : error
         ? (
           <div class={`mt-3 ${notificationContainerError}`}>
-            <h6 class={`${notificationHeading} ${notificationTextError}`}>
+            <h6 class={`${notificationHeader} ${notificationTextError}`}>
               ERROR LOADING RECENT DEPLOYS
             </h6>
             <h6 class={`${notificationBody} ${notificationTextError}`}>
@@ -98,11 +98,7 @@ export default function SRC20DeploysGallery(): JSX.Element {
           </div>
         )
         : transactions.length === 0
-        ? (
-          <div class="text-color-grey-dark text-sm">
-            NO RECENT DEPLOYS FOUND
-          </div>
-        )
+        ? <EmptyState label="NO RECENT DEPLOYS FOUND" icon="src20Tokens" />
         : (
           <div class="w-full grid grid-cols-3 mobileMd:grid-cols-4 mobileLg:grid-cols-6 tablet:grid-cols-3 desktop:grid-cols-4 gap-5">
             {transactions.map((stamp, index) => (
@@ -113,7 +109,7 @@ export default function SRC20DeploysGallery(): JSX.Element {
                   stamp_url: constructStampUrl(stamp.tx_hash, "svg"),
                 }}
                 isRecentSale={false}
-                showDetails={false}
+                variant="cardSquare"
               />
             ))}
           </div>

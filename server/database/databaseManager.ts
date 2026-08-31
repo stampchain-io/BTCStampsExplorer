@@ -86,6 +86,72 @@ function shouldInitializeRedis(): boolean {
   return !skip;
 }
 
+export type SqlErrorReason =
+  | "nonRetryable"
+  | "queryTimeout"
+  | "poolExhaustion"
+  | "connectionError"
+  | "unknown";
+
+export interface SqlErrorClassification {
+  reason: SqlErrorReason;
+  shouldRetry: boolean;
+  isConnectionError: boolean;
+}
+
+/**
+ * Classifies a MySQL error message so `executeQuery` knows whether to
+ * retry, and whether the client connection must be closed rather than
+ * returned to the pool.
+ *
+ * Order matters: query/read timeouts (e.g. "connection read timed out")
+ * also match the generic "connection" substring further down, so they are
+ * checked first. Otherwise a slow-but-still-running query would get
+ * retried on a fresh connection while the original kept executing
+ * server-side, compounding load instead of recovering from it.
+ */
+export function classifySqlError(message: string): SqlErrorClassification {
+  // Schema/syntax errors can never succeed on retry.
+  if (
+    message.includes("syntax error") ||
+    message.includes("Unknown column") ||
+    message.includes("doesn't exist") ||
+    message.includes("ER_BAD_FIELD_ERROR") ||
+    message.includes("ER_NO_SUCH_TABLE") ||
+    message.includes("ER_PARSE_ERROR") ||
+    message.includes("constraint") ||
+    message.includes("duplicate") ||
+    message.includes("foreign key")
+  ) {
+    return { reason: "nonRetryable", shouldRetry: false, isConnectionError: false };
+  }
+
+  // Query/read timeouts: the original query may still be running
+  // server-side, so retrying just piles up duplicate work on top of it.
+  if (message.includes("timed out") || message.includes("ETIMEDOUT")) {
+    return { reason: "queryTimeout", shouldRetry: false, isConnectionError: true };
+  }
+
+  // Pool exhaustion has no client to clean up — just back off and retry.
+  if (message.includes("No available connections in the pool")) {
+    return { reason: "poolExhaustion", shouldRetry: true, isConnectionError: false };
+  }
+
+  // Transient connection/network errors: safe to close and retry fresh.
+  if (
+    message.includes("disconnected by the server") ||
+    message.includes("wait_timeout") ||
+    message.includes("interactive_timeout") ||
+    message.includes("connection") ||
+    message.includes("PROTOCOL_CONNECTION_LOST") ||
+    message.includes("ECONNRESET")
+  ) {
+    return { reason: "connectionError", shouldRetry: true, isConnectionError: true };
+  }
+
+  return { reason: "unknown", shouldRetry: true, isConnectionError: false };
+}
+
 class DatabaseManager {
   #pool: Client[] = [];
   #activeConnections = 0; // Track active connections
@@ -410,33 +476,22 @@ class DatabaseManager {
         let isConnectionError = false;
 
         if (error instanceof Error) {
-          // Check if it's a connection pool exhaustion error
-          if (error.message.includes("No available connections in the pool")) {
+          const classification = classifySqlError(error.message);
+          shouldRetry = classification.shouldRetry;
+          isConnectionError = classification.isConnectionError;
+
+          if (classification.reason === "poolExhaustion") {
             this.#logger.warn(
               `Connection pool exhausted on attempt ${attempt}. Pool stats: ${JSON.stringify(this.getConnectionStats())}`,
             );
-            // Don't set isConnectionError for pool exhaustion - there's no client to clean up
-            shouldRetry = true;
-          }
-          // Check if it's a connection timeout/network error
-          else if (error.message.includes("disconnected by the server") ||
-                   error.message.includes("wait_timeout") ||
-                   error.message.includes("interactive_timeout") ||
-                   error.message.includes("connection") ||
-                   error.message.includes("PROTOCOL_CONNECTION_LOST") ||
-                   error.message.includes("ECONNRESET") ||
-                   error.message.includes("ETIMEDOUT")) {
+          } else if (classification.reason === "connectionError") {
             this.#logger.warn(
               `Connection error detected on attempt ${attempt}: ${error.message}`,
             );
-            isConnectionError = true;
-          }
-          // For SQL syntax errors or constraint violations, don't retry
-          else if (error.message.includes("syntax error") ||
-                   error.message.includes("constraint") ||
-                   error.message.includes("duplicate") ||
-                   error.message.includes("foreign key")) {
-            shouldRetry = false;
+          } else if (classification.reason === "queryTimeout") {
+            this.#logger.warn(
+              `Query timed out on attempt ${attempt}, not retrying (original query may still be running server-side): ${error.message}`,
+            );
           }
         }
 
@@ -460,9 +515,9 @@ class DatabaseManager {
           );
           throw error;
         } else {
+          const errorMessage = error instanceof Error ? error.message : String(error);
           this.#logger.warn(
-            `Query failed on attempt ${attempt}, retrying...`,
-            error instanceof Error ? error.message : String(error),
+            `Query failed on attempt ${attempt}, retrying...: ${errorMessage}`,
           );
         }
       }
@@ -590,20 +645,28 @@ class DatabaseManager {
     };
 
     // Enable TLS for MySQL 8.4+ caching_sha2_password support.
-    // The deno-mysql driver's RSA key exchange is broken over plaintext;
-    // TLS bypasses RSA entirely by sending credentials over the encrypted channel.
+    // NOTE: the deno-mysql driver (v2.12.1) only supports two TLS modes:
+    // "disabled" and "verify_identity" (no "verify_ca"). "verify_identity"
+    // requires the server cert's CN/SAN to match the connection hostname
+    // (e.g. "127.0.0.1"), which self-signed local dev certs typically don't
+    // have — it will fail even with correct credentials in that case.
+    // Also note: TLS does NOT bypass the driver's broken RSA "full auth"
+    // path for caching_sha2_password (only MySQL's fast-auth cache being
+    // warm does — i.e. a prior successful login by any client). Set
+    // DB_ENABLE_TLS=false for local dev against a self-signed cert.
     if (Deno.env.get("DB_ENABLE_TLS") !== "false") {
       const caCertPath = Deno.env.get("DB_CA_CERT_PATH") || "certs/rds-ca-bundle.pem";
       try {
         const caCert = await Deno.readTextFile(caCertPath);
-        connectionOptions.tls = {
-          mode: "verify_identity",
-          caCerts: [caCert],
-        };
+        const tlsMode = Deno.env.get("DB_TLS_MODE") || "verify_identity";
+        if (tlsMode !== "disabled" && tlsMode !== "verify_identity") {
+          throw new Error(`Invalid DB_TLS_MODE "${tlsMode}"; must be "disabled" or "verify_identity"`);
+        }
+        connectionOptions.tls = { mode: tlsMode, caCerts: [caCert] };
       } catch {
         console.warn(
           `[DB TLS] CA cert not found at "${caCertPath}" — falling back to plaintext. ` +
-          `This will fail with MySQL 8.4 caching_sha2_password. ` +
+          `This will fail with MySQL 8.4 caching_sha2_password unless the fast-auth cache is warm. ` +
           `Run: curl -o certs/rds-ca-bundle.pem https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem`,
         );
       }
@@ -904,18 +967,65 @@ class DatabaseManager {
     }
   }
 
-  private generateCacheKey(query: string, params: unknown[]): string {
+  // Pure function of (query, params) — deterministic and side-effect free,
+  // so any process can independently recompute the exact same key that a
+  // different process cached. This is what makes invalidateCacheKey() work
+  // correctly across ECS tasks/deploys, unlike the category registry below
+  // which only tracks keys seen by the *current* process.
+  private computeCacheKeyHash(query: string, params: unknown[]): string {
     const input = `${query}:${JSON.stringify(params)}`;
     const encoder = new TextEncoder();
     const data = encoder.encode(input);
     const hashBuffer = crypto.subtle.digestSync("SHA-256", data);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const cacheKey = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  private generateCacheKey(query: string, params: unknown[]): string {
+    const cacheKey = this.computeCacheKeyHash(query, params);
 
     // Register cache key by category based on query content
     this.registerCacheKey(cacheKey, query);
 
     return cacheKey;
+  }
+
+  /**
+   * Invalidate the single cache entry for a specific (query, params) pair
+   * without relying on the in-process category registry used by
+   * invalidateCacheByCategory(). Since the cache key is a deterministic
+   * hash of the query text + params, any process can recompute the exact
+   * key a *different* process cached and delete it directly — this is the
+   * only reliable way to invalidate a specific read across multiple ECS
+   * tasks or across a deploy (the registry is empty on every process
+   * restart, while Redis entries survive it).
+   *
+   * Callers must pass the exact same query string used for the read (same
+   * whitespace/formatting), since it's part of the hash input.
+   */
+  public async invalidateCacheKey(query: string, params: unknown[]): Promise<void> {
+    const cacheKey = this.computeCacheKeyHash(query, params);
+
+    if (this.#redisAvailable && this.#redisClient) {
+      try {
+        await this.#redisClient.del(cacheKey);
+      } catch (error) {
+        console.error(
+          `[CACHE] Redis direct key invalidation error for key ${cacheKey.substring(0, 12)}...:`,
+          error,
+        );
+      }
+    }
+
+    // Always clear the in-memory cache too (used as fallback when Redis is
+    // unavailable, so a stale entry could otherwise linger there as well).
+    this.removeFromInMemoryCache(cacheKey);
+
+    // Best-effort cleanup of the local registry, in case this process
+    // happens to have this key registered under some category.
+    for (const keys of Object.values(this.#cacheKeyRegistry)) {
+      keys.delete(cacheKey);
+    }
   }
 
   private registerCacheKey(cacheKey: string, query: string): void {

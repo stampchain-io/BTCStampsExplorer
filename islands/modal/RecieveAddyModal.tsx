@@ -30,6 +30,7 @@ function RecieveAddyModal(
     if (!qrRef.current) return;
 
     const qrCode = new QRCodeStyling({
+      type: "svg",
       width: 256,
       height: 256,
       data: `bitcoin:${address}`,
@@ -43,8 +44,8 @@ function RecieveAddyModal(
           type: "linear",
           rotation: 45,
           colorStops: [
-            { offset: 0, color: "var(--color-grey-semilight)" },
-            { offset: 1, color: "var(--color-grey)" },
+            { offset: 0, color: "var(--color-neutral-100)" },
+            { offset: 1, color: "var(--color-neutral-500)" },
           ],
         },
       },
@@ -131,18 +132,18 @@ function RecieveAddyModal(
         {/* ===== QR CODE SECTION ===== */}
         <div
           ref={qrRef}
-          class="mb-4 bg-transparent w-[256px] h-[256px] flex items-center justify-center"
+          class="mb-5 bg-transparent w-[256px] h-[256px] flex items-center justify-center"
         />
 
         {/* ===== ADDRESS SECTION ===== */}
         <div class="flex flex-col items-center">
-          <p class="break-all text-center text-base leading-relaxed text-color-grey-light max-w-full pt-4">
+          <p class="break-all text-center text-base leading-relaxed text-color-neutral-200 max-w-full">
             {formatAddress(address ?? "")}
           </p>
         </div>
 
         {/* ===== COPY BUTTON SECTION ===== */}
-        <div class="flex flex-col items-center pt-3 pb-6">
+        <div class="flex flex-col items-center pt-3 pb-1">
           <div
             ref={copyButtonRef}
             class="relative"
@@ -153,8 +154,8 @@ function RecieveAddyModal(
               type="iconButton"
               name="copy"
               weight="light"
-              size="sm"
-              color="purpleLight"
+              size="xs"
+              color="neutral400"
               onClick={handleCopy}
             />
             <div
@@ -178,7 +179,7 @@ function formatAddress(address: string): JSX.Element[] {
     index % 2 === 0 ? <span key={index}>{group}</span> : (
       <span
         key={index}
-        class="font-semibold text-base text-color-purple-semilight"
+        class="font-semibold text-base text-color-primary-400"
       >
         {group}
       </span>

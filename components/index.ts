@@ -12,7 +12,6 @@ export * from "./layout/index.ts";
 // Re-export other component directories as needed
 export * from "./button/index.ts";
 export * from "./card/index.ts";
-export * from "./display/index.ts";
 export * from "./form/index.ts";
 export * from "./icon/index.ts";
 export * from "./notification/index.ts";

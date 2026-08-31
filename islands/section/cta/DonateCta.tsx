@@ -16,10 +16,10 @@ import { tooltipIcon } from "$notification";
 import {
   headingGrey,
   labelSm,
-  subtitlePurple,
+  subtitlePrimary,
   text,
   textLg,
-  titlePurpleLD,
+  titlePrimary,
 } from "$text";
 import type { StampRow } from "$types/stamp.d.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
@@ -301,14 +301,13 @@ export default function DonateCta() {
       <div class="w-[134px] mobileLg:w-[174px] tablet:w-[204px]">
         <StampCard
           stamp={DONATE_STAMP as unknown as StampRow}
-          showDetails={false}
-          showMinDetails={false}
+          variant="cardSquare"
         />
       </div>
       <Button
         variant="flat"
-        color="purple"
-        size="mdR"
+        color="primary"
+        size="smR"
         onClick={onClick}
       >
         DONATE
@@ -319,11 +318,11 @@ export default function DonateCta() {
   /* ===== COMPONENT ===== */
   return (
     <>
-      <section class={containerBackground}>
+      <section id="donate" class={containerBackground}>
         {/* ===== HEADER SECTION ===== */}
         <div class="w-full flex flex-col justify-center items-start">
-          <h3 class={titlePurpleLD}>DONATE</h3>
-          <h4 class={subtitlePurple}>TO THE DEV FUND</h4>
+          <h3 class={titlePrimary}>DONATE</h3>
+          <h4 class={subtitlePrimary}>TO THE DEV FUND</h4>
         </div>
         {/* ===== MAIN CONTENT SECTION ===== */}
         <p class={`${textLg} tablet:hidden block mb-0`}>
@@ -373,10 +372,10 @@ export default function DonateCta() {
               dev wallet.
             </p>
 
-            <div class="flex justify-start gap-6 items-center mt-3">
+            <div class="flex justify-start gap-3 items-center mt-3">
               <div
                 ref={receiveButtonRef}
-                class="relative group order-1 tablet:order-2"
+                class="relative group order-1 tablet:order-2 peer "
                 onMouseEnter={handleReceiveMouseEnter}
                 onMouseLeave={handleReceiveMouseLeave}
               >
@@ -384,8 +383,8 @@ export default function DonateCta() {
                   type="iconButton"
                   name="donate"
                   weight="normal"
-                  size="sm"
-                  color="purpleLight"
+                  size="smR"
+                  color="neutral400"
                   onClick={() => {
                     setIsReceiveTooltipVisible(false);
                     handleOpenReceiveModal();
@@ -403,7 +402,7 @@ export default function DonateCta() {
               {/* Address Text - second on mobile, first on tablet+ */}
               <a
                 href={`/wallet/${DONATE_ADDRESS}`}
-                class="font-medium text-base text-color-purple-semilight hover:text-color-purple-light transition-colors duration-200 order-2 tablet:order-1"
+                class="font-medium text-base text-color-neutral-400 hover:text-color-hover link-neutral-400 transition-colors duration-200 order-2 tablet:order-1 peer-hover:text-color-hover peer-hover:[background-size:0%_0.8px]"
               >
                 <span class="hidden tablet:block">{DONATE_ADDRESS}</span>
                 <span class="hidden mobileMd:block tablet:hidden">

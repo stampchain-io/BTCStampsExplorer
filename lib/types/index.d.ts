@@ -216,6 +216,7 @@ export type {
   ChartWidgetProps,
   // Theme and styling
   ColorPalette,
+  ColorScale,
   ComponentWithChildren,
   ContainerProps,
   EmptyStateProps,
@@ -248,8 +249,8 @@ export type {
   // Shared component types
   SharedListProps,
   SpacingScale,
-  SRC20CardProps,
   SRC20CardSize,
+  StatusColorScale,
   // Gallery and card types
   // Table and display types
   TableColumn,
@@ -477,24 +478,22 @@ export type {
 export type { __TYPE_ONLY_MODULE__ };
 
 /**
- * Page props for Collection Overview pages
+ * Page props for the Collection Overview page (routes/collection/index.tsx)
  * Used in routes to pass collection data and metadata
  */
 export interface CollectionOverviewPageProps {
-  data: {
-    collection: import("../../server/types/collection.d.ts").CollectionRow;
-    stamps?: import("./stamp.d.ts").StampRow[];
-    src20?: import("./src20.d.ts").SRC20Row[];
-    totalStamps?: number;
-    totalSRC20?: number;
-    error?: string;
-  };
-  selectedTab?: string;
-  stamps?: import("./stamp.d.ts").StampRow[];
   collections?: import("../../server/types/collection.d.ts").CollectionRow[];
   page?: number;
   pages?: number;
-  isRecentSales?: boolean;
+  page_size?: number;
+  // Total collection count for the current editions filter - used by
+  // CollectionOverviewHeader's count pill
+  total?: number;
+  filterBy?: string[];
+  sortBy?: "ASC" | "DESC";
+  editionsFilter?: "single" | "multiple";
+  viewMode?: "cardHorizontal" | "cardVertical" | "cardSquare";
+  error?: string;
 }
 
 // ============================================================================

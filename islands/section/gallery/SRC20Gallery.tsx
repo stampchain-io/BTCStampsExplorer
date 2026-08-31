@@ -2,14 +2,14 @@
 // @baba - add token cards specific to wallet page
 import { PaginationButtons, ViewAllButton } from "$button";
 import {
-  SRC20Card,
-  SRC20CardMinting,
-  SRC20CardSm,
-  SRC20CardSmMinting,
+  SRC20Minting,
+  SRC20MintingCompact,
+  SRC20Overview,
+  SRC20OverviewCompact,
 } from "$card";
 import { useLoadingSkeleton } from "$lib/hooks/useLoadingSkeleton.ts";
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
-import { subtitleGrey, titleGreyLD } from "$text";
+import { subtitlePrimary, titlePrimary } from "$text";
 import type { EnrichedSRC20Row } from "$types/src20.d.ts";
 import type { SRC20GalleryProps } from "$types/ui.d.ts";
 import { useEffect, useMemo, useState } from "preact/hooks";
@@ -47,24 +47,14 @@ export function SRC20Gallery({
     }
   }, [serverData]);
 
-  // 🚀 REMOVED: Client-side API calls for /src20 page - use server-side rendering only
-  // This eliminates dual data sources and ensures consistency
-
-  // 🚀 FRESH.JS NAVIGATION: Server-side rendering with URL updates
-  const handlePageChange = (page: number) => {
-    if (pagination?.onPageChange) {
-      pagination.onPageChange(page);
-    } else {
-      // Always use server-side navigation for /src20 page
-      // SSR-safe browser environment check
-      if (typeof globalThis === "undefined" || !globalThis?.location) {
-        return; // Cannot navigate during SSR
-      }
-      const url = new URL(globalThis.location.href);
-      url.searchParams.set("page", page.toString());
-      globalThis.location.href = url.toString();
-    }
-  };
+  // Sync data from initialData (used by the /src20 page). Fresh preserves island
+  // state across partial navigations, so without this the table would keep
+  // showing stale rows after a filter/view/timeframe change.
+  useEffect(() => {
+    if (serverData) return; // serverData-driven pages (home) handled above
+    setData(initialData || []);
+    setIsLoading(false);
+  }, [initialData]);
 
   // 🚀 SIMPLIFIED: Basic image click handler
   const handleImageClick = (_imgSrc: string) => {
@@ -75,10 +65,10 @@ export function SRC20Gallery({
   const CardComponent = useMemo(() => {
     // For /src20 page, use full-size cards
     if (fromPage === "src20" || fromPage === "stamping/src20") {
-      return viewType === "minted" ? SRC20Card : SRC20CardMinting;
+      return viewType === "minted" ? SRC20Overview : SRC20Minting;
     }
     // For other pages (home, wallet), use small cards
-    return viewType === "minted" ? SRC20CardSm : SRC20CardSmMinting;
+    return viewType === "minted" ? SRC20OverviewCompact : SRC20MintingCompact;
   }, [viewType, fromPage]);
 
   // 🚀 PREACT OPTIMIZATION: Memoized card props
@@ -100,16 +90,11 @@ export function SRC20Gallery({
     return <div class={skeletonClasses} />;
   }
 
-  // 🚀 DENO FRESH 2.3+ OPTIMIZATION: Early return for src20 page with optimized rendering
-  if (fromPage === "src20" || fromPage === "stamping/src20") {
-    return <CardComponent {...cardProps} />;
-  }
-
   return (
     <div class="w-full">
       {title && (
         <h1
-          class={`${titleGreyLD} ${
+          class={`${titlePrimary} ${
             fromPage === "home" && viewType === "minting" ? "opacity-0" : ""
           }`}
         >
@@ -118,7 +103,7 @@ export function SRC20Gallery({
       )}
       {subTitle && (
         <h2
-          class={`${subtitleGrey} ${
+          class={`${subtitlePrimary} ${
             viewType === "minting" ? "text-left tablet:text-right" : ""
           }`}
         >
@@ -126,26 +111,25 @@ export function SRC20Gallery({
         </h2>
       )}
 
-      {/* 🚀 OPTIMIZED: Use dynamic card component selection based on minting status */}
       <CardComponent {...cardProps} />
 
       {fromPage === "home" && (
-        <div class="flex justify-end -mt-3 mobileLg:-mt-7">
+        <div class="flex justify-end -mt-3">
           <ViewAllButton
-            href={`/src20${viewType === "minting" ? "/minting" : ""}`}
+            href={`/src20${viewType === "minting" ? "?viewType=minting" : ""}`}
           />
         </div>
       )}
 
-      {pagination && pagination.totalPages > 1 && (
-        <div class="mt-7.5 tablet:mt-10">
-          <PaginationButtons
-            page={pagination.page}
-            totalPages={pagination.totalPages}
-            prefix={fromPage === "wallet" ? "src20" : ""}
-            onPageChange={handlePageChange}
-          />
-        </div>
+      {pagination && (
+        <PaginationButtons
+          page={pagination.page}
+          totalPages={pagination.totalPages}
+          {...(fromPage === "wallet" ? { prefix: "src20" } : {})}
+          {...(pagination.onPageChange
+            ? { onPageChange: pagination.onPageChange }
+            : {})}
+        />
       )}
     </div>
   );

@@ -1,18 +1,13 @@
 /* ===== MEDIA PAGE ===== */
 /* TODO @baba: Refactor the page and create island components for each section  - similar to About page */
 import { Button } from "$button";
-import {
-  body,
-  containerBackground,
-  containerGap,
-  glassmorphism,
-} from "$layout";
+import { body, container1, containerBackground, containerGap } from "$layout";
 import {
   headingGreyLDLink,
-  subtitleGrey,
+  subtitleNeutral,
   text,
   textLg,
-  titleGreyLD,
+  titleNeutral,
 } from "$text";
 
 /* ===== PAGE COMPONENT ===== */
@@ -23,11 +18,8 @@ export default function MediaPage() {
       {/* ===== INTRODUCTION SECTION ===== */}
       <section class={containerBackground}>
         <div class={`flex flex-col w-full`}>
-          <h1 class={titleGreyLD}>MEDIA MATTERS</h1>
-          <h2 class={subtitleGrey}>
-            <span class="hidden min-[460px]:inline">HONOURABLE&nbsp;</span>STAMP
-            MENTIONS
-          </h2>
+          <h1 class={titleNeutral}>Media Matters</h1>
+          <h2 class={subtitleNeutral}>Stamp Mentions</h2>
           <p class={textLg}>
             Explore the world of Bitcoin Stamps with our curated list of news
             coverage, in-depth articles, reports and video podcasts.
@@ -47,14 +39,14 @@ export default function MediaPage() {
       </section>
 
       {/* ===== INTERVIEWS SECTION ===== */}
-      <section class={`flex flex-col ${glassmorphism} p-5`}>
-        <h1 class={titleGreyLD}>INTERVIEWS</h1>
+      <section class={`flex flex-col ${container1} p-5`}>
+        <h1 class={titleNeutral}>Interviews</h1>
         <div
           class={`grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 ${containerGap}`}
         >
           {/* ===== RICE TVX INTERVIEW ===== */}
           <div class={`flex flex-col`}>
-            <h2 class={subtitleGrey}>RICE TVX</h2>
+            <h2 class={subtitleNeutral}>Rice TVX</h2>
             <div class="relative w-full pt-[56.25%]">
               <iframe
                 class="absolute top-0 left-0 w-full h-full pb-3 mobileMd:pb-6"
@@ -80,7 +72,7 @@ export default function MediaPage() {
 
           {/* ===== WAGE CUCKING INTERVIEW ===== */}
           <div class={`flex flex-col`}>
-            <h2 class={subtitleGrey}>WAGE CUCKING</h2>
+            <h2 class={subtitleNeutral}>Wage Cucking</h2>
             <div class="relative w-full pt-[56.25%]">
               <iframe
                 class="absolute top-0 left-0 w-full h-full pb-3 mobileMd:pb-6"
@@ -104,7 +96,7 @@ export default function MediaPage() {
 
           {/* ===== UNIVERSE INTERVIEW ===== */}
           <div class={`flex flex-col`}>
-            <h2 class={subtitleGrey}>UNIVERSE</h2>
+            <h2 class={subtitleNeutral}>Universe</h2>
             <div class="relative w-full pt-[56.25%]">
               <iframe
                 class="absolute top-0 left-0 w-full h-full pb-3 mobileMd:pb-6"
@@ -135,8 +127,8 @@ export default function MediaPage() {
       {/* ===== NEWS SECTION ===== */}
       <section>
         <div class={containerBackground}>
-          <h1 class={titleGreyLD}>IN THE NEWS</h1>
-          <h2 class={subtitleGrey}>BREAKING STORIES</h2>
+          <h1 class={titleNeutral}>In the News</h1>
+          <h2 class={subtitleNeutral}>Breaking Stories</h2>
           {/* ===== NEWS ARTICLES LIST ===== */}
           <div class={`flex flex-col min-[940px]:flex-row ${containerGap}`}>
             <div class="flex flex-col w-full min-[940px]:w-1/2">
@@ -260,13 +252,13 @@ export default function MediaPage() {
 
       {/* ===== REPORTS SECTION ===== */}
       <section class={containerBackground}>
-        <h1 class={titleGreyLD}>REPORTS</h1>
+        <h1 class={titleNeutral}>Reports</h1>
         <div class="flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6 mobileLg:gap-9 desktop:gap-12">
           {/* ===== SQRR DEEP DIVE ===== */}
           <div
             class={`flex flex-col w-full mobileLg:w-2/3 ${text}`}
           >
-            <h2 class={subtitleGrey}>SQRR - DEEP DIVE</h2>
+            <h2 class={subtitleNeutral}>SQRR - Deep Dive</h2>
             <p>
               Stamps is a blockchain protocol created by MikeInSpace that
               enables storing images on-chain on Bitcoin transaction outputs.
@@ -279,8 +271,8 @@ export default function MediaPage() {
             <div>
               <Button
                 variant="outline"
-                color="grey"
-                size="mdR"
+                color="neutral"
+                size="smR"
                 href="https://sqrr.xyz/reports/docs/4/1/Stamps%20Protocol_Final_17_May_2023.pdf"
                 target="_blank"
               >
@@ -291,7 +283,7 @@ export default function MediaPage() {
 
           {/* ===== INSIGHTS REPORT ===== */}
           <div class="flex flex-col w-full mobileLg:w-1/3 mobileLg:text-right">
-            <h2 class={subtitleGrey}>INSIGHTS</h2>
+            <h2 class={subtitleNeutral}>Insights</h2>
             <p class={text}>
               <b>Detailed monthly reports about Bitcoin Stamps.</b>
               <br />
@@ -301,8 +293,8 @@ export default function MediaPage() {
             <div class="flex justify-start mobileLg:justify-end">
               <Button
                 variant="outline"
-                color="grey"
-                size="mdR"
+                color="neutral"
+                size="smR"
                 href="https://sqrr.xyz/reports/"
                 target="_blank"
               >

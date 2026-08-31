@@ -1,14 +1,14 @@
 /* ===== HOW TO REGISTER BITNAME COMPONENT ===== */
 import { containerBackground } from "$layout";
-import { subtitleGrey, text, titleGreyLD } from "$text";
+import { subtitleNeutral, text, titleNeutral } from "$text";
 
 /* ===== COMPONENT ===== */
 export const SRC101RegisterHowto = () => {
   return (
     <div class={`${containerBackground} gap-5`}>
       <div class="flex flex-col">
-        <h3 class={titleGreyLD}>HOW-TO</h3>
-        <h2 class={subtitleGrey}>REGISTER YOUR BITNAME</h2>
+        <h3 class={titleNeutral}>HOW-TO</h3>
+        <h2 class={subtitleNeutral}>REGISTER YOUR BITNAME</h2>
         <p class={text}>
           <ul class="list-disc pl-5 space-y-2">
             <li>
@@ -60,7 +60,7 @@ export const SRC101RegisterHowto = () => {
             href="https://mempool.space/"
             target="_blank"
             rel="noopener noreferrer"
-            class="animated-underline"
+            class="link-neutral-200-bold"
           >
             blockchain explorer
           </a>.

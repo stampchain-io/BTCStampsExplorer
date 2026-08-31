@@ -1,19 +1,19 @@
 /* ===== ABOUT HEADER COMPONENT ===== */
-import { containerBackground } from "$layout";
-import { subtitleGrey, text, textLg, titleGreyLD } from "$text";
+import { subtitlePrimary, text, textLg, titlePrimary } from "$text";
 
 /* ===== COMPONENT ===== */
 export default function AboutHeader() {
   return (
-    <section class={containerBackground}>
+    <section>
       <div class="flex flex-col">
         {/* ===== HEADER SECTION ===== */}
-        <h1 class={titleGreyLD}>ABOUT</h1>
-        <h2 class={subtitleGrey}>STAMPCHAIN</h2>
+        <h1 class={titlePrimary}>ABOUT</h1>
+        <h2 class={subtitlePrimary}>STAMPCHAIN</h2>
 
         {/* ===== INTRODUCTION SECTION ===== */}
         <p class={textLg}>
-          The <b>Bitcoin Stamps meta-protocol</b>{" "}
+          The <b class="text-color-primary-400">Bitcoin Stamps meta-protocol</b>
+          {" "}
           was conceived by Mike In Space, a maverick figure in the Bitcoin and
           Counterparty community with deep roots in underground memetic culture.
           While others saw Bitcoin's UTXO model as just a ledger, Mike glimpsed
@@ -35,7 +35,8 @@ export default function AboutHeader() {
           temporary Post-it notes.
         </p>
         <p class={text}>
-          The introduction of <b>SRC-20 tokens</b>{" "}
+          The introduction of{" "}
+          <b class="text-color-primary-400">SRC-20 tokens</b>{" "}
           marked a watershed moment, proving that Bitcoin Stamps could do more
           than just store data—it could breathe new life into the entire
           ecosystem. In a delightful twist of fate, the success of this
@@ -45,7 +46,7 @@ export default function AboutHeader() {
         </p>
         <p class={text}>
           Today,{" "}
-          <b>
+          <b class="text-color-primary-400">
             Bitcoin Stamps stands as an immutable testament to human ingenuity
           </b>, combining Bitcoin's unshakeable security with groundbreaking
           on-chain capabilities. Every stamp is a story, every transaction a

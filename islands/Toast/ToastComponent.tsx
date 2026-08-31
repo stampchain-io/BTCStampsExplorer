@@ -6,7 +6,8 @@ import {
   notificationContainerInfo,
   notificationContainerSuccess,
   notificationContainerWarning,
-  notificationHeading,
+  notificationFooter,
+  notificationHeader,
 } from "$notification";
 import type { ToastComponentProps } from "$types/ui.d.ts";
 
@@ -20,6 +21,7 @@ export const ToastComponent = (
     autoDismiss,
     duration = 3000,
     isAnimatingOut: externalIsAnimatingOut,
+    isUpdate = false,
   }: ToastComponentProps & { isAnimatingOut?: boolean },
 ) => {
   // Use the external animation state from the provider
@@ -41,14 +43,14 @@ export const ToastComponent = (
   const getIconColor = (toastType: ToastTypeFromProvider["type"]) => {
     switch (toastType) {
       case "error":
-        return "stroke-color-red";
+        return "stroke-color-red-700";
       case "warning":
-        return "stroke-color-orange";
+        return "stroke-color-orange-500";
       case "success":
-        return "stroke-color-green";
+        return "stroke-color-green-700";
       case "info":
       default:
-        return "stroke-color-grey";
+        return "stroke-color-neutral-400";
     }
   };
 
@@ -69,14 +71,14 @@ export const ToastComponent = (
   const getProgressBarColor = (toastType: ToastTypeFromProvider["type"]) => {
     switch (toastType) {
       case "error":
-        return "bg-color-red-semidark";
+        return "bg-color-red-700";
       case "warning":
-        return "bg-color-orange";
+        return "bg-color-orange-500";
       case "success":
-        return "bg-color-green-semidark";
+        return "bg-color-green-700";
       case "info":
       default:
-        return "bg-color-grey-semidark";
+        return "bg-color-neutral-500";
     }
   };
 
@@ -84,17 +86,38 @@ export const ToastComponent = (
   const lines = message.split("\n");
   const firstLine = lines[0];
   const remainingLines = lines.slice(1);
+  // Only the update announcement toast distinguishes heading/footer lines;
+  // all other toasts render every line with the plain body style.
+  const lastLine = lines[lines.length - 1];
+  const middleLines = lines.slice(1, -1);
 
   return (
     <div
       id={`toast-${id}`}
       class={`fixed top-5 inset-x-5 z-notification !w-auto
-        min-[460px]:left-5 min-[460px]:right-auto min-[460px]:max-w-[460px] overflow-hidden ${
+        min-[460px]:left-5 min-[460px]:right-auto min-[420px]:max-w-[420px] ${
         shouldAnimateOut ? "notification-exit" : "notification-enter"
       } ${getContainerStyle(type)}`}
       role="alert"
     >
-      <div class="flex items-start space-x-6">
+      {
+        /* Positioned outside the padded/flex content so it can hug the
+          corner without being constrained by the container's padding
+          (this container intentionally has no overflow-hidden). */
+      }
+      <div class="absolute top-0.5 right-0.5">
+        <Icon
+          type="iconButton"
+          name="close"
+          weight="bold"
+          size="mdR"
+          color="neutral400"
+          ariaLabel="Close notification"
+          onClick={onClose}
+        />
+      </div>
+
+      <div class="flex items-start space-x-6 pr-8">
         <Icon
           type="icon"
           name={getIconName(type)}
@@ -106,33 +129,41 @@ export const ToastComponent = (
         />
 
         <div class="flex-1 ml-6 break-words">
-          <div class={notificationHeading}>{firstLine}</div>
-          {body
+          {isUpdate
             ? (
-              <div class={notificationBody}>
-                {body}
-              </div>
+              <>
+                <div class={notificationHeader}>{firstLine}</div>
+                {middleLines.length > 0 && (
+                  <div class={`${notificationBody} whitespace-pre-line`}>
+                    {middleLines.join("\n")}
+                  </div>
+                )}
+                {lines.length > 1 && (
+                  <div class={`${notificationFooter} mt-1`}>{lastLine}</div>
+                )}
+              </>
             )
-            : remainingLines.length > 0 && (
-              <div class={`${notificationBody} whitespace-pre-line`}>
-                {remainingLines.join("\n")}
-              </div>
+            : (
+              <>
+                <div class={notificationBody}>{firstLine}</div>
+                {body
+                  ? (
+                    <div class={notificationBody}>
+                      {body}
+                    </div>
+                  )
+                  : remainingLines.length > 0 && (
+                    <div class={`${notificationBody} whitespace-pre-line`}>
+                      {remainingLines.join("\n")}
+                    </div>
+                  )}
+              </>
             )}
         </div>
-
-        <Icon
-          type="iconButton"
-          name="close"
-          weight="bold"
-          size="xs"
-          color="greyLight"
-          onClick={onClose}
-          className="ml-auto -mt-1.5"
-        />
       </div>
 
       {autoDismiss && (
-        <div class="mt-2 w-full h-0.5 rounded-full bg-color-border">
+        <div class="mt-2 w-full h-0.5 rounded-full bg-color-neutral-800">
           <div
             class={`h-full rounded-full ${
               getProgressBarColor(type)

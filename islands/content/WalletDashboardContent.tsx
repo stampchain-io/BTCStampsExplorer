@@ -5,9 +5,9 @@ import { PaginationButtons } from "$button";
 import { Icon, LoadingIcon, PlaceholderImage } from "$icon";
 import { SettingsButton } from "$islands/button/SettingsButton.tsx";
 import { SortButton } from "$islands/button/SortButton.tsx";
-import FreshSRC20Gallery from "$islands/section/gallery/FreshSRC20Gallery.tsx";
-import { FreshStampGallery } from "$islands/section/gallery/FreshStampGallery.tsx";
-import { glassmorphism, shadowGlowPurple } from "$layout";
+import SRC20GalleryWallet from "$islands/section/gallery/SRC20GalleryWallet.tsx";
+import { StampGalleryWallet } from "$islands/section/gallery/StampGalleryWallet.tsx";
+import { container1, shadowGlowPurple } from "$layout";
 import {
   createPaginationHandler,
   getCurrentUrl,
@@ -95,7 +95,7 @@ function DispenserItem({
   /* ===== EMPTY STATE HANDLING ===== */
   if (!dispensers?.length) {
     return (
-      <div class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black color-purple-gradientLD">
+      <div class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-gradient-to-r color-primary-gradient">
         NO LISTINGS FOUND
       </div>
     );
@@ -113,7 +113,7 @@ function DispenserItem({
   if (!openDispensers.length && !closedDispensers.length) {
     return (
       <div>
-        <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black color-purple-gradientLD">
+        <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-gradient-to-r color-primary-gradient">
           NO LISTINGS FOUND
         </h3>
       </div>
@@ -127,7 +127,7 @@ function DispenserItem({
         {/* Open Dispensers Section */}
         {openDispensers.length > 0 && (
           <div id="open-listings-section">
-            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black color-purple-gradientLD mb-6">
+            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-gradient-to-r color-primary-gradient mb-6">
               OPEN LISTINGS
             </h3>
             <div class="flex flex-col gap-6">
@@ -141,7 +141,7 @@ function DispenserItem({
         {/* Closed Dispensers Section */}
         {closedDispensers.length > 0 && (
           <div id="closed-listings-section">
-            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black color-purple-gradientLD mb-6">
+            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-gradient-to-r color-primary-gradient mb-6">
               CLOSED LISTINGS
             </h3>
             <div class="flex flex-col gap-6">
@@ -158,7 +158,7 @@ function DispenserItem({
         {/* Open Dispensers Section */}
         {openDispensers.length > 0 && (
           <div class="mb-8" id="open-listings-section">
-            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black color-purple-gradientLD mb-6">
+            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-gradient-to-r color-primary-gradient mb-6">
               OPEN LISTINGS
             </h3>
             <div class="flex flex-col gap-6">
@@ -172,7 +172,7 @@ function DispenserItem({
         {/* Closed Dispensers Section */}
         {closedDispensers.length > 0 && (
           <div id="closed-listings-section">
-            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black color-purple-gradientLD mb-6">
+            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-gradient-to-r color-primary-gradient mb-6">
               CLOSED LISTINGS
             </h3>
             <div class="flex flex-col gap-6">
@@ -185,18 +185,16 @@ function DispenserItem({
       </div>
 
       {/* Pagination */}
-      {pagination && pagination.totalPages > 1 && (
-        <div class="mt-6">
-          <PaginationButtons
-            page={pagination.page}
-            totalPages={pagination.totalPages}
-            prefix="dispensers"
-            onPageChange={createPaginationHandler(
-              "dispensers_page",
-              "closed_listings",
-            )}
-          />
-        </div>
+      {pagination && (
+        <PaginationButtons
+          page={pagination.page}
+          totalPages={pagination.totalPages}
+          prefix="dispensers"
+          onPageChange={createPaginationHandler(
+            "dispensers_page",
+            "closed_listings",
+          )}
+        />
       )}
     </div>
   );
@@ -233,7 +231,7 @@ function DispenserRow(
 
   return (
     <div
-      class={`flex justify-between ${glassmorphism} rounded-2xl hover:border-color-purple-light ${shadowGlowPurple} border-2 border-transparent`}
+      class={`flex justify-between ${container1} rounded-2xl hover:border-color-purple-light ${shadowGlowPurple} border-2 border-transparent`}
     >
       <div class="flex p-3 mobileLg:p-6 gap-6 uppercase w-full">
         <a
@@ -269,7 +267,7 @@ function DispenserRow(
             <div class="relative">
               <a
                 href={`/stamp/${dispenser.stamp.stamp}`}
-                class="!inline-block text-2xl mobileLg:text-4xl font-black color-purple-gradientLD group-hover:[-webkit-text-fill-color:var(--color-purple-light)]"
+                class="!inline-block text-2xl mobileLg:text-4xl font-black bg-gradient-to-r color-primary-gradient color-gradient-hover"
               >
                 {`#${dispenser.stamp.stamp}`}
               </a>
@@ -302,14 +300,14 @@ function DispenserRow(
                 name="copy"
                 weight="normal"
                 size="xs"
-                color="greyLight"
+                color="neutral400"
               />
               <Icon
                 type="iconButton"
                 name="history"
                 weight="normal"
                 size="xs"
-                color="greyLight"
+                color="neutral400"
               />
             </div>
           </div>
@@ -479,7 +477,7 @@ const WalletDashboardContent = ({
         <div class="mt-3 mobileLg:mt-6">
           {stamps.data?.length
             ? (
-              <FreshStampGallery
+              <StampGalleryWallet
                 initialData={stamps.data}
                 initialPagination={{
                   page: stamps.pagination.page,
@@ -542,7 +540,7 @@ const WalletDashboardContent = ({
         <div class="mt-3 mobileLg:mt-6">
           {src20.data?.length
             ? (
-              <FreshSRC20Gallery
+              <SRC20GalleryWallet
                 initialData={src20.data}
                 initialPagination={{
                   page: src20.pagination.page,

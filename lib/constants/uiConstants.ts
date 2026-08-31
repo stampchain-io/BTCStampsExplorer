@@ -7,18 +7,16 @@
  * Button variant types - standardized across the application
  */
 export type ButtonVariant =
-  | "text"
   | "outline"
-  | "flat"
-  | "flatOutline"
-  | "outlineFlat";
+  | "flat";
 
 /**
  * Button color types - standardized theme colors
  */
 export type ButtonColor =
-  | "purple"
-  | "grey"
+  | "neutral"
+  | "primary"
+  | "secondary"
   | "test"
   | "custom";
 

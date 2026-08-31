@@ -13,6 +13,7 @@ import {
   describe,
   it,
 } from "jsr:@std/testing@1.0.14/bdd";
+import { classifySqlError } from "$server/database/databaseManager.ts";
 
 // Mock console to reduce noise
 const originalConsole = {
@@ -131,6 +132,20 @@ class EnhancedMockClient {
       throw new Error(
         "Cannot add or update a child row: a foreign key constraint fails",
       );
+    }
+
+    // Non-existent schema references (should not retry — will never succeed)
+    if (query.includes("UNKNOWN_COLUMN")) {
+      throw new Error("Unknown column 'address' in 'where clause'");
+    }
+
+    if (query.includes("MISSING_TABLE")) {
+      throw new Error("Table 'test_db.balances' doesn't exist");
+    }
+
+    // Query/read timeout (should close the client but not retry)
+    if (query.includes("READ_TIMEOUT")) {
+      throw new Error("connection read timed out");
     }
 
     if (this._shouldThrow) {
@@ -602,33 +617,15 @@ class EnhancedTestDatabaseManager {
         this.releaseClient(client);
         return result as T;
       } catch (error) {
+        // Delegate to the same classifier the real DatabaseManager uses, so
+        // this mock's retry behavior can't silently drift from production.
         let shouldRetry = true;
         let isConnectionError = false;
 
         if (error instanceof Error) {
-          // Check for pool exhaustion
-          if (error.message.includes("No available connections in the pool")) {
-            shouldRetry = true;
-          } // Check for connection errors
-          else if (
-            error.message.includes("disconnected by the server") ||
-            error.message.includes("wait_timeout") ||
-            error.message.includes("interactive_timeout") ||
-            error.message.includes("connection") ||
-            error.message.includes("PROTOCOL_CONNECTION_LOST") ||
-            error.message.includes("ECONNRESET") ||
-            error.message.includes("ETIMEDOUT")
-          ) {
-            isConnectionError = true;
-          } // Don't retry syntax/constraint errors
-          else if (
-            error.message.includes("syntax error") ||
-            error.message.includes("constraint") ||
-            error.message.includes("duplicate") ||
-            error.message.includes("foreign key")
-          ) {
-            shouldRetry = false;
-          }
+          const classification = classifySqlError(error.message);
+          shouldRetry = classification.shouldRetry;
+          isConnectionError = classification.isConnectionError;
         }
 
         // Handle client cleanup
@@ -1297,6 +1294,41 @@ describe("DatabaseManager - Enhanced Comprehensive Tests", () => {
       );
     });
 
+    it("should not retry Unknown column errors (bad SQL can't self-heal)", async () => {
+      const before = mockClient.getStats().queryCount;
+      await assertRejects(
+        () => dbManager.executeQuery("SELECT * FROM UNKNOWN_COLUMN WHERE address = ?", ["x"]),
+        Error,
+        "Unknown column",
+      );
+      // Exactly one attempt (connection validation + ping + the query
+      // itself) — no retry loop for a schema error that can never succeed.
+      assertEquals(mockClient.getStats().queryCount - before, 3);
+    });
+
+    it("should not retry missing-table errors", async () => {
+      const before = mockClient.getStats().queryCount;
+      await assertRejects(
+        () => dbManager.executeQuery("SELECT * FROM MISSING_TABLE", []),
+        Error,
+        "doesn't exist",
+      );
+      assertEquals(mockClient.getStats().queryCount - before, 3);
+    });
+
+    it("should close the client and not retry on query read timeout", async () => {
+      const before = mockClient.getStats().queryCount;
+      await assertRejects(
+        () => dbManager.executeQuery("SELECT * FROM READ_TIMEOUT", []),
+        Error,
+        "connection read timed out",
+      );
+      // A slow query that timed out client-side may still be running on the
+      // server — retrying would pile a second query on top of it instead
+      // of recovering, so this must fail fast after a single attempt.
+      assertEquals(mockClient.getStats().queryCount - before, 3);
+    });
+
     it("should handle pool exhaustion during query execution", async () => {
       // Fill up the pool
       const clients: any[] = [];
@@ -1706,5 +1738,61 @@ describe("DatabaseManager - Enhanced Comprehensive Tests", () => {
       };
       await dbManager.closeAllClients();
     });
+  });
+});
+
+describe("classifySqlError", () => {
+  it("treats schema errors as non-retryable", () => {
+    for (
+      const message of [
+        "Unknown column 'address' in 'where clause'",
+        "Table 'btc_stamps.balances' doesn't exist",
+        "ER_BAD_FIELD_ERROR: Unknown column",
+        "ER_NO_SUCH_TABLE",
+        "syntax error near 'FROM'",
+      ]
+    ) {
+      const result = classifySqlError(message);
+      assertEquals(result.shouldRetry, false, `expected no retry for: ${message}`);
+      assertEquals(result.isConnectionError, false);
+    }
+  });
+
+  it("treats query/read timeouts as non-retryable but closes the client", () => {
+    for (
+      const message of [
+        "connection read timed out",
+        "Query execution timed out",
+        "ETIMEDOUT",
+      ]
+    ) {
+      const result = classifySqlError(message);
+      assertEquals(result.shouldRetry, false, `expected no retry for: ${message}`);
+      assertEquals(result.isConnectionError, true, `expected client close for: ${message}`);
+    }
+  });
+
+  it("keeps retrying transient connection errors", () => {
+    for (
+      const message of [
+        "PROTOCOL_CONNECTION_LOST",
+        "ECONNRESET",
+        "disconnected by the server",
+        "wait_timeout exceeded",
+        "interactive_timeout exceeded",
+      ]
+    ) {
+      const result = classifySqlError(message);
+      assertEquals(result.shouldRetry, true, `expected retry for: ${message}`);
+      assertEquals(result.isConnectionError, true, `expected client close for: ${message}`);
+    }
+  });
+
+  it("retries pool exhaustion without closing a client", () => {
+    const result = classifySqlError(
+      "No available connections in the pool. Stats: active=10, pool=0",
+    );
+    assertEquals(result.shouldRetry, true);
+    assertEquals(result.isConnectionError, false);
   });
 });

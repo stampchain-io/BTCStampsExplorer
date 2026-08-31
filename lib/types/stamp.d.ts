@@ -9,6 +9,7 @@
  * @reference https://github.com/mikeinspace/stamps/blob/main/spec.md
  */
 
+import type { StampDispenserActivityLevel } from "$constants";
 import type {
   BasicUTXO,
   BlockRow,
@@ -33,7 +34,6 @@ import type { SortKey, SortMetrics } from "$types/sorting.d.ts";
 import type { DetailedUTXO } from "$types/transaction.d.ts";
 import type { PaginationState } from "$types/ui.d.ts";
 import type {
-  ActivityLevel,
   AlertDashboardData,
   CompilationDashboardData,
   CompilationMetrics,
@@ -573,6 +573,29 @@ export interface StampTransactionFeeAnalysis {
 // ============================================================================
 
 /**
+ * Canonical shape for a single sale's transaction details, as attached to a
+ * stamp under `sale_data`. This is the single source of truth for this
+ * shape — previously four independent, drifted copies existed across this
+ * file, marketData.d.ts, and StampCard.tsx (see stampchain.io#1209 /
+ * btc_stamps#939 history for context on why that drift caused bugs).
+ */
+export interface StampSaleData {
+  btc_amount: number;
+  block_index: number;
+  tx_hash: string;
+  buyer_address?: string;
+  seller_address?: string;
+  dispenser_address?: string;
+  dispenser_tx_hash?: string;
+  sale_time?: number | null;
+  time_ago?: string;
+  btc_amount_satoshis?: number;
+  dispense_quantity?: number;
+  usd_price?: number;
+  sale_type?: string;
+}
+
+/**
  * Core stamp data interface representing a Bitcoin stamp
  * This is the main data structure for stamps in the protocol
  *
@@ -620,11 +643,7 @@ export interface StampRow {
   unbound_quantity: number;
 
   // Sale information (optional)
-  sale_data?: {
-    btc_amount: number;
-    block_index: number;
-    tx_hash: string;
-  };
+  sale_data?: StampSaleData;
 
   // Extended fields (optional)
   asset_longname?: string | null;
@@ -633,6 +652,9 @@ export interface StampRow {
   is_btc_stamp?: number | null;
   is_reissue?: number | null;
   is_valid_base64?: number | null;
+
+  // Activity tracking (marketplace context)
+  activity_level?: StampDispenserActivityLevel | null;
 }
 
 /**
@@ -651,6 +673,9 @@ export interface StampBalance {
   creator: string;
   creator_name: string | null;
   balance: number | string;
+  file_size_bytes: number | null;
+  block_index: number;
+  block_time: Date;
   // Market data pricing fields - added for backward compatibility
   floorPrice?: number | "priceless";
   recentSalePrice?: number | "priceless";
@@ -1141,11 +1166,7 @@ export interface WalletContext {
  * StampWithSaleData - Migrated from StampCard.tsx
  */
 export interface StampWithSaleData extends Omit<StampRow, "stamp_base64"> {
-  sale_data?: {
-    btc_amount: number;
-    block_index: number;
-    tx_hash: string;
-  };
+  sale_data?: StampSaleData;
   stamp_base64?: string;
 }
 
@@ -1329,7 +1350,7 @@ export interface StampMarketDataRow {
   last_sale_dispenser_tx_hash: string | null;
   last_sale_block_index: number | null;
   // Activity tracking fields
-  activity_level: ActivityLevel | null;
+  activity_level: StampDispenserActivityLevel | null;
   last_activity_time: number | null; // Unix timestamp
 }
 
@@ -1389,8 +1410,14 @@ export interface StampMarketData {
   lastSaleDispenserTxHash: string | null;
   lastSaleBlockIndex: number | null;
   // Activity tracking fields
-  activityLevel: ActivityLevel | null;
+  activityLevel: StampDispenserActivityLevel | null;
   lastActivityTime: number | null; // Unix timestamp
+  // Parsed from the lowest_dispenser_* columns (btc_stamps#939) by
+  // MarketDataRepository.parseStampMarketDataRow — kept in sync with the
+  // canonical StampMarketData in marketData.d.ts (these two interfaces are
+  // duplicates; see that file for the full field comment). `null` when the
+  // stamp has no open dispenser.
+  lowestPriceDispenser: DispenserRow | null;
 }
 
 /**
@@ -1489,18 +1516,9 @@ export interface RecentSaleData {
  * StampWithEnhancedSaleData - Migrated from marketData.d.ts
  */
 export interface StampWithEnhancedSaleData extends StampRow {
-  sale_data?: {
-    btc_amount: number;
-    block_index: number;
-    tx_hash: string;
-    buyer_address?: string;
-    dispenser_address?: string;
-    time_ago?: string;
-    btc_amount_satoshis?: number;
-    dispenser_tx_hash?: string;
-  };
+  sale_data?: StampSaleData;
   marketData?: StampMarketData;
-  activity_level?: ActivityLevel;
+  activity_level?: StampDispenserActivityLevel | null;
   last_activity_time?: number;
 }
 
@@ -2264,6 +2282,37 @@ export declare function isValidStampTransaction(
 // ============================================================================
 
 /**
+ * Display variant for StampCard and gallery components.
+ * - "cardSquare"            : stamp image only
+ * - "cardSquareDetail"      : stamp image + editions pill (bottom-right)
+ * - "cardSquareBalance"     : stamp image + wallet balance pill (bottom-right)
+ * - "cardVerticalDetail"    : full footer + BTC icon overlay if listed
+ * - "cardVerticalBalance"   : full footer, SUPPLY pill replaced with wallet
+ *   BALANCE pill; BTC icon overlay if listed (same as cardVerticalDetail)
+ * - "cardVerticalListing"   : full footer + buy button row
+ * - "cardVerticalSale"      : full footer + sale price + time ago row
+ * - "cardVerticalSaleCompact": minimal footer (stamp# + price pill)
+ * - "cardHorizontalListing" : flex-row layout — thumbnail (left) + details
+ *   column (right): stamp#/cpid/creator, supply+status icons row, filetype+
+ *   filesize row, price + buy button row
+ * - "cardHorizontalListingCompact": same thumbnail + stamp#/cpid/creator
+ *   layout, but a single footer row (supply pill + status icons + BTC icon
+ *   with hover tooltip in place of the full price pill/BUY button)
+ */
+export type StampCardVariant =
+  | "cardSquare"
+  | "cardSquareDetail"
+  | "cardSquareBalance"
+  | "cardVerticalDetail"
+  | "cardVerticalBalance"
+  | "cardVerticalCollection"
+  | "cardVerticalListing"
+  | "cardVerticalSale"
+  | "cardVerticalSaleCompact"
+  | "cardHorizontalListing"
+  | "cardHorizontalListingCompact";
+
+/**
  * Props for StampGallery component
  */
 export interface StampGalleryProps {
@@ -2271,26 +2320,24 @@ export interface StampGalleryProps {
   subTitle?: string;
   type?: string;
   stamps: StampRow[];
-  layout?: "grid" | "list";
   isRecentSales?: boolean;
-  filterBy?: string;
-  showDetails?: boolean;
-  showEdition?: boolean;
+  variant?: StampCardVariant;
   gridClass?: string;
   displayCounts?: any;
   pagination?: any;
-  showMinDetails?: boolean;
-  variant?: "default" | "grey";
   viewAllLink?: string;
   alignRight?: boolean;
   fromPage?: string;
   sortBy?: "ASC" | "DESC";
+  // Swiper carousel config - only used when the swiper/carousel render path is active
+  swiperSlidesPerView?: number;
+  swiperBreakpoints?: Record<number, { slidesPerView: number }>;
 }
 
 /**
- * Props for FreshStampGallery component
+ * Props for StampGalleryWallet component
  */
-export interface FreshStampGalleryProps {
+export interface StampGalleryWalletProps {
   initialData: StampRow[];
   initialPagination: PaginationState;
   address?: string;
@@ -2298,17 +2345,19 @@ export interface FreshStampGalleryProps {
   enablePartialNavigation?: boolean;
   showLoadingSkeleton?: boolean;
   gridClass?: string;
-  showDetails?: boolean;
+  variant?: StampCardVariant;
 }
 
 /**
- * Props for StampOverviewGallery component
+ * Props for StampGalleryHome component
  */
-export interface StampOverviewGalleryProps {
+export interface StampGalleryHomeProps {
   stamps_src721?: StampRow[];
   stamps_art?: StampRow[];
   stamps_posh?: StampRow[];
   collectionData?: CollectionRow[];
+  recentSalesData?: Array<any>;
+  newListingsData?: Array<any>;
 }
 
 /**

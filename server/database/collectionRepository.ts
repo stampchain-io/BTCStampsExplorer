@@ -1,6 +1,6 @@
-import { SMALL_LIMIT, STAMP_TABLE } from "$constants";
-import type { CollectionRow, CollectionWithCreators } from "$server/types/collection.d.ts";
+import { HIDDEN_COLLECTION_NAMES, SMALL_LIMIT, STAMP_TABLE } from "$constants";
 import { dbManager } from "$server/database/databaseManager.ts";
+import type { CollectionRow, CollectionWithCreators } from "$server/types/collection.d.ts";
 
 // Local utility function for BTC decimal parsing
 function parseBTCDecimal(value: any): number | null {
@@ -14,6 +14,43 @@ function parseIntOrNull(value: any): number | null {
   if (value === null || value === undefined) return null;
   const parsed = parseInt(value);
   return isNaN(parsed) ? null : parsed;
+}
+
+// HAVING fragment for the editions filter — counts stamps whose supply is
+// NOT exactly one unit for their type (divisible stamps store supply in
+// satoshi-like units, so one edition = 100_000_000; non-divisible stamps use
+// raw supply, so one edition = 1). "single" collections have zero such
+// stamps (every stamp is a 1-of-1); "multiple" collections have at least
+// one. This per-stamp check is used instead of comparing SUM(editions) to
+// COUNT(stamps) because that comparison misclassifies collections
+// containing divisible stamps with a supply far below one full unit (e.g.
+// supply = 1), which pulls the summed total below the stamp count even
+// though those stamps aren't 1-of-1 editions.
+function buildEditionsHavingCondition(
+  editionsFilter?: "single" | "multiple",
+): string | null {
+  const nonSingleEditionStamps = `SUM(
+    CASE
+      WHEN st.divisible = 1 AND st.supply != 100000000 THEN 1
+      WHEN st.divisible = 0 AND st.supply != 1 THEN 1
+      ELSE 0
+    END
+  )`;
+  if (editionsFilter === "single") {
+    return `${nonSingleEditionStamps} = 0`;
+  }
+  if (editionsFilter === "multiple") {
+    return `${nonSingleEditionStamps} > 0`;
+  }
+  return null;
+}
+
+// WHERE fragment excluding known test/placeholder collections by name
+// (case-insensitive). Applied in SQL so the total count and the rendered
+// rows always match — see HIDDEN_COLLECTION_NAMES.
+function buildHiddenNamesCondition(): string {
+  const placeholders = HIDDEN_COLLECTION_NAMES.map(() => "?").join(",");
+  return `LOWER(c.collection_name) NOT IN (${placeholders})`;
 }
 
 export class CollectionRepository {
@@ -31,6 +68,7 @@ export class CollectionRepository {
       creator?: string;
       sortBy?: string;
       minStampCount?: number;
+      editionsFilter?: "single" | "multiple";
     },
   ) {
     const {
@@ -39,6 +77,7 @@ export class CollectionRepository {
       creator,
       sortBy = "DESC",
       minStampCount,
+      editionsFilter,
     } = options;
     const offset = (page - 1) * limit;
 
@@ -65,8 +104,14 @@ export class CollectionRepository {
 
     const queryParams: any[] = [];
 
+    const whereConditions: string[] = [buildHiddenNamesCondition()];
+    const hiddenNamesParams = HIDDEN_COLLECTION_NAMES.map((n) => n.toLowerCase());
     if (creator) {
-      query += ` WHERE cc.creator_address = ?`;
+      whereConditions.push(`cc.creator_address = ?`);
+    }
+    query += ` WHERE ${whereConditions.join(" AND ")}`;
+    queryParams.push(...hiddenNamesParams);
+    if (creator) {
       queryParams.push(creator);
     }
 
@@ -74,10 +119,18 @@ export class CollectionRepository {
       GROUP BY c.collection_id, c.collection_name, c.collection_description
     `;
 
-    // Add HAVING clause for minimum stamp count filter
+    // Add HAVING clause(s) for minimum stamp count / editions filters
+    const havingConditions: string[] = [];
     if (minStampCount !== undefined && minStampCount > 0) {
-      query += ` HAVING COUNT(DISTINCT cs.stamp) >= ?`;
+      havingConditions.push(`COUNT(DISTINCT cs.stamp) >= ?`);
       queryParams.push(minStampCount);
+    }
+    const editionsHaving = buildEditionsHavingCondition(editionsFilter);
+    if (editionsHaving) {
+      havingConditions.push(editionsHaving);
+    }
+    if (havingConditions.length > 0) {
+      query += ` HAVING ${havingConditions.join(" AND ")}`;
     }
 
     query += `
@@ -111,39 +164,61 @@ export class CollectionRepository {
   static async getTotalCollectionsByCreatorFromDb(
     creator?: string,
     minStampCount?: number,
+    editionsFilter?: "single" | "multiple",
   ) {
     let query: string;
     const queryParams: any[] = [];
 
-    if (minStampCount !== undefined && minStampCount > 0) {
-      // Use subquery to count collections with minimum stamp count
+    const editionsHaving = buildEditionsHavingCondition(editionsFilter);
+    const needsGroupedCount = (minStampCount !== undefined &&
+      minStampCount > 0) || editionsHaving !== null;
+
+    if (needsGroupedCount) {
+      // Use subquery to count collections matching the stamp-count / editions filters
       query = `
         SELECT COUNT(*) as total FROM (
           SELECT c.collection_id
           FROM collections c
           LEFT JOIN collection_creators cc ON c.collection_id = cc.collection_id
           LEFT JOIN collection_stamps cs ON c.collection_id = cs.collection_id
+          LEFT JOIN ${STAMP_TABLE} st ON cs.stamp = st.stamp
       `;
 
+      const whereConditions: string[] = [buildHiddenNamesCondition()];
       if (creator) {
-        query += ` WHERE cc.creator_address = ?`;
+        whereConditions.push(`cc.creator_address = ?`);
+      }
+      query += ` WHERE ${whereConditions.join(" AND ")}`;
+      queryParams.push(...HIDDEN_COLLECTION_NAMES.map((n) => n.toLowerCase()));
+      if (creator) {
         queryParams.push(creator);
       }
 
-      query += `
-          GROUP BY c.collection_id
-          HAVING COUNT(DISTINCT cs.stamp) >= ?
-        ) as filtered_collections
-      `;
-      queryParams.push(minStampCount);
-    } else {
-      // Original query for all collections
-      query =
-        `SELECT COUNT(DISTINCT c.collection_id) as total FROM collections c`;
+      query += ` GROUP BY c.collection_id`;
 
+      const havingConditions: string[] = [];
+      if (minStampCount !== undefined && minStampCount > 0) {
+        havingConditions.push(`COUNT(DISTINCT cs.stamp) >= ?`);
+        queryParams.push(minStampCount);
+      }
+      if (editionsHaving) {
+        havingConditions.push(editionsHaving);
+      }
+      query += ` HAVING ${havingConditions.join(" AND ")}`;
+
+      query += ` ) as filtered_collections`;
+    } else {
+      // Simple count for all collections, still excluding hidden names
+      query = `SELECT COUNT(DISTINCT c.collection_id) as total FROM collections c`;
+
+      const whereConditions: string[] = [buildHiddenNamesCondition()];
       if (creator) {
-        query +=
-          ` JOIN collection_creators cc ON c.collection_id = cc.collection_id WHERE cc.creator_address = ?`;
+        query += ` JOIN collection_creators cc ON c.collection_id = cc.collection_id`;
+        whereConditions.push(`cc.creator_address = ?`);
+      }
+      query += ` WHERE ${whereConditions.join(" AND ")}`;
+      queryParams.push(...HIDDEN_COLLECTION_NAMES.map((n) => n.toLowerCase()));
+      if (creator) {
         queryParams.push(creator);
       }
     }
@@ -186,9 +261,21 @@ export class CollectionRepository {
       query,
       [collectionName],
       60 * 10, // Cache for 10 minutes instead of never
-    ) as { rows: CollectionRow[] };
+    ) as { rows: any[] };
 
-    return result.rows.length > 0 ? result.rows[0] : null;
+    if (result.rows.length === 0) return null;
+
+    const row = result.rows[0];
+    return {
+      ...row,
+      creators: row.creators ? row.creators.split(",") : [],
+      stamp_count: typeof row.stamp_count === "string"
+        ? parseInt(row.stamp_count)
+        : row.stamp_count,
+      total_editions: typeof row.total_editions === "string"
+        ? parseFloat(row.total_editions)
+        : row.total_editions,
+    } as CollectionRow;
   }
 
   static async getCollectionByStamp(
@@ -216,7 +303,14 @@ export class CollectionRepository {
         return null;
       }
 
-      const row = result.rows[0];
+      // "posh" is a stamp classification (CPID naming), not a curatorial
+      // collection — skip it so a real collection can surface if present.
+      const row = result.rows.find(
+        (r) => r.collection_name.toLowerCase() !== "posh",
+      );
+      if (!row) {
+        return null;
+      }
       console.debug(
         `getCollectionByStamp: stamp=${stampNumber} -> collection="${row.collection_name}" (${row.collection_id})`,
       );
@@ -427,6 +521,7 @@ export class CollectionRepository {
       sortBy?: string;
       minStampCount?: number;
       includeMarketData?: boolean;
+      editionsFilter?: "single" | "multiple";
     },
   ): Promise<{
     rows: import("../../server/types/collection.d.ts").CollectionRow[];
@@ -439,8 +534,17 @@ export class CollectionRepository {
       sortBy = "DESC",
       minStampCount,
       includeMarketData = false,
+      editionsFilter,
     } = options;
     const offset = (page - 1) * limit;
+    const editionsHaving = buildEditionsHavingCondition(editionsFilter);
+    const havingConditions: string[] = [];
+    if (minStampCount !== undefined && minStampCount > 0) {
+      havingConditions.push(`COUNT(DISTINCT cs.stamp) >= ?`);
+    }
+    if (editionsHaving) {
+      havingConditions.push(editionsHaving);
+    }
 
     // Core collection query (no market data JOIN - fetched separately)
     const query = `
@@ -464,14 +568,21 @@ export class CollectionRepository {
       LEFT JOIN creator cr ON cc.creator_address = cr.address
       LEFT JOIN collection_stamps cs ON c.collection_id = cs.collection_id
       LEFT JOIN ${STAMP_TABLE} st ON cs.stamp = st.stamp
-      ${creator ? "WHERE cc.creator_address = ?" : ""}
+      WHERE ${buildHiddenNamesCondition()}${
+      creator ? " AND cc.creator_address = ?" : ""
+    }
       GROUP BY c.collection_id, c.collection_name, c.collection_description
-      ${minStampCount !== undefined && minStampCount > 0 ? "HAVING COUNT(DISTINCT cs.stamp) >= ?" : ""}
+      ${
+      havingConditions.length > 0
+        ? `HAVING ${havingConditions.join(" AND ")}`
+        : ""
+    }
       ORDER BY c.collection_name ${sortBy}
       LIMIT ? OFFSET ?
     `;
 
     const queryParams: any[] = [];
+    queryParams.push(...HIDDEN_COLLECTION_NAMES.map((n) => n.toLowerCase()));
     if (creator) queryParams.push(creator);
     if (minStampCount !== undefined && minStampCount > 0) queryParams.push(minStampCount);
     queryParams.push(limit, offset);

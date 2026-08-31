@@ -1,16 +1,16 @@
 /* ===== SRC20 MINTS TABLE COMPONENT ===== */
-import { cellAlign, colGroup } from "$components/layout/types.ts";
+import { colGroup } from "$components/layout/types.ts";
 import {
   cellCenterL2Detail,
   cellLeftL2Detail,
   cellRightL2Detail,
-  glassmorphismL2,
+  container2,
 } from "$layout";
 import {
   abbreviateAddress,
   formatDate,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
-import { labelXs, textSm, valueDarkSm, valueSmLink } from "$text";
+import { labelXxs, textXs, valueDarkSm } from "$text";
 import type { SRC20Row } from "$types/src20.d.ts";
 import type { SRC20MintsProps } from "$types/ui.d.ts";
 
@@ -23,9 +23,9 @@ export function SRC20MintsTable(
 
   /* ===== RENDER ===== */
   return (
-    <div class="-mt-2 overflow-x-auto tablet:overflow-x-visible scrollbar-hide">
+    <div class="overflow-x-auto overflow-y-clip tablet:overflow-x-clip flow-root scrollbar-hide">
       <table
-        class={`w-full border-separate border-spacing-y-2 ${textSm}`}
+        class={`w-full -my-2 border-separate border-spacing-y-2 ${textXs}`}
       >
         {/* ===== TABLE STRUCTURE ===== */}
         <colgroup>
@@ -38,9 +38,8 @@ export function SRC20MintsTable(
           ]).map((col) => <col key={col.key} class={col.className} />)}
         </colgroup>
         {/* ===== TABLE HEADER ===== */}
-        <thead class="sticky top-0 z-10">
-          {/* Only sticky on desktop */}
-          <tr class={`${glassmorphismL2}`}>
+        <thead>
+          <tr class={container2}>
             {headers.map((header, i) => {
               const isFirst = i === 0;
               const isLast = i === (headers?.length ?? 0) - 1;
@@ -55,9 +54,7 @@ export function SRC20MintsTable(
               return (
                 <th
                   key={header}
-                  class={`${
-                    cellAlign(i, headers?.length ?? 0)
-                  } !py-1.5 ${rowClass} ${labelXs}`}
+                  class={`sticky top-0 z-10 !py-1.5 ${rowClass} ${labelXxs}`}
                 >
                   {header}
                 </th>
@@ -71,25 +68,21 @@ export function SRC20MintsTable(
             ? mints?.map((mint: SRC20Row, index: number) => (
               <tr
                 key={`${mint.tx_hash}-${index}`}
-                class={`${glassmorphismL2} group`}
+                class={`${container2} group`}
               >
                 {/* AMOUNT */}
                 <td
-                  class={`${
-                    cellAlign(0, headers?.length ?? 0)
-                  } ${cellLeftL2Detail}`}
+                  class={`${cellLeftL2Detail} text-color-primary-400`}
                 >
                   {Number(mint.amt).toLocaleString()}
                 </td>
                 {/* ADDRESS */}
                 <td
-                  class={`${
-                    cellAlign(1, headers?.length ?? 0)
-                  } ${cellCenterL2Detail}`}
+                  class={cellCenterL2Detail}
                 >
                   <a
                     href={`/wallet/${mint.destination}`}
-                    className={valueSmLink}
+                    className="link-neutral-200"
                   >
                     <span class="tablet:hidden">
                       {abbreviateAddress(mint.destination, 4)}
@@ -101,9 +94,7 @@ export function SRC20MintsTable(
                 </td>
                 {/* DATE */}
                 <td
-                  class={`${
-                    cellAlign(2, headers?.length ?? 0)
-                  } ${cellCenterL2Detail}`}
+                  class={cellCenterL2Detail}
                 >
                   {formatDate(new Date(mint.block_time), {
                     month: "numeric",
@@ -113,9 +104,7 @@ export function SRC20MintsTable(
                 </td>
                 {/* TX HASH */}
                 <td
-                  class={`${
-                    cellAlign(3, headers?.length ?? 0)
-                  } ${cellCenterL2Detail}`}
+                  class={cellCenterL2Detail}
                 >
                   <a
                     href={`https://www.blockchain.com/explorer/transactions/btc/${mint.tx_hash}`}
@@ -127,7 +116,7 @@ export function SRC20MintsTable(
                         "_blank",
                       );
                     }}
-                    className={valueSmLink}
+                    className="link-neutral-200"
                   >
                     <span class="tablet:hidden">
                       {abbreviateAddress(mint.tx_hash, 4)}
@@ -139,9 +128,7 @@ export function SRC20MintsTable(
                 </td>
                 {/* BLOCK */}
                 <td
-                  class={`${
-                    cellAlign(4, headers?.length ?? 0)
-                  } ${cellRightL2Detail} text-color-grey`}
+                  class={`${cellRightL2Detail} text-color-neutral-400`}
                 >
                   {mint.block_index.toLocaleString()}
                 </td>
@@ -151,7 +138,7 @@ export function SRC20MintsTable(
               <tr>
                 <td
                   colSpan={headers?.length ?? 0}
-                  class={`w-full h-[34px] ${glassmorphismL2}`}
+                  class={`w-full h-[34px] ${container2}`}
                 >
                   <h6 class={`${valueDarkSm} text-center`}>
                     NO MINTS YET

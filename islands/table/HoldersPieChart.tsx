@@ -25,20 +25,25 @@ export const HoldersPieChart = ({ holders: rawHolders }: PieChartProps) => {
 
   /* ===== HELPER FUNCTIONS ===== */
   const generateColors = (count: number) => {
-    // Convert hex to RGB for easier interpolation
-    const startColor = { r: 0xaa, g: 0x00, b: 0xff };
-    const endColor = { r: 0x44, g: 0x00, b: 0x66 };
+    // Primary fuchsia stops from tailwind.config.ts: primary.500 (#D946EF), primary.400 (#E879F9), primary.300 (#F0ABFC)
+    const palette = [
+      { r: 0xd9, g: 0x46, b: 0xef },
+      { r: 0xe8, g: 0x79, b: 0xf9 },
+      { r: 0xf0, g: 0xab, b: 0xfc },
+    ];
 
     return Array(count).fill(0).map((_, index) => {
-      // Calculate interpolation factor (0 to 1)
       const factor = count === 1 ? 0 : index / (count - 1);
+      const scaled = factor * (palette.length - 1);
+      const fromIndex = Math.min(Math.floor(scaled), palette.length - 2);
+      const localFactor = scaled - fromIndex;
+      const from = palette[fromIndex];
+      const to = palette[fromIndex + 1];
 
-      // Interpolate between colors
-      const r = Math.round(startColor.r + (endColor.r - startColor.r) * factor);
-      const g = Math.round(startColor.g + (endColor.g - startColor.g) * factor);
-      const b = Math.round(startColor.b + (endColor.b - startColor.b) * factor);
+      const r = Math.round(from.r + (to.r - from.r) * localFactor);
+      const g = Math.round(from.g + (to.g - from.g) * localFactor);
+      const b = Math.round(from.b + (to.b - from.b) * localFactor);
 
-      // Convert back to hex
       return `#${r.toString(16).padStart(2, "0")}${
         g.toString(16).padStart(2, "0")
       }${b.toString(16).padStart(2, "0")}`;
@@ -50,8 +55,8 @@ export const HoldersPieChart = ({ holders: rawHolders }: PieChartProps) => {
     /* ===== CHART CONFIGURATION ===== */
     const DoughnutConfig = {
       type: "doughnut" as const,
-      width: 300,
-      height: 300,
+      width: 290,
+      height: 290,
       options: {
         responsive: false,
         maintainAspectRatio: false,
@@ -66,8 +71,8 @@ export const HoldersPieChart = ({ holders: rawHolders }: PieChartProps) => {
             enabled: true,
             position: "nearest" as const,
             yAlign: "bottom" as const,
-            backgroundColor: "#0d0a0dbf",
-            borderColor: "#303030",
+            backgroundColor: "#000000e6",
+            borderColor: "#262626",
             borderWidth: 1,
             cornerRadius: 12,
             padding: {
@@ -76,8 +81,8 @@ export const HoldersPieChart = ({ holders: rawHolders }: PieChartProps) => {
               left: 16,
               right: 16,
             },
-            titleColor: "#fff8f0",
-            bodyColor: "#d8d2ca",
+            titleColor: "#A3A3A3",
+            bodyColor: "#E5E5E5",
             usePointStyle: true,
             boxWidth: 10,
             boxHeight: 10,
@@ -100,7 +105,7 @@ export const HoldersPieChart = ({ holders: rawHolders }: PieChartProps) => {
         labels: holders.map((h: any) => h.address || "Unknown"),
         datasets: [{
           borderColor: [...Array(holders.length)].fill(
-            "#0d0a0dbf",
+            "#000000e6",
           ),
           label: "Graph Holder",
           data: holders.map((holder: any) => Number(holder.amt)),
@@ -112,13 +117,13 @@ export const HoldersPieChart = ({ holders: rawHolders }: PieChartProps) => {
 
     /* ===== RENDER ===== */
     return (
-      <div class="flex items-center justify-center w-[300px] h-[300px] p-6">
+      <div class="flex items-center justify-center w-[290px] h-[290px] tablet:pt-1">
         <Chart {...DoughnutConfig} />
       </div>
     );
   } catch (error) {
     /* ===== ERROR STATE ===== */
     console.error("Error rendering chart:", error);
-    return <div class="text-center py-6">ERROR RENDERING CHART</div>;
+    return <div class="text-center py-5">ERROR RENDERING CHART</div>;
   }
 };

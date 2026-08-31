@@ -11,8 +11,8 @@ import { describe, it } from "jsr:@std/testing@1.0.14/bdd";
 describe("SSR Safety Integration Tests", () => {
   const testFiles = [
     "islands/modal/FilterSRC20Modal.tsx",
-    "components/card/SRC20CardMinting.tsx",
-    "components/card/SRC20CardSmMinting.tsx",
+    "components/table/src20OverviewTable/SRC20Minting.tsx",
+    "components/table/src20OverviewTable/SRC20MintingCompact.tsx",
     "lib/utils/navigation/freshNavigationUtils.ts",
     "islands/modal/SearchSRC20Modal.tsx",
     "islands/modal/SearchStampModal.tsx",
@@ -208,19 +208,28 @@ describe("SSR Safety Pattern Recognition", () => {
     assertStringIncludes(content, "globalThis.location.href");
   });
 
-  it("should recognize SRC20CardMinting safety pattern", async () => {
-    const filePath = "../components/card/SRC20CardMinting.tsx";
+  it("should recognize SRC20Minting safety pattern", async () => {
+    const filePath =
+      "../components/table/src20OverviewTable/SRC20Minting.tsx";
     if (!existsSync(filePath)) return;
 
     const content = await Deno.readTextFile(filePath);
 
-    // Should contain the safety checks
-    assertStringIncludes(content, 'typeof globalThis === "undefined"');
-    assertStringIncludes(content, "!globalThis?.location");
-    assertStringIncludes(content, "Cannot navigate during SSR");
-
-    // Should contain the navigation
-    assertStringIncludes(content, "globalThis.location.href");
+    // The component must never navigate unguarded during SSR. That property
+    // is satisfied EITHER by inlining the guards OR by delegating to the
+    // audited helpers in freshNavigationUtils (whose own guards are asserted
+    // by the "freshNavigationUtils safety pattern" test below). Assert the
+    // property, not one particular spelling of it.
+    const inlinesGuards = content.includes('typeof globalThis === "undefined"') &&
+      content.includes("!globalThis?.location") &&
+      content.includes("Cannot navigate during SSR") &&
+      content.includes("globalThis.location.href");
+    const delegatesToHelper = content.includes("isBrowser") &&
+      content.includes("safeNavigate");
+    assert(
+      inlinesGuards || delegatesToHelper,
+      "SRC20Minting must guard navigation for SSR, either inline or via freshNavigationUtils",
+    );
   });
 
   it("should recognize freshNavigationUtils safety pattern", async () => {

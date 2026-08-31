@@ -1,13 +1,13 @@
 /* ===== SRC20 RECENT MINTS GALLERY COMPONENT ===== */
-import { SRC20CardSmMinting } from "$card";
-import { containerBackground } from "$layout";
+import { SRC20MintingCompact } from "$card";
+import { containerBackground, EmptyState } from "$layout";
 import {
   notificationBody,
   notificationContainerError,
-  notificationHeading,
+  notificationHeader,
   notificationTextError,
 } from "$notification";
-import { subtitleGrey, titleGreyDL, titleGreyLD } from "$text";
+import { subtitleNeutral, titleNeutral } from "$text";
 import type { SRC20Row } from "$types/src20.d.ts";
 import { useEffect, useState } from "preact/hooks";
 
@@ -57,16 +57,16 @@ export default function SRC20MintsGallery() {
     <div class={`${containerBackground} items-start tablet:items-end`}>
       {/* ===== TITLE SECTION ===== */}
       <div>
-        <h4 class={`${titleGreyLD} tablet:hidden`}>
+        <h4 class={`${titleNeutral} tablet:hidden`}>
           TRENDING
         </h4>
         <h4
-          class={`hidden tablet:block w-full tablet:text-right ${titleGreyDL}`}
+          class={`hidden tablet:block w-full tablet:text-right ${titleNeutral} !bg-gradient-to-l`}
         >
           TRENDING
         </h4>
       </div>
-      <h3 class={`${subtitleGrey} tablet:text-right mb-2`}>
+      <h3 class={`${subtitleNeutral} tablet:text-right mb-2`}>
         {isLoading ? <span class="animate-pulse">POPULAR TOKENS</span> : (
           "POPULAR TOKENS"
         )}
@@ -89,7 +89,7 @@ export default function SRC20MintsGallery() {
         : error
         ? (
           <div class={`mt-3 ${notificationContainerError}`}>
-            <h6 class={`${notificationHeading} ${notificationTextError}`}>
+            <h6 class={`${notificationHeader} ${notificationTextError}`}>
               ERROR LOADING TRENDING TOKENS
             </h6>
             <h6 class={`${notificationBody} ${notificationTextError}`}>
@@ -98,14 +98,10 @@ export default function SRC20MintsGallery() {
           </div>
         )
         : transactions.length === 0
-        ? (
-          <div class="text-color-grey-dark text-sm">
-            NO TRENDING TOKENS FOUND
-          </div>
-        )
+        ? <EmptyState label="NO TRENDING TOKENS FOUND" icon="src20Tokens" />
         : (
           <div class="-mb-3">
-            <SRC20CardSmMinting
+            <SRC20MintingCompact
               data={transactions}
               fromPage="stamping/src20"
               timeframe="24H"

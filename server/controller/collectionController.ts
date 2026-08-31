@@ -2,7 +2,7 @@
 import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
 import { CollectionService } from "$server/services/core/collectionService.ts";
 import { StampService } from "$server/services/stampService.ts";
-import type {CollectionQueryParams, PaginatedCollectionResponseBody, CollectionRow, CollectionWithCreators} from "$server/types/collection.d.ts";
+import type { CollectionQueryParams, CollectionRow, CollectionWithCreators, PaginatedCollectionResponseBody } from "$server/types/collection.d.ts";
 import type { Collection } from "$types/api.d.ts";
 
 export class CollectionController {
@@ -22,16 +22,23 @@ export class CollectionController {
     page?: number;
     sortBy?: "ASC" | "DESC";
     includeMarketData?: boolean;
+    editionsFilter?: "single" | "multiple";
+    minStampCount?: number;
   }) {
     try {
       console.log("[CollectionController] getCollectionStamps started");
       const overallStartTime = Date.now();
-      
+
       const {
         limit = 50,
         page = 1,
         sortBy = "DESC",
         includeMarketData = true,
+        editionsFilter,
+        // Exclude empty collections by default so the total count (used for
+        // the overview page's count pill) stays in sync with the rendered
+        // cards, which have always required at least one stamp to display.
+        minStampCount = 1,
       } = options;
 
       // Get collections with market data
@@ -42,6 +49,8 @@ export class CollectionController {
         page,
         sortBy,
         includeMarketData,
+        minStampCount,
+        ...(editionsFilter && { editionsFilter }),
       });
       console.log(`[CollectionController] Collection details fetched in ${Date.now() - collectionsStartTime}ms, got ${collectionsResult.data?.length || 0} collections`);
 
@@ -68,7 +77,7 @@ export class CollectionController {
 
       console.log(`[CollectionController] Starting to fetch stamps for ${collectionsResult.data.length} collections...`);
       const stampsStartTime = Date.now();
-      
+
       // Fetch stamps for all collections in parallel
       const stampPromises = collectionsResult.data.map(async (collection) => {
         const collectionId = collection.collection_id;
@@ -113,7 +122,7 @@ export class CollectionController {
           console.error(`Error fetching stamps for collection ${collectionId}:`, error);
         }
       });
-      
+
       // Wait for all stamp fetches to complete
       await Promise.all(stampPromises);
       console.log(`[CollectionController] Stamps fetched for all collections in ${Date.now() - stampsStartTime}ms`);
@@ -153,7 +162,7 @@ export class CollectionController {
         data: collections as any,
         // No need to update total - it's already correct from database filtering
       };
-      
+
       console.log(`[CollectionController] getCollectionStamps completed in ${Date.now() - overallStartTime}ms`);
       return result;
     } catch (error) {

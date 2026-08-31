@@ -1,4 +1,5 @@
 /* ===== EDIT CREATOR NAME MODAL COMPONENT ===== */
+import { Button, ButtonProcessing } from "$button";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { inputField } from "$form";
 import { closeModal } from "$islands/modal/states.ts";
@@ -6,6 +7,7 @@ import { ModalBase } from "$layout";
 import { logger } from "$lib/utils/logger.ts";
 import { getCSRFToken } from "$lib/utils/security/clientSecurityUtils.ts";
 import { showToast } from "$lib/utils/ui/notifications/toastSignal.ts";
+import { labelSm } from "$text";
 import { useState } from "preact/hooks";
 
 /* ===== CONSTANTS ===== */
@@ -248,10 +250,10 @@ function EditCreatorNameModal({
         {/* ===== SUCCESS STATE ===== */}
         {successName && (
           <div class="flex flex-col items-center gap-2 py-2">
-            <p class="text-sm font-medium text-green-400 text-center">
+            <p class="text-sm font-medium text-color-green-400 text-center">
               Name updated successfully
             </p>
-            <p class="text-base font-semibold text-color-grey-light text-center">
+            <p class="text-base font-semibold text-color-neutral-200 text-center">
               {successName}
             </p>
           </div>
@@ -263,9 +265,11 @@ function EditCreatorNameModal({
             <div class="flex flex-col gap-2">
               {/* ===== CURRENT NAME DISPLAY ===== */}
               {currentName && (
-                <p class="text-xs font-light text-color-grey-semidark uppercase tracking-wide">
+                <p class="text-xs font-light text-color-neutral-500 uppercase tracking-wide">
                   Current:{" "}
-                  <span class="font-medium text-color-grey">{currentName}</span>
+                  <span class="font-medium text-color-neutral-200">
+                    {currentName}
+                  </span>
                 </p>
               )}
 
@@ -279,7 +283,7 @@ function EditCreatorNameModal({
                   maxLength={CREATOR_NAME_MAX_LENGTH + 5}
                   disabled={isSubmitting}
                   class={`${inputField} ${
-                    isOverLimit ? "border-red-500/75" : ""
+                    isOverLimit ? "ring-1 ring-red-500/75 ring-inset" : ""
                   } ${isSubmitting ? "opacity-60 cursor-not-allowed" : ""}`}
                 />
 
@@ -287,10 +291,10 @@ function EditCreatorNameModal({
                 <span
                   class={`absolute right-3 top-1/2 -translate-y-1/2 text-xs font-light pointer-events-none ${
                     isOverLimit
-                      ? "text-red-400"
+                      ? "text-color-red-400"
                       : charCount > CREATOR_NAME_MAX_LENGTH - 5
-                      ? "text-yellow-400/80"
-                      : "text-color-grey-semidark"
+                      ? "text-color-orange-400"
+                      : "text-color-neutral-500"
                   }`}
                 >
                   {charCount}/{CREATOR_NAME_MAX_LENGTH}
@@ -299,14 +303,14 @@ function EditCreatorNameModal({
 
               {/* ===== VALIDATION ERROR ===== */}
               {validationError && (
-                <p class="text-xs text-red-400 mt-1 leading-snug">
+                <p class="text-xs text-color-red-500 mt-1 leading-snug">
                   {validationError}
                 </p>
               )}
 
               {/* ===== FORMAT HINT ===== */}
               {!validationError && (
-                <p class="text-xs font-light text-color-grey-semidark leading-snug">
+                <p class={`${labelSm} leading-snug !whitespace-normal`}>
                   Letters, numbers, spaces, periods, hyphens, underscores,
                   apostrophes
                 </p>
@@ -314,26 +318,31 @@ function EditCreatorNameModal({
             </div>
 
             {/* ===== ACTION BUTTONS ===== */}
-            <div class="flex gap-3 mt-1">
+            <div class="flex gap-5">
               {/* ===== CANCEL BUTTON ===== */}
-              <button
-                type="button"
+              <Button
+                variant="outline"
+                color="neutral"
+                size="smR"
                 onClick={handleClose}
                 disabled={isSubmitting}
-                class="flex-1 h-10 px-4 rounded-2xl border border-color-border/75 bg-color-background/30 hover:bg-color-background/60 hover:border-color-border text-sm font-medium text-color-grey hover:text-color-grey-light transition-colors duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                class="flex-1"
               >
                 CANCEL
-              </button>
+              </Button>
 
               {/* ===== UPDATE BUTTON ===== */}
-              <button
-                type="button"
+              <ButtonProcessing
+                variant="flat"
+                color="primary"
+                size="smR"
+                isSubmitting={isSubmitting}
                 onClick={handleSubmit}
-                disabled={isSubmitting || isOverLimit || charCount === 0}
-                class="flex-1 h-10 px-4 rounded-2xl border border-color-border/75 bg-color-background/30 hover:bg-color-background/60 hover:border-color-border text-sm font-medium text-color-grey-light hover:text-white transition-colors duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={isOverLimit || charCount === 0}
+                class="flex-1"
               >
-                {isSubmitting ? "UPDATING..." : "UPDATE"}
-              </button>
+                UPDATE
+              </ButtonProcessing>
             </div>
           </>
         )}

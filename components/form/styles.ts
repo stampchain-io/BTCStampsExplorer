@@ -1,45 +1,32 @@
 /* ===== FORM STYLES MODULE ===== */
-import {
-  glassmorphismL2,
-  glassmorphismL2Hover,
-  transitionColors,
-} from "$layout";
+import { container2Hover } from "$layout";
 
 /* ===== BASE STYLES ===== */
 // Global sizes
 const inputFieldHeight = "h-10";
 const inputFieldWidth = "!w-10";
 
-// Input field styles - focus values must be same as glassmorphismL2Hover
-const inputFieldStyle = `px-5 w-full
-  ${glassmorphismL2} ${glassmorphismL2Hover}
-  focus:bg-color-background/60 focus:border-color-border focus:outline-none focus-visible:outline-none no-outline ${transitionColors}
-  font-medium text-sm text-color-grey-light
-  placeholder:font-light placeholder:text-color-grey-semidark placeholder:uppercase`;
-
-/* ===== INPUT STYLES ===== */
-// Base input
 export const inputField = `
-  ${inputFieldHeight}
-  ${inputFieldStyle}
+  ${inputFieldHeight} px-5 w-full bg-transparent
+  ${container2Hover}
+  focus:outline-none focus-visible:outline-none focus:bg-color-neutral-1000
+  font-normal text-xs text-color-neutral-200
+  placeholder:font-light placeholder:text-color-neutral-500 placeholder:uppercase
 `;
 
-// Square input field - used for quantity input
 export const inputFieldSquare = `
-  ${inputField}
-  ${inputFieldWidth}
-  !px-0.5 text-center
+  ${inputFieldHeight} ${inputFieldWidth} bg-transparent
+  ${container2Hover}
+  focus:outline-none focus-visible:outline-none focus:bg-color-neutral-1000
+  font-normal text-xs text-color-neutral-200 text-center px-0.5
 `;
 
-// Outline input - most styling of this input field is done in the outlineGradient constant
-export const inputFieldOutline = `
-  ${inputFieldHeight} w-full
-`;
-
-// Textarea
 export const inputTextarea = `
-  h-[100px] resize-none
-  ${inputFieldStyle}
+  px-5 pt-3 w-full h-[100px] min-h-[100px] resize-none bg-transparent
+  ${container2Hover}
+  focus:outline-none focus-visible:outline-none focus:bg-color-neutral-1000
+  font-normal text-xs text-color-neutral-200
+  placeholder:font-light placeholder:text-color-neutral-500 placeholder:uppercase
 `;
 
 // Input field dropdown - define height in the component
@@ -47,13 +34,13 @@ export const inputFieldDropdown = `
 absolute top-[100%] left-0 w-full z-dropdown
 bg-gradient-to-b from-color-background/30 to-color-background backdrop-blur-sm
 border border-t-0 border-color-border/75 rounded-b-2xl
-text-color-grey-light text-sm font-medium uppercase leading-none
+text-color-neutral-200 text-sm font-medium uppercase leading-none
 overflow-y-auto scrollbar-background-layer2 shadow-lg cursor-pointer`;
 
 export const inputFieldDropdownHover = `
 flex justify-between py-2.5 px-3
 border-b-[1px] border-color-border last:border-b-0
-${glassmorphismL2Hover} ${transitionColors} uppercase cursor-pointer`;
+${container2Hover} uppercase cursor-pointer`;
 
 // Checkbox - used for both checkboxes and radiobuttons
 export const inputCheckbox = (
@@ -70,11 +57,11 @@ export const inputCheckbox = (
   ${
   checked
     ? canHoverSelected
-      ? "border-color-grey-light after:bg-color-grey-light group-hover:border-color-grey group-hover:after:bg-color-grey"
-      : "border-color-grey-light after:bg-color-grey-light"
+      ? "border-color-primary-400 after:bg-color-primary-400 group-hover:border-color-hover group-hover:after:bg-color-hover"
+      : "border-color-primary-400 after:bg-color-primary-400"
     : canHoverSelected
-    ? "border-color-grey group-hover:border-color-grey-light"
-    : "border-color-grey"
+    ? "border-color-neutral-400 group-hover:border-color-hover"
+    : "border-color-neutral-400"
 }
     after:content-['']
     after:block
@@ -106,43 +93,33 @@ export const inputSelect = `
   pr-10
 `;
 /* ===== ===== ===== */
-/* ===== NOT IN USE NOR UPDATED ===== */
-/* ===== LABEL STYLES ===== */
-export const labelBase =
-  "font-medium text-base text-color-grey-light cursor-default select-none whitespace-nowrap";
-export const labelLarge =
-  "font-medium text-lg text-color-grey-light cursor-default select-none whitespace-nowrap";
-
+/* ===== NOT IN USE OR NOT UPDATED ===== */
 /* ===== STATE STYLES ===== */
-export const stateDisabled = "opacity-50 cursor-not-allowed";
+export const stateDisabled = "opacity-50 cursor-not-allowed"; // used in StampingTool
 export const stateLoading = "cursor-wait opacity-75";
-export const stateError = "text-xs border-red-500 focus:border-red-500";
-export const stateSuccess = "text-xs border-green-500 focus:border-green-500";
+export const stateError = "text-xs border-red-400 focus:border-red-400";
+export const stateSuccess = "text-xs border-green-400 focus:border-green-400";
 
 /* ===== MESSAGE STYLES ===== */
-export const messageError = "text-xs text-red-500 mt-2";
-export const messageSuccess = "text-xs text-green-500 mt-2";
-export const messageHelp = "text-xs text-color-grey-dark mt-1";
+export const messageError = "text-xs text-red-400 mt-2";
+export const messageSuccess = "text-xs text-green-400 mt-2";
+export const messageHelp = "text-xs text-color-neutral-500 mt-1";
 /* ===== ===== ===== */
 
 /* ===== TYPE DEFINITIONS ===== */
 export type FormStyles = {
   // Inputs
   inputField: string;
-  inputFieldOutline: string;
   inputFieldSquare: string;
   inputNumeric: string;
   inputTextarea: string;
   inputSelect: string;
-  inputCheckbox: string;
-  inputRadio: string;
+  inputCheckbox: (
+    checked: boolean,
+    canHoverSelected: boolean,
+  ) => string;
   inputFieldDropdown: string;
   inputFieldDropdownHover: string;
-
-  // Gradients
-  // purple: string;
-  // grey: string;
-  // outlineGradient: string;
 
   // Labels - not used
   labelBase: string;

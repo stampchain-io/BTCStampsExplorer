@@ -1,9 +1,9 @@
-import { CloseIcon } from "$icon";
+import { Icon } from "$icon";
 import { closeModal } from "$islands/modal/states.ts";
-import { glassmorphismOverlay, shadow } from "$layout";
+import { container0, shadow } from "$layout";
 import { logger } from "$lib/utils/logger.ts";
 import { tooltipIcon } from "$notification";
-import { titleGreyLD } from "$text";
+import { titlePrimary } from "$text";
 import type { ModalBaseProps } from "$types/ui.d.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
 
@@ -82,11 +82,11 @@ export function ModalBase({
   }, []);
 
   return (
-    <div /* similar to glassmorphism design on the drawers - importing the class consts doesn't display properly */
+    <div /* similar to container1 design on the drawers - importing the class consts doesn't display properly */
       className={`
         relative w-[340px] min-[420px]:w-[360px] mobileMd:w-[380px] p-5
-        ${glassmorphismOverlay} rounded-3xl
-        border border-color-border/50
+        ${container0} rounded-3xl
+        border border-color-neutral-800
         ${shadow} ${className}
       `}
       onClick={(e) => e.stopPropagation()}
@@ -95,14 +95,17 @@ export function ModalBase({
         {!hideHeader && (
           <>
             <div
-              class="absolute top-0 right-0 -mr-1.5 -mt-1.5 ms-auto cursor-pointer"
+              class="absolute -top-[16px] -right-[16px] ms-auto cursor-pointer"
               onMouseEnter={handleCloseMouseEnter}
               onMouseLeave={handleCloseMouseLeave}
             >
-              <CloseIcon
-                size="sm"
+              <Icon
+                type="iconButton"
+                name="close"
+                size="mdR"
                 weight="bold"
-                color="greyLight"
+                color="neutral400"
+                ariaLabel="Close modal"
                 onClick={() => handleClose()}
               />
               <div
@@ -115,7 +118,7 @@ export function ModalBase({
             </div>
 
             <div class="w-full text-center">
-              <h2 class={`${titleGreyLD} pb-6`}>
+              <h2 class={`${titlePrimary} py-3`}>
                 {title}
               </h2>
             </div>

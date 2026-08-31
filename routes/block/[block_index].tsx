@@ -2,46 +2,84 @@
 
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { BlockController } from "$server/controller/blockController.ts";
+import { SRC20Service } from "$server/services/src20/index.ts";
 import type { BlockRow } from "$types/base.d.ts";
+import type { BlockInfoResponseBody } from "$types/api.d.ts";
+import type { StampRow } from "$types/stamp.d.ts";
 
-import { BlockSelector, BlockTransactions } from "$content";
+import { BlockSelector } from "$content";
 import { BlockHeader } from "$header";
+import BlockTransactions from "$islands/content/blockContent/BlockTransactions.tsx";
 import { signal } from "@preact/signals";
 
 /* ===== TYPES ===== */
 interface BlockPageData {
   currentBlock: BlockRow;
   relatedBlocks: BlockRow[];
+  stamps: unknown[];
+  src20: unknown[];
   error?: string;
 }
 
 import { body } from "$layout";
-import { subtitleGrey, textLg } from "$text";
+import { subtitleNeutral, textLg } from "$text";
+
+function relatedBlockList(related: unknown): BlockRow[] {
+  if (Array.isArray(related)) return related as BlockRow[];
+  const blocks = (related as { blocks?: BlockRow[] } | null)?.blocks;
+  return Array.isArray(blocks) ? blocks : [];
+}
+
+function stampRows(
+  blockInfo: BlockInfoResponseBody & { data?: StampRow[] },
+): StampRow[] {
+  const rows = Array.isArray(blockInfo.data)
+    ? blockInfo.data
+    : blockInfo.issuances ?? [];
+  return rows.filter((s) => s.ident !== "SRC-20");
+}
+
+async function src20Rows(blockIndex: number) {
+  try {
+    const result = await SRC20Service.QueryService.fetchBasicSrc20Data({
+      block_index: blockIndex,
+      limit: 500,
+      page: 1,
+      sortBy: "ASC",
+    });
+    const data = result.data;
+    return Array.isArray(data) ? data : data ? [data] : [];
+  } catch (error) {
+    console.error("Error fetching SRC-20 for block:", error);
+    return [];
+  }
+}
 
 /* ===== SERVER HANDLER ===== */
 export const handler: Handlers<BlockPageData> = {
   async GET(_req, ctx) {
     try {
-      /* ===== PARAMS EXTRACTION ===== */
       const { block_index } = ctx.params;
 
-      /* ===== DATA FETCHING ===== */
-      // Get block info and related blocks
       const blockInfo = await BlockController.getBlockInfoResponse(
         block_index,
         "all",
       );
-      const relatedBlocks = await BlockController.getRelatedBlocksWithStamps(
-        block_index,
-      );
+      const blockHeight = blockInfo.block_info?.block_index ??
+        (/^\d+$/.test(block_index) ? Number(block_index) : 0);
 
-      /* ===== RESPONSE ===== */
+      const [relatedBlocks, src20] = await Promise.all([
+        BlockController.getRelatedBlocksWithStamps(block_index),
+        src20Rows(blockHeight),
+      ]);
+
       return ctx.render({
         currentBlock: blockInfo.block_info,
-        relatedBlocks: Array.isArray(relatedBlocks) ? relatedBlocks : [], // Ensure it's an array
+        relatedBlocks: relatedBlockList(relatedBlocks),
+        stamps: stampRows(blockInfo),
+        src20,
       });
     } catch (error) {
-      /* ===== ERROR HANDLING ===== */
       console.error("Error in block page handler:", error);
       return ctx.render({
         currentBlock: {
@@ -57,6 +95,8 @@ export const handler: Handlers<BlockPageData> = {
           indexed: 1,
         } as BlockRow,
         relatedBlocks: [],
+        stamps: [],
+        src20: [],
         error: "Failed to load block data",
       });
     }
@@ -65,17 +105,14 @@ export const handler: Handlers<BlockPageData> = {
 
 /* ===== PAGE COMPONENT ===== */
 export default function BlockPage({ data }: PageProps<BlockPageData>) {
-  /* ===== STATE ===== */
   const selectedBlock = signal(data.currentBlock);
 
-  /* ===== RENDER ===== */
   return (
     <div class={body}>
       <BlockHeader />
 
-      {/* ===== PAGE TITLE ===== */}
       <div class="mb-6">
-        <h2 class={subtitleGrey}>
+        <h2 class={subtitleNeutral}>
           BLOCK{" "}
           {data.currentBlock?.block_index?.toLocaleString() || "Not Found"}
         </h2>
@@ -84,10 +121,17 @@ export default function BlockPage({ data }: PageProps<BlockPageData>) {
         </p>
       </div>
 
-      {/* ===== MAIN CONTENT ===== */}
       <div class="flex flex-col gap-6">
+        <div>
+          <BlockTransactions
+            stamps={data.stamps as never}
+            src20={data.src20 as never}
+            blockDifficulty={data.currentBlock.difficulty}
+          />
+        </div>
+
         <div class="flex flex-col gap-4">
-          <h3 class={subtitleGrey}>RELATED BLOCKS</h3>
+          <h3 class={subtitleNeutral}>RELATED BLOCKS</h3>
           {Array.isArray(data.relatedBlocks) && data.relatedBlocks.length > 0
             ? (
               data.relatedBlocks.map((block) => (
@@ -102,10 +146,6 @@ export default function BlockPage({ data }: PageProps<BlockPageData>) {
               ))
             )
             : <div class="text-gray-500">No related blocks available</div>}
-        </div>
-
-        <div>
-          <BlockTransactions />
         </div>
       </div>
 

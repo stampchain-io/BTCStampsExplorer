@@ -1,10 +1,10 @@
 /* ===== ICON STYLES MODULE ===== */
 /* @baba - check icon button hover states */
-import { JSX } from "preact";
+import type { AriaRole } from "preact";
 
 /* ===== TYPE DEFINITIONS ===== */
 export interface IconVariants {
-  type: "icon" | "iconButton";
+  type: "icon" | "iconHover" | "iconButton";
   name: string;
   weight: "extraLight" | "light" | "normal" | "bold" | "custom";
   size:
@@ -25,15 +25,15 @@ export interface IconVariants {
     | "xxlR"
     | "custom";
   color:
-    | "greyDark"
-    | "grey"
-    | "greyLight"
-    | "purpleDark"
-    | "purple"
-    | "purpleLight"
+    | "neutral400"
+    | "neutral500"
+    | "neutral600"
+    | "primary400"
+    | "primary500"
+    | "primary600"
     | "custom";
   className?: string | undefined;
-  role?: JSX.AriaRole;
+  role?: AriaRole;
   ariaLabel?: string;
   isOpen?: boolean;
   onClick?:
@@ -101,41 +101,35 @@ export const iconStyles = {
   // Note: Two-tone colors are built into the icon styles below
   // Custom color allows for special icons with advanced coloring:
   // - Gear icon in collapsible menu (mobile menu drawer) has conditional color based on menu state
-  // - Close icon in mobile menu drawer has custom gradient fill options (grey/purple)
+  // - Close icon in mobile menu drawer has custom gradient fill options (neutral/primary)
   //   - the gradient defs have to be included in the file, since creating a global gradient file for them requires moving them up in the DOM tree (I abandoned this approach)
 
   icon: {
-    greyDark:
-      "stroke-color-grey-semidark fill-none [&_path[class*='fill-stroke']]:fill-color-grey-semidark",
-    grey:
-      "stroke-color-grey fill-none [&_path[class*='fill-stroke']]:fill-color-grey",
-    greyLight:
-      "stroke-color-grey-semilight fill-none [&_path[class*='fill-stroke']]:fill-color-grey-semilight",
+    neutral400: "stroke-color-neutral-400 fill-none",
+    neutral500: "stroke-color-neutral-500 fill-none",
+    neutral600: "stroke-color-neutral-600 fill-none",
 
-    purpleDark:
-      "stroke-color-purple-semidark fill-none [&_path[class*='fill-stroke']]:fill-color-purple-semidark",
-    purple:
-      "stroke-color-purple fill-none [&_path[class*='fill-stroke']]:fill-color-purple",
-    purpleLight:
-      "stroke-color-purple-semilight fill-none [&_path[class*='fill-stroke']]:fill-color-purple-semilight",
+    primary400: "stroke-color-primary-400 fill-none",
+    primary500: "stroke-color-primary-500 fill-none",
+    primary600: "stroke-color-primary-600 fill-none",
 
     custom: "fill-none",
   },
 
   iconButton: {
-    greyDark:
-      "stroke-color-grey-semidark hover:stroke-color-grey-light group-hover:stroke-color-grey-light fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-color-grey-semidark [&:hover_path[class*='fill-stroke']]:fill-color-grey-light [&:group-hover_path[class*='fill-stroke']]:fill-color-grey-light",
-    grey:
-      "stroke-color-grey hover:stroke-color-grey-light group-hover:stroke-color-grey-light fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-color-grey [&:hover_path[class*='fill-stroke']]:fill-color-grey-light [&:group-hover_path[class*='fill-stroke']]:fill-color-grey-light",
-    greyLight:
-      "stroke-color-grey-semilight hover:stroke-color-grey-light group-hover:stroke-color-grey-light fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-color-grey-semilight [&:hover_path[class*='fill-stroke']]:fill-color-grey-light [&:group-hover_path[class*='fill-stroke']]:fill-color-grey-light",
+    neutral400:
+      "stroke-color-neutral-400 hover:stroke-color-hover group-hover:stroke-color-hover fill-none hover:fill-none group-hover:fill-none cursor-pointer",
+    neutral500:
+      "stroke-color-neutral-500 hover:stroke-color-hover group-hover:stroke-color-hover fill-none hover:fill-none group-hover:fill-none cursor-pointer",
+    neutral600:
+      "stroke-color-neutral-600 hover:stroke-color-hover group-hover:stroke-color-hover fill-none hover:fill-none group-hover:fill-none cursor-pointer",
 
-    purpleDark:
-      "stroke-color-purple-semidark hover:stroke-color-purple-light group-hover:stroke-color-purple-light fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-color-purple-semidark [&:hover_path[class*='fill-stroke']]:fill-color-purple-light [&:group-hover_path[class*='fill-stroke']]:fill-color-purple-light",
-    purple:
-      "stroke-color-purple hover:stroke-color-purple-light group-hover:stroke-color-purple-light fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-color-purple [&:hover_path[class*='fill-stroke']]:fill-color-purple-light [&:group-hover_path[class*='fill-stroke']]:fill-color-purple-light",
-    purpleLight:
-      "stroke-color-purple-semilight hover:stroke-color-purple-light group-hover:stroke-color-purple-light fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-color-purple-semilight [&:hover_path[class*='fill-stroke']]:fill-color-purple-light [&:group-hover_path[class*='fill-stroke']]:fill-color-purple-light",
+    primary400:
+      "stroke-color-primary-400 hover:stroke-color-hover group-hover:stroke-color-hover fill-none hover:fill-none group-hover:fill-none cursor-pointer",
+    primary500:
+      "stroke-color-primary-500 hover:stroke-color-hover group-hover:stroke-color-hover fill-none hover:fill-none group-hover:fill-none cursor-pointer",
+    primary600:
+      "stroke-color-primary-600 hover:stroke-color-hover group-hover:stroke-color-hover fill-none hover:fill-none group-hover:fill-none cursor-pointer",
 
     custom: "fill-none cursor-pointer",
   },
@@ -144,8 +138,8 @@ export const iconStyles = {
   weight: {
     extraLight: "[stroke-width:0.75]", // used for loading icon and tool image icons
     light: "[stroke-width:1.0]",
-    normal: "[stroke-width:1.5] tablet:[stroke-width:1.25]",
-    bold: "[stroke-width:1.75] tablet:[stroke-width:1.5]",
+    normal: "[stroke-width:1.25] tablet:[stroke-width:1.0]",
+    bold: "[stroke-width:1.25]",
     custom: "",
   },
 
@@ -172,6 +166,14 @@ export const iconStyles = {
 } as const;
 
 /* ===== INTERACTIVE ELEMENT STYLES ===== */
+/* ===== ICON BUTTON HOVER PILL =====
+ * Applied automatically to type="iconButton" Icons (see IconBase.tsx) on the
+ * wrapping <a>, not the svg. Icons that want the same interactive coloring
+ * without the pill (e.g. tightly-spaced carets) should use type="iconHover"
+ * instead. */
+export const iconButtonPill = `p-1.5 bg-transparent rounded-full
+  hover:bg-gradient-to-b hover:from-color-neutral-700/80 hover:via-color-neutral-800/90 hover:to-color-neutral-800`;
+
 /* ===== SLIDER HANDLE ===== */
 export const handleIcon = `
   absolute w-full h-4 tablet:h-3 rounded-full appearance-none bg-transparent pointer-events-none
@@ -193,32 +195,32 @@ export type PlaceholderVariant = "no-image" | "audio" | "library" | "error";
 type Palette = { bg: string; stroke: string; fill: string };
 
 export const placeholderColor: Record<
-  "grey" | "red" | "green" | "orange",
+  "neutral" | "red" | "green" | "orange",
   Palette
 > = {
-  grey: {
+  neutral: {
     bg:
-      "bg-gradient-to-br from-color-grey-semidark/75 via-color-grey-dark/75 to-black",
-    stroke: "stroke-color-grey-semidark",
-    fill: "fill-color-grey-semidark",
+      "bg-gradient-to-br from-color-neutral-500 via-color-neutral-700 to-color-neutral-900",
+    stroke: "stroke-color-neutral-500",
+    fill: "fill-color-neutral-500",
   },
   red: {
     bg:
-      "bg-gradient-to-br from-color-red-semidark/75 via-color-red-dark/75 to-black",
-    stroke: "stroke-color-red-semidark",
-    fill: "fill-color-red-semidark",
+      "bg-gradient-to-br from-color-red-600 via-color-red-800 to-color-neutral-900",
+    stroke: "stroke-color-red-600",
+    fill: "fill-color-red-600",
   },
   green: {
     bg:
-      "bg-gradient-to-br from-color-green-semidark/75 via-color-green-dark/75 to-black",
-    stroke: "stroke-color-green-semidark",
-    fill: "fill-color-green-semidark",
+      "bg-gradient-to-br from-color-green-600 via-color-green-800 to-color-neutral-900",
+    stroke: "stroke-color-green-600",
+    fill: "fill-color-green-600",
   },
   orange: {
     bg:
-      "bg-gradient-to-br from-color-orange-semidark/75 via-color-orange-dark/75 to-black",
-    stroke: "stroke-color-orange-semidark",
-    fill: "fill-color-orange-semidark",
+      "bg-gradient-to-br from-color-orange-600 via-color-orange-800 to-color-neutral-900",
+    stroke: "stroke-color-orange-600",
+    fill: "fill-color-orange-600",
   },
 };
 
@@ -226,7 +228,7 @@ export const variantColor: Record<
   PlaceholderVariant,
   keyof typeof placeholderColor
 > = {
-  "no-image": "grey",
+  "no-image": "neutral",
   "audio": "orange",
   "library": "green",
   "error": "red",

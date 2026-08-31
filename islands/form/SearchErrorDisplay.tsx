@@ -17,7 +17,7 @@ export function SearchErrorDisplay(
   const lines = error.split("\n");
 
   return (
-    <ul class="bg-color-background/50 rounded-b-3xl z-modal overflow-y-auto">
+    <ul class="rounded-b-3xl z-modal overflow-y-auto">
       <li class="flex flex-col items-center justify-end pt-1.5 pb-3 px-7.5">
         <img
           src="/img/placeholder/broken.png"

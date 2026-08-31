@@ -1,16 +1,16 @@
 /* ===== STAMP LISTINGS ALL TABLE COMPONENT ===== */
-import { cellAlign, colGroup } from "$components/layout/types.ts";
+import { colGroup } from "$components/layout/types.ts";
 import {
   cellCenterL2Detail,
   cellLeftL2Detail,
   cellRightL2Detail,
-  glassmorphismL2,
+  container2,
 } from "$layout";
 import {
   abbreviateAddress,
   formatSatoshisToBTC,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
-import { labelXs, textSm, valueDarkSm, valueSmLink } from "$text";
+import { labelXxs, textXs, valueDarkSm } from "$text";
 import type { Dispenser } from "$types/stamp.d.ts";
 import type { StampListingsAllProps } from "$types/ui.d.ts";
 
@@ -31,9 +31,9 @@ export function StampListingsAllTable(
 
   /* ===== RENDER ===== */
   return (
-    <div class="-mt-2 overflow-x-auto tablet:overflow-x-visible scrollbar-hide">
+    <div class="overflow-x-auto overflow-y-clip tablet:overflow-x-clip flow-root scrollbar-hide">
       <table
-        class={`w-full border-separate border-spacing-y-2 ${textSm}`}
+        class={`w-full -my-2 border-separate border-spacing-y-2 ${textXs}`}
       >
         {/* ===== TABLE STRUCTURE ===== */}
         <colgroup>
@@ -48,9 +48,8 @@ export function StampListingsAllTable(
           ]).map((col) => <col key={col.key} class={col.className} />)}
         </colgroup>
         {/* ===== TABLE HEADER ===== */}
-        <thead class="sticky top-0 z-10">
-          {/* Only sticky on desktop */}
-          <tr class={`${glassmorphismL2}`}>
+        <thead>
+          <tr class={container2}>
             {headers.map((header, i) => {
               const isFirst = i === 0;
               const isLast = i === (headers?.length ?? 0) - 1;
@@ -65,9 +64,7 @@ export function StampListingsAllTable(
               return (
                 <th
                   key={header}
-                  class={`${
-                    cellAlign(i, headers?.length ?? 0)
-                  } !py-1.5 ${rowClass} ${labelXs}`}
+                  class={`sticky top-0 z-10 !py-1.5 ${rowClass} ${labelXxs}`}
                 >
                   {header}
                 </th>
@@ -80,19 +77,22 @@ export function StampListingsAllTable(
           {(listings?.length ?? 0) > 0
             ? listings?.map((dispenser: Dispenser, index: number) => {
               const isEmpty = dispenser.give_remaining === 0;
+              const isOpen = !dispenser.close_block_index ||
+                dispenser.close_block_index <= 0;
+              const isActive = isOpen && !isEmpty;
 
               return (
                 <tr
                   key={`${dispenser.tx_hash}-${index}`}
-                  class={`${glassmorphismL2} group ${
-                    isEmpty ? "text-color-grey-semidark" : ""
+                  class={`${container2} group ${
+                    isEmpty ? "text-color-neutral-500" : ""
                   }`}
                 >
                   {/* PRICE */}
                   <td
-                    class={`${
-                      cellAlign(0, headers?.length ?? 0)
-                    } ${cellLeftL2Detail}`}
+                    class={`${cellLeftL2Detail} ${
+                      isActive ? "text-color-orange-400" : ""
+                    }`}
                   >
                     {formatSatoshisToBTC(dispenser.satoshirate, {
                       includeSymbol: true,
@@ -102,48 +102,40 @@ export function StampListingsAllTable(
                   </td>
                   {/* ESCROW */}
                   <td
-                    class={`${
-                      cellAlign(1, headers?.length ?? 0)
-                    } ${cellCenterL2Detail}`}
+                    class={cellCenterL2Detail}
                   >
                     {dispenser.escrow_quantity.toLocaleString()}
                   </td>
                   {/* GIVE */}
                   <td
-                    class={`${
-                      cellAlign(2, headers?.length ?? 0)
-                    } ${cellCenterL2Detail}`}
+                    class={cellCenterL2Detail}
                   >
                     {dispenser.give_quantity.toLocaleString()}
                   </td>
                   {/* REMAIN */}
                   <td
-                    class={`${
-                      cellAlign(3, headers?.length ?? 0)
-                    } ${cellCenterL2Detail}`}
+                    class={`${cellCenterL2Detail} ${
+                      isActive ? "text-color-primary-400" : ""
+                    }`}
                   >
                     {dispenser.give_remaining.toLocaleString()}
                   </td>
                   {/* SOURCE */}
                   <td
-                    class={`${
-                      cellAlign(4, headers?.length ?? 0)
-                    } ${cellCenterL2Detail}`}
+                    class={cellCenterL2Detail}
                   >
                     DISPENSER
                   </td>
                   {/* ADDRESS */}
                   <td
-                    class={`${
-                      cellAlign(5, headers?.length ?? 0)
-                    } ${cellCenterL2Detail}`}
+                    class={cellCenterL2Detail}
                   >
                     <a
                       href={`/wallet/${dispenser.source}`}
-                      className={`${valueSmLink} ${
+                      className={`${
                         isEmpty
-                          ? "!text-color-grey-semidark hover:!text-color-purple-light"
-                          : ""
+                          ? "!text-color-neutral-500 link-neutral-500 hover:text-color-hover"
+                          : "link-neutral-200"
                       }`}
                     >
                       <span class="tablet:hidden">
@@ -156,9 +148,7 @@ export function StampListingsAllTable(
                   </td>
                   {/* STATUS */}
                   <td
-                    class={`${
-                      cellAlign(6, headers?.length ?? 0)
-                    } ${cellRightL2Detail}`}
+                    class={cellRightL2Detail}
                   >
                     {!dispenser.close_block_index ||
                         dispenser.close_block_index <= 0
@@ -170,7 +160,7 @@ export function StampListingsAllTable(
                           href={`https://www.blockchain.com/explorer/transactions/btc/${dispenser.tx_hash}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          class="hover:text-color-purple-light"
+                          class="link-neutral-500"
                         >
                           CLOSED
                         </a>
@@ -183,7 +173,7 @@ export function StampListingsAllTable(
               <tr>
                 <td
                   colSpan={headers?.length ?? 0}
-                  class={`w-full h-[34px] ${glassmorphismL2}`}
+                  class={`w-full h-[34px] ${container2}`}
                 >
                   <h6 class={`${valueDarkSm} text-center`}>
                     NO LISTINGS AT THE MOMENT

@@ -3,11 +3,11 @@
  *
  * Covers: classifySearchInput, generateSearchErrorMessage
  */
-import { assertEquals } from "@std/assert";
 import {
-  classifySearchInput,
-  generateSearchErrorMessage,
+    classifySearchInput,
+    generateSearchErrorMessage,
 } from "$lib/utils/data/search/searchInputClassifier.ts";
+import { assertEquals } from "@std/assert";
 
 // ---------------------------------------------------------------------------
 // classifySearchInput

@@ -1,9 +1,9 @@
-import { BadgeIcon, Icon } from "$components/icon/IconBase.tsx";
+import { BadgeIcon, Icon } from "$icon";
 import { tooltipIcon } from "$notification";
 import { useEffect, useRef, useState } from "preact/hooks";
 
 // Define the filter types
-export type FilterType = "stamp" | "src20" | "explorer";
+export type FilterType = "stamp" | "src20" | "explorer" | "marketplace";
 
 export function FilterButton(
   { count, open, setOpen, type = "stamp" }: {
@@ -51,14 +51,15 @@ export function FilterButton(
   }, []);
 
   return (
-    <div class="group relative">
+    <div class="group relative flex items-center">
       <BadgeIcon text={count !== undefined ? count.toString() : ""} />
       <Icon
         type="iconButton"
         name="filter"
-        weight="normal"
-        size="smR"
-        color="grey"
+        weight="bold"
+        size="custom"
+        color={count > 0 ? "primary400" : "neutral400"}
+        className="w-[17px] h-[17px] tablet:w-[14px] tablet:h-[14px] stroke-width:1.5"
         onClick={() => {
           setOpen(!open);
           setIsTooltipVisible(false);

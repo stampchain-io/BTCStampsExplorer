@@ -110,14 +110,53 @@ export const mimeTypeToSuffix = Object.entries(mimeTypes).reduce(
 /**
  * Get the preview PNG URL for a stamp (rendered server-side via Chrome/ImageScript).
  * Used in grid/listing views where a static preview is preferred over live HTML/SVG.
+ *
+ * By default, if rendering fails the endpoint 302s to the generic Stampchain
+ * logo (appropriate for social-share og:image tags). Pass
+ * `placeholderOnFail: true` for in-app thumbnails so the endpoint 404s
+ * instead — that fails the `<img>` load, letting the caller swap in the
+ * local "no image" placeholder icon rather than the unrelated logo.
  */
-export const getStampPreviewUrl = (stamp: StampRow): string => {
-  return `/api/v2/stamp/${stamp.stamp}/preview`;
+export const getStampPreviewUrl = (
+  stamp: StampRow,
+  options?: { placeholderOnFail?: boolean },
+): string => {
+  const base = `/api/v2/stamp/${stamp.stamp}/preview`;
+  return options?.placeholderOnFail ? `${base}?placeholderOnFail=true` : base;
 };
+
+// "Library file" mimetypes (recursive stamps that are really CSS/JS/GZIP/
+// JSON, not an image) can never be decoded as a raster image, even though
+// they have a real, reachable `stamp_url` — e.g. "cursed" stamps are often
+// plain .js files that build their content via the DOM. Handing one of
+// these to an `<img src>` doesn't reliably fire `onerror` in every browser
+// (cross-origin script/JSON responses can be blocked before a normal
+// image-decode error is raised), so callers that can't run their own
+// onError fallback (SSR-only table rows) would be left with a native
+// broken-image icon forever. Excluded here so every caller gets `undefined`
+// (→ "no image" placeholder) up front instead of depending on a runtime
+// load failure. NOTE: audio/* and text/plain are intentionally NOT excluded
+// — StampCard/wallet table rows reuse this same `src` for the <audio> source
+// and for fetching text content (StampTextContent), so it must stay a real
+// URL for those mimetypes.
+const NON_RENDERABLE_IMAGE_MIMETYPES = new Set([
+  "text/css",
+  "text/javascript",
+  "application/javascript",
+  "application/gzip",
+  "application/json",
+  "text/json",
+]);
 
 export const getStampImageSrc = (stamp: StampRow): string | undefined => {
   const baseUrl = getBaseUrl();
   if (!stamp.stamp_url) {
+    return undefined;
+  }
+  if (
+    stamp.stamp_mimetype &&
+    NON_RENDERABLE_IMAGE_MIMETYPES.has(stamp.stamp_mimetype)
+  ) {
     return undefined;
   }
 

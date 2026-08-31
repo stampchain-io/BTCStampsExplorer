@@ -8,12 +8,14 @@ import PreviewImageModal from "$islands/modal/PreviewImageModal.tsx";
 import { openModal } from "$islands/modal/states.ts";
 import {
   body,
+  container2,
+  container3,
   containerDetailImage,
   containerGap,
-  glassmorphism,
 } from "$layout";
 import {
   getStampImageSrc,
+  getStampPreviewUrl,
   handleImageError,
 } from "$lib/utils/ui/media/imageUtils.ts";
 import { tooltipIcon } from "$notification";
@@ -63,6 +65,11 @@ function RightPanel(
   const [isToolsTooltipVisible, setIsToolsTooltipVisible] = useState(false);
   const toolsTooltipTimeoutRef = useRef<number | null>(null);
 
+  const [isDownloadTooltipVisible, setIsDownloadTooltipVisible] = useState(
+    false,
+  );
+  const downloadTooltipTimeoutRef = useRef<number | null>(null);
+
   /* ===== EFFECTS ===== */
   useEffect(() => {
     return () => {
@@ -77,6 +84,9 @@ function RightPanel(
       }
       if (fullscreenTooltipTimeoutRef.current) {
         globalThis.clearTimeout(fullscreenTooltipTimeoutRef.current);
+      }
+      if (downloadTooltipTimeoutRef.current) {
+        globalThis.clearTimeout(downloadTooltipTimeoutRef.current);
       }
     };
   }, []);
@@ -271,10 +281,46 @@ function RightPanel(
     setIsToolsTooltipVisible(false);
   };
 
+  const handleDownloadMouseEnter = () => {
+    if (downloadTooltipTimeoutRef.current) {
+      globalThis.clearTimeout(downloadTooltipTimeoutRef.current);
+    }
+    downloadTooltipTimeoutRef.current = globalThis.setTimeout(() => {
+      setIsDownloadTooltipVisible(true);
+    }, 1500);
+  };
+
+  const handleDownloadMouseLeave = () => {
+    if (downloadTooltipTimeoutRef.current) {
+      globalThis.clearTimeout(downloadTooltipTimeoutRef.current);
+    }
+    setIsDownloadTooltipVisible(false);
+  };
+
+  const handleDownloadPreview = async () => {
+    setIsDownloadTooltipVisible(false);
+    const res = await fetch(getStampPreviewUrl(stamp));
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `stamp-${stamp.stamp}.png`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+
   /* ===== RENDER ===== */
   return (
-    <div className={`${containerDetailImage} !py-4 px-5 flex justify-between`}>
-      <div className="flex gap-5 tablet:gap-3.5">
+    <div
+      className={`flex justify-between !rounded-full
+        ${container2} pt-0.5 pb-[1px] px-0.5 tablet:${container3}
+        tablet:absolute tablet:inset-x-0 tablet:bottom-0 tablet:z-10
+        tablet:opacity-0 tablet:translate-y-3 tablet:pointer-events-none
+        tablet:transition-all tablet:duration-300 tablet:ease-out
+        tablet:group-hover/panel:opacity-100 tablet:group-hover/panel:translate-y-0
+        tablet:group-hover/panel:pointer-events-auto`}
+    >
+      <div className="flex gap-2 tablet:gap-1">
         <div
           ref={copyButtonRef}
           class="relative"
@@ -286,8 +332,8 @@ function RightPanel(
             name="copyLink"
             weight="normal"
             size="custom"
-            color="greyLight"
-            className="w-[29px] h-[29px] tablet:w-[25px] tablet:h-[25px]"
+            color="neutral400"
+            className="w-[25px] h-[25px] tablet:w-[21px] tablet:h-[21px]"
             onClick={copyLink}
           />
           <div
@@ -314,8 +360,8 @@ function RightPanel(
             name="share"
             weight="normal"
             size="custom"
-            color="greyLight"
-            className="w-[29px] h-[29px] tablet:w-[25px] tablet:h-[25px]"
+            color="neutral400"
+            className="w-[25px] h-[25px] tablet:w-[21px] tablet:h-[21px]"
             onClick={shareContent}
             ariaLabel="Share content"
           />
@@ -337,8 +383,8 @@ function RightPanel(
             type="iconButton"
             name="twitterImage"
             weight="normal"
-            size="mdR"
-            color="greyLight"
+            size="smR"
+            color="neutral400"
             onClick={shareToX}
             ariaLabel="Share on X"
           />
@@ -351,7 +397,8 @@ function RightPanel(
           </div>
         </div>
       </div>
-      <div className="flex gap-5 tablet:gap-3.5">
+
+      <div className="flex gap-2 tablet:gap-1">
         {showCodeButton && (
           <div
             ref={codeButtonRef}
@@ -363,8 +410,8 @@ function RightPanel(
               type="iconButton"
               name="previewCode"
               weight="normal"
-              size="mdR"
-              color="greyLight"
+              size="smR"
+              color="neutral400"
               onClick={() => {
                 setIsCodeTooltipVisible(false);
                 toggleCodeModal();
@@ -382,6 +429,28 @@ function RightPanel(
         )}
         <div
           class="relative"
+          onMouseEnter={handleDownloadMouseEnter}
+          onMouseLeave={handleDownloadMouseLeave}
+        >
+          <Icon
+            type="iconButton"
+            name="downloadImage"
+            weight="normal"
+            size="smR"
+            color="neutral400"
+            onClick={handleDownloadPreview}
+            ariaLabel="Download stamp preview image"
+          />
+          <div
+            class={`${tooltipIcon} ${
+              isDownloadTooltipVisible ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            DOWNLOAD
+          </div>
+        </div>
+        <div
+          class="relative"
           onMouseEnter={handleToolsMouseEnter}
           onMouseLeave={handleToolsMouseLeave}
         >
@@ -389,8 +458,8 @@ function RightPanel(
             type="iconButton"
             name="previewImageRaw"
             weight="normal"
-            size="mdR"
-            color="greyLight"
+            size="smR"
+            color="neutral400"
             onClick={() =>
               globalThis.open(
                 `/s/${stamp.cpid}`,
@@ -420,8 +489,8 @@ function RightPanel(
             type="iconButton"
             name="previewImage"
             weight="normal"
-            size="mdR"
-            color="greyLight"
+            size="smR"
+            color="neutral400"
             onClick={() => {
               setIsFullscreenTooltipVisible(false);
               toggleFullScreenModal();
@@ -723,13 +792,15 @@ export function StampImage(
   return (
     <>
       {(!src || isUnrenderable) && (
-        <div className={`${glassmorphism} p-5`}>
+        <div className={`${container2} p-1`}>
           <PlaceholderImage variant={isUnrenderable ? "error" : "no-image"} />
         </div>
       )}
 
       {src && isHtml && (
-        <div className={`${className} ${body} ${containerGap}`}>
+        <div
+          className={`${className} ${body} ${containerGap} group/panel tablet:relative`}
+        >
           <div
             className={`relative ${
               flag ? `${containerDetailImage} ${containerClassName || ""}` : ""
@@ -747,10 +818,9 @@ export function StampImage(
                 <iframe
                   width="100%"
                   height="100%"
-                  scrolling="no"
                   className={`${
                     className || ""
-                  } rounded-2xl absolute top-0 left-0 bg-transparent`}
+                  } rounded-2xl absolute top-0 left-0 bg-transparent overflow-hidden`}
                   sandbox="allow-scripts allow-same-origin"
                   src={src || ""}
                   loading="lazy"
@@ -823,7 +893,7 @@ export function StampImage(
       )}
 
       {src && isPlainText && (
-        <div class={`${body} ${containerGap}`}>
+        <div class={`${body} ${containerGap} group/panel tablet:relative`}>
           <div
             className={`${containerDetailImage} ${containerClassName || ""}`}
           >
@@ -845,7 +915,9 @@ export function StampImage(
       )}
 
       {src && isAudio && (
-        <div className={`${className} ${body} ${containerGap}`}>
+        <div
+          className={`${className} ${body} ${containerGap} group/panel tablet:relative`}
+        >
           <div
             className={`${containerDetailImage} ${containerClassName || ""}`}
           >
@@ -870,7 +942,7 @@ export function StampImage(
                     type="iconButton"
                     weight="bold"
                     size="xxl"
-                    color="grey"
+                    color="neutral500"
                     className="p-[25%] relative z-10"
                   />
                 </button>
@@ -889,7 +961,9 @@ export function StampImage(
       )}
 
       {src && isLibraryFile && (
-        <div className={`${className} ${body} ${containerGap}`}>
+        <div
+          className={`${className} ${body} ${containerGap} group/panel tablet:relative`}
+        >
           <div
             className={`${containerDetailImage} ${containerClassName || ""}`}
           >
@@ -912,7 +986,9 @@ export function StampImage(
         !isLibraryFile && !isUnrenderable && (
           flag
             ? (
-              <div class={`${body} ${containerGap}`}>
+              <div
+                class={`${body} ${containerGap} group/panel tablet:relative`}
+              >
                 <div
                   className={`${containerDetailImage} ${
                     containerClassName || ""

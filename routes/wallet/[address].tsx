@@ -2,27 +2,149 @@
 /*@baba-367*/
 
 import { MetaTags } from "$components/layout/MetaTags.tsx";
-import { WalletProfileContent } from "$content";
+import { WalletContent } from "$content";
 import { Handlers } from "$fresh/server.ts";
 import { body, containerGap } from "$layout";
-import type { SRC20Balance, SRC20Row } from "$types/src20.d.ts";
-import type { Dispenser, StampRow } from "$types/stamp.d.ts";
-import type { WalletStampWithValue } from "$types/wallet.d.ts";
+import type { DispenserRow, StampRow } from "$types/stamp.d.ts";
 
-import WalletDispenserDetails from "$islands/content/WalletDispenserDetails.tsx";
-import WalletProfileDetails from "$islands/content/WalletProfileDetails.tsx";
+import WalletContentDispenser from "$islands/content/WalletContentDispenser.tsx";
+import WalletHeader from "$islands/header/WalletHeader.tsx";
 import { getBTCBalanceInfo } from "$lib/utils/data/processing/balanceUtils.ts";
+import { DATA_PLACEHOLDER_DEV } from "$lib/utils/dataPlaceholderProd.ts";
+import { CollectionController } from "$server/controller/collectionController.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { CreatorService } from "$server/services/creator/creatorService.ts";
-import type { PaginatedResponse } from "$types/pagination.d.ts";
-import type { WalletPageProps } from "$types/ui.d.ts";
+import { SRC20Service } from "$server/services/src20/index.ts";
+import type {
+  WalletContentTabId,
+  WalletContentTabIdSub,
+  WalletProfilePageProps,
+  WalletStampsTab,
+  WalletTokensTab,
+} from "$types/ui.d.ts";
 import type { WalletOverviewInfo } from "$types/wallet.d.ts";
+
+/* ===== CONSTANTS ===== */
+const SECTION_VALUES: WalletContentTabId[] = ["all", "stamps", "tokens"];
+const CONTENT_TAB_VALUES: WalletContentTabIdSub[] = [
+  "balance",
+  "created",
+  "listings",
+  "collections",
+];
+const VIEW_MODE_VALUES = ["cardVertical", "cardSquare", "cardRow"] as const;
+type ViewMode = typeof VIEW_MODE_VALUES[number];
+
+// Grid-friendly page sizes per sub-tab
+const STAMPS_GRID_LIMIT = 40; // fills a 10x4 desktop grid
+const LISTINGS_LIMIT = 20;
+const COLLECTIONS_LIMIT = 10;
+const TOKENS_GRID_LIMIT = 20;
+const DISPENSERS_STATS_LIMIT = 10; // matches legacy default, used for the stats card when Listings isn't active
+
+/* ===== HELPERS ===== */
+function normalizeSortBy(value: string | null): "ASC" | "DESC" {
+  return value?.toUpperCase() === "ASC" ? "ASC" : "DESC";
+}
+
+function normalizeViewMode(value: string | null): ViewMode {
+  return (VIEW_MODE_VALUES as readonly string[]).includes(value ?? "")
+    ? value as ViewMode
+    : "cardVertical";
+}
+
+function normalizeSection(value: string | null): WalletContentTabId {
+  return (SECTION_VALUES as readonly string[]).includes(value ?? "")
+    ? value as WalletContentTabId
+    : "all";
+}
+
+/**
+ * `listings`/`collections` are stamps-only — force back to `balance` when
+ * they're paired with a `section` that can't render them (defensive: the
+ * header already prevents this combination from being reachable via the
+ * UI, but URLs can be typed/bookmarked directly).
+ */
+function normalizeContentTab(
+  value: string | null,
+  section: WalletContentTabId,
+): WalletContentTabIdSub {
+  const tab = (CONTENT_TAB_VALUES as readonly string[]).includes(value ?? "")
+    ? value as WalletContentTabIdSub
+    : "balance";
+  return (tab === "listings" || tab === "collections") && section !== "stamps"
+    ? "balance"
+    : tab;
+}
+
+/**
+ * Maps the unified header tab (balance/created/listings/collections) back
+ * to each side's existing internal tab type — keeps
+ * StampsTabContent/TokensTabContent and the fetch logic below unchanged.
+ */
+function mapTabToStampsTab(tab: WalletContentTabIdSub): WalletStampsTab {
+  return tab;
+}
+
+function mapTabToTokensTab(tab: WalletContentTabIdSub): WalletTokensTab {
+  // "listings"/"collections" have no Tokens equivalent — only reachable
+  // when section === "stamps", where the Tokens panel isn't rendered.
+  return tab === "created" ? "created" : "balance";
+}
+
+/**
+ * `SRC20QueryService.fetchBasicSrc20Data` returns raw, flat market columns
+ * (e.g. `price_btc`, `price_change_24h_percent`) instead of the nested
+ * `market_data` object that `SRC20OverviewCompact` reads. Re-shape it here
+ * so the "Created" tab's row view can show price/mcap/volume like the
+ * "Balance" tab (which goes through `MarketDataEnrichmentService`).
+ */
+function withNestedMarketData(row: Record<string, any>) {
+  const hasMarketFields = row.market_cap_btc != null ||
+    row.price_btc != null ||
+    row.volume_24h_btc != null ||
+    row.price_change_24h_percent != null;
+  if (!hasMarketFields) return row;
+  return {
+    ...row,
+    market_data: {
+      market_cap_btc: row.market_cap_btc ?? null,
+      price_btc: row.price_btc ?? null,
+      volume_24h_btc: row.volume_24h_btc ?? null,
+      change_24h_percent: row.price_change_24h_percent ?? null,
+    },
+  };
+}
+
+// Helper function to determine if address should be treated as dispenser-only
+function isDispenserOnlyAddress(data: {
+  stampsTotal: number;
+  src20Total: number;
+  stampsCreated: number;
+  walletData?: { dispensers?: { total?: number } };
+}) {
+  const dispensersTotal = data.walletData?.dispensers?.total ?? 0;
+  const hasDispensers = dispensersTotal > 0;
+  const hasOtherStamps = data.stampsTotal > dispensersTotal;
+  const hasSrc20Tokens = data.src20Total > 0;
+  const hasCreatedStamps = data.stampsCreated > 0;
+
+  // Only treat as dispenser if it ONLY has dispenser activity
+  return hasDispensers && !hasOtherStamps && !hasSrc20Tokens &&
+    !hasCreatedStamps;
+}
 
 /* ===== SERVER HANDLER ===== */
 /**
- * We add stampsSortBy to the query to handle the ASC / DESC sorting on stamps.
- * This is optional; if not provided, default to "DESC".
+ * Stamps and Tokens are rendered as panels of one unified wallet content
+ * container, sharing a single top-level section selector (all/stamps/
+ * tokens), sub-tab selector (balance/created/listings/collections), view
+ * mode, and sort order — mirrors ExplorerHeader's `section`/`view`/`page`
+ * handling. Only the panel(s) visible under the current `section` are
+ * fetched at full page size; the data sources that still feed the stats
+ * card (balance stamps/tokens/dispensers) are fetched with a minimal
+ * limit purely to obtain an accurate `total` when their panel is hidden.
  */
 export const handler: Handlers = {
   async GET(req, ctx) {
@@ -30,84 +152,97 @@ export const handler: Handlers = {
     const { address } = ctx.params;
     const url = new URL(req.url);
 
-    // Get sort parameters for each section with enhanced sorting support
-    const stampsSortBy = url.searchParams.get("stampsSortBy") || "DESC";
-    const src20SortBy = url.searchParams.get("src20SortBy") || "DESC";
-    const dispensersSortBy = url.searchParams.get("dispensersSortBy") || "DESC";
+    const section = normalizeSection(url.searchParams.get("section"));
+    const tab = normalizeContentTab(url.searchParams.get("tab"), section);
+    const view = normalizeViewMode(url.searchParams.get("view"));
+    const sortBy = normalizeSortBy(url.searchParams.get("sortBy"));
 
-    // Validate and normalize stamps sort parameter for enhanced sorting
-    const validStampsSortOptions = [
-      "ASC",
-      "DESC",
-      "value_desc",
-      "value_asc",
-      "quantity_desc",
-      "quantity_asc",
-      "stamp_desc",
-      "stamp_asc",
-      "recent_desc",
-      "recent_asc",
-    ];
-    const normalizedStampsSortBy = validStampsSortOptions.includes(stampsSortBy)
-      ? stampsSortBy
-      : "DESC";
+    // The unified tab/sort drive both panels at once — map back to each
+    // side's existing internal tab type for the fetch logic below.
+    const stampsTab = mapTabToStampsTab(tab);
+    const stampsSortBy = sortBy;
+    const stampsPage = Math.max(
+      1,
+      parseInt(url.searchParams.get("stamps_page") || "1") || 1,
+    );
 
-    // For backward compatibility, convert src20 and dispensers to uppercase
-    const normalizedSrc20SortBy = (src20SortBy.toUpperCase() === "ASC" ||
-        src20SortBy.toUpperCase() === "DESC")
-      ? src20SortBy.toUpperCase() as "ASC" | "DESC"
-      : "DESC" as "ASC" | "DESC";
-    const normalizedDispensersSortBy =
-      (dispensersSortBy.toUpperCase() === "ASC" ||
-          dispensersSortBy.toUpperCase() === "DESC")
-        ? dispensersSortBy.toUpperCase() as "ASC" | "DESC"
-        : "DESC" as "ASC" | "DESC";
-
-    // Extract pagination parameters with grid-friendly defaults
-    const stampsParams = {
-      page: parseInt(url.searchParams.get("stamps_page") || "1"),
-      limit: parseInt(url.searchParams.get("stamps_limit") || "40"), // Changed to 40 to fill 10x4 grid completely
-      sortBy: url.searchParams.get("stampsSortBy") as "ASC" | "DESC" || "DESC",
-    };
-
-    const src20Params = {
-      page: parseInt(url.searchParams.get("src20_page") || "1"),
-      limit: parseInt(url.searchParams.get("src20_limit") || "20"),
-      sortBy: url.searchParams.get("src20SortBy") as "ASC" | "DESC" || "DESC",
-    };
-
-    const dispensersParams = {
-      page: parseInt(url.searchParams.get("dispensers_page") || "1"),
-      limit: parseInt(url.searchParams.get("dispensers_limit") || "10"),
-      sortBy: url.searchParams.get("dispensersSortBy") as "ASC" | "DESC" ||
-        "DESC",
-    };
+    const tokensTab = mapTabToTokensTab(tab);
+    const tokensSortBy = sortBy;
+    const tokensPage = Math.max(
+      1,
+      parseInt(url.searchParams.get("tokens_page") || "1") || 1,
+    );
 
     const anchor = url.searchParams.get("anchor");
+
+    if (DATA_PLACEHOLDER_DEV) {
+      const { getDummyWalletPage } = await import(
+        "$lib/utils/dataPlaceholderDev.ts"
+      );
+      return ctx.render(
+        getDummyWalletPage(address, {
+          section,
+          tab,
+          view,
+          stampsPage,
+          tokensPage,
+        }),
+      );
+    }
+
+    // Only the visible side(s) need full-grid-limit data — e.g. when
+    // section === "stamps", tokensTab is still "balance" (mapped from the
+    // shared `tab`) but the Tokens panel isn't rendered, so it should only
+    // ever get the minimal stats-card fetch.
+    const stampsVisible = section !== "tokens";
+    const tokensVisible = section !== "stamps";
+
+    // "Balance" stamps — full page when active, minimal fetch (just for an
+    // accurate `total`) otherwise.
+    const balanceStampsActive = stampsVisible && stampsTab === "balance";
+    const balanceStampsPage = balanceStampsActive ? stampsPage : 1;
+    const balanceStampsLimit = balanceStampsActive ? STAMPS_GRID_LIMIT : 1;
+    const balanceStampsSort = balanceStampsActive ? stampsSortBy : "DESC";
+
+    // Dispensers back the "Listings" sub-tab AND the stats card's dispenser
+    // counts — always fetched, just at a smaller page size when inactive.
+    const listingsActive = stampsVisible && stampsTab === "listings";
+    const dispensersPage = listingsActive ? stampsPage : 1;
+    const dispensersLimit = listingsActive
+      ? LISTINGS_LIMIT
+      : DISPENSERS_STATS_LIMIT;
+    const dispensersSort = listingsActive ? stampsSortBy : "DESC";
+
+    // "Balance" tokens — same minimal-fetch-when-inactive pattern as stamps.
+    const balanceSrc20Active = tokensVisible && tokensTab === "balance";
+    const balanceSrc20Page = balanceSrc20Active ? tokensPage : 1;
+    const balanceSrc20Limit = balanceSrc20Active ? TOKENS_GRID_LIMIT : 1;
+    const balanceSrc20Sort = balanceSrc20Active ? tokensSortBy : "DESC";
+
+    const createdStampsActive = stampsVisible && stampsTab === "created";
+    const collectionsActive = stampsVisible && stampsTab === "collections";
+    const createdSrc20Active = tokensVisible && tokensTab === "created";
 
     /* ===== DATA FETCHING ===== */
     try {
       const [
-        stampsResponse,
-        src20Response,
+        balanceStampsResponse,
+        balanceSrc20Response,
         btcInfoResponse,
         dispensersResponse,
-        stampsCreatedCount,
+        stampsCreatedCountResponse,
         src101FetchResponse,
         creatorNameResponse,
-        // Add a separate fetch for ALL stamps for accurate value calculation
+        // Separate fetch for ALL stamps for accurate value calculation
         allStampsForValuesResponse,
+        createdStampsResponse,
+        collectionsResponse,
+        createdSrc20Response,
       ] = await Promise.allSettled([
-        // Stamps with enhanced sorting and pagination - use the enhanced API endpoint
+        // Balance stamps via the enhanced API endpoint, with fallback
         fetch(
-          `${url.origin}/api/v2/stamps/balance/${address}?enhanced=true&page=${
-            stampsParams.page || 1
-          }&limit=${stampsParams.limit || 40}&sortBy=${normalizedStampsSortBy}`,
-          {
-            headers: {
-              "X-API-Version": "2.3",
-            },
-          },
+          `${url.origin}/api/v2/stamps/balance/${address}?enhanced=true&page=${balanceStampsPage}&limit=${balanceStampsLimit}&sortBy=${balanceStampsSort}`,
+          { headers: { "X-API-Version": "2.3" } },
         ).then(async (res) => {
           if (!res.ok) {
             console.error(
@@ -115,65 +250,51 @@ export const handler: Handlers = {
               res.status,
               res.statusText,
             );
-            // Fallback to basic endpoint
             return StampController.getStampBalancesByAddress(
               address,
-              stampsParams.limit || 40,
-              stampsParams.page || 1,
-              (normalizedStampsSortBy === "ASC" ||
-                  normalizedStampsSortBy === "DESC")
-                ? normalizedStampsSortBy as "ASC" | "DESC"
-                : "DESC",
+              balanceStampsLimit,
+              balanceStampsPage,
+              balanceStampsSort,
             );
           }
           return await res.json();
         }),
 
-        // SRC20 tokens with sorting and pagination
+        // Balance SRC20 tokens
         Src20Controller.handleSrc20BalanceRequest({
           address,
           includePagination: true,
-          limit: src20Params.limit || 10,
-          page: src20Params.page || 1,
+          limit: balanceSrc20Limit,
+          page: balanceSrc20Page,
           includeMintData: true,
-          includeMarketData: true, // 🚀 FIX: Use controller's built-in market data
-          sortBy: normalizedSrc20SortBy,
+          includeMarketData: true,
+          sortBy: balanceSrc20Sort,
         }),
 
         // BTC info
-        getBTCBalanceInfo(address, {
-          includeUSD: true,
-        }),
+        getBTCBalanceInfo(address, { includeUSD: true }),
 
-        // Dispensers with sorting and pagination
+        // Dispensers (backs both Listings sub-tab and the stats card)
         StampController.getDispensersWithStampsByAddress(
           address,
-          dispensersParams.page || 1,
-          dispensersParams.limit || 10,
-          {
-            sortBy: normalizedDispensersSortBy,
-          },
+          dispensersPage,
+          dispensersLimit,
+          { sortBy: dispensersSort },
         ),
 
         StampController.getStampsCreatedCount(address),
 
-        // SRC101 Balance request via fetch
+        // SRC101 balance
         fetch(
           `${url.origin}/api/v2/src101/balance/${address}?limit=100&offset=0`,
-          {
-            headers: {
-              "X-API-Version": "2.3",
-            },
-          },
+          { headers: { "X-API-Version": "2.3" } },
         ).then(async (res) => {
           if (!res.ok) {
             console.error("SRC101 fetch failed:", res.status, res.statusText);
             return null;
           }
           const data = await res.json();
-          console.log("Raw SRC-101 Response:", data);
 
-          // If we have pagination info and there's more data, fetch the rest
           if (data.pagination?.total > 100) {
             const remainingPages = Math.ceil(data.pagination.total / 100) - 1;
             const additionalRequests = Array.from(
@@ -183,17 +304,11 @@ export const handler: Handlers = {
                   `${url.origin}/api/v2/src101/balance/${address}?limit=100&offset=${
                     (i + 1) * 100
                   }`,
-                  {
-                    headers: {
-                      "X-API-Version": "2.3",
-                    },
-                  },
-                )
-                  .then((r) => r.json()),
+                  { headers: { "X-API-Version": "2.3" } },
+                ).then((r) => r.json()),
             );
 
             const additionalData = await Promise.all(additionalRequests);
-            // Combine all data
             data.data = [
               ...data.data,
               ...additionalData.flatMap((d) => d.data || []),
@@ -203,18 +318,14 @@ export const handler: Handlers = {
           return data;
         }),
 
-        // Fetch creator name
+        // Creator name
         CreatorService.getCreatorNameByAddress(address),
 
-        // CRITICAL FIX: Fetch ALL stamps for accurate value calculation
-        // This ensures the wallet dashboard shows correct total values
+        // ALL stamps for accurate wallet value calculation (unrelated to
+        // whichever sub-tab is active)
         fetch(
           `${url.origin}/api/v2/stamps/balance/${address}?enhanced=true&page=1&limit=1000&sortBy=DESC`,
-          {
-            headers: {
-              "X-API-Version": "2.3",
-            },
-          },
+          { headers: { "X-API-Version": "2.3" } },
         ).then(async (res) => {
           if (!res.ok) {
             console.error(
@@ -222,17 +333,15 @@ export const handler: Handlers = {
               res.status,
               res.statusText,
             );
-            // Fallback to basic endpoint with high limit
             return StampController.getStampBalancesByAddress(
               address,
-              1000, // High limit to get all stamps for value calculation
+              1000,
               1,
               "DESC",
             );
           }
           const data = await res.json();
 
-          // If we have pagination info and there's more data, fetch the rest
           if (data.pagination && data.pagination.total > 1000) {
             const totalPages = Math.ceil(data.pagination.total / 1000);
             const additionalRequests = Array.from(
@@ -242,90 +351,95 @@ export const handler: Handlers = {
                   `${url.origin}/api/v2/stamps/balance/${address}?enhanced=true&page=${
                     i + 2
                   }&limit=1000&sortBy=DESC`,
-                  {
-                    headers: {
-                      "X-API-Version": "2.3",
-                    },
-                  },
-                )
-                  .then((r) => r.json()),
+                  { headers: { "X-API-Version": "2.3" } },
+                ).then((r) => r.json()),
             );
 
             const additionalData = await Promise.all(additionalRequests);
-            // Combine all data
             data.data = [
               ...data.data,
               ...additionalData.flatMap((d) => d.data || []),
             ];
-
-            console.log(
-              `[WalletPage] Fetched ${data.data.length} stamps across ${totalPages} pages for value calculation`,
-            );
           }
 
           return data;
         }),
+
+        // "Created" — stamps created by this address (Stamps > Created)
+        createdStampsActive
+          ? StampController.getStamps({
+            creatorAddress: address,
+            ident: ["STAMP", "SRC-721"],
+            page: stampsPage,
+            limit: STAMPS_GRID_LIMIT,
+            sortBy: stampsSortBy,
+            url: url.origin,
+          })
+          : Promise.resolve(null),
+
+        // "Collections" — collections created by this address (Stamps > Collections)
+        collectionsActive
+          ? CollectionController.getCollectionDetails({
+            creator: address,
+            page: stampsPage,
+            limit: COLLECTIONS_LIMIT,
+            sortBy: stampsSortBy,
+            includeMarketData: true,
+          })
+          : Promise.resolve(null),
+
+        // "Created" — tokens deployed by this address (Tokens > Created)
+        createdSrc20Active
+          ? SRC20Service.QueryService.fetchBasicSrc20Data({
+            op: "DEPLOY",
+            address,
+            page: tokensPage,
+            limit: TOKENS_GRID_LIMIT,
+            sortBy: tokensSortBy,
+          })
+          : Promise.resolve(null),
       ]);
 
       /* ===== DATA PROCESSING ===== */
-      // Process responses and handle errors
-      const stampsData = stampsResponse.status === "fulfilled"
+      const balanceStamps = balanceStampsResponse.status === "fulfilled"
         ? {
-          data: stampsResponse.value.data as unknown as StampRow[],
-          total: stampsResponse.value.pagination?.total ||
-            stampsResponse.value.totalPages * stampsResponse.value.limit ||
-            stampsResponse.value.data.length,
-          page: stampsResponse.value.pagination?.page ||
-            stampsResponse.value.page || 1,
-          limit: stampsResponse.value.pagination?.limit ||
-            stampsResponse.value.limit || 40,
-          totalPages: stampsResponse.value.pagination?.totalPages ||
-            stampsResponse.value.totalPages || 0,
+          data: (balanceStampsResponse.value.data ?? []) as StampRow[],
+          total: balanceStampsResponse.value.pagination?.total ??
+            balanceStampsResponse.value.total ?? 0,
+          totalPages: balanceStampsResponse.value.pagination?.totalPages ??
+            balanceStampsResponse.value.totalPages ?? 0,
         }
-        : { data: [], total: 0, page: 1, limit: 40, totalPages: 0 };
+        : { data: [], total: 0, totalPages: 0 };
 
-      // CRITICAL FIX: Calculate stamp values using ALL stamps, not just current page
+      // Calculate stamp values using ALL stamps, not just the current page
       const stampValues = allStampsForValuesResponse.status === "fulfilled"
         ? await StampController.calculateWalletStampValues(
           allStampsForValuesResponse.value.data,
         )
         : { stampValues: {}, totalValue: 0 };
 
-      console.log(
-        `[WalletPage] Calculated stamp values for ${
-          allStampsForValuesResponse.status === "fulfilled"
-            ? allStampsForValuesResponse.value.data.length
-            : 0
-        } stamps, total value: ${stampValues.totalValue} BTC`,
-      );
+      const baseSrc20Data = balanceSrc20Response.status === "fulfilled"
+        ? balanceSrc20Response.value
+        : {
+          data: [],
+          total: 0,
+          page: 1,
+          limit: balanceSrc20Limit,
+          totalPages: 0,
+        };
 
-      // Process SRC20 data - now includes market data from controller
-      const baseSrc20Data = src20Response.status === "fulfilled"
-        ? src20Response.value
-        : { data: [], total: 0, page: 1, limit: 10, totalPages: 0 };
-
-      // 🚀 PERFORMANCE FIX: No more manual enrichment needed!
-      // Market data is already included via includeMarketData: true
-      const src20Data = {
-        ...baseSrc20Data,
-        data: baseSrc20Data.data, // Data already enriched by controller
-      } as PaginatedResponse<SRC20Row>;
-
-      // Calculate total SRC20 value from enriched tokens with better error handling
-      const src20Value = Array.isArray(src20Data.data)
-        ? src20Data.data.reduce((total, token: any) => {
+      // Calculate total SRC20 value from enriched tokens
+      const src20Value = Array.isArray(baseSrc20Data.data)
+        ? baseSrc20Data.data.reduce((total: number, token: any) => {
           try {
-            // For v2.3, market data is in token.market_data
             const marketData = token.market_data;
             if (marketData?.floor_price_btc && token.amt) {
               const quantity = typeof token.amt === "bigint"
                 ? Number(token.amt)
                 : token.amt;
-              const valueInBTC = marketData.floor_price_btc * quantity;
-              return total + valueInBTC;
+              return total + marketData.floor_price_btc * quantity;
             }
           } catch (marketDataError) {
-            // Log market data errors but don't break the calculation
             console.warn(
               `Market data calculation error for token ${token.tick}:`,
               marketDataError,
@@ -335,21 +449,18 @@ export const handler: Handlers = {
         }, 0)
         : 0;
 
-      // Add market data availability flags for graceful degradation
       const marketDataStatus = {
-        stampsMarketData: stampsResponse.status === "fulfilled" &&
-            stampsResponse.value.stampValues
+        stampsMarketData: balanceStampsResponse.status === "fulfilled" &&
+            (balanceStampsResponse.value as any).stampValues
           ? "available"
           : "unavailable",
-        src20MarketData: src20Response.status === "fulfilled" &&
-            (baseSrc20Data.data?.length === 0 || // Empty wallet is OK
+        src20MarketData: balanceSrc20Response.status === "fulfilled" &&
+            (baseSrc20Data.data?.length === 0 ||
               baseSrc20Data.data?.some((token: any) => token.market_data))
           ? "available"
           : "unavailable",
-        overallStatus: "partial", // Can be "full", "partial", or "unavailable"
+        overallStatus: "partial" as "full" | "partial" | "unavailable",
       };
-
-      // Update overall market data status
       if (
         marketDataStatus.stampsMarketData === "available" &&
         marketDataStatus.src20MarketData === "available"
@@ -362,24 +473,24 @@ export const handler: Handlers = {
         marketDataStatus.overallStatus = "unavailable";
       }
 
-      const dispensersData = dispensersResponse.status === "fulfilled"
-        ? dispensersResponse.value.dispensers
-        : [];
+      const dispensersData: DispenserRow[] =
+        dispensersResponse.status === "fulfilled"
+          ? (dispensersResponse.value
+            .dispensers as unknown as DispenserRow[]) ??
+            []
+          : [];
+      const dispensersTotal = dispensersResponse.status === "fulfilled"
+        ? dispensersResponse.value.total ?? dispensersData.length
+        : 0;
+      const openDispensers = dispensersData.filter((d) => d.give_remaining > 0);
+      const closedDispensers = dispensersData.filter((d) =>
+        d.give_remaining === 0
+      );
 
       const btcInfo = btcInfoResponse.status === "fulfilled"
         ? btcInfoResponse.value
         : null;
 
-      // Calculate dispenser counts from the full response
-      const allDispensers = dispensersResponse.status === "fulfilled"
-        ? dispensersResponse.value.dispensers
-        : [];
-      const openDispensers = allDispensers.filter((d) => d.give_remaining > 0);
-      const closedDispensers = allDispensers.filter((d) =>
-        d.give_remaining === 0
-      );
-
-      // Process SRC-101 response to get all BitNames
       const src101Data = src101FetchResponse.status === "fulfilled" &&
           src101FetchResponse.value &&
           typeof src101FetchResponse.value === "object"
@@ -391,18 +502,14 @@ export const handler: Handlers = {
         }
         : { names: [], total: 0 };
 
-      console.log("Final Processed SRC-101 Data:", src101Data);
-
-      /* ===== WALLET DATA ASSEMBLY ===== */
-      // Get creator name from response
       const creatorName = creatorNameResponse.status === "fulfilled"
         ? creatorNameResponse.value
         : null;
 
-      // Build wallet data
+      /* ===== WALLET DATA ASSEMBLY ===== */
       const walletData = {
-        balance: btcInfo?.balance ?? 0, // BTC balance only
-        usdValue: (btcInfo?.balance ?? 0) * (btcInfo?.btcPrice ?? 0), // USD value of BTC only
+        balance: btcInfo?.balance ?? 0,
+        usdValue: (btcInfo?.balance ?? 0) * (btcInfo?.btcPrice ?? 0),
         address,
         btcPrice: btcInfo?.btcPrice ?? 0,
         fee: 0,
@@ -411,181 +518,173 @@ export const handler: Handlers = {
         unconfirmedBalance: btcInfo?.unconfirmedBalance ?? 0,
         unconfirmedTxCount: btcInfo?.unconfirmedTxCount ?? 0,
         stampValue: stampValues.totalValue,
-        src20Value: src20Value,
-        marketDataStatus, // Add market data status for UI feedback
+        src20Value,
+        marketDataStatus,
         dispensers: {
           open: openDispensers.length,
           closed: closedDispensers.length,
-          total: allDispensers.length,
+          total: dispensersTotal,
           items: dispensersData,
         },
         src101: src101Data,
       };
 
+      /* ===== ACTIVE STAMPS SUB-TAB DATA ===== */
+      let stampsData: any[] = balanceStamps.data;
+      let stampsPagination = {
+        page: balanceStampsPage,
+        limit: balanceStampsLimit,
+        total: balanceStamps.total,
+        totalPages: balanceStamps.totalPages ||
+          Math.ceil(balanceStamps.total / (balanceStampsLimit || 1)),
+      };
+
+      if (stampsTab === "created") {
+        const r = createdStampsResponse.status === "fulfilled"
+          ? createdStampsResponse.value as any
+          : null;
+        stampsData = r?.data ?? [];
+        stampsPagination = {
+          page: r?.page ?? stampsPage,
+          limit: r?.limit ?? STAMPS_GRID_LIMIT,
+          total: r?.total ?? 0,
+          totalPages: r?.totalPages ?? 0,
+        };
+      } else if (stampsTab === "collections") {
+        const r = collectionsResponse.status === "fulfilled"
+          ? collectionsResponse.value
+          : null;
+        stampsData = r?.data ?? [];
+        stampsPagination = {
+          page: r?.page ?? stampsPage,
+          limit: r?.limit ?? COLLECTIONS_LIMIT,
+          total: r?.total ?? 0,
+          totalPages: r?.totalPages ??
+            Math.ceil((r?.total ?? 0) / COLLECTIONS_LIMIT),
+        };
+      } else if (stampsTab === "listings") {
+        stampsData = dispensersData;
+        stampsPagination = {
+          page: dispensersPage,
+          limit: dispensersLimit,
+          total: dispensersTotal,
+          totalPages: Math.max(1, Math.ceil(dispensersTotal / dispensersLimit)),
+        };
+      }
+
+      /* ===== ACTIVE TOKENS SUB-TAB DATA ===== */
+      let tokensData: any[] = baseSrc20Data.data ?? [];
+      let tokensPagination = {
+        page: balanceSrc20Page,
+        limit: balanceSrc20Limit,
+        total: baseSrc20Data.total ?? 0,
+        totalPages: baseSrc20Data.totalPages ??
+          Math.ceil((baseSrc20Data.total ?? 0) / (balanceSrc20Limit || 1)),
+      };
+
+      if (tokensTab === "created") {
+        const r = createdSrc20Response.status === "fulfilled"
+          ? createdSrc20Response.value as any
+          : null;
+        tokensData = (r?.data ?? []).map(withNestedMarketData);
+        tokensPagination = {
+          page: r?.page ?? tokensPage,
+          limit: r?.limit ?? TOKENS_GRID_LIMIT,
+          total: r?.total ?? 0,
+          totalPages: r?.totalPages ?? 0,
+        };
+      }
+
       /* ===== RESPONSE RENDERING ===== */
       return ctx.render({
-        data: {
-          data: {
-            stamps: {
-              data: stampsData.data,
-              pagination: {
-                page: stampsParams.page,
-                limit: stampsParams.limit,
-                total: stampsData.total || 0,
-                totalPages: stampsData.totalPages ||
-                  Math.ceil((stampsData.total || 0) / stampsParams.limit),
-              },
-            },
-            src20: {
-              data: src20Data.data,
-              pagination: {
-                page: src20Params.page,
-                limit: src20Params.limit,
-                total: src20Data.total || 0,
-                totalPages: src20Data.totalPages ||
-                  Math.ceil((src20Data.total || 0) / src20Params.limit),
-              },
-            },
-            dispensers: {
-              data: dispensersData,
-              pagination: {
-                page: dispensersParams.page,
-                limit: dispensersParams.limit,
-                total: dispensersData.length,
-                totalPages: Math.ceil(
-                  dispensersData.length / dispensersParams.limit,
-                ),
-              },
-            },
-            src101: src101FetchResponse.status === "fulfilled"
-              ? src101FetchResponse.value
-              : null,
-          },
-          address,
-          walletData,
-          stampsTotal: stampsData.total,
-          src20Total: src20Data.total,
-          stampsCreated: stampsCreatedCount.status === "fulfilled"
-            ? stampsCreatedCount.value
-            : 0,
-          anchor,
-        },
-        stampsSortBy: normalizedStampsSortBy,
-        src20SortBy: normalizedSrc20SortBy,
-        dispensersSortBy: normalizedDispensersSortBy,
+        address,
+        walletData,
+        stampsTotal: balanceStamps.total,
+        src20Total: baseSrc20Data.total ?? 0,
+        stampsCreated: stampsCreatedCountResponse.status === "fulfilled"
+          ? stampsCreatedCountResponse.value
+          : 0,
+        anchor,
+
+        section,
+        tab,
+        view,
+
+        stampsData,
+        stampsPagination,
+
+        tokensData,
+        tokensPagination,
       });
     } catch (error) {
       /* ===== ERROR HANDLING ===== */
       console.error("Wallet page error:", error);
-
-      // Log more specific error details for debugging
       if (error instanceof Error) {
         console.error("Error details:", {
           message: error.message,
           stack: error.stack,
-          address: address,
+          address,
           timestamp: new Date().toISOString(),
         });
       }
 
-      // Return safe default state with empty data and market data unavailable status
       return ctx.render({
-        data: {
-          data: {
-            stamps: {
-              data: [],
-              pagination: { page: 1, limit: 40, total: 0, totalPages: 0 },
-            },
-            src20: {
-              data: [],
-              pagination: { page: 1, limit: 8, total: 0, totalPages: 0 },
-            },
-            dispensers: {
-              data: [],
-              pagination: { page: 1, limit: 8, total: 0, totalPages: 0 },
-            },
-          },
+        address,
+        walletData: {
+          balance: 0,
+          usdValue: 0,
           address,
-          walletData: {
-            balance: 0,
-            usdValue: 0,
-            address,
-            btcPrice: 0,
-            fee: 0,
-            creatorName: null,
-            txCount: 0,
-            unconfirmedBalance: 0,
-            unconfirmedTxCount: 0,
-            stampValue: 0,
-            src20Value: 0,
-            btcBalance: 0,
-            marketDataStatus: {
-              stampsMarketData: "unavailable",
-              src20MarketData: "unavailable",
-              overallStatus: "unavailable",
-            },
-            dispensers: {
-              open: 0,
-              closed: 0,
-              total: 0,
-              items: [],
-            },
-            src101: { names: [], total: 0 },
+          btcPrice: 0,
+          fee: 0,
+          creatorName: null,
+          txCount: 0,
+          unconfirmedBalance: 0,
+          unconfirmedTxCount: 0,
+          stampValue: 0,
+          src20Value: 0,
+          marketDataStatus: {
+            stampsMarketData: "unavailable",
+            src20MarketData: "unavailable",
+            overallStatus: "unavailable",
           },
-          stampsTotal: 0,
-          src20Total: 0,
-          stampsCreated: 0,
-          anchor: "",
+          dispensers: { open: 0, closed: 0, total: 0, items: [] },
+          src101: { names: [], total: 0 },
         },
-        stampsSortBy: "DESC",
-        src20SortBy: "DESC",
-        dispensersSortBy: "DESC",
+        stampsTotal: 0,
+        src20Total: 0,
+        stampsCreated: 0,
+        anchor: "",
+
+        // Preserve the requested section/tab/view (parsed above, before
+        // this try/catch) so the selector buttons stay in sync with the
+        // URL even when the underlying data fetch fails.
+        section,
+        tab,
+        view,
+
+        stampsData: [],
+        stampsPagination: {
+          page: 1,
+          limit: STAMPS_GRID_LIMIT,
+          total: 0,
+          totalPages: 0,
+        },
+
+        tokensData: [],
+        tokensPagination: {
+          page: 1,
+          limit: TOKENS_GRID_LIMIT,
+          total: 0,
+          totalPages: 0,
+        },
       });
     }
   },
 };
 
-/* ===== HELPERS ===== */
-// Helper function to determine if address should be treated as dispenser-only
-function isDispenserOnlyAddress(data: {
-  address: string;
-  walletData: any;
-  stampsTotal: number;
-  src20Total: number;
-  stampsCreated: number;
-  anchor: string;
-  data?: {
-    stamps: { data: WalletStampWithValue[] };
-    src20: { data: SRC20Balance[] };
-    dispensers: { data: Dispenser[] };
-  };
-}) {
-  // Safety check: if data.data doesn't exist or is missing dispensers, return false
-  if (
-    !data.data?.dispensers?.data || !data.data?.stamps?.data ||
-    !data.data?.src20?.data
-  ) {
-    return false;
-  }
-
-  // Check if address has dispensers
-  const hasDispensers = data.data.dispensers.data.length > 0;
-
-  // Check if address has other assets
-  const hasOtherStamps =
-    data.data.stamps.data.length > (data.data.dispensers.data.length || 0);
-  const hasSrc20Tokens = data.data.src20.data.length > 0;
-  const hasCreatedStamps = data.stampsCreated > 0;
-
-  // Only treat as dispenser if it ONLY has dispenser activity
-  return hasDispensers && !hasOtherStamps && !hasSrc20Tokens &&
-    !hasCreatedStamps;
-}
-
 /* ===== PAGE COMPONENT ===== */
-export default function WalletPage(props: { data: WalletPageProps }) {
-  const pageData = props.data;
-  const routeData = pageData.data as any; // Type assertion to handle nested structure
+export default function WalletPage(props: { data: WalletProfilePageProps }) {
+  const routeData = props.data;
   const isDispenserOnly = isDispenserOnlyAddress(routeData);
 
   /* ===== RENDER ===== */
@@ -603,8 +702,8 @@ export default function WalletPage(props: { data: WalletPageProps }) {
       />
       {isDispenserOnly
         ? (
-          <WalletDispenserDetails
-            walletData={routeData as WalletOverviewInfo}
+          <WalletContentDispenser
+            walletData={routeData.walletData as WalletOverviewInfo}
             stampsTotal={routeData.stampsTotal || 0}
             src20Total={routeData.src20Total || 0}
             stampsCreated={routeData.stampsCreated || 0}
@@ -613,29 +712,23 @@ export default function WalletPage(props: { data: WalletPageProps }) {
         )
         : (
           <>
-            <WalletProfileDetails
+            <WalletHeader
               walletData={routeData.walletData as WalletOverviewInfo}
               stampsTotal={routeData.stampsTotal}
               src20Total={routeData.src20Total}
               stampsCreated={routeData.stampsCreated}
               setShowItem={() => {}}
             />
-            <WalletProfileContent
-              stamps={routeData.data?.stamps || routeData.stamps}
-              src20={routeData.data?.src20 || routeData.src20}
-              dispensers={routeData.data?.dispensers || routeData.dispensers}
+            <WalletContent
               address={routeData.address}
               anchor={routeData.anchor}
-              stampsSortBy={props.data.stampsSortBy ?? "DESC"}
-              src20SortBy={props.data.src20SortBy ?? "DESC"}
-              // ===== ADVANCED SORTING FEATURE =====
-              enableAdvancedSorting
-              showSortingMetrics={false} // Can be enabled for debugging
-              sortingConfig={{
-                enableUrlSync: true,
-                enablePersistence: true,
-                enableMetrics: false, // Can be enabled for performance monitoring
-              }}
+              section={routeData.section}
+              tab={routeData.tab}
+              view={routeData.view}
+              stampsData={routeData.stampsData}
+              stampsPagination={routeData.stampsPagination}
+              tokensData={routeData.tokensData}
+              tokensPagination={routeData.tokensPagination}
             />
           </>
         )}

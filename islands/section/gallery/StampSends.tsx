@@ -1,6 +1,6 @@
 /* ===== STAMP RECENT SALES GALLERY COMPONENT ===== */
 import { StampCard } from "$card";
-import { subtitleGrey, titleGreyDL, titleGreyLD } from "$text";
+import { subtitleNeutral, titleNeutral } from "$text";
 import type { StampSendsGalleryProps } from "$types/ui.d.ts";
 import type { JSX } from "preact";
 
@@ -16,16 +16,18 @@ export default function StampSendsGallery({
     <div class="flex flex-col w-full items-start tablet:items-end">
       {/* ===== TITLE SECTION ===== */}
       <div class="w-full">
-        <h3 class={`${titleGreyLD} tablet:hidden`}>
+        <h3 class={`${titleNeutral} tablet:hidden`}>
           RECENT SALES
         </h3>
-        <h3 class={`hidden tablet:block w-full text-right ${titleGreyDL}`}>
+        <h3
+          class={`hidden tablet:block w-full text-right ${titleNeutral} !bg-gradient-to-l`}
+        >
           RECENT SALES
         </h3>
       </div>
 
       {/* Show block title */}
-      <h4 class={`w-full text-right ${subtitleGrey}`}>
+      <h4 class={`w-full text-right ${subtitleNeutral}`}>
         {transactions.length > 0 && `BLOCK #${transactions[0].block_index}`}
       </h4>
 
@@ -37,7 +39,7 @@ export default function StampSendsGallery({
               key={index}
               stamp={stamp}
               isRecentSale
-              showDetails={false}
+              variant="cardSquare"
             />
           ))
           : (

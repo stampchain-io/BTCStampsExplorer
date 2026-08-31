@@ -6,7 +6,7 @@
 defined individually
   */
   --animation-timing: cubic-bezier(0.46,0.03,0.52,0.96);
-  --animation-bg: rgba(0, 0, 0, 0.25);
+  --animation-bg: #17171780; /* color-neutral-900/50 */
   --animation-duration-background: .5s;
 
   /* Base modal container styles */

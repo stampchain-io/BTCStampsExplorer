@@ -5,53 +5,63 @@
  * Overview
  * --------
  * The How-To modules are short intro guides that explain how to use the stamp tooling.
- * They are based upon the How-To articles and the intro guide modules all include a "Read More" button linking to the specific article, that goes more into depth on the subject.
+ * They are based upon the How-To articles and most of the intro guide modules include a "Read More" button (via ReadAllButton) linking to the specific article, that goes more into depth on the subject.
  * 
  * Module Files
  * -----------
- * Current modules in /islands/howto/:
- * - HowToStamp.tsx
- * - HowToTransferStamp.tsx
- * - HowToDeployToken.tsx
- * - HowToMintToken.tsx
- * - HowToTransferToken.tsx
- * - HowToRegisterBiname.tsx
- * - HowToTransferBitname.tsx
+ * Current modules in /islands/section/howto/:
+ * - SRC101RegisterHowto.tsx
+ * - SRC101TransferHowto.tsx
+ * - SRC20DeployHowto.tsx
+ * - SRC20MintHowto.tsx
+ * - SRC20TransferHowto.tsx
+ * - StampSendHowTo.tsx
+ * - StampingHowto.tsx
  * - doc.md (this documentation)
  * 
  * Creating a New Module
  * -------------------
  * To add a new How-To module:
  * 
- * 1. Create a new .tsx file in /islands/howto/
+ * 1. Create a new .tsx file in /islands/section/howto/
  * @example
- * // HowToTemplate.tsx
- * export default function HowToTemplate() {
+ * // NewFeatureHowto.tsx
+ * import { ReadAllButton } from "$button";
+ * import { containerBackground } from "$layout";
+ * import { subtitleNeutral, text, titleNeutral } from "$text";
+ *
+ * export const NewFeatureHowto = () => {
  *   return (
- *     <div>
- *       <h1>How to [Action]</h1>
- *       <div className="steps">
- *         {/* Add your steps here */}
+ *     <div class={`${containerBackground} gap-5`}>
+ *       <div class="flex flex-col">
+ *         <h3 class={titleNeutral}>HOW-TO</h3>
+ *         <h2 class={subtitleNeutral}>DO THE NEW FEATURE</h2>
+ *         <p class={text}>
+ *           <ul class="list-disc pl-5 space-y-2">
+ *             <li>Add your steps here.</li>
+ *           </ul>
+ *         </p>
  *       </div>
- *       <a href="/howto/[action-guide]">Read More</a>
+ *       <ReadAllButton href="/howto/newfeature" />
  *     </div>
  *   );
- * }
+ * };
  * 
  * - Alternately copy the code of one of the existing guides and paste it into a new file, updating the text content and button link
+ * - Export the new component from islands/section/index.ts so it can be imported via "$section"
  *
  * Best Practices
  * -------------
  * 1. Naming Convention
- *    - Prefix with "HowTo"
+ *    - Suffix with "Howto" (e.g. SRC20MintHowto, StampingHowto)
  *    - Use CamelCase
- *    - Be descriptive (e.g., HowToMintToken)
+ *    - Be descriptive (e.g., SRC20MintHowto)
  * 
  * 2. Content Guidelines
  *    - Keep instructions concise
  *    - Focus on essential steps
- *    - Always include "Read More" link
- *    - Link to detailed article
+ *    - Include a "Read More" link via `<ReadAllButton href="..." />` where the guide has a matching in-depth article
+ *    - Link to the detailed article under /howto/
  * 
  * Module Purpose
  * -------------
@@ -60,6 +70,6 @@
  * - Direct users to detailed documentation
  * - Maintain consistent user experience
  * 
- * @lastUpdated April 4, 2025
+ * @lastUpdated August 23, 2026
  * @author baba
  */

@@ -1,6 +1,6 @@
-import { useEffect, useRef } from "preact/hooks";
-import flatpickr from "flatpickr";
 import { inputField } from "$form";
+import flatpickr from "flatpickr";
+import { useEffect, useRef } from "preact/hooks";
 
 interface PropTypes {
   setDateRange: (date: Date[]) => void;

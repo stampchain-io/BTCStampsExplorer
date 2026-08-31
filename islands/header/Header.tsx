@@ -1,32 +1,21 @@
 /* ===== HEADER COMPONENT ===== */
-import { CloseIcon, Icon } from "$icon";
+import { Icon, LogoIcon } from "$icon";
 import { MenuButton } from "$islands/button/MenuButton.tsx";
 import { SearchButton } from "$islands/button/SearchButton.tsx";
 import { ToolsButton } from "$islands/button/ToolsButton.tsx";
 import { WalletButton } from "$islands/button/WalletButton.tsx";
-import {
-  glassmorphism,
-  glassmorphismOverlay,
-  transitionTransform,
-} from "$layout";
+import { container0, container1, transitionTransform } from "$layout";
 import { useFees } from "$lib/hooks/useFees.ts";
 import { tooltipIcon } from "$notification";
-import {
-  navLinkGreyLD,
-  navLinkGreyLDActive,
-  navLinkPurple,
-  navLinkPurpleActive,
-} from "$text";
+import { logoHeader, navLinkActiveDesktop, navLinkDesktop } from "$text";
 import { createPortal } from "preact/compat";
 import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 
 /* ===== NAVIGATION LINK INTERFACE ===== */
 interface NavLink {
-  title: string | {
-    default: string;
-    tablet: string;
-  };
+  title: string;
   href?: string;
+  icon?: string;
 }
 
 /* ===== TOOLS CONFIGURATION ===== */
@@ -34,54 +23,36 @@ interface NavLink {
 /* ===== DESKTOP NAVIGATION CONFIGURATION ===== */
 const desktopNavLinks: NavLink[] = [
   {
-    title: {
-      default: "ART STAMPS",
-      tablet: "STAMPS",
-    },
-    href: "/stamp?type=classic",
+    title: "Marketplace",
+    href: "/marketplace",
+    icon: "artStamp",
   },
   {
-    title: {
-      default: "COLLECTIONS",
-      tablet: "COLLECTIONS",
-    },
+    title: "Collections",
     href: "/collection",
+    icon: "artStamps",
   },
   {
-    title: {
-      default: "SRC-20 TOKENS",
-      tablet: "TOKENS",
-    },
+    title: "Tokens",
     href: "/src20",
+    icon: "src20Token",
   },
   {
-    title: {
-      default: "EXPLORER",
-      tablet: "EXPLORER",
-    },
+    title: "Explorer",
     href: "/explorer",
+    icon: "explorer",
   },
 ];
 
 /* ===== MOBILE NAVIGATION CONFIGURATION ===== */
-const mobileNavLinks: NavLink[] = [
-  {
-    title: "ART STAMPS",
-    href: "/stamp?type=classic",
-  },
-  {
-    title: "COLLECTIONS",
-    href: "/collection",
-  },
-  {
-    title: "SRC-20 TOKENS",
-    href: "/src20",
-  },
-  {
-    title: "EXPLORER",
-    href: "/explorer",
-  },
-];
+// Mobile/tablet drawer nav links live in islands/button/MenuButton.tsx — not here.
+// This file only drives the desktop (mobileLg+) pill nav via renderNavLinks().
+
+// Toggle nav link icons on/off for the desktop pill (default: disabled)
+const NAV_ICONS = false;
+
+// Desktop pill nav link position: "center" (absolute centred) | "right" (beside icon buttons)
+const NAV_POSITION: "center" | "right" = "center";
 
 /* ===== MAIN HEADER COMPONENT ===== */
 export function Header() {
@@ -312,8 +283,8 @@ export function Header() {
     if (toolsButtonRef.current) {
       const rect = toolsButtonRef.current.getBoundingClientRect();
       toolsPos = {
-        top: rect.bottom + 12,
-        left: rect.right - 550 + 61,
+        top: rect.bottom + 24,
+        left: rect.right - 550 + 56,
       };
     }
 
@@ -348,8 +319,8 @@ export function Header() {
     if (walletButtonRef.current) {
       const rect = walletButtonRef.current.getBoundingClientRect();
       walletPos = {
-        top: rect.bottom + 12,
-        left: rect.right - 150 - 15,
+        top: rect.bottom + 23.5,
+        left: rect.right - 150 - 50,
       };
     }
 
@@ -447,19 +418,19 @@ export function Header() {
       <div
         ref={drawerContent === type ? drawerRef : null}
         class={`flex tablet:hidden flex-col justify-between
-          fixed top-0 right-0 left-auto w-full min-[420px]:w-[340px] h-[100dvh] z-30
+          fixed top-0 right-0 left-auto w-full min-[420px]:w-[320px] h-[100dvh] z-modal
           min-[420px]:rounded-l-3xl min-[420px]:border-l-[1px]
           min-[420px]:border-l-color-border/75 min-[420px]:shadow-[-12px_0_12px_-6px_rgba(8,7,8,0.75)]
-          ${glassmorphismOverlay} ${transitionTransform} transition-transform will-change-transform
+          ${container0} ${transitionTransform} transition-transform will-change-transform
           overflow-y-auto overflow-x-hidden scrollbar-background-overlay
           ${isActive ? "translate-x-0" : "translate-x-full"}`}
         style="transition-timing-function: cubic-bezier(0.46,0.03,0.52,0.96);"
         id={`navbar-collapse-${type}`}
       >
         <div class="flex flex-col h-full">
-          <div class="pt-[29px] mobileLg:pt-[41px] px-9">
+          <div class="pt-[21px] px-7.5">
             <div class="flex flex-row justify-between items-center w-full">
-              <div class="relative">
+              <div class="relative -translate-x-3 translate-y-[1px]">
                 <div
                   class={`${tooltipIcon} ${
                     isCloseTooltipVisible ? "opacity-100" : "opacity-0"
@@ -467,10 +438,13 @@ export function Header() {
                 >
                   {closeTooltipText}
                 </div>
-                <CloseIcon
+                <Icon
+                  type="iconButton"
+                  name="close"
                   size="md"
                   weight="bold"
-                  color="greyLight"
+                  color="neutral400"
+                  ariaLabel="Close menu"
                   onClick={() => {
                     if (open) {
                       closeMenu();
@@ -478,12 +452,11 @@ export function Header() {
                   }}
                   onMouseEnter={handleCloseMouseEnter}
                   onMouseLeave={handleCloseMouseLeave}
-                  aria-label="Close menu"
                 />
               </div>
               <h6
-                class={`font-extrabold text-2xl color-grey-gradientLD tracking-wide select-none inline-block w-fit ${
-                  type === "menu" ? "italic font-black pr-0.5" : ""
+                class={`font-black text-2xl text-color-neutral-700 tracking-wide select-none ${
+                  type === "menu" ? "italic pr-0.5" : ""
                 }`}
               >
                 {getTitle()}
@@ -497,68 +470,47 @@ export function Header() {
   };
 
   /* ===== NAVIGATION LINKS RENDERER ===== */
-  const renderNavLinks = (isMobile = false) => {
+  // Desktop (mobileLg+) pill nav only. Mobile/tablet drawer nav is in MenuButton.tsx.
+  const renderNavLinks = () => {
     const isActive = (href?: string) => {
       if (!href || !currentPath) return false;
       const hrefPath = href.split("?")[0];
       return currentPath === hrefPath || currentPath.startsWith(`${hrefPath}/`);
     };
 
-    // Choose which navigation links to use based on mobile/desktop view
-    const filteredNavLinks = isMobile ? mobileNavLinks : desktopNavLinks;
-
     return (
       <>
-        {/* Map through each navigation link */}
-        {filteredNavLinks.map((link) => (
-          // Main container for each nav item
+        {desktopNavLinks.map((link) => (
           <div
-            // Generate unique key based on title type
-            key={typeof link.title === "string"
-              ? link.title
-              : link.title.default}
-            // Base styles for nav container with conditional mobile styling
-            class={`relative group ${isMobile ? "" : "mb-[2px]"}`}
+            key={link.title}
+            class="relative group mb-[2px]"
           >
-            {/* Main navigation link */}
             <a
               href={link.href}
-              // Click handler for navigation
               onClick={() => {
-                if (!link?.href) return; // Don't navigate if no href
+                if (!link?.href) return;
                 if (open) {
-                  closeMenu(); // Never open; only close if already open
+                  closeMenu();
                 }
-                setCurrentPath(link?.href ? link?.href : null); // Update current path
+                setCurrentPath(link?.href ? link?.href : null);
               }}
-              // Complex conditional styling for mobile/desktop
-              class={`inline-block w-full ${
-                isMobile
-                  ? isActive(link.href) ? navLinkGreyLDActive : navLinkGreyLD
-                  : isActive(link.href)
-                  ? navLinkPurpleActive
-                  : navLinkPurple
+              class={`flex items-center gap-2 ${
+                isActive(link.href) ? navLinkActiveDesktop : navLinkDesktop
               }`}
             >
-              {/* Responsive text label */}
-              {typeof link.title === "string" ? link.title : (
-                isMobile
-                  ? (
-                    // On mobile drawer, always show default label
-                    <span>{link.title.default}</span>
-                  )
-                  : (
-                    // Show abbreviated label initially and default label at tablet - 1024px
-                    <>
-                      <span class="hidden tablet:inline">
-                        {link.title.default}
-                      </span>
-                      <span class="inline tablet:hidden">
-                        {link.title.tablet}
-                      </span>
-                    </>
-                  )
+              {/* Left icon */}
+              {NAV_ICONS && link.icon && (
+                <Icon
+                  type="icon"
+                  name={link.icon}
+                  weight="normal"
+                  size="xxs"
+                  color="neutral400"
+                  className="group-hover:stroke-color-hover"
+                />
               )}
+              {/* Text label */}
+              <span>{link.title}</span>
             </a>
           </div>
         ))}
@@ -568,57 +520,70 @@ export function Header() {
 
   /* ===== LOGO ICON ===== */
   const logoIcon = (
-    <Icon
-      type="iconButton"
-      name="stampchain"
-      size="lg"
-      weight="light"
-      color="purpleLight"
-      className="ml-1.5"
+    <LogoIcon
       href="/home"
       f-partial="/home"
       onClick={() => setCurrentPath("home")}
-    />
+    >
+      <span class={`${logoHeader} hidden tablet:inline`}>
+        <span class="group-hover:text-color-hover transition-colors duration-200">
+          STAMP
+        </span>CHAIN
+      </span>
+    </LogoIcon>
   );
 
   /* ===== COMPONENT RENDER ===== */
   return (
     <header class="mobileLg:flex justify-between items-center max-w-desktop w-full mx-auto
-     px-gutter-mobile mobileLg:px-gutter-tablet tablet:px-gutter-desktop
-     pt-6 pb-9 mobileLg:pt-9 tablet:pb-14">
+     px-shell-mobile mobileLg:px-shell-tablet tablet:px-shell-desktop
+     pt-shell-mobile mobileLg:pt-shell-tablet tablet:pt-shell-desktop pb-5">
       {/* ===== MOBILE NAVIGATION ===== */}
-      <div class="mobileLg:hidden flex justify-between items-center w-full relative z-header">
-        {/* Left: Logo Icon */}
-        {logoIcon}
-
-        {/* Right: Search, Tools, Wallet and Menu Buttons */}
+      <div class="mobileLg:hidden flex items-center w-full relative z-header">
         <div
-          class={`flex items-center gap-7 py-1.5 px-5 ${glassmorphism} !rounded-full`}
+          class={`flex items-center justify-between w-full gap-7 py-0.5 px-5 ${container1} !rounded-full`}
         >
-          <SearchButton />
-          {ToolsButton({ onOpenDrawer: openDrawer, data: toolsData }).icon}
-          {WalletButton({
-            onOpenDrawer: openDrawer,
-            onCloseDrawer: closeMenu,
-          }).icon}
-          {MenuButton({ onOpenDrawer: openDrawer }).icon}
+          {/* Left: Logo Icon */}
+          {logoIcon}
+
+          {/* Right: Search, Tools, Wallet and Menu Buttons */}
+          <div class="flex items-center gap-2 -mr-2">
+            <SearchButton />
+            {ToolsButton({ onOpenDrawer: openDrawer, data: toolsData }).icon}
+            {WalletButton({
+              onOpenDrawer: openDrawer,
+              onCloseDrawer: closeMenu,
+            }).icon}
+            {MenuButton({ onOpenDrawer: openDrawer }).icon}
+          </div>
         </div>
       </div>
 
       {/* ===== TABLET/DESKTOP NAVIGATION ===== */}
-      <div class="hidden mobileLg:flex justify-between items-center w-full relative z-header">
-        {/* Left: Logo Icon */}
-        {logoIcon}
-
-        {/* Right: Navigation Links and Icon Buttons */}
+      <div class="hidden mobileLg:flex items-center w-full relative z-header">
         <div
-          class={`flex items-center gap-7 tablet:gap-6 py-1.5 tablet:py-1 px-5 tablet:px-4 ${glassmorphism} !rounded-full`}
+          class={`relative flex items-center justify-between w-full
+             py-0.5 px-4
+             ${container1} !rounded-full`}
         >
-          {/* Navigation Links */}
-          {renderNavLinks()}
+          {/* Left: Logo Icon */}
+          {logoIcon}
 
-          {/* Icon Buttons */}
-          <div class="flex items-center gap-5">
+          {/* Center: Navigation Links (only when NAV_POSITION === "center") */}
+          {NAV_POSITION === "center" && (
+            <div class="absolute left-1/2 -translate-x-1/2 flex items-center gap-6 tablet:gap-5">
+              {renderNavLinks()}
+            </div>
+          )}
+
+          {/* Right: Icon Buttons (nav links prepended when NAV_POSITION === "right") */}
+          <div class="flex items-center gap-2 tablet:gap-1">
+            {NAV_POSITION === "right" && (
+              <div class="flex items-center gap-6 tablet:gap-5 mr-2">
+                {renderNavLinks()}
+              </div>
+            )}
+
             <div class="relative group">
               <SearchButton />
             </div>
@@ -664,7 +629,7 @@ export function Header() {
 
         return shouldRenderTools && createPortal(
           <div
-            class={`hidden tablet:block fixed z-dropdown w-[550px] py-3.5 px-5 whitespace-nowrap ${glassmorphism} ${animationClass}`}
+            class={`hidden tablet:block !fixed z-dropdown w-[550px] py-3.5 px-5 whitespace-nowrap ${container1} ${animationClass}`}
             style={{
               top: `${dropdownState.toolsPos!.top}px`,
               left: `${dropdownState.toolsPos!.left}px`,
@@ -709,7 +674,7 @@ export function Header() {
 
         return shouldRenderWallet && createPortal(
           <div
-            class={`hidden tablet:block fixed z-dropdown min-w-[150px] py-3.5 px-5 justify-end whitespace-nowrap ${glassmorphism} ${animationClass}`}
+            class={`hidden tablet:block !fixed z-dropdown min-w-[150px] py-3.5 px-5 justify-end whitespace-nowrap ${container1} ${animationClass}`}
             style={{
               top: `${dropdownState.walletPos!.top}px`,
               left: `${dropdownState.walletPos!.left}px`,

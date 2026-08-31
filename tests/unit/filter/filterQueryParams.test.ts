@@ -2,7 +2,7 @@ import {
   defaultFilters,
   filtersToQueryParams,
   queryParamsToFilters,
-} from "$islands/filter/FilterOptionsStamp.tsx";
+} from "$islands/filter/FilterOptionsExplorerStamp.tsx";
 import { expect } from "jsr:@std/expect";
 
 Deno.test("filterToQueryParams - does not encode false values", () => {

@@ -58,7 +58,7 @@ const getCommonButtonProps = ({
 /* ===== COMPONENT ===== */
 export function Button({
   variant = "outline",
-  color = "grey",
+  color = "neutral",
   size = "mdR",
   disabled,
   isActive,
@@ -83,7 +83,7 @@ export function Button({
     active: isActive || undefined,
   });
 
-  const combinedClass = `${buttonClass} ${className ?? ""} group`;
+  const combinedClass = `${buttonClass} ${className ?? ""} group button-focus`;
 
   const commonProps = getCommonButtonProps({
     type,
@@ -117,7 +117,7 @@ export function Button({
 /* ===== ICON BUTTON COMPONENT ===== */
 export function ButtonIcon({
   variant = "outline",
-  color = "purple",
+  color = "primary",
   size = "md",
   disabled,
   isLoading,
@@ -153,7 +153,9 @@ export function ButtonIcon({
     role,
     ariaLabel,
     dataType,
-    className: `${buttonClass} ${className ?? ""} p-0 aspect-square`,
+    className: `${buttonClass} ${
+      className ?? ""
+    } p-0 aspect-square button-focus`,
     ref,
     ...props,
   });
@@ -176,7 +178,7 @@ export function ButtonIcon({
 /* ===== PROCESSING BUTTON COMPONENT ===== */
 export function ButtonProcessing({
   variant = "outline",
-  color = "grey",
+  color = "neutral",
   size = "mdR",
   disabled,
   isSubmitting,
@@ -214,7 +216,7 @@ export function ButtonProcessing({
     role,
     ariaLabel,
     dataType,
-    className: `${buttonClass} ${className ?? ""}`,
+    className: `${buttonClass} ${className ?? ""} button-focus`,
     ref,
     ...props,
   });

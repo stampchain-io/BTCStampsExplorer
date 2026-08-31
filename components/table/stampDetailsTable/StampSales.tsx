@@ -1,17 +1,17 @@
 /* ===== STAMP SALES TABLE COMPONENT ===== */
-import { cellAlign, colGroup } from "$components/layout/types.ts";
+import { colGroup } from "$components/layout/types.ts";
 import {
   cellCenterL2Detail,
   cellLeftL2Detail,
   cellRightL2Detail,
-  glassmorphismL2,
+  container2,
 } from "$layout";
 import {
   abbreviateAddress,
   formatDate,
   formatSatoshisToBTC,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
-import { labelXs, textSm, valueDarkSm, valueSmLink } from "$text";
+import { labelXxs, textXs, valueDarkSm } from "$text";
 import type { StampSalesProps } from "$types/ui.d.ts";
 
 /* ===== COMPONENT ===== */
@@ -19,28 +19,27 @@ export function StampSalesTable(
   { dispenses, isLoading = false }: StampSalesProps,
 ) {
   /* ===== CONSTANTS ===== */
-  const headers = ["FROM", "TO", "QUANTITY", "PRICE", "DATE"];
+  const headers = ["FROM", "TO", "AMOUNT", "PRICE", "DATE"];
 
   /* ===== RENDER ===== */
   return (
-    <div class="-mt-2 overflow-x-auto tablet:overflow-x-visible scrollbar-hide">
+    <div class="overflow-x-auto overflow-y-clip tablet:overflow-x-clip flow-root scrollbar-hide">
       <table
-        class={`w-full border-separate border-spacing-y-2 ${textSm}`}
+        class={`w-full -my-2 border-separate border-spacing-y-2 ${textXs}`}
       >
         {/* ===== TABLE STRUCTURE ===== */}
         <colgroup>
           {colGroup([
             { width: "min-w-[150px] w-auto" }, // FROM
             { width: "min-w-[150px] w-auto" }, // TO
-            { width: "min-w-[100px] w-auto" }, // QUANTITY
+            { width: "min-w-[100px] w-auto" }, // AMOUNT
             { width: "min-w-[150px] w-auto" }, // PRICE
             { width: "min-w-[150px] w-auto" }, // DATE
           ]).map((col) => <col key={col.key} class={col.className} />)}
         </colgroup>
         {/* ===== TABLE HEADER ===== */}
-        <thead class="sticky top-0 z-10">
-          {/* Only sticky on desktop */}
-          <tr class={`${glassmorphismL2}`}>
+        <thead>
+          <tr class={container2}>
             {headers.map((header, i) => {
               const isFirst = i === 0;
               const isLast = i === (headers?.length ?? 0) - 1;
@@ -55,9 +54,7 @@ export function StampSalesTable(
               return (
                 <th
                   key={header}
-                  class={`${
-                    cellAlign(i, headers?.length ?? 0)
-                  } !py-1.5 ${rowClass} ${labelXs}`}
+                  class={`sticky top-0 z-10 !py-1.5 ${rowClass} ${labelXxs}`}
                 >
                   {header}
                 </th>
@@ -71,17 +68,15 @@ export function StampSalesTable(
             ? dispenses?.map((dispense, index) => (
               <tr
                 key={`${dispense.tx_hash}-${index}`}
-                class={`${glassmorphismL2} group`}
+                class={`${container2} group`}
               >
                 {/* FROM */}
                 <td
-                  class={`${
-                    cellAlign(0, headers?.length ?? 0)
-                  } ${cellLeftL2Detail}`}
+                  class={cellLeftL2Detail}
                 >
                   <a
                     href={`/wallet/${dispense.source}`}
-                    className={`${valueSmLink}`}
+                    className="link-neutral-200"
                   >
                     <span class="tablet:hidden">
                       {abbreviateAddress(dispense.source, 4)}
@@ -93,13 +88,11 @@ export function StampSalesTable(
                 </td>
                 {/* TO */}
                 <td
-                  class={`${
-                    cellAlign(1, headers?.length ?? 0)
-                  } ${cellCenterL2Detail}`}
+                  class={cellCenterL2Detail}
                 >
                   <a
                     href={`/wallet/${dispense.destination}`}
-                    className={`${valueSmLink}`}
+                    className="link-neutral-200"
                   >
                     <span class="tablet:hidden">
                       {abbreviateAddress(dispense.destination, 4)}
@@ -109,19 +102,15 @@ export function StampSalesTable(
                     </span>
                   </a>
                 </td>
-                {/* QUANTITY */}
+                {/* AMOUNT */}
                 <td
-                  class={`${
-                    cellAlign(2, headers?.length ?? 0)
-                  } ${cellCenterL2Detail}`}
+                  class={`${cellCenterL2Detail} text-color-primary-400`}
                 >
                   {Number(dispense.dispense_quantity).toLocaleString()}
                 </td>
                 {/* PRICE */}
                 <td
-                  class={`${
-                    cellAlign(3, headers?.length ?? 0)
-                  } ${cellCenterL2Detail}`}
+                  class={`${cellCenterL2Detail} text-color-orange-400`}
                 >
                   {formatSatoshisToBTC(dispense.satoshirate, {
                     includeSymbol: true,
@@ -131,9 +120,7 @@ export function StampSalesTable(
                 </td>
                 {/* DATE */}
                 <td
-                  class={`${
-                    cellAlign(4, headers?.length ?? 0)
-                  } ${cellRightL2Detail} text-color-grey`}
+                  class={`${cellRightL2Detail} text-color-neutral-400`}
                 >
                   {dispense.block_time
                     ? formatDate(new Date(dispense.block_time), {
@@ -149,7 +136,7 @@ export function StampSalesTable(
               <tr>
                 <td
                   colSpan={headers?.length ?? 0}
-                  class={`w-full h-[34px] ${glassmorphismL2}`}
+                  class={`w-full h-[34px] ${container2}`}
                 >
                   <h6 class={`${valueDarkSm} text-center`}>
                     NO SALES YET

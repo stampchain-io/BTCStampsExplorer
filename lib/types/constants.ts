@@ -235,6 +235,7 @@ export function getStampTypeDisplay(type: StampType): string {
     [STAMP_TYPES.CURSED]: "Cursed Stamps",
     [STAMP_TYPES.CLASSIC]: "Classic Stamps",
     [STAMP_TYPES.POSH]: "Posh Stamps",
+    [STAMP_TYPES.SRC721]: "Recursive Stamps",
     [STAMP_TYPES.SRC20]: "SRC-20 Images",
   };
   return displays[type] || type;

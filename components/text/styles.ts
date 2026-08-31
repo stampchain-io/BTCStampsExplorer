@@ -1,111 +1,122 @@
 /* ===== TEXT STYLES MODULE ===== */
+/* ======================================================================== */
 
 /* ===== BASE STYLES ===== */
-const logoFont = "font-black italic text-3xl tracking-wide inline-block w-fit";
-const titleFont = "font-black text-3xl tracking-wide inline-block w-fit";
-const subtitleFont = "font-extralight text-2xl mb-2";
-const textFont = "font-normal text-color-grey-light";
-const labelFont = "font-light text-color-grey-semidark tracking-wide";
-const valueFont = "font-medium text-color-grey-light";
+const logoFont = "font-black italic tracking-wide";
+const titleFont =
+  "font-black text-3xl uppercase tracking-tight -mt-1.5 inline-block w-fit cursor-default";
+const subtitleFont = "font-light text-2xl uppercase mb-2 cursor-default";
+const textFont = "font-normal text-color-neutral-200";
+const labelFont = "font-light text-color-neutral-500 tracking-wide";
+const valueFont = "font-medium text-color-neutral-200";
 const select = "select-none whitespace-nowrap";
 const transitionColors = "transition-colors duration-200";
+export const truncate = "truncate max-w-[97%]";
 
-/* ===== OVERLAY STYLES ===== */
-// Overlays - used for text overlay effects of whole divs - text must be transparent or not declared with tailwind css
-export const overlayPurple =
-  `bg-gradient-to-l from-color-purple-semilight/80 via-color-purple-semilight/90 to-color-purple-semilight
-  tablet:bg-gradient-to-r text-transparent bg-clip-text`;
+/* ======================================================================== */
+
+/* ======================================================================== */
 
 /* ===== LOGO STYLES ===== */
-export const logoPurpleDL = `${logoFont} color-purple-gradientDL ${select}`; // used in footer
-export const logoPurpleDLLink =
-  `${logoFont} color-purple-gradientDL-hover ${transitionColors} cursor-pointer ${select}`;
-export const logoPurpleLD = `${logoFont} color-purple-gradientLD ${select}`;
-export const logoPurpleLDLink =
-  `${logoFont} color-purple-gradientLD-hover ${transitionColors} cursor-pointer ${select}`;
+export const logoHeader = // used in header wordmark (tablet+)
+  `${logoFont} text-xl text-color-neutral-400 ${transitionColors} ${select}`;
+export const logoFooter = // used in footer
+  `${logoFont} text-3xl text-color-primary-400 ${select}`;
+
+/* ======================================================================== */
 
 /* ===== NAVIGATION STYLES ===== */
-// Header - Desktop
-export const navLinkPurple =
-  `font-semibold tablet:font-normal text-color-purple-semilight text-sm tablet:text-[13px] group-hover:text-color-purple-light tracking-wider ${transitionColors} cursor-pointer ${select}`;
-export const navLinkPurpleActive =
-  `${navLinkPurple} !text-color-purple-light hover:!text-color-purple-semilight`;
-export const navSublinkPurple =
-  `font-light text-color-purple-semilight text-[13px] hover:text-color-purple-light tracking-wider ${transitionColors} cursor-pointer ${select}`; // used in WalletButton and ToolsButton for submenu links
-export const navSublinkPurpleActive =
-  `${navSublinkPurple} !text-color-purple-light hover:!text-color-purple-semilight`;
-// Header - Mobile/tablet
-export const navLinkGrey =
-  `font-semibold text-sm tablet:text-xs text-color-grey hover:text-color-grey-light
+// Header Navigation - Desktop
+export const navLinkDesktop =
+  `mt-0.5 font-normal tablet:font-normal text-sm tablet:text-xs uppercase
+  text-color-neutral-400 group-hover:text-color-hover tracking-[0.01rem] ${transitionColors} cursor-pointer ${select}`;
+export const navLinkActiveDesktop =
+  `${navLinkDesktop} !text-color-hover !cursor-default`;
+export const navSublinkDesktop =
+  `font-normal text-xs uppercase text-color-neutral-400 hover:text-color-hover tracking-tight ${transitionColors} cursor-pointer ${select}`; // used in WalletButton and ToolsButton for submenu links
+export const navSublinkActiveDesktop =
+  `${navSublinkDesktop} !text-color-hover !cursor-default`;
+
+// Drawer Navigation - Mobile/tablet
+export const navLinkMobile = `font-light text-xl uppercase
+  text-color-neutral-400 hover:text-color-hover
+  tracking-wider cursor-pointer ${select}`;
+export const navLinkActiveMobile =
+  `${navLinkMobile} text-color-hover !cursor-default`;
+export const navSublinkMobile = `font-semibold text-sm tablet:text-xs uppercase
+  text-color-neutral-500 hover:text-color-hover
   tracking-wide ${transitionColors} cursor-pointer ${select}`;
-export const navLinkGreyActive =
-  `${navLinkGrey} !text-color-grey-light hover:!text-color-grey`;
-export const navLinkGreyLD =
-  `font-light text-xl tablet:text-lg color-grey-gradientLD-hover tracking-wider inline-block w-fit ${transitionColors} cursor-pointer ${select}`;
-export const navLinkGreyLDActive =
-  `${navLinkGreyLD} text-color-grey-light [background:none_!important] [-webkit-text-fill-color:var(--color-grey-semilight)_!important] [text-fill-color:var(--color-grey-semilight)_!important] hover:[-webkit-text-fill-color:var(--color-grey)!important] hover:[text-fill-color:var(--color-grey)!important]`;
-// Footer - transparent text - ued with the overlayPurple class
-export const navLinkTransparentPurple =
-  `font-light text-[13px] hover:text-color-purple-light tracking-wider ${transitionColors} cursor-pointer ${select}`;
+export const navSublinkActiveMobile =
+  `${navSublinkMobile} !text-color-hover !cursor-default`;
+
+// Footer - transparent text - used with the navLinkFooterOverlay class
+export const navLinkFooter =
+  `font-normal text-[0.8125rem] tablet:text-xs uppercase hover:text-color-hover tracking-tight ${transitionColors} cursor-pointer ${select}`;
+export const navLinkFooterOverlay =
+  `bg-gradient-to-b tablet:bg-gradient-to-r from-color-neutral-400 via-color-neutral-400 to-color-neutral-500 text-transparent bg-clip-text`;
+
+/* ======================================================================== */
 
 /* ===== TITLE STYLES ===== */
-export const titleGreyLD =
-  `${titleFont} color-grey-gradientLD cursor-default ${select}`;
-export const titleGreyDL =
-  `${titleFont} color-grey-gradientDL cursor-default ${select}`;
-export const titlePurpleLD =
-  `${titleFont} color-purple-gradientLD cursor-default ${select}`;
-export const titlePurpleDL =
-  `${titleFont} color-purple-gradientDL cursor-default ${select}`;
+export const titleNeutral = `${titleFont} text-color-neutral-400 ${select}`;
+export const titlePrimary = `${titleFont} text-color-primary-400 ${select}`;
+export const titleSecondary = `${titleFont} text-color-secondary-400 ${select}`;
+
+/* ======================================================================== */
 
 /* ===== SUBTITLE STYLES ===== */
-export const subtitleGrey =
-  `${subtitleFont} text-color-grey-light cursor-default ${select}`;
-export const subtitlePurple =
-  `${subtitleFont} text-color-purple-light cursor-default ${select}`;
+export const subtitleNeutral =
+  `${subtitleFont} text-color-neutral-300 ${select}`;
+export const subtitlePrimary =
+  `${subtitleFont} text-color-primary-300 ${select}`;
+export const subtitleSecondary =
+  `${subtitleFont} text-color-secondary-300 ${select}`;
+
+/* ======================================================================== */
 
 /* ===== HEADING STYLES ===== */
 export const headingGrey2 =
   `font-black text-3xl mobileLg:text-4xl text-color-grey-light tracking-wide ${select}`; // was used in about donate section - rename
 export const headingGreyLD =
-  `font-bold text-xl color-grey-gradientLD tracking-wide inline-block w-fit relative ${select}`;
+  `font-bold text-xl bg-gradient-to-r color-neutral-gradient tracking-wide inline-block w-fit relative ${select}`;
 export const headingGreyLDLink =
-  `font-bold text-lg color-grey-gradientLD-hover tracking-wide inline-block w-fit relative ${transitionColors} cursor-pointer ${select}`; // used in media page / keep reading in howto pages / accordion titles (custom code)
+  `font-bold text-lg bg-gradient-to-r color-neutral-gradient color-gradient-hover tracking-wide inline-block w-fit relative cursor-pointer ${select}`; // used in media page / keep reading in howto pages / accordion titles (custom code)
 export const headingGreyDLLink =
-  `font-bold text-lg color-grey-gradientDL-hover tracking-wide inline-block w-fit relative -mt-1 ${transitionColors} cursor-pointer ${select}`; // used in collection and stamp detail pages
+  `font-bold text-lg bg-gradient-to-l color-neutral-gradient color-gradient-hover tracking-wide inline-block w-fit relative -mt-1 cursor-pointer ${select}`; // used in collection and stamp detail pages
 export const headingGrey =
-  `font-bold text-2xl text-color-grey cursor-default ${select}`; // used in howto overview and detail pages / donate CTA
+  `font-bold text-2xl text-color-neutral-300 cursor-default ${select}`; // used in howto overview and detail pages / donate CTA
 export const headingPurpleLD =
-  "font-black text-sm mobileMd:text-lg color-purple-gradientLD tracking-wide inline-block w-fit text-center mt-3 mobileMd:mt-4 mobileLg:mt-5 mb-1 mobileMd:mb-0"; // used specifically in team banner gallery
+  `font-black text-sm mobileMd:text-lg bg-gradient-to-r color-primary-gradient tracking-wide inline-block w-fit text-center mt-3 mobileMd:mt-4 mobileLg:mt-5 mb-1 mobileMd:mb-0 ${select}`; // used specifically in team banner gallery
+
+/* ======================================================================== */
 
 /* ===== BODY TEXT STYLES ===== */
-export const textXxs = `${textFont} text-[10px]`;
+export const textXxs = `${textFont} text-[0.625rem]`;
 export const textXs = `${textFont} text-xs`;
 export const textSm = `${textFont} text-sm`;
 export const textSmLink =
-  `${textFont} text-sm hover:text-color-purple-light ${transitionColors} cursor-pointer ${select}`;
+  `${textFont} text-sm hover:text-color-hover ${transitionColors} cursor-pointer ${select}`;
 export const text = `${textFont} text-base`;
 export const textLg = `${textFont} text-lg`;
 export const textXl = `${textFont} text-xl`;
 export const text2xl = `${textFont} text-2xl`;
 export const textLinkUnderline =
-  `font-bold text-base text-color-grey-light animated-underline ${transitionColors}`;
+  `font-bold text-base text-color-neutral-200 link-neutral-200-bold ${transitionColors}`;
 
 /* ===== LINK STYLES ===== */
-// Use the specific link styles created or just add "animated-underline" to the class name to apply an animated underline effect
+// Use the specific link styles created or just add "link-neutral-200-bold" to the class name to apply an animated underline effect
+
+/* ======================================================================== */
 
 /* ===== LABEL STYLES ===== */
-export const labelXxs = `${labelFont} text-[10px] ${select}`;
+export const labelXxs = `${labelFont} text-[0.625rem] ${select}`;
 export const labelXs = `${labelFont} text-xs ${select}`;
 export const labelSm = `${labelFont} text-sm ${select}`;
-export const label = `${labelFont} text-base ${select}`; // old dataLabel name
+export const label = `${labelFont} text-base ${select}`;
 export const labelLg = `${labelFont} text-lg ${select}`;
 export const labelXl = `${labelFont} text-xl ${select}`;
-export const labelXsR = `${labelFont} text-xs tablet:text-[10px] ${select}`; // used for the filter file type labels
-export const labelXsPosition =
-  `flex justify-end mt-1 tablet:mt-0 -mb-5 tablet:-mb-4`; // used for the filter file type label positioning
+export const labelXsR = `${labelFont} text-xs tablet:text-[0.625rem] ${select}`; // used for the filter file type labels
 export const labelLightSm = `font-light text-sm text-color-grey ${select}`;
-
 export const labelSmPurple =
   `font-light text-sm text-color-purple-light tracking-wide mb-0.5 ${select}`;
 
@@ -114,26 +125,27 @@ export const labelLogicResponsive = ( // used for the filter labels
   canHoverSelected: boolean,
 ): string => `
   inline-block ml-3 tablet:ml-[9px] pt-[1px] tablet:pt-0
-  font-semibold text-sm tablet:text-xs
-  transition-colors duration-200
-  select-pointer select-none
+  font-medium text-sm tablet:text-xs
+  ${transitionColors} ${select} cursor-pointer
   ${
   checked
     ? canHoverSelected
-      ? "text-color-grey-light group-hover:text-color-grey"
-      : "text-color-grey-light"
+      ? "text-color-primary-400 group-hover:text-color-hover"
+      : "text-color-primary-400"
     : canHoverSelected
-    ? "text-color-grey group-hover:text-color-grey-light"
-    : "text-color-grey"
+    ? "text-color-neutral-400 group-hover:text-color-hover"
+    : "text-color-neutral-400"
 }
 `;
 
+/* ======================================================================== */
+
 /* ===== VALUE STYLES ===== */
-// Grey variants
+// Neutral variants
 export const valueXs = `${valueFont} text-xs ${select}`;
 export const valueSm = `${valueFont} text-sm ${select}`;
 export const valueSmLink =
-  `${valueFont} text-sm hover:text-color-purple-light ${transitionColors} cursor-pointer w-full ${select}`;
+  `${valueFont} text-sm hover:text-color-hover ${transitionColors} cursor-pointer w-full ${select}`;
 export const value = `${valueFont} text-base ${select}`;
 export const valueLg = `${valueFont} text-lg ${select}`;
 export const valueXl =
@@ -155,16 +167,16 @@ export const value5xlPurpleGlow =
 export const value7xlPurpleGlow =
   `font-black text-7xl text-black text-stroke-glow-large cursor-default ${select}`; // used in about header
 // Dark variants
-export const valueDarkXs =
-  `font-medium text-xs text-color-grey-semidark tracking-tighter ${select}`; // used for addy styling in mobile/table header
 export const valueDarkSm =
-  `font-medium text-sm text-color-grey-semidark tracking-tighter ${select}`; // used for addy styling in desktop header
+  `font-normal text-sm text-color-neutral-500 ${select}`; // used for tables and addy styling in wallet button
 export const valueDark =
-  `font-semibold text-base text-color-grey-semidark ${select}`; // used in tables
+  `font-semibold text-base text-color-neutral-500 ${select}`; // used in stamp details CPID and stamp number
+export const valueDarkLg =
+  `font-semibold text-lg text-color-neutral-500 ${select}`; // used in stamp details html title
 // Color variants
-export const valuePositive = `text-color-green-semilight`;
-export const valueNegative = `text-color-red-semilight`;
-export const valueNeutral = `text-color-grey-semidark`;
+export const valuePositive = `text-color-green-400`;
+export const valueNegative = `text-color-red-400`;
+export const valueNeutral = `text-color-neutral-400`;
 
 /* ===== NOTIFICATION AND TOOLTIP STYLES ===== */
 // One text style for tooltips - defined in /notifications/styles.ts
@@ -173,83 +185,82 @@ export const valueNeutral = `text-color-grey-semidark`;
 /* ===== CODE STYLES ===== */
 // Add "font-courier-prime" to the class name to use the Courier font and make text monospace
 
+/* ======================================================================== */
+
 /* ===== SPECIAL TEXT STYLES ===== */
-export const tagline =
-  `font-regular text-xs bg-gradient-to-r from-color-purple-light via-color-purple-semilight to-color-purple-semidark text-transparent bg-clip-text cursor-default ${select}`; // used in footer
+export const eyebrowNeutral =
+  `font-bold text-xs tablet:text-[0.625rem] text-color-neutral-700 tracking-wider cursor-default ${select}`; // descriptive text above icons, links, etc.
+export const eyebrowPrimary =
+  `font-bold text-sm tablet:text-[0.625rem] text-color-primary-300 tracking-wider cursor-default ${select}`;
+export const eyebrowSecondary =
+  `font-bold text-sm tablet:text-[0.625rem] text-color-secondary-300 tracking-wider cursor-default ${select}`;
+export const eyebrowPositionFilter =
+  `flex justify-end mt-1 tablet:mt-0 -mb-5 tablet:-mb-4`; // used for the filter file type label positioning
+export const tagline = `font-regular text-xs text-color-neutral-400 ${select}`; // used in footer
 export const copyright =
-  `font-normal text-xs mobileMd:text-sm tablet:text-xs text-color-grey-dark cursor-default ${select}`; // used in the footer for copyright and counterparty version text
+  `font-normal text-xs text-color-neutral-600 cursor-default ${select}`; // used in the footer for copyright and counterparty version text
 export const toggleSymbol =
   `font-bold text-[10px] text-black cursor-default ${select}`; // used in ToggleSwitchButton.tsx for $/BTC symbols
 
-// Captions - used for stamp/token cards
+/* ======================================================================== */
 
 /* ===== CARD TEXT STYLES ===== */
 // Standard card styles
-export const cardHashSymbol =
-  `font-light text-color-purple-light text-lg mobileLg:text-xl ${select}`;
-export const cardStampNumber =
-  `font-extrabold text-color-purple-light truncate max-w-full text-lg mobileLg:text-xl ${select}`;
+export const cardStampNumber = `font-extrabold text-base min-[420px]:text-lg
+   text-color-neutral-200 group-hover:text-color-hover
+   tracking-wide ${truncate} ${select}`;
+export const cardRowStampNumber = `font-extrabold text-sm
+   text-color-neutral-200 group-hover:text-color-hover tracking-wide ${truncate} ${select}`;
 export const cardCreator =
-  `font-semibold text-color-grey-light break-words text-center pt-1 text-xs mobileMd:text-sm ${select}`;
-export const cardPrice =
-  `font-normal text-color-grey-light text-nowrap text-xs mobileLg:text-sm ${select}`;
-export const cardMimeType =
-  `font-normal text-color-grey text-nowrap text-xs mobileLg:text-sm ${select}`;
+  `font-medium text-sm text-color-neutral-200 text-center ${truncate} ${select}`;
 export const cardSupply =
-  `font-medium text-color-grey text-right text-xs mobileLg:text-base ${select}`;
-
-// Minimal card variant styles
-export const cardHashSymbolMinimal =
-  `font-light text-color-grey-light group-hover:text-color-purple-light text-xs mobileSm:text-base mobileLg:text-xl tablet:text-xl desktop:text-xl ${transitionColors} ${select}`;
-export const cardStampNumberMinimal =
-  `font-black color-grey-gradientLD group-hover:[-webkit-text-fill-color:var(--color-purple-light)] truncate text-sm mobileSm:text-base mobileLg:text-xl tablet:text-xl desktop:text-xl ${transitionColors} ${select}`;
-export const cardPriceMinimal =
-  `font-normal text-color-grey truncate text-nowrap text-[10px] mobileMd:text-xs mobileLg:text-sm ${select}`;
-
-// Grey gradient card variant styles
-export const cardHashSymbolGrey =
-  `font-light text-color-grey group-hover:text-color-purple-light text-lg min-[420px]:text-xl ${transitionColors} ${select}`;
-export const cardStampNumberGrey =
-  `font-black color-grey-gradientLD group-hover:[-webkit-text-fill-color:var(--color-purple-light)] truncate max-w-full text-lg min-[420px]:text-xl ${transitionColors} ${select}`;
-
-/* ===== CARD CONFIGURATION - check if used ===== */
-export const ABBREVIATION_LENGTHS = {
-  desktop: 5,
-  tablet: 5,
-  mobileLg: 4,
-  mobileMd: 5,
-  mobileSm: 5,
-} as const;
+  `font-semibold text-xs text-color-primary-400 ${select}`;
+export const cardFileType =
+  `font-medium text-xs text-color-neutral-200 text-nowrap ${select}`;
+export const cardFileSize =
+  `font-normal text-xs text-color-neutral-400 text-nowrap ${select}`;
+export const cardPrice =
+  `font-medium text-xs text-color-secondary-400 text-nowrap ${select}`;
+export const cardEyebrowNeutral =
+  `font-bold text-[0.625rem] text-color-neutral-600 tracking-wider ${select}`;
+// Compact card variant styles
+export const cardStampNumberCompact =
+  `font-extrabold text-sm min-[420px]:text-base
+  text-color-neutral-200 group-hover:text-color-hover
+  tracking-wide truncate ${select} max-w-full`;
+export const cardPriceCompact = `font-medium text-[0.625rem] mobileLg:text-xs
+   text-color-secondary-400 text-nowrap ${select}`;
 
 /* ===== UNCATEGORIZED STYLES ===== */
 // Add any new styles you cannot categorize here
 
+/* ======================================================================== */
+
 /* ===== TYPE DEFINITIONS ===== */
 export type TextStyles = {
-  // Overlay styles
-  overlayPurple: string;
+  truncate: string;
   // Logo styles
-  logoPurpleDL: string;
-  logoPurpleDLLink: string;
-  logoPurpleLD: string;
-  logoPurpleLDLink: string;
+  logoHeader: string;
+  logoFooter: string;
   // Navigation styles
-  navLinkPurple: string;
-  navLinkPurpleActive: string;
-  navSublinkPurple: string;
-  navSublinkPurpleActive: string;
-  navLinkGrey: string;
-  navLinkGreyLD: string;
-  navLinkGreyLDActive: string;
-  navLinkTransparentPurple: string;
+  navLinkDesktop: string;
+  navLinkActiveDesktop: string;
+  navSublinkDesktop: string;
+  navSublinkActiveDesktop: string;
+  navLinkMobile: string;
+  navLinkActiveMobile: string;
+  navSublinkMobile: string;
+  navSublinkActiveMobile: string;
+  navLinkFooter: string;
+  navLinkFooterOverlay: string;
   // Title styles
-  titleGreyLD: string;
-  titleGreyDL: string;
-  titlePurpleLD: string;
-  titlePurpleDL: string;
+  titleNeutral: string;
+  titlePrimary: string;
+  titleSecondary: string;
   // Subtitle styles
-  subtitleGrey: string;
-  subtitlePurple: string;
+  subtitleNeutral: string;
+  subtitlePrimary: string;
+  subtitleSecondary: string;
   // Heading styles
   headingGrey2: string;
   headingGreyLD: string;
@@ -275,7 +286,7 @@ export type TextStyles = {
   labelLg: string;
   labelXl: string;
   labelXsR: string;
-  labelXsPosition: string;
+
   labelLightSm: string;
   labelSmPurple: string;
   labelLogicResponsive: (
@@ -298,24 +309,27 @@ export type TextStyles = {
   value5xlPurpleGlow: string;
   value7xlPurpleGlow: string;
   valueDarkSm: string;
-  valueDarkXs: string;
   valueDark: string;
-  valueGain: string;
-  valueLoss: string;
+  valuePositive: string;
+  valueNegative: string;
+  valueNeutral: string;
   // Special text styles
+  eyebrowNeutral: string;
+  eyebrowPrimary: string;
+  eyebrowSecondary: string;
+  eyebrowPositionFilter: string;
   tagline: string;
   copyright: string;
   toggleSymbol: string;
   // Card text styles
-  cardHashSymbol: string;
   cardStampNumber: string;
+  cardRowStampNumber: string;
   cardCreator: string;
-  cardPrice: string;
-  cardMimeType: string;
   cardSupply: string;
-  cardHashSymbolMinimal: string;
-  cardStampNumberMinimal: string;
-  cardPriceMinimal: string;
-  cardHashSymbolGrey: string;
-  cardStampNumberGrey: string;
+  cardFileType: string;
+  cardFileSize: string;
+  cardPrice: string;
+  cardEyebrowNeutral: string;
+  cardStampNumberCompact: string;
+  cardPriceCompact: string;
 };

@@ -2,7 +2,7 @@
 import { SearchErrorDisplay, SearchInputField } from "$form";
 import { Icon } from "$icon";
 import { closeModal, openModal, searchState } from "$islands/modal/states.ts";
-import { ModalSearchBase, transitionColors } from "$layout";
+import { container1, ModalSearchBase, transitionColors } from "$layout";
 import { generateSearchErrorMessage } from "$lib/utils/data/search/searchInputClassifier.ts";
 import { isValidBitcoinAddress } from "$lib/utils/typeGuards.ts";
 import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
@@ -161,7 +161,7 @@ function SearchContent({
   const error = searchState.value.error;
 
   return (
-    <>
+    <div class={container1}>
       <SearchInputField
         value={searchState.value.term}
         onChange={setSearchTerm}
@@ -169,7 +169,6 @@ function SearchContent({
         placeholder="TOKEN, ADDY OR TX HASH"
         inputRef={inputRef}
         autoFocus={autoFocus}
-        hasResults={rawResults.length > 0}
         hasError={!!error}
         isLoading={searchState.value.isLoading}
       />
@@ -178,7 +177,7 @@ function SearchContent({
         ? <SearchErrorDisplay error={error} />
         : rawResults.length > 0
         ? (
-          <ul class="max-h-[266px] bg-color-background/50 rounded-b-3xl z-modal overflow-y-auto scrollbar-background-overlay [&::-webkit-scrollbar]:!rounded-[2px] [&::-webkit-scrollbar]:!w-[4px]">
+          <ul class="max-h-[266px] rounded-b-3xl z-modal overflow-y-auto scrollbar-background-overlay [&::-webkit-scrollbar]:!rounded-[2px] [&::-webkit-scrollbar]:!w-[4px]">
             {rawResults.map(
               (result) =>
                 result._addressLink
@@ -197,14 +196,14 @@ function SearchContent({
                           name="wallet"
                           weight="normal"
                           size="md"
-                          color="greyLight"
+                          color="neutral400"
                         />
                       </div>
                       <div class="flex flex-col flex-1 min-w-0">
-                        <span class="text-sm font-medium text-stamp-grey-light">
+                        <span class="text-sm font-medium text-color-grey-light">
                           VIEW WALLET
                         </span>
-                        <span class="text-xs text-stamp-grey truncate">
+                        <span class="text-xs text-color-grey truncate">
                           {result.address?.startsWith("bc1p")
                             ? abbreviateAddress(result.address, 20)
                             : result.address}
@@ -240,6 +239,6 @@ function SearchContent({
           </ul>
         )
         : null}
-    </>
+    </div>
   );
 }

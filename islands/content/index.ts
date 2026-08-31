@@ -1,6 +1,6 @@
 /* ===== PAGECONTENT ===== */
-/* ===== STAMP =====  */
-export * from "$islands/content/StampOverviewContent.tsx";
+/* ===== MARKETPLACE ===== */
+export * from "$islands/content/MarketplaceContent.tsx";
 /*@baba-refactor/rename stamp details content  */
 export * from "$islands/content/stampDetailContent/StampImage.tsx";
 export * from "$islands/content/stampDetailContent/StampInfo.tsx";
@@ -12,10 +12,11 @@ export * from "$islands/content/SRC20OverviewContent.tsx";
 
 /* ===== COLLECTION ===== */
 export * from "$islands/content/CollectionDetailContent.tsx";
+export * from "$islands/content/CollectionOverviewContent.tsx";
 
 /* ===== WALLET ===== */
+export { default as WalletContent } from "$islands/content/WalletContent.tsx";
 export { default as WalletDashboardContent } from "$islands/content/WalletDashboardContent.tsx";
-export { default as WalletProfileContent } from "$islands/content/WalletProfileContent.tsx";
 
 /* ===== FAQ ===== */
 export * from "$islands/content/faqContent/AccordionBase.tsx";

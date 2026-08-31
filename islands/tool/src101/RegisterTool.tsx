@@ -11,9 +11,9 @@ import DetailSRC101Modal from "$islands/modal/DetailSRC101Modal.tsx";
 import { openModal } from "$islands/modal/states.ts";
 import {
   bodyTool,
+  container2Hover,
   containerBackground,
   containerGap,
-  glassmorphismL2Hover,
   transitionAll,
 } from "$layout";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
@@ -21,7 +21,7 @@ import { logger } from "$lib/utils/logger.ts";
 import { mapProgressiveFeeDetails } from "$lib/utils/performance/fees/fee-estimation-utils.ts";
 import { StatusMessages, tooltipButton } from "$notification";
 import { FeeCalculatorBase } from "$section";
-import { titleGreyLD } from "$text";
+import { titleNeutral } from "$text";
 import type { ROOT_DOMAIN_TYPES } from "$types/base.d.ts";
 import type { SRC101Balance } from "$types/src101.d.ts";
 import type { SRC101RegisterToolProps } from "$types/ui.d.ts";
@@ -207,7 +207,7 @@ export function SRC101RegisterTool({
   if (!config) {
     return (
       <div class={`${bodyTool} ${containerGap}`}>
-        <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
+        <h1 class={`${titleNeutral} mx-auto -mb-2 mobileLg:-mb-4`}>
           REGISTER
         </h1>
         <RegisterToolSkeleton />
@@ -273,7 +273,7 @@ export function SRC101RegisterTool({
   /* ===== COMPONENT RENDER ===== */
   return (
     <div class={`${bodyTool} ${containerGap}`}>
-      <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
+      <h1 class={`${titleNeutral} mx-auto -mb-2 mobileLg:-mb-4`}>
         REGISTER
       </h1>
 
@@ -300,11 +300,11 @@ export function SRC101RegisterTool({
             aria-label="Bitname input"
           />
 
-          {/* TLD Dropdown InputField - styled like glassmorphismL2/Hover */}
+          {/* TLD Dropdown InputField - styled like container2/Hover */}
           <div class="relative w-[64px]" ref={tldDropdownRef}>
             <div
               class={`h-10 px-4 border border-color-border/75 rounded-2xl
-                !bg-color-background/60 ${glassmorphismL2Hover}
+                !bg-color-background/60 ${container2Hover}
                 font-semibold text-sm text-color-grey text-right backdrop-blur-sm hover:text-color-grey-light tracking-wider ${transitionAll} !duration-200 focus-visible:!outline-none cursor-pointer flex items-center justify-end ${
                 openTldDropdown && !isSelectingTld ? "input-open-bottom" : ""
               }`}
@@ -380,8 +380,8 @@ export function SRC101RegisterTool({
             <Button
               type="button"
               variant="outline"
-              color="grey"
-              size="mdR"
+              color="neutral"
+              size="smR"
               onClick={checkAvailability}
               aria-label="Check bitname availability"
             >

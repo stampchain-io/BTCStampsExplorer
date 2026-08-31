@@ -1,4 +1,4 @@
-import { Icon } from "$components/icon/IconBase.tsx";
+import { Icon } from "$icon";
 import { useSSRSafeNavigation } from "$lib/hooks/useSSRSafeNavigation.ts";
 import { tooltipIcon } from "$notification";
 import type { SortProps } from "$types/ui.d.ts";
@@ -29,29 +29,20 @@ export function SortButton(
   const [allowTooltip, setAllowTooltip] = useState(true);
   const tooltipTimeoutRef = useRef<number | null>(null);
 
-  // Helper function to determine the anchor based on sort parameter
-  const getSectionAnchor = (sortParam: string): string => {
-    switch (sortParam) {
-      case "stampsSortBy":
-        return "stamps";
-      case "src20SortBy":
-        return "src20";
-      case "dispensersSortBy":
-        return "dispensers";
-      default:
-        return "stamps";
-    }
-  };
-
   // Generate the sort URL for Fresh.js partial navigation
   const getSortUrl = (): string => {
     // Get current URL in an SSR-safe way
     const url = new URL(getUrl());
-    const currentSort = isClient ? getSearchParam(sortParam) || "DESC" : "DESC";
+    // Fall back to `initSort` (rather than a hardcoded "DESC") so pages that
+    // default to ascending sort still toggle correctly before any `sortBy`
+    // param exists in the URL.
+    const defaultSort = initSort || "DESC";
+    const currentSort = isClient
+      ? getSearchParam(sortParam) || defaultSort
+      : defaultSort;
     const newSort = currentSort === "ASC" ? "DESC" : "ASC";
 
     url.searchParams.set(sortParam, newSort);
-    url.searchParams.set("anchor", getSectionAnchor(sortParam));
 
     return url.toString();
   };
@@ -86,23 +77,22 @@ export function SortButton(
   }, []);
 
   return (
-    <div class="relative">
-      <a
+    <div
+      class="relative flex items-center"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      <Icon
+        type="iconButton"
+        name={sort === "DESC" ? "sortDesc" : "sortAsc"}
+        weight="bold"
+        size="custom"
+        color="neutral400"
+        className="w-[17px] h-[17px] tablet:w-[14px] tablet:h-[14px] stroke-width:1.5"
         href={getSortUrl()}
         f-partial={getSortUrl()}
-        class="inline-block"
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-      >
-        <Icon
-          type="iconButton"
-          name={sort === "DESC" ? "sortDesc" : "sortAsc"}
-          weight="normal"
-          size="smR"
-          color="grey"
-          ariaLabel={`Sorted ${sort === "DESC" ? "descending" : "ascending"}`}
-        />
-      </a>
+        ariaLabel={`Sorted ${sort === "DESC" ? "descending" : "ascending"}`}
+      />
       <div
         className={`${tooltipIcon} ${
           isTooltipVisible ? "opacity-100" : "opacity-0"

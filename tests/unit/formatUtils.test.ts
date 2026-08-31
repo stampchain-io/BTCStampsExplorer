@@ -13,7 +13,7 @@ import {
   formatPercentage,
   formatSatoshisToBTC,
   formatSatoshisToUSD,
-  formatSupplyValue,
+  formatSupply,
   formatVolume,
   isIntOr32ByteHex,
   stripTrailingZeros,
@@ -73,13 +73,13 @@ Deno.test("formatUtils - stripTrailingZeros", () => {
   assertEquals(stripTrailingZeros("0.00000000"), "0");
 });
 
-Deno.test("formatUtils - formatSupplyValue", () => {
-  assertEquals(formatSupplyValue(undefined, true), "0");
-  assertEquals(formatSupplyValue(100000000, true), "1.00");
-  assertEquals(formatSupplyValue(100000000, false), "100000000");
-  assertEquals(formatSupplyValue("100000000", true), "1.00");
-  assertEquals(formatSupplyValue("100000000", false), "100000000");
-  assertEquals(formatSupplyValue(250000000, true), "2.50");
+Deno.test("formatUtils - formatSupply", () => {
+  assertEquals(formatSupply(undefined, true), "0");
+  assertEquals(formatSupply(100000000, true), "1.00");
+  assertEquals(formatSupply(100000000, false), "100000000");
+  assertEquals(formatSupply("100000000", true), "1.00");
+  assertEquals(formatSupply("100000000", false), "100000000");
+  assertEquals(formatSupply(250000000, true), "2.50");
 });
 
 Deno.test("formatUtils - isIntOr32ByteHex", () => {

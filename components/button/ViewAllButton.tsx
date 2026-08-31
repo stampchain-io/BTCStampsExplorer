@@ -5,13 +5,13 @@ import type { ViewAllButtonProps } from "$types/ui.d.ts";
 /* ===== COMPONENT ===== */
 export function ViewAllButton({ href }: ViewAllButtonProps) {
   return (
-    <div class="flex justify-end w-full mt-6 mobileLg:mt-9">
+    <div class="flex justify-end w-full mt-5">
       <Button
         variant="flat"
-        color="grey"
-        size="mdR"
+        color="primary"
+        size="smR"
         href={href}
-        f-partial="/collection"
+        f-partial={href}
         target="_top"
       >
         VIEW ALL

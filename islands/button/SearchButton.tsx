@@ -29,14 +29,14 @@ export function SearchButton() {
   }, []);
 
   return (
-    <div class="relative">
+    <div class="relative flex items-center">
       <Icon
         type="iconButton"
         name="search"
         weight="normal"
-        size="mdR"
-        color="purpleLight"
-        className="mb-[1px] mobileLg:-ml-1 -mr-0.5 mobileLg:mr-0"
+        size="custom"
+        color="neutral400"
+        className="w-[25px] h-[25px] tablet:w-[21px] tablet:h-[21px]"
         onClick={openContextualSearch}
         role="button"
         aria-label="Search"

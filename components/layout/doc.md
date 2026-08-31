@@ -16,21 +16,21 @@ The app UI is inspired by Apple design principles, with dark themed multilayered
                         ▲
 ┌─────────────────────────────────────────────────────┐
 │  Overlay Layer: Drawers & Modals                    │
-│  - glassmorphismOverlay                             │
+│  - container0                                       │
 │  - backdrop-blur-lg                                 │
 │  - Used by: FilterDrawer, Header mobile menu        │
 └─────────────────────────────────────────────────────┘
                         ▲
 ┌─────────────────────────────────────────────────────┐
 │  Layer 1: Primary Containers                        │
-│  - glassmorphism (rounded-3xl)                      │
+│  - container1 (rounded-3xl)                         │
 │  - Page bodies, cards, tokens                       │
 │  - Used by: Body containers, StampCards             │
 └─────────────────────────────────────────────────────┘
                         ▲
 ┌─────────────────────────────────────────────────────┐
 │  Layer 2: Nested Elements                           │
-│  - glassmorphismL2 (rounded-2xl)                    │
+│  - container2 (rounded-2xl)                         │
 │  - Child containers, detail tables                  │
 │  - Used by: Nested cards, detail rows               │
 └─────────────────────────────────────────────────────┘
@@ -53,59 +53,64 @@ The app UI is inspired by Apple design principles, with dark themed multilayered
       - Desktop: 1500 particles
 
 - Overlay layer styles:
-  - GlassmorphismOverlay
+  - Container0
     - Used for drawers background and modal (base) containers
     - Darker black background with gradient opacity
     - Background blur:
       - backdrop-blur-lg
     - Background: Linear gradient to bottom
-      - bg-gradient-to-b from-color-background/95 via-color-background/70 to-black/90
-    - Note: Rounded corners and shadows are applied by individual components using this overlay
+      - bg-gradient-to-b from-color-neutral-950/80 via-color-neutral-900/90 to-color-neutral-1000
+    - Note: Rounded corners, borders and shadows are applied by individual components using this overlay
       - Drawers (FilterDrawer, Header mobile menu) typically use:
         - Rounded corners (24px): rounded-3xl (applied to left or right side depending on drawer position)
-        - Border: border border-color-border/75
+        - Border: border border-color-neutral-800
         - Shadows:
           - Left drawer: shadow-[-12px_0_12px_-6px_rgba(8,7,8,0.75)]
           - Right drawer: shadow-[12px_0_12px_-6px_rgba(8,7,8,0.75)]
-      - Modal containers typically use:
-        - Shadow: shadow-[0_4px_8px_rgba(13,11,13,0.2),inset_0_1px_0_rgba(13,11,13,0.1),inset_0_-1px_0_rgba(13,11,13,0.1),inset_0_0_1px_1px_rgba(13,11,13,0.1)]
+      - Modal containers (`ModalBase`) typically use:
+        - Rounded corners (24px): rounded-3xl, border border-color-neutral-800
+        - Shadow: the shared `shadow` constant — shadow-[0_4px_8px_rgba(13,11,13,0.2),inset_0_1px_0_rgba(13,11,13,0.1),inset_0_-1px_0_rgba(13,11,13,0.1),inset_0_0_1px_1px_rgba(13,11,13,0.1)]
 
 - Layer 1:
-  - Glassmorphism
+  - Container1
     - Used for page body containers, stampcards, tokencards
     - Black background with medium opacity
-    - Rounded corners (24px) and background blur:
-      - rounded-3xl backdrop-blur
-    - Background: Linear gradient to bottom right
-      - bg-gradient-to-br from-[#191919]/40 via-color-background/50 to-black/60
-    - Border: border border-color-border/50
-    - Shadow: Outer and inner shadows:
-      - shadow-[0_4px_8px_rgba(13,11,13,0.2),inset_0_1px_0_rgba(13,11,13,0.1),inset_0_-1px_0_rgba(13,11,13,0.1),inset_0_0_1px_1px_rgba(13,11,13,0.1)]
+    - Rounded corners (24px) and small background blur:
+      - rounded-3xl backdrop-blur-sm
+    - Background: Linear gradient to bottom
+      - bg-gradient-to-b from-color-neutral-800/40 via-color-neutral-900/60 to-neutral-950/80
+    - Border: border border-color-neutral-800
+    - Shadow: not embedded in `container1` itself — composed separately via the shared `shadow` constant (outer + inner shadow) where needed, e.g. `containerCardTable` combines `container1` with `shadowGlowPurple`
 
 - Layer 2 styles:
-  - GlassmorphismL2
-    - Used for child containers inside of parent layer 1 glassmorphism containers
-    - Black background with high opacity
-    - Rounded corners (16px) and small background blur:
-      - rounded-2xl backdrop-blur-xs
-    - Background: bg-color-background/30
-    - Border: border border-color-border/75
-    - Shadow: Smaller outer and inner shadows:
-      - shadow-[0_2px_4px_rgba(13,11,13,0.1),inset_0_1px_0_rgba(13,11,13,0.08),inset_0_-1px_0_rgba(13,11,13,0.08),inset_0_0_2px_2px_rgba(13,11,13,0.08)]
+  - Container2
+    - Used for child containers inside of parent layer 1 containers, and as the base for pills (`containerPill`, `containerPillCount`) and the icon-row container (`container2Icon`)
+    - Black background with medium-high opacity, no blur
+    - Rounded corners (16px):
+      - rounded-2xl
+    - Background: Linear gradient to bottom
+      - bg-gradient-to-b from-color-neutral-800/40 via-color-neutral-900/60 to-neutral-900/80
+    - Border: border border-color-neutral-700
 
-  - GlassmorphismL2Hover
-    - Combines background and border hover styles
-    - Intended to be used with layer 2 elements
-    - Background: bg-color-background/60
-    - Border: border-color-border
+  - Container2Hover
+    - Combines `container2` with a border hover transition
+    - Intended to be used with layer 2 elements (e.g. `containerCard`)
+    - Adds: hover:border-color-hover + `transitionColors`
+
+  - Container3
+    - Used mainly inside cards, one level deeper than Layer 2 (rounded-xl, cursor-default, select-none)
+    - Background: Linear gradient to bottom
+      - bg-gradient-to-b from-color-neutral-800/80 via-color-neutral-900/90 to-color-neutral-900
+    - Border: border border-color-neutral-800
 
 ### Layer Comparison
 
 | Layer | Blur | Border Radius | Opacity | Use Case | Examples |
 |-------|------|---------------|---------|----------|----------|
-| **Overlay** | backdrop-blur-lg | Component-specific (24px typical) | 70-95% | Modals, Drawers | FilterDrawer, Header menu |
-| **Layer 1** | backdrop-blur | rounded-3xl (24px) | 50-70% | Primary containers | Page bodies, StampCards, TokenCards |
-| **Layer 2** | backdrop-blur-xs | rounded-2xl (16px) | 20-30% | Nested elements | Detail tables, nested cards |
+| **Overlay** | backdrop-blur-lg | Component-specific (24px typical) | 80-90% | Modals, Drawers | FilterDrawer, Header menu, ModalBase |
+| **Layer 1** | backdrop-blur-sm | rounded-3xl (24px) | 40-80% | Primary containers | Page bodies, StampCards, TokenCards |
+| **Layer 2** | none (flat) | rounded-2xl (16px) | 40-80% | Nested elements | Detail tables, nested cards, pills, cards |
+| **Layer 3** | none (flat) | rounded-xl | 80-90% | Innermost card elements | Card sub-sections |
 
 ## Core Components
 
@@ -116,22 +121,29 @@ The app UI is inspired by Apple design principles, with dark themed multilayered
   - **Exports**:
     - Transition utilities: `transitionColors`, `transitionTransform`, `transitionAll`
     - Shadow variants: `shadow`, `shadowL2`, `shadowGlowPurple`, `shadowGlowGrey`
-    - Glassmorphism layers: `glassmorphism`, `glassmorphismOverlay`, `glassmorphismL2`, `glassmorphismL2Hover`
-    - Body styles: `body`, `bodyTool`, `bodyArticle`, `gapSection`, `containerGap`, `containerGap`
-    - Container styles: `containerBackground`, `containerCard`, `containerCardL2`, `containerColForm`
-    - Cell styles: `cellLeftCard`, `cellRightCard`, `cellCenterCard` (+ L2 variants)
-    - Loader styles: `loaderSpinPurple`, `loaderSpinGrey`, `loaderSkeleton` (+ size variants)
+    - Container layers: `container0`, `container1`, `container2`, `container2Hover`, `container2Icon`, `container3`
+    - Pill styles: `containerPill`, `containerPillCount`
+    - Body styles: `body`, `bodyTool`, `bodyArticle`
+    - Container styles: `containerBackground`, `containerGap`, `containerDetailImage`, `containerStickyBottom`, `containerCard`, `containerCardTable`, `containerColData`, `containerColForm`, `containerRowForm`
+    - Grid styles: `gridCardSm`, `gridCardMd`, `gridCardLg`, `gridCardMdSplitSm`, `gridCardMdSplitMd`, `gridCardMdSplitLg`, and helpers `gridCard()`, `gridCardWallet()`
+    - Row/col styles: `rowForm`, `rowResponsiveForm`, `rowContainerBackground`, `colContainerBackground`
+    - Cell styles: `cellLeftL2Card`, `cellRightL2Card`, `cellCenterL2Card`, `cellLeftL2Detail`, `cellRightL2Detail`, `cellCenterL2Detail`, `cellStickyLeft`, `cellStickyLeft2` (the older `cellLeftCard`/`cellRightCard`/`cellCenterCard` Layer-1 variants are commented out and unused — replaced by the L2 variants above)
+    - Image styles: `imagePreviewTool`, `imageUploadTool`
+    - Loader styles: `loaderSpinXsGrey`/`loaderSpinSmGrey`/`loaderSpinGrey`/`loaderSpinLgGrey`, `loaderSpinXsPurple`/`loaderSpinSmPurple`/`loaderSpinPurple`/`loaderSpinLgPurple`, `loaderSkeleton`
+    - Alignment utilities: `alignmentClasses` (`{ left, center, right }`) and `AlignmentType` (used by `StatStyles.tsx`)
+    - Type: `LayoutStyles` (see [Type Definitions](#type-definitions))
   - **Location**: `components/layout/styles.ts`
   - **Usage**: Import specific style constants to maintain consistency across components
 
 - **ModalBase.tsx**: Base modal component with consistent styling and behavior
   - **Purpose**: Reusable modal foundation for all modal dialogs
-  - **Key Features**: Glassmorphism overlay styling, keyboard shortcuts (Escape), close button with delayed tooltip, animation support, responsive width
+  - **Key Features**: Container overlay styling, keyboard shortcuts (Escape), close button with delayed tooltip, animation support, responsive width
   - **Props**: `onClose`, `title`, `children`, `className`, `contentClassName`, `hideHeader`
+  - **Also exports**: `handleModalClose()` — standalone helper that triggers the same close animation/timing as the in-component close handler, for callers that need to close the modal without rendering `ModalBase`'s own close button
 
 - **ModalSearchBase.tsx**: Specialized search modal container
   - **Purpose**: Modal container specifically for search functionality
-  - **Key Features**: Conic gradient border animation, responsive width, keyboard shortcuts (Escape, Ctrl/Cmd+S), custom styling
+  - **Key Features**: Layer-1 container styling, responsive width, keyboard shortcuts (Escape, Ctrl/Cmd+S)
   - **Props**: `children`, `onClose`
 
 - **ScrollContainer.tsx**: Table scroll management component
@@ -141,54 +153,60 @@ The app UI is inspired by Apple design principles, with dark themed multilayered
 
 - **MetaTags.tsx**: SEO and meta information management
   - **Purpose**: Manages page metadata, OpenGraph tags, and social media cards
-  - **Key Features**: Essential meta tags, OpenGraph tags, Twitter Card support, conditional rendering, canonical URL management
-  - **Props**: `title`, `description`, `image`, `skipImage`, `skipTitle`, `skipDescription`, `skipOgMeta`
+  - **Key Features**: Essential meta tags, favicon/manifest links (with a dark/light theme-aware SVG favicon refresh script), canonical URL + machine-readable `llms.txt` alternate link, OpenGraph tags, Twitter Card support, JSON-LD structured data (`WebSite` + `Organization`), conditional rendering
+  - **Props**: `title`, `description`, `image`, `skipImage`, `skipTitle`, `skipDescription`, `skipOgMeta`, `canonicalUrl`, `ogUrl`
+
+- **EmptyState.tsx**: Shared "no results" state component
+  - **Purpose**: Reused across wallet/explorer/marketplace/stamp overview pages so the icon + copy + container styling for empty states stays in one place
+  - **Key Features**: Renders one or more icons (via `Icon` from `$components/icon/IconBase.tsx`) above a label; switches between `colContainerBackground` (icon present) and `rowContainerBackground` (no icon) container styles
+  - **Props**: `label`, `icon` (single `IconVariants["name"]` or an array), `className`
+  - **Note**: Imports concrete modules directly (not the `$layout`/`$icon` barrels) to avoid circular re-export chains
+
+- **PillContentCount.tsx**: Floating count badge
+  - **Purpose**: Floating count badge shown above a tab/selector row, reflecting only the currently active tab/section's own count
+  - **Key Features**: Positions itself absolutely (`-top-1 right-0`) using the `containerPillCount` style; callers compute the count/label/fallback locally and pass the finished node as `value` — this component only owns the pill's visual style and default position
+  - **Props**: `value` (`ComponentChildren`), `class`
+
+- **StatStyles.tsx**: Stat display components
+  - **Purpose**: Shared label/value display patterns for stats (card headers, price rows, detail pages)
+  - **Exports**:
+    - `StatItem` — label + value pair (`labelXs` / `valueSm`), optionally alignable and wrapped in a link
+    - `StatTitle` — label + larger value pair (`labelXs` / `valueXl`), optionally alignable and wrapped in a link
+    - `StatPrice` — BTC price (+ optional USD price and `ActivityLevelIndicator`), alignable
+  - **Key Features**: Shared `alignmentClasses` from `styles.ts`, optional `href`/`target` to render as a link, hover color transition on the value
+  - **Props**: See `StatItemProps`, `StatTitleProps`, `StatPriceProps` in `$types/ui.d.ts`
 
 - **types.ts**: Layout type definitions and constants
-  - **Purpose**: TypeScript interfaces and constants for layout components
-  - **Key Features**: Donate CTA data structures, SRC20 table column definitions, table styling constants, timeframe types
+  - **Purpose**: TypeScript interfaces, constants and utilities for layout components
+  - **Key Features**: Donate CTA data structures (`TxOutput`, `Transaction`, `DonateStampData`), SRC20 table column definitions (`MINTED_COLUMNS`, `MINTING_COLUMNS`, `TableColumn`), table/data types (`TableType`, `TabData`, `FetchResponse`), timeframe types (`SRC20ViewType`, `Timeframe`), and the `colGroup()` helper for building `<colgroup>` column metadata from column widths
   - **Usage**: Provides type safety for layout-related data structures
 
 - **data.ts**: FAQ and content data management
   - **Purpose**: Centralized content management for FAQ sections and static data
-  - **Key Features**: Comprehensive FAQ content for Bitcoin Stamps, multi-paragraph support, organized sections, external link management
+  - **Key Features**: Comprehensive FAQ content for Bitcoin Stamps (`FAQ_CONTENT`), multi-paragraph support, organized sections, external link management
   - **Usage**: Data source for FAQ pages and informational content
 
 - **index.ts**: Module exports and re-exports
   - **Purpose**: Central export file for all layout components and utilities
-  - **Key Features**: Re-exports from layout components, islands/layout components, modal components
-  - **Usage**: Single import point for all layout-related functionality
+  - **Key Features**: Re-exports layout components (`MetaTags`, `styles.ts`, `types.ts`, `data.ts`, `ScrollContainer`, `ModalBase`, `ModalSearchBase`, `StatStyles`, `PillContentCount`, `EmptyState`) alongside related islands (`Footer`, `ScrollFadeRow`, `NavigatorProvider`, `FontLoader`)
+  - **Usage**: Single import point (`$layout`) for all layout-related functionality
+  - **Note**: `PerformanceUtils.tsx` (see below) is present in `components/layout/` but is **not** re-exported from `index.ts` — import it directly if needed
 
-- **ChartWidget.tsx**: Chart display and visualization component
-  - **Purpose**: Provides chart rendering capabilities for data visualization
-  - **Key Features**: Chart widget functionality, data visualization, responsive chart display
-  - **Usage**: Used for displaying charts and graphs in the application
-
-- **WalletProvider.tsx**: Wallet connection and state management
-  - **Purpose**: Manages wallet connections and wallet-related state
-  - **Key Features**: Wallet connection handling, state management, wallet provider context
-  - **Usage**: Provides wallet functionality across the application
-
-- **ModalOverlay.tsx**: Modal backdrop and overlay management
-  - **Purpose**: Handles modal backdrop rendering and overlay behavior
-  - **Key Features**: Modal backdrop, overlay management, click handling
-  - **Usage**: Used in conjunction with modal components for proper backdrop behavior
-
-- **ModalStack.tsx**: Modal stacking and z-index management
-  - **Purpose**: Manages multiple modals and their stacking order
-  - **Key Features**: Modal stacking, z-index management, modal hierarchy
-  - **Usage**: Ensures proper modal layering when multiple modals are open
-
-- **CollapsibleSection.tsx**: Expandable/collapsible content sections
-  - **Purpose**: Provides collapsible content sections for better content organization
-  - **Key Features**: Expand/collapse functionality, smooth animations, content organization
-  - **Usage**: Used for organizing content into expandable sections
+- **PerformanceUtils.tsx**: Rendering/loading performance helpers
+  - **Purpose**: Small presentational utilities for improving perceived and actual page performance
+  - **Exports**:
+    - `OptimizedContent` — wraps children with a `content-visibility` style tuned by a `priority` level (`critical`/`high`/`medium`/`low`)
+    - `LazySection` — defers rendering of below-the-fold content via `content-visibility: auto` and a `contain-intrinsic-size` placeholder
+    - `CriticalResource` — renders a `<link rel="preload">` (or other `rel`) tag for a critical resource
+    - `ResourceHints` — renders DNS-prefetch/preconnect `<link>` tags for `stampchain.io`, `esm.sh`, and Google Fonts
+  - **Usage**: Not currently re-exported from `index.ts`; import directly from `$components/layout/PerformanceUtils.tsx` when needed
 
 ## Related Island Components
 
 ### **islands/layout/** - Client-Side Layout Components
 - **BackgroundTopology.tsx**: Animated background topology lines
 - **Footer.tsx**: Application footer with navigation and links
+- **ScrollFadeRow.tsx**: Horizontal scroll container with edge fade
 - **NavigatorProvider.tsx**: Navigation state management
 - **ModalProvider.tsx**: Modal state and overlay management
 - **FontLoader.tsx**: Dynamic font loading and management
@@ -205,57 +223,90 @@ The app UI is inspired by Apple design principles, with dark themed multilayered
 ### Layout Styles Type
 ```typescript
 export type LayoutStyles = {
-  // Transitions
+  // Base styles
   transitionColors: string;
   transitionTransform: string;
   transitionAll: string;
 
-  // Shadows
-  shadow: string;
-  shadowL2: string;
   shadowGlowPurple: string;
   shadowGlowGrey: string;
+  shadow: string;
+  shadowL2: string;
 
-  // Glassmorphism
-  glassmorphism: string;
-  glassmorphismOverlay: string;
-  glassmorphismL2: string;
-  glassmorphismL2Hover: string;
+  container0: string;
+  container1: string;
+  container2: string;
+  container2Hover: string;
+  container2Icon: string;
+  container3: string;
+  containerPill: string;
 
   // Body styles
   body: string;
   bodyTool: string;
   bodyArticle: string;
-  gapSection: string;
 
   // Container styles
   containerBackground: string;
   containerGap: string;
+  containerDetailImage: string;
+  containerStickyBottom: string;
   containerCard: string;
-  containerCardL2: string;
+  containerCardTable: string;
+  containerColData: string;
   containerColForm: string;
   containerRowForm: string;
 
+  // Row styles
+  rowForm: string;
+  rowResponsiveForm: string;
+  rowContainerBackground: string;
+
+  // Col styles
+  colContainerBackground: string;
+
+  // Grid styles
+  gridCardSm: string;
+  gridCardMd: string;
+  gridCardLg: string;
+  gridCardMdSplitSm: string;
+  gridCardMdSplitMd: string;
+  gridCardMdSplitLg: string;
+
   // Cell styles
-  cellLeftCard: string;
-  cellRightCard: string;
-  cellCenterCard: string;
   cellLeftL2Card: string;
   cellRightL2Card: string;
   cellCenterL2Card: string;
+  cellLeftL2Detail: string;
+  cellRightL2Detail: string;
+  cellCenterL2Detail: string;
+  cellStickyLeft: string;
+  cellStickyLeft2: string;
+
+  // Image styles
+  imagePreviewTool: string;
+  imageUploadTool: string;
 
   // Loader styles
-  loaderSpinPurple: string;
+  loaderSpinXsGrey: string;
+  loaderSpinSmGrey: string;
   loaderSpinGrey: string;
+  loaderSpinLgGrey: string;
+  loaderSpinXsPurple: string;
+  loaderSpinSmPurple: string;
+  loaderSpinPurple: string;
+  loaderSpinLgPurple: string;
   loaderSkeleton: string;
-}
+};
 ```
+
+Note: `containerPillCount` is exported as a style constant but, as of this writing, is not yet included in the `LayoutStyles` type above. The `gridCard()`/`gridCardWallet()` helper functions and `alignmentClasses`/`AlignmentType` are exported separately from `styles.ts` and are also not part of this type.
 
 ### Modal Props
 ```typescript
 interface ModalBaseProps {
-  onClose: () => void;
-  title?: string;
+  onClose?: () => void;
+  title: string;
   children: ComponentChildren;
   className?: string;
   contentClassName?: string;
@@ -287,6 +338,54 @@ interface MetaTagsProps {
   skipTitle?: boolean;
   skipDescription?: boolean;
   skipOgMeta?: boolean;
+  canonicalUrl?: string;
+  ogUrl?: string;
+}
+```
+
+### Empty State Props
+```typescript
+interface EmptyStateProps {
+  label: string;
+  icon?: IconVariants["name"] | IconVariants["name"][];
+  className?: string;
+}
+```
+
+### Pill Content Count Props
+```typescript
+interface PillContentCountProps {
+  value: ComponentChildren;
+  class?: string;
+}
+```
+
+### Stat Display Props
+```typescript
+interface StatItemProps {
+  label: string | ComponentChildren;
+  value: string | ComponentChildren;
+  align?: "left" | "center" | "right";
+  class?: string;
+  valueClass?: string;
+  href?: string;
+  target?: "_self" | "_blank";
+}
+
+interface StatTitleProps {
+  label: string | ComponentChildren;
+  value: string | ComponentChildren;
+  align?: "left" | "center" | "right";
+  href?: string;
+  target?: "_self" | "_blank";
+}
+
+interface StatPriceProps {
+  priceBTC: string | number | ComponentChildren;
+  priceUSD?: string | number | ComponentChildren | null;
+  activityLevel?: "HOT" | "WARM" | "COOL" | "DORMANT" | "COLD" | null;
+  align?: "left" | "center" | "right";
+  class?: string;
 }
 ```
 
@@ -294,7 +393,7 @@ interface MetaTagsProps {
 
 ### Creating a Page Layout
 ```tsx
-import { body, containerBackground, glassmorphism } from "$layout";
+import { body, containerBackground } from "$layout";
 
 export default function StampPage() {
   return (
@@ -309,16 +408,16 @@ export default function StampPage() {
 
 ### Building a Card Component
 ```tsx
-import { containerCard, cellLeftCard, cellRightCard } from "$layout";
+import { cellLeftL2Card, cellRightL2Card, containerCard } from "$layout";
 
 export function StampCard({ stamp }) {
   return (
     <div class={`${containerCard} group cursor-pointer`}>
       <div class="flex">
-        <div class={cellLeftCard}>
+        <div class={cellLeftL2Card}>
           <img src={stamp.image} alt={stamp.title} />
         </div>
-        <div class={cellRightCard}>
+        <div class={cellRightL2Card}>
           <p>{stamp.title}</p>
         </div>
       </div>
@@ -329,13 +428,13 @@ export function StampCard({ stamp }) {
 
 ### Nested Layer 2 Components
 ```tsx
-import { glassmorphism, glassmorphismL2, glassmorphismL2Hover } from "$layout";
+import { container1, container2, container2Hover } from "$layout";
 
 export function DetailContainer() {
   return (
-    <div class={glassmorphism}>
+    <div class={container1}>
       {/* Layer 1 container */}
-      <div class={`${glassmorphismL2} ${glassmorphismL2Hover} group cursor-pointer`}>
+      <div class={`${container2} ${container2Hover} group cursor-pointer`}>
         {/* Layer 2 nested element with hover effects */}
       </div>
     </div>
@@ -430,6 +529,49 @@ export default function CustomPage() {
 }
 ```
 
+### Empty State Usage
+```tsx
+import { EmptyState } from "$layout";
+
+export function NoResults() {
+  return <EmptyState label="No stamps found" icon="image" />;
+}
+```
+
+### Pill Content Count Usage
+```tsx
+import { PillContentCount } from "$layout";
+
+export function TabWithCount({ count }: { count: number }) {
+  return (
+    <div class="relative">
+      <PillContentCount value={count} />
+      {/* Tab content */}
+    </div>
+  );
+}
+```
+
+### Stat Display Usage
+```tsx
+import { StatItem, StatPrice, StatTitle } from "$layout";
+
+export function TokenStats({ token }) {
+  return (
+    <>
+      <StatTitle label="TOKEN" value={token.tick} align="left" />
+      <StatItem label="HOLDERS" value={token.holders} align="center" />
+      <StatPrice
+        priceBTC={token.priceBTC}
+        priceUSD={token.priceUSD}
+        activityLevel={token.activityLevel}
+        align="right"
+      />
+    </>
+  );
+}
+```
+
 ## Style System Integration
 
 ### Tailwind Color System
@@ -445,9 +587,9 @@ Colors are defined in **two formats** within `tailwind.config.ts`:
    colors: {
      color: {
        purple: {
-         dark: "#43005c",
-         semidark: "#610085",
-         DEFAULT: "#7f00ad",
+         dark: "#A21CAF",
+         semidark: "#C026D3",
+         DEFAULT: "#D946EF",
          // ...
        }
      }
@@ -457,9 +599,9 @@ Colors are defined in **two formats** within `tailwind.config.ts`:
 2. **CSS Variables** - Defined in the `:root` selector
    ```css
    ":root": {
-     "--color-purple-dark": "#43005c",
-     "--color-purple-semidark": "#610085",
-     "--color-purple": "#7f00ad",
+     "--color-purple-dark": "#A21CAF",
+     "--color-purple-semidark": "#C026D3",
+     "--color-purple": "#D946EF",
      // ...
    }
    ```
@@ -495,58 +637,67 @@ color: {
 ```
 
 #### Color Families
+
+The primary system is a numbered `neutral`/`primary`/`secondary` scale (Tailwind-style `0`–`950`/`1000` steps). Legacy named scales (`purple`, `grey`, `red`, `green`, `orange`) still exist as aliases for backward compatibility, now mapped onto the equivalent `neutral`/`primary`/`secondary` hex values instead of their own standalone hues.
+
 ```typescript
-// Purple (brand color)
-color-purple-dark      // #43005c
-color-purple-semidark  // #610085
-color-purple           // #7f00ad (DEFAULT)
-color-purple-semilight // #9d00d6
-color-purple-light     // #BB00FF
+// Neutral (base greyscale, replaces most "grey"/"background"/"border" usage)
+color-neutral-0     // #FFFFFF
+color-neutral-50    // #FAFAFA
+color-neutral-400   // #A3A3A3
+color-neutral-800   // #262626
+color-neutral-900   // #171717
+color-neutral-950   // #0A0A0A
+color-neutral-1000  // #000000
 
-// Grey (neutral)
-color-grey-dark        // #585552
-color-grey-semidark    // #817e78
-color-grey             // #a8a39d (DEFAULT)
-color-grey-semilight   // #d1cbc3
-color-grey-light       // #f9f2e9
+// Primary (brand color, fuchsia — replaces most "purple" usage)
+color-primary-50    // #FDF4FF
+color-primary-400   // #E879F9
+color-primary-500   // #D946EF
+color-primary-700   // #A21CAF
+color-primary-950   // #4A044E
 
-// Red (errors/warnings)
-color-red-dark         // #5c0000
-color-red-semidark     // #850000
-color-red              // #ad0000 (DEFAULT)
-color-red-semilight    // #d60000
-color-red-light        // #ff0000
+// Secondary (orange)
+color-secondary-50  // #FFF7ED
+color-secondary-500 // #F97316
+color-secondary-950 // #431407
 
-// Green (success)
-color-green-dark       // #005c00
-color-green-semidark   // #008500
-color-green            // #00ad00 (DEFAULT)
-color-green-semilight  // #00d600
-color-green-light      // #00ff00
+// Legacy aliases (kept for backward compatibility, values now derived from
+// the neutral/primary/secondary scale — see inline comments in tailwind.config.ts)
+color-purple-dark      // #A21CAF (primary-700)
+color-purple-semidark  // #C026D3 (primary-600)
+color-purple           // #D946EF (DEFAULT, primary-500)
+color-purple-semilight // #E879F9 (primary-400)
+color-purple-light     // #F0ABFC (primary-300)
 
-// Orange (warnings)
-color-orange-dark      // #5c2b00
-color-orange-semidark  // #853e00
-color-orange           // #ad5100 (DEFAULT)
-color-orange-semilight // #d66400
-color-orange-light     // #ff7700
+color-grey-dark        // #404040 (neutral-700)
+color-grey-semidark    // #525252 (neutral-600)
+color-grey             // #737373 (DEFAULT, neutral-500)
+color-grey-semilight   // #A3A3A3 (neutral-400)
+color-grey-light       // #D4D4D4 (neutral-300)
 
-// Background & Border
-color-background       // #0d0a0d
-color-border           // #292626
+color-red-dark / color-red / color-red-light       // 50-950 scale + dark/semidark/DEFAULT/semilight/light aliases
+color-green-dark / color-green / color-green-light // 50-950 scale + dark/semidark/DEFAULT/semilight/light aliases
+color-orange-dark / color-orange / color-orange-light // 50-950 scale + dark/semidark/DEFAULT/semilight/light aliases
+
+// Background, border & hover
+color-background       // #0A0A0A (DEFAULT, neutral-950)
+color-border           // #262626 (DEFAULT, neutral-800)
+color-hover            // #E879F9 (DEFAULT, primary-400)
 ```
 
 **Notes:**
 - Color hue definitions are calculated using HSL values with lightness decreasing by 8% for each step (grey hues are estimations)
-- All colors are available as both Tailwind classes (e.g., `color-purple-dark`) and CSS variables (e.g., `var(--color-purple-dark)`)
+- All colors are available as both Tailwind classes (e.g., `color-neutral-800`, `color-purple-dark`) and CSS variables (e.g., `var(--color-neutral-800)`, `var(--color-purple-dark)`)
 - The dual definition ensures compatibility with both Tailwind utilities and custom CSS/style constants
+- `components/layout/styles.ts` container/cell/pill styles now build directly on the numbered `color-neutral`/`color-primary` scale (e.g. `container1`, `container2`, `cellLeftL2Card`) rather than the legacy named aliases
 
 ### System Integration
 
 The layout system integrates with the global style system through:
 
-- **Consistent breakpoints**: mobile, mobileLg, mobileMd, tablet, desktop
-- **Glassmorphism variants**: overlay, base, L2 with hover states
+- **Consistent breakpoints**: mobileSm, mobileMd, mobileLg, tablet, desktop
+- **Container layer variants**: container0 (overlay), container1 (base), container2 / container2Hover (L2)
 - **Shadow system**: standard, L2, and glow effects
 - **Transition utilities**: colors, transform, and all with consistent durations
 - **Responsive design**: mobile-first approach with progressive enhancement
@@ -562,9 +713,8 @@ The layout system integrates with the global style system through:
 ### Style Constant Pattern
 ```typescript
 // Pattern used in styles.ts
-export const glassmorphism = `border border-color-border/50 rounded-3xl
-  bg-gradient-to-br from-[#191919]/40 via-color-background/50 to-black/60
-  backdrop-blur ${shadow}`;
+export const container1 =
+  `bg-gradient-to-b from-color-neutral-800/40 via-color-neutral-900/60 to-neutral-950/80 border border-color-neutral-800 rounded-3xl backdrop-blur-sm`;
 ```
 
 ### Import and Usage Flow
@@ -581,14 +731,14 @@ Rendered with compiled CSS
 ```
 
 ### Responsive Breakpoints
-Defined in `tailwind.config.ts`:
+Defined in `tailwind.config.ts` (`screens`):
 ```typescript
 {
-  mobile: "360px",      // Small phones
-  mobileMd: "420px",    // Medium phones
-  mobileLg: "640px",    // Large phones
-  tablet: "768px",      // Tablets
-  desktop: "1024px"     // Desktop
+  mobileSm: "360px",    // Small phones (custom; "mobile-568" is unused, use mobileSm)
+  mobileMd: "568px",    // Medium phones
+  mobileLg: "768px",    // Large phones
+  tablet: "1024px",     // Tablets (same as Tailwind's 'lg')
+  desktop: "1440px"     // Desktop (same as Tailwind's 'xl')
 }
 ```
 
@@ -660,10 +810,10 @@ import { ScrollContainer } from "$layout";
 
 ### Hover Effects on Cards
 ```tsx
-import { containerCard, cellLeftCard } from "$layout";
+import { cellLeftL2Card, containerCard } from "$layout";
 
 <div class={`${containerCard} group`}>
-  <div class={cellLeftCard}>
+  <div class={cellLeftL2Card}>
     {/* Content with auto hover styles */}
   </div>
 </div>
@@ -742,5 +892,5 @@ import { containerCard, cellLeftCard } from "$layout";
 
 ---
 
-**Last Updated:** October 6, 2025
+**Last Updated:** August 23, 2026
 **Author:** baba

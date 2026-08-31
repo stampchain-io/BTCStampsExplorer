@@ -1,27 +1,53 @@
 /* ===== HOME PAGE ROUTE ===== */
+import { asset } from "$fresh/runtime.ts";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import type { CollectionRow } from "$server/types/collection.d.ts";
 import type { SRC20Row } from "$types/src20.d.ts";
 import type { StampRow, StampSaleRow } from "$types/stamp.d.ts";
 
 import { HomeHeader } from "$header";
+import { body, containerBackground, containerGap } from "$layout";
 import {
-  body,
-  containerBackground,
-  containerGap,
-  Micro5FontLoader,
-} from "$layout";
+  DATA_PLACEHOLDER_DEV,
+  DATA_PLACEHOLDER_PROD_HOME,
+} from "$lib/utils/dataPlaceholderProd.ts";
 import {
-  CarouselHome,
   GetStampingCta,
-  PartnersBanner,
   SRC20Gallery,
   StampchainContactCta,
-  StampOverviewGallery,
-  StampSalesGallery,
+  StampGalleryHome,
 } from "$section";
 import { StampController } from "$server/controller/stampController.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
+
+/* ===== HELPERS ===== */
+/**
+ * StampController.getRecentSales returns flat sale fields (btc_amount,
+ * buyer_address, etc.) rather than nesting them under `sale_data`. Nest them
+ * into the canonical shape (StampSaleData, $types/stamp.d.ts) here instead
+ * of passing the flat controller shape straight through, so StampCard can
+ * read `stamp.sale_data` directly without a flat-field fallback.
+ */
+function nestRecentSaleData(sale: any) {
+  return {
+    ...sale,
+    sale_data: {
+      btc_amount: sale.btc_amount,
+      block_index: sale.block_index,
+      tx_hash: sale.tx_hash,
+      buyer_address: sale.buyer_address,
+      seller_address: sale.seller_address,
+      dispenser_address: sale.dispenser_address,
+      dispenser_tx_hash: sale.dispenser_tx_hash,
+      sale_time: sale.sale_time ?? null,
+      time_ago: sale.time_ago,
+      btc_amount_satoshis: sale.btc_amount_satoshis,
+      dispense_quantity: sale.dispense_quantity,
+      usd_price: sale.usd_price,
+      sale_type: sale.sale_type,
+    },
+  };
+}
 
 /* ===== TYPES ===== */
 // Define the shape of pageData from StampController.getHomePageData()
@@ -59,6 +85,13 @@ interface HomePageData extends StampControllerData {
     page: number;
     totalPages: number;
   };
+  // New listings data (stamps with open dispensers) for SSR optimization
+  newListingsData?: {
+    data: StampRow[];
+    total: number;
+    page: number;
+    totalPages: number;
+  };
 }
 
 /* ===== SERVER HANDLER ===== */
@@ -72,6 +105,37 @@ export const handler: Handlers<HomePageData> = {
     }
 
     console.log(`[HOMEPAGE] Starting homepage request`);
+
+    if (DATA_PLACEHOLDER_DEV) {
+      const {
+        DATA_PLACEHOLDER_DEV_HOME_SRC20_MINTED,
+        DATA_PLACEHOLDER_DEV_HOME_SRC20_MINTING,
+        DATA_PLACEHOLDER_DEV_LANDING_PAGE,
+        DATA_PLACEHOLDER_DEV_NEW_LISTINGS,
+        DATA_PLACEHOLDER_DEV_RECENT_SALES,
+      } = await import("$lib/utils/dataPlaceholderDev.ts");
+      return await ctx.render({
+        ...DATA_PLACEHOLDER_DEV_LANDING_PAGE,
+        src20Data: {
+          minted: DATA_PLACEHOLDER_DEV_HOME_SRC20_MINTED as any,
+          minting: DATA_PLACEHOLDER_DEV_HOME_SRC20_MINTING as any,
+        },
+        recentSalesData: {
+          data: DATA_PLACEHOLDER_DEV_RECENT_SALES as any,
+          total: DATA_PLACEHOLDER_DEV_RECENT_SALES.length,
+          page: 1,
+          totalPages: 1,
+        },
+        newListingsData: {
+          data: DATA_PLACEHOLDER_DEV_NEW_LISTINGS as any,
+          total: DATA_PLACEHOLDER_DEV_NEW_LISTINGS.length,
+          page: 1,
+          totalPages: 1,
+        },
+        btcPrice: 65000,
+        btcPriceSource: "dummy",
+      });
+    }
 
     try {
       /* ===== SINGLE BTC PRICE FETCH ===== */
@@ -124,110 +188,135 @@ export const handler: Handlers<HomePageData> = {
       // This eliminates the internal API self-referencing issue where requests
       // were timing out due to EC2 IP resolution instead of localhost
 
-      const [pageData, mintedData, mintingData, recentSalesData] = await Promise
-        .allSettled([
-          // Stamp homepage data (carousels, galleries)
-          fetchWithFallback(
-            () =>
-              StampController.getHomePageData(btcPrice, btcPriceData.source),
-            {
-              carouselStamps: [],
-              stamps_art: [],
-              stamps_src721: [],
-              stamps_posh: [],
-              collectionData: [],
-            },
-            "StampController.getHomePageData",
-          ),
-          // Top minted SRC20 tokens - call service directly
-          fetchWithFallback(
-            async () => {
-              const result = await SRC20Service.QueryService
-                .fetchEnhancedSrc20Data(
-                  {
-                    op: "DEPLOY",
-                    sortBy: "TRENDING_24H_DESC",
-                    limit: 5,
-                    page: 1,
-                  },
-                  {
-                    onlyFullyMinted: true,
-                    includeMarketData: true,
-                    enrichWithProgress: true,
-                  },
-                );
-              // Type assertion for paginated response
-              const paginatedResult = result as {
-                data: unknown[];
-                page?: number;
-                totalPages?: number;
-                limit?: number;
-              };
-              const dataArray = Array.isArray(paginatedResult.data)
-                ? paginatedResult.data
-                : [];
-              return {
-                data: dataArray,
-                total: dataArray.length,
-                page: paginatedResult.page || 1,
-                totalPages: paginatedResult.totalPages || 1,
-              };
-            },
-            { data: [], total: 0, page: 1, totalPages: 0 },
-            "fetchTopMintedTokens",
-          ),
-          // Trending minting SRC20 tokens - call service directly
-          fetchWithFallback(
-            async () => {
-              const result = await SRC20Service.QueryService
-                .fetchEnhancedSrc20Data(
-                  {
-                    op: "DEPLOY",
-                    sortBy: "TRENDING_MINTING_DESC",
-                    limit: 5,
-                    page: 1,
-                  },
-                  {
-                    excludeFullyMinted: true,
-                    includeMarketData: true,
-                    enrichWithProgress: true,
-                  },
-                );
-              // Type assertion for paginated response
-              const paginatedResult = result as {
-                data: unknown[];
-                page?: number;
-                totalPages?: number;
-                limit?: number;
-              };
-              const dataArray = Array.isArray(paginatedResult.data)
-                ? paginatedResult.data
-                : [];
-              return {
-                data: dataArray,
-                total: dataArray.length,
-                page: paginatedResult.page || 1,
-                totalPages: paginatedResult.totalPages || 1,
-              };
-            },
-            { data: [], total: 0, page: 1, totalPages: 0 },
-            "fetchTrendingActiveMintingTokensV2",
-          ),
-          // Recent stamp sales - call controller directly
-          fetchWithFallback(
-            async () => {
-              const result = await StampController.getRecentSales(1, 8);
-              return {
-                data: result.data || [],
-                total: result.total || 0,
-                page: result.page || 1,
-                totalPages: result.totalPages || 0,
-              };
-            },
-            { data: [], total: 0, page: 1, totalPages: 0 },
-            "fetchRecentSalesData",
-          ),
-        ]);
+      const [
+        pageData,
+        mintedData,
+        mintingData,
+        recentSalesData,
+        newListingsData,
+      ] = await Promise.allSettled([
+        // Stamp homepage data (carousels, galleries)
+        fetchWithFallback(
+          () => StampController.getHomePageData(btcPrice, btcPriceData.source),
+          {
+            carouselStamps: [],
+            stamps_art: [],
+            stamps_src721: [],
+            stamps_posh: [],
+            collectionData: [],
+          },
+          "StampController.getHomePageData",
+        ),
+        // Top minted SRC20 tokens - call service directly
+        fetchWithFallback(
+          async () => {
+            const result = await SRC20Service.QueryService
+              .fetchEnhancedSrc20Data(
+                {
+                  op: "DEPLOY",
+                  sortBy: "TRENDING_24H_DESC",
+                  limit: 5,
+                  page: 1,
+                },
+                {
+                  onlyFullyMinted: true,
+                  includeMarketData: true,
+                  enrichWithProgress: true,
+                },
+              );
+            // Type assertion for paginated response
+            const paginatedResult = result as {
+              data: unknown[];
+              page?: number;
+              totalPages?: number;
+              limit?: number;
+            };
+            const dataArray = Array.isArray(paginatedResult.data)
+              ? paginatedResult.data
+              : [];
+            return {
+              data: dataArray,
+              total: dataArray.length,
+              page: paginatedResult.page || 1,
+              totalPages: paginatedResult.totalPages || 1,
+            };
+          },
+          { data: [], total: 0, page: 1, totalPages: 0 },
+          "fetchTopMintedTokens",
+        ),
+        // Trending minting SRC20 tokens - call service directly
+        fetchWithFallback(
+          async () => {
+            const result = await SRC20Service.QueryService
+              .fetchEnhancedSrc20Data(
+                {
+                  op: "DEPLOY",
+                  sortBy: "TRENDING_MINTING_DESC",
+                  limit: 5,
+                  page: 1,
+                },
+                {
+                  excludeFullyMinted: true,
+                  includeMarketData: true,
+                  enrichWithProgress: true,
+                },
+              );
+            // Type assertion for paginated response
+            const paginatedResult = result as {
+              data: unknown[];
+              page?: number;
+              totalPages?: number;
+              limit?: number;
+            };
+            const dataArray = Array.isArray(paginatedResult.data)
+              ? paginatedResult.data
+              : [];
+            return {
+              data: dataArray,
+              total: dataArray.length,
+              page: paginatedResult.page || 1,
+              totalPages: paginatedResult.totalPages || 1,
+            };
+          },
+          { data: [], total: 0, page: 1, totalPages: 0 },
+          "fetchTrendingActiveMintingTokensV2",
+        ),
+        // Recent stamp sales - call controller directly
+        fetchWithFallback(
+          async () => {
+            const result = await StampController.getRecentSales(1, 8);
+            return {
+              data: (result.data || []).map(nestRecentSaleData),
+              total: result.total || 0,
+              page: result.page || 1,
+              totalPages: result.totalPages || 0,
+            };
+          },
+          { data: [], total: 0, page: 1, totalPages: 0 },
+          "fetchRecentSalesData",
+        ),
+        // New listings - stamps with open dispensers, call controller directly
+        fetchWithFallback(
+          async () => {
+            const result = await StampController.getStamps({
+              market: "listings",
+              dispensers: true,
+              listings: "all",
+              page: 1,
+              limit: 10,
+              sortBy: "DESC",
+            });
+            return {
+              data: Array.isArray(result.data) ? result.data : [],
+              total: "total" in result ? (result.total || 0) : 0,
+              page: "page" in result ? (result.page || 1) : 1,
+              totalPages: "totalPages" in result ? (result.totalPages || 0) : 0,
+            };
+          },
+          { data: [], total: 0, page: 1, totalPages: 0 },
+          "fetchNewListingsData",
+        ),
+      ]);
 
       clearTimeout(timeout);
 
@@ -251,6 +340,9 @@ export const handler: Handlers<HomePageData> = {
       const recentSalesResult = recentSalesData.status === "fulfilled"
         ? recentSalesData.value
         : { data: [], total: 0, page: 1, totalPages: 0 };
+      const newListingsResult = newListingsData.status === "fulfilled"
+        ? newListingsData.value
+        : { data: [], total: 0, page: 1, totalPages: 0 };
 
       /* ===== RESPONSE RENDERING ===== */
       const response = await ctx.render({
@@ -260,6 +352,7 @@ export const handler: Handlers<HomePageData> = {
           minting: mintingResult as any,
         },
         recentSalesData: recentSalesResult as any,
+        newListingsData: newListingsResult as any,
         // 🚀 PERFORMANCE: Pass BTC price to components to avoid redundant fetches
         btcPrice: btcPrice,
         btcPriceSource: btcPriceData.source,
@@ -272,19 +365,8 @@ export const handler: Handlers<HomePageData> = {
         console.error("[HOMEPAGE] Error stack:", error.stack);
       }
 
-      // ECS-specific: Return minimal working page instead of failing completely
-      return await ctx.render({
-        carouselStamps: [],
-        stamps_art: [],
-        stamps_src721: [],
-        stamps_posh: [],
-        collectionData: [],
-        error: "Service temporarily unavailable", // This will show a friendly error message
-        src20Data: {
-          minted: { data: [], total: 0, page: 1, totalPages: 0 },
-          minting: { data: [], total: 0, page: 1, totalPages: 0 },
-        },
-      });
+      // Return the original error/empty state instead of failing completely
+      return await ctx.render(DATA_PLACEHOLDER_PROD_HOME);
     }
   },
 };
@@ -293,13 +375,13 @@ export const handler: Handlers<HomePageData> = {
 export default function Home({ data }: PageProps<HomePageData>) {
   /* ===== DATA EXTRACTION ===== */
   const {
-    carouselStamps = [],
     stamps_art = [],
     stamps_src721 = [],
     stamps_posh = [],
     collectionData = [],
     src20Data,
     recentSalesData,
+    newListingsData,
   } = data || {};
 
   /* ===== RENDER ===== */
@@ -307,14 +389,17 @@ export default function Home({ data }: PageProps<HomePageData>) {
     <>
       {/* ===== CRITICAL RESOURCES ===== */}
       {/* Preload carousel CSS for above-fold content */}
-      <link rel="preload" href="/carousel.css" as="style" />
-      <link rel="stylesheet" href="/carousel.css" />
-      {/* Homepage animation optimizations */}
-      <link rel="preload" href="/homepage-animations.css" as="style" />
-      <link rel="stylesheet" href="/homepage-animations.css" />
-      {/* Load Micro5 font only when needed */}
-      <Micro5FontLoader />
-
+      <link rel="preload" href={asset("/carousel.css")} as="style" />
+      <link rel="stylesheet" href={asset("/carousel.css")} />
+      {
+        /* The two /homepage-animations.css links that used to sit here were
+          removed: that file was never committed. It was referenced from
+          814a95e78 (2025-07-30) but the stylesheet itself never landed, so
+          both the preload and the stylesheet request have 404'd in production
+          ever since — two wasted round-trips and a console error on every
+          homepage load. Nothing depends on it; the animation work from that
+          commit lives in static/styles.css. */
+      }
       {/* ===== MAIN CONTENT ===== */}
       <div
         class={`${body} ${containerGap}`}
@@ -322,39 +407,28 @@ export default function Home({ data }: PageProps<HomePageData>) {
         {/* ===== CRITICAL ABOVE FOLD CONTENT ===== */}
         <HomeHeader />
 
-        {/* ===== DEFERRED IMPORTANT CONTENT ===== */}
+        {
+          /* ===== DEFERRED IMPORTANT CONTENT =====
         <div style="content-visibility:auto;">
           <CarouselHome carouselStamps={carouselStamps} />
         </div>
 
-        {/* ===== NON-CRITICAL CONTENT ===== */}
-        <div style="content-visibility: auto; contain-intrinsic-size: 0 500px;">
-          <StampOverviewGallery
+        {/* ===== NON-CRITICAL CONTENT ===== */
+        }
+        <div style="content-visibility: auto; contain-intrinsic-size: 0 1240px;">
+          <StampGalleryHome
             stamps_art={stamps_art}
             stamps_posh={stamps_posh}
             stamps_src721={stamps_src721}
             collectionData={collectionData}
+            recentSalesData={recentSalesData?.data || []}
+            newListingsData={newListingsData?.data || []}
           />
         </div>
 
         {/* ===== BELOW FOLD CONTENT - LAZY LOAD ===== */}
-        <div style="content-visibility: auto; contain-intrinsic-size: 0 800px;">
-          <div class="flex flex-col">
-            <StampSalesGallery
-              title="RECENT SALES"
-              subTitle="HOT STAMPS"
-              variant="home"
-              initialData={recentSalesData?.data || []}
-              displayCounts={{
-                mobileSm: 3,
-                mobileMd: 4,
-                mobileLg: 5,
-                tablet: 6,
-                desktop: 7,
-              }}
-            />
-          </div>
-          <div class="my-6 mobileLg:my-9">
+        <div style="content-visibility: auto; contain-intrinsic-size: 0 360px;">
+          <div class="mb-5 mobileLg:mb-7.5">
             <GetStampingCta />
           </div>
 
@@ -384,9 +458,8 @@ export default function Home({ data }: PageProps<HomePageData>) {
           </div>
         </div>
 
-        <div class={`flex flex-col ${containerGap}`}>
+        <div>
           <StampchainContactCta />
-          <PartnersBanner />
         </div>
       </div>
     </>

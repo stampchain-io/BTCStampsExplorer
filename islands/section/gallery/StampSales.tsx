@@ -1,29 +1,17 @@
 /* ===== RECENT SALES GALLERY COMPONENT ===== */
 /*@baba-153+154-move Refreshing to ViewAllButton-remove default (not used)*/
-import { containerBackground, loaderSpinXsGrey } from "$layout";
+import { container2, EmptyState, loaderSpinXsGrey } from "$layout";
 import { StampGallery } from "$section";
-import { titleGreyLD, valueDarkSm } from "$text";
+import { titlePrimary, valueDarkSm } from "$text";
 import type { StampWithEnhancedSaleData } from "$types/marketData.d.ts";
 import type { StampSalesProps } from "$types/ui.d.ts";
 import { useEffect, useState } from "preact/hooks";
 
-/* ===== TYPES ===== */
-interface DisplayCountBreakpoints {
-  mobileSm: number;
-  mobileMd: number;
-  mobileLg: number;
-  tablet: number;
-  desktop: number;
-}
-
 /* ===== COMPONENT ===== */
 export function StampSalesGallery({
   initialData = [],
-  title = "LATEST STAMPS",
+  title,
   subTitle,
-  variant = "detail",
-  displayCounts,
-  gridClass,
 }: StampSalesProps) {
   /* ===== STATE ===== */
   const [recentSales, setRecentSales] = useState<StampWithEnhancedSaleData[]>(
@@ -79,108 +67,70 @@ export function StampSalesGallery({
     }
 
     // Set up refresh interval for live updates (but less aggressive for SSR)
-    const refreshInterval = setInterval(fetchRecentSales, 60000); // Increased to 60s for better SSR performance
+    const refreshInterval = setInterval(fetchRecentSales, 180000); // 3 minutes
     return () => clearInterval(refreshInterval);
   }, [initialData.length]); // Depend on initialData.length to handle server-side updates
 
   /* ===== ERROR HANDLING ===== */
   if (error) {
-    return <div class="text-red-500">{error}</div>;
+    return (
+      <div
+        class={`${container2} flex items-center justify-center w-full h-[46px] ${valueDarkSm} text-center`}
+      >
+        {error}
+      </div>
+    );
   }
-
-  /* ===== DISPLAY CONFIGURATIONS ===== */
-  const defaultHomeDisplayCounts: DisplayCountBreakpoints = {
-    mobileSm: 3,
-    mobileMd: 4,
-    mobileLg: 5,
-    tablet: 6,
-    desktop: 7,
-  };
-
-  const defaultDetailDisplayCounts: DisplayCountBreakpoints = {
-    mobileSm: 3,
-    mobileMd: 3,
-    mobileLg: 4,
-    tablet: 4,
-    desktop: 6,
-  };
-
-  /* ===== GRID STYLES ===== */
-  const defaultHomeGridClass = `
-    grid w-full gap-3 mobileMd:gap-6
-    grid-cols-3 mobileMd:grid-cols-3 mobileLg:grid-cols-5 tablet:grid-cols-6 desktop:grid-cols-7
-    auto-rows-fr
-  `;
-
-  const defaultDetailGridClass = `
-    grid w-full gap-3 mobileLg:gap-6
-    grid-cols-2 mobileSm:grid-cols-3
-    mobileLg:grid-cols-4 desktop:grid-cols-6
-  `;
 
   /* ===== SECTION PROPS ===== */
   // Filter for hot stamps when activity data is available
-  const filteredStamps = variant === "home" && recentSales.length > 0
+  const filteredStamps = recentSales.length > 0
     ? recentSales.filter((stamp) => {
-      // If activity_level is available, filter for HOT stamps
+      // If activity_level is available, filter for 24H, 7D, 30D sales
       if (stamp.activity_level) {
-        return stamp.activity_level === "HOT";
+        return ["HOT", "WARM", "COOL"].includes(stamp.activity_level);
       }
       // Fallback: show all recent sales if no activity data
       return true;
     })
     : recentSales;
 
-  const sectionProps = variant === "home"
-    ? {
-      subTitle: subTitle || "HOT STAMPS",
-      type: "recent",
-      stamps: filteredStamps,
-      fromPage: "home",
-      layout: "grid" as const,
-      isRecentSales: true,
-      showDetails: false,
-      viewAllLink: "/stamp?view=sales",
-      showMinDetails: true,
-      variant: "grey" as const,
-      gridClass: gridClass || defaultHomeGridClass,
-      displayCounts: displayCounts || defaultHomeDisplayCounts,
-    }
-    : {
-      subTitle: subTitle || "LATEST TRANSACTIONS",
-      type: "stamps",
-      stamps: recentSales,
-      layout: "grid" as const,
-      isRecentSales: true,
-      showDetails: false,
-      showMinDetails: true,
-      gridClass: gridClass || defaultDetailGridClass,
-      displayCounts: displayCounts || defaultDetailDisplayCounts,
-    };
+  const sectionProps = {
+    subTitle: subTitle || "RECENT SALES",
+    type: "recent",
+    stamps: filteredStamps,
+    fromPage: "home",
+    isRecentSales: true,
+    variant: "cardVerticalSaleCompact" as const,
+    viewAllLink: "/marketplace?market=sales",
+    // Rendered via the swiper/carousel path in StampGallery, so slide
+    // counts (not gridClass) control the columns shown per breakpoint
+    swiperSlidesPerView: 2,
+    swiperBreakpoints: {
+      460: { slidesPerView: 3 },
+      568: { slidesPerView: 4 },
+      820: { slidesPerView: 5 },
+      1024: { slidesPerView: 6 },
+      1440: { slidesPerView: 8 },
+    },
+  };
 
   /* ===== RENDER ===== */
   return (
-    <div class={containerBackground}>
-      <h3
-        class={variant === "home"
-          ? titleGreyLD
-          : "text-3xl tablet:text-7xl text-left mb-2 bg-clip-text text-transparent color-purple-gradientDL font-black"}
-      >
-        {title}
-      </h3>
+    <div class="flex flex-col">
+      {title && <h3 class={titlePrimary}>{title}</h3>}
       <div class="flex flex-col">
-        {variant === "home" && filteredStamps.length === 0 && !isLoading && (
-          <div class={`${valueDarkSm} text-center py-8`}>
-            <h6 class="text-lg">NO TRENDING STAMPS AVAILABLE AT THE MOMENT</h6>
-          </div>
+        {filteredStamps.length === 0 && !isLoading && (
+          <EmptyState
+            label="NO RECENT SALES AVAILABLE AT THE MOMENT"
+            icon="artStamps"
+          />
         )}
-        {(filteredStamps.length > 0 || variant !== "home") && (
-          <StampGallery {...sectionProps} />
-        )}
+        {filteredStamps.length > 0 && <StampGallery {...sectionProps} />}
         {isLoading && (
           <div class="flex items-center gap-3 -mt-[29px] mb-[9px]">
             <div class={loaderSpinXsGrey} />
-            <div class="animate-pulse font-medium text-sm text-color-grey">
+            <div class="animate-pulse font-medium text-xs text-color-neutral-400">
               REFRESHING
             </div>
           </div>

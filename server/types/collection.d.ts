@@ -68,6 +68,10 @@ export interface CollectionQueryParams {
   sortBy?: string;
   minStampCount?: number;
   includeMarketData?: boolean; // New optional parameter
+  // Filters collections to those containing exclusively 1/1 (supply === 1)
+  // stamps ("single"), or those containing at least one multi-edition stamp
+  // ("multiple"). Omit to include all collections regardless of edition mix.
+  editionsFilter?: "single" | "multiple";
 }
 
 export interface PaginatedCollectionResponseBody {

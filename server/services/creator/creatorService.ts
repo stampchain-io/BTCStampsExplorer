@@ -1,5 +1,4 @@
 import { verifySignature } from "$lib/utils/security/cryptoUtils.ts";
-import { StampController } from "$server/controller/stampController.ts";
 import { SecurityService } from "$server/services/security/securityService.ts";
 import { SRC101Service } from "$server/services/src101/index.ts";
 import { StampService } from "$server/services/stampService.ts";
@@ -87,18 +86,30 @@ export class CreatorService {
       return stamps;
     }
 
-    // Get enhanced creator names for all addresses that need it
+    // Get enhanced creator names for all addresses that need it.
+    // Run lookups with bounded concurrency instead of one-at-a-time —
+    // sequential awaits here turn into O(n) round trips and can blow past
+    // route-level timeouts when many unique creators are on a page. The
+    // concurrency limit is kept well under the DB pool's max connections
+    // (see DatabaseManager) so this doesn't starve other concurrent requests.
     const enhancedCreatorNames = new Map<string, string>();
+    const addresses = Array.from(creatorsNeedingEnhancement);
+    const CONCURRENCY_LIMIT = 3;
 
-    for (const creatorAddress of creatorsNeedingEnhancement) {
-      try {
-        const enhancedName = await this.getCreatorNameByAddress(creatorAddress);
-        if (enhancedName) {
-          enhancedCreatorNames.set(creatorAddress, enhancedName);
-        }
-      } catch (error) {
-        console.error(`Error getting enhanced creator name for ${creatorAddress}:`, error);
-      }
+    for (let i = 0; i < addresses.length; i += CONCURRENCY_LIMIT) {
+      const batch = addresses.slice(i, i + CONCURRENCY_LIMIT);
+      await Promise.all(
+        batch.map(async (creatorAddress) => {
+          try {
+            const enhancedName = await this.getCreatorNameByAddress(creatorAddress);
+            if (enhancedName) {
+              enhancedCreatorNames.set(creatorAddress, enhancedName);
+            }
+          } catch (error) {
+            console.error(`Error getting enhanced creator name for ${creatorAddress}:`, error);
+          }
+        }),
+      );
     }
 
     // Enrich the stamps with enhanced creator names
@@ -150,8 +161,14 @@ export class CreatorService {
         return { success: false, message: "Signature expired" };
       }
 
-      // Update with sanitized (trimmed) name
-      const updated = await StampController.updateCreatorName(params.address, sanitizedName);
+      // Update with sanitized (trimmed) name. Call StampService directly
+      // (not StampController) — the controller is HTTP-route-shaped and
+      // always resolves to a truthy Response object, which would silently
+      // mask a `false` (failed) result from the underlying DB write.
+      const updated = await StampService.updateCreatorName(
+        params.address,
+        sanitizedName,
+      );
       if (!updated) {
         return { success: false, message: "Failed to update creator name" };
       }

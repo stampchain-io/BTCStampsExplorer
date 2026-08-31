@@ -116,11 +116,11 @@ export default function HowToBuy() {
           <p class={text}>
             Browse the{" "}
             <a
-              href="/stamp"
-              f-partial="/stamp"
-              class="animated-underline"
+              href="/marketplace?market=listings"
+              f-partial="/marketplace?market=listings"
+              class="link-neutral-200-bold"
             >
-              stamp explorer
+              stamp marketplace
             </a>{" "}
             to find a stamp with an open dispenser.
           </p>
@@ -137,7 +137,7 @@ export default function HowToBuy() {
             <a
               href="/src20"
               f-partial="/src20"
-              class="animated-underline"
+              class="link-neutral-200-bold"
             >
               SRC-20 explorer
             </a>, then buy it on{" "}
@@ -145,7 +145,7 @@ export default function HowToBuy() {
               href="https://openstamp.io"
               target="_blank"
               rel="noopener noreferrer"
-              class="animated-underline"
+              class="link-neutral-200-bold"
             >
               OpenStamp
             </a>,{" "}
@@ -153,7 +153,7 @@ export default function HowToBuy() {
               href="https://stampscan.xyz"
               target="_blank"
               rel="noopener noreferrer"
-              class="animated-underline"
+              class="link-neutral-200-bold"
             >
               StampScan
             </a>, or{" "}
@@ -161,7 +161,7 @@ export default function HowToBuy() {
               href="https://www.bitmart.com"
               target="_blank"
               rel="noopener noreferrer"
-              class="animated-underline"
+              class="link-neutral-200-bold"
             >
               BitMart
             </a>.

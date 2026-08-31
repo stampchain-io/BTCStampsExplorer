@@ -2,7 +2,12 @@
 /*@baba-149*/
 import { SRC20OverviewContent } from "$content";
 import { Handlers } from "$fresh/server.ts";
-import { body } from "$layout";
+import { SRC20OverviewHeader } from "$header";
+import { containerBackground } from "$layout";
+import {
+  DATA_PLACEHOLDER_DEV,
+  DATA_PLACEHOLDER_PROD_TOKEN_OVERVIEW_PAGE,
+} from "$lib/utils/dataPlaceholderProd.ts";
 
 /* ===== HELPER FUNCTIONS ===== */
 /**
@@ -23,6 +28,7 @@ async function fetchFromAPI(endpoint: string, baseUrl: string): Promise<any> {
       headers: {
         "X-API-Version": "2.3", // Use latest API version with market data
       },
+      signal: AbortSignal.timeout(15000),
     });
 
     if (!response.ok) {
@@ -61,7 +67,7 @@ async function fetchFromAPI(endpoint: string, baseUrl: string): Promise<any> {
       `[SRC20] API call error: ${endpoint}`,
       error,
     );
-    return { data: [], total: 0, page: 1, totalPages: 0 };
+    return DATA_PLACEHOLDER_PROD_TOKEN_OVERVIEW_PAGE;
   }
 }
 
@@ -69,6 +75,44 @@ async function fetchFromAPI(endpoint: string, baseUrl: string): Promise<any> {
 export const handler: Handlers = {
   async GET(req, ctx) {
     const url = new URL(req.url);
+
+    if (DATA_PLACEHOLDER_DEV) {
+      const { DATA_PLACEHOLDER_DEV_TOKEN_OVERVIEW_PAGE } = await import(
+        "$lib/utils/dataPlaceholderDev.ts"
+      );
+      const dummyTimeframe = url.searchParams.get("timeframe") || "24H";
+      const dummySortBy = url.searchParams.get("sortBy") || "TRENDING";
+      const dummySortDirection = url.searchParams.get("sortDirection") ||
+        "desc";
+      const dummyViewType = (url.searchParams.get("viewType") || "minted") as
+        | "minted"
+        | "minting";
+
+      // Mirror the real API (op=DEPLOY = one row per token), then split by
+      // minting status: progress < 100 = still minting, >= 100 = fully minted.
+      const deployRows = DATA_PLACEHOLDER_DEV_TOKEN_OVERVIEW_PAGE.data.filter(
+        (row: { op?: string }) => row?.op === "DEPLOY",
+      );
+      const filtered = deployRows.filter((row: { progress?: string }) => {
+        const pct = parseFloat(row?.progress ?? "100");
+        return dummyViewType === "minting" ? pct < 100 : pct >= 100;
+      });
+
+      return ctx.render({
+        mintingData: {
+          ...DATA_PLACEHOLDER_DEV_TOKEN_OVERVIEW_PAGE,
+          data: filtered,
+          total: filtered.length,
+        },
+        timeframe: dummyTimeframe,
+        sortBy: dummySortBy,
+        sortDirection: dummySortDirection,
+        viewType: dummyViewType,
+        btcPrice: 65000,
+        btcPriceSource: "dummy",
+      });
+    }
+
     const page = parseInt(url.searchParams.get("page") || "1");
     const limit = 50;
     const timeframe = (url.searchParams.get("timeframe") || "24H") as
@@ -247,14 +291,12 @@ export const handler: Handlers = {
         error,
       );
 
-      const emptyData = { data: [], total: 0, page: 1, totalPages: 0 };
       return ctx.render({
-        mintingData: emptyData,
+        mintingData: DATA_PLACEHOLDER_PROD_TOKEN_OVERVIEW_PAGE,
         timeframe,
         sortBy,
         sortDirection,
-        viewType, // Pass viewType to frontend
-        // Pass BTC price even in error case
+        viewType,
         btcPrice: undefined,
         btcPriceSource: "error",
       });
@@ -280,10 +322,17 @@ export default function SRC20OverviewPage({ data }: any) {
 
   return (
     <div
-      class={`${body} -mb-3`}
+      class={`${containerBackground} -mb-3`}
       f-client-nav
       data-partial="/src20"
     >
+      <SRC20OverviewHeader
+        viewType={viewType}
+        timeframe={timeframe}
+        sortBy={sortBy}
+        sortDirection={sortDirection}
+        currentTotal={mintingData?.total ?? 0}
+      />
       <SRC20OverviewContent
         mintingData={mintingData}
         timeframe={timeframe}

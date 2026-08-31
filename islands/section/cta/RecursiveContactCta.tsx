@@ -1,7 +1,7 @@
 /* ===== RECURSIVE CONTACT CTA COMPONENT ===== */
 import { Button } from "$button";
 import { containerBackground } from "$layout";
-import { subtitleGrey, text } from "$text";
+import { subtitleNeutral, text } from "$text";
 
 /* ===== COMPONENT ===== */
 export const RecursiveContactCta = () => {
@@ -10,7 +10,7 @@ export const RecursiveContactCta = () => {
     <>
       {/* ===== CONTENT SECTION ===== */}
       <div class={`${containerBackground} mt-6 mobileLg:mt-12`}>
-        <h4 class={subtitleGrey}>
+        <h4 class={subtitleNeutral}>
           RECURSIVE LAYERING
         </h4>
         <div
@@ -44,8 +44,8 @@ export const RecursiveContactCta = () => {
         <div class="flex justify-end">
           <Button
             variant="outline"
-            color="grey"
-            size="mdR"
+            color="neutral"
+            size="smR"
             href="/about#contact"
             class="float-right mt-6"
           >

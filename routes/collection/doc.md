@@ -1,22 +1,33 @@
 /**
  * Collection Route Pages
  * ======================
- * 
+ *
  * Overview
  * --------
- * The index.tsx contains the Collection Landing page
- * The [overview].tsx contains the Collection Overview page for: Posh, recursive and artists
- * The detail folder contains the [id].tsx Collection Details page
- * - I attempted having the [id].tsx file in the route folder, but it overrules the [overview].tsx file
- *   and posh, recursive and artists pages display in the [id].tsx file instead
- *   I tried several approaches, but couldn't properly redirect to or use the [id].tsx file
+ * - `index.tsx` — the Collection landing/overview page. Renders the paginated
+ *   "artist" collections gallery (formerly `[overview].tsx`'s artist tab).
+ *   Static route matching `/collection` exactly.
+ * - `[id].tsx` — the Collection Details page for a single collection,
+ *   matching `/collection/:id` (formerly `detail/[id].tsx`).
  *
- *
- * Barrel files
+ * Routing note
  * ------------
- * The barrel file for exporting all collection-related islands components is located in:
- * /islands/collection/index.ts
- * All collection related files can be imported using:
- * import { CollectionXxxx, CollectionYyyy } from "$collection";
+ * Fresh only allows one dynamic single-segment route file per directory.
+ * This folder previously had both `[overview].tsx` (matching
+ * `/collection/artist|posh|recursive`) and a `detail/[id].tsx` in a
+ * subfolder to avoid clashing with it. The posh/recursive tabs were
+ * removed, so `[overview].tsx` was deleted and `[id].tsx` was moved up
+ * into this folder — it's now the only dynamic segment route here, so
+ * there's no conflict.
+ *
+ * Components
+ * ----------
+ * There's no dedicated `$collection` barrel — collection-related components
+ * are grouped by UI element type, like the rest of the codebase, and pulled
+ * in via the existing barrels:
+ * - CollectionOverviewHeader, CollectionDetailHeader — islands/header/index.ts ($header)
+ * - CollectionGallery, CollectionGalleryBanner, CollectionsBanner — islands/section/index.ts ($section)
+ * - CollectionDetailContent — islands/content/index.ts ($content)
+ * - CollectionCard — components/card/index.ts ($card)
  *
  */
