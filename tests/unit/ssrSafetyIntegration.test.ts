@@ -215,13 +215,21 @@ describe("SSR Safety Pattern Recognition", () => {
 
     const content = await Deno.readTextFile(filePath);
 
-    // Should contain the safety checks
-    assertStringIncludes(content, 'typeof globalThis === "undefined"');
-    assertStringIncludes(content, "!globalThis?.location");
-    assertStringIncludes(content, "Cannot navigate during SSR");
-
-    // Should contain the navigation
-    assertStringIncludes(content, "globalThis.location.href");
+    // The component must never navigate unguarded during SSR. That property
+    // is satisfied EITHER by inlining the guards OR by delegating to the
+    // audited helpers in freshNavigationUtils (whose own guards are asserted
+    // by the "freshNavigationUtils safety pattern" test below). Assert the
+    // property, not one particular spelling of it.
+    const inlinesGuards = content.includes('typeof globalThis === "undefined"') &&
+      content.includes("!globalThis?.location") &&
+      content.includes("Cannot navigate during SSR") &&
+      content.includes("globalThis.location.href");
+    const delegatesToHelper = content.includes("isBrowser") &&
+      content.includes("safeNavigate");
+    assert(
+      inlinesGuards || delegatesToHelper,
+      "SRC20Minting must guard navigation for SSR, either inline or via freshNavigationUtils",
+    );
   });
 
   it("should recognize freshNavigationUtils safety pattern", async () => {

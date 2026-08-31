@@ -210,6 +210,17 @@ export class MockDatabaseManager {
       return this.getCollectionData(normalizedQuery, params);
     }
 
+    // SRC-20 list queries select `st.stamp` and LEFT JOIN the stamp table to
+    // surface the stamp number. That makes the `st.stamp` heuristic in the
+    // stamp branch below misroute them into getStampData, which returns
+    // stamp-shaped rows with no `tick`. Route on the DRIVING table instead:
+    // if the FROM clause resolves to SRC20Valid (directly, or via the
+    // push-down subquery form `FROM (SELECT * FROM SRC20Valid ...)`), this is
+    // an SRC-20 query no matter what it joins to.
+    if (/from\s+\(?\s*(?:select\s+\*\s+from\s+)?src20valid/i.test(normalizedQuery)) {
+      return this.getSrc20Data(normalizedQuery, params);
+    }
+
     // Stamp queries with market data JOIN - check BEFORE simple stamp queries
     if (
       (normalizedQuery.includes("from stamps") ||
@@ -1151,14 +1162,24 @@ export class MockDatabaseManager {
       // Apply filters
       let filteredData = transformedCollections;
 
-      // Filter by creator if specified
-      if (
-        normalizedQuery.includes("where cc.creator_address = ?") && params[0]
-      ) {
-        const creatorAddress = params[0];
-        filteredData = filteredData.filter((c: any) =>
-          c.creators.includes(creatorAddress)
-        );
+      // Filter by creator if specified.
+      // The creator predicate is no longer the first WHERE term — a hidden-names
+      // condition precedes it and contributes its own placeholders — so match the
+      // predicate alone and resolve the creator param by counting the "?"
+      // placeholders that appear before it.
+      const creatorPredicateIndex = normalizedQuery.indexOf(
+        "cc.creator_address = ?",
+      );
+      if (creatorPredicateIndex !== -1) {
+        const paramIndex =
+          (normalizedQuery.slice(0, creatorPredicateIndex).match(/\?/g) ?? [])
+            .length;
+        const creatorAddress = params[paramIndex];
+        if (creatorAddress) {
+          filteredData = filteredData.filter((c: any) =>
+            c.creators.includes(creatorAddress)
+          );
+        }
       }
 
       // Filter by minimum stamp count if HAVING clause is present
