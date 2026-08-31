@@ -28,7 +28,7 @@ import { useState } from "preact/hooks";
 import type { WalletStampBalanceRow } from "./WalletStampOverview.tsx";
 
 /* ===== CONSTANTS ===== */
-const HEADERS = ["IMAGE", "STAMP #", "CPID", "FLOOR", "BALANCE", "VALUE"];
+const HEADERS = ["IMAGE", "STAMP #", "CPID", "PRICE", "BALANCE", "VALUE"];
 
 // VALUE is hidden from tablet+ up (see below) — BALANCE becomes the
 // visually "last" column at that breakpoint, so it picks up the rounded
@@ -139,7 +139,7 @@ export function WalletStampOverviewRowCompact(
         {stamp.cpid ?? "—"}
       </td>
 
-      {/* FLOOR */}
+      {/* PRICE */}
       <td
         class={`${cellCenterL2Card} text-color-secondary-400`}
       >
@@ -188,7 +188,7 @@ export function WalletStampOverviewTableCompact(
             { width: "w-10" }, // IMAGE (fixed for sticky left-0 anchor)
             { width: "min-w-[90px] w-auto" }, // STAMP #
             { width: "min-w-[130px] w-auto" }, // CPID
-            { width: "min-w-[100px] w-auto" }, // FLOOR
+            { width: "min-w-[100px] w-auto" }, // PRICE
             { width: "min-w-[110px] w-auto" }, // BALANCE
             { width: "min-w-[110px] w-auto tablet:hidden" }, // VALUE
           ]).map((col) => <col key={col.key} class={col.className} />)}
