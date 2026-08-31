@@ -579,6 +579,7 @@ export function StampCard({
           target="_top"
           f-partial={`/stamp/${stamp.tx_hash}`}
           data-long-number={isLongNumber(stampValue)}
+          aria-label={`Stamp ${stampValue}`}
           class={`${containerCard} gap-2`}
         >
           {/* ===== TOP: IMAGE + DETAILS (2-COLUMN) ===== */}
@@ -762,6 +763,7 @@ export function StampCard({
           target="_top"
           f-partial={`/stamp/${stamp.tx_hash}`}
           data-long-number={isLongNumber(stampValue)}
+          aria-label={`Stamp ${stampValue}`}
           class={`${containerCard} gap-2`}
         >
           {/* ===== TOP: IMAGE + DETAILS (2-COLUMN) ===== */}
@@ -846,6 +848,7 @@ export function StampCard({
         target="_top"
         f-partial={`/stamp/${stamp.tx_hash}`}
         data-long-number={isLongNumber(stampValue)}
+        aria-label={`Stamp ${stampValue}`}
         class={containerCard}
       >
         {/* ===== ATOM ICON (wallet balance variants only) ===== */}

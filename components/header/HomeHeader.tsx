@@ -36,8 +36,12 @@ export function HomeHeader() {
       {/* ===== BACKGROUND IMAGE with dark overlay gradient (top -> bottom) ===== */}
       <div class="absolute inset-0 z-0">
         <img
-          src="/img/components/stamps-collage-6000x4000.png"
+          src="/img/components/stamps-collage-1920.webp"
           alt=""
+          width={1920}
+          height={1280}
+          fetchpriority="high"
+          decoding="async"
           className="w-full h-full object-cover"
         />
         <div class="absolute inset-0 bg-gradient-to-b from-color-neutral-950/95 via-color-neutral-900/70 to-color-neutral-1000/90" />
