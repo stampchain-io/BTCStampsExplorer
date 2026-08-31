@@ -46,7 +46,15 @@ export function LogoIcon({
     <a
       href={href}
       onClick={onClick}
-      aria-label={ariaLabel}
+      {
+        /* Only name the link explicitly when it has no visible children.
+           With children present (the wordmark), an aria-label REPLACES that
+           visible text in the accessible name, which trips axe's
+           label-content-name-mismatch — the name a screen reader announces
+           would no longer match the label a sighted user reads aloud. The
+           children already provide a perfectly good name, so step aside. */
+        ...(children ? {} : { "aria-label": ariaLabel })
+      }
       class={`inline-flex items-center gap-3 group ${className}`.trim()}
       {...(fPartial !== undefined ? { "f-partial": fPartial } : {})}
     >

@@ -579,9 +579,14 @@ export function StampCard({
           target="_top"
           f-partial={`/stamp/${stamp.tx_hash}`}
           data-long-number={isLongNumber(stampValue)}
-          aria-label={`Stamp ${stampValue}`}
           class={`${containerCard} gap-2`}
         >
+          {
+            /* Visually-hidden name: the anchor's only other content is the
+              stamp image, which is a skeleton until it resolves — without
+              this the link has no accessible name during SSR/loading. */
+          }
+          <span class="sr-only">Stamp {stampValue}</span>
           {/* ===== TOP: IMAGE + DETAILS (2-COLUMN) ===== */}
           {
             /* Fixed-width image column (not "auto") — with no explicit
@@ -763,9 +768,14 @@ export function StampCard({
           target="_top"
           f-partial={`/stamp/${stamp.tx_hash}`}
           data-long-number={isLongNumber(stampValue)}
-          aria-label={`Stamp ${stampValue}`}
           class={`${containerCard} gap-2`}
         >
+          {
+            /* Visually-hidden name: the anchor's only other content is the
+              stamp image, which is a skeleton until it resolves — without
+              this the link has no accessible name during SSR/loading. */
+          }
+          <span class="sr-only">Stamp {stampValue}</span>
           {/* ===== TOP: IMAGE + DETAILS (2-COLUMN) ===== */}
           {
             /* Fixed-width image column (not "auto") — see cardHorizontalListing
@@ -848,9 +858,14 @@ export function StampCard({
         target="_top"
         f-partial={`/stamp/${stamp.tx_hash}`}
         data-long-number={isLongNumber(stampValue)}
-        aria-label={`Stamp ${stampValue}`}
         class={containerCard}
       >
+        {
+          /* Visually-hidden name: the anchor's only other content is the
+            stamp image, which is a skeleton until it resolves — without
+            this the link has no accessible name during SSR/loading. */
+        }
+        <span class="sr-only">Stamp {stampValue}</span>
         {/* ===== ATOM ICON (wallet balance variants only) ===== */}
         {(variant === "cardVerticalBalance" ||
           variant === "cardSquareBalance") &&
