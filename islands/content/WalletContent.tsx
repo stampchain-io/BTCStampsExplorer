@@ -8,7 +8,9 @@ import {
 } from "$card";
 import { WalletHeaderContent } from "$header";
 import { containerBackground, EmptyState, gridCardWallet } from "$layout";
+import { WalletTableBase } from "$components/table/walletTable/WalletTableBase.tsx";
 import type { DispenserRow, StampRow } from "$types/stamp.d.ts";
+import type { SRC20Row } from "$types/src20.d.ts";
 import type {
   WalletContainerPagination,
   WalletContentProps,
@@ -21,14 +23,13 @@ import type { ComponentChildren } from "preact";
 import { useEffect } from "preact/hooks";
 
 /* ===== VIEW TYPES =====
- * "cardRow" is temporarily disabled — the wallet-specific table variants
- * (StampOverviewTable/StampListingsTable/SRC20OverviewCompact) aren't
- * updated for this layout yet, so the ViewButton (see WalletHeaderContent)
- * no longer offers it and the route no longer accepts it as a `view`
- * value. "cardHorizontal" is a reserved placeholder for a future layout —
- * none of the render branches below handle it yet (gridCardWallet falls
- * back to the Md grid, and no tab switches on it). */
-type ViewMode = "cardVertical" | "cardSquare" | "cardHorizontal";
+ * "cardRow" renders the walletTable/ components (WalletTableBase) instead
+ * of a card grid — only wired up for the Balance sub-tab (see
+ * BalanceTabContent/TokensTabContent below); Created/Listings/Collections
+ * fall back to the grid. "cardHorizontal" is a reserved placeholder for a
+ * future layout — none of the render branches below handle it yet
+ * (gridCardWallet falls back to the Md grid, and no tab switches on it). */
+type ViewMode = "cardVertical" | "cardSquare" | "cardRow" | "cardHorizontal";
 
 /* ===== TAB MAPPING ===== */
 // The header exposes one unified sub-tab (balance/created/listings/
@@ -110,6 +111,19 @@ function BalanceTabContent({
   section: WalletContentTabId;
   pagination?: WalletContainerPagination | undefined;
 }) {
+  if (view === "cardRow") {
+    return (
+      <>
+        <WalletTableBase
+          type="stamps"
+          stamps={stamps}
+          compact={section === "all"}
+        />
+        <PaginationBlock pagination={pagination} prefix="stamps" />
+      </>
+    );
+  }
+
   if (!stamps.length) {
     return <EmptyState label="NO ART STAMPS IN THE WALLET" icon="artStamps" />;
   }
@@ -353,6 +367,19 @@ function TokensTabContent({
   data: any[];
   pagination?: WalletContainerPagination | undefined;
 }) {
+  if (view === "cardRow" && tab === "balance") {
+    return (
+      <>
+        <WalletTableBase
+          type="src20"
+          src20s={data as SRC20Row[]}
+          compact={section === "all"}
+        />
+        <PaginationBlock pagination={pagination} prefix="tokens" />
+      </>
+    );
+  }
+
   if (!data.length) {
     return (
       <EmptyState
@@ -389,16 +416,12 @@ export default function WalletContent({
   anchor,
   section = "all",
   tab = "balance",
-  view: rawView = "cardVertical",
+  view = "cardVertical",
   stampsData = [],
   stampsPagination,
   tokensData = [],
   tokensPagination,
 }: WalletContentProps) {
-  // "cardRow" is disabled here (see the ViewMode comment above) — the route
-  // already excludes it from the `view` query param, but fall back safely
-  // in case a stale value ever reaches this component directly.
-  const view: ViewMode = rawView === "cardRow" ? "cardVertical" : rawView;
   /* ===== EFFECTS ===== */
   useEffect(() => {
     if (anchor) {

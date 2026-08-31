@@ -135,11 +135,10 @@ export const WalletHeaderContent = (
         }
         <div class="flex shrink-0 gap-3 ml-auto">
           <div class={container2Icon}>
-            {/* "cardRow" excluded — wallet table variants aren't updated yet. */}
             <ViewButton
               viewMode={viewMode}
               paramName="view"
-              modes={["cardVertical", "cardSquare"]}
+              modes={["cardVertical", "cardSquare", "cardRow"]}
             />
           </div>
           <div class={`${container2Icon} gap-1.5 tablet:gap-1`}>
