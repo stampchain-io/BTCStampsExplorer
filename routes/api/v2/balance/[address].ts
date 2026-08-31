@@ -64,12 +64,22 @@ export const handler: Handlers<AddressHandlerContext> = {
         getBTCBalanceInfo(address),
       ]);
 
-      // Check for empty results - return 404 for valid Bitcoin addresses with no stamps/tokens
-      if (!stamps.data?.length && !src20.data?.length) {
-        return ApiResponseUtil.notFound(
-          `No stamps or SRC-20 tokens found for address: ${address}`,
-        );
-      }
+      // NOTE: deliberately NO 404 for "valid address, zero holdings".
+      //
+      // The address has already been validated above (malformed input returns
+      // 400), so reaching here means the address is real — it simply holds no
+      // stamps or SRC-20. That is an empty result, not a missing resource, and
+      // 200 with empty arrays is the correct representation. It also matters
+      // practically: this endpoint is the one that carries `btc`, so 404-ing
+      // would throw away the BTC balance for exactly the users who most need
+      // it — a freshly connected wallet holding BTC but no stamps yet.
+      //
+      // This is also the behaviour already shipping on dev, which only ever
+      // passed the old emptiness check because the SRC-20 controller returned
+      // a single wrapper object (`[{ last_block: 0, data: [] }]`) rather than
+      // a genuinely empty array. Once that wrapper was cleaned up, the check
+      // started firing and the endpoint began 404-ing. Making the 200 explicit
+      // preserves the shipped contract instead of resting on that quirk.
 
       // Calculate combined totals
       const totalItems = ((stamps as any).total || 0) +
