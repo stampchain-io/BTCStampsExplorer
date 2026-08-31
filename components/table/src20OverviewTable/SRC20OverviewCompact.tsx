@@ -79,9 +79,9 @@ export function SRC20OverviewCompact({
     `${cellCenterL2Card} tablet:rounded-r-2xl tablet:border-r-[1px] tablet:!pr-3 tablet:text-right desktop:rounded-r-none desktop:border-r-0 desktop:text-center`;
 
   return (
-    <div class="overflow-x-auto tablet:overflow-x-visible scrollbar-hide">
+    <div class="overflow-x-auto tablet:overflow-x-visible scrollbar-hide -my-3">
       <table
-        class={`w-full -mt-2 border-separate border-spacing-y-3 ${textXs}`}
+        class={`w-full border-separate border-spacing-y-3 ${textXs}`}
       >
         <colgroup>
           {colGroup(

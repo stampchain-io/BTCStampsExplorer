@@ -212,7 +212,7 @@ interface SRC20OverviewTableProps {
 
 export function SRC20OverviewTable({ src20s }: SRC20OverviewTableProps) {
   return (
-    <div class="overflow-x-auto tablet:overflow-x-visible scrollbar-hide">
+    <div class="overflow-x-auto tablet:overflow-x-visible scrollbar-hide -my-3">
       <table
         class={`w-full border-separate border-spacing-y-3 ${textXs}`}
       >

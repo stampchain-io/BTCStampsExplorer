@@ -21,9 +21,7 @@ export function MarketplaceContent({
 
   /* ===== RENDER ===== */
   return (
-    <div
-      class={`w-full ${viewMode !== "cardRow" ? "pt-5" : "pt-2"}`}
-    >
+    <div class="w-full pt-5">
       {viewMode === "cardRow"
         ? (
           /* ===== ROW TABLE VIEW ===== */

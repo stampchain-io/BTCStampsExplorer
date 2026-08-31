@@ -306,7 +306,7 @@ interface StampListingsTableProps {
 
 export function StampListingsTable({ stamps }: StampListingsTableProps) {
   return (
-    <div class="overflow-x-auto scrollbar-hide">
+    <div class="overflow-x-auto scrollbar-hide -my-3">
       <table
         class={`w-full border-separate border-spacing-y-3 ${textXs}`}
       >

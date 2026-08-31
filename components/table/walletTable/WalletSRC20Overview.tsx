@@ -237,7 +237,7 @@ export function WalletSRC20OverviewTable(
   { src20s }: WalletSRC20OverviewTableProps,
 ) {
   return (
-    <div class="overflow-x-auto tablet:overflow-x-visible scrollbar-hide">
+    <div class="overflow-x-auto tablet:overflow-x-visible scrollbar-hide -my-3">
       <table
         class={`w-full border-separate border-spacing-y-3 ${textXs}`}
       >

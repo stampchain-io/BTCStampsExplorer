@@ -67,7 +67,7 @@ The Table system provides a comprehensive, scalable solution for displaying tabu
 | **SRC20 Details** | src20DetailsTable/ | SRC20Mints, SRC20Transfers | Per-token mint/transfer history |
 | **SRC20 Overview** | src20OverviewTable/ | SRC20Minting(Compact), SRC20Overview(Compact) | Sortable market/minting grids, progress bars |
 | **Stamp Details** | stampDetailsTable/ | StampListingsAll, StampListingsOpen, StampSales, StampTransfers | Dispenser data, pricing, quantities |
-| **Wallet** | walletTable/ | *(reserved, no components yet)* | Placeholder for future wallet-specific tables |
+| **Wallet** | walletTable/ | WalletTableBase, WalletStampOverview(Compact), WalletSRC20Overview(Compact) | Balance-tab stamp/SRC20 row view, full + compact variants |
 | **Upload** | islands/table/ | UploadImageTable | File management, preview |
 
 ### Responsive Behavior
@@ -250,9 +250,47 @@ The Table system provides a comprehensive, scalable solution for displaying tabu
     - Transaction hash links
   - **Location**: `components/table/stampDetailsTable/StampTransfers.tsx`
 
-#### `walletTable/` — Reserved
+#### `walletTable/` — Wallet Balance row view (`cardRow`)
 
-- Currently an empty directory reserved for future wallet-specific table components. No files exist here yet; wallet pages currently reuse `src20OverviewTable/SRC20OverviewCompact.tsx` (via its `fromPage="wallet"` mode) and other existing tables.
+- **WalletTableBase.tsx**: Full/compact switcher for the wallet page's `cardRow` view mode
+  - **Purpose**: Picks the right stamp/SRC20 table variant for whichever panel is rendering — mirrors `ExplorerTableBase`'s role as the family's entry point, but since the wallet page always renders stamps and tokens as two separate panels (never one merged feed), it just selects full vs. compact rather than merging/sorting `MixedItem[]`
+  - **Props**: `type: "stamps" | "src20"`, `stamps?: WalletStampBalanceRow[]`, `src20s?: SRC20Row[]`, `compact?: boolean`
+  - **Location**: `components/table/walletTable/WalletTableBase.tsx`
+
+- **WalletStampOverview.tsx**: Full wallet stamp balance row/table
+  - **Purpose**: Render stamps held by a wallet with market value context
+  - **Exports**: `WalletStampOverviewRow({ stamp: WalletStampBalanceRow })`, `WalletStampOverviewTable({ stamps })`, plus the `WalletStampBalanceRow` type
+  - **Columns**: IMAGE, STAMP #, CPID, CREATOR, FLOOR, MCAP, BALANCE, VALUE
+  - **Features**:
+    - BALANCE renders as `owned/issued` (same formula as `StampOverviewRow`'s SUPPLY cell)
+    - VALUE prefers the balance API's precomputed `market_data.wallet_value_btc`, falling back to `floor × owned`
+    - MCAP has no live per-stamp source — computed client-side as `floor × issued` (divisible-adjusted)
+    - Sticky IMAGE and STAMP # columns, row click navigates to `/stamp/{tx_hash}`
+  - **Location**: `components/table/walletTable/WalletStampOverview.tsx`
+
+- **WalletStampOverviewCompact.tsx**: Compact wallet stamp balance row/table
+  - **Purpose**: Space-constrained variant used in the wallet page's ALL tab split layout
+  - **Exports**: `WalletStampOverviewRowCompact({ stamp })`, `WalletStampOverviewTableCompact({ stamps })`
+  - **Columns**: IMAGE, STAMP #, CPID, FLOOR, BALANCE, VALUE (drops CREATOR/MCAP)
+  - **Location**: `components/table/walletTable/WalletStampOverviewCompact.tsx`
+
+- **WalletSRC20Overview.tsx**: Full wallet SRC20 balance row/table
+  - **Purpose**: Render SRC20 tokens held by a wallet with market value context
+  - **Exports**: `WalletSRC20OverviewRow({ src20: SRC20Row })`, `WalletSRC20OverviewTable({ src20s })`, plus shared helpers `getPrice`, `getMarketCap`, `formatPriceSats`, `formatValueBtc` (reused by the compact variant)
+  - **Columns**: IMAGE, TICKER, CREATOR, SUPPLY, PRICE, CHANGE, MCAP, BALANCE, VALUE
+  - **Features**:
+    - SUPPLY = `max` (total mintable supply), BALANCE = `amt` (amount held)
+    - PRICE/VALUE basis: `market_data.price_btc ?? floor_price_btc` (same fallback `SRC20Card` uses), VALUE = `price × balance`
+    - Sticky IMAGE and TICKER columns, row click navigates to `/src20/{tick}`
+  - **Location**: `components/table/walletTable/WalletSRC20Overview.tsx`
+
+- **WalletSRC20OverviewCompact.tsx**: Compact wallet SRC20 balance row/table
+  - **Purpose**: Space-constrained variant used in the wallet page's ALL tab split layout
+  - **Exports**: `WalletSRC20OverviewRowCompact({ src20 })`, `WalletSRC20OverviewTableCompact({ src20s })`
+  - **Columns**: IMAGE, TICKER, PRICE, CHANGE, BALANCE, VALUE (drops CREATOR/SUPPLY/MCAP)
+  - **Location**: `components/table/walletTable/WalletSRC20OverviewCompact.tsx`
+
+Wired into the wallet page via `islands/content/WalletContent.tsx`'s `BalanceTabContent`/`TokensTabContent` when `view === "cardRow"`, with `compact={section === "all"}`. Only the Balance sub-tab renders tables this way — Created/Listings/Collections still fall back to the card grid.
 
 ### Interactive Islands (`islands/table/`)
 
@@ -314,7 +352,7 @@ The Table system provides a comprehensive, scalable solution for displaying tabu
 - `DetailsTableBase`, `HoldersPieChart`, `HoldersTableBase`, `UploadImageTable` (from `islands/table/`)
 - The `Dispenser` type (from `$types/stamp.d.ts`)
 
-**`explorerTable/`, `marketplaceTable/`, and `src20OverviewTable/` components are NOT re-exported through `$table`.** Import them directly by file path, e.g.:
+**`explorerTable/`, `marketplaceTable/`, `src20OverviewTable/`, and `walletTable/` components are NOT re-exported through `$table`.** Import them directly by file path, e.g.:
 
 ```tsx
 import { ExplorerTableBase } from "$components/table/explorerTable/ExplorerTableBase.tsx";
@@ -610,6 +648,24 @@ headers.map((header, i) => {
 });
 ```
 
+### Border-Spacing Edge Compensation
+
+Every table uses `border-separate` with a vertical `border-spacing-y-*` (`-y-3` for card-style tables, `-y-2` for detail-style tables) to get consistent gaps between the "floating pill" rows. Because `border-spacing` in the separated-borders model applies the **full** spacing value at the table's outer edges too — not just between rows — every table also renders extra dead space above its `<thead>` and below its last `<tbody>` row equal to the spacing value itself (`12px`/`8px`), on top of whatever padding/margin surrounds the table.
+
+Every table cancels this edge overflow with a matching negative vertical margin on the table (or its non-padded wrapper `<div>` — margin behaves identically either way since nothing sits between them):
+
+```tsx
+// Card-style tables (border-spacing-y-3 → -my-3)
+<div class="overflow-x-auto tablet:overflow-x-visible scrollbar-hide -my-3">
+  <table class={`w-full border-separate border-spacing-y-3 ${textXs}`}>
+
+// Detail-style tables (border-spacing-y-2 → -my-2)
+<div class="overflow-x-auto overflow-y-clip tablet:overflow-x-clip flow-root scrollbar-hide">
+  <table class={`w-full -my-2 border-separate border-spacing-y-2 ${textXs}`}>
+```
+
+**Rule of thumb**: the `-my-N` magnitude must exactly match the `border-spacing-y-N` value (not half of it) — a mismatch (e.g. only compensating the top, or using half the value) leaves a visible, asymmetric gap. Page-level containers around `cardRow`/table views use a plain `pt-5` like every other view mode; they should never special-case a smaller top padding to work around this — that duplicates the fix and either leaves a residual gap or (if stacked with the table's own `-my-N`) squashes the layout. See `ExplorerContent.tsx` and `MarketplaceContent.tsx` for the canonical pattern.
+
 ### Sticky Columns
 
 Card-style tables (explorer, marketplace, SRC20 overview) keep an image and/or primary column visible while scrolling horizontally using `cellStickyLeft` (column 0) and `cellStickyLeft2` (column 1):
@@ -679,13 +735,15 @@ import { ScrollContainer } from "$layout";
   class="min-h-[80px] max-h-[290px] scrollbar-background-layer1"
   onScroll={handleScroll}
 >
-  <div class="!-my-2 overflow-x-auto tablet:overflow-x-visible scrollbar-hide">
-    <table class={`w-full border-separate border-spacing-y-2 ${textSm}`}>
+  <div class="overflow-x-auto overflow-y-clip tablet:overflow-x-clip flow-root scrollbar-hide">
+    <table class={`w-full -my-2 border-separate border-spacing-y-2 ${textSm}`}>
       {/* Table content */}
     </table>
   </div>
 </ScrollContainer>
 ```
+
+(the `-my-2` cancels `border-spacing-y-2`'s edge overflow — see "Border-Spacing Edge Compensation" above)
 
 **ScrollContainer Features:**
 - Automatic scrollbar padding detection
@@ -1031,7 +1089,10 @@ export function NewTable({ data, isLoading = false }: NewTableProps) {
   const headers = ["ID", "VALUE", "DATE"];
 
   return (
-    <div class="-mt-2 overflow-x-auto tablet:overflow-x-visible scrollbar-hide">
+    // -my-2 cancels border-spacing-y-2's edge overflow (see "Border-Spacing
+    // Edge Compensation" above) — keep the magnitude matched if you change
+    // the spacing value.
+    <div class="overflow-x-auto tablet:overflow-x-visible scrollbar-hide -my-2">
       <table class={`w-full border-separate border-spacing-y-2 ${textXs}`}>
         <colgroup>
           {colGroup([
@@ -1123,5 +1184,5 @@ Otherwise, import it directly by file path — this is how `explorerTable/`, `ma
 
 ---
 
-**Last Updated:** August 23, 2026
+**Last Updated:** August 31, 2026 (documented border-spacing edge-compensation pattern)
 **Author:** baba
