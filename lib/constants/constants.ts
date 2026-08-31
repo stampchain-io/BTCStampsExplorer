@@ -30,3 +30,15 @@ export const ROOT_DOMAINS: ROOT_DOMAIN_TYPES[] = [
   ".x",
   ".pink",
 ];
+
+/* ===== HIDDEN COLLECTIONS ===== */
+// Known test/placeholder collections excluded from the Collections overview
+// (matched case-insensitively against collection_name). Enforced server-side
+// in CollectionRepository so totals stay in sync with rendered results.
+export const HIDDEN_COLLECTION_NAMES = [
+  "testtt",
+  "valtius",
+  "posh",
+  "hnft pepe cash",
+  "alpha_pxllabs",
+];

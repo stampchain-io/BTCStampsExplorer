@@ -386,8 +386,11 @@ Deno.test("StampController.getStamps handles pagination edge cases", async () =>
       stamps: [], // Empty result for high page
       last_block: 820000,
       page: 999,
-      page_size: 50,
-      pages: 100,
+      // StampService.getStamps normalises the repository's page_size/pages
+      // into limit/totalPages before returning, so the stub must mirror the
+      // service's OUTPUT contract, not the repository's raw column names.
+      limit: 50,
+      totalPages: 100,
       total: 5000,
     });
   };

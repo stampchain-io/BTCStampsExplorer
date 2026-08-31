@@ -110,8 +110,7 @@ import * as $api_v2_versions_changelog from "./routes/api/v2/versions/changelog.
 import * as $api_v2_versions_index from "./routes/api/v2/versions/index.ts";
 import * as $block_block_index_ from "./routes/block/[block_index].tsx";
 import * as $block_index from "./routes/block/index.tsx";
-import * as $collection_overview_ from "./routes/collection/[overview].tsx";
-import * as $collection_detail_id_ from "./routes/collection/detail/[id].tsx";
+import * as $collection_id_ from "./routes/collection/[id].tsx";
 import * as $collection_index from "./routes/collection/index.tsx";
 import * as $config from "./routes/config.ts";
 import * as $content_imgpath_ from "./routes/content/[...imgpath].tsx";
@@ -135,6 +134,7 @@ import * as $howto_template_index from "./routes/howto/template/index.tsx";
 import * as $howto_transferbitname_index from "./routes/howto/transferbitname/index.tsx";
 import * as $howto_transfertoken_index from "./routes/howto/transfertoken/index.tsx";
 import * as $index from "./routes/index.tsx";
+import * as $marketplace_index from "./routes/marketplace/index.tsx";
 import * as $media_index from "./routes/media/index.tsx";
 import * as $presskit_index from "./routes/presskit/index.tsx";
 import * as $s_id_ from "./routes/s/[...id].tsx";
@@ -142,9 +142,7 @@ import * as $sitemap_xml from "./routes/sitemap.xml.ts";
 import * as $src20_tick_ from "./routes/src20/[tick].tsx";
 import * as $src20_index from "./routes/src20/index.tsx";
 import * as $stamp_id_ from "./routes/stamp/[id].tsx";
-import * as $stamp_art from "./routes/stamp/art.tsx";
 import * as $stamp_index from "./routes/stamp/index.tsx";
-import * as $stamp_posh from "./routes/stamp/posh.tsx";
 import * as $termsofservice_index from "./routes/termsofservice/index.tsx";
 import * as $test_design_system from "./routes/test/design-system.tsx";
 import * as $test_horizon_psbt_html from "./routes/test/horizon-psbt.html.ts";
@@ -164,8 +162,6 @@ import * as $Toast_NotificationUpdate from "./islands/Toast/NotificationUpdate.t
 import * as $Toast_ToastComponent from "./islands/Toast/ToastComponent.tsx";
 import * as $Toast_ToastProvider from "./islands/Toast/ToastProvider.tsx";
 import * as $WebVitalsReporter from "./islands/WebVitalsReporter.tsx";
-import * as $badge_ActivityBadge from "./islands/badge/ActivityBadge.tsx";
-import * as $badge_index from "./islands/badge/index.ts";
 import * as $button_FilterButton from "./islands/button/FilterButton.tsx";
 import * as $button_MenuButton from "./islands/button/MenuButton.tsx";
 import * as $button_PaginationButtons from "./islands/button/PaginationButtons.tsx";
@@ -178,26 +174,22 @@ import * as $button_SettingsButton from "./islands/button/SettingsButton.tsx";
 import * as $button_SortButton from "./islands/button/SortButton.tsx";
 import * as $button_ToggleButton from "./islands/button/ToggleButton.tsx";
 import * as $button_ToolsButton from "./islands/button/ToolsButton.tsx";
+import * as $button_TrendingButton from "./islands/button/TrendingButton.tsx";
+import * as $button_ViewButton from "./islands/button/ViewButton.tsx";
 import * as $button_WalletButton from "./islands/button/WalletButton.tsx";
 import * as $button_buttonActions from "./islands/button/buttonActions.tsx";
-import * as $card_RecentSaleCard from "./islands/card/RecentSaleCard.tsx";
-import * as $card_SRC20CardBase from "./islands/card/SRC20CardBase.tsx";
-import * as $card_SRC20CardMinted from "./islands/card/SRC20CardMinted.tsx";
-import * as $card_SRC20CardMinting from "./islands/card/SRC20CardMinting.tsx";
+import * as $card_SRC20Card from "./islands/card/SRC20Card.tsx";
 import * as $card_StampCard from "./islands/card/StampCard.tsx";
-import * as $card_WalletStampCard from "./islands/card/WalletStampCard.tsx";
 import * as $card_index from "./islands/card/index.ts";
-import * as $card_styles from "./islands/card/styles.ts";
 import * as $content_CollectionDetailContent from "./islands/content/CollectionDetailContent.tsx";
+import * as $content_CollectionOverviewContent from "./islands/content/CollectionOverviewContent.tsx";
 import * as $content_ExplorerContent from "./islands/content/ExplorerContent.tsx";
+import * as $content_MarketplaceContent from "./islands/content/MarketplaceContent.tsx";
 import * as $content_SRC20OverviewContent from "./islands/content/SRC20OverviewContent.tsx";
-import * as $content_StampOverviewContent from "./islands/content/StampOverviewContent.tsx";
+import * as $content_WalletContent from "./islands/content/WalletContent.tsx";
+import * as $content_WalletContentDispenser from "./islands/content/WalletContentDispenser.tsx";
 import * as $content_WalletDashboardContent from "./islands/content/WalletDashboardContent.tsx";
 import * as $content_WalletDashboardDetails from "./islands/content/WalletDashboardDetails.tsx";
-import * as $content_WalletDetails from "./islands/content/WalletDetails.tsx";
-import * as $content_WalletDispenserDetails from "./islands/content/WalletDispenserDetails.tsx";
-import * as $content_WalletProfileContent from "./islands/content/WalletProfileContent.tsx";
-import * as $content_WalletProfileDetails from "./islands/content/WalletProfileDetails.tsx";
 import * as $content_blockContent_BlockSelector from "./islands/content/blockContent/BlockSelector.tsx";
 import * as $content_blockContent_BlockTransactions from "./islands/content/blockContent/BlockTransactions.tsx";
 import * as $content_faqContent_AccordionBase from "./islands/content/faqContent/AccordionBase.tsx";
@@ -208,11 +200,17 @@ import * as $content_stampDetailContent_StampInfo from "./islands/content/stampD
 import * as $content_stampDetailContent_StampTextContent from "./islands/content/stampDetailContent/StampTextContent.tsx";
 import * as $error_ErrorDisplay from "./islands/error/ErrorDisplay.tsx";
 import * as $filter_FilterComponents from "./islands/filter/FilterComponents.tsx";
+import * as $filter_FilterContentExplorer from "./islands/filter/FilterContentExplorer.tsx";
+import * as $filter_FilterContentExplorerSRC20 from "./islands/filter/FilterContentExplorerSRC20.tsx";
+import * as $filter_FilterContentExplorerStamp from "./islands/filter/FilterContentExplorerStamp.tsx";
+import * as $filter_FilterContentMarketplace from "./islands/filter/FilterContentMarketplace.tsx";
 import * as $filter_FilterContentSRC20 from "./islands/filter/FilterContentSRC20.tsx";
-import * as $filter_FilterContentStamp from "./islands/filter/FilterContentStamp.tsx";
 import * as $filter_FilterDrawer from "./islands/filter/FilterDrawer.tsx";
+import * as $filter_FilterOptionsExplorer from "./islands/filter/FilterOptionsExplorer.tsx";
+import * as $filter_FilterOptionsExplorerSRC20 from "./islands/filter/FilterOptionsExplorerSRC20.tsx";
+import * as $filter_FilterOptionsExplorerStamp from "./islands/filter/FilterOptionsExplorerStamp.tsx";
+import * as $filter_FilterOptionsMarketplace from "./islands/filter/FilterOptionsMarketplace.tsx";
 import * as $filter_FilterOptionsSRC20 from "./islands/filter/FilterOptionsSRC20.tsx";
-import * as $filter_FilterOptionsStamp from "./islands/filter/FilterOptionsStamp.tsx";
 import * as $form_Checkbox from "./islands/form/Checkbox.tsx";
 import * as $form_InputField from "./islands/form/InputField.tsx";
 import * as $form_SRC20InputField from "./islands/form/SRC20InputField.tsx";
@@ -222,15 +220,17 @@ import * as $form_SelectDate from "./islands/form/SelectDate.tsx";
 import * as $form_SelectField from "./islands/form/SelectField.tsx";
 import * as $header_AboutHeader from "./islands/header/AboutHeader.tsx";
 import * as $header_BlockHeader from "./islands/header/BlockHeader.tsx";
+import * as $header_CollectionDetailHeader_v2 from "./islands/header/CollectionDetailHeader-v2.tsx";
 import * as $header_CollectionDetailHeader from "./islands/header/CollectionDetailHeader.tsx";
 import * as $header_CollectionOverviewHeader from "./islands/header/CollectionOverviewHeader.tsx";
 import * as $header_ExplorerHeader from "./islands/header/ExplorerHeader.tsx";
 import * as $header_Header from "./islands/header/Header.tsx";
+import * as $header_MarketplaceHeader from "./islands/header/MarketplaceHeader.tsx";
 import * as $header_SRC20DetailHeader from "./islands/header/SRC20DetailHeader.tsx";
 import * as $header_SRC20OverviewHeader from "./islands/header/SRC20OverviewHeader.tsx";
-import * as $header_StampOverviewHeader from "./islands/header/StampOverviewHeader.tsx";
 import * as $header_WalletDashboardHeader from "./islands/header/WalletDashboardHeader.tsx";
-import * as $header_WalletProfileHeader from "./islands/header/WalletProfileHeader.tsx";
+import * as $header_WalletHeader from "./islands/header/WalletHeader.tsx";
+import * as $header_WalletHeaderContent from "./islands/header/WalletHeaderContent.tsx";
 import * as $header_index from "./islands/header/index.ts";
 import * as $layout_AnimationControlsManager from "./islands/layout/AnimationControlsManager.tsx";
 import * as $layout_BackgroundTopology from "./islands/layout/BackgroundTopology.tsx";
@@ -243,6 +243,7 @@ import * as $layout_ModalProvider from "./islands/layout/ModalProvider.tsx";
 import * as $layout_ModalStack from "./islands/layout/ModalStack.tsx";
 import * as $layout_NavigatorProvider from "./islands/layout/NavigatorProvider.tsx";
 import * as $layout_PageVisibilityManager from "./islands/layout/PageVisibilityManager.tsx";
+import * as $layout_ScrollFadeRow from "./islands/layout/ScrollFadeRow.tsx";
 import * as $layout_WalletProvider from "./islands/layout/WalletProvider.tsx";
 import * as $modal_BuyStampModal from "./islands/modal/BuyStampModal.tsx";
 import * as $modal_ConnectWalletModal from "./islands/modal/ConnectWalletModal.tsx";
@@ -266,18 +267,18 @@ import * as $section_cta_StampPoshCta from "./islands/section/cta/StampPoshCta.t
 import * as $section_cta_StampchainContactCta from "./islands/section/cta/StampchainContactCta.tsx";
 import * as $section_feed_SalesActivityFeed from "./islands/section/feed/SalesActivityFeed.tsx";
 import * as $section_gallery_Carousel from "./islands/section/gallery/Carousel.tsx";
-import * as $section_gallery_CollectionDetailGallery from "./islands/section/gallery/CollectionDetailGallery.tsx";
 import * as $section_gallery_CollectionGallery from "./islands/section/gallery/CollectionGallery.tsx";
-import * as $section_gallery_FreshSRC20Gallery from "./islands/section/gallery/FreshSRC20Gallery.tsx";
-import * as $section_gallery_FreshStampGallery from "./islands/section/gallery/FreshStampGallery.tsx";
+import * as $section_gallery_CollectionGalleryBanner from "./islands/section/gallery/CollectionGalleryBanner.tsx";
 import * as $section_gallery_PartnersBanner from "./islands/section/gallery/PartnersBanner.tsx";
-import * as $section_gallery_RecentSalesGallery from "./islands/section/gallery/RecentSalesGallery.tsx";
 import * as $section_gallery_SRC20Deploys from "./islands/section/gallery/SRC20Deploys.tsx";
 import * as $section_gallery_SRC20Gallery from "./islands/section/gallery/SRC20Gallery.tsx";
+import * as $section_gallery_SRC20GalleryWallet from "./islands/section/gallery/SRC20GalleryWallet.tsx";
 import * as $section_gallery_SRC20Mints from "./islands/section/gallery/SRC20Mints.tsx";
 import * as $section_gallery_SRC20Transfers from "./islands/section/gallery/SRC20Transfers.tsx";
 import * as $section_gallery_StampGallery from "./islands/section/gallery/StampGallery.tsx";
-import * as $section_gallery_StampOverviewGallery from "./islands/section/gallery/StampOverviewGallery.tsx";
+import * as $section_gallery_StampGalleryHome from "./islands/section/gallery/StampGalleryHome.tsx";
+import * as $section_gallery_StampGalleryWallet from "./islands/section/gallery/StampGalleryWallet.tsx";
+import * as $section_gallery_StampListings from "./islands/section/gallery/StampListings.tsx";
 import * as $section_gallery_StampSales from "./islands/section/gallery/StampSales.tsx";
 import * as $section_gallery_StampSends from "./islands/section/gallery/StampSends.tsx";
 import * as $section_gallery_StatsBanner from "./islands/section/gallery/StatsBanner.tsx";
@@ -462,8 +463,7 @@ const manifest = {
     "./routes/api/v2/versions/index.ts": $api_v2_versions_index,
     "./routes/block/[block_index].tsx": $block_block_index_,
     "./routes/block/index.tsx": $block_index,
-    "./routes/collection/[overview].tsx": $collection_overview_,
-    "./routes/collection/detail/[id].tsx": $collection_detail_id_,
+    "./routes/collection/[id].tsx": $collection_id_,
     "./routes/collection/index.tsx": $collection_index,
     "./routes/config.ts": $config,
     "./routes/content/[...imgpath].tsx": $content_imgpath_,
@@ -489,6 +489,7 @@ const manifest = {
     "./routes/howto/transferbitname/index.tsx": $howto_transferbitname_index,
     "./routes/howto/transfertoken/index.tsx": $howto_transfertoken_index,
     "./routes/index.tsx": $index,
+    "./routes/marketplace/index.tsx": $marketplace_index,
     "./routes/media/index.tsx": $media_index,
     "./routes/presskit/index.tsx": $presskit_index,
     "./routes/s/[...id].tsx": $s_id_,
@@ -496,9 +497,7 @@ const manifest = {
     "./routes/src20/[tick].tsx": $src20_tick_,
     "./routes/src20/index.tsx": $src20_index,
     "./routes/stamp/[id].tsx": $stamp_id_,
-    "./routes/stamp/art.tsx": $stamp_art,
     "./routes/stamp/index.tsx": $stamp_index,
-    "./routes/stamp/posh.tsx": $stamp_posh,
     "./routes/termsofservice/index.tsx": $termsofservice_index,
     "./routes/test/design-system.tsx": $test_design_system,
     "./routes/test/horizon-psbt.html.ts": $test_horizon_psbt_html,
@@ -520,8 +519,6 @@ const manifest = {
     "./islands/Toast/ToastComponent.tsx": $Toast_ToastComponent,
     "./islands/Toast/ToastProvider.tsx": $Toast_ToastProvider,
     "./islands/WebVitalsReporter.tsx": $WebVitalsReporter,
-    "./islands/badge/ActivityBadge.tsx": $badge_ActivityBadge,
-    "./islands/badge/index.ts": $badge_index,
     "./islands/button/FilterButton.tsx": $button_FilterButton,
     "./islands/button/MenuButton.tsx": $button_MenuButton,
     "./islands/button/PaginationButtons.tsx": $button_PaginationButtons,
@@ -535,30 +532,27 @@ const manifest = {
     "./islands/button/SortButton.tsx": $button_SortButton,
     "./islands/button/ToggleButton.tsx": $button_ToggleButton,
     "./islands/button/ToolsButton.tsx": $button_ToolsButton,
+    "./islands/button/TrendingButton.tsx": $button_TrendingButton,
+    "./islands/button/ViewButton.tsx": $button_ViewButton,
     "./islands/button/WalletButton.tsx": $button_WalletButton,
     "./islands/button/buttonActions.tsx": $button_buttonActions,
-    "./islands/card/RecentSaleCard.tsx": $card_RecentSaleCard,
-    "./islands/card/SRC20CardBase.tsx": $card_SRC20CardBase,
-    "./islands/card/SRC20CardMinted.tsx": $card_SRC20CardMinted,
-    "./islands/card/SRC20CardMinting.tsx": $card_SRC20CardMinting,
+    "./islands/card/SRC20Card.tsx": $card_SRC20Card,
     "./islands/card/StampCard.tsx": $card_StampCard,
-    "./islands/card/WalletStampCard.tsx": $card_WalletStampCard,
     "./islands/card/index.ts": $card_index,
-    "./islands/card/styles.ts": $card_styles,
     "./islands/content/CollectionDetailContent.tsx":
       $content_CollectionDetailContent,
+    "./islands/content/CollectionOverviewContent.tsx":
+      $content_CollectionOverviewContent,
     "./islands/content/ExplorerContent.tsx": $content_ExplorerContent,
+    "./islands/content/MarketplaceContent.tsx": $content_MarketplaceContent,
     "./islands/content/SRC20OverviewContent.tsx": $content_SRC20OverviewContent,
-    "./islands/content/StampOverviewContent.tsx": $content_StampOverviewContent,
+    "./islands/content/WalletContent.tsx": $content_WalletContent,
+    "./islands/content/WalletContentDispenser.tsx":
+      $content_WalletContentDispenser,
     "./islands/content/WalletDashboardContent.tsx":
       $content_WalletDashboardContent,
     "./islands/content/WalletDashboardDetails.tsx":
       $content_WalletDashboardDetails,
-    "./islands/content/WalletDetails.tsx": $content_WalletDetails,
-    "./islands/content/WalletDispenserDetails.tsx":
-      $content_WalletDispenserDetails,
-    "./islands/content/WalletProfileContent.tsx": $content_WalletProfileContent,
-    "./islands/content/WalletProfileDetails.tsx": $content_WalletProfileDetails,
     "./islands/content/blockContent/BlockSelector.tsx":
       $content_blockContent_BlockSelector,
     "./islands/content/blockContent/BlockTransactions.tsx":
@@ -576,11 +570,23 @@ const manifest = {
       $content_stampDetailContent_StampTextContent,
     "./islands/error/ErrorDisplay.tsx": $error_ErrorDisplay,
     "./islands/filter/FilterComponents.tsx": $filter_FilterComponents,
+    "./islands/filter/FilterContentExplorer.tsx": $filter_FilterContentExplorer,
+    "./islands/filter/FilterContentExplorerSRC20.tsx":
+      $filter_FilterContentExplorerSRC20,
+    "./islands/filter/FilterContentExplorerStamp.tsx":
+      $filter_FilterContentExplorerStamp,
+    "./islands/filter/FilterContentMarketplace.tsx":
+      $filter_FilterContentMarketplace,
     "./islands/filter/FilterContentSRC20.tsx": $filter_FilterContentSRC20,
-    "./islands/filter/FilterContentStamp.tsx": $filter_FilterContentStamp,
     "./islands/filter/FilterDrawer.tsx": $filter_FilterDrawer,
+    "./islands/filter/FilterOptionsExplorer.tsx": $filter_FilterOptionsExplorer,
+    "./islands/filter/FilterOptionsExplorerSRC20.tsx":
+      $filter_FilterOptionsExplorerSRC20,
+    "./islands/filter/FilterOptionsExplorerStamp.tsx":
+      $filter_FilterOptionsExplorerStamp,
+    "./islands/filter/FilterOptionsMarketplace.tsx":
+      $filter_FilterOptionsMarketplace,
     "./islands/filter/FilterOptionsSRC20.tsx": $filter_FilterOptionsSRC20,
-    "./islands/filter/FilterOptionsStamp.tsx": $filter_FilterOptionsStamp,
     "./islands/form/Checkbox.tsx": $form_Checkbox,
     "./islands/form/InputField.tsx": $form_InputField,
     "./islands/form/SRC20InputField.tsx": $form_SRC20InputField,
@@ -590,17 +596,20 @@ const manifest = {
     "./islands/form/SelectField.tsx": $form_SelectField,
     "./islands/header/AboutHeader.tsx": $header_AboutHeader,
     "./islands/header/BlockHeader.tsx": $header_BlockHeader,
+    "./islands/header/CollectionDetailHeader-v2.tsx":
+      $header_CollectionDetailHeader_v2,
     "./islands/header/CollectionDetailHeader.tsx":
       $header_CollectionDetailHeader,
     "./islands/header/CollectionOverviewHeader.tsx":
       $header_CollectionOverviewHeader,
     "./islands/header/ExplorerHeader.tsx": $header_ExplorerHeader,
     "./islands/header/Header.tsx": $header_Header,
+    "./islands/header/MarketplaceHeader.tsx": $header_MarketplaceHeader,
     "./islands/header/SRC20DetailHeader.tsx": $header_SRC20DetailHeader,
     "./islands/header/SRC20OverviewHeader.tsx": $header_SRC20OverviewHeader,
-    "./islands/header/StampOverviewHeader.tsx": $header_StampOverviewHeader,
     "./islands/header/WalletDashboardHeader.tsx": $header_WalletDashboardHeader,
-    "./islands/header/WalletProfileHeader.tsx": $header_WalletProfileHeader,
+    "./islands/header/WalletHeader.tsx": $header_WalletHeader,
+    "./islands/header/WalletHeaderContent.tsx": $header_WalletHeaderContent,
     "./islands/header/index.ts": $header_index,
     "./islands/layout/AnimationControlsManager.tsx":
       $layout_AnimationControlsManager,
@@ -614,6 +623,7 @@ const manifest = {
     "./islands/layout/ModalStack.tsx": $layout_ModalStack,
     "./islands/layout/NavigatorProvider.tsx": $layout_NavigatorProvider,
     "./islands/layout/PageVisibilityManager.tsx": $layout_PageVisibilityManager,
+    "./islands/layout/ScrollFadeRow.tsx": $layout_ScrollFadeRow,
     "./islands/layout/WalletProvider.tsx": $layout_WalletProvider,
     "./islands/modal/BuyStampModal.tsx": $modal_BuyStampModal,
     "./islands/modal/ConnectWalletModal.tsx": $modal_ConnectWalletModal,
@@ -640,26 +650,26 @@ const manifest = {
     "./islands/section/feed/SalesActivityFeed.tsx":
       $section_feed_SalesActivityFeed,
     "./islands/section/gallery/Carousel.tsx": $section_gallery_Carousel,
-    "./islands/section/gallery/CollectionDetailGallery.tsx":
-      $section_gallery_CollectionDetailGallery,
     "./islands/section/gallery/CollectionGallery.tsx":
       $section_gallery_CollectionGallery,
-    "./islands/section/gallery/FreshSRC20Gallery.tsx":
-      $section_gallery_FreshSRC20Gallery,
-    "./islands/section/gallery/FreshStampGallery.tsx":
-      $section_gallery_FreshStampGallery,
+    "./islands/section/gallery/CollectionGalleryBanner.tsx":
+      $section_gallery_CollectionGalleryBanner,
     "./islands/section/gallery/PartnersBanner.tsx":
       $section_gallery_PartnersBanner,
-    "./islands/section/gallery/RecentSalesGallery.tsx":
-      $section_gallery_RecentSalesGallery,
     "./islands/section/gallery/SRC20Deploys.tsx": $section_gallery_SRC20Deploys,
     "./islands/section/gallery/SRC20Gallery.tsx": $section_gallery_SRC20Gallery,
+    "./islands/section/gallery/SRC20GalleryWallet.tsx":
+      $section_gallery_SRC20GalleryWallet,
     "./islands/section/gallery/SRC20Mints.tsx": $section_gallery_SRC20Mints,
     "./islands/section/gallery/SRC20Transfers.tsx":
       $section_gallery_SRC20Transfers,
     "./islands/section/gallery/StampGallery.tsx": $section_gallery_StampGallery,
-    "./islands/section/gallery/StampOverviewGallery.tsx":
-      $section_gallery_StampOverviewGallery,
+    "./islands/section/gallery/StampGalleryHome.tsx":
+      $section_gallery_StampGalleryHome,
+    "./islands/section/gallery/StampGalleryWallet.tsx":
+      $section_gallery_StampGalleryWallet,
+    "./islands/section/gallery/StampListings.tsx":
+      $section_gallery_StampListings,
     "./islands/section/gallery/StampSales.tsx": $section_gallery_StampSales,
     "./islands/section/gallery/StampSends.tsx": $section_gallery_StampSends,
     "./islands/section/gallery/StatsBanner.tsx": $section_gallery_StatsBanner,

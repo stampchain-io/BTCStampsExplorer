@@ -27,8 +27,9 @@ The Icon system provides a lightweight, versatile solution for rendering SVG ico
 ┌─────────────────────────────────────────────────────┐
 │  Icon Base Components                               │
 │  - Icon: Main icon component (IconBase.tsx)         │
-│  - CloseIcon: Special gradient close button         │
 │  - LoadingIcon: Animated loading spinner            │
+│  - LogoIcon: Stampchain logo link (img-based)       │
+│  - UserProfileIcon: Shared creator/artist avatar    │
 │  - PlaceholderImage: Placeholder graphics           │
 └────────────────┬────────────────────────────────────┘
                  ▼
@@ -48,87 +49,86 @@ The Icon system provides a lightweight, versatile solution for rendering SVG ico
 | Type | Behavior | Styling | Use Case |
 |------|----------|---------|----------|
 | **icon** | Static, non-interactive | Solid color, no hover effects | Display icons, status indicators, decorative elements |
-| **iconButton** | Interactive, clickable | Color transitions on hover, cursor pointer | Navigation, actions, links, controls |
+| **iconHover** | Interactive, clickable, no pill | Color transitions on hover, cursor pointer, wrapped in `<a>` but without the pill background | Tightly-spaced controls (e.g. carets) that need hover color without the padded pill hit-area |
+| **iconButton** | Interactive, clickable, pill background | Color transitions on hover, cursor pointer, hover pill background (`iconButtonPill`) | Navigation, actions, links, controls |
+
+Both `iconHover` and `iconButton` render the `<svg>` wrapped in an `<a>` element (see [Technical Implementation](#technical-implementation)), so click/hover/ARIA semantics live on the wrapper and the clickable area matches the visible element rather than being limited to the inner `<svg>`.
 
 ### Color Palettes
 
-The icon system uses a 5-step gradient color system with Tailwind CSS classes (defined in `tailwind.config.ts`), providing smooth color transitions for both static and interactive icons. See [Layout System Documentation](mdc:components/layout/doc.md#tailwind-color-system) for the complete color palette.
+Color values come from CSS variables defined in `tailwind.config.ts`, using the `neutral`/`primary` numbered scale directly (the old `grey`/`purple` legacy aliases, marked "refactor and delete" in `tailwind.config.ts`, are no longer referenced by the Icon system). Unlike older revisions, interactive icons of every color transition to a single shared `color-hover` value (`#E879F9`, aliasing `primary-400`) rather than a same-hue "light" variant. See [Layout System Documentation](mdc:components/layout/doc.md#tailwind-color-system) for the complete color palette.
 
-#### greyDark
+Colors are listed light → dark. `fill-stroke` paths (see [Fill-Stroke Paths](#fill-stroke-paths-two-tone-icons)) don't need a dedicated CSS selector — `IconBase.tsx`'s `renderPaths()` derives the matching `fill-color-*` (and `group-hover:fill-color-*`) classes straight from the active `stroke-color-*` class and applies them directly to the path, for every color below.
+
+#### neutral400
 ```css
 /* Static (icon type) */
-stroke: color-grey-semidark (#817e78)
+stroke: color-neutral-400 (#A3A3A3)
 fill: none
-[fill-stroke paths]: color-grey-semidark
 
-/* Interactive (iconButton type) */
-stroke: color-grey-semidark → color-grey-light (#f9f2e9)
-hover/group-hover: color-grey-light
+/* Interactive (iconButton/iconHover type) */
+stroke: color-neutral-400 → color-hover (#E879F9)
+hover/group-hover: color-hover
 cursor: pointer
 ```
 
-#### grey (Default)
+#### neutral500 (Default)
 ```css
 /* Static (icon type) */
-stroke: color-grey (#a8a39d)
+stroke: color-neutral-500 (#737373)
 fill: none
-[fill-stroke paths]: color-grey
 
-/* Interactive (iconButton type) */
-stroke: color-grey → color-grey-light (#f9f2e9)
-hover/group-hover: color-grey-light
+/* Interactive (iconButton/iconHover type) */
+stroke: color-neutral-500 → color-hover (#E879F9)
+hover/group-hover: color-hover
 cursor: pointer
 ```
 
-#### greyLight
+#### neutral600
 ```css
 /* Static (icon type) */
-stroke: color-grey-semilight (#d1cbc3)
+stroke: color-neutral-600 (#525252)
 fill: none
-[fill-stroke paths]: color-grey-semilight
 
-/* Interactive (iconButton type) */
-stroke: color-grey-semilight → color-grey-light (#f9f2e9)
-hover/group-hover: color-grey-light
+/* Interactive (iconButton/iconHover type) */
+stroke: color-neutral-600 → color-hover (#E879F9)
+hover/group-hover: color-hover
 cursor: pointer
 ```
 
-#### purpleDark
+#### primary400
 ```css
 /* Static (icon type) */
-stroke: color-purple-semidark (#610085)
+stroke: color-primary-400 (#E879F9)
 fill: none
-[fill-stroke paths]: color-purple-semidark
 
-/* Interactive (iconButton type) */
-stroke: color-purple-semidark → color-purple-light (#BB00FF)
-hover/group-hover: color-purple-light
+/* Interactive (iconButton/iconHover type) */
+stroke: color-primary-400 → color-hover (#E879F9)
+hover/group-hover: color-hover
 cursor: pointer
 ```
 
-#### purple
+#### primary500
 ```css
 /* Static (icon type) */
-stroke: color-purple (#7f00ad)
+stroke: color-primary-500 (#D946EF)
 fill: none
-[fill-stroke paths]: color-purple
 
-/* Interactive (iconButton type) */
-stroke: color-purple → color-purple-light (#BB00FF)
-hover/group-hover: color-purple-light
+/* Interactive (iconButton/iconHover type) */
+stroke: color-primary-500 → color-hover (#E879F9)
+hover/group-hover: color-hover
 cursor: pointer
 ```
 
-#### purpleLight
+#### primary600
 ```css
 /* Static (icon type) */
-stroke: color-purple-semilight (#9d00d6)
+stroke: color-primary-600 (#C026D3)
 fill: none
-[fill-stroke paths]: color-purple-semilight
 
-/* Interactive (iconButton type) */
-stroke: color-purple-semilight → color-purple-light (#BB00FF)
-hover/group-hover: color-purple-light
+/* Interactive (iconButton/iconHover type) */
+stroke: color-primary-600 → color-hover (#E879F9)
+hover/group-hover: color-hover
 cursor: pointer
 ```
 
@@ -167,11 +167,11 @@ cursor: pointer
 |--------|--------------|----------|
 | **extraLight** | 0.75 | Loading icons, delicate graphics |
 | **light** | 1.0 | Subtle icons, secondary elements |
-| **normal** | 1.5/1.25* | Default weight, standard icons |
-| **bold** | 1.75/1.5* | Emphasis, primary actions |
+| **normal** | 1.25/1.0* | Default weight, standard icons |
+| **bold** | 1.25 | Emphasis, primary actions |
 | **custom** | Manual | Full control via className |
 
-*Responsive weights: mobile/tablet
+*Responsive weights: mobile/tablet (only `normal` currently varies by breakpoint)
 
 ## Core Components
 
@@ -187,7 +187,7 @@ cursor: pointer
   - **Location**: `components/icon/styles.ts`
   - **Features**:
     - 2 icon types (icon, iconButton)
-    - 6 color palettes with 5-step gradient system (greyDark, grey, greyLight, purpleDark, purple, purpleLight) + custom
+    - 6 color palettes with 5-step gradient system (neutral400, neutral500, neutral600, primary400, primary500, primary600) + custom
     - 15 size options (8 standard + 7 responsive)
     - 5 weight options
     - Special fill-stroke path support
@@ -220,15 +220,23 @@ cursor: pointer
     - Fresh partial navigation support
   - **Location**: `components/icon/IconBase.tsx`
 
-- **CloseIcon.tsx**: Special close button icon
-  - **Purpose**: Close button with optional gradient fill
-  - **Features**: Custom gradient definitions, conditional styling
-  - **Usage**: Modal close buttons, drawer dismissal
-
 - **LoadingIcon.tsx**: Animated loading spinner
   - **Purpose**: Loading state indicator with animation
   - **Features**: Rotating animation, consistent styling, extraLight weight
   - **Usage**: Loading states, async operations
+
+- **LogoIcon.tsx**: Stampchain logo link
+  - **Component**: `LogoIcon`
+  - **Purpose**: Renders the Stampchain wordmark/logo as a clickable link (defaults to `/home`)
+  - **Props**: `href`, `onClick`, `className`, `ariaLabel`, `"f-partial"`, `children`
+  - **Implementation note**: Uses the `stampchain` icon (`type="icon"`) rather than an `<img>` tag loading an SVG asset directly, because the logo's gradient-based static SVGs (`static/img/logo/logo-duotone-gradient.svg`) break `stroke:url(#gradient)` references during Fresh island hydration. `type="icon"` is used instead of `iconButton` to avoid nesting a second `<a>` inside the wrapping link, which would break the flex layout during SSR.
+  - **Location**: `components/icon/LogoIcon.tsx`
+
+- **UserProfileIcon.tsx**: Shared creator/artist avatar icon
+  - **Component**: `UserProfileIcon`
+  - **Purpose**: Renders the `userCircle` icon next to a creator name/address, consolidating repeated icon+wrapper markup used across cards and detail headers
+  - **Props**: `size` (default `"custom"`), `weight` (default `"custom"`), `className`, `wrapperClassName`, `link` (adds `group`/`cursor-pointer` + hover-color transition for linked creator names), `children` (creator name/address markup rendered inline next to the icon)
+  - **Location**: `components/icon/UserProfileIcon.tsx`
 
 - **PlaceholderImageIcon.tsx**: Placeholder image component
   - **Component**: `PlaceholderImage`
@@ -252,12 +260,12 @@ cursor: pointer
 ### Icon Props
 ```typescript
 export interface IconVariants {
-  type: "icon" | "iconButton";
+  type: "icon" | "iconHover" | "iconButton";
   name: string;
   weight: "extraLight" | "light" | "normal" | "bold" | "custom";
   size: "xxxs" | "xxs" | "xs" | "sm" | "md" | "lg" | "xl" | "xxl" |
         "xxsR" | "xsR" | "smR" | "mdR" | "lgR" | "xlR" | "xxlR" | "custom";
-  color: "greyLight" | "grey" | "purpleLight" | "purple" | "custom";
+  color: "neutral400" | "neutral500" | "neutral600" | "primary400" | "primary500" | "primary600" | "custom";
   className?: string;
   role?: JSX.AriaRole;
   ariaLabel?: string;
@@ -286,7 +294,7 @@ type Palette = {
   fill: string;
 };
 
-export const placeholderColor: Record<"grey" | "red" | "green" | "orange", Palette>;
+export const placeholderColor: Record<"neutral" | "red" | "green" | "orange", Palette>;
 
 export const variantColor: Record<PlaceholderVariant, keyof typeof placeholderColor>;
 
@@ -324,21 +332,30 @@ The system includes 80+ icons mapped through `iconNameMap`:
 - `menu`, `close`, `expand`, `search`, `filter`, `listAsc`, `listDesc`, `sortAsc`, `sortDesc`
 - `tools`, `speedSlow`, `speedMedium`, `speedFast`
 
+**View Mode**
+- `viewCardRow`, `viewCardVertical`, `viewCardSquare`, `viewCardHorizontal`
+
 **Carets**
 - `caretUp`, `caretDown`, `caretLeft`, `caretRight`, `caretDoubleLeft`, `caretDoubleRight`
 
+**Art Stamp & Collection / SRC-20 Token**
+- `artStamp`, `artStamps`, `src20Token`, `src20Tokens`
+
 **Stamp Specific**
 - `share`, `copyLink`, `twitterImage`, `previewImage`, `previewCode`, `previewImageRaw`
-- `play`, `pause`, `locked`, `unlocked`, `keyburned`, `divisible`, `atom`, `dispenserListings`
+- `play`, `pause`, `locked`, `unlocked`, `keyburned`, `divisible`, `recursive`, `atom`, `dispenserListings`
 
 **Wallet**
-- `view`, `hide`, `collection`, `copy`
+- `view`, `hide`, `userCircle`, `collection`, `copy`, `edit`, `pencil`
+
+**SRC-101**
+- `chartUp`, `chartDown`
 
 **Bitcoin**
-- `bitcoin`, `bitcoins`, `bitcoinTx`, `bitcoinBlock`, `version`, `send`, `receive`, `history`, `wallet`, `donate`
+- `bitcoin`, `bitcoins`, `bitcoinTx`, `bitcoinBlock`, `listings`, `version`, `send`, `receive`, `history`, `wallet`, `donate`, `explorer`
 
 **Tools & Misc**
-- `stamp`, `uploadImage`, `loading`, `refresh`, `eye`, `externallink`
+- `stamp`, `uploadImage`, `downloadImage`, `loading`, `refresh`, `eye`, `externallink`
 
 **Notifications**
 - `info`, `error`, `success`
@@ -356,7 +373,7 @@ export function SocialLink() {
       name="telegram"
       weight="normal"
       size="sm"
-      color="greyLight"
+      color="neutral400"
     />
   );
 }
@@ -373,7 +390,7 @@ export function CloseButton() {
       name="close"
       weight="bold"
       size="md"
-      color="purpleLight"
+      color="primary400"
       onClick={() => handleClose()}
       ariaLabel="Close Dialog"
     />
@@ -392,7 +409,7 @@ export function TwitterLink() {
       name="twitter"
       weight="bold"
       size="mdR"
-      color="purpleLight"
+      color="primary400"
       href="https://twitter.com/stampchain_io"
       target="_blank"
       rel="noopener noreferrer"
@@ -451,7 +468,7 @@ export function NavIcon() {
       name="search"
       weight="bold"
       size="md"
-      color="purpleLight"
+      color="primary400"
       href="/search"
       f-partial="/search"
     />
@@ -468,6 +485,32 @@ export function LoadingState() {
     <div class="flex items-center justify-center">
       <LoadingIcon />
     </div>
+  );
+}
+```
+
+### Logo Link
+```tsx
+import { LogoIcon } from "$icon";
+
+export function HeaderLogo() {
+  return (
+    <LogoIcon href="/home" ariaLabel="Stampchain home">
+      <span class="hidden tablet:inline">Stampchain</span>
+    </LogoIcon>
+  );
+}
+```
+
+### Creator Avatar with Name
+```tsx
+import { UserProfileIcon } from "$icon";
+
+export function CreatorLabel({ creatorName }: { creatorName: string }) {
+  return (
+    <UserProfileIcon link size="xs" weight="bold">
+      <span class="group-hover:text-color-hover">{creatorName}</span>
+    </UserProfileIcon>
   );
 }
 ```
@@ -531,9 +574,9 @@ The `PlaceholderImage` component provides a unified system for rendering placeho
 
 ### Variants & Palettes
 
-#### no-image (Grey Palette)
+#### no-image (Neutral Palette)
 - **Use**: Default placeholder for missing/unavailable images
-- **Colors**: Grey gradient background, grey-darker stroke/fill
+- **Colors**: Neutral gradient background, neutral stroke/fill
 
 #### audio (Orange Palette)
 - **Use**: Audio file placeholder
@@ -551,10 +594,10 @@ The `PlaceholderImage` component provides a unified system for rendering placeho
 
 ```typescript
 export const placeholderColor = {
-  grey: {
-    bg: "bg-gradient-to-br from-color-grey-semidark/75 via-color-grey-dark/75 to-black",
-    stroke: "stroke-color-grey-semidark",
-    fill: "fill-color-grey-semidark"
+  neutral: {
+    bg: "bg-gradient-to-br from-color-neutral-500 via-color-neutral-700 to-color-neutral-900",
+    stroke: "stroke-color-neutral-500",
+    fill: "fill-color-neutral-500"
   },
   red: {
     bg: "bg-gradient-to-br from-color-red-semidark/75 via-color-red-dark/75 to-black",
@@ -656,7 +699,7 @@ Now you can use the icon anywhere:
   name="newIconName"
   weight="normal"
   size="md"
-  color="purple"
+  color="primary500"
 />
 ```
 
@@ -664,17 +707,38 @@ Now you can use the icon anywhere:
 
 ### Style Composition
 
-Icons use a base style combined with type-specific, color, weight, and size styles:
+Icons use a base style combined with type-specific, color, weight, and size styles. Both `iconHover` and `iconButton` share the `iconButton` color styles (only the wrapper markup differs):
 
 ```typescript
-const combinedClasses = `
-  ${iconStyles.base}
-  ${iconStyles.size[size]}
-  ${type === "icon" ? iconStyles.icon[color] : iconStyles.iconButton[color]}
-  ${iconStyles.weight[weight]}
-  group
-  ${className}
-`;
+const isInteractive = type === "iconButton" || type === "iconHover";
+
+const combinedClasses = `${iconStyles.base} ${iconStyles.size[size]} ${
+  isInteractive
+    ? iconStyles.iconButton[color]
+    : iconStyles.icon[color].replace("stroke-1", "")
+} ${iconStyles.weight[weight]} group ${className}`;
+```
+
+### Interactive Wrapper (`iconHover` / `iconButton`)
+
+For `type="icon"`, the bare `<svg>` is returned and click/hover/ARIA props are applied directly to it. For `iconHover` and `iconButton`, the `<svg>` is wrapped in an `<a>` so the clickable/hoverable area matches the visible element instead of being limited to the inner `<svg>`. Only `iconButton` receives the `iconButtonPill` hover background; `iconHover` gets the same color transition without the padded pill:
+
+```tsx
+<a
+  href={href}
+  target={target}
+  rel={rel}
+  role={role || "button"}
+  aria-label={ariaLabel || name}
+  onClick={onClick}
+  onMouseEnter={onMouseEnter}
+  onMouseLeave={onMouseLeave}
+  class={`inline-flex items-center group cursor-pointer ${
+    type === "iconButton" ? iconButtonPill : ""
+  }`}
+>
+  {svgElement}
+</a>
 ```
 
 ### Two-Tone Icon Support
@@ -766,12 +830,12 @@ All icons share these SVG attributes:
 - Always provide `onClick` handler for iconButton type
 
 ### Color Selection
-- **greyLight**: Brightest grey, high visibility neutral elements
-- **grey**: Default neutral icons, standard visibility
-- **greyDark**: Subtle, less prominent neutral icons
-- **purpleLight**: Brightest purple, brand actions with high emphasis
-- **purple**: Default purple icons, standard brand visibility
-- **purpleDark**: Subtle purple, less prominent brand elements
+- **neutral400**: Brightest neutral, high visibility neutral elements
+- **neutral500**: Default neutral icons, standard visibility
+- **neutral600**: Subtle, less prominent neutral icons
+- **primary400**: Brightest primary, brand actions with high emphasis
+- **primary500**: Default primary icons, standard brand visibility
+- **primary600**: Subtle primary, less prominent brand elements
 - **custom**: Full control for special cases (gradients, conditional colors)
 
 ### Size Selection
@@ -809,7 +873,7 @@ All icons share these SVG attributes:
   name="twitter"
   weight="bold"
   size="mdR"
-  color="purple"
+  color="primary500"
   href="https://twitter.com/stampchain_io"
   target="_blank"
   rel="noopener noreferrer"
@@ -823,7 +887,7 @@ All icons share these SVG attributes:
   name="close"
   weight="bold"
   size="md"
-  color="grey"
+  color="neutral500"
   onClick={handleClose}
   ariaLabel="Close"
 />
@@ -841,7 +905,7 @@ All icons share these SVG attributes:
   name={isLocked ? "locked" : "unlocked"}
   weight="normal"
   size="sm"
-  color="grey"
+  color="neutral500"
 />
 ```
 
@@ -852,7 +916,7 @@ All icons share these SVG attributes:
   name="caretRight"
   weight="bold"
   size="xs"
-  color="purple"
+  color="primary500"
   onClick={handleNext}
 />
 ```
@@ -885,5 +949,5 @@ All icons share these SVG attributes:
 
 ---
 
-**Last Updated:** October 6, 2025
+**Last Updated:** August 23, 2026
 **Author:** baba

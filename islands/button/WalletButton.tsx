@@ -6,24 +6,18 @@ import { Icon } from "$icon";
 import { WalletProvider } from "$islands/layout/WalletProvider.tsx";
 import { ConnectWalletModal } from "$islands/modal/ConnectWalletModal.tsx";
 import { closeModal, openModal } from "$islands/modal/states.ts";
-import { containerStickyBottom, glassmorphismL2 } from "$layout";
+import { containerStickyBottom } from "$layout";
 import {
   abbreviateAddress,
   formatSatoshisToBTC,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { tooltipIcon } from "$notification";
 import {
-  labelLg,
-  labelSm,
-  labelXs,
-  navLinkGreyLD,
-  navLinkGreyLDActive,
-  navSublinkPurple,
-  navSublinkPurpleActive,
+  navLinkActiveMobile,
+  navLinkMobile,
+  navSublinkActiveDesktop,
+  navSublinkDesktop,
   valueDarkSm,
-  valueDarkXs,
-  valueLg,
-  valueSm,
 } from "$text";
 import { useEffect, useRef, useState } from "preact/hooks";
 
@@ -40,6 +34,7 @@ interface WalletButtonProps {
 /* ===== WALLET CONFIGURATION ===== */
 const getWalletLinks = (address: string): WalletLink[] => [
   { title: "DASHBOARD", href: `/wallet/${address}` },
+
   { title: "DISCONNECT" },
 ];
 
@@ -193,17 +188,16 @@ export const WalletButton = (
   return {
     // The wallet icon component
     icon: (
-      <div class="relative z-10">
+      <div class="relative z-10 flex items-center">
         {/* ===== CONNECT WALLET BUTTON ===== */}
         {!(isConnected && address) && (
           <Icon
             type="iconButton"
             name="wallet"
             weight="normal"
-            size="mdR"
-            color="purpleLight"
-            colorAccent="color-mix(in srgb, var(--color-grey-semidark) 75%, transparent)"
-            colorAccentHover="var(--color-grey-semidark)"
+            size="custom"
+            color="neutral400"
+            className="w-[26px] h-[26px] tablet:w-[22px] tablet:h-[22px]"
             onClick={handleWalletIconClick}
           />
         )}
@@ -217,10 +211,11 @@ export const WalletButton = (
                 type="iconButton"
                 name="wallet"
                 weight="normal"
-                size="mdR"
-                color="purpleLight"
-                colorAccent="color-mix(in srgb, var(--color-grey) 75%, transparent)"
-                colorAccentHover="var(--color-grey)"
+                size="custom"
+                color="neutral400"
+                className="w-[25px] h-[25px] tablet:w-[21px] tablet:h-[21px]"
+                colorAccent="var(--color-primary-400)"
+                colorAccentHover="var(--color-hover)"
                 onClick={handleWalletIconClick}
               />
             </div>
@@ -235,7 +230,7 @@ export const WalletButton = (
           <div class="flex flex-row-reverse justify-end items-center gap-3">
             <div
               ref={copyButtonRef}
-              class="relative peer"
+              class="relative peer translate-y-0.5"
               onMouseEnter={handleCopyMouseEnter}
               onMouseLeave={handleCopyMouseLeave}
             >
@@ -244,8 +239,7 @@ export const WalletButton = (
                 name="copy"
                 weight="normal"
                 size="xxs"
-                color="greyDark"
-                className="mb-0.5"
+                color="neutral500"
                 onClick={copy}
               />
               <div
@@ -264,56 +258,81 @@ export const WalletButton = (
               </div>
             </div>
             <h6
-              class={`${valueDarkXs} transition-colors duration-200 peer-hover:text-color-grey-light`}
+              class={`${valueDarkSm} !text-xs transition-colors duration-200 peer-hover:text-color-hover`}
             >
-              {abbreviateAddress(address, 7)}
+              {abbreviateAddress(address, 8)}
             </h6>
           </div>
-          <div class="flex items-center gap-3 mb-0.5">
+          <div class="flex items-center justify-between gap-3 mb-0.5">
             <Icon
               type="icon"
               name="bitcoins"
               weight="normal"
               size="xs"
-              color="greyDark"
+              color="neutral500"
             />
-            <h6 class={valueSm}>
+            <h6 class="font-semibold text-sm text-color-orange-400">
               {formatSatoshisToBTC(btcBalance.total, {
                 includeSymbol: false,
                 stripZeros: true,
-              })} <span class={labelSm}>BTC</span>
+              })} <span class="font-light">BTC</span>
             </h6>
           </div>
           <hr class="!mt-2 !mb-2" />
           <a
             href={`/wallet/${address}`}
             class={isActive(`/wallet/${address}`)
-              ? `${navSublinkPurpleActive}`
-              : `${navSublinkPurple}`}
+              ? `${navSublinkActiveDesktop}`
+              : `${navSublinkDesktop}`}
           >
-            DASHBOARD
+            Dashboard
           </a>
           <a
             onClick={() => walletSignOut()}
-            class={`${navSublinkPurple}`}
+            class={`${navSublinkDesktop}`}
           >
-            DISCONNECT
+            Disconnect
           </a>
         </div>
       )
       : null,
     // The wallet drawer content
     drawer: (
-      <div class="flex flex-col h-full px-9 tablet:px-6">
+      <div class="flex flex-col h-full px-7.5 tablet:px-5">
         {/* Top - Main navigation content */}
-        <div class="flex flex-col flex-1 items-start pt-9 tablet:pt-6 gap-5">
+        <div class="flex flex-col flex-1 items-start pt-8 gap-5">
+          {getWalletLinks(address).map((link) => (
+            <a
+              key={link.title}
+              href={link.href}
+              onClick={() => {
+                if (link.title === "DISCONNECT") {
+                  walletSignOut();
+                }
+                if (link.href) {
+                  setCurrentPath(link.href);
+                }
+              }}
+              class={`${
+                link.href && link.title === "DASHBOARD" && isActive(link.href)
+                  ? navLinkActiveMobile
+                  : navLinkMobile
+              }`}
+            >
+              {link.title}
+            </a>
+          ))}
+        </div>
+
+        {/* Bottom - Wallet address and balance */}
+        <div class={containerStickyBottom}>
           <div
-            class={`flex-col ${glassmorphismL2} w-full -mt-1.5 mb-3 px-3 py-2 space-y-1`}
+            class={`flex-col bg-border-container-2-secondary rounded-2xl w-full px-4 py-3 space-y-1`}
           >
             <div class="flex flex-row-reverse justify-start items-center gap-3">
               <div
                 ref={copyButtonRef}
-                class="relative peer"
+                class="relative peer translate-y-0.5"
                 onMouseEnter={handleCopyMouseEnter}
                 onMouseLeave={handleCopyMouseLeave}
               >
@@ -322,8 +341,7 @@ export const WalletButton = (
                   name="copy"
                   weight="normal"
                   size="xs"
-                  color="greyDark"
-                  className="mb-0.5"
+                  color="neutral500"
                   onClick={copy}
                 />
                 <div
@@ -342,9 +360,9 @@ export const WalletButton = (
                 </div>
               </div>
               <h6
-                class={`${valueDarkSm} transition-colors duration-200 peer-hover:text-color-grey-light`}
+                class={`${valueDarkSm} transition-colors duration-200 peer-hover:text-color-hover`}
               >
-                {abbreviateAddress(address, 12)}
+                {abbreviateAddress(address, 9)}
               </h6>
             </div>
             <div class="flex justify-between items-end flex-1">
@@ -353,44 +371,15 @@ export const WalletButton = (
                 name="bitcoins"
                 weight="normal"
                 size="xs"
-                color="greyDark"
+                color="neutral500"
               />
-              <h6 class={valueLg}>
+              <h6 class="font-semibold text-lg text-color-orange-400">
                 {formatSatoshisToBTC(btcBalance.total, {
                   includeSymbol: false,
                   stripZeros: true,
-                })} <span class={labelLg}>BTC</span>
+                })} <span class="font-light">BTC</span>
               </h6>
             </div>
-          </div>
-
-          {getWalletLinks(address).map((link) => (
-            <a
-              key={link.title}
-              href={link.href}
-              onClick={() => {
-                if (link.title === "DISCONNECT") {
-                  walletSignOut();
-                }
-                if (link.href) {
-                  setCurrentPath(link.href);
-                }
-              }}
-              class={`inline-block w-full ${
-                link.href && link.title === "DASHBOARD" && isActive(link.href)
-                  ? navLinkGreyLDActive
-                  : navLinkGreyLD
-              }`}
-            >
-              {link.title}
-            </a>
-          ))}
-        </div>
-
-        {/* Bottom - Counterparty version */}
-        <div class={containerStickyBottom}>
-          <div class={`flex items-end -mb-1.5`}>
-            <CounterpartyVersion />
           </div>
         </div>
       </div>
@@ -399,56 +388,3 @@ export const WalletButton = (
     isConnected: Boolean(isConnected && address),
   };
 };
-
-function CounterpartyVersion() {
-  const [version, setVersion] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-
-  useEffect(() => {
-    let cancelled = false;
-    const fetchVersion = async () => {
-      try {
-        const res = await fetch("/api/v2/counterparty/version", {
-          headers: { "X-CSRF-Token": "safe" },
-        });
-        const data = await res.json();
-        if (!cancelled) {
-          setVersion(data?.version ?? null);
-        }
-      } catch (_e) {
-        if (!cancelled) setVersion(null);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-
-    fetchVersion();
-
-    // Refresh periodically to keep up-to-date
-    const interval = globalThis.setInterval(fetchVersion, 24 * 60 * 60 * 1000);
-    return () => {
-      cancelled = true;
-      globalThis.clearInterval(interval);
-    };
-  }, []);
-
-  return (
-    <div class={`flex items-center`}>
-      <Icon
-        type="icon"
-        name="version"
-        weight="normal"
-        size="xs"
-        color="custom"
-        className="mr-3 stroke-color-grey-dark"
-      />
-      <span class={labelXs}>
-        COUNTERPARTY {loading
-          ? <span class="animate-pulse">vXX.X.X</span>
-          : version
-          ? <>v{version}</>
-          : <>v N/A</>}
-      </span>
-    </div>
-  );
-}

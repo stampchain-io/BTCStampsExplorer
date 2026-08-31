@@ -28,14 +28,11 @@ export const Accordion = (
         class="flex justify-between items-center cursor-pointer group"
         onClick={toggleAccordion}
       >
-        {/* Title with Gradient Styling - cant use headingGreyLDLink styling (color-grey-gradientDL-hover) because of the group hover effect */}
+        {/* Title with Gradient Styling - uses bg-gradient-to-r color-neutral-gradient color-gradient-hover instead of headingGreyLDLink because group-hover overrides the hover state */}
+        {/* group-hover overrides --gradient-stop-* to a custom grey instead of the default primary-400 used by color-gradient-hover */}
         <h2
-          class={`font-bold text-xl tracking-wide color-grey-gradientLD-hover group-hover:[background:none_!important] group-hover:[-webkit-text-fill-color:var(--color-grey-semilight)_!important] group-hover:[text-fill-color:var(--color-grey-semilight)_!important] transition-colors duration-200
-            ${
-            isOpen
-              ? "[background:none_!important] [-webkit-text-fill-color:var(--color-grey-semilight)_!important] [text-fill-color:var(--color-grey-semilight)_!important] "
-              : ""
-          }`}
+          class={`font-bold text-xl text-color-neutral-200 group-hover:text-color-hover tracking-wide
+            ${isOpen ? "text-color-primary-400" : ""}`}
         >
           {title}
         </h2>
@@ -44,8 +41,8 @@ export const Accordion = (
         <span
           class={`transition-transform duration-400 ${
             isOpen
-              ? "stroke-color-grey-light rotate-45"
-              : "stroke-color-grey-semidark group-hover:stroke-color-grey-light transition-colors duration-400 rotate-0"
+              ? "stroke-color-hover rotate-45"
+              : "stroke-color-neutral-200 group-hover:stroke-color-hover transition-colors duration-400 rotate-0"
           }`}
         >
           <Icon
@@ -54,7 +51,6 @@ export const Accordion = (
             weight="bold"
             size="xsR"
             color="custom"
-            className="-mt-[3px]"
           />
         </span>
       </div>

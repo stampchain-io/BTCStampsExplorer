@@ -1,21 +1,21 @@
 import { MAX_PAGINATION_LIMIT } from "$constants";
 import blockFixturesData from "../fixtures/blockData.json" with {
-  type: "json",
+  type: "json"
 };
 import collectionFixturesData from "../fixtures/collectionData.json" with {
-  type: "json",
+  type: "json"
 };
 import marketDataFixturesData from "../fixtures/marketData.json" with {
-  type: "json",
+  type: "json"
 };
 import src101FixturesData from "../fixtures/src101Data.json" with {
-  type: "json",
+  type: "json"
 };
 import src20FixturesData from "../fixtures/src20Data.json" with {
-  type: "json",
+  type: "json"
 };
 import stampFixturesData from "../fixtures/stampData.json" with {
-  type: "json",
+  type: "json"
 };
 
 interface QueryResult {
@@ -208,6 +208,17 @@ export class MockDatabaseManager {
       normalizedQuery.includes("hex(c.collection_id)") // Specific to collection queries
     ) {
       return this.getCollectionData(normalizedQuery, params);
+    }
+
+    // SRC-20 list queries select `st.stamp` and LEFT JOIN the stamp table to
+    // surface the stamp number. That makes the `st.stamp` heuristic in the
+    // stamp branch below misroute them into getStampData, which returns
+    // stamp-shaped rows with no `tick`. Route on the DRIVING table instead:
+    // if the FROM clause resolves to SRC20Valid (directly, or via the
+    // push-down subquery form `FROM (SELECT * FROM SRC20Valid ...)`), this is
+    // an SRC-20 query no matter what it joins to.
+    if (/from\s+\(?\s*(?:select\s+\*\s+from\s+)?src20valid/i.test(normalizedQuery)) {
+      return this.getSrc20Data(normalizedQuery, params);
     }
 
     // Stamp queries with market data JOIN - check BEFORE simple stamp queries
@@ -1151,14 +1162,24 @@ export class MockDatabaseManager {
       // Apply filters
       let filteredData = transformedCollections;
 
-      // Filter by creator if specified
-      if (
-        normalizedQuery.includes("where cc.creator_address = ?") && params[0]
-      ) {
-        const creatorAddress = params[0];
-        filteredData = filteredData.filter((c: any) =>
-          c.creators.includes(creatorAddress)
-        );
+      // Filter by creator if specified.
+      // The creator predicate is no longer the first WHERE term — a hidden-names
+      // condition precedes it and contributes its own placeholders — so match the
+      // predicate alone and resolve the creator param by counting the "?"
+      // placeholders that appear before it.
+      const creatorPredicateIndex = normalizedQuery.indexOf(
+        "cc.creator_address = ?",
+      );
+      if (creatorPredicateIndex !== -1) {
+        const paramIndex =
+          (normalizedQuery.slice(0, creatorPredicateIndex).match(/\?/g) ?? [])
+            .length;
+        const creatorAddress = params[paramIndex];
+        if (creatorAddress) {
+          filteredData = filteredData.filter((c: any) =>
+            c.creators.includes(creatorAddress)
+          );
+        }
       }
 
       // Filter by minimum stamp count if HAVING clause is present
@@ -1503,6 +1524,18 @@ export class MockDatabaseManager {
   async invalidateCacheByCategory(category: string): Promise<void> {
     // Log for test verification if needed
     console.log(`[MOCK] Invalidating cache for category: ${category}`);
+    return Promise.resolve();
+  }
+
+  /**
+   * Mock implementation of invalidateCacheKey
+   * In tests, this just logs the action without doing anything
+   */
+  async invalidateCacheKey(query: string, params: unknown[]): Promise<void> {
+    console.log(
+      `[MOCK] Invalidating cache key for query: ${query.slice(0, 50)}...`,
+      params,
+    );
     return Promise.resolve();
   }
 }

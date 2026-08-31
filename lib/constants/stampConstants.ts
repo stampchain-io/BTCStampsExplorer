@@ -31,6 +31,8 @@ export const STAMP_TYPES = {
   CLASSIC: "classic",
   /** Posh stamps - premium quality stamps */
   POSH: "posh",
+  /** SRC-721 recursive stamps */
+  SRC721: "src-721",
   /** SRC-20 images - for showing SRC-20 related imagery */
   SRC20: "src20",
 } as const;
@@ -76,12 +78,14 @@ export type HandlerStampType =
 
 /**
  * Frontend-specific stamp types for UI filtering
- * Excludes meta types (all, stamps) and SRC-20 imagery
+ * Includes all, classic, posh, src-721 (recursive), and cursed
  */
 export const FRONTEND_STAMP_TYPES = {
+  ALL: STAMP_TYPES.ALL,
   CLASSIC: STAMP_TYPES.CLASSIC,
   CURSED: STAMP_TYPES.CURSED,
   POSH: STAMP_TYPES.POSH,
+  SRC721: STAMP_TYPES.SRC721,
 } as const;
 
 export const FRONTEND_STAMP_TYPE_VALUES = Object.values(FRONTEND_STAMP_TYPES);
@@ -171,6 +175,23 @@ export type StampMarketplace =
   typeof STAMP_MARKETPLACE[keyof typeof STAMP_MARKETPLACE];
 
 /**
+ * Stamp trading activity levels, computed by the btc_stamps indexer.
+ * Thresholds: HOT <24h, WARM <7d, COOL <30d,
+ * DORMANT = no recent sales but has open dispensers, COLD = no activity.
+ */
+export const STAMP_DISPENSER_ACTIVITY_LEVEL = {
+  HOT: "HOT",
+  WARM: "WARM",
+  COOL: "COOL",
+  DORMANT: "DORMANT",
+  COLD: "COLD",
+} as const;
+
+export type StampDispenserActivityLevel = typeof STAMP_DISPENSER_ACTIVITY_LEVEL[
+  keyof typeof STAMP_DISPENSER_ACTIVITY_LEVEL
+];
+
+/**
  * File type classifications for stamp content
  * Maps to StampTableV4.stamp_mimetype database field
  */
@@ -218,6 +239,8 @@ export const STAMP_RANGES = {
   RANGE_1000: "1000", // stamp < 1000
   RANGE_5000: "5000", // stamp < 5000
   RANGE_10000: "10000", // stamp < 10000
+  RANGE_500000: "500000", // stamp < 500,000
+  RANGE_1000000: "1000000", // stamp < 1,000,000
   CUSTOM: "custom", // User-defined range
 } as const;
 

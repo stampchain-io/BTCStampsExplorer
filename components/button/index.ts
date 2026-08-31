@@ -18,4 +18,5 @@ export * from "$islands/button/PaginationButtons.tsx";
 export * from "$islands/button/SelectorButtons.tsx";
 export * from "$islands/button/SortButton.tsx";
 export * from "$islands/button/ToggleButton.tsx";
+export * from "$islands/button/TrendingButton.tsx";
 export * from "$islands/button/WalletButton.tsx";

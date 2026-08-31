@@ -1,14 +1,15 @@
 /* ===== STAMP INFO COMPONENT ===== */
-/*@baba-750+764+815+icons - refactor to StatItems */
 import { Button } from "$button";
-import { Icon } from "$icon";
+import { Icon, UserProfileIcon } from "$icon";
 import BuyStampModal from "$islands/modal/BuyStampModal.tsx";
 import { openModal } from "$islands/modal/states.ts";
 import {
-  body,
-  containerBackground,
-  containerColData,
-  containerGap,
+  container2Icon,
+  container3,
+  containerPill,
+  PillContentCount,
+  StatItem,
+  StatPrice,
 } from "$layout";
 import type { Src101Detail } from "$lib/types/src101.d.ts";
 import type { StampRow } from "$lib/types/stamp.d.ts";
@@ -17,28 +18,75 @@ import {
   formatBTCAmount,
   formatDate,
   formatFileSize,
+  formatFileType,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import {
   getSRC101Data,
   getStampImageSrc,
 } from "$lib/utils/ui/media/imageUtils.ts";
-import { tooltipIcon } from "$notification";
+import { tooltipButton, tooltipIcon } from "$notification";
 import { Dispenser, StampListingsOpenTable } from "$table";
 import {
-  headingGreyDLLink,
-  labelSm,
-  titleGreyLD,
-  value2xl,
-  value3xl,
-  valueDark,
-  valueSm,
+  cardSupply,
+  subtitlePrimary,
+  titlePrimary,
+  truncate,
+  valueDarkLg,
 } from "$text";
+import type { ComponentChildren } from "preact";
 import { useEffect, useRef, useState } from "preact/hooks";
+
+/* ===== TOOLTIP HELPERS ===== */
+function PillWithTooltip(
+  { label, className, children }: {
+    label: string;
+    className: string;
+    children: ComponentChildren;
+  },
+) {
+  return (
+    <div class="relative group/pill">
+      <div class={className}>{children}</div>
+      <div
+        class={`${tooltipButton} opacity-0 group-hover/pill:opacity-100 transition-opacity duration-150`}
+      >
+        {label}
+      </div>
+    </div>
+  );
+}
+
+function IconWithTooltip(
+  { label, children }: {
+    label: ComponentChildren;
+    children: ComponentChildren;
+  },
+) {
+  return (
+    <div class="relative group/icon">
+      {children}
+      <div
+        class={`${tooltipIcon} opacity-0 group-hover/icon:opacity-100`}
+      >
+        {label}
+      </div>
+    </div>
+  );
+}
 
 /* ===== TYPES ===== */
 interface StampInfoProps {
   stamp: StampRow;
   lowestPriceDispenser: any;
+  btcPriceUSD?: number;
+  collectionInfo?:
+    | {
+      collection_id: string;
+      collection_name: string;
+      collection_description: string;
+    }
+    | null
+    | undefined;
 }
 
 interface DimensionsType {
@@ -48,7 +96,9 @@ interface DimensionsType {
 }
 
 /* ===== COMPONENT ===== */
-export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
+export function StampInfo(
+  { stamp, lowestPriceDispenser, btcPriceUSD, collectionInfo }: StampInfoProps,
+) {
   /* ===== STATE ===== */
   const [fee, setFee] = useState<number>(0);
   const handleChangeFee = (newFee: number) => {
@@ -98,7 +148,6 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     ? "+100000"
     : stamp.supply;
 
-  const editionLabel = stamp.supply === 1 ? "EDITION" : "EDITIONS";
   /* ===== REFS AND UI STATE ===== */
   const [imageDimensions, setImageDimensions] = useState<DimensionsType | null>(
     null,
@@ -107,36 +156,34 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   const fileExtension = stamp.stamp_url?.split(".")?.pop()?.toUpperCase() ||
     "UNKNOWN";
 
+  const creatorDisplaySm = stamp.creator_name
+    ? stamp.creator_name
+    : abbreviateAddress(stamp.creator, 7);
   const creatorDisplay = stamp.creator_name
     ? stamp.creator_name
-    : abbreviateAddress(stamp.creator, 8);
+    : abbreviateAddress(stamp.creator, 12);
 
-  const [isDivisibleTooltipVisible, setIsDivisibleTooltipVisible] = useState(
+  /* ===== CPID COPY STATE ===== */
+  const [showCpidCopied, setShowCpidCopied] = useState(false);
+  const [isCpidTooltipVisible, setIsCpidTooltipVisible] = useState(false);
+  const [allowCpidTooltip, setAllowCpidTooltip] = useState(true);
+  const cpidCopyButtonRef = useRef<HTMLDivElement>(null);
+  const cpidTooltipTimeoutRef = useRef<number | null>(null);
+
+  /* ===== LISTINGS TOOLTIP STATE ===== */
+  const [isListingsTooltipVisible, setIsListingsTooltipVisible] = useState(
     false,
   );
-  const [isKeyburnTooltipVisible, setIsKeyburnTooltipVisible] = useState(false);
-  const [isLockedTooltipVisible, setIsLockedTooltipVisible] = useState(false);
-  const [isUnlockedTooltipVisible, setIsUnlockedTooltipVisible] = useState(
-    false,
-  );
-  const [allowDivisibleTooltip, setAllowDivisibleTooltip] = useState(true);
-  const [allowKeyburnTooltip, setAllowKeyburnTooltip] = useState(true);
-  const [allowLockedTooltip, setAllowLockedTooltip] = useState(true);
-  const [allowUnlockedTooltip, setAllowUnlockedTooltip] = useState(true);
-  const divisibleTooltipTimeoutRef = useRef<number | null>(null);
-  const keyburnTooltipTimeoutRef = useRef<number | null>(null);
-  const lockedTooltipTimeoutRef = useRef<number | null>(null);
-  const unlockedTooltipTimeoutRef = useRef<number | null>(null);
+  const [allowListingsTooltip, setAllowListingsTooltip] = useState(true);
+  const listingsTooltipTimeoutRef = useRef<number | null>(null);
 
   /* ===== EFFECTS ===== */
   // Cleanup effect
   useEffect(() => {
     return () => {
       [
-        divisibleTooltipTimeoutRef,
-        keyburnTooltipTimeoutRef,
-        lockedTooltipTimeoutRef,
-        unlockedTooltipTimeoutRef,
+        cpidTooltipTimeoutRef,
+        listingsTooltipTimeoutRef,
       ].forEach((ref) => {
         if (ref.current) {
           globalThis.clearTimeout(ref.current);
@@ -145,82 +192,68 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     };
   }, []);
 
-  /* ===== EVENT HANDLERS ===== */
-  // Tooltip handlers
-  const handleDivisibleMouseEnter = () => {
-    if (allowDivisibleTooltip) {
-      if (divisibleTooltipTimeoutRef.current) {
-        globalThis.clearTimeout(divisibleTooltipTimeoutRef.current);
+  /* ===== CPID COPY HANDLERS ===== */
+  const handleCpidCopyMouseEnter = () => {
+    if (allowCpidTooltip) {
+      if (cpidTooltipTimeoutRef.current) {
+        globalThis.clearTimeout(cpidTooltipTimeoutRef.current);
       }
-      divisibleTooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        setIsDivisibleTooltipVisible(true);
+
+      cpidTooltipTimeoutRef.current = globalThis.setTimeout(() => {
+        const buttonRect = cpidCopyButtonRef.current?.getBoundingClientRect();
+        if (buttonRect) {
+          setIsCpidTooltipVisible(true);
+        }
+      }, 1500);
+    }
+  };
+
+  const handleCpidCopyMouseLeave = () => {
+    if (cpidTooltipTimeoutRef.current) {
+      globalThis.clearTimeout(cpidTooltipTimeoutRef.current);
+    }
+    setIsCpidTooltipVisible(false);
+    setShowCpidCopied(false);
+    setAllowCpidTooltip(true);
+  };
+
+  const copyCpid = async () => {
+    try {
+      await navigator.clipboard.writeText(stamp.cpid);
+      setShowCpidCopied(true);
+      setIsCpidTooltipVisible(false);
+      setAllowCpidTooltip(false);
+
+      if (cpidTooltipTimeoutRef.current) {
+        globalThis.clearTimeout(cpidTooltipTimeoutRef.current);
+      }
+
+      cpidTooltipTimeoutRef.current = globalThis.setTimeout(() => {
+        setShowCpidCopied(false);
+      }, 1500);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  };
+
+  /* ===== LISTINGS TOOLTIP HANDLERS ===== */
+  const handleListingsMouseEnter = () => {
+    if (allowListingsTooltip) {
+      if (listingsTooltipTimeoutRef.current) {
+        globalThis.clearTimeout(listingsTooltipTimeoutRef.current);
+      }
+      listingsTooltipTimeoutRef.current = globalThis.setTimeout(() => {
+        setIsListingsTooltipVisible(true);
       }, 500);
     }
   };
 
-  const handleDivisibleMouseLeave = () => {
-    if (divisibleTooltipTimeoutRef.current) {
-      globalThis.clearTimeout(divisibleTooltipTimeoutRef.current);
+  const handleListingsMouseLeave = () => {
+    if (listingsTooltipTimeoutRef.current) {
+      globalThis.clearTimeout(listingsTooltipTimeoutRef.current);
     }
-    setIsDivisibleTooltipVisible(false);
-    setAllowDivisibleTooltip(true);
-  };
-
-  const handleKeyburnMouseEnter = () => {
-    if (allowKeyburnTooltip) {
-      if (keyburnTooltipTimeoutRef.current) {
-        globalThis.clearTimeout(keyburnTooltipTimeoutRef.current);
-      }
-      keyburnTooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        setIsKeyburnTooltipVisible(true);
-      }, 500);
-    }
-  };
-
-  const handleKeyburnMouseLeave = () => {
-    if (keyburnTooltipTimeoutRef.current) {
-      globalThis.clearTimeout(keyburnTooltipTimeoutRef.current);
-    }
-    setIsKeyburnTooltipVisible(false);
-    setAllowKeyburnTooltip(true);
-  };
-
-  const handleLockedMouseEnter = () => {
-    if (allowLockedTooltip) {
-      if (lockedTooltipTimeoutRef.current) {
-        globalThis.clearTimeout(lockedTooltipTimeoutRef.current);
-      }
-      lockedTooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        setIsLockedTooltipVisible(true);
-      }, 500);
-    }
-  };
-
-  const handleLockedMouseLeave = () => {
-    if (lockedTooltipTimeoutRef.current) {
-      globalThis.clearTimeout(lockedTooltipTimeoutRef.current);
-    }
-    setIsLockedTooltipVisible(false);
-    setAllowLockedTooltip(true);
-  };
-
-  const handleUnlockedMouseEnter = () => {
-    if (allowUnlockedTooltip) {
-      if (unlockedTooltipTimeoutRef.current) {
-        globalThis.clearTimeout(unlockedTooltipTimeoutRef.current);
-      }
-      unlockedTooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        setIsUnlockedTooltipVisible(true);
-      }, 500);
-    }
-  };
-
-  const handleUnlockedMouseLeave = () => {
-    if (unlockedTooltipTimeoutRef.current) {
-      globalThis.clearTimeout(unlockedTooltipTimeoutRef.current);
-    }
-    setIsUnlockedTooltipVisible(false);
-    setAllowUnlockedTooltip(true);
+    setIsListingsTooltipVisible(false);
+    setAllowListingsTooltip(true);
   };
 
   /* ===== HELPER FUNCTIONS ===== */
@@ -374,6 +407,14 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     return !cpid?.startsWith("A");
   };
 
+  const getIdentLabel = () => {
+    if (stamp.ident === "SRC-20") return "SRC-20";
+    if (stamp.ident === "SRC-101") return "SRC-101";
+    if (stamp.ident === "SRC-721") return "RECURSIVE";
+    if (stamp.ident === "STAMP" && isPoshStamp(stamp.cpid)) return "POSH";
+    return "CLASSIC";
+  };
+
   const titleRef = useRef<HTMLParagraphElement>(null);
   const [scale, setScale] = useState(1);
 
@@ -482,17 +523,16 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     (stamp.floorPrice && stamp.floorPrice !== "priceless"
       ? stamp.floorPrice
       : null);
-  const floorPriceUSD = marketData
-    // For v2.3: calculate from marketData if available
-    ? (marketData.floorPriceBTC && marketData.volume24hBTC
-      ? marketData.floorPriceBTC * 117888
-      : null)
-    // Legacy fallback
-    : stamp.floorPriceUSD;
+  const floorPriceUSD = stampWithMarketData?.market_data?.floor_price_usd ??
+    stamp.floorPriceUSD ??
+    null;
 
+  // Prefer the BTC/USD ratio implied by cached market data; fall back to
+  // the live BTC price fetched server-side so USD still renders for stamps
+  // without cached market data (e.g. priced purely from a dispenser).
   const btcPrice = floorPriceUSD && floorPriceBTC
     ? floorPriceUSD / floorPriceBTC
-    : null;
+    : btcPriceUSD ?? null;
 
   // Calculate display price: dispenser price > floor price
   const displayPrice = selectedDispenser
@@ -509,6 +549,10 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
       ) / 100000000) *
         btcPrice
       : floorPriceUSD;
+
+  const activityLevel = stamp.activity_level ??
+    marketData?.activityLevel ??
+    null;
 
   // Debug effects for development only
   useEffect(() => {
@@ -627,6 +671,54 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     return stamp.ident === "SRC-101";
   };
 
+  const fileTypeValue = isSrc20Stamp()
+    ? "SRC-20"
+    : isSrc101Stamp()
+    ? "SRC-101"
+    : fileExtension === "BMN"
+    ? "BMN"
+    : formatFileType(stamp.stamp_mimetype);
+
+  const fileSizeValue = stamp.file_size_bytes !== null
+    ? formatFileSize(
+      stamp.file_size_bytes,
+      stamp.stamp_mimetype === "text/plain",
+    )
+    : "N/A";
+
+  const dimensionsValue = isSrc20Stamp()
+    ? stamp.stamp_base64 &&
+        JSON.parse(atob(stamp.stamp_base64))?.op === "DEPLOY"
+      ? "DEPLOY"
+      : stamp.stamp_base64 &&
+          JSON.parse(atob(stamp.stamp_base64))?.op === "MINT"
+      ? "MINT"
+      : "TRANSFER"
+    : isMediaFile
+    ? (mediaDuration ? formatDuration(mediaDuration) : "-")
+    : isSrc101Stamp()
+    ? stamp.stamp_base64 &&
+        JSON.parse(atob(stamp.stamp_base64))?.op === "DEPLOY"
+      ? "SALE"
+      : stamp.stamp_base64 &&
+          JSON.parse(atob(stamp.stamp_base64))?.op === "MINT"
+      ? "REGISTER"
+      : "TRANSFER"
+    : getDimensionsDisplay(imageDimensions);
+
+  const txHashValue = stamp.tx_hash !== null
+    ? (
+      <a
+        href={`https://www.blockchain.com/explorer/transactions/btc/${stamp.tx_hash}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="link-neutral-400 transition-colors duration-200"
+      >
+        {abbreviateAddress(stamp.tx_hash, 8)}
+      </a>
+    )
+    : "N/A";
+
   // Effect to handle document title updates
   useEffect(() => {
     document.title = `Bitcoin Stamp #${stamp.stamp} - stampchain.io`;
@@ -636,352 +728,457 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   }, [stamp.stamp]);
 
   /* ===== RENDER ===== */
+  // `contents` lets the listings table participate in the parent CSS grid
+  // (routes/stamp/[id].tsx) as a full-width row beneath image + info.
+  // That grows the card by the table height only — `h-full` inside a
+  // stretch-sized flex column cannot, so the table used to overflow.
   return (
-    <>
-      <div className={`${body} ${containerGap}`}>
-        <div
-          className={containerBackground}
-        >
-          <div>
-            <h2
-              ref={titleRef}
-              className={`${titleGreyLD} overflow-hidden`}
-              style={{
-                transform: `scale(${scale})`,
-                transformOrigin: "left",
-                width: `${(100 / scale)}%`,
-                marginTop: `${-0.2 * (1 / scale - 1)}em`,
-                marginBottom: `${-0.26 * (1 / scale - 1)}em`,
-              }}
-            >
-              {isSrc101Stamp() && src101
-                ? (
-                  <span className="font-light">
-                    {src101?.tokenid?.length && atob(src101?.tokenid[0])}
-                  </span>
-                )
-                : isSrc20Stamp()
-                ? (
-                  <>
-                    <span className="font-light">#</span>
-                    <span className="font-black">{stamp.stamp}</span>
-                  </>
-                )
-                : (isPoshStamp(stamp.cpid) ||
-                    (htmlStampTitle && stamp.stamp_mimetype === "text/html"))
-                ? (
-                  <span className="font-black uppercase text-ellipsis overflow-hidden">
-                    {isPoshStamp(stamp.cpid) ? stamp.cpid : htmlStampTitle}
-                  </span>
-                )
-                : (
-                  <>
-                    <span className="font-light">#</span>
-                    <span className="font-black">{stamp.stamp}</span>
-                  </>
-                )}
-            </h2>
-
-            {isSrc20Stamp() && stamp.cpid && (
-              <h6 className={`${valueDark} -mt-1 pb-1 block`}>
-                {stamp.cpid}
-              </h6>
-            )}
-
-            <h5 className="-mt-1.5 font-light text-xl text-color-grey block">
-              {(!isSrc20Stamp() && (isPoshStamp(stamp.cpid) ||
-                (htmlStampTitle && stamp.stamp_mimetype === "text/html"))) && (
-                <>
-                  #{stamp.stamp}
-                </>
-              )}
-            </h5>
-
-            {(!isPoshStamp(stamp.cpid) && stamp.cpid) && (
-              <h6 className={`${valueDark} block`}>
-                {stamp.cpid}
-              </h6>
-            )}
-
-            <div className="flex flex-col items-start pt-3">
-              <h6 className={labelSm}>ARTIST</h6>
-              <a
-                className={headingGreyDLLink}
-                href={`/wallet/${stamp.creator}`}
-                target="_parent"
+    <div className="contents">
+      <div className="min-w-0 h-full">
+        <div className="flex flex-col h-full">
+          <div className="flex justify-between items-start gap-3">
+            <div className="min-w-0 flex-1">
+              <h2
+                ref={titleRef}
+                className={`${titlePrimary} overflow-hidden`}
+                style={{
+                  transform: `scale(${scale})`,
+                  transformOrigin: "left",
+                  width: `${(100 / scale)}%`,
+                  marginTop: `${-0.2 * (1 / scale - 1)}em`,
+                  marginBottom: `${-0.26 * (1 / scale - 1)}em`,
+                }}
               >
-                {creatorDisplay}
-              </a>
-            </div>
-          </div>
-
-          {(dispensers?.length > 0)
-            ? (
-              <div className="flex flex-col w-full pt-6 mobileLg:pt-12">
-                <div
-                  className={`flex w-full gap-6 mb-2 items-end ${
-                    dispensers?.length >= 2 ? "justify-between" : "justify-end"
-                  }`}
-                >
-                  {dispensers?.length >= 2 && (
-                    <Icon
-                      type="iconButton"
-                      name="dispenserListings"
-                      weight="normal"
-                      size="mdR"
-                      color="greyLight"
-                      ariaLabel="Listings"
-                      onClick={() => setShowListings(!showListings)}
-                      className="pb-0.5"
-                    />
-                  )}
-
-                  <div className="text-right">
-                    {displayPriceUSD && (
-                      <h6 className={labelSm}>
-                        {displayPriceUSD.toLocaleString("en-US", {
-                          maximumFractionDigits: 2,
-                        })} <span className="font-light">USD</span>
-                      </h6>
-                    )}
-                    <h6 className={value2xl}>
-                      {formatBTCAmount(
-                        typeof displayPrice === "number" ? displayPrice : 0,
-                        {
-                          excludeSuffix: true,
-                          decimals: 8,
-                          stripZeros: true,
-                        },
-                      )} <span className="font-extralight">BTC</span>
-                    </h6>
-                  </div>
-                </div>
-
-                {(dispensers?.length >= 2)
+                {isSrc101Stamp() && src101
                   ? (
-                    <div
-                      className={`overflow-hidden transition-all duration-500 ease-in-out
-                      ${
-                        showListings
-                          ? "max-h-[244px] mt-1 mb-3 opacity-100"
-                          : "max-h-0 opacity-0"
-                      }`}
-                    >
-                      <div className="w-full mb-4">
-                        {isLoadingDispensers
-                          ? <h6>LOADING</h6>
-                          : (
-                            <StampListingsOpenTable
-                              dispensers={dispensers}
-                              floorPrice={floorPriceBTC || 0}
-                              onSelectDispenser={handleDispenserSelect}
-                              selectedDispenser={selectedDispenser}
-                            />
-                          )}
-                      </div>
-                    </div>
+                    <span className="font-light">
+                      {src101?.tokenid?.length && atob(src101?.tokenid[0])}
+                    </span>
                   )
-                  : null}
+                  : isSrc20Stamp()
+                  ? (
+                    <>
+                      <span className="font-light">#</span>
+                      <span className="font-black">{stamp.stamp}</span>
+                    </>
+                  )
+                  : isPoshStamp(stamp.cpid)
+                  ? (
+                    <span className="font-black uppercase text-ellipsis overflow-hidden">
+                      {stamp.cpid}
+                    </span>
+                  )
+                  : (
+                    <>
+                      <span className="font-light">#</span>
+                      <span className="font-black">{stamp.stamp}</span>
+                    </>
+                  )}
+              </h2>
 
-                <div className="flex justify-end">
-                  <Button
-                    variant="flat"
-                    color="grey"
-                    size="mdR"
-                    onClick={() =>
-                      toggleModal(selectedDispenser || lowestPriceDispenser)}
-                  >
-                    BUY
-                  </Button>
-                </div>
-              </div>
-            )
-            : null}
-        </div>
-
-        <div className={containerBackground}>
-          {!isSrc20Stamp() && (
-            <div className="flex flex-col pb-3">
-              <h6 className={labelSm}>{editionLabel}</h6>
-              <h6 className={value3xl}>{editionCount}</h6>
-            </div>
-          )}
-
-          <div className="flex flex-row">
-            <div className={`${containerColData} flex-1 items-start`}>
-              <h6 className={labelSm}>TYPE</h6>
-              <h6 className={valueSm}>
-                {isSrc20Stamp()
-                  ? "SRC-20"
-                  : isSrc101Stamp()
-                  ? "SRC-101"
-                  : fileExtension}
-              </h6>
-            </div>
-            <div className={`${containerColData} flex-1 items-center`}>
-              <h6 className={labelSm}>
-                {(isSrc20Stamp() || isSrc101Stamp())
-                  ? "TRANSACTION"
-                  : isMediaFile
-                  ? "DURATION"
-                  : "DIMENSIONS"}
-              </h6>
-              <h6 className={valueSm}>
-                {isSrc20Stamp()
-                  ? stamp.stamp_base64 &&
-                      JSON.parse(atob(stamp.stamp_base64))?.op === "DEPLOY"
-                    ? "DEPLOY"
-                    : stamp.stamp_base64 &&
-                        JSON.parse(atob(stamp.stamp_base64))?.op === "MINT"
-                    ? "MINT"
-                    : "TRANSFER"
-                  : isMediaFile
-                  ? (mediaDuration ? formatDuration(mediaDuration) : "-")
-                  : isSrc101Stamp()
-                  ? stamp.stamp_base64 &&
-                      JSON.parse(atob(stamp.stamp_base64))?.op === "DEPLOY"
-                    ? "SALE"
-                    : stamp.stamp_base64 &&
-                        JSON.parse(atob(stamp.stamp_base64))?.op === "MINT"
-                    ? "REGISTER"
-                    : "TRANSFER"
-                  : getDimensionsDisplay(imageDimensions)}
-              </h6>
-            </div>
-            <div className="flex flex-1 justify-end items-end pb-1 space-x-[9px]">
-              {stamp.divisible == true && (
-                <div
-                  className="relative group"
-                  onMouseEnter={handleDivisibleMouseEnter}
-                  onMouseLeave={handleDivisibleMouseLeave}
-                >
-                  <Icon
-                    type="icon"
-                    name="divisible"
-                    weight="normal"
-                    size="xs"
-                    color="greyDark"
-                    ariaLabel="Divisible"
-                  />
-                  <div
-                    className={`${tooltipIcon} ${
-                      isDivisibleTooltipVisible ? "opacity-100" : "opacity-0"
-                    }`}
-                  >
-                    DIVISIBLE
-                  </div>
-                </div>
+              {isSrc20Stamp() && stamp.cpid && (
+                <h6 className={`${subtitlePrimary} -mt-1 pb-1 block`}>
+                  {stamp.cpid}
+                </h6>
               )}
-              {stamp.keyburn != null && (
-                <div
-                  className="relative group"
-                  onMouseEnter={handleKeyburnMouseEnter}
-                  onMouseLeave={handleKeyburnMouseLeave}
-                >
-                  <Icon
-                    type="icon"
-                    name="keyburned"
-                    weight="normal"
-                    size="xs"
-                    color="greyDark"
-                    ariaLabel="Keyburned"
-                  />
-                  <div
-                    className={`${tooltipIcon} ${
-                      isKeyburnTooltipVisible ? "opacity-100" : "opacity-0"
-                    }`}
-                  >
-                    KEYBURNED
-                  </div>
-                </div>
+
+              {(!isSrc20Stamp() && isPoshStamp(stamp.cpid)) && (
+                <h5 className={`${subtitlePrimary} -mt-1.5 block`}>
+                  #{stamp.stamp}
+                </h5>
               )}
-              {stamp.locked
-                ? (
-                  <div
-                    className="relative group"
-                    onMouseEnter={handleLockedMouseEnter}
-                    onMouseLeave={handleLockedMouseLeave}
-                  >
+
+              {(!isPoshStamp(stamp.cpid) && stamp.cpid) && (
+                <h6 className={`${subtitlePrimary} -mt-1.5 block min-w-0`}>
+                  <span className="inline-flex max-w-full flex-row-reverse items-center gap-3 min-w-0">
+                    <span
+                      ref={cpidCopyButtonRef}
+                      className="relative peer -translate-y-[1px] shrink-0"
+                      onMouseEnter={handleCpidCopyMouseEnter}
+                      onMouseLeave={handleCpidCopyMouseLeave}
+                    >
+                      <Icon
+                        type="iconButton"
+                        name="copy"
+                        weight="normal"
+                        size="xxs"
+                        color="neutral500"
+                        onClick={copyCpid}
+                      />
+                      <div
+                        className={`${tooltipIcon} ${
+                          isCpidTooltipVisible ? "opacity-100" : "opacity-0"
+                        }`}
+                      >
+                        COPY CPID
+                      </div>
+                      <div
+                        className={`${tooltipIcon} ${
+                          showCpidCopied ? "opacity-100" : "opacity-0"
+                        }`}
+                      >
+                        CPID COPIED
+                      </div>
+                    </span>
+                    <span
+                      className={`${truncate} peer-hover:text-color-hover transition-colors duration-200 min-w-0`}
+                    >
+                      {stamp.cpid}
+                    </span>
+                  </span>
+                </h6>
+              )}
+
+              {(!isSrc20Stamp() && !isPoshStamp(stamp.cpid) && htmlStampTitle &&
+                stamp.stamp_mimetype === "text/html") && (
+                <h6 className={`${valueDarkLg} -mt-2 mb-1 block`}>
+                  {htmlStampTitle}
+                </h6>
+              )}
+
+              <UserProfileIcon
+                size="xs"
+                weight="bold"
+                className="stroke-color-neutral-200 translate-y-0.5"
+                wrapperClassName="mt-1"
+                link
+              >
+                <span className="font-normal text-sm text-color-neutral-200 link-neutral-200 group-hover:text-color-hover transition-colors duration-200">
+                  <span className="min-[420px]:hidden">{creatorDisplaySm}</span>
+                  <span className="hidden min-[420px]:inline">
+                    {creatorDisplay}
+                  </span>
+                </span>
+              </UserProfileIcon>
+            </div>
+
+            <div className="flex flex-col items-end gap-2 shrink-0">
+              <PillWithTooltip label="STAMP TYPE" className="w-fit">
+                <PillContentCount
+                  value={getIdentLabel()}
+                  class="!static !text-color-neutral-500"
+                />
+              </PillWithTooltip>
+
+              {!isSrc20Stamp() && (
+                <PillWithTooltip
+                  label={stamp.supply === 1 ? "EDITION" : "EDITIONS"}
+                  className={`${containerPill} ${cardSupply} !text-sm w-fit`}
+                >
+                  {stamp.supply === 1 ? "1/1" : editionCount}
+                </PillWithTooltip>
+              )}
+
+              <div className="flex items-center space-x-2">
+                {stamp.ident === "SRC-721" && (
+                  <IconWithTooltip label="RECURSIVE">
                     <Icon
                       type="icon"
-                      name="locked"
+                      name="recursive"
                       weight="normal"
                       size="xs"
-                      color="greyDark"
-                      ariaLabel="Locked"
+                      color="neutral600"
+                      ariaLabel="Recursive"
                     />
-                    <div
-                      className={`${tooltipIcon} ${
-                        isLockedTooltipVisible ? "opacity-100" : "opacity-0"
-                      }`}
-                    >
-                      LOCKED
-                    </div>
-                  </div>
-                )
-                : (
-                  <div
-                    className="relative group"
-                    onMouseEnter={handleUnlockedMouseEnter}
-                    onMouseLeave={handleUnlockedMouseLeave}
-                  >
-                    <Icon
-                      type="icon"
-                      name="unlocked"
-                      weight="normal"
-                      size="xs"
-                      color="greyDark"
-                      ariaLabel="Unlocked"
-                    />
-                    <div
-                      className={`${tooltipIcon} ${
-                        isUnlockedTooltipVisible ? "opacity-100" : "opacity-0"
-                      }`}
-                    >
-                      UNLOCKED
-                    </div>
-                  </div>
+                  </IconWithTooltip>
                 )}
+                {stamp.divisible == true && (
+                  <IconWithTooltip label="DIVISIBLE">
+                    <Icon
+                      type="icon"
+                      name="divisible"
+                      weight="normal"
+                      size="xs"
+                      color="neutral600"
+                      ariaLabel="Divisible"
+                    />
+                  </IconWithTooltip>
+                )}
+                {Boolean(stamp.keyburn) && (
+                  <IconWithTooltip label="KEYBURNED">
+                    <Icon
+                      type="icon"
+                      name="keyburned"
+                      weight="normal"
+                      size="xs"
+                      color="neutral600"
+                      ariaLabel="Keyburned"
+                    />
+                  </IconWithTooltip>
+                )}
+                {stamp.locked
+                  ? (
+                    <IconWithTooltip label="LOCKED">
+                      <Icon
+                        type="icon"
+                        name="locked"
+                        weight="normal"
+                        size="xs"
+                        color="neutral600"
+                        ariaLabel="Locked"
+                      />
+                    </IconWithTooltip>
+                  )
+                  : (
+                    <IconWithTooltip label="UNLOCKED">
+                      <Icon
+                        type="icon"
+                        name="unlocked"
+                        weight="normal"
+                        size="xs"
+                        color="neutral600"
+                        ariaLabel="Unlocked"
+                      />
+                    </IconWithTooltip>
+                  )}
+              </div>
             </div>
           </div>
 
-          <div className="flex flex-row pt-3">
-            <div className={`${containerColData} flex-1 items-start`}>
-              <h6 className={labelSm}>SIZE</h6>
-              <h6 className={valueSm}>
-                {stamp.file_size_bytes !== null
-                  ? formatFileSize(
-                    stamp.file_size_bytes,
-                    stamp.stamp_mimetype === "text/plain",
-                  )
-                  : "N/A"}
-              </h6>
-            </div>
-            <div className={`${containerColData} flex-1 items-center`}>
-              <h6 className={labelSm}>
-                {isSrc20Stamp() ? "SENT" : "CREATED"}
-              </h6>
-              <h6 className={valueSm}>
-                {createdDate}
-              </h6>
-            </div>
-            {/* @baba - fix logic handling for no tx hash */}
-            <div className={`${containerColData} flex-1 items-end`}>
-              <h6 className={labelSm}>TX HASH</h6>
-              <a
-                href={`https://www.blockchain.com/explorer/transactions/btc/${stamp.tx_hash}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`${valueSm} hover:text-color-grey transition-colors duration-300`}
-              >
-                {stamp.tx_hash !== null
-                  ? abbreviateAddress(stamp.tx_hash, 4)
-                  : "N/A"}
-              </a>
-            </div>
+          <div className="w-full min-w-0">
+            {collectionInfo?.collection_name &&
+              collectionInfo.collection_name.toLowerCase() !== "posh" && (
+              <div className="w-fit">
+                <PillWithTooltip
+                  label="COLLECTION"
+                  className={`flex items-center gap-1.5 w-fit mt-4 px-3 py-1 ${container3} group`}
+                >
+                  <a
+                    href={`/collection/${
+                      encodeURIComponent(collectionInfo.collection_name)
+                    }`}
+                    class="flex items-center gap-1.5"
+                  >
+                    <Icon
+                      type="icon"
+                      name="artStamps"
+                      weight="normal"
+                      size="xxs"
+                      color="custom"
+                      className="stroke-color-neutral-500  group-hover:stroke-color-hover transition-colors duration-200"
+                      ariaLabel="Collection"
+                    />
+                    <span className="font-normal text-xs text-color-neutral-500 group-hover:text-color-hover transition-colors duration-200">
+                      {collectionInfo.collection_name}
+                    </span>
+                  </a>
+                </PillWithTooltip>
+              </div>
+            )}
+          </div>
+
+          <div className="flex flex-col mobileMd:flex-row mobileMd:justify-between mobileMd:items-end gap-3 mt-auto -mb-1.5">
+            {(dispensers?.length > 0 || !!lowestPriceDispenser)
+              ? (
+                <>
+                  <hr className="w-full mt-12 mb-0.5 border-color-neutral-800 border-t-1 mobileMd:hidden" />
+                  <div
+                    className={`flex flex-col w-full mobileMd:w-[310px] mobileMd:shrink-0 mobileMd:mt-16 tablet:mt-16 gap-1`}
+                  >
+                    <div className="flex justify-between mobileMd:flex-wrap w-full gap-5">
+                      <StatItem
+                        label="FILE TYPE"
+                        value={fileTypeValue}
+                        align="left"
+                      />
+                      <StatItem
+                        label="FILE SIZE"
+                        value={fileSizeValue}
+                        align="center"
+                      />
+                      <StatItem
+                        label="DIMENSIONS"
+                        value={dimensionsValue}
+                        align="right"
+                        valueClass="!text-color-neutral-400"
+                      />
+                    </div>
+
+                    <div className="flex justify-between mobileMd:flex-wrap w-full gap-5 mt-2">
+                      <StatItem
+                        label="CREATED"
+                        value={createdDate}
+                        valueClass="!text-color-neutral-400"
+                      />
+                      <StatItem
+                        label="TX HASH"
+                        value={txHashValue}
+                        align="right"
+                      />
+                    </div>
+                  </div>
+                </>
+              )
+              : (
+                <div className="flex flex-col w-full mt-16 tablet:mt-0 gap-1">
+                  <hr className="w-full mb-3 border-color-neutral-800 border-t-1" />
+                  <div className="flex flex-col gap-1 mobileMd:hidden min-[900px]:flex min-[900px]:flex-col tablet:hidden">
+                    <div className="flex justify-between w-full gap-5">
+                      <StatItem
+                        label="FILE TYPE"
+                        value={fileTypeValue}
+                        align="left"
+                      />
+                      <StatItem
+                        label="FILE SIZE"
+                        value={fileSizeValue}
+                        align="center"
+                      />
+                      <StatItem
+                        label="DIMENSIONS"
+                        value={dimensionsValue}
+                        align="right"
+                        valueClass="!text-color-neutral-400"
+                      />
+                    </div>
+
+                    <div className="flex justify-between w-full gap-5 mt-2">
+                      <StatItem
+                        label="CREATED"
+                        value={createdDate}
+                        valueClass="!text-color-neutral-400"
+                      />
+                      <StatItem
+                        label="TX HASH"
+                        value={txHashValue}
+                        align="right"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="hidden mobileMd:flex min-[900px]:hidden tablet:flex justify-between w-full gap-5">
+                    <StatItem
+                      label="FILE TYPE"
+                      value={fileTypeValue}
+                      align="left"
+                    />
+                    <StatItem
+                      label="FILE SIZE"
+                      value={fileSizeValue}
+                      align="center"
+                    />
+                    <StatItem
+                      label="DIMENSIONS"
+                      value={dimensionsValue}
+                      align="center"
+                      valueClass="!text-color-neutral-400"
+                    />
+                    <StatItem
+                      label="CREATED"
+                      value={createdDate}
+                      align="center"
+                      valueClass="!text-color-neutral-400"
+                    />
+                    <StatItem
+                      label="TX HASH"
+                      value={txHashValue}
+                      align="right"
+                    />
+                  </div>
+                </div>
+              )}
+
+            {(dispensers?.length > 0 || !!lowestPriceDispenser)
+              ? (
+                <div className="flex flex-col w-full mobileMd:min-w-0 mobileMd:flex-1">
+                  <hr className="w-full mt-0.5 mb-12 border-color-neutral-800 border-t-1 mobileMd:hidden" />
+                  <div className="flex flex-row mobileMd:flex-col justify-between mobileMd:justify-end items-end gap-3 min-w-0">
+                    <div
+                      className={`flex flex-col items-start tablet:items-end w-fit px-3 py-2.5 ${container3}`}
+                    >
+                      <StatPrice
+                        priceBTC={formatBTCAmount(
+                          typeof displayPrice === "number" ? displayPrice : 0,
+                          {
+                            excludeSuffix: true,
+                            decimals: 8,
+                            stripZeros: false,
+                          },
+                        )}
+                        priceUSD={displayPriceUSD != null
+                          ? displayPriceUSD.toLocaleString("en-US", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })
+                          : null}
+                        activityLevel={activityLevel}
+                        align="right"
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-end gap-5">
+                      {dispensers?.length >= 2 && (
+                        <div
+                          class={container2Icon}
+                          onMouseEnter={handleListingsMouseEnter}
+                          onMouseLeave={handleListingsMouseLeave}
+                        >
+                          <Icon
+                            type="iconButton"
+                            name="listings"
+                            weight="bold"
+                            size="xxsR"
+                            color="custom"
+                            className="stroke-color-orange-400 group-hover:stroke-color-hover transition-colors duration-200"
+                            ariaLabel="Listings"
+                            onClick={() => {
+                              setShowListings(!showListings);
+                              setIsListingsTooltipVisible(false);
+                              setAllowListingsTooltip(false);
+                            }}
+                          />
+                          <div
+                            className={`${tooltipIcon} pointer-events-none ${
+                              isListingsTooltipVisible
+                                ? "opacity-100"
+                                : "opacity-0"
+                            }`}
+                          >
+                            LISTINGS
+                          </div>
+                        </div>
+                      )}
+
+                      <Button
+                        variant="flat"
+                        color="primary"
+                        size="smR"
+                        onClick={() =>
+                          toggleModal(
+                            selectedDispenser || lowestPriceDispenser,
+                          )}
+                      >
+                        BUY
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )
+              : null}
           </div>
         </div>
       </div>
-    </>
+
+      {(dispensers?.length >= 2)
+        ? (
+          <div
+            className={`col-span-full overflow-hidden transition-all duration-500 ease-in-out
+                      ${
+              showListings
+                ? "max-h-[222px] mt-5 opacity-100"
+                : "max-h-0 mt-0 opacity-0"
+            }`}
+          >
+            {isLoadingDispensers ? <h6>LOADING</h6> : (
+              <StampListingsOpenTable
+                dispensers={dispensers}
+                onSelectDispenser={handleDispenserSelect}
+                selectedDispenser={selectedDispenser}
+              />
+            )}
+          </div>
+        )
+        : null}
+    </div>
   );
 }

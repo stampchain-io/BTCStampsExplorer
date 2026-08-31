@@ -2,10 +2,10 @@
 /*@baba-71-81*/
 
 import { Handlers, PageProps } from "$fresh/server.ts";
+import { StampingToolLazy } from "$islands/tool/stamp/StampingToolLazy.tsx";
 import { body, containerBackground, containerGap } from "$layout";
 import { StampGallery, StampingHowto } from "$section";
 import { StampController } from "$server/controller/stampController.ts";
-import { StampingToolLazy } from "$islands/tool/stamp/StampingToolLazy.tsx";
 import type { StampRow } from "$types/stamp.d.ts";
 
 /* ===== TYPES ===== */
@@ -44,8 +44,7 @@ export default function ToolStampingPage({ data }: PageProps<StampPageData>) {
     subTitle: "ON-CHAIN MARVELS",
     type: "classic",
     stamps: data.latestStamps,
-    layout: "grid" as const,
-    showDetails: false,
+    variant: "cardSquare" as const,
     alignRight: true,
     gridClass: `
       grid w-full

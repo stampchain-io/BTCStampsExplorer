@@ -125,7 +125,7 @@ describe("CollectionRepository Unit Tests", () => {
 
       const fullHistory = mockDb.getFullQueryHistory();
       const creatorQuery = fullHistory.find((entry) =>
-        entry.query.includes("WHERE cc.creator_address = ?")
+        entry.query.includes("cc.creator_address = ?")
       );
 
       assertExists(creatorQuery);

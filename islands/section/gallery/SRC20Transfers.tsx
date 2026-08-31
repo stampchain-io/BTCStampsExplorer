@@ -1,15 +1,15 @@
 /* ===== SRC20 RECENT TRANSFERS GALLERY COMPONENT ===== */
 import { StampCard } from "$card";
-import { containerBackground } from "$layout";
+import { containerBackground, EmptyState } from "$layout";
 import type { StampTransaction } from "$lib/types/stamping.ts";
 import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
 import {
   notificationBody,
   notificationContainerError,
-  notificationHeading,
+  notificationHeader,
   notificationTextError,
 } from "$notification";
-import { subtitleGrey, titleGreyDL, titleGreyLD } from "$text";
+import { subtitleNeutral, titleNeutral } from "$text";
 import type { JSX } from "preact";
 import { useEffect, useState } from "preact/hooks";
 
@@ -57,18 +57,18 @@ export default function SRC20TransfersGallery(): JSX.Element {
     <div class={`${containerBackground} items-start tablet:items-end`}>
       {/* ===== TITLE SECTION ===== */}
       <div>
-        <h4 class={`${titleGreyLD} tablet:hidden`}>
+        <h4 class={`${titleNeutral} tablet:hidden`}>
           RECENT TRANSFERS
         </h4>
         <h4
-          class={`hidden tablet:block w-full tablet:text-right ${titleGreyDL}`}
+          class={`hidden tablet:block w-full tablet:text-right ${titleNeutral} !bg-gradient-to-l`}
         >
           RECENT TRANSFERS
         </h4>
       </div>
 
       {/* Show block title with loading state */}
-      <h3 class={`tablet:text-right ${subtitleGrey}`}>
+      <h3 class={`tablet:text-right ${subtitleNeutral}`}>
         {isLoading ? <span class="animate-pulse">BLOCK #XXXXXX</span> : (
           transactions.length > 0 && `BLOCK #${transactions[0].block_index}`
         )}
@@ -89,7 +89,7 @@ export default function SRC20TransfersGallery(): JSX.Element {
         : error
         ? (
           <div class={`mt-3 ${notificationContainerError}`}>
-            <h6 class={`${notificationHeading} ${notificationTextError}`}>
+            <h6 class={`${notificationHeader} ${notificationTextError}`}>
               ERROR LOADING RECENT TRANSFERS
             </h6>
             <h6 class={`${notificationBody} ${notificationTextError}`}>
@@ -98,11 +98,7 @@ export default function SRC20TransfersGallery(): JSX.Element {
           </div>
         )
         : transactions.length === 0
-        ? (
-          <div class="text-color-grey-dark text-sm">
-            NO RECENT TRANSFERS FOUND
-          </div>
-        )
+        ? <EmptyState label="NO RECENT TRANSFERS FOUND" icon="src20Tokens" />
         : (
           <div class="w-full grid grid-cols-4 mobileMd:grid-cols-4 mobileLg:grid-cols-6 tablet:grid-cols-4 desktop:grid-cols-4 gap-6">
             {transactions.map((stamp, index) => (
@@ -113,7 +109,7 @@ export default function SRC20TransfersGallery(): JSX.Element {
                   stamp_url: constructStampUrl(stamp.tx_hash, "svg"),
                 }}
                 isRecentSale={false}
-                showDetails={false}
+                variant="cardSquare"
               />
             ))}
           </div>

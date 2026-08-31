@@ -36,7 +36,7 @@ const PreviewImageModal = ({
       }}
       title=""
       hideHeader
-      className="!w-[min(calc(100vh-48px),calc(100vw-48px))] !h-[min(calc(100vh-48px),calc(100vw-48px))] mobileLg:!w-[min(calc(100vh-96px),calc(100vw-96px))] mobileLg:!h-[min(calc(100vh-96px),calc(100vw-96px))] !p-3 min-[420px]:!p-6"
+      className="!w-[min(calc(100vh-40px),calc(100vw-40px))] !h-[min(calc(100vh-40px),calc(100vw-40px))] mobileLg:!w-[min(calc(100vh-80px),calc(100vw-80px))] mobileLg:!h-[min(calc(100vh-80px),calc(100vw-80px))] !p-2"
     >
       <div class="flex flex-col h-full w-full stamp-container">
         {/* ===== CONTENT RENDERING ===== */}
@@ -45,8 +45,7 @@ const PreviewImageModal = ({
             <iframe
               width="100%"
               height="100%"
-              scrolling="no"
-              className="rounded-xl mobileMd:rounded-2xl w-full h-full relative z-[2]"
+              className="w-full h-full relative rounded-2xl z-[2] overflow-hidden"
               sandbox="allow-scripts allow-same-origin"
               src={imageUrl}
               loading="lazy"
@@ -55,7 +54,7 @@ const PreviewImageModal = ({
           )
           : contentType === "text"
           ? (
-            <div className="w-full h-full rounded-xl mobileMd:rounded-2xl aspect-square">
+            <div className="w-full h-full rounded-2xl aspect-square">
               <StampTextContent src={imageUrl} />
             </div>
           )
@@ -63,7 +62,7 @@ const PreviewImageModal = ({
           ? <PlaceholderImage variant="audio" />
           : (
             <img
-              className="rounded-xl mobileMd:rounded-2xl pixelart stamp-image aspect-square"
+              className="rounded-2xl pixelart stamp-image aspect-square"
               style={{
                 imageRendering: "pixelated",
               }}

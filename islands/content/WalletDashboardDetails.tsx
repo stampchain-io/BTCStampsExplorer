@@ -1,15 +1,20 @@
 /* ===== WALLET DASHBOARD DETAILS COMPONENT ===== */
 /* @baba - cleanup button/icon code */
-import { StatItem, StatTitle } from "$components/section/WalletComponents.tsx";
 import { Icon } from "$icon";
 import RecieveAddyModal from "$islands/modal/RecieveAddyModal.tsx";
 import SendBTCModal from "$islands/modal/SendBTCModal.tsx";
 import { openModal } from "$islands/modal/states.ts";
-import { containerBackground } from "$layout";
+import {
+  containerBackground,
+  containerColData,
+  StatItem,
+  StatPrice,
+  StatTitle,
+} from "$layout";
 import type { WalletOverviewInfo } from "$lib/types/index.d.ts";
 import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { tooltipIcon } from "$notification";
-import { titleGreyLD } from "$text";
+import { labelXs, titleNeutral } from "$text";
 import type { WalletDashboardDetailsProps } from "$types/ui.d.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
 
@@ -219,18 +224,12 @@ function WalletOverview(
     <div class="flex flex-col">
       <div class="flex justify-between">
         <div class={`${hideBalance ? "blur-sm" : ""}`}>
-          <h6 class="text-color-grey-light font-extralight text-2xl mobileMd:text-3xl mobileLg:text-4xl select-none">
-            <span class="font-bold">
-              {hideBalance ? "*********" : walletData.balance}
-            </span>{" "}
-            BTC
-          </h6>
-          <h6 class="text-color-grey font-extralight text-base mobileMd:text-lg mobileLg:text-xl select-none pt-[3px]">
-            <span class="font-medium">
-              {hideBalance ? "*****" : walletData.usdValue.toLocaleString()}
-            </span>{" "}
-            USD
-          </h6>
+          <StatPrice
+            priceBTC={hideBalance ? "*********" : walletData.balance}
+            priceUSD={hideBalance
+              ? "*****"
+              : walletData.usdValue.toLocaleString()}
+          />
         </div>
         <button
           type="button"
@@ -252,7 +251,7 @@ function WalletOverview(
                   name="view"
                   weight="normal"
                   size="mdR"
-                  color="greyLight"
+                  color="neutral400"
                   ariaLabel="Show Balance"
                 />
                 <div
@@ -271,7 +270,7 @@ function WalletOverview(
                   name="hide"
                   weight="normal"
                   size="mdR"
-                  color="greyLight"
+                  color="neutral400"
                   ariaLabel="Hide Balance"
                 />
                 <div
@@ -286,7 +285,7 @@ function WalletOverview(
         </button>
       </div>
 
-      <div class="flex items-center pt-3 mobileMd:pt-6 text-base mobileLg:text-lg text-color-purple-semilight font-medium select-none">
+      <div class="flex items-center pt-5 text-base mobileLg:text-lg text-color-purple-semilight font-medium select-none">
         <h6 class="hidden tablet:block">
           {abbreviateAddress(walletData.address, 12)}
         </h6>
@@ -309,7 +308,7 @@ function WalletOverview(
             name="copy"
             weight="normal"
             size="mdR"
-            color="greyLight"
+            color="neutral400"
             onClick={copy}
           />
           <div
@@ -336,7 +335,7 @@ function WalletOverview(
             name="send"
             weight="normal"
             size="mdR"
-            color="greyLight"
+            color="neutral400"
             onClick={() => {
               setIsSendTooltipVisible(false);
               onSend();
@@ -361,7 +360,7 @@ function WalletOverview(
             name="receive"
             weight="normal"
             size="mdR"
-            color="greyLight"
+            color="neutral400"
             onClick={() => {
               setIsReceiveTooltipVisible(false);
               onReceive();
@@ -391,7 +390,7 @@ function WalletOverview(
               name="history"
               weight="normal"
               size="mdR"
-              color="greyLight"
+              color="neutral400"
             />
           </a>
           <div
@@ -421,7 +420,7 @@ function DashboardProfile() {
           />
         </div>
         <div class="flex ml-1.5 mobileMd:ml-0 mt-1.5 mobileMd:-mt-2 mobileLg:mt-0">
-          <h5 class={titleGreyLD}>
+          <h5 class={titleNeutral}>
             ANONYMOUS
           </h5>
         </div>
@@ -454,7 +453,7 @@ function DashboardProfile() {
             name="website"
             weight="normal"
             size="mdR"
-            color="greyLight"
+            color="neutral400"
           />
 
           <Icon
@@ -462,7 +461,7 @@ function DashboardProfile() {
             name="collection"
             weight="normal"
             size="mdR"
-            color="greyLight"
+            color="neutral400"
           />
 
           <Icon
@@ -470,7 +469,7 @@ function DashboardProfile() {
             name="stamp"
             weight="normal"
             size="mdR"
-            color="greyLight"
+            color="neutral400"
           />
         </div>
       </div>
@@ -559,16 +558,13 @@ function StampStats(
       <div class="flex justify-between">
         <StatItem label="EDITIONS" value="239" />
         <StatItem label="CREATED" value={stampsCreated.toString()} />
-        <StatItem
-          label="VALUE"
-          value={
-            <>
-              {stampValue > 0 ? stampValue.toFixed(8) : "N/A"}{" "}
-              <span class="font-light">BTC</span>
-            </>
-          }
-          align="right"
-        />
+        <div class={`${containerColData} items-end`}>
+          <h5 class={`${labelXs} text-right`}>VALUE</h5>
+          <StatPrice
+            priceBTC={stampValue > 0 ? stampValue.toFixed(8) : "N/A"}
+            align="right"
+          />
+        </div>
       </div>
       <div class="flex justify-between">
         <StatItem label="COLLECTIONS" value="8" />
@@ -626,15 +622,12 @@ function TokenStats(
       </div>
 
       <div class="flex justify-between">
-        <StatItem
-          label="VALUE"
-          value={
-            <>
-              {totalValue > 0 ? totalValue.toFixed(8) : "N/A"}{" "}
-              <span class="font-light">BTC</span>
-            </>
-          }
-        />
+        <div class={containerColData}>
+          <h5 class={labelXs}>VALUE</h5>
+          <StatPrice
+            priceBTC={totalValue > 0 ? totalValue.toFixed(8) : "N/A"}
+          />
+        </div>
         <StatItem label="24H CHANGE" value="+/- 0.00%" align="right" />
       </div>
       <div class="flex justify-between">

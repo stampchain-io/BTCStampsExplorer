@@ -1,18 +1,18 @@
 /* ===== TEAM GALLERY COMPONENT ===== */
-import { containerBackground, containerGap } from "$layout";
-import { headingGreyLD, subtitleGrey, valueSm } from "$text";
+import { containerGap } from "$layout";
+import { headingGreyLD, subtitlePrimary, valueSm } from "$text";
 
 /* ===== COMPONENT ===== */
 export default function TeamBanner() {
   /* ===== RENDER ===== */
   return (
     <>
-      <section class={containerBackground}>
+      <section>
         {/* ===== TEAM SECTION CONTAINER ===== */}
-        <div class="w-full flex justify-start items-start">
+        <div class="w-full flex justify-start items-start mt-5">
           <div class="w-full">
             {/* ===== SECTION TITLE ===== */}
-            <h2 class={subtitleGrey}>THE TEAM</h2>
+            <h2 class={subtitlePrimary}>FOUNDERS</h2>
 
             {/* ===== TEAM MEMBERS GRID ===== */}
             <div

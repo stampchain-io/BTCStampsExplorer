@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Text system provides a comprehensive typography solution with consistent styling, gradient effects, and responsive behavior across the application. Built with composable constants and Tailwind CSS, it offers a complete range of text styles for logos, navigation, titles, headings, body text, labels, values, and specialized card layouts following the app's dark-themed design principles.
+The Text system provides a comprehensive typography solution with consistent styling, gradient effects, and responsive behavior across the application. Built with composable constants and Tailwind CSS, it offers a complete range of text styles for logos, navigation, titles, headings, body text, labels, values, eyebrows, and specialized card layouts following the app's dark-themed design principles.
 
 ## Architecture
 
@@ -12,27 +12,28 @@ The Text system provides a comprehensive typography solution with consistent sty
 │  Base Font Styles (styles.ts)                       │
 │  - logoFont, titleFont, subtitleFont                │
 │  - textFont, labelFont, valueFont                   │
-│  - Global modifiers and transitions                 │
+│  - Global modifiers, transitions, and truncate      │
 └────────────────┬────────────────────────────────────┘
                  ▼
 ┌─────────────────────────────────────────────────────┐
 │  Gradient Overlays & Custom Classes                 │
-│  - Purple gradients (LD/DL variants)                │
-│  - Grey gradients (LD/DL variants)                  │
+│  - Neutral gradient (direction set via bg-gradient) │
+│  - Primary gradient (direction set via bg-gradient) │
 │  - Tailwind custom utilities                        │
 └────────────────┬────────────────────────────────────┘
                  ▼
 ┌─────────────────────────────────────────────────────┐
 │  Composed Text Styles                               │
-│  - Logo: 4 variants with gradients                  │
-│  - Navigation: 8 variants (desktop/mobile)          │
-│  - Titles: 4 gradient variants                      │
+│  - Logo: 2 variants (header/footer)                 │
+│  - Navigation: 10 variants (desktop/mobile/footer)  │
+│  - Titles: 3 variants (neutral/primary/secondary)   │
+│  - Subtitles: 3 variants                            │
 │  - Headings: 6 variants with links                  │
-│  - Body: 8 sizes + link variants                    │
-│  - Labels: 9 variants + responsive                  │
-│  - Values: 17 variants (grey/purple/dark/glow)      │
+│  - Body: 9 sizes + link/underline variants          │
+│  - Labels: 10 variants (incl. responsive function)  │
+│  - Values: 19 variants (neutral/purple/dark/glow)   │
+│  - Special: 7 utility styles (eyebrows, tagline...) │
 │  - Cards: 10 specialized card text styles           │
-│  - Special: 3 utility styles                        │
 └────────────────┬────────────────────────────────────┘
                  ▼
 ┌─────────────────────────────────────────────────────┐
@@ -51,42 +52,44 @@ The Text system provides a comprehensive typography solution with consistent sty
 
 **Format**: `[purpose][color]/[size][modifier]`
 
-- **Purpose**: logo, nav, title, subtitle, heading, text, label, value, card
-- **Color**: Grey, Purple, Transparent, Dark
-- **Direction**: LD (Light to Dark), DL (Dark to Light)
+- **Purpose**: logo, nav, title, subtitle, heading, text, label, value, eyebrow, card
+- **Color**: Neutral, Primary, Secondary (current palette); Grey, Purple (legacy names still used by a handful of label/value styles)
+- **Direction**: LD (Light to Dark), DL (Dark to Light) — applied via `bg-gradient-to-r`/`bg-gradient-to-l` at the usage site
 - **Size**: Xxs, Xs, Sm, (base), Lg, Xl, 2xl, 3xl, 5xl, 7xl
-- **Modifier**: Link, Active, Responsive (R), Minimal, Glow, Position
+- **Modifier**: Link, Active, Desktop, Mobile, Compact, Row, Glow, Position, Dark
 
 **Examples**:
-- `titleGreyLD` = Title style with grey gradient from light to dark
-- `navLinkPurpleActive` = Purple navigation link in active state
+- `titleNeutral` = Title style in the neutral (grey) color
+- `navLinkActiveDesktop` = Desktop navigation link in active state
 - `valueSmLink` = Small value with link hover effect
-- `cardStampNumberMinimal` = Minimal card variant for stamp numbers
+- `cardStampNumberCompact` = Compact card variant for stamp numbers
 
 ### Base Font Styles
 
 ```typescript
 // Core typography foundations
-const logoFont = "font-black italic text-3xl tracking-wide inline-block w-fit";
-const titleFont = "font-black text-3xl tracking-wide inline-block w-fit";
-const subtitleFont = "font-extralight text-2xl mb-2";
-const textFont = "font-normal text-color-grey-light";
-const labelFont = "font-light text-color-grey-semidark tracking-wide";
-const valueFont = "font-medium text-color-grey-light";
+const logoFont = "font-black italic tracking-wide";
+const titleFont =
+  "font-black text-3xl uppercase tracking-tight -mt-1.5 inline-block w-fit cursor-default";
+const subtitleFont = "font-light text-2xl uppercase mb-2 cursor-default";
+const textFont = "font-normal text-color-neutral-200";
+const labelFont = "font-light text-color-neutral-500 tracking-wide";
+const valueFont = "font-medium text-color-neutral-200";
 
 // Global modifiers
 const select = "select-none whitespace-nowrap";
 const transitionColors = "transition-colors duration-200";
+export const truncate = "truncate max-w-[97%]";
 ```
 
 **Color Usage:**
-- `text-color-grey-light` (#f9f2e9): Primary text color for body content and values
-- `text-color-grey-semidark` (#817e78): Subdued text color for labels and secondary content
-- Gradients applied via custom utilities for logos, titles, and headings
+- `text-color-neutral-200` (#E5E5E5): Primary text color for body content and values
+- `text-color-neutral-500` (#737373): Subdued text color for labels
+- Gradients applied via custom utilities for gradient-based headings
 
 ### Color System
 
-The text system uses a comprehensive **5-step gradient color system** with dual definitions for maximum flexibility. See [Layout System Documentation](mdc:components/layout/doc.md#tailwind-color-system) for complete details.
+The text system uses the app-wide **neutral / primary / secondary** color palettes (each with numeric shades 50–950), plus a small set of legacy `grey`/`purple` color names still referenced by a few label and value styles. See [Layout System Documentation](mdc:components/layout/doc.md#tailwind-color-system) for complete details.
 
 #### Dual Definition System
 
@@ -96,13 +99,14 @@ Colors are defined in **two formats** within `tailwind.config.ts`:
    ```typescript
    colors: {
      color: {
-       purple: {
-         dark: "#43005c",
-         semidark: "#610085",
-         DEFAULT: "#7f00ad",
-         semilight: "#9d00d6",
-         light: "#BB00FF",
-       }
+       primary: {
+         300: "#F0ABFC",
+         400: "#E879F9",
+         600: "#C026D3",
+       },
+       hover: {
+         DEFAULT: "#E879F9", // primary-400
+       },
      }
    }
    ```
@@ -110,413 +114,414 @@ Colors are defined in **two formats** within `tailwind.config.ts`:
 2. **CSS Variables** - For gradients and dynamic styling
    ```css
    ":root": {
-     "--color-purple-dark": "#43005c",
-     "--color-purple-semidark": "#610085",
-     "--color-purple": "#7f00ad",
-     "--color-purple-semilight": "#9d00d6",
-     "--color-purple-light": "#BB00FF",
+     "--color-primary-300": "#F0ABFC",
+     "--color-primary-400": "#E879F9",
+     "--color-primary-600": "#C026D3",
    }
    ```
 
 #### When to Use Each Format
 
-**Use Tailwind Classes** (`color-purple-dark`) when:
+**Use Tailwind Classes** (`color-neutral-200`) when:
 - Styling directly in JSX/TSX className attributes
-- Using with Tailwind utility classes (e.g., `text-color-purple-light`)
+- Using with Tailwind utility classes (e.g., `text-color-neutral-200`)
 - Need IntelliSense autocomplete in editors
 
-**Use CSS Variables** (`var(--color-purple-dark)`) when:
-- Creating gradient effects (as seen in gradient classes below)
+**Use CSS Variables** (`var(--color-primary-400)`) when:
+- Creating gradient effects (as seen in the gradient utilities below)
 - Dynamic styling with JavaScript/TypeScript
 - Using in custom CSS or inline styles
 
 #### Color Families
 
 ```typescript
-// Purple (brand color)
-color-purple-dark      // #43005c
-color-purple-semidark  // #610085
-color-purple           // #7f00ad (DEFAULT)
-color-purple-semilight // #9d00d6
-color-purple-light     // #BB00FF
+// Neutral (default text/UI color)
+color-neutral-200  // #E5E5E5 - body text, values
+color-neutral-300  // #D4D4D4 - subtitles
+color-neutral-400  // #A3A3A3 - nav links, gradient stop
+color-neutral-500  // #737373 - labels, dark values
+color-neutral-600  // #525252 - gradient stop
+color-neutral-700  // #404040 - headings
 
-// Grey (neutral)
-color-grey-dark        // #585552
-color-grey-semidark    // #817e78
-color-grey             // #a8a39d (DEFAULT)
-color-grey-semilight   // #d1cbc3
-color-grey-light       // #f9f2e9
+// Primary (fuchsia, brand accent)
+color-primary-300  // #F0ABFC - subtitles, gradient stop
+color-primary-400  // #E879F9 - hover color (== color-hover), gradient stop
+color-primary-600  // #C026D3 - gradient stop
+
+// Secondary (orange)
+color-secondary-300  // #FDBA74 - subtitles
+color-secondary-400  // #FB923C - prices, card price text
 
 // Semantic Colors (for value indicators)
-color-red-semilight    // #d60000 (negative values)
-color-green-semilight  // #00d600 (positive values)
+color-green-400  // #4ADE80 (positive values)
+color-red-400    // #F87171 (negative values)
+
+// Legacy palettes (still used by a few label/value styles)
+color-grey-light    // #D4D4D4
+color-grey          // #737373
+color-purple        // #D946EF
+color-purple-light  // #F0ABFC
 ```
 
 ### Gradient System
 
-All gradients use the 5-step color system defined as CSS variables:
+Gradient headings use three direction-agnostic gradient utilities defined as CSS custom properties. Direction ("LD" light-to-dark or "DL" dark-to-light) is applied at the usage site with Tailwind's `bg-gradient-to-r` / `bg-gradient-to-l`, not baked into the class name itself:
 
-| Gradient | Direction | Color Steps | Usage |
-|----------|-----------|------------|-------|
-| **color-grey-gradientLD** | Light → Dark | `light → semilight → DEFAULT → semidark → dark` | Titles, headings, card numbers |
-| **color-grey-gradientLD-hover** | Light → Dark with hover | Same + hover to `light` | Interactive headings, links |
-| **color-grey-gradientDL** | Dark → Light | `dark → semidark → DEFAULT → semilight → light` | Alternative title style |
-| **color-grey-gradientDL-hover** | Dark → Light with hover | Same + hover to `light` | Collection/stamp page headings |
-| **color-purple-gradientLD** | Light → Dark | `light → semilight → DEFAULT → semidark → dark` | Primary titles, header logo |
-| **color-purple-gradientLD-hover** | Light → Dark with hover | Same + hover to `light` | Interactive logo |
-| **color-purple-gradientDL** | Dark → Light | `dark → semidark → DEFAULT → semilight → light` | Footer logo, alt variations |
-| **color-purple-gradientDL-hover** | Dark → Light with hover | Same + hover to `light` | Interactive footer logo |
+| Gradient Utility | Color Stops | Usage |
+|----------|-----------|-------|
+| **color-neutral-gradient** | `neutral-300 → neutral-400 → neutral-600` | Grey gradient headings (paired with `bg-gradient-to-r`/`bg-gradient-to-l`) |
+| **color-primary-gradient** | `primary-300 → primary-400 → primary-600` | Purple gradient headings (team banner) |
+| **color-gradient-hover** | Transitions all stops to solid `primary-400` on hover/`.group:hover` | Interactive gradient headings/links |
 
 ### Hover Effects
 
 | Effect | Implementation | Use Case |
 |--------|---------------|----------|
-| **-hover suffix** | Gradient color change on hover | Interactive headings, links |
-| **transitionColors** | 200ms color transition | Smooth hover animations |
-| **animated-underline** | Growing underline animation | Text links |
+| **color-gradient-hover** | Gradient stops transition to solid `color-primary-400` on hover | Interactive gradient headings (`headingGreyLDLink`, `headingGreyDLLink`) |
+| **transitionColors** | 200ms color transition | Smooth hover animations on solid-color text |
+| **group-hover:text-color-hover** | Solid color swap on hover | Nav links, card text (hover color = `color-primary-400` / #E879F9) |
+| **link-neutral-200-bold** | Growing underline animation | Text links (`textLinkUnderline`) |
 | **cursor-pointer** | Pointer cursor on hover | Clickable elements |
 
 ## Style Categories
 
-### Logo Styles (4 variants)
+### Logo Styles (2 variants)
 
 ```typescript
-// Footer logo - Dark to Light gradient
-logoPurpleDL: "font-black italic text-3xl color-purple-gradientDL select-none"
-// Colors: #43005c → #610085 → #7f00ad → #9d00d6 → #BB00FF
+// Header wordmark (tablet+) - solid neutral color
+logoHeader: "font-black italic tracking-wide text-xl text-color-neutral-400 transition-colors duration-200 select-none whitespace-nowrap"
+// Color: #A3A3A3
 
-// Footer logo with hover - Interactive
-logoPurpleDLLink: "font-black italic text-3xl color-purple-gradientDL-hover transition-colors cursor-pointer"
-// Hover: Gradient → solid #BB00FF
-
-// Alternative gradient - Light to Dark
-logoPurpleLD: "font-black italic text-3xl color-purple-gradientLD select-none"
-// Colors: #BB00FF → #9d00d6 → #7f00ad → #610085 → #43005c
-
-// Header logo - Light to Dark with hover
-logoPurpleLDLink: "font-black italic text-3xl color-purple-gradientLD-hover transition-colors cursor-pointer"
-// Hover: Gradient → solid #BB00FF
+// Footer logo - solid primary color
+logoFooter: "font-black italic tracking-wide text-3xl text-color-primary-400 select-none whitespace-nowrap"
+// Color: #E879F9
 ```
 
-### Navigation Styles (8 variants)
+### Navigation Styles (10 variants)
 
 #### Desktop Navigation
 ```typescript
-// Purple navigation link
-navLinkPurple: "font-semibold text-color-purple-semilight text-sm group-hover:text-color-purple-light"
-// Default: #9d00d6 | Hover: #BB00FF
+// Header nav link
+navLinkDesktop: "mt-0.5 font-normal tablet:font-normal text-sm tablet:text-xs uppercase text-color-neutral-400 group-hover:text-color-hover tracking-[0.01rem] transition-colors duration-200 cursor-pointer select-none whitespace-nowrap"
+// Default: #A3A3A3 | Hover: #E879F9
 
 // Active state
-navLinkPurpleActive: "!text-color-purple-light hover:!text-color-purple-semilight"
-// Active: #BB00FF | Hover: #9d00d6
+navLinkActiveDesktop: `${navLinkDesktop} !text-color-hover !cursor-default`
+// Active: #E879F9
 
-// Sublink (dropdown menus)
-navSublinkPurple: "font-light text-color-purple-semilight text-[13px] hover:text-color-purple-light"
-// Default: #9d00d6 | Hover: #BB00FF
+// Sublink (used in WalletButton / ToolsButton submenu links)
+navSublinkDesktop: "font-normal text-xs uppercase text-color-neutral-400 hover:text-color-hover tracking-tight transition-colors duration-200 cursor-pointer select-none whitespace-nowrap"
+// Default: #A3A3A3 | Hover: #E879F9
 
 // Sublink active
-navSublinkPurpleActive: "!text-color-purple-light hover:!text-color-purple-semilight"
-// Active: #BB00FF | Hover: #9d00d6
+navSublinkActiveDesktop: `${navSublinkDesktop} !text-color-hover !cursor-default`
 ```
 
 #### Mobile Navigation
 ```typescript
-// Grey mobile link
-navLinkGrey: "font-semibold text-sm text-color-grey hover:text-color-grey-light"
-// Default: #a8a39d | Hover: #f9f2e9
+// Drawer nav link
+navLinkMobile: "font-light text-xl uppercase text-color-neutral-400 hover:text-color-hover tracking-wider cursor-pointer select-none whitespace-nowrap"
+// Default: #A3A3A3 | Hover: #E879F9
 
 // Active state
-navLinkGreyActive: "!text-color-grey-light hover:!text-color-grey"
-// Active: #f9f2e9 | Hover: #a8a39d
+navLinkActiveMobile: `${navLinkMobile} text-color-hover !cursor-default`
 
-// Mobile menu items with gradient
-navLinkGreyLD: "font-light text-xl color-grey-gradientLD-hover tracking-wider"
-// Gradient: #f9f2e9 → #d1cbc3 → #a8a39d → #817e78 → #585552 | Hover: #f9f2e9
+// Mobile submenu link
+navSublinkMobile: "font-semibold text-sm tablet:text-xs uppercase text-color-neutral-500 hover:text-color-hover tracking-wide transition-colors duration-200 cursor-pointer select-none whitespace-nowrap"
+// Default: #737373 | Hover: #E879F9
 
-// Active gradient link
-navLinkGreyLDActive: "text-color-grey-light [background:none !important]"
-// Color: #f9f2e9 (solid, no gradient)
+// Mobile submenu active
+navSublinkActiveMobile: `${navSublinkMobile} !text-color-hover !cursor-default`
 ```
 
 #### Footer Navigation
 ```typescript
-// Transparent text for overlay use
-navLinkTransparentPurple: "font-light text-[13px] hover:text-color-purple-light"
-// Hover: #BB00FF
+// Transparent text for overlay use (paired with navLinkFooterOverlay wrapper)
+navLinkFooter: "font-normal text-[0.8125rem] tablet:text-xs uppercase hover:text-color-hover tracking-tight transition-colors duration-200 cursor-pointer select-none whitespace-nowrap"
+// Hover: #E879F9
+
+// Footer overlay gradient wrapper
+navLinkFooterOverlay: "bg-gradient-to-b tablet:bg-gradient-to-r from-color-neutral-400 via-color-neutral-400 to-color-neutral-500 text-transparent bg-clip-text"
+// Gradient: #A3A3A3 → #A3A3A3 → #737373
 ```
 
-### Title Styles (4 variants)
+### Title Styles (3 variants)
 
 ```typescript
-// Grey Light to Dark (primary)
-titleGreyLD: "font-black text-3xl color-grey-gradientDL cursor-default"
+// Neutral (grey) title
+titleNeutral: "font-black text-3xl uppercase tracking-tight -mt-1.5 inline-block w-fit cursor-default text-color-neutral-400 select-none whitespace-nowrap"
+// Color: #A3A3A3
 
-// Grey Dark to Light (alternative)
-titleGreyDL: "font-black text-3xl color-grey-gradientLD cursor-default"
+// Primary (purple) title
+titlePrimary: "... text-color-primary-400 select-none whitespace-nowrap"
+// Color: #E879F9
 
-// Purple Light to Dark
-titlePurpleLD: "font-black text-3xl color-purple-gradientLD cursor-default"
-
-// Purple Dark to Light
-titlePurpleDL: "font-black text-3xl color-purple-gradientDL cursor-default"
+// Secondary (orange) title
+titleSecondary: "... text-color-secondary-400 select-none whitespace-nowrap"
+// Color: #FB923C
 ```
 
-### Subtitle Styles (2 variants)
+### Subtitle Styles (3 variants)
 
 ```typescript
-// Grey subtitle
-subtitleGrey: "font-extralight text-2xl text-color-grey-light mb-2"
-// Color: #f9f2e9
+// Neutral subtitle
+subtitleNeutral: "font-light text-2xl uppercase mb-2 cursor-default text-color-neutral-300 select-none whitespace-nowrap"
+// Color: #D4D4D4
 
-// Purple subtitle
-subtitlePurple: "font-extralight text-2xl text-color-purple-light mb-2"
-// Color: #BB00FF
+// Primary subtitle
+subtitlePrimary: "... text-color-primary-300 select-none whitespace-nowrap"
+// Color: #F0ABFC
+
+// Secondary subtitle
+subtitleSecondary: "... text-color-secondary-300 select-none whitespace-nowrap"
+// Color: #FDBA74
 ```
 
 ### Heading Styles (6 variants)
 
 ```typescript
 // Large grey heading (about page donate section)
-headingGrey2: "font-black text-3xl mobileLg:text-4xl text-color-grey-light"
-// Color: #f9f2e9
+headingGrey2: "font-black text-3xl mobileLg:text-4xl text-color-grey-light tracking-wide select-none whitespace-nowrap"
+// Color: #D4D4D4
 
-// Grey gradient heading
-headingGreyLD: "font-bold text-xl color-grey-gradientLD tracking-wide"
-// Gradient: #f9f2e9 → #d1cbc3 → #a8a39d → #817e78 → #585552
+// Grey gradient heading, light-to-dark
+headingGreyLD: "font-bold text-xl bg-gradient-to-r color-neutral-gradient tracking-wide inline-block w-fit relative select-none whitespace-nowrap"
+// Gradient: #D4D4D4 → #A3A3A3 → #525252
 
-// Grey gradient heading with link
-headingGreyLDLink: "font-bold text-lg color-grey-gradientLD-hover tracking-wide cursor-pointer"
-// Gradient: #f9f2e9 → ... → #585552 | Hover: #f9f2e9 solid
+// Grey gradient heading with link (media page / howto "keep reading" / accordion titles)
+headingGreyLDLink: "font-bold text-lg bg-gradient-to-r color-neutral-gradient color-gradient-hover tracking-wide inline-block w-fit relative cursor-pointer select-none whitespace-nowrap"
+// Gradient: #D4D4D4 → ... → #525252 | Hover: #E879F9 solid
 
-// Dark to Light gradient link (collection/stamp pages)
-headingGreyDLLink: "font-bold text-lg color-grey-gradientDL-hover tracking-wide cursor-pointer"
-// Gradient: #585552 → ... → #f9f2e9 | Hover: #f9f2e9 solid
+// Grey gradient heading, dark-to-light with link (collection/stamp detail pages)
+headingGreyDLLink: "font-bold text-lg bg-gradient-to-l color-neutral-gradient color-gradient-hover tracking-wide inline-block w-fit relative -mt-1 cursor-pointer select-none whitespace-nowrap"
+// Gradient: #525252 → ... → #D4D4D4 | Hover: #E879F9 solid
 
-// Standard grey heading
-headingGrey: "font-bold text-2xl text-color-grey"
-// Color: #a8a39d
+// Standard grey heading (howto pages / donate CTA)
+headingGrey: "font-bold text-2xl text-color-neutral-300 cursor-default select-none whitespace-nowrap"
+// Color: #D4D4D4
 
-// Purple gradient (team banner)
-headingPurpleLD: "font-black text-sm mobileMd:text-lg color-purple-gradientLD text-center"
-// Gradient: #BB00FF → #9d00d6 → #7f00ad → #610085 → #43005c
+// Purple gradient heading (team banner gallery)
+headingPurpleLD: "font-black text-sm mobileMd:text-lg bg-gradient-to-r color-primary-gradient tracking-wide inline-block w-fit text-center mt-3 mobileMd:mt-4 mobileLg:mt-5 mb-1 mobileMd:mb-0 select-none whitespace-nowrap"
+// Gradient: #F0ABFC → #E879F9 → #C026D3
 ```
 
 ### Body Text Styles (9 variants)
 
-All body text uses `text-color-grey-light` (#f9f2e9) as the base color:
+All body text uses `text-color-neutral-200` (#E5E5E5) as the base color:
 
 ```typescript
 // Size variants
-textXxs: "font-normal text-color-grey-light text-[10px]"
-textXs: "font-normal text-color-grey-light text-xs"
-textSm: "font-normal text-color-grey-light text-sm"
-text: "font-normal text-color-grey-light text-base"      // Default
-textLg: "font-normal text-color-grey-light text-lg"
-textXl: "font-normal text-color-grey-light text-xl"
-text2xl: "font-normal text-color-grey-light text-2xl"
+textXxs: "font-normal text-color-neutral-200 text-[0.625rem]"
+textXs: "font-normal text-color-neutral-200 text-xs"
+textSm: "font-normal text-color-neutral-200 text-sm"
+text: "font-normal text-color-neutral-200 text-base"      // Default
+textLg: "font-normal text-color-neutral-200 text-lg"
+textXl: "font-normal text-color-neutral-200 text-xl"
+text2xl: "font-normal text-color-neutral-200 text-2xl"
 
-// Link variants
-textSmLink: "text-sm hover:text-color-purple-light transition-colors cursor-pointer"
-// Hover: #BB00FF
+// Link variant
+textSmLink: "font-normal text-color-neutral-200 text-sm hover:text-color-hover transition-colors duration-200 cursor-pointer select-none whitespace-nowrap"
+// Hover: #E879F9
 
-textLinkUnderline: "font-bold text-base text-color-grey-light animated-underline"
-// Base: #f9f2e9 with underline animation
+textLinkUnderline: "font-bold text-base text-color-neutral-200 link-neutral-200-bold transition-colors duration-200"
+// Base: #E5E5E5 with underline animation
 ```
 
 ### Label Styles (10 variants)
 
-Most labels use `text-color-grey-semidark` (#817e78) for subdued secondary text:
+Most labels use `text-color-neutral-500` (#737373) for subdued secondary text:
 
 ```typescript
 // Size variants
-labelXxs: "font-light text-color-grey-semidark tracking-wide text-[10px]"
-labelXs: "font-light text-color-grey-semidark tracking-wide text-xs"
-labelSm: "font-light text-color-grey-semidark tracking-wide text-sm"
-label: "font-light text-color-grey-semidark tracking-wide text-base"
-labelLg: "font-light text-color-grey-semidark tracking-wide text-lg"
-labelXl: "font-light text-color-grey-semidark tracking-wide text-xl"
+labelXxs: "font-light text-color-neutral-500 tracking-wide text-[0.625rem] select-none whitespace-nowrap"
+labelXs: "font-light text-color-neutral-500 tracking-wide text-xs select-none whitespace-nowrap"
+labelSm: "font-light text-color-neutral-500 tracking-wide text-sm select-none whitespace-nowrap"
+label: "font-light text-color-neutral-500 tracking-wide text-base select-none whitespace-nowrap"
+labelLg: "font-light text-color-neutral-500 tracking-wide text-lg select-none whitespace-nowrap"
+labelXl: "font-light text-color-neutral-500 tracking-wide text-xl select-none whitespace-nowrap"
 
-// Responsive variants
-labelXsR: "text-xs tablet:text-[10px]"                  // Filter file type labels
-labelXsPosition: "flex justify-end mt-1 tablet:mt-0"    // Label positioning
+// Responsive variant
+labelXsR: "font-light text-color-neutral-500 tracking-wide text-xs tablet:text-[0.625rem] select-none whitespace-nowrap"    // Filter file type labels
 
-// Special variants
-labelLightSm: "font-light text-sm text-color-grey"
-// Color: #a8a39d
+// Legacy-color variants
+labelLightSm: "font-light text-sm text-color-grey select-none whitespace-nowrap"
+// Color: #737373
 
-labelSmPurple: "font-light text-sm text-color-purple-light tracking-wide mb-0.5"
-// Color: #BB00FF
+labelSmPurple: "font-light text-sm text-color-purple-light tracking-wide mb-0.5 select-none whitespace-nowrap"
+// Color: #F0ABFC
 
 // Logic-based responsive (filter labels)
-// Uses text-color-grey (#a8a39d) and text-color-grey-light (#f9f2e9)
+// Uses text-color-primary-400 (checked) and text-color-neutral-400 (unchecked), hover text-color-hover
 labelLogicResponsive: (checked, canHoverSelected) => string
 ```
 
-### Value Styles (17 variants)
+### Value Styles (19 variants)
 
-#### Grey Variants
-Primary value text color is `text-color-grey-light` (#f9f2e9):
+#### Neutral Variants
+Primary value text color is `text-color-neutral-200` (#E5E5E5):
 
 ```typescript
-valueXs: "font-medium text-color-grey-light text-xs"
-valueSm: "font-medium text-color-grey-light text-sm"
-value: "font-medium text-color-grey-light text-base"
-valueLg: "font-medium text-color-grey-light text-lg"
-valueXl: "font-black text-xl text-color-grey-light -mt-1"
-value2xl: "font-black text-2xl text-color-grey-light -mt-1"
-value3xl: "font-black text-3xl text-color-grey-light -mt-1"
+valueXs: "font-medium text-color-neutral-200 text-xs select-none whitespace-nowrap"
+valueSm: "font-medium text-color-neutral-200 text-sm select-none whitespace-nowrap"
+value: "font-medium text-color-neutral-200 text-base select-none whitespace-nowrap"
+valueLg: "font-medium text-color-neutral-200 text-lg select-none whitespace-nowrap"
 
 // Link variant
-valueSmLink: "font-medium text-sm hover:text-color-purple-light cursor-pointer"
-// Hover: #BB00FF
+valueSmLink: "font-medium text-color-neutral-200 text-sm hover:text-color-hover transition-colors duration-200 cursor-pointer w-full select-none whitespace-nowrap"
+// Hover: #E879F9
+```
+
+#### Legacy-Color (Grey) Variants
+```typescript
+valueXl: "font-black text-xl text-color-grey-light -mt-1 select-none whitespace-nowrap"
+value2xl: "font-black text-2xl text-color-grey-light -mt-1 select-none whitespace-nowrap"
+value3xl: "font-black text-3xl text-color-grey-light -mt-1 select-none whitespace-nowrap"
+// Color: #D4D4D4
 ```
 
 #### Transparent Variants
 Used in DetailsTableBase for color-agnostic layouts:
 
 ```typescript
-value2xlTransparent: "font-black text-2xl -mt-1"
-value3xlTransparent: "font-black text-3xl -mt-1"
+value2xlTransparent: "font-black text-2xl -mt-1 select-none whitespace-nowrap"
+value3xlTransparent: "font-black text-3xl -mt-1 select-none whitespace-nowrap"
 ```
 
 #### Purple Variants
-Using the purple color palette:
+Using the legacy purple color name (team banner gallery / about header):
 
 ```typescript
-valueSmPurple: "font-medium text-xs text-color-purple text-center"
-// Color: #7f00ad
+valueSmPurple: "font-medium text-xs text-color-purple text-center wcursor-default select-none whitespace-nowrap"
+// Color: #D946EF
 
 // Glow effects with purple stroke (about page header)
-value2xlPurpleGlow: "font-black text-2xl text-black text-stroke-glow-small"
-value5xlPurpleGlow: "font-black text-5xl text-black text-stroke-glow-small"
-value7xlPurpleGlow: "font-black text-7xl text-black text-stroke-glow-large"
-// Glow colors: #8800CC (inner), #AA00FF (outer stroke)
+value2xlPurpleGlow: "font-black text-2xl text-black text-stroke-glow-small cursor-default select-none whitespace-nowrap"
+value5xlPurpleGlow: "font-black text-5xl text-black text-stroke-glow-small cursor-default select-none whitespace-nowrap"
+value7xlPurpleGlow: "font-black text-7xl text-black text-stroke-glow-large cursor-default select-none whitespace-nowrap"
+// Glow effect defined via text-shadow in tailwind.config.ts
 ```
 
 #### Dark Variants
-Using `text-color-grey-semidark` (#817e78) for subdued values:
+Using `text-color-neutral-500` (#737373) for subdued values:
 
 ```typescript
-valueDarkXs: "font-medium text-xs text-color-grey-semidark tracking-tighter"
-valueDarkSm: "font-medium text-sm text-color-grey-semidark tracking-tighter"
-valueDark: "font-semibold text-base text-color-grey-semidark"
+valueDarkSm: "font-normal text-sm text-color-neutral-500 select-none whitespace-nowrap"     // Tables and address styling in wallet button
+valueDark: "font-semibold text-base text-color-neutral-500 select-none whitespace-nowrap"   // Stamp details CPID and stamp number
+valueDarkLg: "font-semibold text-lg text-color-neutral-500 select-none whitespace-nowrap"   // Stamp details HTML title
 ```
 
 #### Color Indicators
 Semantic colors for value states (gains/losses):
 
 ```typescript
-valuePositive: "text-color-green-semilight"      // #00d600 - Gains, positive changes
-valueNegative: "text-color-red-semilight"        // #d60000 - Losses, negative changes
-valueNeutral: "text-color-grey-semidark"         // #817e78 - Neutral state
+valuePositive: "text-color-green-400"    // #4ADE80 - Gains, positive changes
+valueNegative: "text-color-red-400"      // #F87171 - Losses, negative changes
+valueNeutral: "text-color-neutral-400"   // #A3A3A3 - Neutral state
+```
+
+### Special Text Styles (7 variants)
+
+```typescript
+// Eyebrow text (descriptive text above icons, links, etc.)
+eyebrowNeutral: "font-bold text-xs tablet:text-[0.625rem] text-color-neutral-700 tracking-wider cursor-default select-none whitespace-nowrap"
+// Color: #404040
+
+eyebrowPrimary: "font-bold text-sm tablet:text-[0.625rem] text-color-primary-300 tracking-wider cursor-default select-none whitespace-nowrap"
+// Color: #F0ABFC
+
+eyebrowSecondary: "font-bold text-sm tablet:text-[0.625rem] text-color-secondary-300 tracking-wider cursor-default select-none whitespace-nowrap"
+// Color: #FDBA74
+
+// Positioning helper for the filter file type eyebrow
+eyebrowPositionFilter: "flex justify-end mt-1 tablet:mt-0 -mb-5 tablet:-mb-4"
+
+// Footer tagline
+tagline: "font-regular text-xs text-color-neutral-400 select-none whitespace-nowrap"
+// Color: #A3A3A3
+
+// Footer copyright and counterparty version text
+copyright: "font-normal text-xs text-color-neutral-600 cursor-default select-none whitespace-nowrap"
+// Color: #525252
+
+// Toggle switch symbol (ToggleSwitchButton.tsx for $/BTC symbols)
+toggleSymbol: "font-bold text-[10px] text-black cursor-default select-none whitespace-nowrap"
 ```
 
 ### Card Text Styles (10 variants)
 
-#### Standard Card Styles
-Default stamp/token card text styles:
-
 ```typescript
-cardHashSymbol: "font-light text-color-purple-light text-lg mobileLg:text-xl"
-// Color: #BB00FF
+cardStampNumber: "font-extrabold text-base min-[420px]:text-lg text-color-neutral-200 group-hover:text-color-hover tracking-wide truncate max-w-[97%] select-none whitespace-nowrap"
+// Default: #E5E5E5 | Hover: #E879F9
 
-cardStampNumber: "font-extrabold text-color-purple-light truncate text-lg mobileLg:text-xl"
-// Color: #BB00FF
+cardRowStampNumber: "font-extrabold text-sm text-color-neutral-200 group-hover:text-color-hover tracking-wide truncate max-w-[97%] select-none whitespace-nowrap"
+// Default: #E5E5E5 | Hover: #E879F9
 
-cardCreator: "font-semibold text-color-grey-light break-words text-center text-xs mobileMd:text-sm"
-// Color: #f9f2e9
+cardCreator: "font-medium text-sm text-color-neutral-200 text-center truncate max-w-[97%] select-none whitespace-nowrap"
+// Color: #E5E5E5
 
-cardPrice: "font-normal text-color-grey-light text-nowrap text-xs mobileLg:text-sm"
-// Color: #f9f2e9
+cardSupply: "font-semibold text-xs text-color-primary-400 select-none whitespace-nowrap"
+// Color: #E879F9
 
-cardMimeType: "font-normal text-color-grey text-nowrap text-xs mobileLg:text-sm"
-// Color: #a8a39d
+cardFileType: "font-medium text-xs text-color-neutral-200 text-nowrap select-none whitespace-nowrap"
+// Color: #E5E5E5
 
-cardSupply: "font-medium text-color-grey text-right text-xs mobileLg:text-base"
-// Color: #a8a39d
+cardFileSize: "font-normal text-xs text-color-neutral-400 text-nowrap select-none whitespace-nowrap"
+// Color: #A3A3A3
+
+cardPrice: "font-medium text-xs text-color-secondary-400 text-nowrap select-none whitespace-nowrap"
+// Color: #FB923C
+
+cardEyebrowNeutral: "font-bold text-[0.625rem] text-color-neutral-600 tracking-wider select-none whitespace-nowrap"
+// Color: #525252
+
+// Compact card variant styles
+cardStampNumberCompact: "font-extrabold text-sm min-[420px]:text-base text-color-neutral-200 group-hover:text-color-hover tracking-wide truncate select-none whitespace-nowrap max-w-full"
+// Default: #E5E5E5 | Hover: #E879F9
+
+cardPriceCompact: "font-medium text-[0.625rem] mobileLg:text-xs text-color-secondary-400 text-nowrap select-none whitespace-nowrap"
+// Color: #FB923C
 ```
 
-#### Minimal Card Variant
-Compact card style with gradient effects:
+### Other Notes
 
-```typescript
-cardHashSymbolMinimal: "font-light text-color-grey-light group-hover:text-color-purple-light"
-// Default: #f9f2e9 | Hover: #BB00FF
-
-cardStampNumberMinimal: "font-black color-grey-gradientDL group-hover:[-webkit-text-fill-color:var(--color-purple-light)] truncate"
-// Gradient: #585552 → ... → #f9f2e9 | Hover: #BB00FF solid
-
-cardPriceMinimal: "font-normal text-color-grey truncate text-[10px] mobileMd:text-xs"
-// Color: #a8a39d
-```
-
-#### Grey Gradient Card Variant
-Alternative card style with grey-to-purple hover:
-
-```typescript
-cardHashSymbolGrey: "font-light text-color-grey group-hover:text-color-purple-light text-lg"
-// Default: #a8a39d | Hover: #BB00FF
-
-cardStampNumberGrey: "font-black color-grey-gradientDL group-hover:[-webkit-text-fill-color:var(--color-purple-light)] truncate"
-// Gradient: #585552 → ... → #f9f2e9 | Hover: #BB00FF solid
-```
-
-### Special Styles (4 variants)
-
-```typescript
-// Gradient overlay (requires transparent text)
-// Used for text overlay effects on footer links
-overlayPurple: "bg-gradient-to-l from-color-purple-semilight/80 via-color-purple-semilight/90 to-color-purple-semilight tablet:bg-gradient-to-r text-transparent bg-clip-text"
-// Gradient: #9d00d6 with varying opacity (80%, 90%, 100%)
-
-// Footer tagline
-tagline: "font-regular text-xs bg-gradient-to-r from-color-purple-light via-color-purple-semilight to-color-purple-semidark text-transparent bg-clip-text"
-// Gradient: #BB00FF → #9d00d6 → #610085
-
-// Footer copyright
-copyright: "font-normal text-xs mobileMd:text-sm tablet:text-xs text-color-grey-dark"
-// Color: #585552
-
-// Toggle switch symbol
-toggleSymbol: "font-bold text-[10px] text-black"
-// Used in ToggleSwitchButton for $/BTC symbols
-```
+- **Notification/Tooltip styles**: A single tooltip text style, plus Status/Success/Error/Info notification styles, are defined separately in `notifications/styles.ts` (see [Notification System Documentation](mdc:components/notification/doc.md)).
+- **Code styles**: Add `font-courier-prime` to a class name to use the Courier Prime font and render text as monospace.
+- **Uncategorized styles**: `styles.ts` reserves a section for new styles that don't yet fit an existing category.
 
 ## Type Definitions
 
 ### TextStyles Type
 ```typescript
 export type TextStyles = {
-  // Overlay styles
-  overlayPurple: string;
+  truncate: string;
 
-  // Logo styles (4)
-  logoPurpleDL: string;
-  logoPurpleDLLink: string;
-  logoPurpleLD: string;
-  logoPurpleLDLink: string;
+  // Logo styles
+  logoHeader: string;
+  logoFooter: string;
 
-  // Navigation styles (8)
-  navLinkPurple: string;
-  navLinkPurpleActive: string;
-  navSublinkPurple: string;
-  navSublinkPurpleActive: string;
-  navLinkGrey: string;
-  navLinkGreyLD: string;
-  navLinkGreyLDActive: string;
-  navLinkTransparentPurple: string;
+  // Navigation styles
+  navLinkDesktop: string;
+  navLinkActiveDesktop: string;
+  navSublinkDesktop: string;
+  navSublinkActiveDesktop: string;
+  navLinkMobile: string;
+  navLinkActiveMobile: string;
+  navSublinkMobile: string;
+  navSublinkActiveMobile: string;
+  navLinkFooter: string;
+  navLinkFooterOverlay: string;
 
-  // Title styles (4)
-  titleGreyLD: string;
-  titleGreyDL: string;
-  titlePurpleLD: string;
-  titlePurpleDL: string;
+  // Title styles
+  titleNeutral: string;
+  titlePrimary: string;
+  titleSecondary: string;
 
-  // Subtitle styles (2)
-  subtitleGrey: string;
-  subtitlePurple: string;
+  // Subtitle styles
+  subtitleNeutral: string;
+  subtitlePrimary: string;
+  subtitleSecondary: string;
 
-  // Heading styles (6)
+  // Heading styles
   headingGrey2: string;
   headingGreyLD: string;
   headingGreyLDLink: string;
@@ -524,7 +529,7 @@ export type TextStyles = {
   headingGrey: string;
   headingPurpleLD: string;
 
-  // Body text styles (9)
+  // Body text styles
   textXxs: string;
   textXs: string;
   textSm: string;
@@ -535,7 +540,7 @@ export type TextStyles = {
   text2xl: string;
   textLinkUnderline: string;
 
-  // Label styles (10)
+  // Label styles
   labelXxs: string;
   labelXs: string;
   labelSm: string;
@@ -543,12 +548,11 @@ export type TextStyles = {
   labelLg: string;
   labelXl: string;
   labelXsR: string;
-  labelXsPosition: string;
   labelLightSm: string;
   labelSmPurple: string;
   labelLogicResponsive: (checked: boolean, canHoverSelected: boolean) => string;
 
-  // Value styles (17)
+  // Value styles
   valueXs: string;
   valueSm: string;
   valueSmLink: string;
@@ -563,30 +567,33 @@ export type TextStyles = {
   value2xlPurpleGlow: string;
   value5xlPurpleGlow: string;
   value7xlPurpleGlow: string;
-  valueDarkXs: string;
   valueDarkSm: string;
   valueDark: string;
+  valueDarkLg: string;
   valuePositive: string;
   valueNegative: string;
   valueNeutral: string;
 
-  // Special styles
+  // Special text styles
+  eyebrowNeutral: string;
+  eyebrowPrimary: string;
+  eyebrowSecondary: string;
+  eyebrowPositionFilter: string;
   tagline: string;
   copyright: string;
   toggleSymbol: string;
 
-  // Card styles (10)
-  cardHashSymbol: string;
+  // Card text styles
   cardStampNumber: string;
+  cardRowStampNumber: string;
   cardCreator: string;
-  cardPrice: string;
-  cardMimeType: string;
   cardSupply: string;
-  cardHashSymbolMinimal: string;
-  cardStampNumberMinimal: string;
-  cardPriceMinimal: string;
-  cardHashSymbolGrey: string;
-  cardStampNumberGrey: string;
+  cardFileType: string;
+  cardFileSize: string;
+  cardPrice: string;
+  cardEyebrowNeutral: string;
+  cardStampNumberCompact: string;
+  cardPriceCompact: string;
 };
 ```
 
@@ -594,13 +601,13 @@ export type TextStyles = {
 
 ### Page Layout
 ```tsx
-import { titleGreyLD, subtitleGrey, text } from "$text";
+import { subtitleNeutral, text, titleNeutral } from "$text";
 
 export function PageHeader() {
   return (
     <div class="flex flex-col gap-4">
-      <h1 class={titleGreyLD}>Explore Bitcoin Stamps</h1>
-      <h2 class={subtitleGrey}>Digital Artifacts on Bitcoin</h2>
+      <h1 class={titleNeutral}>Explore Bitcoin Stamps</h1>
+      <h2 class={subtitleNeutral}>Digital Artifacts on Bitcoin</h2>
       <p class={text}>
         Discover unique digital stamps permanently embedded on the Bitcoin blockchain
       </p>
@@ -611,20 +618,20 @@ export function PageHeader() {
 
 ### Navigation Menu
 ```tsx
-import { navLinkPurple, navLinkPurpleActive } from "$text";
+import { navLinkActiveDesktop, navLinkDesktop } from "$text";
 
 export function Navigation({ currentPath }) {
   return (
     <nav class="flex gap-6">
       <a
         href="/explore"
-        class={currentPath === '/explore' ? navLinkPurpleActive : navLinkPurple}
+        class={currentPath === '/explore' ? navLinkActiveDesktop : navLinkDesktop}
       >
         EXPLORE
       </a>
       <a
         href="/tools"
-        class={currentPath === '/tools' ? navLinkPurpleActive : navLinkPurple}
+        class={currentPath === '/tools' ? navLinkActiveDesktop : navLinkDesktop}
       >
         TOOLS
       </a>
@@ -662,28 +669,25 @@ export function ArticleHeading({ title, href }) {
 
 ### Card Component
 ```tsx
-import { cardHashSymbol, cardStampNumber, cardCreator } from "$text";
+import { cardCreator, cardStampNumber } from "$text";
 
 export function StampCard({ stamp }) {
   return (
     <div class="flex flex-col items-center gap-2">
-      <div class="flex items-center gap-1">
-        <span class={cardHashSymbol}>#</span>
-        <span class={cardStampNumber}>{stamp.number}</span>
-      </div>
+      <span class={cardStampNumber}>#{stamp.number}</span>
       <span class={cardCreator}>{stamp.creator}</span>
     </div>
   );
 }
 ```
 
-### Logo with Link
+### Logo
 ```tsx
-import { logoPurpleLDLink } from "$text";
+import { logoHeader } from "$text";
 
 export function HeaderLogo() {
   return (
-    <a href="/" class={logoPurpleLDLink}>
+    <a href="/" class={logoHeader}>
       STAMPCHAIN
     </a>
   );
@@ -705,13 +709,13 @@ export function ReadMoreLink({ href }) {
 
 ### Gradient Overlay Effect
 ```tsx
-import { overlayPurple, navLinkTransparentPurple } from "$text";
+import { navLinkFooter, navLinkFooterOverlay } from "$text";
 
 export function FooterLinks() {
   return (
-    <div class={overlayPurple}>
-      <a href="/about" class={navLinkTransparentPurple}>ABOUT</a>
-      <a href="/contact" class={navLinkTransparentPurple}>CONTACT</a>
+    <div class={navLinkFooterOverlay}>
+      <a href="/about" class={navLinkFooter}>ABOUT</a>
+      <a href="/contact" class={navLinkFooter}>CONTACT</a>
     </div>
   );
 }
@@ -719,7 +723,7 @@ export function FooterLinks() {
 
 ### Value with Color Indicator
 ```tsx
-import { valueLg, valuePositive, valueNegative } from "$text";
+import { valueLg, valueNegative, valuePositive } from "$text";
 
 export function PriceChange({ change }) {
   const colorClass = change > 0 ? valuePositive : valueNegative;
@@ -750,65 +754,69 @@ export function FilterLabel({ checked, label }) {
 ### Style Composition Pattern
 
 ```typescript
-// Base styles are composed with modifiers using new color system
-const textFont = "font-normal text-color-grey-light";  // #f9f2e9
+// Base styles are composed with modifiers using the neutral/primary/secondary color system
+const textFont = "font-normal text-color-neutral-200";  // #E5E5E5
 const transitionColors = "transition-colors duration-200";
+const select = "select-none whitespace-nowrap";
 
 // Final composed style
-export const textSmLink = `${textFont} text-sm hover:text-color-purple-light ${transitionColors} cursor-pointer`;
-// Base: #f9f2e9 | Hover: #BB00FF
+export const textSmLink =
+  `${textFont} text-sm hover:text-color-hover ${transitionColors} cursor-pointer ${select}`;
+// Base: #E5E5E5 | Hover: #E879F9
 
 // Example with gradient
-export const headingGreyLDLink = `font-bold text-lg color-grey-gradientLD-hover tracking-wide inline-block w-fit relative ${transitionColors} cursor-pointer`;
-// Gradient: #f9f2e9 → #d1cbc3 → #a8a39d → #817e78 → #585552 | Hover: #f9f2e9 solid
+export const headingGreyLDLink =
+  `font-bold text-lg bg-gradient-to-r color-neutral-gradient color-gradient-hover tracking-wide inline-block w-fit relative cursor-pointer ${select}`;
+// Gradient: #D4D4D4 → #A3A3A3 → #525252 | Hover: #E879F9 solid
 ```
 
 ### Gradient Implementation
 
-Gradients are applied via Tailwind custom utilities defined in `tailwind.config.ts`, utilizing the CSS variable system for all color values:
+Gradients are applied via Tailwind custom utilities defined in `tailwind.config.ts`. Each gradient utility registers `--gradient-stop-from/via/to` custom properties (typed via `@property` so browsers can animate them) which feed into Tailwind's `--tw-gradient-*` chain:
 
 ```typescript
 // In tailwind.config.ts
 {
-  // Grey gradient: Dark to Light
-  '.color-grey-gradientDL': {
-    'background':
-      'linear-gradient(to right, var(--color-grey-dark), var(--color-grey-semidark), var(--color-grey), var(--color-grey-semilight), var(--color-grey-light))',
+  // Neutral gradient stops - direction comes from bg-gradient-to-r / bg-gradient-to-l at usage site
+  '.color-neutral-gradient': {
+    '--gradient-stop-from': 'var(--color-neutral-300)',
+    '--gradient-stop-via': 'var(--color-neutral-400)',
+    '--gradient-stop-to': 'var(--color-neutral-600)',
+    '--tw-gradient-from': 'var(--gradient-stop-from) var(--tw-gradient-from-position)',
+    '--tw-gradient-via': 'var(--gradient-stop-via) var(--tw-gradient-via-position)',
+    '--tw-gradient-to': 'var(--gradient-stop-to) var(--tw-gradient-to-position)',
+    '--tw-gradient-stops':
+      'var(--tw-gradient-from), var(--tw-gradient-via), var(--tw-gradient-to)',
     '-webkit-background-clip': 'text',
     '-webkit-text-fill-color': 'transparent',
     'background-clip': 'text',
+    'text-fill-color': 'transparent',
   },
 
-  // Grey gradient with hover: Dark to Light → Light on hover
-  '.color-grey-gradientDL-hover': {
-    'background':
-      'linear-gradient(to right, var(--color-grey-dark), var(--color-grey-semidark), var(--color-grey), var(--color-grey-semilight), var(--color-grey-light))',
-    '-webkit-background-clip': 'text',
-    '-webkit-text-fill-color': 'transparent',
-    'background-clip': 'text',
-    'transition': 'background 0.2s ease-in-out, -webkit-text-fill-color 0.2s ease-in-out',
+  // Pairs with color-neutral-gradient / color-primary-gradient to transition to a
+  // solid primary-400 color on hover or when an ancestor .group is hovered
+  '.color-gradient-hover': {
+    'transition':
+      '--gradient-stop-from 0.2s ease-in-out, --gradient-stop-via 0.2s ease-in-out, --gradient-stop-to 0.2s ease-in-out',
     '&:hover': {
-      'background': 'none',
-      '-webkit-text-fill-color': 'var(--color-grey-light)',
-    }
+      '--gradient-stop-from': 'var(--color-primary-400)',
+      '--gradient-stop-via': 'var(--color-primary-400)',
+      '--gradient-stop-to': 'var(--color-primary-400)',
+    },
+    '.group:hover &': {
+      '--gradient-stop-from': 'var(--color-primary-400)',
+      '--gradient-stop-via': 'var(--color-primary-400)',
+      '--gradient-stop-to': 'var(--color-primary-400)',
+    },
   },
-
-  // Purple gradient: Light to Dark
-  '.color-purple-gradientLD': {
-    'background':
-      'linear-gradient(to right, var(--color-purple-light), var(--color-purple-semilight), var(--color-purple), var(--color-purple-semidark), var(--color-purple-dark))',
-    '-webkit-background-clip': 'text',
-    '-webkit-text-fill-color': 'transparent',
-    'background-clip': 'text',
-  }
 }
 ```
 
 **Key Features:**
-- All gradients use 5 color stops from the CSS variable system
-- Hover variants transition to solid light color for emphasis
+- Gradient direction is controlled by pairing the utility with `bg-gradient-to-r` (LD) or `bg-gradient-to-l` (DL) instead of separate LD/DL classes
+- The hover utility transitions all three gradient stops to a solid `primary-400` color for emphasis
 - Smooth 200ms transitions for hover effects
-- Background clip creates text-only gradient effect
+- Background clip creates a text-only gradient effect
 
 ### Import Flow
 
@@ -847,8 +855,8 @@ The text system follows SEO best practices with proper heading structure:
 
 | Tag | Text Style | Purpose | SEO Impact |
 |-----|-----------|---------|------------|
-| **H1** | titleGreyLD, titlePurpleLD | Page title | High - One per page, primary keyword |
-| **H2** | subtitleGrey, subtitlePurple | Major sections | High - Main subtopics, secondary keywords |
+| **H1** | titleNeutral, titlePrimary | Page title | High - One per page, primary keyword |
+| **H2** | subtitleNeutral, subtitlePrimary | Major sections | High - Main subtopics, secondary keywords |
 | **H3** | headingGreyLD, headingGrey | Subsections | Medium - Supporting points, related keywords |
 | **H4** | headingGreyLDLink, headingGreyDLLink | Minor sections | Medium - Feature titles, UI sections |
 | **H5** | labelSm, labelLg, valueLg | Data labels | Low - Data displays, component headers |
@@ -904,22 +912,22 @@ The text system follows SEO best practices with proper heading structure:
 ### Import Strategy
 ```tsx
 // For component usage - import specific styles
-import { titleGreyLD, text, labelSm } from "$text";
+import { labelSm, text, titleNeutral } from "$text";
 
 // For type work - import the type
 import type { TextStyles } from "$text";
 
 // Type-safe style references
-const myStyle: keyof TextStyles = "titleGreyLD";
+const myStyle: keyof TextStyles = "titleNeutral";
 ```
 
 ### Composition Patterns
 ```tsx
 // Combining with Tailwind utilities
-<h1 class={`${titleGreyLD} mb-4 tablet:mb-6`}>Title</h1>
+<h1 class={`${titleNeutral} mb-4 tablet:mb-6`}>Title</h1>
 
 // Dynamic style selection
-const headingClass = isActive ? navLinkPurpleActive : navLinkPurple;
+const navClass = isActive ? navLinkActiveDesktop : navLinkDesktop;
 
 // Conditional styling
 <span class={`${valueLg} ${isPositive ? valuePositive : valueNegative}`}>
@@ -936,8 +944,8 @@ const headingClass = isActive ? navLinkPurpleActive : navLinkPurple;
 ### Page Title Section
 ```tsx
 <div class="flex flex-col gap-3">
-  <h1 class={titleGreyLD}>Page Title</h1>
-  <h2 class={subtitleGrey}>Subtitle</h2>
+  <h1 class={titleNeutral}>Page Title</h1>
+  <h2 class={subtitleNeutral}>Subtitle</h2>
 </div>
 ```
 
@@ -953,7 +961,7 @@ const headingClass = isActive ? navLinkPurpleActive : navLinkPurple;
 ```tsx
 <a
   href="/path"
-  class={isActive ? navLinkPurpleActive : navLinkPurple}
+  class={isActive ? navLinkActiveDesktop : navLinkDesktop}
 >
   LINK TEXT
 </a>
@@ -962,8 +970,7 @@ const headingClass = isActive ? navLinkPurpleActive : navLinkPurple;
 ### Card Content
 ```tsx
 <div class="flex items-center gap-1">
-  <span class={cardHashSymbol}>#</span>
-  <span class={cardStampNumber}>12345</span>
+  <span class={cardStampNumber}>#12345</span>
 </div>
 ```
 
@@ -979,7 +986,7 @@ const headingClass = isActive ? navLinkPurpleActive : navLinkPurple;
 ### Step 1: Define the Style
 ```typescript
 // Add to styles.ts
-export const newStyleName = `${textFont} text-lg tablet:text-xl text-color-purple ${transitionColors}`;
+export const newStyleName = `${textFont} text-lg tablet:text-xl text-color-primary-400 ${transitionColors}`;
 ```
 
 ### Step 2: Update Type Definition
@@ -1006,16 +1013,16 @@ Add to appropriate category in this documentation with:
 ## Troubleshooting
 
 ### Issue: Gradient not displaying
-**Solution**: Ensure you're using the correct gradient class (`color-grey-gradientDL`, `color-purple-gradientLD`, etc.). Check that Tailwind config includes custom utilities.
+**Solution**: Ensure you're using the correct gradient class (`color-neutral-gradient`, `color-primary-gradient`) paired with a direction utility (`bg-gradient-to-r` or `bg-gradient-to-l`). Check that Tailwind config includes the custom utilities.
 
 ### Issue: Hover effect not working
-**Solution**: Verify `-hover` suffix gradients are used. Check that `transitionColors` is included in the style. Ensure `cursor-pointer` is present.
+**Solution**: Verify `color-gradient-hover` is included alongside the gradient class for gradient text, or that `transitionColors`/`hover:text-color-hover` is present for solid-color text. Ensure `cursor-pointer` is present.
 
 ### Issue: Text not responsive
 **Solution**: Use responsive size variants or add breakpoint modifiers. Check mobile-first order (base size → tablet: → desktop:).
 
 ### Issue: Text truncation not working
-**Solution**: Ensure parent container has defined width. Add `max-w-full` or `w-full` to parent. Verify `truncate` class is present.
+**Solution**: Ensure parent container has defined width. Add `max-w-full` or `w-full` to parent. Verify the `truncate` class (or the exported `truncate` constant, `truncate max-w-[97%]`) is present.
 
 ### Issue: Select/copy disabled
 **Solution**: The `select-none` class prevents text selection. Remove it or use conditional logic where copy is needed.
@@ -1028,9 +1035,9 @@ Add to appropriate category in this documentation with:
 - **Layout System**: Provides container styles and spacing ([layout/doc.md](mdc:components/layout/doc.md))
 - **Button System**: Uses text styles for button labels ([button/doc.md](mdc:components/button/doc.md))
 - **Card Components**: Specialized card text styles integrated ([card components])
-- **Notification System**: Tooltip text styles defined in notification ([notification/doc.md](mdc:components/notification/doc.md))
+- **Notification System**: Tooltip and notification text styles defined in notification ([notification/doc.md](mdc:components/notification/doc.md))
 
 ---
 
-**Last Updated:** October 29, 2025
+**Last Updated:** August 23, 2026
 **Author:** baba

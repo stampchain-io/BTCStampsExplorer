@@ -1,20 +1,19 @@
-import { CollectionRepository } from "$server/database/collectionRepository.ts";
-import { BlockController } from "$server/controller/blockController.ts";
-import type {CollectionQueryParams, PaginatedCollectionResponseBody} from "$server/types/collection.d.ts";
 import { paginate } from "$lib/utils/data/pagination/paginationUtils.ts";
-import type { CollectionRow, CollectionWithCreators } from "$server/types/collection.d.ts";
+import { BlockController } from "$server/controller/blockController.ts";
+import { CollectionRepository } from "$server/database/collectionRepository.ts";
+import type { CollectionQueryParams, CollectionRow, CollectionWithCreators, PaginatedCollectionResponseBody } from "$server/types/collection.d.ts";
 
 export class CollectionService {
   static async getCollectionDetails(
     params: CollectionQueryParams,
   ): Promise<PaginatedCollectionResponseBody> {
-    const { limit = 50, page = 1, creator, sortBy, minStampCount, includeMarketData = false } = params;
+    const { limit = 50, page = 1, creator, sortBy, minStampCount, includeMarketData = false, editionsFilter } = params;
 
     const [collectionsResult, totalCollections, lastBlock] = await Promise.all([
-      includeMarketData 
-        ? CollectionRepository.getCollectionDetailsWithMarketData({ limit, page, ...(creator && { creator }), ...(sortBy && { sortBy }), ...(minStampCount && { minStampCount }), includeMarketData })
-        : CollectionRepository.getCollectionDetails({ limit, page, ...(creator && { creator }), ...(sortBy && { sortBy }), ...(minStampCount && { minStampCount }) }),
-      CollectionRepository.getTotalCollectionsByCreatorFromDb(creator, minStampCount),
+      includeMarketData
+        ? CollectionRepository.getCollectionDetailsWithMarketData({ limit, page, ...(creator && { creator }), ...(sortBy && { sortBy }), ...(minStampCount && { minStampCount }), includeMarketData, ...(editionsFilter && { editionsFilter }) })
+        : CollectionRepository.getCollectionDetails({ limit, page, ...(creator && { creator }), ...(sortBy && { sortBy }), ...(minStampCount && { minStampCount }), ...(editionsFilter && { editionsFilter }) }),
+      CollectionRepository.getTotalCollectionsByCreatorFromDb(creator, minStampCount, editionsFilter),
       BlockController.getLastBlock(),
     ]);
 

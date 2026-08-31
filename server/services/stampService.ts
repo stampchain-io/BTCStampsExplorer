@@ -1,11 +1,11 @@
 import type {
-    StampEdition,
-    StampFilesize,
-    StampFiletype,
-    StampFilterType,
-    StampMarketplace,
-    StampRange,
-    StampSuffixFilter
+  StampEdition,
+  StampFilesize,
+  StampFiletype,
+  StampFilterType,
+  StampMarketplace,
+  StampRange,
+  StampSuffixFilter
 } from "$constants";
 import { type StampType } from "$constants";
 import { StampRepository } from "$server/database/index.ts";
@@ -409,16 +409,26 @@ export class StampService {
       const marketData = stamp.marketData;
       if (!marketData) return null;
 
+      // StampRepository.getRecentlyActiveSold returns the actual per-sale
+      // transaction details (buyer/seller address, tx hash, block index)
+      // under `sale_data` — sourced from stamp_sales_history — not nested
+      // under `marketData`. `marketData.lastSale*` fields referenced below
+      // don't exist on this query's shape, so reading them here always
+      // produced null (this is why buyer/dispenser address never rendered).
+      const saleData = stamp.sale_data || {};
+
       // Calculate time ago
-      const saleTime = new Date(marketData.lastPriceUpdate);
-      const timeAgo = this.getTimeAgo(saleTime);
+      const saleTime = saleData.sale_time
+        ? new Date(saleData.sale_time * 1000)
+        : new Date(marketData.lastPriceUpdate);
+      const timeAgo = saleData.time_ago || this.getTimeAgo(saleTime);
 
       // Use enhanced transaction detail fields if available, fall back to existing data
-      const btcAmount = marketData.lastSaleBtcAmount || marketData.recentSalePriceBTC || 0;
-      const txHash = marketData.lastSaleTxHash || stamp.tx_hash;
-      const blockIndex = marketData.lastSaleBlockIndex || stamp.block_index;
-      const buyerAddress = marketData.lastSaleBuyerAddress || null;
-      const dispenserAddress = marketData.lastSaleDispenserAddress || null;
+      const btcAmount = saleData.btc_amount || marketData.recentSalePriceBTC || 0;
+      const txHash = saleData.tx_hash || stamp.tx_hash;
+      const blockIndex = saleData.block_index || stamp.block_index;
+      const buyerAddress = saleData.buyer_address || null;
+      const dispenserAddress = saleData.seller_address || null;
 
       // Return EnhancedStampSale format (schema-compliant)
       return {
@@ -426,6 +436,11 @@ export class StampService {
         tx_hash: txHash,
         block_index: blockIndex,
         timestamp: saleTime.toISOString(),
+        // Raw unix-seconds counterpart to `timestamp` — routes need this to
+        // build a nested `sale_data.sale_time` without re-parsing the ISO
+        // string, matching what StampRepository.getRecentlyActiveSold
+        // already provides at the DB layer.
+        sale_time: Math.floor(saleTime.getTime() / 1000),
 
         // Stamp info
         cpid: stamp.cpid,
@@ -437,9 +452,14 @@ export class StampService {
         destination: buyerAddress || null, // Buyer
         buyer_address: buyerAddress, // v2.2 compatibility
         dispenser_address: dispenserAddress, // v2.2 compatibility
+        // Same value as dispenser_address today (100% of sales are
+        // sale_type='dispenser'), exposed under its own name too so callers
+        // building a canonical sale_data object don't have to assume that.
+        seller_address: dispenserAddress,
+        sale_type: saleData.sale_type || null,
 
         // Dispenser info
-        dispenser_tx_hash: marketData.lastSaleDispenserTxHash || null,
+        dispenser_tx_hash: saleData.dispenser_tx_hash || null,
         dispense_quantity: marketData.lastSaleQuantity || 1, // Use actual quantity from sales history
 
         // Price info
@@ -474,10 +494,13 @@ export class StampService {
         // Additional stamp metadata for compatibility
         stamp_url: stamp.stamp_url,
         stamp_mimetype: stamp.stamp_mimetype,
+        file_size_bytes: stamp.file_size_bytes ?? null,
         creator: stamp.creator,
         creator_name: stamp.creator_name,
 
-        // Activity tracking
+        // Activity tracking (now sourced from stamp_market_data via the
+        // smd.activity_level / smd.last_activity_time columns added to
+        // getRecentlyActiveSold's query)
         activity_level: marketData.activityLevel || null,
         last_activity_time: marketData.lastActivityTime || null,
       };
@@ -505,7 +528,8 @@ export class StampService {
   }
 
   /**
-   * Calculate time ago string from date
+   * Calculate time ago string from date. Sales older than 7 days switch to
+   * an absolute M/D/YYYY date instead of an ever-growing "Nd ago" string.
    */
   private static getTimeAgo(date: Date): string {
     const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
@@ -513,7 +537,8 @@ export class StampService {
     if (seconds < 60) return `${seconds}s ago`;
     if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
     if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
-    return `${Math.floor(seconds / 86400)}d ago`;
+    if (seconds < 7 * 86400) return `${Math.floor(seconds / 86400)}d ago`;
+    return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
   }
 
   static async getCreatorNameByAddress(
@@ -622,6 +647,9 @@ export class StampService {
       return {
         ...stamp,
         market_data: null,
+        // btc_stamps#939 forward-compat (see below) — no market data row at
+        // all means no dispenser info either.
+        lowestPriceDispenser: null,
         marketDataMessage: "No market data available for this stamp"
       };
     }
@@ -660,6 +688,17 @@ export class StampService {
 
     return {
       ...stamp,
+      // Activity tracking (top-level for StampCard / StampInfo)
+      activity_level: marketData.activityLevel || null,
+      // btc_stamps#939 ("Store lowest-price open dispenser in
+      // stamp_market_data") forward-compat: MarketDataRepository already
+      // parses this from the lowest_dispenser_* columns (null until the
+      // indexer ships them) — forward it as-is, no new SQL here.
+      // StampCard.tsx / StampListingsRow / useLowestPriceDispenser already
+      // read stamp.lowestPriceDispenser in exactly this DispenserRow shape
+      // (from the #1209 stopgap), so this needs zero other changes once
+      // the column data starts flowing.
+      lowestPriceDispenser: marketData.lowestPriceDispenser || null,
       // v2.3+: market_data contains all market information (consistent snake_case)
       market_data: marketData ? {
         // Convert camelCase to snake_case for API consistency
@@ -681,6 +720,7 @@ export class StampService {
         last_price_update: marketData.lastPriceUpdate || null,
         cache_status: marketData.lastUpdated ?
           this.getCacheStatus(marketData.lastUpdated) : undefined,
+        activity_level: marketData.activityLevel || null,
         dispensers: {
           open_count: marketData.openDispensersCount || 0,
           closed_count: marketData.closedDispensersCount || 0,
@@ -702,7 +742,8 @@ export class StampService {
         lastUpdated: marketData.lastUpdated,
         openDispensersCount: marketData.openDispensersCount || 0,
         closedDispensersCount: marketData.closedDispensersCount || 0,
-        totalDispensersCount: marketData.totalDispensersCount || 0
+        totalDispensersCount: marketData.totalDispensersCount || 0,
+        activityLevel: marketData.activityLevel || null,
       } : null,
       marketDataMessage: marketData ? undefined : "No market data available for this stamp"
     };

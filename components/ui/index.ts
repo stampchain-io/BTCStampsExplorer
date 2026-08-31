@@ -9,7 +9,6 @@ export {
   StampCardSkeleton,
   TableRowSkeleton,
   TextBlockSkeleton,
-  WalletStampCardSkeleton,
 } from "./SkeletonLoader.tsx";
 
 // Performance Optimization Components

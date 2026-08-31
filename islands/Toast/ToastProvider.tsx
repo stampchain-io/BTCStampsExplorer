@@ -33,6 +33,7 @@ export const ToastProvider = ({ children }: ToastProviderProps) => {
     type: BaseToast["type"],
     autoDismiss?: boolean,
     body?: BaseToast["body"],
+    isUpdate?: BaseToast["isUpdate"],
   ) => {
     const id = Math.random().toString(36).substr(2, 9);
     const duration = getDuration(type);
@@ -50,6 +51,7 @@ export const ToastProvider = ({ children }: ToastProviderProps) => {
         autoDismiss: shouldDismiss,
         duration,
         isAnimatingOut: false,
+        isUpdate,
       },
     ]);
     if (shouldDismiss) {
@@ -95,6 +97,7 @@ export const ToastProvider = ({ children }: ToastProviderProps) => {
           toastMsg.type,
           toastMsg.autoDismiss,
           toastMsg.body,
+          toastMsg.isUpdate,
         );
       }
     });
@@ -115,6 +118,7 @@ export const ToastProvider = ({ children }: ToastProviderProps) => {
           autoDismiss={toast.autoDismiss}
           duration={toast.duration}
           isAnimatingOut={toast.isAnimatingOut ?? false}
+          isUpdate={toast.isUpdate}
         />
       ))}
     </>

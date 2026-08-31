@@ -1,7 +1,7 @@
 /* ===== GET STAMPING CTA COMPONENT ===== */
 import { Button } from "$button";
 import { containerBackground, containerGap } from "$layout";
-import { subtitleGrey, text, titleGreyLD } from "$text";
+import { subtitleNeutral, text, titleNeutral } from "$text";
 
 /* ===== COMPONENT ===== */
 export default function GetStampingCta() {
@@ -11,8 +11,8 @@ export default function GetStampingCta() {
   return (
     <div class={`${containerBackground}`}>
       {/* ===== HEADER SECTION ===== */}
-      <h3 class={titleGreyLD}>GET STAMPING</h3>
-      <h4 class={subtitleGrey}>IMMORTALISE YOUR ART</h4>
+      <h3 class={titleNeutral}>GET STAMPING</h3>
+      <h4 class={subtitleNeutral}>IMMORTALISE YOUR ART</h4>
 
       {/* ===== CONTENT SECTION ===== */}
       <div
@@ -60,16 +60,16 @@ export default function GetStampingCta() {
         <div class="flex justify-end gap-5">
           <Button
             variant="outline"
-            color="grey"
-            size="mdR"
+            color="neutral"
+            size="smR"
             href="/faq"
           >
             FAQ
           </Button>
           <Button
             variant="flat"
-            color="grey"
-            size="mdR"
+            color="neutral"
+            size="smR"
             href="/tool/stamp/create"
           >
             STAMP

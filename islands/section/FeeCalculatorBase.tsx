@@ -262,12 +262,12 @@ export function FeeCalculatorBase({
             </div>
           )}
         </div>
-        <h6 class="font-light text-xs text-color-grey cursor-default select-none text-nowrap">
-          <span class="text-color-grey-semidark pr-2">
+        <h6 class="font-light text-xs text-color-neutral-300 cursor-default select-none text-nowrap">
+          <span class="text-color-neutral-500 pr-2">
             {maraMode ? "MARA REQUIRED" : "RECOMMENDED"}
           </span>
           <span
-            class={`font-medium ${maraMode ? "text-color-grey-light" : ""}`}
+            class={`font-medium ${maraMode ? "" : ""}`}
           >
             {maraMode && maraFeeRate !== null
               ? maraFeeRate
@@ -277,10 +277,10 @@ export function FeeCalculatorBase({
           </span>{" "}
           SAT/vB
         </h6>
-        <h6 class="font-light text-base text-color-grey-light mb-1.5 cursor-default select-none">
-          <span class="text-color-grey-semidark pr-2.5">FEE</span>
+        <h6 class="font-light text-sm text-color-primary-400 mb-1.5 cursor-default select-none">
+          <span class="text-color-neutral-500 pr-2.5">FEE</span>
           <span
-            class={`font-bold ${maraMode ? "text-color-grey-light" : ""}`}
+            class={`font-bold ${maraMode ? "" : ""}`}
           >
             {fee === 0 ? <span class="animate-pulse">XX</span> : fee}
           </span>{" "}
@@ -376,7 +376,7 @@ export function FeeCalculatorBase({
               onMouseMove={handleMouseMove}
             >
               <span class={labelXs}>TX SIZE</span>&nbsp;&nbsp;
-              <span class="text-color-grey-light pr-1">~</span>
+              <span class="text-color-neutral-300 pr-1">~</span>
               {(() => {
                 const transactionType = type === "send"
                   ? "send"
@@ -408,7 +408,7 @@ export function FeeCalculatorBase({
               ? (
                 <>
                   {!feeDetails.hasExactFees && (
-                    <span class="text-color-grey-light pr-1">~</span>
+                    <span class="text-color-neutral-300 pr-1">~</span>
                   )}
                   {coinType === "BTC"
                     ? formatSatoshisToBTC(feeDetails.minerFee, {
@@ -681,24 +681,24 @@ export function FeeCalculatorBase({
 
           {/* TOTAL */}
           <h6 class={textXs}>
-            <span class={`${labelXs} font-normal`}>
+            <span class={`${labelXs} !font-bold`}>
               TOTAL
             </span>&nbsp;&nbsp;
-            {feeDetails?.totalValue
-              ? (
-                <>
-                  {!feeDetails.hasExactFees && (
-                    <span class="text-color-grey-light pr-1">~</span>
-                  )}
-                  {coinType === "BTC"
-                    ? formatSatoshisToBTC(feeDetails.totalValue, {
-                      includeSymbol: false,
-                    })
-                    : formatSatoshisToUSD(feeDetails.totalValue, BTCPrice)}
-                </>
-              )
-              : <span class="animate-pulse">0.00000000</span>}{" "}
-            <span class="font-light">{coinType}</span>
+            <span class="font-bold text-color-neutral-100">
+              {feeDetails?.totalValue
+                ? (
+                  <>
+                    {!feeDetails.hasExactFees && <span style="pr-1">~</span>}
+                    {coinType === "BTC"
+                      ? formatSatoshisToBTC(feeDetails.totalValue, {
+                        includeSymbol: false,
+                      })
+                      : formatSatoshisToUSD(feeDetails.totalValue, BTCPrice)}
+                  </>
+                )
+                : <span class="animate-pulse">0.00000000</span>}{" "}
+              <span class="font-light">{coinType}</span>
+            </span>
           </h6>
         </div>
       </div>
@@ -728,11 +728,13 @@ export function FeeCalculatorBase({
           >
             <div className="relative">
               <ToggleSwitchButton
-                isActive={coinType === "USDT"}
+                isActive={coinType === "BTC"}
                 onToggle={handleCoinToggle}
                 toggleButtonId="currency-toggle"
-                activeSymbol="$"
-                inactiveSymbol="₿"
+                activeSymbol="₿"
+                inactiveSymbol="$"
+                activeKnobClassName="bg-color-orange-400"
+                inactiveKnobClassName="bg-color-neutral-400"
                 onMouseEnter={handleCurrencyMouseEnter}
                 onMouseLeave={handleCurrencyMouseLeave}
               />
@@ -749,13 +751,19 @@ export function FeeCalculatorBase({
       </div>
 
       <div class="mt-6 flex flex-col-reverse justify-start min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between">
-        <h6 class="text-lg text-color-grey-light font-light cursor-default select-none">
-          <span class="text-color-grey-semidark">ESTIMATE</span>
+        <h6
+          class={`text-base font-light cursor-default select-none ${
+            coinType === "BTC"
+              ? "text-color-orange-400"
+              : "text-color-neutral-400"
+          }`}
+        >
+          <span class="text-color-neutral-500">ESTIMATE</span>
           {feeDetails?.totalValue !== undefined
             ? (
               <>
                 {!feeDetails.hasExactFees && (
-                  <span class="text-color-grey-light pl-2.5 pr-1.5">~</span>
+                  <span class="pl-2.5 pr-1.5">~</span>
                 )}
                 {(() => {
                   // Add MARA service fee if in MARA mode
@@ -771,7 +779,9 @@ export function FeeCalculatorBase({
                             includeSymbol: false,
                           })}
                         </span>{" "}
-                        <span class="font-light">BTC</span>
+                        <span class="font-light">
+                          BTC
+                        </span>
                       </>
                     )
                     : (
@@ -781,7 +791,9 @@ export function FeeCalculatorBase({
                             ? (totalWithMaraFee / 1e8 * BTCPrice).toFixed(2)
                             : "N/A"}
                         </span>{" "}
-                        <span class="font-light">{coinType}</span>
+                        <span class="font-light">
+                          {coinType}
+                        </span>
                       </>
                     );
                 })()}
@@ -790,7 +802,9 @@ export function FeeCalculatorBase({
             : (
               <>
                 <span class="font-bold animate-pulse">0.00000000</span>{" "}
-                <span class="font-light">{coinType}</span>
+                <span class="font-light text-color-neutral-500">
+                  {coinType}
+                </span>
               </>
             )}
         </h6>
@@ -804,7 +818,7 @@ export function FeeCalculatorBase({
 
       <div
         onClick={() => setVisible(!visible)}
-        className="flex items-center font-normal text-xs text-color-grey-semidark hover:text-color-grey-light uppercase transition-colors duration-200 gap-1.5 cursor-pointer group"
+        className="flex items-center font-normal text-xs text-color-neutral-500 hover:text-color-hover uppercase transition-colors duration-200 gap-1.5 cursor-pointer group"
       >
         DETAILS
         <Icon
@@ -813,7 +827,7 @@ export function FeeCalculatorBase({
           weight="bold"
           size="xxxs"
           color="custom"
-          className={` stroke-color-grey-semidark group-hover:stroke-color-grey-light transition-all duration-200 transform ${
+          className={` stroke-color-neutral-500 group-hover:stroke-color-hover transition-all duration-200 transform ${
             visible ? "scale-y-[-1]" : ""
           }`}
         />
@@ -853,11 +867,11 @@ export function FeeCalculatorBase({
                 ${
                 tosAgreed
                   ? canHoverSelected
-                    ? "bg-color-grey-dark/15 border-color-grey-dark/20  group-hover:border-color-grey-light/20"
-                    : "bg-color-grey-dark/15 border-color-grey-dark/20"
+                    ? "bg-color-neutral-900 border-color-neutral-600  group-hover:border-color-hover"
+                    : "bg-color-neutral-900 border-color-neutral-600"
                   : canHoverSelected
-                  ? "bg-color-grey-dark/15 border-color-grey-light/20 group-hover:border-color-grey-dark/40"
-                  : "bg-color-grey-dark/15 border-color-grey-light/20"
+                  ? "bg-color-neutral-900 border-color-neutral-400 group-hover:border-color-hover"
+                  : "bg-color-neutral-900 border-color-neutral-400"
               }
               `}
             >
@@ -868,60 +882,62 @@ export function FeeCalculatorBase({
                   ${tosAgreed ? "scale-100" : "scale-0"}
                   ${
                   canHoverSelected
-                    ? "bg-color-grey-semidark group-hover:bg-color-grey-light"
-                    : "bg-color-grey-semidark"
+                    ? "bg-color-neutral-600 group-hover:bg-color-hover"
+                    : "bg-color-neutral-600"
                 }
                 `}
               />
             </div>
             <span
               className={`
-                text-xs font-medium select-none
+                font-normal text-xs uppercase select-none
                 transition-colors duration-200
                 ${
-                tosAgreed ? "text-color-grey-semidark" : "text-color-grey-light"
+                tosAgreed ? "text-color-neutral-600" : "text-color-neutral-400"
               }
                 ${
                 tosAgreed
-                  ? canHoverSelected ? "group-hover:text-color-grey-light" : ""
+                  ? canHoverSelected ? "group-hover:text-color-hover" : ""
                   : canHoverSelected
-                  ? "group-hover:text-color-grey-semidark"
+                  ? "group-hover:text-color-hover"
                   : ""
               }
               `}
             >
-              AGREE TO THE{" "}
-              <span class="text-color-grey-semidark">
+              Agree to the{" "}
+              <span class="text-color-neutral-600">
                 <span class="tablet:hidden">
                   <a
                     href="/termsofservice"
+                    target="_blank"
                     className={`
-                      transition-colors duration-200
+                      uppercase transition-colors duration-200
                       ${
                       tosAgreed
-                        ? "text-color-grey-semidark"
-                        : "text-color-grey-semidark"
+                        ? "text-color-neutral-600"
+                        : "text-color-neutral-600"
                     }
-                      hover:text-color-grey-light
+                      hover:text-color-hover
                     `}
                   >
-                    TERMS
+                    Terms
                   </a>
                 </span>
                 <span class="hidden tablet:inline">
                   <a
                     href="/termsofservice"
+                    target="_blank"
                     className={`
-                      transition-colors duration-200
+                      uppercase transition-colors duration-200
                       ${
                       tosAgreed
-                        ? "text-color-grey-semidark"
-                        : "text-color-grey-semidark"
+                        ? "text-color-neutral-600"
+                        : "text-color-neutral-600"
                     }
-                      hover:text-color-grey-light
+                      hover:text-color-hover
                     `}
                   >
-                    TERMS OF SERVICE
+                    Terms of Service
                   </a>
                 </span>
               </span>
@@ -935,8 +951,8 @@ export function FeeCalculatorBase({
             {onCancel && (
               <Button
                 variant="outline"
-                color="grey"
-                size="mdR"
+                color="neutral"
+                size="smR"
                 onClick={() => {
                   logger.debug("ui", {
                     message: "Cancel clicked",
@@ -952,8 +968,8 @@ export function FeeCalculatorBase({
             )}
             <ButtonProcessing
               variant="flat"
-              color="grey"
-              size="mdR"
+              color="primary"
+              size="smR"
               isSubmitting={!!isSubmitting}
               onClick={() => {
                 console.log(

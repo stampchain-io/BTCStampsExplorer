@@ -1,13 +1,11 @@
 import type { MetaTagsProps } from "$types/ui.d.ts";
-import {
-  STAMPCHAIN_FAVICON_IMAGE,
-  STAMPCHAIN_OPENGRAPH_IMAGE,
-} from "$constants";
+
+const OPENGRAPH_IMAGE = "https://stampchain.io/img/logo/opengraph-1200x630.png";
 
 export function MetaTags({
   title = "Bitcoin Stamps",
   description = "Unprunable UTXO Art, Because Sats Don't Exist",
-  image = STAMPCHAIN_OPENGRAPH_IMAGE,
+  image = OPENGRAPH_IMAGE,
   skipImage = false,
   skipTitle = false,
   skipDescription = false,
@@ -33,15 +31,49 @@ export function MetaTags({
       <meta name="robots" content="index, follow" />
 
       {/* Icons */}
+      {
+        /*
+        Order matters for Chrome: ICO must come first with sizes="48x48" so
+        Chrome ignores it (doesn't request that size) and falls through to the
+        SVG. Without this Chrome picks up the ICO and never loads the SVG.
+        See: https://spacejelly.dev/posts/light-dark-mode-favicons
+      */
+      }
+      <link rel="icon" href="/img/logo/favicon/favicon.ico" sizes="48x48" />
       <link
         rel="icon"
-        type="image/jpeg"
-        href={STAMPCHAIN_FAVICON_IMAGE}
+        type="image/svg+xml"
         sizes="any"
+        href="/img/logo/favicon/favicon.svg"
       />
       <link
         rel="apple-touch-icon"
-        href={STAMPCHAIN_FAVICON_IMAGE}
+        sizes="180x180"
+        href="/img/logo/favicon/apple-touch-icon.png"
+      />
+      <meta name="apple-mobile-web-app-title" content="Stampchain" />
+      <link rel="manifest" href="/img/logo/favicon/site.webmanifest" />
+      {
+        /* Force-refresh SVG favicon on theme change — Chrome caches the favicon
+          and won't re-evaluate its media queries without a new href. */
+      }
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `(function() {
+  var SVG_BASE = '/img/logo/favicon/favicon.svg';
+  var mq = window.matchMedia('(prefers-color-scheme: dark)');
+
+  function refreshFavicon() {
+    var isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var link = document.querySelector('link[type="image/svg+xml"]');
+    if (link) {
+      link.setAttribute('href', SVG_BASE + '?scheme=' + (isDark ? 'dark' : 'light') + '&t=' + Date.now());
+    }
+  }
+
+  mq.addEventListener('change', refreshFavicon);
+})();`,
+        }}
       />
       <link rel="canonical" href={resolvedCanonical} />
 
@@ -168,7 +200,7 @@ export function MetaTags({
             "@type": "Organization",
             "name": "Stampchain",
             "url": "https://stampchain.io",
-            "logo": "https://stampchain.io/img/logo/stampchain-logo-480.svg",
+            "logo": "https://stampchain.io/img/logo/logo-monotone-black.svg",
             "sameAs": [
               "https://x.com/ArmandDLV",
               "https://github.com/stampchain-io",

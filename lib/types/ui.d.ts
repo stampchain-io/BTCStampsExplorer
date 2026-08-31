@@ -9,7 +9,6 @@
  * Usage: Import UI component types and interfaces
  */
 
-import type { IconVariants } from "$components/icon/styles.ts";
 import type { Timeframe } from "$components/layout/types.ts";
 import type {
   ButtonColor,
@@ -18,13 +17,19 @@ import type {
   CircuitState,
 } from "$constants";
 import type { Signal } from "@preact/signals";
-import type { ComponentChildren, ComponentProps, JSX, Ref } from "preact";
+import type {
+  AriaRole,
+  ComponentChildren,
+  ComponentProps,
+  JSX,
+  Ref,
+} from "preact";
 
 // Re-export button types for use by other modules
 export type { ButtonColor, ButtonSize, ButtonVariant };
 
 import type { StampFilterType, StampType } from "$constants";
-import type { StampFilters } from "$islands/filter/FilterOptionsStamp.tsx";
+import type { ExplorerStampFilters } from "$islands/filter/FilterOptionsExplorerStamp.tsx";
 import type { FeeEstimationResult as TransactionFeeEstimationResult } from "$lib/utils/bitcoin/minting/TransactionConstructionService.ts";
 import type {
   AlignmentType,
@@ -42,7 +47,6 @@ import type {
 } from "$types/index.d.ts";
 import type { MarketListingAggregated } from "$types/marketData.d.ts";
 import type {
-  CollectionWithOptionalMarketData,
   Deployment,
   FeeData,
   PSBTFees,
@@ -50,7 +54,7 @@ import type {
 } from "$types/services.d.ts";
 import type { SortDirection, SortKey, SortMetrics } from "$types/sorting.d.ts";
 import type { ScriptType, SRC20_TYPES, SRC20Row } from "$types/src20.d.ts";
-import type { StampRow } from "$types/stamp.d.ts";
+import type { Collection, StampRow } from "$types/stamp.d.ts";
 import type {
   SRC20Transaction,
   StampTransaction,
@@ -166,6 +170,15 @@ export interface TableProps<T = any> {
   cpid?: string;
   tick?: string;
   initialCounts?: Record<string, number>;
+  holders?: import("./wallet.d.ts").HolderRow[];
+  title?: string;
+  // Serializable deploy metadata (e.g. SRC-20 creator/date/params) used to
+  // render the non-fetched "info" tab. Must stay plain JSON-safe data —
+  // islands can't receive VNodes/functions as props (they get dropped
+  // during Fresh's client-state serialization), so `DetailsTableBase`
+  // renders `SRC20DetailInfo` itself from this data instead of accepting
+  // pre-built JSX.
+  deployment?: SRC20DetailInfoProps["deployment"];
 }
 // Removed circular self-import block - these types should be defined locally
 // import type {
@@ -209,8 +222,8 @@ export interface TableProps<T = any> {
 //   FilterSRC20ModalProps,
 //   FlexboxProps,
 //   FormControlProps,
-//   FreshSRC20GalleryProps,
-//   FreshStampGalleryProps,
+//   SRC20GalleryWalletProps,
+//   StampGalleryWalletProps,
 //   GearIconProps,
 //   GridProps,
 //   HoldersTableBaseProps,
@@ -272,10 +285,7 @@ export interface TableProps<T = any> {
 //   SortProps,
 //   SpinnerProps,
 //   SRC101RegisterToolProps,
-//   SRC20CardMintingProps,
-//   SRC20CardProps,
-//   SRC20CardSmMintingProps,
-//   SRC20CardSmProps,
+//   SRC20MintingCompactProps,
 //   SRC20DetailPageProps,
 //   SRC20InputFieldProps,
 //   SRC20MintedTableProps,
@@ -292,7 +302,7 @@ export interface TableProps<T = any> {
 //   StampListingsAllProps,
 //   StampListingsOpenProps,
 //   StampOverviewContentProps,
-//   StampOverviewGalleryProps,
+//   StampGalleryHomeProps,
 //   StampSalesProps,
 //   StampTransfersProps,
 //   StatBaseProps,
@@ -321,8 +331,8 @@ export interface TableProps<T = any> {
 //   TransitionProps,
 //   WalletComponentProps,
 //   WalletDashboardDetailsProps,
-//   WalletDispenserDetailsProps,
-//   WalletProfileDetailsProps,
+//   WalletContentDispenserProps,
+//   WalletHeaderProps,
 //   WalletProviderProps,
 //   WalletStampCardProps,
 //   WalletStampValueProps,
@@ -877,6 +887,16 @@ export interface ActivityBadgeProps extends BaseComponentProps {
 }
 
 /**
+ * Activity Level Indicator component props.
+ * Renders three cumulative dots (HOT/WARM/COOL), neutral dots for DORMANT,
+ * or "none" text for COLD.
+ */
+export interface ActivityLevelIndicatorProps {
+  level?: "HOT" | "WARM" | "COOL" | "DORMANT" | "COLD" | null;
+  className?: string;
+}
+
+/**
  * Transaction badge component props
  */
 export interface TransactionBadgeProps extends BaseComponentProps {
@@ -997,6 +1017,7 @@ export interface StatItemProps {
   value: string | ComponentChildren;
   align?: "left" | "center" | "right";
   class?: string;
+  valueClass?: string;
   href?: string;
   target?: "_self" | "_blank";
 }
@@ -1007,6 +1028,14 @@ export interface StatTitleProps {
   align?: "left" | "center" | "right";
   href?: string;
   target?: "_self" | "_blank";
+}
+
+export interface StatPriceProps {
+  priceBTC: string | number | ComponentChildren;
+  priceUSD?: string | number | ComponentChildren | null;
+  activityLevel?: "HOT" | "WARM" | "COOL" | "DORMANT" | "COLD" | null;
+  align?: "left" | "center" | "right";
+  class?: string;
 }
 
 export interface RadioProps {
@@ -1032,15 +1061,15 @@ export interface StampSalesProps {
   initialData?: Array<any>;
   title?: string;
   subTitle?: string;
-  variant?: string;
-  displayCounts?: {
-    mobileSm: number;
-    mobileMd: number;
-    mobileLg: number;
-    tablet: number;
-    desktop: number;
-  };
-  gridClass?: string;
+}
+
+/**
+ * Props for StampListingsGallery component
+ */
+export interface StampListingsProps {
+  initialData?: Array<any>;
+  title?: string;
+  subTitle?: string;
 }
 
 export interface ToolSrc20PageProps {
@@ -1083,7 +1112,7 @@ export interface WalletDashboardDetailsProps {
   setShowItem: (item: string) => void;
 }
 
-export interface WalletProfileDetailsProps {
+export interface WalletHeaderProps {
   walletData: any; // Replace with proper WalletData type if available
   stampsTotal: number;
   src20Total: number;
@@ -1091,7 +1120,7 @@ export interface WalletProfileDetailsProps {
   setShowItem: (item: string) => void;
 }
 
-export interface WalletDispenserDetailsProps {
+export interface WalletContentDispenserProps {
   walletData: WalletOverviewInfo;
   stampsTotal?: number;
   src20Total?: number;
@@ -1168,7 +1197,7 @@ export interface SRC20GalleryProps {
   pagination?: {
     page: any;
     totalPages: any;
-    onPageChange: (newPage: number) => void;
+    onPageChange?: (newPage: number) => void;
   };
   title?: string;
   initialPagination?: { page: number; limit: number; total?: number };
@@ -1201,22 +1230,6 @@ export interface StatusMessagesProps {
   onDismiss?: (index: number) => void;
 }
 
-export interface StampOverviewContentProps {
-  stamp?: any;
-  marketData?: any;
-  loading?: boolean;
-  error?: string;
-  stamps?: StampRow[];
-  isRecentSales?: boolean;
-  pagination?: {
-    page: number;
-    totalPages: number;
-    onPageChange?: (newPage: number) => void;
-    prefix?: string;
-  };
-  fromPage?: string;
-}
-
 export interface StampListingsAllProps {
   listings: Array<any>;
   loading?: boolean;
@@ -1233,7 +1246,6 @@ export interface StampListingsOpenProps {
   onSelect?: (listing: any) => void;
   selectedDispenser?: any;
   dispensers?: import("./stamp.d.ts").Dispenser[];
-  floorPrice?: number;
   onSelectDispenser?: (dispenser: any) => void;
 }
 
@@ -1410,45 +1422,6 @@ export interface ReceiveAddyModalProps {
   title?: string;
 }
 
-export interface RecentSaleCardProps {
-  sale: any;
-  onClick?: () => void;
-  className?: string;
-  showFullDetails?: boolean;
-  btc_price_usd?: number;
-}
-
-export interface RecentSalesGalleryProps {
-  title?: string;
-  subTitle?: string;
-  sales: Array<any>;
-  layout?: "grid" | "list";
-  showFullDetails?: boolean;
-  displayCounts?: {
-    mobileSm?: number;
-    mobileMd?: number;
-    mobileLg?: number;
-    tablet?: number;
-    desktop?: number;
-  };
-  pagination?: {
-    page: number;
-    totalPages: number;
-    onPageChange?: (newPage: number) => void;
-    prefix?: string;
-  };
-  isLoading?: boolean;
-  btc_price_usd?: number;
-  autoRefresh?: boolean;
-  refreshIntervalMs?: number;
-  onRefresh?: () => void;
-  gridClass?: string;
-  maxItems?: number;
-  loading?: boolean;
-  error?: string;
-  onLoadMore?: () => void;
-}
-
 export interface ResponsiveProps {
   mobile?: any;
   tablet?: any;
@@ -1543,76 +1516,81 @@ export interface TransactionHexDisplayProps {
   class?: string;
 }
 
-/**
- * Icon component props
- */
-export interface CloseIconProps {
-  onClick: (e?: MouseEvent) => void;
-  size: IconVariants["size"];
-  weight: IconVariants["weight"];
-  color: "greyLight" | "purpleLight";
-  className?: string;
-  onMouseEnter?: (() => void) | undefined;
-  onMouseLeave?: (() => void) | undefined;
-  "aria-label"?: string;
-}
-
-export interface GearIconProps {
-  className?: string;
-  onClick?: () => void;
-  size?: IconSize | number;
-  color?: string;
-  isOpen?: boolean;
-  onToggle?: () => void;
-  weight?: IconWeight;
-}
-
 // =============================================================================
 // THEME AND DESIGN SYSTEM TYPES
 // =============================================================================
 
+/* NOT INITIALIZED IN THE CODEBASE */
+
 /**
- * Color palette definition for the design system
+ * A standard 50-950 color scale, matching the shape used by the
+ * `primary`, `secondary`, and status colors in tailwind.config.ts.
+ */
+export interface ColorScale {
+  50: string;
+  100: string;
+  200: string;
+  300: string;
+  400: string;
+  500: string;
+  600: string;
+  700: string;
+  800: string;
+  900: string;
+  950: string;
+}
+
+/**
+ * A status color scale as defined in tailwind.config.ts - a full numeric
+ * ColorScale plus the legacy dark/semidark/DEFAULT/semilight/light aliases.
+ */
+export interface StatusColorScale extends ColorScale {
+  dark: string;
+  semidark: string;
+  DEFAULT: string;
+  semilight: string;
+  light: string;
+}
+
+/**
+ * Color palette definition for the design system.
+ * Mirrors the actual color tokens defined in tailwind.config.ts
+ * (theme.extend.colors.color).
  */
 export interface ColorPalette {
-  // Primary colors
-  primary: {
-    50: string;
-    100: string;
-    200: string;
-    300: string;
-    400: string;
-    500: string;
-    600: string;
-    700: string;
-    800: string;
-    900: string;
+  // Grayscale, 0-1000 (includes pure white/black endpoints)
+  neutral: ColorScale & { 0: string; 1000: string };
+
+  // Brand primary (fuchsia)
+  primary: ColorScale;
+
+  // Brand secondary (orange)
+  secondary: ColorScale;
+
+  // Status colors - named red/green/orange in tailwind.config.ts,
+  // not success/warning/error/info
+  status: {
+    red: StatusColorScale;
+    green: StatusColorScale;
+    orange: StatusColorScale;
   };
 
-  // Bitcoin Stamps brand colors
-  stamp: {
+  // Surface tokens
+  background: string;
+  border: string;
+  hover: string;
+
+  /**
+   * @deprecated Legacy Bitcoin Stamps purple/grey aliases. tailwind.config.ts
+   * marks these "refactor and delete" - prefer `primary`/`neutral` instead.
+   */
+  stamp?: {
     purple: string;
     "purple-dark": string;
     "purple-light": string;
-    "purple-highlight": string;
     grey: string;
     "grey-dark": string;
     "grey-light": string;
-  };
-
-  // Semantic colors
-  semantic: {
-    success: string;
-    warning: string;
-    error: string;
-    info: string;
-  };
-
-  // Neutral colors
-  neutral: {
-    white: string;
-    black: string;
-    transparent: string;
   };
 }
 
@@ -1889,7 +1867,7 @@ export interface TableColumn<T = any> {
  */
 export interface AriaAttributes {
   /** ARIA role */
-  "aria-role"?: JSX.AriaRole;
+  "aria-role"?: AriaRole;
   /** ARIA label */
   "aria-label"?: string;
   /** ARIA labelledby */
@@ -2225,6 +2203,67 @@ export interface ExplorerContentProps extends BaseComponentProps {
     prefix?: string;
   };
   fromPage?: string;
+  src20DataCard?: {
+    data: import("./src20.d.ts").SRC20Row[];
+    total: number;
+    page: number;
+    totalPages: number;
+  } | null;
+  section?: "all" | "stamps" | "tokens";
+  viewMode?: "cardVertical" | "cardSquare" | "cardRow" | "cardHorizontal";
+}
+
+/**
+ * Explorer Header component props
+ */
+export interface ExplorerHeaderProps extends BaseComponentProps {
+  currentSection?: "all" | "stamps" | "tokens";
+  viewMode?: "cardVertical" | "cardSquare" | "cardRow";
+  // Counts for the section-selector's PillContentCount badge — combined
+  // for "all", stamps-only for "stamps", tokens-only for "tokens"
+  stampsTotal?: number;
+  tokensTotal?: number;
+}
+
+/**
+ * Wallet page — Stamps container sub-tabs
+ */
+export type WalletStampsTab =
+  | "balance"
+  | "created"
+  | "listings"
+  | "collections";
+
+/**
+ * Wallet page — Tokens container sub-tabs
+ */
+export type WalletTokensTab = "balance" | "created";
+
+/**
+ * Wallet page — top-level content selector (WalletHeaderContent): which
+ * asset type(s) the unified wallet content container displays.
+ */
+export type WalletContentTabId = "all" | "stamps" | "tokens";
+
+/**
+ * Wallet page — unified sub-tab selector (WalletHeaderContent). `listings`
+ * and `collections` are stamps-only and only selectable when
+ * `WalletContentTabId` is `"stamps"`.
+ */
+export type WalletContentTabIdSub =
+  | "balance"
+  | "created"
+  | "listings"
+  | "collections";
+
+export interface WalletHeaderContentProps extends BaseComponentProps {
+  section?: WalletContentTabId;
+  tab?: WalletContentTabIdSub;
+  viewMode?: "cardVertical" | "cardSquare" | "cardRow" | "cardHorizontal";
+  // Totals for the currently active section/tab combo - used by the count
+  // pill (stampsPagination.total / tokensPagination.total from the route)
+  stampsTotal?: number | undefined;
+  tokensTotal?: number | undefined;
 }
 
 /**
@@ -2620,6 +2659,10 @@ export interface ToggleSwitchButtonProps {
 
   // Optional ref forwarding
   buttonRef?: preact.RefObject<HTMLButtonElement>;
+
+  // Optional overrides for the knob background color/gradient classes
+  activeKnobClassName?: string;
+  inactiveKnobClassName?: string;
 }
 
 // ICON COMPONENT PROPS
@@ -2627,10 +2670,6 @@ export interface ToggleSwitchButtonProps {
 
 /**
  * Loading Icon component props
- */
-
-/**
- * Gear Icon component props
  */
 
 /**
@@ -2873,6 +2912,7 @@ export interface StampDetailPageProps {
     last_block: number;
     stamps_recent: any;
     lowestPriceDispenser: any;
+    btcPriceUSD?: number;
     htmlTitle?: string;
     previewImageUrl?: string;
     error?: string;
@@ -3097,44 +3137,6 @@ export interface TransactionStatusProps {
 }
 
 /**
- * SRC20CardBaseProps - Migrated from SRC20CardBase.tsx
- */
-export interface SRC20CardBaseProps {
-  // For individual card usage (SRC20CardBase component)
-  src20?: SRC20Row | null | undefined;
-  // For bulk card usage (SRC20Card, SRC20CardSm components)
-  data?: SRC20Row[] | null;
-  // fromPage is reserved for future use
-  fromPage?: "src20" | "wallet" | "stamping/src20" | "home";
-  // timeframe is reserved for future use
-  timeframe?: Timeframe;
-  onImageClick?: (imgSrc: string) => void;
-  children?: preact.ComponentChildren;
-  totalColumns?: number;
-  // Current sort state for table headers
-  currentSort?: {
-    filter: string;
-    direction: "asc" | "desc";
-  };
-}
-
-/**
- * EnhancedWalletContentProps - Migrated from WalletProfileContent.tsx
- */
-export interface EnhancedWalletContentProps extends WalletContentProps {
-  /** Enable advanced sorting features (default: false for backward compatibility) */
-  enableAdvancedSorting?: boolean;
-  /** Show performance metrics for sorting operations */
-  showSortingMetrics?: boolean;
-  /** Additional sorting configuration */
-  sortingConfig?: {
-    enableUrlSync?: boolean;
-    enablePersistence?: boolean;
-    enableMetrics?: boolean;
-  };
-}
-
-/**
  * SRC20DetailHeaderProps - Migrated from SRC20DetailHeader.tsx
  */
 export interface SRC20DetailHeaderProps {
@@ -3145,20 +3147,86 @@ export interface SRC20DetailHeaderProps {
     x?: string;
     stamp_url?: string;
     deploy_img?: string;
+    // Optional about/description text; not yet populated by the API, so
+    // the header hides this stat entirely when absent.
+    description?: string;
   };
   _mintStatus: SRC20MintStatus;
   _totalMints: number;
   _totalTransfers: number;
   marketInfo?: MarketListingAggregated;
   _align?: AlignmentType;
+  // Price history series rendered beneath the ticker row via ChartWidget.
+  // Chart is temporarily disabled (see routes/src20/[tick].tsx) but the
+  // prop stays so the widget can be re-enabled easily later.
+  highcharts?: HighchartsData;
 }
 
 /**
- * StampOverviewHeaderProps - Migrated from StampOverviewHeader.tsx
+ * SRC20DetailInfoProps - deploy metadata rendered in the DetailsTableBase
+ * "INFO" tab (about, creator, deploy date, tx hash, block, decimals, limit).
  */
-export type StampOverviewHeaderProps = {
-  currentFilters?: StampFilters;
+export interface SRC20DetailInfoProps {
+  deployment: Pick<
+    SRC20DetailHeaderProps["deployment"],
+    | "destination"
+    | "creator_name"
+    | "tx_hash"
+    | "block_index"
+    | "block_time"
+    | "deci"
+    | "lim"
+    | "max"
+    | "description"
+    | "email"
+    | "web"
+    | "tg"
+    | "x"
+  >;
+}
+
+/**
+ * MarketplaceHeaderProps - Props for the MarketplaceHeader island
+ */
+export type MarketplaceHeaderProps = {
+  currentFilters?: ExplorerStampFilters;
+  viewMode?: "cardVertical" | "cardSquare" | "cardRow";
+  isSalesMode?: boolean;
+  // Total count for the current market mode + stamp-type combo - used by
+  // the count pill
+  currentTotal?: number;
 };
+
+/**
+ * MarketplaceContentProps - Props for the MarketplaceContent island
+ */
+export interface MarketplaceContentProps {
+  stamps?: StampRow[];
+  isRecentSales?: boolean;
+  pagination?: {
+    page: number;
+    totalPages: number;
+    onPageChange?: (newPage: number) => void;
+    prefix?: string;
+  };
+  fromPage?: string;
+  viewMode?: "cardVertical" | "cardSquare" | "cardRow" | "cardHorizontal";
+}
+
+/**
+ * CollectionOverviewContentProps - Props for the CollectionOverviewContent
+ * island (collection landing/overview page)
+ */
+export interface CollectionOverviewContentProps {
+  collections?: Collection[];
+  pagination?: {
+    page: number;
+    totalPages: number;
+    onPageChange?: (newPage: number) => void;
+    prefix?: string;
+  };
+  viewMode?: "cardHorizontal" | "cardVertical" | "cardSquare";
+}
 
 /**
  * GlobalModalState - Migrated from states.ts
@@ -3338,7 +3406,7 @@ export interface AdvancedFeeCalculatorProps extends BaseFeeCalculatorProps {
  * Consolidated from stamp.d.ts and pagination.d.ts to support all consumers
  */
 export interface PaginationState {
-  // Basic pagination properties (for FreshStampGallery compatibility)
+  // Basic pagination properties (for StampGalleryWallet compatibility)
   page: number;
   limit: number;
   total: number;
@@ -3434,7 +3502,7 @@ export interface StampingProps {
 export interface SRC20MintingProps {
   // For stamping transaction tracking
   transactions?: SRC20Transaction[];
-  // For minting card components (SRC20CardMinting, SRC20CardSmMinting)
+  // For minting table components (SRC20Minting, SRC20MintingCompact)
   data?: SRC20Row[];
   fromPage?: "src20" | "wallet" | "stamping/src20" | "home";
   // For table components
@@ -3488,15 +3556,8 @@ export interface ToastComponentProps {
   autoDismiss: boolean;
   duration: number;
   isAnimatingOut?: boolean;
-}
-
-/**
- * WalletStampCardProps - Props for WalletStampCard component
- */
-export interface WalletStampCardProps {
-  stamp: any;
-  variant?: "default" | string;
-  fromPage?: string;
+  /** True only for the one-time app update announcement toast. */
+  isUpdate?: boolean | undefined;
 }
 
 /**
@@ -3522,11 +3583,12 @@ export interface RangeInputProps {
  * SRC20OverviewHeaderProps - Props for SRC20OverviewHeader component
  */
 export interface SRC20OverviewHeaderProps {
-  onViewTypeChange?: (viewType: string) => void;
   viewType?: string;
-  onTimeframeChange?: (timeframe: string) => void;
-  onFilterChange?: (filter: any) => void;
-  currentSort?: any;
+  timeframe?: string;
+  sortBy?: string;
+  sortDirection?: string;
+  // Total count for the current minted/minting view - used by the count pill
+  currentTotal?: number;
 }
 
 /**
@@ -3611,17 +3673,69 @@ export interface WalletPageProps {
 }
 
 /**
- * WalletContentProps - Migrated from wallet.d.ts
+ * Pagination summary shared by the Stamps and Tokens containers on the
+ * wallet page — only the active sub-tab's data/pagination is fetched
+ * server-side and passed down (see routes/wallet/[address].tsx).
+ */
+export interface WalletContainerPagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+/**
+ * WalletContentProps - props for the unified wallet content island. A
+ * single shared container renders Stamps and/or Tokens panels depending on
+ * `section`, with a shared `tab`/`view` driving both panels at once.
+ * Replaces the legacy EnhancedWalletContentProps / advanced-sorting shape
+ * and the earlier two-container `WalletProfileContentProps` shape.
  */
 export interface WalletContentProps {
-  stamps: any;
-  src20: any;
-  dispensers: any;
   address: string;
+  anchor?: string | undefined;
+
+  section?: WalletContentTabId | undefined;
+  tab?: WalletContentTabIdSub | undefined;
+  view?:
+    | "cardVertical"
+    | "cardSquare"
+    | "cardRow"
+    | "cardHorizontal"
+    | undefined;
+
+  stampsData?: any[] | undefined;
+  stampsPagination?: WalletContainerPagination | undefined;
+
+  tokensData?: any[] | undefined;
+  tokensPagination?: WalletContainerPagination | undefined;
+}
+
+/**
+ * WalletProfilePageProps - flat props shape rendered by the wallet profile
+ * page's handler (routes/wallet/[address].tsx). Deliberately separate from
+ * the legacy `WalletPageProps` (still used by routes/dashboard/[address].tsx
+ * with its nested `data.data.{stamps,src20,dispensers}` shape) since the two
+ * routes now diverge — this page fetches per-container, per-sub-tab data
+ * instead of always fetching every section.
+ */
+export interface WalletProfilePageProps {
+  address: string;
+  walletData: WalletOverviewInfo;
+  stampsTotal: number;
+  src20Total: number;
+  stampsCreated: number;
   anchor?: string;
-  stampsSortBy?: "ASC" | "DESC";
-  src20SortBy?: "ASC" | "DESC";
-  dispensersSortBy?: "ASC" | "DESC";
+
+  section?: WalletContentTabId;
+  tab?: WalletContentTabIdSub;
+  view?: "cardVertical" | "cardSquare" | "cardRow" | "cardHorizontal";
+
+  stampsData?: any[];
+  stampsPagination?: WalletContainerPagination;
+
+  tokensData?: any[];
+  tokensPagination?: WalletContainerPagination;
 }
 
 /**
@@ -3636,23 +3750,6 @@ export interface WalletAuthState {
   maxFailedAttempts: number;
   failedAttempts: number;
 }
-
-/**
- * CollectionLandingPageProps - Migrated from index.tsx
- */
-export type CollectionLandingPageProps = {
-  data: {
-    collections: CollectionWithOptionalMarketData[];
-    total: number;
-    _page: number;
-    _pages: number;
-    _page_size: number;
-    _filterBy: string[];
-    sortBy: "ASC" | "DESC";
-    stamps_src721: StampRow[];
-    stamps_posh: StampRow[];
-  };
-};
 
 /**
  * State - Migrated from sharedContentHandler.ts
@@ -3836,8 +3933,10 @@ export type CollectionDetailsPageProps = {
     pages: number;
     page_size: number;
     selectedTab: "all" | "classic" | "posh";
-    sortBy: string;
+    sortBy: "ASC" | "DESC";
     filterBy: string[];
+    market?: "all" | "listings";
+    viewMode?: "cardVertical" | "cardSquare";
   };
 };
 
@@ -4042,11 +4141,7 @@ export interface AlertContext {
 /**
  * Backward compatibility aliases for commonly expected type names
  */
-export type SRC20CardProps = SRC20CardBaseProps;
-export type SRC20CardMintingProps = SRC20MintingProps;
-export type SRC20CardSmProps = SRC20CardBaseProps;
-export interface SRC20CardSmMintingProps extends SRC20MintingProps {
-  // Ensure explicit onImageClick type handling
+export interface SRC20MintingCompactProps extends SRC20MintingProps {
   onImageClick?: (imgSrc: string) => void;
 }
 export type SRC20MintsProps = SRC20MintingProps;

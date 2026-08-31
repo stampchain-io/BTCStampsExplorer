@@ -1,6 +1,6 @@
 /* ===== TERMS OF SERVICE PAGE ===== */
 import { containerBackground, containerGap, CourierFontLoader } from "$layout";
-import { subtitleGrey, text, textLg, textSm, titleGreyLD } from "$text";
+import { subtitleNeutral, text, textLg, textSm, titleNeutral } from "$text";
 
 /* ===== PAGE COMPONENT ===== */
 export default function TermsOfServicePage() {
@@ -10,14 +10,14 @@ export default function TermsOfServicePage() {
       <div class={`${containerBackground} ${containerGap}`}>
         {/* ===== HEADER SECTION ===== */}
         <section>
-          <h1 class={titleGreyLD}>TERMS OF SERVICE</h1>
+          <h1 class={titleNeutral}>TERMS OF SERVICE</h1>
           <div class="flex flex-col tablet:flex-row tablet:justify-between tablet:items-end">
-            <h2 class={subtitleGrey}>
+            <h2 class={subtitleNeutral}>
               AGREEMENT TO OUR LEGAL TERMS
             </h2>
-            <h5 class="text-lg mobileLg:text-xl font-light text-color-grey pb-4 mobileLg:pb-2">
+            <h5 class="text-lg mobileLg:text-xl font-light text-color-neutral-500 pb-4 mobileLg:pb-2">
               LAST UPDATED
-              <span class="pl-3 font-medium text-color-grey-light">
+              <span class="pl-3 font-medium text-color-neutral-400">
                 SEPTEMBER 11 2024
               </span>
             </h5>
@@ -70,7 +70,7 @@ export default function TermsOfServicePage() {
         </section>
         {/* ===== TABLE OF CONTENTS SECTION ===== */}
         <section>
-          <p class="font-semibold text-lg text-color-grey-light font-courier-prime">
+          <p class="font-semibold text-lg text-color-neutral-200 font-courier-prime">
             <span class="text-2xl">
               TABLE OF CONTENTS<br />
             </span>
@@ -767,7 +767,7 @@ export default function TermsOfServicePage() {
             further information regarding use of the Services, please{" "}
             <a
               href="/about#contact"
-              class={`${textSm} animated-underline`}
+              class={`${textSm} link-neutral-200`}
             >
               send us an email
             </a>.

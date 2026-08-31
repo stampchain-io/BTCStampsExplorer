@@ -1,5 +1,5 @@
-import type { SelectFieldProps } from "$types/ui.d.ts";
 import { inputField } from "$form";
+import type { SelectFieldProps } from "$types/ui.d.ts";
 
 export function SelectField({
   onChange,
@@ -22,11 +22,13 @@ export function SelectField({
         onChange={handleChange}
         onClick={onClick}
         disabled={disabled}
-        class={inputField}
+        class={`${inputField} appearance-none cursor-pointer`}
         value={value?.toString() ?? ""}
       >
         {placeholder && (
-          <option value="" disabled={options.length > 0}>{placeholder}</option>
+          <option value="" disabled={options.length > 0}>
+            {placeholder}
+          </option>
         )}
 
         {options.length > 0

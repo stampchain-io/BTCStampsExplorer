@@ -1,23 +1,23 @@
 /* ===== STAMP LISTINGS OPEN TABLE COMPONENT ===== */
-import { cellAlign, colGroup } from "$components/layout/types.ts";
+import { colGroup } from "$components/layout/types.ts";
 import {
   cellCenterL2Detail,
   cellLeftL2Detail,
   cellRightL2Detail,
-  glassmorphismL2,
+  container2,
   ScrollContainer,
+  shadowGlowPurple,
 } from "$layout";
 import {
   formatNumber,
   formatSatoshisToBTC,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
-import { labelXs, textSm } from "$text";
+import { labelXxs, textXs } from "$text";
 import type { StampListingsOpenProps } from "$types/ui.d.ts";
 
 /* ===== COMPONENT ===== */
 export function StampListingsOpenTable({
   dispensers,
-  floorPrice,
   onSelectDispenser,
   selectedDispenser,
 }: StampListingsOpenProps) {
@@ -29,12 +29,28 @@ export function StampListingsOpenTable({
     .filter((dispenser) => dispenser.give_remaining > 0)
     .sort((a, b) => b.give_remaining - a.give_remaining);
 
+  // Mirrors StampInfo's displayPrice fallback (selectedDispenser -> lowest
+  // priced open dispenser) so the highlighted row always matches the price
+  // shown there, instead of comparing against the separately-sourced,
+  // potentially stale market floor price.
+  const lowestPriceDispenser = sortedDispensers.reduce<
+    typeof sortedDispensers[number] | null
+  >(
+    (lowest, dispenser) =>
+      !lowest || dispenser.satoshirate < lowest.satoshirate
+        ? dispenser
+        : lowest,
+    null,
+  );
+
   /* ===== RENDER ===== */
   return (
     <div class="relative w-full">
-      <ScrollContainer class="min-h-[76px] max-h-[244px] scrollbar-background-layer1">
-        <div class="!-my-2 overflow-x-auto tablet:overflow-x-visible scrollbar-hide">
-          <table class={`w-full border-separate border-spacing-y-2 ${textSm}`}>
+      <ScrollContainer class="min-h-[72px] max-h-[220px] scrollbar-background-layer1">
+        <div class="overflow-x-auto overflow-y-clip tablet:overflow-x-clip flow-root scrollbar-hide">
+          <table
+            class={`w-full -my-2 border-separate border-spacing-y-2 ${textXs}`}
+          >
             {/* ===== TABLE STRUCTURE ===== */}
             <colgroup>
               {colGroup([
@@ -46,9 +62,8 @@ export function StampListingsOpenTable({
               ]).map((col) => <col key={col.key} class={col.className} />)}
             </colgroup>
             {/* ===== TABLE HEADER ===== */}
-            <thead class="sticky top-0 z-10">
-              {/* Only sticky on desktop */}
-              <tr class={`${glassmorphismL2}`}>
+            <thead>
+              <tr class={container2}>
                 {headers.map((header, i) => {
                   const isFirst = i === 0;
                   const isLast = i === (headers?.length ?? 0) - 1;
@@ -61,9 +76,7 @@ export function StampListingsOpenTable({
                   return (
                     <th
                       key={header}
-                      class={`${
-                        cellAlign(i, headers?.length ?? 0)
-                      } !py-1.5 ${rowClass} ${labelXs}`}
+                      class={`sticky top-0 z-10 !py-1.5 !px-3 ${rowClass} ${labelXxs} text-color-neutral-500`}
                     >
                       {header}
                     </th>
@@ -75,29 +88,27 @@ export function StampListingsOpenTable({
             <tbody>
               {sortedDispensers.map((dispenser) => {
                 const isEmpty = dispenser.give_remaining === 0;
-                const isFloorPrice =
-                  (dispenser.satoshirate / 100000000) === floorPrice;
+                const isLowestPrice =
+                  dispenser.source === lowestPriceDispenser?.source;
                 const isSelected =
                   selectedDispenser?.source === dispenser.source ||
-                  (!selectedDispenser && isFloorPrice);
+                  (!selectedDispenser && isLowestPrice);
 
                 return (
                   <tr
                     key={dispenser.source}
-                    class={`${glassmorphismL2} group cursor-pointer ${
-                      isEmpty ? "text-color-grey-semidark" : ""
+                    class={`${container2} ${shadowGlowPurple} cursor-pointer ${
+                      isEmpty ? "text-color-neutral-500" : ""
                     } ${
                       isSelected
-                        ? "text-color-grey-light"
-                        : "text-color-grey-semidark"
+                        ? "text-color-neutral-200"
+                        : "text-color-neutral-500"
                     }`}
                     onClick={() => onSelectDispenser?.(dispenser)}
                   >
                     {/* PRICE */}
                     <td
-                      class={`${
-                        cellAlign(0, headers?.length ?? 0)
-                      } ${cellLeftL2Detail} group-hover:text-color-purple-light`}
+                      class={`${cellLeftL2Detail} text-color-orange-400 group-hover:border-color-hover`}
                     >
                       {formatSatoshisToBTC(dispenser.satoshirate, {
                         includeSymbol: true,
@@ -107,33 +118,29 @@ export function StampListingsOpenTable({
                     </td>
                     {/* ESCROW */}
                     <td
-                      class={`${
-                        cellAlign(1, headers?.length ?? 0)
-                      } ${cellCenterL2Detail}`}
+                      class={`${cellCenterL2Detail} group-hover:border-color-hover`}
                     >
                       {formatNumber(dispenser.escrow_quantity, 0)}
                     </td>
                     {/* GIVE */}
                     <td
-                      class={`${
-                        cellAlign(2, headers?.length ?? 0)
-                      } ${cellCenterL2Detail}`}
+                      class={`${cellCenterL2Detail} group-hover:border-color-hover`}
                     >
                       {formatNumber(dispenser.give_quantity, 0)}
                     </td>
                     {/* REMAIN */}
                     <td
-                      class={`${
-                        cellAlign(3, headers?.length ?? 0)
-                      } ${cellCenterL2Detail}`}
+                      class={`${cellCenterL2Detail} group-hover:border-color-hover ${
+                        dispenser.give_remaining > 0
+                          ? "text-color-primary-400"
+                          : "text-color-neutral-200"
+                      }`}
                     >
                       {formatNumber(dispenser.give_remaining, 0)}
                     </td>
                     {/* SOURCE */}
                     <td
-                      class={`${
-                        cellAlign(4, headers?.length ?? 0)
-                      } ${cellRightL2Detail} group-hover:text-color-grey-light`}
+                      class={`${cellRightL2Detail} group-hover:border-color-hover group-hover:text-color-neutral-200`}
                     >
                       DISPENSER
                     </td>

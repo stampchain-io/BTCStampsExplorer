@@ -423,6 +423,10 @@ export class FetchHttpClient implements HttpClient {
     // Clean up from active requests when done
     requestPromise.finally(() => {
       this.activeRequests.delete(requestPromise);
+    }).catch(() => {
+      // requestPromise's rejection is already handled by the caller via the
+      // returned promise below; this only exists to prevent an unhandled
+      // rejection on the derived .finally() promise.
     });
 
     return requestPromise;

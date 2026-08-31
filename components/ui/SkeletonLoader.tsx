@@ -106,35 +106,6 @@ export function StampCardSkeleton() {
 }
 
 /**
- * 🚀 PERFORMANCE OPTIMIZATION: Wallet Stamp Card Skeleton
- * Matches the wallet dashboard stamp layout with dispenser info
- */
-export function WalletStampCardSkeleton() {
-  return (
-    <div class="flex gap-4 p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700">
-      {/* Stamp Image */}
-      <div class="w-16 h-16 flex-shrink-0">
-        <div class="w-full h-full bg-gray-200 dark:bg-gray-700 rounded-2xl">
-          <Skeleton width="100%" height="100%" borderRadius="0.5rem" />
-        </div>
-      </div>
-
-      {/* Content */}
-      <div class="flex-1 min-w-0">
-        <Skeleton width="70%" height="20px" className="mb-2" />
-        <Skeleton width="50%" height="16px" className="mb-3" />
-
-        {/* Dispenser info */}
-        <div class="flex justify-between items-center">
-          <Skeleton width="80px" height="14px" />
-          <Skeleton width="60px" height="14px" />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/**
  * 🚀 PERFORMANCE OPTIMIZATION: Gallery Skeleton Grid
  * Creates a grid of skeleton cards for gallery loading states
  */

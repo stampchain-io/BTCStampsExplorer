@@ -266,8 +266,8 @@ describe("CollectionRepository Unit Tests", () => {
       if (result !== null) {
         assertEquals(result.collection_name, "KEVIN");
         assertExists(result.collection_id);
-        assertEquals(typeof result.stamp_count, "string");
-        assertEquals(typeof result.total_editions, "string");
+        assertEquals(typeof result.stamp_count, "number");
+        assertEquals(typeof result.total_editions, "number");
       }
     });
 

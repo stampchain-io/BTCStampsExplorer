@@ -355,6 +355,18 @@ export class StampRepository {
     suffix?: StampSuffixFilter[];
     fileType?: StampFiletype[];
     creatorAddress?: string;
+    market?: "listings" | "sales" | "";
+    dispensers?: boolean;
+    atomics?: boolean;
+    listings?: "all" | "bargain" | "affordable" | "premium" | "custom" | "";
+    listingsMin?: string;
+    listingsMax?: string;
+    sales?: "recent" | "premium" | "custom" | "volume" | "";
+    salesMin?: string;
+    salesMax?: string;
+    volume?: "24h" | "7d" | "30d" | "";
+    volumeMin?: string;
+    volumeMax?: string;
   }) {
     const {
       type = STAMP_TYPE_CONSTANTS.STAMPS,
@@ -366,6 +378,18 @@ export class StampRepository {
       suffix = [],
       fileType = [],
       creatorAddress,
+      market,
+      dispensers,
+      atomics,
+      listings,
+      listingsMin,
+      listingsMax,
+      sales,
+      salesMin,
+      salesMax,
+      volume,
+      volumeMin,
+      volumeMax,
     } = options;
 
     // Combine filters
@@ -385,25 +409,26 @@ export class StampRepository {
       filterBy,
       combinedFilters,
       false,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined
+      undefined, // filters
+      undefined, // editions
+      undefined, // range
+      undefined, // rangeMin
+      undefined, // rangeMax
+      undefined, // fileSize
+      undefined, // fileSizeMin
+      undefined, // fileSizeMax
+      market,
+      dispensers,
+      atomics,
+      listings,
+      listingsMin,
+      listingsMax,
+      sales,
+      salesMin,
+      salesMax,
+      volume,
+      volumeMin,
+      volumeMax
     );
 
     if (creatorAddress) {
@@ -421,6 +446,23 @@ export class StampRepository {
       LEFT JOIN creator AS cr ON st.creator = cr.address
     `;
 
+    // Add marketplace joins if needed (mirrors getStamps' main query) - the
+    // WHERE conditions from buildMarketplaceFilterConditions above reference
+    // smd.* / ss.* columns, which are unresolvable without these joins
+    const hasListingsFilter = market === "listings" || dispensers || listings;
+    const hasSalesFilter = market === "sales" || sales || volume;
+
+    if (hasListingsFilter || hasSalesFilter) {
+      joinClause += `
+        LEFT JOIN stamp_market_data smd ON st.cpid = smd.cpid
+      `;
+    }
+    if (hasSalesFilter) {
+      joinClause += `
+        LEFT JOIN stamp_sales_history ss ON st.cpid = ss.cpid
+      `;
+    }
+
     // Include collection_stamps join only if collectionId is provided
     if (collectionId) {
       joinClause = `
@@ -429,8 +471,13 @@ export class StampRepository {
       `;
     }
 
+    // Use COUNT(DISTINCT ...) when the sales history join is present, since
+    // a stamp with multiple sales would otherwise be counted more than once
+    // (mirrors the "DISTINCT" select prefix used in the main getStamps query)
+    const countExpression = hasSalesFilter ? "COUNT(DISTINCT st.stamp)" : "COUNT(*)";
+
     const queryTotal = `
-      SELECT COUNT(*) AS total
+      SELECT ${countExpression} AS total
       FROM ${STAMP_TABLE} AS st
       ${joinClause}
       ${whereClause}
@@ -1017,10 +1064,18 @@ export class StampRepository {
         LEFT JOIN creator AS cr ON st.creator = cr.address
       `;
 
-      // Add market data join if needed for collections
-      if (hasMarketDataFilters) {
+      // Add market data join if needed for collections - covers both the
+      // Task 42 market data filters and the listings/sales marketplace
+      // filters (dispenser counts / floor price live on stamp_market_data)
+      if (hasMarketDataFilters || hasListingsFilter || hasSalesFilter) {
         joinClause += `
           LEFT JOIN stamp_market_data smd ON st.cpid = smd.cpid
+        `;
+      }
+
+      if (hasSalesFilter) {
+        joinClause += `
+          LEFT JOIN stamp_sales_history ss ON st.cpid = ss.cpid
         `;
       }
     }
@@ -1127,6 +1182,22 @@ export class StampRepository {
         ...(filterBy && { filterBy }),
         ...(suffix && { suffix }),
         ...(fileType && { fileType }),
+        ...(creatorAddress && { creatorAddress }),
+        // Marketplace filters (Task 42 + listings/sales) must mirror the data
+        // query, otherwise totalPages reflects the unfiltered collection size
+        // (e.g. pagination showing pages for a "listings" view with 0 rows)
+        ...(_market && { market: _market }),
+        ...(_dispensers && { dispensers: _dispensers }),
+        ...(_atomics && { atomics: _atomics }),
+        ...(_listings && { listings: _listings }),
+        ...(_listingsMin && { listingsMin: _listingsMin }),
+        ...(_listingsMax && { listingsMax: _listingsMax }),
+        ...(_sales && { sales: _sales }),
+        ...(_salesMin && { salesMin: _salesMin }),
+        ...(_salesMax && { salesMax: _salesMax }),
+        ...(_volume && { volume: _volume }),
+        ...(_volumeMin && { volumeMin: _volumeMin }),
+        ...(_volumeMax && { volumeMax: _volumeMax }),
       });
       total = (totalResult as any).rows[0]?.total || 0;
       totalPages = noPagination ? 1 : Math.ceil(total / limit);
@@ -1177,6 +1248,9 @@ export class StampRepository {
           st.supply,
           st.locked,
           st.creator,
+          st.file_size_bytes,
+          st.block_index,
+          st.block_time,
           cr.creator AS creator_name
         FROM ${STAMP_TABLE} st
         LEFT JOIN creator cr ON st.creator = cr.address
@@ -1259,19 +1333,28 @@ export class StampRepository {
     return (result as any).rows;
   }
 
+  // Shared verbatim between reads and cache invalidation — the cache key is
+  // a hash of this exact string + params, so the read and the invalidation
+  // call must use an identical query string or the invalidation would
+  // silently target the wrong (non-existent) key.
+  private static readonly CREATOR_NAME_QUERY =
+    "SELECT creator FROM creator WHERE address = ?";
+
+  // Cache duration for creator name reads. Kept short (rather than the
+  // previous 7 days) as a safety net: invalidateCacheKey() below already
+  // deterministically clears the exact cached read on every successful
+  // write, but a short TTL bounds the staleness window for any edge case
+  // where that direct invalidation doesn't run (e.g. a thrown error after
+  // the DB write but before invalidation completes).
+  private static readonly CREATOR_NAME_CACHE_SECONDS = 3600; // 1 hour
+
   static async getCreatorNameByAddress(
     address: string
   ): Promise<string | null> {
-    const query = `
-      SELECT creator
-      FROM creator
-      WHERE address = ?
-    `;
-
     const result = await this.db.executeQueryWithCache(
-      query,
+      this.CREATOR_NAME_QUERY,
       [address],
-      604800 // 1 week cache (7 days), will be invalidated on updates
+      this.CREATOR_NAME_CACHE_SECONDS,
     );
 
     if ((result as any) && (result as any).rows && (result as any).rows.length > 0) {
@@ -1279,6 +1362,17 @@ export class StampRepository {
     }
 
     return null;
+  }
+
+  /**
+   * Invalidate the cached creator-name read for a specific address.
+   * Uses a deterministic direct-key delete (recomputes the same hash the
+   * read used) rather than the process-local category registry, so it
+   * works correctly even when the write and the original cached read
+   * happened on different ECS tasks or across a deploy.
+   */
+  static async invalidateCreatorNameCache(address: string): Promise<void> {
+    await this.db.invalidateCacheKey(this.CREATOR_NAME_QUERY, [address]);
   }
 
   static async updateCreatorName(
@@ -1301,6 +1395,11 @@ export class StampRepository {
       // Invalidate creator cache after successful update
       if ((result as any).affectedRows > 0) {
         console.log(`[CACHE] Invalidating creator cache after update for address: ${address}`);
+        // Deterministic, cross-instance-safe invalidation of this address's
+        // cached read (see invalidateCreatorNameCache doc comment above).
+        await this.invalidateCreatorNameCache(address);
+        // Also clear the process-local category registry as a secondary
+        // measure — cheap, and covers same-process cached variations.
         await this.db.invalidateCacheByCategory('creator');
         return true;
       }
@@ -1462,6 +1561,7 @@ export class StampRepository {
         s.supply,
         s.divisible,
         s.locked,
+        s.file_size_bytes,
         ${includeMarketData ? `
         -- Sales data from stamp_sales_history
         ssh.btc_amount,
@@ -1469,6 +1569,8 @@ export class StampRepository {
         ssh.quantity,
         ssh.buyer_address,
         ssh.seller_address,
+        ssh.dispenser_tx_hash,
+        ssh.sale_type,
         ssh.block_time as sale_time,
         ssh.tx_hash as sale_tx_hash,
         ssh.block_index as sale_block_index,
@@ -1477,7 +1579,9 @@ export class StampRepository {
         smd.volume_24h_btc,
         smd.volume_7d_btc,
         smd.holder_count,
-        smd.data_quality_score
+        smd.data_quality_score,
+        smd.activity_level,
+        smd.last_activity_time
         ` : ''}
       FROM ${STAMP_TABLE} s
       INNER JOIN stamp_sales_history ssh ON s.cpid = ssh.cpid
@@ -1532,7 +1636,8 @@ export class StampRepository {
             ident: row.ident,
             supply: row.supply,
             divisible: row.divisible,
-            locked: row.locked
+            locked: row.locked,
+            file_size_bytes: row.file_size_bytes ?? null
           };
 
           if (includeMarketData) {
@@ -1547,17 +1652,31 @@ export class StampRepository {
                 lastPriceUpdate: row.sale_time ? new Date(row.sale_time * 1000) : null, // Convert unix timestamp
                 dataQualityScore: row.data_quality_score || 0,
                 minutesSinceSale: row.sale_time ? Math.floor((Date.now() - (row.sale_time * 1000)) / 60000) : 0,
-                lastSaleQuantity: row.quantity ? parseInt(row.quantity) : 1 // Quantity sold in transaction
+                lastSaleQuantity: row.quantity ? parseInt(row.quantity) : 1, // Quantity sold in transaction
+                activityLevel: row.activity_level || null,
+                lastActivityTime: row.last_activity_time || null
               },
               sale_data: {
-                btc_amount: row.btc_amount ? parseFloat(row.btc_amount) : 0,
+                // `stamp_sales_history.btc_amount` is a BIGINT column storing
+                // satoshis (it matches unit_price_sats for qty=1 sales), not
+                // a decimal BTC value — must divide by 1e8, same as
+                // unit_price_sats above. Not doing this made sale prices
+                // display 100,000,000x too large (e.g. "52500 BTC").
+                btc_amount: row.btc_amount ? parseFloat(row.btc_amount) / 100000000 : 0,
                 block_index: row.sale_block_index || row.block_index,
                 tx_hash: row.sale_tx_hash || row.tx_hash,
                 buyer_address: row.buyer_address,
                 seller_address: row.seller_address,
+                // Today every sale is sale_type='dispenser', so the seller's
+                // address IS the dispenser's address — mirrored here under
+                // both names so DISPENSER-column consumers don't need to
+                // know which sale_type produced the row.
+                dispenser_address: row.seller_address,
+                sale_time: row.sale_time ?? null,
                 time_ago: row.sale_time ? this.getTimeAgo(new Date(row.sale_time * 1000)) : null,
-                btc_amount_satoshis: row.btc_amount ? Math.round(parseFloat(row.btc_amount) * 100000000) : null,
-                dispenser_tx_hash: null
+                btc_amount_satoshis: row.btc_amount ? Math.round(parseFloat(row.btc_amount)) : null,
+                dispenser_tx_hash: row.dispenser_tx_hash || null,
+                sale_type: row.sale_type || null,
               }
             };
           }
@@ -2188,7 +2307,8 @@ export class StampRepository {
   }
 
   /**
-   * Calculate time ago string from date
+   * Calculate time ago string from date. Sales older than 7 days switch to
+   * an absolute M/D/YYYY date instead of an ever-growing "Nd ago" string.
    */
   private static getTimeAgo(date: Date): string {
     const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
@@ -2196,6 +2316,7 @@ export class StampRepository {
     if (seconds < 60) return `${seconds}s ago`;
     if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
     if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
-    return `${Math.floor(seconds / 86400)}d ago`;
+    if (seconds < 7 * 86400) return `${Math.floor(seconds / 86400)}d ago`;
+    return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
   }
 }

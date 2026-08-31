@@ -274,10 +274,43 @@ Deno.test("SRC20Repository - Query Parameter Building", async (t) => {
       assertEquals(params.includes(800000), true);
       assertEquals(params.includes("bc1qtest123"), true);
       assertEquals(params.includes("abc123def456"), true);
+
+      // SRC20Valid has no `address` column — the count query must filter by
+      // creator/destination the same way the list query does, or the whole
+      // wallet fetch throws (see getValidSrc20TxFromDb below).
+      assertEquals(query.includes("src20.creator = ?"), true);
+      assertEquals(query.includes("src20.destination = ?"), true);
+      assertEquals(query.includes("address = ?"), false);
     } finally {
       SRC20Repository.setDatabase(originalDb);
     }
   });
+
+  await t.step(
+    "should filter getTotalCountValidSrc20TxFromDbOptimized by creator/destination, not address",
+    async () => {
+      const mock = createMockDb(mockCountResponse);
+      SRC20Repository.setDatabase(mock.db as any);
+
+      try {
+        await SRC20Repository.getTotalCountValidSrc20TxFromDbOptimized({
+          address: "bc1qtest123",
+        });
+
+        const [query, params] = [mock.calls[0].query, mock.calls[0].params];
+        assertEquals(query.includes("src20.creator = ?"), true);
+        assertEquals(query.includes("src20.destination = ?"), true);
+        assertEquals(query.includes("src20.address = ?"), false);
+        // Address is pushed twice: once for creator, once for destination.
+        assertEquals(
+          params.filter((p: unknown) => p === "bc1qtest123").length,
+          2,
+        );
+      } finally {
+        SRC20Repository.setDatabase(originalDb);
+      }
+    },
+  );
 });
 
 Deno.test("SRC20Repository - Filtering and Sorting", async (t) => {

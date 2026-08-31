@@ -1,10 +1,17 @@
-import { FilterContentStamp } from "$islands/filter/FilterContentStamp.tsx";
+import { FilterContentExplorerStamp } from "$islands/filter/FilterContentExplorerStamp.tsx";
+import { FilterContentMarketplace } from "$islands/filter/FilterContentMarketplace.tsx";
 import {
   defaultFilters as stampDefaultFilters,
+  ExplorerStampFilters,
   filtersToQueryParams as stampFiltersToQueryParams,
   queryParamsToFilters as stampQueryParamsToFilters,
-  StampFilters,
-} from "$islands/filter/FilterOptionsStamp.tsx";
+} from "$islands/filter/FilterOptionsExplorerStamp.tsx";
+import {
+  defaultFilters as marketplaceDefaultFilters,
+  filtersToQueryParams as marketplaceFiltersToQueryParams,
+  queryParamsToFilters as marketplaceQueryParamsToFilters,
+  StampFilters as MarketplaceFilters,
+} from "$islands/filter/FilterOptionsMarketplace.tsx";
 import { useEffect, useRef, useState } from "preact/hooks";
 // Import SRC20 filter options
 import {
@@ -13,17 +20,24 @@ import {
   queryParamsToFilters as src20QueryParamsToFilters,
   SRC20Filters,
 } from "$islands/filter/FilterOptionsSRC20.tsx";
+// Import Explorer filter options and content
+import { FilterContentExplorer } from "$islands/filter/FilterContentExplorer.tsx";
+import {
+  defaultFilters as explorerDefaultFilters,
+  ExplorerFilters,
+  filtersToQueryParams as explorerFiltersToQueryParams,
+  queryParamsToFilters as explorerQueryParamsToFilters,
+} from "$islands/filter/FilterOptionsExplorer.tsx";
 // Import SRC20 filter content
 import { Button } from "$button";
-import { CloseIcon, Icon } from "$icon";
+import { Icon } from "$icon";
 import type { FilterType } from "$islands/button/FilterButton.tsx";
 import { FilterContentSRC20 } from "$islands/filter/FilterContentSRC20.tsx";
 import {
+  container0,
   containerStickyBottom,
-  glassmorphismOverlay,
   transitionTransform,
 } from "$layout";
-import { useBreakpoints } from "$lib/hooks/useBreakpoints.ts";
 import { tooltipIcon } from "$notification";
 import {
   getSearchParams,
@@ -39,7 +53,11 @@ const Tooltip = ({ visible, text }: { visible: boolean; text: string }) => (
 );
 
 // Define a type for all possible filter types
-type AllFilters = StampFilters | SRC20Filters;
+type AllFilters =
+  | ExplorerStampFilters
+  | SRC20Filters
+  | ExplorerFilters
+  | MarketplaceFilters;
 
 const FilterDrawer = (
   { open, setOpen, type = "stamp" }: {
@@ -48,8 +66,6 @@ const FilterDrawer = (
     type?: FilterType;
   },
 ) => {
-  const { isMobile } = useBreakpoints();
-
   // Parse the current URL parameters to initialize filters
   const getInitialFilters = (): AllFilters => {
     // SSR-safe browser environment check
@@ -67,7 +83,11 @@ const FilterDrawer = (
         break;
       }
       case "explorer": {
-        filters = src20QueryParamsToFilters(searchString); // Temporary fallback
+        filters = explorerQueryParamsToFilters(searchString);
+        break;
+      }
+      case "marketplace": {
+        filters = marketplaceQueryParamsToFilters(searchString);
         break;
       }
       default: {
@@ -84,8 +104,9 @@ const FilterDrawer = (
       case "src20":
         return { ...src20DefaultFilters };
       case "explorer":
-        // For future implementation
-        return { ...src20DefaultFilters }; // Temporary fallback
+        return { ...explorerDefaultFilters };
+      case "marketplace":
+        return { ...marketplaceDefaultFilters };
       default:
         return { ...stampDefaultFilters };
     }
@@ -200,35 +221,32 @@ const FilterDrawer = (
     };
   }, [open]); // Remove currentFilters from dependencies
 
-  // Mobile single-section logic: Only allow one collapsible section open at a time on mobile
+  // Accordion: only one collapsible section open at a time
   useEffect(() => {
-    if (!isMobile() || !open) return;
+    if (!open) return;
 
     const handleSectionToggle = (event: Event) => {
       const target = event.target as HTMLElement;
-
-      // Only target main section toggle buttons
       const sectionButton = target.closest("button[data-section-toggle]");
 
       if (!sectionButton || !drawerRef.current?.contains(sectionButton)) return;
 
-      // Check if the current section is about to be opened (currently closed)
       const currentSection = sectionButton.nextElementSibling;
       const isCurrentlyExpanded = currentSection?.getAttribute(
         "data-section-expanded",
       ) === "true";
 
-      // Only close other sections if we're opening this one (not closing it)
+      // Only close others when opening a section (not when closing)
       if (!isCurrentlyExpanded) {
-        // Find all other main section toggle buttons and close their sections
         const allSectionButtons = drawerRef.current.querySelectorAll(
           "button[data-section-toggle]",
         );
         allSectionButtons.forEach((button) => {
           if (button !== sectionButton) {
             const nextSibling = button.nextElementSibling;
-            if (nextSibling?.getAttribute("data-section-expanded") === "true") {
-              // This section is expanded, close it
+            if (
+              nextSibling?.getAttribute("data-section-expanded") === "true"
+            ) {
               (button as HTMLButtonElement).click();
             }
           }
@@ -236,7 +254,6 @@ const FilterDrawer = (
       }
     };
 
-    // Use capture phase to handle this before the section's own click handler
     drawerRef.current?.addEventListener("click", handleSectionToggle, true);
 
     return () => {
@@ -246,7 +263,7 @@ const FilterDrawer = (
         true,
       );
     };
-  }, [isMobile, open]);
+  }, [open]);
 
   // Add tooltip state for close button
   const [isCloseTooltipVisible, setIsCloseTooltipVisible] = useState(false);
@@ -290,24 +307,48 @@ const FilterDrawer = (
     }
 
     const existingParams = new URLSearchParams(globalThis.location.search);
-    const baseParams = existingParams.get("type")
-      ? `type=${existingParams.get("type")}`
-      : "";
+    const typeParam = existingParams.get("type");
+    const viewParam = existingParams.get("view");
+    const sortParam = existingParams.get("sortBy");
+
+    const baseParams = typeParam ? `type=${typeParam}` : "";
+    // Preserve view mode + sort order across filter changes for pages that
+    // use them (stamp/marketplace carry "type" too; explorer uses "section"
+    // instead of "type" so it omits that key).
+    const baseParamsWithView = [
+      baseParams,
+      viewParam && `view=${viewParam}`,
+      sortParam && `sortBy=${sortParam}`,
+    ].filter(Boolean).join("&");
 
     let queryParams: string;
     if (type === "stamp") {
       queryParams = stampFiltersToQueryParams(
-        baseParams,
-        currentFilters as StampFilters,
+        baseParamsWithView,
+        currentFilters as ExplorerStampFilters,
+      );
+    } else if (type === "marketplace") {
+      queryParams = marketplaceFiltersToQueryParams(
+        baseParamsWithView,
+        currentFilters as MarketplaceFilters,
       );
     } else if (type === "src20") {
       queryParams = src20FiltersToQueryParams(
         baseParams,
         currentFilters as SRC20Filters,
       );
+    } else if (type === "explorer") {
+      const base = [
+        viewParam && `view=${viewParam}`,
+        sortParam && `sortBy=${sortParam}`,
+      ].filter(Boolean).join("&");
+      queryParams = explorerFiltersToQueryParams(
+        base,
+        currentFilters as ExplorerFilters,
+      );
     } else {
-      // Handle explorer case or throw error - @baba - add explorer filter
-      throw new Error(`Unsupported filter type: ${type}`);
+      setOpen(false);
+      return;
     }
 
     // Construct the new URL with the query params
@@ -345,10 +386,10 @@ const FilterDrawer = (
       id={drawerId}
       ref={drawerRef}
       class={`fixed top-0 z-40 h-[100dvh] left-0 right-auto w-full
-        ${glassmorphismOverlay} ${transitionTransform}
-        min-[420px]:w-[340px] min-[420px]:rounded-r-3xl min-[420px]:border-r-[1px] min-[420px]:border-r-color-border/75
+        ${container0} ${transitionTransform}
+        min-[420px]:w-[320px] min-[420px]:rounded-r-3xl min-[420px]:border-r-[1px] min-[420px]:border-r-color-border
         min-[420px]:shadow-[12px_0_12px_-6px_rgba(8,7,8,0.75)]
-        tablet:right-0 tablet:left-auto tablet:w-[300px] tablet:rounded-l-3xl tablet:border-l-[1px] tablet:border-l-color-border/75 tablet:shadow-[-12px_0_12px_-6px_rgba(8,7,8,0.75)]
+        tablet:right-0 tablet:left-auto tablet:w-[300px] tablet:rounded-l-3xl tablet:border-l-[1px] tablet:border-l-color-border tablet:shadow-[-12px_0_12px_-6px_rgba(8,7,8,0.75)]
         ${
         open ? "translate-x-0" : "-translate-x-full tablet:translate-x-full"
       }`}
@@ -356,35 +397,14 @@ const FilterDrawer = (
       aria-labelledby="drawer-form-label"
     >
       {/* Content container with flex column to separate scrollable area from sticky buttons */}
-      <div class="h-full pt-[29px] mobileLg:pt-[41px] tablet:pt-[40px] flex flex-col">
+      <div class="flex flex-col h-full pt-[21px] mobileLg:pt-[31px]">
         {/* Scrollable content area - overflow only on this section */}
         <div class="flex-1 overflow-y-auto scrollbar-background-overlay">
-          <div class="px-9 tablet:px-6">
+          <div class="px-7.5 tablet:px-5">
             <div class="relative w-full">
-              {/* Mobile CloseIcon - shows by default, hidden on tablet+ */}
-              <div class="flex flex-row tablet:hidden justify-between items-center w-full">
-                <h6 class="font-extrabold text-2xl color-grey-gradientLD tracking-wide select-none inline-block w-fit">
-                  FILTERS
-                </h6>
-                <div class="relative">
-                  <Tooltip
-                    visible={isCloseTooltipVisible}
-                    text={closeTooltipText}
-                  />
-                  <CloseIcon
-                    size="md"
-                    weight="bold"
-                    color="greyLight"
-                    onClick={handleCloseDrawer}
-                    onMouseEnter={handleCloseMouseEnter}
-                    onMouseLeave={handleCloseMouseLeave}
-                    aria-label="Close"
-                  />
-                </div>
-              </div>
-              {/* Tablet+ Icon - hidden on mobile, shows on tablet+ */}
-              <div class="hidden tablet:flex flex-row justify-between items-center w-full">
-                <div class="relative">
+              {/* Close icon + heading - order flips between mobile and tablet+ via flex-row-reverse */}
+              <div class="flex flex-row-reverse tablet:flex-row justify-between items-center w-full">
+                <div class="relative tablet:-translate-x-2 translate-y-[1px]">
                   <Tooltip
                     visible={isCloseTooltipVisible}
                     text={closeTooltipText}
@@ -393,15 +413,15 @@ const FilterDrawer = (
                     type="iconButton"
                     name="close"
                     weight="bold"
-                    size="xs"
-                    color="greyLight"
+                    size="mdR"
+                    color="neutral400"
+                    ariaLabel="Close filter drawer"
                     onClick={handleCloseDrawer}
                     onMouseEnter={handleCloseMouseEnter}
                     onMouseLeave={handleCloseMouseLeave}
-                    aria-label="Close menu"
                   />
                 </div>
-                <h6 class="font-normal text-lg color-grey-gradientLD mt-[2px] select-none inline-block w-fit">
+                <h6 class="font-black text-2xl tablet:text-lg text-color-neutral-700 tracking-wide tablet:tracking-normal select-none">
                   FILTERS
                 </h6>
               </div>
@@ -411,8 +431,16 @@ const FilterDrawer = (
           {/* Filter content based on type */}
           <div class="flex flex-col pt-6 pb-[120px] px-9 tablet:pt-5 tablet:pb-[100px] tablet:px-6">
             {type === "stamp" && (
-              <FilterContentStamp
-                initialFilters={currentFilters as StampFilters}
+              <FilterContentExplorerStamp
+                initialFilters={currentFilters as ExplorerStampFilters}
+                onFiltersChange={(filters) => {
+                  setCurrentFilters(filters);
+                }}
+              />
+            )}
+            {type === "marketplace" && (
+              <FilterContentMarketplace
+                initialFilters={currentFilters as MarketplaceFilters}
                 onFiltersChange={(filters) => {
                   setCurrentFilters(filters);
                 }}
@@ -426,18 +454,25 @@ const FilterDrawer = (
                 }}
               />
             )}
-            {/* Add more filter content components for other types as needed */}
+            {type === "explorer" && (
+              <FilterContentExplorer
+                initialFilters={currentFilters as ExplorerFilters}
+                onFiltersChange={(filters) => {
+                  setCurrentFilters(filters);
+                }}
+              />
+            )}
           </div>
         </div>
 
         {/* Sticky buttons - now outside overflow container */}
         <div
-          class={`flex justify-between ${containerStickyBottom} !mt-0 w-full px-9 tablet:px-6 gap-6 bg-transparent`}
+          class={`flex justify-between ${containerStickyBottom} !mt-0 w-full px-7.5 tablet:px-5 gap-5 bg-transparent`}
         >
           <Button
             variant="outline"
-            color="grey"
-            size="mdR"
+            color="neutral"
+            size="xsR"
             onClick={() => {
               isClearingRef.current = true;
               // Always clear to empty default filters (full reset)
@@ -453,8 +488,8 @@ const FilterDrawer = (
           </Button>
           <Button
             variant="flat"
-            color="grey"
-            size="mdR"
+            color="primary"
+            size="xsR"
             onClick={handleApplyFilters}
             class="w-full"
           >

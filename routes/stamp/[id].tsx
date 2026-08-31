@@ -5,16 +5,21 @@ import { StampImage, StampInfo } from "$content";
 import { Head } from "$fresh/runtime.ts";
 import { Handlers } from "$fresh/server.ts";
 import { body, containerBackground, containerGap } from "$layout";
+import {
+  DATA_PLACEHOLDER_DEV,
+  DATA_PLACEHOLDER_PROD_STAMP_DETAIL_PAGE,
+} from "$lib/utils/dataPlaceholderProd.ts";
+import { ErrorHandlingUtils } from "$lib/utils/errorHandling.ts";
 import { generateStampJsonLd } from "$lib/utils/jsonLd.ts";
 import { logger, LogNamespace } from "$lib/utils/logger.ts";
 import { StampGallery } from "$section";
 import { serverConfig } from "$server/config/config.ts";
-import { CollectionRepository } from "$server/database/collectionRepository.ts";
 import { StampController } from "$server/controller/stampController.ts";
+import { CollectionRepository } from "$server/database/collectionRepository.ts";
 import { getPreviewUrl } from "$server/services/aws/previewStorageService.ts";
 import { CounterpartyDispenserService } from "$server/services/counterpartyApiService.ts";
 import { RouteType } from "$server/services/infrastructure/cacheService.ts";
-import { DetailsTableBase, HoldersTable } from "$table";
+import { DetailsTableBase } from "$table";
 import type { StampRow } from "$types/stamp.d.ts";
 import type { StampDetailPageProps } from "$types/ui.d.ts";
 import type { HolderRow } from "$types/wallet.d.ts";
@@ -32,6 +37,7 @@ interface StampData {
   last_block: number;
   stamps_recent: any;
   lowestPriceDispenser: any;
+  btcPriceUSD?: number;
   htmlTitle?: string;
   error?: string;
   url: string;
@@ -46,16 +52,29 @@ interface StampData {
 /* ===== SERVER HANDLER ===== */
 export const handler: Handlers<StampData> = {
   async GET(req: Request, ctx) {
+    if (DATA_PLACEHOLDER_DEV) {
+      const { getDummyStampDetailPage } = await import(
+        "$lib/utils/dataPlaceholderDev.ts"
+      );
+      return ctx.render({
+        ...getDummyStampDetailPage(ctx.params.id),
+        url: req.url,
+      });
+    }
     try {
       const { id } = ctx.params;
       // Get stamp details first with market data
-      const stampData = await StampController.getStampDetailsById(
-        id,
-        "all",
-        RouteType.STAMP_DETAIL,
-        undefined,
-        true,
-        false,
+      const stampData = await ErrorHandlingUtils.withTimeout(
+        StampController.getStampDetailsById(
+          id,
+          "all",
+          RouteType.STAMP_DETAIL,
+          undefined,
+          true,
+          false,
+        ),
+        15000,
+        "DB timeout after 15000ms",
       );
       if (!stampData?.data?.stamp) {
         return ctx.renderNotFound();
@@ -168,6 +187,8 @@ export const handler: Handlers<StampData> = {
         stamps_recent: mainCategories[0]?.stamps ?? [],
         holders: holders.data,
         lowestPriceDispenser: lowestPriceDispenser,
+        btcPriceUSD: (stampData as { metadata?: { btcPrice?: number } })
+          .metadata?.btcPrice,
         collectionInfo,
         url: req.url,
         initialCounts: {
@@ -186,17 +207,8 @@ export const handler: Handlers<StampData> = {
         return ctx.renderNotFound();
       }
       return ctx.render({
+        ...DATA_PLACEHOLDER_PROD_STAMP_DETAIL_PAGE,
         error: error instanceof Error ? error.message : "Internal server error",
-        stamp: {} as StampRow,
-        total: 0,
-        sends: [],
-        dispensers: [],
-        dispenses: [],
-        holders: [],
-        vaults: [],
-        last_block: 0,
-        stamps_recent: [],
-        lowestPriceDispenser: null,
         url: req.url,
       });
     }
@@ -245,6 +257,7 @@ export default function StampDetailPage(props: StampDetailPageProps) {
     holders,
     stamps_recent,
     lowestPriceDispenser = null,
+    btcPriceUSD,
     collectionInfo,
   } = props.data;
 
@@ -291,7 +304,9 @@ export default function StampDetailPage(props: StampDetailPageProps) {
     ? stamp.name || "Unprunable UTXO Art"
     : "Unprunable UTXO Art";
 
-  const jsonLd = stamp
+  // block_time is required to derive datePublished — skip JSON-LD entirely
+  // for the empty fallback stamp (e.g. rendered when the DB is unreachable).
+  const jsonLd = stamp?.block_time
     ? generateStampJsonLd(
       stamp,
       { url: metaInfo.url, baseUrl },
@@ -306,9 +321,8 @@ export default function StampDetailPage(props: StampDetailPageProps) {
     subTitle: "ON-CHAIN MARVELS",
     type: "classic",
     stamps: stamps_recent,
-    layout: "grid" as const,
     fromPage: "stamp_detail",
-    showDetails: false,
+    variant: "cardSquare" as const,
     alignRight: false,
     gridClass: `
       grid w-full
@@ -332,6 +346,11 @@ export default function StampDetailPage(props: StampDetailPageProps) {
   };
 
   const tableConfigs = [
+    {
+      id: "holders",
+      label: "HOLDERS",
+      count: holders?.length || 0,
+    },
     {
       id: "dispensers",
       label: "DISPENSERS",
@@ -407,29 +426,37 @@ export default function StampDetailPage(props: StampDetailPageProps) {
       </Head>
 
       <div class={`${body} ${containerGap}`}>
-        <div class="grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 gap-6 mobileLg:gap-9">
-          <div class="desktop:col-span-1">
-            {stamp &&
-              (
-                <StampImage
-                  stamp={stamp}
-                  flag
-                />
-              )}
-          </div>
-          <div class="desktop:col-span-2">
+        <div class={containerBackground}>
+          <div
+            class={`grid grid-cols-1 min-[900px]:grid-cols-[minmax(0,38fr)_minmax(0,62fr)] tablet:grid-cols-[minmax(0,33fr)_minmax(0,67fr)] desktop:grid-cols-[minmax(0,26fr)_minmax(0,74fr)] gap-x-7.5`}
+          >
+            <div class="min-w-0 mb-5 min-[900px]:mb-0">
+              {stamp &&
+                (
+                  <StampImage
+                    stamp={stamp}
+                    flag
+                  />
+                )}
+            </div>
             {stamp &&
               (
                 <StampInfo
                   stamp={stamp}
                   lowestPriceDispenser={lowestPriceDispenser}
+                  collectionInfo={collectionInfo}
+                  {...(btcPriceUSD !== undefined ? { btcPriceUSD } : {})}
                 />
               )}
           </div>
         </div>
 
-        {holders && holders.length > 0 && (
-          <HoldersTable
+        {stamp?.ident !== "SRC-20" && (
+          <DetailsTableBase
+            type="stamps"
+            title="DETAILS"
+            configs={tableConfigs}
+            cpid={stamp?.cpid || ""}
             holders={holders.map((holder) => ({
               quantity: Number(holder.quantity),
               divisible: holder.divisible,
@@ -437,14 +464,6 @@ export default function StampDetailPage(props: StampDetailPageProps) {
               amt: Number(holder.amt ?? 0),
               percentage: Number(holder.percentage ?? 0),
             }))}
-          />
-        )}
-
-        {stamp?.ident !== "SRC-20" && (
-          <DetailsTableBase
-            type="stamps"
-            configs={tableConfigs}
-            cpid={stamp?.cpid || ""}
           />
         )}
 

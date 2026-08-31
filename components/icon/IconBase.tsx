@@ -3,6 +3,7 @@ import * as iconPaths from "$components/icon/paths.ts";
 import {
   BadgeVariants,
   globalSvgAttributes,
+  iconButtonPill,
   iconStyles,
   IconVariants,
 } from "$icon";
@@ -22,22 +23,33 @@ export function Icon(props: IconVariants) {
     colorAccentHover,
     isOpen: _isOpen,
     onClick,
-    ["f-partial"]: _fPartial,
+    onMouseEnter,
+    onMouseLeave,
+    ["f-partial"]: fPartial,
     ...rest
   } = props;
 
+  const isInteractive = type === "iconButton" || type === "iconHover";
+
   /* ===== STYLES ===== */
   const combinedClasses = `${iconStyles.base} ${iconStyles.size[size]} ${
-    type === "icon"
-      ? iconStyles.icon[color].replace("stroke-1", "")
-      : iconStyles.iconButton[color]
+    isInteractive
+      ? iconStyles.iconButton[color]
+      : iconStyles.icon[color].replace("stroke-1", "")
   } ${iconStyles.weight[weight]} group ${className}`;
 
+  // For iconButton/iconHover, click/hover/a11y semantics live on the <a>
+  // wrapper (see render branch below) so the clickable/hoverable area
+  // matches the visible pill instead of being limited to the inner <svg>.
   const commonProps = {
     className: combinedClasses,
-    role: role || (type === "iconButton" ? "button" : undefined),
-    "aria-label": ariaLabel || name,
-    onClick,
+    ...(isInteractive ? {} : {
+      role,
+      "aria-label": ariaLabel || name,
+      onClick,
+      onMouseEnter,
+      onMouseLeave,
+    }),
     ...rest,
   };
 
@@ -45,7 +57,7 @@ export function Icon(props: IconVariants) {
   const getIconPath = () => {
     const iconNameMap = {
       // Social Media Icons
-      stampchain: "logoS",
+      stampchain: "stampchainFill",
       twitter: "twitter",
       telegram: "telegram",
       github: "github",
@@ -68,6 +80,12 @@ export function Icon(props: IconVariants) {
       speedMedium: "time30",
       speedFast: "time60",
 
+      // View Mode Icons
+      viewCardRow: "gridRow",
+      viewCardVertical: "gridVertical",
+      viewCardSquare: "gridSquare",
+      viewCardHorizontal: "gridHorizontal",
+
       // Caret Icons
       caretUp: "caretUp",
       caretDown: "caretDown",
@@ -75,6 +93,14 @@ export function Icon(props: IconVariants) {
       caretRight: "caretRight",
       caretDoubleLeft: "caretDoubleLeft",
       caretDoubleRight: "caretDoubleRight",
+
+      // Art Stamp & Collection Icons
+      artStamp: "artStamp",
+      artStamps: "artStamps",
+
+      // SRC-20 Token Icons
+      src20Token: "src20Token",
+      src20Tokens: "src20Tokens",
 
       // Stamp Specific
       // - Image Right Panel Icons
@@ -92,33 +118,42 @@ export function Icon(props: IconVariants) {
       unlocked: "lockOpen",
       keyburned: "flame",
       divisible: "imageDivide",
+      recursive: "layers3",
       atom: "atom",
       dispenserListings: "imagesStar",
 
       // Wallet Specific Icons
       view: "eye",
       hide: "eyeSlash",
+      userCircle: "userCircle",
       collection: "images",
       copy: "copy",
       edit: "pencil",
       pencil: "pencil",
+
+      // SRC-101 Specific Icons
+      chartUp: "chartUp",
+      chartDown: "chartDown",
 
       // Bitcoin Specific Icons
       bitcoin: "bitcoin",
       bitcoins: "bitcoins",
       bitcoinTx: "bitcoinTx",
       bitcoinBlock: "blockchain",
+      listings: "bitcoinTag",
       version: "bitcoinCpu",
       send: "bitcoinOut",
       receive: "bitcoinIn",
       history: "bitcoinHistory",
       wallet: "bitcoinWallet",
       donate: "bitcoinHand",
+      explorer: "bitcoinMagnifyingGlass",
 
       // Misc Icons
       // - Tools, loader placeholder and donate CTA icons
-      stamp: "stampchain",
+      stamp: "stampchainOutline",
       uploadImage: "imageUpload",
+      downloadImage: "imageDownload",
 
       // Notification Display Icons
       info: "info",
@@ -149,7 +184,9 @@ export function Icon(props: IconVariants) {
         // Handle path object with custom styling
         if (typeof pathItem === "object" && pathItem.path && pathItem.style) {
           // Extract stroke colors and convert to fill
-          const iconStyleClass = iconStyles[type][color];
+          const iconStyleClass = isInteractive
+            ? iconStyles.iconButton[color]
+            : iconStyles.icon[color];
           const baseStroke = iconStyleClass.match(/(?:^|\s)(stroke-[a-z0-9-]+)/)
             ?.[1];
           const hoverStroke = iconStyleClass.match(
@@ -227,10 +264,23 @@ export function Icon(props: IconVariants) {
     return svgElement;
   }
 
-  if (type === "iconButton") {
+  if (isInteractive) {
     const { href, target, rel } = props;
     return (
-      <a href={href} target={target} rel={rel}>
+      <a
+        href={href}
+        target={target}
+        rel={rel}
+        {...(fPartial !== undefined ? { "f-partial": fPartial } : {})}
+        role={role || "button"}
+        aria-label={ariaLabel || name}
+        onClick={onClick}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        class={`inline-flex items-center group cursor-pointer ${
+          type === "iconButton" ? iconButtonPill : ""
+        }`}
+      >
         {svgElement}
       </a>
     );
@@ -240,23 +290,16 @@ export function Icon(props: IconVariants) {
   throw new Error(`Invalid icon type: ${type}`);
 }
 
-/* ===== SPECIALIZED ICONS ===== */
-// Hambirger menu icon is defined in: MenuIcon.tsx - its built with css/html instead of svg for better animation
-// Gradient close menu icon is defined in: CloseIcon.tsx
-// Animated gear icon code is in: GearIcon.tsx
-
 /* ===== BADGE ICON COMPONENT ===== */
 export function BadgeIcon({ text, className = "" }: BadgeVariants) {
   return (
     <span
       class={`
         flex items-center justify-center z-[-999]
-        absolute top-[-19px] left-[-29px]
-        tablet:top-[-16px] tablet:left-[-26px]
-        size-5 rounded-full backdrop-blur-lg
-        font-normal text-[10px] text-color-grey group-hover:text-color-grey-light group-hover:font-medium tracking-wider
-        bg-color-background/30 group-hover:bg-color-background/60
-        border border-color-border/75 group-hover:border-color-border
+        absolute top-[-15px] left-[-15px]
+        size-5 rounded-full
+        font-semibold text-[10px] text-color-hover tracking-wider
+        bg-transparent group-hover:bg-gradient-to-b group-hover:from-color-neutral-800 group-hover:via-color-neutral-800 group-hover:to-color-neutral-900 border border-color-neutral-700
         transition-all duration-200 cursor-pointer
         ${text === "0" ? "opacity-0" : "opacity-100"}
         ${className}

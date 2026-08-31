@@ -1,6 +1,9 @@
 import { SATOSHIS_PER_BTC } from "$constants";
 import { BigFloat } from "bigfloat/mod.ts";
+// @ts-ignore - esm.sh's dayjs type declaration uses `export =`, so it
+// has no `default` export per its .d.ts, even though the runtime module does.
 import dayjs from "dayjs";
+// @ts-ignore - same `export =` typing issue as the dayjs import above.
 import relativeTime from "dayjs/plugin/relativeTime";
 
 dayjs.extend(relativeTime);
@@ -86,6 +89,9 @@ interface DateFormatOptions {
   month?: "short" | "long" | "numeric" | "2-digit";
   year?: "numeric" | "2-digit";
   day?: "numeric" | "2-digit";
+  hour?: "numeric" | "2-digit";
+  minute?: "numeric" | "2-digit";
+  hour12?: boolean;
   includeRelative?: boolean;
 }
 
@@ -110,8 +116,15 @@ export function formatDate(
   if (options.month) formatOptions.month = options.month;
   if (options.year) formatOptions.year = options.year;
   if (options.day) formatOptions.day = options.day;
+  if (options.hour) formatOptions.hour = options.hour;
+  if (options.minute) formatOptions.minute = options.minute;
+  if (options.hour12 !== undefined) formatOptions.hour12 = options.hour12;
 
-  const formattedDate = date.toLocaleDateString(locale, formatOptions);
+  // Use toLocaleString (date + time) when time components are requested,
+  // otherwise keep the date-only formatter.
+  const formattedDate = (options.hour || options.minute)
+    ? date.toLocaleString(locale, formatOptions)
+    : date.toLocaleDateString(locale, formatOptions);
 
   // Add relative time if requested
   if (options.includeRelative) {
@@ -150,7 +163,7 @@ export function bigFloatToString(
   return result.replace(/\.?0+$/, "");
 }
 
-export function formatSupplyValue(
+export function formatSupply(
   supply: number | string | undefined,
   divisible: boolean,
 ): string {
@@ -367,6 +380,28 @@ export function formatFileSize(
 }
 
 /**
+ * Maps a mimetype subtype (e.g. from "text/plain" -> "plain") to a short
+ * display label used in stamp card badges.
+ */
+const FILE_TYPE_LABEL_OVERRIDES: Record<string, string> = {
+  javascript: "JS",
+  plain: "TXT",
+  "svg+xml": "SVG",
+};
+
+/**
+ * Formats a stamp mimetype subtype into a short, human-readable label
+ * for display in stamp card file-type badges (e.g. "javascript" -> "JS").
+ * @param mimetype The full mimetype string (e.g. "text/javascript")
+ * @returns The abbreviated label, or "N/A" if no mimetype is provided
+ */
+export function formatFileType(mimetype?: string | null): string {
+  const subtype = mimetype?.split("/")[1]?.toLowerCase();
+  if (!subtype) return "N/A";
+  return FILE_TYPE_LABEL_OVERRIDES[subtype] ?? subtype.toUpperCase();
+}
+
+/**
  * Formats market cap
  * @param marketCap The market cap in BTC
  * @returns Formatted market cap string
@@ -432,7 +467,7 @@ export function formatBalanceDisplay(
   let formattedSupply: string;
 
   if (divisible) {
-    // For divisible stamps, use formatSupplyValue but abbreviate if result is too long
+    // For divisible stamps, use formatSupply but abbreviate if result is too long
     const balanceValue = balance / 100000000;
     const supplyValue = supply / 100000000;
 

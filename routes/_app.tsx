@@ -1,12 +1,11 @@
 /* ===== ROOT APP LAYOUT ROUTE ===== */
 import { MetaTags } from "$components/layout/MetaTags.tsx";
 import { ResourceHints } from "$components/layout/PerformanceUtils.tsx";
-import { Head, Partial } from "$fresh/runtime.ts";
+import { asset, Head, Partial } from "$fresh/runtime.ts";
 import { type PageProps } from "$fresh/server.ts";
 import { Header } from "$header";
 import AnimationControlsManager from "$islands/layout/AnimationControlsManager.tsx";
 import BackgroundTopology from "$islands/layout/BackgroundTopology.tsx";
-import FontLoader from "$islands/layout/FontLoader.tsx";
 import ModalProvider from "$islands/layout/ModalProvider.tsx";
 import PageVisibilityManager from "$islands/layout/PageVisibilityManager.tsx";
 import { NotificationUpdate } from "$islands/Toast/NotificationUpdate.tsx";
@@ -46,97 +45,45 @@ export default function App({ Component, state, url }: PageProps<unknown>) {
         {/* ===== ENHANCED RESOURCE PRELOADING ===== */}
         <ResourceHints />
 
-        {/* ===== VANTA.JS DEPENDENCIES ===== */}
-        <link
-          rel="preconnect"
-          href="https://cdn.jsdelivr.net"
-          crossOrigin="anonymous"
-        />
-
-        {/* ===== LAZY SCRIPT LOADING COORDINATOR ===== */}
-        {/* Inline script to track loading and dispatch event when ready */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                // Track script loading state
-                window.__vantaScripts = { three: false, p5: false, vanta: false };
-
-                // Dispatch event when all scripts are ready
-                window.checkVantaReady = function() {
-                  if (window.__vantaScripts.three && window.__vantaScripts.p5 && window.__vantaScripts.vanta) {
-                    window.dispatchEvent(new CustomEvent('vanta-scripts-ready', {
-                      detail: { three: true, p5: true, vanta: true }
-                    }));
-                  }
-                };
-              })();
-            `,
-          }}
-        />
-
-        {/* Load scripts with onload handlers embedded in src URLs via wrapper scripts */}
-        <script
-          async
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                var s = document.createElement('script');
-                s.async = true;
-                s.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
-                s.onload = function() { window.__vantaScripts.three = true; window.checkVantaReady(); };
-                document.head.appendChild(s);
-              })();
-            `,
-          }}
-        />
-        <script
-          async
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                var s = document.createElement('script');
-                s.async = true;
-                s.src = 'https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js';
-                s.onload = function() { window.__vantaScripts.p5 = true; window.checkVantaReady(); };
-                document.head.appendChild(s);
-              })();
-            `,
-          }}
-        />
-        <script
-          async
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                var s = document.createElement('script');
-                s.async = true;
-                s.src = '/background-topology.js';
-                s.onload = function() { window.__vantaScripts.vanta = true; window.checkVantaReady(); };
-                document.head.appendChild(s);
-              })();
-            `,
-          }}
-        />
-
         {/* ===== CRITICAL CSS ===== */}
-        <link rel="preload" href="/styles.css" as="style" />
-        <link rel="stylesheet" href="/styles.css" />
-        <link rel="preload" href="/modal.css" as="style" />
-        <link rel="stylesheet" href="/modal.css" />
-        <link rel="preload" href="/slick.css" as="style" />
-        <link rel="stylesheet" href="/slick.css" />
+        {
+          /* asset() appends the Fresh build id (?__frsh_c=...), so a deploy that
+            changes Tailwind output is picked up immediately. Without it these
+            URLs are static and Cloudflare serves them with max-age=691200 —
+            eight days of stale CSS for returning visitors, which is not purged
+            by deploy.sh (it only purges /_frsh/ and /_fresh/) and not purged at
+            all by production-deploy.yml. Fresh already does this automatically
+            for <img src>, which is why images never showed the problem. */
+        }
+        <link rel="preload" href={asset("/styles.css")} as="style" />
+        <link rel="stylesheet" href={asset("/styles.css")} />
+        <link rel="preload" href={asset("/modal.css")} as="style" />
+        <link rel="stylesheet" href={asset("/modal.css")} />
+        <link rel="preload" href={asset("/slick.css")} as="style" />
+        <link rel="stylesheet" href={asset("/slick.css")} />
 
         {/* ===== FONT LOADING ===== */}
-        <FontLoader />
+        {
+          /* Emitted as plain <head> markup, not an island. Fresh does not
+            hydrate islands rendered from _app.tsx, so <FontLoader /> here
+            produced no output at all and Montserrat never loaded — every
+            font-montserrat / font-sans class silently fell back to the
+            system sans-serif. */
+        }
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+        />
 
         {/* ===== CRITICAL STYLES ===== */}
         <style>
           {`
-            .text-fill-transparent {
-              -webkit-text-fill-color: transparent;
-            }
-
             /* Critical text styles */
             .home-header-text {
               text-rendering: optimizeLegibility;
@@ -145,24 +92,6 @@ export default function App({ Component, state, url }: PageProps<unknown>) {
             }
 
             /* Mobile menu is handled with CSS classes in the component */
-          `}
-        </style>
-
-        {/* ===== FONT FACE DEFINITIONS ===== */}
-        <style>
-          {`
-            @font-face {
-              font-family: 'Work Sans';
-              font-style: normal;
-              font-weight: 700;
-              font-display: swap;
-            }
-            @font-face {
-              font-family: 'Work Sans';
-              font-style: normal;
-              font-weight: 900;
-              font-display: swap;
-            }
           `}
         </style>
 
@@ -282,12 +211,12 @@ export default function App({ Component, state, url }: PageProps<unknown>) {
         {/* ===== NON-CRITICAL CSS ===== */}
         <link
           rel="stylesheet"
-          href="/carousel.css"
+          href={asset("/carousel.css")}
           media="(min-width: 1px)"
         />
         <link
           rel="stylesheet"
-          href="/flatpickr.css"
+          href={asset("/flatpickr.css")}
           media="(min-width: 1px)"
         />
       </Head>
@@ -298,7 +227,7 @@ export default function App({ Component, state, url }: PageProps<unknown>) {
         <BackgroundTopology />
 
         {/* ===== MAIN CONTENT WRAPPER ===== */}
-        <div class="flex flex-col min-h-screen font-work-sans relative z-[2]">
+        <div class="flex flex-col min-h-screen font-montserrat relative z-[2]">
           {/* ===== PROVIDERS ===== */}
           <ToastProvider>
             <NotificationUpdate />
@@ -307,7 +236,7 @@ export default function App({ Component, state, url }: PageProps<unknown>) {
                 {/* ===== LAYOUT STRUCTURE ===== */}
                 <Header />
                 <main
-                  class="flex flex-col flex-grow w-full max-w-desktop mx-auto px-gutter-mobile mobileLg:px-gutter-tablet tablet:px-gutter-desktop"
+                  class="flex flex-col flex-grow w-full max-w-desktop mx-auto px-shell-mobile mobileLg:px-shell-tablet tablet:px-shell-desktop"
                   f-client-nav
                 >
                   <Partial name="body">

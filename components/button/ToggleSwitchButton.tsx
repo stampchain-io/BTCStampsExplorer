@@ -17,6 +17,8 @@ export function ToggleSwitchButton({
   onMouseLeave,
   onClick,
   buttonRef,
+  activeKnobClassName = "bg-color-primary-400",
+  inactiveKnobClassName = "bg-color-neutral-400",
 }: ToggleSwitchButtonProps): JSX.Element {
   /* ===== REFS ===== */
   const handleRef = useRef<HTMLDivElement>(null);
@@ -38,7 +40,7 @@ export function ToggleSwitchButton({
       // Create inner content
       const innerDiv = document.createElement("div");
       innerDiv.className = `${toggleKnob} ${
-        isActive ? "bg-color-grey-light/70" : "bg-color-grey/70"
+        isActive ? activeKnobClassName : inactiveKnobClassName
       } flex items-center justify-center ${toggleSymbol} ${
         isActive ? "mr-1" : ""
       }`;
@@ -74,7 +76,7 @@ export function ToggleSwitchButton({
           // Update inner content with active color
           const innerDiv = document.createElement("div");
           innerDiv.className =
-            `${toggleKnob} bg-color-grey-light/70 flex items-center justify-center ${toggleSymbol} mr-1`;
+            `${toggleKnob} ${activeKnobClassName} flex items-center justify-center ${toggleSymbol} mr-1`;
 
           if (activeSymbol) {
             innerDiv.textContent = activeSymbol;
@@ -91,7 +93,7 @@ export function ToggleSwitchButton({
           // Update inner content with inactive color and symbol
           const innerDiv = document.createElement("div");
           innerDiv.className =
-            `${toggleKnob} bg-color-grey/70 flex items-center justify-center ${toggleSymbol}`;
+            `${toggleKnob} ${inactiveKnobClassName} flex items-center justify-center ${toggleSymbol}`;
 
           if (inactiveSymbol) {
             innerDiv.textContent = inactiveSymbol;

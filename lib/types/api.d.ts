@@ -408,6 +408,11 @@ export interface SRC20TrxRequestParams {
   trendingWindow?: "24h" | "7d" | "30d"; // Time window for trending calculations
   includeProgress?: boolean; // Include progress_percentage, total_minted from market data
   mintVelocityMin?: number; // Minimum mint velocity for trending (mints per hour)
+
+  // Explorer filter params — token range and amount
+  stampMin?: number; // filter: st.stamp >= stampMin (custom range lower bound)
+  stampMax?: number; // filter: st.stamp < stampMax (preset or custom range upper bound)
+  amtMax?: string; // filter: CAST(src20.amt AS DECIMAL) <= amtMax
 }
 
 /**
@@ -462,6 +467,7 @@ export interface PaginatedStampBalanceResponseBody {
   page: number;
   limit: number;
   totalPages: number;
+  total: number;
   data: StampBalance[];
 }
 
@@ -773,11 +779,43 @@ export type StampPageProps = {
     stamps: StampRow[];
     page: number;
     totalPages: number;
+    // Total stamp count for the current filters/section — used by
+    // ExplorerHeader's count pill (combined with src20DataCard.total when
+    // section is "all")
+    total?: number;
     selectedTab: "all" | "classic" | "posh" | "recent_sales";
     sortBy: "ASC" | "DESC";
     filterBy: StampFilterType[];
     filters: StampFilters;
     search: string;
+    src20DataCard?: {
+      data: import("./src20.d.ts").SRC20Row[];
+      total: number;
+      page: number;
+      totalPages: number;
+    } | null;
+    section?: "all" | "stamps" | "tokens";
+    cardView?: "cardVertical" | "cardSquare" | "cardRow";
+  };
+};
+
+/**
+ * MarketplacePageProps - Data structure for the Marketplace page
+ */
+export type MarketplacePageProps = {
+  data: {
+    stamps: StampRow[];
+    page: number;
+    totalPages: number;
+    // Total count for the current market mode + stamp-type filter combo -
+    // used by MarketplaceHeader's count pill
+    pagination?: { total: number };
+    selectedTab: "all" | "classic" | "posh" | "recent_sales";
+    sortBy: "ASC" | "DESC";
+    filterBy: StampFilterType[];
+    filters: StampFilters;
+    search: string;
+    cardView?: "cardVertical" | "cardSquare" | "cardRow";
   };
 };
 
@@ -1078,21 +1116,6 @@ export interface SRC20BackgroundUploadResponse {
 }
 
 // Additional Internal Endpoint Types
-/**
- * Creator name cache response
- * Response from /api/internal/creatorName
- */
-export interface CreatorNameResponse {
-  /** Creator address */
-  address: string;
-  /** Creator display name */
-  name: string;
-  /** Cache timestamp */
-  timestamp: number;
-  /** Cache TTL remaining */
-  ttl?: number;
-}
-
 /**
  * UTXO query response
  * Response from /api/internal/utxoquery

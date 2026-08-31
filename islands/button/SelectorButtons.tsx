@@ -1,7 +1,5 @@
-/* @baba - before:blur-sm is causing a flash of the pill before it is mounted */
-
-import { buttonStyles, color, state } from "$button";
-import { glassmorphism, transitionColors } from "$layout";
+import { buttonHover, buttonStyles, color, state } from "$button";
+import { container2, transitionColors } from "$layout";
 import type { SelectorButtonsProps } from "$types/ui.d.ts";
 import { useCallback, useEffect, useRef, useState } from "preact/hooks";
 
@@ -24,17 +22,11 @@ export const SelectorButtons = ({
   disabled: disabledProp = false,
 }: SelectorButtonsProps) => {
   const [selectedValue, setSelectedValue] = useState<string>(() => {
-    // Use function form to ensure correct initial value on SSR/hydration
     return value !== undefined
       ? value
       : (defaultValue || options[0]?.value || "");
   });
-  const [selectionTransform, setSelectionTransform] = useState(
-    "translateX(0px)",
-  );
   const [isMounted, setIsMounted] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const optionRefs = useRef<(HTMLDivElement | null)[]>([]);
   // Generate unique name for this instance to avoid radio button conflicts
   const uniqueName = useRef(
     `selector-${Math.random().toString(36).substr(2, 9)}`,
@@ -55,40 +47,6 @@ export const SelectorButtons = ({
     }
   }, [value]);
 
-  // Calculate and update selection pill position
-  const updateSelectionPosition = useCallback(() => {
-    if (!containerRef.current) return;
-
-    const selectedIndex = options.findIndex((option) =>
-      option.value === selectedValue
-    );
-    if (selectedIndex === -1) return;
-
-    const optionElement = optionRefs.current[selectedIndex];
-    if (!optionElement) return;
-
-    const containerRect = containerRef.current.getBoundingClientRect();
-    const optionRect = optionElement.getBoundingClientRect();
-    const offsetX = optionRect.left - containerRect.left;
-
-    setSelectionTransform(`translateX(${offsetX}px)`);
-  }, [selectedValue, options]);
-
-  // Update position on mount and when selection changes
-  useEffect(() => {
-    updateSelectionPosition();
-  }, [updateSelectionPosition]);
-
-  // Update position on window resize
-  useEffect(() => {
-    const handleResize = () => {
-      updateSelectionPosition();
-    };
-
-    globalThis.addEventListener("resize", handleResize);
-    return () => globalThis.removeEventListener("resize", handleResize);
-  }, [updateSelectionPosition]);
-
   // Handle option selection
   const handleOptionChange = useCallback((optionValue: string) => {
     if (disabledProp) return;
@@ -104,8 +62,8 @@ export const SelectorButtons = ({
 
   // Use imported color from buttonStyles (needs the css variables)
   const colorVariants = {
-    grey: color.grey,
-    purple: color.purple,
+    neutral: color.neutral,
+    primary: color.primary,
   } as const satisfies Record<string, string>;
 
   // Helper function to determine if an option is disabled
@@ -113,67 +71,70 @@ export const SelectorButtons = ({
     return option.disabled || disabledProp;
   }, [disabledProp]);
 
+  // Derive pill position from selected index using pure CSS calc — no DOM measurement needed.
+  // All columns are equal (1fr), container has p-0.5 (2px padding), labels have mx-0.5 (2px margin).
+  // pill left  = 2px (container padding) + i * columnWidth + 2px (label margin)
+  //            = calc(2px + i * (100% - 2px) / N)
+  // pill width = columnWidth - 2px (label margins)
+  //            = calc((100% - 2px) / N - 2px)
+  const N = options.length;
+  const selectedIndex = options.findIndex((o) => o.value === selectedValue);
+
   return (
     <div
-      ref={containerRef}
-      class={`relative grid p-0.5 select-none
-        ${glassmorphism} !rounded-full
+      class={`relative grid select-none
+        ${container2} rounded-full
         ${
-        (colorProp === "purple" || colorProp === "grey")
+        (colorProp === "primary" || colorProp === "neutral")
           ? colorVariants[colorProp]
-          : colorVariants.grey
+          : colorVariants.neutral
       }
         ${disabledProp ? state.disabled : ""}
         ${className}
       `}
       style={{
-        gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))`,
+        gridTemplateColumns: `repeat(${N}, minmax(0, 1fr))`,
       }}
     >
-      {/* Selection button - only render after mount to prevent SSR flash */}
-      {isMounted && (
+      {/* Pill — hidden during SSR, positioned via CSS calc. */}
+      {isMounted && selectedIndex !== -1 && (
         <div
-          class={`!absolute top-0.5 bottom-0.5 z-10
-            ${buttonStyles.variant.flat}
-          `}
+          class={`!absolute top-0.5 bottom-0.5 z-10 hover:!bg-[var(--color-button)] ${buttonStyles.variant.flat}`}
           style={{
-            transform: selectionTransform,
-            width: `calc((100% - ${options.length * 4}px) / ${options.length})`,
-            transition: "transform 200ms ease-out",
+            left: `calc(2px + ${selectedIndex} * (100% - 2px) / ${N})`,
+            width: `calc((100% - 2px) / ${N} - 2px)`,
+            transition: "left 200ms ease-out",
           }}
         />
       )}
 
       {/* Options */}
-      {options.map((option, index) => {
+      {options.map((option, _index) => {
         const optionDisabled = isOptionDisabled(option);
         const isSelected = selectedValue === option.value;
 
-        // Compute label styling based on selection and mount state
-        const labelClass = isSelected
-          ? isMounted
-            ? `text-black ${transitionColors}` // After mount: fancy pill behind
-            : `text-black ${buttonStyles.variant.flat} !px-1 transition-none pointer-events-none` // Before mount: flat
+        // All cursor/disabled state lives on the wrapper div only.
+        const wrapperClass = optionDisabled
+          ? state.disabled
+          : isSelected
+          ? "!cursor-default"
           : isMounted
-          ? `mx-0.5 bg-transparent text-[var(--color-button-dark)] ${transitionColors} hover:text-[var(--color-button)] hover:bg-color-grey-dark/25` // Unselected after mount
-          : "mx-0.5 bg-transparent text-[var(--color-button-dark)] transition-none pointer-events-none"; // Unselected before mount
+          ? "!cursor-pointer"
+          : "";
+
+        // Only appearance (color/bg) on the label — no cursor or disabled duplication.
+        const labelClass = isSelected && isMounted
+          ? `mx-0.5 text-color-neutral-1000 ${transitionColors}`
+          : `mx-0.5 bg-transparent text-color-neutral-400 ${
+            isMounted
+              ? `${transitionColors} hover:!text-color-hover ${buttonHover}`
+              : "transition-none"
+          }`;
 
         return (
           <div
             key={option.value}
-            ref={(el) => {
-              optionRefs.current[index] = el;
-            }}
-            class={`
-              relative min-w-0 group
-              ${
-              optionDisabled
-                ? state.disabled
-                : isSelected
-                ? "!cursor-default"
-                : "!cursor-pointer"
-            }
-            `}
+            class={`relative min-w-0 group ${wrapperClass}`}
           >
             <input
               type="radio"
@@ -183,22 +144,17 @@ export const SelectorButtons = ({
               checked={isSelected}
               disabled={optionDisabled}
               onChange={() => handleOptionChange(option.value)}
-              class="absolute inset-0 w-full h-full opacity-0"
+              class="absolute inset-0 w-full h-full opacity-0 cursor-[inherit]"
             />
             <label
               for={`${uniqueName.current}-${option.value}`}
               class={`
-                relative flex items-center justify-center z-20 group
-                font-semibold text-center !rounded-full
+                relative flex items-center justify-center my-0.5 z-20 cursor-[inherit]
+                ${
+                isSelected ? "font-medium" : "font-normal"
+              } text-center tracking-wide !rounded-full
                 ${buttonStyles.size[size]}
                 ${labelClass}
-                ${
-                optionDisabled
-                  ? state.disabled
-                  : isMounted
-                  ? isSelected ? "!cursor-default" : "!cursor-pointer"
-                  : ""
-              }
               `}
             >
               <span class="block relative z-20">

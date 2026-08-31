@@ -1,31 +1,22 @@
-import { STAMPCHAIN_LOGO_IMAGE } from "$constants";
+import { containerBackground } from "$layout";
 import { ComponentChildren } from "preact";
 
 function TitleText({
   children,
   class: className = "",
-  delay,
 }: {
   children: ComponentChildren;
   class?: string;
-  delay: string;
 }) {
   return (
     <span
       class={`
-        font-work-sans
-        bg-clip-text text-fill-transparent
+        font-montserrat
+        bg-clip-text text-transparent
         whitespace-normal mobileLg:whitespace-nowrap inline-block
-        opacity-0
         ${className}
       `}
-      style={`
-        animation-delay: ${delay}ms;
-        animation-duration: 300ms;
-        animation-fill-mode: both;
-        animation-timing-function: ease-out;
-        filter: drop-shadow(0.05em 0.05em 0.05em rgba(0, 0, 0, 0.75));
-      `}
+      style="filter: drop-shadow(0.05em 0.05em 0.05em rgba(0, 0, 0, 0.75));"
     >
       {children}
     </span>
@@ -34,111 +25,66 @@ function TitleText({
 
 export function HomeHeader() {
   return (
-    <header class="
-      flex flex-col items-center justify-center
-      gap-1.5 mobileMd:gap-3 mobileLg:gap-[18px]
-      w-full
-      h-[220px] tablet:h-[250px]
-      relative
-      overflow-visible
-    ">
-      <img
-        src={STAMPCHAIN_LOGO_IMAGE}
-        alt=""
-        class="
-          absolute
-          w-[200px] mobileMd:w-[220px] mobileLg:w-[250px]
-          h-[200px] mobileMd:h-[220px] mobileLg:h-[250px]
-          top-[10px] mobileMd:top-[0px] mobileLg:top-[-24px] tablet:top-[3px]
-          left-[calc(50%+39px)] min-[420px]:left-[calc(50%+73px)] mobileMd:left-[calc(50%+98px)] mobileLg:left-[calc(50%+153px)]
-          pointer-events-none
-          opacity-0
-          animate-slide-down
-          z-[-10]
-        "
-        style="
-          animation-duration: 400ms;
-          animation-fill-mode: both;
-          animation-timing-function: ease-out;
-        "
-      />
+    <header
+      class={`
+        relative overflow-hidden
+        flex flex-col items-center justify-center
+        ${containerBackground} h-[420px] tablet:h-[520px]
+        gap-1.5 mobileMd:gap-3 mobileLg:gap-[18px]
+      `}
+    >
+      {/* ===== BACKGROUND IMAGE with dark overlay gradient (top -> bottom) ===== */}
+      <div class="absolute inset-0 z-0">
+        <img
+          src="/img/components/stamps-collage-1920.webp"
+          alt=""
+          width={1920}
+          height={1280}
+          fetchpriority="high"
+          decoding="async"
+          className="w-full h-full object-cover"
+        />
+        <div class="absolute inset-0 bg-gradient-to-b from-color-neutral-950/95 via-color-neutral-900/70 to-color-neutral-1000/90" />
+      </div>
+
       <div class="
-          w-[336px]
-          min-[420px]:w-[376px]
-          mobileMd:w-[520px]
-          mobileLg:w-[720px]
-          tablet:w-[976px]
-          flex flex-col justify-center
-          relative
+          relative z-10
+          w-[clamp(21rem,80vw,61rem)]
+          flex flex-col justify-center leading-[1]
         ">
         <h1 class="text-center">
-          <TitleText
-            delay="50"
-            class="
+          <TitleText class="
               font-black
-              color-grey-gradientLD
-              text-2xl
-              min-[420px]:text-3xl
-              mobileMd:text-4xl
-              mobileLg:text-5xl
-              tablet:text-5xl
-              desktop:text-5xl
-              animate-slide-down
-            "
-          >
+              bg-gradient-to-r color-neutral-gradient
+              text-[clamp(1.375rem,5vw,2.75rem)]
+            ">
             UNPRUNABLE{" "}
-            <span class="color-purple-gradientDL">
+            <span class="bg-gradient-to-l color-primary-gradient">
               UTXO ART
             </span>
           </TitleText>
           <br />
-          <TitleText
-            delay="150"
-            class="
+          <TitleText class="
               font-bold
-              color-grey-gradientLD
+              bg-gradient-to-r color-neutral-gradient
               uppercase
-              text-xl
-              min-[420px]:text-2xl
-              mobileMd:text-3xl
-              mobileLg:text-4xl
-              tablet:text-4xl
-              -mt-1
-              tablet:mt-0
-              animate-slide-up
-            "
-          >
+              text-[clamp(1.125rem,4vw,2rem)]
+            ">
             BECAUSE SATS DON'T EXIST
           </TitleText>
         </h1>
       </div>
 
-      <p
-        class="
-          mx-auto
-          w-full
-          max-w-[310px]
-          text-center
-          font-medium
-          text-color-grey-light
-          text-base
-          mobileLg:text-xl
-          mobileMd:max-w-[380px]
-          mobileLg:max-w-[515px]
-          tablet:max-w-[550px]
-          opacity-0
-          animate-fade-in
-        "
-        style={`
-          animation-delay: 250ms;
-          animation-duration: 400ms;
-          animation-fill-mode: both;
-          animation-timing-function: ease-out;
-        `}
-      >
+      <h3 class="
+          relative z-10 mx-auto
+          w-[clamp(19.375rem,80vw,34.375rem)]
+          font-normal text-center text-color-neutral-200
+          text-[clamp(0.8125rem,2vw,0.9375rem)]
+          leading-[1.3]
+        ">
         Welcome to the forefront of digital collectibles, where each stamp is a
         unique piece of art intertwined with the immutability of the blockchain.
-      </p>
+      </h3>
     </header>
   );
 }

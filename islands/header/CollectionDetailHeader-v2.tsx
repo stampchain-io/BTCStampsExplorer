@@ -1,0 +1,252 @@
+/* ===== COLLECTION DETAILS HEADER COMPONENT ===== */
+import { Icon, PlaceholderImage, UserProfileIcon } from "$icon";
+import {
+  body,
+  container1,
+  containerGap,
+  containerPill,
+  StatItem,
+} from "$layout";
+import {
+  abbreviateAddress,
+  formatBTC,
+  formatMarketCap,
+  formatNumberWithCommas,
+} from "$lib/utils/ui/formatting/formatUtils.ts";
+import { tooltipOverlay } from "$notification";
+import {
+  cardFileSize,
+  cardPrice,
+  cardSupply,
+  titlePrimary,
+  truncate,
+} from "$text";
+import type { CollectionWithOptionalMarketData } from "$types/services.d.ts";
+import type { StampRow } from "$types/stamp.d.ts";
+import { useEffect, useRef, useState } from "preact/hooks";
+
+/* ===== COMPONENT ===== */
+export const CollectionDetailHeader = (
+  { collection, stamps }: {
+    collection: CollectionWithOptionalMarketData;
+    stamps: StampRow[];
+  },
+) => {
+  /* ===== STATE ===== */
+  const [imgError, setImgError] = useState(false);
+  const [showDescription, setShowDescription] = useState(false);
+  const descriptionRef = useRef<HTMLDivElement>(null);
+
+  /* ===== CLICK OUTSIDE HANDLER (close description tooltip) ===== */
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        descriptionRef.current &&
+        !descriptionRef.current.contains(event.target as Node)
+      ) {
+        setShowDescription(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  /* ===== GUARD ===== */
+  if (!collection) return null;
+
+  /* ===== COMPUTED VALUES ===== */
+  const imageUrl = imgError
+    ? null
+    : (collection.img || stamps?.[0]?.stamp_url || null);
+
+  const creatorName =
+    collection.creator_names && collection.creator_names.length > 0
+      ? collection.creator_names[0]
+      : null;
+  const creatorAddress = collection.creators && collection.creators.length > 0
+    ? collection.creators[0]
+    : null;
+
+  // Full (unabbreviated) address only fits comfortably at the mobileMd
+  // breakpoint - abbreviate at base and tablet+ where the row is tighter
+  const creatorDisplayFull = creatorName ?? creatorAddress ?? "ANONYMOUS";
+  const creatorDisplayAbbreviated = creatorName ??
+    (creatorAddress ? abbreviateAddress(creatorAddress, 6) : "ANONYMOUS");
+
+  const floorPriceBTC = collection.marketData?.floorPriceBTC ?? null;
+
+  const amountValue = `${
+    formatNumberWithCommas(collection.stamp_count)
+  } STAMPS`;
+
+  // collection_market_data.total_value_btc is currently unpopulated (always 0)
+  // in production, so market cap is computed the same way the live collection
+  // gallery cards do it: floor price * total editions
+  const marketCapBTC = floorPriceBTC !== null && collection.total_editions
+    ? floorPriceBTC * collection.total_editions
+    : null;
+
+  /* ===== SHARED SUB-COMPONENTS (rendered once per breakpoint layout) ===== */
+  const collectionImage = (
+    <div class="w-11 h-11 shrink-0 rounded-2xl overflow-hidden">
+      {imageUrl
+        ? (
+          <img
+            src={imageUrl}
+            class="w-full h-full object-contain pixelart rounded-2xl"
+            alt="Collection image"
+            loading="lazy"
+            onError={() => setImgError(true)}
+          />
+        )
+        : (
+          <PlaceholderImage
+            variant="no-image"
+            className="!rounded-2xl"
+          />
+        )}
+    </div>
+  );
+
+  /* Clicking the info icon toggles the collection description tooltip.
+    Below mobileLg the pills move to their own row, leaving nothing for
+    the name row to justify against, so the wrapper grows to fill the
+    row (flex-1) and the icon uses ml-auto to land at the far end; at
+    mobileLg+ flex-1 is dropped and the icon sits adjacent to the name
+    as before */
+  const collectionImageAndName = (
+    <div class="flex items-center gap-3 min-w-0 flex-1 mobileLg:flex-none">
+      {collectionImage}
+      <h1 class={`mt-1 ml-2 min-w-0 ${titlePrimary} ${truncate}`}>
+        {collection.collection_name.toUpperCase()}
+      </h1>
+      {collection.collection_description && (
+        <div
+          ref={descriptionRef}
+          class="relative shrink-0 ml-auto mobileLg:ml-0 translate-y-[1px]"
+        >
+          <Icon
+            type="iconButton"
+            name="info"
+            weight="bold"
+            size="xs"
+            color="neutral500"
+            onClick={() => setShowDescription((prev) => !prev)}
+            ariaLabel="Collection description"
+          />
+          <div
+            class={`${tooltipOverlay} ${
+              showDescription ? "opacity-100" : "opacity-0 pointer-events-none"
+            }`}
+          >
+            {collection.collection_description}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
+  const stampsPill = (
+    <div class={`${containerPill} ${cardSupply}`}>
+      {amountValue}
+    </div>
+  );
+
+  const floorPricePill = (
+    <div class={`${containerPill} ${cardPrice}`}>
+      {floorPriceBTC !== null ? `${formatBTC(floorPriceBTC)} BTC` : "N/A BTC"}
+    </div>
+  );
+
+  const editionsPill = (
+    <div class={`${containerPill} ${cardFileSize}`}>
+      {formatNumberWithCommas(collection.total_editions)} EDITIONS
+    </div>
+  );
+
+  const creatorStat = (
+    <StatItem
+      label="CREATOR"
+      value={
+        <UserProfileIcon
+          size="xxs"
+          weight="bold"
+          className="stroke-color-neutral-200"
+        >
+          <span class="mobileMd:hidden tablet:inline">
+            {creatorDisplayAbbreviated}
+          </span>
+          <span class="hidden mobileMd:inline tablet:hidden">
+            {creatorDisplayFull}
+          </span>
+        </UserProfileIcon>
+      }
+      align="left"
+    />
+  );
+
+  const marketCapStat = (
+    <StatItem
+      label="MARKET CAP"
+      value={marketCapBTC !== null
+        ? `${formatMarketCap(marketCapBTC)} BTC`
+        : "N/A BTC"}
+      align="right"
+    />
+  );
+
+  /* ===== RENDER ===== */
+  return (
+    <div class={`${body} ${containerGap}`}>
+      <div class={`relative z-header ${container1} p-0.5 flex-wrap`}>
+        {/* ===== MOBILE LAYOUT (base + mobileMd, below tablet) ===== */}
+        <div class="flex flex-col gap-3 tablet:hidden">
+          <div class="flex items-center justify-between gap-5">
+            {collectionImageAndName}
+            <div class="hidden mobileLg:flex items-center gap-3 shrink-0">
+              {stampsPill}
+              {editionsPill}
+              {floorPricePill}
+            </div>
+          </div>
+
+          {/* Row 2 (base, below mobileMd): pills only */}
+          <div class="flex items-center justify-between px-3 gap-3 mobileLg:hidden">
+            <div class="flex items-center gap-3">
+              {stampsPill}
+              {editionsPill}
+            </div>
+            <div class="flex justify-end">
+              {floorPricePill}
+            </div>
+          </div>
+
+          {/* Row 3: creator + market cap */}
+          <div class="flex items-center justify-between px-5 pb-3 gap-3">
+            {creatorStat}
+            {marketCapStat}
+          </div>
+        </div>
+
+        {/* ===== DESKTOP LAYOUT (tablet and up) ===== */}
+        <div class="hidden tablet:flex flex-row w-full items-center justify-between">
+          {collectionImageAndName}
+
+          <div class="flex items-center gap-3 px-5 shrink-0">
+            {stampsPill}
+            {editionsPill}
+            {floorPricePill}
+          </div>
+
+          <div class="flex items-center pr-5 gap-5 shrink-0">
+            {creatorStat}
+            {marketCapStat}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};

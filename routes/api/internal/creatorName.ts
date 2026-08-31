@@ -4,37 +4,11 @@ import { CreatorService } from "$server/services/creator/creatorService.ts";
 import { InternalApiFrontendGuard } from "$server/services/security/internalApiFrontendGuard.ts";
 import { InternalRouteGuard } from "$server/services/security/internalRouteGuard.ts";
 
+// Note: no GET handler here — the SSR wallet page
+// (routes/wallet/[address].tsx) reads creator names via
+// CreatorService.getCreatorNameByAddress() directly, so there is no
+// client-side consumer for a GET endpoint on this route.
 export const handler: Handlers = {
-  async GET(req) {
-    // GET requests need origin check but not CSRF
-    const originError = await InternalApiFrontendGuard.requireInternalAccess(
-      req,
-    );
-    if (originError) return originError;
-
-    const url = new URL(req.url);
-    const address = url.searchParams.get("address");
-
-    if (!address) {
-      return ApiResponseUtil.badRequest("Address is required");
-    }
-
-    try {
-      const creatorName = await CreatorService.getCreatorNameByAddress(address);
-
-      if (!creatorName) {
-        return ApiResponseUtil.notFound("Creator name not found");
-      }
-
-      return ApiResponseUtil.success({ creatorName });
-    } catch (error) {
-      return ApiResponseUtil.internalError(
-        error,
-        "Error fetching creator name",
-      );
-    }
-  },
-
   async POST(req) {
     // Clone request before any guards to preserve body stream
     const reqClone = req.clone();

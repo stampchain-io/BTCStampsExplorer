@@ -16,12 +16,12 @@ import PreviewImageModal from "$islands/modal/PreviewImageModal.tsx";
 import { closeModal, globalModal, openModal } from "$islands/modal/states.ts";
 import {
   bodyTool,
+  container1,
+  container2,
+  container2Hover,
   containerBackground,
   containerGap,
   containerRowForm,
-  glassmorphism,
-  glassmorphismL2,
-  glassmorphismL2Hover,
   transitionAll,
   transitionColors,
 } from "$layout";
@@ -50,7 +50,7 @@ import {
   tooltipImage,
 } from "$notification";
 import { FeeCalculatorBase } from "$section";
-import { labelLg, subtitleGrey, titleGreyLD } from "$text";
+import { labelLg, subtitleNeutral, titleNeutral } from "$text";
 import {
   getSearchParams,
   isBrowser,
@@ -240,7 +240,7 @@ export function StampingTool() {
   if (isLoading) {
     return (
       <div class={`${bodyTool} ${containerGap}`}>
-        <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
+        <h1 class={`${titleNeutral} mx-auto -mb-2 mobileLg:-mb-4`}>
           STAMP
         </h1>
         <StampingToolSkeleton />
@@ -251,8 +251,8 @@ export function StampingTool() {
   if (!config) {
     return (
       <div class={bodyTool}>
-        <h5 class={`${titleGreyLD} mx-auto mb-2`}>ERROR</h5>
-        <h6 class={`${subtitleGrey} mx-auto`}>CONFIGURATION NOT LOADED</h6>
+        <h5 class={`${titleNeutral} mx-auto mb-2`}>ERROR</h5>
+        <h6 class={`${subtitleNeutral} mx-auto`}>CONFIGURATION NOT LOADED</h6>
       </div>
     );
   }
@@ -1745,8 +1745,8 @@ function StampingToolMain({ config }: { config: Config }) {
   const imagePreviewDiv = (
     <div
       id="image-preview"
-      class={`relative items-center content-center mx-auto ${PREVIEW_SIZE_CLASSES} text-center group ${glassmorphismL2}
-      ${glassmorphismL2Hover} ${transitionColors} cursor-pointer overflow-hidden`}
+      class={`relative items-center content-center mx-auto ${PREVIEW_SIZE_CLASSES} text-center group ${container2}
+      ${container2Hover} ${transitionColors} cursor-pointer overflow-hidden`}
       onMouseMove={handleMouseMove}
       onMouseEnter={handleUploadMouseEnter}
       onMouseLeave={handleUploadMouseLeave}
@@ -1786,11 +1786,10 @@ function StampingToolMain({ config }: { config: Config }) {
                 <iframe
                   width="100%"
                   height="100%"
-                  scrolling="no"
                   loading="lazy"
                   sandbox="allow-scripts allow-same-origin"
                   src={htmlPreviewUrl}
-                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded-2xl bg-color-grey/30 [image-rendering:pixelated]`}
+                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded-2xl bg-color-grey/30 overflow-hidden [image-rendering:pixelated]`}
                   onError={(e) => {
                     console.error("iframe error (detailed):", {
                       error: e,
@@ -2111,7 +2110,7 @@ function StampingToolMain({ config }: { config: Config }) {
   /* ===== COMPONENT RENDER ===== */
   return (
     <div class={`${bodyTool} ${containerGap}`}>
-      <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
+      <h1 class={`${titleNeutral} mx-auto -mb-2 mobileLg:-mb-4`}>
         STAMP
       </h1>
 
@@ -2128,7 +2127,7 @@ function StampingToolMain({ config }: { config: Config }) {
       {/* MARA Unavailable Warning Banner */}
       {maraMode && maraUnavailable && (
         <div
-          class={`mb-4 ${glassmorphism} bg-gradient-to-br from-orange-900/15 to-orange-800/25 border-orange-500/20 p-4`}
+          class={`mb-4 ${container1} bg-gradient-to-br from-orange-900/15 to-orange-800/25 border-orange-500/20 p-4`}
         >
           <div class="flex items-start gap-3 mb-3">
             <div class="text-orange-400 text-xl mt-0.5">⚠️</div>
@@ -2147,7 +2146,7 @@ function StampingToolMain({ config }: { config: Config }) {
             <button
               type="button"
               onClick={switchToStandardMode}
-              class={`px-4 py-2 ${glassmorphism} bg-gradient-to-br from-purple-600/80 to-purple-700/80 text-white text-sm rounded-2xl hover:from-purple-600 hover:to-purple-700 transition-colors font-semibold`}
+              class={`px-4 py-2 ${container1} bg-gradient-to-br from-purple-600/80 to-purple-700/80 text-white text-sm rounded-2xl hover:from-purple-600 hover:to-purple-700 transition-colors font-semibold`}
             >
               Switch to Standard
             </button>
@@ -2157,7 +2156,7 @@ function StampingToolMain({ config }: { config: Config }) {
 
       {isConnected && addressError && (
         <div
-          class={`w-full mb-4 ${glassmorphism} bg-gradient-to-br from-red-900/15 to-red-800/25 border-red-500/20 p-4`}
+          class={`w-full mb-4 ${container1} bg-gradient-to-br from-red-900/15 to-red-800/25 border-red-500/20 p-4`}
         >
           <p class="text-red-400 text-center font-medium">{addressError}</p>
         </div>
@@ -2231,7 +2230,7 @@ function StampingToolMain({ config }: { config: Config }) {
             {poshToggleButton}
             <div
               ref={lockButtonRef}
-              className={`flex items-center justify-center !w-10 !h-10 ${glassmorphismL2} ${glassmorphismL2Hover} cursor-pointer group`}
+              className={`flex items-center justify-center !w-10 !h-10 ${container2} ${container2Hover} cursor-pointer group`}
               onClick={() => {
                 setIsLocked(!isLocked);
                 setIsLockTooltipVisible(false);
@@ -2245,7 +2244,7 @@ function StampingToolMain({ config }: { config: Config }) {
                 name={isLocked ? "locked" : "unlocked"}
                 weight="normal"
                 size="xs"
-                color="greyDark"
+                color="neutral600"
                 className="mb-0.5"
               />
             </div>
@@ -2268,8 +2267,8 @@ function StampingToolMain({ config }: { config: Config }) {
               className={`flex items-center justify-center !w-[46px] !h-10
                  ${
                 file
-                  ? `${glassmorphismL2} ${glassmorphismL2Hover} cursor-pointer group`
-                  : `${glassmorphismL2} ${stateDisabled} group`
+                  ? `${container2} ${container2Hover} cursor-pointer group`
+                  : `${container2} ${stateDisabled} group`
               }`}
               onClick={() => {
                 if (!file) return;
@@ -2289,7 +2288,7 @@ function StampingToolMain({ config }: { config: Config }) {
                 name="previewImage"
                 weight="normal"
                 size="xs"
-                color="greyDark"
+                color="neutral600"
                 className={`mb-0.5 ${!file ? "!cursor-not-allowed" : ""}`}
               />
               <div

@@ -8,12 +8,12 @@ import { Icon } from "$icon";
 import { DeployToolSkeleton } from "$indicators";
 import {
   bodyTool,
+  container2,
+  container2Hover,
   containerBackground,
   containerColForm,
   containerGap,
   containerRowForm,
-  glassmorphismL2,
-  glassmorphismL2Hover,
   transitionAll,
   transitionColors,
 } from "$layout";
@@ -24,7 +24,7 @@ import { mapProgressiveFeeDetails } from "$lib/utils/performance/fees/fee-estima
 import { getCSRFToken } from "$lib/utils/security/clientSecurityUtils.ts";
 import { StatusMessages, tooltipButton, tooltipImage } from "$notification";
 import { FeeCalculatorBase } from "$section";
-import { titleGreyLD } from "$text";
+import { titleNeutral } from "$text";
 import axiod from "axiod";
 import { useEffect, useRef, useState } from "preact/hooks";
 
@@ -335,8 +335,8 @@ export function SRC20DeployTool(
   if (!config) {
     return (
       <div class={`${bodyTool} ${containerGap}`}>
-        <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
-          DEPLOY
+        <h1 class={`${titleNeutral} mx-auto -mb-2 mobileLg:-mb-4`}>
+          Deploy
         </h1>
         <DeployToolSkeleton />
       </div>
@@ -346,8 +346,8 @@ export function SRC20DeployTool(
   /* ===== COMPONENT RENDER ===== */
   return (
     <div class={`${bodyTool} ${containerGap}`}>
-      <h1 class={`${titleGreyLD} mx-auto -mb-2 mobileLg:-mb-4`}>
-        DEPLOY
+      <h1 class={`${titleNeutral} mx-auto -mb-2 mobileLg:-mb-4`}>
+        Deploy
       </h1>
 
       <form
@@ -367,7 +367,7 @@ export function SRC20DeployTool(
             <div
               id="image-preview"
               class={`relative flex flex-col items-center justify-center content-center mx-auto min-h-[100px] min-w-[100px]
-              ${glassmorphismL2} ${glassmorphismL2Hover}
+              ${container2} ${container2Hover}
               ${transitionColors} cursor-pointer group`}
               onMouseMove={handleMouseMove}
               onMouseEnter={handleUploadMouseEnter}
@@ -408,7 +408,9 @@ export function SRC20DeployTool(
                     weight="extraLight"
                     size="xl"
                     color="custom"
-                    className="stroke-color-grey-dark group-hover:stroke-color-grey-semidark/80"
+                    className="stroke-color-neutral-600 group-hover:stroke-color-hover"
+                    colorAccent="var(--color-neutral-500)"
+                    colorAccentHover="var(--color-primary-300)"
                   />
                 </label>
               )}

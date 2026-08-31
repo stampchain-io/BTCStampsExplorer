@@ -173,6 +173,8 @@ export interface BaseToast {
   message: string;
   autoDismiss?: boolean;
   body?: import("preact").ComponentChildren;
+  /** True only for the one-time app update announcement toast. */
+  isUpdate?: boolean | undefined;
 }
 
 export interface ProgressiveFeeEstimationResult {

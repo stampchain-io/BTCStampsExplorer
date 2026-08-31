@@ -28,64 +28,93 @@ The Toast notification system provides a user-friendly way to display temporary 
 The Toast notification system follows the app's dark-themed glassmorphism design principles:
 
 ### Visual Styling
-- **Border radius**: Large rounded corners (16px) - `rounded-2xl`
-- **Backdrop blur**: Enhanced glassmorphism effect - `backdrop-blur-lg`
-- **Shadow**: Consistent with app shadow system
-- **Position**: Fixed top-left positioning with proper z-index layering
-- **Colors**: Type-specific color palettes (grey, green, orange, red) with gradient backgrounds from the [Tailwind color system](mdc:components/layout/doc.md#tailwind-color-system)
+- **Border radius**: `rounded-2xl`
+- **Backdrop blur**: `backdrop-blur-md`
+- **Shadow**: `$layout` `shadow` token
+- **Padding**: `px-4 pt-3 pb-4` with a 1px border
+- **Position**: `fixed top-5 inset-x-5 z-notification`; from `min-[460px]` left-aligned (`left-5 right-auto`)
+- **Width**: Defined on `ToastComponent` (not the style tokens). Below 420px the toast spans `inset-x-5` (`!w-auto`). From `min-[420px]` up it caps at `max-w-[420px]` (while still spanning `inset-x-5` until 460px, at which point `left-5 right-auto` take over). Inner `notificationContainer` is `w-full` of that wrapper.
+- **Colors**: Type-specific palettes (`neutral`, `green`, `orange`, `red`) with gradient backgrounds from the [Tailwind color system](mdc:components/layout/doc.md#tailwind-color-system)
+
+Shared container classes (`notificationContainer` in `styles.ts`):
+
+```
+w-full px-4 pt-3 pb-4 border rounded-2xl backdrop-blur-md ${shadow}
+```
 
 ### Style Variants
 
-#### Info Notifications
+Containers use `notificationContainer*` tokens from `components/notification/styles.ts`.
+
+#### Info (`notificationContainerInfo`)
 ```typescript
-bg-gradient-to-br from-color-grey-dark/60 via-color-background/60 to-color-background/90
-border-color-grey-semidark/80
+bg-gradient-to-br from-color-neutral-800/90 via-color-neutral-900/80 to-color-neutral-1000/90
+border-color-neutral-500
 ```
 
-#### Success Notifications
+#### Success (`notificationContainerSuccess`)
 ```typescript
-bg-gradient-to-br from-color-green-dark/60 via-color-background/60 to-color-background/90
-border-color-green-semidark/80
+bg-gradient-to-br from-color-green-950/90 via-color-neutral-900/80 to-color-neutral-1000/90
+border-color-green-700
 ```
 
-#### Warning Notifications
+#### Warning (`notificationContainerWarning`)
 ```typescript
-bg-gradient-to-br from-color-orange-dark/60 via-color-background/60 to-color-background/90
-border-color-orange/80
+bg-gradient-to-br from-color-orange-950/90 via-color-neutral-900/80 to-color-neutral-1000/90
+border-color-orange-500
 ```
 
-#### Error Notifications
+#### Error (`notificationContainerError`)
 ```typescript
-bg-gradient-to-br from-color-red-dark/60 via-color-background/60 to-color-background/90
-border-color-red-semidark/80
+bg-gradient-to-br from-color-red-950/90 via-color-neutral-900/80 to-color-neutral-1000/90
+border-color-red-700
 ```
+
+### Type Accents
+
+Icons and progress bars use the same accent tokens:
+
+| Type | Icon stroke | Progress bar |
+|------|-------------|--------------|
+| **info** | `stroke-color-neutral-400` | `bg-color-neutral-500` |
+| **success** | `stroke-color-green-700` | `bg-color-green-700` |
+| **warning** | `stroke-color-orange-500` | `bg-color-orange-500` |
+| **error** | `stroke-color-red-700` | `bg-color-red-700` |
+
+Inline text overrides (gallery error/success copy, not toast layout):
+
+- `notificationTextError`: `!text-color-red-400`
+- `notificationTextSuccess`: `!text-color-green-400`
 
 ## Notification Types
 
 The system supports **4 status message types** with distinct visual treatments:
 
-| Type | Icon | Color | Duration | Auto-Dismiss | Use Case |
-|------|------|-------|----------|--------------|----------|
-| **info** | info | neutral `color-grey` | 7000ms | ✅ Yes | General information, updates |
-| **success** | success | green `color-green-semidark` | 3000ms | ✅ Yes | Successful operations |
-| **warning** | info | orange `color-orange` | 7000ms | ✅ Yes | Warnings requiring attention |
-| **error** | error | red `color-red-semidark` | 7000ms | ✅ Yes | Error messages |
+| Type | Icon | Accent | Duration | Auto-Dismiss | Use Case |
+|------|------|--------|----------|--------------|----------|
+| **info** | info | `color-neutral-400` / `500` | 7000ms | ✅ Yes (default) | General information, updates |
+| **success** | success | `color-green-700` | 3000ms | ✅ Yes (default) | Successful operations |
+| **warning** | info | `color-orange-500` | 7000ms | ✅ Yes (default) | Warnings requiring attention |
+| **error** | error | `color-red-700` | 7000ms | ✅ Yes (default) | Error messages |
+
+`ToastProvider.getDuration()` returns `3000` for success and `7000` for every other type. `shouldAutoDismiss()` always returns `true`; pass `autoDismiss: false` as the third `showToast` argument to keep a toast until the user closes it.
 
 ### Type Characteristics
 
-- **Info**: Uses grey color palette, longer duration for reading informational content
-- **Success**: Quick confirmation with green palette, shorter duration for fast acknowledgment
-- **Warning**: Uses info icon with orange color palette for moderate urgency warnings
-- **Error**: Full error styling with error icon and red palette for critical messages
+- **Info**: Neutral palette (`neutral-800` → `neutral-1000`, border `neutral-500`)
+- **Success**: Green accent (`green-950` gradient, `green-700` border/icon)
+- **Warning**: Orange accent (`orange-950` gradient, `orange-500` border/icon)
+- **Error**: Red accent (`red-950` gradient, `red-700` border/icon)
 
 ## Integration
 
 ### Global Setup
 
-The `ToastProvider` is integrated at the root level in `routes/_app.tsx`, wrapping the main application content:
+The `ToastProvider` wraps app content in `routes/_app.tsx`. `NotificationUpdate` must sit **inside** the provider so it can call `showToast()`:
 
 ```tsx
 <ToastProvider>
+  <NotificationUpdate />
   <NavigatorProvider>
     {/* App content */}
   </NavigatorProvider>
@@ -114,7 +143,7 @@ showToast("Failed to connect to wallet", "error");
 
 ### Multi-line Messages
 
-The system supports multi-line messages with automatic formatting:
+The system supports multi-line messages. **Default toasts** render every line with `notificationBody` (regular weight, `text-color-neutral-200`):
 
 ```tsx
 showToast(
@@ -123,7 +152,7 @@ showToast(
 );
 ```
 
-The first line is displayed in **bold** (`notificationHeading`), while subsequent lines use regular weight (`notificationBody`).
+The **update announcement** toast (`isUpdate: true`) is the only variant that splits lines by role. See [Message Layout Variants](#message-layout-variants).
 
 ### Manual Dismiss Override
 
@@ -135,6 +164,64 @@ showToast("Please review these important terms", "info", false);
 
 // Override default behavior for any type
 showToast("Custom behavior message", "success", false);
+```
+
+## Message Layout Variants
+
+`ToastComponent` has two typography layouts, controlled by the optional `isUpdate` flag on `showToast()`.
+
+Typography tokens (from `styles.ts`):
+
+| Token | Color |
+|-------|--------|
+| `notificationHeader` | `text-color-neutral-200` |
+| `notificationBody` | `text-color-neutral-200` |
+| `notificationFooter` | `text-color-neutral-400` |
+
+### Default (`isUpdate` omitted / `false`)
+
+Used by every toast except the one-time update announcement.
+
+- **All lines** use `notificationBody`: `font-normal text-sm text-color-neutral-200`
+- An optional `body` prop (JSX/children) also uses `notificationBody`
+- Remaining `\n` lines keep `whitespace-pre-line`
+
+```tsx
+showToast("Wallet connected successfully", "success");
+showToast("Failed to create stamp\nCheck the fee rate and try again", "error");
+```
+
+### Update (`isUpdate: true`)
+
+Used only by `NotificationUpdate`. Do not pass `true` from other call sites.
+
+| Line | Style token | Classes |
+|------|-------------|--------|
+| **First line** | `notificationHeader` | `font-bold text-sm text-color-neutral-200 tracking-wider` |
+| **Middle lines** | `notificationBody` | `font-normal text-sm text-color-neutral-200` (+ `whitespace-pre-line`) |
+| **Last line** | `notificationFooter` | `font-normal text-sm text-color-neutral-400` (+ `mt-1`) |
+
+Header and body share `text-color-neutral-200`. Footer is muted `text-color-neutral-400` so the cache/refresh note reads as secondary copy under the feature list.
+
+```tsx
+showToast(
+  NOTIFICATION_UPDATE_MESSAGE,
+  "info",
+  false,       // autoDismiss
+  undefined,   // body
+  true,        // isUpdate
+);
+```
+
+Example message shape:
+
+```
+Website Redesign                          ← notificationHeader
+• New logo, typeface, and color palette   ← notificationBody
+• Reimagined stamp cards ...
+• ...
+
+Please clear browser cache ...            ← notificationFooter
 ```
 
 ## Features
@@ -150,14 +237,14 @@ showToast("Custom behavior message", "success", false);
 
 ### Manual Close
 
-- **Close button**: Always available in center-right corner
-- **Icon**: Uses Icon component with "close" name, grey color
-- **Instant response**: Triggers notification-exit animation immediately
+- **Close button**: Always available, `absolute top-0.5 right-0.5`
+- **Icon**: `Icon` `type="iconButton"` `name="close"` `weight="bold"` `size="mdR"` `color="neutral400"`
+- **Instant response**: Triggers `notification-exit` animation immediately, then removes the toast after 400ms
 - **Accessible**: Proper ARIA labels and keyboard support
 
 ### Smooth Animations
 
-Defined in `static/styles.css`:
+Defined in `static/styles.css` (400ms, `cubic-bezier(0.46,0.03,0.52,0.96)`):
 
 #### notification-enter Animation (400ms)
 ```css
@@ -181,13 +268,15 @@ Defined in `static/styles.css`:
     opacity: 1;
   }
   to {
-    transform: translateX(--100%);
+    transform: translateX(-100%);
     opacity: 0;
   }
 }
 ```
 
 #### Progress Bar Animation
+Track: `mt-2 w-full h-0.5 rounded-full bg-color-neutral-800`. Fill uses the type accent from [Type Accents](#type-accents).
+
 ```css
 @keyframes progress {
   from {
@@ -247,7 +336,7 @@ The system uses **Preact Signals** for reactive state management:
 
 #### `showToast()` Function
 - **Purpose**: Public API for triggering notifications
-- **Parameters**: `message`, `type`, `autoDismiss?`
+- **Parameters**: `message`, `type`, `autoDismiss?`, `body?`, `isUpdate?`
 - **Behavior**: Updates global signal, clears after 50ms
 - **Location**: `lib/utils/ui/notifications/toastSignal.ts`
 
@@ -266,7 +355,7 @@ The system uses **Preact Signals** for reactive state management:
 - **Features**:
   - Type-specific icon selection
   - Color scheme application
-  - Multi-line message formatting
+  - Default vs `isUpdate` message layout (`notificationBody` vs header/body/footer)
   - Progress bar rendering
   - Manual close handling
 - **Location**: `islands/Toast/ToastComponent.tsx`
@@ -279,6 +368,9 @@ export interface BaseToast {
   type: "success" | "error" | "warning" | "info";
   message: string;
   autoDismiss?: boolean;
+  body?: import("preact").ComponentChildren;
+  /** True only for the one-time app update announcement toast. */
+  isUpdate?: boolean | undefined;
 }
 
 // Internal toast with runtime state
@@ -293,11 +385,13 @@ export interface Toast extends Omit<BaseToast, "autoDismiss"> {
 export interface ToastComponentProps {
   id: string;
   message: string;
+  body?: ComponentChildren;
   type: "success" | "error" | "warning" | "info";
   onClose: () => void;
   autoDismiss: boolean;
   duration: number;
   isAnimatingOut?: boolean;
+  isUpdate?: boolean | undefined;
 }
 ```
 
@@ -377,6 +471,7 @@ The `NotificationUpdate` component provides a one-time notification system for a
 - Display update announcements when users visit after a major release
 - Show only once per version using localStorage tracking
 - Configurable message, timing, and behavior
+- Uses the `isUpdate` layout: header / body / footer line styles
 
 ### Location
 - **Component**: `islands/Toast/NotificationUpdate.tsx`
@@ -384,51 +479,54 @@ The `NotificationUpdate` component provides a one-time notification system for a
 
 ### Configuration
 
-All settings are self-contained within the component:
+All settings are self-contained within the component (`islands/Toast/NotificationUpdate.tsx`):
 
 ```typescript
-// Version tracking - increment for new announcements
-const NOTIFICATION_UPDATE_VERSION = "feature-update-v3.04";
+const SHOW_NOTIFICATION = true; // feature flag
+const DELAY = 2000;
+const AUTO_DISMISS = false;
+const TYPE = "info" as const;
+const NOTIFICATION_UPDATE_VERSION = "feature-update-v3.2";
 
-// Message content (supports multi-line with bullet points)
-const NOTIFICATION_UPDATE_MESSAGE = `Website Updates
-• Enhanced color palette with vibrant hues
-• Improved Wallet Profile page with updated design
-• Minor UI tweaks and bug fixes
-• Major code optimization and performance improvements
+const NOTIFICATION_UPDATE_MESSAGE = `Website UI Reimagined
+• New logo, typeface, and color palette
+• Redesigned stamp cards with multiple view modes
+• Improved Explorer page with fully featured filters
+• Added Marketplace page with listings and sales
+• Updated Collection and Wallet pages
+• Codebase optimization and performance improvements
 
 Please clear browser cache and refresh the page for all updates to take effect.`;
-
-// Timing and behavior
-const DELAY = 2000;                    // Delay before showing (ms)
-const TYPE = "info" as const;          // Toast type
-const AUTO_DISMISS = false;            // Requires manual close
 ```
 
 ### How It Works
 
-1. **Version Check**: On mount, checks localStorage for the current version key
-2. **One-Time Display**: If not shown before, displays toast after delay
-3. **localStorage Tracking**: Marks version as shown to prevent repeats
-4. **User Experience**: 2-second delay allows page to settle before showing
+1. **Feature flag**: Exits immediately if `SHOW_NOTIFICATION` is `false`
+2. **SSR-safe**: Exits if `window` is undefined
+3. **Version check**: Reads `localStorage` for `NOTIFICATION_UPDATE_VERSION`
+4. **One-time display**: If not shown, waits `DELAY` (2000ms) then calls `showToast(..., undefined, true)`
+5. **Tracking**: Writes `"true"` to that localStorage key after showing
 
 ### Usage Example
 
-To create a new update announcement:
+To create a new update announcement, edit `islands/Toast/NotificationUpdate.tsx`:
 
 ```typescript
-// 1. Update the version identifier
-const NOTIFICATION_UPDATE_VERSION = "feature-update-v3.05";
+// 1. Increment the version identifier (current: feature-update-v3.2)
+const NOTIFICATION_UPDATE_VERSION = "feature-update-v3.3";
 
-// 2. Update the message content
+// 2. Update the message: first line = header, bullets = body, last line = footer
 const NOTIFICATION_UPDATE_MESSAGE = `New Features Released
 • Feature 1 description
 • Feature 2 description
-• Bug fixes and improvements`;
+• Bug fixes and improvements
 
-// 3. Adjust timing if needed (optional)
-const DELAY = 3000;  // Show after 3 seconds
-const AUTO_DISMISS = false;  // Keep manual dismiss
+Please clear browser cache and refresh the page for all updates to take effect.`;
+
+// 3. Timing / behavior (optional)
+const DELAY = 2000;
+const AUTO_DISMISS = false;
+const SHOW_NOTIFICATION = true;
 ```
 
 ### Implementation Details
@@ -438,53 +536,55 @@ The component uses Preact hooks for lifecycle management:
 ```typescript
 export function NotificationUpdate() {
   useEffect(() => {
-    // Client-side only check
+    if (!SHOW_NOTIFICATION) return;
     if (typeof window === "undefined") return;
 
-    // Check localStorage for version key
     const hasBeenShown = localStorage.getItem(NOTIFICATION_UPDATE_VERSION);
     if (hasBeenShown) return;
 
-    // Delayed notification display
     const timer = setTimeout(() => {
-      showToast(NOTIFICATION_UPDATE_MESSAGE, TYPE, AUTO_DISMISS);
+      showToast(
+        NOTIFICATION_UPDATE_MESSAGE,
+        TYPE,
+        AUTO_DISMISS,
+        undefined,
+        true, // isUpdate — header / body / footer typography
+      );
       localStorage.setItem(NOTIFICATION_UPDATE_VERSION, "true");
     }, DELAY);
 
     return () => clearTimeout(timer);
   }, []);
 
-  return null; // Pure behavior component
+  return null;
 }
 ```
 
 **Key Features:**
+- **Feature flag**: `SHOW_NOTIFICATION` can disable the announcement without deleting it
 - **SSR-Safe**: Checks for `window` existence before running
-- **Zero Visual Footprint**: Returns `null` - pure behavior component
-- **Cleanup**: Properly clears timer on unmount
-- **localStorage**: Uses version key as storage key for tracking
+- **Zero Visual Footprint**: Returns `null` — pure behavior component
+- **Cleanup**: Clears the delay timer on unmount
+- **localStorage**: Uses the version string as the storage key
 
 ### Integration
 
-Add to `routes/_app.tsx` to run on every page load:
+Already wired in `routes/_app.tsx` (must stay inside `ToastProvider`):
 
-```typescript
-import { NotificationUpdate } from "$islands/Toast/NotificationUpdate.tsx";
-
-export default function App({ Component }: PageProps) {
-  return (
-    <>
-      <NotificationUpdate />
-      <Component />
-    </>
-  );
-}
+```tsx
+<ToastProvider>
+  <NotificationUpdate />
+  <NavigatorProvider>
+    {/* ... */}
+  </NavigatorProvider>
+</ToastProvider>
 ```
 
 ### Best Practices
 
-- **Version Naming**: Use descriptive version strings (e.g., `feature-update-v3.04`, `major-release-v4.0`)
-- **Message Content**: Keep concise but informative, use bullet points for clarity
+- **Version Naming**: Increment `NOTIFICATION_UPDATE_VERSION` for each new announcement (current: `feature-update-v3.2`)
+- **Message Content**: Keep concise but informative; first line is the header, bullets are the body, last line is the muted footer
+- **isUpdate**: Always pass `true` as the fifth `showToast` argument so header/footer styles apply
 - **Timing**: 2-3 second delay prevents overwhelming users on page load
 - **Auto-Dismiss**: Set to `false` for important announcements requiring acknowledgment
 - **Frequency**: Use sparingly for major updates only, not minor bug fixes
@@ -521,12 +621,13 @@ As outlined in [Issue #860](https://github.com/stampchain-io/stampchain.io/issue
 - **Layout System**: Follows glassmorphism design principles ([layout/doc.md](mdc:components/layout/doc.md))
 - **Notification Styles**: Style definitions in `components/notification/styles.ts`
 - **Global Styles**: Animation keyframes in `static/styles.css`
+- **Inline gallery errors**: `SRC20Deploys`, `SRC20Mints`, and `SRC20Transfers` reuse `notificationContainerError`, `notificationHeader`, `notificationBody`, and `notificationTextError` (not the toast overlay)
 
 ## Best Practices
 
 ### Message Content
-- **Be concise**: First line should summarize the message
-- **Provide context**: Use additional lines for details when needed
+- **Be concise**: First line should summarize the message (header only on `isUpdate` toasts)
+- **Provide context**: Use additional lines for details; default toasts keep the same body style on every line
 - **Action-oriented**: Tell users what happened and what to do next
 - **Consistent tone**: Match message style to notification type
 
@@ -545,12 +646,12 @@ As outlined in [Issue #860](https://github.com/stampchain-io/stampchain.io/issue
   - Persistent status indicators
 
 ### Multiple Toasts
-- The system supports multiple simultaneous toasts
+- The provider can hold multiple toasts in state
 - Each toast has a unique ID and independent lifecycle
-- Toasts stack vertically in the top-left corner
+- All toasts use the same `fixed top-5` position, so they overlay rather than stack
 - Consider user experience when triggering multiple toasts rapidly
 
 ---
 
-**Last Updated:** October 6, 2025
+**Last Updated:** August 23, 2026
 **Author:** baba

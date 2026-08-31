@@ -1,11 +1,11 @@
 /* ===== SALES ACTIVITY FEED COMPONENT ===== */
 import { Icon, LoadingIcon } from "$icon";
-import { glassmorphismL2 } from "$layout";
+import { container2 } from "$layout";
 import {
   abbreviateAddress,
   formatBTCAmount,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
-import { subtitleGrey, titleGreyDL } from "$text";
+import { subtitleNeutral, titleNeutral } from "$text";
 import type { StampWithEnhancedSaleData } from "$types/marketData.d.ts";
 import type { SalesActivityFeedProps } from "$types/ui.d.ts";
 import { useEffect, useState } from "preact/hooks";
@@ -231,12 +231,12 @@ export default function SalesActivityFeed({
       <div class="flex justify-between items-center mb-6">
         <div class="flex flex-col">
           {title && (
-            <h2 class={`${titleGreyDL} text-lg`}>
+            <h2 class={`${titleNeutral} !bg-gradient-to-l text-lg`}>
               {title}
             </h2>
           )}
           {subTitle && (
-            <p class={`${subtitleGrey} text-sm`}>
+            <p class={`${subtitleNeutral} text-sm`}>
               {subTitle}
             </p>
           )}
@@ -314,7 +314,7 @@ export default function SalesActivityFeed({
       {/* ===== LOADING OVERLAY FOR REFRESH ===== */}
       {refreshLoading && !isLoading && (
         <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center rounded-2xl">
-          <div class={`${glassmorphismL2} p-4 flex items-center gap-2`}>
+          <div class={`${container2} p-4 flex items-center gap-2`}>
             <LoadingIcon />
             <span class="text-white text-sm">Refreshing...</span>
           </div>

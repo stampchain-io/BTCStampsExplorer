@@ -305,6 +305,9 @@ const CACHE_HEADERS = {
   error: { "Cache-Control": "no-cache, no-store" },
 };
 
+// NOTE: verify this path still 200s if stampchain.io's static assets are
+// ever reorganized — a stale path here silently breaks every fallback
+// preview (card shows a broken-image placeholder instead of the logo).
 const FALLBACK_LOGO =
   "https://stampchain.io/img/logo/stampchain-logo-opengraph.jpg";
 
@@ -387,6 +390,36 @@ function fallbackCacheHeaders(
   return isPermanentFallback(reason)
     ? CACHE_HEADERS.redirect
     : CACHE_HEADERS.error;
+}
+
+/**
+ * Build the response used whenever a preview render fails.
+ *
+ * By default this 302s to the generic Stampchain logo, which is the right
+ * behavior for social-media og:image tags (routes/stamp/[id].tsx builds that
+ * URL directly, without going through getStampPreviewUrl, so it always gets
+ * this branch) — a branded image beats no image on a share card.
+ *
+ * In-app thumbnails (StampCard, wallet table rows, Carousel) instead pass
+ * `?placeholderOnFail=true` (see getStampPreviewUrl) so they get a 404 here
+ * — that fails the `<img>` load, letting the client swap in the local
+ * "no image" placeholder icon instead of showing the unrelated logo inside
+ * a stamp thumbnail slot.
+ */
+function fallbackResponse(
+  reason: FallbackReason | string,
+  cacheHeaders: Record<string, string>,
+  placeholderOnFail: boolean,
+  extraHeaders: Record<string, string> = {},
+): Response {
+  if (placeholderOnFail) {
+    return WebResponseUtil.notFound("Preview unavailable", {
+      headers: { "X-Fallback": reason, ...extraHeaders, ...cacheHeaders },
+    });
+  }
+  return WebResponseUtil.redirect(FALLBACK_LOGO, 302, {
+    headers: { "X-Fallback": reason, ...extraHeaders, ...cacheHeaders },
+  });
 }
 
 /** Encode Uint8Array to base64 string */
@@ -1159,6 +1192,7 @@ async function centerOnCanvas(
 async function handleS3Preview(
   stamp: string,
   forceRefresh: boolean,
+  placeholderOnFail: boolean,
 ): Promise<Response> {
   // Check if preview already exists in S3 (skip on force refresh)
   if (!forceRefresh && await previewExists(stamp)) {
@@ -1179,12 +1213,11 @@ async function handleS3Preview(
     // errors, missing config, or an unclassified null) must NOT be cached —
     // caching the 302-to-logo for 24h is the #1031 pinning symptom. Only
     // permanent failures keep the redirect cache so they aren't re-rendered.
-    return WebResponseUtil.redirect(FALLBACK_LOGO, 302, {
-      headers: {
-        "X-Fallback": reason,
-        ...fallbackCacheHeaders(reason),
-      },
-    });
+    return fallbackResponse(
+      reason,
+      fallbackCacheHeaders(reason),
+      placeholderOnFail,
+    );
   }
 
   // Upload raw binary PNG to S3 (decode from base64)
@@ -1207,6 +1240,7 @@ async function handleS3Preview(
 async function handleRedisPreview(
   stamp: string,
   forceRefresh: boolean,
+  placeholderOnFail: boolean,
 ): Promise<Response> {
   const cacheKey = `preview:${stamp}`;
 
@@ -1245,23 +1279,17 @@ async function handleRedisPreview(
     // also covers a just-written transient sentinel (wasRendered) above.
     if (!isPermanentFallback(reason)) {
       await dbManager.invalidateCacheByPattern(cacheKey);
-      return WebResponseUtil.redirect(FALLBACK_LOGO, 302, {
-        headers: {
-          "X-Fallback": reason,
-          ...CACHE_HEADERS.error,
-        },
-      });
+      return fallbackResponse(reason, CACHE_HEADERS.error, placeholderOnFail);
     }
     const age = Date.now() - cached.timestamp;
     if (age < FAILED_RENDER_TTL * 1000) {
       // Permanent failure still within TTL — return fallback without re-rendering
-      return WebResponseUtil.redirect(FALLBACK_LOGO, 302, {
-        headers: {
-          "X-Fallback": reason,
-          "X-Failure-Age": `${Math.round(age / 1000)}s`,
-          ...CACHE_HEADERS.redirect,
-        },
-      });
+      return fallbackResponse(
+        reason,
+        CACHE_HEADERS.redirect,
+        placeholderOnFail,
+        { "X-Failure-Age": `${Math.round(age / 1000)}s` },
+      );
     }
     // Failure sentinel has expired — invalidate and re-render
     await dbManager.invalidateCacheByPattern(cacheKey);
@@ -1297,19 +1325,17 @@ async function handleRedisPreview(
           }),
         604800,
       );
-      return WebResponseUtil.redirect(FALLBACK_LOGO, 302, {
-        headers: {
-          "X-Fallback": retryReason,
-          ...CACHE_HEADERS.redirect,
-        },
-      });
+      return fallbackResponse(
+        retryReason,
+        CACHE_HEADERS.redirect,
+        placeholderOnFail,
+      );
     }
-    return WebResponseUtil.redirect(FALLBACK_LOGO, 302, {
-      headers: {
-        "X-Fallback": retryReason,
-        ...CACHE_HEADERS.error,
-      },
-    });
+    return fallbackResponse(
+      retryReason,
+      CACHE_HEADERS.error,
+      placeholderOnFail,
+    );
   }
 
   if (cached?.png) {
@@ -1325,12 +1351,11 @@ async function handleRedisPreview(
   }
 
   const finalReason = renderDiag.reason ?? "render-failed";
-  return WebResponseUtil.redirect(FALLBACK_LOGO, 302, {
-    headers: {
-      "X-Fallback": finalReason,
-      ...fallbackCacheHeaders(finalReason),
-    },
-  });
+  return fallbackResponse(
+    finalReason,
+    fallbackCacheHeaders(finalReason),
+    placeholderOnFail,
+  );
 }
 
 // Handler-level timeout: prevent the request from hanging indefinitely
@@ -1535,6 +1560,12 @@ async function handleS3GifPreview(
 export const handler: Handlers = {
   async GET(req, ctx) {
     const handlerStart = Date.now();
+    // In-app thumbnails (see getStampPreviewUrl) opt into a 404 instead of
+    // the logo redirect so the client can swap in a local placeholder icon.
+    // Parsed outside the try block so the catch-all error handler below can
+    // still honor it.
+    const placeholderOnFail =
+      new URL(req.url).searchParams.get("placeholderOnFail") === "true";
     try {
       const { stamp } = ctx.params;
       const url = new URL(req.url);
@@ -1564,8 +1595,8 @@ export const handler: Handlers = {
           result = await handleS3GifPreview(stamp, forceRefresh);
         } else {
           result = useS3Storage
-            ? await handleS3Preview(stamp, forceRefresh)
-            : await handleRedisPreview(stamp, forceRefresh);
+            ? await handleS3Preview(stamp, forceRefresh, placeholderOnFail)
+            : await handleRedisPreview(stamp, forceRefresh, placeholderOnFail);
         }
         console.log(
           `[Preview] Render complete for stamp ${stamp} (${format}) in ${
@@ -1582,12 +1613,13 @@ export const handler: Handlers = {
               Date.now() - handlerStart
             }ms`,
           );
-          resolve(WebResponseUtil.redirect(FALLBACK_LOGO, 302, {
-            headers: {
-              "X-Fallback": "handler-timeout",
-              ...CACHE_HEADERS.error,
-            },
-          }));
+          resolve(
+            fallbackResponse(
+              "handler-timeout",
+              CACHE_HEADERS.error,
+              placeholderOnFail,
+            ),
+          );
         }, timeoutMs);
       });
 
@@ -1607,12 +1639,11 @@ export const handler: Handlers = {
         errMsg,
         error instanceof Error ? error.stack : "",
       );
-      return WebResponseUtil.redirect(FALLBACK_LOGO, 302, {
-        headers: {
-          "X-Fallback": "general-error",
-          ...CACHE_HEADERS.error,
-        },
-      });
+      return fallbackResponse(
+        "general-error",
+        CACHE_HEADERS.error,
+        placeholderOnFail,
+      );
     }
   },
 };

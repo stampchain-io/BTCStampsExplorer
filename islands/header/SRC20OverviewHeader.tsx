@@ -1,60 +1,68 @@
 /* ===== SRC20 HEADER COMPONENT ===== */
-/* @baba - update search button styling */
-import { SelectorButtons, ToggleButton } from "$button";
-import { titleGreyLD } from "$text";
+import { SelectorButtons, TrendingButton } from "$button";
+import { container2Icon, PillContentCount, ScrollFadeRow } from "$layout";
+import {
+  navigateWithFreshPartial,
+} from "$lib/utils/navigation/freshNavigationUtils.ts";
+import { formatNumberWithCommas } from "$lib/utils/ui/formatting/formatUtils.ts";
+import { titlePrimary } from "$text";
 import type { SRC20OverviewHeaderProps } from "$types/ui.d.ts";
-import { useCallback, useState } from "preact/hooks";
-
-/* ===== TYPES ===== */
+import { useCallback } from "preact/hooks";
 
 /* ===== COMPONENT ===== */
-export const SRC20OverviewHeader = (
-  {
-    onViewTypeChange,
-    viewType,
-    onTimeframeChange,
-    onFilterChange,
-    currentSort,
-  }: SRC20OverviewHeaderProps,
-) => {
-  // 🚀 SIMPLIFIED STATE: Reduced complexity with modern patterns
-  const [selectedTimeframe, setSelectedTimeframe] = useState<string>("24H");
+export const SRC20OverviewHeader = ({
+  viewType = "minted",
+  timeframe = "24H",
+  sortBy = "TRENDING",
+  sortDirection = "desc",
+  currentTotal = 0,
+}: SRC20OverviewHeaderProps) => {
+  /* ===== NAVIGATION HANDLERS ===== */
+  const handleViewTypeClick = useCallback((newViewType: string) => {
+    navigateWithFreshPartial("/src20", {
+      viewType: newViewType,
+      timeframe: "24H",
+      sortBy,
+      sortDirection,
+    }, true);
+  }, [sortBy, sortDirection]);
 
-  // 🚀 PREACT OPTIMIZATION: Memoized handlers
-  const handleViewTypeClick = useCallback((viewType: string) => {
-    // Reset timeframe to default when switching views
-    setSelectedTimeframe("24H");
-    onTimeframeChange?.("24H");
-    // Pass the new view type to the parent component
-    onViewTypeChange?.(viewType);
-  }, [onViewTypeChange, onTimeframeChange]);
-
-  const handleTimeframeClick = useCallback(
-    (timeframe: string) => {
-      setSelectedTimeframe(timeframe);
-      onTimeframeChange?.(timeframe as "24H" | "7D" | "30D");
-    },
-    [onTimeframeChange],
-  );
+  const handleTimeframeClick = useCallback((newTimeframe: string) => {
+    navigateWithFreshPartial("/src20", {
+      timeframe: newTimeframe,
+      viewType,
+      sortBy,
+      sortDirection,
+    }, false);
+  }, [viewType, sortBy, sortDirection]);
 
   const handleTrendingClick = useCallback(() => {
-    const currentFilter = currentSort?.filter || "TRENDING";
-    const newFilter = currentFilter === "TRENDING" ? "DEPLOY" : "TRENDING";
-    onFilterChange?.(newFilter);
-  }, [onFilterChange, currentSort?.filter]);
+    const newFilter = sortBy === "TRENDING" ? "DEPLOY" : "TRENDING";
+    navigateWithFreshPartial("/src20", {
+      sortBy: newFilter,
+      sortDirection,
+      viewType,
+      timeframe,
+    }, true);
+  }, [sortBy, sortDirection, viewType, timeframe]);
+
+  /* ===== COUNT PILL ===== */
+  // Reflects only the currently active MINTED/MINTING view.
+  const countPill = formatNumberWithCommas(currentTotal);
 
   /* ===== RENDER ===== */
   return (
-    <div class="relative flex flex-col w-full gap-1.5">
-      <div class="flex flex-row justify-between items-start w-full">
+    <div class="flex flex-col w-full gap-1.5">
+      <div class="relative flex flex-row justify-between items-start w-full">
         {/* ===== TITLE ===== */}
-        <h1 class={`${titleGreyLD} ml-1.5`}>SRC-20 TOKENS</h1>
+        <h1 class={titlePrimary}>SRC-20 TOKENS</h1>
+        <PillContentCount value={countPill} />
       </div>
 
-      {/* ===== TRENDING, MINTED/MINTING AND TIMEFRAME BUTTONS ===== */}
-      <div class="flex flex-col mobileLg:flex-row justify-between w-full">
+      {/* ===== MINTED/MINTING, TRENDING AND TIMEFRAME BUTTONS ===== */}
+      <ScrollFadeRow deps={[viewType, sortBy, timeframe]}>
         {/* Minting/Minted */}
-        <div class="flex gap-3 w-full mobileMd:w-auto">
+        <div class="shrink-0">
           <SelectorButtons
             options={[
               { value: "minted", label: "MINTED" },
@@ -62,40 +70,32 @@ export const SRC20OverviewHeader = (
             ]}
             value={viewType}
             onChange={handleViewTypeClick}
-            size="smR"
-            color="grey"
-            className="w-full mobileMd:w-auto"
+            size="xsR"
+            color="primary"
           />
         </div>
 
-        {/* Trending and Timeframes - Right */}
-        <div class="flex justify-between pt-3 mobileLg:pt-0 gap-3">
-          {/* Trending Toggle */}
-          <div class="mt-[3px]">
-            <ToggleButton
-              options={["TRENDING"]}
-              selected={currentSort?.filter === "TRENDING" ? "TRENDING" : ""}
-              onChange={handleTrendingClick}
-              mode="single"
-              size="smR"
-              color="grey"
+        {/* Timeframe Buttons - Right */}
+        <div class="shrink-0 flex ml-auto gap-3">
+          <div class={container2Icon}>
+            <TrendingButton
+              selected={sortBy === "TRENDING"}
+              onClick={handleTrendingClick}
             />
           </div>
-
-          {/* Timeframe Buttons */}
           <SelectorButtons
             options={[
               { value: "24H", label: "24H" },
               { value: "7D", label: "7D" },
               { value: "30D", label: "30D" },
             ]}
-            value={selectedTimeframe}
+            value={timeframe}
             onChange={handleTimeframeClick}
-            size="smR"
-            color="grey"
+            size="xsR"
+            color="primary"
           />
         </div>
-      </div>
+      </ScrollFadeRow>
     </div>
   );
 };

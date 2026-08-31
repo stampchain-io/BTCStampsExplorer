@@ -58,7 +58,7 @@ function IntroSection() {
           NOTE:{" "}
           <b>
             There is a{" "}
-            <a href="/howto/leathercreate" class="animated-underline">
+            <a href="/howto/leathercreate" class="link-neutral-200-bold">
               How-To article
             </a>{" "}
             to create a Leather wallet.

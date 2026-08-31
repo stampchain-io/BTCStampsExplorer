@@ -59,6 +59,20 @@ export class SRC20Repository {
     };
   }
 
+  /**
+   * Adds the wallet-address filter shared by list and count queries.
+   * SRC20Valid has no `address` column — a wallet can appear as either
+   * the sender (`creator`) or the recipient (`destination`) of a tx.
+   */
+  private static pushAddressCondition(
+    whereConditions: string[],
+    queryParams: unknown[],
+    address: string,
+  ): void {
+    whereConditions.push(`(src20.creator = ? OR src20.destination = ?)`);
+    queryParams.push(address, address);
+  }
+
   static async getTotalCountValidSrc20TxFromDb(
     params: SRC20TrxRequestParams,
     excludeFullyMinted: boolean = false,
@@ -70,10 +84,14 @@ export class SRC20Repository {
       block_index = null,
       tx_hash = null,
       address = null,
+      stampMin,
+      stampMax,
+      amtMax,
     } = params;
 
     const queryParams = [];
     const whereConditions = [];
+    let needsStampJoin = false;
 
     if (tick !== null) {
       if (Array.isArray(tick)) {
@@ -103,8 +121,7 @@ export class SRC20Repository {
     }
 
     if (address !== null) {
-      whereConditions.push(`address = ?`);
-      queryParams.push(address);
+      this.pushAddressCondition(whereConditions, queryParams, address);
     }
 
     if (tx_hash !== null) {
@@ -112,21 +129,40 @@ export class SRC20Repository {
       queryParams.push(tx_hash);
     }
 
+    if (stampMax != null) {
+      whereConditions.push(`st.stamp < ?`);
+      queryParams.push(stampMax);
+      needsStampJoin = true;
+    }
+
+    if (stampMin != null) {
+      whereConditions.push(`st.stamp >= ?`);
+      queryParams.push(stampMin);
+      needsStampJoin = true;
+    }
+
+    if (amtMax != null) {
+      whereConditions.push(`CAST(src20.amt AS DECIMAL) <= ?`);
+      queryParams.push(amtMax);
+    }
+
     // 🚀 OPTIMIZED: Use pre-computed market data instead of expensive correlated subquery
     let fromClause = `FROM ${SRC20_TABLE} src20`;
 
+    if (needsStampJoin) {
+      fromClause += `\n        LEFT JOIN ${STAMP_TABLE} st ON st.tx_hash = src20.tx_hash`;
+    }
+
     if (excludeFullyMinted) {
       // Use LEFT JOIN with src20_market_data for much better performance
-      fromClause = `FROM ${SRC20_TABLE} src20
-        LEFT JOIN src20_market_data smd ON smd.tick = src20.tick`;
+      fromClause += `\n        LEFT JOIN src20_market_data smd ON smd.tick = src20.tick`;
       whereConditions.push(`COALESCE(smd.progress_percentage, 0) < 100`);
     }
 
     // 🚀 CRITICAL: Add filter for onlyFullyMinted
     if (onlyFullyMinted) {
       // Use LEFT JOIN with src20_market_data for filtering
-      fromClause = `FROM ${SRC20_TABLE} src20
-        LEFT JOIN src20_market_data smd ON smd.tick = src20.tick`;
+      fromClause += `\n        LEFT JOIN src20_market_data smd ON smd.tick = src20.tick`;
       whereConditions.push(`COALESCE(smd.progress_percentage, 0) >= 99.9`);
     }
 
@@ -161,6 +197,9 @@ export class SRC20Repository {
       filterBy: _filterBy,
       tx_hash,
       address,
+      stampMin,
+      stampMax,
+      amtMax,
     } = params;
 
     const queryParams = [];
@@ -197,8 +236,22 @@ export class SRC20Repository {
     }
 
     if (address != null) {
-      whereClauses.push(`(src20.creator = ? OR src20.destination = ?)`);
-      queryParams.push(address, address);
+      this.pushAddressCondition(whereClauses, queryParams, address);
+    }
+
+    if (stampMax != null) {
+      whereClauses.push(`st.stamp < ?`);
+      queryParams.push(stampMax);
+    }
+
+    if (stampMin != null) {
+      whereClauses.push(`st.stamp >= ?`);
+      queryParams.push(stampMin);
+    }
+
+    if (amtMax != null) {
+      whereClauses.push(`CAST(src20.amt AS DECIMAL) <= ?`);
+      queryParams.push(amtMax);
     }
 
     if (excludeFullyMinted) {
@@ -382,6 +435,30 @@ export class SRC20Repository {
           LEFT JOIN transactions txns ON src20.tx_hash = txns.tx_hash` : "";
     // feeFieldsOutput removed - no longer needed in simplified query
 
+    // 🚀 PERFORMANCE: Avoid "join-before-limit" pessimization. When sorting/
+    // filtering only depends on native SRC20Valid columns (i.e. we don't need
+    // market data or a stamp-range filter, and we're not sorting by the
+    // joined creator name), sort+limit SRC20Valid FIRST in a derived table,
+    // then join the enrichment tables (creator, market data, stamp) onto only
+    // those N rows. Otherwise MySQL streams the full multi-million-row join
+    // before it can apply ORDER BY + LIMIT, which is fine on fast SSD/large
+    // buffer pools but disastrous on slow disks. All whereClauses reference
+    // only src20.* columns in this case, so it's safe to push them down
+    // unchanged.
+    const canPushDownLimit = !needsMarketData &&
+      stampMin == null &&
+      stampMax == null &&
+      !finalOrderBy.includes("creator_info");
+
+    const src20FromClause = canPushDownLimit
+      ? `(
+          SELECT * FROM ${SRC20_TABLE} src20
+          ${whereClause}
+          ORDER BY ${finalOrderBy}
+          ${limitOffsetClause}
+        ) src20`
+      : `${SRC20_TABLE} src20`;
+
     try {
       // 🚀 SIMPLIFIED QUERY: Remove expensive CTE and ROW_NUMBER() for better performance
       const query = `
@@ -404,6 +481,7 @@ export class SRC20Repository {
           COALESCE(smd.progress_percentage, 0) as progress,
           COALESCE(smd.total_minted, 0) as minted_amt,
           COALESCE(smd.total_mints, 0) as total_mints,
+          st.stamp,
           -- Add deploy_tx for image URL generation
           CASE
             WHEN src20.op = 'DEPLOY' THEN src20.tx_hash
@@ -419,13 +497,14 @@ export class SRC20Repository {
           smd.volume_24h_btc,
           smd.price_change_24h_percent,
           smd.price_source_type` : ''}${feeFieldsSelect}
-        FROM ${SRC20_TABLE} src20
+        FROM ${src20FromClause}
         LEFT JOIN creator creator_info ON src20.creator = creator_info.address
         LEFT JOIN creator destination_info ON src20.destination = destination_info.address
-        LEFT JOIN src20_market_data smd ON smd.tick = src20.tick${feeFieldsJoin}
-        ${whereClause}
+        LEFT JOIN src20_market_data smd ON smd.tick = src20.tick
+        LEFT JOIN ${STAMP_TABLE} st ON st.tx_hash = src20.tx_hash${feeFieldsJoin}
+        ${canPushDownLimit ? "" : whereClause}
         ORDER BY ${finalOrderBy}
-        ${limitOffsetClause}
+        ${canPushDownLimit ? "" : limitOffsetClause}
       `;
 
       // 🚀 SIMPLIFIED PARAMS: No offset parameter needed since ROW_NUMBER() was removed
@@ -1281,8 +1360,7 @@ export class SRC20Repository {
     }
 
     if (address !== null) {
-      whereConditions.push(`src20.address = ?`);
-      queryParams.push(address);
+      this.pushAddressCondition(whereConditions, queryParams, address);
     }
 
     if (tx_hash !== null) {

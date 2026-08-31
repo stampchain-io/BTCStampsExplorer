@@ -8,7 +8,7 @@ import {
   rowForm,
   rowResponsiveForm,
 } from "$layout";
-import { subtitleGrey, text, textLg, titleGreyLD } from "$text";
+import { subtitleNeutral, text, textLg, titleNeutral } from "$text";
 import type { FormEventHandler } from "$types/ui.d.ts";
 import { useState } from "preact/hooks";
 
@@ -35,13 +35,13 @@ const ContactCta = () => {
   /* ===== COMPONENT ===== */
   return (
     <>
-      <section class={containerBackground}>
+      <section id="contact" class={containerBackground}>
         {/* ===== HEADER SECTION ===== */}
         <div class="flex flex-col">
-          <h4 class={titleGreyLD}>
+          <h4 class={titleNeutral}>
             CONTACT
           </h4>
-          <h5 class={subtitleGrey}>
+          <h5 class={subtitleNeutral}>
             DROP US A MESSAGE
           </h5>
         </div>
@@ -63,7 +63,7 @@ const ContactCta = () => {
               <a
                 href="https://t.me/BitcoinStamps"
                 target="_blank"
-                class="animated-underline"
+                class="link-neutral-200-bold"
               >
                 Get in touch via Telegram
               </a>{" "}
@@ -119,8 +119,8 @@ const ContactCta = () => {
                 <ButtonProcessing
                   type="submit"
                   variant="flat"
-                  color="grey"
-                  size="mdR"
+                  color="neutral"
+                  size="smR"
                   isSubmitting={isSubmitting}
                 >
                   SEND

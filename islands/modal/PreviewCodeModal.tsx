@@ -85,12 +85,12 @@ export default function PreviewCodeModal({ src }: PreviewCodeModalProps) {
       }}
       title=""
       hideHeader
-      className="w-[calc(100vw-48px)] h-[calc(100vh-48px)] mobileLg:w-[calc(100vw-96px)] mobileLg:h-[calc(100vh-96px)] max-w-[800px]"
-      contentClassName="h-full bg-[#FAFAFA] rounded-xl mobileMd:rounded-2xl overflow-auto scrollbar-background-layer1"
+      className="w-[calc(100vw-40px)] h-[calc(100vh-40px)] mobileLg:w-[calc(100vw-80px)] mobileLg:h-[calc(100vh-80px)] max-w-[800px]"
+      contentClassName="h-full bg-[#FAFAFA] rounded-2xl overflow-auto scrollbar-background-layer1"
     >
       {/* ===== CODE DISPLAY ===== */}
-      <div class="flex flex-col w-full h-full p-6 mobileMd:p-9">
-        <code class="whitespace-pre-wrap text-xs text-color-grey-dark leading-tight pb-6 mobileMd:pb-9">
+      <div class="flex flex-col w-full h-full p-5">
+        <code class="whitespace-pre-wrap text-xs text-color-neutral-600 leading-tight pb-5">
           {formattedSrc}
         </code>
       </div>

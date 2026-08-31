@@ -97,7 +97,7 @@ SortingComponent.Dropdown = function SortingDropdown({
             type="icon"
             name="loading"
             weight="normal"
-            color="grey"
+            color="neutral500"
             size="sm"
             className="sorting-dropdown__loading-icon"
           />
@@ -173,7 +173,7 @@ SortingComponent.Buttons = function SortingButtons({
                 type="icon"
                 name={option.icon}
                 weight="normal"
-                color="grey"
+                color="neutral500"
                 size="sm"
                 className="sorting-buttons__button-icon"
               />
@@ -186,7 +186,7 @@ SortingComponent.Buttons = function SortingButtons({
                 type="icon"
                 name="check"
                 weight="normal"
-                color="grey"
+                color="neutral500"
                 size="sm"
                 className="sorting-buttons__button-check"
               />
@@ -259,7 +259,7 @@ SortingComponent.Label = function SortingLabel({
           type="icon"
           name="loading"
           weight="normal"
-          color="grey"
+          color="neutral500"
           size="sm"
           className="sorting-label__loading-icon"
         />
@@ -307,7 +307,7 @@ SortingComponent.Error = function SortingError({
           type="icon"
           name="warning"
           weight="normal"
-          color="grey"
+          color="neutral500"
           size="sm"
           className="sorting-error__icon"
         />
@@ -325,7 +325,7 @@ SortingComponent.Error = function SortingError({
             type="icon"
             name="refresh"
             weight="normal"
-            color="grey"
+            color="neutral500"
             size="sm"
             className="sorting-error__retry-icon"
           />

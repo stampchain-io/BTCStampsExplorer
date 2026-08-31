@@ -1,16 +1,16 @@
 /* ===== SRC20 TRANSFERS TABLE COMPONENT ===== */
-import { cellAlign, colGroup } from "$components/layout/types.ts";
+import { colGroup } from "$components/layout/types.ts";
 import {
   cellCenterL2Detail,
   cellLeftL2Detail,
   cellRightL2Detail,
-  glassmorphismL2,
+  container2,
 } from "$layout";
 import {
   abbreviateAddress,
   formatDate,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
-import { labelXs, textSm, valueDarkSm, valueSmLink } from "$text";
+import { labelXxs, textXs, valueDarkSm } from "$text";
 import type { SRC20Row } from "$types/src20.d.ts";
 import type { SRC20TransfersProps } from "$types/ui.d.ts";
 
@@ -23,9 +23,9 @@ export function SRC20TransfersTable(
 
   /* ===== RENDER ===== */
   return (
-    <div class="-mt-2 overflow-x-auto tablet:overflow-x-visible scrollbar-hide">
+    <div class="overflow-x-auto overflow-y-clip tablet:overflow-x-clip flow-root scrollbar-hide">
       <table
-        class={`w-full border-separate border-spacing-y-2 ${textSm}`}
+        class={`w-full -my-2 border-separate border-spacing-y-2 ${textXs}`}
       >
         {/* ===== TABLE STRUCTURE ===== */}
         <colgroup>
@@ -38,9 +38,8 @@ export function SRC20TransfersTable(
           ]).map((col) => <col key={col.key} class={col.className} />)}
         </colgroup>
         {/* ===== TABLE HEADER ===== */}
-        <thead class="sticky top-0 z-10">
-          {/* Only sticky on desktop */}
-          <tr class={`${glassmorphismL2}`}>
+        <thead>
+          <tr class={container2}>
             {headers.map((header, i) => {
               const isFirst = i === 0;
               const isLast = i === (headers?.length ?? 0) - 1;
@@ -55,9 +54,7 @@ export function SRC20TransfersTable(
               return (
                 <th
                   key={header}
-                  class={`${
-                    cellAlign(i, headers?.length ?? 0)
-                  } !py-1.5 ${rowClass} ${labelXs}`}
+                  class={`sticky top-0 z-10 !py-1.5 ${rowClass} ${labelXxs}`}
                 >
                   {header}
                 </th>
@@ -71,17 +68,15 @@ export function SRC20TransfersTable(
             ? sends?.map((send: SRC20Row, index: number) => (
               <tr
                 key={`${send.tx_hash}-${index}`}
-                class={`${glassmorphismL2} group`}
+                class={`${container2} group`}
               >
                 {/* FROM */}
                 <td
-                  class={`${
-                    cellAlign(0, headers?.length ?? 0)
-                  } ${cellLeftL2Detail}`}
+                  class={cellLeftL2Detail}
                 >
                   <a
                     href={`/wallet/${send.creator}`}
-                    className={valueSmLink}
+                    className="link-neutral-200"
                   >
                     <span class="tablet:hidden">
                       {abbreviateAddress(send.creator, 4)}
@@ -93,13 +88,11 @@ export function SRC20TransfersTable(
                 </td>
                 {/* TO */}
                 <td
-                  class={`${
-                    cellAlign(1, headers?.length ?? 0)
-                  } ${cellCenterL2Detail}`}
+                  class={cellCenterL2Detail}
                 >
                   <a
                     href={`/wallet/${send.destination}`}
-                    className={valueSmLink}
+                    className="link-neutral-200"
                   >
                     <span class="tablet:hidden">
                       {abbreviateAddress(send.destination, 4)}
@@ -111,17 +104,13 @@ export function SRC20TransfersTable(
                 </td>
                 {/* AMOUNT */}
                 <td
-                  class={`${
-                    cellAlign(2, headers?.length ?? 0)
-                  } ${cellCenterL2Detail}`}
+                  class={`${cellCenterL2Detail} text-color-primary-400`}
                 >
                   {Number(send.amt).toLocaleString()}
                 </td>
                 {/* DATE */}
                 <td
-                  class={`${
-                    cellAlign(3, headers?.length ?? 0)
-                  } ${cellCenterL2Detail}`}
+                  class={cellCenterL2Detail}
                 >
                   {formatDate(new Date(send.block_time), {
                     month: "numeric",
@@ -131,9 +120,7 @@ export function SRC20TransfersTable(
                 </td>
                 {/* TX HASH */}
                 <td
-                  class={`${
-                    cellAlign(4, headers?.length ?? 0)
-                  } ${cellRightL2Detail} text-color-grey`}
+                  class={cellRightL2Detail}
                 >
                   <a
                     href={`https://www.blockchain.com/explorer/transactions/btc/${send.tx_hash}`}
@@ -145,7 +132,7 @@ export function SRC20TransfersTable(
                         "_blank",
                       );
                     }}
-                    className={valueSmLink}
+                    className="link-neutral-200"
                   >
                     <span class="tablet:hidden">
                       {abbreviateAddress(send.tx_hash, 4)}
@@ -161,7 +148,7 @@ export function SRC20TransfersTable(
               <tr>
                 <td
                   colSpan={headers?.length ?? 0}
-                  class={`w-full h-[34px] ${glassmorphismL2}`}
+                  class={`w-full h-[34px] ${container2}`}
                 >
                   <h6 class={`${valueDarkSm} text-center`}>
                     NO TRANSFERS

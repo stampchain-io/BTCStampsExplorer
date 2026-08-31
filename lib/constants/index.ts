@@ -1,12 +1,10 @@
 // Re-export all constants for clean imports
-export * from "./activityLevels.ts";
 export * from "./apiConstants.ts";
 export * from "./apiOpenAPIConstants.ts";
 export * from "./apiUrls.ts";
 export * from "./constants.ts";
 export * from "./database.ts";
 export * from "./errorConstants.ts";
-export * from "./images.ts";
 export * from "./loggingConstants.ts";
 export * from "./mediaConstants.ts";
 export * from "./paginationConstants.ts";

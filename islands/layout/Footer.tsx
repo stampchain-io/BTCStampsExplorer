@@ -1,12 +1,12 @@
 /* ===== FOOTER COMPONENT ===== */
-import { STAMPCHAIN_LOGO_IMAGE } from "$constants";
 import { Icon } from "$icon";
 import { containerBackground } from "$layout";
 import {
   copyright,
-  logoPurpleLD,
-  navLinkTransparentPurple,
-  overlayPurple,
+  eyebrowNeutral,
+  logoFooter,
+  navLinkFooter,
+  navLinkFooterOverlay,
   tagline,
 } from "$text";
 import { useEffect, useState } from "preact/hooks";
@@ -21,35 +21,40 @@ interface FooterLink {
 
 /* ===== NAVIGATION CONFIGURATIONS ===== */
 const resourcesLinks: FooterLink[] = [
+  { title: "Media", href: "/media" },
+  { title: "How-To", href: "/howto" },
   { title: "FAQ", href: "/faq" },
-  { title: "HOW-TO", href: "/howto" },
-  { title: "MEDIA", href: "/media" },
   {
-    title: "PRESS KIT",
+    title: "Press Kit",
     href:
       "https://drive.google.com/drive/folders/18QsMTZ_ZII5FVxuAs2CLFoLdZE3NOdlT",
+    isExternal: true,
+  },
+  {
+    title: "Documentation",
+    href: "https://bitcoinstamps.xyz/en/",
     isExternal: true,
   },
 ];
 
 const aboutLinks: FooterLink[] = [
-  { title: "ABOUT", href: "/about" },
-  { title: "DONATE", href: "/about#donate" },
-  { title: "CONTACT", href: "/about#contact" },
-  { title: "TERMS", href: "/termsofservice" },
+  { title: "Stampchain", href: "/about" },
+  { title: "Donate", href: "/about#donate" },
+  { title: "Contact", href: "/about#contact" },
+  { title: "Terms", href: "/termsofservice" },
 ];
 
 const mobileLinks: FooterLink[] = [
-  { title: "ABOUT", href: "/about" },
-  { title: "DONATE", href: "/about#donate" },
+  { title: "About", href: "/about" },
+  { title: "Donate", href: "/about#donate" },
   {
-    title: "PRESS KIT",
+    title: "Press Kit",
     href:
       "https://drive.google.com/drive/folders/18QsMTZ_ZII5FVxuAs2CLFoLdZE3NOdlT",
     isExternal: true,
     hiddenOnMobile: true,
   },
-  { title: "TERMS", href: "/termsofservice" },
+  { title: "Terms", href: "/termsofservice" },
 ];
 
 /* ===== SOCIAL MEDIA CONFIGURATION ===== */
@@ -60,8 +65,8 @@ const socialLinks = [
         type="iconButton"
         name="twitter"
         weight="light"
-        size="md"
-        color="purple"
+        size="smR"
+        color="neutral400"
         href="https://x.com/Stampchain"
         target="_blank"
       />
@@ -73,8 +78,8 @@ const socialLinks = [
         type="iconButton"
         name="telegram"
         weight="light"
-        size="md"
-        color="purple"
+        size="smR"
+        color="neutral400"
         href="https://t.me/BitcoinStamps"
         target="_blank"
       />
@@ -86,8 +91,8 @@ const socialLinks = [
         type="iconButton"
         name="discord"
         weight="light"
-        size="md"
-        color="purple"
+        size="smR"
+        color="neutral400"
         href="https://discord.gg/BRYRt4bH"
         target="_blank"
       />
@@ -99,8 +104,8 @@ const socialLinks = [
         type="iconButton"
         name="github"
         weight="light"
-        size="md"
-        color="purple"
+        size="smR"
+        color="neutral400"
         href="https://github.com/stampchain-io/"
         target="_blank"
       />
@@ -114,25 +119,10 @@ export function Footer() {
   return (
     <footer class="
       flex flex-col tablet:flex-row justify-between max-w-desktop w-full mx-auto
-      px-gutter-mobile mobileLg:px-gutter-tablet tablet:px-gutter-desktop
-      pt-10 pb-7.5 tablet:pt-15 tablet:pb-10
+      px-shell-mobile mobileLg:px-shell-tablet tablet:px-shell-desktop
+      pt-5 pb-shell-mobile mobileLg:pb-shell-tablet tablet:pb-shell-desktop
       gap-2 mobileMd:gap-3 tablet:gap-4
     ">
-      {/* ===== BACKGROUND LOGO ===== */}
-      <img
-        src={STAMPCHAIN_LOGO_IMAGE}
-        alt=""
-        class="
-          absolute z-[-999]
-          size-[270px] mobileMd:size-[250px]
-          -bottom-11 mobileMd:-bottom-10
-          left-[-135px] mobileMd:left-[-120px]
-          opacity-20 pointer-events-none
-          [mask-image:linear-gradient(90deg,rgba(0,0,0,0.8),rgba(0,0,0,1))]
-          [-webkit-mask-image:linear-gradient(90deg,rgba(0,0,0,0.8),rgba(0,0,0,1))]
-        "
-      />
-
       {/* ===== MOBILE SMALL CENTER SECTION - MOBILE MEDIUM+ LEFT SECTION ===== */}
       <div
         class={`${containerBackground} !py-3 tablet:flex-row justify-between`}
@@ -143,31 +133,26 @@ export function Footer() {
         items-center mobileMd:items-end tablet:items-start gap-1
       ">
           {/* ===== LOGO AND TAGLINE ===== */}
-          <div class="flex flex-col">
-            <h5
-              class={`${logoPurpleLD} text-center mobileMd:text-left`}
-            >
-              STAMPCHAIN
-              <span class="font-extralight pr-1">
-                .IO
+          <div class="flex flex-col items-center mobileMd:items-start">
+            <h5 class={logoFooter}>
+              STAMP<span class="text-color-neutral-400">
+                CHAIN
               </span>
             </h5>
-            <h6
-              class={`${tagline} text-center mobileMd:text-left`}
-            >
-              IMMORTALISED ART - STORED ON BITCOIN
+            <h6 class={tagline}>
+              IMMORTALISED ART STORED ON BITCOIN
             </h6>
           </div>
 
           {/* ===== SOCIAL MEDIA ICONS ===== */}
-          <div class="flex gap-6 tablet:gap-5 mt-3 mobileMd:mt-0 tablet:mt-3">
+          <div class="flex gap-2 tablet:gap-1 mt-1.5 -mb-1 mobileMd:mt-0 tablet:mb-0">
             {socialLinks.map((link, index) => (
               <div key={index}>
                 {link.icon}
               </div>
             ))}
           </div>
-          <div class="hidden tablet:flex w-full  mt-3 mb-1">
+          <div class="hidden tablet:flex w-full mt-3 mb-1 tablet:mt-auto tablet:mb-0">
             <h6 class={`${copyright}`}>
               <span class="italic">STAMPCHAIN</span> &copy; 2026
             </h6>
@@ -175,17 +160,18 @@ export function Footer() {
         </div>
 
         {/* ===== DESKTOP RIGHT SECTION ===== */}
-        <div class={`${overlayPurple}`}>
+        <div class={`${navLinkFooterOverlay}`}>
           <div class="hidden tablet:flex flex-row justify-end w-[300px] pt-1">
             {/* ===== RESOURCES LINKS ===== */}
             <div class="flex w-1/2 ">
-              <div class="flex flex-col w-full justify-center gap-1">
+              <div class="flex flex-col w-full justify-start gap-1">
+                <h6 class={`${eyebrowNeutral}`}>RESOURCES</h6>
                 {resourcesLinks.map((link) => (
                   <a
                     key={link.href}
                     href={link.href}
                     f-partial={link.isExternal ? "" : link.href}
-                    class={`${navLinkTransparentPurple}`}
+                    class={`${navLinkFooter}`}
                     target={link.isExternal ? "_blank" : undefined}
                     rel={link.isExternal ? "noopener noreferrer" : undefined}
                   >
@@ -197,13 +183,14 @@ export function Footer() {
 
             {/* ===== ABOUT LINKS  ===== */}
             <div class="flex w-1/2">
-              <div class="flex flex-col w-full justify-center gap-1 text-right">
+              <div class="flex flex-col w-full justify-start gap-1 text-right">
+                <h6 class={`${eyebrowNeutral}`}>ABOUT</h6>
                 {aboutLinks.map((link) => (
                   <a
                     key={link.href}
                     href={link.href}
                     f-partial={link.isExternal ? "" : link.href}
-                    class={`${navLinkTransparentPurple}`}
+                    class={`${navLinkFooter}`}
                     target={link.isExternal ? "_blank" : undefined}
                     rel={link.isExternal ? "noopener noreferrer" : undefined}
                   >
@@ -216,7 +203,7 @@ export function Footer() {
 
           {/* ===== MOBILE BOTTOM ROW SECTION ===== */}
           {/* ===== MIXED LINKS  ===== */}
-          <div class="flex tablet:hidden w-full justify-center mobileMd:justify-start mx-auto mt-3 mobileMd:mt-2 mb-2 mobileMd:mb-0 overflow-hidden">
+          <div class="flex tablet:hidden w-full justify-start mobileMd:justify-start mx-auto mt-3 mobileMd:mt-2 mb-2 mobileMd:mb-0 overflow-hidden">
             {/* ===== BASE/MOBILESM: EVENLY DISTRIBUTED LINKS ===== */}
             <div class="flex mobileMd:hidden flex-row flex-wrap w-full justify-center items-center mx-auto gap-6">
               {mobileLinks.filter((link) => !link.hiddenOnMobile).map((
@@ -226,7 +213,7 @@ export function Footer() {
                   key={link.href}
                   href={link.href}
                   f-partial={link.isExternal ? "" : link.href}
-                  class={`${navLinkTransparentPurple}`}
+                  class={`${navLinkFooter}`}
                   target={link.isExternal ? "_blank" : undefined}
                   rel={link.isExternal ? "noopener noreferrer" : undefined}
                 >
@@ -246,7 +233,7 @@ export function Footer() {
                     key={link.href}
                     href={link.href}
                     f-partial={link.isExternal ? "" : link.href}
-                    class={`${navLinkTransparentPurple}`}
+                    class={`${navLinkFooter}`}
                     target={link.isExternal ? "_blank" : undefined}
                     rel={link.isExternal ? "noopener noreferrer" : undefined}
                   >
@@ -264,7 +251,7 @@ export function Footer() {
                     key={link.href}
                     href={link.href}
                     f-partial={link.isExternal ? "" : link.href}
-                    class={`${navLinkTransparentPurple}`}
+                    class={`${navLinkFooter}`}
                     target={link.isExternal ? "_blank" : undefined}
                     rel={link.isExternal ? "noopener noreferrer" : undefined}
                   >
@@ -288,7 +275,7 @@ export function Footer() {
               <span class="italic">STAMPCHAIN</span> &copy; 2026
             </h6>
           </div>
-          <div class="hidden tablet:flex mt-[18px] justify-end">
+          <div class="hidden tablet:flex justify-end mt-2">
             <CounterpartyVersion />
           </div>
         </div>

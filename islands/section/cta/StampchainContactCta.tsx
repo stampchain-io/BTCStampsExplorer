@@ -1,7 +1,7 @@
 /* ===== STAMPCHAIN CONTACT CTA COMPONENT ===== */
 import { Button } from "$button";
 import { containerBackground } from "$layout";
-import { subtitleGrey, text, textLg, titleGreyLD } from "$text";
+import { subtitleNeutral, text, textLg, titleNeutral } from "$text";
 
 /* ===== COMPONENT ===== */
 export const StampchainContactCta = () => {
@@ -13,8 +13,8 @@ export const StampchainContactCta = () => {
     >
       <div class="col-span1 desktop:col-span-2">
         {/* ===== HEADER SECTION ===== */}
-        <h3 class={titleGreyLD}>STAMPCHAIN</h3>
-        <h4 class={subtitleGrey}>
+        <h3 class={titleNeutral}>STAMPCHAIN</h3>
+        <h4 class={subtitleNeutral}>
           THE CREATORS OF BITCOIN STAMPS
         </h4>
         {/* ===== CONTENT SECTION ===== */}
@@ -47,16 +47,17 @@ export const StampchainContactCta = () => {
       <div class="flex gap-5 justify-end">
         <Button
           variant="outline"
-          color="grey"
-          size="mdR"
-          href="/about/#contact"
+          color="neutral"
+          size="smR"
+          href="https://bitcoinstamps.xyz/en/"
+          target="_blank"
         >
-          CONTACT
+          DOCUMENTATION
         </Button>
         <Button
           variant="flat"
-          color="grey"
-          size="mdR"
+          color="neutral"
+          size="smR"
           href="/about"
         >
           ABOUT
