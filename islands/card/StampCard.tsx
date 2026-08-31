@@ -13,6 +13,7 @@ import {
   getFreshDispenserForPurchase,
   useLowestPriceDispenser,
 } from "$lib/hooks/useLowestPriceDispenser.ts";
+import { isAtomicIconVisible } from "$lib/utils/bitcoin/stamps/stampUtils.ts";
 import {
   abbreviateAddress,
   formatFileSize,
@@ -42,6 +43,7 @@ import type {
   StampRow,
   StampSaleData,
 } from "$types/stamp.d.ts";
+import type { WalletStampWithValue } from "$types/wallet.d.ts";
 import { ComponentChildren, VNode } from "preact";
 import { useEffect, useRef, useState } from "preact/hooks";
 
@@ -846,9 +848,25 @@ export function StampCard({
         data-long-number={isLongNumber(stampValue)}
         class={containerCard}
       >
-        {/* ===== ATOM ICON ===== */}
-        {/* Note: Atomic icon is only shown on WalletStampCard for stamps with UTXO attachments */}
-        {/* Regular StampCard does not show atomic icon as it lacks wallet-specific UTXO data */}
+        {/* ===== ATOM ICON (wallet balance variants only) ===== */}
+        {(variant === "cardVerticalBalance" ||
+          variant === "cardSquareBalance") &&
+          isAtomicIconVisible(stamp as unknown as WalletStampWithValue) && (
+          <div class="absolute top-0 left-0 w-[31px] h-[31px] z-10 rounded-[3px] bg-color-background p-[3px] desktop:block hidden group/atomic">
+            <Icon
+              type="icon"
+              name="atom"
+              weight="normal"
+              size="xs"
+              color="greyLight"
+            />
+            <div
+              class={`${tooltipIcon} opacity-0 group-hover/atomic:opacity-100`}
+            >
+              ATOMIC SWAP
+            </div>
+          </div>
+        )}
 
         <div class="relative w-full h-full">
           <div class="aspect-stamp w-full h-full overflow-hidden flex items-center justify-center">
@@ -870,7 +888,9 @@ export function StampCard({
           {variant === "cardSquareBalance" && (
             <div class="absolute bottom-0.5 right-0.5 z-20">
               <PillWithTooltip
-                label="BALANCE"
+                label={`You own ${stamp.balance ?? 0} out of ${
+                  stamp.supply ?? 0
+                } total supply`}
                 className={`${containerPill} ${cardSupply} cursor-pointer`}
               >
                 {formatSupply(
@@ -914,7 +934,9 @@ export function StampCard({
             <div class="flex justify-between items-center mt-2 w-full">
               <PillWithTooltip
                 label={variant === "cardVerticalBalance"
-                  ? "BALANCE"
+                  ? `You own ${stamp.balance ?? 0} out of ${
+                    stamp.supply ?? 0
+                  } total supply`
                   : "EDITIONS"}
                 className={`${containerPill} ${cardSupply}`}
               >

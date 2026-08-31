@@ -40,7 +40,7 @@ const HEADERS = [
   "SUPPLY",
   "PRICE",
   "CHANGE",
-  "MCAP",
+  "MARKETCAP",
   "BALANCE",
   "VALUE",
 ];
@@ -200,7 +200,7 @@ export function WalletSRC20OverviewRow({ src20 }: WalletSRC20OverviewRowProps) {
           : <span class="text-color-neutral-500">N/A</span>}
       </td>
 
-      {/* MCAP */}
+      {/* MARKETCAP */}
       <td
         class={`${cellCenterL2Card} text-color-neutral-400`}
       >
@@ -251,7 +251,7 @@ export function WalletSRC20OverviewTable(
             { width: "min-w-[100px] w-auto" }, // SUPPLY
             { width: "min-w-[110px] w-auto" }, // PRICE
             { width: "min-w-[90px] w-auto" }, // CHANGE
-            { width: "min-w-[100px] w-auto" }, // MCAP
+            { width: "min-w-[100px] w-auto" }, // MARKETCAP
             { width: "min-w-[110px] w-auto" }, // BALANCE
             { width: "min-w-[110px] w-auto" }, // VALUE
           ]).map((col) => <col key={col.key} class={col.className} />)}

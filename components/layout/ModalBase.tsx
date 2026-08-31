@@ -118,7 +118,7 @@ export function ModalBase({
             </div>
 
             <div class="w-full text-center">
-              <h2 class={`${titlePrimary} pt-3 pb-5`}>
+              <h2 class={`${titlePrimary} py-3`}>
                 {title}
               </h2>
             </div>

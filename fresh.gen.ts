@@ -180,7 +180,6 @@ import * as $button_WalletButton from "./islands/button/WalletButton.tsx";
 import * as $button_buttonActions from "./islands/button/buttonActions.tsx";
 import * as $card_SRC20Card from "./islands/card/SRC20Card.tsx";
 import * as $card_StampCard from "./islands/card/StampCard.tsx";
-import * as $card_WalletStampCard from "./islands/card/WalletStampCard.tsx";
 import * as $card_index from "./islands/card/index.ts";
 import * as $content_CollectionDetailContent from "./islands/content/CollectionDetailContent.tsx";
 import * as $content_CollectionOverviewContent from "./islands/content/CollectionOverviewContent.tsx";
@@ -539,7 +538,6 @@ const manifest = {
     "./islands/button/buttonActions.tsx": $button_buttonActions,
     "./islands/card/SRC20Card.tsx": $card_SRC20Card,
     "./islands/card/StampCard.tsx": $card_StampCard,
-    "./islands/card/WalletStampCard.tsx": $card_WalletStampCard,
     "./islands/card/index.ts": $card_index,
     "./islands/content/CollectionDetailContent.tsx":
       $content_CollectionDetailContent,
