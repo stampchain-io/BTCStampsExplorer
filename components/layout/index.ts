@@ -39,3 +39,9 @@ export * from "$components/layout/PillContentCount.tsx";
 
 /* ===== EMPTY STATE ===== */
 export * from "$components/layout/EmptyState.tsx";
+
+/* ===== BTC VALUE DISPLAY ===== */
+export * from "$components/layout/BTCValueDisplay.tsx";
+
+/* ===== MARKET DATA STATUS ===== */
+export * from "$components/layout/MarketDataStatus.tsx";
