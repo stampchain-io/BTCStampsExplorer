@@ -196,7 +196,7 @@ function SearchContent({
                           name="wallet"
                           weight="normal"
                           size="md"
-                          color="greyLight"
+                          color="neutral400"
                         />
                       </div>
                       <div class="flex flex-col flex-1 min-w-0">

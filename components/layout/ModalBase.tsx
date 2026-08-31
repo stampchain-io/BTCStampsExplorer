@@ -104,7 +104,7 @@ export function ModalBase({
                 name="close"
                 size="mdR"
                 weight="bold"
-                color="greyLight"
+                color="neutral400"
                 ariaLabel="Close modal"
                 onClick={() => handleClose()}
               />

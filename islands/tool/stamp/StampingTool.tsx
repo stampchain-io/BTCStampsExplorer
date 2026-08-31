@@ -2244,7 +2244,7 @@ function StampingToolMain({ config }: { config: Config }) {
                 name={isLocked ? "locked" : "unlocked"}
                 weight="normal"
                 size="xs"
-                color="greyDark"
+                color="neutral600"
                 className="mb-0.5"
               />
             </div>
@@ -2288,7 +2288,7 @@ function StampingToolMain({ config }: { config: Config }) {
                 name="previewImage"
                 weight="normal"
                 size="xs"
-                color="greyDark"
+                color="neutral600"
                 className={`mb-0.5 ${!file ? "!cursor-not-allowed" : ""}`}
               />
               <div

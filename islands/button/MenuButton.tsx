@@ -157,7 +157,7 @@ export function MenuButton({ onOpenDrawer }: MenuButtonProps) {
         name="menu"
         weight="normal"
         size="sm"
-        color="greyLight"
+        color="neutral400"
         isOpen={false}
         onClick={handleMenuClick}
       />
@@ -223,7 +223,7 @@ function CounterpartyVersion() {
         name="version"
         weight="normal"
         size="xs"
-        color="greyDark"
+        color="neutral600"
         className="mr-3"
       />
       <span class={labelXs}>

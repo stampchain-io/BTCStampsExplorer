@@ -125,7 +125,7 @@ export function PaginationButtons({
                 name={iconName}
                 weight="bold"
                 size="xxs"
-                color="greyLight"
+                color="neutral400"
               />
             )
             : <span>{pageNum}</span>}

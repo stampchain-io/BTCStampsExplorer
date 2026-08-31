@@ -802,7 +802,7 @@ export function StampInfo(
                         name="copy"
                         weight="normal"
                         size="xxs"
-                        color="grey"
+                        color="neutral500"
                         onClick={copyCpid}
                       />
                       <div
@@ -877,7 +877,7 @@ export function StampInfo(
                       name="recursive"
                       weight="normal"
                       size="xs"
-                      color="greyDark"
+                      color="neutral600"
                       ariaLabel="Recursive"
                     />
                   </IconWithTooltip>
@@ -889,7 +889,7 @@ export function StampInfo(
                       name="divisible"
                       weight="normal"
                       size="xs"
-                      color="greyDark"
+                      color="neutral600"
                       ariaLabel="Divisible"
                     />
                   </IconWithTooltip>
@@ -901,7 +901,7 @@ export function StampInfo(
                       name="keyburned"
                       weight="normal"
                       size="xs"
-                      color="greyDark"
+                      color="neutral600"
                       ariaLabel="Keyburned"
                     />
                   </IconWithTooltip>
@@ -914,7 +914,7 @@ export function StampInfo(
                         name="locked"
                         weight="normal"
                         size="xs"
-                        color="greyDark"
+                        color="neutral600"
                         ariaLabel="Locked"
                       />
                     </IconWithTooltip>
@@ -926,7 +926,7 @@ export function StampInfo(
                         name="unlocked"
                         weight="normal"
                         size="xs"
-                        color="greyDark"
+                        color="neutral600"
                         ariaLabel="Unlocked"
                       />
                     </IconWithTooltip>

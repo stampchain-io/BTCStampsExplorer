@@ -639,7 +639,7 @@ export function StampCard({
                     name="recursive"
                     weight="bold"
                     size="xxs"
-                    color="greyLight"
+                    color="neutral400"
                     ariaLabel="Recursive"
                   />
                 </IconWithTooltip>
@@ -651,7 +651,7 @@ export function StampCard({
                     name="divisible"
                     weight="bold"
                     size="xxs"
-                    color="greyLight"
+                    color="neutral400"
                     ariaLabel="Divisible"
                   />
                 </IconWithTooltip>
@@ -663,7 +663,7 @@ export function StampCard({
                     name="keyburned"
                     weight="bold"
                     size="xxs"
-                    color="greyLight"
+                    color="neutral400"
                     ariaLabel="Keyburned"
                   />
                 </IconWithTooltip>
@@ -676,7 +676,7 @@ export function StampCard({
                       name="locked"
                       weight="bold"
                       size="xxs"
-                      color="greyLight"
+                      color="neutral400"
                       ariaLabel="Locked"
                     />
                   </IconWithTooltip>
@@ -688,7 +688,7 @@ export function StampCard({
                       name="unlocked"
                       weight="bold"
                       size="xxs"
-                      color="greyLight"
+                      color="neutral400"
                       ariaLabel="Unlocked"
                     />
                   </IconWithTooltip>
@@ -858,7 +858,7 @@ export function StampCard({
               name="atom"
               weight="normal"
               size="xs"
-              color="greyLight"
+              color="neutral400"
             />
             <div
               class={`${tooltipIcon} opacity-0 group-hover/atomic:opacity-100`}
@@ -985,7 +985,7 @@ export function StampCard({
                       name="recursive"
                       weight="bold"
                       size="xxs"
-                      color="greyLight"
+                      color="neutral400"
                       ariaLabel="Recursive"
                     />
                   </IconWithTooltip>
@@ -997,7 +997,7 @@ export function StampCard({
                       name="divisible"
                       weight="bold"
                       size="xxs"
-                      color="greyLight"
+                      color="neutral400"
                       ariaLabel="Divisible"
                     />
                   </IconWithTooltip>
@@ -1009,7 +1009,7 @@ export function StampCard({
                       name="keyburned"
                       weight="bold"
                       size="xxs"
-                      color="greyLight"
+                      color="neutral400"
                       ariaLabel="Keyburned"
                     />
                   </IconWithTooltip>
@@ -1022,7 +1022,7 @@ export function StampCard({
                         name="locked"
                         weight="bold"
                         size="xxs"
-                        color="greyLight"
+                        color="neutral400"
                         ariaLabel="Locked"
                       />
                     </IconWithTooltip>
@@ -1034,7 +1034,7 @@ export function StampCard({
                         name="unlocked"
                         weight="bold"
                         size="xxs"
-                        color="greyLight"
+                        color="neutral400"
                         ariaLabel="Unlocked"
                       />
                     </IconWithTooltip>
@@ -1196,7 +1196,7 @@ export function StampCard({
                       name="recursive"
                       weight="bold"
                       size="xxs"
-                      color="greyLight"
+                      color="neutral400"
                       ariaLabel="Recursive"
                     />
                   </IconWithTooltip>
@@ -1208,7 +1208,7 @@ export function StampCard({
                       name="divisible"
                       weight="bold"
                       size="xxs"
-                      color="greyLight"
+                      color="neutral400"
                       ariaLabel="Divisible"
                     />
                   </IconWithTooltip>
@@ -1220,7 +1220,7 @@ export function StampCard({
                       name="keyburned"
                       weight="bold"
                       size="xxs"
-                      color="greyLight"
+                      color="neutral400"
                       ariaLabel="Keyburned"
                     />
                   </IconWithTooltip>
@@ -1233,7 +1233,7 @@ export function StampCard({
                         name="locked"
                         weight="bold"
                         size="xxs"
-                        color="greyLight"
+                        color="neutral400"
                         ariaLabel="Locked"
                       />
                     </IconWithTooltip>
@@ -1245,7 +1245,7 @@ export function StampCard({
                         name="unlocked"
                         weight="bold"
                         size="xxs"
-                        color="greyLight"
+                        color="neutral400"
                         ariaLabel="Unlocked"
                       />
                     </IconWithTooltip>

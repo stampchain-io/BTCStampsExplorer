@@ -196,7 +196,7 @@ export const WalletButton = (
             name="wallet"
             weight="normal"
             size="custom"
-            color="greyLight"
+            color="neutral400"
             className="w-[26px] h-[26px] tablet:w-[22px] tablet:h-[22px]"
             onClick={handleWalletIconClick}
           />
@@ -212,7 +212,7 @@ export const WalletButton = (
                 name="wallet"
                 weight="normal"
                 size="custom"
-                color="greyLight"
+                color="neutral400"
                 className="w-[25px] h-[25px] tablet:w-[21px] tablet:h-[21px]"
                 colorAccent="var(--color-primary-400)"
                 colorAccentHover="var(--color-hover)"
@@ -239,7 +239,7 @@ export const WalletButton = (
                 name="copy"
                 weight="normal"
                 size="xxs"
-                color="grey"
+                color="neutral500"
                 onClick={copy}
               />
               <div
@@ -269,7 +269,7 @@ export const WalletButton = (
               name="bitcoins"
               weight="normal"
               size="xs"
-              color="grey"
+              color="neutral500"
             />
             <h6 class="font-semibold text-sm text-color-orange-400">
               {formatSatoshisToBTC(btcBalance.total, {
@@ -341,7 +341,7 @@ export const WalletButton = (
                   name="copy"
                   weight="normal"
                   size="xs"
-                  color="grey"
+                  color="neutral500"
                   onClick={copy}
                 />
                 <div
@@ -371,7 +371,7 @@ export const WalletButton = (
                 name="bitcoins"
                 weight="normal"
                 size="xs"
-                color="grey"
+                color="neutral500"
               />
               <h6 class="font-semibold text-lg text-color-orange-400">
                 {formatSatoshisToBTC(btcBalance.total, {

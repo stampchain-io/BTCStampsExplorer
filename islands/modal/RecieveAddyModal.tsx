@@ -155,7 +155,7 @@ function RecieveAddyModal(
               name="copy"
               weight="light"
               size="xs"
-              color="greyLight"
+              color="neutral400"
               onClick={handleCopy}
             />
             <div

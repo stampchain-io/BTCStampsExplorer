@@ -180,7 +180,7 @@ export function ToolsButton({ onOpenDrawer, data }: ToolsButtonProps) {
           name="bitcoinBlock"
           weight="normal"
           size="xs"
-          color="grey"
+          color="neutral500"
           className="mr-3"
         />
         {isLoading
@@ -196,7 +196,7 @@ export function ToolsButton({ onOpenDrawer, data }: ToolsButtonProps) {
           name="bitcoin"
           weight="normal"
           size="xs"
-          color="grey"
+          color="neutral500"
           className="mr-3"
         />
         {isLoading
@@ -229,21 +229,21 @@ export function ToolsButton({ onOpenDrawer, data }: ToolsButtonProps) {
             name="speedSlow"
             weight="normal"
             size="xs"
-            color="grey"
+            color="neutral500"
           />
           <Icon
             type="icon"
             name="speedMedium"
             weight="normal"
             size="xs"
-            color="grey"
+            color="neutral500"
           />
           <Icon
             type="icon"
             name="speedFast"
             weight="normal"
             size="xs"
-            color="grey"
+            color="neutral500"
           />
         </div>
         {/* Data row */}
@@ -279,7 +279,7 @@ export function ToolsButton({ onOpenDrawer, data }: ToolsButtonProps) {
           name="tools"
           weight="normal"
           size="smR"
-          color="greyLight"
+          color="neutral400"
           onClick={handleToolsClick}
         />
         {/* Dropdown content is rendered by Header.tsx */}

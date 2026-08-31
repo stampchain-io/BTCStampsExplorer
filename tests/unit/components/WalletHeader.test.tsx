@@ -489,7 +489,7 @@ describe("WalletHeader - Edit Button Integration", () => {
         name: "edit",
         weight: "normal",
         size: "smR",
-        color: "greyDark",
+        color: "neutral600",
         ariaLabel: expectedAriaLabel,
       };
 
@@ -501,13 +501,13 @@ describe("WalletHeader - Edit Button Integration", () => {
         name: "edit",
         weight: "normal",
         size: "smR",
-        color: "greyDark",
+        color: "neutral600",
       };
 
       assertEquals(iconConfig.name, "edit");
       assertEquals(iconConfig.weight, "normal");
       assertEquals(iconConfig.size, "smR");
-      assertEquals(iconConfig.color, "greyDark");
+      assertEquals(iconConfig.color, "neutral600");
     });
   });
 

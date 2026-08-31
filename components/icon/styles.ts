@@ -25,12 +25,12 @@ export interface IconVariants {
     | "xxlR"
     | "custom";
   color:
-    | "greyDark"
-    | "grey"
-    | "greyLight"
-    | "purpleDark"
-    | "purple"
-    | "purpleLight"
+    | "neutral400"
+    | "neutral500"
+    | "neutral600"
+    | "primary400"
+    | "primary500"
+    | "primary600"
     | "custom";
   className?: string | undefined;
   role?: AriaRole;
@@ -101,41 +101,35 @@ export const iconStyles = {
   // Note: Two-tone colors are built into the icon styles below
   // Custom color allows for special icons with advanced coloring:
   // - Gear icon in collapsible menu (mobile menu drawer) has conditional color based on menu state
-  // - Close icon in mobile menu drawer has custom gradient fill options (grey/purple)
+  // - Close icon in mobile menu drawer has custom gradient fill options (neutral/primary)
   //   - the gradient defs have to be included in the file, since creating a global gradient file for them requires moving them up in the DOM tree (I abandoned this approach)
 
   icon: {
-    greyDark:
-      "stroke-color-neutral-600 fill-none [&_path[class*='fill-stroke']]:fill-color-neutral-600",
-    grey:
-      "stroke-color-neutral-500 fill-none [&_path[class*='fill-stroke']]:fill-color-neutral-500",
-    greyLight:
-      "stroke-color-neutral-400 fill-none [&_path[class*='fill-stroke']]:fill-color-neutral-400",
+    neutral400: "stroke-color-neutral-400 fill-none",
+    neutral500: "stroke-color-neutral-500 fill-none",
+    neutral600: "stroke-color-neutral-600 fill-none",
 
-    purpleDark:
-      "stroke-color-purple-semidark fill-none [&_path[class*='fill-stroke']]:fill-color-purple-semidark",
-    purple:
-      "stroke-color-purple fill-none [&_path[class*='fill-stroke']]:fill-color-purple",
-    purpleLight:
-      "stroke-color-purple-semilight fill-none [&_path[class*='fill-stroke']]:fill-color-purple-semilight",
+    primary400: "stroke-color-primary-400 fill-none",
+    primary500: "stroke-color-primary-500 fill-none",
+    primary600: "stroke-color-primary-600 fill-none",
 
     custom: "fill-none",
   },
 
   iconButton: {
-    greyDark:
-      "stroke-color-neutral-600 hover:stroke-color-hover group-hover:stroke-color-hover fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-color-neutral-600 [&:hover_path[class*='fill-stroke']]:fill-color-hover [&:group-hover_path[class*='fill-stroke']]:fill-color-hover",
-    grey:
-      "stroke-color-neutral-500 hover:stroke-color-hover group-hover:stroke-color-hover fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-color-neutral-500 [&:hover_path[class*='fill-stroke']]:fill-color-hover [&:group-hover_path[class*='fill-stroke']]:fill-color-hover",
-    greyLight:
-      "stroke-color-neutral-400 hover:stroke-color-hover group-hover:stroke-color-hover fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-color-neutral-400 [&:hover_path[class*='fill-stroke']]:fill-color-hover [&:group-hover_path[class*='fill-stroke']]:fill-color-hover",
+    neutral400:
+      "stroke-color-neutral-400 hover:stroke-color-hover group-hover:stroke-color-hover fill-none hover:fill-none group-hover:fill-none cursor-pointer",
+    neutral500:
+      "stroke-color-neutral-500 hover:stroke-color-hover group-hover:stroke-color-hover fill-none hover:fill-none group-hover:fill-none cursor-pointer",
+    neutral600:
+      "stroke-color-neutral-600 hover:stroke-color-hover group-hover:stroke-color-hover fill-none hover:fill-none group-hover:fill-none cursor-pointer",
 
-    purpleDark:
-      "stroke-color-purple-semidark hover:stroke-color-hover group-hover:stroke-color-hover fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-color-purple-semidark [&:hover_path[class*='fill-stroke']]:fill-color-hover [&:group-hover_path[class*='fill-stroke']]:fill-color-hover",
-    purple:
-      "stroke-color-purple hover:stroke-color-hover group-hover:stroke-color-hover fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-color-purple [&:hover_path[class*='fill-stroke']]:fill-color-hover [&:group-hover_path[class*='fill-stroke']]:fill-color-hover",
-    purpleLight:
-      "stroke-color-purple-semilight hover:stroke-color-hover group-hover:stroke-color-hover fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-color-purple-semilight [&:hover_path[class*='fill-stroke']]:fill-color-hover [&:group-hover_path[class*='fill-stroke']]:fill-color-hover",
+    primary400:
+      "stroke-color-primary-400 hover:stroke-color-hover group-hover:stroke-color-hover fill-none hover:fill-none group-hover:fill-none cursor-pointer",
+    primary500:
+      "stroke-color-primary-500 hover:stroke-color-hover group-hover:stroke-color-hover fill-none hover:fill-none group-hover:fill-none cursor-pointer",
+    primary600:
+      "stroke-color-primary-600 hover:stroke-color-hover group-hover:stroke-color-hover fill-none hover:fill-none group-hover:fill-none cursor-pointer",
 
     custom: "fill-none cursor-pointer",
   },

@@ -332,7 +332,7 @@ function RightPanel(
             name="copyLink"
             weight="normal"
             size="custom"
-            color="greyLight"
+            color="neutral400"
             className="w-[25px] h-[25px] tablet:w-[21px] tablet:h-[21px]"
             onClick={copyLink}
           />
@@ -360,7 +360,7 @@ function RightPanel(
             name="share"
             weight="normal"
             size="custom"
-            color="greyLight"
+            color="neutral400"
             className="w-[25px] h-[25px] tablet:w-[21px] tablet:h-[21px]"
             onClick={shareContent}
             ariaLabel="Share content"
@@ -384,7 +384,7 @@ function RightPanel(
             name="twitterImage"
             weight="normal"
             size="smR"
-            color="greyLight"
+            color="neutral400"
             onClick={shareToX}
             ariaLabel="Share on X"
           />
@@ -411,7 +411,7 @@ function RightPanel(
               name="previewCode"
               weight="normal"
               size="smR"
-              color="greyLight"
+              color="neutral400"
               onClick={() => {
                 setIsCodeTooltipVisible(false);
                 toggleCodeModal();
@@ -437,7 +437,7 @@ function RightPanel(
             name="downloadImage"
             weight="normal"
             size="smR"
-            color="greyLight"
+            color="neutral400"
             onClick={handleDownloadPreview}
             ariaLabel="Download stamp preview image"
           />
@@ -459,7 +459,7 @@ function RightPanel(
             name="previewImageRaw"
             weight="normal"
             size="smR"
-            color="greyLight"
+            color="neutral400"
             onClick={() =>
               globalThis.open(
                 `/s/${stamp.cpid}`,
@@ -490,7 +490,7 @@ function RightPanel(
             name="previewImage"
             weight="normal"
             size="smR"
-            color="greyLight"
+            color="neutral400"
             onClick={() => {
               setIsFullscreenTooltipVisible(false);
               toggleFullScreenModal();
@@ -942,7 +942,7 @@ export function StampImage(
                     type="iconButton"
                     weight="bold"
                     size="xxl"
-                    color="grey"
+                    color="neutral500"
                     className="p-[25%] relative z-10"
                   />
                 </button>

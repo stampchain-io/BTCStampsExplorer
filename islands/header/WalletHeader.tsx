@@ -139,7 +139,7 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
               name="edit"
               weight="bold"
               size="xsR"
-              color="grey"
+              color="neutral500"
               onClick={handleEditClick}
               ariaLabel="Edit creator name"
             />
@@ -158,7 +158,7 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
             name="copy"
             weight="bold"
             size="xsR"
-            color="grey"
+            color="neutral500"
             onClick={copy}
           />
           <div
@@ -247,7 +247,7 @@ function TokenStats(
           name="bitcoins"
           weight="bold"
           size="xs"
-          color="greyDark"
+          color="neutral600"
         />
         <StatPrice
           priceUSD={walletData.usdValue.toFixed(2)}

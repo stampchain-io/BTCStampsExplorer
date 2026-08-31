@@ -443,7 +443,7 @@ export function Header() {
                   name="close"
                   size="md"
                   weight="bold"
-                  color="greyLight"
+                  color="neutral400"
                   ariaLabel="Close menu"
                   onClick={() => {
                     if (open) {
@@ -505,7 +505,7 @@ export function Header() {
                   name={link.icon}
                   weight="normal"
                   size="xxs"
-                  color="greyLight"
+                  color="neutral400"
                   className="group-hover:stroke-color-hover"
                 />
               )}

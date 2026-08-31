@@ -87,7 +87,7 @@ export function SortButton(
         name={sort === "DESC" ? "sortDesc" : "sortAsc"}
         weight="bold"
         size="custom"
-        color="greyLight"
+        color="neutral400"
         className="w-[17px] h-[17px] tablet:w-[14px] tablet:h-[14px] stroke-width:1.5"
         href={getSortUrl()}
         f-partial={getSortUrl()}

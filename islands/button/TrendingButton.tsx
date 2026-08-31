@@ -57,7 +57,7 @@ export function TrendingButton(
         name="chartUp"
         weight="bold"
         size="custom"
-        color={selected ? "custom" : "greyLight"}
+        color={selected ? "custom" : "neutral400"}
         className={`w-[17px] h-[17px] tablet:w-[14px] tablet:h-[14px] ${
           selected
             ? "stroke-color-orange-400 hover:stroke-color-hover group-hover:stroke-color-hover"

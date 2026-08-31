@@ -111,7 +111,7 @@ export const ToastComponent = (
           name="close"
           weight="bold"
           size="mdR"
-          color="greyLight"
+          color="neutral400"
           ariaLabel="Close notification"
           onClick={onClose}
         />

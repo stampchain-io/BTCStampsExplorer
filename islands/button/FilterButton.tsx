@@ -58,7 +58,7 @@ export function FilterButton(
         name="filter"
         weight="bold"
         size="custom"
-        color={count > 0 ? "purpleLight" : "greyLight"}
+        color={count > 0 ? "primary400" : "neutral400"}
         className="w-[17px] h-[17px] tablet:w-[14px] tablet:h-[14px] stroke-width:1.5"
         onClick={() => {
           setOpen(!open);

@@ -133,7 +133,7 @@ export const CollectionDetailHeader = (
             name="info"
             weight="bold"
             size="xs"
-            color="grey"
+            color="neutral500"
             onClick={() => setShowDescription((prev) => !prev)}
             ariaLabel="Collection description"
           />

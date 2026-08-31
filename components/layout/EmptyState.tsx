@@ -36,7 +36,7 @@ export function EmptyState({ label, icon, className = "" }: EmptyStateProps) {
               name={iconName}
               weight="custom"
               size="custom"
-              color="greyLight"
+              color="neutral400"
               className="w-16 h-16 mobileMd:w-20 mobileMd:h-20 flex-shrink-0 [stroke-width:0.35]"
             />
           ))}

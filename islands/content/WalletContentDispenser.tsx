@@ -180,7 +180,7 @@ function StampStats({
                 name="divisible"
                 weight="normal"
                 size="custom"
-                color="greyLight"
+                color="neutral400"
                 className="w-[23px] h-[23px]"
               />
               <div
@@ -203,7 +203,7 @@ function StampStats({
                 name="keyburned"
                 weight="normal"
                 size="xs"
-                color="greyLight"
+                color="neutral400"
               />
               <div
                 className={`${tooltipIcon} ${
@@ -225,7 +225,7 @@ function StampStats({
                 name="locked"
                 weight="normal"
                 size="xs"
-                color="greyLight"
+                color="neutral400"
               />
               <div
                 className={`${tooltipIcon} ${
@@ -247,7 +247,7 @@ function StampStats({
                 name="unlocked"
                 weight="normal"
                 size="xs"
-                color="greyLight"
+                color="neutral400"
               />
               <div
                 className={`${tooltipIcon} ${
@@ -481,7 +481,7 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
             name="copy"
             weight="normal"
             size="mdR"
-            color="grey"
+            color="neutral500"
             onClick={copy}
           />
           <div

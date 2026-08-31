@@ -114,7 +114,7 @@ export default function BlockTransactions({
             type="icon"
             name="caretUp"
             size="md"
-            color="purple"
+            color="primary500"
             weight="normal"
             className={`cursor-pointer ${isExpanded ? "" : "rotate-180"}`}
             onClick={() => handleExpand()}

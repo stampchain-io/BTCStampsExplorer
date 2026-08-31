@@ -56,40 +56,15 @@ Both `iconHover` and `iconButton` render the `<svg>` wrapped in an `<a>` element
 
 ### Color Palettes
 
-Color values come from CSS variables defined in `tailwind.config.ts`. The `grey`/`purple` names are legacy aliases (marked "refactor and delete" in `tailwind.config.ts`) now pointing at the `neutral`/`primary` numbered scale's hex values rather than their original standalone hues. Unlike the old system, interactive icons of every color now transition to a single shared `color-hover` value (`#E879F9`, aliasing `primary-400`) rather than a same-hue "light" variant. See [Layout System Documentation](mdc:components/layout/doc.md#tailwind-color-system) for the complete color palette.
+Color values come from CSS variables defined in `tailwind.config.ts`, using the `neutral`/`primary` numbered scale directly (the old `grey`/`purple` legacy aliases, marked "refactor and delete" in `tailwind.config.ts`, are no longer referenced by the Icon system). Unlike older revisions, interactive icons of every color transition to a single shared `color-hover` value (`#E879F9`, aliasing `primary-400`) rather than a same-hue "light" variant. See [Layout System Documentation](mdc:components/layout/doc.md#tailwind-color-system) for the complete color palette.
 
-#### greyDark
-```css
-/* Static (icon type) */
-stroke: color-neutral-600 (#525252)
-fill: none
-[fill-stroke paths]: color-neutral-600
+Colors are listed light → dark. `fill-stroke` paths (see [Fill-Stroke Paths](#fill-stroke-paths-two-tone-icons)) don't need a dedicated CSS selector — `IconBase.tsx`'s `renderPaths()` derives the matching `fill-color-*` (and `group-hover:fill-color-*`) classes straight from the active `stroke-color-*` class and applies them directly to the path, for every color below.
 
-/* Interactive (iconButton/iconHover type) */
-stroke: color-neutral-600 → color-hover (#E879F9)
-hover/group-hover: color-hover
-cursor: pointer
-```
-
-#### grey (Default)
-```css
-/* Static (icon type) */
-stroke: color-neutral-500 (#737373)
-fill: none
-[fill-stroke paths]: color-neutral-500
-
-/* Interactive (iconButton/iconHover type) */
-stroke: color-neutral-500 → color-hover (#E879F9)
-hover/group-hover: color-hover
-cursor: pointer
-```
-
-#### greyLight
+#### neutral400
 ```css
 /* Static (icon type) */
 stroke: color-neutral-400 (#A3A3A3)
 fill: none
-[fill-stroke paths]: color-neutral-400
 
 /* Interactive (iconButton/iconHover type) */
 stroke: color-neutral-400 → color-hover (#E879F9)
@@ -97,41 +72,62 @@ hover/group-hover: color-hover
 cursor: pointer
 ```
 
-#### purpleDark
+#### neutral500 (Default)
 ```css
 /* Static (icon type) */
-stroke: color-purple-semidark (#C026D3)
+stroke: color-neutral-500 (#737373)
 fill: none
-[fill-stroke paths]: color-purple-semidark
 
 /* Interactive (iconButton/iconHover type) */
-stroke: color-purple-semidark → color-hover (#E879F9)
+stroke: color-neutral-500 → color-hover (#E879F9)
 hover/group-hover: color-hover
 cursor: pointer
 ```
 
-#### purple
+#### neutral600
 ```css
 /* Static (icon type) */
-stroke: color-purple (#D946EF)
+stroke: color-neutral-600 (#525252)
 fill: none
-[fill-stroke paths]: color-purple
 
 /* Interactive (iconButton/iconHover type) */
-stroke: color-purple → color-hover (#E879F9)
+stroke: color-neutral-600 → color-hover (#E879F9)
 hover/group-hover: color-hover
 cursor: pointer
 ```
 
-#### purpleLight
+#### primary400
 ```css
 /* Static (icon type) */
-stroke: color-purple-semilight (#E879F9)
+stroke: color-primary-400 (#E879F9)
 fill: none
-[fill-stroke paths]: color-purple-semilight
 
 /* Interactive (iconButton/iconHover type) */
-stroke: color-purple-semilight → color-hover (#E879F9)
+stroke: color-primary-400 → color-hover (#E879F9)
+hover/group-hover: color-hover
+cursor: pointer
+```
+
+#### primary500
+```css
+/* Static (icon type) */
+stroke: color-primary-500 (#D946EF)
+fill: none
+
+/* Interactive (iconButton/iconHover type) */
+stroke: color-primary-500 → color-hover (#E879F9)
+hover/group-hover: color-hover
+cursor: pointer
+```
+
+#### primary600
+```css
+/* Static (icon type) */
+stroke: color-primary-600 (#C026D3)
+fill: none
+
+/* Interactive (iconButton/iconHover type) */
+stroke: color-primary-600 → color-hover (#E879F9)
 hover/group-hover: color-hover
 cursor: pointer
 ```
@@ -191,7 +187,7 @@ cursor: pointer
   - **Location**: `components/icon/styles.ts`
   - **Features**:
     - 2 icon types (icon, iconButton)
-    - 6 color palettes with 5-step gradient system (greyDark, grey, greyLight, purpleDark, purple, purpleLight) + custom
+    - 6 color palettes with 5-step gradient system (neutral400, neutral500, neutral600, primary400, primary500, primary600) + custom
     - 15 size options (8 standard + 7 responsive)
     - 5 weight options
     - Special fill-stroke path support
@@ -269,7 +265,7 @@ export interface IconVariants {
   weight: "extraLight" | "light" | "normal" | "bold" | "custom";
   size: "xxxs" | "xxs" | "xs" | "sm" | "md" | "lg" | "xl" | "xxl" |
         "xxsR" | "xsR" | "smR" | "mdR" | "lgR" | "xlR" | "xxlR" | "custom";
-  color: "greyLight" | "grey" | "purpleLight" | "purple" | "custom";
+  color: "neutral400" | "neutral500" | "neutral600" | "primary400" | "primary500" | "primary600" | "custom";
   className?: string;
   role?: JSX.AriaRole;
   ariaLabel?: string;
@@ -298,7 +294,7 @@ type Palette = {
   fill: string;
 };
 
-export const placeholderColor: Record<"grey" | "red" | "green" | "orange", Palette>;
+export const placeholderColor: Record<"neutral" | "red" | "green" | "orange", Palette>;
 
 export const variantColor: Record<PlaceholderVariant, keyof typeof placeholderColor>;
 
@@ -377,7 +373,7 @@ export function SocialLink() {
       name="telegram"
       weight="normal"
       size="sm"
-      color="greyLight"
+      color="neutral400"
     />
   );
 }
@@ -394,7 +390,7 @@ export function CloseButton() {
       name="close"
       weight="bold"
       size="md"
-      color="purpleLight"
+      color="primary400"
       onClick={() => handleClose()}
       ariaLabel="Close Dialog"
     />
@@ -413,7 +409,7 @@ export function TwitterLink() {
       name="twitter"
       weight="bold"
       size="mdR"
-      color="purpleLight"
+      color="primary400"
       href="https://twitter.com/stampchain_io"
       target="_blank"
       rel="noopener noreferrer"
@@ -472,7 +468,7 @@ export function NavIcon() {
       name="search"
       weight="bold"
       size="md"
-      color="purpleLight"
+      color="primary400"
       href="/search"
       f-partial="/search"
     />
@@ -578,9 +574,9 @@ The `PlaceholderImage` component provides a unified system for rendering placeho
 
 ### Variants & Palettes
 
-#### no-image (Grey Palette)
+#### no-image (Neutral Palette)
 - **Use**: Default placeholder for missing/unavailable images
-- **Colors**: Grey gradient background, grey-darker stroke/fill
+- **Colors**: Neutral gradient background, neutral stroke/fill
 
 #### audio (Orange Palette)
 - **Use**: Audio file placeholder
@@ -598,10 +594,10 @@ The `PlaceholderImage` component provides a unified system for rendering placeho
 
 ```typescript
 export const placeholderColor = {
-  grey: {
-    bg: "bg-gradient-to-br from-color-grey-semidark/75 via-color-grey-dark/75 to-black",
-    stroke: "stroke-color-grey-semidark",
-    fill: "fill-color-grey-semidark"
+  neutral: {
+    bg: "bg-gradient-to-br from-color-neutral-500 via-color-neutral-700 to-color-neutral-900",
+    stroke: "stroke-color-neutral-500",
+    fill: "fill-color-neutral-500"
   },
   red: {
     bg: "bg-gradient-to-br from-color-red-semidark/75 via-color-red-dark/75 to-black",
@@ -703,7 +699,7 @@ Now you can use the icon anywhere:
   name="newIconName"
   weight="normal"
   size="md"
-  color="purple"
+  color="primary500"
 />
 ```
 
@@ -834,12 +830,12 @@ All icons share these SVG attributes:
 - Always provide `onClick` handler for iconButton type
 
 ### Color Selection
-- **greyLight**: Brightest grey, high visibility neutral elements
-- **grey**: Default neutral icons, standard visibility
-- **greyDark**: Subtle, less prominent neutral icons
-- **purpleLight**: Brightest purple, brand actions with high emphasis
-- **purple**: Default purple icons, standard brand visibility
-- **purpleDark**: Subtle purple, less prominent brand elements
+- **neutral400**: Brightest neutral, high visibility neutral elements
+- **neutral500**: Default neutral icons, standard visibility
+- **neutral600**: Subtle, less prominent neutral icons
+- **primary400**: Brightest primary, brand actions with high emphasis
+- **primary500**: Default primary icons, standard brand visibility
+- **primary600**: Subtle primary, less prominent brand elements
 - **custom**: Full control for special cases (gradients, conditional colors)
 
 ### Size Selection
@@ -877,7 +873,7 @@ All icons share these SVG attributes:
   name="twitter"
   weight="bold"
   size="mdR"
-  color="purple"
+  color="primary500"
   href="https://twitter.com/stampchain_io"
   target="_blank"
   rel="noopener noreferrer"
@@ -891,7 +887,7 @@ All icons share these SVG attributes:
   name="close"
   weight="bold"
   size="md"
-  color="grey"
+  color="neutral500"
   onClick={handleClose}
   ariaLabel="Close"
 />
@@ -909,7 +905,7 @@ All icons share these SVG attributes:
   name={isLocked ? "locked" : "unlocked"}
   weight="normal"
   size="sm"
-  color="grey"
+  color="neutral500"
 />
 ```
 
@@ -920,7 +916,7 @@ All icons share these SVG attributes:
   name="caretRight"
   weight="bold"
   size="xs"
-  color="purple"
+  color="primary500"
   onClick={handleNext}
 />
 ```

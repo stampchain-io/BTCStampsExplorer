@@ -73,7 +73,7 @@ export function MaraModeWarningModal({
             name="close"
             size="mdR"
             weight="bold"
-            color="greyLight"
+            color="neutral400"
             ariaLabel="Close"
             onClick={onCancel || (() => {})}
           />

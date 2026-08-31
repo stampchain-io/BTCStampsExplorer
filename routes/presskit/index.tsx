@@ -83,7 +83,7 @@ function ImagePlaceholder(
                 name={name}
                 weight="light"
                 size="custom"
-                color="grey"
+                color="neutral500"
                 className="w-8 h-8"
               />
             ))}

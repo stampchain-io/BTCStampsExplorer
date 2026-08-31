@@ -489,7 +489,7 @@ export function SRC20MintTool({
                   name="previewImage"
                   weight="extraLight"
                   size="xl"
-                  color="greyDark"
+                  color="neutral600"
                 />
               )}
           </div>

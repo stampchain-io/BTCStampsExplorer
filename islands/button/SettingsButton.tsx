@@ -69,7 +69,7 @@ export function SettingsButton({
             name="gear"
             weight="normal"
             size="custom"
-            color="greyLight"
+            color="neutral400"
             ariaLabel="Settings"
             onClick={() => handleOpen?.(true)}
             onMouseEnter={() => setVisible(true)}
