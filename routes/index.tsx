@@ -1,4 +1,5 @@
 /* ===== HOME PAGE ROUTE ===== */
+import { asset } from "$fresh/runtime.ts";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import type { CollectionRow } from "$server/types/collection.d.ts";
 import type { SRC20Row } from "$types/src20.d.ts";
@@ -388,11 +389,17 @@ export default function Home({ data }: PageProps<HomePageData>) {
     <>
       {/* ===== CRITICAL RESOURCES ===== */}
       {/* Preload carousel CSS for above-fold content */}
-      <link rel="preload" href="/carousel.css" as="style" />
-      <link rel="stylesheet" href="/carousel.css" />
-      {/* Homepage animation optimizations */}
-      <link rel="preload" href="/homepage-animations.css" as="style" />
-      <link rel="stylesheet" href="/homepage-animations.css" />
+      <link rel="preload" href={asset("/carousel.css")} as="style" />
+      <link rel="stylesheet" href={asset("/carousel.css")} />
+      {
+        /* The two /homepage-animations.css links that used to sit here were
+          removed: that file was never committed. It was referenced from
+          814a95e78 (2025-07-30) but the stylesheet itself never landed, so
+          both the preload and the stylesheet request have 404'd in production
+          ever since — two wasted round-trips and a console error on every
+          homepage load. Nothing depends on it; the animation work from that
+          commit lives in static/styles.css. */
+      }
       {/* ===== MAIN CONTENT ===== */}
       <div
         class={`${body} ${containerGap}`}

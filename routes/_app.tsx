@@ -1,7 +1,7 @@
 /* ===== ROOT APP LAYOUT ROUTE ===== */
 import { MetaTags } from "$components/layout/MetaTags.tsx";
 import { ResourceHints } from "$components/layout/PerformanceUtils.tsx";
-import { Head, Partial } from "$fresh/runtime.ts";
+import { asset, Head, Partial } from "$fresh/runtime.ts";
 import { type PageProps } from "$fresh/server.ts";
 import { Header } from "$header";
 import AnimationControlsManager from "$islands/layout/AnimationControlsManager.tsx";
@@ -46,12 +46,21 @@ export default function App({ Component, state, url }: PageProps<unknown>) {
         <ResourceHints />
 
         {/* ===== CRITICAL CSS ===== */}
-        <link rel="preload" href="/styles.css" as="style" />
-        <link rel="stylesheet" href="/styles.css" />
-        <link rel="preload" href="/modal.css" as="style" />
-        <link rel="stylesheet" href="/modal.css" />
-        <link rel="preload" href="/slick.css" as="style" />
-        <link rel="stylesheet" href="/slick.css" />
+        {
+          /* asset() appends the Fresh build id (?__frsh_c=...), so a deploy that
+            changes Tailwind output is picked up immediately. Without it these
+            URLs are static and Cloudflare serves them with max-age=691200 —
+            eight days of stale CSS for returning visitors, which is not purged
+            by deploy.sh (it only purges /_frsh/ and /_fresh/) and not purged at
+            all by production-deploy.yml. Fresh already does this automatically
+            for <img src>, which is why images never showed the problem. */
+        }
+        <link rel="preload" href={asset("/styles.css")} as="style" />
+        <link rel="stylesheet" href={asset("/styles.css")} />
+        <link rel="preload" href={asset("/modal.css")} as="style" />
+        <link rel="stylesheet" href={asset("/modal.css")} />
+        <link rel="preload" href={asset("/slick.css")} as="style" />
+        <link rel="stylesheet" href={asset("/slick.css")} />
 
         {/* ===== FONT LOADING ===== */}
         {
@@ -202,12 +211,12 @@ export default function App({ Component, state, url }: PageProps<unknown>) {
         {/* ===== NON-CRITICAL CSS ===== */}
         <link
           rel="stylesheet"
-          href="/carousel.css"
+          href={asset("/carousel.css")}
           media="(min-width: 1px)"
         />
         <link
           rel="stylesheet"
-          href="/flatpickr.css"
+          href={asset("/flatpickr.css")}
           media="(min-width: 1px)"
         />
       </Head>
