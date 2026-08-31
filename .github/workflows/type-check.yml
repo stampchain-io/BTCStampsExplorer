@@ -20,7 +20,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           # Fetch more history for better diff analysis
           fetch-depth: 0
@@ -31,7 +31,7 @@ jobs:
           deno-version: v2.6.9
 
       - name: Cache Deno dependencies
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: |
             ~/.deno
@@ -68,60 +68,43 @@ jobs:
         run: |
           echo "🔍 Type checking changed TypeScript files in PR..."
 
-          # Get changed TypeScript files
-          CHANGED_TS_FILES=$(git diff --name-only origin/${{ github.base_ref }}..HEAD | grep -E '\.(ts|tsx)$' | grep -v -E '(test|spec)\.(ts|tsx)$' || echo "")
+          # Only files that still EXIST. git diff --name-only also lists deleted
+          # paths, and handing a deleted path to `deno check` reports a spurious
+          # TS2307 "Cannot find module".
+          CHANGED_TS_FILES=$(git diff --name-only origin/${{ github.base_ref }}..HEAD \
+            | grep -E '\.(ts|tsx)$' \
+            | grep -v -E '(test|spec)\.(ts|tsx)$' \
+            | while read -r f; do [ -f "$f" ] && echo "$f"; done)
 
-          if [ -n "$CHANGED_TS_FILES" ]; then
-            echo "📝 Changed TypeScript files:"
-            echo "$CHANGED_TS_FILES"
-            echo ""
-
-            # Check each changed file and track results
-            NEW_ERRORS_FOUND=false
-            CHECKED_FILES=0
-            FILES_WITH_ERRORS=0
-
-            echo "🔍 Type checking changed files..."
-            
-            # Process files and collect results
-            ERROR_FILES=""
-            for file in $CHANGED_TS_FILES; do
-              if [ -f "$file" ]; then
-                CHECKED_FILES=$((CHECKED_FILES + 1))
-                echo -n "Checking $file... "
-                
-                # Check the file with timeout
-                if timeout 30 deno check "$file" 2>&1 >/dev/null; then
-                  echo "✅"
-                else
-                  echo "❌"
-                  FILES_WITH_ERRORS=$((FILES_WITH_ERRORS + 1))
-                  ERROR_FILES="${ERROR_FILES}  - $file\n"
-                fi
-              fi
-            done
-            
-            if [ -n "$ERROR_FILES" ]; then
-              echo -e "\n⚠️ Files with type errors:\n$ERROR_FILES"
-            fi
-
-            echo "📊 Summary for changed files:"
-            echo "  - Files checked: $CHECKED_FILES"
-            echo "  - Files with type errors: $FILES_WITH_ERRORS"
-            echo "  - Files without errors: $((CHECKED_FILES - FILES_WITH_ERRORS))"
-
-            # Only fail if ALL changed files have errors (likely indicates a systemic issue)
-            if [ $CHECKED_FILES -gt 0 ] && [ $FILES_WITH_ERRORS -eq $CHECKED_FILES ] && [ $CHECKED_FILES -gt 2 ]; then
-              echo "❌ All changed files have type errors - this may indicate a systemic issue"
-              echo "💡 Consider fixing at least some type errors before merging"
-              # Uncomment the next line if you want to fail in this case:
-              # exit 1
-            else
-              echo "✅ Type checking passed for PR (gradual improvement mode)"
-            fi
-          else
+          if [ -z "$CHANGED_TS_FILES" ]; then
             echo "📝 No TypeScript files changed in this PR"
             echo "✅ No type checking needed for this PR"
+            exit 0
+          fi
+
+          CHECKED_FILES=$(echo "$CHANGED_TS_FILES" | grep -c .)
+          echo "📝 Changed TypeScript files: $CHECKED_FILES"
+          echo "$CHANGED_TS_FILES"
+          echo ""
+
+          # ONE `deno check` invocation for all changed files.
+          #
+          # This previously ran `deno check` once PER FILE in a shell loop, which
+          # rebuilt the entire module graph on every iteration. On a large PR that
+          # is quadratic in practice: PR #1224 (~270 changed .ts/.tsx files) blew
+          # the job's 10-minute ceiling and was cancelled, so the step reported
+          # nothing at all — no pass, no errors, just a red X that told you only
+          # that it was slow.
+          #
+          # A single invocation shares one module graph across every file: the
+          # same ~270 files complete in ~14s.
+          if echo "$CHANGED_TS_FILES" | xargs deno check; then
+            echo ""
+            echo "✅ No type errors in the changed files"
+          else
+            echo ""
+            echo "⚠️ Type errors found in changed files (listed above)"
+            echo "💡 Gradual improvement mode: this step reports, it does not block the PR"
           fi
 
       - name: Generate type check summary

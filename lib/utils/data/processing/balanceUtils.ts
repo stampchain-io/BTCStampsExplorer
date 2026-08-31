@@ -6,14 +6,17 @@ import {
 } from "$lib/types/index.d.ts";
 import { BLOCKCYPHER_API_BASE_URL } from "$constants";
 import { formatSatoshisToBTC, formatUSDValue } from "$lib/utils/formatUtils.ts";
-import { getBTCBalanceFromMempool } from "$lib/utils/mempool.ts";
+import {
+  fetchWithTimeout,
+  getBTCBalanceFromMempool,
+} from "$lib/utils/mempool.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
 
 async function getBTCBalanceFromBlockCypher(
   address: string,
 ): Promise<BTCBalance | null> {
   try {
-    const response = await fetch(
+    const response = await fetchWithTimeout(
       `${BLOCKCYPHER_API_BASE_URL}/v1/btc/main/addrs/${address}/balance`,
     );
     if (!response.ok) return null;
