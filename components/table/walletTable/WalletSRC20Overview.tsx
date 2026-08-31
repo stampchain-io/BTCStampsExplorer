@@ -1,4 +1,7 @@
-/* ===== WALLET SRC20 TABLE COMPONENT (FULL) ===== */
+/* ===== WALLET SRC20 TABLE COMPONENT (FULL) =====
+ * IMAGE + TICKER are merged into a single sticky "TOKEN" cell (matches
+ * SRC20OverviewCompact's and WalletSRC20OverviewCompact's merged "TOKEN"
+ * cell) instead of two separate sticky columns. */
 import { colGroup } from "$components/layout/types.ts";
 import { PlaceholderImage } from "$icon";
 import {
@@ -6,7 +9,6 @@ import {
   cellLeftL2Card,
   cellRightL2Card,
   cellStickyLeft,
-  cellStickyLeft2,
   container2,
   EmptyState,
   shadowGlowPurple,
@@ -33,8 +35,7 @@ import type { SRC20Row } from "$types/src20.d.ts";
 
 /* ===== CONSTANTS ===== */
 const HEADERS = [
-  "IMAGE",
-  "TICKER",
+  "TOKEN",
   "CREATOR",
   "SUPPLY",
   "PRICE",
@@ -117,7 +118,10 @@ export function WalletSRC20OverviewRow({ src20 }: WalletSRC20OverviewRowProps) {
         }
       }}
     >
-      {/* IMAGE */}
+      {
+        /* TOKEN — IMAGE + TICKER merged into one sticky cell. Ticker text
+      uses cardRowStampNumber directly (same styling as the STAMP # cell). */
+      }
       <td
         class={`${cellLeftL2Card} ${cellStickyLeft}`}
       >
@@ -125,32 +129,28 @@ export function WalletSRC20OverviewRow({ src20 }: WalletSRC20OverviewRowProps) {
           href={href}
           f-partial={href}
           target="_top"
-          class="flex items-center justify-center w-6.5 h-6.5 rounded-xl overflow-hidden"
+          class="flex items-center gap-4"
         >
-          {imageUrl
-            ? (
-              <img
-                src={imageUrl}
-                alt={tick}
-                class="w-6.5 h-6.5 object-contain rounded-xl"
-              />
-            )
-            : <PlaceholderImage variant="no-image" className="!rounded-xl" />}
-        </a>
-      </td>
-
-      {/* TICKER */}
-      <td class={`${cellCenterL2Card} ${cellStickyLeft2}`}>
-        <a
-          href={href}
-          f-partial={href}
-          target="_top"
-          class="font-mono text-color-neutral-400"
-        >
-          {tickText && (
-            <span class={cardRowStampNumber}>{tickText.toUpperCase()}</span>
-          )}
-          {tickEmoji && <span class="emoji-ticker">{tickEmoji}</span>}
+          <div class="flex items-center justify-center w-6.5 h-6.5 rounded-xl overflow-hidden shrink-0">
+            {imageUrl
+              ? (
+                <img
+                  src={imageUrl}
+                  alt={tick}
+                  class="w-6.5 h-6.5 object-contain rounded-xl"
+                />
+              )
+              : <PlaceholderImage variant="no-image" className="!rounded-xl" />}
+          </div>
+          <span class={cardRowStampNumber}>
+            {tickText && (
+              <>
+                <span class="font-light pr-0.5">$</span>
+                {tickText.toUpperCase()}
+              </>
+            )}
+            {tickEmoji && <span class="emoji-ticker">{tickEmoji}</span>}
+          </span>
         </a>
       </td>
 
@@ -243,8 +243,10 @@ export function WalletSRC20OverviewTable(
       >
         <colgroup>
           {colGroup([
-            { width: "w-10" }, // IMAGE (fixed for sticky left-0 anchor)
-            { width: "min-w-[100px] w-auto" }, // TICKER
+            {
+              width:
+                "min-w-[140px] max-w-[160px] w-auto sticky left-0 mobileLg:static",
+            }, // TOKEN (image + ticker)
             { width: "min-w-[110px] w-auto" }, // CREATOR
             { width: "min-w-[100px] w-auto" }, // SUPPLY
             { width: "min-w-[110px] w-auto" }, // PRICE
@@ -264,11 +266,7 @@ export function WalletSRC20OverviewTable(
                 : isLast
                 ? cellRightL2Card
                 : cellCenterL2Card;
-              const stickyClass = isFirst
-                ? cellStickyLeft
-                : i === 1
-                ? cellStickyLeft2
-                : "";
+              const stickyClass = isFirst ? cellStickyLeft : "";
               return (
                 <th
                   key={header}

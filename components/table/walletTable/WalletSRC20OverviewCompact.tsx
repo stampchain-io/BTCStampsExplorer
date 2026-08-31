@@ -1,6 +1,9 @@
 /* ===== WALLET SRC20 TABLE COMPONENT (COMPACT) =====
  * Used in the wallet page's ALL tab (1/3 tokens + 2/3 stamps split) — same
- * row/cell styling as WalletSRC20Overview.tsx, fewer columns. */
+ * row/cell styling as WalletSRC20Overview.tsx, fewer columns. IMAGE + TICKER
+ * are merged into a single sticky "TOKEN" cell (matches SRC20OverviewCompact's
+ * merged "TOKEN" cell and WalletStampOverviewCompact's merged "STAMP" cell)
+ * instead of two separate sticky columns. */
 import { colGroup } from "$components/layout/types.ts";
 import { PlaceholderImage } from "$icon";
 import {
@@ -8,7 +11,6 @@ import {
   cellLeftL2Card,
   cellRightL2Card,
   cellStickyLeft,
-  cellStickyLeft2,
   container2,
   EmptyState,
   shadowGlowPurple,
@@ -38,7 +40,7 @@ import {
 } from "./WalletSRC20Overview.tsx";
 
 /* ===== CONSTANTS ===== */
-const HEADERS = ["IMAGE", "TICKER", "PRICE", "CHANGE", "BALANCE", "VALUE"];
+const HEADERS = ["TOKEN", "PRICE", "CHANGE", "BALANCE", "VALUE"];
 
 // VALUE is hidden from tablet+ up (see below) — BALANCE becomes the
 // visually "last" column at that breakpoint, so it picks up the rounded
@@ -78,7 +80,11 @@ export function WalletSRC20OverviewRowCompact(
         }
       }}
     >
-      {/* IMAGE */}
+      {
+        /* TOKEN — IMAGE + TICKER merged into one sticky cell. Ticker text
+      uses cardRowStampNumber directly (same styling as the STAMP #
+      compact cell) rather than a separate font-mono wrapper. */
+      }
       <td
         class={`${cellLeftL2Card} ${cellStickyLeft}`}
       >
@@ -86,32 +92,28 @@ export function WalletSRC20OverviewRowCompact(
           href={href}
           f-partial={href}
           target="_top"
-          class="flex items-center justify-center w-6.5 h-6.5 rounded-xl overflow-hidden"
+          class="flex items-center gap-4"
         >
-          {imageUrl
-            ? (
-              <img
-                src={imageUrl}
-                alt={tick}
-                class="w-6.5 h-6.5 object-contain rounded-xl"
-              />
-            )
-            : <PlaceholderImage variant="no-image" className="!rounded-xl" />}
-        </a>
-      </td>
-
-      {/* TICKER */}
-      <td class={`${cellCenterL2Card} ${cellStickyLeft2}`}>
-        <a
-          href={href}
-          f-partial={href}
-          target="_top"
-          class="font-mono text-color-neutral-400"
-        >
-          {tickText && (
-            <span class={cardRowStampNumber}>{tickText.toUpperCase()}</span>
-          )}
-          {tickEmoji && <span class="emoji-ticker">{tickEmoji}</span>}
+          <div class="flex items-center justify-center w-6.5 h-6.5 rounded-xl overflow-hidden shrink-0">
+            {imageUrl
+              ? (
+                <img
+                  src={imageUrl}
+                  alt={tick}
+                  class="w-6.5 h-6.5 object-contain rounded-xl"
+                />
+              )
+              : <PlaceholderImage variant="no-image" className="!rounded-xl" />}
+          </div>
+          <span class={cardRowStampNumber}>
+            {tickText && (
+              <>
+                <span class="font-light pr-0.5">$</span>
+                {tickText.toUpperCase()}
+              </>
+            )}
+            {tickEmoji && <span class="emoji-ticker">{tickEmoji}</span>}
+          </span>
         </a>
       </td>
 
@@ -179,8 +181,10 @@ export function WalletSRC20OverviewTableCompact(
       >
         <colgroup>
           {colGroup([
-            { width: "w-10" }, // IMAGE (fixed for sticky left-0 anchor)
-            { width: "min-w-[100px] w-auto" }, // TICKER
+            {
+              width:
+                "min-w-[140px] max-w-[160px] w-auto sticky left-0 mobileLg:static",
+            }, // TOKEN (image + ticker)
             { width: "min-w-[110px] w-auto" }, // PRICE
             { width: "min-w-[90px] w-auto" }, // CHANGE
             { width: "min-w-[110px] w-auto" }, // BALANCE
@@ -202,11 +206,7 @@ export function WalletSRC20OverviewTableCompact(
                 : isLast
                 ? cellRightL2Card
                 : cellCenterL2Card;
-              const stickyClass = isFirst
-                ? cellStickyLeft
-                : i === 1
-                ? cellStickyLeft2
-                : "";
+              const stickyClass = isFirst ? cellStickyLeft : "";
               return (
                 <th
                   key={header}

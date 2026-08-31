@@ -29,7 +29,7 @@ import { useState } from "preact/hooks";
 /* ===== TYPES =====
  * The wallet balance API (routes/api/v2/stamps/balance/[address].tsx)
  * nests floor price + precomputed wallet value on every balance row —
- * there is no per-stamp market-cap field, so MCAP below is derived
+ * there is no per-stamp market-cap field, so MARKETCAP below is derived
  * client-side (floor price × total issued supply). */
 export interface WalletStampBalanceRow extends StampRow {
   market_data?: {
@@ -44,14 +44,14 @@ const HEADERS = [
   "STAMP #",
   "CPID",
   "CREATOR",
-  "FLOOR",
-  "MCAP",
+  "PRICE",
+  "MARKETCAP",
   "BALANCE",
   "VALUE",
 ];
 
 /* ===== HELPERS =====
- * Mirrors formatSupply's divisible handling so BALANCE/MCAP math lines up
+ * Mirrors formatSupply's divisible handling so BALANCE/MARKETCAP math lines up
  * with the pill text shown alongside it. */
 function toRealUnits(amount: number, divisible: boolean): number {
   return divisible ? amount / 100000000 : amount;
@@ -170,7 +170,7 @@ export function WalletStampOverviewRow({ stamp }: WalletStampOverviewRowProps) {
         </a>
       </td>
 
-      {/* FLOOR */}
+      {/* PRICE */}
       <td
         class={`${cellCenterL2Card} text-color-secondary-400`}
       >
@@ -179,7 +179,7 @@ export function WalletStampOverviewRow({ stamp }: WalletStampOverviewRowProps) {
           : <span class="text-color-neutral-500">N/A</span>}
       </td>
 
-      {/* MCAP */}
+      {/* MARKETCAP */}
       <td
         class={`${cellCenterL2Card} text-color-neutral-400`}
       >
@@ -226,8 +226,8 @@ export function WalletStampOverviewTable(
             { width: "min-w-[90px] w-auto" }, // STAMP #
             { width: "min-w-[150px] w-auto" }, // CPID
             { width: "min-w-[110px] w-auto" }, // CREATOR
-            { width: "min-w-[100px] w-auto" }, // FLOOR
-            { width: "min-w-[100px] w-auto" }, // MCAP
+            { width: "min-w-[100px] w-auto" }, // PRICE
+            { width: "min-w-[100px] w-auto" }, // MARKETCAP
             { width: "min-w-[110px] w-auto" }, // BALANCE
             { width: "min-w-[110px] w-auto" }, // VALUE
           ]).map((col) => <col key={col.key} class={col.className} />)}
