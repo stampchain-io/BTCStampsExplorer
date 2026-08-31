@@ -183,12 +183,12 @@ export function WalletSRC20OverviewTableCompact(
           {colGroup([
             {
               width:
-                "min-w-[140px] max-w-[160px] w-auto sticky left-0 mobileLg:static",
+                "min-w-[140px] max-w-[150px] w-auto sticky left-0 mobileLg:static",
             }, // TOKEN (image + ticker)
-            { width: "min-w-[110px] w-auto" }, // PRICE
+            { width: "min-w-[90px] w-auto" }, // PRICE
             { width: "min-w-[90px] w-auto" }, // CHANGE
-            { width: "min-w-[110px] w-auto" }, // BALANCE
-            { width: "min-w-[110px] w-auto tablet:hidden" }, // VALUE
+            { width: "min-w-[90px] w-auto" }, // BALANCE
+            { width: "min-w-[90px] w-auto tablet:hidden" }, // VALUE
           ]).map((col) => <col key={col.key} class={col.className} />)}
         </colgroup>
         <thead>

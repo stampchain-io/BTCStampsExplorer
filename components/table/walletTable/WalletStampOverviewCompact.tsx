@@ -23,7 +23,7 @@ import {
   formatSupply,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
-import { cardRowStampNumber, labelXxs, textXs } from "$text";
+import { cardRowStampNumber, labelXxs, textXs, truncate } from "$text";
 import { useState } from "preact/hooks";
 import type { WalletStampBalanceRow } from "./WalletStampOverview.tsx";
 
@@ -132,9 +132,13 @@ export function WalletStampOverviewRowCompact(
         </a>
       </td>
 
-      {/* CPID */}
+      {
+        /* CPID — truncated with an ellipsis (same $text truncate pattern used
+       * for CPID on the stamp cards, e.g. islands/card/StampCard.tsx) so a
+       * long asset id can't force this column past its intended width. */
+      }
       <td
-        class={`${cellCenterL2Card} font-mono text-color-neutral-400`}
+        class={`${cellCenterL2Card} font-mono text-color-neutral-400 !max-w-[130px] ${truncate}`}
       >
         {stamp.cpid ?? "—"}
       </td>
@@ -186,11 +190,11 @@ export function WalletStampOverviewTableCompact(
         <colgroup>
           {colGroup([
             { width: "w-10" }, // IMAGE (fixed for sticky left-0 anchor)
-            { width: "min-w-[90px] w-auto" }, // STAMP #
-            { width: "min-w-[130px] w-auto" }, // CPID
-            { width: "min-w-[100px] w-auto" }, // PRICE
-            { width: "min-w-[110px] w-auto" }, // BALANCE
-            { width: "min-w-[110px] w-auto tablet:hidden" }, // VALUE
+            { width: "min-w-[85px] w-auto" }, // STAMP #
+            { width: "min-w-[130px] w-auto" }, // CPID (matches truncate max-w)
+            { width: "min-w-[90px] w-auto" }, // PRICE
+            { width: "min-w-[90px] w-auto" }, // BALANCE
+            { width: "min-w-[90px] w-auto tablet:hidden" }, // VALUE
           ]).map((col) => <col key={col.key} class={col.className} />)}
         </colgroup>
         <thead>

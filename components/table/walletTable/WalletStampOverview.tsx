@@ -224,12 +224,12 @@ export function WalletStampOverviewTable(
           {colGroup([
             { width: "w-10" }, // IMAGE (fixed for sticky left-0 anchor)
             { width: "min-w-[90px] w-auto" }, // STAMP #
-            { width: "min-w-[150px] w-auto" }, // CPID
-            { width: "min-w-[110px] w-auto" }, // CREATOR
+            { width: "min-w-[180px] w-auto" }, // CPID
+            { width: "min-w-[120px] w-auto" }, // CREATOR
             { width: "min-w-[100px] w-auto" }, // PRICE
             { width: "min-w-[100px] w-auto" }, // MARKETCAP
-            { width: "min-w-[110px] w-auto" }, // BALANCE
-            { width: "min-w-[110px] w-auto" }, // VALUE
+            { width: "min-w-[100px] w-auto" }, // BALANCE
+            { width: "min-w-[100px] w-auto" }, // VALUE
           ]).map((col) => <col key={col.key} class={col.className} />)}
         </colgroup>
         <thead>

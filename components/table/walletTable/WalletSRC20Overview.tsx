@@ -247,13 +247,13 @@ export function WalletSRC20OverviewTable(
               width:
                 "min-w-[140px] max-w-[160px] w-auto sticky left-0 mobileLg:static",
             }, // TOKEN (image + ticker)
-            { width: "min-w-[110px] w-auto" }, // CREATOR
+            { width: "min-w-[120px] w-auto" }, // CREATOR
             { width: "min-w-[100px] w-auto" }, // SUPPLY
-            { width: "min-w-[110px] w-auto" }, // PRICE
-            { width: "min-w-[90px] w-auto" }, // CHANGE
+            { width: "min-w-[100px] w-auto" }, // PRICE
+            { width: "min-w-[100px] w-auto" }, // CHANGE
             { width: "min-w-[100px] w-auto" }, // MARKETCAP
-            { width: "min-w-[110px] w-auto" }, // BALANCE
-            { width: "min-w-[110px] w-auto" }, // VALUE
+            { width: "min-w-[100px] w-auto" }, // BALANCE
+            { width: "min-w-[100px] w-auto" }, // VALUE
           ]).map((col) => <col key={col.key} class={col.className} />)}
         </colgroup>
         <thead>
