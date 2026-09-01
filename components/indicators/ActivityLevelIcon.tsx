@@ -27,8 +27,8 @@ const TOOLTIP_LABEL: Record<string, string> = {
   HOT: "24H SALES",
   WARM: "7D SALES",
   COOL: "30D SALES",
-  DORMANT: "NO SALES",
-  COLD: "NO DISPENSERS",
+  DORMANT: "NO RECENT SALES",
+  COLD: "NO SALES YET",
 };
 
 const STROKES_BY_LEVEL: Record<string, [string, string, string]> = {
