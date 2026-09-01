@@ -289,8 +289,10 @@ const _ACTIVITY_CYCLE = ["HOT", "WARM", "COOL", "DORMANT", "COLD"] as const;
 
 /**
  * Applies cycling activity levels and a staggered last_activity_time.
- * Pass a custom `levels` array to restrict which levels are cycled —
- * e.g. listings must exclude "COLD" because they always have an open dispenser.
+ * Pass a custom `levels` array to restrict which levels are cycled.
+ * Note: activity_level reflects sales recency only, not dispenser state —
+ * a stamp can be "COLD" (no sales yet) while still having an open dispenser,
+ * so listings views should NOT exclude "COLD" from the cycle.
  */
 export function withDummyActivityLevels<T extends Record<string, unknown>>(
   stamps: T[],
@@ -821,8 +823,8 @@ export const DATA_PLACEHOLDER_DEV_RECENT_SALES = _timeLabels.map(
  * New Listings — 10 entries cycling CLASSIC → POSH → SRC721, all currently
  * listed (i.e. carrying an open dispenser + floorPriceBTC) so every card
  * renders with a price and BUY button, matching a real "listings" query.
- * Activity levels cycle HOT/WARM/COOL/DORMANT — "COLD" is excluded since
- * every entry here always has an open dispenser.
+ * Activity levels cycle through all five states, including "COLD" — a
+ * listed stamp can still have zero sales, which is common in production.
  * Count matches the desktop displayCounts in StampListingsGallery:
  *   newListingsData → 10 (desktop: 10, 5 cols × 2 rows)
  */
@@ -832,7 +834,6 @@ export const DATA_PLACEHOLDER_DEV_NEW_LISTINGS = withDummyActivityLevels(
     { length: 10 },
     (_, i) => ({ ..._listingBase[i % _listingBase.length] }),
   ),
-  ["HOT", "WARM", "COOL", "DORMANT"],
 );
 
 /**

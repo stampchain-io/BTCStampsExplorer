@@ -83,15 +83,13 @@ export function StatPrice({
 
   return (
     <div class={`flex flex-col -space-y-0.5 ${customClass || ""}`}>
-      {activityLevel !== undefined
+      {activityLevel
         ? (
           <div class="flex justify-between items-center w-full gap-3">
-            {activityLevel && (
-              <ActivityLevelIndicator
-                level={activityLevel}
-                className="!cursor-default"
-              />
-            )}
+            <ActivityLevelIndicator
+              level={activityLevel}
+              className="!cursor-default"
+            />
             {priceUSD == null ? null : (
               <div
                 class={`font-normal text-xs text-color-neutral-500 text-nowrap ${alignmentClass}`}

@@ -1052,7 +1052,7 @@ export interface StampSalesProps {
     source: string;
     destination: string;
     dispense_quantity: number;
-    satoshirate: number;
+    btc_amount: number;
     tx_hash: string;
     block_time: number | null;
   }>;
