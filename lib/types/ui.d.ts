@@ -2195,6 +2195,22 @@ export interface ExplorerContentProps extends BaseComponentProps {
   loading?: boolean;
   error?: string;
   stamps?: import("./stamp.d.ts").StampRow[];
+  // Pre-ordered, pre-paginated stamp+token feed for the "all" section
+  // (built server-side by ExplorerFeedRepository). When provided,
+  // ExplorerContent renders it directly instead of merging/sorting
+  // `stamps` and `src20DataCard.data` client-side.
+  mixedItems?:
+    | (
+      | {
+        kind: "stamp";
+        item: import("./stamp.d.ts").StampRow;
+      }
+      | {
+        kind: "src20";
+        item: import("./src20.d.ts").SRC20Row;
+      }
+    )[]
+    | undefined;
   isRecentSales?: boolean;
   pagination?: {
     page: number;

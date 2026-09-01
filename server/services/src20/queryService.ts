@@ -95,7 +95,9 @@ export class SRC20QueryService {
           ? params.op.replace(/[^\w-]/g, "")
           : undefined,
         tx_hash: params.tx_hash
-          ? params.tx_hash.replace(/[^\w-]/g, "")
+          ? (Array.isArray(params.tx_hash)
+            ? params.tx_hash.map((h) => h.replace(/[^\w-]/g, ""))
+            : params.tx_hash.replace(/[^\w-]/g, ""))
           : null,
       };
 
@@ -115,7 +117,7 @@ export class SRC20QueryService {
           ? sanitizedParams.tick[0]
           : (sanitizedParams.tick || null),
         op: sanitizedParams.op || null,
-        tx_hash: sanitizedParams.tx_hash || null,
+        tx_hash: sanitizedParams.tx_hash ?? null,
         limit,
         page,
         sortBy: sanitizedParams.sortBy || { field: "amt", direction: "asc" },
@@ -610,7 +612,9 @@ export class SRC20QueryService {
           ? params.op.replace(/[^\w-]/g, "")
           : undefined,
         tx_hash: params.tx_hash
-          ? params.tx_hash.replace(/[^\w-]/g, "")
+          ? (Array.isArray(params.tx_hash)
+            ? params.tx_hash.map((h) => h.replace(/[^\w-]/g, ""))
+            : params.tx_hash.replace(/[^\w-]/g, ""))
           : null,
       };
 

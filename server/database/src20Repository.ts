@@ -73,6 +73,83 @@ export class SRC20Repository {
     queryParams.push(address, address);
   }
 
+  /**
+   * Builds a minimal, ordering-only SELECT fragment (tx_hash, block_index,
+   * tx_index, kind) over SRC20Valid for the unified explorer feed. Used by
+   * `ExplorerFeedRepository` as one branch of a `UNION ALL` with the
+   * equivalent stamp-side fragment (`StampRepository.buildFeedFragment`) so
+   * the two tables can be ordered and paginated together in a single query,
+   * instead of merging two independently-paginated result sets client-side.
+   */
+  static buildFeedFragment(options: {
+    op?: string | string[] | undefined;
+    tick?: string | string[] | undefined;
+    stampMin?: number | string | undefined;
+    stampMax?: number | string | undefined;
+    amtMax?: number | string | undefined;
+  }): { subquery: string; params: (string | number)[] } {
+    const { op, tick, stampMin, stampMax, amtMax } = options;
+    const whereConditions: string[] = [];
+    const queryParams: (string | number)[] = [];
+    let needsStampJoin = false;
+
+    if (op != null) {
+      if (Array.isArray(op)) {
+        whereConditions.push(`src20.op IN (${op.map(() => "?").join(", ")})`);
+        queryParams.push(...op.map((o) => this.ensureUnicodeEscape(o)));
+      } else {
+        whereConditions.push(`src20.op = ?`);
+        queryParams.push(this.ensureUnicodeEscape(op));
+      }
+    }
+
+    if (tick != null) {
+      if (Array.isArray(tick)) {
+        whereConditions.push(
+          `src20.tick IN (${tick.map(() => "?").join(", ")})`,
+        );
+        queryParams.push(...tick.map((t) => this.ensureUnicodeEscape(t)));
+      } else {
+        whereConditions.push(`src20.tick = ?`);
+        queryParams.push(this.ensureUnicodeEscape(tick));
+      }
+    }
+
+    if (stampMax != null) {
+      whereConditions.push(`st.stamp < ?`);
+      queryParams.push(stampMax);
+      needsStampJoin = true;
+    }
+
+    if (stampMin != null) {
+      whereConditions.push(`st.stamp >= ?`);
+      queryParams.push(stampMin);
+      needsStampJoin = true;
+    }
+
+    if (amtMax != null) {
+      whereConditions.push(`CAST(src20.amt AS DECIMAL) <= ?`);
+      queryParams.push(amtMax);
+    }
+
+    const joinClause = needsStampJoin
+      ? `LEFT JOIN ${STAMP_TABLE} st ON st.tx_hash = src20.tx_hash`
+      : "";
+
+    const whereClause = whereConditions.length > 0
+      ? `WHERE ${whereConditions.join(" AND ")}`
+      : "";
+
+    const subquery = `
+      SELECT src20.tx_hash AS tx_hash, src20.block_index AS block_index, src20.tx_index AS tx_index, 'src20' AS kind
+      FROM ${SRC20_TABLE} src20
+      ${joinClause}
+      ${whereClause}
+    `;
+
+    return { subquery, params: queryParams };
+  }
+
   static async getTotalCountValidSrc20TxFromDb(
     params: SRC20TrxRequestParams,
     excludeFullyMinted: boolean = false,
@@ -125,8 +202,19 @@ export class SRC20Repository {
     }
 
     if (tx_hash !== null) {
-      whereConditions.push(`tx_hash = ?`);
-      queryParams.push(tx_hash);
+      if (Array.isArray(tx_hash)) {
+        if (tx_hash.length === 0) {
+          whereConditions.push("1 = 0");
+        } else {
+          whereConditions.push(
+            `tx_hash IN (${tx_hash.map(() => "?").join(", ")})`,
+          );
+          queryParams.push(...tx_hash);
+        }
+      } else {
+        whereConditions.push(`tx_hash = ?`);
+        queryParams.push(tx_hash);
+      }
     }
 
     if (stampMax != null) {
@@ -231,8 +319,19 @@ export class SRC20Repository {
     }
 
     if (tx_hash != null) {
-      whereClauses.push(`src20.tx_hash = ?`);
-      queryParams.push(tx_hash);
+      if (Array.isArray(tx_hash)) {
+        if (tx_hash.length === 0) {
+          whereClauses.push("1 = 0");
+        } else {
+          whereClauses.push(
+            `src20.tx_hash IN (${tx_hash.map(() => "?").join(", ")})`,
+          );
+          queryParams.push(...tx_hash);
+        }
+      } else {
+        whereClauses.push(`src20.tx_hash = ?`);
+        queryParams.push(tx_hash);
+      }
     }
 
     if (address != null) {
