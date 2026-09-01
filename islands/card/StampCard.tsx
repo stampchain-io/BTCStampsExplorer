@@ -866,23 +866,27 @@ export function StampCard({
             this the link has no accessible name during SSR/loading. */
         }
         <span class="sr-only">Stamp {stampValue}</span>
-        {/* ===== ATOM ICON (wallet balance variants only) ===== */}
-        {(variant === "cardVerticalBalance" ||
-          variant === "cardSquareBalance") &&
+        {
+          /* ===== ATOM ICON PILL (square wallet balance variant only —
+          vertical/detail renders its own atomic icon inline in the row 1
+          icon group, to the left of the price icon, see below) ===== */
+        }
+        {variant === "cardSquareBalance" &&
           isAtomicIconVisible(stamp as unknown as WalletStampWithValue) && (
-          <div class="absolute top-0 left-0 w-[31px] h-[31px] z-10 rounded-[3px] bg-color-background p-[3px] desktop:block hidden group/atomic">
-            <Icon
-              type="icon"
-              name="atom"
-              weight="normal"
-              size="xs"
-              color="neutral400"
-            />
-            <div
-              class={`${tooltipIcon} opacity-0 group-hover/atomic:opacity-100`}
-            >
-              ATOMIC SWAP
-            </div>
+          <div class="absolute top-1.5 left-1.5 z-10">
+            <IconWithTooltip label="ATOMIC SWAP">
+              <div class={`${containerPill} !p-1.5`}>
+                <Icon
+                  type="icon"
+                  name="atom"
+                  weight="bold"
+                  size="custom"
+                  color="neutral400"
+                  className="w-3.5 h-3.5"
+                  ariaLabel="Atomic Swap"
+                />
+              </div>
+            </IconWithTooltip>
           </div>
         )}
 
@@ -982,6 +986,20 @@ export function StampCard({
                   : supplyDisplay}
               </PillWithTooltip>
               <div class="flex items-center gap-1.5 mr-0.5 -translate-y-0.5">
+                {variant === "cardVerticalBalance" &&
+                  isAtomicIconVisible(
+                    stamp as unknown as WalletStampWithValue,
+                  ) && (
+                  <IconWithTooltip label="ATOMIC SWAP">
+                    <Icon
+                      type="icon"
+                      name="atom"
+                      weight="bold"
+                      size="xxs"
+                      color="neutral400"
+                    />
+                  </IconWithTooltip>
+                )}
                 {(variant === "cardVerticalDetail" ||
                   variant === "cardVerticalBalance") && isListed && (
                   <IconWithTooltip label={displayPriceBTC().text}>

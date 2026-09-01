@@ -154,7 +154,9 @@ export const MarketplaceHeader = (
     <div class="flex flex-col w-full gap-1.5">
       <div class="relative flex flex-row justify-between items-start w-full">
         {/* ===== TITLE ===== */}
-        <h1 class={titlePrimary}>MARKETPLACE</h1>
+        <h1 class={titlePrimary}>
+          MARKET<span class="hidden min-[420px]:inline">PLACE</span>
+        </h1>
         <PillContentCount value={countPill} />
       </div>
 
