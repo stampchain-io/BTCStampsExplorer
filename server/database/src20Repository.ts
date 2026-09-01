@@ -10,8 +10,8 @@ import {
 import type { SRC20BalanceRequestParams } from "$lib/types/src20.d.ts";
 import { emojiToUnicodeEscape, unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { bigFloatToString } from "$lib/utils/ui/formatting/formatUtils.ts";
-import { serverConfig } from "$server/config/config.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
+import { buildSrc20StampUrl } from "$server/utils/src20ImageUrl.ts";
 import type { SRC20SnapshotRequestParams, SRC20TrxRequestParams } from "$types/src20.d.ts";
 import { BigFloat } from "bigfloat/mod.ts";
 
@@ -721,9 +721,7 @@ export class SRC20Repository {
     ) => ({
       ...result,
       deploy_tx: tx_hashes_map[result.tick],
-      deploy_img: tx_hashes_map[result.tick]
-        ? `https://stampchain.io/stamps/${tx_hashes_map[result.tick]}.svg`
-        : null,
+      deploy_img: buildSrc20StampUrl(tx_hashes_map[result.tick]) ?? null,
     }));
 
     return resultsWithDeployImg;
@@ -1009,11 +1007,6 @@ export class SRC20Repository {
 
     const row = (result as any).rows[0];
 
-    // ✅ ENHANCED IMAGE FIELDS: Add stamp_url and deploy_img for SRC-20 detail pages
-    const baseUrl = serverConfig.IS_DEVELOPMENT
-      ? serverConfig.DEV_BASE_URL
-      : "https://stampchain.io";
-
     const deployment = this.convertSingleResponseToEmoji({
       tick: row.tick,
       tx_hash: row.tx_hash,
@@ -1028,9 +1021,10 @@ export class SRC20Repository {
       max: row.max,
       destination: row.destination,
       block_time: row.block_time,
-      // ✅ Add enhanced image fields
-      stamp_url: row.tx_hash ? `${baseUrl}/stamps/${row.tx_hash}.svg` : null,
-      deploy_img: row.tx_hash ? `${baseUrl}/stamps/${row.tx_hash}.svg` : null,
+      // ✅ Add enhanced image fields — this is a DEPLOY row, so tx_hash
+      // doubles as its own deploy_tx.
+      stamp_url: buildSrc20StampUrl(row.tx_hash) ?? null,
+      deploy_img: buildSrc20StampUrl(row.tx_hash) ?? null,
     });
 
     return {
