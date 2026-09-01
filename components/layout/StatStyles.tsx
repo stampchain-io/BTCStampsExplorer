@@ -80,10 +80,14 @@ export function StatPrice({
   class: customClass,
 }: StatPriceProps) {
   const alignmentClass = alignmentClasses[align];
+  // COLD renders nothing from ActivityLevelIndicator, so treat it the same
+  // as "no activity level" — otherwise the justify-between row below would
+  // collapse to a single child and lose its intended alignment.
+  const showActivityLevel = activityLevel && activityLevel !== "COLD";
 
   return (
     <div class={`flex flex-col -space-y-0.5 ${customClass || ""}`}>
-      {activityLevel
+      {showActivityLevel
         ? (
           <div class="flex justify-between items-center w-full gap-3">
             <ActivityLevelIndicator

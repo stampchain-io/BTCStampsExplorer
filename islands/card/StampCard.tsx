@@ -1108,14 +1108,20 @@ export function StampCard({
                 <div
                   class={`flex flex-col w-full mt-2 px-2.5 py-1 ${container3} cursor-pointer`}
                 >
-                  <div class="flex justify-end items-end min-[420px]:justify-between min-[420px]:items-center -ml-1">
+                  <div class="flex items-end min-[420px]:items-center -ml-1">
                     {stamp.activity_level && (
                       <ActivityLevelIndicator
                         level={stamp.activity_level}
                         className="hidden min-[420px]:flex"
                       />
                     )}
-                    <div class="font-normal text-xs text-color-neutral-500 text-nowrap">
+                    {
+                      /* ml-auto keeps the price pinned to the right edge
+                        whether or not the activity indicator renders
+                        (it's hidden below 420px, and absent entirely for
+                        COLD listings) */
+                    }
+                    <div class="font-normal text-xs text-color-neutral-500 text-nowrap ml-auto">
                       {displayPriceUSD()?.toLocaleString("en-US", {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
