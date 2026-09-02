@@ -8,7 +8,7 @@ import {
   countActiveExplorerFilters,
   queryParamsToFilters as explorerQueryParamsToFilters,
 } from "$islands/filter/FilterOptionsExplorer.tsx";
-import { container2Icon, PillContentCount } from "$layout";
+import { container2Icon, PillContentCount, ScrollFadeRow } from "$layout";
 import {
   getCurrentPathname,
   getSearchParams,
@@ -82,9 +82,9 @@ export const ExplorerHeader = (
       </div>
 
       {/* Section Selector + Controls */}
-      <div class="flex flex-col mobileMd:flex-row justify-between mobileMd:items-center w-full">
+      <ScrollFadeRow deps={[currentSection]}>
         {/* Section Selector - Left */}
-        <div class="flex gap-3">
+        <div class="shrink-0">
           <SelectorButtons
             options={[
               { value: "all", label: "ALL" },
@@ -95,23 +95,15 @@ export const ExplorerHeader = (
             onChange={handleSectionChange}
             size="xsR"
             color="primary"
-            className="w-full mobileMd:w-auto"
           />
         </div>
 
         {/* View Toggle + Filter + Sort Controls - Right */}
-        <div class="flex justify-between mobileMd:justify-end pt-3 mobileMd:pt-0 gap-3">
-          {/* View Mode Toggle */}
-          <div
-            class={container2Icon}
-          >
+        <div class="shrink-0 flex ml-auto gap-3">
+          <div class={container2Icon}>
             <ViewButton viewMode={viewMode} />
           </div>
-
-          {/* Filter + Sort Controls */}
-          <div
-            class={`${container2Icon} gap-1.5 tablet:gap-1`}
-          >
+          <div class={`${container2Icon} gap-1.5 tablet:gap-1`}>
             <FilterButton
               count={activeFilterCount}
               open={isOpen}
@@ -121,7 +113,7 @@ export const ExplorerHeader = (
             <SortButton initSort={sortBy} />
           </div>
         </div>
-      </div>
+      </ScrollFadeRow>
 
       {/* Filter Drawer — portalled to document.body to escape backdrop-filter containing block */}
       {typeof document !== "undefined" && createPortal(
