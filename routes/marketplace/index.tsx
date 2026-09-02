@@ -458,7 +458,7 @@ export function MarketplacePage(props: MarketplacePageProps) {
     page,
     totalPages,
     pagination,
-    sortBy: _sortBy,
+    sortBy,
     selectedTab,
     filters,
     search: _search,
@@ -487,6 +487,7 @@ export function MarketplacePage(props: MarketplacePageProps) {
         viewMode={cardView}
         isSalesMode={isSalesMode}
         currentTotal={pagination?.total ?? 0}
+        sortBy={sortBy as "ASC" | "DESC"}
       />
 
       {/* Main Content with Pagination */}

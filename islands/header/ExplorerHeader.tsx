@@ -28,6 +28,7 @@ export const ExplorerHeader = (
     viewMode = "cardVertical",
     stampsTotal = 0,
     tokensTotal = 0,
+    sortBy = "DESC",
   }: ExplorerHeaderProps,
 ) => {
   /* ===== STATE ===== */
@@ -117,7 +118,7 @@ export const ExplorerHeader = (
               setOpen={handleOpen}
               type="explorer"
             />
-            <SortButton />
+            <SortButton initSort={sortBy} />
           </div>
         </div>
       </div>

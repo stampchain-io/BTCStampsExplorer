@@ -2239,6 +2239,10 @@ export interface ExplorerHeaderProps extends BaseComponentProps {
   // for "all", stamps-only for "stamps", tokens-only for "tokens"
   stampsTotal?: number;
   tokensTotal?: number;
+  // Current sort direction from the URL — passed down so SortButton stays
+  // in sync across Fresh partial navigations instead of relying on
+  // client-only URL tracking
+  sortBy?: "ASC" | "DESC";
 }
 
 /**
@@ -3211,6 +3215,10 @@ export type MarketplaceHeaderProps = {
   // Total count for the current market mode + stamp-type combo - used by
   // the count pill
   currentTotal?: number;
+  // Current sort direction from the URL — passed down so SortButton stays
+  // in sync across Fresh partial navigations instead of relying on
+  // client-only URL tracking
+  sortBy?: "ASC" | "DESC";
 };
 
 /**

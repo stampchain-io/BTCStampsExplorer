@@ -151,7 +151,7 @@ export const handler: Handlers = {
 
       if (src20Data) {
         // DEV: apply token op filter
-        const tokenOpParam = url.searchParams.get("token[op]");
+        const tokenOpParam = url.searchParams.get("tokenOp");
         if (tokenOpParam) {
           src20Data = {
             ...src20Data,
@@ -162,9 +162,9 @@ export const handler: Handlers = {
         }
 
         // DEV: apply token range filter (st.stamp)
-        const tokenRangePreset = url.searchParams.get("token[range]");
-        const tokenRangeMin = url.searchParams.get("token[rangeMin]");
-        const tokenRangeMax = url.searchParams.get("token[rangeMax]");
+        const tokenRangePreset = url.searchParams.get("tokenRange");
+        const tokenRangeMin = url.searchParams.get("tokenRangeMin");
+        const tokenRangeMax = url.searchParams.get("tokenRangeMax");
 
         if (tokenRangePreset && tokenRangePreset !== "custom") {
           const max = parseInt(tokenRangePreset);
@@ -190,7 +190,7 @@ export const handler: Handlers = {
         }
 
         // DEV: apply token amount filter
-        const tokenAmountParam = url.searchParams.get("token[amount]");
+        const tokenAmountParam = url.searchParams.get("tokenAmount");
         if (tokenAmountParam) {
           const maxAmt = parseInt(tokenAmountParam.replace("<", ""));
           src20Data = {
@@ -263,17 +263,17 @@ export const handler: Handlers = {
       );
 
       // Token filter params from URL
-      const tokenOp = url.searchParams.get("token[op]") || undefined;
-      const tokenRangeParam = url.searchParams.get("token[range]");
-      const tokenRangeMin = url.searchParams.get("token[rangeMin]");
-      const tokenRangeMax = url.searchParams.get("token[rangeMax]");
+      const tokenOp = url.searchParams.get("tokenOp") || undefined;
+      const tokenRangeParam = url.searchParams.get("tokenRange");
+      const tokenRangeMin = url.searchParams.get("tokenRangeMin");
+      const tokenRangeMax = url.searchParams.get("tokenRangeMax");
       const stampMax = tokenRangeParam && tokenRangeParam !== "custom"
         ? parseInt(tokenRangeParam)
         : tokenRangeMax
         ? parseInt(tokenRangeMax)
         : undefined;
       const stampMin = tokenRangeMin ? parseInt(tokenRangeMin) : undefined;
-      const tokenAmountParam = url.searchParams.get("token[amount]");
+      const tokenAmountParam = url.searchParams.get("tokenAmount");
       const amtMax = tokenAmountParam
         ? tokenAmountParam.replace("<", "")
         : undefined;
@@ -583,7 +583,7 @@ export function ExplorerPage(props: StampPageProps) {
     totalPages,
     total,
     filterBy: _filterBy,
-    sortBy: _sortBy,
+    sortBy,
     selectedTab,
     src20DataCard,
     section = "all",
@@ -606,6 +606,7 @@ export function ExplorerPage(props: StampPageProps) {
         viewMode={cardView}
         stampsTotal={total ?? 0}
         tokensTotal={src20DataCard?.total ?? 0}
+        sortBy={sortBy as "ASC" | "DESC"}
       />
 
       {/* Main Content with Pagination */}

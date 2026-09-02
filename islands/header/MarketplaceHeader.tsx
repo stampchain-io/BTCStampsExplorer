@@ -29,6 +29,7 @@ export const MarketplaceHeader = (
     viewMode = "cardVertical",
     isSalesMode = false,
     currentTotal = 0,
+    sortBy = "DESC",
   }: MarketplaceHeaderProps,
 ) => {
   /* ===== STATE MANAGEMENT ===== */
@@ -210,7 +211,7 @@ export const MarketplaceHeader = (
               setOpen={handleOpen1}
               type="marketplace"
             />
-            <SortButton />
+            <SortButton initSort={sortBy} />
           </div>
         </div>
       </ScrollFadeRow>
