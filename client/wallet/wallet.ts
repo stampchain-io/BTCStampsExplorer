@@ -32,6 +32,7 @@ interface WalletProviders {
   phantom?: any;
   HorizonWalletProvider?: any;
   XverseProviders?: { BitcoinProvider?: any };
+  wonderWallet?: any;
 }
 
 // Initialize wallet state
@@ -200,6 +201,7 @@ export function getGlobalWallets(): WalletProviders {
       tapwallet?: unknown;
       phantom?: { bitcoin?: { isPhantom?: boolean } };
       HorizonWalletProvider?: unknown;
+      wonderWallet?: unknown;
     };
 
     logger.debug("ui", {
@@ -211,6 +213,7 @@ export function getGlobalWallets(): WalletProviders {
         hasTapWallet: Boolean(global.tapwallet),
         hasPhantom: Boolean(global.phantom?.bitcoin?.isPhantom),
         hasHorizon: Boolean(global.HorizonWalletProvider),
+        hasWonder: Boolean(global.wonderWallet),
         timestamp: new Date().toISOString(),
       },
     });
@@ -222,6 +225,7 @@ export function getGlobalWallets(): WalletProviders {
       tapwallet: global.tapwallet,
       phantom: global.phantom,
       HorizonWalletProvider: global.HorizonWalletProvider,
+      wonderWallet: global.wonderWallet,
     };
   } catch (_error) {
     // Silently handle wallet detection errors to prevent console spam
@@ -254,6 +258,8 @@ export function checkWalletAvailability(provider: string): boolean {
       return !!wallets.HorizonWalletProvider;
     case "xverse":
       return !!wallets.XverseProviders?.BitcoinProvider;
+    case "wonder":
+      return !!wallets.wonderWallet;
     default:
       return false;
   }
