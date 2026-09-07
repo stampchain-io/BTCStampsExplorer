@@ -3,8 +3,10 @@
  *
  * Tests cover:
  *   - checkWonder() provider detection
+ *   - connectWonder() account normalization and empty-account handling
  *   - handleAccountsChanged() account/balance mapping and disconnect handling
  *   - signPSBT() PSBT signing with the Wonder (UniSat-style) API
+ *   - broadcastRawTX() / broadcastPSBT() txid unwrapping
  *   - signMessage() message signing
  *   - wonderProvider object structure and interface compliance
  *
@@ -13,9 +15,18 @@
  * Deno server-side test environment. Mocks mirror the exact logic in wonder.ts
  * to validate behavior independently — the same approach used by
  * tests/unit/wallet/xverse.test.ts.
+ *
+ * The provider response shapes exercised here follow the Wonder Wallet
+ * provider API: requestAccounts() resolves { accounts, proof } on a first
+ * connect and a bare string[] on a repeat connect, broadcastTransaction()
+ * resolves { txid }, and a non-finalized signPsbt() resolves a base64 PSBT.
  */
 
 import { assertEquals, assertRejects } from "@std/assert";
+import {
+  base64ToHex,
+  hexToBase64,
+} from "$lib/utils/data/binary/baseUtils.ts";
 
 // ============================================================================
 // Type definitions mirroring the Wonder provider + wallet types
@@ -27,17 +38,29 @@ interface MockBalance {
   total?: number;
 }
 
+type WonderAccountsResponse =
+  | string[]
+  | { accounts?: unknown; proof?: unknown }
+  | null
+  | undefined;
+
+type WonderBroadcastResponse =
+  | string
+  | { txid?: unknown }
+  | null
+  | undefined;
+
 interface MockWonderProvider {
-  requestAccounts: () => Promise<string[]>;
-  getPublicKey: () => Promise<string>;
+  requestAccounts: () => Promise<WonderAccountsResponse>;
+  getPublicKey: () => Promise<string | null>;
   getBalances: () => Promise<MockBalance | undefined>;
   signPsbt: (
     psbtHex: string,
     options: WonderSignOptions,
   ) => Promise<WonderSignResult | undefined>;
-  broadcastTransaction: (txhex: string) => Promise<string>;
+  broadcastTransaction: (txhex: string) => Promise<WonderBroadcastResponse>;
   signMessage: (message: string) => Promise<string>;
-  on?: (event: string, handler: (accounts: string[]) => void) => void;
+  on?: (event: string, handler: (payload: unknown) => void) => void;
 }
 
 interface WonderSignOptions {
@@ -60,6 +83,7 @@ interface MockWallet {
   accounts: string[];
   address: string;
   publicKey: string;
+  addressType: "p2pkh" | "p2sh" | "p2wpkh" | "p2tr";
   btcBalance: {
     confirmed: number;
     unconfirmed: number;
@@ -67,6 +91,7 @@ interface MockWallet {
   };
   network: "mainnet" | "testnet";
   provider: string;
+  stampBalance: unknown[];
 }
 
 interface SignPSBTResult {
@@ -92,6 +117,66 @@ function mockCheckWonder(
   return !!(wallets?.wonderWallet);
 }
 
+/** Mirror of toAccounts() from wonder.ts. */
+function toAccounts(result: unknown): string[] {
+  const list = Array.isArray(result)
+    ? result
+    : (result as { accounts?: unknown } | null)?.accounts;
+  return Array.isArray(list)
+    ? list.filter((account): account is string => typeof account === "string")
+    : [];
+}
+
+/** Mirror of toTxid() from wonder.ts. */
+function toTxid(result: unknown): string {
+  if (typeof result === "string") return result;
+  const txid = (result as { txid?: unknown } | null)?.txid;
+  return typeof txid === "string" ? txid : "";
+}
+
+/** Mirror of toPsbtHex() from wonder.ts. */
+function toPsbtHex(psbt: string): string {
+  return /^[0-9a-fA-F]+$/.test(psbt) ? psbt : base64ToHex(psbt);
+}
+
+/** Mirror of addressTypeFor() from wonder.ts. */
+function addressTypeFor(address: string): MockWallet["addressType"] {
+  if (address.startsWith("bc1p")) return "p2tr";
+  if (address.startsWith("bc1")) return "p2wpkh";
+  if (address.startsWith("3")) return "p2sh";
+  return "p2pkh";
+}
+
+type ConnectOutcome =
+  | { status: "not-installed" }
+  | { status: "no-accounts" }
+  | { status: "connected"; accounts: string[] }
+  | { status: "error"; message: string };
+
+/**
+ * Mirror of connectWonder() from wonder.ts, reduced to the outcome so tests
+ * can assert without a live toast queue or walletContext.
+ */
+async function mockConnectWonder(
+  provider: MockWonderProvider | undefined,
+): Promise<ConnectOutcome> {
+  if (!provider) {
+    return { status: "not-installed" };
+  }
+  try {
+    const accounts = toAccounts(await provider.requestAccounts());
+    if (accounts.length === 0) {
+      return { status: "no-accounts" };
+    }
+    return { status: "connected", accounts };
+  } catch (error: unknown) {
+    return {
+      status: "error",
+      message: error instanceof Error ? error.message : String(error),
+    };
+  }
+}
+
 type AccountsChangedOutcome =
   | { action: "disconnect" }
   | { action: "unchanged" }
@@ -103,11 +188,12 @@ type AccountsChangedOutcome =
  * walletContext.
  */
 async function mockHandleAccountsChanged(
-  accounts: string[] | null | undefined,
+  rawAccounts: unknown,
   provider: MockWonderProvider | undefined,
   currentAddress = "",
 ): Promise<AccountsChangedOutcome> {
-  if (!accounts || accounts.length === 0) {
+  const accounts = toAccounts(rawAccounts);
+  if (accounts.length === 0) {
     return { action: "disconnect" };
   }
   if (currentAddress === accounts[0]) {
@@ -117,7 +203,9 @@ async function mockHandleAccountsChanged(
   const wallet = {} as MockWallet;
   wallet.accounts = accounts;
   wallet.address = accounts[0];
-  wallet.publicKey = await wonder.getPublicKey();
+  const publicKey = await wonder.getPublicKey();
+  wallet.publicKey = typeof publicKey === "string" ? publicKey : "";
+  wallet.addressType = addressTypeFor(accounts[0]);
   const balance = await wonder.getBalances();
   const confirmed = balance?.confirmed ?? 0;
   const unconfirmed = balance?.unconfirmed ?? 0;
@@ -128,6 +216,7 @@ async function mockHandleAccountsChanged(
   };
   wallet.network = "mainnet";
   wallet.provider = "wonder";
+  wallet.stampBalance = [];
   return { action: "update", wallet };
 }
 
@@ -172,7 +261,10 @@ async function mockSignPSBT(
 
     if (autoBroadcast && result.txhex) {
       try {
-        const txid = await wonder.broadcastTransaction(result.txhex);
+        const txid = toTxid(await wonder.broadcastTransaction(result.txhex));
+        if (!txid) {
+          throw new Error("Wonder Wallet did not return a txid");
+        }
         return { signed: true, txid };
       } catch (_broadcastError) {
         return {
@@ -184,7 +276,7 @@ async function mockSignPSBT(
     }
 
     if (result.psbt) {
-      return { signed: true, psbt: result.psbt };
+      return { signed: true, psbt: toPsbtHex(result.psbt) };
     }
     if (result.txhex) {
       return { signed: true, psbt: result.txhex };
@@ -194,6 +286,35 @@ async function mockSignPSBT(
     const message = error instanceof Error ? error.message : String(error);
     return { signed: false, error: message };
   }
+}
+
+/** Mirror of broadcastRawTX() from wonder.ts. */
+async function mockBroadcastRawTX(
+  rawTx: string,
+  provider: MockWonderProvider | undefined,
+): Promise<string> {
+  if (!provider) {
+    throw new Error("Wonder Wallet not connected");
+  }
+  const txid = toTxid(await provider.broadcastTransaction(rawTx));
+  if (!txid) {
+    throw new Error("Wonder Wallet did not return a txid");
+  }
+  return txid;
+}
+
+/** Mirror of broadcastPSBT() from wonder.ts. */
+async function mockBroadcastPSBT(
+  psbtHex: string,
+  provider: MockWonderProvider | undefined,
+): Promise<string> {
+  if (psbtHex.toLowerCase().startsWith("70736274ff")) {
+    throw new Error(
+      "Wonder Wallet cannot broadcast an unfinalized PSBT. " +
+        "Re-sign the transaction to broadcast it.",
+    );
+  }
+  return await mockBroadcastRawTX(psbtHex, provider);
 }
 
 /**
@@ -217,17 +338,19 @@ async function mockSignMessage(
 const PSBT_HEX = "70736274ff01000a0200000000000000000000";
 const ADDRESS = "bc1qwonderpayment123abc";
 const PUBKEY = "02wonderpubkey1234567890abcdef";
+const PROOF = { message: "stampchain.io wants you to connect", signature: "s" };
 
 function buildProvider(
   overrides: Partial<MockWonderProvider> = {},
 ): MockWonderProvider {
   return {
-    requestAccounts: () => Promise.resolve([ADDRESS]),
+    requestAccounts: () =>
+      Promise.resolve({ accounts: [ADDRESS], proof: PROOF }),
     getPublicKey: () => Promise.resolve(PUBKEY),
     getBalances: () =>
       Promise.resolve({ confirmed: 100000, unconfirmed: 0, total: 100000 }),
     signPsbt: () => Promise.resolve({ txhex: "aabbcc", txid: "txid123" }),
-    broadcastTransaction: () => Promise.resolve("broadcasttxid"),
+    broadcastTransaction: () => Promise.resolve({ txid: "broadcasttxid" }),
     signMessage: () => Promise.resolve("signature123"),
     on: () => {},
     ...overrides,
@@ -257,7 +380,101 @@ Deno.test(
 );
 
 // ============================================================================
-// Section 2: handleAccountsChanged() tests
+// Section 2: toAccounts() normalization tests
+// ============================================================================
+
+Deno.test(
+  "toAccounts: unwraps the { accounts, proof } first-connect response",
+  () => {
+    assertEquals(
+      toAccounts({ accounts: [ADDRESS, "bc1qsecond456"], proof: PROOF }),
+      [ADDRESS, "bc1qsecond456"],
+    );
+  },
+);
+
+Deno.test(
+  "toAccounts: passes through the bare array repeat-connect response",
+  () => {
+    assertEquals(toAccounts([ADDRESS]), [ADDRESS]);
+  },
+);
+
+Deno.test("toAccounts: returns empty for null, undefined and {}", () => {
+  assertEquals(toAccounts(null), []);
+  assertEquals(toAccounts(undefined), []);
+  assertEquals(toAccounts({}), []);
+});
+
+Deno.test("toAccounts: returns empty for an empty accounts array", () => {
+  assertEquals(toAccounts({ accounts: [] }), []);
+});
+
+Deno.test("toAccounts: drops non-string entries", () => {
+  assertEquals(toAccounts([ADDRESS, null, 42, undefined]), [ADDRESS]);
+});
+
+// ============================================================================
+// Section 3: connectWonder() tests
+// ============================================================================
+
+Deno.test(
+  "connectWonder: reports not-installed when the provider is missing",
+  async () => {
+    const outcome = await mockConnectWonder(undefined);
+    assertEquals(outcome.status, "not-installed");
+  },
+);
+
+Deno.test(
+  "connectWonder: connects from the { accounts, proof } response",
+  async () => {
+    const outcome = await mockConnectWonder(buildProvider());
+    assertEquals(outcome.status, "connected");
+    if (outcome.status !== "connected") return;
+    assertEquals(outcome.accounts, [ADDRESS]);
+  },
+);
+
+Deno.test(
+  "connectWonder: connects from the bare array response",
+  async () => {
+    const provider = buildProvider({
+      requestAccounts: () => Promise.resolve([ADDRESS]),
+    });
+    const outcome = await mockConnectWonder(provider);
+    assertEquals(outcome.status, "connected");
+    if (outcome.status !== "connected") return;
+    assertEquals(outcome.accounts, [ADDRESS]);
+  },
+);
+
+Deno.test(
+  "connectWonder: reports no-accounts instead of connecting with no address",
+  async () => {
+    const provider = buildProvider({
+      requestAccounts: () => Promise.resolve({ accounts: [], proof: PROOF }),
+    });
+    const outcome = await mockConnectWonder(provider);
+    assertEquals(outcome.status, "no-accounts");
+  },
+);
+
+Deno.test(
+  "connectWonder: surfaces a rejected approval as an error",
+  async () => {
+    const provider = buildProvider({
+      requestAccounts: () => Promise.reject(new Error("user_rejected")),
+    });
+    const outcome = await mockConnectWonder(provider);
+    assertEquals(outcome.status, "error");
+    if (outcome.status !== "error") return;
+    assertEquals(outcome.message, "user_rejected");
+  },
+);
+
+// ============================================================================
+// Section 4: handleAccountsChanged() tests
 // ============================================================================
 
 Deno.test(
@@ -299,6 +516,53 @@ Deno.test(
     assertEquals(outcome.wallet.publicKey, PUBKEY);
     assertEquals(outcome.wallet.provider, "wonder");
     assertEquals(outcome.wallet.network, "mainnet");
+    assertEquals(outcome.wallet.stampBalance, []);
+  },
+);
+
+Deno.test(
+  "handleAccountsChanged: builds wallet from the connect response object",
+  async () => {
+    const outcome = await mockHandleAccountsChanged(
+      { accounts: [ADDRESS], proof: PROOF },
+      buildProvider(),
+    );
+    assertEquals(outcome.action, "update");
+    if (outcome.action !== "update") return;
+    assertEquals(outcome.wallet.address, ADDRESS);
+    assertEquals(outcome.wallet.accounts, [ADDRESS]);
+  },
+);
+
+Deno.test(
+  "handleAccountsChanged: falls back to an empty publicKey when unavailable",
+  async () => {
+    const provider = buildProvider({
+      getPublicKey: () => Promise.resolve(null),
+    });
+    const outcome = await mockHandleAccountsChanged([ADDRESS], provider);
+    if (outcome.action !== "update") throw new Error("expected update");
+    assertEquals(outcome.wallet.publicKey, "");
+  },
+);
+
+Deno.test(
+  "handleAccountsChanged: derives addressType from the address prefix",
+  async () => {
+    const cases: [string, MockWallet["addressType"]][] = [
+      ["bc1qwonderpayment123abc", "p2wpkh"],
+      ["bc1ptaprootaddress123abc", "p2tr"],
+      ["3NestedSegwitAddress123", "p2sh"],
+      ["1LegacyAddress123abcdef", "p2pkh"],
+    ];
+    for (const [address, expected] of cases) {
+      const outcome = await mockHandleAccountsChanged(
+        [address],
+        buildProvider(),
+      );
+      if (outcome.action !== "update") throw new Error("expected update");
+      assertEquals(outcome.wallet.addressType, expected);
+    }
   },
 );
 
@@ -357,7 +621,7 @@ Deno.test(
 );
 
 // ============================================================================
-// Section 3: signPSBT() tests
+// Section 5: signPSBT() tests
 // ============================================================================
 
 Deno.test(
@@ -377,7 +641,28 @@ Deno.test(
 );
 
 Deno.test(
-  "signPSBT: auto-broadcasts finalized txhex and returns txid",
+  "signPSBT: unwraps the { txid } broadcast response into a txid string",
+  async () => {
+    const provider = buildProvider({
+      signPsbt: () => Promise.resolve({ txhex: "deadbeef", txid: "signed" }),
+      broadcastTransaction: () => Promise.resolve({ txid: "finaltxid" }),
+    });
+    const result = await mockSignPSBT(
+      PSBT_HEX,
+      [{ index: 0 }],
+      true,
+      undefined,
+      true,
+      provider,
+    );
+    assertEquals(result.signed, true);
+    assertEquals(result.txid, "finaltxid");
+    assertEquals(typeof result.txid, "string");
+  },
+);
+
+Deno.test(
+  "signPSBT: accepts a bare txid string broadcast response",
   async () => {
     const provider = buildProvider({
       signPsbt: () => Promise.resolve({ txhex: "deadbeef" }),
@@ -393,6 +678,28 @@ Deno.test(
     );
     assertEquals(result.signed, true);
     assertEquals(result.txid, "finaltxid");
+  },
+);
+
+Deno.test(
+  "signPSBT: falls back to signed txhex when broadcast returns no txid",
+  async () => {
+    const provider = buildProvider({
+      signPsbt: () => Promise.resolve({ txhex: "deadbeef" }),
+      broadcastTransaction: () => Promise.resolve({}),
+    });
+    const result = await mockSignPSBT(
+      PSBT_HEX,
+      [{ index: 0 }],
+      true,
+      undefined,
+      true,
+      provider,
+    );
+    assertEquals(result.signed, true);
+    assertEquals(result.txid, undefined);
+    assertEquals(result.psbt, "deadbeef");
+    assertEquals(result.error, "Transaction signed but broadcast failed");
   },
 );
 
@@ -418,10 +725,11 @@ Deno.test(
 );
 
 Deno.test(
-  "signPSBT: returns signed psbt when not auto-broadcasting",
+  "signPSBT: converts a base64 signed PSBT to hex",
   async () => {
+    const signedHex = "70736274ffdeadbeef";
     const provider = buildProvider({
-      signPsbt: () => Promise.resolve({ psbt: "signedpsbthex" }),
+      signPsbt: () => Promise.resolve({ psbt: hexToBase64(signedHex) }),
     });
     const result = await mockSignPSBT(
       PSBT_HEX,
@@ -432,7 +740,26 @@ Deno.test(
       provider,
     );
     assertEquals(result.signed, true);
-    assertEquals(result.psbt, "signedpsbthex");
+    assertEquals(result.psbt, signedHex);
+  },
+);
+
+Deno.test(
+  "signPSBT: leaves an already-hex signed PSBT untouched",
+  async () => {
+    const provider = buildProvider({
+      signPsbt: () => Promise.resolve({ psbt: "70736274ffaabbcc" }),
+    });
+    const result = await mockSignPSBT(
+      PSBT_HEX,
+      [{ index: 0 }],
+      true,
+      undefined,
+      false,
+      provider,
+    );
+    assertEquals(result.signed, true);
+    assertEquals(result.psbt, "70736274ffaabbcc");
     assertEquals(result.txid, undefined);
   },
 );
@@ -580,7 +907,73 @@ Deno.test(
 );
 
 // ============================================================================
-// Section 4: signMessage() tests
+// Section 6: broadcastRawTX() / broadcastPSBT() tests
+// ============================================================================
+
+Deno.test(
+  "broadcastRawTX: unwraps the { txid } response",
+  async () => {
+    const txid = await mockBroadcastRawTX("aabbcc", buildProvider());
+    assertEquals(txid, "broadcasttxid");
+  },
+);
+
+Deno.test(
+  "broadcastRawTX: accepts a bare txid string response",
+  async () => {
+    const provider = buildProvider({
+      broadcastTransaction: () => Promise.resolve("plaintxid"),
+    });
+    assertEquals(await mockBroadcastRawTX("aabbcc", provider), "plaintxid");
+  },
+);
+
+Deno.test(
+  "broadcastRawTX: throws when the provider is missing",
+  async () => {
+    await assertRejects(
+      () => mockBroadcastRawTX("aabbcc", undefined),
+      Error,
+      "Wonder Wallet not connected",
+    );
+  },
+);
+
+Deno.test(
+  "broadcastRawTX: throws when the response carries no txid",
+  async () => {
+    const provider = buildProvider({
+      broadcastTransaction: () => Promise.resolve({}),
+    });
+    await assertRejects(
+      () => mockBroadcastRawTX("aabbcc", provider),
+      Error,
+      "did not return a txid",
+    );
+  },
+);
+
+Deno.test(
+  "broadcastPSBT: forwards a finalized raw transaction",
+  async () => {
+    const txid = await mockBroadcastPSBT("aabbcc", buildProvider());
+    assertEquals(txid, "broadcasttxid");
+  },
+);
+
+Deno.test(
+  "broadcastPSBT: rejects an unfinalized PSBT",
+  async () => {
+    await assertRejects(
+      () => mockBroadcastPSBT(PSBT_HEX, buildProvider()),
+      Error,
+      "cannot broadcast an unfinalized PSBT",
+    );
+  },
+);
+
+// ============================================================================
+// Section 7: signMessage() tests
 // ============================================================================
 
 Deno.test(
@@ -621,19 +1014,25 @@ Deno.test(
 );
 
 // ============================================================================
-// Section 5: wonderProvider structure tests
+// Section 8: wonderProvider structure tests
 // ============================================================================
 
 Deno.test(
-  "wonderProvider: exposes connectWonder, signPSBT and signMessage",
+  "wonderProvider: exposes the full WalletProvider surface",
   () => {
     const wonderProvider = {
+      checkWonder: () => {},
       connectWonder: () => {},
       signPSBT: () => {},
       signMessage: () => {},
+      broadcastRawTX: () => {},
+      broadcastPSBT: () => {},
     };
+    assertEquals(typeof wonderProvider.checkWonder, "function");
     assertEquals(typeof wonderProvider.connectWonder, "function");
     assertEquals(typeof wonderProvider.signPSBT, "function");
     assertEquals(typeof wonderProvider.signMessage, "function");
+    assertEquals(typeof wonderProvider.broadcastRawTX, "function");
+    assertEquals(typeof wonderProvider.broadcastPSBT, "function");
   },
 );

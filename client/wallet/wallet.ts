@@ -23,8 +23,9 @@ declare global {
   }
 }
 
-// Move interfaces and variables to the top
-interface WalletProviders {
+// Injected extension providers on window. Named separately from the
+// WalletProviders alias (WalletProviderKey string union) in $types.
+export interface GlobalWalletProviders {
   LeatherProvider?: any;
   okxwallet?: any;
   unisat?: any;
@@ -186,7 +187,7 @@ if (typeof globalThis !== "undefined" && "addEventListener" in globalThis) {
 }
 
 // Provider checking functions
-export function getGlobalWallets(): WalletProviders {
+export function getGlobalWallets(): GlobalWalletProviders {
   // Skip provider checks if we're not in a browser context
   if (typeof globalThis === "undefined" || !("document" in globalThis)) {
     return {};
