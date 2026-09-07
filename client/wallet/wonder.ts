@@ -7,6 +7,7 @@ import {
   handleWalletError,
   parseConnectionError,
 } from "$client/wallet/walletHelper.ts";
+import { extractPrevTxsFromPSBT } from "$lib/utils/bitcoin/psbt/psbtUtils.ts";
 import { base64ToHex } from "$lib/utils/data/binary/baseUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import type { BaseToast } from "$lib/utils/ui/notifications/toastSignal.ts";
@@ -169,6 +170,10 @@ interface WonderSignOptions {
     address: string;
     sighashTypes?: number[] | undefined;
   }[];
+  // Legacy (P2PKH/P2SH) inputs require the full previous transaction. Wonder
+  // reads it from opts.prevTxs (keyed by display txid), not from the PSBT's own
+  // nonWitnessUtxo, so we hand it across.
+  prevTxs?: Record<string, string>;
 }
 
 interface WonderSignResult {
@@ -203,6 +208,14 @@ export const signPSBT = async (
         address: walletContext.wallet.address,
         sighashTypes,
       }));
+    }
+
+    // Legacy inputs can't be signed without their previous transactions. Our
+    // PSBTs already embed those as nonWitnessUtxo, so extract them into the
+    // prevTxs map Wonder expects. SegWit-only PSBTs yield an empty map (no-op).
+    const prevTxs = extractPrevTxsFromPSBT(psbtHex);
+    if (Object.keys(prevTxs).length > 0) {
+      options.prevTxs = prevTxs;
     }
 
     const rawResult = await wonder.signPsbt(psbtHex, options);
